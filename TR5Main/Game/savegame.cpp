@@ -25,47 +25,47 @@ ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
 
-ChunkId* SaveGame::m_chunkGameStatus;
-ChunkId* SaveGame::m_chunkItems;
-ChunkId* SaveGame::m_chunkItem;
-ChunkId* SaveGame::m_chunkLara;
-ChunkId* SaveGame::m_chunkLuaVariable;
-ChunkId* SaveGame::m_chunkStaticFlags;
-ChunkId* SaveGame::m_chunkVehicle;
-ChunkId* SaveGame::m_chunkSequenceSwitch;
-ChunkId* SaveGame::m_chunkFlybyFlags;
-ChunkId* SaveGame::m_chunkCdFlags;
-ChunkId* SaveGame::m_chunkCamera;
-ChunkId* SaveGame::m_chunkFlipStats;
-ChunkId* SaveGame::m_chunkFlipMap;
-ChunkId* SaveGame::m_chunkItemDummy;
-ChunkId* SaveGame::m_chunkStatistics;
-ChunkId* SaveGame::m_chunkItemAnims;
-ChunkId* SaveGame::m_chunkItemMeshes;
-ChunkId* SaveGame::m_chunkItemFlags;
-ChunkId* SaveGame::m_chunkItemHitPoints;
-ChunkId* SaveGame::m_chunkItemPosition;
-ChunkId* SaveGame::m_chunkItemIntelligentData;
-ChunkId* SaveGame::m_chunkSpecialItemBurningTorch;
-ChunkId* SaveGame::m_chunkSpecialItemChaff;
-ChunkId* SaveGame::m_chunkSpecialItemTorpedo;
-ChunkId* SaveGame::m_chunkSpecialItemCrossbowBolt;
-ChunkId* SaveGame::m_chunkSpecialItemFlare;
-ChunkId* SaveGame::m_chunkItemQuadInfo;
-ChunkId* SaveGame::m_chunkBats;
-ChunkId* SaveGame::m_chunkRats;
-ChunkId* SaveGame::m_chunkSpiders;
-ChunkId* SaveGame::m_chunkLaraExtraInfo;
-ChunkId* SaveGame::m_chunkWeaponInfo;
-ChunkId* SaveGame::m_chunkPuzzle;
-ChunkId* SaveGame::m_chunkKey;
-ChunkId* SaveGame::m_chunkPickup;
-ChunkId* SaveGame::m_chunkExamine;
-ChunkId* SaveGame::m_chunkPuzzleCombo;
-ChunkId* SaveGame::m_chunkKeyCombo;
-ChunkId* SaveGame::m_chunkPickupCombo;
-ChunkId* SaveGame::m_chunkExamineCombo;
-ChunkId* SaveGame::m_chunkWeaponItem;
+std::unique_ptr<ChunkId> SaveGame::m_chunkGameStatus;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItems;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItem;
+std::unique_ptr<ChunkId> SaveGame::m_chunkLara;
+std::unique_ptr<ChunkId> SaveGame::m_chunkLuaVariable;
+std::unique_ptr<ChunkId> SaveGame::m_chunkStaticFlags;
+std::unique_ptr<ChunkId> SaveGame::m_chunkVehicle;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSequenceSwitch;
+std::unique_ptr<ChunkId> SaveGame::m_chunkFlybyFlags;
+std::unique_ptr<ChunkId> SaveGame::m_chunkCdFlags;
+std::unique_ptr<ChunkId> SaveGame::m_chunkCamera;
+std::unique_ptr<ChunkId> SaveGame::m_chunkFlipStats;
+std::unique_ptr<ChunkId> SaveGame::m_chunkFlipMap;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemDummy;
+std::unique_ptr<ChunkId> SaveGame::m_chunkStatistics;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemAnims;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemMeshes;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemFlags;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemHitPoints;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemPosition;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemIntelligentData;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemBurningTorch;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemChaff;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemTorpedo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemCrossbowBolt;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemFlare;
+std::unique_ptr<ChunkId> SaveGame::m_chunkItemQuadInfo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkBats;
+std::unique_ptr<ChunkId> SaveGame::m_chunkRats;
+std::unique_ptr<ChunkId> SaveGame::m_chunkSpiders;
+std::unique_ptr<ChunkId> SaveGame::m_chunkLaraExtraInfo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponInfo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkPuzzle;
+std::unique_ptr<ChunkId> SaveGame::m_chunkKey;
+std::unique_ptr<ChunkId> SaveGame::m_chunkPickup;
+std::unique_ptr<ChunkId> SaveGame::m_chunkExamine;
+std::unique_ptr<ChunkId> SaveGame::m_chunkPuzzleCombo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkKeyCombo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkPickupCombo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkExamineCombo;
+std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
 
 SAVEGAME_INFO Savegame;
 extern vector<AudioTrack> g_AudioTracks;
@@ -78,7 +78,7 @@ void SaveGame::saveItems()
 {
 	// Save level items
 	for (int i = 0; i < g_Level.NumItems; i++)
-		m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 0);
+		m_writer->WriteChunkWithChildren(m_chunkItem.get(), &saveItem, i, 0);
 
 	// Save items created at runtime (flares, missiles...)
 	for (int i = g_Level.NumItems; i < NUM_ITEMS; i++)
@@ -88,17 +88,17 @@ void SaveGame::saveItems()
 		{
 			// Some items are very special and are saved in specific functions, all the others use the general function
 			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-				m_writer->WriteChunk(m_chunkSpecialItemBurningTorch, &saveBurningTorch, i, 1);
+				m_writer->WriteChunk(m_chunkSpecialItemBurningTorch.get(), &saveBurningTorch, i, 1);
 			else if (item->objectNumber == ID_CHAFF)
-				m_writer->WriteChunk(m_chunkSpecialItemChaff, &saveChaff, i, 1);
+				m_writer->WriteChunk(m_chunkSpecialItemChaff.get(), &saveChaff, i, 1);
 			else if (item->objectNumber == ID_TORPEDO)
-				m_writer->WriteChunk(m_chunkSpecialItemTorpedo, &saveTorpedo, i, 1);
+				m_writer->WriteChunk(m_chunkSpecialItemTorpedo.get(), &saveTorpedo, i, 1);
 			else if (item->objectNumber == ID_CROSSBOW_BOLT)
-				m_writer->WriteChunk(m_chunkSpecialItemCrossbowBolt, &saveCrossbowBolt, i, 1);
+				m_writer->WriteChunk(m_chunkSpecialItemCrossbowBolt.get(), &saveCrossbowBolt, i, 1);
 			else if (item->objectNumber == ID_FLARE_ITEM)
-				m_writer->WriteChunk(m_chunkSpecialItemFlare, &saveFlare, i, 1);
+				m_writer->WriteChunk(m_chunkSpecialItemFlare.get(), &saveFlare, i, 1);
 			else
-				m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 1);
+				m_writer->WriteChunkWithChildren(m_chunkItem.get(), &saveItem, i, 1);
 		}
 	}
 
@@ -106,17 +106,17 @@ void SaveGame::saveItems()
 	if (Objects[ID_BATS_EMITTER].loaded)
 		for (int i = 0; i < NUM_BATS; i++)
 			if (Bats[i].on)
-				m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
+				m_writer->WriteChunk(m_chunkBats.get(), &saveBats, i, 0);
 
 	if (Objects[ID_RATS_EMITTER].loaded)
 		for (int i = 0; i < NUM_RATS; i++)
 			if (Rats[i].on)
-				m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
+				m_writer->WriteChunk(m_chunkRats.get(), &saveRats, i, 0);
 
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
 		for (int i = 0; i < NUM_SPIDERS; i++)
 			if (Spiders[i].on)
-				m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);
+				m_writer->WriteChunk(m_chunkSpiders.get(), &saveSpiders, i, 0);
 }
 
 void SaveGame::saveItem(int itemNumber, int runtimeItem)
@@ -150,29 +150,29 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 
 	if (hasData)
 	{
-		m_writer->WriteChunkInt(m_chunkItemDummy, 1);
+		m_writer->WriteChunkInt(m_chunkItemDummy.get(), 1);
 
 		if (obj->saveAnim)
-			m_writer->WriteChunk(m_chunkItemAnims, &saveItemAnims, itemNumber, 0);
+			m_writer->WriteChunk(m_chunkItemAnims.get(), &saveItemAnims, itemNumber, 0);
 
 		if (obj->savePosition)
-			m_writer->WriteChunk(m_chunkItemPosition, &saveItemPosition, itemNumber, 0);
+			m_writer->WriteChunk(m_chunkItemPosition.get(), &saveItemPosition, itemNumber, 0);
 
 		if (obj->saveHitpoints)
-			m_writer->WriteChunk(m_chunkItemHitPoints, &saveItemHitPoints, itemNumber, 0);
+			m_writer->WriteChunk(m_chunkItemHitPoints.get(), &saveItemHitPoints, itemNumber, 0);
 
 		if (obj->saveFlags)
-			m_writer->WriteChunkWithChildren(m_chunkItemFlags, &saveItemFlags, itemNumber, 0);
+			m_writer->WriteChunkWithChildren(m_chunkItemFlags.get(), &saveItemFlags, itemNumber, 0);
 
 		if (obj->saveMesh)
-			m_writer->WriteChunk(m_chunkItemMeshes, &saveItemMesh, itemNumber, 0);
+			m_writer->WriteChunk(m_chunkItemMeshes.get(), &saveItemMesh, itemNumber, 0);
 
 		if (obj->intelligent && item->data != NULL)
-			m_writer->WriteChunk(m_chunkItemIntelligentData, &saveItemIntelligentData, itemNumber, 0);
+			m_writer->WriteChunk(m_chunkItemIntelligentData.get(), &saveItemIntelligentData, itemNumber, 0);
 	}
 	else
 	{
-		m_writer->WriteChunkInt(m_chunkItemDummy, 1);
+		m_writer->WriteChunkInt(m_chunkItemDummy.get(), 1);
 	}
 }
 
@@ -188,25 +188,25 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 	// Now the sub-chunks
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
-			m_writer->WriteChunk(m_chunkStaticFlags, &saveStaticFlag, i, j);
+			m_writer->WriteChunk(m_chunkStaticFlags.get(), &saveStaticFlag, i, j);
 
 	for (int i = 0; i < 6; i++)
-		m_writer->WriteChunk(m_chunkSequenceSwitch, &saveSequenceSwitch, i, SequenceUsed[i]);
+		m_writer->WriteChunk(m_chunkSequenceSwitch.get(), &saveSequenceSwitch, i, SequenceUsed[i]);
 
 	for (int i = 0; i < NumberSpotcams; i++)
-		m_writer->WriteChunk(m_chunkFlybyFlags, &saveFlybyFlags, i, SpotCam[i].flags);
+		m_writer->WriteChunk(m_chunkFlybyFlags.get(), &saveFlybyFlags, i, SpotCam[i].flags);
 
 	for (int i = 0; i < g_AudioTracks.size(); i++)
-		m_writer->WriteChunk(m_chunkCdFlags, &saveCdFlags, i, g_AudioTracks[i].Mask);
+		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, g_AudioTracks[i].Mask);
 
 	for (int i = 0; i < NumberCameras; i++)
-		m_writer->WriteChunk(m_chunkCamera, &saveCamera, i, FixedCameras[i].flags);
+		m_writer->WriteChunk(m_chunkCamera.get(), &saveCamera, i, FixedCameras[i].flags);
 
 	for (int i = 0; i < 255; i++)
-		m_writer->WriteChunk(m_chunkFlipStats, &saveFlipStats, i, FlipStats[i]);
+		m_writer->WriteChunk(m_chunkFlipStats.get(), &saveFlipStats, i, FlipStats[i]);
 
 	for (int i = 0; i < 255; i++)
-		m_writer->WriteChunk(m_chunkFlipMap, &saveFlipMap, i, FlipMap[i]);
+		m_writer->WriteChunk(m_chunkFlipMap.get(), &saveFlipMap, i, FlipMap[i]);
 }
 
 void SaveGame::saveLara(int arg1, int arg2)
@@ -223,64 +223,64 @@ void SaveGame::saveLara(int arg1, int arg2)
 	
 	// Lara weapon data
 	if (Lara.weaponItem != NO_ITEM)
-		m_writer->WriteChunk(m_chunkWeaponItem, &saveWeaponItem, Lara.weaponItem, 0);
+		m_writer->WriteChunk(m_chunkWeaponItem.get(), &saveWeaponItem, Lara.weaponItem, 0);
 	
 	// Save Lara extra info
-	m_writer->WriteChunk(m_chunkLaraExtraInfo, &saveLaraExtraInfo, 0, 0);
+	m_writer->WriteChunk(m_chunkLaraExtraInfo.get(), &saveLaraExtraInfo, 0, 0);
 	
 	// Save carried weapons
 	for (int i = 0; i < NUM_WEAPONS; i++)
 	{
-		m_writer->WriteChunk(m_chunkWeaponInfo, &saveWeaponInfo, i, 0);
+		m_writer->WriteChunk(m_chunkWeaponInfo.get(), &saveWeaponInfo, i, 0);
 	}
 
 	// Save carried puzzles, keys, pickups and examines
 	for (int i = 0; i < NUM_PUZZLES; i++)
 	{
 		if (Lara.Puzzles[i] > 0)
-			m_writer->WriteChunk(m_chunkPuzzle, &savePuzzle, i, Lara.Puzzles[i]);
+			m_writer->WriteChunk(m_chunkPuzzle.get(), &savePuzzle, i, Lara.Puzzles[i]);
 	}
 
 	for (int i = 0; i < NUM_PUZZLES * 2; i++)
 	{
 		if (Lara.PuzzlesCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkPuzzleCombo, &savePuzzle, i, Lara.PuzzlesCombo[i]);
+			m_writer->WriteChunk(m_chunkPuzzleCombo.get(), &savePuzzle, i, Lara.PuzzlesCombo[i]);
 	}
 
 	for (int i = 0; i < NUM_KEYS; i++)
 	{
 		if (Lara.Keys[i] > 0)
-			m_writer->WriteChunk(m_chunkKey, &savePuzzle, i, Lara.Keys[i]);
+			m_writer->WriteChunk(m_chunkKey.get(), &savePuzzle, i, Lara.Keys[i]);
 	}
 
 	for (int i = 0; i < NUM_KEYS * 2; i++)
 	{
 		if (Lara.KeysCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkKeyCombo, &savePuzzle, i, Lara.KeysCombo[i]);
+			m_writer->WriteChunk(m_chunkKeyCombo.get(), &savePuzzle, i, Lara.KeysCombo[i]);
 	}
 
 	for (int i = 0; i < NUM_PICKUPS; i++)
 	{
 		if (Lara.Pickups[i] > 0)
-			m_writer->WriteChunk(m_chunkPickup, &savePuzzle, i, Lara.Pickups[i]);
+			m_writer->WriteChunk(m_chunkPickup.get(), &savePuzzle, i, Lara.Pickups[i]);
 	}
 
 	for (int i = 0; i < NUM_PICKUPS * 2; i++)
 	{
 		if (Lara.PickupsCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkPickupCombo, &savePuzzle, i, Lara.PickupsCombo[i]);
+			m_writer->WriteChunk(m_chunkPickupCombo.get(), &savePuzzle, i, Lara.PickupsCombo[i]);
 	}
 
 	for (int i = 0; i < NUM_EXAMINES; i++)
 	{
 		if (Lara.Examines[i] > 0)
-			m_writer->WriteChunk(m_chunkExamine, &savePuzzle, i, Lara.Examines[i]);
+			m_writer->WriteChunk(m_chunkExamine.get(), &savePuzzle, i, Lara.Examines[i]);
 	}
 
 	for (int i = 0; i < NUM_EXAMINES * 2; i++)
 	{
 		if (Lara.ExaminesCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkExamineCombo, &savePuzzle, i, Lara.ExaminesCombo[i]);
+			m_writer->WriteChunk(m_chunkExamineCombo.get(), &savePuzzle, i, Lara.ExaminesCombo[i]);
 	}
 }
 
@@ -338,7 +338,7 @@ void SaveGame::saveVariables()
 	m_luaVariables.clear();
 	//g_GameScript->GetVariables(&m_luaVariables);
 	for (int i = 0; i < m_luaVariables.size(); i++)
-		m_writer->WriteChunk(m_chunkLuaVariable, &saveVariable, i, 0);
+		m_writer->WriteChunk(m_chunkLuaVariable.get(), &saveVariable, i, 0);
 }
 
 void SaveGame::saveVariable(int arg1, int arg2)
@@ -408,47 +408,6 @@ void SaveGame::Start()
 
 void SaveGame::End()
 {
-	delete m_chunkGameStatus;
-	delete m_chunkItems;
-	delete m_chunkItem;
-	delete m_chunkLara;
-	delete m_chunkLuaVariable;
-	delete m_chunkStaticFlags;
-	delete m_chunkVehicle;
-	delete m_chunkFlipMap;
-	delete m_chunkFlipStats;
-	delete m_chunkFlybyFlags;
-	delete m_chunkSequenceSwitch;
-	delete m_chunkCdFlags;
-	delete m_chunkCamera;
-	delete m_chunkItemDummy;
-	delete m_chunkStatistics;
-	delete m_chunkItemAnims;
-	delete m_chunkItemMeshes;
-	delete m_chunkItemFlags;
-	delete m_chunkItemHitPoints;
-	delete m_chunkItemPosition;
-	delete m_chunkItemIntelligentData;
-	delete m_chunkSpecialItemBurningTorch;
-	delete m_chunkSpecialItemChaff;
-	delete m_chunkSpecialItemTorpedo;
-	delete m_chunkSpecialItemCrossbowBolt;
-	delete m_chunkSpecialItemFlare;
-	delete m_chunkItemQuadInfo;
-	delete m_chunkBats;
-	delete m_chunkRats;
-	delete m_chunkSpiders;
-	delete m_chunkLaraExtraInfo;
-	delete m_chunkWeaponInfo;
-	delete m_chunkPuzzle;
-	delete m_chunkKey;
-	delete m_chunkPickup;
-	delete m_chunkExamine;
-	delete m_chunkPuzzleCombo;
-	delete m_chunkKeyCombo;
-	delete m_chunkPickupCombo;
-	delete m_chunkExamineCombo;
-	delete m_chunkWeaponItem;
 }
 
 bool SaveGame::Save(char* fileName)
@@ -469,9 +428,9 @@ bool SaveGame::Save(char* fileName)
 	LEB128::Write(m_stream, ++LastSaveGame);
 
 	// Now we write chunks
-	m_writer->WriteChunk(m_chunkStatistics, &saveStatistics, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkGameStatus, &saveGameStatus, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkLara, &saveLara, 0, 0);
+	m_writer->WriteChunk(m_chunkStatistics.get(), &saveStatistics, 0, 0);
+	m_writer->WriteChunkWithChildren(m_chunkGameStatus.get(), &saveGameStatus, 0, 0);
+	m_writer->WriteChunkWithChildren(m_chunkLara.get(), &saveLara, 0, 0);
 	saveItems();
 	saveVariables();
 	
@@ -632,31 +591,31 @@ bool SaveGame::readVariable()
 
 bool SaveGame::readSavegameChunks(ChunkId* chunkId, int maxSize, int arg)
 {
-	if (chunkId->EqualsTo(m_chunkGameStatus))
+	if (chunkId->EqualsTo(m_chunkGameStatus.get()))
 		return readGameStatus();
-	else if (chunkId->EqualsTo(m_chunkLara))
+	else if (chunkId->EqualsTo(m_chunkLara.get()))
 		return readLara();
-	else if (chunkId->EqualsTo(m_chunkItem))
+	else if (chunkId->EqualsTo(m_chunkItem.get()))
 		return readItem();
-	else if (chunkId->EqualsTo(m_chunkLuaVariable))
+	else if (chunkId->EqualsTo(m_chunkLuaVariable.get()))
 		return readVariable();
-	else if (chunkId->EqualsTo(m_chunkStatistics))
+	else if (chunkId->EqualsTo(m_chunkStatistics.get()))
 		return readStatistics();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemBurningTorch))
+	else if (chunkId->EqualsTo(m_chunkSpecialItemBurningTorch.get()))
 		return readBurningTorch();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemChaff))
+	else if (chunkId->EqualsTo(m_chunkSpecialItemChaff.get()))
 		return readChaff();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemTorpedo))
+	else if (chunkId->EqualsTo(m_chunkSpecialItemTorpedo.get()))
 		return readTorpedo();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemCrossbowBolt))
+	else if (chunkId->EqualsTo(m_chunkSpecialItemCrossbowBolt.get()))
 		return readCrossbowBolt();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemFlare))
+	else if (chunkId->EqualsTo(m_chunkSpecialItemFlare.get()))
 		return readFlare();
-	else if (chunkId->EqualsTo(m_chunkBats))
+	else if (chunkId->EqualsTo(m_chunkBats.get()))
 		return readBats();
-	else if (chunkId->EqualsTo(m_chunkRats))
+	else if (chunkId->EqualsTo(m_chunkRats.get()))
 		return readRats();
-	else if (chunkId->EqualsTo(m_chunkSpiders))
+	else if (chunkId->EqualsTo(m_chunkSpiders.get()))
 		return readSpiders();
 
 	return false;
@@ -736,7 +695,7 @@ void SaveGame::saveStaticFlag(int arg1, int arg2)
 
 bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 {
-	if (chunkId->EqualsTo(m_chunkLaraExtraInfo))
+	if (chunkId->EqualsTo(m_chunkLaraExtraInfo.get()))
 	{
 		Lara.Binoculars = LEB128::ReadByte(m_stream);
 		Lara.Lasersight = LEB128::ReadByte(m_stream);
@@ -754,7 +713,7 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkWeaponInfo))
+	else if (chunkId->EqualsTo(m_chunkWeaponInfo.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		CarriedWeaponInfo* weapon = &Lara.Weapons[id];
@@ -767,55 +726,55 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 		weapon->HasSilencer = LEB128::ReadByte(m_stream);
 		weapon->HasLasersight = LEB128::ReadByte(m_stream);
 	}
-	else if (chunkId->EqualsTo(m_chunkPuzzle))
+	else if (chunkId->EqualsTo(m_chunkPuzzle.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.Puzzles[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkPuzzleCombo))
+	else if (chunkId->EqualsTo(m_chunkPuzzleCombo.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.PuzzlesCombo[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkKey))
+	else if (chunkId->EqualsTo(m_chunkKey.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.Keys[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkKeyCombo))
+	else if (chunkId->EqualsTo(m_chunkKeyCombo.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.KeysCombo[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkPickup))
+	else if (chunkId->EqualsTo(m_chunkPickup.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.Pickups[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkPickupCombo))
+	else if (chunkId->EqualsTo(m_chunkPickupCombo.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.PickupsCombo[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkExamine))
+	else if (chunkId->EqualsTo(m_chunkExamine.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.Examines[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkExamineCombo))
+	else if (chunkId->EqualsTo(m_chunkExamineCombo.get()))
 	{
 		int id = LEB128::ReadInt32(m_stream);
 		int quantity = LEB128::ReadInt32(m_stream);
 		Lara.ExaminesCombo[id] = quantity;
 	}
-	else if (chunkId->EqualsTo(m_chunkWeaponItem))
+	else if (chunkId->EqualsTo(m_chunkWeaponItem.get()))
 	{
 		short weaponItemNum = CreateItem();
 		Lara.weaponItem = weaponItemNum;
@@ -836,7 +795,7 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 
 bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 {
-	if (chunkId->EqualsTo(m_chunkStaticFlags))
+	if (chunkId->EqualsTo(m_chunkStaticFlags.get()))
 	{
 		short roomIndex = LEB128::ReadInt16(m_stream);
 		short staticIndex = LEB128::ReadInt16(m_stream);
@@ -858,14 +817,14 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkFlipStats))
+	else if (chunkId->EqualsTo(m_chunkFlipStats.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
 		//FlipStats[index] = value;
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkFlipMap))
+	else if (chunkId->EqualsTo(m_chunkFlipMap.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
@@ -874,7 +833,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 			DoFlipMap(index);
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkCdFlags))
+	else if (chunkId->EqualsTo(m_chunkCdFlags.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
@@ -883,21 +842,21 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 			g_AudioTracks[index].Mask = value;
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkCamera))
+	else if (chunkId->EqualsTo(m_chunkCamera.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
 		FixedCameras[index].flags = value;
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkSequenceSwitch))
+	else if (chunkId->EqualsTo(m_chunkSequenceSwitch.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
 		SequenceUsed[index] = value;
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkFlybyFlags))
+	else if (chunkId->EqualsTo(m_chunkFlybyFlags.get()))
 	{
 		int index = LEB128::ReadInt16(m_stream);
 		int value = LEB128::ReadInt16(m_stream);
@@ -947,9 +906,9 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (chunkId->EqualsTo(m_chunkItemDummy))
+	if (chunkId->EqualsTo(m_chunkItemDummy.get()))
 		return m_reader->ReadChunkInt32(maxSize);
-	else if (chunkId->EqualsTo(m_chunkItemAnims))
+	else if (chunkId->EqualsTo(m_chunkItemAnims.get()))
 	{
 		item->currentAnimState = LEB128::ReadInt16(m_stream);
 		item->goalAnimState = LEB128::ReadInt16(m_stream);
@@ -959,7 +918,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemPosition))
+	else if (chunkId->EqualsTo(m_chunkItemPosition.get()))
 	{
 		item->pos.xPos = LEB128::ReadInt32(m_stream);
 		item->pos.yPos = LEB128::ReadInt32(m_stream);
@@ -977,13 +936,13 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemHitPoints))
+	else if (chunkId->EqualsTo(m_chunkItemHitPoints.get()))
 	{
 		item->hitPoints = LEB128::ReadInt16(m_stream);
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemFlags))
+	else if (chunkId->EqualsTo(m_chunkItemFlags.get()))
 	{
 		item->flags = LEB128::ReadInt16(m_stream);
 		byte active = LEB128::ReadByte(m_stream);
@@ -1008,7 +967,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemIntelligentData))
+	else if (chunkId->EqualsTo(m_chunkItemIntelligentData.get()))
 	{
 		EnableBaddieAI(itemNumber, 1);
 
@@ -1053,7 +1012,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemQuadInfo))
+	else if (chunkId->EqualsTo(m_chunkItemQuadInfo.get()))
 	{
 		QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
 		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
@@ -1062,7 +1021,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkItemMeshes))
+	else if (chunkId->EqualsTo(m_chunkItemMeshes.get()))
 	{
 		item->meshBits = LEB128::ReadInt32(m_stream);
 		item->swapMeshFlags = LEB128::ReadInt32(m_stream);
