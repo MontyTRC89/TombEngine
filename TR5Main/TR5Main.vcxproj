@@ -140,6 +140,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\Lara\lara_hang.h" />
     <ClInclude Include="Game\Lara\lara_monkey.h" />
     <ClInclude Include="Game\Lara\lara_objects.h" />
+    <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
     <ClInclude Include="Game\memory\linearPool.h" />
@@ -427,6 +428,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_monkey.cpp" />
     <ClCompile Include="Game\Lara\lara_objects.cpp" />
+    <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />

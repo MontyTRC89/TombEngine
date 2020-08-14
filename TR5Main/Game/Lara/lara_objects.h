@@ -55,3 +55,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll);
 /*end poles*/
+/*-*/
+/*deathslide*/
+void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll);
+/*end deathslide*/

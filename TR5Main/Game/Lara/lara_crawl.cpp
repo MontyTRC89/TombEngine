@@ -2,8 +2,11 @@
 #include "lara.h"
 #include "input.h"
 #include "lara_tests.h"
+#include "lara_slide.h"
 #include "lara_collide.h"
 #include "draw.h"
+
+/*this file has all the related functions to ducking and crawling*/
 
 /*crouch/duck start*/
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)

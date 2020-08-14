@@ -5,6 +5,7 @@
 #include "draw.h"
 #include "rope.h"
 #include "lara_tests.h"
+#include "laramisc.h"
 
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
@@ -792,3 +793,32 @@ void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)//1707C(<), 171B0(<) (F)
 		item->pos.yRot -= 256;
 }
 /*end poles*/
+/*-*/
+/*deathslide*/
+void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)//1B038, 1B16C (F)
+{
+	/*state 70*/
+	/*collision: lara_void_func*/
+	short roomNumber = item->roomNumber;
+
+	Camera.targetAngle = ANGLE(70.0f);
+
+	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
+		item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	coll->trigger = TriggerIndex;
+
+	if (!(TrInput & IN_ACTION))
+	{
+		item->goalAnimState = LS_JUMP_FORWARD;
+
+		AnimateLara(item);
+
+		LaraItem->gravityStatus = true;
+		LaraItem->speed = 100;
+		LaraItem->fallspeed = 40;
+
+		Lara.moveAngle = 0;
+	}
+}
+/*end deathslide*/

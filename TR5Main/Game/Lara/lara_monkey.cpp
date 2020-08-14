@@ -5,6 +5,8 @@
 #include "lara_tests.h"
 #include "lara_monkey.h"
 
+/*this file has all the related functions to monkeyswinging*/
+
 /*monkeyswing state handling functions*/
 void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)//1630C(<), 16440(<) (F) 
 {

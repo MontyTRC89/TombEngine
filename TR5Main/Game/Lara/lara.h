@@ -35,12 +35,10 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_back(ITEM_INFO* item, COLL_INFO* coll);
@@ -55,23 +53,18 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll);
-
 void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll);
-
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_fastturn(ITEM_INFO* item, COLL_INFO* coll);
@@ -102,5 +95,4 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll);
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
+
