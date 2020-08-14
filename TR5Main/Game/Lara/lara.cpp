@@ -6,6 +6,7 @@
 #include "lara_crawl.h"
 #include "lara_objects.h"
 #include "lara_hang.h"
+#include "lara_slide.h"
 #include "control.h"
 #include "items.h"
 #include "inventory.h"
@@ -72,15 +73,15 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_stepright,
 	lara_as_stepleft,
 	lara_void_func,
-	lara_as_slide,
-	lara_as_backjump,
-	lara_as_rightjump,
-	lara_as_leftjump,
-	lara_as_upjump,
-	lara_as_fallback,
+	lara_as_slide,//24
+	lara_as_backjump,//25
+	lara_as_rightjump,//26
+	lara_as_leftjump,//27
+	lara_as_upjump,//28
+	lara_as_fallback,//29
 	lara_as_hangleft,//30
 	lara_as_hangright,//31
-	lara_as_slideback,
+	lara_as_slideback,//32
 	lara_as_surftread,
 	lara_as_surfswim,
 	lara_as_dive,
@@ -118,7 +119,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_pickupflare,
 	lara_void_func,
 	lara_void_func,
-	lara_as_deathslide,
+	lara_as_deathslide,//70
 	lara_as_duck,//71
 	lara_as_crouch_roll,//72
 	lara_as_dash,
@@ -946,12 +947,6 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 		item->pos.yPos += coll->midFloor;
 }
 
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F)
-{
-	Lara.moveAngle = ANGLE(180);
-	lara_slide_slope(item, coll);
-}
-
 void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
 {
 	Lara.moveAngle = ANGLE(180);
@@ -995,12 +990,6 @@ void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)//1C130(<), 1C264(<) (F)
 {
 	Lara.moveAngle = ANGLE(180);
 	lara_col_jumper(item, coll);
-}
-
-void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
-{
-	Lara.moveAngle = 0;
-	lara_slide_slope(item, coll);
 }
 
 void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1C0E8(<), 1C21C(<) (F)
@@ -1448,31 +1437,6 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)//1B0FC(<), 1B230(<) (F
 	}
 }
 
-void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)//1B038, 1B16C (F)
-{
-	short roomNumber = item->roomNumber;
-
-	Camera.targetAngle = ANGLE(70.0f);
-
-	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	coll->trigger = TriggerIndex;
-
-	if (!(TrInput & IN_ACTION))
-	{
-		item->goalAnimState = LS_JUMP_FORWARD;
-
-		AnimateLara(item);
-
-		LaraItem->gravityStatus = true;
-		LaraItem->speed = 100;
-		LaraItem->fallspeed = 40;
-
-		Lara.moveAngle = 0;
-	}
-}
-
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
 {
 	if (item->hitPoints <= 0)
@@ -1585,14 +1549,6 @@ void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)//1ADDC(<), 1AF10(<) (F)
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)//1A9E0(<), 1AB14(<) (F)
-{
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_FORWARD))
-	{
-		item->goalAnimState = LS_JUMP_BACK;
-	}
-}
-
 void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)//1959C(<), 196D0(<) (F)
 {
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
@@ -1639,13 +1595,6 @@ void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)//1A854(<), 1A988(<) (F)
 	{
 		item->goalAnimState = LS_FREEFALL;
 	}
-}
-
-void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)//1A824(<), 1A958(<) (F)
-{
-	Camera.targetElevation = -ANGLE(45.0f); // FIXED
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_BACK))
-		item->goalAnimState = LS_JUMP_FORWARD;
 }
 
 void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1A750(<), 1A884(<) (F)
@@ -2737,97 +2686,5 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)//15A28, 15B5C (F)
 	else
 	{
 		item->goalAnimState = LS_SPRINT_ROLL;
-	}
-}
-
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
-{
-	ShiftItem(item, coll);
-
-	switch (coll->collType)
-	{
-	case CT_LEFT:
-		item->pos.yRot += ANGLE(5.0f);
-		break;
-
-	case CT_RIGHT:
-		item->pos.yRot -= ANGLE(5.0f);
-		break;
-
-	case CT_TOP:
-	case CT_TOP_FRONT:
-		if (item->fallspeed <= 0)
-			item->fallspeed = 1;
-		break;
-
-	case CT_CLAMP:
-		item->pos.zPos -= (400 * phd_cos(coll->facing)) >> W2V_SHIFT;
-		item->pos.xPos -= (400 * phd_sin(coll->facing)) >> W2V_SHIFT;
-
-		item->speed = 0;
-
-		coll->midFloor = 0;
-
-		if (item->fallspeed <= 0)
-			item->fallspeed = 16;
-
-		break;
-	}
-}
-
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
-{
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -512;
-	coll->badCeiling = 0;
-
-	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
-
-	if (!LaraHitCeiling(item, coll))
-	{
-		LaraDeflectEdge(item, coll);
-
-		if (coll->midFloor <= 200)
-		{
-			TestLaraSlide(item, coll);
-
-			item->pos.yPos += coll->midFloor;
-
-			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
-			{
-				if (TrInput & IN_FORWARD && item->currentAnimState != LS_SLIDE_BACK)
-				{
-					item->goalAnimState = LS_RUN_FORWARD;
-				}
-				else
-				item->goalAnimState = LS_STOP;
-				StopSoundEffect(SFX_LARA_SLIPPING);
-			}
-		}
-		else
-		{
-			if (item->currentAnimState == LS_SLIDE_FORWARD)
-			{
-				item->animNumber = LA_FALL_START;
-				item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-
-				item->currentAnimState = LS_JUMP_FORWARD;
-				item->goalAnimState = LS_JUMP_FORWARD;
-			}
-			else
-			{
-				item->animNumber = LA_FALL_BACK;
-				item->frameNumber = g_Level.Anims[LA_FALL_BACK].frameBase;
-
-				item->currentAnimState = LS_FALL_BACK;
-				item->goalAnimState = LS_FALL_BACK;
-			}
-
-			StopSoundEffect(SFX_LARA_SLIPPING);
-
-			item->gravityStatus = true;
-			item->fallspeed = 0;
-		}
 	}
 }
