@@ -1285,3 +1285,59 @@ void SearchObjectControl(short itemNumber)
     }
 }
 
+int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
+{
+
+	short selectedObject = g_Inventory.GetSelectedObject();
+
+	if (item->animNumber != LA_STAND_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
+		return false;
+
+	if (selectedObject >= ID_WATERSKIN1_EMPTY && selectedObject <= ID_WATERSKIN2_5)
+	{
+		item->itemFlags[2] = 25;
+
+		if (selectedObject != ID_WATERSKIN1_3 && selectedObject != ID_WATERSKIN2_5)
+		{
+			if (selectedObject >= ID_WATERSKIN2_EMPTY)
+				Lara.Waterskin2.Quantity = 5;
+			else
+				Lara.Waterskin1.Quantity = 3;
+
+			item->animNumber = LA_WATERSKIN_FILL;
+		}
+		else
+		{
+			if (selectedObject >= ID_WATERSKIN2_EMPTY)
+			{
+				item->itemFlags[3] = Lara.Waterskin2.Quantity;
+				Lara.Waterskin2.Quantity = 1;
+			}
+			else
+			{
+				item->itemFlags[3] = Lara.Waterskin1.Quantity;
+				Lara.Waterskin1.Quantity = 1;
+			}
+
+			item->animNumber = LA_WATERSKIN_POUR_LOW;
+		}
+	}
+	else if (selectedObject == ID_CLOCKWORK_BEETLE)
+	{
+		item->animNumber = LA_MECHANICAL_BEETLE_USE;
+		//UseClockworkBeetle(1);
+	}
+	else
+	{
+		return false;
+	}
+
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->goalAnimState = LS_MISC_CONTROL;
+	item->currentAnimState = LS_MISC_CONTROL;
+
+	Lara.gunStatus = LG_HANDS_BUSY;
+	g_Inventory.SetSelectedObject(NO_ITEM);
+
+	return true;
+}
