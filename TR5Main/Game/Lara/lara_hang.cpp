@@ -3,6 +3,8 @@
 #include "input.h"
 #include "lara_tests.h"
 
+/*this file has all the lara_as/lara_col functions related to hanging*/
+
 /*normal hanging and shimmying*/
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)//19A28, 19B5C (F)
 {

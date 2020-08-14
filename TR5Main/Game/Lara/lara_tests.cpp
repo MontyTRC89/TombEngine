@@ -17,10 +17,10 @@ static short RightClimbTab[4] = // offset 0xA0640
 	0x0800, 0x0100, 0x0200, 0x0400
 };
 
-short OldAngle = 1;
 //bool EnableCrawlFlex1click, EnableCrawlFlex2click, EnableCrawlFlex3click, EnableMonkeyVault;
 //bool TR12_OSCILLATE_HANG, EnableFeetHang;
 
+/*this file has all the generic test functions called in lara's state code*/
 
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
@@ -222,56 +222,6 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 //	else
 		return 0;
-}
-
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
-{
-	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
-		return 0;
-
-	short angle = ANGLE(0.0f);
-	if (coll->tiltX > 2)
-		angle = -ANGLE(90.0f);
-	else if (coll->tiltX < -2)
-		angle = ANGLE(90.0f);
-
-	if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
-		angle = ANGLE(180.0f);
-	else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
-		angle = ANGLE(0.0f);
-
-	short delta = angle - item->pos.yRot;
-
-	ShiftItem(item, coll);
-
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
-	{
-		if (item->currentAnimState == LS_SLIDE_BACK && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_BACK_START;
-		item->goalAnimState = LS_SLIDE_BACK;
-		item->currentAnimState = LS_SLIDE_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->pos.yRot = angle + ANGLE(180.0f);
-		Lara.moveAngle = ANGLE(180);
-	}
-	else
-	{
-		if (item->currentAnimState == LS_SLIDE_FORWARD && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_FORWARD;
-		item->goalAnimState = LS_SLIDE_FORWARD;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_SLIDE_FORWARD;
-		item->pos.yRot = angle;
-		Lara.moveAngle = 0;
-	}
-
-	OldAngle = angle;
-
-	return 1;
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)

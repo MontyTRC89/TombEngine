@@ -3,6 +3,8 @@
 #include "input.h"
 #include "laramisc.h"
 
+/*this file has all the generic **collision** test functions called in lara's state code*/
+
 int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
