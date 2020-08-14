@@ -27,11 +27,7 @@ extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
 extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
-void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll);
+
 void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll);
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll);
@@ -59,8 +55,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll);
+
 void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll);
@@ -70,13 +65,7 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll);
+
 void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll);
@@ -107,19 +96,6 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll);
-
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
