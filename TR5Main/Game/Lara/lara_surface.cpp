@@ -230,62 +230,6 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 		item->fallspeed = 60;
 }
 
-void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
-{
-	Camera.targetElevation = -ANGLE(22);
-
-	coll->badPos = 32512;
-	coll->badNeg = -128;
-	coll->badCeiling = 100;
-
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
-
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
-
-	coll->radius = 100;
-	coll->trigger = NULL;
-
-	if (TrInput & IN_LOOK && Lara.look)
-		LookLeftRight();
-	else
-		ResetLook();
-
-	Lara.look = true;
-
-	lara_control_routines[item->currentAnimState](item, coll);
-
-	if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
-		item->pos.zRot = 0;
-	else if (item->pos.zRot < 0)
-		item->pos.zRot += ANGLE(2);
-	else
-		item->pos.zRot -= ANGLE(2);
-
-	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
-		LaraWaterCurrent(coll);
-
-	AnimateLara(item);
-
-	item->pos.xPos += item->fallspeed * phd_sin(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
-	item->pos.zPos += item->fallspeed * phd_cos(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
-
-	LaraBaddieCollision(item, coll);
-
-	lara_collision_routines[item->currentAnimState](item, coll);
-
-	UpdateLaraRoom(item, 100);
-
-	LaraGun();
-
-	TestTriggers(coll->trigger, 0, 0);
-}
-
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) (F)
 {
 	coll->facing = Lara.moveAngle;
