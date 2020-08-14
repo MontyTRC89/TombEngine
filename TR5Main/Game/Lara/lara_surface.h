@@ -13,7 +13,6 @@ void _cdecl lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll);
-void _cdecl LaraSurface(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
 int _cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 int _cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
