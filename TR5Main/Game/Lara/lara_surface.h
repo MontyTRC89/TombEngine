@@ -18,3 +18,4 @@ void _cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
 int _cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 int _cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 int _cdecl LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll); // NEW function for water to ladder move
+void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll);
