@@ -864,10 +864,10 @@
     <ClInclude Include="Game\Lara\lara_crawl.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Lara\lara_pickup.h">
+    <ClInclude Include="Game\Lara\lara_hang.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Lara\lara_hang.h">
+    <ClInclude Include="Game\Lara\lara_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1583,10 +1583,10 @@
     <ClCompile Include="Game\Lara\lara_crawl.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Lara\lara_pickup.cpp">
+    <ClCompile Include="Game\Lara\lara_hang.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Lara\lara_hang.cpp">
+    <ClCompile Include="Game\Lara\lara_objects.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
