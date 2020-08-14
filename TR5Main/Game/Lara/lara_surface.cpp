@@ -557,3 +557,11 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 	
 	return 1;
 }
+
+void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)//1AEE4(<), 1B018(<) (F)
+{
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+	Camera.flags = CF_FOLLOW_CENTER;
+}
+
