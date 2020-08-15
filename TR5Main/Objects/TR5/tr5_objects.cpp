@@ -1177,6 +1177,7 @@ static void StartProjectiles(OBJECT_INFO *obj)
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);
 	InitProjectile(obj, ControlGrenade, ID_GRENADE);
+	InitProjectile(obj, ControlRocket, ID_ROCKET);
 	InitProjectile(obj, ControlHarpoonBolt, ID_HARPOON);
 	InitProjectile(obj, ControlCrossbowBolt, ID_CROSSBOW_BOLT);
 }

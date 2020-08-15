@@ -1565,16 +1565,17 @@ void Inventory::UseCurrentItem()
 	}
 
 	// TODO: can cause problem with harpoongun in underwater and wading !
-	bool canUseWeapons = !(LaraItem->currentAnimState == LS_CRAWL_IDLE || 
-						   LaraItem->currentAnimState == LS_CRAWL_FORWARD ||
-						   LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT || 
-						   LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
-						   LaraItem->currentAnimState == LS_CRAWL_BACK || 
-						   LaraItem->currentAnimState == LS_CRAWL_TO_HANG ||
-						   LaraItem->currentAnimState == LS_CROUCH_IDLE || 
-						   LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
-						   LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT || 
-						   Lara.waterStatus != LW_ABOVE_WATER);
+	bool canUseWeapons = (LaraItem->currentAnimState != LS_CRAWL_IDLE && 
+						   LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
+						   LaraItem->currentAnimState != LS_CRAWL_TURN_LEFT &&
+						   LaraItem->currentAnimState != LS_CRAWL_TURN_RIGHT &&
+						   LaraItem->currentAnimState != LS_CRAWL_BACK &&
+						   LaraItem->currentAnimState != LS_CRAWL_TO_HANG &&
+						   LaraItem->currentAnimState != LS_CROUCH_IDLE &&
+						   LaraItem->currentAnimState != LS_CROUCH_TURN_LEFT &&
+						   LaraItem->currentAnimState != LS_CROUCH_TURN_RIGHT &&
+						   (Lara.waterStatus != LW_UNDERWATER 
+							   || (Lara.waterStatus == LW_UNDERWATER && objectNumber == ID_HARPOON_ITEM)));
 
 	// Pistols
 	if (objectNumber == ID_PISTOLS_ITEM)
@@ -1699,6 +1700,44 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
 				Lara.gunStatus = LG_DRAW_GUNS;
 		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+		}
+		else
+		{
+			SayNo();
+		}
+
+		return;
+	}
+
+	// Harpoon gun
+	if (objectNumber == ID_HARPOON_ITEM)
+	{
+		if (canUseWeapons)
+		{
+			Lara.requestGunType = WEAPON_HARPOON_GUN;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON_GUN)
+				Lara.gunStatus = LG_DRAW_GUNS;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+		}
+		else
+		{
+			SayNo();
+		}
+
+		return;
+	}
+
+	// Rocket launcher
+	if (objectNumber == ID_ROCKET_LAUNCHER_ITEM)
+	{
+		if (canUseWeapons)
+		{
+			Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_ROCKET_LAUNCHER)
+				Lara.gunStatus = LG_DRAW_GUNS;
+
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else

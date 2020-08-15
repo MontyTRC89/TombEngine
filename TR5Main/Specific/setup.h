@@ -9,6 +9,7 @@ enum HitEffectEnum
     HIT_BLOOD,
     HIT_SMOKE,
     HIT_FRAGMENT,
+	HIT_SPECIAL,
     MAX_HIT_EFFECT
 };
 
@@ -59,11 +60,19 @@ struct STATIC_INFO
 	int flags;
 	BOUNDING_BOX visibilityBox;
 	BOUNDING_BOX collisionBox;
+	int shatterType;
+	int shatterDamage;
+	int shatterSound;
 };
 
 #define MAX_STATICS 1000
+constexpr auto SF_NO_COLLISION = 0x01;
+constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6;
 constexpr auto SWAMP_GRAVITY = 2;
+constexpr auto SHT_NONE = 0;
+constexpr auto SHT_EXPLODE = 1;
+constexpr auto SHT_FRAGMENT = 2;
 
 extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];

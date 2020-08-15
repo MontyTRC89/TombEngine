@@ -177,13 +177,13 @@ void LaraCheatGetStuff() // (F) (D)
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
 	{
-		Lara.Weapons[ID_CROSSBOW_ITEM].Present = true;
-		Lara.Weapons[ID_CROSSBOW_ITEM].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[ID_CROSSBOW_ITEM].HasLasersight = false;
-		Lara.Weapons[ID_CROSSBOW_ITEM].HasSilencer = false;
-		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO1] = -1;
-		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO2] = -1;
-		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO3] = -1;
+		Lara.Weapons[WEAPON_CROSSBOW].Present = true;
+		Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
+		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
+		Lara.Weapons[WEAPON_CROSSBOW].HasSilencer = false;
+		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] = -1;
+		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] = -1;
+		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] = -1;
 	}
 
 	g_Inventory.LoadObjects(false);

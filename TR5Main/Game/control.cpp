@@ -2152,9 +2152,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 				else
 				{
 					item = &g_Level.Items[itemNumber];
-					if (item->objectNumber != ID_SHOOT_SWITCH1 && item->objectNumber != ID_SHOOT_SWITCH2)
+					if (item->objectNumber < ID_SHOOT_SWITCH1 && item->objectNumber > ID_SHOOT_SWITCH4)
 					{
-						if (Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit && LaserSight)
+						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit) && LaserSight)
 						{
 							if (!Objects[item->objectNumber].intelligent)
 							{
@@ -2237,10 +2237,17 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 									ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
 								if (item->triggerFlags == 444 && item->objectNumber == ID_SHOOT_SWITCH2)
 								{
+									// TR5 ID_SWITCH_TYPE_8/ID_SHOOT_SWITCH2
 									ProcessExplodingSwitchType8(item);
 								}
-								else
+								else 
 								{
+									if (item->objectNumber == ID_SHOOT_SWITCH3)
+									{
+										// TR4 ID_SWITCH_TYPE7
+										ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
+									}
+
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
 										room = item->roomNumber;
