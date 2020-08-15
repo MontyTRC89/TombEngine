@@ -453,9 +453,9 @@ namespace T5M::Renderer {
 								pos + p3,
 								pos + p4,
 								Vector4(
-								shockwave->r * shockwave->life / 255.0f / 64.0f,
-								shockwave->g * shockwave->life / 255.0f / 64.0f,
-								shockwave->b * shockwave->life / 255.0f / 64.0f,
+								shockwave->r * shockwave->life / 255.0f / 16.0f,
+								shockwave->g * shockwave->life / 255.0f / 16.0f,
+								shockwave->b * shockwave->life / 255.0f / 16.0f,
 								1.0f),
 								0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
