@@ -410,9 +410,9 @@ namespace T5M::Renderer
 		if (meshPtr->positions.size() == 0)
 			return mesh;
 
-		mesh->Positions.reserve(meshPtr->positions.size());
+		mesh->Positions.resize(meshPtr->positions.size());
 		for (int i = 0; i < meshPtr->positions.size(); i++)
-			mesh->Positions.push_back(meshPtr->positions[i]);
+			mesh->Positions[i] = meshPtr->positions[i];
 
 		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
@@ -427,14 +427,17 @@ namespace T5M::Renderer
 
 			bucket = &mesh->Buckets[bucketIndex];
 			
-			bucket->Vertices.reserve(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-			bucket->Indices.reserve(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+			bucket->Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+			bucket->Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+
+			int lastVertex = 0;
+			int lastIndex = 0;
 
 			for (int p = 0; p < levelBucket->polygons.size(); p++)
 			{
 				POLYGON* poly = &levelBucket->polygons[p];
 
-				int baseVertices = bucket->Vertices.size();
+				int baseVertices = lastVertex; // bucket->Vertices.size();
 
 				for (int k = 0; k < poly->indices.size(); k++)
 				{
@@ -463,23 +466,34 @@ namespace T5M::Renderer
 					/*if (isHairs)
 						vertex.Bone = v;*/
 
-					bucket->Vertices.push_back(vertex);
+					bucket->Vertices[lastVertex++] = vertex;
 				}
 
 				if (poly->shape == 0)
 				{
-					bucket->Indices.push_back(baseVertices);
+					bucket->Indices[lastIndex++] = baseVertices;
+					bucket->Indices[lastIndex++] = baseVertices + 1;
+					bucket->Indices[lastIndex++] = baseVertices + 3;
+					bucket->Indices[lastIndex++] = baseVertices + 2;
+					bucket->Indices[lastIndex++] = baseVertices + 3;
+					bucket->Indices[lastIndex++] = baseVertices + 1;
+
+					/*bucket->Indices.push_back(baseVertices);
 					bucket->Indices.push_back(baseVertices + 1);
 					bucket->Indices.push_back(baseVertices + 3);
 					bucket->Indices.push_back(baseVertices + 2);
 					bucket->Indices.push_back(baseVertices + 3);
-					bucket->Indices.push_back(baseVertices + 1);
+					bucket->Indices.push_back(baseVertices + 1);*/
 				}
 				else
 				{
-					bucket->Indices.push_back(baseVertices);
+					bucket->Indices[lastIndex++] = baseVertices;
+					bucket->Indices[lastIndex++] = baseVertices + 1;
+					bucket->Indices[lastIndex++] = baseVertices + 2;
+					
+					/*bucket->Indices.push_back(baseVertices);
 					bucket->Indices.push_back(baseVertices + 1);
-					bucket->Indices.push_back(baseVertices + 2);
+					bucket->Indices.push_back(baseVertices + 2);*/
 				}
 			}
 		}

@@ -187,7 +187,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 				{
 					ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-					if (item == collidingItem || !ignoreLara && item == LaraItem)
+					if (item == collidingItem || ignoreLara && item == LaraItem)
 					{
 						itemNumber = item->nextItem;
 						continue;
