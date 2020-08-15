@@ -15,6 +15,7 @@
 #include "lara_two_guns.h"
 #include "laramisc.h"
 #include "lara_climb.h"
+#include "lara_initialise.h"
 
 #include "motorbike.h"
 #include "cannon.h"
@@ -34,11 +35,12 @@
 #include "savegame.h"
 
 using std::function;
+using T5M::Renderer::g_Renderer;
 
 extern Inventory g_Inventory;
 
 short elevation = 57346;
-
+extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
@@ -1139,4 +1141,188 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		Lara.meshEffects = 0;
 		LaraItem->hitPoints = 1000;
 	}
+}
+
+void AnimateLara(ITEM_INFO* item)
+{
+	item->frameNumber++;
+
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &g_Level.Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			short* cmd = &g_Level.Commands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*(cmd++))
+				{
+				case COMMAND_MOVE_ORIGIN:
+					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					UpdateLaraRoom(item, -LARA_HITE / 2);
+					cmd += 3;
+					break;
+
+				case COMMAND_JUMP_VELOCITY:
+					item->fallspeed = *(cmd++);
+					item->speed = *(cmd++);
+					item->gravityStatus = true;
+					if (Lara.calcFallSpeed)
+					{
+						item->fallspeed = Lara.calcFallSpeed;
+						Lara.calcFallSpeed = 0;
+					}
+					break;
+
+				case COMMAND_ATTACK_READY:
+					if (Lara.gunStatus != LG_SPECIAL)
+						Lara.gunStatus = LG_NO_ARMS;
+					break;
+
+				case COMMAND_SOUND_FX:
+				case COMMAND_EFFECT:
+					cmd += 2;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+
+		anim = &g_Level.Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		short* cmd = &g_Level.Commands[anim->commandIndex];
+		int flags;
+		int effectID = 0;
+
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*(cmd++))
+			{
+			case COMMAND_MOVE_ORIGIN:
+				cmd += 3;
+				break;
+
+			case COMMAND_JUMP_VELOCITY:
+				cmd += 2;
+				break;
+
+			case COMMAND_SOUND_FX:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				flags = cmd[1] & 0xC000;
+				if (flags == SFX_LANDANDWATER ||
+					(flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
+					(flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
+				{
+					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+				}
+
+				cmd += 2;
+				break;
+
+			case COMMAND_EFFECT:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				FXType = cmd[1] & 0xC000;
+				effectID = cmd[1] & 0x3FFF;
+				effect_routines[effectID](item);
+
+				cmd += 2;
+				break;
+
+			default:
+				break;
+
+			}
+		}
+	}
+
+	int lateral = anim->Xvelocity;
+	if (anim->Xacceleration)
+		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
+	lateral >>= 16;
+
+	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
+	{
+		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			item->speed -= item->speed >> 3;
+			if (abs(item->speed) < 8)
+			{
+				item->speed = 0;
+				item->gravityStatus = false;
+			}
+			if (item->fallspeed > 128)
+				item->fallspeed >>= 1;
+			item->fallspeed -= item->fallspeed >> 2;
+			if (item->fallspeed < 4)
+				item->fallspeed = 4;
+			item->pos.yPos += item->fallspeed;
+		}
+		else
+		{
+			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
+			item->speed -= velocity >> 16;
+			item->speed += (velocity + anim->acceleration) >> 16;
+			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
+			item->pos.yPos += item->fallspeed;
+		}
+	}
+	else                                 // if on the Ground...
+	{
+		int velocity;
+
+		if (Lara.waterStatus == LW_WADE && g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			velocity = (anim->velocity >> 1);
+			if (anim->acceleration)
+				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
+		}
+		else
+		{
+			velocity = anim->velocity;
+			if (anim->acceleration)
+				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		}
+
+		item->speed = velocity >> 16;
+	}
+
+	if (Lara.ropePtr != -1)
+		DelAlignLaraToRope(item);
+
+	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
+	{
+		item->pos.xPos += item->speed * phd_sin(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.zPos += item->speed * phd_cos(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
+
+		item->pos.xPos += lateral * phd_sin(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.zPos += lateral * phd_cos(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+	}
+
+	// Update matrices
+	g_Renderer.UpdateLaraAnimations(true);
 }

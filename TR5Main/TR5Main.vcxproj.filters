@@ -876,6 +876,9 @@
     <ClInclude Include="Game\Lara\lara_basic.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Lara\lara_initialise.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1599,6 +1602,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\Lara\lara_basic.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Lara\lara_initialise.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

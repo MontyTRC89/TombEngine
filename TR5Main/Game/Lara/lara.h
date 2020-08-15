@@ -32,4 +32,4 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll);
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll);
-// LaraAboveWater(), LaraUnderWater(), LaraSurface() or LaraCheat()
+void AnimateLara(ITEM_INFO* item);
