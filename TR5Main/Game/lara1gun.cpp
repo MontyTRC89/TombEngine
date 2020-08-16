@@ -736,7 +736,7 @@ void ControlGrenade(short itemNumber)
 			// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 			// Found possible collided items and statics
-			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], false);
 
 			// If no collided items and meshes are found, then exit the loop
 			if (!CollidedItems[0] && !CollidedMeshes[0])
@@ -972,7 +972,7 @@ void ControlRocket(short itemNumber)
 		// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 		// Found possible collided items and statics
-		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], true);
 
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
@@ -1456,7 +1456,7 @@ void ControlCrossbowBolt(short itemNumber)
 		// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 		// Found possible collided items and statics
-		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], true);
 		
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
