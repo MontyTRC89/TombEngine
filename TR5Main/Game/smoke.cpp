@@ -10,7 +10,14 @@ namespace T5M {
 	namespace Effects {
 		namespace Smoke {
 			std::array<SmokeParticle, 128> SmokeParticles;
-
+			SmokeParticle& getFreeSmokeParticle()
+			{
+				for(int i = 0; i < SmokeParticles.size(); i++){
+					if(!SmokeParticles[i].active)
+						return SmokeParticles[i];
+				}
+				return SmokeParticles[0];
+			}
 			void UpdateSmokeParticles()
 			{
 				for (int i = 0; i < SmokeParticles.size(); i++) {
@@ -70,23 +77,15 @@ namespace T5M {
 				s.room = room;
 			}
 
-			SmokeParticle& getFreeSmokeParticle()
-			{
-				for (int i = 0; i < SmokeParticles.size(); i++) {
-					if (!SmokeParticles[i].active)
-						return SmokeParticles[i];
-				}
-				return SmokeParticles[0];
-			}
-
 			void TriggerGunSmokeParticles(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
 			{
 				SmokeParticle& s = getFreeSmokeParticle();
 				s = {};
 				s.active = true;
 				s.position = Vector3(x, y, z);
-				Vector3(xv, yv, zv).Normalize(s.velocity);
-				s.velocity *= frand() * 24 + 16;
+				Vector3 dir = Vector3(xv, yv, zv);
+				dir.Normalize();
+				s.velocity = dir;
 				s.gravity = -.1f;
 				s.affectedByWind = g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND;
 				s.sourceColor = Vector4(.4, .4, .4, 1);
@@ -98,9 +97,10 @@ namespace T5M {
 					s.sourceSize = size *2;
 					s.destinationSize = size * 8;
 					s.terminalVelocity = 0;
-					s.friction = 0.90f;
+					s.friction = 0.88f;
 					s.life = frand() * 30 + 60;
-										
+					s.velocity = getRandomVectorInCone(s.velocity, 10);
+					s.velocity *= frand() * 14 + 16;
 				}
 				else
 				{
@@ -111,13 +111,14 @@ namespace T5M {
 					s.terminalVelocity = 0;
 					s.friction = 0.97f;
 					s.life = frand() * 20 + 42;
+					s.velocity *= frand() * 24 + 16;
 					
 				}
 				s.position = Vector3(x, y, z);
 				s.position += Vector3(frandMinMax(-8, 8), frandMinMax(-8, 8), frandMinMax(-8, 8));
 				s.angularVelocity = frandMinMax(-PI / 4, PI / 4);
 
-				s.angularDrag = 0.8f;
+				s.angularDrag = 0.95f;
 				s.room = LaraItem->roomNumber;
 				
 			}
