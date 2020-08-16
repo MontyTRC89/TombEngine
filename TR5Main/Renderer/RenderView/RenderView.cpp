@@ -47,7 +47,8 @@ namespace T5M::Renderer {
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 		WorldDirection = Vector3(cam->target.x, cam->target.y, cam->target.z) - WorldPosition;
-		WorldDirection.Normalize();
+		if (WorldDirection == Vector3::Zero) [[unlikely]]
+			WorldDirection = Vector3::UnitZ;
 		Vector3 up = -Vector3::UnitY;
 		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		up = Vector3::Transform(up, upRotation);

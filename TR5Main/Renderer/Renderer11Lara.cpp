@@ -78,6 +78,7 @@ void Renderer11::updateLaraAnimations(bool force)
 		case WEAPON_HK:
 		case WEAPON_CROSSBOW:
 		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
 			ANIM_FRAME* shotgunFramePtr;
 
@@ -152,7 +153,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetInputLayout(m_inputLayout.Get());
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	RendererItem *item = &m_items[Lara.itemNumber];
@@ -160,13 +161,13 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 	// Set shaders
 	if (shadowMap)
 	{
-		m_context->VSSetShader(m_vsShadowMap, NULL, 0);
-		m_context->PSSetShader(m_psShadowMap, NULL, 0);
+		m_context->VSSetShader(m_vsShadowMap.Get(), NULL, 0);
+		m_context->PSSetShader(m_psShadowMap.Get(), NULL, 0);
 	}
 	else
 	{
-		m_context->VSSetShader(m_vsItems, NULL, 0);
-		m_context->PSSetShader(m_psItems, NULL, 0);
+		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
+		m_context->PSSetShader(m_psItems.Get(), NULL, 0);
 	}
 
 	// Set texture
@@ -177,7 +178,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	m_stMisc.AlphaTest = !transparent;
-	m_cbMisc.updateData(m_stMisc, m_context);
+	m_cbMisc.updateData(m_stMisc, m_context.Get());
 	m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
 	RendererObject &laraObj = *m_moveableObjects[ID_LARA];
@@ -188,7 +189,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-	m_cbItem.updateData(m_stItem, m_context);
+	m_cbItem.updateData(m_stItem, m_context.Get());
 	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 	m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
@@ -197,7 +198,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 		m_stLights.NumLights = item->Lights.size();
 		for (int j = 0; j < item->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context);
+		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 	}
 
@@ -256,7 +257,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 			matrices[i + 1] = world;
 		}
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
-		m_cbItem.updateData(m_stItem,m_context);
+		m_cbItem.updateData(m_stItem,m_context.Get());
 		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 

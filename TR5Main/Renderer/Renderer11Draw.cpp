@@ -76,12 +76,12 @@ namespace T5M::Renderer
         // Set vertex buffer
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set shaders
-        m_context->VSSetShader(m_vsInventory, NULL, 0);
-        m_context->PSSetShader(m_psInventory, NULL, 0);
+        m_context->VSSetShader(m_vsInventory.Get(), NULL, 0);
+        m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
@@ -93,7 +93,7 @@ namespace T5M::Renderer
         // Set matrices
         CCameraMatrixBuffer HudCamera;
         HudCamera.ViewProjection = view * projection;
-        m_cbCameraMatrices.updateData(HudCamera, m_context);
+        m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
@@ -113,7 +113,7 @@ namespace T5M::Renderer
             else
                 m_stItem.World = (moveableObj.BindPoseTransforms[n] * world);
             m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-            m_cbItem.updateData(m_stItem, m_context);
+            m_cbItem.updateData(m_stItem, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
@@ -129,7 +129,7 @@ namespace T5M::Renderer
                     m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                 m_stMisc.AlphaTest = (m < 2);
-                m_cbMisc.updateData(m_stMisc, m_context);
+                m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
                 m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -242,12 +242,12 @@ namespace T5M::Renderer
         UINT offset = 0;
 
         // Set shaders
-        m_context->VSSetShader(m_vsShadowMap, NULL, 0);
-        m_context->PSSetShader(m_psShadowMap, NULL, 0);
+        m_context->VSSetShader(m_vsShadowMap.Get(), NULL, 0);
+        m_context->PSSetShader(m_psShadowMap.Get(), NULL, 0);
 
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set texture
@@ -265,13 +265,13 @@ namespace T5M::Renderer
                                                                  (m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
         CCameraMatrixBuffer shadowProjection;
         shadowProjection.ViewProjection = view * projection;
-        m_cbCameraMatrices.updateData(shadowProjection, m_context);
+        m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         m_stShadowMap.LightViewProjection = (view * projection);
 
         m_stMisc.AlphaTest = true;
-        m_cbMisc.updateData(m_stMisc, m_context);
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         RendererObject &laraObj = *m_moveableObjects[ID_LARA];
@@ -282,7 +282,7 @@ namespace T5M::Renderer
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-        m_cbItem.updateData(m_stItem, m_context);
+        m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
         m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
@@ -357,7 +357,7 @@ namespace T5M::Renderer
             matrices[i + 1] = world;
         }
         memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
-        m_cbItem.updateData(m_stItem, m_context);
+        m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
         m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
@@ -386,7 +386,7 @@ namespace T5M::Renderer
 
         std::mbstowcs(introFileChars, g_GameFlow->Intro, 255);
         std::wstring titleStringFileName(introFileChars);
-        Texture2D texture = Texture2D(m_device, titleStringFileName);
+        Texture2D texture = Texture2D(m_device.Get(), titleStringFileName);
 
         float currentFade = 0;
         while (currentFade <= 1.0f)
@@ -425,11 +425,11 @@ namespace T5M::Renderer
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        m_cbLights.updateData(m_stLights, m_context);
+        m_cbLights.updateData(m_stLights, m_context.Get());
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         m_stMisc.AlphaTest = true;
-        m_cbMisc.updateData(m_stMisc, m_context);
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int i = 0; i < 24; i++)
@@ -446,7 +446,7 @@ namespace T5M::Renderer
                 Matrix world = rotation * translation;
 
                 m_stItem.World = world;
-                m_cbItem.updateData(m_stItem, m_context);
+                m_cbItem.updateData(m_stItem, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
                 RendererMesh *mesh = moveableObj.ObjectMeshes[0];
@@ -511,12 +511,12 @@ namespace T5M::Renderer
         // Set vertex buffer
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set shaders
-        m_context->VSSetShader(m_vsInventory, NULL, 0);
-        m_context->PSSetShader(m_psInventory, NULL, 0);
+        m_context->VSSetShader(m_vsInventory.Get(), NULL, 0);
+        m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
@@ -537,7 +537,7 @@ namespace T5M::Renderer
                                       Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
                                                                            g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
 
-        m_cbCameraMatrices.updateData(inventoryCam, m_context);
+        m_cbCameraMatrices.updateData(inventoryCam, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
@@ -634,7 +634,7 @@ namespace T5M::Renderer
                     else
                         m_stItem.World = (moveableObj.BindPoseTransforms[n] * transform);
                     m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-                    m_cbItem.updateData(m_stItem, m_context);
+                    m_cbItem.updateData(m_stItem, m_context.Get());
                     m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
                     m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
@@ -650,7 +650,7 @@ namespace T5M::Renderer
                             m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                         m_stMisc.AlphaTest = (m < 2);
-                        m_cbMisc.updateData(m_stMisc, m_context);
+                        m_cbMisc.updateData(m_stMisc, m_context.Get());
                         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1218,15 +1218,15 @@ namespace T5M::Renderer
             vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
         }
 
-        m_context->VSSetShader(m_vsFullScreenQuad, NULL, 0);
-        m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
+        m_context->VSSetShader(m_vsFullScreenQuad.Get(), NULL, 0);
+        m_context->PSSetShader(m_psFullScreenQuad.Get(), NULL, 0);
 
         m_context->PSSetShaderResources(0, 1, &texture);
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
 
         m_primitiveBatch->Begin();
         m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -1358,12 +1358,12 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-        m_context->VSSetShader(m_vsSolid, NULL, 0);
-        m_context->PSSetShader(m_psSolid, NULL, 0);
+        m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
+        m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
         Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
 
         m_primitiveBatch->Begin();
 
@@ -1479,7 +1479,7 @@ namespace T5M::Renderer
 
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         if (Objects[ID_RATS_EMITTER].loaded)
@@ -1504,7 +1504,7 @@ namespace T5M::Renderer
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
-                    m_cbItem.updateData(m_stItem, m_context);
+                    m_cbItem.updateData(m_stItem, m_context.Get());
 
                     for (int b = 0; b < 2; b++)
                     {
@@ -1529,7 +1529,7 @@ namespace T5M::Renderer
 
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         if (Objects[ID_BATS_EMITTER].loaded)
@@ -1561,7 +1561,7 @@ namespace T5M::Renderer
                         m_stItem.World = world;
                         m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
-                        m_cbItem.updateData(m_stItem, m_context);
+                        m_cbItem.updateData(m_stItem, m_context.Get());
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
@@ -1579,7 +1579,7 @@ namespace T5M::Renderer
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		if (Objects[ID_LITTLE_BEETLE].loaded)
@@ -1604,7 +1604,7 @@ namespace T5M::Renderer
 					m_stItem.World = world;
 					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
 					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
-                    m_cbItem.updateData(m_stItem,m_context);
+                    m_cbItem.updateData(m_stItem,m_context.Get());
 
 					for (int b = 0; b < 2; b++)
 					{
@@ -1759,11 +1759,11 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-        m_context->VSSetShader(m_vsSolid, NULL, 0);
-        m_context->PSSetShader(m_psSolid, NULL, 0);
+        m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
+        m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
 
         m_primitiveBatch->Begin();
 
@@ -1974,7 +1974,7 @@ namespace T5M::Renderer
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context);
+        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
@@ -2126,7 +2126,7 @@ namespace T5M::Renderer
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context);
+        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
@@ -2147,14 +2147,14 @@ namespace T5M::Renderer
 
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         RendererItem *item = &m_items[Lara.itemNumber];
 
         // Set shaders
-        m_context->VSSetShader(m_vsItems, NULL, 0);
-        m_context->PSSetShader(m_psItems, NULL, 0);
+        m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
+        m_context->PSSetShader(m_psItems.Get(), NULL, 0);
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
@@ -2164,7 +2164,7 @@ namespace T5M::Renderer
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_stMisc.AlphaTest = !transparent;
-        m_cbMisc.updateData(m_stMisc, m_context);
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int i = 0; i < view.itemsToDraw.size(); i++)
@@ -2221,18 +2221,18 @@ namespace T5M::Renderer
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-        m_cbItem.updateData(m_stItem, m_context);
+        m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
         m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        m_cbLights.updateData(m_stLights, m_context);
+        m_cbLights.updateData(m_stLights, m_context.Get());
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         m_stMisc.AlphaTest = !transparent;
-        m_cbMisc.updateData(m_stMisc, m_context);
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
@@ -2344,12 +2344,12 @@ namespace T5M::Renderer
 
         m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set shaders
-        m_context->VSSetShader(m_vsStatics, NULL, 0);
-        m_context->PSSetShader(m_psStatics, NULL, 0);
+        m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+        m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
@@ -2374,7 +2374,7 @@ namespace T5M::Renderer
 
                 m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
                 m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-                m_cbStatic.updateData(m_stStatic, m_context);
+                m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
                 for (int j = firstBucket; j < lastBucket; j++)
@@ -2405,13 +2405,13 @@ namespace T5M::Renderer
             // Set vertex buffer
             m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
             m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            m_context->IASetInputLayout(m_inputLayout);
+            m_context->IASetInputLayout(m_inputLayout.Get());
             m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
         }
 
         // Set shaders
-        m_context->VSSetShader(m_vsRooms, NULL, 0);
-        m_context->PSSetShader(m_psRooms, NULL, 0);
+        m_context->VSSetShader(m_vsRooms.Get(), NULL, 0);
+        m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
@@ -2419,7 +2419,7 @@ namespace T5M::Renderer
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
         m_context->PSSetSamplers(0, 1, &sampler);
         m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
-        m_context->PSSetSamplers(1, 1, &m_shadowSampler);
+        m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
         // Set shadow map data
@@ -2434,7 +2434,7 @@ namespace T5M::Renderer
         {
             m_stShadowMap.CastShadows = false;
         }
-        m_cbShadowMap.updateData(m_stShadowMap, m_context);
+        m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
         m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
         m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
 
@@ -2448,16 +2448,16 @@ namespace T5M::Renderer
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
                 memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-            m_cbLights.updateData(m_stLights, m_context);
+            m_cbLights.updateData(m_stLights, m_context.Get());
             m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
 
             m_stMisc.Caustics = (room->Room->flags & ENV_FLAG_WATER);
             m_stMisc.AlphaTest = !transparent;
-            m_cbMisc.updateData(m_stMisc, m_context);
+            m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
             m_stRoom.AmbientColor = room->AmbientLight;
             m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-            m_cbRoom.updateData(m_stRoom, m_context);
+            m_cbRoom.updateData(m_stRoom, m_context.Get());
             m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
             m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
             for (int j = firstBucket; j < lastBucket; j++)
@@ -2584,11 +2584,11 @@ namespace T5M::Renderer
         vertices[3].Color.z = 1.0f;
         vertices[3].Color.w = 1.0f;
 
-        m_context->VSSetShader(m_vsSky, NULL, 0);
-        m_context->PSSetShader(m_psSky, NULL, 0);
+        m_context->VSSetShader(m_vsSky.Get(), NULL, 0);
+        m_context->PSSetShader(m_psSky.Get(), NULL, 0);
 
         m_stMisc.AlphaTest = true;
-        m_cbMisc.updateData(m_stMisc, m_context);
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         m_context->PSSetShaderResources(0, 1, m_skyTexture.ShaderResourceView.GetAddressOf());
@@ -2596,7 +2596,7 @@ namespace T5M::Renderer
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_context->IASetInputLayout(m_inputLayout);
+        m_context->IASetInputLayout(m_inputLayout.Get());
 
         for (int i = 0; i < 2; i++)
         {
@@ -2605,7 +2605,7 @@ namespace T5M::Renderer
 
             m_stStatic.World = (rotation * translation);
             m_stStatic.Color = color;
-            m_cbStatic.updateData(m_stStatic, m_context);
+            m_cbStatic.updateData(m_stStatic, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
 
@@ -2619,7 +2619,7 @@ namespace T5M::Renderer
         {
             m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
             m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            m_context->IASetInputLayout(m_inputLayout);
+            m_context->IASetInputLayout(m_inputLayout.Get());
             m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
             m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
@@ -2632,12 +2632,12 @@ namespace T5M::Renderer
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
             m_stStatic.Position = Vector4::Zero;
             m_stStatic.Color = Vector4::One;
-            m_cbStatic.updateData(m_stStatic, m_context);
+            m_cbStatic.updateData(m_stStatic, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
 
             m_stMisc.AlphaTest = true;
-            m_cbMisc.updateData(m_stMisc, m_context);
+            m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
             for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)

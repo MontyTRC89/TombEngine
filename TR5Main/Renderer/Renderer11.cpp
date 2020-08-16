@@ -34,39 +34,6 @@ namespace T5M::Renderer {
 
 	Renderer11::~Renderer11() {
 		freeRendererData();
-
-		DX11_RELEASE(m_backBufferRTV);
-		DX11_RELEASE(m_backBufferTexture);
-		DX11_RELEASE(m_depthStencilState);
-		DX11_RELEASE(m_depthStencilTexture);
-		DX11_RELEASE(m_depthStencilView);
-
-		DX11_DELETE(m_primitiveBatch);
-		DX11_DELETE(m_spriteBatch);
-		DX11_DELETE(m_gameFont);
-		DX11_DELETE(m_states);
-
-		DX11_RELEASE(m_vsRooms);
-		DX11_RELEASE(m_psRooms);
-		DX11_RELEASE(m_vsItems);
-		DX11_RELEASE(m_psItems);
-		DX11_RELEASE(m_vsStatics);
-		DX11_RELEASE(m_psStatics);
-		DX11_RELEASE(m_vsHairs);
-		DX11_RELEASE(m_psHairs);
-		DX11_RELEASE(m_vsSky);
-		DX11_RELEASE(m_psSky);
-		DX11_RELEASE(m_vsSprites);
-		DX11_RELEASE(m_psSprites);
-		DX11_RELEASE(m_vsSolid);
-		DX11_RELEASE(m_psSolid);
-		DX11_RELEASE(m_vsInventory);
-		DX11_RELEASE(m_psInventory);
-		DX11_RELEASE(m_vsFullScreenQuad);
-		DX11_RELEASE(m_psFullScreenQuad);
-		DX11_RELEASE(m_swapChain);
-		DX11_RELEASE(m_context);
-		DX11_RELEASE(m_device);
 	}
 
 	void Renderer11::freeRendererData()
