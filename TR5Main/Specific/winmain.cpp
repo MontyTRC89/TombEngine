@@ -185,9 +185,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
-
-	_CrtSetReportMode(0, 2);
-	_CrtSetDbgFlag(-1);
 	
 	// Initialise the new scripting system
 	sol::state luaState;
