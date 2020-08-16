@@ -3,7 +3,6 @@
 #include "lara_basic.h"
 #include "lara_tests.h"
 #include "lara_collide.h"
-#include "laramisc.h"
 #include "lara_slide.h"
 #include "lara_monkey.h"
 #include "input.h"

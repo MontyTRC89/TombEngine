@@ -48,3 +48,5 @@ void UpdateRopeSwing(ITEM_INFO* item);
 void JumpOffRope(ITEM_INFO* item);
 void FallFromRope(ITEM_INFO* item);
 void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
+void DelAlignLaraToRope(ITEM_INFO* item);
+

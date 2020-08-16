@@ -13,7 +13,7 @@
 #include "lara_swim.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
-#include "laramisc.h"
+#include "lara_cheat.h"
 #include "lara_climb.h"
 #include "lara_initialise.h"
 
@@ -33,6 +33,7 @@
 #include "effect2.h"
 #include "sound.h"
 #include "savegame.h"
+#include "rope.h"
 
 using std::function;
 using T5M::Renderer::g_Renderer;
@@ -43,6 +44,7 @@ short elevation = 57346;
 extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
+COLL_INFO lara_coll;
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {

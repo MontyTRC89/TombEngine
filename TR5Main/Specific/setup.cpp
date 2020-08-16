@@ -13,7 +13,6 @@
 #include "lara_one_gun.h"
 #include "lara_flare.h"
 #include "lara_fire.h"
-#include "laramisc.h"
 #include "objects.h"
 #include "door.h"
 #include "rope.h"

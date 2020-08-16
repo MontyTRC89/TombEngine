@@ -21,7 +21,6 @@
 #include "box.h"
 #include "objects.h"
 #include "switch.h"
-#include "laramisc.h"
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"

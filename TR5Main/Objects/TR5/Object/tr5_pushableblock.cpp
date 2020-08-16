@@ -6,7 +6,6 @@
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
-#include "laramisc.h"
 #include "box.h"
 #include "level.h"
 #include "input.h"

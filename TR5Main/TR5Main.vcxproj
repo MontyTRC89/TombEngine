@@ -136,6 +136,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
+    <ClInclude Include="Game\Lara\lara_cheat.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
     <ClInclude Include="Game\Lara\lara_crawl.h" />
     <ClInclude Include="Game\Lara\lara_hang.h" />
@@ -379,7 +380,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\Lara\lara_climb.h" />
     <ClInclude Include="Game\Lara\lara_fire.h" />
     <ClInclude Include="Game\Lara\lara_flare.h" />
-    <ClInclude Include="Game\Lara\laramisc.h" />
     <ClInclude Include="Game\Lara\lara_surface.h" />
     <ClInclude Include="Game\Lara\lara_swim.h" />
     <ClInclude Include="Game\lot.h" />
@@ -426,6 +426,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\explosion.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
+    <ClCompile Include="Game\Lara\lara_cheat.cpp" />
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_hang.cpp" />
@@ -624,7 +625,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\Lara\lara_climb.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
-    <ClCompile Include="Game\Lara\laramisc.cpp" />
     <ClCompile Include="Game\Lara\lara_surface.cpp" />
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\lot.cpp" />
