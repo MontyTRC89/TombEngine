@@ -44,7 +44,7 @@ typedef struct MESH_INFO
 	short shade;
 	short flags;
 	short staticNumber;
-	int hitPoints;
+	short hitPoints;
 };
 
 typedef struct LIGHTINFO

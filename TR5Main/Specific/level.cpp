@@ -342,6 +342,10 @@ void LoadObjects()
 		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
+
+		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterDamage = (short)ReadInt16();
+		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
 	// HACK: to remove after decompiling LoadSprites
@@ -631,6 +635,7 @@ void ReadRooms()
 			mesh.shade = ReadUInt16();
 			mesh.flags = ReadUInt16();
 			mesh.staticNumber = ReadUInt16();
+			mesh.hitPoints = ReadInt16();
 
 			room.mesh.push_back(mesh);
 		}
