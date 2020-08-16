@@ -727,11 +727,14 @@ void ControlGrenade(short itemNumber)
 	// If is not a flash grenade then try to destroy surrounding objects
 	if (!(item->itemFlags[0] == GRENADE_FLASH && explode))
 	{
-		int n = 0;
+		int radius = (explode ? GRENADE_EXPLODE_RADIUS : GRENADE_HIT_RADIUS);
 		bool foundCollidedObjects = false;
 
-		do
+		for (int n = 0; n < 2; n++)
 		{
+			// Step 0: check for specific collision in a small radius
+			// Step 1: done only if explosion, try to smash all objects in the blast radius
+
 			// Found possible collided items and statics
 			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
 
@@ -820,10 +823,9 @@ void ControlGrenade(short itemNumber)
 				}
 			}
 
-			n++;
 			explode = true;
 			radius = GRENADE_EXPLODE_RADIUS;
-		} while (n < 2);
+		}
 	}
 
 	// Handle explosion effects
@@ -961,13 +963,20 @@ void ControlRocket(short itemNumber)
 	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && abovewater)
 		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 
-	// Search for possible collided items and statics
-	GetCollidedObjects(item, ROCKET_EXPLODE_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+	int radius = (explode ? ROCKET_EXPLODE_RADIUS : ROCKET_HIT_RADIUS);
+	bool foundCollidedObjects = false;
 
-	// If no collided items and meshes are found, then exit the loop
-	if (CollidedItems[0] || CollidedMeshes[0])
+	for (int n = 0; n < 2; n++)
 	{
-		explode = true;
+		// Step 0: check for specific collision in a small radius
+		// Step 1: done only if explosion, try to smash all objects in the blast radius
+
+		// Found possible collided items and statics
+		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+
+		// If no collided items and meshes are found, then exit the loop
+		if (!CollidedItems[0] && !CollidedMeshes[0])
+			break;
 
 		if (CollidedItems[0])
 		{
@@ -977,9 +986,9 @@ void ControlRocket(short itemNumber)
 			int k = 0;
 			do
 			{
-				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE) 
+				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
 					|| currentItem->objectNumber == ID_LARA
-					|| (currentItem->flags & 0x40 && 
+					|| (currentItem->flags & 0x40 &&
 					(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
 					// All active intelligent creatures explode, if their HP is <= 0
@@ -1021,9 +1030,9 @@ void ControlRocket(short itemNumber)
 			do
 			{
 				STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
-				if (s->shatterType != SHT_NONE)  
+				if (s->shatterType != SHT_NONE)
 				{
-					currentMesh->hitPoints -= ROCKET_DAMAGE;
+					currentMesh->hitPoints -= Weapons[WEAPON_ROCKET_LAUNCHER].damage;
 					if (currentMesh->hitPoints <= 0)
 					{
 						TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
@@ -1041,6 +1050,9 @@ void ControlRocket(short itemNumber)
 
 			} while (currentMesh);
 		}
+
+		explode = true;
+		radius = ROCKET_EXPLODE_RADIUS;
 	}
 
 	// Do explosion if needed
@@ -1082,13 +1094,13 @@ void draw_shotgun(int weaponType)
 		if (weaponType == WEAPON_ROCKET_LAUNCHER)
 			item->animNumber = Objects[item->objectNumber].animIndex + 1;
 		else if (weaponType == WEAPON_GRENADE_LAUNCHER)
-			item->animNumber = Objects[item->objectNumber].animIndex + ROCKET_DRAW_ANIM;
+			item->animNumber = Objects[item->objectNumber].animIndex + 0;
 		else
-			item->animNumber = Objects[item->objectNumber].animIndex + HARPOON_DRAW_ANIM; // M16 too
+			item->animNumber = Objects[item->objectNumber].animIndex + 1;
 		
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
+		item->goalAnimState = WSTATE_DRAW;
+		item->currentAnimState = WSTATE_DRAW;
 		item->status = ITEM_ACTIVE;
 		item->roomNumber = NO_ROOM;
 		
@@ -1168,43 +1180,43 @@ void AnimateShotgun(int weaponType)
 
 	switch (item->currentAnimState)
 	{
-	case 0:
+	case WSTATE_AIM:
 		HKFlag = 0;
 		HKTimer = 0;
 		HKFlag2 = 0;
 
-		if (Lara.waterStatus == 1 || running)
-			item->goalAnimState = 6;
+		if (Lara.waterStatus == LW_UNDERWATER || running)
+			item->goalAnimState = WSTATE_UW_AIM;
 		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
-			item->goalAnimState = 4;
+			item->goalAnimState = WSTATE_UNAIM;
 		else
-			item->goalAnimState = 2;
+			item->goalAnimState = WSTATE_RECOIL;
 
 		break;
 
-	case 6:
+	case WSTATE_UW_AIM:
 		HKFlag = 0;
 		HKTimer = 0;
 		HKFlag2 = 0;
 
-		if (Lara.waterStatus == 1 || running)
+		if (Lara.waterStatus == LW_UNDERWATER || running)
 		{
 			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
-				item->goalAnimState = 7;
+				item->goalAnimState = WSTATE_UW_UNAIM;
 			else
-				item->goalAnimState = 8;
+				item->goalAnimState = WSTATE_UW_RECOIL;
 		}
 		else
-			item->goalAnimState = 0;
+			item->goalAnimState = WSTATE_AIM;
 		
 		break;
 
-	case 2:
+	case WSTATE_RECOIL:
 		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			item->goalAnimState = 4;
+			item->goalAnimState = WSTATE_UNAIM;
 			
-			if (Lara.waterStatus != 1 && !running && !harpoonFired)
+			if (Lara.waterStatus != LW_UNDERWATER && !running && !harpoonFired)
 			{
 				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.leftArm.lock))
 				{
@@ -1233,27 +1245,29 @@ void AnimateShotgun(int weaponType)
 
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
-							SoundEffect(14, 0, 0);
+							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
 						else
 						{
-							SoundEffect(105, &LaraItem->pos, 83888140);
-							SoundEffect(68, &LaraItem->pos, 0);
+							SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
+							SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 						}
 					}
 					else
 						FireShotgun();
 
-					item->goalAnimState = 2;
+					item->goalAnimState = WSTATE_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
 					item->goalAnimState = 0; 
 			}
 
-			if (item->goalAnimState != 2 && HKFlag && !(Lara.Weapons[WEAPON_HK].HasSilencer))
+			if (item->goalAnimState != WSTATE_RECOIL 
+				&& HKFlag 
+				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
-				StopSoundEffect(68);
-				SoundEffect(69, &LaraItem->pos, 0);
+				StopSoundEffect(SFX_HK_FIRE);
+				SoundEffect(SFX_HK_STOP, &LaraItem->pos, 0);
 				HKFlag = 0;
 			}
 		}
@@ -1261,31 +1275,35 @@ void AnimateShotgun(int weaponType)
 		{
 			if (Lara.Weapons[WEAPON_HK].HasSilencer)
 			{
-				SoundEffect(14, 0, 0);
+				SoundEffect(SFX_HK_SILENCED, 0, 0);
 			}
 			else
 			{
-				SoundEffect(105, &LaraItem->pos, 83888140);
-				SoundEffect(68, &LaraItem->pos, 0);
+				SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
+				SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 			}
 		}
 		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.leftArm.lock)
 		{
-			item->goalAnimState = 4;
+			item->goalAnimState = WSTATE_UNAIM;
 		}
 
-		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 12 && weaponType == WEAPON_SHOTGUN)
-			TriggerGunShell(1, ID_SHOTGUNSHELL, 4);
+		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 12 
+			&& weaponType == WEAPON_SHOTGUN)
+			TriggerGunShell(1, ID_SHOTGUNSHELL, WEAPON_SHOTGUN);
 		break;
 
-	case 8:
+	case WSTATE_UW_RECOIL:
 		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 0)
 		{
-			item->goalAnimState = 7;
+			item->goalAnimState = WSTATE_UW_UNAIM;
 
-			if ((Lara.waterStatus == 1 || running) && !harpoonFired)
+			if ((Lara.waterStatus == LW_UNDERWATER || running)
+				&& !harpoonFired)
 			{
-				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.leftArm.lock))
+				if ((TrInput & IN_ACTION) 
+					&& (!Lara.target 
+						|| Lara.leftArm.lock))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
@@ -1304,36 +1322,38 @@ void AnimateShotgun(int weaponType)
 						}
 						else
 						{
-							SoundEffect(105, &LaraItem->pos, 83888140);
-							SoundEffect(68, &LaraItem->pos, 0);
+							SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
+							SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 						}
 					}
 					else
 					{
-						item->goalAnimState = 6;
+						item->goalAnimState = WSTATE_UW_AIM;
 					}
 
-					item->goalAnimState = 8;
+					item->goalAnimState = WSTATE_UW_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
-					item->goalAnimState = 6;
+					item->goalAnimState = WSTATE_UW_AIM;
 			}
-			else if (item->goalAnimState != 8 && HKFlag && !(Lara.Weapons[WEAPON_HK].HasSilencer))
+			else if (item->goalAnimState != WSTATE_UW_RECOIL 
+				&& HKFlag 
+				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
-				StopSoundEffect(68);
-				SoundEffect(69, &LaraItem->pos, 0);
+				StopSoundEffect(SFX_HK_FIRE);
+				SoundEffect(SFX_HK_STOP, &LaraItem->pos, 0);
 				HKFlag = 0;
 			}
 			else if (HKFlag)
 			{
 				if (Lara.Weapons[WEAPON_HK].HasSilencer)
 				{
-					SoundEffect(14, 0, 0);
+					SoundEffect(SFX_HK_SILENCED, 0, 0);
 				}
 				else
 				{
-					SoundEffect(105, &LaraItem->pos, 83888140);
-					SoundEffect(68, &LaraItem->pos, 0);
+					SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
+					SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 				}
 			}
 		}		
@@ -1428,12 +1448,13 @@ void ControlCrossbowBolt(short itemNumber)
 	}
 
 	int radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
-
-	int n = 0;
 	bool foundCollidedObjects = false;
 
-	do
+	for (int n = 0; n < 2; n++)
 	{
+		// Step 0: check for specific collision in a small radius
+		// Step 1: done only if explosion, try to smash all objects in the blast radius
+
 		// Found possible collided items and statics
 		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
 		
@@ -1521,10 +1542,9 @@ void ControlCrossbowBolt(short itemNumber)
 			break;
 		}
 
-		n++;
 		explode = true;
 		radius = CROSSBOW_EXPLODE_RADIUS;
-	} while (n < 2);
+	};
 		
 	if (!explode)
 	{

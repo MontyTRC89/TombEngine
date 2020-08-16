@@ -18,9 +18,10 @@ constexpr auto CROSSBOW_AMMO2 = 2;
 constexpr auto CROSSBOW_AMMO3 = 2;
 constexpr auto CROSSBOW_HIT_RADIUS = 128;
 constexpr auto CROSSBOW_EXPLODE_RADIUS = SECTOR(2);
+constexpr auto GRENADE_HIT_RADIUS = 128;
 constexpr auto GRENADE_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto ROCKET_EXPLODE_RADIUS = 2048;
-constexpr auto ROCKET_DAMAGE = 100;
+constexpr auto ROCKET_HIT_RADIUS = 128;
+constexpr auto ROCKET_EXPLODE_RADIUS = SECTOR(2);
 constexpr auto HARPOON_HIT_RADIUS = 128;
 
 void FireGrenade();
