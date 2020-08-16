@@ -5,8 +5,8 @@
 #include "setup.h"
 #include "draw.h"
 #include "lara.h"
+#include "lara_collide.h"
 #include "sound.h"
-#include "laramisc.h"
 #include "sphere.h"
 #include "traps.h"
 

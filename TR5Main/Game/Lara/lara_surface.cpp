@@ -9,7 +9,6 @@
 #include "Lara.h"
 #include "lara_swim.h"
 #include "lara_fire.h"
-#include "laramisc.h"
 #include "level.h"
 #include "input.h"
 

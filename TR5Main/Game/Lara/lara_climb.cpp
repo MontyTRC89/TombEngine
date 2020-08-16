@@ -4,7 +4,6 @@
 #include "control.h"
 #include "draw.h"
 #include "sphere.h"
-#include "laramisc.h"
 #include "camera.h"
 #include "level.h"
 #include "input.h"

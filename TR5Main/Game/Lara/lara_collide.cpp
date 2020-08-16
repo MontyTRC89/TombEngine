@@ -1,7 +1,8 @@
 #include "framework.h"
 #include "lara.h"
 #include "input.h"
-#include "laramisc.h"
+#include "draw.h"
+#include "effect2.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
@@ -262,4 +263,20 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F)
 short GetDirOctant(int rot)//160B4(<), 161E8(<) (F)
 {
 	return abs(rot) >= ANGLE(45) && abs(rot) <= ANGLE(135.0f);
+}
+
+void GetLaraDeadlyBounds() // (F) (D)
+{
+	BOUNDING_BOX* bounds;
+	BOUNDING_BOX tbounds;
+
+	bounds = GetBoundsAccurate(LaraItem);
+	phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, &tbounds);
+
+	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds.X1;
+	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds.X2;
+	DeadlyBounds[2] = LaraItem->pos.yPos + tbounds.Y1;
+	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds.Y2;
+	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds.Z1;
+	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
 }

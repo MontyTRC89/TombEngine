@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "rope.h"
 #include "draw.h"
-#include "laramisc.h"
 #include "lara.h"
 #include "level.h"
 #include "input.h"
@@ -664,4 +663,94 @@ void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		if (!(TrInput & IN_BACK) || Lara.ropeSegment >= 21)
 			item->goalAnimState = LS_ROPE_IDLE;
 	}
+}
+
+void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
+{
+	ROPE_STRUCT* rope;
+	short ropeY;
+	PHD_VECTOR vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
+	int matrix[12];
+	short angle[3];
+	ANIM_FRAME* frame;
+
+	vec.x = 4096;
+	vec.y = 0;
+	vec.z = 0;
+	frame = (ANIM_FRAME*)GetBestFrame(item);
+	ropeY = Lara.ropeY - ANGLE(90);
+	rope = &Ropes[Lara.ropePtr];
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offsetY - 192, &pos2.x, &pos2.y, &pos2.z);
+	diff.x = pos.x - pos2.x << 16;
+	diff.y = pos.y - pos2.y << 16;
+	diff.z = pos.z - pos2.z << 16;
+	NormaliseRopeVector(&diff);
+	diff.x >>= 2;
+	diff.y >>= 2;
+	diff.z >>= 2;
+	ScaleVector(&diff, DotProduct(&vec, &diff), &vec2);
+	vec2.x = vec.x - vec2.x;
+	vec2.y = vec.y - vec2.y;
+	vec2.z = vec.z - vec2.z;
+	vec3.x = vec2.x;
+	vec3.y = vec2.y;
+	vec3.z = vec2.z;
+	vec4.x = vec2.x;
+	vec4.y = vec2.y;
+	vec4.z = vec2.z;
+	diff2.x = diff.x;
+	diff2.y = diff.y;
+	diff2.z = diff.z;
+	ScaleVector(&vec3, phd_cos(ropeY), &vec3);
+	ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
+	ScaleVector(&diff2, 4096 - phd_cos(ropeY), &diff2);
+	CrossProduct(&diff, &vec2, &vec4);
+	ScaleVector(&vec4, phd_sin(ropeY), &vec4);
+	diff2.x += vec3.x;
+	diff2.y += vec3.y;
+	diff2.z += vec3.z;
+	vec2.x = diff2.x + vec4.x << 16;
+	vec2.y = diff2.y + vec4.y << 16;
+	vec2.z = diff2.z + vec4.z << 16;
+	NormaliseRopeVector(&vec2);
+	vec2.x >>= 2;
+	vec2.y >>= 2;
+	vec2.z >>= 2;
+	CrossProduct(&diff, &vec2, &vec5);
+	vec5.x <<= 16;
+	vec5.y <<= 16;
+	vec5.z <<= 16;
+	NormaliseRopeVector(&vec5);
+	vec5.x >>= 2;
+	vec5.y >>= 2;
+	vec5.z >>= 2;
+	matrix[M00] = vec5.x;
+	matrix[M01] = diff.x;
+	matrix[M02] = vec2.x;
+	matrix[M10] = vec5.y;
+	matrix[M11] = diff.y;
+	matrix[M12] = vec2.y;
+	matrix[M20] = vec5.z;
+	matrix[M21] = diff.z;
+	matrix[M22] = vec2.z;
+	_0x0046D420(matrix, angle);
+	item->pos.xPos = rope->position.x + (rope->meshSegment[Lara.ropeSegment].x >> 16);
+	item->pos.yPos = rope->position.y + (rope->meshSegment[Lara.ropeSegment].y >> 16) + Lara.ropeOffset;
+	item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeSegment].z >> 16);
+
+	Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
+		TO_DEGREES(angle[1]),
+		TO_DEGREES(angle[0]),
+		TO_DEGREES(angle[2])
+	);
+
+	// PHD_MATH!
+	item->pos.xPos += -112 * rotMatrix.m[0][2]; // MatrixPtr[M02] >> W2V_SHIFT;
+	item->pos.yPos += -112 * rotMatrix.m[1][2]; // MatrixPtr[M12] >> W2V_SHIFT;
+	item->pos.zPos += -112 * rotMatrix.m[2][2]; // MatrixPtr[M22] >> W2V_SHIFT;
+
+	item->pos.xRot = angle[0];
+	item->pos.yRot = angle[1];
+	item->pos.zRot = angle[2];
 }

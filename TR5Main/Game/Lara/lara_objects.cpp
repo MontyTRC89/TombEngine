@@ -5,7 +5,6 @@
 #include "draw.h"
 #include "rope.h"
 #include "lara_tests.h"
-#include "laramisc.h"
 
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 

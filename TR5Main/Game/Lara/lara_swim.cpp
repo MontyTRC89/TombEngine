@@ -7,9 +7,7 @@
 #include "Lara.h"
 #include "lara_surface.h"
 #include "effect.h"
-#include "effect2.h"
 #include "lara_fire.h"
-#include "laramisc.h"
 #include "draw.h"
 #include "camera.h"
 #include "level.h"
@@ -365,58 +363,6 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 
 	if (!(TrInput & IN_JUMP))
 		item->goalAnimState = LS_UNDERWATER_INERTIA;
-}
-
-void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
-{
-	if (TrInput & IN_FORWARD)
-	{
-		item->pos.xRot -= ANGLE(3);
-	}
-	else if (TrInput & IN_BACK)
-	{
-		item->pos.xRot += ANGLE(3);
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= 613;
-
-		if (Lara.turnRate < -ANGLE(6))
-			Lara.turnRate = -ANGLE(6);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += 613;
-
-		if (Lara.turnRate > ANGLE(6))
-			Lara.turnRate = ANGLE(6);
-	}
-
-	if (TrInput & IN_ACTION)
-	{
-		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 31, 255, 255, 255);
-	}
-
-	if (TrInput & IN_OPTION)
-	{
-		Lara.turnRate = -ANGLE(12);
-	}
-
-	if (TrInput & IN_JUMP)
-	{
-		item->fallspeed += 16;
-
-		if (item->fallspeed > 400)
-			item->fallspeed = 400;
-	}
-	else
-	{
-		if (item->fallspeed >= 8)
-			item->fallspeed -= item->fallspeed >> 3;
-		else
-			item->fallspeed = 0;
-	}
 }
 
 void UpdateSubsuitAngles()//4BD20, 4C184 (F)

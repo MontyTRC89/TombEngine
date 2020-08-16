@@ -2,7 +2,6 @@
 #include "hair.h"
 
 #include "draw.h"
-#include "laramisc.h"
 #include "lara.h"
 #include "control.h"
 #include "GameFlowScript.h"
