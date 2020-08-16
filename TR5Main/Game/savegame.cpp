@@ -8,7 +8,6 @@
 #include "switch.h"
 #include "spotcam.h"
 #include "traps.h"
-#include "laramisc.h"
 #include "sound.h"
 #include "level.h"
 #include "setup.h"

@@ -11,7 +11,6 @@
 #include "control.h"
 #include "effect.h"
 #include "switch.h"
-#include "laramisc.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"

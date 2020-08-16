@@ -825,9 +825,6 @@
     <ClInclude Include="Game\Lara\lara_struct.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Lara\laramisc.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Lara\lara_tests.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -877,6 +874,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\Lara\lara_initialise.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Lara\lara_cheat.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1553,9 +1553,6 @@
     <ClCompile Include="Game\Lara\lara.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Lara\laramisc.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Lara\lara_tests.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1605,6 +1602,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\Lara\lara_initialise.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Lara\lara_cheat.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

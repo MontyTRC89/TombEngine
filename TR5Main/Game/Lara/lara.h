@@ -17,6 +17,7 @@ constexpr auto LARA_VELOCITY = 12;
 
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
+extern COLL_INFO lara_coll;
 extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
