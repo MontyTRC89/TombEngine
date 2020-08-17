@@ -228,40 +228,18 @@ void ControlHarpoonBolt(short itemNumber)
 	if (CollidedItems[0])
 	{
 		ITEM_INFO* currentItem = CollidedItems[0];
-		OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
-
+		
 		int k = 0;
 		do
 		{
-			if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
-				|| currentItem->objectNumber == ID_LARA
-				|| (currentItem->flags & 0x40 &&
-				(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
-			{
-				// All active intelligent creatures explode, if their HP is <= 0
-				// Explosion is handled by CreatureDie()
-				// Also Lara can be damaged
-				// HitTarget() is called inside this
-				DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
-			}
-			else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
-			{
-				// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
-				TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-				TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
-				ExplodeItemNode(currentItem, 0, 0, 128);
-				short currentItemNumber = (currentItem - CollidedItems[0]);
-				SmashObject(currentItemNumber);
-				KillItem(currentItemNumber);
-			}
-			// TODO_LUA: we need to handle it with an event like OnDestroy
-			/*else if (currentObj->hitEffect == HIT_SPECIAL)
-			{
-				// Some objects need a custom behaviour
-				//HitSpecial(item, currentItem, 1);
-			}*/
+			OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
 
-			// All other items (like puzzles) don't explode
+			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+			{
+				HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
+			}
+
+			// All other items (like puzzles) can't be hit
 
 			k++;
 			currentItem = CollidedItems[k];
@@ -635,12 +613,13 @@ void ControlGrenade(short itemNumber)
 					if (explode)
 					{
 						ITEM_INFO* currentItem = CollidedItems[0];
-						OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
-
+						
 						int k = 0;
 						do
 						{
-							if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
+							OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+
+							if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
 								|| currentItem->objectNumber == ID_LARA
 								|| (currentItem->flags & 0x40 &&
 								(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
@@ -865,11 +844,12 @@ void ControlRocket(short itemNumber)
 		if (CollidedItems[0])
 		{
 			ITEM_INFO* currentItem = CollidedItems[0];
-			OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
-
+			
 			int k = 0;
 			do
 			{
+				OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+
 				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
 					|| currentItem->objectNumber == ID_LARA
 					|| (currentItem->flags & 0x40 &&
@@ -1352,22 +1332,39 @@ void ControlCrossbowBolt(short itemNumber)
 		{
 			if (CollidedItems[0])
 			{
-				ITEM_INFO* currentItem = CollidedItems[0];
-				OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+				// If explosive ammos selected and item hit, then blast everything
+				if (item->itemFlags[0] == CROSSBOW_EXPLODE)
+					explode = true;
 
+				ITEM_INFO* currentItem = CollidedItems[0];
+				
 				int k = 0;
 				do
 				{
-					if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
-						|| currentItem->objectNumber == ID_LARA
+					OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+
+					if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+						|| (currentItem->objectNumber == ID_LARA && explode)
 						|| (currentItem->flags & 0x40 &&
 						(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
 					{
-						// All active intelligent creatures explode, if their HP is <= 0
-						// Explosion is handled by CreatureDie()
-						// Also Lara can be damaged
-						// HitTarget() is called inside this
-						DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
+						if (explode)
+						{
+							// All active intelligent creatures explode, if their HP is <= 0
+							// Explosion is handled by CreatureDie()
+							// Also Lara can be damaged
+							// HitTarget() is called inside this
+							DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
+						}
+						else if (currentItem->objectNumber != ID_LARA)
+						{
+							// Normal hit
+							HitTarget(currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
+
+							// Poisoned ammos
+							if (item->itemFlags[0] == CROSSBOW_POISON)
+								currentItem->poisoned = true;
+						}
 					}
 					else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
 					{
