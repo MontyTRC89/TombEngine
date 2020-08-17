@@ -1325,7 +1325,7 @@ float TO_RAD(short angle)
 
 const float frand()
 {
-	float result = float((float)rand() / RAND_MAX);
+	float result = float(static_cast<float>(rand()) / RAND_MAX);
 	return result;
 }
 
@@ -1337,6 +1337,24 @@ const float frandMinMax(float min, float max)
 const float lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;
+}
+
+const Vector3 getRandomVector()
+{
+	Vector3 v = {frandMinMax(-1,1),frandMinMax(-1,1),frandMinMax(-1,1)};
+	v.Normalize();
+	return v;
+}
+
+const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
+{
+	float x = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
+	float y = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
+	float z = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
+	Matrix m = Matrix::CreateRotationX(x)* Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
+	Vector3 result = direction.TransformNormal(direction, m);
+	result.Normalize();
+	return result;
 }
 
 // FIXME: game code still expects << 2 >> W2V_SHIFT so we multiply by 16384.0f
