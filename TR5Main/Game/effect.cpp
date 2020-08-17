@@ -246,10 +246,10 @@ void ExplosionFX(ITEM_INFO* item)//39694(<), 39B94(<) (F)
 
 void SwapCrowbar(ITEM_INFO* item)//39638(<), 39B38(<) (F)
 {
-	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA].meshIndex + LM_RHAND)
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
 	else 
-		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA].meshIndex + LM_RHAND;
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void ActivateKey(ITEM_INFO* item)//39624(<), 39B24(<) (F)
