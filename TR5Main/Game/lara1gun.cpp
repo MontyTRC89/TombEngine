@@ -57,10 +57,10 @@ void FireHarpoon()
 			PHD_VECTOR jointPos;
 			
 			jointPos.x = -2;
-			jointPos.y = 0;
+			jointPos.y = 273 + 100;
 			jointPos.z = 77;
 
-			GetLaraJointPosition(&jointPos, LM_LHAND);
+			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
 			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
@@ -80,19 +80,6 @@ void FireHarpoon()
 			}
 
 			InitialiseItem(itemNumber);
-
-			/*if (Lara.target != nullptr)
-			{
-				find_target_point(Lara.target, &pos);
-				item->pos.yRot = phd_atan(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
-				int distance = sqrt(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
-				item->pos.xRot = -phd_atan(distance, pos.y - item->pos.yPos);
-			}
-			else
-			{
-				item->pos.xRot = LaraItem->pos.xRot + Lara.torsoXrot;
-				item->pos.yRot = LaraItem->pos.yRot + Lara.torsoYrot;
-			}*/
 
 			item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
 			item->pos.zRot = 0;
@@ -120,101 +107,15 @@ void FireHarpoon()
 
 void ControlHarpoonBolt(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	// Store position for later
+	// Store old position for later
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
-	short oldRoom = item->roomNumber;
-
-	// Update position
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.yPos += item->fallspeed;
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
-
 	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	// Has harpoon changed room?
-	if (item->roomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-
-	//  First check if the harpoon has it an item
-	short targetItemNumber = 0;
-	ITEM_INFO* target;
-	for (targetItemNumber = g_Level.Rooms[item->roomNumber].itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
-	{
-		target = &g_Level.Items[targetItemNumber];
-		if (target == LaraItem || !target->collidable)
-			continue;
-
-		if (target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision)
-		{
-			// check against bounds of target for collision
-			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(target);
-			if (item->pos.yPos < target->pos.yPos + bounds->Y1 || item->pos.yPos > target->pos.yPos + bounds->Y2)
-				continue;
-
-			// get vector from target to bolt and check against x,z bounds
-			short c = phd_cos(target->pos.yRot);
-			short s = phd_sin(target->pos.yRot);
-
-			int x = item->pos.xPos - target->pos.xPos;
-			int z = item->pos.zPos - target->pos.zPos;
-			int rx = (c * x - s * z) >> W2V_SHIFT;
-
-			int ox = oldX - target->pos.xPos;
-			int oz = oldZ - target->pos.zPos;
-			int sx = (c * ox - s * oz) >> W2V_SHIFT;
-
-			if ((rx < bounds->X1 && sx < bounds->X1) || (rx > bounds->X2 && sx > bounds->X2))
-				continue;
-
-			int rz = (c * z + s * x) >> W2V_SHIFT;
-			int sz = (c * oz + s * ox) >> W2V_SHIFT;
-
-			if ((rz < bounds->Z1 && sz < bounds->Z1) || (rz > bounds->Z2 && sz > bounds->Z2))
-				continue;
-
-			// TODO:
-			if (target->objectNumber == SMASH_OBJECT1 && CurrentLevel != LV_CRASH)
-			{
-				SmashWindow(targetItemNumber);
-			}
-			else if (target->objectNumber == SMASH_WINDOW ||
-				target->objectNumber == SMASH_OBJECT2 ||
-				target->objectNumber == SMASH_OBJECT3)
-			{
-				SmashWindow(targetItemNumber);
-			}
-			else if (target->objectNumber == CARCASS || target->objectNumber == EXTRAFX6)
-			{
-				if (item->status != ACTIVE)
-				{
-					item->status = ACTIVE;
-					AddActiveItem(targetItemNumber);
-				}
-			}
-			else if (target->objectNumber != SMASH_OBJECT1)
-			{
-			if (Objects[target->objectNumber].intelligent)
-			{
-				DoLotsOfBlood(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, 0, item->roomNumber, 3);
-				HitTarget(target, NULL, Weapons[WEAPON_HARPOON_GUN].damage << item->itemFlags[0], 0);
-				Savegame.Level.AmmoHits++;
-				Savegame.Game.AmmoHits++;
-			}
-
-			KillItem(itemNumber);
-			item->afterDeath = 0;
-			return;
-		}
-	}
-
-	// Has harpoon hit a wall?
-	if (item->pos.yPos >= item->floor || item->pos.yPos <= GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos))
+	/*if (item->pos.yPos >= item->floor || item->pos.yPos <= GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos))
 	{
 		if (item->hitPoints == HARPOON_TIME)
 		{
@@ -223,15 +124,14 @@ void ControlHarpoonBolt(short itemNumber)
 
 		if (item->hitPoints >= 192)
 		{
-			item->pos.xRot = item->currentAnimState + ((((rcossin_tbl[((item->hitPoints - 192) << 9) & 4095] >> 1) - 1024)*(item->hitPoints - 192)) >> 6);
+			item->pos.xRot = item->currentAnimState + ((((phd_sin(item->hitPoints * 2048) / 8) - 1024) * (item->hitPoints - 192)) / 64);
 			item->hitPoints--;
 		}
 
 		item->hitPoints--;
-		if (item->hitPoints <= 0)
+		if (!item->hitPoints)
 		{
 			KillItem(itemNumber);
-			item->afterDeath = 0;
 			return;
 		}
 		item->speed = item->fallspeed = 0;
@@ -239,39 +139,23 @@ void ControlHarpoonBolt(short itemNumber)
 	else
 	{
 		item->pos.zRot += ANGLE(35);
-		if (!(g_Level.Rooms[item->roomNumber].flags & 1))
+		if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER))
 		{
-			item->pos.xRot -= ANGLE(1);
-			if (item->pos.xRot < -16384)
-				item->pos.xRot = -16384;
+			item->pos.xRot -= (ANGLE(1));
+			if (item->pos.xRot < -ANGLE(90))
+				item->pos.xRot = -ANGLE(90);
 			item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
 			item->speed = (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		}
 		else
 		{
-			// Create bubbles
 			if ((Wibble & 15) == 0)
-				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0,BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
-			//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
+				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 2, 8);
+			TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
 			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * phd_sin(item->pos.xRot) >> W2V_SHIFT);
 			item->speed = (short)((HARPOON_SPEED >> 1) * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		}
-	}
-
-
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	if (item->roomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);*/
-
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	// Store old position for later
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
-	short roomNumber = item->roomNumber;
+	}*/
 
 	bool aboveWater = false;
 
@@ -291,7 +175,7 @@ void ControlHarpoonBolt(short itemNumber)
 		// Create bubbles
 		if ((Wibble & 15) == 0)
 			CreateBubble((PHD_VECTOR*)& item->pos, item->roomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
-		//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
+		TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
 		item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * phd_sin(item->pos.xRot) >> W2V_SHIFT);
 		item->speed = (short)((HARPOON_SPEED >> 1) * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		aboveWater = false;

@@ -45,6 +45,8 @@ int phd_cos(short a);
 const float frand();
 const float frandMinMax(float min, float max);
 const float lerp(float v0, float v1, float t);
+const Vector3 getRandomVector();
+const Vector3 getRandomVectorInCone(const Vector3& direction,const float angleDegrees);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 void phd_GetVectorAngles(int x, int y, int z, short* angles);
