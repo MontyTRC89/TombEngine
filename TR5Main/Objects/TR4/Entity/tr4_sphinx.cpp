@@ -17,7 +17,7 @@ void InitialiseSphinx(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[item->animNumber].animIndex + 1;
+	item->animNumber = Objects[item->objectNumber].animIndex + 1;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
