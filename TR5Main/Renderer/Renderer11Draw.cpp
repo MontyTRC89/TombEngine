@@ -23,6 +23,7 @@
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 #include "hair.h"
+#include "winmain.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -1907,6 +1908,8 @@ namespace T5M::Renderer
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+        drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255,255, 255), 0);
+        drawAllStrings();
         m_swapChain->Present(0, 0);
     }
 
