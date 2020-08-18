@@ -65,8 +65,8 @@ void Renderer11::updateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
-		laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
+		laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(-Lara.leftArm.yRot), TO_RAD(Lara.leftArm.zRot));
+		laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(-Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
 
 		LARA_ARM *leftArm = &Lara.leftArm;
 		LARA_ARM *rightArm = &Lara.rightArm;
@@ -80,6 +80,7 @@ void Renderer11::updateLaraAnimations(bool force)
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
+		case WEAPON_REVOLVER:
 			ANIM_FRAME* shotgunFramePtr;
 
 			// Left arm
@@ -95,7 +96,6 @@ void Renderer11::updateLaraAnimations(bool force)
 
 		case WEAPON_PISTOLS:
 		case WEAPON_UZI:
-		case WEAPON_REVOLVER:
 		default:
 		{
 			ANIM_FRAME* pistolFramePtr;
