@@ -25,6 +25,7 @@
 #include "tr4_baboon.h" // OK
 #include "tr4_mutant.h" // OK
 #include "tr4_locusts.h" // OK
+#include "tr4_big_beetle.h" // OFF
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -289,6 +290,26 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_BIG_BEETLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBigBeetle;
+		obj->control = BigBeetleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 50;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->undead = true;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_SETHA];
