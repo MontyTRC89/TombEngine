@@ -772,6 +772,16 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_SETH_BLADE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSethBlade;
+		obj->control = SethBladeControl;
+		obj->collision = TrapCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
 	obj = &Objects[ID_SPIKEBALL];
 	if (obj->loaded)
 	{
