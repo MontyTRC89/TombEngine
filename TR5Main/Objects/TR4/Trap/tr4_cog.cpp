@@ -12,7 +12,6 @@ void CogControl(short itemNum)
 	if (TriggerActive(item))
 	{
 		item->status = ITEM_ACTIVE;
-		// *(_DWORD *)&item->gap4C[5526] = *(_DWORD *)&item->gap4C[5526] & 0xFFFFFFFB | 2;
 		AnimateItem(item);
 
 		if (item->triggerFlags == 666)

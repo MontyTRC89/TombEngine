@@ -763,6 +763,15 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_CATWALK_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = CatwalkBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
 	obj = &Objects[ID_SPIKEBALL];
 	if (obj->loaded)
 	{
