@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_horseman.h"
+#include "tr4_setha.h"
 #include "items.h"
 #include "effect2.h"
 #include "setup.h"
@@ -9,7 +9,7 @@
 #include <lara.h>
 #include <sound.h>
 #include <sphere.h>
-#include <Game\people.h>
+#include <people.h>
 
 BITE_INFO SethaBite1 = { 0,220,50,17 };
 BITE_INFO SethaBite2 = { 0,220,50,13 };
@@ -484,7 +484,7 @@ void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv)
 	}
 }
 
-void TriggerSethaSparks2(short itemNumber, byte node, int size)
+void TriggerSethaSparks2(short itemNumber, char node, int size)
 {
 	int dx = LaraItem->pos.xPos - g_Level.Items[itemNumber].pos.xPos;
 	int dz = LaraItem->pos.zPos - g_Level.Items[itemNumber].pos.zPos;
