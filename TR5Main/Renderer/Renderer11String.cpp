@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 namespace T5M::Renderer {
-	void Renderer11::drawString(int x, int y, char* string, D3DCOLOR color, int flags) {
+	void Renderer11::drawString(int x, int y, const char* string, D3DCOLOR color, int flags) {
 		int realX = x;
 		int realY = y;
 		float factorX = ScreenWidth / 800.0f;

@@ -625,7 +625,7 @@ namespace T5M::Renderer
 		void renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void drawPickup(short objectNum);
 		int SyncRenderer();
-		void drawString(int x, int y, char* string, D3DCOLOR color, int flags);
+		void drawString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void clearDynamicLights();
 		void addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void freeRendererData();
