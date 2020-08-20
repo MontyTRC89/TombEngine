@@ -48,6 +48,7 @@
 #include "tr4_stargate.h"
 #include "tr4_cog.h"
 #include "tr4_laradouble.h"
+#include "tr4_setha.h"
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
@@ -288,6 +289,26 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_SETHA];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSetha;
+		obj->control = SethaControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 500;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->hitEffect = HIT_NONE;
+		obj->undead = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_DEMIGOD1];

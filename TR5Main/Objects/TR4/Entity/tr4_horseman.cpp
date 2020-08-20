@@ -6,6 +6,9 @@
 #include "level.h"
 #include "control.h"
 #include "trmath.h"
+#include <lara.h>
+#include <sound.h>
+#include <sphere.h>
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };
@@ -14,7 +17,7 @@ BITE_INFO horsemanBite1 = { 0, 0, 0, 0x06 };
 BITE_INFO horsemanBite2 = { 0, 0, 0, 0x0E };
 BITE_INFO horsemanBite3 = { 0, 0, 0, 0x0A };
 
-static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
+static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -34,9 +37,9 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->life = 9;
 		spark->sLife = 9;
 		spark->transType = COLADD;
-		spark->x = pos->xPos;
-		spark->y = pos->yPos;
-		spark->z = pos->zPos;
+		spark->x = pos->x;
+		spark->y = pos->y;
+		spark->z = pos->z;
 		spark->friction = 34;
 		spark->yVel = (r & 0xFFF) - 2048;
 		spark->flags = SP_NONE;
@@ -64,9 +67,9 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->life = 9;
 		spark->sLife = 9;
 		spark->transType = COLADD;
-		spark->x = pos->xPos;
-		spark->y = pos->yPos;
-		spark->z = pos->zPos;
+		spark->x = pos->x;
+		spark->y = pos->y;
+		spark->z = pos->z;
 		spark->yVel = (r & 0xFFF) - 2048;
 		spark->gravity = (r >> 7) & 0x1F;
 		spark->rotAng = r >> 3;
@@ -117,7 +120,8 @@ void InitialiseHorseman(short itemNumber)
 void HorsemanControl(short itemNumber)
 {
 	printf("[Horseman] Not Implemented !");
-#ifdef OLD_CODE
+
+#if OLDCODE
 	if (!CreatureActive(itemNumber))
 		return;
 
@@ -158,6 +162,7 @@ void HorsemanControl(short itemNumber)
 	short height1;
 	short height2;
 	int xRot = 0;
+	short angle;
 
 	if (horseItem != NULL)
 	{
@@ -197,7 +202,7 @@ void HorsemanControl(short itemNumber)
 
 				if (item->itemFlags[0])
 				{
-					Items[item->itemFlags[0]].afterDeath = 1;
+					g_Level.Items[item->itemFlags[0]].afterDeath = 1;
 				}
 			}
 		}
@@ -239,605 +244,586 @@ void HorsemanControl(short itemNumber)
 			}
 		}
 	}
-
-	if (item->aiBits)
-	{
-		GetAITarget(creature);
-	}
-	else if (creature->hurtByLara)
-	{
-		creature->enemy = LaraItem;
-	}
-
-	AI_INFO info;
-	AI_INFO laraInfo;
-
-	CreatureAIInfo(item, &info);
-
-	if (creature->enemy == LaraItem)
-	{
-		laraInfo.angle = info.angle;
-		laraInfo.distance = info.distance;
-	}
 	else
 	{
-		deltaX = LaraItem->pos.zPos - item->pos.zPos;
-		deltaZ = LaraItem->pos.zPos - item->pos.zPos;
-
-		laraInfo.angle = phd_atan(deltaX, deltaZ) - item->pos.yRot;
-		laraInfo.distance = SQUARE(deltaX) + SQUARE(deltaZ);
-	}
-
-	short angle = 0;
-	short tilt = 0;
-
-	if (item->hitStatus
-		&& laraInfo.angle < 12288
-		&& laraInfo.angle > -12288
-		&& laraInfo.distance < SQUARE(2048))
-	{
-		if (!horseItem || !item->itemFlags[1])
+		if (item->aiBits)
 		{
-			Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
-			CreatureAnimation(itemNumber, angle, 0);
-			return;
+			GetAITarget(creature);
+		}
+		else if (creature->hurtByLara)
+		{
+			creature->enemy = LaraItem;
 		}
 
-		if (abs(xRot - item->pos.xRot) < 256)
+		AI_INFO info;
+		AI_INFO laraInfo;
+
+		CreatureAIInfo(item, &info);
+
+		if (creature->enemy == LaraItem)
 		{
-			item->pos.xRot = xRot;
+			laraInfo.angle = info.angle;
+			laraInfo.distance = info.distance;
 		}
 		else
 		{
-			if (xRot > item->pos.xRot)
-			{
-				item->pos.xRot += 256;
-			}
-			else if (xRot < item->pos.xRot)
-			{
-				item->pos.xRot -= 256;
-			}
+			deltaX = LaraItem->pos.zPos - item->pos.zPos;
+			deltaZ = LaraItem->pos.zPos - item->pos.zPos;
+
+			laraInfo.angle = phd_atan(deltaX, deltaZ) - item->pos.yRot;
+			laraInfo.distance = SQUARE(deltaX) + SQUARE(deltaZ);
 		}
 
-		horseItem->pos.xPos = item->pos.xPos;
-		horseItem->pos.yPos = item->pos.yPos;
-		horseItem->pos.zPos = item->pos.zPos;
-		horseItem->pos.xRot = item->pos.xRot;
-		horseItem->pos.yRot = item->pos.yRot;
-		horseItem->pos.zRot = item->pos.zRot;
+		short tilt = 0;
 
-		if (horseItem->roomNumber != item->roomNumber)
+		if (item->hitStatus
+			&& laraInfo.angle < 12288
+			&& laraInfo.angle > -12288
+			&& laraInfo.distance < SQUARE(2048))
 		{
-			ItemNewRoom(item->itemFlags[0], item->roomNumber);
-		}
-
-		AnimateItem(horseItem);
-
-		Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
-		CreatureAnimation(itemNumber, angle, 0);
-
-		if (item->currentAnimState != 15)
-		{
-			if (laraInfo.angle > 0)
+			if (item->currentAnimState != 15)
 			{
-				goto LABEL_188;
-			}
-
-			if (laraInfo.angle <= 0)
-			{
-				if (item->itemFlags[1])
-				{
-				LABEL_47:
-					if (!item->itemFlags[1])
-					{
-						v36 = item->meshBits;
-						if (item->meshBits & 0x400)
-						{
-							item->requiredAnimState = 15;
-						}
-					}
-					goto LABEL_50;
-				}
-			}
-
-			if (item->itemFlags[1])
-			{
-			LABEL_47:
 				if (!item->itemFlags[1])
 				{
-					v36 = item->meshBits;
-					if (v36 & 0x400)
+					if (laraInfo.angle > 0 || !(item->meshBits & 0x400))
 					{
-						item->requiredAnimState = 15;
+						if (Lara.gunType == WEAPON_SHOTGUN)
+						{
+							item->hitPoints -= 10;
+							item->hitStatus = true;
+						}
+						else if (Lara.gunType == WEAPON_REVOLVER)
+						{
+							item->hitPoints -= 20;
+							item->hitStatus = true;
+						}
+						else
+						{
+							item->hitPoints--;
+						}
+
+						SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->pos, 0);
+						SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->pos, 0);
+
+						PHD_VECTOR pos;
+						pos.x = 0;
+						pos.y = -128;
+						pos.z = 80;
+						GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
+						HorsemanSparks(&pos, item->pos.yRot, 7);
+
+						if (!item->itemFlags[1])
+						{
+							if (item->meshBits & 0x400)
+								item->requiredAnimState = 15;
+						}
+						goto LABEL_50;
 					}
 				}
-				goto LABEL_50;
 			}
-			v35 = item->meshBits;
-			if (!(v35 & 0x400))
+			else if (!(GetRandomControl() & 7))
 			{
-			LABEL_188:
-				if (Lara_GunType == 4)
+				if (item->currentAnimState == 15)
+					item->goalAnimState = 9;
+				ExplodeItemNode(item, 10, 1, -24);
+			}
+
+			if (!item->itemFlags[1])
+			{
+				if (item->meshBits & 0x400)
+					item->requiredAnimState = 15;
+			}
+		}
+
+		creature->hurtByLara = false;
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			creature->maximumTurn = ANGLE(3);
+			horseItem->goalAnimState = 2;
+			if (item->requiredAnimState)
+			{
+				item->goalAnimState = 17;
+				horseItem->goalAnimState = 5;
+			}
+			else if (creature->flags
+				|| creature->reachedGoal
+				|| item->hitStatus
+				&& !GetRandomControl())
+			{
+				if (laraInfo.distance > SQUARE(4096)
+					|| creature->reachedGoal)
 				{
-					item->hitPoints -= 10;
-					LOBYTE(v34) = v34 | 0x10;
-					item->MainFlags = v34;
-				}
-				else if (Lara_GunType == 2)
-				{
-					item->hitPoints -= 20;
-					LOBYTE(v34) = v34 | 0x10;
-					item->MainFlags = v34;
+					creature->flags = 0;
+					creature->enemy = LaraItem;
+					if (laraInfo.angle > -8192 && laraInfo.angle < 0x2000)
+					{
+						item->goalAnimState = 3;
+						horseItem->goalAnimState = 1;
+					}
 				}
 				else
 				{
-					--item->hitPoints;
+					item->aiBits = FOLLOW;
+					item->itemFlags[3] = (-(item->itemFlags[3] != 1)) + 2;
 				}
-				SoundEffect(301, &item->pos, 0);
-				SoundEffect(213, &item->pos, 0);
-				v68 = 0;
-				v69 = -128;
-				v70 = 80;
-				GetJointAbsPosition((int)item, &v68, 1);
-				sub_408D90(&v68, (signed short)item->pos.yRot, 7);
-				goto LABEL_47;
 			}
-		}
-		if (!(GetRandomControl() & 7))
-		{
-			if (item->currentAnimState == 15)
+
+			if (info.distance >= SQUARE(1024)
+				|| info.bite
+				|| info.angle >= -ANGLE(10)
+				&& info.angle <= ANGLE(10))
 			{
-				item->goalAnimState = 9;
-			}
-			ExplodeItemNode((int)item, 10, 1, -24);
-		}
-
-		return;
-	}
-
-	creature->hurtByLara = false;
-
-	GetCreatureMood(item, &info, VIOLENT);
-	CreatureMood(item, &info, VIOLENT);
-
-	angle = CreatureTurn(item, creature->maximumTurn);
-
-	switch (item->currentAnimState)
-	{
-	case 1:
-		creature->maximumTurn = ANGLE(3);
-		horseItem->goalAnimState = 2;
-		if (item->requiredAnimState)
-		{
-			item->goalAnimState = 17;
-			horseItem->goalAnimState = 5;
-		}
-		else if (creature->flags || creature->reachedGoal || item->hitStatus && !GetRandomControl())
-		{
-			if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal)
-			{
-				creature->flags = 0;
-				creature->enemy = LaraItem;
-				if (laraInfo.angle > -8192 && laraInfo.angle < 0x2000)
+				if (info.bite)
 				{
-					item->goalAnimState = 3;
-					horseItem->goalAnimState = 1;
+					if (info.angle >= -ANGLE(10)
+						|| info.distance >= SQUARE(1024)
+						&& (info.distance >= SQUARE(1365)
+							|| info.angle <= -ANGLE(20)))
+					{
+						if (info.angle > ANGLE(10)
+							&& (info.distance < SQUARE(1024)
+								|| info.distance < SQUARE(1365) &&
+								info.angle < ANGLE(20)))
+						{
+							creature->maximumTurn = 0;
+							item->goalAnimState = 6;
+						}
+					}
+					else
+					{
+						creature->maximumTurn = 0;
+						item->goalAnimState = 7;
+					}
 				}
 			}
 			else
 			{
-				item->aiBits = FOLLOW;
-				item->itemFlags[3] = (-(item->itemFlags[3] != 1)) + 2;
+				item->goalAnimState = 3;
+				horseItem->goalAnimState = 1;
 			}
-		}
 
-		if (info.distance >= SQUARE(1024) || info.bite || info.angle >= -ANGLE(10) && info.angle <= ANGLE(10))
-		{
-			if (info.bite)
+			break;
+
+		case 2:
+			creature->maximumTurn = 273;
+
+			if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal || creature->enemy == LaraItem)
 			{
-				if (info.angle >= -ANGLE(10)
-					|| info.distance >= SQUARE(1024) && (info.distance >= SQUARE(1365) || info.angle <= -ANGLE(20)))
-				{
-					if (info.angle > ANGLE(10) && (info.distance < SQUARE(1024) || info.distance < SQUARE(1365) &&
-						info.angle < ANGLE(20)))
-					{
-						creature->maximumTurn = 0;
-						item->goalAnimState = 6;
-					}
-				}
-				else
-				{
-					creature->maximumTurn = 0;
-					item->goalAnimState = 7;
-				}
+				creature->reachedGoal = false;
+				creature->flags = 0;
+				item->goalAnimState = 1;
+				horseItem->goalAnimState = 2;
+				creature->enemy = LaraItem;
 			}
-		}
-		else
-		{
-			item->goalAnimState = 3;
+
+			break;
+
+		case 3:
+			creature->maximumTurn = 0;
 			horseItem->goalAnimState = 1;
-		}
 
-		break;
-
-	case 2:
-		creature->maximumTurn = 273;
-
-		if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal || creature->enemy == LaraItem)
-		{
-			creature->reachedGoal = false;
-			creature->flags = 0;
-			item->goalAnimState = 1;
-			horseItem->goalAnimState = 2;
-			creature->enemy = LaraItem;
-		}
-
-		break;
-
-	case 3:
-		creature->maximumTurn = 0;
-		horseItem->goalAnimState = 1;
-
-		if (creature->flags)
-		{
-			item->aiBits = FOLLOW;
-			item->itemFlags[3] = -(item->itemFlags[3] != 1) + 2;
-		}
-		else
-		{
-			creature->flags = 0;
-		}
-
-		if (item->requiredAnimState)
-		{
-			item->goalAnimState = 1;
-			horseItem->goalAnimState = 2;
-			horseItem->flags = 0;
-		}
-		else if (creature->reachedGoal
-			|| !horseItem->flags
-			&& info.distance < SQUARE(1024)
-			&& info.bite
-			&& info.angle < ANGLE(10)
-			&& info.angle > -ANGLE(10))
-		{
-			item->goalAnimState = 4;
-			if (creature->reachedGoal)
+			if (creature->flags)
 			{
-				item->requiredAnimState = 17;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3] = -(item->itemFlags[3] != 1) + 2;
 			}
-			horseItem->flags = 0;
-		}
-		else
-		{
-			item->goalAnimState = 1;
-			horseItem->goalAnimState = 2;
-			horseItem->flags = 0;
-		}
-
-		break;
-
-	case 4:
-		creature->maximumTurn = 0;
-		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
-		{
-			horseItem->animNumber = Objects[ID_HORSE].animIndex + 1;
-			horseItem->currentAnimState = 4;
-			horseItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		}
-		if (!horseItem->flags)
-		{
-			if (horseItem->touchBits & 0x22000)
+			else
 			{
-				LaraItem->hitPoints -= 150;
-				LaraItem->hitStatus = true;
-
-				if (horseItem->touchBits & 0x2000)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horseBite1,
-						10,
-						-1,
-						DoBloodSplat);
-				}
-				else
-				{
-					CreatureEffect2(
-						horseItem,
-						&horseBite2,
-						10,
-						-1,
-						DoBloodSplat);
-				}
-
-				horseItem->flags = 1;
+				creature->flags = 0;
 			}
-		}
 
-		break;
-
-	case 6:
-		if (!creature->flags)
-		{
-			if (item->touchBits & 0x60)
-			{
-				LaraItem->hitPoints -= 250;
-				LaraItem->hitStatus = true;
-
-				CreatureEffect2(
-					item,
-					&horsemanBite1,
-					10,
-					item->pos.yRot,
-					DoBloodSplat);
-
-				creature->flags = 1;
-			}
-		}
-		if (item->hitStatus)
-		{
-			item->goalAnimState = 9;
-		}
-
-		break;
-
-	case 7:
-		if (!creature->flags)
-		{
-			if (item->touchBits & 0x4000)
-			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
-
-				CreatureEffect2(
-					item,
-					&horsemanBite2,
-					3,
-					item->pos.yRot,
-					DoBloodSplat);
-
-				creature->flags = 1;
-			}
-		}
-
-		break;
-
-	case 9:
-		creature->maximumTurn = 0;
-		creature->flags = 0;
-
-		if (!item->aiBits || item->itemFlags[3])
-		{
 			if (item->requiredAnimState)
 			{
-				item->goalAnimState = item->requiredAnimState;
+				item->goalAnimState = 1;
+				horseItem->goalAnimState = 2;
+				horseItem->flags = 0;
 			}
-			else if (info.bite && info.distance < SQUARE(682))
+			else if (creature->reachedGoal
+				|| !horseItem->flags
+				&& info.distance < SQUARE(1024)
+				&& info.bite
+				&& info.angle < ANGLE(10)
+				&& info.angle > -ANGLE(10))
 			{
-				item->goalAnimState = 14;
+				item->goalAnimState = 4;
+				if (creature->reachedGoal)
+				{
+					item->requiredAnimState = 17;
+				}
+				horseItem->flags = 0;
 			}
-			else if (info.distance < SQUARE(6144) && info.distance > SQUARE(682))
+			else
+			{
+				item->goalAnimState = 1;
+				horseItem->goalAnimState = 2;
+				horseItem->flags = 0;
+			}
+
+			break;
+
+		case 4:
+			creature->maximumTurn = 0;
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+			{
+				horseItem->animNumber = Objects[ID_HORSE].animIndex + 1;
+				horseItem->currentAnimState = 4;
+				horseItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			}
+			if (!horseItem->flags)
+			{
+				if (horseItem->touchBits & 0x22000)
+				{
+					LaraItem->hitPoints -= 150;
+					LaraItem->hitStatus = true;
+
+					if (horseItem->touchBits & 0x2000)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horseBite1,
+							10,
+							-1,
+							DoBloodSplat);
+					}
+					else
+					{
+						CreatureEffect2(
+							horseItem,
+							&horseBite2,
+							10,
+							-1,
+							DoBloodSplat);
+					}
+
+					horseItem->flags = 1;
+				}
+			}
+
+			break;
+
+		case 6:
+			if (!creature->flags)
+			{
+				if (item->touchBits & 0x60)
+				{
+					LaraItem->hitPoints -= 250;
+					LaraItem->hitStatus = true;
+
+					CreatureEffect2(
+						item,
+						&horsemanBite1,
+						10,
+						item->pos.yRot,
+						DoBloodSplat);
+
+					creature->flags = 1;
+				}
+			}
+			if (item->hitStatus)
+			{
+				item->goalAnimState = 9;
+			}
+
+			break;
+
+		case 7:
+			if (!creature->flags)
+			{
+				if (item->touchBits & 0x4000)
+				{
+					LaraItem->hitPoints -= 100;
+					LaraItem->hitStatus = true;
+
+					CreatureEffect2(
+						item,
+						&horsemanBite2,
+						3,
+						item->pos.yRot,
+						DoBloodSplat);
+
+					creature->flags = 1;
+				}
+			}
+
+			break;
+
+		case 9:
+			creature->maximumTurn = 0;
+			creature->flags = 0;
+
+			if (!item->aiBits || item->itemFlags[3])
+			{
+				if (item->requiredAnimState)
+				{
+					item->goalAnimState = item->requiredAnimState;
+				}
+				else if (info.bite && info.distance < SQUARE(682))
+				{
+					item->goalAnimState = 14;
+				}
+				else if (info.distance < SQUARE(6144) && info.distance > SQUARE(682))
+				{
+					item->goalAnimState = 10;
+				}
+			}
+			else
 			{
 				item->goalAnimState = 10;
 			}
-		}
-		else
-		{
-			item->goalAnimState = 10;
-		}
-
-		break;
-
-	case 10:
-		creature->maximumTurn = ANGLE(3);
-		creature->flags = 0;
-
-		if (creature->reachedGoal)
-		{
-			item->aiBits = 0;
-			item->itemFlags[1] = 1;
-
-			item->pos.xPos = horseItem->pos.xPos;
-			item->pos.yPos = horseItem->pos.yPos;
-			item->pos.zPos = horseItem->pos.zPos;
-			item->pos.xRot = horseItem->pos.xRot;
-			item->pos.yRot = horseItem->pos.yRot;
-			item->pos.zRot = horseItem->pos.zRot;
-
-			creature->reachedGoal = false;
-			creature->enemy = NULL;
-
-			item->animNumber = Objects[ID_HORSEMAN].animIndex + 14;
-			item->currentAnimState = 5;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-
-			creature->maximumTurn = 0;
 
 			break;
-		}
 
-		if (item->hitStatus)
-		{
-			item->goalAnimState = 9;
-			break;
-		}
+		case 10:
+			creature->maximumTurn = ANGLE(3);
+			creature->flags = 0;
 
-		if (info.bite && info.distance < SQUARE(682))
-		{
-			if (GetRandomControl() & 1)
+			if (creature->reachedGoal)
 			{
-				item->goalAnimState = 12;
+				item->aiBits = 0;
+				item->itemFlags[1] = 1;
+
+				item->pos.xPos = horseItem->pos.xPos;
+				item->pos.yPos = horseItem->pos.yPos;
+				item->pos.zPos = horseItem->pos.zPos;
+				item->pos.xRot = horseItem->pos.xRot;
+				item->pos.yRot = horseItem->pos.yRot;
+				item->pos.zRot = horseItem->pos.zRot;
+
+				creature->reachedGoal = false;
+				creature->enemy = NULL;
+
+				item->animNumber = Objects[ID_HORSEMAN].animIndex + 14;
+				item->currentAnimState = 5;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+
+				creature->maximumTurn = 0;
+
+				break;
 			}
-			else if (GetRandomControl() & 1)
+
+			if (item->hitStatus)
 			{
-				item->goalAnimState = 13;
+				item->goalAnimState = 9;
+				break;
+			}
+
+			if (info.bite && info.distance < SQUARE(682))
+			{
+				if (GetRandomControl() & 1)
+				{
+					item->goalAnimState = 12;
+				}
+				else if (GetRandomControl() & 1)
+				{
+					item->goalAnimState = 13;
+				}
+				else
+				{
+					item->goalAnimState = 9;
+				}
+			}
+			else if (info.distance < SQUARE(5120) && info.distance > SQUARE(1365))
+			{
+				item->goalAnimState = 11;
+			}
+
+			break;
+
+		case 11:
+			if (info.distance < SQUARE(1365))
+			{
+				item->goalAnimState = 10;
+			}
+
+			break;
+
+		case 12:
+		case 13:
+		case 14:
+			creature->maximumTurn = 0;
+			if (abs(info.angle) >= ANGLE(3))
+			{
+				if (info.angle >= 0)
+				{
+					item->pos.yRot += ANGLE(3);
+				}
+				else
+				{
+					item->pos.yRot -= ANGLE(3);
+				}
 			}
 			else
+			{
+				item->pos.yRot += info.angle;
+			}
+
+			if (!creature->flags)
+			{
+				if (item->touchBits & 0x4000)
+				{
+					LaraItem->hitPoints -= 100;
+					LaraItem->hitStatus = true;
+
+					CreatureEffect2(
+						item,
+						&horsemanBite2,
+						3,
+						item->pos.yRot,
+						DoBloodSplat);
+
+					creature->flags = 1;
+				}
+			}
+
+			break;
+
+		case 15:
+			if (Lara.target != item || info.bite && info.distance < SQUARE(682))
 			{
 				item->goalAnimState = 9;
 			}
-		}
-		else if (info.distance < SQUARE(5120) && info.distance > SQUARE(1365))
-		{
-			item->goalAnimState = 11;
-		}
 
-		break;
+			break;
 
-	case 11:
-		if (info.distance < SQUARE(1365))
-		{
-			item->goalAnimState = 10;
-		}
+		case 17:
+			creature->reachedGoal = false;
+			creature->maximumTurn = 546;
 
-		break;
-
-	case 12:
-	case 13:
-	case 14:
-		creature->maximumTurn = 0;
-		if (abs(info.angle) >= ANGLE(3))
-		{
-			if (info.angle >= 0)
+			if (!horseItem->flags)
 			{
-				item->pos.yRot += ANGLE(3);
+				if (horseItem->touchBits & 0xA2000)
+				{
+					LaraItem->hitPoints -= 150;
+					LaraItem->hitStatus = true;
+
+					if (horseItem->touchBits & 0x2000)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horseBite1,
+							10,
+							-1,
+							DoBloodSplat);
+					}
+
+					if (horseItem->touchBits & 0x20000)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horseBite2,
+							10,
+							-1,
+							DoBloodSplat);
+					}
+
+					if (horseItem->touchBits & 0x80000)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horseBite3,
+							10,
+							-1,
+							DoBloodSplat);
+					}
+
+					horseItem->flags = 1;
+				}
 			}
+			if (!creature->flags)
+			{
+				if (item->touchBits & 0x460)
+				{
+					LaraItem->hitStatus = true;
+
+					if (item->touchBits & 0x60)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horsemanBite1,
+							20,
+							-1,
+							DoBloodSplat);
+						LaraItem->hitPoints -= 250;
+					}
+					else if (item->touchBits & 0x400)
+					{
+						CreatureEffect2(
+							horseItem,
+							&horsemanBite3,
+							10,
+							-1,
+							DoBloodSplat);
+						LaraItem->hitPoints -= 150;
+					}
+
+					creature->flags = 1;
+				}
+			}
+
+			if (item->animNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
+				item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+			{
+				horseItem->animNumber = Objects[ID_HORSE].animIndex + 10;
+				horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
+			}
+
+			if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal)
+			{
+				creature->reachedGoal = false;
+				creature->flags = 0;
+				creature->enemy = LaraItem;
+			}
+			else if (!info.ahead)
+			{
+				item->goalAnimState = 3;
+				horseItem->goalAnimState = 1;
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		if (horseItem && item->itemFlags[1])
+		{
+			if (abs(xRot - item->pos.xRot) < 256)
+				item->pos.xRot = xRot;
 			else
 			{
-				item->pos.yRot -= ANGLE(3);
+				if (xRot > item->pos.xRot)
+				{
+					item->pos.xRot += 256;
+				}
+				else if (xRot < item->pos.xRot)
+				{
+					item->pos.xRot -= 256;
+				}
 			}
-		}
-		else
-		{
-			item->pos.yRot += info.angle;
-		}
 
-		if (!creature->flags)
-		{
-			if (item->touchBits & 0x4000)
+			horseItem->pos.xPos = item->pos.xPos;
+			horseItem->pos.yPos = item->pos.yPos;
+			horseItem->pos.zPos = item->pos.zPos;
+			horseItem->pos.xRot = item->pos.xRot;
+			horseItem->pos.yRot = item->pos.yRot;
+			horseItem->pos.zRot = item->pos.zRot;
+
+			if (horseItem->roomNumber != item->roomNumber)
 			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
-
-				CreatureEffect2(
-					item,
-					&horsemanBite2,
-					3,
-					item->pos.yRot,
-					DoBloodSplat);
-
-				creature->flags = 1;
+				ItemNewRoom(item->itemFlags[0], item->roomNumber);
 			}
+
+			AnimateItem(horseItem);
 		}
-
-		break;
-
-	case 15:
-		if (Lara.target != item || info.bite && info.distance < SQUARE(682))
-		{
-			item->goalAnimState = 9;
-		}
-
-		break;
-
-	case 17:
-		creature->reachedGoal = false;
-		creature->maximumTurn = 546;
-
-		if (!horseItem->flags)
-		{
-			if (horseItem->touchBits & 0xA2000)
-			{
-				LaraItem->hitPoints -= 150;
-				LaraItem->hitStatus = true;
-
-				if (horseItem->touchBits & 0x2000)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horseBite1,
-						10,
-						-1,
-						DoBloodSplat);
-				}
-
-				if (horseItem->touchBits & 0x20000)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horseBite2,
-						10,
-						-1,
-						DoBloodSplat);
-				}
-
-				if (horseItem->touchBits & 0x80000)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horseBite3,
-						10,
-						-1,
-						DoBloodSplat);
-				}
-
-				horseItem->flags = 1;
-			}
-		}
-		if (!creature->flags)
-		{
-			if (item->touchBits & 0x460)
-			{
-				LaraItem->hitStatus = true;
-
-				if (item->touchBits & 0x60)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horsemanBite1,
-						20,
-						-1,
-						DoBloodSplat);
-					LaraItem->hitPoints -= 250;
-				}
-				else if (item->touchBits & 0x400)
-				{
-					CreatureEffect2(
-						horseItem,
-						&horsemanBite3,
-						10,
-						-1,
-						DoBloodSplat);
-					LaraItem->hitPoints -= 150;
-				}
-
-				creature->flags = 1;
-			}
-		}
-
-		if (item->animNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
-			item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
-		{
-			horseItem->animNumber = Objects[ID_HORSE].animIndex + 10;
-			horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
-		}
-
-		if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal)
-		{
-			creature->reachedGoal = false;
-			creature->flags = 0;
-			creature->enemy = LaraItem;
-		}
-		else if (!info.ahead)
-		{
-			item->goalAnimState = 3;
-			horseItem->goalAnimState = 1;
-		}
-		break;
-
-	default:
-		break;
 	}
+
+	Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
+	CreatureAnimation(itemNumber, angle, 0);
 #endif
 }
