@@ -782,6 +782,15 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_PLINTH_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = PlinthBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
 	obj = &Objects[ID_SPIKEBALL];
 	if (obj->loaded)
 	{
