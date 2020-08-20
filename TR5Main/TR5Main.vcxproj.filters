@@ -864,6 +864,9 @@
     <ClInclude Include="Objects\TR4\Entity\tr4_setha.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_big_beetle.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1572,6 +1575,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_setha.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_big_beetle.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
