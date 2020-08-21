@@ -27,6 +27,7 @@
 #include "tr4_locusts.h" // OK
 #include "tr4_big_beetle.h" // OFF
 #include "tr4_joby_spikes.h"
+#include "tr4_mapper.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -721,6 +722,15 @@ static void StartObject(OBJECT_INFO* obj)
 	{
 		obj->control = AnimatingControl;
 		obj->collision = SarcophagusCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_MAPPER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMapper;
+		obj->control = MapperControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
