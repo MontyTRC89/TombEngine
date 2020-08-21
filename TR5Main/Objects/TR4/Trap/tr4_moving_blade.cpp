@@ -5,8 +5,8 @@
 #include <sound.h>
 #include <draw.h>
 #include <lara.h>
-#include <Game\sphere.h>
-#include <Game\effect2.h>
+#include <sphere.h>
+#include <effect2.h>
 
 void MovingBladeControl(short itemNumber)
 {
