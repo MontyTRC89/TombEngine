@@ -28,6 +28,7 @@
 #include "tr4_big_beetle.h" // OFF
 #include "tr4_joby_spikes.h"
 #include "tr4_mapper.h"
+#include "tr4_moving_blade.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -818,6 +819,15 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->control = JobySpikesControl;
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MOVING_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = MovingBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_SPIKEBALL];
