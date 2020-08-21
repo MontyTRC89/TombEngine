@@ -29,6 +29,7 @@
 #include "tr4_joby_spikes.h"
 #include "tr4_mapper.h"
 #include "tr4_moving_blade.h"
+#include "tr4_element_puzzle.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -734,6 +735,16 @@ static void StartObject(OBJECT_INFO* obj)
 		obj->control = MapperControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_ELEMENT_PUZZLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseElementPuzzle;
+		obj->control = ElementPuzzleControl;
+		obj->collision = ElementPuzzleCollision;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
 	}
 }
 
