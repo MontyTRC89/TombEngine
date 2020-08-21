@@ -867,6 +867,9 @@
     <ClInclude Include="Objects\TR4\Entity\tr4_big_beetle.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_joby_spikes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1578,6 +1581,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_big_beetle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_joby_spikes.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
