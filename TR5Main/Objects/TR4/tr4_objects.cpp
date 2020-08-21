@@ -26,6 +26,7 @@
 #include "tr4_mutant.h" // OK
 #include "tr4_locusts.h" // OK
 #include "tr4_big_beetle.h" // OFF
+#include "tr4_joby_spikes.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -797,6 +798,15 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->control = BirdBladeControl;
 		obj->collision = TrapCollision;
 		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_JOBY_SPIKES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseJobySpikes;
+		obj->control = JobySpikesControl;
+		obj->collision = GenericSphereBoxCollision;
 		obj->saveFlags = true;
 	}
 
