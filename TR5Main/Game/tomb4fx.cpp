@@ -234,7 +234,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	if (on)
 		fptr->on = on;
 	else
-		fptr->on = true;
+		fptr->on = 1;
 
 	fptr->x = x;
 	fptr->y = y;
