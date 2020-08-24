@@ -1092,6 +1092,17 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
+	
+	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseClassicRollingBall;
+		obj->control = ClassicRollingBallControl;
+		obj->collision = ClassicRollingBallCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
 
 	obj = &Objects[ID_DARTS];
 	if (obj->loaded)
