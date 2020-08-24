@@ -371,7 +371,7 @@ void ClassicRollingBallControl(short itemNum)
 	item = &g_Level.Items[itemNum];
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (LaraItem->goalAnimState == 2)
+		if (item->goalAnimState == 2)
 		{
 			AnimateItem(item);
 			return;
@@ -379,7 +379,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->pos.yPos < item->floor)
 		{
-			if (item->gravityStatus == 0)
+			if (!item->gravityStatus)
 			{
 				item->gravityStatus = 1;
 				item->fallspeed = -10;
