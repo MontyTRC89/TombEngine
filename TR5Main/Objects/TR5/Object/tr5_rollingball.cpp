@@ -5,6 +5,7 @@
 #include "control.h"
 #include "lara.h"
 #include "setup.h"
+#include "sound.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
@@ -304,50 +305,51 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (TestBoundsCollide(item, lara, coll->radius))
+		if (!TestBoundsCollide(item, lara, coll->radius))
+			return;
+		if (!TestCollision(item, lara))
+			return;
+		if (lara->gravityStatus)
 		{
-			if (TestCollision(item, lara))
+			if (coll->enableBaddiePush)
+				ItemPushLara(item, lara, coll, coll->enableSpaz, 1);
+			lara->hitPoints -= 100;
+			x = lara->pos.xPos - item->pos.xPos;
+			y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);
+			z = lara->pos.zPos - item->pos.zPos;				
+			d = (short)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+			if (d < 512)
+				d = 512;
+			x = item->pos.xPos + ((x * 512) / d);
+			y = item->pos.yPos - 512 + ((y * 512) / d);
+			z = item->pos.zPos + ((z * 512) / d);
+			DoBloodSplat(x, y, z, item->speed, item->pos.yRot, item->roomNumber);
+		}
+		else
+		{
+			lara->hitStatus = 1;
+			if (lara->hitPoints > 0)
 			{
-				if (lara->gravityStatus)
+				lara->hitPoints = -1;//?
+				lara->pos.yRot = item->pos.yRot;
+				lara->pos.zPos = 0;
+				lara->pos.zRot = 0;	
+
+				lara->animNumber = LA_BOULDER_DEATH;
+				lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
+				lara->currentAnimState = LS_BOULDER_DEATH;
+				lara->goalAnimState = LS_BOULDER_DEATH;
+						
+				Camera.flags = CF_FOLLOW_CENTER;
+				Camera.targetAngle = ANGLE(170);
+				Camera.targetElevation = -ANGLE(25);
+				for (int i = 0; i < 15; i++)
 				{
-					if (coll->enableBaddiePush)
-						ItemPushLara(item, lara, coll, coll->enableSpaz, 1);
-					lara->hitPoints -= 100;
-					x = lara->pos.xPos - item->pos.xPos;
-					y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);
-					z = lara->pos.zPos - item->pos.zPos;
-					d = (short)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
-					if (d < 512)
-						d = 512;
-					x = item->pos.xPos + ((x * 512) / d);
-					y = item->pos.yPos - 512 + ((y * 512) / d);
-					z = item->pos.zPos + ((z * 512) / d);
-					DoBloodSplat(x, y, z, item->speed, item->pos.yRot, item->roomNumber);
-				}
-				else
-				{
-					lara->hitStatus = 1;
-					if (lara->hitPoints > 0)
-					{
-						lara->hitPoints = -1;//?
-						lara->pos.yRot = item->pos.yRot;
-						lara->pos.zPos = 0;
-						lara->pos.zRot = 0;
-						/*
-						Lara's animation stuff
-						*/
-						Camera.flags = CF_FOLLOW_CENTER;
-						Camera.targetAngle = ANGLE(170);
-						Camera.targetElevation = -ANGLE(25);
-						for (int i = 0; i < 15; i++)
-						{
-							x = lara->pos.xPos + (GetRandomControl() - ANGLE(180) / 256);
-							y = lara->pos.yPos - (GetRandomControl() / 64);
-							z = lara->pos.zPos + (GetRandomControl() - ANGLE(180) / 256);
-							d = ((GetRandomControl() - ANGLE(180) / 8) + item->pos.yRot);
-							DoBloodSplat(x, y, z, (short)(item->speed * 2), d, item->roomNumber);
-						}
-					}
+					x = lara->pos.xPos + (GetRandomControl() - ANGLE(180) / 256);
+					y = lara->pos.yPos - (GetRandomControl() / 64);
+					z = lara->pos.zPos + (GetRandomControl() - ANGLE(180) / 256);
+					d = ((GetRandomControl() - ANGLE(180) / 8) + item->pos.yRot);
+					DoBloodSplat(x, y, z, (short)(item->speed * 2), d, item->roomNumber);
 				}
 			}
 		}
@@ -360,6 +362,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 void ClassicRollingBallControl(short itemNum)
 {
 	short x, z, dist, oldx, oldz, roomNum;
+	short y1, y2, ydist;
 	ITEM_INFO* item;
 	FLOOR_INFO* floor;
 	GAME_VECTOR* old;
@@ -402,17 +405,40 @@ void ClassicRollingBallControl(short itemNum)
 			item->gravityStatus = false;
 			item->fallspeed = 0;
 			item->pos.yPos = item->floor;
-			/*stupid sound crap hardcoded to object # idk*/
+			SoundEffect(SFX_TR3_ROLLING_BALL, &item->pos, 0);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->pos.xPos)) + (SQUARE(Camera.mikePos.z - item->pos.zPos)));
 			if (dist < 10240)
 				Camera.bounce = -40 * (10240 - dist) / 10240;
 		}
 
-		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
+//		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
+		if (item->objectNumber == ID_CLASSIC_ROLLING_BALL)
+		{
+			dist = 320;
+			ydist = 832;
+		}
+		else if (item->objectNumber == ID_BIG_ROLLING_BALL)
+		{
+			dist = 1088;
+			ydist = 2112;
+		}
+		else
+		{
+			dist = 1024;
+			ydist = 1024;
+		}
+
 		x = item->pos.xPos + (dist * phd_sin(item->pos.yRot) >> W2V_SHIFT);
 		z = item->pos.zPos + (dist * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+
 		floor = GetFloor(x, item->pos.yPos, z, &roomNum);
-		if (GetFloorHeight(floor, x, item->pos.yPos, z) < item->pos.yPos)
+		y1 = GetFloorHeight(floor, x, item->pos.yPos, z);
+
+		roomNum = item->roomNumber;
+		floor = GetFloor(x, item->pos.yPos - ydist, z, &roomNum);
+		y2 = GetCeiling(floor, x, item->pos.yPos - ydist, z);
+
+		if (y1 < item->pos.yPos || y2 > (item->pos.yPos-ydist))
 		{
 			/*stupid sound crap hardcoded to object # idk*/
 			item->status = ITEM_DEACTIVATED;
