@@ -438,7 +438,7 @@ void ClassicRollingBallControl(short itemNum)
 		floor = GetFloor(x, item->pos.yPos - ydist, z, &roomNum);
 		y2 = GetCeiling(floor, x, item->pos.yPos - ydist, z);
 
-		if (y1 < item->pos.yPos || y2 > (item->pos.yPos-ydist))
+		if (y1 < item->pos.yPos || y2 > (item->pos.yPos-ydist)) //there's something wrong here, this if statement returns true, executing this block, deactivating the boulders.
 		{
 			/*stupid sound crap hardcoded to object # idk*/
 			item->status = ITEM_DEACTIVATED;
