@@ -293,3 +293,178 @@ void RollingBallControl(short itemNumber)
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	TestTriggers(TriggerIndex, TRUE, NULL);
 }
+
+void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
+{
+	int x, y, z;
+	short d;
+	ITEM_INFO* item;
+
+	item = &g_Level.Items[itemNum];
+
+	if (item->status == ITEM_ACTIVE)
+	{
+		if (TestBoundsCollide(item, lara, coll->radius))
+		{
+			if (TestCollision(item, lara))
+			{
+				if (lara->gravityStatus)
+				{
+					if (coll->enableBaddiePush)
+						ItemPushLara(item, lara, coll, coll->enableSpaz, 1);
+					lara->hitPoints -= 100;
+					x = lara->pos.xPos - item->pos.xPos;
+					y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);
+					z = lara->pos.zPos - item->pos.zPos;
+					d = (short)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+					if (d < 512)
+						d = 512;
+					x = item->pos.xPos + ((x * 512) / d);
+					y = item->pos.yPos - 512 + ((y * 512) / d);
+					z = item->pos.zPos + ((z * 512) / d);
+					DoBloodSplat(x, y, z, item->speed, item->pos.yRot, item->roomNumber);
+				}
+				else
+				{
+					lara->hitStatus = 1;
+					if (lara->hitPoints > 0)
+					{
+						lara->hitPoints = -1;//?
+						lara->pos.yRot = item->pos.yRot;
+						lara->pos.zPos = 0;
+						lara->pos.zRot = 0;
+						/*
+						Lara's animation stuff
+						*/
+						Camera.flags = CF_FOLLOW_CENTER;
+						Camera.targetAngle = ANGLE(170);
+						Camera.targetElevation = -ANGLE(25);
+						for (int i = 0; i < 15; i++)
+						{
+							x = lara->pos.xPos + (GetRandomControl() - ANGLE(180) / 256);
+							y = lara->pos.yPos - (GetRandomControl() / 64);
+							z = lara->pos.zPos + (GetRandomControl() - ANGLE(180) / 256);
+							d = ((GetRandomControl() - ANGLE(180) / 8) + item->pos.yRot);
+							DoBloodSplat(x, y, z, (short)(item->speed * 2), d, item->roomNumber);
+						}
+					}
+				}
+			}
+		}
+	}
+	else if (item->status != ITEM_INVISIBLE)
+		ObjectCollision(itemNum, lara, coll);
+
+}
+
+void ClassicRollingBallControl(short itemNum)
+{
+	short x, z, dist, oldx, oldz, roomNum;
+	ITEM_INFO* item;
+	FLOOR_INFO* floor;
+	GAME_VECTOR* old;
+	ROOM_INFO* r;
+
+	item = &g_Level.Items[itemNum];
+	if (item->status == ITEM_ACTIVE)
+	{
+		if (LaraItem->goalAnimState == 2)
+		{
+			AnimateItem(item);
+			return;
+		}
+
+		if (item->pos.yPos < item->floor)
+		{
+			if (item->gravityStatus == 0)
+			{
+				item->gravityStatus = 1;
+				item->fallspeed = -10;
+			}
+		}
+		else if (item->currentAnimState == 0)
+			item->goalAnimState = 1;
+
+		oldx = item->pos.xPos;
+		oldz = item->pos.zPos;
+		AnimateItem(item);
+		roomNum = item->roomNumber;
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
+		if (item->roomNumber != roomNum)
+			ItemNewRoom(itemNum, item->roomNumber);
+
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+		TestTriggers(TriggerIndex, TRUE, NULL);
+
+		if (item->pos.yPos >= (int)floor - 256)
+		{
+			item->gravityStatus = false;
+			item->fallspeed = 0;
+			item->pos.yPos = item->floor;
+			/*stupid sound crap hardcoded to object # idk*/
+			dist = sqrt((SQUARE(Camera.mikePos.x - item->pos.xPos)) + (SQUARE(Camera.mikePos.z - item->pos.zPos)));
+			if (dist < 10240)
+				Camera.bounce = -40 * (10240 - dist) / 10240;
+		}
+
+		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
+		x = item->pos.xPos + (dist * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+		z = item->pos.zPos + (dist * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+		floor = GetFloor(x, item->pos.yPos, z, &roomNum);
+		if (GetFloorHeight(floor, x, item->pos.yPos, z) < item->pos.yPos)
+		{
+			/*stupid sound crap hardcoded to object # idk*/
+			item->status = ITEM_DEACTIVATED;
+			item->pos.yPos = item->floor;
+			item->pos.xPos = oldx;
+			item->pos.zPos = oldz;
+			item->speed = 0;
+			item->fallspeed = 0;
+			item->touchBits = 0;
+		}
+	}
+	else if (item->status == ITEM_DEACTIVATED)
+	{
+		if (!TriggerActive(item))
+		{
+			item->status = ITEM_NOT_ACTIVE;
+			old = (GAME_VECTOR*)item->data;
+			item->pos.xPos = old->x;
+			item->pos.yPos = old->y;
+			item->pos.zPos = old->z;
+			if (item->roomNumber != old->roomNumber)
+			{
+				RemoveDrawnItem(itemNum);
+				r = &g_Level.Rooms[old->roomNumber];
+				item->nextItem = r->itemNumber;
+				r->itemNumber = itemNum;
+				item->roomNumber = old->roomNumber;
+			}
+			item->currentAnimState = 0;
+			item->goalAnimState = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState; 
+			item->goalAnimState = g_Level.Anims[item->animNumber].currentAnimState;
+			item->requiredAnimState = 0;
+			RemoveActiveItem(itemNum);
+		}
+	}
+}
+
+void InitialiseClassicRollingBall(short itemNum)
+{
+	ITEM_INFO *item;
+	GAME_VECTOR* old;
+
+	item = &g_Level.Items[itemNum];
+	old = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
+	item->data = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
+
+	old->x = item->pos.xPos;
+	old->y = item->pos.yPos;
+	old->z = item->pos.zPos;
+	old->roomNumber = item->roomNumber;
+
+}
