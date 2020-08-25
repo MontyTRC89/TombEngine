@@ -1255,3 +1255,18 @@ void GetTighRopeFallOff(int regularity)
 	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
 		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
 }
+
+bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: make it more fine-tuned when new collision is done.
+	switch (coll->collType)
+	{
+	case CT_RIGHT:
+		if (TrInput & IN_RIGHT)
+			return false;
+	case CT_LEFT:
+		if (TrInput & IN_LEFT)
+			return false;
+	}
+	return true;
+}
