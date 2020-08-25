@@ -17,19 +17,19 @@ ChunkId::~ChunkId() {
 		delete m_chunkBytes;
 }
 
-ChunkId* ChunkId::FromString(const char* str) {
-	return new ChunkId((char*)str, strlen(str));
+std::unique_ptr<ChunkId> ChunkId::FromString(const char* str) {
+	return std::make_unique<ChunkId>((char*)str, strlen(str));
 }
 
-ChunkId* ChunkId::FromString(string* str) {
-	return new ChunkId((char*)str->c_str(), str->length());
+std::unique_ptr<ChunkId> ChunkId::FromString(string* str) {
+	return std::make_unique<ChunkId>( (char*)str->c_str(), str->length());
 }
 
-ChunkId* ChunkId::FromStream(BaseStream* stream) {
+std::unique_ptr<ChunkId> ChunkId::FromStream(BaseStream* stream) {
 	int idLength = LEB128::ReadInt32(stream);
 	char* buffer = (char*)malloc(idLength);
 	stream->Read(buffer, idLength);
-	ChunkId* chunk = new ChunkId(buffer, idLength);
+	std::unique_ptr<ChunkId> chunk = std::make_unique<ChunkId>(buffer, idLength);
 	free(buffer);
 	return chunk;
 }

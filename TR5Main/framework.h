@@ -44,6 +44,7 @@
 #include "bass_fx.h"
 #include "sol.hpp"
 #include "memory/malloc.h"
+#include "Game/debug/debug.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

@@ -214,3 +214,5 @@ void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void WadeSplash(ITEM_INFO* item, int wh, int wd);
 void Splash(ITEM_INFO* item);
+void TriggerRocketFire(int x, int y, int z);
+void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);

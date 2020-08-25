@@ -342,6 +342,10 @@ void LoadObjects()
 		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
+
+		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterDamage = (short)ReadInt16();
+		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
 	// HACK: to remove after decompiling LoadSprites
@@ -631,6 +635,7 @@ void ReadRooms()
 			mesh.shade = ReadUInt16();
 			mesh.flags = ReadUInt16();
 			mesh.staticNumber = ReadUInt16();
+			mesh.hitPoints = ReadInt16();
 
 			room.mesh.push_back(mesh);
 		}
@@ -695,7 +700,7 @@ void FreeLevel()
 			g_Level.Zones[j][i].clear();
 		}
 	}
-	g_Renderer.FreeRendererData();
+	g_Renderer.freeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
 
@@ -807,7 +812,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	LevelFilePtr = NULL;
 	char* baseLevelDataPtr = NULL;
 
-	g_Renderer.UpdateProgress(0);
+	g_Renderer.updateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -835,21 +840,21 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadTextures();
 
-		g_Renderer.UpdateProgress(20);
+		g_Renderer.updateProgress(20);
 
 		WeatherType = ReadInt8();
 		LaraDrawType = ReadInt8();
 
 		LoadRooms();
-		g_Renderer.UpdateProgress(40);
+		g_Renderer.updateProgress(40);
 
 		LoadObjects();
-		g_Renderer.UpdateProgress(50);
+		g_Renderer.updateProgress(50);
 
 		LoadSprites();
 		LoadCameras();
 		LoadSoundEffects();
-		g_Renderer.UpdateProgress(60);
+		g_Renderer.updateProgress(60);
 
 		LoadBoxes();
 
@@ -857,12 +862,12 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();
-		g_Renderer.UpdateProgress(70);
+		g_Renderer.updateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
 		LoadSamples();
-		g_Renderer.UpdateProgress(80);
+		g_Renderer.updateProgress(80);
 
 		free(baseLevelDataPtr);
 		LevelDataPtr = NULL;
@@ -873,7 +878,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		return false;
 	}
 
-	g_Renderer.UpdateProgress(90);
+	g_Renderer.updateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
@@ -894,7 +899,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 	// Level loaded
 	IsLevelLoading = false;
-	g_Renderer.UpdateProgress(100);
+	g_Renderer.updateProgress(100);
 
 	_endthreadex(1);
 
@@ -1001,7 +1006,7 @@ int S_LoadLevelFile(int levelIndex)
 	wchar_t loadscreenFileName[80];
 	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
 	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.DrawLoadingScreen(loadScreenFile);
+	g_Renderer.renderLoadingScreen(loadScreenFile);
 
 	while (IsLevelLoading);
 
