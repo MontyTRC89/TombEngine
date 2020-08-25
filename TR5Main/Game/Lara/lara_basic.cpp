@@ -11,7 +11,7 @@
 #include "draw.h"
 #include "pickup.h"
 
-bool doJump = false;
+bool DoJump = false;
 
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)//19928(<), 19A5C(<) (F)
@@ -224,9 +224,12 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)//192EC, 19420 (F)
 		if (Lara.turnRate < -LARA_FAST_TURN)
 			Lara.turnRate = -LARA_FAST_TURN;
 
-		item->pos.zRot -= LARA_LEAN_RATE;
-		if (item->pos.zRot < -LARA_LEAN_MAX)
-			item->pos.zRot = -LARA_LEAN_MAX;
+		if (TestLaraLean(item, coll))
+		{
+			item->pos.zRot -= LARA_LEAN_RATE;
+			if (item->pos.zRot < -LARA_LEAN_MAX)
+				item->pos.zRot = -LARA_LEAN_MAX;
+		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -234,26 +237,29 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)//192EC, 19420 (F)
 		if (Lara.turnRate > LARA_FAST_TURN)
 			Lara.turnRate = LARA_FAST_TURN;
 
-		item->pos.zRot += LARA_LEAN_RATE;
-		if (item->pos.zRot > LARA_LEAN_MAX)
-			item->pos.zRot = LARA_LEAN_MAX;
+		if (TestLaraLean(item, coll))
+		{
+			item->pos.zRot += LARA_LEAN_RATE;
+			if (item->pos.zRot > LARA_LEAN_MAX)
+				item->pos.zRot = LARA_LEAN_MAX;
+		}
 	}
 
 	if (item->animNumber == LA_STAND_TO_RUN)
 	{
-		doJump = false;
+		DoJump = false;
 	}
 	else if (item->animNumber == LA_RUN)
 	{
 		if (item->frameNumber == 4)
-			doJump = true;
+			DoJump = true;
 	}
 	else
 	{
-		doJump = true;
+		DoJump = true;
 	}
 
-	if (TrInput & IN_JUMP && doJump && !item->gravityStatus)
+	if (TrInput & IN_JUMP && DoJump && !item->gravityStatus)
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
 	}
@@ -1948,9 +1954,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
 			if (Lara.turnRate < -(LARA_FAST_TURN >> 1))
 				Lara.turnRate = -(LARA_FAST_TURN >> 1);
 
-			item->pos.zRot -= LARA_LEAN_RATE;
-			if (item->pos.zRot < -(LARA_LEAN_MAX >> 1))
-				item->pos.zRot = -(LARA_LEAN_MAX >> 1);
+			if (TestLaraLean(item, coll))
+			{
+				item->pos.zRot -= LARA_LEAN_RATE;
+				if (item->pos.zRot < -(LARA_LEAN_MAX >> 1))
+					item->pos.zRot = -(LARA_LEAN_MAX >> 1);
+			}
 		}
 		else if (TrInput & IN_RIGHT)
 		{
@@ -1958,9 +1967,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
 			if (Lara.turnRate > (LARA_FAST_TURN >> 1))
 				Lara.turnRate = (LARA_FAST_TURN >> 1);
 
-			item->pos.zRot += LARA_LEAN_RATE;
-			if (item->pos.zRot > (LARA_LEAN_MAX >> 1))
-				item->pos.zRot = (LARA_LEAN_MAX >> 1);
+			if (TestLaraLean(item, coll))
+			{
+				item->pos.zRot += LARA_LEAN_RATE;
+				if (item->pos.zRot > (LARA_LEAN_MAX >> 1))
+					item->pos.zRot = (LARA_LEAN_MAX >> 1);
+			}
 		}
 
 		if (TrInput & IN_FORWARD)
@@ -1976,9 +1988,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
 			if (Lara.turnRate < -LARA_FAST_TURN)
 				Lara.turnRate = -LARA_FAST_TURN;
 
-			item->pos.zRot -= LARA_LEAN_RATE;
-			if (item->pos.zRot < -LARA_LEAN_MAX)
-				item->pos.zRot = -LARA_LEAN_MAX;
+			if (TestLaraLean(item, coll))
+			{
+				item->pos.zRot -= LARA_LEAN_RATE;
+				if (item->pos.zRot < -LARA_LEAN_MAX)
+					item->pos.zRot = -LARA_LEAN_MAX;
+			}
 		}
 		else if (TrInput & IN_RIGHT)
 		{
@@ -1986,9 +2001,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
 			if (Lara.turnRate > LARA_FAST_TURN)
 				Lara.turnRate = LARA_FAST_TURN;
 
-			item->pos.zRot += LARA_LEAN_RATE;
-			if (item->pos.zRot > LARA_LEAN_MAX)
-				item->pos.zRot = LARA_LEAN_MAX;
+			if (TestLaraLean(item, coll))
+			{
+				item->pos.zRot += LARA_LEAN_RATE;
+				if (item->pos.zRot > LARA_LEAN_MAX)
+					item->pos.zRot = LARA_LEAN_MAX;
+			}
 		}
 
 		if (TrInput & IN_FORWARD)

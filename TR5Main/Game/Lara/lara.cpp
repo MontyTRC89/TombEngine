@@ -40,7 +40,7 @@ using T5M::Renderer::g_Renderer;
 
 extern Inventory g_Inventory;
 
-short elevation = 57346;
+short Elevation = 57346;
 extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
@@ -1326,5 +1326,5 @@ void AnimateLara(ITEM_INFO* item)
 	}
 
 	// Update matrices
-	g_Renderer.UpdateLaraAnimations(true);
+	g_Renderer.updateLaraAnimations(true);
 }

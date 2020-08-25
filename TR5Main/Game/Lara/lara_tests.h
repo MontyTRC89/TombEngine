@@ -20,3 +20,4 @@ short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 int LaraLandedBad(ITEM_INFO* l, COLL_INFO* coll);
 void GetTighRopeFallOff(int Regularity);
+bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll);
