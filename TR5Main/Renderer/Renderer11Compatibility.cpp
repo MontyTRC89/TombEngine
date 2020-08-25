@@ -17,7 +17,7 @@ namespace T5M::Renderer
 		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
 		m_staticObjects.resize(MAX_STATICS);
-		m_rooms = vector<RendererRoom>(NUM_ROOMS);
+		m_rooms.resize(g_Level.Rooms.size());
 
 		m_meshes.clear();
 
@@ -107,79 +107,85 @@ namespace T5M::Renderer
 		//free(buffer);
 
 		// Upload textures to GPU memory
+		m_roomTextures.resize(g_Level.RoomTextures.size());
 		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex =std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
-			m_roomTextures.push_back(tex);
+			TexturePair tex =std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_roomTextures[i] = tex;
 		}
 
+		m_moveablesTextures.resize(g_Level.MoveablesTextures.size());
 		for (int i = 0; i < g_Level.MoveablesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
-			m_moveablesTextures.push_back(tex);
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_moveablesTextures[i] = tex;
 		}
 
+		m_staticsTextures.resize(g_Level.RoomTextures.size());
 		for (int i = 0; i < g_Level.StaticsTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
-			m_staticsTextures.push_back(tex);
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_staticsTextures[i] = tex;
 		}
 
+		m_spritesTextures.resize(g_Level.SpritesTextures.size());
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.SpritesTextures[i];
-			m_spritesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
+			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size());
 		}
 
-		m_skyTexture = Texture2D(m_device, g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
+		m_skyTexture = Texture2D(m_device.Get(), g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
 		vector<int> roomIndices;
 
-		int baseRoomVertex = 0;
-		int baseRoomIndex = 0;
+		int totalRoomsVertices = 0;
+		int totalRoomsIndices = 0;
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
-			ROOM_INFO *room = &g_Level.Rooms[i];
+			ROOM_INFO* room = &g_Level.Rooms[i];
 
-			m_rooms[i] = RendererRoom();
-			RendererRoom &r = m_rooms[i];
-			r.RoomNumber = i;
-			r.Room = room;
-			r.AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
+			RendererRoom* r = &m_rooms[i];
+			r->RoomNumber = i;
+			r->Room = room;
+			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
 			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
-			r.Statics.resize(room->mesh.size());
+			r->Statics.resize(room->mesh.size());
 
 			if (room->positions.size() == 0)
 				continue;
 
+			int baseRoomVertex = 0;
+			int baseRoomIndex = 0;
+
 			for (int n = 0; n < room->buckets.size(); n++)
 			{
-				BUCKET *levelBucket = &room->buckets[n];
-				RendererBucket *bucket;
+				BUCKET* levelBucket = &room->buckets[n];
+				RendererBucket* bucket;
 				int bucketIndex;
 
 				if (levelBucket->blendMode != 0)
@@ -187,125 +193,140 @@ namespace T5M::Renderer
 				else
 					bucketIndex = RENDERER_BUCKET_SOLID;
 
-				bucket = &r.Buckets[bucketIndex];
+				bucket = &r->Buckets[bucketIndex];
 
-				bucket->Vertices.reserve(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-				bucket->Indices.reserve(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+				bucket->Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+				bucket->Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+
+				int lastVertex = 0;
+				int lastIndex = 0;
 
 				for (int p = 0; p < levelBucket->polygons.size(); p++)
 				{
 					POLYGON* poly = &levelBucket->polygons[p];
 
-					int baseVertices = bucket->Vertices.size();
+					int baseVertices = lastVertex;
 
 					for (int k = 0; k < poly->indices.size(); k++)
 					{
-						RendererVertex vertex;
+						RendererVertex* vertex = &bucket->Vertices[lastVertex];
 						int v = poly->indices[k];
 
-						vertex.Position.x = room->x + room->positions[v].x;
-						vertex.Position.y = room->y + room->positions[v].y;
-						vertex.Position.z = room->z + room->positions[v].z;
+						vertex->Position.x = room->x + room->positions[v].x;
+						vertex->Position.y = room->y + room->positions[v].y;
+						vertex->Position.z = room->z + room->positions[v].z;
 
-						vertex.Normal = poly->normals[k];
-						vertex.UV = poly->textureCoordinates[k];
-						vertex.Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z,1.0f);
-						vertex.Tangent = poly->tangents[k];
-						vertex.BiTangent = poly->bitangents[k];
+						vertex->Normal = poly->normals[k];
+						vertex->UV = poly->textureCoordinates[k];
+						vertex->Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z, 1.0f);
+						vertex->Tangent = poly->tangents[k];
+						vertex->BiTangent = poly->bitangents[k];
 
-						vertex.Bone = 0;
+						vertex->Bone = 0;
 
-						bucket->Vertices.push_back(vertex);
+						lastVertex++;
+						totalRoomsVertices++;
 					}
 
 					if (poly->shape == 0)
 					{
-						bucket->Indices.push_back(baseVertices);
-						bucket->Indices.push_back(baseVertices + 1);
-						bucket->Indices.push_back(baseVertices + 3);
-						bucket->Indices.push_back(baseVertices + 2);
-						bucket->Indices.push_back(baseVertices + 3);
-						bucket->Indices.push_back(baseVertices + 1);
+						bucket->Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
+						bucket->Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
+						bucket->Indices[lastIndex + 2] = baseVertices + 3; //.push_back(baseVertices + 3);
+						bucket->Indices[lastIndex + 3] = baseVertices + 2; //.push_back(baseVertices + 2);
+						bucket->Indices[lastIndex + 4] = baseVertices + 3; //.push_back(baseVertices + 3);
+						bucket->Indices[lastIndex + 5] = baseVertices + 1; //.push_back(baseVertices + 1);
+
+						lastIndex += 6;
+						totalRoomsIndices += 6;
 					}
 					else
 					{
-						bucket->Indices.push_back(baseVertices);
-						bucket->Indices.push_back(baseVertices + 1);
-						bucket->Indices.push_back(baseVertices + 2);
+						bucket->Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
+						bucket->Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
+						bucket->Indices[lastIndex + 2] = baseVertices + 2; //.push_back(baseVertices + 2);
+
+						lastIndex += 3;
+						totalRoomsIndices += 3;
 					}
 				}
 			}
 
 			if (room->lights.size() != 0)
 			{
+				r->Lights.resize(room->lights.size());
 				for (int l = 0; l < room->lights.size(); l++)
 				{
-					RendererLight light;
-					ROOM_LIGHT *oldLight = &room->lights[l];
+					RendererLight* light = &r->Lights[l];
+					ROOM_LIGHT* oldLight = &room->lights[l];
 
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
-						light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-						light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light.Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
-						light.Intensity = 1.0f;
-
-						r.Lights.push_back(light);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+						light->Intensity = 1.0f;
 					}
 					else if (oldLight->type == LIGHT_TYPE_POINT)
 					{
-						light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
-						light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-						light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light.Intensity = 1.0f;
-						light.In = oldLight->in;
-						light.Out = oldLight->out;
-						light.Type = LIGHT_TYPE_POINT;
-
-						r.Lights.push_back(light);
+						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+						light->Intensity = 1.0f;
+						light->In = oldLight->in;
+						light->Out = oldLight->out;
+						light->Type = LIGHT_TYPE_POINT;
 					}
 					else if (oldLight->type == LIGHT_TYPE_SHADOW)
 					{
-						light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
-						light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-						light.In = oldLight->in;
-						light.Out = oldLight->out;
-						light.Type = LIGHT_TYPE_SHADOW;
-						light.Intensity = 1.0f;
-
-						r.Lights.push_back(light);
+						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->In = oldLight->in;
+						light->Out = oldLight->out;
+						light->Type = LIGHT_TYPE_SHADOW;
+						light->Intensity = 1.0f;
 					}
 					else if (oldLight->type == LIGHT_TYPE_SPOT)
 					{
-						light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
-						light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-						light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light.Intensity = 1.0f;
-						light.In = oldLight->in;
-						light.Out = oldLight->out;
-						light.Range = oldLight->length;
-						light.Type = LIGHT_TYPE_SPOT;
-
-						r.Lights.push_back(light);
+						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+						light->Intensity = 1.0f;
+						light->In = oldLight->in;
+						light->Out = oldLight->out;
+						light->Range = oldLight->length;
+						light->Type = LIGHT_TYPE_SPOT;
 					}
 
 					oldLight++;
 				}
 			}
+		}
+
+		roomVertices.resize(totalRoomsVertices);
+		roomIndices.resize(totalRoomsIndices);
+
+		int baseRoomVertex = 0;
+		int baseRoomIndex = 0;
+
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
+		{
+			ROOM_INFO* room = &g_Level.Rooms[i];
+			RendererRoom* r = &m_rooms[i];
 
 			// Merge vertices and indices in a single list
 			for (int j = 0; j < NUM_BUCKETS; j++)
 			{
-				RendererBucket *bucket = &r.Buckets[j];
+				RendererBucket *bucket = &r->Buckets[j];
 
 				bucket->StartVertex = baseRoomVertex;
 				bucket->StartIndex = baseRoomIndex;
 
 				for (int k = 0; k < bucket->Vertices.size(); k++)
-					roomVertices.push_back(bucket->Vertices[k]);
+					roomVertices[baseRoomVertex + k] = bucket->Vertices[k];
 
 				for (int k = 0; k < bucket->Indices.size(); k++)
-					roomIndices.push_back(baseRoomVertex + bucket->Indices[k]);
+					roomIndices[baseRoomIndex + k] = baseRoomVertex + bucket->Indices[k];
 
 				baseRoomVertex += bucket->Vertices.size();
 				baseRoomIndex += bucket->Indices.size();
@@ -314,8 +335,8 @@ namespace T5M::Renderer
 
 		// Create a single vertex buffer and a single index buffer for all rooms
 		// NOTICE: in theory, a 1,000,000 vertices scene should have a VB of 52 MB and an IB of 4 MB
-		m_roomsVertexBuffer = VertexBuffer(m_device, roomVertices.size(), roomVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device, roomIndices.size(), roomIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomVertices.size(), roomVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomIndices.size(), roomIndices.data());
 
 		m_numHairVertices = 0;
 		m_numHairIndices = 0;
@@ -339,24 +360,6 @@ namespace T5M::Renderer
 				m_moveableObjects[MoveablesIds[i]] = RendererObject();
 				RendererObject &moveable = *m_moveableObjects[MoveablesIds[i]];
 				moveable.Id = MoveablesIds[i];
-
-				// Assign the draw routine
-				/*if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
-					objNum == ID_TRIGGER_TRIGGERER || objNum == ID_TIGHT_ROPE || objNum == ID_AI_AMBUSH ||
-					objNum == ID_AI_FOLLOW || objNum == ID_AI_GUARD || objNum == ID_AI_MODIFY ||
-					objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
-					objNum == ID_AI_X2 || objNum == ID_DART_EMITTER || objNum == ID_HOMING_DART_EMITTER ||
-					objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS || objNum == ID_EARTHQUAKE ||
-					objNum == ID_CAMERA_TARGET || objNum == ID_WATERFALLMIST || objNum == ID_SMOKE_EMITTER_BLACK ||
-					objNum == ID_SMOKE_EMITTER_WHITE)
-				{
-					moveable.DoNotDraw = true;
-				}
-				else
-				{
-					moveable.DoNotDraw = false;
-				}*/
-
 				moveable.DoNotDraw = (obj->drawRoutine == NULL);
 
 				for (int j = 0; j < obj->nmeshes; j++)
@@ -644,8 +647,8 @@ namespace T5M::Renderer
 		}
 
 		// Create a single vertex buffer and a single index buffer for all moveables
-		m_moveablesVertexBuffer = VertexBuffer(m_device, moveablesVertices.size(), moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device, moveablesIndices.size(), moveablesIndices.data());
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), moveablesVertices.size(), moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), moveablesIndices.size(), moveablesIndices.data());
 
 		// Step 4: prepare static meshes
 		vector<RendererVertex> staticsVertices;
@@ -688,8 +691,8 @@ namespace T5M::Renderer
 		}
 
 		// Create a single vertex buffer and a single index buffer for all statics
-		m_staticsVertexBuffer = VertexBuffer(m_device, staticsVertices.size(), staticsVertices.data());
-		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
+		m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
+		m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());

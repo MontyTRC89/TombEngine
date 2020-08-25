@@ -20,7 +20,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, int worldSpace, Matrix local)
 	BoundingSphere spheres[MAX_SPHERES];
 	short itemNumber = (item - g_Level.Items.data());
 
-	int num = g_Renderer.GetSpheres(itemNumber, spheres, worldSpace, local);
+	int num = g_Renderer.getSpheres(itemNumber, spheres, worldSpace, local);
 
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{
@@ -168,7 +168,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 
 	// Use matrices done in the renderer and transform the input vector
 	Vector3 p = Vector3(vec->x, vec->y, vec->z);
-	g_Renderer.GetItemAbsBonePosition(itemNumber, &p, joint);
+	g_Renderer.getItemAbsBonePosition(itemNumber, &p, joint);
 
 	// Store the result
 	vec->x = p.x;

@@ -168,9 +168,24 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
 		LM_enum = LM_HEAD;
 
 	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.GetLaraAbsBonePosition(&p, LM_enum);
+	g_Renderer.getLaraAbsBonePosition(&p, LM_enum);
 
 	pos->x = p.x;
 	pos->y = p.y;
 	pos->z = p.z;
+}
+
+void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
+{
+	if (angle <= rot)
+	{
+		if (angle >= -rot)
+			pos->yRot += angle;
+		else
+			pos->yRot -= rot;
+	}
+	else
+	{
+		pos->yRot += rot;
+	}
 }

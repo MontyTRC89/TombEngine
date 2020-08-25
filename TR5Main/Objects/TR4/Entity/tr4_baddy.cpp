@@ -9,6 +9,7 @@
 #include "effect.h"
 #include "setup.h"
 #include "level.h"
+#include <draw.h>
 
 enum BADDY_STATES {
 	STATE_BADDY_STOP = 0,
@@ -156,21 +157,6 @@ enum BADDY_SWAP_MESH_FLAGS {
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
-
-void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
-{
-	if (angle <= rot)
-	{
-		if (angle >= -rot)
-			pos->yRot += angle;
-		else
-			pos->yRot -= rot;
-	}
-	else
-	{
-		pos->yRot += rot;
-	}
-}
 
 void InitialiseBaddy(short itemNum)
 {

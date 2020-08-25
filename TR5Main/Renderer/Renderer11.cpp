@@ -33,51 +33,11 @@ namespace T5M::Renderer {
 	}
 
 	Renderer11::~Renderer11() {
-		FreeRendererData();
-
-		DX11_RELEASE(m_backBufferRTV);
-		DX11_RELEASE(m_backBufferTexture);
-		DX11_RELEASE(m_depthStencilState);
-		DX11_RELEASE(m_depthStencilTexture);
-		DX11_RELEASE(m_depthStencilView);
-
-		DX11_DELETE(m_primitiveBatch);
-		DX11_DELETE(m_spriteBatch);
-		DX11_DELETE(m_gameFont);
-		DX11_DELETE(m_states);
-
-		DX11_RELEASE(m_vsRooms);
-		DX11_RELEASE(m_psRooms);
-		DX11_RELEASE(m_vsItems);
-		DX11_RELEASE(m_psItems);
-		DX11_RELEASE(m_vsStatics);
-		DX11_RELEASE(m_psStatics);
-		DX11_RELEASE(m_vsHairs);
-		DX11_RELEASE(m_psHairs);
-		DX11_RELEASE(m_vsSky);
-		DX11_RELEASE(m_psSky);
-		DX11_RELEASE(m_vsSprites);
-		DX11_RELEASE(m_psSprites);
-		DX11_RELEASE(m_vsSolid);
-		DX11_RELEASE(m_psSolid);
-		DX11_RELEASE(m_vsInventory);
-		DX11_RELEASE(m_psInventory);
-		DX11_RELEASE(m_vsFullScreenQuad);
-		DX11_RELEASE(m_psFullScreenQuad);
-		DX11_RELEASE(m_cbCameraMatrices);
-		DX11_RELEASE(m_cbItem);
-		DX11_RELEASE(m_cbStatic);
-		DX11_RELEASE(m_cbLights);
-		DX11_RELEASE(m_cbMisc);
-		DX11_RELEASE(m_cbHUD);
-		DX11_RELEASE(m_cbHUDBar);
-		DX11_RELEASE(m_swapChain);
-		DX11_RELEASE(m_context);
-		DX11_RELEASE(m_device);
-		DX11_RELEASE(m_cbSprite);
+		freeRendererData();
 	}
 
-	void Renderer11::FreeRendererData() {
+	void Renderer11::freeRendererData()
+{
 		m_meshPointersToMesh.clear();
 		m_moveableObjects.clear();
 		m_staticObjects.clear();
@@ -118,103 +78,16 @@ namespace T5M::Renderer {
 		return nf;
 	}
 
-	ID3D11VertexShader* Renderer11::compileVertexShader(const wchar_t* fileName, const char* function, const char* model, ID3D10Blob** bytecode) {
-		HRESULT res;
-
-		*bytecode = NULL;
-		ID3DBlob* errors = NULL;
-
-		printf("Compiling vertex shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
-		res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
-		throwIfFailed(res);
-
-
-		ID3D11VertexShader* shader = NULL;
-		res = m_device->CreateVertexShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader);
-		throwIfFailed(res);
-
-		return shader;
-	}
-
-	ID3D11PixelShader* Renderer11::compilePixelShader(const wchar_t* fileName, const char* function, const char* model, ID3D10Blob** bytecode) {
-		HRESULT res;
-
-		*bytecode = NULL;
-		ID3DBlob* errors = NULL;
-
-		printf("Compiling pixel shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
-		throwIfFailed(D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors));
-
-		ID3D11PixelShader* shader = NULL;
-		throwIfFailed(m_device->CreatePixelShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader));
-		return shader;
-	}
-
-	ID3D11GeometryShader* Renderer11::compileGeometryShader(const wchar_t* fileName) {
-		HRESULT res;
-
-		ID3DBlob* bytecode = NULL;
-		ID3DBlob* errors = NULL;
-
-		res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, &bytecode, &errors);
-		if (FAILED(res))
-			return NULL;
-
-		ID3D11GeometryShader* shader = NULL;
-		res = m_device->CreateGeometryShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), NULL, &shader);
-		if (FAILED(res))
-			return NULL;
-
-		return shader;
-	}
-
-	ID3D11ComputeShader* Renderer11::compileComputeShader(const wchar_t* fileName) {
-		HRESULT res;
-
-		ID3DBlob* bytecode = NULL;
-		ID3DBlob* errors = NULL;
-
-		res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, &bytecode, &errors);
-		if (FAILED(res))
-			return NULL;
-
-		ID3D11ComputeShader* shader = NULL;
-		res = m_device->CreateComputeShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), NULL, &shader);
-		if (FAILED(res))
-			return NULL;
-
-		return shader;
-	}
-
-	void Renderer11::UpdateProgress(float value) {
+	void Renderer11::updateProgress(float value) {
 		m_progress = value;
 	}
 
 
-	ID3D11Buffer* Renderer11::createConstantBuffer(size_t size) {
-		ID3D11Buffer* buffer;
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-
-		desc.ByteWidth = size; // Constant buffer must have a size multiple of 16 bytes
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-		HRESULT res = m_device->CreateBuffer(&desc, NULL, &buffer);
-		if (FAILED(res))
-			return NULL;
-
-		return buffer;
-	}
 
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
 			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
-			drawSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
 	}

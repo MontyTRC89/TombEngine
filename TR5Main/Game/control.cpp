@@ -254,7 +254,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Does the player want to enter inventory?
 		SetDebounce = false;
-		if (CurrentLevel != 0 && !g_Renderer.IsFading())
+		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
 			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
@@ -372,7 +372,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Clear dynamic lights
 		ClearDynamicLights();
 		ClearFires();
-		g_Renderer.ClearDynamicLights();
+		g_Renderer.clearDynamicLights();
 
 		GotLaraSpheres = false;
 
@@ -477,7 +477,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			InItemControlLoop = false;
 			KillMoveItems();
 
-			g_Renderer.UpdateLaraAnimations(true);
+			g_Renderer.updateLaraAnimations(true);
 
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
@@ -584,7 +584,7 @@ unsigned CALLBACK GameMain(void *)
 	TIME_Init();
 
 	// Do a fixed time title image
-	g_Renderer.DoTitleImage();
+	g_Renderer.renderTitleImage();
 
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
@@ -747,18 +747,18 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	int nframes = 2;
 
 	// First control phase
-	g_Renderer.ResetAnimations();
+	g_Renderer.resetAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen
-	g_Renderer.FadeIn();
+	g_Renderer.fadeIn();
 
 	// The game loop, finally!
 	while (true)
 	{
 		nframes = DrawPhaseGame();
 
-		g_Renderer.ResetAnimations();
+		g_Renderer.resetAnimations();
 		result = ControlPhase(nframes, 0);
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
@@ -2198,9 +2198,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 				else
 				{
 					item = &g_Level.Items[itemNumber];
-					if (item->objectNumber != ID_SHOOT_SWITCH1 && item->objectNumber != ID_SHOOT_SWITCH2)
+					if (item->objectNumber < ID_SHOOT_SWITCH1 && item->objectNumber > ID_SHOOT_SWITCH4)
 					{
-						if (Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit && LaserSight)
+						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit) && LaserSight)
 						{
 							if (!Objects[item->objectNumber].intelligent)
 							{
@@ -2283,10 +2283,17 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 									ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
 								if (item->triggerFlags == 444 && item->objectNumber == ID_SHOOT_SWITCH2)
 								{
+									// TR5 ID_SWITCH_TYPE_8/ID_SHOOT_SWITCH2
 									ProcessExplodingSwitchType8(item);
 								}
-								else
+								else 
 								{
+									if (item->objectNumber == ID_SHOOT_SWITCH3)
+									{
+										// TR4 ID_SWITCH_TYPE7
+										ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
+									}
+
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
 										room = item->roomNumber;
@@ -2940,7 +2947,7 @@ void AnimateItem(ITEM_INFO *item)
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.UpdateItemAnimations(itemNumber, true);
+	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
 void DoFlipMap(short group)
@@ -2969,7 +2976,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(r);
 
-			g_Renderer.FlipRooms(i, r->flippedRoom);
+			g_Renderer.flipRooms(i, r->flippedRoom);
 		}
 	}
 
@@ -3314,4 +3321,11 @@ int IsRoomOutside(int x, int y, int z)
 	}
 
 	return -2;
+}
+
+void GetFloorAndTestTriggers(int x, int y, int z, short roomNumber, int heavy, int heavyFlags)
+{
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	GetFloorHeight(floor, x, y, z);
+	TestTriggers(TriggerIndex, heavy, heavyFlags);
 }
