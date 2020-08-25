@@ -2181,7 +2181,8 @@ namespace T5M::Renderer
             {
                 continue;
             }
-            else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2)
+            else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2 
+                || objectNumber == ID_JOBY_SPIKES)
             {
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
                 drawScaledSpikes(item, transparent, animated);
