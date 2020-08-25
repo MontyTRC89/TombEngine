@@ -193,5 +193,6 @@ int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
+void GetFloorAndTestTriggers(int x, int y, int z, short roomNumber, int heavy, int heavyFlags);
 
 unsigned CALLBACK GameMain(void*);

@@ -465,7 +465,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::ResetAnimations()
+	void Renderer11::resetAnimations()
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
 		{

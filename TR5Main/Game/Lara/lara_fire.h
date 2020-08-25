@@ -23,6 +23,15 @@ typedef struct WEAPON_INFO
 	byte drawFrame;
 	short sampleNum;
 };
+
+constexpr auto WSTATE_AIM = 0;
+constexpr auto WSTATE_DRAW = 1;
+constexpr auto WSTATE_UW_AIM = 6;
+constexpr auto WSTATE_RECOIL = 2;
+constexpr auto WSTATE_UW_RECOIL = 8;
+constexpr auto WSTATE_UNAIM = 4;
+constexpr auto WSTATE_UW_UNAIM = 7;
+
 extern WEAPON_INFO Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);

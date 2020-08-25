@@ -20,3 +20,4 @@ bool TIME_Init();
 bool TIME_Reset();
 void DrawAnimatingItem(ITEM_INFO* item);
 void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);
+void ClampRotation(PHD_3DPOS* pos, short angle, short rot);

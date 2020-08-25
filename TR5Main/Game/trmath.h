@@ -14,14 +14,24 @@ constexpr auto WALL_SIZE = 1024;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 
-#define SQUARE(x) ((x)*(x))
-#define CLAMP(x, a, b) ((x)<(a)?(a):((x)>(b)?(b):(x)))
-#define SIGN(x) ((0 < (x)) - ((x) < 0))
-#define CLAMPADD(x, a, b) ((x)<(a)?((x)+(a)):((x)>(b)?((x)-(b)):0))
-#define CLICK(x) ((x) * STEP_SIZE)
-#define SECTOR(x) ((x) * WALL_SIZE)
-#define HIDWORD(l) ((DWORD)(((DWORDLONG)(l)>>32)&0xFFFFFFFF))
-
+template<typename T>
+constexpr auto SQUARE(T x) { return ((x)*(x)); }
+template<typename T1, typename T2, typename T3>
+constexpr auto CLAMP(T1 x, T2  a, T3  b) { return ((x)<(a)?(a):((x)>(b)?(b):(x))); }
+template<typename T>
+constexpr auto SIGN(T x) { return ((0 < (x)) - ((x) < 0)); }
+template<typename T1, typename T2, typename T3>
+constexpr auto CLAMPADD(T1 x, T2  a, T3  b) { return ((x)<(a)?((x)+(a)):((x)>(b)?((x)-(b)):0)); }
+template<typename T>
+constexpr auto CLICK(T x) { return ((x) * STEP_SIZE); }
+template<typename T>
+constexpr auto SECTOR(T x) { return ((x) * WALL_SIZE); }
+template<typename T>
+constexpr auto HIDWORD(T l) { return ((DWORD)(((DWORDLONG)(l)>>32)&0xFFFFFFFF)); }
+template<typename T>
+constexpr auto MESH_BITS(T x) {
+	return (1 << x);
+}
 short ANGLE(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);
@@ -35,6 +45,8 @@ int phd_cos(short a);
 const float frand();
 const float frandMinMax(float min, float max);
 const float lerp(float v0, float v1, float t);
+const Vector3 getRandomVector();
+const Vector3 getRandomVectorInCone(const Vector3& direction,const float angleDegrees);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 void phd_GetVectorAngles(int x, int y, int z, short* angles);

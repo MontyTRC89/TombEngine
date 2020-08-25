@@ -32,7 +32,6 @@ namespace T5M{
 
 			void UpdateSmokeParticles();
 			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room);
-			SmokeParticle& getFreeSmokeParticle();
 			void TriggerGunSmokeParticles(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count);
 
 		}

@@ -142,7 +142,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 {
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		TriggerUnderwaterExplosion(item);
+		TriggerUnderwaterExplosion(item, 1);
 	}
 	else
 	{
