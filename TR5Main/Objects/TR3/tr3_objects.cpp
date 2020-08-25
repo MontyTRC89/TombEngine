@@ -23,7 +23,7 @@
 /// switch
 
 /// vehicles
-#include "cannon.h"
+#include "biggun.h"
 #include "kayak.h"
 #include "minecart.h"
 #include "quad.h"
@@ -392,6 +392,18 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
+
+	obj = &Objects[ID_BIGGUN];
+	if (obj->loaded)
+	{
+		obj->initialise = BigGunInitialise;
+		obj->collision = BigGunCollision;
+//		obj->draw_routine = BigGunDraw;
+		obj->savePosition = 1;
+		obj->saveFlags = 1;
+		obj->saveAnim = 1;
+	}
+
 }
 
 static void StartProjectiles(OBJECT_INFO* obj)
