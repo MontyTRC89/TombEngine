@@ -1798,7 +1798,7 @@ void LookLeftRight()
 				Lara.headYrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && !Lara.leftArm.lock && !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
 		Lara.torsoYrot = Lara.headYrot;
 }
 
@@ -1827,7 +1827,7 @@ void LookUpDown()
 				Lara.headXrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && !Lara.leftArm.lock && !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
 		Lara.torsoXrot = Lara.headXrot;
 }
 
