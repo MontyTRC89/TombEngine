@@ -849,7 +849,7 @@ void CalculateSpotCameras()
 
 					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));
 
-					Camera.targetElevation = Elevation;
+					Camera.targetElevation = elevation;
 
 					LookAt(&Camera, croll);
 
