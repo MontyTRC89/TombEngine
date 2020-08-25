@@ -25,6 +25,11 @@
 #include "tr4_baboon.h" // OK
 #include "tr4_mutant.h" // OK
 #include "tr4_locusts.h" // OK
+#include "tr4_big_beetle.h" // OFF
+#include "tr4_joby_spikes.h"
+#include "tr4_mapper.h"
+#include "tr4_moving_blade.h"
+#include "tr4_element_puzzle.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -48,6 +53,7 @@
 #include "tr4_stargate.h"
 #include "tr4_cog.h"
 #include "tr4_laradouble.h"
+#include "tr4_setha.h"
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
@@ -288,6 +294,46 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_BIG_BEETLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBigBeetle;
+		obj->control = BigBeetleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 50;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->undead = true;
+		obj->zoneType = ZONE_FLYER;
+	}
+
+	obj = &Objects[ID_SETHA];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSetha;
+		obj->control = SethaControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 500;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->hitEffect = HIT_NONE;
+		obj->undead = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_DEMIGOD1];
@@ -681,6 +727,25 @@ static void StartObject(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
+
+	obj = &Objects[ID_MAPPER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMapper;
+		obj->control = MapperControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_ELEMENT_PUZZLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseElementPuzzle;
+		obj->control = ElementPuzzleControl;
+		obj->collision = ElementPuzzleCollision;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
 }
 
 static void StartTrap(OBJECT_INFO* obj)
@@ -719,6 +784,61 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CATWALK_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = CatwalkBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SETH_BLADE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSethBlade;
+		obj->control = SethBladeControl;
+		obj->collision = TrapCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PLINTH_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = PlinthBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_BIRD_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = BirdBladeControl;
+		obj->collision = TrapCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_JOBY_SPIKES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseJobySpikes;
+		obj->control = JobySpikesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MOVING_BLADE];
+	if (obj->loaded)
+	{
+		obj->control = MovingBladeControl;
+		obj->collision = BladeCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_SPIKEBALL];
