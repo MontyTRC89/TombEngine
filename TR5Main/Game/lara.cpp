@@ -23,7 +23,7 @@
 #include "setup.h"
 
 #include "motorbike.h"
-#include "cannon.h"
+#include "biggun.h"
 #include "quad.h"
 #include "snowmobile.h"
 #include "jeep.h"
@@ -445,6 +445,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			//	if (MineCartControl())
 			//		return;
 			//	break;
+
+			case ID_BIGGUN:
+				if (BigGunControl(coll))
+					return;
+				break;
 
 			default:
 				break;
