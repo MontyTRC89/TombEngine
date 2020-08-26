@@ -6,7 +6,6 @@ typedef struct {
 	short yRot;
 	short startYRot;
 	char flags;
-	signed char fireCount;
 }BIGGUNINFO;
 void FireBigGun(ITEM_INFO *obj);
 void BigGunInitialise(short itemNum);
