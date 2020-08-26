@@ -10,85 +10,66 @@
 #include "sphere.h"
 #include "effect2.h"
 #include "lara_struct.h"
+#include "tomb4fx.h"
+#include "draw.h"
 
 static long GunRotYAdd = 0;
+int fireCount = 0;
 
 void FireBigGun(ITEM_INFO *obj)
 {
-	short item_number;
+		Lara.hasFired = true;
 
-	if ((item_number = CreateItem()) != NO_ITEM)
-	{
-		int lp;
-		PHD_VECTOR pos;
-		ITEM_INFO *item;
-		long	x, y, z, wx, wy, wz, xv, yv, zv;
-		BIGGUNINFO *gun = (BIGGUNINFO *)obj->data;
-
-		item = &g_Level.Items[item_number];
-
-		item->objectNumber = ID_ROCKET;
-		item->roomNumber = LaraItem->roomNumber;
-
-		pos.x = 0;
-		pos.y = 0;
-		pos.z = 256;
-		GetJointAbsPosition(obj, &pos, 2);
-
-		item->pos.xPos = pos.x;
-		item->pos.yPos = pos.y;
-		item->pos.zPos = pos.z;
-
-		InitialiseItem(item_number);
-
-		item->pos.xRot = -((gun->xRot - 32) * (ANGLE(1)));
-		item->pos.yRot = obj->pos.yRot;
-		item->pos.zRot = 0;
-		item->speed = 512 >> 5;
-		item->itemFlags[0] = 1;
-
-		AddActiveItem(item_number);
-
-		SoundEffect(77, &item->pos, 0);
-		SoundEffect(105, &item->pos, PITCH_SHIFT | 0x2000000);
-
-
-		SmokeCountL = 32;
-		SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
-
-		for (lp = 0; lp < 5; lp++)
-			TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 32);
-
-/*		phd_PushUnitMatrix();
-
-		*(phd_mxptr + M03) = 0;
-		*(phd_mxptr + M13) = 0;
-		*(phd_mxptr + M23) = 0;
-
-		phd_RotYXZ(item->pos.y_rot, item->pos.x_rot, item->pos.z_rot);
-		phd_PushMatrix();
-		phd_TranslateRel(0, 0, -128);
-
-		wx = (*(phd_mxptr + M03) >> W2V_SHIFT);
-		wy = (*(phd_mxptr + M13) >> W2V_SHIFT);
-		wz = (*(phd_mxptr + M23) >> W2V_SHIFT);
-
-		phd_PopMatrix();*/
-
-/*		for (lp = 0; lp < 8; lp++)
+		short itemNumber = CreateItem();
+		if (itemNumber != NO_ITEM)
 		{
-			phd_PushMatrix();
-			phd_TranslateRel(0, 0, -(GetRandomControl() & 2047));
+			ITEM_INFO* item = &g_Level.Items[itemNumber];
+			item->objectNumber = ID_ROCKET;
+			item->roomNumber = LaraItem->roomNumber;
 
-			xv = (*(phd_mxptr + M03) >> W2V_SHIFT);
-			yv = (*(phd_mxptr + M13) >> W2V_SHIFT);
-			zv = (*(phd_mxptr + M23) >> W2V_SHIFT);
 
-			phd_PopMatrix();
-			TriggerRocketFlame(wx, wy, wz, xv - wx, yv - wy, zv - wz, item_number);
+			PHD_VECTOR jointPos;
+			jointPos.x = Lara.torsoXrot;
+			jointPos.y = Lara.torsoYrot + 1300;
+			jointPos.z = Lara.torsoZrot;
+
+			GetLaraJointPosition(&jointPos, LM_RHAND);
+
+			int x, y, z;
+			item->pos.xPos = x = jointPos.x;
+			item->pos.yPos = y = jointPos.y;
+			item->pos.zPos = z = jointPos.z;
+
+			jointPos.x = 0;
+			jointPos.y = 180 + 1024;
+			jointPos.z = 0;
+
+			SmokeCountL = 32;
+			SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
+
+			for (int i = 0; i < 5; i++)
+				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
+
+			InitialiseItem(itemNumber);
+
+			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
+			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
+			item->pos.zRot = 0;
+
+			if (!Lara.leftArm.lock)
+			{
+				item->pos.xRot += Lara.torsoXrot;
+				item->pos.yRot += Lara.torsoYrot;
+			}
+
+			item->speed = 512 >> 5;
+			item->itemFlags[0] = 0;
+
+			AddActiveItem(itemNumber);
+
+			SoundEffect(SFX_EXPLOSION1, 0, 0);
 		}
-		phd_PopMatrix();*/
-	}
+
 }
 
 static int CanUseGun(ITEM_INFO *obj, ITEM_INFO *lara)
@@ -123,7 +104,7 @@ void BigGunInitialise(short itemNum)
 	obj->data = malloc(sizeof(BIGGUNINFO));
 
 	gun->flags = 0;
-	gun->fireCount = 0;
+	fireCount = 0;
 	gun->yRot = 30;
 	gun->yRot = 0;
 	gun->startYRot = obj->pos.yRot;
@@ -191,40 +172,43 @@ int BigGunControl(COLL_INFO *coll)
 		{
 			gun->flags = 2;
 		}
-		else if ((TrInput & IN_ACTION) && gun->fireCount == 0)
+		else if ((TrInput & IN_ACTION) && fireCount == 0)
 		{
 			FireBigGun(obj);
-			gun->fireCount = 26;
+			fireCount = 26;
 		}
 		else
 		{
 			if (TrInput & IN_LEFT)
 			{
 				if (GunRotYAdd > 0)
-					GunRotYAdd >>= 1;
+					GunRotYAdd--;// >>= 1;
 
-				GunRotYAdd -= 8;
+				GunRotYAdd -= 16;
+
 				if (GunRotYAdd < -64)
 					GunRotYAdd = -64;
-				if (((Wibble & 7) == 0) && (abs(gun->yRot) < (136 << 2)))
+
+				if (((Wibble & 7) == 0) && (abs(gun->yRot) < 544))
 					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
 				if (GunRotYAdd < 0)
-					GunRotYAdd >>= 1;
+					GunRotYAdd++;// >>= 1;
 
-				GunRotYAdd += 8;
+				GunRotYAdd += 16;
 
 				if (GunRotYAdd < 64)
 					GunRotYAdd = 64;
+
 				if (((Wibble & 7) == 0) && (abs(gun->yRot) < (136 << 2)))
 					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
 			}
 			else
 			{
-				GunRotYAdd -= GunRotYAdd >> 2;
-				if (abs(GunRotYAdd) < 8)
+//				GunRotYAdd -= GunRotYAdd >> 2;
+				if (abs(GunRotYAdd) < 16)
 					GunRotYAdd = 0;
 			}
 
@@ -283,13 +267,13 @@ int BigGunControl(COLL_INFO *coll)
 		break;
 	case 2:
 		lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 2;
-		lara->frameNumber = (g_Level.Anims[Objects[ID_BIGGUN].animIndex + 2].frameBase) + gun->xRot;
+		lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + 2].frameBase + gun->xRot;
 
 		obj->animNumber = Objects[ID_BIGGUN].animIndex + (lara->animNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
 		obj->frameNumber = g_Level.Anims[obj->animNumber].frameBase + (lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase);
 
-		if (gun->fireCount)
-			gun->fireCount--;
+		if (fireCount)
+			fireCount--;
 
 		gun->flags = 1;
 		break;
