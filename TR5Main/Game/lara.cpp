@@ -31,6 +31,7 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
+//#include "rubberboat.h"
 
 using std::function;
 
@@ -431,7 +432,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			//		return;
 			//	break;
 
-			//case ID_RUBBERBOAT:
+			//case ID_RUBBER_BOAT:
 			//	if (RubberBoatControl())
 			//		return;
 			//	break;
