@@ -372,6 +372,19 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_RUBBER_BOAT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRubberBoat;
+		obj->control = RubberBoatControl;
+		obj->collision = RubberBoatCollision;
+		obj->drawRoutine = DrawRubberBoat;
+		obj->savePosition = 1;
+		obj->saveFlags = 1;
+		obj->saveAnim = 1;
+		g_Level.Bones[obj->boneIndex + (1 * 4)] |= ROT_Z;
+	}
+
 	obj = &Objects[ID_KAYAK];
 	if (obj->loaded)
 	{
