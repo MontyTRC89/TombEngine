@@ -7,9 +7,9 @@
 #include <lara.h>
 #include <sphere.h>
 #include <effect2.h>
-#include <Game\tomb4fx.h>
-#include <Game\switch.h>
-#include <Specific\input.h>
+#include <tomb4fx.h>
+#include <switch.h>
+#include <input.h>
 
 OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {
     0x0000, 0x0000, 0xFFC0, 0x0000, 0x0000, 0x0000,

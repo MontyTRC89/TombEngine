@@ -1579,16 +1579,16 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	startBox = LOT->node[item->boxNumber].exitBox;
 	if (startBox != NO_BOX)
 	{
-		overlapIndex = g_Level.Boxes[startBox].overlapIndex;
+		overlapIndex = g_Level.Boxes[item->boxNumber].overlapIndex;
 		nextBox = 0;
 		flags = 0;
 		if (overlapIndex >= 0)
 		{
 			do
 			{
-				overlapIndex++;
+				//overlapIndex++;
 				nextBox = g_Level.Overlaps[overlapIndex].box;
-				flags = g_Level.Overlaps[overlapIndex].flags;
+				flags = g_Level.Overlaps[overlapIndex++].flags;
 			} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
 		}
 

@@ -69,10 +69,12 @@ typedef struct ITEM_INFO
 	byte aiBits; // AIObjectType enum
 	bool reallyActive;
 	bool inDrawRoom;
+	bool friendly;
 	int swapMeshFlags;
 	short drawRoom;
 	short TOSSPAD;
 	PHD_3DPOS startPos;
+	short location;
 };
 
 // used by fx->shade !
