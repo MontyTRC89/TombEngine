@@ -30,6 +30,7 @@
 #include "tr4_mapper.h"
 #include "tr4_moving_blade.h"
 #include "tr4_element_puzzle.h"
+#include "tr4_von_croy.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -714,6 +715,30 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 4 * 9] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4 * 11] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4 * 12] |= ROT_X;
+	}
+
+	obj = &Objects[ID_VON_CROY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseVonCroy;
+		obj->control = VonCroyControl;
+		obj->collision = CreatureCollision;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
+		obj->hitPoints = 15;
+		obj->explodableMeshbits = 0x200000;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveMesh = true;
+		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
+
+		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4 * 20] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 20] |= ROT_Y;
 	}
 }
 

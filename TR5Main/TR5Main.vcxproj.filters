@@ -879,6 +879,12 @@
     <ClInclude Include="Objects\TR4\Object\tr4_element_puzzle.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_hammer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_von_croy.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1602,6 +1608,12 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Object\tr4_element_puzzle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_hammer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_von_croy.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -276,7 +276,7 @@ void HitmanControl(short itemNumber)
 				creature->flags = 0;
 				creature->maximumTurn = 0;
 
-				if (info.ahead && (item->aiBits) != GUARD)
+				if (info.ahead && item->aiBits != GUARD)
 				{
 					joint0 = info.angle >> 1;
 					joint1 = info.xAngle;
