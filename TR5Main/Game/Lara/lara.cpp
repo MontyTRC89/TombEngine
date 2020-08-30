@@ -18,7 +18,7 @@
 #include "lara_initialise.h"
 
 #include "motorbike.h"
-#include "cannon.h"
+#include "biggun.h"
 #include "quad.h"
 #include "snowmobile.h"
 #include "jeep.h"
@@ -26,7 +26,7 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
-
+//#include "rubberboat.h"
 
 #include "GameFlowScript.h"
 #include "health.h"
@@ -895,7 +895,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			//		return;
 			//	break;
 
-			//case ID_RUBBERBOAT:
+			//case ID_RUBBER_BOAT:
 			//	if (RubberBoatControl())
 			//		return;
 			//	break;
@@ -909,6 +909,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			//	if (MineCartControl())
 			//		return;
 			//	break;
+
+		case ID_BIGGUN:
+			if (BigGunControl(coll))
+				return;
+			break;
 
 		default:
 			break;
