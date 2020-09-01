@@ -711,18 +711,18 @@ void VonCroyControl(short itemNumber)
 		creature->LOT.isJumping = true;
 		creature->maximumTurn = 0;
 
-		if (!creature->reachedGoal) 
+		/*if (!creature->reachedGoal) 
 		{
 			item->goalAnimState = STATE_VON_CROY_CLIMB_LADDER_RIGHT;
 		}
 		else
-		{
+		{*/
 			item->goalAnimState = STATE_VON_CROY_LADDER_CLIMB_UP;
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
 			item->location++;
-		}
+		//}
 		break;
 
 	case STATE_VON_CROY_CLIMB_LADDER_RIGHT:
@@ -874,6 +874,20 @@ void VonCroyControl(short itemNumber)
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 27;
 			item->currentAnimState = 17;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			break;
+
+		case 7:
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 37;
+			item->currentAnimState = 27;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			break;
+
+		case -7:
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 36;
+			item->currentAnimState = 26;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
