@@ -10,6 +10,8 @@
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
 #define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
+#define MAX_ZONES 6
+
 struct ChunkId;
 struct LEB128;
 struct SAMPLE_INFO;
@@ -132,7 +134,7 @@ struct LEVEL
 	std::vector<SPRITE> Sprites;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
-	std::vector<int> Zones[5][2];
+	std::vector<int> Zones[MAX_ZONES][2];
 	std::vector<short> SoundMap;
 	std::vector<SAMPLE_INFO> SoundDetails;
 	int NumItems;

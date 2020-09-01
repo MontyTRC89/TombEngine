@@ -239,6 +239,15 @@ void InitialiseSlot(short itemNum, short slot)
 			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
 			break;
 
+		case ZONE_HUMAN_LONGJUMP_AND_MONKEY:
+			// Can climb, jump, monkey, long jump
+			creature->LOT.step = SECTOR(1);
+			creature->LOT.drop = -SECTOR(1);
+			creature->LOT.canJump = true;
+			creature->LOT.canMonkey = true;
+			creature->LOT.zone = ZONE_VON_CROY;
+			break;
+
 		case ZONE_SPIDER:
 			creature->LOT.step = SECTOR(1) - CLICK(2);
 			creature->LOT.drop = -(SECTOR(1) - CLICK(2));
