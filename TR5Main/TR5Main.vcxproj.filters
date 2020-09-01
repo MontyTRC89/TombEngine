@@ -414,9 +414,6 @@
     <ClInclude Include="Objects\TR2\Trap\tr2_spinningblade.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TR3\Vehicles\cannon.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR3\Vehicles\kayak.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -883,6 +880,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Entity\tr4_von_croy.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\biggun.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1382,9 +1382,6 @@
     <ClCompile Include="Objects\TR2\Trap\tr2_spinningblade.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR3\Vehicles\cannon.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1614,6 +1611,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_von_croy.cpp">
+		<Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\biggun.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
