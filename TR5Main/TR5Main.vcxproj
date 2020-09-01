@@ -15,7 +15,7 @@
     <ProjectGuid>{15AB0220-541C-4DA1-94EB-ED3C47E4582E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TR5Main</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -316,7 +316,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR4\tr4_objects.h" />
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\cannon.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\biggun.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
     <ClInclude Include="Objects\TR3\Vehicles\kayak.h" />
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
@@ -538,7 +538,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_shiva.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_shotgun.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp" />
-    <ClCompile Include="Objects\TR3\Vehicles\cannon.cpp" />
+    <ClCompile Include="Objects\TR3\Vehicles\biggun.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knifethrower.cpp" />
