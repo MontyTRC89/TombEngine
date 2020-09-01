@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "control.h"
 #include "collide.h"
 #include "draw.h"
 #include "Lara.h"
@@ -29,6 +30,7 @@ char LM[] =
 	LM_HEAD,
 };
 
+extern int SplitFloor, SplitCeiling;
 int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
@@ -55,9 +57,6 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 	// Collect all the rooms where to check
 	GetRoomList(roomNumber, roomList, &numRooms);
 
-	if (numRooms <= 0)
-		return 0;
-
 	for (int i = 0; i < numRooms; i++)
 	{
 		room = &g_Level.Rooms[roomList[i]];
@@ -72,6 +71,15 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 			int yMin = mesh->y + sInfo->collisionBox.Y1;
 			int yMax = mesh->y + sInfo->collisionBox.Y2;
 			short yRot = mesh->yRot;
+
+			std::array<float, 4> box{sInfo->collisionBox.X1, sInfo->collisionBox.Z1, sInfo->collisionBox.X2, sInfo->collisionBox.Z2};
+			RotateBoundingBox(box, mesh->yRot);
+
+			xMin = box[0];
+			zMin = box[1];
+			xMax = box[2];
+			zMax = box[3];
+			
 
 			if (yRot == ANGLE(180))
 			{
@@ -809,7 +817,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		if (Lara.waterStatus != LW_UNDERWATER)
 		{
 			angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
-			direction = ((unsigned short) (angle + ANGLE(45)) / ANGLE(90) - (unsigned short) (dest->yRot + ANGLE(45)) / ANGLE(90)) & 3;
+			direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
 
 			switch (direction)
 			{
@@ -1040,7 +1048,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->shift.x = 0;
 	coll->shift.y = 0;
 	coll->shift.z = 0;
-	coll->quadrant = (unsigned short) (coll->facing + ANGLE(45)) / ANGLE(90);
+	coll->quadrant = GetQuadrant(coll->facing);
+	coll->octant = GetOctant(coll->facing);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
@@ -1061,7 +1070,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->midCeiling = ceiling;
 	coll->midFloor = height;
 	coll->midType = HeightType;
-
+	coll->midSplitFloor = SplitFloor;
+	coll->midSplitCeil = SplitCeiling;
 	coll->trigger = TriggerIndex;
 
 	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
@@ -1070,7 +1080,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	int xright, xleft, zright, zleft;
 
-	switch (coll->quadrant)
+	/*switch (coll->quadrant)
 	{
 	case 0:
 		XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
@@ -1113,7 +1123,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		xright = zright = 0;
 		XFront = ZFront = 0;
 		break;
-	}
+	}*/
+
+	XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
+	ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
+	xleft = -ZFront;
+	zleft = XFront;
+	xright = ZFront;
+	zright = -XFront;
 
 	x = XFront + xPos;
 	z = ZFront + zPos;
@@ -1134,6 +1151,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->frontCeiling = ceiling;
 	coll->frontFloor = height;
 	coll->frontType = HeightType;
+	coll->frontSplitFloor = SplitFloor;
+	coll->frontSplitCeil = SplitCeiling;
 
 	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
 	height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
@@ -1178,6 +1197,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->leftFloor = height;
 	coll->leftCeiling = ceiling;
 	coll->leftType = HeightType;
+	coll->leftSplitFloor = SplitFloor;
+	coll->leftSplitCeil = SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor < 0)
 		coll->leftFloor = -32767;
@@ -1199,6 +1220,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->leftFloor2 = height;
 	coll->leftCeiling2 = ceiling;
 	coll->leftType2 = HeightType;
+	coll->leftSplitFloor2 = SplitFloor;
+	coll->leftSplitCeil2 = SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 < 0)
 		coll->leftFloor2 = -32767;
@@ -1223,6 +1246,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->rightFloor = height;
 	coll->rightCeiling = ceiling;
 	coll->rightType = HeightType;
+	coll->rightSplitFloor = SplitFloor;
+	coll->rightSplitCeil = SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor < 0)
 		coll->rightFloor = -32767;
@@ -1244,6 +1269,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->rightFloor2 = height;
 	coll->rightCeiling2 = ceiling;
 	coll->rightType2 = HeightType;
+	coll->rightSplitFloor2 = SplitFloor;
+	coll->rightSplitCeil2 = SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 < 0)
 		coll->rightFloor2 = -32767;
@@ -1256,25 +1283,25 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	if (coll->midFloor == NO_HEIGHT)	 
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
+		//coll->shift.x = coll->old.x - xPos;
+		//coll->shift.y = coll->old.y - yPos;
+		//coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_FRONT;
 		return;
 	}
 
 	if (coll->midFloor - coll->midCeiling <= 0)
 	{
-		coll->shift.x = coll->old.x - xPos;	 
-		coll->shift.y = coll->old.y - yPos;	 
-		coll->shift.z = coll->old.z - zPos;
+		//coll->shift.x = coll->old.x - xPos;
+		//coll->shift.y = coll->old.y - yPos;
+		//coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_CLAMP;
 		return;
 	}
 
 	if (coll->midCeiling >= 0)
 	{
-		coll->shift.y = coll->midCeiling;	
+		//coll->shift.y = coll->midCeiling;
 		coll->collType = CT_TOP;
 		coll->hitCeiling = true;
 	}
@@ -1286,8 +1313,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		if ((coll->frontType == DIAGONAL)
 			|| (coll->frontType == SPLIT_TRI))
 		{
-			coll->shift.x = coll->old.x - xPos; 
-			coll->shift.z = coll->old.z - zPos; 
+			//coll->shift.x = coll->old.x - xPos;
+			//coll->shift.z = coll->old.z - zPos;
 		}
 		else
 		{
@@ -1295,14 +1322,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				coll->shift.x = coll->old.x - xPos;  
-				coll->shift.z = FindGridShift(zPos + ZFront, zPos); 
+				//coll->shift.x = coll->old.x - xPos;
+				//coll->shift.z = FindGridShift(zPos + ZFront, zPos);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.x = FindGridShift(xPos + XFront, xPos);	 
-				coll->shift.z = coll->old.z - zPos;  
+				//coll->shift.x = FindGridShift(xPos + XFront, xPos);
+				//coll->shift.z = coll->old.z - zPos;
 				break;
 
 			}
@@ -1314,9 +1341,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	if (coll->frontCeiling >= coll->badCeiling)
 	{
-		coll->shift.x = coll->old.x - xPos; 
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
+		//coll->shift.x = coll->old.x - xPos;
+		//coll->shift.y = coll->old.y - yPos;
+		//coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_TOP_FRONT;
 		return;
 	}
@@ -1325,10 +1352,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor < coll->badNeg ||
 		coll->leftCeiling > coll->badCeiling)
 	{
-		if (coll->leftType == SPLIT_TRI)
+		if (coll->leftType == SPLIT_TRI && coll->midType == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos; 
-			coll->shift.z = coll->old.z - zPos;   
+			//coll->shift.x = coll->old.x - xPos;
+			//coll->shift.z = coll->old.z - zPos;
 		}
 		else
 		{
@@ -1336,16 +1363,42 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
+				//coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
+				//coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
 				break;
 			}
 		}
-		coll->collType = CT_LEFT;
+		
+		if (coll->leftSplitFloor && coll->leftSplitFloor == coll->midSplitFloor)
+		{
+			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			quarter %= 2;
+
+			switch (coll->leftSplitFloor)
+			{
+			case SPLIT1:
+			case NOCOLF1T:
+			case NOCOLF1B:
+				if (quarter)
+					coll->collType = CT_LEFT;
+				break;
+			case SPLIT2:
+			case NOCOLF2T:
+			case NOCOLF2B:
+				if (!quarter)
+					coll->collType = CT_LEFT;
+				break;
+			}
+		}
+		else
+		{
+			coll->collType = CT_LEFT;
+		}
+
 		return;
 	}
 
@@ -1353,10 +1406,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor < coll->badNeg ||
 		coll->rightCeiling > coll->badCeiling)
 	{
-		if (coll->rightType == SPLIT_TRI)
+		if (coll->rightType == SPLIT_TRI && coll->midType == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos;   
-			coll->shift.z = coll->old.z - zPos;  
+			//coll->shift.x = coll->old.x - xPos;
+			//coll->shift.z = coll->old.z - zPos;
 		}
 		else
 		{
@@ -1364,16 +1417,42 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
+				//coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
+				//coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
 				break;
 			}
 		}
-		coll->collType = CT_RIGHT;
+		
+		if (coll->rightSplitFloor && coll->rightSplitFloor == coll->midSplitFloor)
+		{
+			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			quarter %= 2;
+
+			switch (coll->rightSplitFloor)
+			{
+			case SPLIT1:
+			case NOCOLF1T:
+			case NOCOLF1B:
+				if (quarter)
+					coll->collType = CT_RIGHT;
+				break;
+			case SPLIT2:
+			case NOCOLF2T:
+			case NOCOLF2B:
+				if (!quarter)
+					coll->collType = CT_RIGHT;
+				break;
+			}
+		}
+		else
+		{
+			coll->collType = CT_RIGHT;
+		}
+
 		return;
 	}
 }
@@ -1560,4 +1639,158 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
 	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
+}
+
+bool SnapToQuadrant(short& angle, int interval)
+{
+	if (abs(angle) <= ANGLE(interval))
+	{
+		angle = 0;
+		return true;
+	}
+	else if (angle >= ANGLE(90 - interval) && angle <= ANGLE(interval + 90))
+	{
+		angle = ANGLE(90);
+		return true;
+	}
+	else if (angle >= ANGLE(180 - interval) || angle <= -ANGLE(180 - interval))
+	{
+		angle = ANGLE(180);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 90) && angle <= -ANGLE(90 - interval))
+	{
+		angle = -ANGLE(90);
+		return true;
+	}
+	return false;
+}
+
+int GetQuadrant(short angle)
+{
+	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
+}
+
+bool SnapToDiagonal(short& angle, int interval)
+{
+	if (angle >= ANGLE(45 - interval) && angle <= ANGLE(interval + 45))
+	{
+		angle = ANGLE(45);
+		return true;
+	}
+	else if (angle >= ANGLE(135 - interval) && angle <= ANGLE(interval + 135))
+	{
+		angle = ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 135) && angle <= -ANGLE(135 - interval))
+	{
+		angle = -ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 45) && angle <= -ANGLE(45 - interval))
+	{
+		angle = -ANGLE(45);
+		return true;
+	}
+	return false;
+}
+
+int GetOctant(short angle)
+{
+	return (unsigned short) (angle + ANGLE(22.5)) / ANGLE(45);
+}
+
+Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot)
+{
+	Vector2 vect;
+
+	int dx = (xPos % WALL_SIZE) - WALL_SIZE/2;
+	int dz = (zPos % WALL_SIZE) - WALL_SIZE/2;
+	int xGrid = xPos - dx;
+	int zGrid = zPos - dz;
+	
+	switch (splitType)
+	{
+	case SPLIT1:
+	case NOCOLF1T:
+	case NOCOLF1B:
+		xPos = xGrid + (dx - dz) / 2;
+		zPos = zGrid - (dx - dz) / 2;
+		break;
+	case SPLIT2:
+	case NOCOLF2T:
+	case NOCOLF2B:
+		xPos = xGrid + (dx + dz) / 2;
+		zPos = zGrid + (dx + dz) / 2;
+		break;
+	default:
+		break;
+	}
+
+	if (splitType)
+	{
+		yRot = floor(yRot / 16384.0f) * ANGLE(90) + ANGLE(45);
+		xPos -= int(radius * sin(TO_RAD(yRot)));
+		zPos -= int(radius * cos(TO_RAD(yRot)));
+	}
+
+	vect.x = xPos;
+	vect.y = zPos;
+
+	return vect;
+}
+
+void RotateBoundingBox(std::array<float, 4>& box, short angle)
+{
+	float s = sin(TO_RAD(angle));
+	float c = cos(TO_RAD(angle));
+
+	std::array<float, 4> x, z;
+	x[0] = box[0] * c;
+	z[0] = -box[0] * s;
+	x[1] = box[1] * s;
+	z[1] = box[1] * c;
+	x[2] = box[2] * c;
+	z[2] = -box[2] * s;
+	x[3] = box[3] * s;
+	z[3] = box[3] * c;
+
+	auto xPair = std::minmax_element(begin(x), end(x));
+	auto zPair = std::minmax_element(begin(z), end(z));
+
+	box[0] = *xPair.first;
+	box[1] = *zPair.first;
+	box[2] = *xPair.second;
+	box[3] = *zPair.second;
+}
+
+Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
+{
+	Vector2 vect;
+
+	int xGrid = xPos - (xPos % WALL_SIZE);
+	int zGrid = zPos - (zPos % WALL_SIZE);
+
+	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
+	switch (dir)
+	{
+	case NORTH:
+		zPos = zGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case EAST:
+		xPos = xGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case SOUTH:
+		zPos = zGrid + radius;
+		break;
+	case WEST:
+		xPos = xGrid + radius;
+		break;
+	}
+
+	vect.x = xPos;
+	vect.y = zPos;
+
+	return vect;
 }

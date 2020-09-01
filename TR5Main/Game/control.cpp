@@ -2,6 +2,7 @@
 #include "collide.h"
 #include "control.h"
 #include "pickup.h"
+#include "puzzles_keys.h"
 #include "camera.h"
 #include "Lara.h"
 #include "hair.h"
@@ -20,14 +21,13 @@
 #include "box.h"
 #include "objects.h"
 #include "switch.h"
-#include "laramisc.h"
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
 #include "effect.h"
 #include "sphere.h"
 #include "debris.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "footprint.h"
 #include "level.h"
 #include "input.h"
@@ -151,6 +151,8 @@ short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
 
+int SplitFloor;
+int SplitCeiling;
 int TiltXOffset;
 int TiltYOffset;
 int FramesCount;
@@ -167,10 +169,36 @@ extern vector<AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
+extern int skipLoop;
+extern int skipFrames;
+extern int lockInput;
+extern int newSkipLoop;
+extern int newSkipFrames;
+extern int newLockInput;
+extern bool newSkipFramesValue;
+extern bool newSkipLoopValue;
+extern bool newLockInputValue;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
-	GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+	short oldLaraFrame;
+	if (newSkipFramesValue)
+	{
+		skipFrames = newSkipFrames;
+		newSkipFramesValue = false;
+	}
+	if (newSkipLoopValue)
+	{
+		skipLoop = newSkipLoop;
+		newSkipLoopValue = false;
+	}
+	if (newLockInputValue)
+	{
+		lockInput = newLockInput;
+		newLockInputValue = false;
+	}
+
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -182,7 +210,15 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
+	if (skipLoop != -1)
+	{
+		if (skipLoop == 0)
+			return GAME_STATUS_NONE;
+		else
+			oldLaraFrame = LaraItem->frameNumber;
+	}
+
+	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= skipFrames)
 	{
 		GlobalCounter++;
 
@@ -200,6 +236,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			DbInput = 0;
 			TrInput = 0;
 		}
+
+		if (lockInput)
+			TrInput = lockInput;
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)
@@ -527,6 +566,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
+	if (skipLoop != -1)
+	{
+		if (oldLaraFrame != LaraItem->frameNumber)
+			--skipLoop;
+	}
+
 	return GAME_STATUS_NONE;
 }
 
@@ -715,7 +760,6 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 		g_Renderer.resetAnimations();
 		result = ControlPhase(nframes, 0);
-
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)
@@ -772,7 +816,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		if (!heavy)
 		{
-			short quad = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+			short quad = GetQuadrant(LaraItem->pos.yRot);
 			if ((1 << (quad + 8)) & *data)
 				Lara.climbStatus = true;
 		}
@@ -1599,6 +1643,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	TiltXOffset = 0;
 	OnObject = 0;
 	HeightType = WALL;
+	SplitFloor = 0;
 
 	ROOM_INFO *r;
 	while (floor->pitRoom != NO_ROOM)
@@ -1726,6 +1771,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 			xOff = yOff = 0;
 
 			HeightType = SPLIT_TRI;
+			SplitFloor = (type & DATA_TYPE);
 
 			if ((type & DATA_TYPE) == SPLIT1 ||
 				(type & DATA_TYPE) == NOCOLF1T ||
@@ -2431,6 +2477,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 	bool end;
 	ITEM_INFO *item;
 
+	SplitCeiling = 0;
 	floor2 = floor;
 	while (floor2->skyRoom != NO_ROOM)
 	{
@@ -2466,6 +2513,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 				{
 					if (function == SPLIT3 || function == SPLIT4 || function == NOCOLC1T || function == NOCOLC1B || function == NOCOLC2T || function == NOCOLC2B)
 					{
+						SplitCeiling = function;
 						dx = x & 0x3FF;
 						dz = z & 0x3FF;
 						t0 = -(*data & DATA_TILT);

@@ -5,7 +5,7 @@
 #include "effect.h"
 #include "effect2.h"
 #include "debris.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"
@@ -1768,5 +1768,92 @@ void CalculateCamera()
 		Camera.targetDistance = 1536;
 		Camera.flags = 0;
 		Camera.laraNode = -1;
+	}
+}
+
+void LookLeftRight()
+{
+	Camera.type = LOOK_CAMERA;
+	if (TrInput & IN_LEFT)
+	{
+		TrInput &= ~IN_LEFT;
+		if (Lara.headYrot > -ANGLE(44.0f))
+		{
+			if (BinocularRange)
+				Lara.headYrot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+			else
+				Lara.headYrot -= ANGLE(2.0f);
+		}
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		TrInput &= ~IN_RIGHT;
+		if (Lara.headYrot < ANGLE(44.0f))
+		{
+			if (BinocularRange)
+				Lara.headYrot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+			else
+				Lara.headYrot += ANGLE(2.0f);
+		}
+	}
+	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
+		Lara.torsoYrot = Lara.headYrot;
+}
+
+void LookUpDown()
+{
+	Camera.type = LOOK_CAMERA;
+	if (TrInput & IN_FORWARD)
+	{
+		TrInput &= ~IN_FORWARD;
+		if (Lara.headXrot > -ANGLE(35.0f))
+		{
+			if (BinocularRange)
+				Lara.headXrot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+			else
+				Lara.headXrot -= ANGLE(2.0f);
+		}
+	}
+	else if (TrInput & IN_BACK)
+	{
+		TrInput &= ~IN_BACK;
+		if (Lara.headXrot < ANGLE(30.0f))
+		{
+			if (BinocularRange)
+				Lara.headXrot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+			else
+				Lara.headXrot += ANGLE(2.0f);
+		}
+	}
+	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
+		Lara.torsoXrot = Lara.headXrot;
+}
+
+void ResetLook()
+{
+	if (Camera.type != 2)
+	{
+		if (Lara.headXrot <= -ANGLE(2.0f) || Lara.headXrot >= ANGLE(2.0f))
+			Lara.headXrot = Lara.headXrot / -8 + Lara.headXrot;
+		else
+			Lara.headXrot = 0;
+
+		if (Lara.headYrot <= -ANGLE(2.0f) || Lara.headYrot >= ANGLE(2.0f))
+			Lara.headYrot = Lara.headYrot / -8 + Lara.headYrot;
+		else
+			Lara.headYrot = 0;
+
+		if (Lara.gunStatus == LG_HANDS_BUSY || Lara.leftArm.lock || Lara.rightArm.lock)
+		{
+			if (!Lara.headXrot)
+				Lara.torsoXrot = 0;
+			if (!Lara.headYrot)
+				Lara.torsoYrot = 0;
+		}
+		else
+		{
+			Lara.torsoYrot = Lara.headYrot;
+			Lara.torsoXrot = Lara.headXrot;
+		}
 	}
 }

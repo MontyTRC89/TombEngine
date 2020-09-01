@@ -2,7 +2,7 @@
 #include "tr1_doppelganger.h"
 #include "box.h"
 #include "items.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "misc.h"
 #include "level.h"
 #include "lara.h"

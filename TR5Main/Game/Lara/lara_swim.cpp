@@ -1,15 +1,13 @@
 #include "framework.h"
-#include "laraswim.h"
+#include "lara_swim.h"
 #include "control.h"
 #include "camera.h"
 #include "items.h"
 #include "box.h"
 #include "Lara.h"
-#include "larasurf.h"
+#include "lara_surface.h"
 #include "effect.h"
-#include "effect2.h"
-#include "larafire.h"
-#include "laramisc.h"
+#include "lara_fire.h"
 #include "draw.h"
 #include "camera.h"
 #include "level.h"
@@ -367,168 +365,6 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 		item->goalAnimState = LS_UNDERWATER_INERTIA;
 }
 
-void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
-{
-	if (TrInput & IN_FORWARD)
-	{
-		item->pos.xRot -= ANGLE(3);
-	}
-	else if (TrInput & IN_BACK)
-	{
-		item->pos.xRot += ANGLE(3);
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= 613;
-
-		if (Lara.turnRate < -ANGLE(6))
-			Lara.turnRate = -ANGLE(6);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += 613;
-
-		if (Lara.turnRate > ANGLE(6))
-			Lara.turnRate = ANGLE(6);
-	}
-
-	if (TrInput & IN_ACTION)
-	{
-		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 31, 255, 255, 255);
-	}
-
-	if (TrInput & IN_OPTION)
-	{
-		Lara.turnRate = -ANGLE(12);
-	}
-
-	if (TrInput & IN_JUMP)
-	{
-		item->fallspeed += 16;
-
-		if (item->fallspeed > 400)
-			item->fallspeed = 400;
-	}
-	else
-	{
-		if (item->fallspeed >= 8)
-			item->fallspeed -= item->fallspeed >> 3;
-		else
-			item->fallspeed = 0;
-	}
-}
-
-// CHECK all subsuit states
-void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
-{
-	coll->badPos = 32512;
-	coll->badNeg = -400;
-	coll->badCeiling = 400;
-
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
-
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
-
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = false;
-
-	coll->radius = 300;
-	coll->trigger = NULL;
-
-	if (TrInput & IN_LOOK && Lara.look)
-		LookLeftRight();
-	else
-		ResetLook();
-
-	Lara.look = true;
-
-	lara_control_routines[item->currentAnimState](item, coll);
-
-	if (LaraDrawType == LARA_DIVESUIT)
-	{
-		if (Lara.turnRate < -ANGLE(0.5))
-		{
-			Lara.turnRate += ANGLE(0.5);
-		}
-		else if (Lara.turnRate > ANGLE(0.5))
-		{
-			Lara.turnRate -= ANGLE(0.5);
-		}
-		else
-		{
-			Lara.turnRate = 0;
-		}
-	}
-	else if (Lara.turnRate < -ANGLE(2))
-	{
-		Lara.turnRate += ANGLE(2);
-	}
-	else if (Lara.turnRate > ANGLE(2))
-	{
-		Lara.turnRate -= ANGLE(2);
-	}
-	else
-	{
-		Lara.turnRate = 0;
-	}
-
-	item->pos.yRot += Lara.turnRate;
-
-	if (LaraDrawType == LARA_DIVESUIT)
-		UpdateSubsuitAngles();
-
-	if (item->pos.zRot < -ANGLE(2))
-		item->pos.zRot += ANGLE(2);
-	else if (item->pos.zRot > ANGLE(2))
-		item->pos.zRot -= ANGLE(2);
-	else
-		item->pos.zRot = 0;
-
-	if (item->pos.xRot < -ANGLE(85))
-		item->pos.xRot = -ANGLE(85);
-	else if (item->pos.xRot > ANGLE(85))
-		item->pos.xRot = ANGLE(85);
-
-	if (LaraDrawType == LARA_DIVESUIT)
-	{
-		if (item->pos.zRot > ANGLE(44))
-			item->pos.zRot = ANGLE(44);
-		else if (item->pos.zRot < -ANGLE(44))
-			item->pos.zRot = -ANGLE(44);
-	}
-	else
-	{
-		if (item->pos.zRot > ANGLE(22))
-			item->pos.zRot = ANGLE(22);
-		else if (item->pos.zRot < -ANGLE(22))
-			item->pos.zRot = -ANGLE(22);
-	}
-
-	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
-		LaraWaterCurrent(coll);
-
-	AnimateLara(item);
-
-	item->pos.xPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_sin(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
-	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) >> (W2V_SHIFT + 2);
-	item->pos.zPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_cos(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
-
-	LaraBaddieCollision(item, coll);
-
-	lara_collision_routines[item->currentAnimState](item, coll);
-
-	UpdateLaraRoom(item, 0);
-
-	LaraGun();
-
-	TestTriggers(coll->trigger, 0, 0);
-}
-
 void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 {
 	if (Subsuit.YVel != 0)
@@ -677,12 +513,12 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 
 	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
-		Lara.moveAngle = item->pos.yRot - ANGLE(180);
+		Lara.moveAngle = ANGLE(180);
 		coll->facing = item->pos.yRot - ANGLE(180);
 	}
 	else
 	{
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 		coll->facing = item->pos.yRot;
 	}
 
