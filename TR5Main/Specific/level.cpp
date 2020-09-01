@@ -962,15 +962,15 @@ void LoadBoxes()
 	for (int i = 0; i < 2; i++)
 	{
 		// Ground zones
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < MAX_ZONES - 1; j++)
 		{
 			g_Level.Zones[j][i].resize(numBoxes * sizeof(int));
 			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
 		}
 
 		// Fly zone
-		g_Level.Zones[4][i].resize(numBoxes * sizeof(int));
-		ReadBytes(g_Level.Zones[4][i].data(), numBoxes * sizeof(int));
+		g_Level.Zones[MAX_ZONES - 1][i].resize(numBoxes * sizeof(int));
+		ReadBytes(g_Level.Zones[MAX_ZONES - 1][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked

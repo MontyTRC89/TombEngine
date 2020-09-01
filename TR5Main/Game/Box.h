@@ -25,6 +25,7 @@ typedef enum ZoneType
 	ZONE_BASIC,
 	ZONE_FLYER,
 	ZONE_HUMAN_CLASSIC,
+	ZONE_VON_CROY,
 	ZONE_WATER,
 	ZONE_MAX,
 	/// custom zone (using zone above for LOT.zone):
@@ -34,6 +35,7 @@ typedef enum ZoneType
 	ZONE_BLOCKABLE, // for trex, shiva, etc..
 	ZONE_SOPHIALEE, // dont want sophia to go down again !
 	ZONE_APE,       // only 2 click climb
+	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
 typedef struct OBJECT_Bones

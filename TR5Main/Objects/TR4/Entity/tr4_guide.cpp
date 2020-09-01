@@ -12,6 +12,11 @@
 #include "lara.h"
 #include "sound.h"
 
+#define	STATE_GUIDE_STOP				1
+#define	STATE_GUIDE_WALK				2
+#define	STATE_GUIDE_RUN					3
+#define	STATE_GUIDE_IGNITE_TORCH		11
+
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
 
@@ -23,8 +28,8 @@ void InitialiseGuide(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 4;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = STATE_GUIDE_STOP;
+	item->currentAnimState = STATE_GUIDE_STOP;
 	item->swapMeshFlags = 0x40000;
 }
 
@@ -124,6 +129,7 @@ void GuideControl(short itemNumber)
 
 			ITEM_INFO* currentItem = &g_Level.Items[baddie->itemNum];
 			if (currentItem->objectNumber != ID_GUIDE &&
+				currentItem->objectNumber != ID_VON_CROY &&
 				abs(currentItem->pos.yPos - item->pos.yPos) <= 512)
 			{
 				dx = currentItem->pos.xPos - item->pos.xPos;
@@ -173,7 +179,7 @@ void GuideControl(short itemNumber)
 
 	switch (item->currentAnimState)
 	{
-	case 1:
+	case STATE_GUIDE_STOP:
 		creature->LOT.isJumping = false;
 		creature->flags = 0;
 		creature->maximumTurn = 0;
@@ -195,7 +201,7 @@ void GuideControl(short itemNumber)
 		/*if (Objects[ID_WRAITH1].loaded & 0x10000)
 		{
 			if (item->itemFlags[3] == 5)
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_GUIDE_WALK;
 
 			if (item->itemFlags[3] == 5 || item->itemFlags[3] == 6)
 			{
@@ -232,7 +238,7 @@ void GuideControl(short itemNumber)
 				}
 				else if (/*true ||*/ enemy != LaraItem || info.distance > SQUARE(2048))
 				{
-					item->goalAnimState = 2;
+					item->goalAnimState = STATE_GUIDE_WALK;
 				}
 			}
 			else
@@ -309,12 +315,12 @@ void GuideControl(short itemNumber)
 		}
 		else
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 		}
 
 		break;
 
-	case 2:
+	case STATE_GUIDE_WALK:
 		creature->LOT.isJumping = false;
 
 		creature->maximumTurn = ANGLE(7);
@@ -333,8 +339,8 @@ void GuideControl(short itemNumber)
 
 		if (item->itemFlags[1] == 1)
 		{
-			item->goalAnimState = 1;
-			item->requiredAnimState = 11; // Ignite torch
+			item->goalAnimState = STATE_GUIDE_STOP;
+			item->requiredAnimState = STATE_GUIDE_IGNITE_TORCH; // Ignite torch
 		}
 		else if (creature->reachedGoal)
 		{
@@ -347,7 +353,7 @@ void GuideControl(short itemNumber)
 
 				break;
 			}
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 		}
 		else
 		{
@@ -361,33 +367,33 @@ void GuideControl(short itemNumber)
 						{
 							if (info.distance > 0x1000000)
 							{
-								item->goalAnimState = 3;
+								item->goalAnimState = STATE_GUIDE_RUN;
 							}
 						}
 						else
 						{
-							item->goalAnimState = 1;
+							item->goalAnimState = STATE_GUIDE_STOP;
 						}
 					}
 					else if (Lara.location > item->itemFlags[3] && laraInfo.distance > 0x400000)
 					{
-						item->goalAnimState = 3;
+						item->goalAnimState = STATE_GUIDE_RUN;
 					}
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_GUIDE_STOP;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUIDE_STOP;
 			}
 		}
 
 		break;
 
-	case 3:
+	case STATE_GUIDE_RUN:
 		if (info.ahead)
 		{
 			joint2 = info.angle;
@@ -398,7 +404,7 @@ void GuideControl(short itemNumber)
 
 		if (info.distance < SQUARE(2048) || Lara.location < item->itemFlags[3])
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 			break;
 		}
 		if (creature->reachedGoal)
@@ -412,17 +418,17 @@ void GuideControl(short itemNumber)
 
 				break;
 			}
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 		}
 		else if (foundEnemy && (info.distance < 0x200000 || !(item->swapMeshFlags & 0x40000) && info.distance < SQUARE(3072)))
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 			break;
 		}
 
 		break;
 
-	case 11:
+	case STATE_GUIDE_IGNITE_TORCH:
 		// Ignite torch
 		pos1.x = guideBiteInfo2.x;
 		pos1.y = guideBiteInfo2.y;
@@ -715,7 +721,7 @@ void GuideControl(short itemNumber)
 		{
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUIDE_STOP;
 
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -732,7 +738,7 @@ void GuideControl(short itemNumber)
 
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 70 && item->roomNumber == 70)
 			{
-				item->requiredAnimState = 3;
+				item->requiredAnimState = STATE_GUIDE_RUN;
 				item->swapMeshFlags |= 0x200000;
 				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->pos, 0);
 			}
@@ -794,7 +800,7 @@ void GuideControl(short itemNumber)
 		}
 		else if (item->triggerFlags <= 999)
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUIDE_STOP;
 		}
 		else
 		{
