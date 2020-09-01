@@ -5,10 +5,10 @@
 #include "setup.h"
 #include "draw.h"
 #include "lara.h"
-#include <Game\sound.h>
-#include <Game\laramisc.h>
-#include <Game\sphere.h>
-#include <Game\traps.h>
+#include "lara_collide.h"
+#include "sound.h"
+#include "sphere.h"
+#include "traps.h"
 
 void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int flags)
 {

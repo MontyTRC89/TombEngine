@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "lara2gun.h"
-#include "larafire.h"
+#include "lara_two_guns.h"
+#include "lara_fire.h"
 #include "lara.h"
 #include "effect2.h"
 #include "draw.h"
