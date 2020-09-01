@@ -1119,6 +1119,8 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 int CreatureVault(short itemNum, short angle, int vault, int shift)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
 	int xBlock, zBlock, y, newXblock, newZblock;
 	short roomNumber;
 
@@ -1129,7 +1131,9 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNum, angle, 0);
 
-	if (item->floor > y + CHECK_CLICK(7))
+	if (item->floor > y + CHECK_CLICK(13) && creature->LOT.drop == -1792)
+		vault = -7;
+	else if (item->floor > y + CHECK_CLICK(7))
 		vault = -4;
 	else if (item->floor > y + CHECK_CLICK(5))
 		vault = -3;
@@ -1141,6 +1145,8 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 		vault = 2;
 	else if (item->pos.yPos > y - CHECK_CLICK(7))
 		vault = 3;
+	else if (item->pos.yPos > y - CHECK_CLICK(15) && creature->LOT.step == 1792)
+		vault = 7;
 	else
 		vault = 4;
 

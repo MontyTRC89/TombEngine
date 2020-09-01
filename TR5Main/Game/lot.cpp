@@ -241,8 +241,8 @@ void InitialiseSlot(short itemNum, short slot)
 
 		case ZONE_HUMAN_LONGJUMP_AND_MONKEY:
 			// Can climb, jump, monkey, long jump
-			creature->LOT.step = SECTOR(1);
-			creature->LOT.drop = -SECTOR(1);
+			creature->LOT.step = 1792;
+			creature->LOT.drop = -1792;
 			creature->LOT.canJump = true;
 			creature->LOT.canMonkey = true;
 			creature->LOT.zone = ZONE_VON_CROY;
