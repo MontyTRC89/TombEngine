@@ -733,7 +733,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 		obj->saveMesh = true;
-		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
+		obj->zoneType = ZONE_HUMAN_LONGJUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;

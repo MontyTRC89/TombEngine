@@ -1009,7 +1009,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 					continue;
 
 				delta = g_Level.Boxes[boxNumber].height - box->height;
-				if (delta > LOT->step || delta < LOT->drop)
+				if ((delta > LOT->step || delta < LOT->drop) && !((flags & BOX_MONKEY) && LOT->canMonkey))
 					continue;
 
 				expand = &LOT->node[boxNumber];
@@ -1587,6 +1587,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			do
 			{
 				//overlapIndex++;
+				//if (g_Level.Overlaps[overlapIndex++].flags & (BOX_JUMP|BOX_MONKEY))
+				//{
 				nextBox = g_Level.Overlaps[overlapIndex].box;
 				flags = g_Level.Overlaps[overlapIndex++].flags;
 			} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
