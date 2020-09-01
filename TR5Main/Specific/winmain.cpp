@@ -31,9 +31,20 @@ extern GameConfiguration g_Configuration;
 DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
 bool BlockAllInput = true;
+int skipLoop = -1;
+int skipFrames = 2;
+int lockInput = 0;
+int newSkipLoop = -1;
+int newSkipFrames = 2;
+int newLockInput = 0;
+bool newSkipFramesValue = false;
+bool newSkipLoopValue = false;
+bool newLockInputValue = false;
+
 #if _DEBUG
 string commit;
 #endif
+
 int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
@@ -136,7 +147,7 @@ void HandleScriptMessage(WPARAM wParam)
 {
 	string ErrorMessage;
 	string message = *(string*)(wParam);
-	bool status;
+	bool status = false;
 
 	//check whether line starts with "lua "
 	if (message.find("lua ") == 0) {
@@ -144,7 +155,28 @@ void HandleScriptMessage(WPARAM wParam)
 		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
 	}
 	else {
-		status = g_GameScript->ExecuteString(message, ErrorMessage);
+		if (message.find("SL=") == 0)
+		{
+			string scriptSubstring = message.substr(3);
+			newSkipLoop = stoi(scriptSubstring);
+			newSkipLoopValue = true;
+		}
+		else if (message.find("SF=") == 0)
+		{
+			string scriptSubstring = message.substr(3);
+			newSkipFrames = stoi(scriptSubstring);
+			newSkipFramesValue = true;
+		}
+		else if (message.find("LI=") == 0)
+		{
+			string scriptSubstring = message.substr(3);
+			newLockInput = stoi(scriptSubstring);
+			newLockInputValue = true;
+		}
+		else
+		{
+			status = g_GameScript->ExecuteString(message, ErrorMessage);
+		}
 	}
 	if (!status)
 		cout << ErrorMessage << endl;

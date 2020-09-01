@@ -4,10 +4,10 @@
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
-#include "larafire.h"
-#include "lara1gun.h"
+#include "lara_fire.h"
+#include "lara_one_gun.h"
 #include "effect2.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "lot.h"
 #include "tomb4fx.h"
 #include "sphere.h"
@@ -285,7 +285,7 @@ static int SkidooCheckGetOff()
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		LaraItem->gravityStatus = 1;
 		Lara.gunStatus = LG_NO_ARMS;
-		Lara.moveAngle = skidoo->pos.yRot;
+		Lara.moveAngle = skidoo->pos.yRot - LaraItem->pos.yRot;
 		skidoo->flags |= ONESHOT; // flag that skidoo is dead
 		skidoo->collidable = false;
 

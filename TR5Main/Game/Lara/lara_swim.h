@@ -16,8 +16,6 @@ void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll);
-void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateSubsuitAngles();
 void SwimTurnSubsuit(ITEM_INFO* item);
 void SwimTurn(ITEM_INFO* item);

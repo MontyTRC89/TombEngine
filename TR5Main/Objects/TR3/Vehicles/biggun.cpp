@@ -5,7 +5,7 @@
 #include "collide.h"
 #include "input.h"
 #include "lara.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "sound.h"
 #include "sphere.h"
 #include "effect2.h"

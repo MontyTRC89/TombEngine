@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "collide.h"
 #include "effect.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
 #include "draw.h"

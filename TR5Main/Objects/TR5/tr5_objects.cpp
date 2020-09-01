@@ -53,9 +53,9 @@
 #include "tr5_smashobject.h"
 /// necessary import
 #include "collide.h"
-#include "laramisc.h"
-#include "lara1gun.h"
-#include "laraflar.h"
+#include "lara_one_gun.h"
+#include "lara_flare.h"
+#include "lara_initialise.h"
 #include "pickup.h"
 #include "flmtorch.h"
 #include "setup.h"

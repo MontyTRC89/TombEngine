@@ -87,3 +87,6 @@ void BinocularCamera(ITEM_INFO* item);
 void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
+void LookLeftRight();
+void LookUpDown();
+void ResetLook();
