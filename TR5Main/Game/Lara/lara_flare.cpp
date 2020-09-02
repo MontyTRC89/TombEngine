@@ -326,7 +326,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 
 		short roomNumber = LaraItem->roomNumber;
 		FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		int collided = GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0);
+		int collided = GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, true);
 		if (collided || GetFloorHeight(floor, pos.x, pos.y, pos.z) < pos.y)
 		{
 			flag = true;
