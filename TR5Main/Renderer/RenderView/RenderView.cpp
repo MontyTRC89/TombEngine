@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "RenderView.h"
 namespace T5M::Renderer {
+	constexpr float EPSILON = 0.00001f;
 	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) {
 		viewport = {};
 		viewport.TopLeftX = 0;
@@ -47,7 +48,7 @@ namespace T5M::Renderer {
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 		WorldDirection = Vector3(cam->target.x, cam->target.y, cam->target.z) - WorldPosition;
-		if (WorldDirection == Vector3::Zero) [[unlikely]]
+		if (WorldDirection.Length() < EPSILON) [[unlikely]]
 			WorldDirection = Vector3::UnitZ;
 		Vector3 up = -Vector3::UnitY;
 		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
