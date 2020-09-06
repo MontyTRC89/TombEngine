@@ -28,10 +28,10 @@
 
 extern GameFlow* g_GameFlow;
 
-int HKCounter = 0;
-int HKTimer = 0;
-int HKFlag = 0;
-byte HKFlag2 = 0;
+//int HKCounter = 0;
+//int HKTimer = 0;
+//int HKFlag = 0;
+//byte HKFlag2 = 0;
 
 void FireHarpoon()
 {
@@ -997,11 +997,11 @@ void draw_shotgun(int weaponType)
 
 void AnimateShotgun(int weaponType)
 {
-	if (HKTimer)
-	{
-		HKFlag = 0;
-		HKTimer--;
-	}
+//	if (HKTimer)
+//	{
+//		HKFlag = 0;
+//		HKTimer--;
+//	}
 
 	if (SmokeCountL)
 	{
@@ -1045,9 +1045,9 @@ void AnimateShotgun(int weaponType)
 	switch (item->currentAnimState)
 	{
 	case WSTATE_AIM:
-		HKFlag = 0;
-		HKTimer = 0;
-		HKFlag2 = 0;
+//		HKFlag = 0;
+//		HKTimer = 0;
+//		HKFlag2 = 0;
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 			item->goalAnimState = WSTATE_UW_AIM;
@@ -1059,9 +1059,9 @@ void AnimateShotgun(int weaponType)
 		break;
 
 	case WSTATE_UW_AIM:
-		HKFlag = 0;
-		HKTimer = 0;
-		HKFlag2 = 0;
+//		HKFlag = 0;
+//		HKTimer = 0;
+//		HKFlag2 = 0;
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 		{
@@ -1105,7 +1105,7 @@ void AnimateShotgun(int weaponType)
 					else if (weaponType == WEAPON_HK)
 					{
 						FireHK(0);
-						HKFlag = 1;
+//						HKFlag = 1;
 
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
@@ -1127,15 +1127,15 @@ void AnimateShotgun(int weaponType)
 			}
 
 			if (item->goalAnimState != WSTATE_RECOIL 
-				&& HKFlag 
+//				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_HK_FIRE);
 				SoundEffect(SFX_HK_STOP, &LaraItem->pos, 0);
-				HKFlag = 0;
+//				HKFlag = 0;
 			}
 		}
-		else if (HKFlag)
+/*		else if (HKFlag)
 		{
 			if (Lara.Weapons[WEAPON_HK].HasSilencer)
 			{
@@ -1146,7 +1146,7 @@ void AnimateShotgun(int weaponType)
 				SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
 				SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 			}
-		}
+		}*/
 		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.leftArm.lock)
 		{
 			item->goalAnimState = WSTATE_UNAIM;
@@ -1175,10 +1175,10 @@ void AnimateShotgun(int weaponType)
 						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
 							harpoonFired = true;
 					}
-					else if (weaponType == WEAPON_HK && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
+					else if (weaponType == WEAPON_HK)// && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
 					{
 						FireHK(1);
-						HKFlag = 1;
+//						HKFlag = 1;
 						item->goalAnimState = 8;
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
@@ -1201,14 +1201,14 @@ void AnimateShotgun(int weaponType)
 					item->goalAnimState = WSTATE_UW_AIM;
 			}
 			else if (item->goalAnimState != WSTATE_UW_RECOIL 
-				&& HKFlag 
+//				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_HK_FIRE);
 				SoundEffect(SFX_HK_STOP, &LaraItem->pos, 0);
-				HKFlag = 0;
+//				HKFlag = 0;
 			}
-			else if (HKFlag)
+/*			else if (HKFlag)
 			{
 				if (Lara.Weapons[WEAPON_HK].HasSilencer)
 				{
@@ -1219,7 +1219,7 @@ void AnimateShotgun(int weaponType)
 					SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 83888140);
 					SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 				}
-			}
+			}*/
 		}		
 
 		break;
@@ -1820,7 +1820,7 @@ void HitSpecial(ITEM_INFO* projectile, ITEM_INFO* target, int flags)
 
 void FireHK(int mode)
 {
-	if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+/*	if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 	{
 		HKTimer = 12;
 	}
@@ -1832,7 +1832,7 @@ void FireHK(int mode)
 			HKCounter = 0;
 			HKTimer = 12;
 		}
-	}
+	}*/
 
 	short angles[2];
 
