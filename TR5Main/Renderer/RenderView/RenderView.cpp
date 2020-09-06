@@ -47,9 +47,8 @@ namespace T5M::Renderer {
 		RoomNumber = cam->pos.roomNumber;
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
-		WorldDirection = Vector3(cam->target.x, cam->target.y, cam->target.z) - WorldPosition;
-		if (WorldDirection.Length() < EPSILON) [[unlikely]]
-			WorldDirection = Vector3::UnitZ;
+		WorldDirection = target - WorldPosition;
+		WorldDirection.Normalize();
 		Vector3 up = -Vector3::UnitY;
 		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		up = Vector3::Transform(up, upRotation);
