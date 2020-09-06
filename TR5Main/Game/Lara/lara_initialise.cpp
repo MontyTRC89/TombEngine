@@ -122,7 +122,7 @@ void LaraInitialiseMeshes() // (AF) (D)
 	}
 	else
 	{
-		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Uzis;
+		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	}
 
 	Lara.gunStatus = LG_NO_ARMS;
