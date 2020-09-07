@@ -344,7 +344,7 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 void T5M::Renderer::Renderer11::Create()
 {
 
-	D3D_FEATURE_LEVEL levels[] = {D3D_FEATURE_LEVEL_11_0,D3D_FEATURE_LEVEL_11_1};
+	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; // {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_11_1};
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 
