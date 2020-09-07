@@ -1671,7 +1671,7 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_von_croy.cpp">
-		<Filter>File di origine</Filter>
+      <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR3\Vehicles\biggun.cpp">
       <Filter>File di origine</Filter>
