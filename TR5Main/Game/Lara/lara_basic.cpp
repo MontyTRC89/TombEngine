@@ -1185,12 +1185,12 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_LEFT && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
 		{
-			item->goalAnimState = LS_JUMP_RIGHT;
+			item->goalAnimState = LS_JUMP_LEFT;
 			Lara.moveAngle = -ANGLE(90);
 		}
 		else if (TrInput & IN_RIGHT && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
 		{
-			item->goalAnimState = LS_JUMP_LEFT;
+			item->goalAnimState = LS_JUMP_RIGHT;
 			Lara.moveAngle = ANGLE(90);
 		}
 		else if (TrInput & IN_BACK && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
