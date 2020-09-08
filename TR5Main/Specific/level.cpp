@@ -918,27 +918,23 @@ void LoadSamples()
 		g_Level.SoundDetails.resize(numSamplesInfos);
 		ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SAMPLE_INFO));
 
-		int numSampleIndices = ReadInt32();
-		if (numSampleIndices)
+		int numSamples = ReadInt32();
+		if (numSamples <= 0)
+			return;
+
+		int uncompressedSize;
+		int compressedSize;
+		char* buffer = (char*)malloc(2 * 1048576);
+
+		for (int i = 0; i < numSamples; i++)
 		{
-			int numSamples = ReadInt32();
-			if (numSamples <= 0)
-				return;
-
-			int uncompressedSize;
-			int compressedSize;
-			char* buffer = (char*)malloc(2 * 1048576);
-
-			for (int i = 0; i < numSamples; i++)
-			{
-				uncompressedSize = ReadInt32();
-				compressedSize = ReadInt32();
-				ReadBytes(buffer, compressedSize);
-				Sound_LoadSample(buffer, compressedSize, uncompressedSize, i);
-			}
-
-			free(buffer);
+			uncompressedSize = ReadInt32();
+			compressedSize = ReadInt32();
+			ReadBytes(buffer, compressedSize);
+			Sound_LoadSample(buffer, compressedSize, uncompressedSize, i);
 		}
+
+		free(buffer);
 	}
 	else
 	{
