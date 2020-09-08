@@ -10,9 +10,38 @@
 #include "level.h"
 #include "GameFlowScript.h"
 #include <Specific\setup.h>
+#include "lara_fire.h"
 using namespace T5M::Renderer;
 
 extern GameFlow *g_GameFlow;
+
+bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
+	ITEM_INFO& laraItem = *LaraItem;
+	LaraInfo& laraInfo = Lara;
+	switch(weapon){
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_CROSSBOW:
+		case WEAPON_SHOTGUN:
+			return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+			break;
+		case WEAPON_HK:
+		{
+			//Animate upper body if Lara is shooting from shoulder OR if Lara is standing still/turning
+			int baseAnim = Objects[WeaponObject(weapon)].animIndex;
+			if(laraInfo.rightArm.animNumber - baseAnim == 0 || laraInfo.rightArm.animNumber - baseAnim == 2 || laraInfo.rightArm.animNumber - baseAnim == 4){
+				return true;
+			} else
+				return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+		}
+			break;
+		default:
+			return false;
+			break;
+		
+	}
+}
 void Renderer11::updateLaraAnimations(bool force)
 {
 	Matrix translation;
@@ -80,7 +109,29 @@ void Renderer11::updateLaraAnimations(bool force)
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
+		{
+			ANIM_FRAME* shotgunFramePtr;
+
+			// Left arm
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+
+			if(shouldAnimateUpperBody(Lara.gunType)){
+				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
+			}
+			shotgunFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber];
+			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+
+			// Right arm
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			if(shouldAnimateUpperBody(Lara.gunType)){
+				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
+			}
+			shotgunFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber];
+			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+		}
+			break;
 		case WEAPON_REVOLVER:
+		{
 			ANIM_FRAME* shotgunFramePtr;
 
 			// Left arm
@@ -92,6 +143,7 @@ void Renderer11::updateLaraAnimations(bool force)
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			shotgunFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber];
 			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+		}
 			break;
 
 		case WEAPON_PISTOLS:
