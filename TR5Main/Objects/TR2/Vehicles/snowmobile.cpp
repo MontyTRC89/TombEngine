@@ -88,56 +88,64 @@ void InitialiseSkidoo(short itemNum)
 	}
 }
 
-static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
+void SkidooBaddieCollision(ITEM_INFO *skidoo)
 {
-	vector<short> roomsList;
-	roomsList.push_back(skidoo->roomNumber);
+	int			i, x, y, z;
+	ITEM_INFO	*item;
+	OBJECT_INFO *object;
+	short		roomz[12], roomnum(1), *door;
+	short		itemNum;
 
-	ROOM_INFO* room = &g_Level.Rooms[skidoo->roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
+	roomz[0] = skidoo->roomNumber;
+	door = (short*)&g_Level.Rooms[skidoo->roomNumber].doors;
+	if (door)
 	{
-		roomsList.push_back(room->doors[i].room);
+		for (i = (int)*(door++); i > 0; i--)
+		{
+			roomz[roomnum++] = *(door);
+			door += 16;
+		}
 	}
 
-	for (int i = 0; i < roomsList.size(); i++)
+	for (i = 0; i < roomnum; i++)
 	{
-		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
+		itemNum = g_Level.Rooms[roomz[i]].itemNumber;
 		while (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* target = &g_Level.Items[itemNum];
-			if (target->collidable && target->status != ITEM_INVISIBLE && target != LaraItem && target != skidoo)
+			item = &g_Level.Items[itemNum];
+			if (item->collidable && item->status != IFLAG_INVISIBLE && item != LaraItem && item != skidoo)
 			{
-				OBJECT_INFO* object = &Objects[target->objectNumber];
-				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
+				object = &Objects[item->objectNumber];
+				if (object->collision && (object->intelligent))
 				{
-					int x = skidoo->pos.xPos - target->pos.xPos;
-					int y = skidoo->pos.yPos - target->pos.yPos;
-					int z = skidoo->pos.zPos - target->pos.zPos;
+					x = skidoo->pos.xPos - item->pos.xPos;
+					y = skidoo->pos.yPos - item->pos.yPos;
+					z = skidoo->pos.zPos - item->pos.zPos;
 					if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
 					{
-						if (target->objectNumber == ID_ROLLINGBALL)
+						if (item->objectNumber == ID_ROLLINGBALL)
 						{
-							if (TestBoundsCollide(target, LaraItem, 100))
+							if (TestBoundsCollide(item, LaraItem, 100))
 							{
 								if (LaraItem->hitPoints > 0)
 								{
 									DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - (STEP_SIZE*2), LaraItem->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 5);
-									target->hitPoints -= 8;
+									item->hitPoints -= 8;
 								}
 							}
 						}
 						else
 						{
-							if (TestBoundsCollide(target, skidoo, SKIDOO_FRONT))
+							if (TestBoundsCollide(item, skidoo, SKIDOO_FRONT))
 							{
 								DoLotsOfBlood(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 3);
-								target->hitPoints = 0;
+								item->hitPoints = 0;
 							}
 						}
 					}
 				}
 			}
+			itemNum = item->nextItem;
 		}
 	}
 }
@@ -899,7 +907,7 @@ static int SkidooDynamics(ITEM_INFO* skidoo)
 
 	/* Test against bad guys too */
 	if (!(skidoo->flags & ONESHOT)) // ONESHOT flag set if skidoo no longer travelling with Lara
-		SkidooBaddieCollision(Lara.Vehicle, skidoo);
+		SkidooBaddieCollision(skidoo);
 
 	/* Test new positions of points (one at a time) and shift skidoo accordingly */
 	rot = 0;
