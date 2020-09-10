@@ -10,8 +10,11 @@
 #include "sphere.h"
 #include "GameFlowScript.h"
 #include <Renderer\RenderView\RenderView.h>
+#include "quad.h"
+
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
+
 namespace T5M::Renderer
 {
 	using std::pair;
@@ -254,8 +257,7 @@ namespace T5M::Renderer
 		itemToDraw->Item = &g_Level.Items[itemNumber];
 
 		ITEM_INFO *item = itemToDraw->Item;
-		CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
-
+		
 		// Lara has her own routine
 		if (item->objectNumber == ID_LARA)
 			return;
@@ -277,26 +279,43 @@ namespace T5M::Renderer
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
-				if (creature)
+				if (item->objectNumber == ID_QUAD)
 				{
-					if (currentBone->ExtraRotationFlags & ROT_Y)
+					QUAD_INFO* quad = (QUAD_INFO*)item->data;
+					if (j == 3 || j == 4)
 					{
-						currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
+						currentBone->ExtraRotation.x = TO_RAD(quad->rearRot);
 					}
-
-					if (currentBone->ExtraRotationFlags & ROT_X)
+					else if (j == 6 || j == 7)
 					{
-						currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
-					}
-
-					if (currentBone->ExtraRotationFlags & ROT_Z)
-					{
-						currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
+						currentBone->ExtraRotation.x = TO_RAD(quad->frontRot);
 					}
 				}
+				else 
+				{
+					CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+					if (creature != NULL)
+					{
+						if (currentBone->ExtraRotationFlags & ROT_Y)
+						{
+							currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_X)
+						{
+							currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_Z)
+						{
+							currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
+							lastJoint++;
+						}
+					}
+				} 
 			}
 
 			ANIM_FRAME* framePtr[2];
