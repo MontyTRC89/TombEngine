@@ -88,13 +88,40 @@ void InitialiseSkidoo(short itemNum)
 	}
 }
 
-static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
+/*void SkidooBaddieCollision(ITEM_INFO *skidoo)
 {
+	int			i, x, y, z;
+	ITEM_INFO	*item;
+	OBJECT_INFO *object;
+	short		roomz[12], roomnum(1), *door;
+	short		itemNum;
+
+	roomz[0] = skidoo->roomNumber;
+	door = (signed short*)&g_Level.Rooms[skidoo->roomNumber].doors;
+
 	vector<short> roomsList;
 	roomsList.push_back(skidoo->roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[skidoo->roomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
+
+	if (door)
+	{
+		for (i = (short)*(door++); i > 0; i--)
+		{
+			roomz[roomnum++] = *(door);
+			door += 16;
+		}
+	}*/
+void SkidooBaddieCollision(ITEM_INFO* skidoo)
+{
+	int x, y, z, i;
+	vector<short> roomsList;
+	roomsList.push_back(skidoo->roomNumber);
+	ITEM_INFO	*item;
+	OBJECT_INFO *object;
+	ROOM_INFO* room = &g_Level.Rooms[skidoo->roomNumber];
+	for (i = 0; i < room->doors.size(); i++)
 	{
 		roomsList.push_back(room->doors[i].room);
 	}
@@ -103,40 +130,45 @@ static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 	{
 		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
 
-		while (itemNum != NO_ITEM)
+		for (int i = 0; i < roomsList.size(); i++)
 		{
-			ITEM_INFO* target = &g_Level.Items[itemNum];
-			if (target->collidable && target->status != ITEM_INVISIBLE && target != LaraItem && target != skidoo)
+			itemNum = (short)*&g_Level.Rooms[roomsList[i]].itemNumber;
+			while (itemNum != NO_ITEM)
 			{
-				OBJECT_INFO* object = &Objects[target->objectNumber];
-				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
+				item = &g_Level.Items[itemNum];
+				if (item->collidable && item->status != IFLAG_INVISIBLE && item != LaraItem && item != skidoo)
 				{
-					int x = skidoo->pos.xPos - target->pos.xPos;
-					int y = skidoo->pos.yPos - target->pos.yPos;
-					int z = skidoo->pos.zPos - target->pos.zPos;
-					if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
+					object = &Objects[item->objectNumber];
+					if (object->collision && (object->intelligent))
 					{
-						if (target->objectNumber == ID_ROLLINGBALL)
+						x = skidoo->pos.xPos - item->pos.xPos;
+						y = skidoo->pos.yPos - item->pos.yPos;
+						z = skidoo->pos.zPos - item->pos.zPos;
+						if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
 						{
-							if (TestBoundsCollide(target, LaraItem, 100))
+							if (item->objectNumber == ID_ROLLINGBALL)
 							{
-								if (LaraItem->hitPoints > 0)
+								if (TestBoundsCollide(item, LaraItem, 100))
 								{
-									DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - (STEP_SIZE*2), LaraItem->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 5);
-									target->hitPoints -= 8;
+									if (LaraItem->hitPoints > 0)
+									{
+										DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - (STEP_SIZE * 2), LaraItem->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 5);
+										item->hitPoints -= 8;
+									}
 								}
 							}
-						}
-						else
-						{
-							if (TestBoundsCollide(target, skidoo, SKIDOO_FRONT))
+							else
 							{
-								DoLotsOfBlood(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 3);
-								target->hitPoints = 0;
+								if (TestBoundsCollide(item, skidoo, SKIDOO_FRONT))
+								{
+									DoLotsOfBlood(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, GetRandomControl() & 3, LaraItem->pos.yRot, LaraItem->roomNumber, 3);
+									item->hitPoints = 0;
+								}
 							}
 						}
 					}
 				}
+				itemNum = item->nextItem;
 			}
 		}
 	}
@@ -899,7 +931,7 @@ static int SkidooDynamics(ITEM_INFO* skidoo)
 
 	/* Test against bad guys too */
 	if (!(skidoo->flags & ONESHOT)) // ONESHOT flag set if skidoo no longer travelling with Lara
-		SkidooBaddieCollision(Lara.Vehicle, skidoo);
+		SkidooBaddieCollision(skidoo);
 
 	/* Test new positions of points (one at a time) and shift skidoo accordingly */
 	rot = 0;
