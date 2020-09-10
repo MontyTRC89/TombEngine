@@ -150,9 +150,9 @@ static void QuadbikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
-
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, 160, 60, 60, 64, ANGLE(45), 0);
 	ExplodingDeath(Lara.Vehicle, 0xfffffffe, 1);
-	KillItem(Lara.Vehicle);
+//	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_EXPLOSION1, NULL, 0);
@@ -196,64 +196,71 @@ static int CanQuadbikeGetOff(int direction)
 
 static int QuadCheckGetOff()
 {
-	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
-
-	if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
+	if (Lara.Vehicle != NO_ITEM)
 	{
-		if (LaraItem->currentAnimState == QUAD_STATE_GETOFFL)
-			LaraItem->pos.yRot += ANGLE(90);
-		else
-			LaraItem->pos.yRot -= ANGLE(90);
+		ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
-		LaraItem->animNumber = LA_STAND_SOLID;
-		LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
-		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
-		LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
-		LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
-		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		Lara.Vehicle = NO_ITEM;
-		Lara.gunStatus = LG_NO_ARMS;
-	}
-	else if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
-	{
-		QUAD_INFO* quad;
-
-		quad = (QUAD_INFO *)item->data;
-		if (LaraItem->currentAnimState == QUAD_STATE_FALLOFF)
+		if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
 		{
-			PHD_VECTOR pos = { 0, 0, 0 };
+			if (LaraItem->currentAnimState == QUAD_STATE_GETOFFL)
+				LaraItem->pos.yRot += ANGLE(90);
+			else
+				LaraItem->pos.yRot -= ANGLE(90);
 
-			LaraItem->animNumber = LA_FREEFALL;
-			LaraItem->frameNumber = GF(LA_FREEFALL, 0);
-			LaraItem->currentAnimState = LS_FREEFALL;
-
-			GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
-
-			LaraItem->pos.xPos = pos.x;
-			LaraItem->pos.yPos = pos.y;
-			LaraItem->pos.zPos = pos.z;
-			LaraItem->fallspeed = item->fallspeed;
-			LaraItem->gravityStatus = true;
-			LaraItem->pos.xRot = 0;
-			LaraItem->pos.zRot = 0;
-			LaraItem->hitPoints = 0;
+			LaraItem->animNumber = LA_STAND_SOLID;
+			LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
+			LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
+			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
-			item->flags |= ONESHOT;
-
-			return false;
 		}
-		else if (LaraItem->currentAnimState == QUAD_STATE_FALLDEATH)
+		else if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			LaraItem->goalAnimState = LS_DEATH;
-			LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
-			LaraItem->speed = 0;
-			quad->flags |= QUAD_FLAGS_DEAD;
+			QUAD_INFO* quad;
 
-			return false;
+			quad = (QUAD_INFO *)item->data;
+			if (LaraItem->currentAnimState == QUAD_STATE_FALLOFF)
+			{
+				PHD_VECTOR pos = { 0, 0, 0 };
+
+				LaraItem->animNumber = LA_FREEFALL;
+				LaraItem->frameNumber = GF(LA_FREEFALL, 0);
+				LaraItem->currentAnimState = LS_FREEFALL;
+
+				GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
+
+				LaraItem->pos.xPos = pos.x;
+				LaraItem->pos.yPos = pos.y;
+				LaraItem->pos.zPos = pos.z;
+				LaraItem->fallspeed = item->fallspeed;
+				LaraItem->gravityStatus = true;
+				LaraItem->pos.xRot = 0;
+				LaraItem->pos.zRot = 0;
+				LaraItem->hitPoints = 0;
+				Lara.gunStatus = LG_NO_ARMS;
+				item->flags |= ONESHOT;
+
+				return false;
+			}
+			else if (LaraItem->currentAnimState == QUAD_STATE_FALLDEATH)
+			{
+				LaraItem->goalAnimState = LS_DEATH;
+				LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
+				LaraItem->speed = 0;
+				quad->flags |= QUAD_FLAGS_DEAD;
+
+				return false;
+			}
 		}
-	}
 
-	return true;
+		return true;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 static int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
@@ -922,6 +929,8 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 		if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 		{
 			LaraItem->goalAnimState = QUAD_STATE_FALLOFF;
+			LaraItem->pos.yPos = item->pos.yPos + 700;
+			LaraItem->roomNumber = item->roomNumber;
 			LaraItem->hitPoints = 0;
 			QuadbikeExplode(item);
 		}
