@@ -801,7 +801,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 		}
 
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		SoundEffect(202, &item->pos, 0);
+		SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &item->pos, 0);
 	}
 	else
 	{
@@ -1323,12 +1323,12 @@ int QuadBikeControl(void)
 			quad->pitch = -0x8000;
 		else if (quad->pitch > 0xa000)
 			quad->pitch = 0xa000;
-		SoundEffect(155, &item->pos, PITCH_SHIFT + ((0x10000 + quad->pitch) << 8));
+		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, PITCH_SHIFT + ((0x10000 + quad->pitch) << 8));
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(153, &item->pos, 0);
+			SoundEffect(SFX_TR3_QUAD_IDLE, &item->pos, 0);
 		quad->pitch = 0;
 	}
 
