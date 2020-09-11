@@ -944,12 +944,12 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
-	if (!quad->velocity && !(TrInput & IN_DUCK) && !QuadCanHandbrakeStart)
+	if (!quad->velocity && !(TrInput & (IN_DUCK | IN_SPRINT)) && !QuadCanHandbrakeStart)
 		QuadCanHandbrakeStart = true;
 	else if (quad->velocity)
 		QuadCanHandbrakeStart = false;
 
-	if (!(TrInput & IN_DUCK))
+	if (!(TrInput & (IN_DUCK | IN_SPRINT)))
 		QuadHandbrakeStarting = false;
 
 	if (!QuadHandbrakeStarting)
@@ -970,7 +970,7 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 
 		if (quad->velocity > 0)
 		{
-			if ((TrInput & IN_DUCK) && !QuadHandbrakeStarting && quad->velocity > MIN_HANDBRAKE_SPEED)
+			if ((TrInput & (IN_DUCK | IN_SPRINT)) && !QuadHandbrakeStarting && quad->velocity > MIN_HANDBRAKE_SPEED)
 			{
 				if (TrInput & IN_LEFT)
 				{
@@ -1003,7 +1003,7 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 		}
 		else if (quad->velocity < 0)
 		{
-			if ((TrInput & IN_DUCK) && !QuadHandbrakeStarting && quad->velocity < -MIN_HANDBRAKE_SPEED + 0x800)
+			if ((TrInput & (IN_DUCK | IN_SPRINT)) && !QuadHandbrakeStarting && quad->velocity < -MIN_HANDBRAKE_SPEED + 0x800)
 			{
 				if (TrInput & IN_RIGHT)
 				{
@@ -1037,7 +1037,7 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 		
 		if (TrInput & IN_JUMP)
 		{
-			if ((TrInput & IN_DUCK) && (QuadCanHandbrakeStart || QuadHandbrakeStarting))
+			if ((TrInput & (IN_DUCK|IN_SPRINT)) && (QuadCanHandbrakeStart || QuadHandbrakeStarting))
 			{
 				QuadHandbrakeStarting = true;
 				quad->revs -= 0x200;
@@ -1057,7 +1057,7 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 
 		else if (TrInput & IN_ACTION)
 		{
-			if ((TrInput & IN_DUCK) && (QuadCanHandbrakeStart || QuadHandbrakeStarting))
+			if ((TrInput & (IN_DUCK | IN_SPRINT)) && (QuadCanHandbrakeStart || QuadHandbrakeStarting))
 			{
 				QuadHandbrakeStarting = true;
 				quad->revs += 0x200;
