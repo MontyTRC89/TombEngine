@@ -180,57 +180,18 @@ int BigGunControl(COLL_INFO *coll)
 		else
 		{
 			if (TrInput & IN_LEFT)
-			{
-				if (GunRotYAdd > 0)
-					GunRotYAdd--;// >>= 1;
+				gun->yRot -= 8;
+			else 
+			if (TrInput & IN_RIGHT)
+				gun->yRot += 8;
 
-				GunRotYAdd -= 16;
-
-				if (GunRotYAdd < -64)
-					GunRotYAdd = -64;
-
-				if (((Wibble & 7) == 0) && (abs(gun->yRot) < 544))
-					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
-			}
-			else if (TrInput & IN_RIGHT)
-			{
-				if (GunRotYAdd < 0)
-					GunRotYAdd++;// >>= 1;
-
-				GunRotYAdd += 16;
-
-				if (GunRotYAdd < 64)
-					GunRotYAdd = 64;
-
-				if (((Wibble & 7) == 0) && (abs(gun->yRot) < (136 << 2)))
-					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
-			}
-			else
-			{
-//				GunRotYAdd -= GunRotYAdd >> 2;
-				if (abs(GunRotYAdd) < 16)
-					GunRotYAdd = 0;
-			}
-
-			gun->yRot = GunRotYAdd >> 2;
-			
-			if (gun->yRot < -(136 << 2))
-			{
-				gun->yRot = -(136 << 2);
-				GunRotYAdd = 0;
-			}
-			else if (gun->yRot > (136 << 2))
-			{
-				gun->yRot = (136 << 2);
-				GunRotYAdd = 0;
-			}
-			
 			if ((TrInput & IN_FORWARD) && (gun->xRot < 59))
 				gun->xRot++;
 			else if ((TrInput & IN_BACK) && (gun->xRot))
 				gun->xRot--;
 		}
 	}
+
 	if (gun->flags & 2)
 	{
 		if (gun->xRot < 30)
@@ -240,7 +201,7 @@ int BigGunControl(COLL_INFO *coll)
 		else
 		{
 			lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 1;
-			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex].frameBase;
+			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + 1].frameBase;
 			lara->currentAnimState = 1;
 			lara->goalAnimState = 1;
 			gun->flags = 4;
