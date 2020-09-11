@@ -13,59 +13,49 @@
 #include "tomb4fx.h"
 #include "draw.h"
 
-static long GunRotYAdd = 0;
 int fireCount = 0;
 
 void FireBigGun(ITEM_INFO *obj)
 {
-		Lara.hasFired = true;
-
 		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
 		{
+
+			BIGGUNINFO *gun = (BIGGUNINFO*)obj->data;
+
 			ITEM_INFO* item = &g_Level.Items[itemNumber];
 			item->objectNumber = ID_ROCKET;
 			item->roomNumber = LaraItem->roomNumber;
 
 
-			PHD_VECTOR jointPos;
-			jointPos.x = Lara.torsoXrot;
-			jointPos.y = Lara.torsoYrot + 1300;
-			jointPos.z = Lara.torsoZrot;
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 520;
 
-			GetLaraJointPosition(&jointPos, LM_RHAND);
+			GetJointAbsPosition(obj, &pos, 2);
 
-			int x, y, z;
-			item->pos.xPos = x = jointPos.x;
-			item->pos.yPos = y = jointPos.y;
-			item->pos.zPos = z = jointPos.z;
+			
+			item->pos.xPos = pos.x;
+			item->pos.yPos = pos.y;
+			item->pos.zPos = pos.z;
 
-			jointPos.x = 0;
-			jointPos.y = 180 + 1024;
-			jointPos.z = 0;
+			InitialiseItem(itemNumber);
+
+
+			item->pos.xRot = -((gun->xRot - 32) * (ANGLE(1)));
+			item->pos.yRot = obj->pos.yRot;
+			item->pos.zRot = 0;
+			item->speed = 512 >> 5;
+			item->itemFlags[0] = 1;
+
+			AddActiveItem(itemNumber);
 
 			SmokeCountL = 32;
 			SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
 
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
-
-			InitialiseItem(itemNumber);
-
-			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-			item->pos.zRot = 0;
-
-			if (!Lara.leftArm.lock)
-			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
-			}
-
-			item->speed = 512 >> 5;
-			item->itemFlags[0] = 0;
-
-			AddActiveItem(itemNumber);
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, WEAPON_ROCKET_LAUNCHER, 32);
 
 			SoundEffect(SFX_EXPLOSION1, 0, 0);
 		}
