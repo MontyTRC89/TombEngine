@@ -119,12 +119,8 @@ void undraw_flare() // (F) (D)
 	short frame1 = Lara.flareFrame;
 	short frame2 = Lara.leftArm.frameNumber;
 
-#if 0
-	if (LaraItem->goalAnimState == LS_STOP &&
-		Lara.Vehicle == NO_ITEM)
-#else
-	if (LaraItem->goalAnimState == LS_STOP)
-#endif
+	if (LaraItem->goalAnimState == LS_STOP 
+		&& Lara.Vehicle == NO_ITEM)
 	{
 		if (LaraItem->animNumber == LA_STAND_IDLE)
 		{
@@ -160,7 +156,8 @@ void undraw_flare() // (F) (D)
 			Lara.flareFrame++;
 		}
 	}
-	else if (LaraItem->currentAnimState == LS_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
+	else if (LaraItem->currentAnimState == LS_STOP 
+		&& Lara.Vehicle == NO_ITEM) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
 	{
 		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;

@@ -34,6 +34,8 @@
 #include "sound.h"
 #include "savegame.h"
 #include "rope.h"
+#include <Objects\TR3\Vehicles\rubberboat.h>
+#include <Game\misc.h>
 
 using std::function;
 using T5M::Renderer::g_Renderer;
@@ -393,11 +395,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 
 	Lara.isDucked = false;
 
-#if 1
-	bool isWater = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
-#else
 	bool isWater = g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-#endif
 
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -409,21 +407,17 @@ void LaraControl(short itemNumber) // (AF) (D)
 		hfw = NO_HEIGHT;
 	Lara.waterSurfaceDist = -hfw;
 
-#if 0
 	if (Lara.Vehicle == NO_ITEM)
-#endif
 		WadeSplash(item, wh, wd);
 
 	short roomNumber;
 
-#if 0
-	if (Lara.Vehicle == NO_ITEM && Lara.ExtraAnim == 0)
+	if (Lara.Vehicle == NO_ITEM && Lara.ExtraAnim == -1)
 	{
-#endif
 		switch (Lara.waterStatus)
 		{
 		case LW_ABOVE_WATER:
-			if (hfw != NO_HEIGHT && hfw >= STEP_SIZE)
+			if (hfw != NO_HEIGHT && hfw >= STEP_SIZE && Lara.Vehicle == NO_ITEM)
 			{
 				if (wd <= 474)
 				{
@@ -434,10 +428,10 @@ void LaraControl(short itemNumber) // (AF) (D)
 						{
 							item->goalAnimState = LS_STOP;
 						}
-#if 0
 						else if (isWater & ENV_FLAG_SWAMP)
 						{
-							if (item->currentAnimState == LS_SWANDIVE_BEGIN || item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
+							if (item->currentAnimState == LS_SWANDIVE_START 
+								|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
 								item->pos.yPos = wh + 1000;
 
 							item->goalAnimState = LS_WADE_FORWARD;
@@ -445,14 +439,9 @@ void LaraControl(short itemNumber) // (AF) (D)
 							item->animNumber = LA_WADE;
 							item->frameNumber = GF(LA_WADE, 0);
 						}
-#endif
 					}
 				}
-#if 1
-				else if (isWater)
-#else
 				else if (!(isWater & ENV_FLAG_SWAMP))
-#endif
 				{
 					Lara.air = 1800;
 					Lara.waterStatus = LW_UNDERWATER;
@@ -548,6 +537,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 				}
 				else
 				{
+					LaraItem->roomNumber;
 					Lara.waterStatus = LW_ABOVE_WATER;
 					if (item->currentAnimState == LS_WADE_FORWARD)
 						item->goalAnimState = LS_RUN_FORWARD;
@@ -668,11 +658,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 			Camera.targetElevation = -ANGLE(22);
 			if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
 			{
-#if 1
-				if (hfw > 730)
-#else
 				if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
-#endif
 				{
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - hfw;
@@ -729,9 +715,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 			}
 			break;
 		}
-#if 0
 	}
-#endif
 
 	if (item->hitPoints <= 0)
 	{
@@ -752,8 +736,8 @@ void LaraControl(short itemNumber) // (AF) (D)
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
-#if 0
-		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
+		if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) 
+			&& Lara.waterSurfaceDist < -775)
 		{
 			if (item->hitPoints >= 0)
 			{
@@ -767,9 +751,6 @@ void LaraControl(short itemNumber) // (AF) (D)
 			}
 		}
 		else if (Lara.gassed)
-#else
-		if (Lara.gassed)
-#endif
 		{
 			if (item->hitPoints >= 0 && --Lara.air < 0)
 			{
@@ -779,17 +760,12 @@ void LaraControl(short itemNumber) // (AF) (D)
 		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
-#if 0
-			/* lara is not equipped with any vehicle */
 			if (Lara.Vehicle == NO_ITEM) // only for the upv !!
 			{
-#endif
 				Lara.air += 10;
 				if (Lara.air > 1800)
 					Lara.air = 1800;
-#if 0
 			}
-#endif
 		}
 		LaraAboveWater(item, &lara_coll);
 		break;
@@ -890,25 +866,15 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 				return;
 			break;
 
-			//case ID_SPEEDBOAT:
-			//	if (BoatControl())
-			//		return;
-			//	break;
+		case ID_UPV:
+			if (SubControl())
+				return;
+			break;
 
-			//case ID_RUBBER_BOAT:
-			//	if (RubberBoatControl())
-			//		return;
-			//	break;
-
-			//case ID_UPV:
-			//	if (SubControl())
-			//		return;
-			//	break;
-
-			//case ID_MINECART:
-			//	if (MineCartControl())
-			//		return;
-			//	break;
+		case ID_MINECART:
+			if (MineCartControl())
+				return;
+			break;
 
 		case ID_BIGGUN:
 			if (BigGunControl(coll))
@@ -916,7 +882,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			break;
 
 		default:
-			break;
+			// Boats are processed like normal items in loop
+			LaraGun();
+			return;
 		}
 	}
 
@@ -941,7 +909,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Animate Lara
 	AnimateLara(item);
 
-	if (Lara.ExtraAnim == NO_ITEM)
+	if (Lara.ExtraAnim == -1)
 	{
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
@@ -1063,7 +1031,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 
 	LaraBaddieCollision(item, coll);
 
-	lara_collision_routines[item->currentAnimState](item, coll);
+	if (/*Lara.ExtraAnim == -1 &&*/ Lara.Vehicle == NO_ITEM)
+		lara_collision_routines[item->currentAnimState](item, coll);
 
 	UpdateLaraRoom(item, 0);
 
@@ -1119,7 +1088,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	LaraBaddieCollision(item, coll);
 
-	lara_collision_routines[item->currentAnimState](item, coll);
+	if (Lara.Vehicle == NO_ITEM)
+		lara_collision_routines[item->currentAnimState](item, coll);
 
 	UpdateLaraRoom(item, 100);
 

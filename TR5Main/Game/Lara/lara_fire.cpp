@@ -379,11 +379,11 @@ void LaraGun() // (F) (D)
 					Lara.requestGunType = WEAPON_FLARE;
 			}
 			else if (Lara.requestGunType == WEAPON_FLARE
-				|| Lara.Vehicle == NO_ITEM
+				|| (Lara.Vehicle == NO_ITEM
 				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
 				|| Lara.waterStatus == LW_ABOVE_WATER
-				|| Lara.waterStatus == LW_WADE)
-				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight)
+				|| (Lara.waterStatus == LW_WADE
+				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight))))
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 				{
@@ -541,11 +541,7 @@ void LaraGun() // (F) (D)
 		case LG_NO_ARMS:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-#if 1
-				if (CheckForHoldingState(LaraItem->currentAnimState))
-#else
 				if (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
-#endif
 				{
 					if (Lara.flareControlLeft)
 					{
@@ -576,11 +572,7 @@ void LaraGun() // (F) (D)
 			{
 				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 				{
-#if 0
 					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
-#else
-					Lara.flareControlLeft = CheckForHoldingState(LaraItem->currentAnimState);
-#endif
 					DoFlareInHand(Lara.flareAge);
 					set_flare_arm(Lara.leftArm.frameNumber);
 				}

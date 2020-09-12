@@ -596,6 +596,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		maxZ += coll->radius;
 	}
 
+	// Big enemies
 	if (abs(dx) > 4608
 	||  abs(dz) > 4608
 	||  rx <= minX
