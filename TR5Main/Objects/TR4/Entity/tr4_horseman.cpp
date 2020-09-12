@@ -84,7 +84,7 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->scalar = 3;
 		spark->friction = 34;
 		spark->sSize = spark->size = ((r >> 5) & 7) + 4;
-		spark->dSize = spark->sSize >> 1;
+		spark->dSize = spark->sSize / 2;
 		spark->flags = 26;
 		spark->maxYvel = 0;
 		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;

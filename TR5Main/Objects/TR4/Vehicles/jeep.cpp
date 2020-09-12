@@ -328,8 +328,8 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 	spark->gravity = -4 - (GetRandomControl() & 3);
 	spark->maxYvel = -8 - (GetRandomControl() & 7);
 	spark->dSize = (GetRandomControl() & 7) + (speed >> 7) + 32;
-	spark->sSize = spark->dSize >> 1;
-	spark->size = spark->dSize >> 1;
+	spark->sSize = spark->dSize / 2;
+	spark->size = spark->dSize / 2;
 }
 
 void InitialiseJeep(short itemNum)

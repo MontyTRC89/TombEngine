@@ -77,7 +77,7 @@ static void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char facto
 	spark->rotAng = GetRandomControl() & 0xFFF;
 	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32 >> factor;
-	spark->dSize = spark->size << 1;
+	spark->dSize = spark->size * 2;
 }
 
 static void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale)
@@ -109,7 +109,7 @@ static void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale
 	spark->rotAng = GetRandomControl() & 0xFFF;
 	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
-	spark->dSize = spark->size << 1;
+	spark->dSize = spark->size * 2;
 }
 
 static void SubmarineAttack(ITEM_INFO* item)

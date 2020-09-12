@@ -101,7 +101,7 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->maxYvel = 0;
 	spark->scalar = 1;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
-	spark->dSize = spark->size >> 2;
+	spark->dSize = spark->size / 4;
 }
 
 static void TriggerHydraSparks(short itemNumber, int frame)

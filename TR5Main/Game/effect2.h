@@ -86,9 +86,9 @@ typedef struct SPARKS
 	short gravity;
 	short rotAng;
 	unsigned short flags; // SP_enum
-	unsigned char sSize;
-	unsigned char dSize;
-	unsigned char size;
+	float sSize;
+	float dSize;
+	float size;
 	unsigned char friction;
 	unsigned char scalar;
 	unsigned char def;

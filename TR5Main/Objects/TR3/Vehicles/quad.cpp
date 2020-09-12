@@ -1264,9 +1264,9 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->scalar = 2;
 	spark->gravity = -(GetRandomControl() & 3) - 4;
 	spark->maxYvel = -(GetRandomControl() & 7) - 8;
-	int size = (GetRandomControl() & 7) + 16 + (speed >> 7);
+	int size = (GetRandomControl() & 7) + 64 + (speed >> 7);
 	spark->dSize = size;
-	spark->size = size >> 1;
+	spark->size = spark->sSize =  size / 2;
 }
 
 int QuadBikeControl(void)
