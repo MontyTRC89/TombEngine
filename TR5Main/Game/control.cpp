@@ -1518,14 +1518,13 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 			else if (yFloor > r->ySize - 2)
 				yFloor = r->ySize - 2;
 		}
-		else if (yFloor >= 0)
-		{
-			if (yFloor >= r->ySize)
-				yFloor = r->ySize - 1;
-		}
-		else
+		else if (yFloor < 0)
 		{
 			yFloor = 0;
+		}
+		else if (yFloor >= r->ySize)
+		{
+			yFloor = r->ySize - 1;
 		}
 
 		floor = &r->floor[xFloor + (yFloor * r->xSize)];
