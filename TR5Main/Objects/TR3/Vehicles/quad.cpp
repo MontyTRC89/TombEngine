@@ -196,6 +196,9 @@ static int CanQuadbikeGetOff(int direction)
 
 static int QuadCheckGetOff()
 {
+	if (Lara.Vehicle == NO_ITEM)
+		return true;
+
 	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
 	if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
