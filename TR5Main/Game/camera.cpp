@@ -1796,7 +1796,10 @@ void LookLeftRight()
 				Lara.headYrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY
+		&& Lara.Vehicle == NO_ITEM 
+		&& !Lara.leftArm.lock 
+		&& !Lara.rightArm.lock)
 		Lara.torsoYrot = Lara.headYrot;
 }
 
@@ -1825,13 +1828,16 @@ void LookUpDown()
 				Lara.headXrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && Lara.Vehicle == NO_ITEM && !Lara.leftArm.lock && !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY 
+		&& Lara.Vehicle == NO_ITEM 
+		&& !Lara.leftArm.lock 
+		& !Lara.rightArm.lock)
 		Lara.torsoXrot = Lara.headXrot;
 }
 
 void ResetLook()
 {
-	if (Camera.type != 2)
+	if (Camera.type != LOOK_CAMERA)
 	{
 		if (Lara.headXrot <= -ANGLE(2.0f) || Lara.headXrot >= ANGLE(2.0f))
 			Lara.headXrot = Lara.headXrot / -8 + Lara.headXrot;
@@ -1843,17 +1849,20 @@ void ResetLook()
 		else
 			Lara.headYrot = 0;
 
-		if (Lara.gunStatus == LG_HANDS_BUSY || Lara.leftArm.lock || Lara.rightArm.lock)
+		if (Lara.gunStatus != LG_HANDS_BUSY 
+			&& !Lara.leftArm.lock 
+			&& !Lara.rightArm.lock
+			&& Lara.Vehicle == NO_ITEM)
+		{
+			Lara.torsoYrot = Lara.headYrot;
+			Lara.torsoXrot = Lara.headXrot;
+		}
+		else
 		{
 			if (!Lara.headXrot)
 				Lara.torsoXrot = 0;
 			if (!Lara.headYrot)
 				Lara.torsoYrot = 0;
-		}
-		else
-		{
-			Lara.torsoYrot = Lara.headYrot;
-			Lara.torsoXrot = Lara.headXrot;
 		}
 	}
 }

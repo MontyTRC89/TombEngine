@@ -9,6 +9,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include <Game\effect2.h>
 
 typedef struct BOAT_INFO
 {
@@ -79,6 +80,52 @@ enum BOAT_STATE
 
 // TODO: (boat) render problem, water height problem, enter problem.
 
+void DoBoatWakeEffect(ITEM_INFO* boat)
+{
+	int c = phd_cos(boat->pos.yRot);
+	int s = phd_sin(boat->pos.yRot);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int h = BOAT_WAKE;
+		int w = (1 - i) * BOAT_SIDE;
+		int x = boat->pos.xPos + (-(c * w) - (h * s) >> W2V_SHIFT);
+		int y = boat->pos.yPos;
+		int z = boat->pos.zPos + ((s * w) - (h * c) >> W2V_SHIFT);
+
+		for (int j = 0; j < 16; j++)
+		{
+			SPARKS* spark = &Sparks[GetFreeSpark()];
+			spark->on = 1;
+			spark->sR = 96;
+			spark->sG = 96;
+			spark->sB = 96;
+			spark->dR = 96;
+			spark->dG = 96;
+			spark->dB = 96;
+			spark->colFadeSpeed = 1;
+			spark->transType = COLADD;
+			spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
+			spark->fadeToBlack = spark->life - 1;
+			int dl = GetRandomControl() % 1408 + 64;
+			spark->x = x + (GetRandomControl() & 255);
+			spark->y = y + (GetRandomControl() & 255);
+			spark->xVel = 0;
+			spark->zVel = 0;
+			spark->z = z + (GetRandomControl() & 255);
+			spark->friction = 0;
+			spark->flags = 10;
+			spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) - 128;
+			spark->scalar = 2;
+			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+			spark->gravity = 0;
+			spark->maxYvel = 0;
+			spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
+			spark->dSize = spark->size * 2;
+		}
+	}
+}
+
 static void GetBoatGetOff(ITEM_INFO* boat)
 {
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
@@ -93,9 +140,9 @@ static void GetBoatGetOff(ITEM_INFO* boat)
 		else
 			LaraItem->pos.yRot += 0x4000;
 
-		LaraItem->animNumber = 77;
+		LaraItem->animNumber = LA_JUMP_FORWARD;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->currentAnimState = LaraItem->goalAnimState = 3;
+		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_JUMP_FORWARD;
 		LaraItem->gravityStatus = true;
 		LaraItem->fallspeed = -40;
 		LaraItem->speed = 20;
@@ -169,7 +216,8 @@ static int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 
 	boat = &g_Level.Items[itemNum];
 
-	dist = ((LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot)) >> W2V_SHIFT;
+	dist = ((LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) -
+		(LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot)) >> W2V_SHIFT;
 	if (dist > 200)
 		return 0;
 
@@ -180,16 +228,16 @@ static int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 		if (!(TrInput & IN_ACTION) || LaraItem->gravityStatus || boat->speed)
 			return 0;
 
-		if (rot > 0x2000 && rot < 0x6000)
+		if (rot > ANGLE(45) && rot < ANGLE(135))
 			geton = 1; //right
-		else if (rot > -0x6000 && rot < -0x2000)
+		else if (rot > -ANGLE(135) && rot < -ANGLE(45))
 			geton = 2; //left
 	}
 	else if (Lara.waterStatus == LW_ABOVE_WATER)
 	{
 		if (LaraItem->fallspeed > 0)
 		{
-			if (rot > -0x6000 && rot < 0x6000 && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
+			if (rot > -ANGLE(135) && rot < 0x6000 && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
 				geton = 3; //jump
 		}
 		else if (LaraItem->fallspeed == 0)
@@ -507,17 +555,18 @@ static int BoatDynamics(short itemNum)
 	/* Move boat according to speed */
 	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
 	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
-	if (boat->speed >= 0)
+	
+	/*if (boat->speed >= 0)
 		binfo->prop_rot += (boat->speed * ANGLE(3));
 	else
-		binfo->prop_rot += ANGLE(33);
+		binfo->prop_rot += ANGLE(33);*/
 
 	/* Slide boat according to tilts (to avoid getting stuck on slopes) */
 	slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot) >> W2V_SHIFT;
 	if (!slip && boat->pos.zRot)
 		slip = (boat->pos.zRot > 0) ? 1 : -1;
-	boat->pos.zPos -= slip * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
-	boat->pos.xPos += slip * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
+	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
+	boat->pos.xPos += slip * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
 
 	slip = BOAT_SLIP * phd_sin(boat->pos.xRot) >> W2V_SHIFT;
 	if (!slip && boat->pos.xRot)
@@ -577,11 +626,11 @@ static int BoatDynamics(short itemNum)
 	{
 		newspeed = ((boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot)) >> W2V_SHIFT;
 
-		if (boat->speed > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < boat->speed - 10)
+		if (boat->speed > BOAT_MAX_SPEED /*+ BOAT_ACCELERATION*/ && newspeed < boat->speed - 10)
 		{
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
-			SoundEffect(31, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR2_LARA_GETTING_HURT, &LaraItem->pos, 0);
 			newspeed >>= 1;
 			boat->speed >>= 1;
 		}
@@ -734,7 +783,7 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 		switch (LaraItem->currentAnimState)
 		{
 		case BOAT_STILL:
-			if (TrInput & IN_DISMOUNT)
+			if (TrInput & IN_JUMP)
 			{
 				if (boat->speed == 0)
 				{
@@ -748,17 +797,21 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 				LaraItem->goalAnimState = BOAT_MOVING;
 			break;
 		case BOAT_MOVING:
-			if (boat->speed <= 0)
+			if (TrInput & IN_JUMP)
+			{
+				if (TrInput & IN_RIGHT)
+					LaraItem->goalAnimState = BOAT_JUMPR;
+				else if (TrInput & IN_LEFT)
+					LaraItem->goalAnimState = BOAT_JUMPL;
+			}
+			else if (boat->speed <= 0)
 				LaraItem->goalAnimState = BOAT_STILL;
-			else if (TrInput & IN_TURNR)
-				LaraItem->goalAnimState = BOAT_TURNR;
-			else if (TrInput & IN_TURNL)
-				LaraItem->goalAnimState = BOAT_TURNL;
 			break;
+
 		case BOAT_FALL:
 			LaraItem->goalAnimState = BOAT_MOVING;
 			break;
-		case BOAT_TURNR:
+		/*case BOAT_TURNR:
 			if (boat->speed <= 0)
 				LaraItem->goalAnimState = BOAT_STILL;
 			else if (!(TrInput & IN_TURNR))
@@ -769,7 +822,7 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 				LaraItem->goalAnimState = BOAT_STILL;
 			else if (!(TrInput & IN_TURNL))
 				LaraItem->goalAnimState = BOAT_MOVING;
-			break;
+			break;*/
 		}
 	}
 }
@@ -904,7 +957,7 @@ void BoatControl(short itemNumber)
 	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, boat->pos.xPos, boat->pos.yPos, boat->pos.zPos);
 	ceiling = GetCeiling(floor, boat->pos.xPos, boat->pos.yPos, boat->pos.zPos);
-	
+
 	if (Lara.Vehicle == itemNumber)
 	{
 		TestTriggers(TriggerIndex, 0, 0);
@@ -918,15 +971,15 @@ void BoatControl(short itemNumber)
 	{
 		switch (LaraItem->currentAnimState)
 		{
-			case BOAT_GETON:
-			case BOAT_JUMPR:
-			case BOAT_JUMPL:
-				break;
+		case BOAT_GETON:
+		case BOAT_JUMPR:
+		case BOAT_JUMPL:
+			break;
 
-			default:
-				drive = 1;
-				no_turn = BoatUserControl(boat);
-				break;
+		default:
+			drive = 1;
+			no_turn = BoatUserControl(boat);
+			break;
 		}
 	}
 	else
@@ -1029,13 +1082,13 @@ void BoatControl(short itemNumber)
 	binfo->pitch += (pitch - binfo->pitch) >> 2;
 
 	if (boat->speed > 8)
-		SoundEffect(197, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
+		SoundEffect(SFX_TR2_BOAT_HIGH_ENGINE_RPM, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
 	else if (drive)
-		SoundEffect(195, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
+		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
 
-	//	/* If boat is moving, then do wake */
-	//	if (boat->speed && water-5 == boat->pos.y_pos)
-	//		DoWakeEffect(boat);
+	/* If boat is moving, then do wake */
+	if (boat->speed && water - 5 == boat->pos.yPos)
+		DoBoatWakeEffect(boat);
 
 	if (Lara.Vehicle != itemNumber)
 		return;
