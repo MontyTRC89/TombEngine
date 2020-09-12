@@ -13,59 +13,49 @@
 #include "tomb4fx.h"
 #include "draw.h"
 
-static long GunRotYAdd = 0;
 int fireCount = 0;
 
 void FireBigGun(ITEM_INFO *obj)
 {
-		Lara.hasFired = true;
-
 		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
 		{
+
+			BIGGUNINFO *gun = (BIGGUNINFO*)obj->data;
+
 			ITEM_INFO* item = &g_Level.Items[itemNumber];
 			item->objectNumber = ID_ROCKET;
 			item->roomNumber = LaraItem->roomNumber;
 
 
-			PHD_VECTOR jointPos;
-			jointPos.x = Lara.torsoXrot;
-			jointPos.y = Lara.torsoYrot + 1300;
-			jointPos.z = Lara.torsoZrot;
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 520;
 
-			GetLaraJointPosition(&jointPos, LM_RHAND);
+			GetJointAbsPosition(obj, &pos, 2);
 
-			int x, y, z;
-			item->pos.xPos = x = jointPos.x;
-			item->pos.yPos = y = jointPos.y;
-			item->pos.zPos = z = jointPos.z;
+			
+			item->pos.xPos = pos.x;
+			item->pos.yPos = pos.y;
+			item->pos.zPos = pos.z;
 
-			jointPos.x = 0;
-			jointPos.y = 180 + 1024;
-			jointPos.z = 0;
+			InitialiseItem(itemNumber);
+
+
+			item->pos.xRot = -((gun->xRot - 32) * (ANGLE(1)));
+			item->pos.yRot = obj->pos.yRot;
+			item->pos.zRot = 0;
+			item->speed = 512 >> 5;
+			item->itemFlags[0] = 1;
+
+			AddActiveItem(itemNumber);
 
 			SmokeCountL = 32;
 			SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
 
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
-
-			InitialiseItem(itemNumber);
-
-			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-			item->pos.zRot = 0;
-
-			if (!Lara.leftArm.lock)
-			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
-			}
-
-			item->speed = 512 >> 5;
-			item->itemFlags[0] = 0;
-
-			AddActiveItem(itemNumber);
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, WEAPON_ROCKET_LAUNCHER, 32);
 
 			SoundEffect(SFX_EXPLOSION1, 0, 0);
 		}
@@ -180,57 +170,18 @@ int BigGunControl(COLL_INFO *coll)
 		else
 		{
 			if (TrInput & IN_LEFT)
-			{
-				if (GunRotYAdd > 0)
-					GunRotYAdd--;// >>= 1;
+				gun->yRot -= 8;
+			else 
+			if (TrInput & IN_RIGHT)
+				gun->yRot += 8;
 
-				GunRotYAdd -= 16;
-
-				if (GunRotYAdd < -64)
-					GunRotYAdd = -64;
-
-				if (((Wibble & 7) == 0) && (abs(gun->yRot) < 544))
-					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
-			}
-			else if (TrInput & IN_RIGHT)
-			{
-				if (GunRotYAdd < 0)
-					GunRotYAdd++;// >>= 1;
-
-				GunRotYAdd += 16;
-
-				if (GunRotYAdd < 64)
-					GunRotYAdd = 64;
-
-				if (((Wibble & 7) == 0) && (abs(gun->yRot) < (136 << 2)))
-					SoundEffect(SFX_TR3_LARA_UZI_STOP, &obj->pos, NULL);
-			}
-			else
-			{
-//				GunRotYAdd -= GunRotYAdd >> 2;
-				if (abs(GunRotYAdd) < 16)
-					GunRotYAdd = 0;
-			}
-
-			gun->yRot = GunRotYAdd >> 2;
-			
-			if (gun->yRot < -(136 << 2))
-			{
-				gun->yRot = -(136 << 2);
-				GunRotYAdd = 0;
-			}
-			else if (gun->yRot > (136 << 2))
-			{
-				gun->yRot = (136 << 2);
-				GunRotYAdd = 0;
-			}
-			
 			if ((TrInput & IN_FORWARD) && (gun->xRot < 59))
 				gun->xRot++;
 			else if ((TrInput & IN_BACK) && (gun->xRot))
 				gun->xRot--;
 		}
 	}
+
 	if (gun->flags & 2)
 	{
 		if (gun->xRot < 30)
@@ -240,7 +191,7 @@ int BigGunControl(COLL_INFO *coll)
 		else
 		{
 			lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 1;
-			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex].frameBase;
+			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + 1].frameBase;
 			lara->currentAnimState = 1;
 			lara->goalAnimState = 1;
 			gun->flags = 4;
