@@ -62,7 +62,7 @@ void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 			spark->scalar = 2;
 		}
 		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-		spark->dSize = spark->size >> 5;
+		spark->dSize = spark->size / 32;
 	}
 }
 
@@ -109,7 +109,7 @@ void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 		spark->fxObj = fxNum;
 		spark->scalar = 2;
 		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-		spark->dSize = spark->size >> 5;
+		spark->dSize = spark->size / 32;
 	}
 }
 
@@ -169,7 +169,7 @@ void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 		spark->fxObj = fxNum;
 		spark->scalar = 2;
 		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-		spark->dSize = spark->size >> 5;
+		spark->dSize = spark->size / 32;
 	}
 }
 

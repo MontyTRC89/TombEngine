@@ -220,7 +220,7 @@ void UpdateSparks()
 			if (spark->life == spark->colFadeSpeed)
 			{
 				if (spark->flags & 0x800)
-					spark->dSize >>= 2;
+					spark->dSize /= 4;
 			}
 
 			if (spark->flags & 0x10)
@@ -286,13 +286,15 @@ void UpdateSparks()
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
 			int ds = dl * (spark->dSize - spark->sSize);
-			spark->size = spark->sSize + (ds & 0xFF);
+			//spark->size = spark->sSize + (ds & 0xFF);
+			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
+			spark->size = lerp(spark->sSize, spark->dSize,alpha );
 
 			if (spark->flags & 1
 				&& !Lara.burn
 				|| spark->flags & 0x400)
 			{
-				ds = spark->size << spark->scalar >> 1;
+				ds = spark->size * (spark->scalar / 2.0);
 
 				if (spark->x + ds > DeadlyBounds[0] && spark->x - ds < DeadlyBounds[1])
 				{
@@ -547,8 +549,8 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
 	}
 	spark->dSize = (GetRandomControl() & 0x1F) + 128;
-	spark->sSize = spark->dSize >> 2;
-	spark->size = spark->dSize >> 2;
+	spark->sSize = spark->dSize / 4;
+	spark->size = spark->dSize / 4;
 }
 
 void TriggerExplosionSmoke(int x, int y, int z, int uw)
@@ -587,8 +589,8 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->gravity = -3 - (GetRandomControl() & 3);
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
 		spark->dSize = (GetRandomControl() & 0x1F) + 128;
-		spark->sSize = spark->dSize >> 2;
-		spark->size = spark->dSize >> 2;
+		spark->sSize = spark->dSize / 4;
+		spark->size = spark->dSize / 4;
 	}
 }
 
@@ -768,11 +770,12 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 	if (type == 2)
 	{
-		spark->dSize = spark->size >> 2;
+		spark->dSize = spark->size / 4;
 	}
 	else
 	{
-		spark->dSize = spark->size >> 4;
+		spark->sSize = frandMinMax(128, 156);
+		spark->dSize = spark->sSize / 16;
 		if (type == 7)
 		{
 			spark->colFadeSpeed >>= 2;
@@ -816,7 +819,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FLAT;
 		sptr->scalar = 2;
 		sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
-		sptr->sSize = sptr->size = sptr->dSize >> 1;
+		sptr->sSize = sptr->size = sptr->dSize / 2;
 
 		if ((-(item->triggerFlags & 0xFF) & 7) == 1)
 		{
@@ -824,7 +827,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 			sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 			sptr->yVel = -size;
 			sptr->zVel = (GetRandomControl() & 0xFF) - 128;
-			sptr->dSize += sptr->dSize >> 2;
+			sptr->dSize += sptr->dSize / 4;
 			return;
 		}
 
@@ -1392,12 +1395,13 @@ void TriggerRocketFire(int x, int y, int z)
 
 	// TODO: right sprite
 	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	sptr->scalar = 3;
+	sptr->scalar = 1;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 
-	int size = (GetRandomControl() & 7) + 32;
+	int size = (GetRandomControl() & 7) + 128;
 	sptr->size = sptr->sSize = size >> 2;
+	sptr->dSize = size;
 }
 
 
@@ -1443,7 +1447,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 
 	// TODO: right sprite
 	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	sptr->scalar = 3;
+	sptr->scalar = 15;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 
@@ -1700,11 +1704,11 @@ void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 
 			if (flag2 == 2)
 			{
-				spark->dSize = spark->size >> 2;
+				spark->dSize = spark->size / 4;
 			}
 			else
 			{
-				spark->dSize = spark->size >> 4;
+				spark->dSize = spark->size / 16;
 				if (flag2 == 7)
 				{
 					spark->colFadeSpeed >>= 2;

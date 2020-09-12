@@ -123,6 +123,27 @@ namespace T5M {
 				
 			}
 
+			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
+			{
+				SmokeParticle& s = getFreeSmokeParticle();
+				s = {};
+				s.position = Vector3(x, y, z) + Vector3(frandMinMax(8, 16), frandMinMax(8, 16), frandMinMax(8, 16));
+				float xVel = std::sin(TO_RAD(angle))*speed;
+				float zVel = std::cos(TO_RAD(angle))*speed;
+				s.velocity = Vector3(xVel, frandMinMax(-1, 4), zVel);
+				s.sourceColor = Vector4(1, 1, 1, 1);
+				s.destinationColor = Vector4(0, 0, 0, 0);
+				s.sourceSize = frandMinMax(8,24);
+				s.active = true;
+				s.affectedByWind = true;
+				s.friction = 0.999f;
+				s.gravity = -0.1f;
+				s.life = frandMinMax(16, 24);
+				s.destinationSize = 128 + frand()*32;
+				s.angularVelocity = frandMinMax(-1, 1);
+				s.angularDrag = frandMinMax(0.97, 0.999);
+			}
+
 		}
 	}
 }

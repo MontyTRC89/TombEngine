@@ -1407,7 +1407,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
-		spark->dSize = spark->size >> 2;
+		spark->dSize = spark->size / 4;
 	}
 }
 

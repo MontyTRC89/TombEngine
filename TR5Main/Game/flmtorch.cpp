@@ -49,7 +49,7 @@ void TriggerTorchFlame(char fxObj, char node)
 	spark->fxObj = fxObj;
 	spark->scalar = 1;
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 80;
-	spark->dSize = spark->size >> 3;
+	spark->dSize = spark->size / 8;
 }
 
 void DoFlameTorch() // (F) (D)

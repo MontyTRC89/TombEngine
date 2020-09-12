@@ -71,8 +71,8 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 
 		spark->scalar = 3;
 		spark->dSize = v * ((GetRandomControl() & 7) + 60) >> 8;
-		spark->sSize = spark->dSize >> 4;
-		spark->size = spark->dSize >> 4;
+		spark->sSize = spark->dSize / 8;
+		spark->size = spark->dSize / 8;
 	}
 }
 

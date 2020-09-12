@@ -676,7 +676,7 @@ void HighObject2Control(short itemNumber)
 		spark->maxYvel = 0;
 		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
 		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
-		spark->dSize = spark->size >> 2;
+		spark->dSize = spark->size / 4;
 
 		if (GetRandomControl() & 3)
 		{
