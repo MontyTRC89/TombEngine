@@ -259,7 +259,7 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 	spark->fxObj = fxObj;
 	spark->scalar = 2;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
-	spark->dSize = spark->size >> 2;
+	spark->dSize = spark->size / 4;
 }
 
 void InitialiseRomanStatue(short itemNum)

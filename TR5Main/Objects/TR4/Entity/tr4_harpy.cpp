@@ -84,7 +84,7 @@ static void HarpySparks1(short itemNumber, byte num, int size)
 		spark->nodeNumber = num;
 		spark->scalar = 2;
 		spark->sSize = spark->size = GetRandomControl() & 0xF + size;
-		spark->dSize = spark->size >> 4;
+		spark->dSize = spark->size / 8;
 	}
 }
 

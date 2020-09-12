@@ -71,7 +71,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 		spark->size = spark->sSize = (GetRandomControl() & 7) + 8;
 	}
 
-	spark->dSize = spark->size >> 1;
+	spark->dSize = spark->size / 2;
 }
 
 void TriggerLaraElectricitySparks(int flame)
