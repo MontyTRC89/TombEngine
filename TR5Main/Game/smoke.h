@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <array>
+struct ITEM_INFO;
 namespace T5M{
 	namespace Effects {
 		namespace Smoke {
@@ -32,8 +33,9 @@ namespace T5M{
 
 			void UpdateSmokeParticles();
 			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room);
-			void TriggerGunSmokeParticles(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count);
+			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count);
 			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
+			void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 		}
 	}
 

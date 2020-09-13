@@ -15,6 +15,7 @@
 #include "explosion.h"
 #include <Game\drip.h>
 #include <Game\bubble.h>
+#include "smoke.h"
 using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
@@ -1407,7 +1408,7 @@ void TriggerRocketFire(int x, int y, int z)
 
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
-	SPARKS* sptr = &Sparks[GetFreeSpark()];
+	/*SPARKS* sptr = &Sparks[GetFreeSpark()];
 
 	sptr->on = true;
 	sptr->sR = 0;
@@ -1452,7 +1453,8 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 
 	int size = (GetRandomControl() & 7) + 32;
-	sptr->size = sptr->sSize = size >> 2;
+	sptr->size = sptr->sSize = size >> 2;*/
+	T5M::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
 void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
