@@ -11,7 +11,7 @@
 #include "sound.h"
 #include <Game\effect2.h>
 
-typedef struct BOAT_INFO
+struct BOAT_INFO
 {
 	int boat_turn;
 	int left_fallspeed;
@@ -78,8 +78,6 @@ enum BOAT_STATE
 #define SKIDOO_HIT_FRONT	13
 #define SKIDOO_HIT_BACK		14
 
-// TODO: (boat) render problem, water height problem, enter problem.
-
 void DoBoatWakeEffect(ITEM_INFO* boat)
 {
 	int c = phd_cos(boat->pos.yRot);
@@ -93,40 +91,66 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 		int y = boat->pos.yPos;
 		int z = boat->pos.zPos + ((s * w) - (h * c) >> W2V_SHIFT);
 
-		for (int j = 0; j < 16; j++)
-		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
-			spark->on = 1;
-			spark->sR = 96;
-			spark->sG = 96;
-			spark->sB = 96;
-			spark->dR = 96;
-			spark->dG = 96;
-			spark->dB = 96;
-			spark->colFadeSpeed = 1;
-			spark->transType = COLADD;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-			spark->fadeToBlack = spark->life - 1;
-			int dl = GetRandomControl() % 1408 + 64;
-			spark->x = x + (GetRandomControl() & 255);
-			spark->y = y + (GetRandomControl() & 255);
-			spark->xVel = 0;
-			spark->zVel = 0;
-			spark->z = z + (GetRandomControl() & 255);
-			spark->friction = 0;
-			spark->flags = 10;
-			spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) - 128;
-			spark->scalar = 2;
-			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
-			spark->gravity = 0;
-			spark->maxYvel = 0;
-			spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
-			spark->dSize = spark->size * 2;
-		}
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = 64;
+		spark->sG = 64;
+		spark->sB = 64;
+		spark->dR = 64;
+		spark->dG = 64;
+		spark->dB = 64;
+		spark->colFadeSpeed = 1;
+		spark->transType = COLADD;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
+		spark->fadeToBlack = spark->life - 4;
+		spark->x = (BOAT_SIDE * phd_sin(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;
+		spark->y = (GetRandomControl() & 0xF) + y - 8;
+		spark->z = (BOAT_SIDE * phd_cos(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + z - 8;
+		spark->xVel = 0;
+		spark->zVel = 0;
+		spark->friction = 0;
+		spark->flags = 538;
+		spark->yVel = (GetRandomControl() & 0x7F) - 256;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->scalar = 3;
+		spark->maxYvel = 0;
+		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
+		spark->gravity = -spark->yVel >> 2;
+		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 16;
+		spark->dSize = 2 * spark->size;
+
+		spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = 64;
+		spark->sG = 64;
+		spark->sB = 64;
+		spark->dR = 64;
+		spark->dG = 64;
+		spark->dB = 64;
+		spark->colFadeSpeed = 1;
+		spark->transType = COLADD;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
+		spark->fadeToBlack = spark->life - 4;		
+		spark->x = (BOAT_SIDE * phd_sin(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;
+		spark->y = (GetRandomControl() & 0xF) + y - 8;
+		spark->z = (BOAT_SIDE * phd_cos(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + z - 8;
+		spark->xVel = 0;
+		spark->zVel = 0;
+		spark->friction = 0;
+		spark->flags = 538;
+		spark->yVel = (GetRandomControl() & 0x7F) - 256;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->scalar = 3;
+		spark->maxYvel = 0;
+		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
+		spark->gravity = -spark->yVel >> 2;
+		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 4;
+		spark->dSize = 2 * spark->size;
+		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
 	}
 }
 
-static void GetBoatGetOff(ITEM_INFO* boat)
+void GetBoatGetOff(ITEM_INFO* boat)
 {
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
 	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
@@ -169,7 +193,7 @@ static void GetBoatGetOff(ITEM_INFO* boat)
 	}
 }
 
-static int CanGetOff(int direction)
+bool CanGetOff(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
