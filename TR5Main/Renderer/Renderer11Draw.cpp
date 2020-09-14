@@ -2601,7 +2601,6 @@ namespace T5M::Renderer
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
-
         for (int i = 0; i < 2; i++)
         {
             Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
@@ -2617,7 +2616,7 @@ namespace T5M::Renderer
             m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
             m_primitiveBatch->End();
         }
-
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
         // Draw horizon
         if (m_moveableObjects[ID_HORIZON].has_value())
         {
