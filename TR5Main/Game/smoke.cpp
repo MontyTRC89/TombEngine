@@ -76,8 +76,9 @@ namespace T5M {
 				s.sprite = lerp(0, numSprites - 1, s.age / s.life);
 				s.room = room;
 			}
-
-			void TriggerGunSmokeParticles(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
+			//TODO: add additional "Weapon Special" param or something. Currently initial == 2 means Rocket Launcher backwards smoke.
+			//TODO: Refactor different weapon types out of it
+			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count)
 			{
 				SmokeParticle& s = getFreeSmokeParticle();
 				s = {};
@@ -93,19 +94,48 @@ namespace T5M {
 
 				if (initial)
 				{
-					float size = (frand() * 25) + 48;
-					s.sourceSize = size *2;
-					s.destinationSize = size * 8;
-					s.terminalVelocity = 0;
-					s.friction = 0.88f;
-					s.life = frand() * 30 + 60;
-					s.velocity = getRandomVectorInCone(s.velocity, 10);
-					s.velocity *= frand() * 14 + 16;
+					
+					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
+						float size = (frand() * 32) + 48;
+						s.sourceSize = size * 2;
+						
+						s.destinationSize = size * 8;
+						s.sourceColor = {0.75,0.75,1,1};
+						s.terminalVelocity = 0;
+						s.friction = 0.82f;
+						s.life = frand() * 30 + 60;
+						if(initial == 1){
+							float size = (frand() * 32) + 48;
+							s.sourceSize = size * 2;
+							s.destinationSize = size * 16;
+							s.velocity = getRandomVectorInCone(dir,25);
+							s.velocity *= frand() * 32;
+						} else{
+							float size = (frand() * 32) + 48;
+							s.sourceSize = size;
+							s.destinationSize = size * 8;
+							s.velocity = getRandomVectorInCone(dir,3);
+							s.velocity *= (frand() * 16);
+						}
+						
+					} else{
+						float size = (frand() * 25) + 48;
+						s.sourceSize = size * 2;
+						s.destinationSize = size * 8;
+						s.terminalVelocity = 0;
+						s.friction = 0.88f;
+						s.life = frand() * 30 + 60;
+						s.velocity = getRandomVectorInCone(dir, 10);
+						s.velocity *= frand() * 14 + 16;
+					}
 				}
 				else
 				{
 					float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
+					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
+						s.sourceColor = {0.75,0.75,1,1};
 
+					}
 					s.sourceSize = size / 2;
 					s.destinationSize = size * 4;
 					s.terminalVelocity = 0;
@@ -144,6 +174,24 @@ namespace T5M {
 				s.angularDrag = frandMinMax(0.97, 0.999);
 			}
 
+			void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
+			{
+				SmokeParticle& s = getFreeSmokeParticle();
+				s = {};
+				s.position = Vector3(x, y, z) + Vector3(frandMinMax(8, 16), frandMinMax(8, 16), frandMinMax(8, 16));
+				s.sourceColor = Vector4(0.8, 0.8, 1, 1);
+				s.destinationColor = Vector4(0, 0, 0, 0);
+				s.sourceSize = frandMinMax(32, 64);
+				s.active = true;
+				s.velocity = getRandomVector() * frandMinMax(1, 3);
+				s.affectedByWind = true;
+				s.friction = 0.979f;
+				s.gravity = -0.1f;
+				s.life = frandMinMax(80, 120);
+				s.destinationSize = 1024 + frand() * 128;
+				s.angularVelocity = frandMinMax(-0.6, 0.6);
+				s.angularDrag = frandMinMax(0.87, 0.99);
+			}
 		}
 	}
 }
