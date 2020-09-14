@@ -1,5 +1,5 @@
 #include "framework.h"
-//#include "rubberboat.h" - was giving me bs errors idk why
+#include "rubberboat.h"
 #include "items.h"
 #include "level.h"
 #include "collide.h"
@@ -10,16 +10,7 @@
 #include "bubble.h"
 #include "draw.h"
 
-typedef struct {
-	int boatTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	short tiltAngle;
-	short extraRotation;
-	int water;
-	int pitch;
-	short propRot;
-}RUBBER_BOAT_INFO;
+
 
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300
@@ -1101,7 +1092,7 @@ void RubberBoatControl(short itemNum)
 	else
 		nowake = 0;*/
 
-	/*prop.x = 0;
+	prop.x = 0;
 	prop.y = 0;
 	prop.z = -80;
 	GetJointAbsPosition(boat, &prop, 2);
@@ -1139,6 +1130,6 @@ void RubberBoatControl(short itemNum)
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) << 4, boat->pos.yRot + 0x4000 + GetRandomControl(), 1);
 
 		}
-	}*/
+	}
 	//update wake effects
 }
