@@ -1,6 +1,7 @@
 #pragma once
 #include <framework.h>
 #include <newtypes.h>
+#include "floordata.h"
 
 struct ANIM_FRAME;
 
@@ -65,48 +66,6 @@ typedef struct LIGHTINFO
 	short FalloffScale; // size=0, offset=26
 	short Length; // size=0, offset=28
 	short Cutoff; // size=0, offset=30
-};
-
-enum SECTOR_SPLIT_TYPE
-{
-	ST_NONE = 0,
-	ST_SPLIT1 = 1,
-	ST_SPLIT2 = 2
-};
-
-enum SECTOR_NOCOLLISION_TYPE
-{
-	NC_NONE = 0,
-	NC_TRIANGLE1 = 1,
-	NC_TRIANGLE2 = 2
-};
-
-struct SECTOR_PLANE
-{
-	float a;
-	float b;
-	float c;
-};
-
-struct SECTOR_COLLISION_INFO
-{
-	int split;
-	int noCollision;
-	SECTOR_PLANE planes[2];
-};
-
-struct FLOOR_INFO
-{
-	int index;
-	int box;
-	int fx;
-	int stopper;
-	int pitRoom;
-	int floor;
-	int skyRoom;
-	int ceiling;
-	SECTOR_COLLISION_INFO floorCollision;
-	SECTOR_COLLISION_INFO ceilingCollision;
 };
 
 enum RoomEnumFlag
