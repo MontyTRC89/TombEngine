@@ -634,9 +634,9 @@ static void StartVehicles(OBJECT_INFO* obj)
 	obj = &Objects[ID_SPEEDBOAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseBoat;
-		obj->collision = BoatCollision;
-		obj->control = BoatControl;
+		obj->initialise = InitialiseSpeedBoat;
+		obj->collision = SpeedBoatCollision;
+		obj->control = SpeedBoatControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
