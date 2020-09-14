@@ -1631,11 +1631,22 @@ void FireRocket()
 			jointPos.y = 180 + 1024;
 			jointPos.z = 72;
 
+			GetLaraJointPosition(&jointPos, LM_RHAND);
+
 			SmokeCountL = 32;
 			SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
 
-			for (int i = 0; i < 5; i++)
+			for(int i = 0; i < 5; i++)
 				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
+
+			jointPos.x = 0;
+			jointPos.y = -256;
+			jointPos.z = 0;
+			
+			GetLaraJointPosition(&jointPos, LM_RHAND);
+
+			for(int i = 0; i < 10; i++)
+				TriggerGunSmoke(jointPos.x, jointPos.y, jointPos.z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 2, WEAPON_ROCKET_LAUNCHER, 32);
 
 			InitialiseItem(itemNumber);
 
