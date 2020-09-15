@@ -378,3 +378,5 @@ void Renderer11::drawLaraHolsters(bool transparent)
 		}
 	}
 }
+
+

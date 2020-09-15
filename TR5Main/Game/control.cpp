@@ -44,11 +44,13 @@
 #include <tr4_littlebeetle.h>
 #include "explosion.h"
 #include "drip.h"
+#include "particle/SimpleParticle.h"
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
+using namespace T5M::Effects;
 using T5M::Renderer::g_Renderer;
 
 short ShatterSounds[18][10] =
@@ -548,6 +550,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateLittleBeetles();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
+		updateSimpleParticles();
 		T5M::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();

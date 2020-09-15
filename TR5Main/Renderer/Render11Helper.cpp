@@ -11,6 +11,7 @@
 #include "GameFlowScript.h"
 #include <Renderer\RenderView\RenderView.h>
 #include "quad.h"
+#include "rubberboat.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
@@ -291,7 +292,13 @@ namespace T5M::Renderer
 						currentBone->ExtraRotation.x = TO_RAD(quad->frontRot);
 					}
 				}
-				else 
+				else if (item->objectNumber == ID_RUBBER_BOAT)
+				{
+					RUBBER_BOAT_INFO* boat = (RUBBER_BOAT_INFO*)item->data;
+					if (j == 2)
+						currentBone->ExtraRotation.z = TO_RAD(boat->propRot);
+				}
+				else
 				{
 					CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
