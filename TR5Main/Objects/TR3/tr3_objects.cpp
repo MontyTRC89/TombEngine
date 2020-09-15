@@ -382,7 +382,6 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->savePosition = 1;
 		obj->saveFlags = 1;
 		obj->saveAnim = 1;
-		g_Level.Bones[obj->boneIndex + (1 * 4)] |= ROT_Z;
 	}
 
 	obj = &Objects[ID_KAYAK];

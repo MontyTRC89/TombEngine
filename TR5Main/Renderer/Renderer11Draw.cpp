@@ -2017,6 +2017,7 @@ namespace T5M::Renderer
         drawFires();
         drawSmokes();
         drawSmokeParticles();
+        drawSimpleParticles();
         drawSparkParticles();
         drawExplosionParticles();
         drawFootprints();
@@ -2091,6 +2092,7 @@ namespace T5M::Renderer
             printDebugMessage("Lara.gunType: %d", Lara.gunType);
             printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
             printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
+			printDebugMessage("true X Z speed: %d %d", abs(lara_coll.old.x - LaraItem->pos.xPos), abs(lara_coll.old.z - LaraItem->pos.zPos));
             printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
             printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
             printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
