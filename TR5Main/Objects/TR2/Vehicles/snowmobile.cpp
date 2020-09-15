@@ -15,6 +15,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include <Game\particle\SimpleParticle.h>
 
 using std::vector;
 
@@ -313,7 +314,8 @@ bool SkidooCheckGetOff()
 
 void DoSnowEffect(ITEM_INFO* skidoo)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	T5M::Effects::TriggerSnowmobileSnow(skidoo);
+	/*SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
 	spark->sR = 64;
 	spark->sG = 64;
@@ -339,7 +341,7 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 	spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 	spark->gravity = -spark->yVel >> 2;
 	spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 32;
-	spark->dSize = 2 * spark->size;
+	spark->dSize = 2 * spark->size;*/
 }
 
 void SkidooAnimation(ITEM_INFO* skidoo, int collide, bool dead)
