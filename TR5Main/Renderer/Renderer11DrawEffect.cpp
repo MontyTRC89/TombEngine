@@ -17,6 +17,7 @@
 #include "drip.h"
 #include "explosion.h"
 #include "Quad/RenderQuad.h"
+#include <Game\particle\SimpleParticle.h>
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -126,7 +127,7 @@ namespace T5M::Renderer {
 												  1.0f,
 												  32.0f,
 												  Vector3::Distance(pos1, pos2),
-												  BLENDMODE_ALPHABLEND,
+						BLENDMODE_ADDITIVE,
 												  d);
 				}
 			}
@@ -142,7 +143,7 @@ namespace T5M::Renderer {
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
-								   BLENDMODE_ALPHABLEND);
+					BLENDMODE_ADDITIVE);
 			}
 		}
 	}
@@ -227,7 +228,7 @@ namespace T5M::Renderer {
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) {
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
+						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ADDITIVE);
 				}
 			}
 		}
@@ -309,7 +310,7 @@ namespace T5M::Renderer {
 									   pos,
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, spark->size, spark->size,
-									   BLENDMODE_ALPHABLEND);
+						BLENDMODE_ADDITIVE);
 				} else {
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
@@ -365,7 +366,7 @@ namespace T5M::Renderer {
 					x2Outer += splash.x;
 					z2Outer = outerRadius * cos(alpha * j * PI / 180);
 					z2Outer += splash.z;
-					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], Vector3(xOuter, yOuter, zOuter), Vector3(x2Outer, yOuter, z2Outer), Vector3(x2Inner, yInner, z2Inner), Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], Vector3(xOuter, yOuter, zOuter), Vector3(x2Outer, yOuter, z2Outer), Vector3(x2Inner, yInner, z2Inner), Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0, 1, 0, 0, BLENDMODE_ADDITIVE);
 				}
 			}
 		}
@@ -375,7 +376,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < MAX_BUBBLES; i++) {
 			BUBBLE_STRUCT* bubble = &Bubbles[i];
 			if (bubble->active)
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum], Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z), bubble->color, bubble->rotation, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
+				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum], Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z), bubble->color, bubble->rotation, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ADDITIVE);
 		}
 	}
 
@@ -396,9 +397,9 @@ namespace T5M::Renderer {
 			if (ripple->active) {
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) {
-					addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+					addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ADDITIVE);
 				} else {
-					addSpriteBillboardConstrainedLookAt(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ALPHABLEND, Vector3(0,-1,0));
+					addSpriteBillboardConstrainedLookAt(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ADDITIVE, Vector3(0,-1,0));
 					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				}
 			}
@@ -457,7 +458,7 @@ namespace T5M::Renderer {
 								shockwave->g * shockwave->life / 255.0f / 16.0f,
 								shockwave->b * shockwave->life / 255.0f / 16.0f,
 								1.0f),
-								0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+								0, 1, 0, 0, BLENDMODE_ADDITIVE);
 
 					p1 = p2;
 					p4 = p3;
@@ -475,7 +476,7 @@ namespace T5M::Renderer {
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
-								   BLENDMODE_ALPHABLEND);
+								   BLENDMODE_ADDITIVE);
 			}
 		}
 	}
@@ -723,7 +724,7 @@ namespace T5M::Renderer {
 			dust->Life++;
 			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-			addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
+			addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, 12, 12, BLENDMODE_ADDITIVE);
 
 			if (dust->Life >= 32)
 				dust->Reset = true;
@@ -751,18 +752,18 @@ namespace T5M::Renderer {
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-		for (int b = 0; b < 4; b++) {
+		for (int b = 0; b < NUM_BLENDMODES; b++) {
 			BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
 			int numSpritesToDraw = m_spritesToDraw.size();
 			int lastSprite = 0;
 			switch (currentBlendMode) {
 			case BLENDMODE_ALPHABLEND:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
 
 				break;
 			case BLENDMODE_ALPHATEST:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
 
 				break;
 			case BLENDMODE_OPAQUE:
@@ -770,7 +771,9 @@ namespace T5M::Renderer {
 				break;
 			case BLENDMODE_SUBTRACTIVE:
 				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
-
+				break;
+			case BLENDMODE_ADDITIVE:
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 				break;
 			}
 
@@ -1176,7 +1179,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < SmokeParticles.size(); i++) {
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
+			addSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ADDITIVE);
 		}
 	}
 
@@ -1190,7 +1193,7 @@ namespace T5M::Renderer {
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ALPHABLEND, v);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ADDITIVE, v);
 		}
 	}
 
@@ -1204,7 +1207,7 @@ namespace T5M::Renderer {
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ALPHABLEND, v);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ADDITIVE, v);
 		}
 	}
 
@@ -1215,7 +1218,15 @@ namespace T5M::Renderer {
 		for (int i = 0; i < explosionParticles.size(); i++) {
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, e.size, e.size, BLENDMODE_ALPHABLEND);
+			addSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, e.size, e.size, BLENDMODE_ADDITIVE);
+		}
+	}
+	void Renderer11::drawSimpleParticles()
+	{
+		using namespace T5M::Effects;
+		for(SimpleParticle& s : simpleParticles){
+			if(!s.active) continue;
+			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1,1,1,1), 0, 1.0f, s.size, s.size/2, BLENDMODE_ALPHATEST);
 		}
 	}
 }

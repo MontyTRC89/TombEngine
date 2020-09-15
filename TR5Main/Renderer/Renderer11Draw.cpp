@@ -2017,6 +2017,7 @@ namespace T5M::Renderer
         drawFires();
         drawSmokes();
         drawSmokeParticles();
+        drawSimpleParticles();
         drawSparkParticles();
         drawExplosionParticles();
         drawFootprints();
