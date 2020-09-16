@@ -4,77 +4,183 @@
 #include "effect2.h"
 #include "draw.h"
 #include "camera.h"
-#include "lara.h"
+#include "Lara.h"
 #include "collide.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-using std::vector;
-#define MAX_SPEED 0x380000
-#define KAYAK_COLLIDE 64
-#define GETOFF_DIST CLICK(3)		// minimum collision distance
-#define KAYAK_TO_BADDIE_RADIUS CLICK(1)
-#define KAYAK_FRICTION 0x8000
-#define KAYAK_ROT_FRIC 0x50000
-#define KAYAK_DFLECT_ROT 0x80000
-#define KAYAK_FWD_VEL 0x180000
-#define KAYAK_FWD_ROT 0x800000
-#define KAYAK_LR_VEL 0x100000
-#define KAYAK_LR_ROT 0xc00000
-#define KAYAK_MAX_LR 0xc00000
-#define KAYAK_TURN_ROT 0x200000
-#define KAYAK_MAX_TURN 0x1000000
-#define KAYAK_TURN_BRAKE 0x8000
-#define KAYAK_HARD_ROT 0x1000000
-#define KAYAK_MAX_STAT 0x1000000
-#define BOAT_SLIP 50
-#define BOAT_SIDE_SLIP 50
-#define HIT_BACK 1
-#define HIT_FRONT 2
-#define HIT_LEFT 3
-#define HIT_RIGHT 4
-#define KAYAK_DRAW_SHIFT 32
-#define LARA_LEG_BITS (MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT))
-#define KAYAK_X	STEP_SIZE/2
-#define KAYAK_Z	STEP_SIZE/2
-#define SKIDOO_MAX_KICK -80
-#define SKIDOO_MIN_BOUNCE ((MAX_SPEED/2)>>8)
 
-enum KAYAK_STATE {
-	KS_BACK,
-	KS_POSE,
-	KS_LEFT,
-	KS_RIGHT,
-	KS_CLIMBIN,
-	KS_DEATHIN,
-	KS_FORWARD,
-	KS_ROLL,
-	KS_DROWNIN,
-	KS_JUMPOUT,
-	KS_TURNL,
-	KS_TURNR,
-	KS_CLIMBINR,
-	KS_CLIMBOUTL,
-	KS_CLIMBOUTR,
+using std::vector;
+
+#define KAYAK_COLLIDE			64
+#define GETOFF_DIST 			768		// minimum collision distance
+#define KAYAK_TO_BADDIE_RADIUS	256
+#define MAX_SPEED		0x380000
+#define KAYAK_FRICTION	0x8000
+#define KAYAK_ROT_FRIC	0x50000
+#define KAYAK_DFLECT_ROT	0x80000
+#define KAYAK_FWD_VEL	0x180000
+#define KAYAK_FWD_ROT	0x800000
+#define KAYAK_LR_VEL	0x100000
+#define KAYAK_LR_ROT	0xc00000
+#define KAYAK_MAX_LR	0xc00000
+#define KAYAK_TURN_ROT	0x200000
+#define KAYAK_MAX_TURN	0x1000000
+#define KAYAK_TURN_BRAKE	0x8000
+#define KAYAK_HARD_ROT	0x1000000
+#define KAYAK_MAX_STAT	0x1000000
+#define BOAT_SLIP		50
+#define BOAT_SIDE_SLIP	50
+
+enum 
+{
+	STATE_KAYAK_BACK,
+	STATE_KAYAK_POSE,
+	STATE_KAYAK_LEFT,
+	STATE_KAYAK_RIGHT,
+	STATE_KAYAK_CLIMBIN,
+	STATE_KAYAK_DEATHIN,
+	STATE_KAYAK_FORWARD,
+	STATE_KAYAK_ROLL,
+	STATE_KAYAK_DROWNIN,
+	STATE_KAYAK_JUMPOUT,
+	STATE_KAYAK_TURNL,
+	STATE_KAYAK_TURNR,
+	STATE_KAYAK_CLIMBINR,
+	STATE_KAYAK_CLIMBOUTL,
+	STATE_KAYAK_CLIMBOUTR,
 };
 
-static void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
+#define HIT_BACK	1
+#define HIT_FRONT	2
+#define HIT_LEFT	3
+#define HIT_RIGHT	4
+
+#define KAYAK_BACK_A		2
+#define KAYAK_CLIMBIN_A		3
+#define KAYAK_CLIMBIN_F		GF(KAYAK_CLIMBIN_A, 0)
+#define KAYAK_CLIMBIN2_A	4
+#define KAYAK_DEATHIN_A		5
+#define KAYAK_FORWARD_A		8
+#define KAYAK_2FORWARD_A	9
+#define KAYAK_JUMPOUT1_A	14
+#define KAYAK_POSE_A		16
+#define KAYAK_POSE_F		GF(KAYAK_POSE_A, 0)
+#define KAYAK_JUMPOUT2_A	24
+#define KAYAK_DROWN_A		25
+#define KAYAK_TURNL_A		26
+#define KAYAK_TURNR_A		27
+#define KAYAK_CLIMBINR_A	28
+#define KAYAK_CLIMBINR_F	GF(KAYAK_CLIMBINR_A, 0)
+#define KAYAK_JUMPOUTR_A	32
+#define KAYAK_DRAW_SHIFT	32
+#define LARA_LEG_BITS		((1<<LM_HIPS)|(1<<LM_LTHIGH)|(1<<LM_LSHIN)|(1<<LM_LFOOT)|(1<<LM_RTHIGH)|(1<<LM_RSHIN)|(1<<LM_RFOOT))
+#define NUM_WAKE_SPRITES	32
+#define WAKE_SIZE 			32
+#define WAKE_SPEED 			4
+#define KAYAK_X				128
+#define KAYAK_Z				128
+#define SKIDOO_MAX_KICK		-80
+#define SKIDOO_MIN_BOUNCE	((MAX_SPEED/2)>>8)
+
+struct WAKE_PTS 
 {
-	RIPPLE_STRUCT* r;
-	int s, c, x, z;
-	FLOOR_INFO* floor;
-	short roomNumber;
+	int 	x[2];
+	int 	y;
+	int		z[2];
+	short	xvel[2];
+	short	zvel[2];
+	byte 	life;
+	byte	pad[3];
+};
 
-	c = phd_cos(v->pos.yRot);
-	s = phd_sin(v->pos.yRot);
+WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];	// Left and right wake.
+byte CurrentStartWake = 0;
+byte WakeShade = 0;
 
-	x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
-	z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
+{
+	int xv[2], zv[2];
+	
+	if (WakePts[CurrentStartWake][rotate].life)
+		return;
 
-	roomNumber = v->roomNumber;
-	floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
+	int s = phd_sin(v->pos.yRot);
+	int c = phd_cos(v->pos.yRot);
+	
+	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
+	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+
+	short angle1, angle2;
+
+	short roomNumber = v->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
+
+	if (GetWaterHeight(x, v->pos.yPos, z, roomNumber) != NO_HEIGHT)
+	{
+		if (v->speed < 0)
+		{
+			if (!rotate)
+			{
+				angle1 = v->pos.yRot - ANGLE(10);
+				angle2 = v->pos.yRot - ANGLE(30);
+			}
+			else
+			{
+				angle1 = v->pos.yRot + ANGLE(10);
+				angle2 = v->pos.yRot + ANGLE(30);
+			}
+		}
+		else
+		{
+			if (!rotate)
+			{
+				angle1 = v->pos.yRot - ANGLE(170);
+				angle2 = v->pos.yRot - ANGLE(150);
+			}
+			else
+			{
+				angle1 = v->pos.yRot + ANGLE(170);
+				angle2 = v->pos.yRot + ANGLE(150);
+			}
+		}
+
+		xv[0] = (WAKE_SPEED * phd_sin(angle1)) >> W2V_SHIFT;
+		zv[0] = (WAKE_SPEED * phd_cos(angle1)) >> W2V_SHIFT;
+		xv[1] = ((WAKE_SPEED + 2) * phd_sin(angle2)) >> W2V_SHIFT;
+		zv[1] = ((WAKE_SPEED + 2) * phd_cos(angle2)) >> W2V_SHIFT;
+
+		WakePts[CurrentStartWake][rotate].y = v->pos.yPos + KAYAK_DRAW_SHIFT;
+		WakePts[CurrentStartWake][rotate].life = 0x40;
+		
+		for (int i = 0; i < 2; i++)
+		{
+			WakePts[CurrentStartWake][rotate].x[i] = x;
+			WakePts[CurrentStartWake][rotate].z[i] = z;
+			WakePts[CurrentStartWake][rotate].xvel[i] = xv[i];
+			WakePts[CurrentStartWake][rotate].zvel[i] = zv[i];
+		}
+
+		if (rotate == 1)
+		{
+			CurrentStartWake++;
+			CurrentStartWake &= (NUM_WAKE_SPRITES - 1);
+		}
+	}
+}
+
+void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff)
+{
+	int s = phd_sin(v->pos.yRot);
+	int c = phd_cos(v->pos.yRot);
+
+	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
+	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+
+	short roomNumber = v->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
 
 	if (GetWaterHeight(x, v->pos.yPos, z, roomNumber) != NO_HEIGHT)
 	{
@@ -82,121 +188,135 @@ static void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	}
 }
 
-static void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
+void KayakUpdateWakeFX()
 {
-	/*
-	SplashSetup.x = item->pos.xPos;
-	SplashSetup.y = water;
-	SplashSetup.z = item->pos.zPos;
-	SplashSetup.InnerXZoff = 16 << 3;
-	SplashSetup.InnerXZsize = 12 << 2;
-	SplashSetup.InnerYsize = -96 << 2;
-	SplashSetup.InnerXZvel = 0xa0;
-	SplashSetup.InnerYvel = -fallspeed << 5;
-	SplashSetup.InnerGravity = 0x80;
-	SplashSetup.InnerFriction = 7;
-	SplashSetup.MiddleXZoff = 24 << 3;
-	SplashSetup.MiddleXZsize = 24 << 2;
-	SplashSetup.MiddleYsize = -64 << 2;
-	SplashSetup.MiddleXZvel = 0xe0;
-	SplashSetup.MiddleYvel = -fallspeed << 4;
-	SplashSetup.MiddleGravity = 0x48;
-	SplashSetup.MiddleFriction = 8;
-	SplashSetup.OuterXZoff = 32 << 3;
-	SplashSetup.OuterXZsize = 32 << 2;
-	SplashSetup.OuterXZvel = 0x110;
-	SplashSetup.OuterFriction = -9;
-	SetupSplash(&SplashSetup);
-	SplashCount = 16;
-	*/
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < NUM_WAKE_SPRITES; j++)
+		{
+			if (WakePts[j][i].life)
+			{
+				WakePts[j][i].life--;
+				WakePts[j][i].x[0] += WakePts[j][i].xvel[0];
+				WakePts[j][i].z[0] += WakePts[j][i].zvel[0];
+				WakePts[j][i].x[1] += WakePts[j][i].xvel[1];
+				WakePts[j][i].z[1] += WakePts[j][i].zvel[1];
+			}
+		}
+	}
 }
 
-static void TriggerRapidsMist(long x, long y, long z)
+void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
+{
+	/*splash_setup.x = item->pos.xPos;
+	splash_setup.y = water;
+	splash_setup.z = item->pos.zPos;
+	splash_setup.InnerXZoff = 16 << 3;
+	splash_setup.InnerXZsize = 12 << 2;
+	splash_setup.InnerYsize = -96 << 2;
+	splash_setup.InnerXZvel = 0xa0;
+	splash_setup.InnerYvel = -fallspeed << 5;
+	splash_setup.InnerGravity = 0x80;
+	splash_setup.InnerFriction = 7;
+	splash_setup.MiddleXZoff = 24 << 3;
+	splash_setup.MiddleXZsize = 24 << 2;
+	splash_setup.MiddleYsize = -64 << 2;
+	splash_setup.MiddleXZvel = 0xe0;
+	splash_setup.MiddleYvel = -fallspeed << 4;
+	splash_setup.MiddleGravity = 0x48;
+	splash_setup.MiddleFriction = 8;
+	splash_setup.OuterXZoff = 32 << 3;
+	splash_setup.OuterXZsize = 32 << 2;
+	splash_setup.OuterXZvel = 0x110;
+	splash_setup.OuterFriction = -9;
+	SetupSplash(&splash_setup);
+	SplashCount = 16;*/
+}
+
+/*void TriggerRapidsMist(long x, long y, long z)
 {
 	SPARKS* sptr;
-	long xsize;
-	sptr = &Sparks[GetFreeSpark()];
-	sptr->on = 1;
+	long		xsize;
+
+	sptr = &spark[GetFreeSpark()];
+
+	sptr->On = 1;
 	sptr->sR = 128;
 	sptr->sG = 128;
 	sptr->sB = 128;
+
 	sptr->dR = 192;
 	sptr->dG = 192;
 	sptr->dB = 192;
-	sptr->colFadeSpeed = 2;
-	sptr->fadeToBlack = 4;	// 8
-	sptr->sLife = sptr->life = 6 + (GetRandomControl() & 3);
-	sptr->transType = SEMITRANS;
+
+	sptr->ColFadeSpeed = 2;
+	sptr->FadeToBlack = 4;	// 8
+	sptr->sLife = sptr->Life = 6 + (GetRandomControl() & 3);
+
+	sptr->TransType = COLADD;
+
 	sptr->extras = 0;
-	sptr->dynamic = -1;
+	sptr->Dynamic = -1;
+
 	sptr->x = x + ((GetRandomControl() & 15) - 8);
 	sptr->y = y + ((GetRandomControl() & 15) - 8);
 	sptr->z = z + ((GetRandomControl() & 15) - 8);
-	sptr->xVel = ((GetRandomControl() & 255) - 128);
-	sptr->zVel = ((GetRandomControl() & 255) - 128);
-	sptr->yVel = ((GetRandomControl() & 255) - 128);
-	sptr->friction = 3;
+	sptr->Xvel = ((GetRandomControl() & 255) - 128);
+	sptr->Zvel = ((GetRandomControl() & 255) - 128);
+	sptr->Yvel = ((GetRandomControl() & 255) - 128);
+	sptr->Friction = 3;
+
 	if (GetRandomControl() & 1)
 	{
-		sptr->flags = SP_SCALE|SP_ROTATE|SP_EXPDEF;
-		sptr->rotAng = GetRandomControl() & 4095;
+		sptr->Flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		sptr->RotAng = GetRandomControl() & 4095;
 		if (GetRandomControl() & 1)
-			sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+			sptr->RotAdd = -(GetRandomControl() & 15) - 16;
 		else
-			sptr->rotAdd = (GetRandomControl() & 15) + 16;
+			sptr->RotAdd = (GetRandomControl() & 15) + 16;
 	}
 	else
-	{
-		sptr->flags = SP_SCALE;
-	}
-	sptr->scalar = 4;
-	sptr->gravity = 0;
-	sptr->maxYvel = 0;
+		sptr->Flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+	sptr->Def = Objects[EXPLOSION1].meshIndex;
+	sptr->Scalar = 4;
+	sptr->Gravity = 0;
+	sptr->MaxYvel = 0;
 	xsize = (GetRandomControl() & 7) + 16;
-	sptr->size = sptr->sSize = xsize >> 1;
-	sptr->dSize = xsize;
-}
+	sptr->Width = sptr->sWidth = xsize >> 1;
+	sptr->dWidth = xsize;
+	sptr->Height = sptr->sHeight = xsize >> 1;
+	sptr->dHeight = xsize;
+}*/
 
-static int GetInKayak(short itemNumber, COLL_INFO* coll)
+int KayakGetIn(short itemNumber, COLL_INFO* coll)
 {
-	int dist;
-	int x, z;
-	ITEM_INFO* kayak;
-	FLOOR_INFO* floor;
-	short roomNumber;
+	ITEM_INFO* l = LaraItem;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
+	if ((!(TrInput & IN_ACTION))
+		|| (Lara.gunStatus != LG_NO_ARMS)
+		|| (l->gravityStatus))
 		return 0;
 
-	kayak = &g_Level.Items[itemNumber];
+	ITEM_INFO* v = &g_Level.Items[itemNumber];
 
-	/* -------- is Lara close enough to use the vehicle */
+	int x = l->pos.xPos - v->pos.xPos;
+	int z = l->pos.zPos - v->pos.zPos;
 
-	x = LaraItem->pos.xPos - kayak->pos.xPos;
-	z = LaraItem->pos.zPos - kayak->pos.zPos;
-
-	dist = (x * x) + (z * z);
-
-	if (dist > (130000))
+	int dist = SQUARE(x) + SQUARE(z);
+	if (dist > SQUARE(360))
 		return 0;
 
-	/*
-	 * SONY BUG FIX 10000001: If player stops in exactly right place and buries
-	 * skidoo in avalanche, then they can get on it and crash the game
-	 */
-	roomNumber = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
-	if (GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos) > -32000)
+	short roomNumber = v->roomNumber;
+	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
+	if (GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos) > -32000)
 	{
-		short ang;
-		unsigned short tempang;
+		short ang = phd_atan(v->pos.zPos - l->pos.zPos, v->pos.xPos - l->pos.xPos);
+		ang -= v->pos.yRot;
 
-		ang = phd_atan(kayak->pos.zPos - LaraItem->pos.zPos, kayak->pos.xPos - LaraItem->pos.xPos);
-		ang -= kayak->pos.yRot;
+		unsigned short tempang = l->pos.yRot - v->pos.yRot;
 
-		tempang = LaraItem->pos.yRot - kayak->pos.yRot;
-
-		if (ang > -ANGLE(45) && ang < ANGLE(135))
+		if ((ang > -ANGLE(45)) && (ang < ANGLE(135)))
 		{
 			if (tempang > ANGLE(45) && tempang < ANGLE(135))
 				return -1;
@@ -211,21 +331,18 @@ static int GetInKayak(short itemNumber, COLL_INFO* coll)
 	return 0;
 }
 
-static int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
+int KayakGetCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 {
 	xdiff = v->pos.xPos - xdiff;
 	zdiff = v->pos.zPos - zdiff;
 
-	/* -------- determine direction of travel relative to rotation */
 	if ((xdiff) || (zdiff))
 	{
-		int c, s, front, side;
-
-		c = phd_cos(v->pos.yRot);
-		s = phd_sin(v->pos.yRot);
-
-		front = ((zdiff * c) + (xdiff * s)) >> W2V_SHIFT;
-		side = ((-zdiff * s) + (xdiff * c)) >> W2V_SHIFT;
+		int s = phd_sin(v->pos.yRot);
+		int c = phd_cos(v->pos.yRot);
+		
+		int front = ((zdiff * c) + (xdiff * s)) >> W2V_SHIFT;
+		int side = ((-zdiff * s) + (xdiff * c)) >> W2V_SHIFT;
 
 		if (abs(front) > abs(side))
 		{
@@ -246,17 +363,14 @@ static int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 	return 0;
 }
 
-static int DoKayakDynamics(int height, int fallspeed, int* y)
+int KayakDoDynamics(int height, int fallspeed, int* y)
 {
-	int kick;
-
 	if (height > * y)
 	{
-		/* In air */
+		// In air
 		*y += fallspeed;
 
 		if (*y > height)
-			//		if (*y > height - SKIDOO_MIN_BOUNCE)
 		{
 			*y = height;
 			fallspeed = 0;
@@ -266,13 +380,15 @@ static int DoKayakDynamics(int height, int fallspeed, int* y)
 	}
 	else
 	{
-		/* On ground: get up push from height change (if not a closed door and so NO_HEIGHT) */
-		kick = (height - *y) << 2;
+		
+		// On ground: get up push from height change (if not a closed door and so NO_HEIGHT) 
+		int kick = (height - *y) << 2;
 
 		if (kick < SKIDOO_MAX_KICK)
 			kick = SKIDOO_MAX_KICK;
 
 		fallspeed += ((kick - fallspeed) >> 3);
+
 		if (*y > height)
 			*y = height;
 	}
@@ -280,18 +396,14 @@ static int DoKayakDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-static void DoKayakCurrent(ITEM_INFO* item)
+void KayakDoCurrent(ITEM_INFO* item)
 {
-	ROOM_INFO* r;
-	PHD_VECTOR target;
-	long angle, dx, dz, speed, sinkval;
-
-	r = &g_Level.Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	if (!Lara.currentActive)
 	{
-		long shifter, absvel;
-		absvel = abs(Lara.currentActive);
+		int absvel = abs(Lara.currentXvel);
+		int shifter;
 
 		if (absvel > 16)
 			shifter = 4;
@@ -317,57 +429,57 @@ static void DoKayakCurrent(ITEM_INFO* item)
 		if (abs(Lara.currentZvel) < 4)
 			Lara.currentZvel = 0;
 
-		if (Lara.currentXvel == 0 && Lara.currentZvel == 0)
+		if (Lara.currentXvel == 0 &&
+			Lara.currentZvel == 0)
 			return;
 	}
 	else
 	{
-		sinkval = Lara.currentActive - 1;
+		int sinkval = Lara.currentActive - 1;
+		
+		PHD_VECTOR target;
 		target.x = FixedCameras[sinkval].x;
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
-		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - 0x4000) >> 4) & 4095;
+		
+		int angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
 
-		dx = target.x - LaraItem->pos.xPos;
-		dz = target.z - LaraItem->pos.zPos;
+		int dx = target.x - LaraItem->pos.xPos;
+		int dz = target.z - LaraItem->pos.zPos;
 
-		speed = FixedCameras[sinkval].data;
-		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
-		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
+		int speed = FixedCameras[sinkval].data;
+		dx = (((rcossin_tbl[(angle << 1)] * speed))) / 4; // / distance)<<4;
+		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) / 4;// / distance)<<4;
 
-		Lara.currentXvel += (dx - Lara.currentXvel) >> 4;
-		Lara.currentZvel += (dz - Lara.currentZvel) >> 4;
+		Lara.currentXvel += (dx - Lara.currentXvel) / 16;
+		Lara.currentZvel += (dz - Lara.currentZvel) / 16;
 	}
 
-	/* Move Lara in direction of sink. */
-	item->pos.xPos += Lara.currentXvel >> 8;
-	item->pos.zPos += Lara.currentZvel >> 8;
+	// Move Lara in direction of sink.
+	item->pos.xPos += Lara.currentXvel / 256;
+	item->pos.zPos += Lara.currentZvel / 256;
 
-	/* Reset current (will get set again so long as Lara is over triggers) */
+	// Reset current (will get set again so long as Lara is over triggers) 
 	Lara.currentActive = 0;
 }
 
-static int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
+int KayakTestHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 {
+	Matrix world =
+		Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) *
+		Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	Vector3 vec = Vector3(x, 0, z);
+	vec = Vector3::Transform(vec, world);
+	
+	pos->x = vec.x;
+	pos->y = vec.y;
+	pos->z = vec.z;
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+	
 	int h;
-	FLOOR_INFO* floor;
-	short roomNumber;
-
-	// PHD_MATH:
-	/*
-	phd_PushUnitMatrix();
-	MatrixPtr[M03] = item->pos.xPos;
-	MatrixPtr[M13] = item->pos.yPos;
-	MatrixPtr[M23] = item->pos.zPos;
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-	phd_TranslateRel(x, 0, z);
-	pos->x = (MatrixPtr[M03] >> W2V_SHIFT);
-	pos->y = (MatrixPtr[M13] >> W2V_SHIFT);
-	pos->z = (MatrixPtr[M23] >> W2V_SHIFT);
-	*/
-
-	roomNumber = item->roomNumber;
-	GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 
 	if ((h = GetWaterHeight(pos->x, pos->y, pos->z, roomNumber)) == NO_HEIGHT)
 	{
@@ -380,27 +492,23 @@ static int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	return h - 5;
 }
 
-static int CanKayakGetOut(ITEM_INFO* kayak, int direction)
+bool KayakCanGetOut(ITEM_INFO* v, int direction)
 {
-	int height;
 	PHD_VECTOR pos;
 
-	height = TestKayakHeight(kayak, (direction < 0) ? -GETOFF_DIST : GETOFF_DIST, 0, &pos);
+	int height = KayakTestHeight(v, (direction < 0) ? -GETOFF_DIST : GETOFF_DIST, 0, &pos);
 
-	if ((kayak->pos.yPos - height) > 0)
-		return 0;
+	if ((v->pos.yPos - height) > 0)
+		return false;
 
-	return 1;
+	return true;
 }
 
-static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
+int KayakDoShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
 	int shift_x, shift_z;
-	int height;
-	FLOOR_INFO* floor;
-	short roomNumber;
 
 	x = pos->x >> WALL_SHIFT;
 	z = pos->z >> WALL_SHIFT;
@@ -453,13 +561,12 @@ static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 	else
 	{
-		/* A diagonal hit; means a barrage of tests needed to determine best shift */
-		x = 0;
-		z = 0;
+		// A diagonal hit; means a barrage of tests needed to determine best shift 
+		x = z = 0;
 
-		roomNumber = v->roomNumber;
-		floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
-		height = GetFloorHeight(floor, old->x, pos->y, pos->z);
+		short roomNumber = v->roomNumber;
+		FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
 			if (pos->z > old->z)
@@ -479,13 +586,13 @@ static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 				x = WALL_SIZE - shift_x;
 		}
 
-		/* -------- corner collision */
+		// corner collision 
 		if (x && z)
 		{
 			v->pos.zPos += z;
 			v->pos.xPos += x;
 		}
-		/* -------- edge collisions */
+		// edge collisions 
 		else if (z)
 		{
 			v->pos.zPos += z;
@@ -504,7 +611,7 @@ static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 			else
 				return (v->pos.zPos - pos->z);
 		}
-		/* -------- diagnal collision */
+		// diagnal collision 
 		else
 		{
 			v->pos.zPos += (old->z - pos->z);
@@ -515,245 +622,260 @@ static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-static void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
+void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 {
-	int h, slip = 0, rot = 0;
+	int slip = 0, rot = 0;
 	PHD_VECTOR pos;
-	int collide, oldx, oldz;
-	FLOOR_INFO* floor;
-	short roomNumber;
 	int height[8];
 	PHD_VECTOR oldpos[9];
-	int x, z;
-	int fh, lh, rh;
 	PHD_VECTOR fpos, lpos, rpos;
 
-	kinfo->OldPos = kayak->pos;
+	Kayak->OldPos = v->pos;
 
-	/* -------- determine valid Kayak positions */
-	height[0] = TestKayakHeight(kayak, 0, 1024, &oldpos[0]);
-	height[1] = TestKayakHeight(kayak, -96, 512, &oldpos[1]);
-	height[2] = TestKayakHeight(kayak, 96, 512, &oldpos[2]);
-	height[3] = TestKayakHeight(kayak, -KAYAK_X, KAYAK_Z, &oldpos[3]);
-	height[4] = TestKayakHeight(kayak, KAYAK_X, KAYAK_Z, &oldpos[4]);
-	height[5] = TestKayakHeight(kayak, -KAYAK_X, -320, &oldpos[5]);
-	height[6] = TestKayakHeight(kayak, KAYAK_X, -320, &oldpos[6]);
-	height[7] = TestKayakHeight(kayak, 0, -640, &oldpos[7]);
+	// determine valid Kayak positions 
+	height[0] = KayakTestHeight(v, 0, 1024, &oldpos[0]);
+	height[1] = KayakTestHeight(v, -96, 512, &oldpos[1]);
+	height[2] = KayakTestHeight(v, 96, 512, &oldpos[2]);
+	height[3] = KayakTestHeight(v, -128, 128, &oldpos[3]);
+	height[4] = KayakTestHeight(v, 128, 128, &oldpos[4]);
+	height[5] = KayakTestHeight(v, -128, -320, &oldpos[5]);
+	height[6] = KayakTestHeight(v, 128, -320, &oldpos[6]);
+	height[7] = KayakTestHeight(v, 0, -640, &oldpos[7]);
 
-	for (collide = 0; collide < 8; collide++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (oldpos[collide].y > height[collide])
-			oldpos[collide].y = height[collide];
+		if (oldpos[i].y > height[i])
+			oldpos[i].y = height[i];
 	}
 
-	oldpos[8].x = kayak->pos.xPos;
-	oldpos[8].y = kayak->pos.yPos;
-	oldpos[8].z = kayak->pos.zPos;
+	oldpos[8].x = v->pos.xPos;
+	oldpos[8].y = v->pos.yPos;
+	oldpos[8].z = v->pos.zPos;
 
-	/* -------- move Kayak according to velocities & current */
-	fh = TestKayakHeight(kayak, 0, 1024, &fpos);
-	lh = TestKayakHeight(kayak, -KAYAK_X, KAYAK_Z, &lpos);
-	rh = TestKayakHeight(kayak, KAYAK_X, KAYAK_Z, &rpos);
+	// move Kayak according to velocities & current 
+	int fh = KayakTestHeight(v, 0, 1024, &fpos);
+	int lh = KayakTestHeight(v, -KAYAK_X, KAYAK_Z, &lpos);
+	int rh = KayakTestHeight(v, KAYAK_X, KAYAK_Z, &rpos);
 
-	kayak->pos.yRot += (kinfo->Rot >> 16);
-	kayak->pos.xPos += (kayak->speed * phd_sin(kayak->pos.yRot)) >> W2V_SHIFT;
-	kayak->pos.zPos += (kayak->speed * phd_cos(kayak->pos.yRot)) >> W2V_SHIFT;
+	v->pos.yRot += (Kayak->Rot >> 16);
 
-	DoKayakCurrent(kayak);
+	v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+	v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
 
-	/* -------- move Kayak vertically */
-	kinfo->FallSpeedL = DoKayakDynamics(lh, kinfo->FallSpeedL, &lpos.y);
-	kinfo->FallSpeedR = DoKayakDynamics(rh, kinfo->FallSpeedR, &rpos.y);
-	kinfo->FallSpeedF = DoKayakDynamics(fh, kinfo->FallSpeedF, &fpos.y);
-	kayak->fallspeed = DoKayakDynamics(kinfo->Water, kayak->fallspeed, &kayak->pos.yPos);
+	KayakDoCurrent(v);
 
-	h = (lpos.y + rpos.y) >> 1;
-	x = phd_atan(1024, kayak->pos.yPos - fpos.y);
-	z = phd_atan(KAYAK_X, h - lpos.y);
+	// move Kayak vertically 
+	Kayak->FallSpeedL = KayakDoDynamics(lh, Kayak->FallSpeedL, &lpos.y);
+	Kayak->FallSpeedR = KayakDoDynamics(rh, Kayak->FallSpeedR, &rpos.y);
+	Kayak->FallSpeedF = KayakDoDynamics(fh, Kayak->FallSpeedF, &fpos.y);
 
-	kayak->pos.xRot = x;
-	kayak->pos.zRot = z;
+	v->fallspeed = KayakDoDynamics(Kayak->Water, v->fallspeed, &v->pos.yPos);
 
-	/* -------- slide Kayak back down slopes */
-	oldx = kayak->pos.xPos;
-	oldz = kayak->pos.zPos;
+	int h = (lpos.y + rpos.y) / 2;
+	int x = phd_atan(1024, v->pos.yPos - fpos.y);
+	int z = phd_atan(KAYAK_X, h - lpos.y);
 
-	/* -------- collide against background */
+	v->pos.xRot = x;
+	v->pos.zRot = z;
 
-	if ((h = TestKayakHeight(kayak, 0, -640, &pos)) < (oldpos[7].y - KAYAK_COLLIDE))
-		rot = DoKayakShift(kayak, &pos, &oldpos[7]);
+	int oldx = v->pos.xPos;
+	int oldz = v->pos.zPos;
 
-	if ((h = TestKayakHeight(kayak, KAYAK_X, -320, &pos)) < (oldpos[6].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[6]);
+	// collide against background */
 
-	if ((h = TestKayakHeight(kayak, -KAYAK_X, -320, &pos)) < (oldpos[5].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[5]);
+	if ((h = KayakTestHeight(v, 0, -640, &pos)) < (oldpos[7].y - KAYAK_COLLIDE))
+		rot = KayakDoShift(v, &pos, &oldpos[7]);
 
-	if ((h = TestKayakHeight(kayak, KAYAK_X, KAYAK_Z, &pos)) < (oldpos[4].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[4]);
+	if ((h = KayakTestHeight(v, 128, -320, &pos)) < (oldpos[6].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[6]);
 
-	if ((h = TestKayakHeight(kayak, -KAYAK_X, KAYAK_Z, &pos)) < (oldpos[3].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[3]);
+	if ((h = KayakTestHeight(v, -128, -320, &pos)) < (oldpos[5].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[5]);
 
-	if ((h = TestKayakHeight(kayak, 96, 512, &pos)) < (oldpos[2].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[2]);
+	if ((h = KayakTestHeight(v, 128, 128, &pos)) < (oldpos[4].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[4]);
 
-	if ((h = TestKayakHeight(kayak, -96, 512, &pos)) < (oldpos[1].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[1]);
+	if ((h = KayakTestHeight(v, -128, 128, &pos)) < (oldpos[3].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[3]);
 
-	if ((h = TestKayakHeight(kayak, 0, 1024, &pos)) < (oldpos[0].y - KAYAK_COLLIDE))
-		rot += DoKayakShift(kayak, &pos, &oldpos[0]);
+	if ((h = KayakTestHeight(v, 96, 512, &pos)) < (oldpos[2].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[2]);
 
-	kayak->pos.yRot += rot;
+	if ((h = KayakTestHeight(v, -96, 512, &pos)) < (oldpos[1].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[1]);
 
-	/* -------- update the vehicle's actual position */
+	if ((h = KayakTestHeight(v, 0, 1024, &pos)) < (oldpos[0].y - KAYAK_COLLIDE))
+		rot += KayakDoShift(v, &pos, &oldpos[0]);
 
-	roomNumber = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
-	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, roomNumber);
+	v->pos.yRot += rot;
 
-	if (h == NO_HEIGHT)
-		h = GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos);
-
-	if (h < (kayak->pos.yPos - KAYAK_COLLIDE))
-		DoKayakShift(kayak, (PHD_VECTOR*)&kayak->pos, &oldpos[8]);
-
-	/* -------- if position is still invalid - find somewhere decent */
-	roomNumber = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
-	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, roomNumber);
+	// update the vehicle's actual position 
+	short roomNumber = v->roomNumber;
+	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
+	h = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
 
 	if (h == NO_HEIGHT)
-		h = GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos);
+		h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
+
+	if (h < (v->pos.yPos - KAYAK_COLLIDE))
+		KayakDoShift(v, (PHD_VECTOR*)&v->pos, &oldpos[8]);
+
+	// if position is still invalid - find somewhere decent 
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
+	h = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
+
+	if (h == NO_HEIGHT)
+		h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 
 	if (h == NO_HEIGHT)
 	{
 		GAME_VECTOR kpos;
 
-		kpos.x = kinfo->OldPos.xPos;
-		kpos.y = kinfo->OldPos.yPos;
-		kpos.z = kinfo->OldPos.zPos;
-		kpos.roomNumber = kayak->roomNumber;
+		kpos.x = Kayak->OldPos.xPos;
+		kpos.y = Kayak->OldPos.yPos;
+		kpos.z = Kayak->OldPos.zPos;
+		kpos.roomNumber = v->roomNumber;
 
 		CameraCollisionBounds(&kpos, 256, 0);
 		{
-			kayak->pos.xPos = kpos.x;
-			kayak->pos.yPos = kpos.y;
-			kayak->pos.zPos = kpos.z;
-			kayak->roomNumber = kpos.roomNumber;
+			v->pos.xPos = kpos.x;
+			v->pos.yPos = kpos.y;
+			v->pos.zPos = kpos.z;
+			v->roomNumber = kpos.roomNumber;
 		}
 	}
 
-	/* -------- adjust speed upon collision */
-	collide = GetKayakCollisionAnim(kayak, oldx, oldz);
+	// adjust speed upon collision 
+	int collide = KayakGetCollisionAnim(v, oldx, oldz);
+
 	if (slip || collide)
 	{
 		int newspeed;
 
-		newspeed = ((kayak->pos.zPos - oldpos[8].z) * phd_cos(kayak->pos.yRot) + (kayak->pos.xPos - oldpos[8].x) * phd_sin(kayak->pos.yRot)) >> W2V_SHIFT;
-		newspeed <<= 8;
+		newspeed = ((v->pos.zPos - oldpos[8].z) * phd_cos(v->pos.yRot)
+			+ (v->pos.xPos - oldpos[8].x) * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+
+		newspeed *= 256;
 
 		if (slip)
 		{
-			/* Only if slip is above certain amount, and boat is not in FAST speed range */
-			if (kinfo->Vel <= MAX_SPEED)
-				kinfo->Vel = newspeed;
+			// Only if slip is above certain amount, and boat is not in FAST speed range 
+			if (Kayak->Vel <= MAX_SPEED)
+				Kayak->Vel = newspeed;
 		}
 		else
 		{
-			if (kinfo->Vel > 0 && newspeed < kinfo->Vel)
-				kinfo->Vel = newspeed;
+			if (Kayak->Vel > 0 && newspeed < Kayak->Vel)
+				Kayak->Vel = newspeed;
 
-			else if (kinfo->Vel < 0 && newspeed > kinfo->Vel)
-				kinfo->Vel = newspeed;
+			else if (Kayak->Vel < 0 && newspeed > Kayak->Vel)
+				Kayak->Vel = newspeed;
 		}
 
-		if (kinfo->Vel < -MAX_SPEED)
-			kinfo->Vel = -MAX_SPEED;
+		if (Kayak->Vel < -MAX_SPEED)
+			Kayak->Vel = -MAX_SPEED;
 	}
 }
 
-static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
+void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 {
 	short frame;
-	char lr;
 
-	/* -------- kill Lara in boat */
-	if ((lara->hitPoints <= 0) && (lara->currentAnimState != KS_DEATHIN))
+	// kill Lara in boat 
+	if ((l->hitPoints <= 0)
+		&& (l->currentAnimState != STATE_KAYAK_DEATHIN))
 	{
-		lara->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 5;
-		lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-		lara->currentAnimState = lara->goalAnimState = KS_DEATHIN;
+		l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_DEATHIN_A;
+		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+		l->currentAnimState = l->goalAnimState = STATE_KAYAK_DEATHIN;
 	}
 
-	/* -------- control Kayak */
-	frame = lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase;
+	// control Kayak 
+	frame = l->frameNumber - g_Level.Anims[l->animNumber].frameBase;
 
-	switch (lara->currentAnimState)
+	char lr = 0;
+
+	switch (l->currentAnimState)
 	{
-	case KS_POSE:
-		if ((TrInput & IN_ROLL) && (!Lara.currentActive) && (!Lara.currentXvel) && (!Lara.currentZvel))
+	case STATE_KAYAK_POSE:
+		if ((TrInput & IN_ROLL)
+			&& (!Lara.currentActive)
+			&& (!Lara.currentXvel)
+			&& (!Lara.currentZvel))
 		{
-			if ((TrInput & IN_LEFT) && (CanKayakGetOut(kayak, -1)))
+			if ((TrInput & IN_LEFT) && (KayakCanGetOut(v, -1)))
 			{
-				lara->goalAnimState = KS_JUMPOUT;
-				lara->requiredAnimState = KS_CLIMBOUTL;
+				l->goalAnimState = STATE_KAYAK_JUMPOUT;
+				l->requiredAnimState = STATE_KAYAK_CLIMBOUTL;
 			}
-			else if ((TrInput & IN_RIGHT) && (CanKayakGetOut(kayak, 1)))
+
+			else if ((TrInput & IN_RIGHT) && (KayakCanGetOut(v, 1)))
 			{
-				lara->goalAnimState = KS_JUMPOUT;
-				lara->requiredAnimState = KS_CLIMBOUTR;
+				l->goalAnimState = STATE_KAYAK_JUMPOUT;
+				l->requiredAnimState = STATE_KAYAK_CLIMBOUTR;
 			}
 		}
 		else if (TrInput & IN_FORWARD)
 		{
-			lara->goalAnimState = KS_RIGHT;
-			kinfo->Turn = 0;
-			kinfo->Forward = 1;
+			l->goalAnimState = STATE_KAYAK_RIGHT;
+			Kayak->Turn = 0;
+			Kayak->Forward = 1;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			lara->goalAnimState = KS_BACK;
+			l->goalAnimState = STATE_KAYAK_BACK;
 		}
 		else if (TrInput & IN_LEFT)
 		{
-			lara->goalAnimState = KS_LEFT;
+			l->goalAnimState = STATE_KAYAK_LEFT;
 
-			if (kinfo->Vel)
-				kinfo->Turn = 0;
+			if (Kayak->Vel)
+				Kayak->Turn = 0;
 			else
-				kinfo->Turn = 1;		// harder turn
+				Kayak->Turn = 1; // harder turn
 
-			kinfo->Forward = 0;
+			Kayak->Forward = 0;
 		}
+
 		else if (TrInput & IN_RIGHT)
 		{
-			lara->goalAnimState = KS_RIGHT;
+			l->goalAnimState = STATE_KAYAK_RIGHT;
 
-			if (kinfo->Vel)
-				kinfo->Turn = 0;
+			if (Kayak->Vel)
+				Kayak->Turn = 0;
 			else
-				kinfo->Turn = 1;		// harder turn
+				Kayak->Turn = 1; // harder turn
 
-			kinfo->Forward = 0;
+			Kayak->Forward = 0;
 		}
-		else if ((TrInput & IN_LSTEP) && ((kinfo->Vel) || (Lara.currentXvel) || (Lara.currentZvel)))
+		else if ((TrInput & IN_LSTEP)
+			&& ((Kayak->Vel)
+				|| (Lara.currentXvel)
+				|| (Lara.currentZvel)))
 		{
-			lara->goalAnimState = KS_TURNL;
+			l->goalAnimState = STATE_KAYAK_TURNL;
 		}
-		else if ((TrInput & IN_RSTEP) && ((kinfo->Vel) || (Lara.currentXvel) || (Lara.currentZvel)))
+		else if ((TrInput & IN_RSTEP)
+			&& ((Kayak->Vel)
+				|| (Lara.currentXvel)
+				|| (Lara.currentZvel)))
 		{
-			lara->goalAnimState = KS_TURNR;
+			l->goalAnimState = STATE_KAYAK_TURNR;
 		}
+
 		break;
-
-	case KS_LEFT:
-		if (kinfo->Forward)
+		
+	case STATE_KAYAK_LEFT:
+		
+		if (Kayak->Forward)
 		{
 			if (!frame)
 				lr = 0;
+
 			if ((frame == 2) && (!(lr & 0x80)))
 				lr++;
+
 			else if (frame > 2)
 				lr &= ~0x80;
 
@@ -762,53 +884,53 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 				if (TrInput & IN_LEFT)
 				{
 					if ((lr & ~0x80) >= 2)
-						lara->goalAnimState = KS_RIGHT;
+						l->goalAnimState = STATE_KAYAK_RIGHT;
 				}
 				else
-					lara->goalAnimState = KS_RIGHT;
+					l->goalAnimState = STATE_KAYAK_RIGHT;
 			}
 			else
-				lara->goalAnimState = KS_POSE;
+				l->goalAnimState = STATE_KAYAK_POSE;
 		}
-
 		else if (!(TrInput & IN_LEFT))
-			lara->goalAnimState = KS_POSE;
+			l->goalAnimState = STATE_KAYAK_POSE;
 
-		/* -------- apply velocities */
+		// apply velocities 
 		if (frame == 7)
 		{
-			if (kinfo->Forward)
+			if (Kayak->Forward)
 			{
-				if ((kinfo->Rot -= KAYAK_FWD_ROT) < -KAYAK_MAX_TURN)
-					kinfo->Rot = -KAYAK_MAX_TURN;
+				if ((Kayak->Rot -= KAYAK_FWD_ROT) < -KAYAK_MAX_TURN)
+					Kayak->Rot = -KAYAK_MAX_TURN;
 
-				kinfo->Vel += KAYAK_FWD_VEL;
+				Kayak->Vel += KAYAK_FWD_VEL;
 			}
 
-			else if (kinfo->Turn)
+			else if (Kayak->Turn)
 			{
-				if ((kinfo->Rot -= KAYAK_HARD_ROT) < -KAYAK_MAX_STAT)
-					kinfo->Rot = -KAYAK_MAX_STAT;
+				if ((Kayak->Rot -= KAYAK_HARD_ROT) < -KAYAK_MAX_STAT)
+					Kayak->Rot = -KAYAK_MAX_STAT;
 			}
 			else
 			{
-				if ((kinfo->Rot -= KAYAK_LR_ROT) < -KAYAK_MAX_LR)
-					kinfo->Rot = -KAYAK_MAX_LR;
+				if ((Kayak->Rot -= KAYAK_LR_ROT) < -KAYAK_MAX_LR)
+					Kayak->Rot = -KAYAK_MAX_LR;
 
-				kinfo->Vel += KAYAK_LR_VEL;
+				Kayak->Vel += KAYAK_LR_VEL;
 			}
 		}
 
-		/* -------- initialise ripple effects */
-
+		// initialise ripple effects
 		if ((frame > 6) && (frame < 24) && (frame & 1))
-			DoKayakRipple(kayak, -384, -64);
+			KayakDoRipple(v, -384, -64);
+
 		break;
-		/* --------------------- */
-	case KS_RIGHT:
-		/* --------------------- */
-		if (kinfo->Forward)
+		
+	case STATE_KAYAK_RIGHT:	
+		if (Kayak->Forward)
 		{
+			int lr = 0;
+
 			if (!frame)
 				lr = 0;
 
@@ -823,406 +945,406 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 				if (TrInput & IN_RIGHT)
 				{
 					if ((lr & ~0x80) >= 2)
-						lara->goalAnimState = KS_LEFT;
+						l->goalAnimState = STATE_KAYAK_LEFT;
 				}
 				else
-					lara->goalAnimState = KS_LEFT;
+					l->goalAnimState = STATE_KAYAK_LEFT;
 			}
 			else
-				lara->goalAnimState = KS_POSE;
+				l->goalAnimState = STATE_KAYAK_POSE;
 		}
 
 		else if (!(TrInput & IN_RIGHT))
-			lara->goalAnimState = KS_POSE;
+			l->goalAnimState = STATE_KAYAK_POSE;
 
-		/* -------- apply velocities */
-
+		// apply velocities 
 		if (frame == 7)
 		{
-			if (kinfo->Forward)
+			if (Kayak->Forward)
 			{
-				if ((kinfo->Rot += KAYAK_FWD_ROT) > KAYAK_MAX_TURN)
-					kinfo->Rot = KAYAK_MAX_TURN;
+				if ((Kayak->Rot += KAYAK_FWD_ROT) > KAYAK_MAX_TURN)
+					Kayak->Rot = KAYAK_MAX_TURN;
 
-				kinfo->Vel += KAYAK_FWD_VEL;
+				Kayak->Vel += KAYAK_FWD_VEL;
 			}
 
-			else if (kinfo->Turn)
+			else if (Kayak->Turn)
 			{
-				if ((kinfo->Rot += KAYAK_HARD_ROT) > KAYAK_MAX_STAT)
-					kinfo->Rot = KAYAK_MAX_STAT;
+				if ((Kayak->Rot += KAYAK_HARD_ROT) > KAYAK_MAX_STAT)
+					Kayak->Rot = KAYAK_MAX_STAT;
 			}
 			else
 			{
-				if ((kinfo->Rot += KAYAK_LR_ROT) > KAYAK_MAX_LR)
-					kinfo->Rot = KAYAK_MAX_LR;
+				if ((Kayak->Rot += KAYAK_LR_ROT) > KAYAK_MAX_LR)
+					Kayak->Rot = KAYAK_MAX_LR;
 
-				kinfo->Vel += KAYAK_LR_VEL;
+				Kayak->Vel += KAYAK_LR_VEL;
 			}
 		}
 
-		/* -------- initialise ripple effects */
+		// initialise ripple effects 
 		if ((frame > 6) && (frame < 24) && (frame & 1))
-			DoKayakRipple(kayak, 384, -64);
-		break;
-		/* --------------------- */
-	case KS_BACK:
-		/* --------------------- */
-		if (!(TrInput & IN_BACK))
-			lara->goalAnimState = KS_POSE;
+			KayakDoRipple(v, 384, -64);
 
-		if ((lara->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == 2)
+		break;
+		
+	case STATE_KAYAK_BACK:
+		
+		if (!(TrInput & IN_BACK))
+			l->goalAnimState = STATE_KAYAK_POSE;
+
+		if ((l->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_BACK_A)
 		{
 			if (frame == 8)
 			{
-				kinfo->Rot += KAYAK_FWD_ROT;
-				kinfo->Vel -= KAYAK_FWD_VEL;
+				Kayak->Rot += KAYAK_FWD_ROT;
+				Kayak->Vel -= KAYAK_FWD_VEL;
 			}
 
 			if (frame == 31)
 			{
-				kinfo->Rot -= KAYAK_FWD_ROT;
-				kinfo->Vel -= KAYAK_FWD_VEL;
+				Kayak->Rot -= KAYAK_FWD_ROT;
+				Kayak->Vel -= KAYAK_FWD_VEL;
 			}
 
 			if ((frame < 15) && (frame & 1))
-				DoKayakRipple(kayak, 384, -128);
+				KayakDoRipple(v, 384, -128);
+
 			else if ((frame >= 20) && (frame <= 34) && (frame & 1))
-				DoKayakRipple(kayak, -384, -128);
+				KayakDoRipple(v, -384, -128);
 		}
 
 		break;
-
-	case KS_TURNL:
-		if ((!(TrInput & IN_LSTEP)) || ((!kinfo->Vel) && (!Lara.currentXvel) && (!Lara.currentZvel)))
+		
+	case STATE_KAYAK_TURNL:
+		
+		if ((!(TrInput & IN_LSTEP))
+			|| ((!Kayak->Vel)
+				&& (!Lara.currentXvel)
+				&& (!Lara.currentZvel)))
 		{
-			lara->goalAnimState = KS_POSE;
+			l->goalAnimState = STATE_KAYAK_POSE;
 		}
-		else if ((lara->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == 26)
+		else if ((l->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_TURNL_A)
 		{
-			if (kinfo->Vel >= 0)
+			if (Kayak->Vel >= 0)
 			{
-				if ((kinfo->Rot -= KAYAK_TURN_ROT) < -KAYAK_MAX_TURN)
-					kinfo->Rot = -KAYAK_MAX_TURN;
+				if ((Kayak->Rot -= KAYAK_TURN_ROT) < -KAYAK_MAX_TURN)
+					Kayak->Rot = -KAYAK_MAX_TURN;
 
-				if ((kinfo->Vel += -KAYAK_TURN_BRAKE) < 0)
-					kinfo->Vel = 0;
+				if ((Kayak->Vel += -KAYAK_TURN_BRAKE) < 0)
+					Kayak->Vel = 0;
 			}
-			if (kinfo->Vel < 0)
+			if (Kayak->Vel < 0)
 			{
-				kinfo->Rot += KAYAK_TURN_ROT;
+				Kayak->Rot += KAYAK_TURN_ROT;
 
-				if ((kinfo->Vel += KAYAK_TURN_BRAKE) > 0)
-					kinfo->Vel = 0;
+				if ((Kayak->Vel += KAYAK_TURN_BRAKE) > 0)
+					Kayak->Vel = 0;
 			}
 
 			if (!(Wibble & 3))
-				DoKayakRipple(kayak, -256, -256);
+				KayakDoRipple(v, -256, -256);
 		}
+
 		break;
-
-	case KS_TURNR:
-		if (!(TrInput & IN_RSTEP) || ((!kinfo->Vel) && (!Lara.currentXvel) && (!Lara.currentZvel)))
+		
+	case STATE_KAYAK_TURNR:
+		if ((!(TrInput & IN_RSTEP))
+			|| ((!Kayak->Vel)
+				&& (!Lara.currentXvel)
+				&& (!Lara.currentZvel)))
 		{
-			lara->goalAnimState = KS_POSE;
+			l->goalAnimState = STATE_KAYAK_POSE;
 		}
-		else if ((lara->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == 27)
+		else if ((l->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_TURNR_A)
 		{
-			if (kinfo->Vel >= 0)
+			if (Kayak->Vel >= 0)
 			{
-				if ((kinfo->Rot += KAYAK_TURN_ROT) > KAYAK_MAX_TURN)
-					kinfo->Rot = KAYAK_MAX_TURN;
+				if ((Kayak->Rot += KAYAK_TURN_ROT) > KAYAK_MAX_TURN)
+					Kayak->Rot = KAYAK_MAX_TURN;
 
-				if ((kinfo->Vel += -KAYAK_TURN_BRAKE) < 0)
-					kinfo->Vel = 0;
+				if ((Kayak->Vel += -KAYAK_TURN_BRAKE) < 0)
+					Kayak->Vel = 0;
 			}
-			if (kinfo->Vel < 0)
+			if (Kayak->Vel < 0)
 			{
-				kinfo->Rot -= KAYAK_TURN_ROT;
+				Kayak->Rot -= KAYAK_TURN_ROT;
 
-				if ((kinfo->Vel += KAYAK_TURN_BRAKE) > 0)
-					kinfo->Vel = 0;
+				if ((Kayak->Vel += KAYAK_TURN_BRAKE) > 0)
+					Kayak->Vel = 0;
 			}
 
 			if (!(Wibble & 3))
-				DoKayakRipple(kayak, 256, -256);
+				KayakDoRipple(v, 256, -256);
 		}
 
 		break;
-		/* --------------------- */
-	case KS_CLIMBIN:
-		/* --------------------- */
-		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 4) && (frame == 24) && (!(kinfo->Flags & 0x80)))
+		
+	case STATE_KAYAK_CLIMBIN:
+		
+		if ((l->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_CLIMBIN2_A)
+			&& (frame == 24)
+			&& (!(Kayak->Flags & 0x80)))
 		{
-			/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
-
-			LARA_MESHES(ID_KAYAK_LARA_ANIMS, LM_RHAND);
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
 			Lara.meshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-			
-			lara->meshBits &= ~LARA_LEG_BITS;
-			kinfo->Flags |= 0x80;
+			l->meshBits &= ~LARA_LEG_BITS;
+
+			Kayak->Flags |= 0x80;
 		}
 		break;
-
-	case KS_JUMPOUT:
-		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 14) && (frame == 27) && (kinfo->Flags & 0x80))
+		
+	case STATE_KAYAK_JUMPOUT:
+		
+		if ((l->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_JUMPOUT1_A)
+			&& (frame == 27)
+			&& (Kayak->Flags & 0x80))
 		{
-			/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
-
-			LARA_MESHES(ID_KAYAK_LARA_ANIMS, LM_RHAND);
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
 			Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+			l->meshBits |= LARA_LEG_BITS;
 
-			lara->meshBits |= LARA_LEG_BITS;
-			kinfo->Flags &= ~0x80;
+			Kayak->Flags &= ~0x80;
 		}
 
-		lara->goalAnimState = lara->requiredAnimState;
-		break;
+		l->goalAnimState = l->requiredAnimState;
 
-	case KS_CLIMBOUTL:
-		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 24) && (frame == 83))
+		break;
+		
+	case STATE_KAYAK_CLIMBOUTL:
+		
+		if ((l->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_JUMPOUT2_A)
+			&& (frame == 83))
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
 
 			GetLaraJointPosition(&vec, LM_HIPS);
 
-			lara->pos.xPos = vec.x;
-			lara->pos.yPos = vec.y;
-			lara->pos.zPos = vec.z;
-			lara->pos.xRot = 0;
-			lara->pos.yRot = kayak->pos.yRot - 0x4000;
-			lara->pos.zRot = 0;
+			l->pos.xPos = vec.x;
+			l->pos.yPos = vec.y;
+			l->pos.zPos = vec.z;
+			l->pos.xRot = 0;
+			l->pos.yRot = v->pos.yRot - ANGLE(90);
+			l->pos.zRot = 0;
 
-			lara->animNumber = 23;
-			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-			lara->currentAnimState = lara->goalAnimState = 9;
+			l->animNumber = LA_FREEFALL;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+			l->currentAnimState = l->goalAnimState = LS_FREEFALL;
 
-			lara->fallspeed = 0;
-			lara->gravityStatus = true;
+			l->fallspeed = 0;
+			l->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
 			Lara.Vehicle = NO_ITEM;
 		}
 		break;
-
-	case KS_CLIMBOUTR:
-		if ((lara->animNumber ==Objects[ID_KAYAK_LARA_ANIMS].animIndex + 32) && (frame == 83))
+		
+	case STATE_KAYAK_CLIMBOUTR:
+		
+		if ((l->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_JUMPOUTR_A)
+			&& (frame == 83))
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
 
 			GetLaraJointPosition(&vec, LM_HIPS);
 
-			lara->pos.xPos = vec.x;
-			lara->pos.yPos = vec.y;
-			lara->pos.zPos = vec.z;
-			lara->pos.xRot = 0;
-			lara->pos.yRot = kayak->pos.yRot + 0x4000;
-			lara->pos.zRot = 0;
+			l->pos.xPos = vec.x;
+			l->pos.yPos = vec.y;
+			l->pos.zPos = vec.z;
+			l->pos.xRot = 0;
+			l->pos.yRot = v->pos.yRot + ANGLE(90);
+			l->pos.zRot = 0;
 
-			lara->animNumber = 23;
-			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-			lara->currentAnimState = lara->goalAnimState = 9;
+			l->animNumber = LA_FREEFALL;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+			l->currentAnimState = l->goalAnimState = LS_FREEFALL;
 
-			lara->fallspeed = 0;
-			lara->gravityStatus = true;
+			l->fallspeed = 0;
+			l->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
 			Lara.Vehicle = NO_ITEM;
 		}
 	}
 
-	/* -------- slow Kayak with friction */
-	if (kinfo->Vel > 0)
+	// slow Kayak with friction 
+	if (Kayak->Vel > 0)
 	{
-		if ((kinfo->Vel -= KAYAK_FRICTION) < 0)
-			kinfo->Vel = 0;
+		if ((Kayak->Vel -= KAYAK_FRICTION) < 0)
+			Kayak->Vel = 0;
 	}
-	else if (kinfo->Vel < 0)
+	else if (Kayak->Vel < 0)
 	{
-		if ((kinfo->Vel += KAYAK_FRICTION) > 0)
-			kinfo->Vel = 0;
+		if ((Kayak->Vel += KAYAK_FRICTION) > 0)
+			Kayak->Vel = 0;
 	}
 
-	if (kinfo->Vel > MAX_SPEED)
-		kinfo->Vel = MAX_SPEED;
+	if (Kayak->Vel > MAX_SPEED)
+		Kayak->Vel = MAX_SPEED;
 
-	else if (kinfo->Vel < -MAX_SPEED)
-		kinfo->Vel = -MAX_SPEED;
+	else if (Kayak->Vel < -MAX_SPEED)
+		Kayak->Vel = -MAX_SPEED;
 
-	kayak->speed = (kinfo->Vel >> 16);
+	v->speed = (Kayak->Vel >> 16);
 
-	/* -------- unwind rotation */
-
-	if (kinfo->Rot >= 0)
+	// unwind rotation 
+	if (Kayak->Rot >= 0)
 	{
-		if ((kinfo->Rot -= KAYAK_ROT_FRIC) < 0)
-			kinfo->Rot = 0;
+		if ((Kayak->Rot -= KAYAK_ROT_FRIC) < 0)
+			Kayak->Rot = 0;
 	}
-	else if (kinfo->Rot < 0)
+	else if (Kayak->Rot < 0)
 	{
-		if ((kinfo->Rot += KAYAK_ROT_FRIC) > 0)
-			kinfo->Rot = 0;
+		if ((Kayak->Rot += KAYAK_ROT_FRIC) > 0)
+			Kayak->Rot = 0;
 	}
 }
 
-static void KayakToBaddieCollision(ITEM_INFO* kayak)
+void KayakToBaddieCollision(ITEM_INFO* v)
 {
-#define TARGET_DIST (WALL_SIZE*2)              // Up to this Distance more Complicated checks are made
-	vector<short> roomsList;
-	short numDoors, *door;
+	// get nearby rooms 
+	short roomsToCheck[128];
+	short numRoomsToCheck = 0;
+	roomsToCheck[numRoomsToCheck++] = v->roomNumber;
 
-	roomsList.push_back(kayak->roomNumber);
-
-	ROOM_INFO* room = &g_Level.Rooms[kayak->roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[v->roomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
 	{
-		roomsList.push_back(room->doors[i].room);
+		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
 	}
 
-	/* -------- collide with all baddies in these rooms */
+	// collide with all baddies in these rooms */
 
-	for (int i = 0; i < roomsList.size(); i++)
+	for (int i = 0; i < numRoomsToCheck; i++)
 	{
-		short item_num;
+		short itemNum = g_Level.Rooms[roomsToCheck[i]].itemNumber; 
 
-		item_num = g_Level.Rooms[roomsList[i]].itemNumber;	// Only do collision with Items on Draw list
-
-		while (item_num != NO_ITEM)
+		while (itemNum != NO_ITEM)
 		{
-			short nex;
-			ITEM_INFO* item;
+			ITEM_INFO* item = &g_Level.Items[itemNum];
+			short nex = item->nextItem;	 
 
-			item = &g_Level.Items[item_num];
-			nex = item->nextItem;				// Store next Item in list as Current may be deleted!!!
-
-			if (item->collidable && item->status != ITEM_INVISIBLE)
+			if ((item->collidable) && (item->status != ITEM_INVISIBLE))
 			{
-				OBJECT_INFO* object;
+				OBJECT_INFO* object = &Objects[item->objectNumber];
 
-				object = &Objects[item->objectNumber];
-
-				if ((object->collision)
-				&& ((item->objectNumber == ID_TEETH_SPIKES)
-				||  (item->objectNumber == ID_DARTS)
-				//||  (item->objectNumber == ID_TEETH_TRAP)
-				//|| ((item->objectNumber == BLADE)
-				&&  (item->currentAnimState != 1))			// STOP
-				//|| ((item->objectNumber == ICICLES)
-				&&  (item->currentAnimState != 3))			// LAND
+				if (object->collision 
+					&& (item->objectNumber == ID_TEETH_SPIKES
+						|| item->objectNumber == ID_DARTS
+							&& item->currentAnimState != 1)			// STOP
+						/*|| ((item->objectNumber == ICICLES)
+							&& (item->currentAnimState != 3)))*/)			// LAND
 				{
-					int x, y, z;
+					int x = v->pos.xPos - item->pos.xPos;
+					int y = v->pos.yPos - item->pos.yPos;
+					int z = v->pos.zPos - item->pos.zPos;
 
-					x = kayak->pos.xPos - item->pos.xPos;
-					y = kayak->pos.yPos - item->pos.yPos;
-					z = kayak->pos.zPos - item->pos.zPos;
-
-					if ((x > -TARGET_DIST)
-					&&  (x < TARGET_DIST)
-					&&  (z > -TARGET_DIST)
-					&&  (z < TARGET_DIST)
-					&&  (y > -TARGET_DIST)
-					&&  (y < TARGET_DIST))
+					if ((x > -2048)
+						&& (x < 2048)
+						&& (z > -2048)
+						&& (z < 2048)
+						&& (y > -2048)
+						&& (y < 2048))
 					{
-						if (TestBoundsCollide(item, kayak, KAYAK_TO_BADDIE_RADIUS))
+						if (TestBoundsCollide(item, v, KAYAK_TO_BADDIE_RADIUS))
 						{
-							DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE, LaraItem->pos.zPos, kayak->speed, kayak->pos.yRot, LaraItem->roomNumber, 3);
+							DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE, LaraItem->pos.zPos, v->speed, v->pos.yRot, LaraItem->roomNumber, 3);
 							LaraItem->hitPoints -= 5;
 						}
 					}
 				}
 			}
-			item_num = nex;
+			itemNum = nex;
 		}
 	}
-
-#undef TARGET_DIST
 }
 
-static void LaraRapidsDrown()
+void KayakLaraRapidsDrown()
 {
-	ITEM_INFO* l = LaraItem;
+	/*ITEM_INFO* l = LaraItem;
 
-	l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 25;
+	l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_DROWN_A;
 	l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-	l->currentAnimState = 12;
-	l->goalAnimState = 12;
+	l->currentAnimState = EXTRA_RAPIDSDROWN;
+	l->goalAnimState = EXTRA_RAPIDSDROWN;
 	l->hitPoints = 0;
 	l->fallspeed = 0;
-	l->gravityStatus = false;
+	l->gravityStatus = 0;
 	l->speed = 0;
 
 	AnimateItem(l);
 
 	Lara.ExtraAnim = 1;
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_BUSY;
 	Lara.gunType = WEAPON_NONE;
-	Lara.hitDirection = -1;
+	Lara.hitDirection = -1;*/
 }
 
 void InitialiseKayak(short itemNumber)
 {
-	int i;
-	ITEM_INFO* v;
-	KAYAK_INFO* Kayak;
+	ITEM_INFO* v = &g_Level.Items[itemNumber];
 
-	v = &g_Level.Items[itemNumber];
-	Kayak = game_malloc<KAYAK_INFO>();
-	v->data = (void*)Kayak;
-	Kayak->Vel = 0;
-	Kayak->Rot = 0;
-	Kayak->Flags = 0;
-	Kayak->FallSpeedF = 0;
-	Kayak->FallSpeedL = 0;
-	Kayak->FallSpeedR = 0;
-	Kayak->OldPos = v->pos;
+	KAYAK_INFO* kayak = game_malloc<KAYAK_INFO>();
+	v->data = kayak;
+
+	kayak->Vel = kayak->Rot = kayak->Flags = 0;
+	kayak->FallSpeedF = kayak->FallSpeedL = kayak->FallSpeedR = 0;
+	kayak->OldPos = v->pos;
+
+	for (int i = 0; i < NUM_WAKE_SPRITES; i++)
+	{
+		WakePts[i][0].life = 0;
+		WakePts[i][1].life = 0;
+	}
 }
 
-void DrawKayak(ITEM_INFO* kayak)
+void KayakDraw(ITEM_INFO* v)
 {
-	kayak->pos.yPos += KAYAK_DRAW_SHIFT;
-	//DrawAnimatingItem(kayak);
-	kayak->pos.yPos -= KAYAK_DRAW_SHIFT;
+	/*v->pos.yPos += KAYAK_DRAW_SHIFT;
+
+	DrawAnimatingItem(v);
+
+	v->pos.yPos -= KAYAK_DRAW_SHIFT;
+
+	//S_DrawWakeFX(v);*/
 }
 
 void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
-	if ((l->hitPoints < 0) || (Lara.Vehicle != NO_ITEM))
+	if ((l->hitPoints < 0)
+		|| (Lara.Vehicle != NO_ITEM))
 		return;
 
-	if ((geton = GetInKayak(itemNumber, coll)))
+	if ((geton = KayakGetIn(itemNumber, coll)))
 	{
-		KAYAK_INFO* Kayak;
 		ITEM_INFO* v = &g_Level.Items[itemNumber];
 
 		Lara.Vehicle = itemNumber;
 
-		/* -------- throw flare away if using */
+		// throw flare away if using 
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			CreateFlare(ID_FLARE_ITEM, FALSE);
+			CreateFlare(ID_FLARE_ITEM, 0);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = 0;
 			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 
-		/* -------- initiate animation */
+		// initiate animation 
 		if (geton > 0)
-			l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 3;
+			l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_CLIMBIN_A;
 		else
-			l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 28;
+			l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_CLIMBINR_A;
 
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-		l->currentAnimState = l->goalAnimState = KS_CLIMBIN;
+		l->currentAnimState = l->goalAnimState = STATE_KAYAK_CLIMBIN;
 
-		Lara.waterStatus = LW_UNDERWATER;
+		Lara.waterStatus = LW_ABOVE_WATER;
 		l->pos.xPos = v->pos.xPos;
 		l->pos.yPos = v->pos.yPos;
 		l->pos.zPos = v->pos.zPos;
 		l->pos.yRot = v->pos.yRot;
 		l->pos.xRot = l->pos.zRot = 0;
-		l->gravityStatus = true;
+		l->gravityStatus = false;
 		l->speed = 0;
 		l->fallspeed = 0;
 
@@ -1231,9 +1353,9 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 		AnimateItem(l);
 
-		Kayak = (KAYAK_INFO*)v->data;
-		Kayak->Water = v->pos.yPos;
-		Kayak->Flags = 0;
+		KAYAK_INFO* kayak = (KAYAK_INFO*)v->data;
+		kayak->Water = v->pos.yPos;
+		kayak->Flags = 0;
 	}
 	else
 	{
@@ -1242,56 +1364,53 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int KayakControl(void)
+int KayakControl()
 {
-	int h;
-	KAYAK_INFO* Kayak;
-	ITEM_INFO* v, * l;
-	FLOOR_INFO* floor;
-	int ofs, water, lp;
-	short roomNumber;
-
-	l = LaraItem;
-	v = &g_Level.Items[Lara.Vehicle];
-	Kayak = (KAYAK_INFO*)v->data;
+	ITEM_INFO* l = LaraItem;
+	ITEM_INFO* v = &g_Level.Items[Lara.Vehicle];
+	KAYAK_INFO*  kayak = (KAYAK_INFO*)v->data;
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	/* -------- update dynamics */
-	ofs = v->fallspeed;
-	KayakUserInput(v, l, Kayak);
-	KayakToBackground(v, Kayak);
+	// update dynamics 
+	int ofs = v->fallspeed;
 
-	/* -------- determine water level */
-	roomNumber = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
-	h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
+	KayakUserInput(v, l, kayak);
+
+	KayakToBackground(v, kayak);
+
+	// determine water level 
+	short roomNumber = v->roomNumber;
+	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
+	int h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 	TestTriggers(TriggerIndex, 0, 0);
 
-	Kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
-	if (water == NO_HEIGHT)
+	int water;
+	if ((kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber)) == NO_HEIGHT)
 	{
-		Kayak->Water = water = h;
-		Kayak->TrueWater = 0;
+		kayak->Water = water = h;
+		kayak->TrueWater = 0;
 	}
 	else
 	{
-		Kayak->Water -= 5;
-		Kayak->TrueWater = 1;
+		kayak->Water -= 5;
+		kayak->TrueWater = 1;
 	}
 
 
-	if (((ofs - v->fallspeed) > 128) && (v->fallspeed == 0) && (water != NO_HEIGHT))
+	if (((ofs - v->fallspeed) > 128)
+		&& (v->fallspeed == 0)
+		&& (water != NO_HEIGHT))
 	{
-		long damage;
+		int damage;
 		if ((damage = (ofs - v->fallspeed)) > 160)
 			l->hitPoints -= (damage - 160) << 3;
 
 		KayakSplash(v, ofs - v->fallspeed, water);
 	}
 
-	/* -------- move Lara to Kayak pos */
+	// move Lara to Kayak pos 
 	if (Lara.Vehicle != NO_ITEM)
 	{
 		if (v->roomNumber != roomNumber)
@@ -1307,59 +1426,65 @@ int KayakControl(void)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot >> 1;
 
-		/* -------- animate Lara then Kayak */
+		// animate Lara then Kayak */
+
 		AnimateItem(l);
 
 		v->animNumber = Objects[ID_KAYAK].animIndex + (l->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
-		
+
 		Camera.targetElevation = -ANGLE(30);
 		Camera.targetDistance = WALL_SIZE * 2;
 	}
 
-	/* -------- process effects */
-	/*
-	if ((!(Wibble & 15)) && (Kayak->TrueWater))
+	// process effects 
+	if ((!(Wibble & 15)) && (kayak->TrueWater))
 	{
-		DoWake(v, -128, 0, 0);
-		DoWake(v, 128, 0, 1);
+		KayakDoWake(v, -128, 0, 0);
+		KayakDoWake(v, 128, 0, 1);
 	}
 
-	if ((wibble & 7))
+
+	if ((Wibble & 7))
 	{
-		if ((!Kayak->TrueWater) && (v->fallspeed < 20))
+		if ((!kayak->TrueWater) && (v->fallspeed < 20))
 		{
 			PHD_VECTOR dest;
-			static char cnt = 0;
-			static short MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
-			//			static sint16 MistXPos[10] = { 32,  64,  128, 192, 256, 480, 480, 350,  256,  64};
-			static short MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };
+			char cnt = 0;
+			short MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
+			short MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };
 
 			cnt ^= 1;
 
-			for (lp = cnt; lp < 10; lp += 2)
+			for (int i = cnt; i < 10; i += 2)
 			{
 				//dest.x = (GetRandomControl()%MistXPos[lp]) - (MistXPos[lp]>>1);
 				if (GetRandomControl() & 1)
-					dest.x = (MistXPos[lp] >> 1);
+					dest.x = (MistXPos[i] >> 1);
 				else
-					dest.x = -(MistXPos[lp] >> 1);
+					dest.x = -(MistXPos[i] >> 1);
 				dest.y = 50;
-				dest.z = MistZPos[lp];
-
-				phd_PushUnitMatrix();
-				phd_RotYXZ(v->pos.y_rot, v->pos.x_rot, v->pos.z_rot);
-				dest.x = v->pos.x_pos + ((*(mptr + M00) * dest.x + *(mptr + M01) * dest.y + *(mptr + M02) * dest.z) >> W2V_SHIFT);
-				dest.y = v->pos.y_pos + ((*(mptr + M10) * dest.x + *(mptr + M11) * dest.y + *(mptr + M12) * dest.z) >> W2V_SHIFT);
-				dest.z = v->pos.z_pos + ((*(mptr + M20) * dest.x + *(mptr + M21) * dest.y + *(mptr + M22) * dest.z) >> W2V_SHIFT);
-				TriggerRapidsMist(dest.x, dest.y, dest.z);
-				phd_PopMatrix();
+				dest.z = MistZPos[i];
 			}
 
 		}
 	}
-	*/
+	if ((v->speed == 0)
+		&& (!Lara.currentXvel)
+		&& (!Lara.currentZvel))
+	{
+		if (WakeShade)
+			WakeShade--;
+	}
+	else
+	{
+		if (WakeShade < 16)
+			WakeShade++;
+	}
+
+	KayakUpdateWakeFX();
 
 	KayakToBaddieCollision(v);
+
 	return (Lara.Vehicle != NO_ITEM) ? 1 : 0;
 }
