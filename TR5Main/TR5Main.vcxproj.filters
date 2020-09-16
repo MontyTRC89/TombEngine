@@ -915,9 +915,6 @@
     <ClInclude Include="Objects\TR3\Vehicles\biggun.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\floordata.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\particle\SimpleParticle.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1682,15 +1679,11 @@
     <ClCompile Include="Objects\TR3\Vehicles\biggun.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\floordata.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\particle\SimpleParticle.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\DX11\Test.fx" />
     <None Include="Shaders\DX11_Test.fx" />
     <None Include="RuleSet.ruleset" />
@@ -1730,6 +1723,7 @@
     <None Include="Shaders\Transparent.fx" />
     <None Include="Resources.aps" />
     <None Include="Shaders\VertexInput.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

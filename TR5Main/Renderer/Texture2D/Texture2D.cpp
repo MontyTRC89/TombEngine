@@ -1,8 +1,12 @@
 #include "framework.h"
 #include "Texture2D.h"
 #include "Utils.h"
+#include <WICTextureLoader.h>
+using namespace DirectX;
+
 namespace T5M::Renderer {
 	using Utils::throwIfFailed;
+	constexpr static auto LOADER_FLAGS = WIC_LOADER_FORCE_RGBA32;
 	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data) {
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = w;
@@ -32,19 +36,20 @@ namespace T5M::Renderer {
 	}
 
 	Texture2D::Texture2D(ID3D11Device* device, const std::wstring& fileName) {
+		
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = NULL;
 		device->GetImmediateContext(&context);
 
-		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
+		throwIfFailed(CreateWICTextureFromFileEx(device, context, fileName.c_str(), (size_t)0,D3D11_USAGE_DEFAULT,D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET,0x0,0x0,LOADER_FLAGS, resource.GetAddressOf(), ShaderResourceView.GetAddressOf()));
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length) {
-
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
-		throwIfFailed(CreateWICTextureFromMemory(device, context, data, length, resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
+		//throwIfFailed(CreateWICTextureFromMemory(device, context, data,length, resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
+		throwIfFailed(CreateWICTextureFromMemoryEx(device, data, length, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET, 0x0, 0x0, LOADER_FLAGS, resource.GetAddressOf(), ShaderResourceView.GetAddressOf()));
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 }
