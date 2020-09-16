@@ -1,6 +1,19 @@
 #pragma once
 #include "phd_global.h"
 
+struct VectorInt2
+{
+	int x;
+	int y;
+};
+
+struct VectorInt3
+{
+	int x;
+	int y;
+	int z;
+};
+
 constexpr auto PI = 3.14159265358979323846f;
 constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
