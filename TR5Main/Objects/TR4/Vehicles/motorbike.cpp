@@ -458,63 +458,94 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
     }
 }
 
+static void QuadbikeExplode(ITEM_INFO* item)
+{
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	{
+		TriggerUnderwaterExplosion(item, 1);
+	}
+	else
+	{
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
+		for (int i = 0; i < 3; i++)
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
+	}
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, 160, 60, 60, 64, ANGLE(45), 0);
+	ExplodingDeath(Lara.Vehicle, 0xfffffffe, 1);
+	//	KillItem(Lara.Vehicle);
+	item->status = ITEM_DEACTIVATED;
+
+	SoundEffect(SFX_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_EXPLOSION2, NULL, 0);
+
+	Lara.Vehicle = NO_ITEM;
+}
+
 static void MotorBikeExplode(ITEM_INFO* item)
 {
-    if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
-    {
-        TriggerUnderwaterExplosion(item, 1);
-    }
-    else
-    {
-        TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
-        for (int i = 0; i < 2; i++)
-            TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
-    }
+	if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
+	{
+		TriggerUnderwaterExplosion(item, 1);
+	}
+	else
+	{
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
+		for (int i = 0; i < 3; i++)
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
+	}
 
-    ExplodingDeath(Lara.Vehicle, -2, 256);
-    ExplodingDeath(Lara.itemNumber, -2, 258); // enable blood
-    LaraItem->hitPoints = 0;
-    KillItem(Lara.Vehicle);
-    item->status = ITEM_INVISIBLE;
-    SoundEffect(SFX_EXPLOSION1, nullptr, NULL);
-    SoundEffect(SFX_EXPLOSION2, nullptr, NULL);
-    Lara.Vehicle = NO_ITEM;
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, frandMinMax(160, 200), 60, 60, 64, frandMinMax(0, 359), 0);
+	ExplodingDeath(Lara.Vehicle, -2, 256);
+	ExplodingDeath(Lara.itemNumber, -2, 258); // enable blood
+	LaraItem->hitPoints = 0;
+//	KillItem(Lara.Vehicle);
+	item->status = ITEM_DEACTIVATED;
+
+	SoundEffect(SFX_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_EXPLOSION2, NULL, 0);
+
+	Lara.Vehicle = NO_ITEM;
 }
 
 static int MotorBikeCheckGetOff(void)
 {
     ITEM_INFO* item;
 
-    item = &g_Level.Items[Lara.Vehicle];
-    if (LaraItem->currentAnimState == BIKE_EXIT && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
-    {
-        LaraItem->pos.yRot -= 0x4000;
-        LaraItem->animNumber = LA_STAND_SOLID;
-        LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-        LaraItem->goalAnimState = LS_STOP;
-        LaraItem->currentAnimState = LS_STOP;
-        LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-        LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
-        LaraItem->pos.xRot = 0;
-        LaraItem->pos.zRot = 0;
-        Lara.Vehicle = NO_ITEM;
-        Lara.gunStatus = LG_NO_ARMS;
-        DashTimer = 120;
-        return true;
-    }
+	if (Lara.Vehicle != NO_ITEM)
+	{
+		item = &g_Level.Items[Lara.Vehicle];
+		if (LaraItem->currentAnimState == BIKE_EXIT && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
+		{
+			LaraItem->pos.yRot -= 0x4000;
+			LaraItem->animNumber = LA_STAND_SOLID;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+			LaraItem->goalAnimState = LS_STOP;
+			LaraItem->currentAnimState = LS_STOP;
+			LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xRot = 0;
+			LaraItem->pos.zRot = 0;
+			Lara.Vehicle = NO_ITEM;
+			Lara.gunStatus = LG_NO_ARMS;
+			DashTimer = 120;
+			return true;
+		}
 
-    if (LaraItem->frameNumber != g_Level.Anims[LaraItem->animNumber].frameEnd)
-        return true;
+		if (LaraItem->frameNumber != g_Level.Anims[LaraItem->animNumber].frameEnd)
+			return true;
 
-    // exit when falling
-    // if (LaraItem->state_current == BIKE_EMPTY6) {
+		// exit when falling
+		// if (LaraItem->state_current == BIKE_EMPTY6) {
 
-    // }
-    // else if (LaraItem->state_current == BIKE_EMPTY5) {
-    // lara death when falling too much
-    // }
+		// }
+		// else if (LaraItem->state_current == BIKE_EMPTY5) {
+		// lara death when falling too much
+		// }
 
-    return false;
+		return false;
+	}
+	else
+		return false;
 }
 
 static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
