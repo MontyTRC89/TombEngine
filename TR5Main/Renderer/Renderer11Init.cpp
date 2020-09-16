@@ -138,11 +138,10 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_lightsToDraw = vector<RendererLight*>(MAX_LIGHTS_DRAW);
 	m_dynamicLights = vector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
 	m_staticsToDraw = vector<RendererStatic*>(MAX_DRAW_STATICS);
-	m_spritesToDraw = vector<RendererSpriteToDraw*>(MAX_SPRITES);
+	m_spritesToDraw = vector<RendererSpriteToDraw>(MAX_SPRITES);
 	m_lines3DToDraw = vector<RendererLine3D*>(MAX_LINES_3D);
 	m_lines2DToDraw = vector<RendererLine2D*>(MAX_LINES_2D);
 	m_tempItemLights = vector<RendererLight*>(MAX_LIGHTS);
-	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
 	m_pickupRotation = 0;
