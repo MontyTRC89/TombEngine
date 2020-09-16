@@ -10,6 +10,7 @@
 #include "input.h"
 #include "sound.h"
 #include <Game\effect2.h>
+#include <Game\particle\SimpleParticle.h>
 
 struct BOAT_INFO
 {
@@ -80,6 +81,8 @@ enum BOAT_STATE
 
 void DoBoatWakeEffect(ITEM_INFO* boat)
 {
+	T5M::Effects::TriggerSpeedboatFoam(boat);
+	/*int c = phd_cos(boat->pos.yRot);
 	int s = phd_sin(boat->pos.yRot);
 	int c = phd_cos(boat->pos.yRot);
 	
@@ -147,7 +150,7 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 4;
 		spark->dSize = 2 * spark->size;
 		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
-	}
+	}*/
 }
 
 void SpeedBoatGetOff(ITEM_INFO* boat)
