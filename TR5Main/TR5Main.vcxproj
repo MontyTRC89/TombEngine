@@ -133,6 +133,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\drip.h" />
     <ClInclude Include="Game\explosion.h" />
+    <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
@@ -437,6 +438,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\chaffFX.cpp" />
     <ClCompile Include="Game\drip.cpp" />
     <ClCompile Include="Game\explosion.cpp" />
+    <ClCompile Include="Game\floordata.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
