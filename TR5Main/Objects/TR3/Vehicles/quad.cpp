@@ -150,8 +150,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
-	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, 160, 60, 60, 64, ANGLE(45), 0);
-	ExplodingDeath(Lara.Vehicle, 0xfffffffe, 1);
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, frandMinMax(160, 200), 60, 60, 64, frandMinMax(0, 359), 0);
 //	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
