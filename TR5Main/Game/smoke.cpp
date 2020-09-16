@@ -6,6 +6,7 @@
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
+#include <algorithm>
 namespace T5M {
 	namespace Effects {
 		namespace Smoke {
@@ -42,11 +43,13 @@ namespace T5M {
 							s.position.z += SmokeWindZ / 2;
 						}
 					}
-					float normalizedLife = s.age / s.life;
+					float normalizedLife = std::clamp(s.age / s.life,0.0f,1.0f);
 					s.size = lerp(s.sourceSize, s.destinationSize, normalizedLife);
 					s.angularVelocity *= s.angularDrag;
 					s.rotation += s.angularVelocity;
 					s.color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
+					int numSprites = -Objects[ID_SMOKE_SPRITES].nmeshes;
+					s.sprite = lerp(0, numSprites - 1, normalizedLife);
 				}
 			}
 
@@ -64,16 +67,14 @@ namespace T5M {
 				s.gravity = -0.2f;
 				s.friction = frandMinMax(0.7f, 0.85f);
 				s.sourceColor = Vector4(1, 131 / 255.0f, 100 / 255.0f, 1);
-				s.destinationColor = Vector4(0, 0, 0, 0);
+				s.destinationColor = Vector4(1, 1, 1, 0);
 				s.life = frandMinMax(25, 35);
 				s.angularVelocity = frandMinMax(-0.3f, 0.3f);
-				s.angularDrag = 0.98f;
+				s.angularDrag = 0.97f;
 				s.sourceSize = age > 4 ? frandMinMax(16, 24) : frandMinMax(100, 128);
 				s.destinationSize = age > 4 ? frandMinMax(160, 200) : frandMinMax(256, 300);
 				s.affectedByWind = true;
 				s.active = true;
-				int numSprites = -Objects[ID_SMOKE_SPRITES].nmeshes;
-				s.sprite = lerp(0, numSprites - 1, s.age / s.life);
 				s.room = room;
 			}
 			//TODO: add additional "Weapon Special" param or something. Currently initial == 2 means Rocket Launcher backwards smoke.
