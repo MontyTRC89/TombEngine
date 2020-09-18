@@ -1959,7 +1959,7 @@ namespace T5M::Renderer
         // Draw shadow map
 
         // Reset GPU state
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
         m_context->RSSetState(m_states->CullCounterClockwise());
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
@@ -1972,7 +1972,7 @@ namespace T5M::Renderer
         m_context->RSSetViewports(1, &view.viewport);
 
         // Opaque geometry
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
@@ -1997,7 +1997,7 @@ namespace T5M::Renderer
 		drawLittleBeetles();
 
         // Transparent geometry
-        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
         drawRooms(true, false, view);

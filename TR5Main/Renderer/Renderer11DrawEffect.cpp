@@ -761,7 +761,7 @@ namespace T5M::Renderer {
 				currentBlendMode = spr.BlendMode;
 				switch(currentBlendMode){
 					case BLENDMODE_ALPHABLEND:
-						m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
+						m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
 
 						break;
 					case BLENDMODE_ALPHATEST:
