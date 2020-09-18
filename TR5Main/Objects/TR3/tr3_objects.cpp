@@ -389,7 +389,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseKayak;
 		obj->collision = KayakCollision;
-		//obj->drawRoutine = DrawKayak;
+		//obj->drawRoutine = KayakDraw;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
