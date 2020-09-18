@@ -15,6 +15,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "kayak.h"
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -296,9 +297,14 @@ void LavaBurn(ITEM_INFO* item)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, 32000, item->pos.zPos, &roomNumber);
 		if (item->floor == GetFloorHeight(floor, item->pos.xPos, 32000, item->pos.zPos))
 		{
-			item->hitPoints = -1;
-			item->hitStatus = true;
-			LaraBurn();
+			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-
+				KayakLaraRapidsDrown();
+			else
+			{
+				item->hitPoints = -1;
+				item->hitStatus = true;
+				LaraBurn();
+			}
 		}
 	}
 }

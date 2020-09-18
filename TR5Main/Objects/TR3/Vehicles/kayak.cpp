@@ -1258,12 +1258,12 @@ void KayakToBaddieCollision(ITEM_INFO* v)
 
 void KayakLaraRapidsDrown()
 {
-	/*ITEM_INFO* l = LaraItem;
+	ITEM_INFO* l = LaraItem;
 
 	l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_DROWN_A;
 	l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-	l->currentAnimState = EXTRA_RAPIDSDROWN;
-	l->goalAnimState = EXTRA_RAPIDSDROWN;
+	l->currentAnimState = 12;
+	l->goalAnimState = 12;
 	l->hitPoints = 0;
 	l->fallspeed = 0;
 	l->gravityStatus = 0;
@@ -1274,7 +1274,7 @@ void KayakLaraRapidsDrown()
 	Lara.ExtraAnim = 1;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	Lara.gunType = WEAPON_NONE;
-	Lara.hitDirection = -1;*/
+	Lara.hitDirection = -1;
 }
 
 void InitialiseKayak(short itemNumber)
