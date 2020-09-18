@@ -39,4 +39,3 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void InitialiseKayak(short itemNumber);
 void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 int KayakControl(void);
-void DrawKayak(ITEM_INFO* kayak);
