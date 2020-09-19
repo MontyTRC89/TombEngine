@@ -25,10 +25,10 @@ public:
 	int Room;
 
 	static VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
-	static FLOOR_INFO& GetFloor(int roomNumber, VectorInt2 pos);
-	static FLOOR_INFO& GetFloor(int roomNumber, int x, int z);
-	static FLOOR_INFO& GetBottomFloor(int startRoomNumber, int x, int z, bool first = false);
-	static FLOOR_INFO& GetTopFloor(int startRoomNumber, int x, int z, bool first = false);
+	static FLOOR_INFO* GetFloor(int roomNumber, VectorInt2 pos);
+	static FLOOR_INFO* GetFloor(int roomNumber, int x, int z);
+	static FLOOR_INFO* GetBottomFloor(int startRoomNumber, int x, int z, bool first = false);
+	static FLOOR_INFO* GetTopFloor(int startRoomNumber, int x, int z, bool first = false);
 	static FLOOR_INFO* GetNearBottomFloor(int startRoomNumber, int x, int z);
 	static FLOOR_INFO* GetNearTopFloor(int startRoomNumber, int x, int z);
 	static int GetRoom(int startRoomNumber, int x, int y, int z);
