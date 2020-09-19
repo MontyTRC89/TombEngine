@@ -1577,10 +1577,11 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	return floor;
 #endif
 
-	auto floor = FLOOR_INFO::GetFloor(x, z, *roomNumber);
-	floor.Room = *roomNumber;
-	*roomNumber = FLOOR_INFO::GetRoom(x, y, z, *roomNumber);
-	return &floor;
+	auto floor = FLOOR_INFO::GetNearBottomFloor(*roomNumber, x, z);
+	if (!floor)
+		floor = FLOOR_INFO::GetFloor(*roomNumber, x, z);
+	*roomNumber = FLOOR_INFO::GetRoom(*roomNumber, x, y, z);
+	return floor;
 }
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
