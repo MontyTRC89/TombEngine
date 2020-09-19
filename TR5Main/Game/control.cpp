@@ -1491,6 +1491,7 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 
 FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 {
+#if 0
 	ROOM_INFO *r;
 	FLOOR_INFO *floor;
 	short data;
@@ -1574,6 +1575,12 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	}
 
 	return floor;
+#endif
+
+	auto floor = FLOOR_INFO::GetFloor(x, z, *roomNumber);
+	floor.Room = *roomNumber;
+	*roomNumber = FLOOR_INFO::GetRoom(x, y, z, *roomNumber);
+	return &floor;
 }
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
@@ -1641,6 +1648,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
+#if 0
 	TiltYOffset = 0;
 	TiltXOffset = 0;
 	OnObject = 0;
@@ -1847,6 +1855,9 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	} while (!(type & END_BIT));
 
 	return height;
+#endif
+
+	return FLOOR_INFO::GetFloorHeight(floor->Room, x, z).value_or(NO_HEIGHT);
 }
 
 int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
@@ -2472,6 +2483,7 @@ void SeedRandomDraw(int seed) // (F) (D)
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 {
+#if 0
 	ROOM_INFO *room;
 	FLOOR_INFO *floor2;
 	int ceiling, t0, t1, t2, t3, dx, dz, xOff, yOff;
@@ -2652,6 +2664,9 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 		}
 	}
 	return ceiling;
+#endif
+
+	return FLOOR_INFO::GetCeilingHeight(floor->Room, x, z).value_or(NO_HEIGHT);
 }
 
 int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)

@@ -22,6 +22,7 @@ public:
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
 	int WallPortal;
+	int Room;
 
 	static VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
 	static FLOOR_INFO& GetFloor(int roomNumber, VectorInt2 pos);
