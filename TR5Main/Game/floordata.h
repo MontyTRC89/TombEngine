@@ -32,8 +32,8 @@ public:
 	static FLOOR_INFO* GetNearTopFloor(int startRoomNumber, int x, int z);
 	static int GetRoom(int startRoomNumber, int x, int y, int z);
 	static VectorInt2 GetSectorPoint(int x, int z);
-	static std::optional<int> GetFloorHeight(int startRoomNumber, int x, int y, int z);
-	static std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int y, int z);
+	static std::optional<int> GetFloorHeight(int startRoomNumber, int x, int z);
+	static std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int z);
 
 	int SectorPlane(int x, int z);
 	std::optional<int> RoomBelow(int plane);
