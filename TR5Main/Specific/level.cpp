@@ -591,6 +591,7 @@ void ReadRooms()
 			floor.CeilingCollision.Planes[1].y = ReadFloat();
 			floor.CeilingCollision.Planes[1].z = ReadFloat();
 			floor.WallPortal = ReadInt32();
+			floor.Room = i;
 
 			room.floor.push_back(floor);
 		}
