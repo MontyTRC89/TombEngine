@@ -152,13 +152,13 @@ VectorInt2 FLOOR_INFO::GetSectorPoint(int x, int z)
 	return VectorInt2{xPoint, yPoint};
 }
 
-std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int y, int z)
+std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int z)
 {
 	auto floor = GetNearBottomFloor(startRoomNumber, x, z);
 	return floor ? std::optional<int>{floor->FloorHeight(x, z)} : std::nullopt;
 }
 
-std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int y, int z)
+std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int z)
 {
 	auto floor = GetNearTopFloor(startRoomNumber, x, z);
 	return floor ? std::optional<int>{floor->CeilingHeight(x, z)} : std::nullopt;
