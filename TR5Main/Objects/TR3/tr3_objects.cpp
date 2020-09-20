@@ -19,7 +19,7 @@
 /// objects
 
 /// traps
-
+#include "train.h"
 /// switch
 
 /// vehicles
@@ -352,12 +352,20 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 static void StartObject(OBJECT_INFO* obj)
 {
-	
+
 }
 
 static void StartTrap(OBJECT_INFO* obj)
 {
-	
+	obj = &Objects[ID_TRAIN];
+	if (obj->loaded)
+	{
+		obj->control = TrainControl;
+		obj->collision = TrainCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 }
 
 static void StartVehicles(OBJECT_INFO* obj)
