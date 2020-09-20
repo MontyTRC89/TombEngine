@@ -38,6 +38,7 @@
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <VertexTypes.h>
+#include <WICTextureLoader.h>
 #include <zlib.h>
 #include "bass.h"
 #include "bass_fx.h"
