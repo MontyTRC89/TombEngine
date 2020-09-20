@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "items.h"
 #include "floordata.h"
 #include "control.h"
