@@ -115,30 +115,20 @@ FLOOR_INFO* FLOOR_INFO::GetNearTopFloor(int startRoomNumber, int x, int z)
 
 int FLOOR_INFO::GetRoom(int startRoomNumber, int x, int y, int z)
 {
-	auto roomNumber = startRoomNumber;
-	auto pos = GetRoomPosition(roomNumber, x, z);
-	auto room = &g_Level.Rooms[roomNumber];
-	auto floor = GetFloor(roomNumber, pos);
+	auto roomNumber = GetFloor(startRoomNumber, x, z)->RoomSide().value_or(startRoomNumber);
+	auto floor = GetFloor(roomNumber, x, z);
+	auto plane = floor->SectorPlane(x, z);
 
-	if (pos.x > 0 && pos.y > 0 && pos.x < room->xSize - 1 && pos.y < room->ySize - 1)
+	if (!floor->IsWall(plane))
 	{
-		auto plane = floor->SectorPlane(x, z);
-
-		if (!floor->IsWall(plane))
+		if (y > floor->FloorHeight(x, z))
 		{
-			if (y > floor->FloorHeight(x, z))
-			{
-				roomNumber = floor->RoomBelow(plane).value_or(roomNumber);
-			}
-			else if (y < floor->CeilingHeight(x, z))
-			{
-				roomNumber = floor->RoomAbove(plane).value_or(roomNumber);
-			}
+			roomNumber = floor->RoomBelow(plane).value_or(roomNumber);
 		}
-	}
-	else
-	{
-		roomNumber = floor->RoomSide().value_or(roomNumber);
+		else if (y < floor->CeilingHeight(x, z))
+		{
+			roomNumber = floor->RoomAbove(plane).value_or(roomNumber);
+		}
 	}
 
 	return roomNumber;
