@@ -279,13 +279,13 @@ void UpdateRats()
 					{
 						if (!(GetRandomControl() & 0xF))
 						{
-							SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2);
+							SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2,Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_RIPPLES);
 						}
 					}
 					else
 					{
 						AddWaterSparks(rat->pos.xPos, r->maxceiling, rat->pos.zPos, 16);
-						SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2);
+						SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 						SoundEffect(SFX_RATSPLASH, &rat->pos, 0);
 					}
 				}

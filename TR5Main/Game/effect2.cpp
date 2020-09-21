@@ -1002,7 +1002,7 @@ void UpdateSplashes()
 	}
 }
 
-void SetupRipple(int x, int y, int z, char size, char flags)
+void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID, float rotation)
 {
 	RIPPLE_STRUCT* ripple;
 	int i;
@@ -1014,6 +1014,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			ripple->active = true;
 			ripple->size = size;
 			ripple->lifeTime = 0;
+			ripple->SpriteID = spriteID;
 			if (flags & RIPPLE_FLAG_SHORT_LIFE) {
 				ripple->life = (rand() & 16) + 16;
 
@@ -1023,15 +1024,15 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			}
 			ripple->worldPos = { (float)x,(float)y,(float)z };
 			ripple->currentColor = Vector4(0, 0, 0, 0);
+			ripple->rotation = rotation;
+
 			if (flags & RIPPLE_FLAG_BLOOD ) {
-				ripple->SpriteID = SPR_FIRE1;
 				ripple->initialColor = Vector4(1, 0, 0, 1);
 				ripple->lifeRate = 0.9f;
 				ripple->sizeRate = 8.0f;
 				ripple->isBillboard = true;
 			}
 			else {
-				ripple->SpriteID = SPR_RIPPLES;
 				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
@@ -1046,10 +1047,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			}
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
-				ripple->rotation = frandMinMax(-PI, PI);
-			}
-			else {
-				ripple->rotation = 0;
+				ripple->rotation += frandMinMax(-PI, PI);
 			}
 			break;
 		}
@@ -1058,7 +1056,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT);
+	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1256,11 +1254,11 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 							{
 								if (item->currentAnimState == LS_STOP)
 								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
+									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 								}
 								else
 								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
+									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 								}
 							}
 						}
