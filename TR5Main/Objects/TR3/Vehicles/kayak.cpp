@@ -184,7 +184,7 @@ void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff)
 
 	if (GetWaterHeight(x, v->pos.yPos, z, roomNumber) != NO_HEIGHT)
 	{
-		SetupRipple(x, v->pos.yPos, z, -2 - (GetRandomControl() & 1), 0);
+		SetupRipple(x, v->pos.yPos, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(v->pos.yRot));
 	}
 }
 

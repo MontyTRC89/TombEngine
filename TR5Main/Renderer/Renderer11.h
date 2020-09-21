@@ -459,11 +459,10 @@ namespace T5M::Renderer
 		std::vector<RendererStatic*> m_staticsToDraw;
 		std::vector<RendererLight*> m_lightsToDraw;
 		std::vector<RendererLight*> m_dynamicLights;
-		std::vector<RendererSpriteToDraw*> m_spritesToDraw;
+		std::vector<RendererSpriteToDraw> m_spritesToDraw;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
 		std::vector<RendererLight*> m_tempItemLights;
-		RendererSpriteToDraw* m_spritesBuffer;
 		int m_nextSprite;
 		RendererLine3D* m_lines3DBuffer;
 		int m_nextLine3D;

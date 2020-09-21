@@ -201,8 +201,6 @@ namespace T5M::Renderer {
 		if (m_nextSprite >= MAX_SPRITES)
 			return;
 
-		scale = 1.0f;
-
 		width *= scale;
 		height *= scale;
 
@@ -397,9 +395,9 @@ namespace T5M::Renderer {
 			if (ripple->active) {
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) {
-					addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ADDITIVE);
+					addSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ADDITIVE);
 				} else {
-					addSpriteBillboardConstrainedLookAt(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ADDITIVE, Vector3(0,-1,0));
+					addSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ADDITIVE, Vector3(0,-1,0));
 					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				}
 			}
@@ -782,7 +780,7 @@ namespace T5M::Renderer {
 			m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
 			ID3D11SamplerState* sampler = m_states->LinearClamp();
 			m_context->PSSetSamplers(0, 1, &sampler);
-			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, 1);
+			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
 				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
@@ -795,14 +793,14 @@ namespace T5M::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
 				billboardMatrix = scale*rotation * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
-					NULL,
+					nullptr,
 					&quadForward);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
@@ -812,7 +810,7 @@ namespace T5M::Renderer {
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
 				Matrix translation = Matrix::CreateTranslation(spr.pos);
-				Matrix rotation = Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
 
 				billboardMatrix = scale * rotation * translation;
 				m_stSprite.billboardMatrix = billboardMatrix;
@@ -1219,7 +1217,7 @@ namespace T5M::Renderer {
 		using namespace T5M::Effects;
 		for(SimpleParticle& s : simpleParticles){
 			if(!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1,1,1,1), 0, 1.0f, s.size, s.size/2, BLENDMODE_ALPHATEST);
+			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1,1,1,1), 0, 1.0f, s.size, s.size/2, BLENDMODE_ALPHABLEND);
 		}
 	}
 }

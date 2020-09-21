@@ -81,6 +81,7 @@ enum BOAT_STATE
 
 void DoBoatWakeEffect(ITEM_INFO* boat)
 {
+	SetupRipple(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(boat->pos.yRot));
 	T5M::Effects::TriggerSpeedboatFoam(boat);
 	/*int c = phd_cos(boat->pos.yRot);
 	int s = phd_sin(boat->pos.yRot);
