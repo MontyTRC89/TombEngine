@@ -7,6 +7,7 @@
 #include "room.h"
 #include "trmath.h"
 #include "effect2.h"
+#include "setup.h"
 namespace T5M {
 	namespace Effects {
 		namespace Drip {
@@ -40,7 +41,7 @@ namespace T5M {
 					}
 					if (d.pos.y > wh) {
 						d.active = false;
-						SetupRipple(d.pos.x, wh, d.pos.z, frandMinMax(16,24), RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY);
+						SetupRipple(d.pos.x, wh, d.pos.z, frandMinMax(16,24), RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 					}
 
 				}

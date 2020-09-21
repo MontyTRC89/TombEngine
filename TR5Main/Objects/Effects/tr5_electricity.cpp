@@ -230,7 +230,7 @@ void ElectricityWiresControl(short itemNumber)
 		{
 			if (counter == j)
 			{
-				SetupRipple(pos.x, r->maxceiling, pos.z, (GetRandomControl() & 7) + 32, 16);
+				SetupRipple(pos.x, r->maxceiling, pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 			}
 
 			water = true;

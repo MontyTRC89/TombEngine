@@ -200,7 +200,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
-void SetupRipple(int x, int y, int z, char size, char flags);
+void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID,float rotation = 0);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
 void TriggerWaterfallMist(int x, int y, int z, int angle);
 void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit);

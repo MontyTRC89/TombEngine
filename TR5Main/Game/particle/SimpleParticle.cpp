@@ -36,22 +36,25 @@ namespace T5M::Effects{
 
 	void TriggerSpeedboatFoam(ITEM_INFO* boat)
 	{
-		float angle = TO_RAD(boat->pos.yRot);
-		const float angleVariation = frandMinMax(-10, 10) * RADIAN;
-		float x = std::sin(angle + angleVariation);
-		float z = std::cos(angle + angleVariation);
-		x = x * -700 + boat->pos.xPos;
-		z = z * -700 + boat->pos.zPos;
-		SimpleParticle& p = getFreeSimpleParticle();
-		p = {};
-		p.active = true;
-		p.life = frandMinMax(8, 14);
-		p.room = boat->roomNumber;
-		p.ageRate = frandMinMax(0.9, 1.3);
-		float size = frandMinMax(96, 128);
-		p.worldPosition = {x,float(boat->pos.yPos) - size / 2,z};
-		p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
-		p.size = frandMinMax(256, 512);
+		for (float i = -0.5;i < 1; i+=1) {
+			float angle = TO_RAD(boat->pos.yRot);
+			float angleVariation = i*2*10 * RADIAN;
+			float x = std::sin(angle + angleVariation);
+			float z = std::cos(angle + angleVariation);
+			x = x * -700 + boat->pos.xPos;
+			z = z * -700 + boat->pos.zPos;
+			SimpleParticle& p = getFreeSimpleParticle();
+			p = {};
+			p.active = true;
+			p.life = frandMinMax(5, 9);
+			p.room = boat->roomNumber;
+			p.ageRate = frandMinMax(0.9, 1.3);
+			float size = frandMinMax(96, 128);
+			p.worldPosition = { x,float(boat->pos.yPos) - size / 2,z };
+			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
+			p.size = frandMinMax(256, 512);
+		}
+		
 	}
 
 	void updateSimpleParticles()
@@ -67,5 +70,4 @@ namespace T5M::Effects{
 			p.sprite = lerp(0, numSprites, normalizedAge);
 		}
 	}
-
 }

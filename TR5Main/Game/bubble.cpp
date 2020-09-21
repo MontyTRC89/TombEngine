@@ -4,6 +4,7 @@
 #include "control.h"
 #include "trmath.h"
 #include "objectslist.h"
+#include "setup.h"
 using std::vector;
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
@@ -36,7 +37,7 @@ void UpdateBubbles()
 
 		if (!(g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER))
 		{
-			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE + RIPPLE_FLAG_RAND_ROT);
+			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE + RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 			bubble->active = false;
 			continue;
 		}

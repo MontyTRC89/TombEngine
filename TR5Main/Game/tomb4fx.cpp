@@ -962,7 +962,7 @@ void UpdateGunShells()
 
 				T5M::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
 				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
-				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2);
+				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				gs->fallspeed >>= 5;
 				continue;
 			}
