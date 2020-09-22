@@ -889,8 +889,8 @@ static void StartObject(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseTwoBlocksPlatform;
 		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
+		//obj->floor = TwoBlocksPlatformFloor;
+		//obj->ceiling = TwoBlocksPlatformCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;

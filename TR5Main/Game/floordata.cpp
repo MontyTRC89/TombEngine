@@ -3,6 +3,7 @@
 #include "floordata.h"
 #include "room.h"
 #include "level.h"
+#include "setup.h"
 
 VectorInt2 FLOOR_INFO::GetRoomPosition(int roomNumber, int x, int z)
 {
@@ -142,16 +143,100 @@ VectorInt2 FLOOR_INFO::GetSectorPoint(int x, int z)
 	return VectorInt2{xPoint, yPoint};
 }
 
-std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int z)
+std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int y, int z, bool raw)
 {
 	auto floor = GetNearBottomFloor(startRoomNumber, x, z);
-	return floor ? std::optional<int>{floor->FloorHeight(x, z)} : std::nullopt;
+
+	if (floor)
+	{
+		auto height = floor->FloorHeight(x, z);
+		if (!raw)
+		{
+			for (auto itemNumber : floor->FloorItem)
+			{
+				auto item = &g_Level.Items[itemNumber];
+				auto itemHeight = Objects[item->objectNumber].floor(itemNumber, x, y, z);
+				if (itemHeight > y && itemHeight < height)
+					height = itemHeight;
+			}
+		}
+
+		return std::optional<int>{height};
+	}
+
+	return std::nullopt;
 }
 
-std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int z)
+std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int y, int z, bool raw)
 {
 	auto floor = GetNearTopFloor(startRoomNumber, x, z);
-	return floor ? std::optional<int>{floor->CeilingHeight(x, z)} : std::nullopt;
+
+	if (floor)
+	{
+		auto height = floor->CeilingHeight(x, z);
+		if (!raw)
+		{
+			for (auto itemNumber : floor->CeilingItem)
+			{
+				auto item = &g_Level.Items[itemNumber];
+				auto itemHeight = Objects[item->objectNumber].ceiling(itemNumber, x, y, z);
+				if (itemHeight < y && itemHeight > height)
+					height = itemHeight;
+			}
+		}
+
+		return std::optional<int>{height};
+	}
+
+	return std::nullopt;
+}
+
+void FLOOR_INFO::AddFloor(short itemNumber)
+{
+	auto item = &g_Level.Items[itemNumber];
+	auto floor = GetNearBottomFloor(item->roomNumber, item->pos.xPos, item->pos.zPos);
+
+	auto begin = floor->FloorItem.cbegin();
+	auto end = floor->FloorItem.cend();
+	auto position = std::find(begin, end, itemNumber);
+	if (position == end)
+		floor->FloorItem.push_back(itemNumber);
+}
+
+void FLOOR_INFO::RemoveFloor(short itemNumber)
+{
+	auto item = &g_Level.Items[itemNumber];
+	auto floor = GetNearBottomFloor(item->roomNumber, item->pos.xPos, item->pos.zPos);
+
+	auto begin = floor->FloorItem.cbegin();
+	auto end = floor->FloorItem.cend();
+	auto position = std::find(begin, end, itemNumber);
+	if (position != end)
+		floor->FloorItem.erase(position);
+}
+
+void FLOOR_INFO::AddCeiling(short itemNumber)
+{
+	auto item = &g_Level.Items[itemNumber];
+	auto floor = GetNearTopFloor(item->roomNumber, item->pos.xPos, item->pos.zPos);
+
+	auto begin = floor->CeilingItem.cbegin();
+	auto end = floor->CeilingItem.cend();
+	auto position = std::find(begin, end, itemNumber);
+	if (position == end)
+		floor->CeilingItem.push_back(itemNumber);
+}
+
+void FLOOR_INFO::RemoveCeiling(short itemNumber)
+{
+	auto item = &g_Level.Items[itemNumber];
+	auto floor = GetNearTopFloor(item->roomNumber, item->pos.xPos, item->pos.zPos);
+
+	auto begin = floor->CeilingItem.cbegin();
+	auto end = floor->CeilingItem.cend();
+	auto position = std::find(begin, end, itemNumber);
+	if (position != end)
+		floor->CeilingItem.erase(position);
 }
 
 int FLOOR_INFO::SectorPlane(int x, int z)
