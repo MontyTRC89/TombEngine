@@ -1,5 +1,6 @@
 #pragma once
 #include "trmath.h"
+#include "items.h"
 
 struct SECTOR_COLLISION_INFO
 {
@@ -22,6 +23,8 @@ public:
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
 	int WallPortal;
+	std::vector<short> FloorItem;
+	std::vector<short> CeilingItem;
 	int Room;
 
 	static VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
@@ -33,8 +36,12 @@ public:
 	static FLOOR_INFO* GetNearTopFloor(int startRoomNumber, int x, int z);
 	static int GetRoom(int startRoomNumber, int x, int y, int z);
 	static VectorInt2 GetSectorPoint(int x, int z);
-	static std::optional<int> GetFloorHeight(int startRoomNumber, int x, int z);
-	static std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int z);
+	static std::optional<int> GetFloorHeight(int startRoomNumber, int x, int y, int z, bool raw = false);
+	static std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int y, int z, bool raw = false);
+	static void AddFloor(short itemNumber);
+	static void RemoveFloor(short itemNumber);
+	static void AddCeiling(short itemNumber);
+	static void RemoveCeiling(short itemNumber);
 
 	int SectorPlane(int x, int z);
 	std::optional<int> RoomBelow(int plane);

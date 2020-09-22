@@ -1858,7 +1858,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	return height;
 #endif
 
-	return FLOOR_INFO::GetFloorHeight(floor->Room, x, z).value_or(NO_HEIGHT);
+	return FLOOR_INFO::GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
@@ -2667,7 +2667,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 	return ceiling;
 #endif
 
-	return FLOOR_INFO::GetCeilingHeight(floor->Room, x, z).value_or(NO_HEIGHT);
+	return FLOOR_INFO::GetCeilingHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)
