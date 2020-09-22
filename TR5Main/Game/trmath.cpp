@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "trmath.h"
-#include "precompute/precompute.h"
 #include <cmath>
 
 // LUT for cos and sin
@@ -1326,16 +1325,7 @@ float TO_RAD(short angle)
 
 const float frand()
 {
-#if PRECOMPUTED
-	using T5M::Precomputed::Random::randLUT;
-	static auto LUTIndex = 0U;
-	float result = randLUT[LUTIndex];
-	LUTIndex+=17;
-	LUTIndex %= randLUT.size();
-	return result;
-#else
 	return rand()/static_cast<float>(RAND_MAX);
-#endif
 }
 
 const float frandMinMax(float min, float max)
