@@ -53,8 +53,14 @@ FLOOR_INFO* FLOOR_INFO::GetBottomFloor(int startRoomNumber, int x, int z, bool f
 
 	while ((!first || floor->IsWall(plane)) && roomBelow)
 	{
-		roomNumber = GetFloor(*roomBelow, x, z)->RoomSide().value_or(*roomBelow);
+		roomNumber = *roomBelow;
 		floor = GetFloor(roomNumber, x, z);
+		auto roomSide = floor->RoomSide();
+		if (roomSide)
+		{
+			roomNumber = *roomSide;
+			floor = GetFloor(roomNumber, x, z);
+		}
 		plane = floor->SectorPlane(x, z);
 		roomBelow = floor->RoomBelow(plane);
 	}
@@ -71,8 +77,14 @@ FLOOR_INFO* FLOOR_INFO::GetTopFloor(int startRoomNumber, int x, int z, bool firs
 
 	while ((!first || floor->IsWall(plane)) && roomAbove)
 	{
-		roomNumber = GetFloor(*roomAbove, x, z)->RoomSide().value_or(*roomAbove);
+		roomNumber = *roomAbove;
 		floor = GetFloor(roomNumber, x, z);
+		auto roomSide = floor->RoomSide();
+		if (roomSide)
+		{
+			roomNumber = *roomSide;
+			floor = GetFloor(roomNumber, x, z);
+		}
 		plane = floor->SectorPlane(x, z);
 		roomAbove = floor->RoomAbove(plane);
 	}
@@ -82,9 +94,16 @@ FLOOR_INFO* FLOOR_INFO::GetTopFloor(int startRoomNumber, int x, int z, bool firs
 
 FLOOR_INFO* FLOOR_INFO::GetNearBottomFloor(int startRoomNumber, int x, int z)
 {
-	auto roomNumber = GetFloor(startRoomNumber, x, z)->RoomSide().value_or(startRoomNumber);
-
+	auto roomNumber = startRoomNumber;
 	auto floor = GetFloor(roomNumber, x, z);
+
+	auto roomSide = floor->RoomSide();
+	if (roomSide)
+	{
+		roomNumber = *roomSide;
+		floor = GetFloor(roomNumber, x, z);
+	}
+
 	if (floor->IsWall(x, z))
 	{
 		floor = GetTopFloor(roomNumber, x, z, true);
@@ -99,9 +118,16 @@ FLOOR_INFO* FLOOR_INFO::GetNearBottomFloor(int startRoomNumber, int x, int z)
 
 FLOOR_INFO* FLOOR_INFO::GetNearTopFloor(int startRoomNumber, int x, int z)
 {
-	auto roomNumber = GetFloor(startRoomNumber, x, z)->RoomSide().value_or(startRoomNumber);
-
+	auto roomNumber = startRoomNumber;
 	auto floor = GetFloor(roomNumber, x, z);
+
+	auto roomSide = floor->RoomSide();
+	if (roomSide)
+	{
+		roomNumber = *roomSide;
+		floor = GetFloor(roomNumber, x, z);
+	}
+
 	if (floor->IsWall(x, z))
 	{
 		floor = GetBottomFloor(roomNumber, x, z, true);
@@ -114,22 +140,92 @@ FLOOR_INFO* FLOOR_INFO::GetNearTopFloor(int startRoomNumber, int x, int z)
 	return floor->IsWall(x, z) ? nullptr : floor;
 }
 
-int FLOOR_INFO::GetRoom(int startRoomNumber, int x, int y, int z)
+std::optional<int> FLOOR_INFO::GetBottomRoom(int startRoomNumber, int x, int y, int z)
 {
-	auto roomNumber = GetFloor(startRoomNumber, x, z)->RoomSide().value_or(startRoomNumber);
+	auto roomNumber = startRoomNumber;
 	auto floor = GetFloor(roomNumber, x, z);
 	auto plane = floor->SectorPlane(x, z);
 
-	if (!floor->IsWall(plane))
+	if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z))
+		return std::nullopt;
+
+	auto roomBelow = floor->RoomBelow(plane);
+
+	while (roomBelow)
 	{
-		if (y > floor->FloorHeight(x, z))
+		roomNumber = *roomBelow;
+		floor = GetFloor(roomNumber, x, z);
+		auto roomSide = floor->RoomSide();
+		if (roomSide)
 		{
-			roomNumber = floor->RoomBelow(plane).value_or(roomNumber);
+			roomNumber = *roomSide;
+			floor = GetFloor(roomNumber, x, z);
 		}
-		else if (y < floor->CeilingHeight(x, z))
+		plane = floor->SectorPlane(x, z);
+
+		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z))
+			return std::optional{roomNumber};
+
+		roomBelow = floor->RoomBelow(plane);
+	}
+
+	return std::nullopt;
+}
+
+std::optional<int> FLOOR_INFO::GetTopRoom(int startRoomNumber, int x, int y, int z)
+{
+	auto roomNumber = startRoomNumber;
+	auto floor = GetFloor(roomNumber, x, z);
+	auto plane = floor->SectorPlane(x, z);
+
+	if (!floor->IsWall(plane) && y >= floor->CeilingHeight(x, z))
+		return std::nullopt;
+
+	auto roomAbove = floor->RoomAbove(plane);
+
+	while (roomAbove)
+	{
+		roomNumber = *roomAbove;
+		floor = GetFloor(roomNumber, x, z);
+		auto roomSide = floor->RoomSide();
+		if (roomSide)
 		{
-			roomNumber = floor->RoomAbove(plane).value_or(roomNumber);
+			roomNumber = *roomSide;
+			floor = GetFloor(roomNumber, x, z);
 		}
+		plane = floor->SectorPlane(x, z);
+
+		if (!floor->IsWall(plane) && y >= floor->CeilingHeight(x, z))
+			return std::optional{roomNumber};
+
+		roomAbove = floor->RoomAbove(plane);
+	}
+
+	return std::nullopt;
+}
+
+int FLOOR_INFO::GetRoom(int startRoomNumber, int x, int y, int z)
+{
+	auto roomNumber = startRoomNumber;
+	auto floor = GetFloor(roomNumber, x, z);
+
+	auto roomSide = floor->RoomSide();
+	if (roomSide)
+	{
+		roomNumber = *roomSide;
+		floor = GetFloor(roomNumber, x, z);
+	}
+
+	auto roomBelow = GetBottomRoom(roomNumber, x, y, z);
+	auto roomAbove = GetTopRoom(roomNumber, x, y, z);
+
+	if (roomBelow)
+	{
+		roomNumber = *roomBelow;
+	}
+	else if (roomAbove)
+	{
+		roomNumber = *roomAbove;
 	}
 
 	return roomNumber;
@@ -156,12 +252,12 @@ std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int y,
 			{
 				auto item = &g_Level.Items[itemNumber];
 				auto itemHeight = Objects[item->objectNumber].floor(itemNumber, x, y, z);
-				if (itemHeight > y && itemHeight < height)
+				if (itemHeight >= y && itemHeight < height)
 					height = itemHeight;
 			}
 		}
 
-		return std::optional<int>{height};
+		return std::optional{height};
 	}
 
 	return std::nullopt;
@@ -180,12 +276,12 @@ std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int 
 			{
 				auto item = &g_Level.Items[itemNumber];
 				auto itemHeight = Objects[item->objectNumber].ceiling(itemNumber, x, y, z);
-				if (itemHeight < y && itemHeight > height)
+				if (itemHeight <= y && itemHeight > height)
 					height = itemHeight;
 			}
 		}
 
-		return std::optional<int>{height};
+		return std::optional{height};
 	}
 
 	return std::nullopt;
@@ -251,7 +347,7 @@ int FLOOR_INFO::SectorPlane(int x, int z)
 std::optional<int> FLOOR_INFO::RoomBelow(int plane)
 {
 	auto room = FloorCollision.Portals[plane];
-	return room != -1 ? std::optional<int>{room} : std::nullopt;
+	return room != -1 ? std::optional{room} : std::nullopt;
 }
 
 std::optional<int> FLOOR_INFO::RoomBelow(int x, int z)
@@ -262,7 +358,7 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int z)
 std::optional<int> FLOOR_INFO::RoomAbove(int plane)
 {
 	auto room = CeilingCollision.Portals[plane];
-	return room != -1 ? std::optional<int>{room} : std::nullopt;
+	return room != -1 ? std::optional{room} : std::nullopt;
 }
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z)
@@ -272,7 +368,7 @@ std::optional<int> FLOOR_INFO::RoomAbove(int x, int z)
 
 std::optional<int> FLOOR_INFO::RoomSide()
 {
-	return WallPortal != -1 ? std::optional<int>{WallPortal} : std::nullopt;
+	return WallPortal != -1 ? std::optional{WallPortal} : std::nullopt;
 }
 
 int FLOOR_INFO::FloorHeight(int x, int z)
