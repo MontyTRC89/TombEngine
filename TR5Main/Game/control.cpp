@@ -2982,9 +2982,9 @@ void DoFlipMap(short group)
 
 			ROOM_INFO *flipped = &g_Level.Rooms[r->flippedRoom];
 
-			memcpy(&temp, r, sizeof(temp));
-			memcpy(r, flipped, sizeof(ROOM_INFO));
-			memcpy(flipped, &temp, sizeof(ROOM_INFO));
+			temp = *r;
+			*r = *flipped;
+			*flipped = temp;
 
 			r->flippedRoom = flipped->flippedRoom;
 			flipped->flippedRoom = -1;
