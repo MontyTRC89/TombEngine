@@ -2995,6 +2995,11 @@ void DoFlipMap(short group)
 			AddRoomFlipItems(r);
 
 			g_Renderer.flipRooms(i, r->flippedRoom);
+
+			for (auto& fd : r->floor)
+				fd.Room = i;
+			for (auto& fd : flipped->floor)
+				fd.Room = r->flippedRoom;
 		}
 	}
 
