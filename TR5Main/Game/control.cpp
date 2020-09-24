@@ -1668,19 +1668,20 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	int height = floor->floor * 256;
 	if (height == NO_HEIGHT)
 		return height;
+#endif
 
 	TriggerIndex = NULL;
 
-	if (floor->index == 0)
-		return height;
+	/*if (floor->index == 0)
+		return height;*/
 
 	short *data = &g_Level.FloorData[floor->index];
 	short type, hadj;
 
 	int xOff, yOff, trigger;
-	ITEM_INFO *item;
+	/*ITEM_INFO *item;
 	OBJECT_INFO *obj;
-	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;*/
 
 	do
 	{
@@ -1700,7 +1701,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 			break;
 
 		case TILT_TYPE:
-			TiltXOffset = xOff = (*data >> 8);
+			/*TiltXOffset = xOff = (*data >> 8);
 			TiltYOffset = yOff = *(char *)data;
 
 			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
@@ -1716,7 +1717,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 			if (yOff >= 0)
 				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
-				height -= yOff * (x & 1023) >> 2;
+				height -= yOff * (x & 1023) >> 2;*/
 
 			data++;
 			break;
@@ -1741,13 +1742,13 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				}
 				else
 				{
-					item = &g_Level.Items[trigger & VALUE_BITS];
+					/*item = &g_Level.Items[trigger & VALUE_BITS];
 					obj = &Objects[item->objectNumber];
 
 					if (obj->floor && !(item->flags & 0x8000))
 					{
 						(obj->floor)(item, x, y, z, &height);
-					}
+					}*/
 				}
 
 			} while (!(trigger & END_BIT));
@@ -1770,7 +1771,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 		case NOCOLF1B:
 		case NOCOLF2T:
 		case NOCOLF2B:
-			tilts = *data;
+			/*tilts = *data;
 			t0 = tilts & 15;
 			t1 = (tilts >> 4) & 15;
 			t2 = (tilts >> 8) & 15;
@@ -1846,7 +1847,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
 				height -= yOff * (x & 1023) >> 2;
-
+				*/
 			data++;
 			break;
 
@@ -1855,8 +1856,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 		}
 	} while (!(type & END_BIT));
 
-	return height;
-#endif
+	/*return height;*/
 
 	return FLOOR_INFO::GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
