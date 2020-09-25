@@ -20,6 +20,12 @@ extern ITEM_INFO* LaraItem;
 extern COLL_INFO lara_coll;
 extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
+// For later.
+extern bool EnableActionToggle;
+extern bool EnableJumpUpAlign;
+extern bool EnableClimbAssist;
+extern bool EnableSafetyDrop;
+
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
 #define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)

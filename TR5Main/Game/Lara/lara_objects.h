@@ -1,61 +1,50 @@
 #pragma once
 #include "lara_struct.h"
 
-/*pickups*/
+// Pickup control functions.
 void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll);
-/*end pickups*/
-/*-*/
-/*switches*/
-void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pickup_flare(ITEM_INFO* item, COLL_INFO* coll);
+
+// Switch control & collision functions.
+void lara_as_switch(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll);
-/*end switches*/
-/*-*/
-/*puzzles and keys*/
-void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll);
-/*end puzzles and keys*/
-/*-*/
-/*pushables*/
-void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll);
-/*end pushables*/
-/*-*/
-/*pulley*/
+
+// Puzzle & key control functions.
+void lara_as_use_key(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_use_puzzle(ITEM_INFO* item, COLL_INFO* coll);
+
+// Pushable state functions.
+void lara_as_pushable_push(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pushable_pull(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pushable_ready(ITEM_INFO* item, COLL_INFO* coll);
+
+// Pulley control function.
 void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll);
-/*end pulley*/
-/*-*/
-/*parallel bars*/
-void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll);
-/*end parallel bars*/
-/*-*/
-/*tightropes*/
-void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll);
-/*end tightropes*/
-/*-*/
-/*ropes*/
-void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll);
+
+// Swingbar control functions.
+void lara_as_swing_bar(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_swing_bar_leap(ITEM_INFO* item, COLL_INFO* coll);
+
+// Tightrope control functions.
+void lara_as_tightrope_stop(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_tightrope_walk(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_tightrope_fall(ITEM_INFO* item, COLL_INFO* coll);
+
+// Rope control & collision functions.
+void lara_as_rope_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_rope_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll);
-/*end ropes*/
-/*-*/
-/*poles*/
-void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll);
-/*end poles*/
-/*-*/
-/*deathslide*/
-void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll);
-/*end deathslide*/
+void lara_col_rope_swing(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_rope_up(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_rope_down(ITEM_INFO* item, COLL_INFO* coll);
+
+// Pole control & collision functions.
+void lara_col_pole_stop(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_pole_up(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll);
+
+// Zipline control functions.
+void lara_as_zipline(ITEM_INFO* item, COLL_INFO* coll);

@@ -21,15 +21,18 @@ static short RightClimbTab[4] = // offset 0xA0640
 
 /*this file has all the generic test functions called in lara's state code*/
 
+// This function is disgusting.
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
+	{
 		return 0;
+	}
 
-//	EnableCrawlFlex1click = true;
-//	EnableCrawlFlex2click = true;
-//	EnableCrawlFlex3click = true;
-//	EnableMonkeyVault = true;
+	//	EnableCrawlFlex1click = true;
+	//	EnableCrawlFlex2click = true;
+	//	EnableCrawlFlex3click = true;
+	//	EnableMonkeyVault = true;
 
 	if (coll->collType == CT_FRONT)
 	{
@@ -219,8 +222,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			return 1;
 		}
 	}
-//	else
-		return 0;
+	//	else
+	return 0;
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
@@ -284,6 +287,34 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
 		return 2;
 
 	return 0;
+}
+
+bool TestLaraHang(ITEM_INFO* player, COLL_INFO* coll)
+{
+	if (TrInput & IN_ACTION &&
+		Lara.climbStatus &&
+		player->hitPoints > 0)
+	{
+		if (!LaraTestHangOnClimbWall(player, coll))
+		{
+			int r;
+		}
+
+		return true;
+	}
+	else if (TrInput & IN_ACTION && player->hitPoints > 0 && coll->frontFloor <= 0)
+	{
+		int t;
+		// some other garbage.
+		return true;
+	}
+
+	return false;
+}
+
+void SetLaraHang(ITEM_INFO* player, COLL_INFO* coll)
+{
+
 }
 
 int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -617,13 +648,28 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 
+bool TestLaraHangRightCorner(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE ||
+		coll->hitStatic)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
+	{
 		return 0;
+	}
 
 	if (coll->hitStatic)
+	{
 		return 0;
+	}
 
 	int x;
 	int z;
@@ -873,7 +919,6 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		break;
 	}
 
-
 	bounds = GetBoundsAccurate(item);
 
 	if (Lara.moveAngle)
@@ -902,7 +947,6 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge) // (F) (D)
 {
-
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	int hdif = coll->frontFloor - bounds->Y1;
 
@@ -967,19 +1011,19 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 
 	if (h != NO_HEIGHT)
 	{
-/*		if (TR12_OSCILLATE_HANG == true)
-		{
-			if (((h - y) > 0)
-				&& ((c - y) < -400))
-				return(1);
-		}
-		else
-		{*/
-			if (((h - y) > 0)
-				&& ((c - y) < -400)
-				&& ((y - 819 - c) > -72))
-				return(1);
-//		}
+		/*		if (TR12_OSCILLATE_HANG == true)
+				{
+					if (((h - y) > 0)
+						&& ((c - y) < -400))
+						return(1);
+				}
+				else
+				{*/
+		if (((h - y) > 0)
+			&& ((c - y) < -400)
+			&& ((y - 819 - c) > -72))
+			return(1);
+		//		}
 	}
 	return(0);
 }
@@ -1205,20 +1249,26 @@ short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 	return height;
 }
 
-int LaraFallen(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+bool TestLaraFall(COLL_INFO* coll)
 {
-	if (Lara.waterStatus == LW_WADE || coll->midFloor <= STEPUP_HEIGHT)
+	if (coll->midFloor <= STEPUP_HEIGHT/* ||
+		Lara.waterStatus == LW_WADE*/)	// TEST: This may have been causing a floor snap bug!
 	{
-		return 0;
+		return false;
 	}
 
+	return true;
+}
+
+// TODO: This should eventually become obsolete. Set goal states to LS_FALL. In WAD2, make links to LA_FALL_START.
+void SetLaraFall(ITEM_INFO* item)
+{
 	item->animNumber = LA_FALL_START;
 	item->currentAnimState = LS_JUMP_FORWARD;
 	item->goalAnimState = LS_JUMP_FORWARD;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->fallspeed = 0;
 	item->gravityStatus = true;
-	return 1;
 }
 
 int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -1242,7 +1292,7 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-void GetTighRopeFallOff(int regularity)
+void GetTighropeFallOff(int regularity)
 {
 	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 	{
@@ -1253,20 +1303,32 @@ void GetTighRopeFallOff(int regularity)
 	}
 
 	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
+	{
 		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
+	}
 }
 
-bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraLean(COLL_INFO* coll)
 {
-	// TODO: make it more fine-tuned when new collision is done.
+	// TODO: fine-tune this when new collision is done.
 	switch (coll->collType)
 	{
-	case CT_RIGHT:
-		if (TrInput & IN_RIGHT)
-			return false;
-	case CT_LEFT:
-		if (TrInput & IN_LEFT)
-			return false;
+		case CT_RIGHT:
+		{
+			if (TrInput & IN_RIGHT)
+			{
+				return false;
+			}
+		}
+
+		case CT_LEFT:
+		{
+			if (TrInput & IN_LEFT)
+			{
+				return false;
+			}
+		}
 	}
+
 	return true;
 }

@@ -35,7 +35,7 @@ enum LARA_STATE
 	LS_UNDERWATER_FORWARD = 17,
 	LS_UNDERWATER_INERTIA = 18,
 	LS_GRABBING = 19,
-	LS_TURN_FAST = 20,
+	LS_TURN_RIGHT_FAST = 20,
 	LS_STEP_RIGHT = 21,
 	LS_STEP_LEFT = 22,
 	LS_ROLL_BACK = 23,
@@ -177,6 +177,15 @@ enum LARA_STATE
 	LS_STEP_BACK_DOWN = 149,
 	LS_LADDER_DISMOUNT_LEFT = 150,
 	LS_LADDER_DISMOUNT_RIGHT = 151,
+
+	LS_SLIDE_STEEP_FORWARD = 152,
+	LS_SLIDE_STEEP_BACK = 153,
+	LS_SLIDE_TURN_180 = 154,
+	LS_FALL = 155,				// This is needed if we are to have a fall anim dispatch from slide states, as LS_JUMP_FORWARD is already used to leap off.
+	LS_TURN_LEFT_FAST = 156,
+	LS_SAFE_DROP = 157,
+	/*LS_POLE_UP = 158,
+	LS_POLE_DOWN = 159,*/		// I broke poles, sorry. :/ I'll get to it later. -Sezz
 	
 	NUM_LARA_STATES
 };
@@ -720,6 +729,34 @@ enum LARA_ANIM
 	LA_LADDER_DISMOUNT_RIGHT_START = 499,					// Ladder dismount right (1/2)
 	LA_LADDER_DISMOUNT_RIGHT_END = 500,						// Ladder dismount right (2/2)
 	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
+
+	// RESERVED.
+	LA_SLIDE_FORWARD_JUMP = 502,							// Slide forward > jump forwad
+	LA_SLIDE_FORWARD_TURN_180 = 503,						// Slide forward > slide back
+	LA_SLIDE_BACK_JUMP = 504,								// Slide back > jump back
+	LA_SLIDE_BACK_TURN_180 = 505,							// Slide back > slide forward
+	LA_SLIDE_FORWARD_TO_STEEP = 506,						// Slide forward, normal > slide forward, steep
+	LA_SLIDE_STEEP_FORWARD_TO_NORMAL = 507,					// Slide forward, steep > slide forward, normal
+	LA_SLIDE_STEEP_FORWARD_START = 508,						// Land on slope > slide forward, steep
+	LA_SLIDE_STEEP_FORWARD = 509,							// Slide forward, steep (looped)
+	LA_SLIDE_STEEP_FORWARD_END = 510,						// Slide forward, steep > stand
+	LA_SLIDE_STEEP_FORWARD_JUMP = 511,						// Slide forward > jump forward
+	LA_SLIDE_BACK_TO_STEEP = 512,							// Slide back, normal > slide back, steep
+	LA_SLIDE_STEEP_BACK_TO_NORMAL = 513,					// Slide back, steep > slide back, normal
+	LA_SLIDE_STEEP_BACK_START = 514,						// Land on slope > slide forward, steep
+	LA_SLIDE_STEEP_BACK = 515,								// Slide back, steep (looped)
+	LA_SLIDE_STEEP_BACK_END = 516,							// Slide back, steep > stand
+	LA_SLIDE_STEEP_BACK_JUMP = 517,							// Slide back, steep > jump forward
+	LA_SLIDE_FORWARD_LEDGE = 518,							// Slide forward > grab ledge
+	LA_SLIDE_BACK_LEDGE = 519,								// Slide back > grab ledge
+	LA_STAND_CROSS_ARMS_AFK_START = 520,					// Stand idle > cross arms AFK
+	LA_STAND_CROSS_ARMS_AFK = 521,							// Cross arms AKF (looped)
+	LA_STAND_CROSS_ARMS_AFK_END = 522,						// Cross arms AFK > stand idle
+	LA_ROLL_180_ALTERNATE = 523,							// Standing mid-air roll 180
+	LA_SPRINT_TO_SPRINT_DIVE_LEFT = 524,					// Sprint > sprint dive, left foot first
+	LA_SPRINT_TO_SPRINT_DIVE_RIGHT = 525,					// Sprint > sprint dive, right foot first
+	LA_SPRINT_DIVE_TO_RUN = 526,							// Sprint dive > run
+	LA_SPRINT_DIVE = 527,									// Sprint dive, leading to swandive freefall
 
 	NUM_LARA_ANIMS
 };
