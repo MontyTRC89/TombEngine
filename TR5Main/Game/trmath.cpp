@@ -1306,6 +1306,11 @@ unsigned short atanTab[] = {
 		0x2000, 0x2000
 };
 
+int GetSign(int num)
+{
+	return (num >= 0) ? 1 : -1;
+}
+
 // fix "improperly terminated macro invocation"
 // fix "expression must have integral or unscoped enum type"
 short ANGLE(float angle)

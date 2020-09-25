@@ -11,6 +11,7 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
+
 struct PISTOL_DEF
 {
 	short objectNum;
@@ -19,6 +20,7 @@ struct PISTOL_DEF
 	char draw2Anim;
 	char recoilAnim;
 };
+
 PISTOL_DEF PistolsTable[4] =
 {
 	{ ID_LARA, 0, 0, 0, 0 },

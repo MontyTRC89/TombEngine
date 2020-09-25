@@ -94,19 +94,29 @@ extern Inventory g_Inventory;
 
 static bool SilencerIsEquiped()
 {
-    return Lara.Weapons[WEAPON_UZI].HasSilencer
-        || Lara.Weapons[WEAPON_PISTOLS].HasSilencer
-        || Lara.Weapons[WEAPON_SHOTGUN].HasSilencer
-        || Lara.Weapons[WEAPON_REVOLVER].HasSilencer
-        || Lara.Weapons[WEAPON_CROSSBOW].HasSilencer
-        || Lara.Weapons[WEAPON_HK].HasSilencer;
+    if (Lara.Weapons[WEAPON_UZI].HasSilencer ||
+        Lara.Weapons[WEAPON_PISTOLS].HasSilencer ||
+        Lara.Weapons[WEAPON_SHOTGUN].HasSilencer ||
+        Lara.Weapons[WEAPON_REVOLVER].HasSilencer ||
+        Lara.Weapons[WEAPON_CROSSBOW].HasSilencer ||
+        Lara.Weapons[WEAPON_HK].HasSilencer)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 static bool LaserSightIsEquiped()
 {
-    return Lara.Weapons[WEAPON_REVOLVER].HasLasersight
-        || Lara.Weapons[WEAPON_CROSSBOW].HasLasersight
-        || Lara.Weapons[WEAPON_HK].HasLasersight;
+    if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight ||
+        Lara.Weapons[WEAPON_CROSSBOW].HasLasersight ||
+        Lara.Weapons[WEAPON_HK].HasLasersight)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void PickedUpObject(short objectNumber)
@@ -502,7 +512,9 @@ void do_pickup()
 						for (int i = 0; i < g_Level.NumItems; i++)
 						{
 							if (g_Level.Items[i].objectNumber == item->objectNumber)
-								KillItem(i);
+                            {
+                                KillItem(i);
+                            }
 						}
 					}
 					if (item->triggerFlags & 0xC0)
@@ -533,10 +545,14 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
     short triggerFlags = item->triggerFlags & 0x3F;
     if (triggerFlags == 5 || triggerFlags == 10)
+    {
         return;
+    }
 
     if (item->objectNumber == ID_FLARE_ITEM && Lara.gunType == WEAPON_FLARE)
+    {
         return;
+    }
 
     item->pos.yRot = l->pos.yRot;
     item->pos.zRot = 0;
@@ -835,7 +851,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         if (l->currentAnimState == LS_CROUCH_IDLE)
         {
 			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-				break;
+            {
+                break;
+            }
+
             AlignLaraPosition(&PickUpPosition, item, l);
             if (item->objectNumber == ID_FLARE_ITEM)
             {
@@ -852,7 +871,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             if (l->currentAnimState == LS_CRAWL_IDLE)
             {
 				if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-					break;
+                {
+                    break;
+                }
+
                 l->goalAnimState = LS_CROUCH_IDLE;
                 Lara.generalPtr = (void*)itemNum;
                 break;
@@ -955,13 +977,20 @@ void PickupControl(short itemNum)
         {
             item->pos.yPos = item->itemFlags[0];
             if (item->fallspeed <= 64)
+            {
                 item->triggerFlags &= 0xC0;
+            }
             else
+            {
                 item->fallspeed = -item->fallspeed >> 2;
+            }
         }
 
         if (item->roomNumber != roomNumber)
+        {
             ItemNewRoom(itemNum, roomNumber);
+        }
+
         break;
 
     case 2:
@@ -1007,10 +1036,14 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
     }
 
     if (found != -1)
+    {
         return &StaticObjects[found].collisionBox;
+    }
 
     if (room->itemNumber == NO_ITEM)
+    {
         return NULL;
+    }
 
     short itemNumber = room->itemNumber;
     for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
@@ -1029,9 +1062,13 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
     }
 
     if (itemNumber == NO_ITEM)
+    {
         return NULL;
+    }
     else
+    {
         return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[itemNumber]);
+    }
 }
 
 void InitialisePickup(short itemNumber)
@@ -1047,7 +1084,9 @@ void InitialisePickup(short itemNumber)
     else
     {
         if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+        {
             item->pos.yPos -= bounds->Y2;
+        }
         
         if ((item->triggerFlags & 0x80) != 0)
         {
@@ -1056,10 +1095,14 @@ void InitialisePickup(short itemNumber)
         }
         
         if (item->triggerFlags & 0x100)
+        {
             item->meshBits = 0;
+        }
         
         if (item->status == ITEM_INVISIBLE)
+        {
             item->flags |= 0x20;
+        }
     }
 }
 
@@ -1198,7 +1241,9 @@ void SearchObjectControl(short itemNumber)
     objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
     if (item->objectNumber != ID_SEARCH_OBJECT4 || item->itemFlags[0] == 1)
+    {
         AnimateItem(item);
+    }
 
     frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
     if (item->objectNumber == ID_SEARCH_OBJECT1)
@@ -1217,16 +1262,22 @@ void SearchObjectControl(short itemNumber)
     else if (item->objectNumber == ID_SEARCH_OBJECT2)
     {
         if (frameNumber == 18)
+        {
             item->meshBits = 1;
+        }
         else if (frameNumber == 172)
+        {
             item->meshBits = 2;
+        }
     }
     else if (item->objectNumber == ID_SEARCH_OBJECT4)
     {
         item->meshBits = FlipStats[0] != 0 ? 48 : 9;
 
         if (frameNumber >= 45 && frameNumber <= 131)
+        {
             item->meshBits |= FlipStats[0] != 0 ? 4 : 2;
+        }
             
         if (item->itemFlags[1] != -1)
         {
@@ -1234,9 +1285,13 @@ void SearchObjectControl(short itemNumber)
             if (Objects[item2->objectNumber].isPickup)
             {
                 if (FlipStats[0])
+                {
                     item2->status = ITEM_NOT_ACTIVE;
+                }
                 else
+                {
                     item2->status = ITEM_INVISIBLE;
+                }
             }
         }
     }
@@ -1287,11 +1342,12 @@ void SearchObjectControl(short itemNumber)
 
 int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 {
-
 	short selectedObject = g_Inventory.GetSelectedObject();
 
 	if (item->animNumber != LA_STAND_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
-		return false;
+    {
+        return false;
+    }
 
 	if (selectedObject >= ID_WATERSKIN1_EMPTY && selectedObject <= ID_WATERSKIN2_5)
 	{
@@ -1300,9 +1356,13 @@ int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 		if (selectedObject != ID_WATERSKIN1_3 && selectedObject != ID_WATERSKIN2_5)
 		{
 			if (selectedObject >= ID_WATERSKIN2_EMPTY)
-				Lara.Waterskin2.Quantity = 5;
+            {
+                Lara.Waterskin2.Quantity = 5;
+            }
 			else
-				Lara.Waterskin1.Quantity = 3;
+            {
+                Lara.Waterskin1.Quantity = 3;
+            }
 
 			item->animNumber = LA_WATERSKIN_FILL;
 		}

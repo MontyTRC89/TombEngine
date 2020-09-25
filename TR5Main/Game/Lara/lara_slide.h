@@ -1,15 +1,25 @@
 #pragma once
 #include "lara_struct.h"
 
-/*Tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
-/*end tests and others*/
-/*-*/
-/*Lara state code*/
+#define SLOPE_ANGLE_NORMAL	ANGLE(30.0f)
+#define SLOPE_ANGLE_STEEP	ANGLE(60.0f)
+
+// Auxiliary functions.
+bool TestLaraSlide(COLL_INFO* coll);
+float GetLaraSlideDirection(COLL_INFO* coll);
+void SetLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
+void PerformLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
+void PerformLaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
+
+int Old_TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
+
+// Sliding control & collision functions.
 void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll);
-/*end Lara state code*/
+void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_steep_slide(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_steep_slide(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_steep_slide_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_steep_slide_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_slide_turn_180(ITEM_INFO* item, COLL_INFO* coll);

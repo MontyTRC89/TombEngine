@@ -149,7 +149,7 @@ void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 		Lara.waterStatus = LW_ABOVE_WATER;
 		item->goalAnimState = LS_STOP;
 		item->currentAnimState = LS_STOP;
-		item->animNumber = LA_STAND_SOLID;
+		item->animNumber = LA_STAND_IDLE;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 }

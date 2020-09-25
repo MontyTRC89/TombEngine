@@ -45,6 +45,9 @@ template<typename T>
 constexpr auto MESH_BITS(T x) {
 	return (1 << x);
 }
+
+int GetSign(int num);
+
 short ANGLE(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);
