@@ -2924,7 +2924,7 @@ void AnimateItem(ITEM_INFO *item)
 
 	if (item->gravityStatus)
 	{
-		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6) / 2;
+		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
 		item->pos.yPos += item->fallspeed;
 	}
 	else

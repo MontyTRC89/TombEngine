@@ -15,14 +15,16 @@
 #include "sound.h"
 #include "GameFlowScript.h"
 
-SubsuitInfo Subsuit;
+typedef struct SUBSUIT_INFO
+{
+	short XRot;
+	short dXRot;
+	short XRotVel;
+	short Vel[2];
+	short YVel;
+};
+SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
-
-// SWIMMING
-
-// ------------------------------
-// Auxillary functions
-// ------------------------------
 
 void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 {
@@ -41,41 +43,25 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 		int shift = 0;
 
 		if (abs(Lara.currentXvel) <= 16)
-		{
 			shift = (abs(Lara.currentXvel) > 8) + 2;
-		}
 		else
-		{
 			shift = 4;
-		}
-
 		Lara.currentXvel -= Lara.currentXvel >> shift;
 
 		if (abs(Lara.currentXvel) < 4)
-		{
 			Lara.currentXvel = 0;
-		}
 
 		if (abs(Lara.currentZvel) <= 16)
-		{
 			shift = (abs(Lara.currentZvel) > 8) + 2;
-		}
 		else
-		{
 			shift = 4;
-		}
-
 		Lara.currentZvel -= Lara.currentZvel >> shift;
 
 		if (abs(Lara.currentZvel) < 4)
-		{
 			Lara.currentZvel = 0;
-		}
 
 		if (!Lara.currentXvel && !Lara.currentZvel)
-		{
 			return;
-		}
 	}
 
 	LaraItem->pos.xPos += Lara.currentXvel >> 8;
@@ -89,17 +75,11 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 	if (coll->collType == CT_FRONT)
 	{
 		if (LaraItem->pos.xRot > ANGLE(35))
-		{
 			LaraItem->pos.xRot += ANGLE(1);
-		}
 		else if (LaraItem->pos.xRot < -ANGLE(35))
-		{
 			LaraItem->pos.xRot -= ANGLE(1);
-		}
 		else
-		{
 			LaraItem->fallspeed = 0;
-		}
 	}
 	else if (coll->collType == CT_TOP)
 	{
@@ -201,6 +181,190 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 	}
 }
 
+void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)//4CA18(<), 4CE7C(<) (F)
+{
+	LaraSwimCollision(item, coll);
+}
+
+void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C980(<), 4CDE4(<) (F)
+{
+	item->hitPoints = -1;
+	Lara.air = -1;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	if (wh != NO_HEIGHT)
+	{
+		if (wh < item->pos.yPos - 100)
+			item->pos.yPos -= 5;
+	}
+	LaraSwimCollision(item, coll);
+}
+
+void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll)//4C960(<), 4CDC4(<) (F)
+{
+	LaraSwimCollision(item, coll);
+}
+
+void lara_col_tread(ITEM_INFO* item, COLL_INFO* coll)//4C940(<), 4CDA4(<) (F)
+{
+	LaraSwimCollision(item, coll);
+}
+
+void lara_col_glide(ITEM_INFO* item, COLL_INFO* coll)//4C920(<), 4CD84(<) (F)
+{
+	LaraSwimCollision(item, coll);
+}
+
+void lara_col_swim(ITEM_INFO* item, COLL_INFO* coll)//4C900(<), 4CD64(<) (F)
+{
+	LaraSwimCollision(item, coll);
+}
+
+void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)//4C8F8(<), 4CD5C(<) (F)
+{
+	item->fallspeed = 0;
+}
+
+void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C884(<), 4CCE8(<) (F)
+{
+	Lara.look = 0;
+
+	item->fallspeed -= 8;
+	if (item->fallspeed <= 0)
+		item->fallspeed = 0;
+
+	if (item->pos.xRot < -ANGLE(2) || item->pos.xRot > ANGLE(2))
+	{
+		if (item->pos.xRot >= 0)
+			item->pos.xRot -= ANGLE(2);
+		else
+			item->pos.xRot += ANGLE(2);
+	}
+	else
+	{
+		item->pos.xRot = 0;
+	}
+}
+
+void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)//4C854, 4CCB8 (F)
+{
+	if (TrInput & IN_FORWARD)
+	{
+		item->pos.xRot -= ANGLE(1);
+	}
+}
+
+void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_WATER_DEATH;
+		return;
+	}
+
+	if (TrInput & IN_ROLL && LaraDrawType != LARA_DIVESUIT)
+	{
+		item->currentAnimState = LS_UNDERWATER_ROLL;
+		item->animNumber = LA_UNDERWATER_ROLL_180_START;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	}
+	else
+	{
+		if (TrInput & IN_LOOK)
+			LookUpDown();
+
+		if (LaraDrawType == LARA_DIVESUIT)
+			SwimTurnSubsuit(item);
+		else
+			SwimTurn(item);
+
+		if (TrInput & IN_JUMP)
+			item->goalAnimState = LS_UNDERWATER_FORWARD;
+
+		item->fallspeed -= 6;
+
+		if (item->fallspeed < 0)
+			item->fallspeed = 0;
+
+		if (Lara.gunStatus == LG_HANDS_BUSY)
+			Lara.gunStatus = LG_NO_ARMS;
+	}
+}
+
+void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_WATER_DEATH;
+		return;
+	}
+
+	if (TrInput & IN_ROLL)
+	{
+		if (LaraDrawType != LARA_DIVESUIT)
+		{
+			item->currentAnimState = LS_UNDERWATER_ROLL;
+			item->animNumber = LA_UNDERWATER_ROLL_180_START;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			return;
+		}
+	}
+	else if (LaraDrawType != LARA_DIVESUIT)
+	{
+		SwimTurn(item);
+	}
+	else
+	{
+		SwimTurnSubsuit(item);
+	}
+
+	if (TrInput & IN_JUMP)
+		item->goalAnimState = LS_UNDERWATER_FORWARD;
+
+	item->fallspeed -= 6;
+	if (item->fallspeed < 0)
+		item->fallspeed = 0;
+
+	if (item->fallspeed <= 133)
+		item->goalAnimState = LS_UNDERWATER_STOP;
+}
+
+void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_WATER_DEATH;
+		return;
+	}
+
+	if (TrInput & IN_ROLL)
+	{
+		if (LaraDrawType != LARA_DIVESUIT)
+		{
+			item->currentAnimState = LS_UNDERWATER_ROLL;
+			item->animNumber = LA_UNDERWATER_ROLL_180_START;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			return;
+		}
+	}
+	else if (LaraDrawType != LARA_DIVESUIT)
+	{
+		SwimTurn(item);
+	}
+	else
+	{
+		SwimTurnSubsuit(item);
+	}
+
+	item->fallspeed += 8;
+
+	if (item->fallspeed > 200)
+		item->fallspeed = 200;
+
+	if (!(TrInput & IN_JUMP))
+		item->goalAnimState = LS_UNDERWATER_INERTIA;
+}
+
 void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 {
 	if (Subsuit.YVel != 0)
@@ -273,7 +437,7 @@ void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 	}
 }
 
-void DoLaraSubsuitSwimTurn(ITEM_INFO* item)//4BBDC, 4C040 (F)
+void SwimTurnSubsuit(ITEM_INFO* item)//4BBDC, 4C040 (F)
 {
 	if (item->pos.yPos < 14080)
 		Subsuit.YVel += (14080 - item->pos.yPos) >> 4;
@@ -311,36 +475,30 @@ void DoLaraSubsuitSwimTurn(ITEM_INFO* item)//4BBDC, 4C040 (F)
 	}
 }
 
-void DoLaraSwimTurn(ITEM_INFO* item)//4BAF4(<), 4BF58(<) (F)
+void SwimTurn(ITEM_INFO* item)//4BAF4(<), 4BF58(<) (F)
 {
 	if (TrInput & IN_FORWARD)
 	{
-		item->pos.xRot -= ANGLE(3.5f);
+		item->pos.xRot -= ANGLE(2);
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->pos.xRot += ANGLE(3.0f);
+		item->pos.xRot += ANGLE(2);
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= ANGLE(3.0f);
-		if (Lara.turnRate < ANGLE(-6.0f))
-		{
-			Lara.turnRate = ANGLE(-6.0f);
-		}
-
-		item->pos.zRot -= ANGLE(3.0f);
+		Lara.turnRate -= 409;
+		if (Lara.turnRate < -ANGLE(6))
+			Lara.turnRate = -ANGLE(6);
+		item->pos.zRot -= ANGLE(3);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += ANGLE(3.0f);
-		if (Lara.turnRate > ANGLE(6.0f))
-		{
-			Lara.turnRate = ANGLE(6.0f);
-		}
-
-		item->pos.zRot += ANGLE(3.0f);
+		Lara.turnRate += 409;
+		if (Lara.turnRate > ANGLE(6))
+			Lara.turnRate = ANGLE(6);
+		item->pos.zRot += ANGLE(3);
 	}
 }
 
@@ -353,10 +511,10 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	short oldYrot = item->pos.yRot;
 	short oldZrot = item->pos.zRot;
 
-	if (item->pos.xRot < ANGLE(-90.0f) || item->pos.xRot > ANGLE(90.0f))
+	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
-		Lara.moveAngle = ANGLE(180.0f);
-		coll->facing = item->pos.yRot - ANGLE(180.0f);
+		Lara.moveAngle = ANGLE(180);
+		coll->facing = item->pos.yRot - ANGLE(180);
 	}
 	else
 	{
@@ -368,40 +526,38 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)
-	{
 		height = ((LaraDrawType == LARA_DIVESUIT) << 6) + 200;
-	}
-
+	
 	coll->badNeg = -64;
-
+	
 	COLL_INFO c1;
 	COLL_INFO c2;
 	memcpy(&c1, coll, sizeof(COLL_INFO));
 	memcpy(&c2, coll, sizeof(COLL_INFO) - 2);
 
 	GetCollisionInfo(coll, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
-
-	c1.facing += ANGLE(45.0f);
+	
+	c1.facing += ANGLE(45);
 	GetCollisionInfo(&c1, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
-
-	c2.facing -= ANGLE(45.0f);
+	
+	c2.facing -= ANGLE(45);
 	GetCollisionInfo(&c2, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
-
+	
 	ShiftItem(item, coll);
-
+	
 	int flag = 0;
 
 	switch (coll->collType)
 	{
 	case CT_FRONT:
-		if (item->pos.xRot <= ANGLE(25.0f))
+		if (item->pos.xRot <= ANGLE(25))
 		{
-			if (item->pos.xRot >= ANGLE(-25.0f))
+			if (item->pos.xRot >= -ANGLE(25))
 			{
-				if (item->pos.xRot > ANGLE(5.0f))
-					item->pos.xRot += ANGLE(0.5f);
-				else if (item->pos.xRot < ANGLE(-5.0f))
-					item->pos.xRot -= ANGLE(0.5f);
+				if (item->pos.xRot > ANGLE(5))
+					item->pos.xRot += ANGLE(0.5);
+				else if (item->pos.xRot < -ANGLE(5))
+					item->pos.xRot -= ANGLE(0.5);
 				else if (item->pos.xRot > 0)
 					item->pos.xRot += 45;
 				else if (item->pos.xRot < 0)
@@ -446,7 +602,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		if (item->pos.xRot >= -8190)
 		{
 			flag = 1;
-			item->pos.xRot -= ANGLE(1.0f);
+			item->pos.xRot -= ANGLE(1);
 		}
 		break;
 
@@ -456,12 +612,12 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		break;
 
 	case CT_LEFT:
-		item->pos.yRot += ANGLE(2.0f);
+		item->pos.yRot += ANGLE(2);
 		flag = 1;
 		break;
 
 	case CT_RIGHT:
-		item->pos.yRot -= ANGLE(2.0f);
+		item->pos.yRot -= ANGLE(2);
 		flag = 1;
 		break;
 
@@ -477,13 +633,13 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
 	{
 		flag = 1;
-		item->pos.xRot += ANGLE(1.0f);
+		item->pos.xRot += ANGLE(1);
 		item->pos.yPos += coll->midFloor;
 	}
 
 	if (oldX == item->pos.xPos
 		&& oldY == item->pos.yPos
-		&& oldZ == item->pos.zPos
+		&& oldZ == item->pos.zPos 
 		&& oldXrot == item->pos.xRot
 		&& oldYrot == item->pos.yRot
 		|| flag != 1)
@@ -505,26 +661,23 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	}
 
 	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
-	{
-		TestLaraWaterDepth(item, coll);
-	}
+		LaraTestWaterDepth(item, coll);
 }
 
-// This is a setter.
-void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F)
+void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F)
 {
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	int depth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
 
-	if (depth == NO_HEIGHT)
+	if (wd == NO_HEIGHT)
 	{
 		item->fallspeed = 0;
 		item->pos.xPos = coll->old.x;
 		item->pos.yPos = coll->old.y;
 		item->pos.zPos = coll->old.z;
 	}
-	else if (depth <= 512)
+	else if (wd <= 512)
 	{
 		item->animNumber = LA_UNDERWATER_TO_STAND;
 		item->currentAnimState = LS_ONWATER_EXIT;
@@ -538,187 +691,4 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F
 		Lara.waterStatus = LW_WADE;
 		item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	}
-}
-
-// ------------------------------
-// SWIMMING
-// State & Collision Functions
-// ------------------------------
-
-void lara_as_underwater_stop(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
-{
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_WATER_DEATH;
-		return;
-	}
-
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_DIVESUIT)
-	{
-		//item->currentAnimState = LS_UNDERWATER_ROLL;
-		//item->animNumber = LA_UNDERWATER_ROLL_180_START;
-		//item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-
-		// BUG: Doesn't work when idle???
-		item->goalAnimState = LS_UNDERWATER_ROLL;
-		return;
-	}
-
-	if (TrInput & IN_LOOK)
-	{
-		LookUpDown();
-	}
-
-	if (LaraDrawType == LARA_DIVESUIT)
-	{
-		DoLaraSubsuitSwimTurn(item);
-	}
-	else
-	{
-		DoLaraSwimTurn(item);
-	}
-
-	if (TrInput & IN_JUMP)
-	{
-		item->goalAnimState = LS_UNDERWATER_FORWARD;
-	}
-
-	item->fallspeed -= 6;
-	if (item->fallspeed < 0)
-	{
-		item->fallspeed = 0;
-	}
-
-	if (Lara.gunStatus == LG_HANDS_BUSY)
-	{
-		Lara.gunStatus = LG_NO_ARMS;
-	}
-}
-
-void lara_col_underwater_stop(ITEM_INFO* item, COLL_INFO* coll)//4C940(<), 4CDA4(<) (F)
-{
-	LaraSwimCollision(item, coll);
-}
-
-void lara_as_underwater_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
-{
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_WATER_DEATH;
-		return;
-	}
-
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_DIVESUIT)
-	{
-		item->goalAnimState = LS_UNDERWATER_ROLL;
-		return;
-	}
-
-	if (LaraDrawType == LARA_DIVESUIT)
-	{
-		DoLaraSubsuitSwimTurn(item);
-	}
-	else
-	{
-		DoLaraSwimTurn(item);
-	}
-
-	item->fallspeed += 8;
-	if (item->fallspeed > 200)
-	{
-		item->fallspeed = 200;
-	}
-
-	if (!(TrInput & IN_JUMP))
-	{
-		item->goalAnimState = LS_UNDERWATER_INERTIA;
-	}
-}
-
-void lara_col_underwater_swim(ITEM_INFO* item, COLL_INFO* coll)//4C900(<), 4CD64(<) (F)
-{
-	LaraSwimCollision(item, coll);
-}
-
-void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
-{
-	lara_as_underwater_stop(item, coll);	// This one has the HANDS_BUSY check which wasn't in the current function.
-
-	if (item->fallspeed <= 133)
-	{
-		item->goalAnimState = LS_UNDERWATER_STOP;
-	}
-}
-
-void lara_col_glide(ITEM_INFO* item, COLL_INFO* coll)//4C920(<), 4CD84(<) (F)
-{
-	LaraSwimCollision(item, coll);
-}
-
-void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)//4C854, 4CCB8 (F)
-{
-	if (TrInput & IN_FORWARD)
-	{
-		item->pos.xRot -= ANGLE(1.0f);
-	}
-}
-
-void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll)//4C960(<), 4CDC4(<) (F)
-{
-	LaraSwimCollision(item, coll);
-}
-
-void lara_as_underwater_death(ITEM_INFO* item, COLL_INFO* coll)//4C884(<), 4CCE8(<) (F)
-{
-	Lara.look = 0;
-
-	item->fallspeed -= 8;
-	if (item->fallspeed <= 0)
-	{
-		item->fallspeed = 0;
-	}
-
-	if (item->pos.xRot < -ANGLE(2.0f) || item->pos.xRot > ANGLE(2.0f))
-	{
-		if (item->pos.xRot >= 0)
-		{
-			item->pos.xRot -= ANGLE(2.0f);
-		}
-		else
-		{
-			item->pos.xRot += ANGLE(2.0f);
-		}
-	}
-	else
-	{
-		item->pos.xRot = 0;
-	}
-}
-
-void lara_col_underwater_death(ITEM_INFO* item, COLL_INFO* coll)//4C980(<), 4CDE4(<) (F)
-{
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.air = -1;
-	item->hitPoints = -1;
-
-	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	if (wh != NO_HEIGHT)
-	{
-		if (wh < item->pos.yPos - 100)
-		{
-			item->pos.yPos -= 5;
-		}
-	}
-
-	LaraSwimCollision(item, coll);
-}
-
-void lara_as_underwater_roll_180(ITEM_INFO* item, COLL_INFO* coll)//4C8F8(<), 4CD5C(<) (F)
-{
-	item->fallspeed = 0;
-}
-
-void lara_col_underwater_roll_180(ITEM_INFO* item, COLL_INFO* coll)//4CA18(<), 4CE7C(<) (F)
-{
-	LaraSwimCollision(item, coll);
 }

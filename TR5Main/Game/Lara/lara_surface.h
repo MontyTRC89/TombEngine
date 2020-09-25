@@ -1,5 +1,7 @@
 #pragma once
-#include "lara.h"
+
+
+#include "Lara.h"
 
 void _cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll);
