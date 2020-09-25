@@ -25,34 +25,32 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
 	}
-
 	Lara.moveAngle = 0;
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DD90(<), 4E1F4(<) (F)
 {
-	Lara.moveAngle = ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DD64(<), 4E1C8(<) (F)
 {
-	Lara.moveAngle = ANGLE(-90.0f);
+	Lara.moveAngle = -ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)//4DD38(<), 4E19C(<) (F)
 {
-	Lara.moveAngle = ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
 {
-	Lara.moveAngle = 0;
 	coll->badNeg = -384;
-
+	Lara.moveAngle = 0;
 	LaraSurfaceCollision(item, coll);
 	LaraTestWaterClimbOut(item, coll);
 	LaraTestLadderClimbOut(item, coll);
@@ -62,9 +60,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 {
 	item->fallspeed -= 4;
 	if (item->fallspeed < 0)
-	{
 		item->fallspeed = 0;
-	}
 
 	if (item->hitPoints <= 0)
 	{
@@ -80,11 +76,11 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 
 	if (TrInput & IN_LEFT)
 	{
-		item->pos.yRot -= ANGLE(4.0f);
+		item->pos.yRot -= ANGLE(4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->pos.yRot += ANGLE(4.0f);
+		item->pos.yRot += ANGLE(4);
 	}
 
 	if (TrInput & IN_FORWARD)
@@ -109,9 +105,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 	{
 		Lara.diveCount++;
 		if (Lara.diveCount == 10)
-		{
 			item->goalAnimState = LS_UNDERWATER_FORWARD;
-		}
 	}
 	else
 	{
@@ -131,11 +125,11 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 
 	if (TrInput & IN_LEFT)
 	{
-		item->pos.yRot -= ANGLE(2.0f);
+		item->pos.yRot -= ANGLE(2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->pos.yRot += ANGLE(2.0f);
+		item->pos.yRot += ANGLE(2);
 	}
 
 	if (!(TrInput & IN_RSTEP))
@@ -145,9 +139,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)
-	{
 		item->fallspeed = 60;
-	}
 }
 
 void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
@@ -162,11 +154,11 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 
 	if (TrInput & IN_LEFT)
 	{
-		item->pos.yRot -= ANGLE(2.0f);
+		item->pos.yRot -= ANGLE(2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->pos.yRot += ANGLE(2.0f);
+		item->pos.yRot += ANGLE(2);
 	}
 
 	if (!(TrInput & IN_LSTEP))
@@ -176,9 +168,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)
-	{
 		item->fallspeed = 60;
-	}
 }
 
 void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
@@ -193,11 +183,11 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 
 	if (TrInput & IN_LEFT)
 	{
-		item->pos.yRot -= ANGLE(2.0f);
+		item->pos.yRot -= ANGLE(2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->pos.yRot += ANGLE(2.0f);
+		item->pos.yRot += ANGLE(2);
 	}
 
 	if (!(TrInput & IN_BACK))
@@ -207,9 +197,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)
-	{
 		item->fallspeed = 60;
-	}
 }
 
 void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
@@ -232,19 +220,13 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 	}
 
 	if (!(TrInput & IN_FORWARD))
-	{
 		item->goalAnimState = LS_ONWATER_STOP;
-	}
 	if (TrInput & IN_JUMP)
-	{
 		item->goalAnimState = LS_ONWATER_STOP;
-	}
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)
-	{
 		item->fallspeed = 60;
-	}
 }
 
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) (F)
@@ -264,11 +246,11 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) 
 	}
 	else if (coll->collType == CT_LEFT)
 	{
-		item->pos.yRot += ANGLE(5.0f);
+		item->pos.yRot += ANGLE(5);
 	}
 	else if (coll->collType == CT_RIGHT)
 	{
-		item->pos.yRot -= ANGLE(5.0f);
+		item->pos.yRot -= ANGLE(5);
 	}
 
 	if (GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) - item->pos.yPos > -100)
@@ -290,9 +272,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) 
 int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 {
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
-	{
 		return 0;
-	}
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
 	EnableCrawlFlexWaterPullUp = false;
@@ -300,26 +280,18 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 
 
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
-	{
 		return 0;
-	}
 
 	if (coll->frontCeiling > 0)
-	{
 		return 0;
-	}
 
 	if (coll->midCeiling > -384)
-	{
 		return 0;
-	}
 
 	int frontFloor = coll->frontFloor + 700;
 	int frontCeiling = coll->frontCeiling + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
-	{
 		return 0;
-	}
 
 	short rot = item->pos.yRot;
 	int slope = 0;
@@ -332,17 +304,13 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	else
 	{
 		if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60)
-		{
 			return 0;
-		}
 
 		result = SnapToQuadrant(rot, 35);
 	}
 
 	if (!result)
-	{
 		return 0;
-	}
 
 	item->pos.yPos += frontFloor - 5;
 
@@ -385,10 +353,8 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 			item->goalAnimState = LA_CROUCH_IDLE;
 		}
 		else
-		{
 			item->animNumber = LA_ONWATER_TO_STAND_M1CLICK;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		}
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 
 	else
@@ -405,17 +371,19 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->goalAnimState = LS_STOP;
 		}
+
+
 	}
 	
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.waterStatus = LW_ABOVE_WATER;
 	item->currentAnimState = LS_ONWATER_EXIT;
 	item->pos.yRot = rot;
+	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
 	item->gravityStatus = false;
 	item->speed = 0;
 	item->fallspeed = 0;
+	Lara.waterStatus = LW_ABOVE_WATER;
 
 	return 1;
 }
@@ -474,33 +442,27 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for water to ladder move
 {
 	if (!Lara.climbStatus || coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
-	{
 		return 0;
-	}
 
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
-	{
 		return 0;
-	}
 
 	if (!LaraTestClimbStance(item, coll))
 		return 0;
 	
 	short rot = item->pos.yRot;
 
-	if (rot >= ANGLE(-35.0f) && rot <= ANGLE(35.0f))
+	if (rot >= -ANGLE(35.0f) && rot <= ANGLE(35.0f))
 		rot = 0;
 	else if (rot >= ANGLE(55.0f) && rot <= ANGLE(125.0f))
 		rot = ANGLE(90.0f);
-	else if (rot >= ANGLE(145.0f) || rot <= ANGLE(-145.0f))
+	else if (rot >= ANGLE(145.0f) || rot <= -ANGLE(145.0f))
 		rot = ANGLE(180.0f);
-	else if (rot >= ANGLE(-125.0f) && rot <= ANGLE(-55.0f))
+	else if (rot >= -ANGLE(125.0f) && rot <= -ANGLE(55.0f))
 		rot = -ANGLE(90.0f);
 
 	if (rot & 0x3FFF)
-	{
 		return 0;
-	}
 
 	switch ((unsigned short)rot / ANGLE(90.0f))
 	{
@@ -527,23 +489,22 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 	item->goalAnimState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.waterStatus = LW_ABOVE_WATER;
 	item->pos.yRot = rot;
+	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
 	item->gravityStatus = false;
 	item->speed = 0;
 	item->fallspeed = 0;
+	Lara.waterStatus = LW_ABOVE_WATER;
 	
 	return 1;
 }
 
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)//1AEE4(<), 1B018(<) (F)
 {
-	Camera.flags = CF_FOLLOW_CENTER;
-
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
+	Camera.flags = CF_FOLLOW_CENTER;
 }
 

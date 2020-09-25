@@ -7,37 +7,34 @@
 #include "effect2.h"
 #include "sound.h"
 
+
 extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 
-void lara_as_swim_cheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
+void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
 {
 	if (TrInput & IN_FORWARD)
 	{
-		item->pos.xRot -= ANGLE(3.0f);
+		item->pos.xRot -= ANGLE(3);
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->pos.xRot += ANGLE(3.0f);
+		item->pos.xRot += ANGLE(3);
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= 613;
 
-		if (Lara.turnRate < ANGLE(-6.0f))
-		{
-			Lara.turnRate = ANGLE(-6.0f);
-		}
+		if (Lara.turnRate < -ANGLE(6))
+			Lara.turnRate = -ANGLE(6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += 613;
 
-		if (Lara.turnRate > ANGLE(6.0f))
-		{
-			Lara.turnRate = ANGLE(6.0f);
-		}
+		if (Lara.turnRate > ANGLE(6))
+			Lara.turnRate = ANGLE(6);
 	}
 
 	if (TrInput & IN_ACTION)
@@ -47,7 +44,7 @@ void lara_as_swim_cheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
 
 	if (TrInput & IN_OPTION)
 	{
-		Lara.turnRate = ANGLE(-12.0f);
+		Lara.turnRate = -ANGLE(12);
 	}
 
 	if (TrInput & IN_JUMP)
@@ -55,20 +52,14 @@ void lara_as_swim_cheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
 		item->fallspeed += 16;
 
 		if (item->fallspeed > 400)
-		{
 			item->fallspeed = 400;
-		}
 	}
 	else
 	{
 		if (item->fallspeed >= 8)
-		{
 			item->fallspeed -= item->fallspeed >> 3;
-		}
 		else
-		{
 			item->fallspeed = 0;
-		}
 	}
 }
 
@@ -80,9 +71,10 @@ void LaraCheatyBits() // (F) (D)
 		{
 			if (Lara.Vehicle == NO_ITEM)
 			{
+
 				LaraCheatGetStuff();
 
-				GiveLaraItemsCheat();
+				DelsGiveLaraItemsCheat();
 
 				LaraItem->pos.yPos -= 128;
 
@@ -113,9 +105,7 @@ void LaraCheatyBits() // (F) (D)
 		}
 	}
 	if (NoCheatCounter)
-	{
 		NoCheatCounter--;
-	}
 }
 
 void LaraCheatGetStuff() // (F) (D)
@@ -125,14 +115,10 @@ void LaraCheatGetStuff() // (F) (D)
 	Lara.NumLargeMedipacks = -1;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-	{
 		Lara.Crowbar = true;
-	}
 
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
-	{
 		Lara.Lasersight = true;
-	}
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
@@ -212,7 +198,7 @@ void LaraCheatGetStuff() // (F) (D)
 	g_Inventory.LoadObjects(false);
 }
 
-void GiveLaraItemsCheat() // (AF) (D)
+void DelsGiveLaraItemsCheat() // (AF) (D)
 {
 	int i;
 
