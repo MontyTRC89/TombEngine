@@ -12,27 +12,24 @@
 #include "effect2.h"
 #include "chaffFX.h"
 
-
 constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920,0.8020,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.84642,0.7896,0.817634,0.923424,0.7589,0.81399,0.92834,0.9978,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.74642 };
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
 constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.920,0.8020,0.07610,0.197878,0.38978,0.09983,0.00934763,0.8485,0.0762573,0.84642,0.7896,0.517634,0.0923424,0.7589,0.081399,0.92834,0.01978,0.17610,0.497878,0.8978,0.69983,0.934763,0.28485,0.1762573,0.374642 };
 
-
-
-void FlareControl(short itemNumber) // (AF) (D)
+void FlareControl(short itemNum) // (AF) (D)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 	{
-		KillItem(itemNumber);
+		KillItem(itemNum);
 		return;
 	}
 
 	if (item->fallspeed)
 	{
-		item->pos.xRot += ANGLE(3);
-		item->pos.zRot += ANGLE(5);
+		item->pos.xRot += ANGLE(3.0f);
+		item->pos.zRot += ANGLE(5.0f);
 	}
 	else
 	{
@@ -50,25 +47,26 @@ void FlareControl(short itemNumber) // (AF) (D)
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
 
-
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed += (5 - item->speed) / 2;
 	}
 	else
+	{
 		item->fallspeed += 6;
+	}
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoProperDetection(itemNum, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
 	{
 		if (!item->fallspeed && !item->speed)
 		{
-			KillItem(itemNumber);
+			KillItem(itemNum);
 			return;
 		}
 	}
@@ -327,7 +325,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		if (collided || GetFloorHeight(floor, pos.x, pos.y, pos.z) < pos.y)
 		{
 			flag = true;
-			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180);
+			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180.0f);
 			item->pos.xPos = LaraItem->pos.xPos + (320 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
 			item->pos.zPos = LaraItem->pos.zPos + (320 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 			item->roomNumber = LaraItem->roomNumber;
@@ -335,9 +333,14 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		else
 		{
 			if (thrown)
+			{
 				item->pos.yRot = LaraItem->pos.yRot;
+			}
 			else
-				item->pos.yRot = LaraItem->pos.yRot - ANGLE(45);
+			{
+				item->pos.yRot = LaraItem->pos.yRot - ANGLE(45.0f);
+			}
+
 			item->roomNumber = roomNumber;
 		}
 
@@ -359,14 +362,20 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		}
 
 		if (flag)
+		{
 			item->speed >>= 1;
+		}
 
 		if (objectNum == ID_FLARE_ITEM)
 		{
 			if (DoFlareLight((PHD_VECTOR*)&item->pos, Lara.flareAge))
+			{
 				item->data = (void*)(Lara.flareAge | 0x8000);
+			}
 			else
+			{
 				item->data = (void*)(Lara.flareAge & 0x7FFF);
+			}
 		}
 		else
 		{
@@ -393,7 +402,9 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 
 	GetLaraJointPosition(&pos, LM_LHAND);
 	if (DoFlareLight(&pos, flare_age))
+	{
 		TriggerChaffEffects(flare_age);
+	}
 
 	/* Hardcoded code */
 
@@ -415,7 +426,10 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 	float random;
 	int falloff;
 	if (age >= 900 || age == 0)
+	{
 		return 0;
+	}
+
 	random = frand();
 
 	x = pos->x + (random* 120);
@@ -431,6 +445,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 		b = FlareMainColor.z * 255;
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
+
 		return (random < 0.9f);
 	}
 	else if (age < 810)
@@ -442,6 +457,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 		g = FlareMainColor.y * 255 * multiplier;
 		b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
+
 		return (random < 0.4f);
 	}
 	else 
@@ -452,9 +468,8 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 		r = FlareMainColor.x * 255 * multiplier;
 		g = FlareMainColor.y * 255 * multiplier;
 		b = FlareMainColor.z * 255 * multiplier;
-			TriggerDynamicLight(x, y, z, falloff, r, g, b);
-			return (random < .3f);
-		
-	}
+		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
+		return (random < .3f);	
+	}
 }

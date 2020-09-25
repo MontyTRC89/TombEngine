@@ -4,9 +4,53 @@
 #include "draw.h"
 #include "effect2.h"
 
-/*this file has all the generic **collision** test functions called in lara's state code*/
+// Generic collision test functions
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+bool TestLaraWallDeflect(COLL_INFO* coll)
+{
+	if (coll->collType == CT_FRONT ||
+		coll->collType == CT_TOP_FRONT ||
+		coll->collType == CT_LEFT ||
+		coll->collType == CT_RIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: For statics?
+void SetLaraWallDeflect(ITEM_INFO* item, COLL_INFO* coll)
+{
+	switch (coll->collType)
+	{
+	case CT_FRONT:
+	case CT_TOP_FRONT:
+	{
+		ShiftItem(item, coll);
+
+		item->goalAnimState = LS_STOP;
+		item->speed = 0;
+		item->gravityStatus = false;
+		break;
+	}
+	case CT_LEFT:
+	{
+		ShiftItem(item, coll);
+		item->pos.yRot += ANGLE(5.0f);
+		break;
+	}
+	case CT_RIGHT:
+	{
+		ShiftItem(item, coll);
+		item->pos.yRot -= ANGLE(5.0f);
+		break;
+	}
+	}
+}
+
+// Legacy function.
+bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -16,7 +60,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->speed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
 
 	if (coll->collType == CT_LEFT)
@@ -30,7 +74,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.yRot -= ANGLE(5.0f);
 	}
 
-	return 0;
+	return false;
 }
 
 void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
@@ -49,7 +93,6 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 				{
 					item->goalAnimState = LS_GRAB_TO_FALL;
 					item->currentAnimState = LS_GRAB_TO_FALL;
-
 					item->animNumber = LA_JUMP_UP_LAND;
 					item->frameNumber = g_Level.Anims[LA_JUMP_UP_LAND].frameBase;
 				}
@@ -58,7 +101,6 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 			{
 				item->goalAnimState = LS_FREEFALL;
 				item->currentAnimState = LS_FREEFALL;
-
 				item->animNumber = LA_JUMP_WALL_SMASH_START;
 				item->frameNumber = g_Level.Anims[LA_JUMP_WALL_SMASH_START].frameBase + 1;
 			}
@@ -67,7 +109,9 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 			Lara.moveAngle += ANGLE(180);
 
 			if (item->fallspeed <= 0)
+			{
 				item->fallspeed = 1;
+			}
 		}
 
 		break;
@@ -96,33 +140,35 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 	}
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+bool TestLaraHitCeiling(COLL_INFO* coll)
 {
-	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
+	if (coll->collType == CT_TOP ||
+		coll->collType == CT_CLAMP)
 	{
-		ShiftItem(item, coll);
-
-		item->gravityStatus = false;
-		item->speed = 0;
-
-		return 1;
+		return true;
 	}
 
-	if (coll->collType == CT_LEFT)
-	{
-		ShiftItem(item, coll);
-		item->pos.yRot += ANGLE(2.0f);
-	}
-	else if (coll->collType == CT_RIGHT)
-	{
-		ShiftItem(item, coll);
-		item->pos.yRot -= ANGLE(2.0f);
-	}
-
-	return 0;
+	return false;
 }
 
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+// TODO: Better handling of collision with ceiling when on ground. This function should become obsolete.
+void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->pos.xPos = coll->old.x;
+	item->pos.yPos = coll->old.y;
+	item->pos.zPos = coll->old.z;
+
+	/*item->goalAnimState = LS_STOP;
+	item->currentAnimState = LS_STOP;
+	item->animNumber = LA_STAND_SOLID;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
+
+	item->speed = 0;
+	item->fallspeed = 0;// -item->fallspeed;
+}
+
+// Legacy function.
+bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_TOP || coll->collType == CT_CLAMP)
 	{
@@ -140,9 +186,9 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->fallspeed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
@@ -152,7 +198,8 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
 	case LS_STOP:
 	case LS_TURN_RIGHT_SLOW:
 	case LS_TURN_LEFT_SLOW:
-	case LS_TURN_FAST:
+	case LS_TURN_RIGHT_FAST:
+	case LS_TURN_LEFT_FAST:
 		item->currentAnimState = coll->oldAnimState;
 		item->animNumber = coll->oldAnimNumber;
 		item->frameNumber = coll->oldFrameNumber;

@@ -1,15 +1,113 @@
 #include "framework.h"
 #include "lara.h"
 #include "lara_collide.h"
+#include "lara_tests.h"
 #include "input.h"
 #include "sound.h"
+//#include "lara_slide.h"
 
-short OldAngle = 1;
+int OldAngle = 1;	// Don't care. To be deleted.
 
-/*this file has all the related functions to sliding*/
+// For later.
+bool EnableAugmentedSlide;			// Adds steep sliding, slope hugging, 180 turn.
+bool EnableNonCardinalSlide;		// Slides Lara in true slope direction.
+bool EnableSlideInterpolation;		// Adapts Lara angles to slope.
+bool EnableSlideSteering;			// Allows player influence on slide trajectory.
 
-/*tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+// SLOPE SLIDING
+
+// ------------------------------
+// Auxiliary functions
+// ------------------------------
+
+bool TestLaraSlide(COLL_INFO* coll)
+{
+	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+short GetLaraSlideDirection(COLL_INFO* coll)
+{
+	short laraAngle = ANGLE(0.0f);
+
+	//if (EnableNonCardinalSlide)
+	//{
+	//	// TODO: Get true slope direction.
+	//}
+	//else
+	//{
+		if (coll->tiltX > 2)
+		{
+			laraAngle = -ANGLE(90.0f);
+		}
+		else if (coll->tiltX < -2)
+		{
+			laraAngle = ANGLE(90.0f);
+		}
+
+		if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
+		{
+			laraAngle = ANGLE(180.0f);
+		}
+		else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
+		{
+			laraAngle = ANGLE(0.0f);
+		}
+	//}
+
+	return laraAngle;
+}
+
+int GetSlopeAngle(COLL_INFO* coll)
+{
+	return 1;
+}
+
+void SetLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
+{
+	short dir = GetLaraSlideDirection(coll);
+	short polarity = dir - item->pos.yRot;
+
+	ShiftItem(item, coll);
+
+	// Slide back.
+	if (polarity < ANGLE(-90.0f) || polarity > ANGLE(90.0f))
+	{
+		if (GetSlopeAngle(coll) < ANGLE(60.0f))//SLOPE_ANGLE_STEEP)
+		{
+			Lara.moveAngle = ANGLE(180);
+			item->goalAnimState = LS_SLIDE_BACK;
+			item->pos.yRot = dir + ANGLE(180.0f);
+		}
+		else
+		{
+			item->goalAnimState = LS_SLIDE_STEEP_BACK;
+			item->pos.yRot = dir + ANGLE(180.0f);
+		}
+	}
+	// Slide forward.
+	else
+	{
+		if (GetSlopeAngle(coll) < ANGLE(60.0f))//SLOPE_ANGLE_STEEP)
+		{
+			Lara.moveAngle = 0;
+			item->goalAnimState = LS_SLIDE_FORWARD;
+			item->pos.yRot = dir;
+		}
+		else
+		{
+			item->goalAnimState = LS_SLIDE_STEEP_FORWARD;
+			item->pos.yRot = dir;
+		}
+	}
+}
+
+// LEGACY. Staying until everything is done.
+int Old_TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 		return 0;
@@ -59,64 +157,12 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 1;
 }
 
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
+void PerformLaraSlide(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
 {
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -512;
-	coll->badCeiling = 0;
 
-	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
-
-	if (!LaraHitCeiling(item, coll))
-	{
-		LaraDeflectEdge(item, coll);
-
-		if (coll->midFloor <= 200)
-		{
-			TestLaraSlide(item, coll);
-
-			item->pos.yPos += coll->midFloor;
-
-			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
-			{
-				if (TrInput & IN_FORWARD && item->currentAnimState != LS_SLIDE_BACK)
-				{
-					item->goalAnimState = LS_RUN_FORWARD;
-				}
-				else
-					item->goalAnimState = LS_STOP;
-				StopSoundEffect(SFX_LARA_SLIPPING);
-			}
-		}
-		else
-		{
-			if (item->currentAnimState == LS_SLIDE_FORWARD)
-			{
-				item->animNumber = LA_FALL_START;
-				item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-
-				item->currentAnimState = LS_JUMP_FORWARD;
-				item->goalAnimState = LS_JUMP_FORWARD;
-			}
-			else
-			{
-				item->animNumber = LA_FALL_BACK;
-				item->frameNumber = g_Level.Anims[LA_FALL_BACK].frameBase;
-
-				item->currentAnimState = LS_FALL_BACK;
-				item->goalAnimState = LS_FALL_BACK;
-			}
-
-			StopSoundEffect(SFX_LARA_SLIPPING);
-
-			item->gravityStatus = true;
-			item->fallspeed = 0;
-		}
-	}
 }
 
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
+void PerformLaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
 {
 	ShiftItem(item, coll);
 
@@ -150,41 +196,245 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
 		break;
 	}
 }
-/*end tests and others*/
-/*-*/
-/*Lara state code*/
-void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)//1A824(<), 1A958(<) (F)
+
+// ------------------------------
+// SLOPE SLIDING
+// Control & Collision Functions
+// ------------------------------
+
+// State:		24
+// Collision:	lara_col_Slide()
+void lara_as_slide(ITEM_INFO* player, COLL_INFO* coll)//1A824(<), 1A958(<) (F)
 {
-	/*state 24*/
-	/*collision: lara_col_slide*/
-	Camera.targetElevation = -ANGLE(45.0f); // FIXED
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_BACK))
-		item->goalAnimState = LS_JUMP_FORWARD;
+	Camera.targetElevation = player->pos.xRot - ANGLE(45.0f);
+
+	/*if (TrInput & IN_LEFT)
+	{
+		player->pos.yRot -= ANGLE(2.0f);
+
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_FAST_TURN)
+		{
+			Lara.turnRate = -LARA_FAST_TURN;
+		}
+
+		if (TestLaraLean(coll) & EnableSlideSteering)
+		{
+			player->pos.zRot -= LARA_LEAN_RATE;
+			if (player->pos.zRot < -LARA_LEAN_MAX)
+			{
+				player->pos.zRot = -LARA_LEAN_MAX;
+			}
+		}
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		player->pos.yRot += ANGLE(2.0f);
+
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_FAST_TURN)
+		{
+			Lara.turnRate = LARA_FAST_TURN;
+		}
+
+		if (TestLaraLean(coll) && EnableSlideSteering)
+		{
+			player->pos.zRot += LARA_LEAN_RATE;
+			if (player->pos.zRot > LARA_LEAN_MAX)
+			{
+				player->pos.zRot = LARA_LEAN_MAX;
+			}
+		}
+	}*/
+
+	if ((TrInput & IN_BACK) || (TrInput & IN_DUCK))
+	{
+		player->goalAnimState = LS_SLIDE_STEEP_FORWARD;
+	}
+
+	if (TrInput & IN_JUMP)
+	{
+		player->goalAnimState = LS_JUMP_FORWARD;
+	}
+
+	if (TrInput & IN_ROLL)
+	{
+		player->goalAnimState = LS_SLIDE_TURN_180;
+		//SetLaraSlide(item, coll);	// Temp: Lara slides up the slope otherwise.
+	}
 }
 
 void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
 {
-	/*state 24*/
-	/*state code: lara_as_slide*/
-	Lara.moveAngle = 0;
-	lara_slide_slope(item, coll);
+	Lara.moveAngle = ANGLE(0.0f);
+
+	coll->badPos = NO_BAD_POS;
+	coll->badNeg = -512;
+	coll->badCeiling = 0;
+	coll->facing = Lara.moveAngle;
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+
+	LaraDeflectEdge(item, coll);
+
+	if (coll->midFloor <= 200)
+	{
+		item->pos.yPos += coll->midFloor;
+
+		if (!TestLaraSlide(coll))
+		{
+			item->goalAnimState = (TrInput & IN_FORWARD) ? LS_RUN_FORWARD : LS_STOP;
+
+			StopSoundEffect(SFX_LARA_SLIPPING);
+		}
+	}
+	else
+	{
+		if (TrInput & IN_ACTION && coll->midFloor >= 1024 && EnableSafetyDrop)
+		{
+			item->goalAnimState = LS_SAFE_DROP;
+		}
+		else
+		{
+			item->goalAnimState = LS_FALL;
+		}
+
+		item->gravityStatus = true;
+		item->fallspeed = 0;
+
+		StopSoundEffect(SFX_LARA_SLIPPING);
+	}
 }
 
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)//1A9E0(<), 1AB14(<) (F)
+// State:		32
+// Collision:	lara_col_SlideBack()
+void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)//1A9E0(<), 1AB14(<) (F)
 {
-	/*state 32*/
-	/*collision: lara_col_slideback*/
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_FORWARD))
+	Camera.targetElevation = item->pos.xRot;
+
+	//if (TrInput & IN_FORWARD)
+	//	item->goalAnimState = LS_SLIDE_STEEP_BACK;
+
+	if (TrInput & IN_JUMP)
+	{
+		item->goalAnimState = LS_JUMP_BACK;
+	}
+
+	/*if (TrInput & IN_ROLL)
+	{
+		item->pos.yRot += ANGLE(180.0f);
+		item->goalAnimState = LS_SLIDE_FORWARD;
+		SetLaraSlide(item, coll);
+	}*/
+}
+
+void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F)
+{
+	Lara.moveAngle = ANGLE(180.0f);
+
+	coll->badPos = NO_BAD_POS;
+	coll->badNeg = -512;
+	coll->badCeiling = 0;
+	coll->facing = Lara.moveAngle;
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+
+	LaraDeflectEdge(item, coll);
+
+	if (coll->midFloor <= 200)
+	{
+		item->pos.yPos += coll->midFloor;
+
+		if (!TestLaraSlide(coll))
+		{
+			item->goalAnimState = LS_STOP;
+			StopSoundEffect(SFX_LARA_SLIPPING);
+		}
+	}
+	else
+	{
+		if (TrInput & IN_ACTION && coll->midFloor >= 1024 && EnableSafetyDrop)
+		{
+			item->goalAnimState = LS_SAFE_DROP;
+		}
+		else
+		{
+			item->goalAnimState = LS_FALL_BACK;
+		}
+
+		item->gravityStatus = true;
+		item->fallspeed = 0;
+
+		StopSoundEffect(SFX_LARA_SLIPPING);
+	}
+}
+
+// TODO: Unique handling for steep slopes. Anims on the way.
+void lara_as_steep_slide(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->pos.xRot >= ANGLE(60))
+	{
+		Camera.targetElevation = ANGLE(-60.0f);
+	}
+	else
+	{
+		Camera.targetElevation = ANGLE(-45.0f);
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		item->goalAnimState = LS_SLIDE_FORWARD;
+	}
+
+	if (TrInput & IN_JUMP)
+	{
+		item->goalAnimState = LS_JUMP_FORWARD;
+	}
+}
+
+void lara_col_steep_slide(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = ANGLE(0.0f);
+	PerformLaraSlide(item, coll);
+}
+
+void lara_as_steep_slide_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.targetElevation = ANGLE(-60.0f);
+
+	if (TrInput & IN_BACK)
+	{
+		item->goalAnimState = LS_SLIDE_BACK;
+	}
+
+	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_BACK;
 	}
 }
 
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F)
+void lara_col_steep_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 32*/
-	/*state code: lara_as_slideback*/
-	Lara.moveAngle = ANGLE(180);
-	lara_slide_slope(item, coll);
+	Lara.moveAngle = ANGLE(180.0f);
+	PerformLaraSlide(item, coll);
 }
-/*end Lara state code*/
+
+void lara_as_slide_turn_180(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = ANGLE(0.0f);
+}
+
+// TODO: Straddling illegal slopes.
+// TODO: Grabbing edge of plateau leading to steep slope.

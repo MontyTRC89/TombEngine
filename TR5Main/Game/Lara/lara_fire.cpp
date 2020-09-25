@@ -227,7 +227,8 @@ short HoldStates[] = {
 	LS_TURN_RIGHT_SLOW,
 	LS_TURN_LEFT_SLOW,
 	LS_WALK_BACK,
-	LS_TURN_FAST,
+	LS_TURN_RIGHT_FAST,
+	LS_TURN_LEFT_FAST,
 	LS_STEP_RIGHT,
 	LS_STEP_LEFT,
 	LS_PICKUP,
@@ -371,19 +372,19 @@ void LaraGun() // (F) (D)
 				|| LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT
 				|| LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 				&& (Lara.requestGunType == WEAPON_HK
-				|| Lara.requestGunType == WEAPON_CROSSBOW
-				|| Lara.requestGunType == WEAPON_SHOTGUN
-				|| Lara.requestGunType == WEAPON_HARPOON_GUN))
+					|| Lara.requestGunType == WEAPON_CROSSBOW
+					|| Lara.requestGunType == WEAPON_SHOTGUN
+					|| Lara.requestGunType == WEAPON_HARPOON_GUN))
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 					Lara.requestGunType = WEAPON_FLARE;
 			}
 			else if (Lara.requestGunType == WEAPON_FLARE
 				|| (Lara.Vehicle == NO_ITEM
-				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
-				|| Lara.waterStatus == LW_ABOVE_WATER
-				|| (Lara.waterStatus == LW_WADE
-				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight))))
+					&& (Lara.requestGunType == WEAPON_HARPOON_GUN
+						|| Lara.waterStatus == LW_ABOVE_WATER
+						|| (Lara.waterStatus == LW_WADE
+							&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight))))
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 				{
@@ -411,18 +412,18 @@ void LaraGun() // (F) (D)
 	}
 	else if (Lara.gunStatus == LG_READY)
 	{
-		if ((TrInput & IN_DRAW) 
+		if ((TrInput & IN_DRAW)
 			|| Lara.requestGunType != Lara.gunType)
 			Lara.gunStatus = LG_UNDRAW_GUNS;
-		else if (Lara.gunType != WEAPON_HARPOON_GUN 
-			&& Lara.waterStatus != LW_ABOVE_WATER 
-			&& (Lara.waterStatus != LW_WADE 
-				|| Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)) 
+		else if (Lara.gunType != WEAPON_HARPOON_GUN
+			&& Lara.waterStatus != LW_ABOVE_WATER
+			&& (Lara.waterStatus != LW_WADE
+				|| Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight))
 			Lara.gunStatus = LG_UNDRAW_GUNS;
 	}
-	else if (Lara.gunStatus == LG_HANDS_BUSY 
-		&& (TrInput & IN_FLARE) 
-		&& LaraItem->currentAnimState == LS_CRAWL_IDLE 
+	else if (Lara.gunStatus == LG_HANDS_BUSY
+		&& (TrInput & IN_FLARE)
+		&& LaraItem->currentAnimState == LS_CRAWL_IDLE
 		&& LaraItem->animNumber == LA_CRAWL_IDLE)
 	{
 		Lara.requestGunType = WEAPON_FLARE;
@@ -430,154 +431,154 @@ void LaraGun() // (F) (D)
 
 	switch (Lara.gunStatus)
 	{
-		case LG_DRAW_GUNS:
-			if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_NONE)
-				Lara.lastGunType = Lara.gunType;
+	case LG_DRAW_GUNS:
+		if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_NONE)
+			Lara.lastGunType = Lara.gunType;
 
 		switch (Lara.gunType)
 		{
-			case WEAPON_PISTOLS:
-			case WEAPON_REVOLVER:
-			case WEAPON_UZI:
-				if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
-					Camera.type = COMBAT_CAMERA;
-				draw_pistols(Lara.gunType);
-				break;
+		case WEAPON_PISTOLS:
+		case WEAPON_REVOLVER:
+		case WEAPON_UZI:
+			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
+				Camera.type = COMBAT_CAMERA;
+			draw_pistols(Lara.gunType);
+			break;
 
-			case WEAPON_SHOTGUN:
-			case WEAPON_CROSSBOW:
-			case WEAPON_HK:
-			case WEAPON_GRENADE_LAUNCHER:
-			case WEAPON_ROCKET_LAUNCHER:
-			case WEAPON_HARPOON_GUN:
-				if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
-					Camera.type = COMBAT_CAMERA;
-				draw_shotgun(Lara.gunType);
-				break;
+		case WEAPON_SHOTGUN:
+		case WEAPON_CROSSBOW:
+		case WEAPON_HK:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
+				Camera.type = COMBAT_CAMERA;
+			draw_shotgun(Lara.gunType);
+			break;
 
-			case WEAPON_FLARE:
-				draw_flare();
-				break;
-
-			default:
-				Lara.gunStatus = LG_NO_ARMS;
-				break;
-		}
-		break;
-
-		case LG_SPECIAL:
+		case WEAPON_FLARE:
 			draw_flare();
 			break;
 
-		case LG_UNDRAW_GUNS:
+		default:
+			Lara.gunStatus = LG_NO_ARMS;
+			break;
+		}
+		break;
+
+	case LG_SPECIAL:
+		draw_flare();
+		break;
+
+	case LG_UNDRAW_GUNS:
+		Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+
+		switch (Lara.gunType)
+		{
+		case WEAPON_PISTOLS:
+		case WEAPON_REVOLVER:
+		case WEAPON_UZI:
+			undraw_pistols(Lara.gunType);
+			break;
+
+		case WEAPON_SHOTGUN:
+		case WEAPON_CROSSBOW:
+		case WEAPON_HK:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+			undraw_shotgun(Lara.gunType);
+			break;
+
+		case WEAPON_FLARE:
+			undraw_flare();
+			break;
+
+		default:
+			return;
+		}
+		break;
+
+	case LG_READY:
+		if (!(TrInput & IN_ACTION))
 			Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+		else
+			Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 
-			switch (Lara.gunType)
+		if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
+			Camera.type = COMBAT_CAMERA;
+
+		if (TrInput & IN_ACTION)
+		{
+			if (!*GetAmmo(Lara.gunType))
 			{
-				case WEAPON_PISTOLS:
-				case WEAPON_REVOLVER:
-				case WEAPON_UZI:
-					undraw_pistols(Lara.gunType);
-					break;
-
-				case WEAPON_SHOTGUN:
-				case WEAPON_CROSSBOW:
-				case WEAPON_HK:
-				case WEAPON_GRENADE_LAUNCHER:
-				case WEAPON_ROCKET_LAUNCHER:
-				case WEAPON_HARPOON_GUN:
-					undraw_shotgun(Lara.gunType);
-					break;
-
-				case WEAPON_FLARE:
-					undraw_flare();
-					break;
-
-				default:
-					return;
+				Lara.requestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
+				return;
 			}
+		}
+
+		switch (Lara.gunType)
+		{
+		case WEAPON_PISTOLS:
+		case WEAPON_UZI:
+			PistolHandler(Lara.gunType);
 			break;
 
-		case LG_READY:
-			if (!(TrInput & IN_ACTION))
-				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
-			else
-				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
-		
-			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
-				Camera.type = COMBAT_CAMERA;
-
-			if (TrInput & IN_ACTION)
-			{
-				if (!*GetAmmo(Lara.gunType))
-				{
-					Lara.requestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
-					return;
-				}
-			}
-
-			switch (Lara.gunType)
-			{
-				case WEAPON_PISTOLS:
-				case WEAPON_UZI:
-					PistolHandler(Lara.gunType);
-					break;
-
-				case WEAPON_SHOTGUN:
-				case WEAPON_CROSSBOW:
-				case WEAPON_HK:
-				case WEAPON_GRENADE_LAUNCHER:
-				case WEAPON_ROCKET_LAUNCHER:
-				case WEAPON_HARPOON_GUN:
-				case WEAPON_REVOLVER:
-					RifleHandler(Lara.gunType);
-					break;
-
-				default:
-					return;
-			}
+		case WEAPON_SHOTGUN:
+		case WEAPON_CROSSBOW:
+		case WEAPON_HK:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+		case WEAPON_REVOLVER:
+			RifleHandler(Lara.gunType);
 			break;
 
-		case LG_NO_ARMS:
-			if (Lara.gunType == WEAPON_FLARE)
+		default:
+			return;
+		}
+		break;
+
+	case LG_NO_ARMS:
+		if (Lara.gunType == WEAPON_FLARE)
+		{
+			if (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
 			{
-				if (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
+				if (Lara.flareControlLeft)
 				{
-					if (Lara.flareControlLeft)
+					if (Lara.leftArm.frameNumber)
 					{
-						if (Lara.leftArm.frameNumber)
-						{
-							if (++Lara.leftArm.frameNumber == 110)
-								Lara.leftArm.frameNumber = 0;
-						}
-					}
-					else
-					{
-						Lara.leftArm.frameNumber = 95;
-						Lara.flareControlLeft = true;
+						if (++Lara.leftArm.frameNumber == 110)
+							Lara.leftArm.frameNumber = 0;
 					}
 				}
 				else
 				{
-					Lara.flareControlLeft = false;
+					Lara.leftArm.frameNumber = 95;
+					Lara.flareControlLeft = true;
 				}
+			}
+			else
+			{
+				Lara.flareControlLeft = false;
+			}
 
+			DoFlareInHand(Lara.flareAge);
+			set_flare_arm(Lara.leftArm.frameNumber);
+		}
+		break;
+
+	case LG_HANDS_BUSY:
+		if (Lara.gunType == WEAPON_FLARE)
+		{
+			if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
+			{
+				Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 				DoFlareInHand(Lara.flareAge);
 				set_flare_arm(Lara.leftArm.frameNumber);
 			}
-			break;
-
-		case LG_HANDS_BUSY:
-			if (Lara.gunType == WEAPON_FLARE)
-			{
-				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
-				{
-					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
-					DoFlareInHand(Lara.flareAge);
-					set_flare_arm(Lara.leftArm.frameNumber);
-				}
-			}
-			break;
+		}
+		break;
 	}
 }
 
@@ -656,7 +657,7 @@ int WeaponObjectMesh(int weaponType)
 
 	case WEAPON_CROSSBOW:
 		return (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
-		
+
 	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
 
@@ -676,7 +677,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	
+
 	item->hitStatus = true;
 	if (creature != nullptr && item != LaraItem)
 		creature->hurtByLara = true;
@@ -687,16 +688,16 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 		{
 			switch (obj->hitEffect)
 			{
-				case 1:
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
-					break;
-				case 3:
-					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, 0);
-					break;
-				case 2:
-					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, -5);
-					SoundEffect(SFX_SWORD_GOD_HITMET, &item->pos, 0);
-					break;
+			case 1:
+				DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
+				break;
+			case 3:
+				TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, 0);
+				break;
+			case 2:
+				TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, -5);
+				SoundEffect(SFX_SWORD_GOD_HITMET, &item->pos, 0);
+				break;
 			}
 		}
 	}
@@ -731,9 +732,9 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 	rotation.zRot = 0;
 
 	// Calculate ray from rotation angles
-	float x =  sin(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
+	float x = sin(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
 	float y = -sin(TO_RAD(rotation.xRot));
-	float z =  cos(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
+	float z = cos(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
 	Vector3 direction = Vector3(x, y, z);
 	direction.Normalize();
 	Vector3 source = Vector3(pos.x, pos.y, pos.z);
@@ -760,7 +761,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 
 	Lara.hasFired = true;
 	Lara.fired = true;
-	
+
 	GAME_VECTOR vSrc;
 	vSrc.x = pos.x;
 	vSrc.y = pos.y;
@@ -826,10 +827,10 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 		}
 		else
 		{*/
-			if (!GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE))
-				HitTarget(target, &vDest, weapon->damage, NULL);
+		if (!GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE))
+			HitTarget(target, &vDest, weapon->damage, NULL);
 		//}
-		
+
 		return FW_MAYBEHIT;
 	}
 }
@@ -841,7 +842,7 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 
 	bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	x = (int)(bounds->X1 + bounds->X2) / 2;
-	y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
+	y = (int)bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
 	z = (int)(bounds->Z1 + bounds->Z2) / 2;
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
@@ -881,9 +882,9 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	if (LOS(&src, &targetPoint))
 	{
 		if (angles[0] >= weapon->lockAngles[0]
-		&&  angles[0] <= weapon->lockAngles[1]
-		&&  angles[1] >= weapon->lockAngles[2]
-		&&  angles[1] <= weapon->lockAngles[3])
+			&& angles[0] <= weapon->lockAngles[1]
+			&& angles[1] >= weapon->lockAngles[2]
+			&& angles[1] <= weapon->lockAngles[3])
 		{
 			Lara.rightArm.lock = true;
 			Lara.leftArm.lock = true;
@@ -893,18 +894,18 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 			if (Lara.leftArm.lock)
 			{
 				if ((angles[0] < weapon->leftAngles[0] ||
-					 angles[0] > weapon->leftAngles[1] ||
-					 angles[1] < weapon->leftAngles[2] ||
-					 angles[1] > weapon->leftAngles[3]))
+					angles[0] > weapon->leftAngles[1] ||
+					angles[1] < weapon->leftAngles[2] ||
+					angles[1] > weapon->leftAngles[3]))
 					Lara.leftArm.lock = false;
 			}
 
 			if (Lara.rightArm.lock)
 			{
 				if ((angles[0] < weapon->rightAngles[0] ||
-					 angles[0] > weapon->rightAngles[1] ||
-					 angles[1] < weapon->rightAngles[2] ||
-					 angles[1] > weapon->rightAngles[3]))
+					angles[0] > weapon->rightAngles[1] ||
+					angles[1] < weapon->rightAngles[2] ||
+					angles[1] > weapon->rightAngles[3]))
 					Lara.rightArm.lock = false;
 			}
 		}
@@ -933,7 +934,7 @@ bool CheckForHoldingState(int state) // (F) (D)
 			return true;
 		holdState++;
 	}
-	
+
 	return false;
 }
 
@@ -942,7 +943,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
 	GAME_VECTOR src, target;
 	PHD_VECTOR muzzleOffset;
 	int bestDistance, maxDistance, targets, slot, x, y, z, distance;
-	ITEM_INFO* bestItem, *item;
+	ITEM_INFO* bestItem, * item;
 	short bestYrot, angle[2], match;
 	bool flag, loop;
 
@@ -1117,7 +1118,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 
 		if (y > (height + 32) && bs == 0 &&
 			(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
-			((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+				((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
 		{
 			// Need to know which direction the wall is.
 
@@ -1524,7 +1525,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 			{
 				if (y < ceiling &&
 					(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
-					((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+						((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
 				{
 					// Need to know which direction the wall is.
 
@@ -1567,26 +1568,26 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 
 HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
 {
-	switch(weapon){
-		case WEAPON_PISTOLS:
-			return HOLSTER_SLOT::Pistols;
-		case WEAPON_UZI:
-			return HOLSTER_SLOT::Uzis;
-		case WEAPON_REVOLVER:
-			return HOLSTER_SLOT::Revolver;
-		case WEAPON_SHOTGUN:
-			return HOLSTER_SLOT::Shotgun;
-		case WEAPON_HK:
-			return HOLSTER_SLOT::HK;
-		case WEAPON_HARPOON_GUN:
-			return HOLSTER_SLOT::Harpoon;
-		case WEAPON_CROSSBOW:
-			return HOLSTER_SLOT::Crowssbow;
-		case WEAPON_GRENADE_LAUNCHER:
-			return HOLSTER_SLOT::GrenadeLauncher;
-		case WEAPON_ROCKET_LAUNCHER:
-			return HOLSTER_SLOT::RocketLauncher;
-		default:
-			return HOLSTER_SLOT::Empty;
+	switch (weapon) {
+	case WEAPON_PISTOLS:
+		return HOLSTER_SLOT::Pistols;
+	case WEAPON_UZI:
+		return HOLSTER_SLOT::Uzis;
+	case WEAPON_REVOLVER:
+		return HOLSTER_SLOT::Revolver;
+	case WEAPON_SHOTGUN:
+		return HOLSTER_SLOT::Shotgun;
+	case WEAPON_HK:
+		return HOLSTER_SLOT::HK;
+	case WEAPON_HARPOON_GUN:
+		return HOLSTER_SLOT::Harpoon;
+	case WEAPON_CROSSBOW:
+		return HOLSTER_SLOT::Crowssbow;
+	case WEAPON_GRENADE_LAUNCHER:
+		return HOLSTER_SLOT::GrenadeLauncher;
+	case WEAPON_ROCKET_LAUNCHER:
+		return HOLSTER_SLOT::RocketLauncher;
+	default:
+		return HOLSTER_SLOT::Empty;
 	}
 }
