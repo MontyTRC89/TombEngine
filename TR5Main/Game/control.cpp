@@ -1491,6 +1491,7 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 
 FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 {
+#if 0
 	ROOM_INFO *r;
 	FLOOR_INFO *floor;
 	short data;
@@ -1574,6 +1575,13 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	}
 
 	return floor;
+#endif
+
+	auto floor = FLOOR_INFO::GetNearBottomFloor(*roomNumber, x, z);
+	if (!floor)
+		floor = FLOOR_INFO::GetFloor(*roomNumber, x, z);
+	*roomNumber = FLOOR_INFO::GetRoom(*roomNumber, x, y, z);
+	return floor;
 }
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
@@ -1641,6 +1649,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
+#if 0
 	TiltYOffset = 0;
 	TiltXOffset = 0;
 	OnObject = 0;
@@ -1659,19 +1668,20 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	int height = floor->floor * 256;
 	if (height == NO_HEIGHT)
 		return height;
+#endif
 
 	TriggerIndex = NULL;
 
-	if (floor->index == 0)
-		return height;
+	/*if (floor->index == 0)
+		return height;*/
 
 	short *data = &g_Level.FloorData[floor->index];
 	short type, hadj;
 
 	int xOff, yOff, trigger;
-	ITEM_INFO *item;
+	/*ITEM_INFO *item;
 	OBJECT_INFO *obj;
-	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;*/
 
 	do
 	{
@@ -1691,7 +1701,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 			break;
 
 		case TILT_TYPE:
-			TiltXOffset = xOff = (*data >> 8);
+			/*TiltXOffset = xOff = (*data >> 8);
 			TiltYOffset = yOff = *(char *)data;
 
 			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
@@ -1707,7 +1717,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 			if (yOff >= 0)
 				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
-				height -= yOff * (x & 1023) >> 2;
+				height -= yOff * (x & 1023) >> 2;*/
 
 			data++;
 			break;
@@ -1732,13 +1742,13 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				}
 				else
 				{
-					item = &g_Level.Items[trigger & VALUE_BITS];
+					/*item = &g_Level.Items[trigger & VALUE_BITS];
 					obj = &Objects[item->objectNumber];
 
 					if (obj->floor && !(item->flags & 0x8000))
 					{
 						(obj->floor)(item, x, y, z, &height);
-					}
+					}*/
 				}
 
 			} while (!(trigger & END_BIT));
@@ -1761,7 +1771,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 		case NOCOLF1B:
 		case NOCOLF2T:
 		case NOCOLF2B:
-			tilts = *data;
+			/*tilts = *data;
 			t0 = tilts & 15;
 			t1 = (tilts >> 4) & 15;
 			t2 = (tilts >> 8) & 15;
@@ -1837,7 +1847,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
 				height -= yOff * (x & 1023) >> 2;
-
+				*/
 			data++;
 			break;
 
@@ -1846,7 +1856,9 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 		}
 	} while (!(type & END_BIT));
 
-	return height;
+	/*return height;*/
+
+	return FLOOR_INFO::GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
@@ -2472,6 +2484,7 @@ void SeedRandomDraw(int seed) // (F) (D)
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 {
+#if 0
 	ROOM_INFO *room;
 	FLOOR_INFO *floor2;
 	int ceiling, t0, t1, t2, t3, dx, dz, xOff, yOff;
@@ -2652,6 +2665,9 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 		}
 	}
 	return ceiling;
+#endif
+
+	return FLOOR_INFO::GetCeilingHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)
@@ -2966,9 +2982,9 @@ void DoFlipMap(short group)
 
 			ROOM_INFO *flipped = &g_Level.Rooms[r->flippedRoom];
 
-			memcpy(&temp, r, sizeof(temp));
-			memcpy(r, flipped, sizeof(ROOM_INFO));
-			memcpy(flipped, &temp, sizeof(ROOM_INFO));
+			temp = *r;
+			*r = *flipped;
+			*flipped = temp;
 
 			r->flippedRoom = flipped->flippedRoom;
 			flipped->flippedRoom = -1;
@@ -2979,6 +2995,11 @@ void DoFlipMap(short group)
 			AddRoomFlipItems(r);
 
 			g_Renderer.flipRooms(i, r->flippedRoom);
+
+			for (auto& fd : r->floor)
+				fd.Room = i;
+			for (auto& fd : flipped->floor)
+				fd.Room = r->flippedRoom;
 		}
 	}
 
