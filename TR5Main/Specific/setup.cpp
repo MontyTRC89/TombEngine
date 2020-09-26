@@ -152,6 +152,7 @@ void ObjectObjects()
 	obj = &Objects[ID_BRIDGE_FLAT];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFlatFloor;
 		obj->ceiling = BridgeFlatCeiling;
 	}
@@ -159,6 +160,7 @@ void ObjectObjects()
 	obj = &Objects[ID_BRIDGE_TILT1];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeTilt1Floor;
 		obj->ceiling = BridgeTilt1Ceiling;
 	}
@@ -166,6 +168,7 @@ void ObjectObjects()
 	obj = &Objects[ID_BRIDGE_TILT2];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeTilt2Floor;
 		obj->ceiling = BridgeTilt2Ceiling;
 	}
@@ -176,8 +179,8 @@ void ObjectObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
+		//obj->floor = FallingBlockFloor;
+		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveMesh = true;
@@ -634,8 +637,8 @@ void TrapObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
+		//obj->floor = FallingBlockFloor;
+		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
@@ -646,8 +649,8 @@ void TrapObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
+		//obj->floor = FallingBlockFloor;
+		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
