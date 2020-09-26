@@ -39,22 +39,22 @@ OBJECT_COLLISION_BOUNDS PoleBounds = // offset 0xA1250
 	0xF8E4, 0x071C
 };
 
-void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height) 
+void InitialiseBridge(short itemNumber)
 {
-	if (item->pos.yPos >= y)
-	{
-		*height = item->pos.yPos;
-		HeightType = WALL;
-		OnObject = 1;
-	}
+	FLOOR_INFO::AddFloor(itemNumber);
+	FLOOR_INFO::AddCeiling(itemNumber);
 }
 
-void BridgeFlatCeiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+int BridgeFlatFloor(short itemNumber, int x, int y, int z)
 {
-	if (item->pos.yPos < y)
-	{
-		*height = item->pos.yPos + 256;
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int BridgeFlatCeiling(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos + 256;
 }
 
 int GetOffset(ITEM_INFO* item, int x, int z)
@@ -77,48 +77,28 @@ int GetOffset(ITEM_INFO* item, int x, int z)
 	}
 }
 
-void BridgeTilt1Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
+int BridgeTilt1Floor(short itemNumber, int x, int y, int z)
 {
-	int level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
-
-	if (level >= y)
-	{
-		*height = level;
-		HeightType = WALL;
-		OnObject = 1;
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos + (GetOffset(item, x, z) >> 2);
 }
 
-void BridgeTilt1Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+int BridgeTilt1Ceiling(short itemNumber, int x, int y, int z)
 {
-	int level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
-
-	if (level < y)
-	{
-		*height = level + 256;
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos + (GetOffset(item, x, z) >> 2);
 }
 
-void BridgeTilt2Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
+int BridgeTilt2Floor(short itemNumber, int x, int y, int z)
 {
-	int level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
-
-	if (level >= y)
-	{
-		*height = level;
-		HeightType = WALL;
-		OnObject = 1;
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos + (GetOffset(item, x, z) >> 1);
 }
 
-void BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+int BridgeTilt2Ceiling(short itemNumber, int x, int y, int z)
 {
-	int level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
-
-	if (level < y)
-	{
-		*height = level + 256;
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos + (GetOffset(item, x, z) >> 1);
 }
 
 void ControlAnimatingSlots(short itemNumber)
