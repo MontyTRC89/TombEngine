@@ -1184,7 +1184,7 @@ namespace T5M::Renderer {
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ADDITIVE, v);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color,0, 1, s.width, s.height, BLENDMODE_ADDITIVE, -v);
 		}
 	}
 
@@ -1198,7 +1198,7 @@ namespace T5M::Renderer {
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ADDITIVE, v);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ADDITIVE, -v);
 		}
 	}
 
