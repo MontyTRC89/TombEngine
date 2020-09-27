@@ -200,8 +200,8 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	int firstBucket = (transparent ? 2 : 0);
-	int lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 1 : 0);
+	int lastBucket = (transparent ? 2 : 1);
 
 	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

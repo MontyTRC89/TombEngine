@@ -45,7 +45,7 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
-	linear float3x3 TBN : TBN;
+	float3x3 TBN : TBN;
 };
 Texture2D NormalTexture : register(t3);
 Texture2D Texture : register(t0);
@@ -85,6 +85,10 @@ float2 texOffset(int u, int v) {
 
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
+	float4 output = Texture.Sample(Sampler, input.UV);
+	if (AlphaTest && output.w < 0.01f) {
+		discard;
+	}
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	//Normal = float3(0.5, 0.5, 1);
 	Normal.g = 1 - Normal.g;
@@ -110,7 +114,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			//PCF sampling for shadow map
 			float sum = 0;
 			float x, y;
-
 			//perform PCF filtering on a 4 x 4 texel neighborhood
 			for (y = -1.5; y <= 1.5; y += 1.0) {
 				for (x = -1.5; x <= 1.5; x += 1.0) {
@@ -173,7 +176,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 	
 	output.xyz = output.xyz * lighting;
-	//output.w = 1.0f;
 
 	return output;
 }
