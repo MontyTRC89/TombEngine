@@ -219,9 +219,6 @@ namespace T5M::Renderer
 
 		ROOM_INFO *r = room.Room;
 
-		if (r->lights.size() <= 0)
-			return;
-
 		m_tempItemLights.clear();
 
 		Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
