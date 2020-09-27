@@ -91,10 +91,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
 	//Normal = input.Normal;
-	float4 output = Texture.Sample(Sampler, input.UV);
-	float3 colorMul = min(input.Color.xyz, 1.0f) * 2.0f;
-
-	float3 lighting = colorMul.xyz;
+	
+	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
 	if (CastShadows)
