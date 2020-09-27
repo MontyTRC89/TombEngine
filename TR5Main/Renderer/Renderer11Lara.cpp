@@ -276,7 +276,7 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 		RendererObject &laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
-		for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+		for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 		{
 			RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
 
