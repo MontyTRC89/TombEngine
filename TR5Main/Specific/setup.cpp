@@ -21,6 +21,7 @@
 #include "level.h"
 #include "tr4_bubbles.h"
 /// objects initializer
+#include "generic_objects.h"
 #include "tr1_objects.h"
 #include "tr2_objects.h"
 #include "tr3_objects.h"
@@ -147,30 +148,6 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_BRIDGE_FLAT];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFlatFloor;
-		obj->ceiling = BridgeFlatCeiling;
-	}
-
-	obj = &Objects[ID_BRIDGE_TILT1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeTilt1Floor;
-		obj->ceiling = BridgeTilt1Ceiling;
-	}
-
-	obj = &Objects[ID_BRIDGE_TILT2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeTilt2Floor;
-		obj->ceiling = BridgeTilt2Ceiling;
 	}
 
 	obj = &Objects[ID_CRUMBLING_FLOOR];
@@ -836,6 +813,7 @@ void InitialiseObjects()
 		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
+	InitialiseGenericObjects(); // Generic objects
 	InitialiseTR1Objects(); // Standard TR1 objects
 	InitialiseTR2Objects(); // Standard TR2 objects
 	InitialiseTR3Objects(); // Standard TR3 objects
