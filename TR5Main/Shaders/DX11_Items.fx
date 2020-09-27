@@ -174,6 +174,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		}
 	}
 
-	output.xyz *= lighting.xyz*2;
+	output.xyz *= lighting.xyz;
 	return output;
 }
