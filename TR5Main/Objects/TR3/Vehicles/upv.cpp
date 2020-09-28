@@ -188,7 +188,7 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->dSize = size;
 }
 
-static void SubEffects(short item_number)
+void SubEffects(short item_number)
 {
 	ITEM_INFO* v;
 	SUB_INFO* sub;
@@ -213,7 +213,7 @@ static void SubEffects(short item_number)
 			pos.y = sub_bites[SUB_FAN].y;
 			pos.z = sub_bites[SUB_FAN].z;
 			GetJointAbsPosition(v, &pos, sub_bites[SUB_FAN].meshNum);
-			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) >> 16, v->pos.yRot + 0x8000);
+			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) >> 16, v->pos.yRot + ANGLE(180));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
@@ -264,7 +264,7 @@ static void SubEffects(short item_number)
 		}
 
 		// TODO: enable the light for UPV
-		//TriggerDynamic(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
+		//TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
 	}
 	*/
 }
@@ -279,7 +279,7 @@ static int CanGetOff(ITEM_INFO* v)
 	if (Lara.currentXvel || Lara.currentZvel)
 		return 0;
 
-	yangle = v->pos.yRot + 0x8000;
+	yangle = v->pos.yRot + ANGLE(180);
 	speed = (GETOFF_DIST * phd_cos(v->pos.xRot)) >> W2V_SHIFT;
 	x = v->pos.xPos + (speed * phd_sin(yangle) >> W2V_SHIFT);
 	z = v->pos.zPos + (speed * phd_cos(yangle) >> W2V_SHIFT);
@@ -380,7 +380,7 @@ static void DoCurrent(ITEM_INFO* item)
 		target.x = FixedCameras[sinkval].x;
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
-		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - 0x4000) >> 4) & 4095;
+		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
@@ -937,7 +937,7 @@ int SubControl(void)
 	}
 
 	TestTriggers(TriggerIndex, false, 0);
-	SubEffects(Lara.Vehicle);
+//	SubEffects(Lara.Vehicle);
 
 	/* -------- update vehicle & Lara */
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))

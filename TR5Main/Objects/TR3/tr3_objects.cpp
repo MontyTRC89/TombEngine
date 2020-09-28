@@ -387,9 +387,9 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->control = RubberBoatControl;
 		obj->collision = RubberBoatCollision;
 		obj->drawRoutine = DrawRubberBoat;
-		obj->savePosition = 1;
-		obj->saveFlags = 1;
-		obj->saveAnim = 1;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_KAYAK];
@@ -419,11 +419,22 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->initialise = BigGunInitialise;
 		obj->collision = BigGunCollision;
 //		obj->draw_routine = BigGunDraw;
-		obj->savePosition = 1;
-		obj->saveFlags = 1;
-		obj->saveAnim = 1;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
+	obj = &Objects[ID_UPV];
+	if (obj->loaded)
+	{
+		obj->initialise = SubInitialise;
+		obj->control = SubEffects;
+		obj->collision = SubCollision;
+	//	obj->drawRoutine = SubDraw;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
 }
 
 static void StartProjectiles(OBJECT_INFO* obj)
