@@ -572,27 +572,51 @@ namespace T5M::Renderer
                 currentAngle = steps * deltaAngle;
                 currentAngle += ring->rotation;
 
-                if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing())
+                if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing())	// Not focused on item AND is active ring.
                 {
                     if (objectIndex == ring->currentObject)
+                    {
                         ring->objects[objectIndex].rotation += 45 * 360 / 30;
+                    }
                     else if (ring->objects[objectIndex].rotation != 0)
-                        ring->objects[objectIndex].rotation += 45 * 360 / 30;
+                    {
+                        if (ring->objects[objectIndex].rotation - INV_NUM_FRAMES_POPUP < 0)
+                        {
+                            ring->objects[objectIndex].rotation = 0;
+                        }
+                        else if (ring->objects[objectIndex].rotation + INV_NUM_FRAMES_POPUP > 65536)
+                        {
+                            ring->objects[objectIndex].rotation = 0;
+                        }
+                        else
+                        {
+                            if (ring->objects[objectIndex].rotation < 65536 / 2)
+                            {
+                                ring->objects[objectIndex].rotation -= ring->objects[objectIndex].rotation / INV_NUM_FRAMES_POPUP;
+                            }
+                            else
+                            {
+                                ring->objects[objectIndex].rotation += (65536 - ring->objects[objectIndex].rotation) / INV_NUM_FRAMES_POPUP;
+                            }
+                        }
+                    }
                 }
                 else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
                     g_Inventory.GetRing(k)->objects[objectIndex].rotation = 0;
 
-                if (ring->objects[objectIndex].rotation > 65536.0f)
+                if (ring->objects[objectIndex].rotation > 65536)
                     ring->objects[objectIndex].rotation = 0;
 
                 int x = ring->distance * cos(currentAngle * RADIAN);
-                int y = g_Inventory.GetRing(k)->y;
+                int y = ring->y;
                 int z = ring->distance * sin(currentAngle * RADIAN);
+
+                int localAxis = 65536 / numObjects * (objectIndex - ring->currentObject) - (65536 / 360 * ring->rotation);
 
                 // Prepare the object transform
                 Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
                 Matrix translation = Matrix::CreateTranslation(x, y, z);
-                Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY));
+                Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY + localAxis));
                 Matrix transform = (scale * rotation) * translation;
 
                 OBJECT_INFO *obj = &Objects[objectNumber];
