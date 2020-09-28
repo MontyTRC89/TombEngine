@@ -19,13 +19,13 @@
 #include "savegame.h"
 #include "sound.h"
 
-enum UPV_FLAG
-{
-	UPV_CONTROL = 1,
-	UPV_SURFACE = 2,
-	UPV_DIVE = 4,
-	UPV_DEAD = 8
-};
+//enum UPV_FLAG
+//{
+#define	UPV_CONTROL 1
+#define	UPV_SURFACE 2
+#define	UPV_DIVE 4
+#define	UPV_DEAD 8
+//};
 
 #define ACCELERATION		0x40000
 #define FRICTION			0x18000
@@ -423,7 +423,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
 		coll->facing = Lara.moveAngle = v->pos.yRot;
 	else
-		coll->facing = Lara.moveAngle = v->pos.yRot - 32768;
+		coll->facing = Lara.moveAngle = v->pos.yRot - ANGLE(180);
 
 	height = phd_sin(v->pos.xRot) * SUB_LENGTH >> W2V_SHIFT;
 	if (height < 0)
@@ -499,9 +499,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		if (sub->Flags & UPV_SURFACE)
 		{
 			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(1);
+				v->pos.xRot -= ANGLE(0.1f);
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(1);
+				v->pos.xRot += ANGLE(0.1f);
 		}
 		else
 		{
@@ -539,9 +539,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		if (sub->Flags & UPV_SURFACE)
 		{
 			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(1);
+				v->pos.xRot -= ANGLE(1.0f);
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(1);
+				v->pos.xRot += ANGLE(1.0f);
 		}
 		else
 		{
@@ -553,15 +553,18 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if ((TrInput & IN_ROLL) && (CanGetOff(v)))
 		{
-			if (sub->Flags & UPV_SURFACE)
-				l->goalAnimState = SUBS_GETOFFS;
-			else
-				l->goalAnimState = SUBS_GETOFF;
+			if (!sub->Vel) // this check isn't in TR3, but it fixes some bug when exiting on the surface. also fixes a few instances of the infamous UPV glitch
+			{
+				if (sub->Flags & UPV_SURFACE)
+					l->goalAnimState = SUBS_GETOFFS;
+				else
+					l->goalAnimState = SUBS_GETOFF;
 
-			sub->Flags &= ~UPV_CONTROL;
+				sub->Flags &= ~UPV_CONTROL;
 
-			StopSoundEffect(346);
-			SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
+				StopSoundEffect(346);
+				SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
+			}
 		}
 
 		else if (TrInput & IN_JUMP)
@@ -619,9 +622,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.xPos = LPos.x;
 			l->pos.yPos = LPos.y;
 			l->pos.zPos = LPos.z;
-			l->animNumber = 108;
+			l->animNumber = LA_UNDERWATER_IDLE;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-			l->currentAnimState = 13;
+			l->currentAnimState = LS_UNDERWATER_STOP;
 
 			l->fallspeed = 0;
 			l->gravityStatus = false;
@@ -658,9 +661,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.yPos = l->pos.yPos + 1 - hfw;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
-			l->animNumber = 114;
+			l->animNumber = LA_UNDERWATER_RESURFACE;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-			l->currentAnimState = l->goalAnimState = 34;
+			l->currentAnimState = l->goalAnimState = LS_ONWATER_FORWARD;
 
 			l->fallspeed = 0;
 			l->gravityStatus = false;
@@ -691,9 +694,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
-			l->animNumber = 124;
-			l->frameNumber = GF(124, 17);
-			l->currentAnimState = l->goalAnimState = 44;
+			l->animNumber = LA_UNDERWATER_DEATH;
+			l->frameNumber = GF(LA_UNDERWATER_DEATH, 17); //i.e l->frameNumber = g_Level.Anims[l->animNumber].frameBase + 17;
+			l->currentAnimState = l->goalAnimState = LS_WATER_DEATH;
 			l->fallspeed = 0;
 			l->gravityStatus = 0;
 			l->pos.xRot = l->pos.zRot = 0;
@@ -775,6 +778,18 @@ void SubInitialise(short itemNum)
 	sub->WeaponTimer = 0;
 }
 
+void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
+{
+	ITEM_INFO	*item;
+
+	item = &g_Level.Items[item_num];
+	if (!TestBoundsCollide(item, laraitem, coll->radius))
+		return;
+	if (!TestCollision(item, laraitem))
+		return;
+	ItemPushLara(item, laraitem, coll, 0, 0);
+}
+
 void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
@@ -804,12 +819,15 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		/* -------- determine animation */
 		Lara.gunStatus = LG_HANDS_BUSY;
 
+		v->hitPoints = 1;
 		l->pos.xPos = v->pos.xPos;
 		l->pos.yPos = v->pos.yPos;
 		l->pos.zPos = v->pos.zPos;
+		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
+		l->pos.zRot = v->pos.zRot;
 
-		if ((l->currentAnimState == 33) || (l->currentAnimState == 34))
+		if ((l->currentAnimState == LS_ONWATER_STOP) || (l->currentAnimState == LS_ONWATER_FORWARD))
 		{
 			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + 10;
 			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, 10, 0);
@@ -826,15 +844,9 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		//v->pos.yPos += SUB_DRAW_SHIFT;
-		
-		if (!TestBoundsCollide(v, LaraItem, coll->radius))
-			return;
-		if (!TestCollision(v, LaraItem))
-			return;
-		ItemPushLara(v, LaraItem, coll, false, 0);
-
-		//v->pos.yPos -= SUB_DRAW_SHIFT;
+		v->pos.yPos += SUB_DRAW_SHIFT;
+		NoGetOnCollision(itemNum, l, coll);
+		v->pos.yPos -= SUB_DRAW_SHIFT;
 	}
 }
 
