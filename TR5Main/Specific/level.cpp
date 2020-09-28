@@ -316,6 +316,14 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
+	auto itemNumber = ReadInt16();
+	while (itemNumber != NO_ITEM)
+	{
+		auto scriptId = ReadInt32();
+		g_GameScript->AddLuaId(scriptId, itemNumber);
+		itemNumber = ReadInt16();
+	}
+
 	InitialiseObjects();
 	InitialiseClosedDoors();
 
