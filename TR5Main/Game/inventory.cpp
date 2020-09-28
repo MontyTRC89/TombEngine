@@ -669,7 +669,7 @@ int Inventory::DoInventory()
 			m_movement = 0;
 			continue;
 		}
-		else if (DbInput & IN_LEFT)
+		else if (TrInput & IN_LEFT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -691,7 +691,7 @@ int Inventory::DoInventory()
 			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
 			m_rings[m_activeRing].rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT)
+		else if (TrInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -1159,7 +1159,7 @@ bool Inventory::DoCombine()
 			closeObject = true;
 			break;
 		}
-		else if (DbInput & IN_LEFT && combineRing->numObjects > 1)
+		else if (TrInput & IN_LEFT && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1183,7 +1183,7 @@ bool Inventory::DoCombine()
 
 			combineRing->rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT && combineRing->numObjects > 1)
+		else if (TrInput & IN_RIGHT && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1339,7 +1339,7 @@ void Inventory::DoSelectAmmo()
 			closeObject = true;
 			break;
 		}
-		else if (DbInput & IN_LEFT && ammoRing->numObjects > 1)
+		else if (TrInput & IN_LEFT && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1363,7 +1363,7 @@ void Inventory::DoSelectAmmo()
 
 			ammoRing->rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT && ammoRing->numObjects > 1)
+		else if (TrInput & IN_RIGHT && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1894,7 +1894,7 @@ int Inventory::DoTitleInventory()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & IN_LEFT)
+		if (TrInput & IN_LEFT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -1916,7 +1916,7 @@ int Inventory::DoTitleInventory()
 
 			ring->rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT)
+		else if (TrInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -2491,10 +2491,19 @@ int	Inventory::PopupObject()
 	InventoryRing* ring = &m_rings[m_activeRing];
 
 	int steps = INV_NUM_FRAMES_POPUP;
-	int deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
+	int deltaAngle;// = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 	float deltaTilt = 90.0f / steps;
 	float deltaDistance = INV_OBJECT_DISTANCE / steps;
+
+	if (ring->objects[ring->currentObject].rotation < 65535 / 2)
+	{
+		deltaAngle = -ring->objects[ring->currentObject].rotation / steps;
+	}
+	else
+	{
+		deltaAngle = (65535 - ring->objects[ring->currentObject].rotation) / steps;
+	}
 
 	ring->focusState = INV_FOCUS_STATE_POPUP;
 
@@ -2516,10 +2525,20 @@ int	Inventory::PopoverObject()
 	InventoryRing* ring = &m_rings[m_activeRing];
 
 	int steps = INV_NUM_FRAMES_POPUP;
-	int deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
+	int deltaAngle;// = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 	float deltaTilt = INV_OBJECT_TILT / steps;
 	float deltaDistance = INV_OBJECT_DISTANCE / steps;
+
+	if (ring->objects[ring->currentObject].rotation < 65535 / 2)
+	{
+		deltaAngle = -ring->objects[ring->currentObject].rotation / steps;
+	}
+	else
+	{
+		deltaAngle = (65535 - ring->objects[ring->currentObject].rotation) / steps;
+	}
+
 
 	ring->focusState = INV_FOCUS_STATE_POPOVER;
 
