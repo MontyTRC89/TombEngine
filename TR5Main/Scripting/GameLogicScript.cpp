@@ -72,13 +72,6 @@ GameScript::GameScript(sol::state* lua)
 		"PlaySoundEffectAtPosition", &GameScript::PlaySoundEffectAtPosition
 		);*/
 
-	m_lua->set_function("GetItemByID", &GameScript::GetItemById);
-	m_lua->set_function("GetItemByName", &GameScript::GetItemByName);
-	m_lua->set_function("CreatePosition", &GameScript::CreatePosition);
-	m_lua->set_function("CreateRotation", &GameScript::CreateRotation);
-	m_lua->set_function("CalculateDistance", &GameScript::CalculateDistance);
-	m_lua->set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance);
-
 	// Add global variables and namespaces
 	//(*m_lua)["TR"] = this;
 }
