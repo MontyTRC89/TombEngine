@@ -285,6 +285,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	g_GameScript = new GameScript(&luaState);
 
+	luaState.set_function("GetItemByID", &GameScript::GetItemById, g_GameScript);
+	luaState.set_function("GetItemByName", &GameScript::GetItemByName, g_GameScript);
+	luaState.set_function("CreatePosition", &GameScript::CreatePosition, g_GameScript);
+	luaState.set_function("CreateRotation", &GameScript::CreateRotation, g_GameScript);
+	luaState.set_function("CalculateDistance", &GameScript::CalculateDistance, g_GameScript);
+	luaState.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance, g_GameScript);
+
 	// Initialise chunks for savegames
 	SaveGame::Start();
 
