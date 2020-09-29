@@ -17,7 +17,7 @@ void PulseLightControl(short itemNumber)
 		item->itemFlags[0] -= 1024;
 
 		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
-		pulse = (HIDWORD(pulse) ^ pulse) - HIDWORD(pulse);
+		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
 

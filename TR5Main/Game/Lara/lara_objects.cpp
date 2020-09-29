@@ -763,7 +763,10 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	// CHECK
 	SoundEffect(SFX_LARA_ROPEDOWN_LOOP, &item->pos, 0);
 
-	item->itemFlags[2] = CLAMP(item->itemFlags[2], 0, ANGLE(90.0f));
+	if (item->itemFlags[2] < 0)
+		item->itemFlags[2] = 0;
+	else if (item->itemFlags[2] > ANGLE(90.0f))
+		item->itemFlags[2] = ANGLE(90.0f);
 
 	item->pos.yPos += item->itemFlags[2] >> 8;
 }
