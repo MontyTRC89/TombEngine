@@ -9,8 +9,7 @@
 namespace T5M {
 	namespace Effects {
 		namespace Footprints {
-			using std::deque;
-			std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();
+			std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
 			bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition) {
 				int x = item.pos.xPos;

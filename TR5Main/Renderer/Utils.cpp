@@ -3,6 +3,7 @@
 #include <winerror.h>
 #include <iostream>
 #include <wrl/client.h>
+#include <d3dcompiler.h>
 namespace T5M::Renderer::Utils {
 	using std::wstring;
 	using std::string;

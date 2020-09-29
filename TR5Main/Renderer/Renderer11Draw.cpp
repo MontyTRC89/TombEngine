@@ -24,6 +24,7 @@
 #include "RenderView/RenderView.h"
 #include "hair.h"
 #include "winmain.h"
+#include <chrono>
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -175,7 +176,7 @@ namespace T5M::Renderer
                         continue;
 
                     float attenuation = 1.0f - distance / light->Out;
-                    float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+                    float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
                     if (intensity >= brightest)
                     {
@@ -199,7 +200,7 @@ namespace T5M::Renderer
 
                     // If Lara, try to collect shadow casting light
                     float attenuation = 1.0f - distance / light->Range;
-                    float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+                    float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
                     if (intensity >= brightest)
                     {
@@ -2510,7 +2511,7 @@ namespace T5M::Renderer
                     m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
-                else
+                /*else
                 {
                     for (int k = 0; k < bucket->Polygons.size(); k++)
                     {
@@ -2527,7 +2528,7 @@ namespace T5M::Renderer
                                                            bucket->Vertices[poly->Indices[2]]);
                         }
                     }
-                }
+                }*/
             }
         }
 

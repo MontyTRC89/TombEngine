@@ -45,6 +45,7 @@
 #include "explosion.h"
 #include "drip.h"
 #include "particle/SimpleParticle.h"
+#include <process.h>
 
 using std::vector;
 using namespace T5M::Effects::Explosion;

@@ -990,7 +990,7 @@ namespace T5M::Renderer {
 							OBJECT_TEXTURE* texture = &g_Level.ObjectTextures[poly->TextureId];
 							int tile = texture->tileAndFlag & 0x7FFF;
 
-							if (poly->Shape == SHAPE_RECTANGLE) {
+							/*if (poly->Shape == SHAPE_RECTANGLE) {
 								bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 								bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 								bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -1008,7 +1008,7 @@ namespace T5M::Renderer {
 								m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]],
 															   bucket->Vertices[poly->Indices[1]],
 															   bucket->Vertices[poly->Indices[2]]);
-							}
+							}*/
 						}
 					}
 				}

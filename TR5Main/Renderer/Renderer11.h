@@ -25,6 +25,10 @@
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
 struct CAMERA_INFO;
 #include <wrl/client.h>
+#include <../packages/directxtk_desktop_2015.2018.11.20.1/include/CommonStates.h>
+#include <../packages/directxtk_desktop_2015.2019.10.17.1/include/SpriteFont.h>
+#include <../packages/directxtk_desktop_2015.2019.10.17.1/include/PrimitiveBatch.h>
+#include <d3d9types.h>
 namespace T5M::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
@@ -527,8 +531,8 @@ namespace T5M::Renderer
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void											updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-		void getVisibleObjects(int from, int to, Vector4* viewPort, bool water, int count, RenderView& renderView);
-		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort,const Matrix& viewProjection);
+		void getVisibleObjects(int from, int to, RenderView& renderView);
+		bool checkPortal(short roomIndex, ROOM_DOOR* portal,const Matrix& viewProjection);
 		void collectRooms(RenderView& renderView);
 		void collectItems(short roomNumber, RenderView& renderView);
 		void collectStatics(short roomNumber, RenderView& renderView);

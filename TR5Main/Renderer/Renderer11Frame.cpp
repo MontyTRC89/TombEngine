@@ -20,10 +20,7 @@ namespace T5M::Renderer
 			m_rooms[i].Visited = false;
 		}
 
-		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
-		vector<RendererRoom *> collectedRooms;
-		collectedRooms.reserve(128);
-		getVisibleObjects(-1, baseRoomIndex, &vp, false, 0, renderView);
+		getVisibleObjects(-1, baseRoomIndex, renderView);
 	}
 
 	void Renderer11::collectItems(short roomNumber, RenderView &renderView)
@@ -170,7 +167,7 @@ namespace T5M::Renderer
 				if (effect->Effect->objectNumber == ID_LARA)
 				{
 					float attenuation = 1.0f - distance / light->Out;
-					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					if (intensity >= brightest)
 					{
@@ -202,7 +199,7 @@ namespace T5M::Renderer
 			m_tempItemLights.push_back(light);
 		}
 
-		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
+		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), m_tempItemLights.size()); i++)
 		{
 			renderView.lightsToDraw.push_back(m_tempItemLights[i]);
 		}
@@ -270,7 +267,7 @@ namespace T5M::Renderer
 				if (item->Item->objectNumber == ID_LARA)
 				{
 					float attenuation = 1.0f - distance / light->Out;
-					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					if (intensity >= brightest)
 					{
@@ -297,7 +294,7 @@ namespace T5M::Renderer
 				if (item->Item->objectNumber == ID_LARA)
 				{
 					float attenuation = 1.0f - distance / light->Range;
-					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					if (intensity >= brightest)
 					{
@@ -315,7 +312,7 @@ namespace T5M::Renderer
 			m_tempItemLights.push_back(light);
 		}
 
-		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
+		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), m_tempItemLights.size()); i++)
 		{
 			item->Lights.push_back(m_tempItemLights[i]);
 		}
@@ -399,7 +396,7 @@ namespace T5M::Renderer
 						continue;
 
 					attenuation = 1.0f - distance / light->Out;
-					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					if (intensity >= brightest)
 					{
@@ -414,7 +411,7 @@ namespace T5M::Renderer
 						continue;
 
 					attenuation = 1.0f - distance / light->Range;
-					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					if (intensity >= brightest)
 					{

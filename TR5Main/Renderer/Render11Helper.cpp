@@ -12,6 +12,7 @@
 #include <Renderer\RenderView\RenderView.h>
 #include "quad.h"
 #include "rubberboat.h"
+#include <algorithm>
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
@@ -121,11 +122,11 @@ namespace T5M::Renderer
 
 					polygon->TextureId = set.Textures[textureIndex].Id;
 
-					for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
+					/*for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
 					{
 						bucket->Vertices[polygon->Indices[v]].UV.x = set.Textures[textureIndex].UV[v].x;
 						bucket->Vertices[polygon->Indices[v]].UV.y = set.Textures[textureIndex].UV[v].y;
-					}
+					}*/
 				}
 			}
 		}
@@ -550,7 +551,7 @@ namespace T5M::Renderer
 	bool Renderer11::isFading()
 	{
 		return false;
-		return (m_fadeStatus != FADEMODE_NONE);
+		return (m_fadeStatus != RENDERER_FADE_STATUS::NO_FADE);
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
@@ -653,7 +654,7 @@ namespace T5M::Renderer
 		return (a->Distance - b->Distance);
 	}
 
-	void Renderer11::getVisibleObjects(int from, int to, Vector4 *viewPort, bool water, int count, RenderView &renderView)
+	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView)
 	{
 		// Avoid allocations, 1024 should be fine
 		RendererRoomNode nodes[256];
@@ -701,7 +702,7 @@ namespace T5M::Renderer
 			{
 				short adjoiningRoom = room->doors[i].room;
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, renderView.camera.ViewProjection))
+				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], renderView.camera.ViewProjection))
 				{
 					RendererRoomNode *childNode = &nodes[nextNode++];
 					childNode->From = node->To;
@@ -714,7 +715,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR *portal, Vector4 *viewPort, Vector4 *clipPort, const Matrix &viewProjection)
+	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection)
 	{
 		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
 
@@ -730,11 +731,7 @@ namespace T5M::Renderer
 
 		int zClip = 0;
 		Vector4 p[4];
-
-		clipPort->x = FLT_MAX;
-		clipPort->y = FLT_MAX;
-		clipPort->z = FLT_MIN;
-		clipPort->w = FLT_MIN;
+		Vector4 clipPort{ FLT_MAX ,FLT_MAX ,FLT_MIN,FLT_MIN };
 
 		// Project all portal's corners in screen space
 		for (int i = 0; i < 4; i++)
@@ -751,10 +748,10 @@ namespace T5M::Renderer
 				p[i].y *= (1.0f / p[i].w);
 				p[i].z *= (1.0f / p[i].w);
 
-				clipPort->x = min(clipPort->x, p[i].x);
-				clipPort->y = min(clipPort->y, p[i].y);
-				clipPort->z = max(clipPort->z, p[i].x);
-				clipPort->w = max(clipPort->w, p[i].y);
+				clipPort.x = std::min(clipPort.x, p[i].x);
+				clipPort.y = std::min(clipPort.y, p[i].y);
+				clipPort.z = std::max(clipPort.z, p[i].x);
+				clipPort.w = std::max(clipPort.w, p[i].y);
 			}
 			else
 				// The corner is behind camera
@@ -777,34 +774,34 @@ namespace T5M::Renderer
 				{
 
 					if (a.x < 0.0f && b.x < 0.0f)
-						clipPort->x = -1.0f;
+						clipPort.x = -1.0f;
 					else if (a.x > 0.0f && b.x > 0.0f)
-						clipPort->z = 1.0f;
+						clipPort.z = 1.0f;
 					else
 					{
-						clipPort->x = -1.0f;
-						clipPort->z = 1.0f;
+						clipPort.x = -1.0f;
+						clipPort.z = 1.0f;
 					}
 
 					if (a.y < 0.0f && b.y < 0.0f)
-						clipPort->y = -1.0f;
+						clipPort.y = -1.0f;
 					else if (a.y > 0.0f && b.y > 0.0f)
-						clipPort->w = 1.0f;
+						clipPort.w = 1.0f;
 					else
 					{
-						clipPort->y = -1.0f;
-						clipPort->w = 1.0f;
+						clipPort.y = -1.0f;
+						clipPort.w = 1.0f;
 					}
 				}
 			}
 		}
+		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
+		clipPort.x = std::max(clipPort.x, vp.x);
+		clipPort.y = std::max(clipPort.y, vp.y);
+		clipPort.z = std::min(clipPort.z, vp.z);
+		clipPort.w = std::min(clipPort.w, vp.w);
 
-		clipPort->x = max(clipPort->x, viewPort->x);
-		clipPort->y = max(clipPort->y, viewPort->y);
-		clipPort->z = min(clipPort->z, viewPort->z);
-		clipPort->w = min(clipPort->w, viewPort->w);
-
-		if (clipPort->x > viewPort->z || clipPort->y > viewPort->w || clipPort->z < viewPort->x || clipPort->w < viewPort->y)
+		if (clipPort.x > vp.z || clipPort.y > vp.w || clipPort.z < vp.x || clipPort.w < vp.y)
 			return false;
 
 		return true;
