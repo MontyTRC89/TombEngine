@@ -252,8 +252,8 @@ std::optional<int> FLOOR_INFO::GetFloorHeight(int startRoomNumber, int x, int y,
 			{
 				auto item = &g_Level.Items[itemNumber];
 				auto itemHeight = Objects[item->objectNumber].floor(itemNumber, x, y, z);
-				if (itemHeight >= y && itemHeight < height)
-					height = itemHeight;
+				if (itemHeight && *itemHeight >= y && *itemHeight < height)
+					height = *itemHeight;
 			}
 		}
 
@@ -276,8 +276,8 @@ std::optional<int> FLOOR_INFO::GetCeilingHeight(int startRoomNumber, int x, int 
 			{
 				auto item = &g_Level.Items[itemNumber];
 				auto itemHeight = Objects[item->objectNumber].ceiling(itemNumber, x, y, z);
-				if (itemHeight <= y && itemHeight > height)
-					height = itemHeight;
+				if (itemHeight && *itemHeight <= y && *itemHeight > height)
+					height = *itemHeight;
 			}
 		}
 
