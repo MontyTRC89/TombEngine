@@ -27,24 +27,11 @@ constexpr auto WALL_SIZE = 1024;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 
-template<typename T>
-constexpr auto SQUARE(T x) { return ((x)*(x)); }
-template<typename T1, typename T2, typename T3>
-constexpr auto CLAMP(T1 x, T2  a, T3  b) { return ((x)<(a)?(a):((x)>(b)?(b):(x))); }
-template<typename T>
-constexpr auto SIGN(T x) { return ((0 < (x)) - ((x) < 0)); }
-template<typename T1, typename T2, typename T3>
-constexpr auto CLAMPADD(T1 x, T2  a, T3  b) { return ((x)<(a)?((x)+(a)):((x)>(b)?((x)-(b)):0)); }
-template<typename T>
-constexpr auto CLICK(T x) { return ((x) * STEP_SIZE); }
-template<typename T>
-constexpr auto SECTOR(T x) { return ((x) * WALL_SIZE); }
-template<typename T>
-constexpr auto HIDWORD(T l) { return ((DWORD)(((DWORDLONG)(l)>>32)&0xFFFFFFFF)); }
-template<typename T>
-constexpr auto MESH_BITS(T x) {
-	return (1 << x);
-}
+constexpr auto SQUARE = [](auto x) { return x * x; };
+constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
+constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
+constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
+
 short ANGLE(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);

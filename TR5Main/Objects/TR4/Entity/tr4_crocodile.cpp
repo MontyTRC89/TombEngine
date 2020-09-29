@@ -182,7 +182,10 @@ void CrocodileControl(short itemNumber)
                         item->itemFlags[1] = (GetRandomControl() & 1) != 0 ? 12 : -12;
                 }
 
-                CLAMP(item->itemFlags[0], -1024, 1024);
+                if (item->itemFlags[0] < -1024)
+                    item->itemFlags[0] = -1024;
+                else if (item->itemFlags[0] > 1024)
+                    item->itemFlags[0] = 1024;
             }
             else if (info.bite && info.distance < CROC_ATTACK_RANGE)
             {
