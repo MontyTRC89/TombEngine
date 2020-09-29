@@ -936,6 +936,9 @@
     <ClInclude Include="Objects\Generic\generic_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1713,6 +1716,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Generic\generic_objects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
