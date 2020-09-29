@@ -197,7 +197,7 @@ void ControlTeethSpikes(short itemNumber)
 				laraY2 = itemY2 + item->pos.yPos;
 
 			long dy = laraY1 - laraY2;
-			int modulus = (HIDWORD(dy) ^ dy) - HIDWORD(dy) + 1;
+			int modulus = abs(dy) + 1;
 
 			angle = item->triggerFlags & 7;
 			if (angle == 2 || angle == 6)
