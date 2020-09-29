@@ -11,6 +11,10 @@
 #include "level.h"
 #include "configuration.h"
 #include "Renderer11.h"
+#include <CommCtrl.h>
+#include <fcntl.h>
+#include <process.h>
+#include <corecrt_io.h>
 using namespace T5M::Renderer;
 using std::exception;
 using std::string;

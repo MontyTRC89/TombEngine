@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Texture2D.h"
 #include "Utils.h"
+#include <WICTextureLoader.h>
 namespace T5M::Renderer {
 	using Utils::throwIfFailed;
 	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data) {
