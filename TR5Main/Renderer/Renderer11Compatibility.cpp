@@ -7,6 +7,7 @@
 #include "objects.h"
 #include <lara_struct.h>
 #include <tuple>
+#include <stack>
 using std::optional;
 using std::stack;
 using std::vector;

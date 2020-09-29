@@ -358,22 +358,22 @@ void PickedUpObject(short objectNumber)
 void RemoveObjectFromInventory(short objectNumber, int count)
 {
     if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-        Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1] -= min(count, Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]);
+        Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1] -= std::min(count, Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]);
 
     else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-        Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1] -= min(count, Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]);
+        Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1] -= std::min(count, Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]);
 
     else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-        Lara.Keys[objectNumber - ID_KEY_ITEM1] -= min(count, Lara.Keys[objectNumber - ID_KEY_ITEM1]);
+        Lara.Keys[objectNumber - ID_KEY_ITEM1] -= std::min(count, Lara.Keys[objectNumber - ID_KEY_ITEM1]);
 
     else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-        Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1] -= min(count, Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]);
+        Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1] -= std::min(count, Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]);
 
     else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
-        Lara.Pickups[objectNumber - ID_PICKUP_ITEM1] -= min(count, Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]);
+        Lara.Pickups[objectNumber - ID_PICKUP_ITEM1] -= std::min(count, Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]);
 
     else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
-        Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1] -= min(count, Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]);
+        Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1] -= std::min(count, Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]);
 
     else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
         Lara.Examines[objectNumber - ID_EXAMINE1] = 0;

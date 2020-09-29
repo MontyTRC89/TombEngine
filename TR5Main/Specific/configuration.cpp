@@ -7,6 +7,7 @@
 #include "GameFlowScript.h"
 #include "configuration.h"
 #include "sound.h"
+#include <CommCtrl.h>
 using namespace T5M::Renderer;
 using std::vector;
 extern GameFlow* g_GameFlow;

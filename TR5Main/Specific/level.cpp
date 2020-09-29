@@ -13,7 +13,8 @@
 #include "box.h"
 #include "sound.h"
 #include "GameFlowScript.h"
-
+#include <process.h>
+#include <zlib.h>
 using T5M::Renderer::g_Renderer;
 using std::vector;
 using std::string;
@@ -156,8 +157,8 @@ int LoadItems()
 
 void LoadObjects()
 {
-	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
-	memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	std::memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
+	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	g_Level.Meshes.reserve(numMeshes);

@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <windows.h>
 
 #include "Streams.h"
 
@@ -45,32 +44,32 @@ typedef struct LEB128
 
 	static int ReadInt32(BaseStream* stream)
 	{
-		long value = ReadLong(stream);
-		return (int)min(max(value, INT32_MIN), INT32_MAX);
+		long long value = ReadLong(stream);
+		return static_cast<int>(std::min(std::max(value, static_cast<long long>(INT32_MIN)), static_cast<long long>(INT32_MAX)));
 	}
 
 	static short ReadInt16(BaseStream* stream)
 	{
 		long value = ReadLong(stream);
-		return (short)min(max(value, INT16_MIN), INT16_MAX);
+		return static_cast<short>(std::min(std::max(value, static_cast<long>(INT16_MIN)), static_cast<long>(INT16_MAX)));
 	}
 
 	static byte ReadByte(BaseStream* stream)
 	{
 		long value = ReadLong(stream);
-		return (byte)min(max(value, 0), UINT8_MAX);
+		return static_cast<byte>(std::min(std::max(value, 0L), static_cast<long>(UINT8_MAX)));
 	}	
 
 	static unsigned int ReadUInt32(BaseStream* stream)
 	{
-		long value = ReadLong(stream);
-		return (unsigned int)min(max(value, 0), UINT32_MAX);
+		long long value = ReadLong(stream);
+		return static_cast<unsigned int>(std::max(std::min(static_cast<unsigned long>(value), static_cast<unsigned long>(UINT32_MAX)), 0UL));
 	}
 
 	static unsigned short ReadUInt16(BaseStream* stream)
 	{
 		long value = ReadLong(stream);
-		return (unsigned short)min(max(value, 0), UINT16_MAX);
+		return static_cast<unsigned short>(std::min(std::max(value, 0L), static_cast<long>(UINT16_MAX)));
 	}
 
 	static void Write(BaseStream* stream, long value, long maximumSize)

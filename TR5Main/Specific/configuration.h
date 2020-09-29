@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Windows.h>
 #include "input.h"
 
 #define REGKEY_ROOT				"Software\\TR5Main\\TR5Main"
