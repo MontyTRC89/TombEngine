@@ -21,8 +21,8 @@ struct OBJECT_INFO
 	int frameBase;
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
-	std::function<int(short itemNumber, int x, int y, int z)> floor;
-	std::function<int(short itemNumber, int x, int y, int z)> ceiling;
+	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> floor;
+	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> ceiling;
 	std::function<void(ITEM_INFO* item)> drawRoutine;
 	std::function<void(ITEM_INFO* item)> drawRoutineExtra;
 	std::function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;

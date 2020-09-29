@@ -9,14 +9,15 @@
 
 static void StartObject()
 {
-	OBJECT_INFO* obj;
-
-	obj = &Objects[ID_BRIDGE];
-	if (obj->loaded)
+	for (int objNumber = ID_BRIDGE1; objNumber <= ID_BRIDGE8; ++objNumber)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor;
-		obj->ceiling = BridgeCeiling;
+		auto obj = &Objects[objNumber];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseBridge;
+			obj->floor = BridgeFloor;
+			obj->ceiling = BridgeCeiling;
+		}
 	}
 }
 

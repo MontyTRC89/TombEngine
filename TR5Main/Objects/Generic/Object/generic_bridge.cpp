@@ -9,16 +9,16 @@ void InitialiseBridge(short itemNumber)
 	FLOOR_INFO::AddCeiling(itemNumber);
 }
 
-int BridgeFloor(short itemNumber, int x, int y, int z)
+std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 {
 	auto item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetOffset(&item->pos, x, z);
+	return std::optional{item->pos.yPos + GetOffset(&item->pos, x, z)};
 }
 
-int BridgeCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 {
 	auto item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetOffset(&item->pos, x, z);
+	return std::optional{item->pos.yPos + GetOffset(&item->pos, x, z)};
 }
 
 int GetOffset(PHD_3DPOS* pos, int x, int z)
