@@ -2470,10 +2470,14 @@ namespace T5M::Renderer
 
         if (animated)
             m_primitiveBatch->Begin();
-
         for (int i = 0; i < view.roomsToDraw.size(); i++)
         {
-            RendererRoom *room = view.roomsToDraw[i];
+            //Draw transparent back-to-front
+            int index = i;
+            if (transparent) {
+                index = view.roomsToDraw.size() - 1 - index;
+            }
+            RendererRoom *room = view.roomsToDraw[index];
 
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
