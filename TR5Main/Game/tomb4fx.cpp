@@ -682,12 +682,10 @@ void TriggerBlood(int x, int y, int z, int unk, int num)// (F)
 		blood->x = (GetRandomControl() & 0x1F) + x - 16;
 		blood->y = (GetRandomControl() & 0x1F) + y - 16;
 		blood->z = (GetRandomControl() & 0x1F) + z - 16;
-		int a = (unk == -1
-			? GetRandomControl() & 0xFFFF
-			: (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
+		int a = (unk == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
 		int b = GetRandomControl() & 0xF;
-		blood->zVel = b * rcossin_tbl[2 * a + 1] >> 7;
-		blood->xVel = -(b * rcossin_tbl[2 * a]) >> 7;
+		blood->zVel = b * phd_cos(a << 4) >> 9;
+		blood->xVel = -b * phd_sin(a << 4) >> 9;
 		blood->friction = 4;
 		blood->yVel = -((GetRandomControl() & 0xFF) + 128);
 		blood->rotAng = GetRandomControl() & 0xFFF;
@@ -1029,10 +1027,10 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->life = 24;
 		spark->sLife = 24;
 		spark->transType = COLADD;	
-		int random = GetRandomControl();
-		spark->xVel = -rcossin_tbl[2 * random] >> 5;
+		int random = GetRandomControl() & 0xFFF;
+		spark->xVel = -phd_sin(random << 4) >> 7;
 		spark->yVel = -640 - GetRandomControl();
-		spark->zVel = rcossin_tbl[2 * random & 0xFFF + 1] >> 5;	
+		spark->zVel = phd_cos(random << 4) >> 7;
 		spark->friction = 5;
 		spark->flags = SP_NONE;
 		spark->x = x + (spark->xVel >> 3);

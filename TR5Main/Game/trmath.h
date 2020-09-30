@@ -36,8 +36,6 @@ short ANGLE(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);
 
-extern short rcossin_tbl[8192];
-
 int phd_sin(short a);
 int phd_cos(short a);
 

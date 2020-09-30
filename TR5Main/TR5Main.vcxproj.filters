@@ -66,9 +66,6 @@
     <ClInclude Include="Game\objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\objlight.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\people.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -987,9 +984,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\objects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\objlight.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\people.cpp">
