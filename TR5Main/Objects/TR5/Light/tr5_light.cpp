@@ -32,22 +32,20 @@ void PulseLightControl(short itemNumber)
 	}
 }
 
-void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, short roomNumber, short falloff)
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
 {
-	GAME_VECTOR from;
-	from.x = x;
-	from.y = y;
-	from.z = z;
-	GetFloor(x, y, z, &roomNumber);
-	from.roomNumber = roomNumber;
+	GAME_VECTOR source, target;
 
-	GAME_VECTOR to;
-	to.x = x + rcossin_tbl[2 * rot];
-	to.y = y;
-	to.z = z + rcossin_tbl[2 * rot + 1];
-
-	if (!LOS(&from, &to))
-		TriggerDynamicLight(to.x, to.y, to.z, falloff, r, g, b);
+	source.x = x;
+	source.y = y;
+	source.z = z;
+	GetFloor(x, y, z, &room);
+	source.roomNumber = room;
+	target.x = x + phd_sin(16 * angle);
+	target.y = y;
+	target.z = z + phd_cos(16 * angle);
+	if (!LOS(&source, &target))
+		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
 
 void StrobeLightControl(short itemNumber)

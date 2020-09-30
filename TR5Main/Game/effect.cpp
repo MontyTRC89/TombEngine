@@ -23,7 +23,6 @@
 
 using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
-int wf = 256;
 using namespace T5M::Effects::Footprints;
 
 short FXType;
@@ -328,19 +327,9 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int x, z;
 
-	if (item->pos.yRot == -ANGLE(180))
-	{
-		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2048] * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2049] * wf) >> W2V_SHIFT);
-	}
-	else
-	{
-		//3934C
-		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_sin(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_cos(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
-	}
+	x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 5) + ((phd_sin(item->pos.yRot - ANGLE(90)) * 256) >> W2V_SHIFT);
+	z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 5) + ((phd_cos(item->pos.yRot - ANGLE(90)) * 256) >> W2V_SHIFT);
 
-	//393A0
 	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
 	SoundEffect(SFX_WATERFALL_LOOP, &item->pos, 0);
 }
