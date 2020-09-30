@@ -448,8 +448,8 @@ void KayakDoCurrent(ITEM_INFO* item)
 		int dz = target.z - LaraItem->pos.zPos;
 
 		int speed = FixedCameras[sinkval].data;
-		dx = (((rcossin_tbl[(angle << 1)] * speed))) / 4; // / distance)<<4;
-		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) / 4;// / distance)<<4;
+		dx = phd_sin(angle << 4) * speed / 16;
+		dz = phd_cos(angle << 4) * speed / 16;
 
 		Lara.currentXvel += (dx - Lara.currentXvel) / 16;
 		Lara.currentZvel += (dz - Lara.currentZvel) / 16;

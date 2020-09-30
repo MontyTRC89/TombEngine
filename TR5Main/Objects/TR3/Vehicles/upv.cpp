@@ -386,8 +386,8 @@ static void DoCurrent(ITEM_INFO* item)
 		dz = target.z - LaraItem->pos.zPos;
 
 		speed = FixedCameras[sinkval].data;
-		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
-		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
+		dx = phd_sin(angle << 4) * speed >> 4;
+		dz = phd_cos(angle << 4) * speed >> 4;
 
 		Lara.currentXvel += (dx - Lara.currentXvel) >> 4;
 		Lara.currentZvel += (dz - Lara.currentZvel) >> 4;

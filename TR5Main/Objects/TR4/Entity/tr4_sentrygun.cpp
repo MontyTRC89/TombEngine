@@ -146,7 +146,7 @@ void SentryGunControl(short itemNum)
 							{
 								// Throw fire
 								SentryGunThrowFire(item);
-								c = 4 * rcossin_tbl[(GlobalCounter & 0x1F) << 11 >> 3] >> 2;
+								c = phd_sin((GlobalCounter & 0x1F) << 11) >> 2;
 							}
 							else
 							{

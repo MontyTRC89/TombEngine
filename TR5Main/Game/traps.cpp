@@ -10,7 +10,7 @@
 #include "switch.h"
 #include "sphere.h"
 #include "camera.h"
-#include "objlight.h"
+#include "tr5_light.h"
 #include "draw.h"
 #include "level.h"
 #include "input.h"
