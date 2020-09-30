@@ -499,9 +499,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		if (sub->Flags & UPV_SURFACE)
 		{
 			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(0.1f);
+				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2
 		}
 		else
 		{
@@ -539,9 +539,9 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		if (sub->Flags & UPV_SURFACE)
 		{
 			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(1.0f);
+				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(1.0f);
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2
 		}
 		else
 		{
