@@ -12,6 +12,7 @@
 #include <Renderer\RenderView\RenderView.h>
 #include "quad.h"
 #include "rubberboat.h"
+#include "upv.h"
 #include <algorithm>
 
 extern GameConfiguration g_Configuration;
@@ -298,6 +299,12 @@ namespace T5M::Renderer
 					RUBBER_BOAT_INFO* boat = (RUBBER_BOAT_INFO*)item->data;
 					if (j == 2)
 						currentBone->ExtraRotation.z = TO_RAD(boat->propRot);
+				}
+				else if (item->objectNumber == ID_UPV)
+				{
+					SUB_INFO* upv = (SUB_INFO*)item->data;
+					if (j == 3)
+						currentBone->ExtraRotation.z = TO_RAD(upv->FanRot);
 				}
 				else
 				{
