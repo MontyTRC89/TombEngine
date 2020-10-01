@@ -127,7 +127,6 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
-		// if lara have ammo, reduce it.
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
 			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0]--;
 		Savegame.Game.AmmoUsed++;
@@ -263,7 +262,9 @@ void SubEffects(short item_number)
 		}
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
 	}
-	
+	// wake stuff?
+	if (sub->WeaponTimer)
+		sub->WeaponTimer--; // fix shooting
 }
 
 static int CanGetOff(ITEM_INFO* v)
