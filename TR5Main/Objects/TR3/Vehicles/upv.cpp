@@ -495,10 +495,30 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if (sub->Flags & UPV_SURFACE)
 		{
-			if (v->pos.xRot > SURFACE_ANGLE)
+			int xa = v->pos.xRot - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - v->pos.xRot;
+			if (xa > 0)
+			{
+				if (xa > ANGLE(1))
+					v->pos.xRot -= ANGLE(1.0f);
+				else
+					v->pos.xRot -= ANGLE(0.1f);
+			}
+			else if (ax)
+			{
+				if (ax > ANGLE(1))
+				{
+					v->pos.xRot += ANGLE(1.0f);
+				}
+				else
+					v->pos.xRot += ANGLE(0.1f);
+			}
+			else
+				v->pos.xRot = SURFACE_DIST;
+/*			if (v->pos.xRot > SURFACE_ANGLE)
 				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
@@ -535,10 +555,31 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if (sub->Flags & UPV_SURFACE)
 		{
+			int xa = v->pos.xRot - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - v->pos.xRot;
+			if (xa > 0)
+			{
+				if (xa > ANGLE(1))
+					v->pos.xRot -= ANGLE(1.0f);
+				else
+					v->pos.xRot -= ANGLE(0.1f);
+			}
+			else if (ax)
+			{
+				if (ax > ANGLE(1))
+				{
+					v->pos.xRot += ANGLE(1.0f);
+				}
+				else
+					v->pos.xRot += ANGLE(0.1f);
+			}
+			else
+				v->pos.xRot = SURFACE_DIST;
+			/*
 			if (v->pos.xRot > SURFACE_ANGLE)
 				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
