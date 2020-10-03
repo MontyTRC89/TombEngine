@@ -638,7 +638,9 @@ int SpeedBoatDynamics(short itemNum)
 	{
 		newspeed = ((boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot)) >> W2V_SHIFT;
 
-		if (boat->speed > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < boat->speed - 10)
+		// this check is required otherwise Lara takes damage if the boat bumps even if she had jumped out of it
+
+		if (Lara.Vehicle == itemNum && boat->speed > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < boat->speed - 10)
 		{
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
