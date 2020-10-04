@@ -68,7 +68,7 @@ namespace T5M::Renderer
             updateAnimation(NULL, moveableObj, frame, 0, 0, 0xFFFFFFFF);
         }
 
-        Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+        Vector3 pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
         // Clear just the Z-buffer so we can start drawing on top of the scene
         ID3D11DepthStencilView *dsv;
@@ -1286,7 +1286,7 @@ namespace T5M::Renderer
                                                        rope->position.y + rope->segment[i].y / 65536.0f,
                                                        rope->position.z + rope->segment[i].z / 65536.0f);
 
-                    projected[i] = m_viewportToolkit->Project(absolutePosition, Projection, View, world);
+                    projected[i] = m_viewportToolkit.Project(absolutePosition, Projection, View, world);
                 }
 
                 // Now each rope point is transformed in screen X, Y and Z depth
@@ -1324,8 +1324,8 @@ namespace T5M::Renderer
 
                 for (int j = 0; j < 24; j++)
                 {
-                    Vector3 p1 = m_viewportToolkit->Unproject(Vector3(x1, y1, depth), Projection, View, world);
-                    Vector3 p2 = m_viewportToolkit->Unproject(Vector3(x2, y2, depth), Projection, View, world);
+                    Vector3 p1 = m_viewportToolkit.Unproject(Vector3(x1, y1, depth), Projection, View, world);
+                    Vector3 p2 = m_viewportToolkit.Unproject(Vector3(x2, y2, depth), Projection, View, world);
 
                     dx = projected[j].x - projected[j - 1].x;
                     dy = projected[j].y - projected[j - 1].y;
@@ -1358,8 +1358,8 @@ namespace T5M::Renderer
 
                     depth = projected[j].z;
 
-                    Vector3 p3 = m_viewportToolkit->Unproject(Vector3(x3, y3, depth), Projection, View, world);
-                    Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
+                    Vector3 p3 = m_viewportToolkit.Unproject(Vector3(x3, y3, depth), Projection, View, world);
+                    Vector3 p4 = m_viewportToolkit.Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
                     addSprite3D(&m_sprites[20],
                                 Vector3(p1.x, p1.y, p1.z),

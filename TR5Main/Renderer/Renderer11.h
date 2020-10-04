@@ -359,7 +359,7 @@ namespace T5M::Renderer
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
-		Viewport* m_viewportToolkit;
+		Viewport m_viewportToolkit;
 		std::vector<RendererVideoAdapter> m_adapters;
 	
 		// Main back buffer
