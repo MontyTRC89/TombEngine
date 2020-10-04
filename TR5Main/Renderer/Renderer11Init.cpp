@@ -196,21 +196,19 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	sd.SampleDesc.Quality = 0;
 	sd.BufferCount = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	ComPtr<IDXGIDevice> dxgiDevice;
+	Utils::throwIfFailed(m_device.As(&dxgiDevice));
 
-	IDXGIDevice* dxgiDevice = NULL;
-	Utils::throwIfFailed(m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)& dxgiDevice));
+	ComPtr<IDXGIAdapter> dxgiAdapter;
+	Utils::throwIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), &dxgiAdapter));
 
-	IDXGIAdapter* dxgiAdapter = NULL;
-	Utils::throwIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)& dxgiAdapter));
-
-	IDXGIFactory* dxgiFactory = NULL;
-	Utils::throwIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)& dxgiFactory));
+	ComPtr<IDXGIFactory> dxgiFactory;
+	Utils::throwIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), &dxgiFactory));
 
 	if (reset)
 	{
 		// Always return to windowed mode otherwise crash will happen
 		m_swapChain->SetFullscreenState(false, NULL);
-		m_swapChain->Release();
 	}
 
 	Utils::throwIfFailed(dxgiFactory->CreateSwapChain(m_device.Get(), &sd, &m_swapChain));
@@ -218,10 +216,6 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 
 	dxgiFactory->MakeWindowAssociation(handle, 0);
 	res = m_swapChain->SetFullscreenState(!windowed, NULL);
-
-	dxgiDevice->Release();
-	dxgiAdapter->Release();
-	dxgiFactory->Release();
 
 	// Initialise the back buffer
 	m_backBufferTexture = NULL;
@@ -320,7 +314,7 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	m_shadowMapViewport.MinDepth = 0.0f;
 	m_shadowMapViewport.MaxDepth = 1.0f;
 
-	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
+	m_viewportToolkit = Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
 	if (windowed)
