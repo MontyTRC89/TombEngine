@@ -14,8 +14,8 @@ void ControlSpikyWall(short itemNum)
 	/* Move wall */
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		int x = item->pos.xPos + phd_sin(item->pos.yRot) >> WALL_SHIFT;
-		int z = item->pos.zPos + phd_cos(item->pos.yRot) >> WALL_SHIFT;
+		int x = item->pos.xPos + phd_sin(item->pos.yRot);
+		int z = item->pos.zPos + phd_cos(item->pos.yRot);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);

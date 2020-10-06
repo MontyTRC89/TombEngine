@@ -428,8 +428,8 @@ void ClassicRollingBallControl(short itemNum)
 			ydist = 1024;
 		}
 
-		x = item->pos.xPos + (dist * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-		z = item->pos.zPos + (dist * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+		x = item->pos.xPos + dist * phd_sin(item->pos.yRot);
+		z = item->pos.zPos + dist * phd_cos(item->pos.yRot);
 
 		floor = GetFloor(x, item->pos.yPos, z, &roomNum);
 		y1 = GetFloorHeight(floor, x, item->pos.yPos, z);

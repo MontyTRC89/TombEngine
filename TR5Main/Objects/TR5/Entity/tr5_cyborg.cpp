@@ -93,8 +93,8 @@ void HitmanControl(short itemNumber)
 		int x = item->pos.xPos;
 		int z = item->pos.zPos;
 
-		int dx = 808 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		int dz = 808 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		int dx = 808 * phd_sin(item->pos.yRot);
+		int dz = 808 * phd_cos(item->pos.yRot);
 
 		x += dx;
 		z += dz;

@@ -161,9 +161,9 @@ void WraithControl(short itemNumber)
 	oldY = item->pos.yPos;
 	oldZ = item->pos.zPos;
 
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * phd_sin(item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->speed * phd_sin(item->pos.xRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
 
 	IsRoomOutsideNo = NO_ROOM;
 	IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -541,9 +541,9 @@ void WraithWallsEffect(int x, int y, int z, short yrot, short objNumber)
 		spark->z = (GetRandomControl() & 0x1F) + z - 16;
 		short rot = yrot + GetRandomControl() - ANGLE(90);
 		short velocity = ((GetRandomControl() & 0x3FF) + 1024);
-		spark->xVel = velocity * phd_sin(rot) >> W2V_SHIFT;
+		spark->xVel = velocity * phd_sin(rot);
 		spark->yVel = (GetRandomControl() & 0x7F) - 64;
-		spark->zVel = velocity * phd_cos(rot) >> W2V_SHIFT;
+		spark->zVel = velocity * phd_cos(rot);
 		spark->friction = 4;
 		spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 		spark->maxYvel = 0;

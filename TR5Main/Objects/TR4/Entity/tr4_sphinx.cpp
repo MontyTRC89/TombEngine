@@ -32,9 +32,9 @@ void SphinxControl(short itemNumber)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	int x = item->pos.xPos + 614 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 614 * phd_sin(item->pos.yRot);
 	int y = item->pos.yPos;
-	int z = item->pos.zPos + 614 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int z = item->pos.zPos + 614 * phd_cos(item->pos.yRot);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -61,9 +61,9 @@ void SphinxControl(short itemNumber)
 		}
 	}
 
-	x = item->pos.xPos - 614 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 614 * phd_sin(item->pos.yRot);
 	y = item->pos.yPos;
-	z = item->pos.zPos - 614 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 614 * phd_cos(item->pos.yRot);
 
 	roomNumber = item->roomNumber;
 

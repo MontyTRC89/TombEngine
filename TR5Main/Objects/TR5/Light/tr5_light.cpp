@@ -16,7 +16,7 @@ void PulseLightControl(short itemNumber)
 	{
 		item->itemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
+		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
@@ -41,9 +41,9 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	source.z = z;
 	GetFloor(x, y, z, &room);
 	source.roomNumber = room;
-	target.x = x + phd_sin(16 * angle);
+	target.x = x + 16384 * phd_sin(16 * angle);
 	target.y = y;
-	target.z = z + phd_cos(16 * angle);
+	target.z = z + 16384 * phd_cos(16 * angle);
 	if (!LOS(&source, &target))
 		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
@@ -70,9 +70,9 @@ void StrobeLightControl(short itemNumber)
 			12);
 
 		TriggerDynamicLight(
-			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528),
 			item->pos.yPos - 768,
-			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528),
 			8,
 			r, g, b);
 	}

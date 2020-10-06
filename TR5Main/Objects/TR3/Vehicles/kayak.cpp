@@ -107,11 +107,11 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 	if (WakePts[CurrentStartWake][rotate].life)
 		return;
 
-	int s = phd_sin(v->pos.yRot);
-	int c = phd_cos(v->pos.yRot);
+	float s = phd_sin(v->pos.yRot);
+	float c = phd_cos(v->pos.yRot);
 	
-	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
-	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+	int x = v->pos.xPos + zoff * s + xoff * c;
+	int z = v->pos.zPos + zoff * c - xoff * s;
 
 	short angle1, angle2;
 
@@ -147,10 +147,10 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 			}
 		}
 
-		xv[0] = (WAKE_SPEED * phd_sin(angle1)) >> W2V_SHIFT;
-		zv[0] = (WAKE_SPEED * phd_cos(angle1)) >> W2V_SHIFT;
-		xv[1] = ((WAKE_SPEED + 2) * phd_sin(angle2)) >> W2V_SHIFT;
-		zv[1] = ((WAKE_SPEED + 2) * phd_cos(angle2)) >> W2V_SHIFT;
+		xv[0] = WAKE_SPEED * phd_sin(angle1);
+		zv[0] = WAKE_SPEED * phd_cos(angle1);
+		xv[1] = (WAKE_SPEED + 2) * phd_sin(angle2);
+		zv[1] = (WAKE_SPEED + 2) * phd_cos(angle2);
 
 		WakePts[CurrentStartWake][rotate].y = v->pos.yPos + KAYAK_DRAW_SHIFT;
 		WakePts[CurrentStartWake][rotate].life = 0x40;
@@ -173,11 +173,11 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 
 void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff)
 {
-	int s = phd_sin(v->pos.yRot);
-	int c = phd_cos(v->pos.yRot);
+	float s = phd_sin(v->pos.yRot);
+	float c = phd_cos(v->pos.yRot);
 
-	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
-	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+	int x = v->pos.xPos + zoff * s + xoff * c;
+	int z = v->pos.zPos + zoff * c - xoff * s;
 
 	short roomNumber = v->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
@@ -338,11 +338,11 @@ int KayakGetCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 
 	if ((xdiff) || (zdiff))
 	{
-		int s = phd_sin(v->pos.yRot);
-		int c = phd_cos(v->pos.yRot);
+		float s = phd_sin(v->pos.yRot);
+		float c = phd_cos(v->pos.yRot);
 		
-		int front = ((zdiff * c) + (xdiff * s)) >> W2V_SHIFT;
-		int side = ((-zdiff * s) + (xdiff * c)) >> W2V_SHIFT;
+		int front = zdiff * c + xdiff * s;
+		int side = -zdiff * s + xdiff * c;
 
 		if (abs(front) > abs(side))
 		{
@@ -448,8 +448,8 @@ void KayakDoCurrent(ITEM_INFO* item)
 		int dz = target.z - LaraItem->pos.zPos;
 
 		int speed = FixedCameras[sinkval].data;
-		dx = phd_sin(angle << 4) * speed / 16;
-		dz = phd_cos(angle << 4) * speed / 16;
+		dx = phd_sin(angle << 4) * speed * 1024;
+		dz = phd_cos(angle << 4) * speed * 1024;
 
 		Lara.currentXvel += (dx - Lara.currentXvel) / 16;
 		Lara.currentZvel += (dz - Lara.currentZvel) / 16;
@@ -659,8 +659,8 @@ void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 
 	v->pos.yRot += (Kayak->Rot >> 16);
 
-	v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
-	v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
+	v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
+	v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
 
 	KayakDoCurrent(v);
 
@@ -753,8 +753,7 @@ void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 	{
 		int newspeed;
 
-		newspeed = ((v->pos.zPos - oldpos[8].z) * phd_cos(v->pos.yRot)
-			+ (v->pos.xPos - oldpos[8].x) * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+		newspeed = (v->pos.zPos - oldpos[8].z) * phd_cos(v->pos.yRot) + (v->pos.xPos - oldpos[8].x) * phd_sin(v->pos.yRot);
 
 		newspeed *= 256;
 

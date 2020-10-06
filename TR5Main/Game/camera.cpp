@@ -340,9 +340,9 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	else
 	{
 		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * phd_sin(angle) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(angle);
 		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
 		Camera.oldType = Camera.type;
 	}
 }
@@ -362,7 +362,7 @@ void ChaseCamera(ITEM_INFO* item)
 	else if (Camera.actualElevation < -ANGLE(85))
 		Camera.actualElevation = -ANGLE(85);
 
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
 	if (g_Level.Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
@@ -392,7 +392,7 @@ void ChaseCamera(ITEM_INFO* item)
 	
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -412,8 +412,8 @@ void ChaseCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
+		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -579,11 +579,11 @@ void CombatCamera(ITEM_INFO* item)
 	UpdateCameraElevation();
 
 	Camera.targetDistance = 1536;
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -603,8 +603,8 @@ void CombatCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
+		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -1119,8 +1119,8 @@ void LookCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1214,11 +1214,11 @@ void BinocularCamera(ITEM_INFO* item)
 	Camera.pos.z = z;	
 	Camera.pos.roomNumber = roomNumber;
 	
-	int l = 20736 * phd_cos(headXrot) >> W2V_SHIFT;
+	int l = 20736 * phd_cos(headXrot);
 	
-	int tx = x + (l * phd_sin(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
-	int ty = y - (20736 * phd_sin(headXrot) >> W2V_SHIFT);
-	int tz = z + (l * phd_cos(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
+	int tx = x + l * phd_sin(LaraItem->pos.yRot + headYrot);
+	int ty = y - 20736 * phd_sin(headXrot);
+	int tz = z + l * phd_cos(LaraItem->pos.yRot + headYrot);
 
 	if (Camera.oldType == FIXED_CAMERA)
 	{
@@ -1264,8 +1264,8 @@ void BinocularCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1694,8 +1694,8 @@ void CalculateCamera()
 		else
 		{
 			int shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->pos.xPos + (shift * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-			z = item->pos.zPos + (shift * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+			x = item->pos.xPos + shift * phd_sin(item->pos.yRot);
+			z = item->pos.zPos + shift * phd_cos(item->pos.yRot);
 
 			Camera.target.x = x;
 			Camera.target.z = z;

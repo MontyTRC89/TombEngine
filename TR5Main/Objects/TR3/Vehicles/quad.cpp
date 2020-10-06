@@ -171,9 +171,9 @@ static int CanQuadbikeGetOff(int direction)
 	else
 		angle = item->pos.yRot + ANGLE(90);
 
-	int x = item->pos.xPos + (512 * phd_sin(angle) >> W2V_SHIFT);
+	int x = item->pos.xPos + 512 * phd_sin(angle);
 	int y = item->pos.yPos;
-	int z = item->pos.zPos + (512 * phd_cos(angle) >> W2V_SHIFT);
+	int z = item->pos.zPos + 512 * phd_cos(angle);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -214,8 +214,8 @@ static int QuadCheckGetOff()
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
 			LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
-			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
-			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
+			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -362,10 +362,10 @@ static int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 	if (p->x || p->z)
 	{
-		int c = phd_cos(item->pos.yRot);
-		int s = phd_sin(item->pos.yRot);
-		int front = ((p->z * c) + (p->x * s)) >> W2V_SHIFT;
-		int side = ((-p->z * s) + (p->x * c)) >> W2V_SHIFT;
+		float c = phd_cos(item->pos.yRot);
+		float s = phd_sin(item->pos.yRot);
+		int front = p->z * c + p->x * s;
+		int side = -p->z * s + p->x * c;
 
 		if (abs(front) > abs(side))
 		{
@@ -388,13 +388,13 @@ static int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 static int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - dz * phd_sin(item->pos.xRot) + dx * phd_sin(item->pos.zRot);
 
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
 
-	pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
-	pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+	pos->z = item->pos.zPos + dz * c - dx * s;
+	pos->x = item->pos.xPos + dz * s + dx * c;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -640,29 +640,29 @@ static int QuadDynamics(ITEM_INFO* item)
 	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int speed = 0;
 	if (item->pos.yPos >= height)
-		speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
+		speed = item->speed * phd_cos(item->pos.xRot);
 	else
 		speed = item->speed;
 
-	item->pos.zPos += (speed * phd_cos(quad->momentumAngle)) >> W2V_SHIFT;
-	item->pos.xPos += (speed * phd_sin(quad->momentumAngle)) >> W2V_SHIFT;
+	item->pos.zPos += speed * phd_cos(quad->momentumAngle);
+	item->pos.xPos += speed * phd_sin(quad->momentumAngle);
 
-	slip = QUAD_SLIP * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+	slip = QUAD_SLIP * phd_sin(item->pos.xRot);
 	if (abs(slip) > QUAD_SLIP / 2)
 	{
 		if (slip > 0)
 			slip -= 10;
 		else
 			slip += 10;
-		item->pos.zPos -= slip * phd_cos(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.xPos -= slip * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos -= slip * phd_cos(item->pos.yRot);
+		item->pos.xPos -= slip * phd_sin(item->pos.yRot);
 	}
 
-	slip = QUAD_SLIP_SIDE * phd_sin(item->pos.zRot) >> W2V_SHIFT;
+	slip = QUAD_SLIP_SIDE * phd_sin(item->pos.zRot);
 	if (abs(slip) > QUAD_SLIP_SIDE / 2)
 	{
-		item->pos.zPos -= slip * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.xPos += slip * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos -= slip * phd_sin(item->pos.yRot);
+		item->pos.xPos += slip * phd_cos(item->pos.yRot);
 	}
 
 	moved.x = item->pos.xPos;
@@ -738,7 +738,7 @@ static int QuadDynamics(ITEM_INFO* item)
 
 	if (collide)
 	{
-		newspeed = ((item->pos.zPos - old.z) * phd_cos(quad->momentumAngle) + (item->pos.xPos - old.x) * phd_sin(quad->momentumAngle)) >> W2V_SHIFT;
+		newspeed = (item->pos.zPos - old.z) * phd_cos(quad->momentumAngle) + (item->pos.xPos - old.x) * phd_sin(quad->momentumAngle);
 
 		newspeed <<= 8;
 
@@ -1240,8 +1240,8 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->x = x + ((GetRandomControl() & 15) - 8);
 	spark->y = y + ((GetRandomControl() & 15) - 8);
 	spark->z = z + ((GetRandomControl() & 15) - 8);
-	int zv = (speed * phd_cos(angle)) >> (W2V_SHIFT + 2);
-	int xv = (speed * phd_sin(angle)) >> (W2V_SHIFT + 2);
+	int zv = speed * phd_cos(angle) / 4;
+	int xv = speed * phd_sin(angle) / 4;
 	spark->xVel = xv + ((GetRandomControl() & 255) - 128);
 	spark->yVel = -(GetRandomControl() & 7) - 8;
 	spark->zVel = zv + ((GetRandomControl() & 255) - 128);

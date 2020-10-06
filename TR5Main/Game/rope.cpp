@@ -178,7 +178,7 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
 	{
 		frame = GetBoundsAccurate(l);
-		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->Y1 + 512, l->pos.zPos + ((int)(frame->Z2 * phd_cos(l->pos.yRot)) >> W2V_SHIFT), l->currentAnimState == LS_REACH ? 128 : 320);
+		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->Y1 + 512, l->pos.zPos + frame->Z2 * phd_cos(l->pos.yRot), l->currentAnimState == LS_REACH ? 128 : 320);
 		if (segment >= 0)
 		{
 			if (l->currentAnimState == LS_REACH)
@@ -390,9 +390,9 @@ int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius) // (F) (D)
 void ApplyVelocityToRope(int node, short angle, short n) // (F) (D)
 {
 	SetPendulumVelocity(
-		(unsigned short) n * phd_sin(angle) >> 2,
+		(unsigned short) n * phd_sin(angle) * 4096,
 		0,
-		(unsigned short) n * phd_cos(angle) >> 2); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
+		(unsigned short) n * phd_cos(angle) * 4096); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
 }
 
 void SetPendulumVelocity(int x, int y, int z) // (F) (D)
@@ -702,11 +702,11 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	diff2.x = diff.x;
 	diff2.y = diff.y;
 	diff2.z = diff.z;
-	ScaleVector(&vec3, phd_cos(ropeY), &vec3);
+	ScaleVector(&vec3, 16384 * phd_cos(ropeY), &vec3);
 	ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
-	ScaleVector(&diff2, 4096 - phd_cos(ropeY), &diff2);
+	ScaleVector(&diff2, 4096 - 16384 * phd_cos(ropeY), &diff2);
 	CrossProduct(&diff, &vec2, &vec4);
-	ScaleVector(&vec4, phd_sin(ropeY), &vec4);
+	ScaleVector(&vec4, 16384 * phd_sin(ropeY), &vec4);
 	diff2.x += vec3.x;
 	diff2.y += vec3.y;
 	diff2.z += vec3.z;

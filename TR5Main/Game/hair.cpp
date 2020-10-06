@@ -225,8 +225,8 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 
 		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
 
-		SmokeWindX = Wind * phd_sin(WindAngle << 3) >> 14;
-		SmokeWindZ = Wind * phd_cos(WindAngle << 3) >> 14;
+		SmokeWindX = Wind * phd_sin(WindAngle << 3);
+		SmokeWindZ = Wind * phd_cos(WindAngle << 3);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{

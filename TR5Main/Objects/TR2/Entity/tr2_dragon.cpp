@@ -174,8 +174,9 @@ static void createDragonBone(short front_number)
 void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
-	int c, s, rx, rz, shift, side_shift, angle;
+	int rx, rz, shift, side_shift, angle;
 	int anim, frame;
+	float c, s;
 
 	/* If Lara has collided with correct bit of dragon, then start him up */
 	item = &g_Level.Items[itemNum];
@@ -194,10 +195,10 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 		s = phd_sin(item->pos.yRot);
 
 		/* See if Lara within leg space of dragon; if so use different collision to sphere stuff */
-		side_shift = (rx * s + rz * c) >> W2V_SHIFT;
+		side_shift = rx * s + rz * c;
 		if (side_shift > DRAGON_LCOL&& side_shift < DRAGON_RCOL)
 		{
-			shift = (rx * c - rz * s) >> W2V_SHIFT;
+			shift = rx * c - rz * s;
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
@@ -259,8 +260,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			else
 				shift = DRAGON_FAR - shift;
 
-			laraitem->pos.xPos += shift * c >> W2V_SHIFT;
-			laraitem->pos.zPos -= shift * s >> W2V_SHIFT;
+			laraitem->pos.xPos += shift * c;
+			laraitem->pos.zPos -= shift * s;
 
 			return;
 		}

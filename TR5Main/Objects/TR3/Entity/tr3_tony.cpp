@@ -361,8 +361,8 @@ void ControlTonyFireBall(short fxNumber)
 		if (fx->fallspeed > 512)
 			fx->fallspeed = 512;
 		fx->pos.yPos += fx->fallspeed >> 1;
-		fx->pos.zPos += (fx->speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT);
-		fx->pos.xPos += (fx->speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT);
+		fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
+		fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
 		if (Wibble & 4)
 			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((old_x - fx->pos.xPos) << 3), (short)((old_y - fx->pos.yPos) << 3), (short)((old_z - fx->pos.zPos) << 3));
 	}
