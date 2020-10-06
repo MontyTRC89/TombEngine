@@ -341,7 +341,7 @@ short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
 	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterBlood(x, y, z, a4);
 	else
-		TriggerBlood(x, y, z, a5 >> 4, a4);
+		TriggerBlood(x, y, z, a5 / 16, a4);
 	return 0;
 }
 

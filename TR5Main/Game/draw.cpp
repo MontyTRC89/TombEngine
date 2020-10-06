@@ -44,12 +44,12 @@ void UpdateStorm()
 		if (LightningRand < 4)
 			LightningRand = 0;
 		else
-			LightningRand = LightningRand - (LightningRand >> 2);
+			LightningRand = LightningRand - (LightningRand / 4);
 	}
 	else if (--LightningCount)
 	{
 		dLightningRand = rand() & 0x1FF;
-		LightningRand = ((dLightningRand - LightningRand) >> 1) + LightningRand;
+		LightningRand = ((dLightningRand - LightningRand) / 2) + LightningRand;
 	}
 	else
 	{
@@ -59,7 +59,7 @@ void UpdateStorm()
 
 	for (int i = 0; i < 3; i++)
 	{
-		SkyStormColor2[i] += LightningRand * SkyStormColor2[i] >> 8;
+		SkyStormColor2[i] += ((LightningRand * SkyStormColor2[i]) / 256);
 		SkyStormColor[i] = SkyStormColor2[i];
 		if (SkyStormColor[i] > 255)
 			SkyStormColor[i] = 255;
@@ -94,7 +94,7 @@ ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
 
 	int frac = GetFrame_D2(item, framePtr, &rate);
 
-	if (frac <= (rate >> 1))
+	if (frac <= (rate / 2))
 		return framePtr[0];
 	else
 		return framePtr[1];

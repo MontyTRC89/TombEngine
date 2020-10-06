@@ -318,7 +318,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) 
 	for (int i = 0; i < 2; i++)
 	{
 		GAME_VECTOR s;
-		s.x = (i << 8) - 0x80;
+		s.x = (i * 256) - 0x80;
 		s.y = -256;
 		s.z = 0;
 
@@ -406,9 +406,9 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 
 	tilt = data[1];
 	t0 = tilt & DATA_TILT;
-	t1 = (tilt >> 4) & DATA_TILT;
-	t2 = (tilt >> 8) & DATA_TILT;
-	t3 = (tilt >> 12) & DATA_TILT;
+	t1 = (tilt / 16) & DATA_TILT;
+	t2 = (tilt / 256) & DATA_TILT;
+	t3 = (tilt / 4096) & DATA_TILT;
 	dx = x & (WALL_SIZE - 1);
 	dz = z & (WALL_SIZE - 1);
 	xOff = 0;
@@ -438,15 +438,15 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 		yOff = t3 - t2;
 	}
 
-	return ((xOff << 8) | (yOff & DATA_STATIC));
+	return ((xOff * 256) | (yOff & DATA_STATIC));
 }
 
 int FindGridShift(int x, int z)
 {
-	if ((x >> WALL_SHIFT) == (z >> WALL_SHIFT))
+	if ((x / SECTOR(1)) == (z / SECTOR(1)))
 		return 0;
 
-	if ((z >> WALL_SHIFT) <= (x >> WALL_SHIFT))
+	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
 		return (-1 - (x & (WALL_SIZE - 1)));
 	else
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
@@ -737,7 +737,7 @@ void TriggerLaraBlood()
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
 		}
 
-		node <<= 1;
+		node *= 2;
 	}
 }
 
@@ -1077,7 +1077,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
 	coll->tiltX = tilt;
-	coll->tiltZ = tilt >> 8;
+	coll->tiltZ = tilt / 256;
 	
 	int xright, xleft, zright, zleft;
 
@@ -1569,7 +1569,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushLara(item, l, coll, (item->itemFlags[0] & (coll->enableSpaz >> 5) & 1), 3) && item->itemFlags[0] & 1)
+						if (ItemPushLara(item, l, coll, (item->itemFlags[0] & (coll->enableSpaz / 32) & 1), 3) && item->itemFlags[0] & 1)
 						{
 							l->hitPoints -= item->itemFlags[3];
 							
@@ -1592,7 +1592,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						}
 					}
 
-					collided >>= 1;
+					collided /= 2;
 					sphere++;
 				}
 			}

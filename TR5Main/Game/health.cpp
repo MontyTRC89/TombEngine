@@ -193,7 +193,7 @@ int DrawAllPickups()
 	{
 		if (PickupX > 0)
 		{
-			PickupX += -PickupX >> 5;
+			PickupX += -PickupX / 32;
 			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 		else
@@ -208,7 +208,7 @@ int DrawAllPickups()
 		{
 			if (PickupVel < 16)
 				PickupVel++;
-			PickupX += PickupVel >> 2;
+			PickupX += PickupVel / 4;
 			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 		else
