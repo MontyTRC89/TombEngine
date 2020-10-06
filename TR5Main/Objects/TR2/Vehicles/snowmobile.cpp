@@ -71,7 +71,7 @@ enum SKIDOO_STATE
 #define SKIDOO_RADIUS 500
 #define SKIDOO_SNOW 500
 #define SKIDOO_MAX_HEIGHT STEP_SIZE
-#define SKIDOO_MIN_BOUNCE ((SKIDOO_MAX_SPEED/2)>>8)
+#define SKIDOO_MIN_BOUNCE ((SKIDOO_MAX_SPEED/2)/256)
 
 void InitialiseSkidoo(short itemNum)
 {
@@ -700,10 +700,10 @@ int TestSkidooHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* pos)
 
 short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-	int	x = pos->x >> WALL_SHIFT;
-	int z = pos->z >> WALL_SHIFT;
-	int xOld = old->x >> WALL_SHIFT;
-	int zOld = old->z >> WALL_SHIFT;
+	int	x = pos->x / SECTOR(1);
+	int z = pos->z / SECTOR(1);
+	int xOld = old->x / SECTOR(1);
+	int zOld = old->z / SECTOR(1);
 	int shiftX = pos->x & (WALL_SIZE - 1);
 	int shiftZ = pos->z & (WALL_SIZE - 1);
 
@@ -1046,8 +1046,8 @@ bool SkidooControl()
 	short xRot = phd_atan(SKIDOO_FRONT, skidoo->pos.yPos - height);
 	short zRot = phd_atan(SKIDOO_SIDE, height - fl.y);
 
-	skidoo->pos.xRot += (xRot - skidoo->pos.xRot) >> 1;
-	skidoo->pos.zRot += (zRot - skidoo->pos.zRot) >> 1;
+	skidoo->pos.xRot += ((xRot - skidoo->pos.xRot) / 2);
+	skidoo->pos.zRot += ((zRot - skidoo->pos.zRot) / 2);
 
 	if (skidoo->flags & ONESHOT)
 	{

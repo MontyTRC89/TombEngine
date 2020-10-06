@@ -89,10 +89,10 @@ static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 
 static int DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-	int x = pos->x >> WALL_SHIFT;
-	int z = pos->z >> WALL_SHIFT;
-	int  oldX = old->x >> WALL_SHIFT;
-	int oldZ = old->z >> WALL_SHIFT;
+	int x = pos->x / SECTOR(1);
+	int z = pos->z / SECTOR(1);
+	int  oldX = old->x / SECTOR(1);
+	int oldZ = old->z / SECTOR(1);
 	int shiftX = pos->x & (WALL_SIZE - 1);
 	int shiftZ = pos->z & (WALL_SIZE - 1);
 
@@ -202,7 +202,7 @@ static int DoJeepDynamics(int height, int speed, int* y, int flags)
 			{
 				temp = -80;
 			}
-			result = ((temp - speed) >> 4) + speed;
+			result = ((temp - speed) / 16) + speed;
 			if (*y > height)
 			{
 				*y = height;
@@ -216,7 +216,7 @@ static int DoJeepDynamics(int height, int speed, int* y, int flags)
 		{
 			if (flags)
 			{
-				result = flags + (flags >> 1) + speed;
+				result = flags + (flags / 2) + speed;
 			}
 			else
 			{
@@ -282,14 +282,14 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 
 	if (moving)
 	{
-		spark->dR = (spark->dR * speed) >> 5;
-		spark->dG = (spark->dG * speed) >> 5;
-		spark->dB = (spark->dB * speed) >> 5;
+		spark->dR = (spark->dR * speed) / 32;
+		spark->dG = (spark->dG * speed) / 32;
+		spark->dB = (spark->dB * speed) / 32;
 	}
 
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
-	spark->life = spark->sLife = (GetRandomControl() & 3) - (speed >> 12) + 20;;
+	spark->life = spark->sLife = (GetRandomControl() & 3) - (speed / 4096) + 20;;
 
 	if (spark->life < 9)
 	{
@@ -327,7 +327,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 	spark->scalar = 1;
 	spark->gravity = -4 - (GetRandomControl() & 3);
 	spark->maxYvel = -8 - (GetRandomControl() & 7);
-	spark->dSize = (GetRandomControl() & 7) + (speed >> 7) + 32;
+	spark->dSize = (GetRandomControl() & 7) + (speed / 128) + 32;
 	spark->sSize = spark->dSize / 2;
 	spark->size = spark->dSize / 2;
 }
@@ -649,7 +649,7 @@ static int JeepDynamics(ITEM_INFO* item)
 			jeep->jeepTurn = 0;
 
 		item->pos.yRot += jeep->jeepTurn + jeep->extraRotation;
-		jeep->momentumAngle += (item->pos.yRot - jeep->momentumAngle) >> 5;
+		jeep->momentumAngle += ((item->pos.yRot - jeep->momentumAngle) / 32);
 	}
 	else
 	{
@@ -666,10 +666,10 @@ static int JeepDynamics(ITEM_INFO* item)
 		item->pos.yRot += jeep->jeepTurn + jeep->extraRotation;
 
 		rot = item->pos.yRot - jeep->momentumAngle;
-		momentum = 728 - (3 * jeep->velocity >> 11);
+		momentum = 728 - ((3 * jeep->velocity) / 2048);
 
 		if (!(TrInput & IN_ACTION) && jeep->velocity > 0)
-			momentum -= momentum >> 2;
+			momentum -= (momentum / 4);
 
 		if (rot >= -273)
 		{
@@ -682,7 +682,7 @@ static int JeepDynamics(ITEM_INFO* item)
 					item->pos.yPos -= 41;
 					item->fallspeed = -6 - (GetRandomControl() & 3);
 					jeep->jeepTurn = 0;
-					jeep->velocity -= jeep->velocity >> 3;
+					jeep->velocity -= (jeep->velocity / 8);
 				}
 
 				if (rot <= 16380)
@@ -698,7 +698,7 @@ static int JeepDynamics(ITEM_INFO* item)
 				item->pos.yPos -= 41;
 				item->fallspeed = -6 - (GetRandomControl() & 3);
 				jeep->jeepTurn = 0;
-				jeep->velocity -= jeep->velocity >> 3;
+				jeep->velocity -= (jeep->velocity / 8);
 			}
 
 			if (rot >= -16380)
@@ -730,9 +730,9 @@ static int JeepDynamics(ITEM_INFO* item)
 		{
 			JeepNoGetOff = 1;
 			if (slip >= 0)
-				slip = jeep->velocity - (SQUARE(slip - 16) >> 1);
+				slip = jeep->velocity - (SQUARE(slip - 16) / 2);
 			else
-				slip = (SQUARE(slip + 16) >> 1) + jeep->velocity;
+				slip = (SQUARE(slip + 16) / 2) + jeep->velocity;
 			jeep->velocity = slip;
 		}
 
@@ -817,27 +817,27 @@ static int JeepDynamics(ITEM_INFO* item)
 
 	jeep->extraRotation = rot1;
 	
-	/*jeep->unknown0 += rot1 >> 1;
+	/*jeep->unknown0 += rot1 / 2;
 
 	if (abs(jeep->unknown0) < 2)
 		jeep->unknown0 = 0;
 
 	if (abs(jeep->unknown0 - jeep->extraRotation) >= 4)
-		jeep->extraRotation += ((jeep->unknown0 - jeep->extraRotation) >> 2);
+		jeep->extraRotation += ((jeep->unknown0 - jeep->extraRotation) / 4);
 	else
 		jeep->extraRotation = jeep->unknown0;
-		*/
+		*/ // just incase this code is ever uncommented.
 	int newspeed = 0;
 	int collide = GetJeepCollisionAnim(item, &movedPos);
 	
 	if (collide)
 	{
 		newspeed = (item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle);
-		newspeed <<= 8;
+		newspeed *= 256;
 
 		if ((&g_Level.Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
 		{
-			LaraItem->hitPoints -= (JEEP_MAX_SPEED - newspeed) >> 7;
+			LaraItem->hitPoints -= (JEEP_MAX_SPEED - newspeed) / 128;
 			LaraItem->hitStatus = true;
 		}
 
@@ -865,8 +865,8 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 		jeep->revs = 0;
 	else
 	{
-		jeep->velocity += jeep->revs >> 4;
-		jeep->revs -= (jeep->revs >> 3);
+		jeep->velocity += (jeep->revs / 16);
+		jeep->revs -= (jeep->revs / 8);
 	}
 
 	int rot1 = 0;
@@ -945,7 +945,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 			{
 				if (jeep->unknown2 == 1 && jeep->velocity > -JEEP_MAX_BACK)
 				{
-					jeep->velocity -= (abs(-JEEP_MAX_BACK - jeep->velocity) >> 3) - 2;
+					jeep->velocity -= (abs(-JEEP_MAX_BACK - jeep->velocity) / 8) - 2;
 				}
 			}
 			else
@@ -953,17 +953,17 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 				if (jeep->velocity < JEEP_MAX_SPEED)
 				{
 					if (jeep->velocity < 0x4000)
-						jeep->velocity += 8 + ((0x4000 + 0x800 - jeep->velocity) >> 3);
+						jeep->velocity += 8 + ((0x4000 + 0x800 - jeep->velocity) / 8);
 					else if (jeep->velocity < 0x7000)
-						jeep->velocity += 4 + ((0x7000 + 0x800 - jeep->velocity) >> 4);
+						jeep->velocity += 4 + ((0x7000 + 0x800 - jeep->velocity) / 16);
 					else if (jeep->velocity < JEEP_MAX_SPEED)
-						jeep->velocity += 2 + ((JEEP_MAX_SPEED - jeep->velocity) >> 3);
+						jeep->velocity += 2 + ((JEEP_MAX_SPEED - jeep->velocity) / 8);
 				}
 				else
 					jeep->velocity = JEEP_MAX_SPEED;
 			}
 
-			jeep->velocity -= abs(item->pos.yRot - jeep->momentumAngle) >> 6;
+			jeep->velocity -= (abs(item->pos.yRot - jeep->momentumAngle) / 64);
 		}
 		else if (jeep->velocity > 256)
 		{
@@ -978,7 +978,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 			jeep->velocity = 0;
 		}
 
-		item->speed = jeep->velocity >> 8;
+		item->speed = jeep->velocity / 256;
 		if (jeep->engineRevs > 0xC000)
 		{
 			jeep->engineRevs = (GetRandomControl() & 0x1FF) + 48896;
@@ -987,10 +987,10 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 		int revs = jeep->velocity;
 		if (jeep->velocity < 0)
 		{
-			revs >>= 1;
+			revs /= 2;
 		}
 
-		jeep->engineRevs += (abs(revs) - jeep->engineRevs) >> 3;
+		jeep->engineRevs += ((abs(revs) - jeep->engineRevs) / 8);
 	}
 
 	if (TrInput & JEEP_IN_BRAKE)
@@ -1699,7 +1699,7 @@ int JeepControl(void)
 			jeep->pitch = -32768;
 		}
 
-		SoundEffect(155, &item->pos, (jeep->pitch << 8) + 16777220);
+		SoundEffect(155, &item->pos, (jeep->pitch * 256) + 16777220);
 	}
 	else
 	{
@@ -1711,7 +1711,7 @@ int JeepControl(void)
 	}
 
 	item->floor = height;
-	short rotAdd = jeep->velocity >> 2;
+	short rotAdd = jeep->velocity / 4;
 	jeep->rot1 -= rotAdd;
 	jeep->rot2 -= rotAdd;
 	jeep->rot3 -= rotAdd;
@@ -1720,19 +1720,19 @@ int JeepControl(void)
 	int oldY = item->pos.yPos;
 	item->fallspeed = DoJeepDynamics(height, item->fallspeed, &item->pos.yPos, 0);
 
-	height = (fl.y + fr.y) >> 1;
+	height = (fl.y + fr.y) / 2;
 	short xRot;
 	short zRot;
 	if (bc.y >= hbc)
 	{
-		if (height >= (hfl + hfr) >> 1)
+		if (height >= (hfl + hfr) / 2)
 			xRot = phd_atan(1100, hbc - height);
 		else
 			xRot = phd_atan(550, hbc - item->pos.yPos);
 	}
 	else
 	{
-		if (height >= (hfl + hfr) >> 1)
+		if (height >= (hfl + hfr) / 2)
 		{
 			xRot = phd_atan(550, item->pos.yPos - height);
 		}
@@ -1744,8 +1744,8 @@ int JeepControl(void)
 		}
 	}
 
-	item->pos.xRot += (xRot - item->pos.xRot) >> 2;
-	item->pos.zRot += (phd_atan(256, height - fl.y) - item->pos.zRot) >> 2;
+	item->pos.xRot += (xRot - item->pos.xRot) / 4;
+	item->pos.zRot += (phd_atan(256, height - fl.y) - item->pos.zRot) / 4;
 
 	if (!(jeep->flags & JF_DEAD))
 	{
@@ -1783,11 +1783,11 @@ int JeepControl(void)
 		if (jeep->unknown2)
 		{
 			if (jeep->unknown2 == 1)
-				jeep->fallSpeed += (32578 - jeep->fallSpeed) >> 3;
+				jeep->fallSpeed += ((32578 - jeep->fallSpeed) / 8);
 		}
 		else
 		{
-			jeep->fallSpeed -= jeep->fallSpeed >> 3;
+			jeep->fallSpeed -= (jeep->fallSpeed / 8);
 		}
 
 		Camera.targetAngle = jeep->fallSpeed;
@@ -1826,11 +1826,11 @@ int JeepControl(void)
 				if (GetRandomControl() & 3)
 					speed = 0;
 				else
-					speed = ((GetRandomControl() & 0xF) + GetRandomControl() & 0x10) << 6;
+					speed = ((GetRandomControl() & 0xF) + GetRandomControl() & 0x10) * 64;
 			}
 			else
 			{
-				speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * JeepSmokeStart) << 6;
+				speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * JeepSmokeStart) * 64;
 				JeepSmokeStart++;
 			}
 			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot + -32768, speed, 0);
