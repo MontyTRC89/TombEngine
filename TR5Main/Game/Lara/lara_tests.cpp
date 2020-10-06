@@ -958,8 +958,8 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 		z += 256;
 	}*/
 
-	z += (phd_cos(angle) * STEP_SIZE) >> W2V_SHIFT;
-	x += (phd_sin(angle) * STEP_SIZE) >> W2V_SHIFT;
+	z += phd_cos(angle) * STEP_SIZE;
+	x += phd_sin(angle) * STEP_SIZE;
 
 	floor = GetFloor(x, y, z, &roomNum);
 	h = GetFloorHeight(floor, x, y, z);
@@ -1177,9 +1177,9 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 {
 	short room = item->roomNumber;
 
-	int x = item->pos.xPos + ((dist * phd_sin(ang)) >> W2V_SHIFT);
+	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - 762;
-	int z = item->pos.zPos + ((dist * phd_cos(ang)) >> W2V_SHIFT);
+	int z = item->pos.zPos + dist * phd_cos(ang);
 
 	int height = GetFloorHeight(GetFloor(x, y, z, &room), x, y, z);
 
@@ -1193,9 +1193,9 @@ short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 {
 	short room = item->roomNumber;
 
-	int x = item->pos.xPos + ((dist * phd_sin(ang)) >> W2V_SHIFT);
+	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - h;
-	int z = item->pos.zPos + ((dist * phd_cos(ang)) >> W2V_SHIFT);
+	int z = item->pos.zPos + dist * phd_cos(ang);
 
 	int height = GetCeiling(GetFloor(x, y, z, &room), x, y, z);
 

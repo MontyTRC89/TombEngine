@@ -33,8 +33,8 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 		OBJECT_VECTOR* sink = &FixedCameras[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
-		Lara.currentXvel += ((sink->data * (phd_sin(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
-		Lara.currentZvel += ((sink->data * (phd_cos(angle - ANGLE(90)) / 4) >> 2) - Lara.currentZvel) >> 4;
+		Lara.currentXvel += (sink->data * 1024 * phd_sin(angle - ANGLE(90)) - Lara.currentXvel) / 16;
+		Lara.currentZvel += (sink->data * 1024 * phd_cos(angle - ANGLE(90)) - Lara.currentZvel) / 16;
 
 		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
 	}
@@ -522,7 +522,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		coll->facing = item->pos.yRot;
 	}
 
-	short height = 762 * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+	short height = 762 * phd_sin(item->pos.xRot);
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)

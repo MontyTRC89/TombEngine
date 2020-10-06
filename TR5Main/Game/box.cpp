@@ -1387,8 +1387,8 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 			if (!(creature->aiTarget.flags & 0x20))
 			{
-				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) >> 4;   
-				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) >> 4;
+				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) * 1024;
+				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) * 1024;
 			}
 		}
 	}
@@ -1437,13 +1437,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 	else
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 
 	y = item->pos.yPos - enemy->pos.yPos;
@@ -1961,8 +1961,8 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;
 
-	x = item->pos.xPos + ((1024 * phd_sin(dir)) >> W2V_SHIFT);
-	z = item->pos.zPos + ((1024 * phd_cos(dir)) >> W2V_SHIFT);
+	x = item->pos.xPos + 1024 * phd_sin(dir);
+	z = item->pos.zPos + 1024 * phd_cos(dir);
 
 	short roomNumber = item->roomNumber;
 	GetFloor(x, item->pos.yPos, z, &roomNumber);

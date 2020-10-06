@@ -34,8 +34,8 @@ void InitialiseChef(short itemNumber)
 	item->goalAnimState = STATE_CHEF_COOKING;
 	item->currentAnimState = STATE_CHEF_COOKING;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->pos.xPos += 192 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += 192 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += 192 * phd_sin(item->pos.yRot);
+	item->pos.zPos += 192 * phd_cos(item->pos.yRot);
 }
 
 void ControlChef(short itemNumber)

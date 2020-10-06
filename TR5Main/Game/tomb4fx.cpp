@@ -684,8 +684,8 @@ void TriggerBlood(int x, int y, int z, int unk, int num)// (F)
 		blood->z = (GetRandomControl() & 0x1F) + z - 16;
 		int a = (unk == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
 		int b = GetRandomControl() & 0xF;
-		blood->zVel = b * phd_cos(a << 4) >> 9;
-		blood->xVel = -b * phd_sin(a << 4) >> 9;
+		blood->zVel = b * phd_cos(a << 4) * 32;
+		blood->xVel = -b * phd_sin(a << 4) * 32;
 		blood->friction = 4;
 		blood->yVel = -((GetRandomControl() & 0xFF) + 128);
 		blood->rotAng = GetRandomControl() & 0xFFF;
@@ -949,9 +949,9 @@ void UpdateGunShells()
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot);
 			gs->pos.yPos += gs->fallspeed;
-			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot);
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -1028,9 +1028,9 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->sLife = 24;
 		spark->transType = COLADD;	
 		int random = GetRandomControl() & 0xFFF;
-		spark->xVel = -phd_sin(random << 4) >> 7;
+		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -640 - GetRandomControl();
-		spark->zVel = phd_cos(random << 4) >> 7;
+		spark->zVel = phd_cos(random << 4) * 128;
 		spark->friction = 5;
 		spark->flags = SP_NONE;
 		spark->x = x + (spark->xVel >> 3);
@@ -1374,9 +1374,9 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
-		spark->xVel = speed * 16 * phd_sin(rot) >> W2V_SHIFT;
+		spark->xVel = speed * 16 * phd_sin(rot);
 		spark->yVel = -512 - (GetRandomControl() & 0x1FF);
-		spark->zVel = speed * 16 * phd_cos(rot) >> W2V_SHIFT;
+		spark->zVel = speed * 16 * phd_cos(rot);
 
 		short angle;
 		if (GetRandomControl() & 1)
@@ -1385,8 +1385,8 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 			angle = rot - ANGLE(90);
 
 		int shift = (GetRandomControl() & 0x1FF) - 256;
-		x += (shift * phd_sin(angle) >> W2V_SHIFT);
-		z += (shift * phd_cos(angle) >> W2V_SHIFT);
+		x += shift * phd_sin(angle);
+		z += shift * phd_cos(angle);
 
 		spark->x = (GetRandomControl() & 0x1F) + x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1689,9 +1689,9 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 
 		angle = GetRandomControl() << 3;
 
-		sptr->xVel = -phd_sin(angle) >> 5;
+		sptr->xVel = -phd_sin(angle) * 512;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);
-		sptr->zVel = phd_cos(angle) >> 5;
+		sptr->zVel = phd_cos(angle) * 512;
 
 		sptr->friction = 5;
 		sptr->flags = 0;

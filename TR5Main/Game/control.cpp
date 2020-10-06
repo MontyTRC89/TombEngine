@@ -1346,12 +1346,12 @@ short GetDoor(FLOOR_INFO *floor)
 
 void TranslateItem(ITEM_INFO *item, int x, int y, int z)
 {
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
 
-	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
+	item->pos.xPos += c * x + s * z;
 	item->pos.yPos += y;
-	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
+	item->pos.zPos += -s * x + c * z;
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)
@@ -2958,11 +2958,11 @@ void AnimateItem(ITEM_INFO *item)
 		lateral >>= 16;
 	}
 
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
 
-	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90));
+	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90));
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();

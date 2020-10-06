@@ -105,11 +105,11 @@ void MissileControl(short itemNumber)
 	int y = fx->pos.yPos;
 	int z = fx->pos.zPos;
 
-	int c = fx->speed * phd_cos(fx->pos.xRot) >> W2V_SHIFT;
+	int c = fx->speed * phd_cos(fx->pos.xRot);
 
-	fx->pos.xPos += c * phd_sin(fx->pos.yRot) >> W2V_SHIFT;
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT;
-	fx->pos.zPos += c * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.xPos += c * phd_sin(fx->pos.yRot);
+	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
+	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

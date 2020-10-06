@@ -327,8 +327,8 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int x, z;
 
-	x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 5) + ((phd_sin(item->pos.yRot - ANGLE(90)) * 256) >> W2V_SHIFT);
-	z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 5) + ((phd_cos(item->pos.yRot - ANGLE(90)) * 256) >> W2V_SHIFT);
+	x = item->pos.xPos - phd_sin(item->pos.yRot + ANGLE(180)) * 512 + phd_sin(item->pos.yRot - ANGLE(90)) * 256;
+	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
 
 	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
 	SoundEffect(SFX_WATERFALL_LOOP, &item->pos, 0);

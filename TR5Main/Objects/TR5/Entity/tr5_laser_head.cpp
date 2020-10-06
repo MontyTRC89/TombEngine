@@ -239,7 +239,7 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - (192 - item->speed) * phd_sin(item->itemFlags[2]);
 			item->itemFlags[2] += ONE_DEGREE * item->speed;
 
 			if (!(GlobalCounter & 7))
@@ -281,7 +281,7 @@ void LaserHeadControl(short itemNumber)
 		else
 		{
 			item->triggerFlags++;
-			item->pos.yPos = item->itemFlags[1] - (128 * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - 128 * phd_sin(item->itemFlags[2]);
 			item->itemFlags[2] += ANGLE(3);
 
 			// Get guardian head's position
@@ -338,10 +338,10 @@ void LaserHeadControl(short itemNumber)
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
-						int c = v * phd_cos(-xRot) >> W2V_SHIFT;
-						dest.x = src.x + (c * phd_sin(yRot) >> W2V_SHIFT);
-						dest.y = src.y + (v * phd_sin(-xRot) >> W2V_SHIFT);
-						dest.z = src.z + (c * phd_cos(yRot) >> W2V_SHIFT);
+						int c = v * phd_cos(-xRot);
+						dest.x = src.x + c * phd_sin(yRot);
+						dest.y = src.y + v * phd_sin(-xRot);
+						dest.z = src.z + c * phd_cos(yRot);
 
 						if (condition)
 						{
@@ -375,11 +375,11 @@ void LaserHeadControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = 8192 * phd_cos(item->pos.xRot + 3328) >> W2V_SHIFT;
+					int c = 8192 * phd_cos(item->pos.xRot + 3328);
 					
-					dest.x = LaserHeadData.target.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-					dest.y = LaserHeadData.target.y = src.y + (8192 * phd_sin(3328 - item->pos.xRot) >> W2V_SHIFT);
-					dest.z = LaserHeadData.target.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+					dest.x = LaserHeadData.target.x = src.x + c * phd_sin(item->pos.yRot);
+					dest.y = LaserHeadData.target.y = src.y + 8192 * phd_sin(3328 - item->pos.xRot);
+					dest.z = LaserHeadData.target.z = src.z + c * phd_cos(item->pos.yRot);
 				}
 				else
 				{
@@ -471,10 +471,10 @@ void LaserHeadControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (PHD_VECTOR*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * phd_cos(angles[1]) >> W2V_SHIFT;
-								dest.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-								dest.y = src.y + (8192 * phd_sin(-angles[1]) >> W2V_SHIFT);
-								dest.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+								int c = 8192 * phd_cos(angles[1]);
+								dest.x = src.x + c * phd_sin(item->pos.yRot);
+								dest.y = src.y + 8192 * phd_sin(-angles[1]);
+								dest.z = src.z + c * phd_cos(item->pos.yRot);
 
 								if (item->itemFlags[3] != 90 
 									&& LaserHeadData.fireArcs[j] != NULL)

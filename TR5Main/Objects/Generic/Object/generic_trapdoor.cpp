@@ -55,9 +55,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		item->goalAnimState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 16;
+		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 1024;
 		ForcedFixedCamera.y = item->pos.yPos + 1024;
-		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 16;
+		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 1024;
 		ForcedFixedCamera.roomNumber = item->roomNumber;
 	}
 	else
@@ -96,11 +96,11 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				item->goalAnimState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 8;
+				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 2048;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
 				if (ForcedFixedCamera.y < g_Level.Rooms[item->roomNumber].maxceiling)
 					ForcedFixedCamera.y = g_Level.Rooms[item->roomNumber].maxceiling;
-				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 8;
+				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 2048;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 			}
 			else

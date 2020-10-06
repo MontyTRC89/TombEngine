@@ -149,9 +149,9 @@ void UpdateSpiders()
 				int y = spider->pos.yPos;
 				int z = spider->pos.zPos;
 
-				spider->pos.xPos += spider->speed * phd_sin(spider->pos.yRot) >> W2V_SHIFT;
+				spider->pos.xPos += spider->speed * phd_sin(spider->pos.yRot);
 				spider->pos.yPos += spider->fallspeed;
-				spider->pos.zPos += spider->speed * phd_cos(spider->pos.yRot) >> W2V_SHIFT;
+				spider->pos.zPos += spider->speed * phd_cos(spider->pos.yRot);
 				spider->fallspeed += GRAVITY;
 
 				int dx = LaraItem->pos.xPos - spider->pos.xPos;

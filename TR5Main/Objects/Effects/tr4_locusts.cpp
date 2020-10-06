@@ -207,9 +207,9 @@ void UpdateLocusts(void)
                 locust->pos.xRot += shiftXrot;
             }
 
-            locust->pos.xPos += (locust->randomRotation * phd_cos(locust->pos.xRot) >> W2V_SHIFT) * phd_sin(locust->pos.yRot) >> W2V_SHIFT;
-            locust->pos.yPos += locust->randomRotation * phd_sin(-locust->pos.xRot) >> W2V_SHIFT;
-            locust->pos.zPos += (locust->randomRotation * phd_cos(locust->pos.xRot) >> W2V_SHIFT) * phd_cos(locust->pos.yRot) >> W2V_SHIFT;
+            locust->pos.xPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_sin(locust->pos.yRot);
+            locust->pos.yPos += locust->randomRotation * phd_sin(-locust->pos.xRot);
+            locust->pos.zPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_cos(locust->pos.yRot);
             if (ItemNearTarget(&locust->pos, locust->target, CLICK(1) / 2))
             {
                 TriggerBlood(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 2 * GetRandomControl(), 2);

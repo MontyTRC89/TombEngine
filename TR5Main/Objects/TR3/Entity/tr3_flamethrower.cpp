@@ -190,19 +190,19 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed << 2)) + 32;
-			velocity = (speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+			velocity = speed * phd_cos(fx->pos.xRot);
 
-			xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-			yv = -((speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
-			zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+			xv = velocity * phd_sin(fx->pos.yRot);
+			yv = -speed * phd_sin(fx->pos.xRot);
+			zv = velocity * phd_cos(fx->pos.yRot);
 
 			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -1);
 		}
 
-		velocity = ((speed << 1) * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
-		zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
-		xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-		yv = -(((speed << 1) * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
+		velocity = (speed << 1) * phd_cos(fx->pos.xRot);
+		zv = velocity * phd_cos(fx->pos.yRot);
+		xv = velocity * phd_sin(fx->pos.yRot);
+		yv = -(speed << 1) * phd_sin(fx->pos.xRot);
 
 		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -2);
 	}

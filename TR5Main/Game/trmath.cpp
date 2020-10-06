@@ -323,15 +323,14 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	return result;
 }
 
-// FIXME: game code still expects << 2 >> W2V_SHIFT so we multiply by 16384.0f
-int phd_sin(short a)
+float phd_sin(short a)
 {
-	return (sin(TO_RAD(a)) * 16384.0f);
+	return sin(TO_RAD(a));
 }
 
-int phd_cos(short a)
+float phd_cos(short a)
 {
-	return (cos(TO_RAD(a)) * 16384.0f);
+	return cos(TO_RAD(a));
 }
 
 int mGetAngle(int x1, int y1, int x2, int y2)

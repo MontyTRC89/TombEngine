@@ -240,8 +240,8 @@ void ShivaControl(short itemNum)
 			if (shiva->mood == ESCAPE_MOOD)
 			{
 				roomNumber = item->roomNumber;
-				x = item->pos.xPos + (WALL_SIZE * phd_sin(item->pos.yRot + 0x8000) >> W2V_SHIFT);
-				z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + 0x8000) >> W2V_SHIFT);
+				x = item->pos.xPos + WALL_SIZE * phd_sin(item->pos.yRot + 0x8000);
+				z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + 0x8000);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 				if (!shiva->flags && floor->box != NO_BOX && !(g_Level.Boxes[floor->box].flags & BLOCKABLE))

@@ -256,9 +256,9 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)//1D244, 1D3D8 (F)
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 	{
-		item->pos.xPos += 700 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += 700 * phd_sin(item->pos.yRot);
 		item->pos.yPos -= 361;
-		item->pos.zPos += 700 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos += 700 * phd_cos(item->pos.yRot);
 
 		item->animNumber = LA_REACH;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -677,8 +677,8 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		}
 		else
 		{
-			item->pos.xPos -= (phd_sin(item->pos.yRot)) << 6 >> W2V_SHIFT;
-			item->pos.zPos -= (phd_cos(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+			item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
 			item->goalAnimState = LS_FREEFALL;
 		}
 	}

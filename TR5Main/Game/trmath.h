@@ -36,8 +36,8 @@ short ANGLE(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);
 
-int phd_sin(short a);
-int phd_cos(short a);
+float phd_sin(short a);
+float phd_cos(short a);
 
 // returns a float between 0-1
 const float frand();

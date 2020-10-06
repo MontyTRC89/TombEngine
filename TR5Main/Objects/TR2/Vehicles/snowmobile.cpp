@@ -226,9 +226,9 @@ bool SkidooCheckGetOffOK(int direction)
 	else
 		angle = skidoo->pos.yRot - 0x4000;
 
-	int x = skidoo->pos.xPos - (SKIDOO_GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
+	int x = skidoo->pos.xPos - SKIDOO_GETOFF_DIST * phd_sin(angle);
 	int y = skidoo->pos.yPos;
-	int z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
+	int z = skidoo->pos.zPos - SKIDOO_GETOFF_DIST * phd_cos(angle);
 
 	short roomNumber = skidoo->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -266,8 +266,8 @@ bool SkidooCheckGetOff()
 		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
-		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
-		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
+		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot);
+		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot);
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		Lara.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
@@ -457,11 +457,11 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	if (moved->x || moved->z)
 	{
 		// Get direction of movement relative to facing 
-		int s = phd_sin(skidoo->pos.yRot);
-		int c = phd_cos(skidoo->pos.yRot);
+		float s = phd_sin(skidoo->pos.yRot);
+		float c = phd_cos(skidoo->pos.yRot);
 		
-		int side = (-moved->z * s + moved->x * c) >> W2V_SHIFT;
-		int front = (moved->z * c + moved->x * s) >> W2V_SHIFT;
+		int side = -moved->z * s + moved->x * c;
+		int front = moved->z * c + moved->x * s;
 
 		if (abs(front) > abs(side))
 		{
@@ -681,14 +681,13 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 
 int TestSkidooHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (zOff * phd_sin(item->pos.xRot) >> W2V_SHIFT) +
-		                      (xOff * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - zOff * phd_sin(item->pos.xRot) + xOff * phd_sin(item->pos.zRot);
 
-	int s = phd_sin(item->pos.yRot);
-	int c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
 
-	pos->x = item->pos.xPos + ((zOff * s + xOff * c) >> W2V_SHIFT);
-	pos->z = item->pos.zPos + ((zOff * c - xOff * s) >> W2V_SHIFT);
+	pos->x = item->pos.xPos + zOff * s + xOff * c;
+	pos->z = item->pos.zPos + zOff * c - xOff * s;
 	
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -877,22 +876,22 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 		skidoo->pos.yRot += skinfo->skidooTurn + skinfo->extraRotation;
 
 	// Move skidoo according to speed 
-	skidoo->pos.zPos += skidoo->speed * phd_cos(skinfo->momentumAngle) >> W2V_SHIFT;
-	skidoo->pos.xPos += skidoo->speed * phd_sin(skinfo->momentumAngle) >> W2V_SHIFT;
+	skidoo->pos.zPos += skidoo->speed * phd_cos(skinfo->momentumAngle);
+	skidoo->pos.xPos += skidoo->speed * phd_sin(skinfo->momentumAngle);
 
 	// Slide skidoo according to tilts (to avoid getting stuck on slopes) 
-	int slip = SKIDOO_SLIP * phd_sin(skidoo->pos.xRot) >> W2V_SHIFT;
+	int slip = SKIDOO_SLIP * phd_sin(skidoo->pos.xRot);
 	if (abs(slip) > SKIDOO_SLIP / 2)
 	{
-		skidoo->pos.zPos -= slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_cos(skidoo->pos.yRot);
+		skidoo->pos.xPos -= slip * phd_sin(skidoo->pos.yRot);
 	}
 
-	slip = SKIDOO_SLIP_SIDE * phd_sin(skidoo->pos.zRot) >> W2V_SHIFT;
+	slip = SKIDOO_SLIP_SIDE * phd_sin(skidoo->pos.zRot);
 	if (abs(slip) > SKIDOO_SLIP_SIDE / 2)
 	{
-		skidoo->pos.zPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos += slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_sin(skidoo->pos.yRot);
+		skidoo->pos.xPos += slip * phd_cos(skidoo->pos.yRot);
 	}
 
 	// Remember desired position in case of collisions moving us about 
@@ -935,7 +934,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	// Check final actual movement; if speed is more than halved then reduce to zero 
 	if (collide)
 	{
-		int newspeed = ((skidoo->pos.zPos - old.z) * phd_cos(skinfo->momentumAngle) + (skidoo->pos.xPos - old.x) * phd_sin(skinfo->momentumAngle)) >> W2V_SHIFT;
+		int newspeed = (skidoo->pos.zPos - old.z) * phd_cos(skinfo->momentumAngle) + (skidoo->pos.xPos - old.x) * phd_sin(skinfo->momentumAngle);
 		if (skidoo->speed > SKIDOO_MAX_SPEED + SKIDOO_ACCELERATION && newspeed < skidoo->speed - 10)
 		{
 			LaraItem->hitPoints -= (skidoo->speed - newspeed) / 2;

@@ -98,13 +98,13 @@ void InitialiseMotorbike(short itemNumber)
 
 static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-    pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+    pos->y = item->pos.yPos - dz * phd_sin(item->pos.xRot) + dx * phd_sin(item->pos.zRot);
 
-    int c = phd_cos(item->pos.yRot);
-    int s = phd_sin(item->pos.yRot);
+    float c = phd_cos(item->pos.yRot);
+    float s = phd_sin(item->pos.yRot);
 
-    pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
-    pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+    pos->z = item->pos.zPos + dz * c - dx * s;
+    pos->x = item->pos.xPos + dz * s + dx * c;
 
     short roomNumber = item->roomNumber;
     FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -391,9 +391,9 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     sptr->x = x + (GetRandomControl() & 0xF) - 8;
     sptr->y = y + (GetRandomControl() & 0xF) - 8;
     sptr->z = z + (GetRandomControl() & 0xF) - 8;
-    sptr->xVel = (speed * phd_sin(angle)) >> 16;
+    sptr->xVel = speed * phd_sin(angle) / 4;
     sptr->yVel = (GetRandomControl() & 7) - 8;
-    sptr->zVel = (speed * phd_cos(angle)) >> 16;
+    sptr->zVel = speed * phd_cos(angle) / 4;
     sptr->friction = 4;
 
     if (GetRandomControl() & 1)
@@ -521,8 +521,8 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->goalAnimState = LS_STOP;
 			LaraItem->currentAnimState = LS_STOP;
-			LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-			LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot);
+			LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
@@ -600,10 +600,10 @@ static int GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* pos)
 
     if (pos->x || pos->z)
     {
-        int c = phd_cos(item->pos.yRot);
-        int s = phd_sin(item->pos.yRot);
-        int front = ((pos->z * c) + (pos->x * s)) >> W2V_SHIFT;
-        int side = (-(pos->z * s) + (pos->x * c)) >> W2V_SHIFT;
+        float c = phd_cos(item->pos.yRot);
+        float s = phd_sin(item->pos.yRot);
+        int front = pos->z * c + pos->x * s;
+        int side = -pos->z * s + pos->x * c;
 
         if (abs(front) > abs(side))
         {
@@ -720,19 +720,19 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (item->pos.yPos >= height)
-        speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
+        speed = item->speed * phd_cos(item->pos.xRot);
     else
         speed = item->speed;
 
-    item->pos.zPos += (speed * phd_cos(motorbike->momentumAngle)) >> W2V_SHIFT;
-    item->pos.xPos += (speed * phd_sin(motorbike->momentumAngle)) >> W2V_SHIFT;
+    item->pos.zPos += speed * phd_cos(motorbike->momentumAngle);
+    item->pos.xPos += speed * phd_sin(motorbike->momentumAngle);
 
     if (item->pos.yPos >= height)
     {
-        short anglex = 100 * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+        short anglex = 100 * phd_sin(item->pos.xRot);
         if (abs(anglex) > 16)
         {
-            short anglex2 = 100 * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+            short anglex2 = 100 * phd_sin(item->pos.xRot);
             if (anglex < 0)
                 anglex2 = -anglex;
             if (anglex2 > 24)
@@ -741,7 +741,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             motorbike->velocity -= anglex;
         }
 
-        short anglez = 100 * phd_sin(item->pos.zRot) >> W2V_SHIFT;
+        short anglez = 100 * phd_sin(item->pos.zRot);
         if (abs(anglez) > 32)
         {
             short ang, angabs;
@@ -751,8 +751,8 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             else
                 ang = item->pos.yRot - 0x4000;
             angabs = abs(anglez) - 24;
-            item->pos.xPos += angabs * phd_sin(ang) >> W2V_SHIFT;
-            item->pos.zPos += angabs * phd_cos(ang) >> W2V_SHIFT;
+            item->pos.xPos += angabs * phd_sin(ang);
+            item->pos.zPos += angabs * phd_cos(ang);
         }
     }
 
@@ -841,7 +841,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     collide = GetMotorbikeCollisionAnim(item, &moved);
     if (collide)
     {
-        newspeed = ((item->pos.zPos - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->pos.xPos - oldpos.x) * phd_sin(motorbike->momentumAngle)) >> 6;
+        newspeed = ((item->pos.zPos - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->pos.xPos - oldpos.x) * phd_sin(motorbike->momentumAngle)) * 256;
         if (&g_Level.Items[Lara.Vehicle] == item && motorbike->velocity >= 0x8000 && newspeed < (motorbike->velocity - 10))
         {
             LaraItem->hitPoints -= (motorbike->velocity - newspeed) >> 7;
@@ -870,9 +870,9 @@ static BOOL MotorbikeCanGetOff(void)
 
     item = &g_Level.Items[Lara.Vehicle];
     angle = item->pos.yRot + 0x4000;
-    x = item->pos.xPos + ((500 * phd_sin(angle)) >> W2V_SHIFT);
+    x = item->pos.xPos + 500 * phd_sin(angle);
     y = item->pos.yPos;
-    z = item->pos.zPos + ((500 * phd_cos(angle)) >> W2V_SHIFT);
+    z = item->pos.zPos + 500 * phd_cos(angle);
 
     room_number = item->roomNumber;
     floor = GetFloor(x, y, z, &room_number);

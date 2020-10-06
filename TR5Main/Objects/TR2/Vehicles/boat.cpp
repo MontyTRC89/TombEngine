@@ -175,9 +175,9 @@ void SpeedBoatGetOff(ITEM_INFO* boat)
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		Lara.Vehicle = NO_ITEM;
 
-		int x = LaraItem->pos.xPos + (360 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+		int x = LaraItem->pos.xPos + 360 * phd_sin(LaraItem->pos.yRot);
 		int y = LaraItem->pos.yPos - 90;
-		int z = LaraItem->pos.zPos + (360 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+		int z = LaraItem->pos.zPos + 360 * phd_cos(LaraItem->pos.yRot);
 		
 		short roomNumber = LaraItem->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -206,9 +206,9 @@ bool SpeedBoatCanGetOff(int direction)
 	else
 		angle = v->pos.yRot + ANGLE(90);
 
-	int x = v->pos.xPos + (GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
+	int x = v->pos.xPos + GETOFF_DIST * phd_sin(angle);
 	int y = v->pos.yPos;
-	int z = v->pos.zPos + (GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
+	int z = v->pos.zPos + GETOFF_DIST * phd_cos(angle);
 
 	short roomNumber = v->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -237,8 +237,7 @@ int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
-	int dist = ((LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) -
-		(LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot)) >> W2V_SHIFT;
+	int dist = (LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot);
 	if (dist > 200)
 		return 0;
 
@@ -294,14 +293,13 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* po
 	// Moves the vector in 'pos' to the required test position too 
 
 	// Get y pos correctly, but don't bother changing zOff and xOff using x_rot and z_rot 
-	pos->y = item->pos.yPos - (zOff * phd_sin(item->pos.xRot) >> W2V_SHIFT) +
-							  (xOff * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - zOff * phd_sin(item->pos.xRot) + xOff * phd_sin(item->pos.zRot);
 
-	int s = phd_sin(item->pos.yRot);
-	int c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
 	
-	pos->x = item->pos.xPos + ((zOff * s + xOff * c) >> W2V_SHIFT);
-	pos->z = item->pos.zPos + ((zOff * c - xOff * s) >> W2V_SHIFT);
+	pos->x = item->pos.xPos + zOff * s + xOff * c;
+	pos->z = item->pos.zPos + zOff * c - xOff * s;
 	
 	// Try to get water height; if none get ground height instead 
 	short roomNumber = item->roomNumber;
@@ -467,11 +465,11 @@ int SpeedBoatGetCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	if (moved->x || moved->z)
 	{
 		// Get direction of movement relative to facing 
-		int s = phd_sin(skidoo->pos.yRot);
-		int c = phd_cos(skidoo->pos.yRot);
+		float s = phd_sin(skidoo->pos.yRot);
+		float c = phd_cos(skidoo->pos.yRot);
 		
-		int front = (moved->z * c + moved->x * s) >> W2V_SHIFT;
-		int side = (-moved->z * s + moved->x * c) >> W2V_SHIFT;
+		int front = moved->z * c + moved->x * s;
+		int side = -moved->z * s + moved->x * c;
 		
 		if (abs(front) > abs(side))
 		{
@@ -565,8 +563,8 @@ int SpeedBoatDynamics(short itemNum)
 	binfo->tiltAngle = binfo->boatTurn * 6;
 
 	// Move boat according to speed 
-	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
-	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
+	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot);
+	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot);
 	
 	/*if (boat->speed >= 0)
 		binfo->propRot += (boat->speed * ANGLE(3));
@@ -574,17 +572,17 @@ int SpeedBoatDynamics(short itemNum)
 		binfo->propRot += ANGLE(33);*/
 
 	// Slide boat according to tilts (to avoid getting stuck on slopes) 
-	slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot) >> W2V_SHIFT;
+	slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot);
 	if (!slip && boat->pos.zRot)
 		slip = (boat->pos.zRot > 0) ? 1 : -1;
-	boat->pos.xPos += slip * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
-	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
+	boat->pos.xPos += slip * phd_sin(boat->pos.yRot);
+	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot);
 	
-	slip = BOAT_SLIP * phd_sin(boat->pos.xRot) >> W2V_SHIFT;
+	slip = BOAT_SLIP * phd_sin(boat->pos.xRot);
 	if (!slip && boat->pos.xRot)
 		slip = (boat->pos.xRot > 0) ? 1 : -1;
-	boat->pos.xPos -= slip * phd_sin(boat->pos.yRot) >> W2V_SHIFT;
-	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot) >> W2V_SHIFT;
+	boat->pos.xPos -= slip * phd_sin(boat->pos.yRot);
+	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot);
 	
 	// Remember desired position in case of collisions moving us about 
 	moved.x = boat->pos.xPos;
@@ -636,7 +634,7 @@ int SpeedBoatDynamics(short itemNum)
 	// Check final movement if slipped or collided and adjust speed 
 	if (slip || collide)
 	{
-		newspeed = ((boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot)) >> W2V_SHIFT;
+		newspeed = (boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot);
 
 		if (boat->speed > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < boat->speed - 10)
 		{

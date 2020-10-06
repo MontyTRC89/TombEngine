@@ -44,8 +44,8 @@ void FlareControl(short itemNumber) // (AF) (D)
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot);
+	int zv = item->speed * phd_cos(item->pos.yRot);
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
@@ -328,8 +328,8 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		{
 			flag = true;
 			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180);
-			item->pos.xPos = LaraItem->pos.xPos + (320 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-			item->pos.zPos = LaraItem->pos.zPos + (320 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+			item->pos.xPos = LaraItem->pos.xPos + 320 * phd_sin(item->pos.yRot);
+			item->pos.zPos = LaraItem->pos.zPos + 320 * phd_cos(item->pos.yRot);
 			item->roomNumber = LaraItem->roomNumber;
 		}
 		else

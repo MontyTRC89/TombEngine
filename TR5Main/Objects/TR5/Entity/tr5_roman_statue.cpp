@@ -273,8 +273,8 @@ void InitialiseRomanStatue(short itemNum)
     item->currentAnimState = 13;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->status = ITEM_NOT_ACTIVE;
-	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
-    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
+	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f));
+    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(ROMAN_STATUE_STRUCT));
 }
