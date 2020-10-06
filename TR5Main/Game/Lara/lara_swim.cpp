@@ -36,7 +36,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 		Lara.currentXvel += (sink->data * 1024 * phd_sin(angle - ANGLE(90)) - Lara.currentXvel) / 16;
 		Lara.currentZvel += (sink->data * 1024 * phd_cos(angle - ANGLE(90)) - Lara.currentZvel) / 16;
 
-		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
+		LaraItem->pos.yPos += ((sink->y - LaraItem->pos.yPos) / 16);
 	}
 	else
 	{
@@ -64,8 +64,8 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 			return;
 	}
 
-	LaraItem->pos.xPos += Lara.currentXvel >> 8;
-	LaraItem->pos.zPos += Lara.currentZvel >> 8;
+	LaraItem->pos.xPos += (Lara.currentXvel / 256);
+	LaraItem->pos.zPos += (Lara.currentZvel / 256);
 	Lara.currentActive = 0;
 
 	coll->facing = phd_atan(LaraItem->pos.zPos - coll->old.z, LaraItem->pos.xPos - coll->old.x);
@@ -116,8 +116,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 	short roomIndex = NO_ROOM;
 	do
 	{
-		int zFloor = (z - r->z) >> WALL_SHIFT;
-		int xFloor = (x - r->x) >> WALL_SHIFT;
+		int zFloor = (z - r->z) / SECTOR(1);
+		int xFloor = (x - r->x) / SECTOR(1);
 
 		if (zFloor <= 0)
 		{
@@ -156,7 +156,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 			r = &g_Level.Rooms[floor->skyRoom];
 			if (!(r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP)))
 			{
-				int wh = floor->ceiling << 8;
+				int wh = floor->ceiling * 256;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -171,7 +171,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 			r = &g_Level.Rooms[floor->pitRoom];
 			if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 			{
-				int wh = floor->floor << 8;
+				int wh = floor->floor * 256;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -405,7 +405,7 @@ void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 
 	if (Subsuit.dXRot != 0)
 	{
-		short rot = Subsuit.dXRot >> 3;
+		short rot = Subsuit.dXRot / 8;
 		if (rot < -ANGLE(2))
 			rot = -ANGLE(2);
 		else if (rot > ANGLE(2))
@@ -413,8 +413,8 @@ void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 		LaraItem->pos.xRot += rot;
 	}
 
-	Subsuit.Vel[0] += abs(Subsuit.XRot >> 3);
-	Subsuit.Vel[1] += abs(Subsuit.XRot >> 3);
+	Subsuit.Vel[0] += abs(Subsuit.XRot / 8);
+	Subsuit.Vel[1] += abs(Subsuit.XRot / 8);
 
 	if (Lara.turnRate > 0)
 	{
@@ -440,7 +440,7 @@ void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 void SwimTurnSubsuit(ITEM_INFO* item)//4BBDC, 4C040 (F)
 {
 	if (item->pos.yPos < 14080)
-		Subsuit.YVel += (14080 - item->pos.yPos) >> 4;
+		Subsuit.YVel += ((14080 - item->pos.yPos) / 16);
 
 	if (TrInput & IN_FORWARD && item->pos.xRot > -ANGLE(85))
 	{
@@ -525,8 +525,8 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	short height = 762 * phd_sin(item->pos.xRot);
 	height = abs(height);
 
-	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)
-		height = ((LaraDrawType == LARA_DIVESUIT) << 6) + 200;
+	if (height < ((LaraDrawType == LARA_DIVESUIT) * 64) + 200)
+		height = ((LaraDrawType == LARA_DIVESUIT) * 64) + 200;
 	
 	coll->badNeg = -64;
 	
@@ -651,7 +651,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	{
 		if (LaraDrawType == 5)
 		{
-			SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) << 8) | 6);
+			SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) * 256) | 6);
 		}
 
 		if (Lara.anxiety < 96)
