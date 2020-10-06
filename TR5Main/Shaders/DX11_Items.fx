@@ -103,8 +103,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float attenuation = (radius - distance) / radius;
-
+			float attenuation = pow(((radius - distance) / radius), 2);
 			float d = dot(Normal, lightVec);
 			d *= 0.5;
 			d += 0.5f;
@@ -159,7 +158,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;			
 
 			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
-
+			attenuation = pow(attenuation, 2);
 			float d = dot(Normal, lightVec);
 			d *= 0.5;
 			d += 0.5f;
