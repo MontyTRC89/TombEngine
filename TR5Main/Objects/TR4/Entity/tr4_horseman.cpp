@@ -45,8 +45,8 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->flags = SP_NONE;
 		spark->gravity = (r >> 7) & 0x1F;
 		spark->maxYvel = 0;
-		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;
-		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) * 4096;
+		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) * 4096;
 	}
 
 	for (int i = 0; i < num; i++)
@@ -87,8 +87,8 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->dSize = spark->sSize / 2;
 		spark->flags = 26;
 		spark->maxYvel = 0;
-		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;
-		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) * 4096;
+		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) * 4096;
 	}
 }
 
@@ -172,16 +172,16 @@ void HorsemanControl(short itemNumber)
 		y = horseItem->pos.yPos;
 		z = horseItem->pos.zPos;
 
-		x = horseItem->pos.xPos + 341 * phd_sin(horseItem->pos.yRot) >> 14;
+		x = horseItem->pos.xPos + 341 * phd_sin(horseItem->pos.yRot);
 		y = horseItem->pos.yPos;
-		z = horseItem->pos.zPos + 341 * phd_cos(horseItem->pos.yRot) >> 14;
+		z = horseItem->pos.zPos + 341 * phd_cos(horseItem->pos.yRot);
 
 		floor = GetFloor(x, y, z, &roomNumber);
 		height1 = GetFloorHeight(floor, x, y, z);
 
-		x = horseItem->pos.xPos - 341 * phd_sin(horseItem->pos.yRot) >> 14;
+		x = horseItem->pos.xPos - 341 * phd_sin(horseItem->pos.yRot);
 		y = horseItem->pos.yPos;
-		z = horseItem->pos.zPos - 341 * phd_cos(horseItem->pos.yRot) >> 14;
+		z = horseItem->pos.zPos - 341 * phd_cos(horseItem->pos.yRot);
 
 		floor = GetFloor(x, y, z, &roomNumber);
 		height2 = GetFloorHeight(floor, x, y, z);

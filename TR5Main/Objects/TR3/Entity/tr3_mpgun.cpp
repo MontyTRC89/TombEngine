@@ -154,9 +154,9 @@ void MPGunControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		int x = item->pos.xPos + (WALL_SIZE * phd_sin(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int x = item->pos.xPos + WALL_SIZE * phd_sin(item->pos.yRot + laraInfo.angle);
 		int y = item->pos.yPos;
-		int z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + laraInfo.angle);
 		
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

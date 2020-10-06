@@ -34,9 +34,9 @@ void ControlBodyPart(short fxNumber)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
 	fx->pos.yPos += fx->fallspeed;
-	fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

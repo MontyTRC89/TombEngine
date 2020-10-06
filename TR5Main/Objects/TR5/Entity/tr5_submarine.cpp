@@ -403,8 +403,8 @@ void ChaffFlareControl(short itemNumber)
 		item->pos.zRot += ANGLE(5);
 	}
 
-	int dx = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = item->speed * phd_sin(item->pos.yRot);
+	int dz = item->speed * phd_cos(item->pos.yRot);
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
@@ -569,11 +569,11 @@ void TorpedoControl(short itemNumber)
 
 	item->pos.zRot += 16 * item->speed;
 
-	int c = item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT;
+	int c = item->speed * phd_cos(item->pos.xRot);
 
-	item->pos.xPos += c * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += c * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += c * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
+	item->pos.zPos += c * phd_cos(item->pos.yRot);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

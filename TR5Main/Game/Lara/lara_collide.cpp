@@ -83,8 +83,8 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 		item->pos.yRot -= ANGLE(5.0f);
 		break;
 	case CT_CLAMP:
-		item->pos.xPos -= (100 * 4 * phd_sin(coll->facing)) >> W2V_SHIFT;
-		item->pos.zPos -= (100 * 4 * phd_cos(coll->facing)) >> W2V_SHIFT;
+		item->pos.xPos -= 400 * phd_sin(coll->facing);
+		item->pos.zPos -= 400 * phd_cos(coll->facing);
 
 		item->speed = 0;
 		coll->midFloor = 0;

@@ -140,8 +140,8 @@ void InitialiseGuard(short itemNum)
         case 9:
             item->goalAnimState = STATE_GUARD_USE_COMPUTER;
             item->animNumber = anim + 59;
-            item->pos.xPos -= phd_sin(item->pos.yRot); // 4 * not exist there ??
-            item->pos.zPos -= phd_cos(item->pos.yRot); // 4 * not exist there ??
+            item->pos.xPos -= 512 * phd_sin(item->pos.yRot);
+            item->pos.zPos -= 512 * phd_cos(item->pos.yRot);
             break;
         case 8:
             item->goalAnimState = STATE_GUARD_HUNTING_IDLE;
@@ -166,8 +166,8 @@ void InitialiseSniper(short itemNum)
     item->goalAnimState = STATE_SNIPER_STOP;
     item->currentAnimState = STATE_SNIPER_STOP;
 	item->pos.yPos += STEP_SIZE * 2;
-    item->pos.xPos += phd_sin(item->pos.yRot);
-    item->pos.zPos += phd_cos(item->pos.yRot);
+    item->pos.xPos += 1024 * phd_sin(item->pos.yRot + ANGLE(90));
+    item->pos.zPos += 1024 * phd_cos(item->pos.yRot + ANGLE(90));
 }
 
 void InitialiseGuardLaser(short itemNum)
@@ -205,8 +205,8 @@ void GuardControl(short itemNum)
 	short joint0 = 0;
 	int x = item->pos.xPos;
 	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;
@@ -1018,8 +1018,8 @@ void Mafia2Control(short itemNum)
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;

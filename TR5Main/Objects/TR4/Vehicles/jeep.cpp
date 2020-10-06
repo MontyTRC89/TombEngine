@@ -70,13 +70,13 @@ extern Inventory g_Inventory;
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - dz * phd_sin(item->pos.xRot) + dx * phd_sin(item->pos.zRot);
 
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
 
-	pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
-	pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+	pos->z = item->pos.zPos + dz * c - dx * s;
+	pos->x = item->pos.xPos + dz * s + dx * c;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -243,9 +243,9 @@ static int JeepCanGetOff()
 
 	short angle = item->pos.yRot + 0x4000;
 
-	int x = item->pos.xPos - (JEEP_GETOFF_DISTANCE * phd_sin(angle) >> W2V_SHIFT);
+	int x = item->pos.xPos - JEEP_GETOFF_DISTANCE * phd_sin(angle);
 	int y = item->pos.yPos;
-	int z = item->pos.zPos - (JEEP_GETOFF_DISTANCE * phd_cos(angle) >> W2V_SHIFT);
+	int z = item->pos.zPos - JEEP_GETOFF_DISTANCE * phd_cos(angle);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -301,9 +301,9 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
-	spark->xVel = speed * phd_sin(angle) >> (W2V_SHIFT + 2);
+	spark->xVel = speed * phd_sin(angle) / 4;
 	spark->yVel = -8 - (GetRandomControl() & 7);
-	spark->zVel = speed * phd_cos(angle) >> (W2V_SHIFT + 2);
+	spark->zVel = speed * phd_cos(angle) / 4;
 	spark->friction = 4;
 
 	if (GetRandomControl() & 1)
@@ -367,8 +367,8 @@ static int JeepCheckGetOff()
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->goalAnimState = LS_STOP;
 			LaraItem->currentAnimState = LS_STOP;
-			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
-			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
+			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
@@ -487,10 +487,10 @@ static int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 	if (p->x || p->z)
 	{
-		int c = phd_cos(item->pos.yRot);
-		int s = phd_sin(item->pos.yRot);
-		int front = ((p->z * c) + (p->x * s)) >> W2V_SHIFT;
-		int side = (-(p->z * s) + (p->x * c)) >> W2V_SHIFT;
+		float c = phd_cos(item->pos.yRot);
+		float s = phd_sin(item->pos.yRot);
+		int front = p->z * c + p->x * s;
+		int side = -p->z * s + p->x * c;
 
 		if (abs(front) > abs(side))
 		{
@@ -716,15 +716,15 @@ static int JeepDynamics(ITEM_INFO* item)
 	if (item->pos.yPos < height)
 		speed = item->speed;
 	else
-		speed = item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT;
+		speed = item->speed * phd_cos(item->pos.xRot);
 
-	item->pos.xPos += (speed * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
-	item->pos.zPos += (speed * phd_cos(jeep->momentumAngle)) >> W2V_SHIFT;
+	item->pos.xPos += speed * phd_sin(jeep->momentumAngle);
+	item->pos.zPos += speed * phd_cos(jeep->momentumAngle);
 	
 	int slip = 0;
 	if (item->pos.yPos >= height)
 	{
-		slip = JEEP_SLIP * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+		slip = JEEP_SLIP * phd_sin(item->pos.xRot);
 
 		if (abs(slip) > 16)
 		{
@@ -736,20 +736,20 @@ static int JeepDynamics(ITEM_INFO* item)
 			jeep->velocity = slip;
 		}
 
-		slip = JEEP_SLIP_SIDE * phd_sin(item->pos.zRot) >> W2V_SHIFT;
+		slip = JEEP_SLIP_SIDE * phd_sin(item->pos.zRot);
 		if (abs(slip) > JEEP_SLIP_SIDE / 4)
 		{
 			JeepNoGetOff = 1;
 
 			if (slip >= 0)
 			{
-				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot + ANGLE(90));
+				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot + ANGLE(90));
 			}
 			else
 			{
-				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
-				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot - ANGLE(90));
+				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot - ANGLE(90));
 			}
 		}
 	}
@@ -832,7 +832,7 @@ static int JeepDynamics(ITEM_INFO* item)
 	
 	if (collide)
 	{
-		newspeed = ((item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
+		newspeed = (item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle);
 		newspeed <<= 8;
 
 		if ((&g_Level.Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))

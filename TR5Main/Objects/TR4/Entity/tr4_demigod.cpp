@@ -207,9 +207,9 @@ static void DemigodHammerAttack(int x, int y, int z, int something)
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle) >> W2V_SHIFT;
+			spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle);
 			spark->yVel = -32 - (GetRandomControl() & 0x3F);
-			spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle) >> W2V_SHIFT;
+			spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
 			spark->friction = 9;
 
 			if (GetRandomControl() & 1)

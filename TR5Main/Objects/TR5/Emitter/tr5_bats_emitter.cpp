@@ -201,11 +201,11 @@ void UpdateBats()
 			bat->pos.xRot += xAngle;
 		}
 
-		int sp = bat->speed * phd_cos(bat->pos.xRot) >> W2V_SHIFT;
+		int sp = bat->speed * phd_cos(bat->pos.xRot);
 
-		bat->pos.xPos += sp * phd_sin(bat->pos.yRot) >> W2V_SHIFT;
-		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot) >> W2V_SHIFT;
-		bat->pos.zPos += sp * phd_cos(bat->pos.yRot) >> W2V_SHIFT;
+		bat->pos.xPos += sp * phd_sin(bat->pos.yRot);
+		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot);
+		bat->pos.zPos += sp * phd_cos(bat->pos.yRot);
 
 		if ((i % 2 == 0)
 			&& bat->pos.xPos > x1

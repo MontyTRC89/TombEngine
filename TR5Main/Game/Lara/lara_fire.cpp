@@ -837,7 +837,8 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
 	BOUNDING_BOX* bounds;
-	int x, y, z, c, s;
+	int x, y, z;
+	float c, s;
 
 	bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	x = (int)(bounds->X1 + bounds->X2) / 2;
@@ -846,9 +847,9 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
 
-	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
+	target->x = item->pos.xPos + c * x + s * z;
 	target->y = item->pos.yPos + y;
-	target->z = item->pos.zPos + ((c * z - s * x) >> W2V_SHIFT);
+	target->z = item->pos.zPos + c * z - s * x;
 	target->roomNumber = item->roomNumber;
 }
 

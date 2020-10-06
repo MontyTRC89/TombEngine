@@ -917,9 +917,9 @@ void FlameEmitter3Control(short itemNumber)
 			{
 				if (item->triggerFlags == 2 || item->triggerFlags == 4)
 				{
-					dest.x = item->pos.xPos + 2048 * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.x = item->pos.xPos + 2048 * phd_sin(item->pos.yRot + ANGLE(180));
 					dest.y = item->pos.yPos;
-					dest.z = item->pos.zPos + 2048 * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.z = item->pos.zPos + 2048 * phd_cos(item->pos.yRot + ANGLE(180));
 					
 					if (GetRandomControl() & 3)
 					{

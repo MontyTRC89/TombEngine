@@ -26,8 +26,8 @@ void SpinningBladeControl(short itemNumber)
 	{
 		if (item->goalAnimState != 1)
 		{
-			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+			int x = item->pos.xPos + WALL_SIZE * 3 * phd_sin(item->pos.yRot) / 2;
+			int z = item->pos.zPos + WALL_SIZE * 3 * phd_cos(item->pos.yRot) / 2;
 
 			short roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
