@@ -179,11 +179,11 @@ static int DoRubberBoatShift2(ITEM_INFO *skidoo, PHD_VECTOR *pos, PHD_VECTOR *ol
 	int x_old, z_old;
 	int shift_x, shift_z;
 
-	x = pos->x >> WALL_SHIFT;
-	z = pos->z >> WALL_SHIFT;
+	x = pos->x / SECTOR(1);
+	z = pos->z / SECTOR(1);
 
-	x_old = old->x >> WALL_SHIFT;
-	z_old = old->z >> WALL_SHIFT;
+	x_old = old->x / SECTOR(1);
+	z_old = old->z / SECTOR(1);
 
 	shift_x = pos->x & (WALL_SIZE - 1);
 	shift_z = pos->z & (WALL_SIZE - 1);
@@ -384,7 +384,7 @@ static int RubberBoatDynamics(short boat_number)
 	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot);
 	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot);
 	if (boat->speed >= 0)
-		binfo->propRot += (boat->speed * (ONE_DEGREE * 3)) + (ONE_DEGREE << 1);
+		binfo->propRot += (boat->speed * (ONE_DEGREE * 3)) + (ONE_DEGREE * 2);
 	else
 		binfo->propRot += ONE_DEGREE * 33;
 
@@ -456,8 +456,8 @@ static int RubberBoatDynamics(short boat_number)
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
 			SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);
-			newspeed >>= 1;
-			boat->speed >>= 1;
+			newspeed /= 2;
+			boat->speed /= 2;
 		}
 
 		/* Adjust speed if serious change */
@@ -497,7 +497,7 @@ static int DoRubberBoatDynamics(int height, int fallspeed, int *y)
 	}
 	else
 	{
-		fallspeed += ((height - *y - fallspeed) >> 3);
+		fallspeed += ((height - *y - fallspeed) / 8);
 		if (fallspeed < -20)
 			fallspeed - 20;
 
@@ -842,7 +842,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long speed, short angl
 	}
 
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
-	sptr->fadeToBlack = 12 - (snow << 3);
+	sptr->fadeToBlack = 12 - (snow * 8);
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
 	sptr->transType = COLADD;
 	sptr->extras = 0;
@@ -854,7 +854,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long speed, short angl
 	zv = speed * phd_cos(angle) / 4;
 	xv = speed * phd_sin(angle) / 4;
 	sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
-	sptr->yVel = (speed << 3) + (speed << 2);
+	sptr->yVel = (speed * 8) + (speed * 4);
 	sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
 	sptr->friction = 3;
 
@@ -877,7 +877,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long speed, short angl
 		sptr->scalar = 4;
 		sptr->gravity = 0;
 		sptr->maxYvel = 0;
-		size = (GetRandomControl() & 7) + (speed >> 1) + 16;
+		size = (GetRandomControl() & 7) + (speed / 2) + 16;
 	}
 }
 
@@ -1011,15 +1011,15 @@ void RubberBoatControl(short itemNum)
 	/* Rotate boat to match these heights */
 	height = (fl.y + fr.y);
 	if (height < 0)
-		height = -(abs(height) >> 1);
+		height = -(abs(height) / 2);
 	else
-		height = height >> 1;
+		height = height / 2;
 
 	x_rot = phd_atan(RUBBER_BOAT_FRONT, boat->pos.yPos - height);
 	z_rot = phd_atan(RUBBER_BOAT_SIDE, height - fl.y);
 
-	boat->pos.xRot += (x_rot - boat->pos.xRot) >> 1;
-	boat->pos.zRot += (z_rot - boat->pos.zRot) >> 1;
+	boat->pos.xRot += ((x_rot - boat->pos.xRot) / 2);
+	boat->pos.zRot += ((z_rot - boat->pos.zRot) / 2);
 
 	/* Auto level the boat on flat water (to stop evil shifts) */
 	if (!x_rot && abs(boat->pos.xRot) < 4)
@@ -1064,12 +1064,12 @@ void RubberBoatControl(short itemNum)
 	}
 
 	pitch = boat->speed;
-	binfo->pitch += (pitch - binfo->pitch) >> 2;
+	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
 	if (boat->speed > 8)
-		SoundEffect(SFX_TR3_BOAT_MOVING, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) << 8));
+		SoundEffect(SFX_TR3_BOAT_MOVING, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) * 256));
 	else if (drive)
-		SoundEffect(SFX_TR3_BOAT_IDLE, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) << 8));
+		SoundEffect(SFX_TR3_BOAT_IDLE, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) * 256));
 
 	if (Lara.Vehicle != itemNum)
 		return;
@@ -1125,7 +1125,7 @@ void RubberBoatControl(short itemNum)
 
 			cnt = (GetRandomControl() & 3) + 3;
 			for (;cnt>0;cnt--)
-			TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) << 4, boat->pos.yRot + 0x4000 + GetRandomControl(), 1);
+			TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) * 16, boat->pos.yRot + 0x4000 + GetRandomControl(), 1);
 
 		}
 	}

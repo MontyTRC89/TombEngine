@@ -34,10 +34,10 @@
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
-#define UPDOWN_ACCEL		(ANGLE(2) << 16)
-#define UPDOWN_SLOWACCEL	(ANGLE(1) << 16)
-#define UPDOWN_FRICTION		(ANGLE(1) << 16)
-#define MAX_UPDOWN			(ANGLE(2) << 16)
+#define UPDOWN_ACCEL		(ANGLE(2) * 65536)
+#define UPDOWN_SLOWACCEL	(ANGLE(1) * 65536)
+#define UPDOWN_FRICTION		(ANGLE(1) * 65536)
+#define MAX_UPDOWN			(ANGLE(2) * 65536)
 #define UPDOWN_LIMIT		ANGLE(80)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
@@ -48,9 +48,9 @@
 #define SUB_RADIUS			300
 #define SUB_HEIGHT			400
 #define SUB_LENGTH			WALL_SIZE
-#define FRONT_TOLERANCE		(ANGLE(45) << 16)
-#define TOP_TOLERANCE		(ANGLE(45) << 16)
-#define WALLDEFLECT			(ANGLE(2) << 16)
+#define FRONT_TOLERANCE		(ANGLE(45) * 65536)
+#define TOP_TOLERANCE		(ANGLE(45) * 65536)
+#define WALLDEFLECT			(ANGLE(2) * 65536)
 #define GETOFF_DIST 		WALL_SIZE
 #define HARPOON_SPEED		256
 #define HARPOON_TIME		256
@@ -183,8 +183,8 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 
 	sptr->scalar = 3;
 	sptr->gravity = sptr->maxYvel = 0;
-	size = (GetRandomControl() & 7) + (speed >> 1) + 16;
-	sptr->size = sptr->sSize = size >> 2;
+	size = (GetRandomControl() & 7) + (speed / 2) + 16;
+	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 }
 
@@ -205,7 +205,7 @@ void SubEffects(short item_number)
 		if (!sub->Vel)
 			sub->FanRot += ANGLE(2);
 		else
-			sub->FanRot += sub->Vel >> 12;
+			sub->FanRot += (sub->Vel / 4069);
 
 		if (sub->Vel)
 		{
@@ -213,7 +213,7 @@ void SubEffects(short item_number)
 			pos.y = sub_bites[SUB_FAN].y;
 			pos.z = sub_bites[SUB_FAN].z;
 			GetJointAbsPosition(v, &pos, sub_bites[SUB_FAN].meshNum);
-			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) >> 16, v->pos.yRot + ANGLE(180));
+			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) / 65536, v->pos.yRot + ANGLE(180));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
@@ -380,22 +380,22 @@ static void DoCurrent(ITEM_INFO* item)
 		target.x = FixedCameras[sinkval].x;
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
-		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
+		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) / 16) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
 		speed = FixedCameras[sinkval].data;
-		dx = phd_sin(angle << 4) * speed * 1024;
-		dz = phd_cos(angle << 4) * speed * 1024;
+		dx = phd_sin(angle * 16) * speed * 1024;
+		dz = phd_cos(angle * 16) * speed * 1024;
 
-		Lara.currentXvel += (dx - Lara.currentXvel) >> 4;
-		Lara.currentZvel += (dz - Lara.currentZvel) >> 4;
+		Lara.currentXvel += ((dx - Lara.currentXvel) / 16);
+		Lara.currentZvel += ((dz - Lara.currentZvel) / 16);
 	}
 
 	/* Move Lara in direction of sink. */
-	item->pos.xPos += Lara.currentXvel >> 8;
-	item->pos.zPos += Lara.currentZvel >> 8;
+	item->pos.xPos += (Lara.currentXvel / 256);
+	item->pos.zPos += (Lara.currentZvel / 256);
 
 	/* Reset current (will get set again so long as Lara is over triggers) */
 	Lara.currentActive = 0;
@@ -867,11 +867,11 @@ int SubControl(void)
 	{
 		UserInput(v, l, sub);
 
-		v->speed = sub->Vel >> 16;
+		v->speed = sub->Vel / 65536;
 
-		v->pos.xRot += sub->RotX >> 16;
-		v->pos.yRot += (sub->Rot >> 16);
-		v->pos.zRot = (sub->Rot >> 12);
+		v->pos.xRot += sub->RotX / 65536;
+		v->pos.yRot += (sub->Rot / 65536);
+		v->pos.zRot = (sub->Rot / 65536);
 
 		if (v->pos.xRot > UPDOWN_LIMIT)
 			v->pos.xRot = UPDOWN_LIMIT;
@@ -979,7 +979,7 @@ int SubControl(void)
 		BackgroundCollision(v, l, sub);
 
 		if (sub->Flags & UPV_CONTROL)
-			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed << 16));
+			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);

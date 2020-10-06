@@ -274,7 +274,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if ((Lara.mineL || Lara.mineR) && (!(Lara.mineL && Lara.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
 	{
 		short ang;
-		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (Lara.mineL << 2);
+		unsigned short rot = (((unsigned short)v->pos.yRot) / 16384) | (Lara.mineL * 4);
 
 		switch (rot)
 		{
@@ -337,9 +337,9 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if (cart->Speed < CART_MIN_SPEED)
 		cart->Speed = CART_MIN_SPEED;
 
-	cart->Speed += (-cart->Gradient << 2);
+	cart->Speed += (-cart->Gradient * 4);
 
-	if ((v->speed = cart->Speed >> 8) < CART_MIN_VEL)
+	if ((v->speed = cart->Speed / 256) < CART_MIN_VEL)
 	{
 		v->speed = CART_MIN_VEL;
 
@@ -357,7 +357,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (cart->YVel)
 			StopSoundEffect(209);
 		else
-			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed << 15));
+			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
 	}
 
 	// move cart around corners
@@ -385,7 +385,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 		if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 		{
-			quad = ((unsigned short)v->pos.yRot) >> 14;
+			quad = ((unsigned short)v->pos.yRot) / 16384;
 			deg = v->pos.yRot & 16383;
 
 			switch (quad)
@@ -451,24 +451,24 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			if (cart->YVel > MAX_CART_YVEL)
 				cart->YVel = MAX_CART_YVEL;
 
-			v->pos.yPos += cart->YVel >> 8;
+			v->pos.yPos += (cart->YVel / 256);
 		}
 	}
 
-	v->pos.xRot = cart->Gradient << 5;
+	v->pos.xRot = cart->Gradient * 32;
 
 	// tilt cart around corners
 	val = v->pos.yRot & 16383;
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
 		if (cart->Flags & CF_TURNINGR)
-			v->pos.zRot = -(val * v->speed) >> 9;
+			v->pos.zRot = -(val * v->speed) / 512;
 		else
-			v->pos.zRot = ((0x4000 - val) * v->speed) >> 9;
+			v->pos.zRot = ((0x4000 - val) * v->speed) / 512;
 	}
 	else
 	{
-		v->pos.zRot -= v->pos.zRot >> 3;
+		v->pos.zRot -= (v->pos.zRot / 8);
 	}
 }
 
@@ -774,7 +774,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 				l->currentAnimState = l->goalAnimState = CART_HIT;
 				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->speed, v->pos.yRot, l->roomNumber, 3);
 
-				hits = (CART_NHITS * short((cart->Speed) >> 11));
+				hits = (CART_NHITS * short((cart->Speed) / 2048));
 				if (hits < 20)
 					hits = 20;
 

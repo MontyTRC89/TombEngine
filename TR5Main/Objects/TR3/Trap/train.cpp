@@ -69,7 +69,7 @@ void TrainControl(short trainNum)
 	if (roomNum != train->roomNumber)
 		ItemNewRoom(trainNum, roomNum);
 
-	train->pos.xRot = -(rh - fh) << 1;
+	train->pos.xRot = -(rh - fh) * 2;
 
 	TriggerDynamicLight(train->pos.xPos + 3072 * s, train->pos.yPos, train->pos.zPos + 3072 * c, 16, 31, 31, 31);
 

@@ -117,10 +117,10 @@ static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 
 static int DoMotorbikeShift(ITEM_INFO* motorbike, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-    int x = pos->x >> WALL_SHIFT;
-    int z = pos->z >> WALL_SHIFT;
-    int  oldX = old->x >> WALL_SHIFT;
-    int oldZ = old->z >> WALL_SHIFT;
+    int x = pos->x / SECTOR(1);
+    int z = pos->z / SECTOR(1);
+    int  oldX = old->x / SECTOR(1);
+    int oldZ = old->z / SECTOR(1);
     int shiftX = pos->x & (WALL_SIZE - 1);
     int shiftZ = pos->z & (WALL_SIZE - 1);
 
@@ -294,7 +294,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
         // update motorbike light
         if (motorbike->bikeTurn)
         {
-            motorbike->bikeTurn -= (motorbike->bikeTurn >> 3) - 1;
+            motorbike->bikeTurn -= (motorbike->bikeTurn / 8) - 1;
             DrawMotorbikeLight(item);
         }
 
@@ -368,14 +368,14 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     sptr->dB = 128;
     if (moving)
     {
-        trans = (speed << 7) >> 5;
+        trans = speed * 4;
         sptr->dR = trans;
         sptr->dG = trans;
         sptr->dB = trans;
     }
     sptr->colFadeSpeed = 4;
     sptr->fadeToBlack = 4;
-    rnd = (GetRandomControl() & 3) - (speed >> 12) + 20;
+    rnd = (GetRandomControl() & 3) - (speed / 4096) + 20;
     if (rnd < 9)
     {
         sptr->life = 9;
@@ -414,10 +414,10 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     sptr->def = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
     sptr->gravity = (GetRandomControl() & 3) - 4;
     sptr->maxYvel = (GetRandomControl() & 7) - 8;
-    size = (GetRandomControl() & 7) + (speed >> 7) + 32;
+    size = (GetRandomControl() & 7) + (speed / 128) + 32;
     sptr->dSize = size;
-    sptr->sSize = size >> 1;
-    sptr->size = size >> 1;
+    sptr->sSize = size / 2;
+    sptr->size = size / 2;
 }
 
 static void DrawMotorBikeSmoke(ITEM_INFO* item)
@@ -447,11 +447,11 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
             if (GetRandomControl() & 3)
                 speed = 0;
             else
-                speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10)) << 6;
+                speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10)) * 64;
         }
         else
         {
-            speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) << 6;
+            speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) * 64;
         }
 
         TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - ANGLE(180), speed, FALSE);
@@ -566,7 +566,7 @@ static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
             if (kick < -80)
                 kick = -80;
 
-            fallspeed += ((kick - fallspeed) >> 4);
+            fallspeed += ((kick - fallspeed) / 16);
 
             if (*y > height)
                 *y = height;
@@ -663,7 +663,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             motorbike->bikeTurn = 0;
 
         item->pos.yRot += motorbike->bikeTurn + motorbike->extraRotation;
-        motorbike->momentumAngle += (item->pos.yRot - motorbike->momentumAngle) >> 5;
+        motorbike->momentumAngle += ((item->pos.yRot - motorbike->momentumAngle) / 32);
     }
     else
     {
@@ -681,10 +681,10 @@ static int MotorBikeDynamics(ITEM_INFO* item)
 
         item->pos.yRot += motorbike->bikeTurn + motorbike->extraRotation;
         rot = item->pos.yRot - motorbike->momentumAngle;
-        momentum = MIN_MOMENTUM_TURN - (2 * motorbike->velocity >> WALL_SHIFT);
+        momentum = MIN_MOMENTUM_TURN - ((2 * motorbike->velocity) / SECTOR(1));
 
         if (!(TrInput & IN_ACTION) && motorbike->velocity > 0)
-            momentum += (momentum >> 1);
+            momentum += (momentum / 2);
 
         if (rot < -MAX_MOMENTUM_TURN)
         {
@@ -829,12 +829,12 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     if (!motorbike->velocity)
         rot2 = 0;
 
-    motorbike->wallShiftRotation = (motorbike->wallShiftRotation + rot2) >> 1;
+    motorbike->wallShiftRotation = (motorbike->wallShiftRotation + rot2) / 2;
     if (abs(motorbike->wallShiftRotation) < 2)
         motorbike->wallShiftRotation = 0;
 
     if (abs(motorbike->wallShiftRotation - motorbike->extraRotation) >= 4)
-        motorbike->extraRotation += ((motorbike->wallShiftRotation - motorbike->extraRotation) >> 2);
+        motorbike->extraRotation += ((motorbike->wallShiftRotation - motorbike->extraRotation) / 4);
     else
         motorbike->extraRotation = motorbike->wallShiftRotation;
 
@@ -844,7 +844,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
         newspeed = ((item->pos.zPos - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->pos.xPos - oldpos.x) * phd_sin(motorbike->momentumAngle)) * 256;
         if (&g_Level.Items[Lara.Vehicle] == item && motorbike->velocity >= 0x8000 && newspeed < (motorbike->velocity - 10))
         {
-            LaraItem->hitPoints -= (motorbike->velocity - newspeed) >> 7;
+            LaraItem->hitPoints -= ((motorbike->velocity - newspeed) / 128);
             LaraItem->hitStatus = true;
         }
 
@@ -1103,8 +1103,8 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
 
     if (motorbike->revs > 0x10)
     {
-        motorbike->velocity += motorbike->revs >> 4;
-        motorbike->revs -= motorbike->revs >> 3;
+        motorbike->velocity += (motorbike->revs / 16);
+        motorbike->revs -= (motorbike->revs / 80);
     }
     else
     {
@@ -1196,11 +1196,11 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             if (motorbike->velocity < MOTORBIKE_ACCEL_MAX)
             {
                 if (motorbike->velocity < MOTORBIKE_ACCEL_1)
-                    motorbike->velocity += 8 + ((MOTORBIKE_ACCEL_1 + 0x800 - motorbike->velocity) >> 3);
+                    motorbike->velocity += 8 + ((MOTORBIKE_ACCEL_1 + 0x800 - motorbike->velocity) / 8);
                 else if (motorbike->velocity < MOTORBIKE_ACCEL_2)
-                    motorbike->velocity += 4 + ((MOTORBIKE_ACCEL_2 + 0x800 - motorbike->velocity) >> 4);
+                    motorbike->velocity += 4 + ((MOTORBIKE_ACCEL_2 + 0x800 - motorbike->velocity) / 16);
                 else if (motorbike->velocity < MOTORBIKE_ACCEL_MAX)
-                    motorbike->velocity += 2 + ((MOTORBIKE_ACCEL_MAX - motorbike->velocity) >> 4);
+                    motorbike->velocity += 2 + ((MOTORBIKE_ACCEL_MAX - motorbike->velocity) / 16);
 
                 if (motorbike->flags & 1)
                     motorbike->velocity += 256;
@@ -1211,7 +1211,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             }
 
             // apply friction according to turn
-            motorbike->velocity -= abs(item->pos.yRot - motorbike->momentumAngle) >> 6;
+            motorbike->velocity -= (abs(item->pos.yRot - motorbike->momentumAngle) / 64);
         }
         else if (motorbike->velocity > MOTORBIKE_FRICTION)
         {
@@ -1238,21 +1238,21 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             }
         }
 
-        item->speed = motorbike->velocity >> 8;
+        item->speed = motorbike->velocity / 256;
 
         if (motorbike->engineRevs > MOTORBIKE_ACCEL_MAX)
             motorbike->engineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
         int newpitch = motorbike->velocity;
         if (motorbike->velocity < 0)
-            newpitch >>= 1;
-        motorbike->engineRevs += ((abs(newpitch) - 0x2000 - motorbike->engineRevs) >> 3);
+            newpitch /= 2;
+        motorbike->engineRevs += ((abs(newpitch) - 0x2000 - motorbike->engineRevs) / 8);
         *pitch = motorbike->engineRevs;
 
     }
     else
     {
         if (motorbike->engineRevs < 0xFFFF)
-            motorbike->engineRevs += (motorbike->engineRevs - 0xFFFF) >> 3;
+            motorbike->engineRevs += ((motorbike->engineRevs - 0xFFFF) / 8);
         *pitch = motorbike->engineRevs;
     }
 
@@ -1344,20 +1344,20 @@ int MotorbikeControl(void)
         else if (motorbike->pitch > 0xA000)
             motorbike->pitch = 0xA000;
 
-        SoundEffect(SFX_TR4_BIKE_MOVING, &item->pos, (motorbike->pitch << 8) + 0x1000004);
+        SoundEffect(SFX_TR4_BIKE_MOVING, &item->pos, (motorbike->pitch * 256) + 0x1000004);
     }
     else
     {
         if (drive != -1)
         {
             SoundEffect(SFX_TR4_BIKE_IDLE, &item->pos, 0);
-            SoundEffect(SFX_TR4_BIKE_MOVING, &item->pos, (motorbike->pitch << 8) + 0x1000004);
+            SoundEffect(SFX_TR4_BIKE_MOVING, &item->pos, (motorbike->pitch * 256) + 0x1000004);
         }
         motorbike->pitch = 0;
     }
 
     item->floor = height;
-    int rotation = motorbike->velocity >> 2;
+    int rotation = motorbike->velocity / 4;
     motorbike->wheelLeft = rotation;
     motorbike->wheelRight = rotation;
     int newy = item->pos.yPos;
@@ -1365,12 +1365,12 @@ int MotorbikeControl(void)
 
     short xrot = 0, zrot = 0;
     int r1, r2;
-    r1 = (fr.y + fl.y) >> 1;
-    r2 = (fr.y + fl.y) >> 1;
+    r1 = (fr.y + fl.y) / 2;
+    r2 = (fr.y + fl.y) / 2;
 
     if (fm.y >= hfm)
     {
-        if (r1 >= (hfl + hfr) >> 1)
+        if (r1 >= ((hfl + hfr) / 2))
         {
             xrot = phd_atan(1000, hfm - r1);
             zrot = phd_atan(350, r2 - fl.y);
@@ -1381,7 +1381,7 @@ int MotorbikeControl(void)
             zrot = phd_atan(350, r2 - fl.y);
         }
     }
-    else if (r1 >= (hfl + hfr) >> 1)
+    else if (r1 >= ((hfl + hfr) / 2))
     {
         xrot = phd_atan(500, item->pos.yPos - r1);
         zrot = phd_atan(350, r2 - fl.y);
@@ -1392,8 +1392,8 @@ int MotorbikeControl(void)
         zrot = phd_atan(350, r2 - fl.y);
     }
 
-    item->pos.xRot += ((xrot - item->pos.xRot) >> 2);
-    item->pos.zRot += ((zrot - item->pos.zRot) >> 2);
+    item->pos.xRot += ((xrot - item->pos.xRot) / 4);
+    item->pos.zRot += ((zrot - item->pos.zRot) / 4);
 
     if (motorbike->flags >= 0)
     {
