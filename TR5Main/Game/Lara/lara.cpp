@@ -1240,21 +1240,21 @@ void AnimateLara(ITEM_INFO* item)
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
-	lateral >>= 16;
+	lateral /= 65536;
 
 	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
 	{
 		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			item->speed -= item->speed >> 3;
+			item->speed -= item->speed * 8;
 			if (abs(item->speed) < 8)
 			{
 				item->speed = 0;
 				item->gravityStatus = false;
 			}
 			if (item->fallspeed > 128)
-				item->fallspeed >>= 1;
-			item->fallspeed -= item->fallspeed >> 2;
+				item->fallspeed /= 2;
+			item->fallspeed -= item->fallspeed / 4;
 			if (item->fallspeed < 4)
 				item->fallspeed = 4;
 			item->pos.yPos += item->fallspeed;
@@ -1262,8 +1262,8 @@ void AnimateLara(ITEM_INFO* item)
 		else
 		{
 			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
-			item->speed -= velocity >> 16;
-			item->speed += (velocity + anim->acceleration) >> 16;
+			item->speed -= (velocity / 65536);
+			item->speed += ((velocity + anim->acceleration) / 65536);
 			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
 			item->pos.yPos += item->fallspeed;
 		}
@@ -1274,9 +1274,9 @@ void AnimateLara(ITEM_INFO* item)
 
 		if (Lara.waterStatus == LW_WADE && g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			velocity = (anim->velocity >> 1);
+			velocity = (anim->velocity / 2);
 			if (anim->acceleration)
-				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
+				velocity += ((anim->acceleration * (item->frameNumber - anim->frameBase)) / 4);
 		}
 		else
 		{
@@ -1285,7 +1285,7 @@ void AnimateLara(ITEM_INFO* item)
 				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
 		}
 
-		item->speed = velocity >> 16;
+		item->speed = velocity / 65536;
 	}
 
 	if (Lara.ropePtr != -1)
