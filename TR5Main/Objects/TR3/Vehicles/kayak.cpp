@@ -382,12 +382,12 @@ int KayakDoDynamics(int height, int fallspeed, int* y)
 	{
 		
 		// On ground: get up push from height change (if not a closed door and so NO_HEIGHT) 
-		int kick = (height - *y) << 2;
+		int kick = (height - *y) * 4;
 
 		if (kick < SKIDOO_MAX_KICK)
 			kick = SKIDOO_MAX_KICK;
 
-		fallspeed += ((kick - fallspeed) >> 3);
+		fallspeed += ((kick - fallspeed) / 8);
 
 		if (*y > height)
 			*y = height;
@@ -442,14 +442,14 @@ void KayakDoCurrent(ITEM_INFO* item)
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
 		
-		int angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
+		int angle = (((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90))) / 16) & 4095;
 
 		int dx = target.x - LaraItem->pos.xPos;
 		int dz = target.z - LaraItem->pos.zPos;
 
 		int speed = FixedCameras[sinkval].data;
-		dx = phd_sin(angle << 4) * speed * 1024;
-		dz = phd_cos(angle << 4) * speed * 1024;
+		dx = phd_sin(angle * 16) * speed * 1024;
+		dz = phd_cos(angle * 16) * speed * 1024;
 
 		Lara.currentXvel += (dx - Lara.currentXvel) / 16;
 		Lara.currentZvel += (dz - Lara.currentZvel) / 16;
@@ -657,7 +657,7 @@ void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 	int lh = KayakTestHeight(v, -KAYAK_X, KAYAK_Z, &lpos);
 	int rh = KayakTestHeight(v, KAYAK_X, KAYAK_Z, &rpos);
 
-	v->pos.yRot += (Kayak->Rot >> 16);
+	v->pos.yRot += (Kayak->Rot / 65536);
 
 	v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
 	v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
@@ -1181,7 +1181,7 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 	else if (Kayak->Vel < -MAX_SPEED)
 		Kayak->Vel = -MAX_SPEED;
 
-	v->speed = (Kayak->Vel >> 16);
+	v->speed = (Kayak->Vel / 65536);
 
 	// unwind rotation 
 	if (Kayak->Rot >= 0)
@@ -1404,7 +1404,7 @@ int KayakControl()
 	{
 		int damage;
 		if ((damage = (ofs - v->fallspeed)) > 160)
-			l->hitPoints -= (damage - 160) << 3;
+			l->hitPoints -= (damage - 160) * 8;
 
 		KayakSplash(v, ofs - v->fallspeed, water);
 	}
@@ -1423,7 +1423,7 @@ int KayakControl()
 		l->pos.zPos = v->pos.zPos;
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
-		l->pos.zRot = v->pos.zRot >> 1;
+		l->pos.zRot = v->pos.zRot / 2;
 
 		// animate Lara then Kayak */
 
@@ -1459,9 +1459,9 @@ int KayakControl()
 			{
 				//dest.x = (GetRandomControl()%MistXPos[lp]) - (MistXPos[lp]>>1);
 				if (GetRandomControl() & 1)
-					dest.x = (MistXPos[i] >> 1);
+					dest.x = (MistXPos[i] / 2);
 				else
-					dest.x = -(MistXPos[i] >> 1);
+					dest.x = -(MistXPos[i] / 2);
 				dest.y = 50;
 				dest.z = MistZPos[i];
 			}

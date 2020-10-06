@@ -352,11 +352,11 @@ void SpeedBoatDoBoatShift(int itemNum)
 
 short SpeedBoatDoShif(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-	int x = pos->x >> WALL_SHIFT;
-	int z = pos->z >> WALL_SHIFT;
+	int x = pos->x / SECTOR(1);
+	int z = pos->z / SECTOR(1);
 
-	int xOld = old->x >> WALL_SHIFT;
-	int zOld = old->z >> WALL_SHIFT;
+	int xOld = old->x / SECTOR(1);
+	int zOld = old->z / SECTOR(1);
 
 	int shiftX = pos->x & (WALL_SIZE - 1);
 	int shiftZ = pos->z & (WALL_SIZE - 1);
@@ -507,7 +507,7 @@ int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y)
 	else
 	{
 		// On ground: get up push from height change (if not a closed door and so NO_HEIGHT) 
-		fallspeed += ((height - *y - fallspeed) >> 3);
+		fallspeed += ((height - *y - fallspeed) / 8);
 		if (fallspeed < BOAT_MAX_BACK)
 			fallspeed = BOAT_MAX_BACK;
 
@@ -641,8 +641,8 @@ int SpeedBoatDynamics(short itemNum)
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
 			SoundEffect(SFX_TR2_LARA_GETTING_HURT, &LaraItem->pos, 0);
-			newspeed >>= 1;
-			boat->speed >>= 1;
+			newspeed /= 2;
+			boat->speed /= 2;
 		}
 
 		// Adjust speed if serious change 
@@ -1029,15 +1029,15 @@ void SpeedBoatControl(short itemNumber)
 	// Rotate boat to match these heights 
 	height = (fl.y + fr.y);
 	if (height < 0)
-		height = -(abs(height) >> 1);
+		height = -(abs(height) / 2);
 	else
-		height = height >> 1;
+		height /= 2;
 
 	x_rot = phd_atan(BOAT_FRONT, boat->pos.yPos - height);
 	z_rot = phd_atan(BOAT_SIDE, height - fl.y);
 
-	boat->pos.xRot += (x_rot - boat->pos.xRot) >> 1;
-	boat->pos.zRot += (z_rot - boat->pos.zRot) >> 1;
+	boat->pos.xRot += ((x_rot - boat->pos.xRot) / 2);
+	boat->pos.zRot += ((z_rot - boat->pos.zRot) / 2);
 
 	// Auto level the boat on flat water (to stop evil shifts) 
 	if (!x_rot && abs(boat->pos.xRot) < 4)
@@ -1088,12 +1088,12 @@ void SpeedBoatControl(short itemNumber)
 
 	// Do sound effect 
 	pitch = boat->speed;
-	binfo->pitch += (pitch - binfo->pitch) >> 2;
+	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
 	if (boat->speed > 8)
-		SoundEffect(SFX_TR2_BOAT_HIGH_ENGINE_RPM, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
+		SoundEffect(SFX_TR2_BOAT_HIGH_ENGINE_RPM, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
 	else if (drive)
-		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) << 8));
+		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
 
 	// If boat is moving, then do wake 
 	if (boat->speed && water - 5 == boat->pos.yPos)
