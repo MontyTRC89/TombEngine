@@ -42,9 +42,9 @@ typedef struct MESH_INFO
 	int y;
 	int z;
 	short yRot;
-	short shade;
-	short flags;
 	short staticNumber;
+	short flags;
+	Vector4 color;
 	short hitPoints;
 };
 

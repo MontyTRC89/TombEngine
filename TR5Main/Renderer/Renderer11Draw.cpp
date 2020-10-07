@@ -100,7 +100,7 @@ namespace T5M::Renderer
 
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
         {
-            RendererMesh *mesh = moveableObj.ObjectMeshes[n];
+            RendererMesh* mesh = moveableObj.ObjectMeshes[n];
 
             // Finish the world matrix
             translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
@@ -121,8 +121,8 @@ namespace T5M::Renderer
 
             for (int m = 0; m < NUM_BUCKETS; m++)
             {
-                RendererBucket *bucket = &mesh->Buckets[m];
-                if (bucket->Vertices.size() == 0)
+                RendererBucket& bucket = mesh->Buckets[m];
+                if (bucket.Vertices.size() == 0)
                     continue;
 
                 if (m < 2)
@@ -134,7 +134,7 @@ namespace T5M::Renderer
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
             }
         }
 
@@ -290,17 +290,17 @@ namespace T5M::Renderer
 
         for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
         {
-            RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
+            RendererMesh* mesh = getMesh(Lara.meshPtrs[k]);
 
             for (int j = 0; j < 2; j++)
             {
-                RendererBucket *bucket = &mesh->Buckets[j];
+                RendererBucket& bucket = mesh->Buckets[j];
 
-                if (bucket->Vertices.size() == 0)
+                if (bucket.Vertices.size() == 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -311,36 +311,27 @@ namespace T5M::Renderer
 
             for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
             {
-                RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
+                RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
                 for (int j = 0; j < 2; j++)
                 {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+                    RendererBucket& bucket = mesh->Buckets[j];
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
+                    drawBucketIndexed(bucket);
 
-                    // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
                 }
             }
         }
 
         for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
         {
-            RendererMesh *mesh = laraSkin.ObjectMeshes[k];
+            RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
             for (int j = 0; j < NUM_BUCKETS; j++)
             {
-                RendererBucket *bucket = &mesh->Buckets[j];
+                RendererBucket& bucket = mesh->Buckets[j];
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
+                drawBucketIndexed(bucket);
             }
         }
 
@@ -365,18 +356,13 @@ namespace T5M::Renderer
 
         for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
         {
-            RendererMesh *mesh = hairsObj.ObjectMeshes[k];
+            RendererMesh* mesh = hairsObj.ObjectMeshes[k];
 
             for (int j = 0; j < 4; j++)
             {
-                RendererBucket *bucket = &mesh->Buckets[j];
+                RendererBucket& bucket = mesh->Buckets[j];
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
+                drawBucketIndexed(bucket);
             }
         }
 
@@ -416,7 +402,7 @@ namespace T5M::Renderer
         }
     }
 
-    void Renderer11::drawGunShells()
+    void Renderer11::drawGunShells(RenderView& view)
 {
         RendererRoom &const room = m_rooms[LaraItem->roomNumber];
         RendererItem *item = &m_items[Lara.itemNumber];
@@ -451,17 +437,13 @@ namespace T5M::Renderer
                 m_cbItem.updateData(m_stItem, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-                RendererMesh *mesh = moveableObj.ObjectMeshes[0];
+                RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
                 for (int b = 0; b < NUM_BUCKETS; b++)
                 {
-                    RendererBucket *bucket = &mesh->Buckets[b];
+                    RendererBucket& bucket = mesh->Buckets[b];
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
+                    drawBucketIndexed(bucket);
                 }
             }
         }
@@ -645,7 +627,7 @@ namespace T5M::Renderer
 
                 for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
                 {
-                    RendererMesh *mesh = moveableObj.ObjectMeshes[n];
+                    RendererMesh* mesh = moveableObj.ObjectMeshes[n];
 
                     // HACK: revolver and crossbow + lasersight
                     if (moveableObj.Id == ID_REVOLVER_ITEM && !Lara.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
@@ -666,8 +648,8 @@ namespace T5M::Renderer
 
                     for (int m = 0; m < NUM_BUCKETS; m++)
                     {
-                        RendererBucket *bucket = &mesh->Buckets[m];
-                        if (bucket->Vertices.size() == 0)
+                        RendererBucket& bucket = mesh->Buckets[m];
+                        if (bucket.Vertices.size() == 0)
                             continue;
 
                         if (m < 2)
@@ -679,7 +661,7 @@ namespace T5M::Renderer
                         m_cbMisc.updateData(m_stMisc, m_context.Get());
                         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                     }
                 }
 
@@ -1260,7 +1242,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawRopes()
+    void Renderer11::drawRopes(RenderView& view)
 {
         for (int n = 0; n < NumRopes; n++)
         {
@@ -1366,7 +1348,7 @@ namespace T5M::Renderer
                                 Vector3(p2.x, p2.y, p2.z),
                                 Vector3(p3.x, p3.y, p3.z),
                                 Vector3(p4.x, p4.y, p4.z),
-                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, 0, 0, BLENDMODE_OPAQUE);
+                        Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, { 0.0f, 0.0f }, BLENDMODE_OPAQUE,view);
 
                     x1 = x4;
                     y1 = y4;
@@ -1432,7 +1414,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawSpiders()
+    void Renderer11::drawSpiders(RenderView& view)
 {
         /*XMMATRIX world;
         UINT cPasses = 1;
@@ -1498,7 +1480,7 @@ namespace T5M::Renderer
         }*/
     }
 
-    void Renderer11::drawRats()
+    void Renderer11::drawRats(RenderView& view)
 {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -1522,7 +1504,7 @@ namespace T5M::Renderer
 
                 if (rat->on)
                 {
-                    RendererMesh *mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+                    RendererMesh& mesh = *getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
                     Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
                     Matrix world = rotation * translation;
@@ -1534,13 +1516,9 @@ namespace T5M::Renderer
 
                     for (int b = 0; b < 2; b++)
                     {
-                        RendererBucket *bucket = &mesh->Buckets[b];
+                        RendererBucket& bucket = mesh.Buckets[b];
 
-                        if (bucket->Vertices.size() == 0)
-                            continue;
-
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                        m_numDrawCalls++;
+                        drawBucketIndexed(bucket);
                     }
                 }
             }
@@ -1548,7 +1526,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawBats()
+    void Renderer11::drawBats(RenderView& view)
 {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -1562,16 +1540,16 @@ namespace T5M::Renderer
         {
             OBJECT_INFO *obj = &Objects[ID_BATS_EMITTER];
             RendererObject &moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
-            RendererMesh *mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
+            RendererMesh& mesh = *getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
             for (int b = 0; b < 2; b++)
             {
-                RendererBucket *bucket = &mesh->Buckets[b];
+                RendererBucket& bucket = mesh.Buckets[b];
 
-                if (bucket->Vertices.size() == 0)
+                if (bucket.Vertices.size() == 0)
                     continue;
 
                 for (int i = 0; i < NUM_BATS; i++)
@@ -1589,7 +1567,7 @@ namespace T5M::Renderer
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
                         m_cbItem.updateData(m_stItem, m_context.Get());
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                         m_numDrawCalls++;
                     }
                 }
@@ -1598,7 +1576,7 @@ namespace T5M::Renderer
 
     }
 
-	void Renderer11::drawLittleBeetles()
+	void Renderer11::drawLittleBeetles(RenderView& view)
 {
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1622,7 +1600,7 @@ namespace T5M::Renderer
 
 				if (beetle->on)
 				{
-					RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex);
+					RendererMesh& mesh = *getMesh(Objects[ID_LITTLE_BEETLE].meshIndex);
 					Matrix translation = Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->pos.yRot, beetle->pos.xRot, beetle->pos.zRot);
 					Matrix world = rotation * translation;
@@ -1634,152 +1612,15 @@ namespace T5M::Renderer
 
 					for (int b = 0; b < 2; b++)
 					{
-						RendererBucket* bucket = &mesh->Buckets[b];
+						RendererBucket& bucket = mesh.Buckets[b];
 
-						if (bucket->Vertices.size() == 0)
-							continue;
-
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
+                        drawBucketIndexed(bucket);
 					}
 				}
 			}
 		}
 	}
-
-
-    void Renderer11::doSnow()
-{
-        if (m_firstWeather)
-        {
-            for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
-                m_snow[i].Reset = true;
-        }
-
-        for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
-        {
-            RendererWeatherParticle *snow = &m_snow[i];
-
-            if (snow->Reset)
-            {
-                snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-                snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
-                snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-
-                // Check if in inside room
-                short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-                if (!(room->flags & ENV_FLAG_OUTSIDE))
-                    continue;
-
-                snow->Size = SNOW_DELTA_Y + (rand() % 64);
-                snow->AngleH = (rand() % SNOW_MAX_ANGLE_H) * RADIAN;
-                snow->AngleV = (rand() % SNOW_MAX_ANGLE_V) * RADIAN;
-                snow->Reset = false;
-            }
-
-            float radius = snow->Size * sin(snow->AngleV);
-
-            float dx = sin(snow->AngleH) * radius;
-            float dz = cos(snow->AngleH) * radius;
-
-            snow->X += dx;
-            snow->Y += SNOW_DELTA_Y;
-            snow->Z += dz;
-
-            if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f)
-            {
-                snow->Reset = true;
-                continue;
-            }
-
-            addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
-                               0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
-                               BLENDMODE_ALPHABLEND);
-
-            short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-            if (snow->Y >= room->y + room->minfloor)
-                snow->Reset = true;
-        }
-
-        m_firstWeather = false;
-
-    }
-
-    void Renderer11::doRain()
-{
-        if (m_firstWeather)
-        {
-            for (int i = 0; i < NUM_RAIN_DROPS; i++)
-            {
-                m_rain[i].Reset = true;
-                m_rain[i].Draw = true;
-            }
-        }
-
-        for (int i = 0; i < NUM_RAIN_DROPS; i++)
-        {
-            RendererWeatherParticle *drop = &m_rain[i];
-
-            if (drop->Reset)
-            {
-                drop->Draw = true;
-
-                drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-                drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT);
-                drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-
-                // Check if in inside room
-                short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-                if (!(room->flags & ENV_FLAG_OUTSIDE))
-                {
-                    drop->Reset = true;
-                    continue;
-                }
-
-                drop->Size = RAIN_SIZE + (rand() % 64);
-                drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
-                drop->AngleV = (rand() % RAIN_MAX_ANGLE_V) * RADIAN;
-                drop->Reset = false;
-            }
-
-            float x1 = drop->X;
-            float y1 = drop->Y;
-            float z1 = drop->Z;
-
-            float radius = drop->Size * sin(drop->AngleV);
-
-            float dx = sin(drop->AngleH) * radius;
-            float dy = drop->Size * cos(drop->AngleV);
-            float dz = cos(drop->AngleH) * radius;
-
-            drop->X += dx;
-            drop->Y += RAIN_DELTA_Y;
-            drop->Z += dz;
-
-            if (drop->Draw)
-                addLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
-
-            // If rain drop has hit the ground, then reset it and add a little drip
-            short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-            if (drop->Y >= room->y + room->minfloor)
-            {
-                drop->Reset = true;
-                AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
-            }
-        }
-
-        m_firstWeather = false;
-    }
-
-    void Renderer11::drawLines3D()
+    void Renderer11::drawLines3D(RenderView& view)
 {
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -2011,15 +1852,15 @@ namespace T5M::Renderer
         drawLara(false, false);
         drawItems(false, false, view);
         drawItems(false, true, view);
-        drawEffects(false);
-        drawGunFlashes();
-        drawGunShells();
-        drawBaddieGunflashes();
-        drawDebris(false);
-        drawBats();
-        drawRats();
-        drawSpiders();
-		drawLittleBeetles();
+        drawEffects(false, view);
+        drawGunFlashes(view);
+        drawGunShells(view);
+        drawBaddieGunflashes(view);
+        drawDebris(false, view);
+        drawBats(view);
+        drawRats(view);
+        drawSpiders(view);
+		drawLittleBeetles(view);
 
         // Transparent geometry
         m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
@@ -2031,31 +1872,30 @@ namespace T5M::Renderer
         drawLara(true, false);
         drawItems(true, false, view);
         drawItems(true, true, view);
-        drawEffects(true);
-        drawWaterfalls();
-        drawDebris(true);
+        drawEffects(true, view);
+        drawDebris(true, view);
 
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
         // Do special effects and weather
-        drawFires();
-        drawSmokes();
-        drawSmokeParticles();
-        drawSimpleParticles();
-        drawSparkParticles();
-        drawExplosionParticles();
-        drawFootprints();
-        drawDripParticles();
-        drawBlood();
-        drawSparks();
-        drawBubbles();
-        drawDrips();
-        drawRipples();
-        drawUnderwaterDust();
-        drawSplahes();
-        drawShockwaves();
-        drawEnergyArcs();
+        drawFires(view);
+        drawSmokes(view);
+        drawSmokeParticles(view);
+        drawSimpleParticles(view);
+        drawSparkParticles(view);
+        drawExplosionParticles(view);
+        drawFootprints(view);
+        drawDripParticles(view);
+        drawBlood(view);
+        drawSparks(view);
+        drawBubbles(view);
+        drawDrips(view);
+        drawRipples(view);
+        drawUnderwaterDust(view);
+        drawSplahes(view);
+        drawShockwaves(view);
+        drawEnergyArcs(view);
 
         switch (level->Weather)
         {
@@ -2063,16 +1903,14 @@ namespace T5M::Renderer
             // no weather in normal
             break;
         case WEATHER_RAIN:
-            doRain();
             break;
         case WEATHER_SNOW:
-            doSnow();
             break;
         }
 
-        drawRopes();
-        drawSprites();
-        drawLines3D();
+        drawRopes(view);
+        drawSprites(view);
+        drawLines3D(view);
 
         time2 = std::chrono::high_resolution_clock::now();
         m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -2100,10 +1938,6 @@ namespace T5M::Renderer
             printDebugMessage("Update time: %d", m_timeUpdate);
             printDebugMessage("Frame time: %d", m_timeFrame);
             printDebugMessage("Draw calls: %d", m_numDrawCalls);
-            printDebugMessage("Rooms: %d", m_roomsToDraw.size());
-            printDebugMessage("Items: %d", m_itemsToDraw.size());
-            printDebugMessage("Statics: %d", m_staticsToDraw.size());
-            printDebugMessage("Lights: %d", m_lightsToDraw.size());
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
             printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
@@ -2235,15 +2069,14 @@ namespace T5M::Renderer
 
     void Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
     {
+		if (m_rooms.size() < item->Item->roomNumber)
+			return;
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
         int firstBucket = (transparent ? 2 : 0);
         int lastBucket = (transparent ? 4 : 2);
-        if (m_rooms.size() <= item->Item->roomNumber)
-        {
-            return;
-        }
+        
         RendererRoom &const room = m_rooms[item->Item->roomNumber];
         RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
         OBJECT_INFO *obj = &Objects[item->Item->objectNumber];
@@ -2284,14 +2117,9 @@ namespace T5M::Renderer
 
             for (int j = firstBucket; j < lastBucket; j++)
             {
-                RendererBucket *bucket = &mesh->Buckets[j];
+                RendererBucket& bucket = mesh->Buckets[j];
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
+                drawBucketIndexed(bucket);
             }
         }
 
@@ -2401,23 +2229,19 @@ namespace T5M::Renderer
 
             if (staticObj.ObjectMeshes.size() > 0)
             {
-                RendererMesh *mesh = staticObj.ObjectMeshes[0];
+                RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
                 m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-                m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+                m_stStatic.Position = Vector4(msh->x,msh->y,msh->z,1);
+                m_stStatic.Color = msh->color;
                 m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
                 for (int j = firstBucket; j < lastBucket; j++)
                 {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+                    RendererBucket& bucket = mesh->Buckets[j];
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
+                    drawBucketIndexed(bucket);
                 }
             }
         }
@@ -2676,23 +2500,13 @@ namespace T5M::Renderer
 
             for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
             {
-                RendererMesh *mesh = moveableObj.ObjectMeshes[k];
+                RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
                 for (int j = 0; j < NUM_BUCKETS; j++)
                 {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+                    RendererBucket& bucket = mesh->Buckets[j];
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    if (j == RENDERER_BUCKET_TRANSPARENT)
-                        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-                    else
-                        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-
-                    // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
+                    drawBucketIndexed(bucket);
                 }
             }
         }

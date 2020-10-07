@@ -65,7 +65,7 @@ struct STATIC_INFO
 	int shatterSound;
 };
 
-#define MAX_STATICS 1000
+constexpr auto MAX_STATICS = 1000;
 constexpr auto SF_NO_COLLISION = 0x01;
 constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6;

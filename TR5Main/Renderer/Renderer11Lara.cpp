@@ -260,14 +260,9 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
-			RendererBucket *bucket = &mesh->Buckets[j];
+			RendererBucket& bucket = mesh->Buckets[j];
 
-			if (bucket->Vertices.size() == 0)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-			m_numDrawCalls++;
+			drawBucketIndexed(bucket);
 		}
 	}
 	drawLaraHolsters(transparent);
@@ -282,14 +277,9 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 
 			for (int j = firstBucket; j < lastBucket; j++)
 			{
-				RendererBucket *bucket = &mesh->Buckets[j];
+				RendererBucket& bucket = mesh->Buckets[j];
 
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-				m_numDrawCalls++;
+				drawBucketIndexed(bucket);
 			}
 		}
 	}
@@ -319,14 +309,9 @@ void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 
 			for (int j = firstBucket; j < lastBucket; j++)
 			{
-				RendererBucket* bucket = &mesh->Buckets[j];
+				RendererBucket& bucket = mesh->Buckets[j];
 
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-				m_numDrawCalls++;
+				drawBucketIndexed(bucket);
 			}
 		}	
 	}
@@ -345,36 +330,24 @@ void Renderer11::drawLaraHolsters(bool transparent)
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
 		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
-				continue;
-			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-			m_numDrawCalls++;
+			RendererBucket& bucket = mesh->Buckets[j];
+			drawBucketIndexed(bucket);
 		}
 	}
 	if(m_moveableObjects[static_cast<int>(rightHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
 		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
-				continue;
-			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-			m_numDrawCalls++;
+			RendererBucket& bucket = mesh->Buckets[j];
+			drawBucketIndexed(bucket);
 		}
 	}
 	if(backHolsterID != HOLSTER_SLOT::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
 		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
-				continue;
-			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-			m_numDrawCalls++;
+			RendererBucket& bucket = mesh->Buckets[j];
+			drawBucketIndexed(bucket);
 		}
 	}
 }
