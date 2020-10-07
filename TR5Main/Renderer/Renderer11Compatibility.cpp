@@ -15,11 +15,6 @@ namespace T5M::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
-		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
-		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		m_staticObjects.resize(MAX_STATICS);
-		m_rooms.resize(g_Level.Rooms.size());
-
 		m_meshes.clear();
 
 		// Step 0: prepare animated textures
@@ -27,7 +22,6 @@ namespace T5M::Renderer
 		short *animatedPtr = AnimTextureRanges;
 		animatedPtr++;
 
-		m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
 		m_numAnimatedTextureSets = numSets;
 
 		for (int i = 0; i < numSets; i++)
@@ -368,10 +362,8 @@ namespace T5M::Renderer
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
-					RendererMesh *mesh = getRendererMeshFromTrMesh(&moveable,
-																   &g_Level.Meshes[obj->meshIndex + j],
-																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-																   MoveablesIds[i] == ID_LARA_HAIR);
+					RendererMesh *mesh = createRendererMeshFromTrMesh(&moveable,
+																   &g_Level.Meshes[obj->meshIndex + j]);
 					moveable.ObjectMeshes.push_back(mesh);
 				}
 
@@ -664,7 +656,7 @@ namespace T5M::Renderer
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Id = StaticObjectsIds[i];
 
-			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh* mesh = createRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber]);
 
 			staticObject.ObjectMeshes.push_back(mesh);
 
@@ -696,7 +688,6 @@ namespace T5M::Renderer
 		m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
-		m_sprites.resize(g_Level.Sprites.size());
 
 		for (int i = 0; i < g_Level.Sprites.size(); i++)
 		{
@@ -720,7 +711,7 @@ namespace T5M::Renderer
 				short numSprites = abs(obj->nmeshes);
 				short baseSprite = obj->meshIndex;
 				m_spriteSequences[MoveablesIds[i]] = RendererSpriteSequence(MoveablesIds[i], numSprites);
-				RendererSpriteSequence &sequence = m_spriteSequences[MoveablesIds[i]];
+				RendererSpriteSequence& sequence = m_spriteSequences[MoveablesIds[i]];
 
 				for (int j = baseSprite; j < baseSprite + numSprites; j++)
 				{
