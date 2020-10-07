@@ -132,25 +132,12 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_roomsToDraw = vector<RendererRoom*>(NUM_ROOMS);
-	m_itemsToDraw = vector<RendererItem*>(NUM_ITEMS);
-	m_effectsToDraw = vector<RendererEffect*>(NUM_ITEMS);
-	m_lightsToDraw = vector<RendererLight*>(MAX_LIGHTS_DRAW);
 	m_dynamicLights = vector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
-	m_staticsToDraw = vector<RendererStatic*>(MAX_DRAW_STATICS);
-	m_spritesToDraw = vector<RendererSpriteToDraw>(MAX_SPRITES);
 	m_lines3DToDraw = vector<RendererLine3D*>(MAX_LINES_3D);
 	m_lines2DToDraw = vector<RendererLine2D*>(MAX_LINES_2D);
-	m_tempItemLights = vector<RendererLight*>(MAX_LIGHTS);
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
 	m_pickupRotation = 0;
-
-	for (int i = 0; i < NUM_ITEMS; i++)
-	{
-		m_items[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-	}
 
 	D3D11_BLEND_DESC blendStateDesc{};
 	blendStateDesc.AlphaToCoverageEnable = false;
@@ -348,9 +335,4 @@ void T5M::Renderer::Renderer11::Create()
 #endif
 	Utils::throwIfFailed(res);
 
-}
-
-void Renderer11::initialiseHairRemaps()
-{
-	
 }

@@ -82,6 +82,10 @@
       <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
+      <StackReserveSize>4194304 </StackReserveSize>
+      <StackCommitSize>4194304 </StackCommitSize>
+      <HeapReserveSize>4194304 </HeapReserveSize>
+      <HeapCommitSize>4194304 </HeapCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 
@@ -147,12 +151,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
-    <ClInclude Include="Game\memory\linearPool.h" />
+    <ClInclude Include="Game\memory\ArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
-    <ClInclude Include="Game\memory\pool.h" />
-    <ClInclude Include="Game\memory\linearPoolAllocator.h" />
-    <ClInclude Include="Game\memory\PoolAllocator.h" />
-    <ClInclude Include="Game\memory\memory.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
     <ClInclude Include="Game\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -353,6 +353,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h" />
+    <ClInclude Include="Renderer\RendererSprites.h" />
+    <ClInclude Include="Renderer\RenderPipelineState\RenderQueueKey.h" />
     <ClInclude Include="Renderer\RenderView\RenderView.h" />
     <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
     <ClInclude Include="Renderer\Utils.h" />
@@ -624,6 +626,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
     <ClCompile Include="Renderer\Renderer11Frame.cpp" />
+    <ClCompile Include="Renderer\RendererSprites.cpp" />
     <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
     <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Renderer\Utils.cpp" />

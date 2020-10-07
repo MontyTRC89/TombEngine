@@ -26,8 +26,8 @@ namespace T5M::Renderer {
 	using namespace T5M::Renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;
+	constexpr auto t = sizeof(Renderer11);
 	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) {
-		initialiseHairRemaps();
 
 		m_blinkColorDirection = 1;
 	}
@@ -51,12 +51,6 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::clearSceneItems() {
-		m_roomsToDraw.clear();
-		m_itemsToDraw.clear();
-		m_effectsToDraw.clear();
-		m_lightsToDraw.clear();
-		m_staticsToDraw.clear();
-		m_spritesToDraw.clear();
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
 		gameCamera.clear();
@@ -90,6 +84,16 @@ namespace T5M::Renderer {
 			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
+	}
+
+	void Renderer11::drawBucketIndexed(RendererBucket& bucket)
+	{
+		if (bucket.Vertices.size() == 0)
+			return;
+
+		// Draw vertices
+		m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+		m_numDrawCalls++;
 	}
 
 	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 9> colors) {
