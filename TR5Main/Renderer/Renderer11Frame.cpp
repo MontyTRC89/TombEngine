@@ -25,7 +25,7 @@ namespace T5M::Renderer
 
 	void Renderer11::collectItems(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() <= roomNumber)
+		if (m_rooms.size() < roomNumber)
 		{
 			return;
 		}
@@ -116,7 +116,7 @@ namespace T5M::Renderer
 		if (r->lights.size() <= 0)
 			return;
 
-		m_tempItemLights.clear();
+		T5M::Memory::LinearArrayBuffer<RendererLight*, 8> tempLightsForEffect;
 
 		Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
@@ -131,7 +131,7 @@ namespace T5M::Renderer
 			if (distance > light->Out)
 				continue;
 
-			m_tempItemLights.push_back(light);
+			tempLightsForEffect.push_back(light);
 		}
 
 		int numLights = room.Lights.size();
@@ -196,27 +196,25 @@ namespace T5M::Renderer
 				continue;
 			}
 
-			m_tempItemLights.push_back(light);
+			tempLightsForEffect.push_back(light);
 		}
+		for (auto& l : tempLightsForEffect) {
+			renderView.lightsToDraw.push_back(l);
 
-		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), m_tempItemLights.size()); i++)
-		{
-			renderView.lightsToDraw.push_back(m_tempItemLights[i]);
 		}
 	}
 
 	void Renderer11::collectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
 	{
 		item->Lights.clear();
-		if (m_rooms.size() <= roomNumber)
+		if (m_rooms.size() < roomNumber)
 		{
 			return;
 		}
 		RendererRoom &const room = m_rooms[roomNumber];
 
 		ROOM_INFO *r = room.Room;
-
-		m_tempItemLights.clear();
+		T5M::Memory::LinearArrayBuffer<RendererLight*, 8> tempItemLights;
 
 		Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
 
@@ -231,7 +229,7 @@ namespace T5M::Renderer
 			if (distance > light->Out)
 				continue;
 
-			m_tempItemLights.push_back(light);
+			tempItemLights.push_back(light);
 		}
 
 		int numLights = room.Lights.size();
@@ -309,12 +307,10 @@ namespace T5M::Renderer
 				continue;
 			}
 
-			m_tempItemLights.push_back(light);
+			tempItemLights.push_back(light);
 		}
-
-		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), m_tempItemLights.size()); i++)
-		{
-			item->Lights.push_back(m_tempItemLights[i]);
+		for (auto& l : tempItemLights) {
+			item->Lights.push_back(l);
 		}
 
 		if (item->Item->objectNumber == ID_LARA)
@@ -325,7 +321,7 @@ namespace T5M::Renderer
 
 	void Renderer11::collectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() <= roomNumber)
+		if (m_rooms.size() < roomNumber)
 		{
 			return;
 		}
@@ -348,11 +344,11 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::prepareLights()
-	{
+	void Renderer11::prepareLights(RenderView& view)
+{
 		// Add dynamic lights
 		for (int i = 0; i < m_dynamicLights.size(); i++)
-			m_lightsToDraw.push_back(m_dynamicLights[i]);
+			view.lightsToDraw.push_back(m_dynamicLights[i]);
 
 		// Now I have a list full of draw. Let's sort them.
 		//std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
@@ -430,7 +426,7 @@ namespace T5M::Renderer
 
 	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() <= roomNumber)
+		if (m_rooms.size() < roomNumber)
 			return;
 		RendererRoom &const room = m_rooms[roomNumber];
 
@@ -455,7 +451,7 @@ namespace T5M::Renderer
 
 			collectLightsForEffect(fx->roomNumber, newEffect, renderView);
 
-			m_effectsToDraw.push_back(newEffect);
+			renderView.effectsToDraw.push_back(newEffect);
 		}
 	}
 
