@@ -109,7 +109,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	//Normal = float3(0.5, 0.5, 1);
-	Normal.g = 1 - Normal.g;
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
 	//Normal = input.Normal;
