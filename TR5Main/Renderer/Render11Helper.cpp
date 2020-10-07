@@ -14,6 +14,7 @@
 #include "rubberboat.h"
 #include "upv.h"
 #include <algorithm>
+#include <memory>
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
@@ -158,7 +159,7 @@ namespace T5M::Renderer
 	{
 		for (int i = 0; i < view.effectsToDraw.size(); i++)
 		{
-			RendererEffect *fx = m_effectsToDraw[i];
+			RendererEffect *fx = view.effectsToDraw[i];
 
 			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
@@ -173,7 +174,7 @@ namespace T5M::Renderer
 
 		Matrix rotation;
 
-		Matrix *transforms = (item == NULL ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
+		Matrix *transforms = (item == NULL ? &obj.AnimationTransforms[0] : &item->AnimationTransforms[0]);
 
 		// Push
 		Bones[nextBone++] = obj.Skeleton;
@@ -435,9 +436,9 @@ namespace T5M::Renderer
 		}
 	}
 
-	RendererMesh *Renderer11::getRendererMeshFromTrMesh(RendererObject *obj, MESH *meshPtr, short boneIndex, int isJoints, int isHairs)
+	T5M::Renderer::RendererMesh* Renderer11::createRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr)
 	{
-		RendererMesh *mesh = new RendererMesh();
+		RendererMesh* mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;
 
@@ -531,26 +532,10 @@ namespace T5M::Renderer
 				}
 			}
 		}
-
-		m_meshes.push_back(mesh);
-
-		return mesh;
+		m_meshes.push_back(std::unique_ptr<RendererMesh>(mesh));
+		return m_meshes[m_meshes.size()-1].get();
 	}
 
-	int Renderer11::getAnimatedTextureInfo(short textureId)
-	{
-		for (int i = 0; i < m_numAnimatedTextureSets; i++)
-		{
-			RendererAnimatedTextureSet &const set = m_animatedTextureSets[i];
-			for (int j = 0; j < set.NumTextures; j++)
-			{
-				if (set.Textures[j].Id == textureId)
-					return i;
-			}
-		}
-
-		return -1;
-	}
 	bool Renderer11::isFullsScreen()
 {
 		return (!Windowed);
@@ -836,9 +821,9 @@ namespace T5M::Renderer
 		m_rooms[roomNumber2].Room = &g_Level.Rooms[roomNumber2];
 	}
 
-	RendererMesh *Renderer11::getMesh(int meshIndex)
+	RendererMesh* Renderer11::getMesh(int meshIndex)
 	{
-		return m_meshes[meshIndex];
+		return m_meshes[meshIndex].get();
 	}
 
 	void Renderer11::getLaraAbsBonePosition(Vector3 *pos, int joint)
@@ -912,7 +897,7 @@ namespace T5M::Renderer
 
 		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
 		{
-			RendererMesh *mesh = moveable.ObjectMeshes[i];
+			RendererMesh* mesh = moveable.ObjectMeshes[i];
 
 			Vector3 pos;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
