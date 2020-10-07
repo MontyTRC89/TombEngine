@@ -2392,8 +2392,8 @@ namespace T5M::Renderer
         {
             MESH_INFO *msh = view.staticsToDraw[i]->Mesh;
 
-            if (!(msh->flags & 1))
-                continue;
+            /*if (!(msh->flags & 1))
+                continue;*/
 
             RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
 
@@ -2404,7 +2404,8 @@ namespace T5M::Renderer
                 RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
                 m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-                m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+                m_stStatic.Position = Vector4(msh->x,msh->y,msh->z,1);
+                m_stStatic.Color = msh->color;
                 m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
