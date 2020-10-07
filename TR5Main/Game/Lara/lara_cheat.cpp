@@ -39,7 +39,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
 
 	if (TrInput & IN_ACTION)
 	{
-		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 31, 255, 255, 255);
+		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 32, 32, 32, 32);
 	}
 
 	if (TrInput & IN_OPTION)

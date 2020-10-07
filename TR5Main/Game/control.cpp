@@ -492,13 +492,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			// Draw flyby cameras
 			//if (CurrentLevel != 0)
-			//	g_Renderer->EnableCinematicBars(true);
+			//	g_Renderer.EnableCinematicBars(true);
 			CalculateSpotCameras();
 		}
 		else
 		{
 			// Do the standard camera
-			//g_Renderer->EnableCinematicBars(false);
+			//g_Renderer.EnableCinematicBars(false);
 			TrackCameraInit = false;
 			CalculateCamera();
 		}
