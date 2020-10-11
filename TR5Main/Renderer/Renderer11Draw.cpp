@@ -416,7 +416,7 @@ namespace T5M::Renderer
         }
     }
 
-    void Renderer11::drawGunShells()
+    void Renderer11::drawGunShells(RenderView& view)
 {
         RendererRoom &const room = m_rooms[LaraItem->roomNumber];
         RendererItem *item = &m_items[Lara.itemNumber];
@@ -1155,7 +1155,6 @@ namespace T5M::Renderer
             drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
         }
 
-        drawLines2D();
         drawAllStrings();
 
         if (g_Inventory.GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
@@ -1260,7 +1259,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawRopes()
+    void Renderer11::drawRopes(RenderView& view)
 {
         for (int n = 0; n < NumRopes; n++)
         {
@@ -1366,7 +1365,7 @@ namespace T5M::Renderer
                                 Vector3(p2.x, p2.y, p2.z),
                                 Vector3(p3.x, p3.y, p3.z),
                                 Vector3(p4.x, p4.y, p4.z),
-                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, 0, 0, BLENDMODE_OPAQUE);
+                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, { 0, 0 }, BLENDMODE_OPAQUE,view);
 
                     x1 = x4;
                     y1 = y4;
@@ -1378,7 +1377,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawLines2D()
+    void Renderer11::drawLines2D(RenderView& view)
 {
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -1432,7 +1431,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawSpiders()
+    void Renderer11::drawSpiders(RenderView& view)
 {
         /*XMMATRIX world;
         UINT cPasses = 1;
@@ -1498,7 +1497,7 @@ namespace T5M::Renderer
         }*/
     }
 
-    void Renderer11::drawRats()
+    void Renderer11::drawRats(RenderView& view)
 {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -1548,7 +1547,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawBats()
+    void Renderer11::drawBats(RenderView& view)
 {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -1598,7 +1597,7 @@ namespace T5M::Renderer
 
     }
 
-	void Renderer11::drawLittleBeetles()
+	void Renderer11::drawLittleBeetles(RenderView& view)
 {
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1648,138 +1647,7 @@ namespace T5M::Renderer
 	}
 
 
-    void Renderer11::doSnow()
-{
-        if (m_firstWeather)
-        {
-            for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
-                m_snow[i].Reset = true;
-        }
-
-        for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
-        {
-            RendererWeatherParticle *snow = &m_snow[i];
-
-            if (snow->Reset)
-            {
-                snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-                snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
-                snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-
-                // Check if in inside room
-                short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-                if (!(room->flags & ENV_FLAG_OUTSIDE))
-                    continue;
-
-                snow->Size = SNOW_DELTA_Y + (rand() % 64);
-                snow->AngleH = (rand() % SNOW_MAX_ANGLE_H) * RADIAN;
-                snow->AngleV = (rand() % SNOW_MAX_ANGLE_V) * RADIAN;
-                snow->Reset = false;
-            }
-
-            float radius = snow->Size * sin(snow->AngleV);
-
-            float dx = sin(snow->AngleH) * radius;
-            float dz = cos(snow->AngleH) * radius;
-
-            snow->X += dx;
-            snow->Y += SNOW_DELTA_Y;
-            snow->Z += dz;
-
-            if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f)
-            {
-                snow->Reset = true;
-                continue;
-            }
-
-            addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
-                               0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
-                               BLENDMODE_ALPHABLEND);
-
-            short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-            if (snow->Y >= room->y + room->minfloor)
-                snow->Reset = true;
-        }
-
-        m_firstWeather = false;
-
-    }
-
-    void Renderer11::doRain()
-{
-        if (m_firstWeather)
-        {
-            for (int i = 0; i < NUM_RAIN_DROPS; i++)
-            {
-                m_rain[i].Reset = true;
-                m_rain[i].Draw = true;
-            }
-        }
-
-        for (int i = 0; i < NUM_RAIN_DROPS; i++)
-        {
-            RendererWeatherParticle *drop = &m_rain[i];
-
-            if (drop->Reset)
-            {
-                drop->Draw = true;
-
-                drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-                drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT);
-                drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-
-                // Check if in inside room
-                short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-                if (!(room->flags & ENV_FLAG_OUTSIDE))
-                {
-                    drop->Reset = true;
-                    continue;
-                }
-
-                drop->Size = RAIN_SIZE + (rand() % 64);
-                drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
-                drop->AngleV = (rand() % RAIN_MAX_ANGLE_V) * RADIAN;
-                drop->Reset = false;
-            }
-
-            float x1 = drop->X;
-            float y1 = drop->Y;
-            float z1 = drop->Z;
-
-            float radius = drop->Size * sin(drop->AngleV);
-
-            float dx = sin(drop->AngleH) * radius;
-            float dy = drop->Size * cos(drop->AngleV);
-            float dz = cos(drop->AngleH) * radius;
-
-            drop->X += dx;
-            drop->Y += RAIN_DELTA_Y;
-            drop->Z += dz;
-
-            if (drop->Draw)
-                addLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
-
-            // If rain drop has hit the ground, then reset it and add a little drip
-            short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-            if (drop->Y >= room->y + room->minfloor)
-            {
-                drop->Reset = true;
-                AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
-            }
-        }
-
-        m_firstWeather = false;
-    }
-
-    void Renderer11::drawLines3D()
+    void Renderer11::drawLines3D(RenderView& view)
 {
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -2008,18 +1876,18 @@ namespace T5M::Renderer
         drawRooms(false, false, view);
         drawRooms(false, true, view);
         drawStatics(false, view);
-        drawLara(false, false);
+        drawLara(view,false, false);
         drawItems(false, false, view);
         drawItems(false, true, view);
-        drawEffects(false);
-        drawGunFlashes();
-        drawGunShells();
-        drawBaddieGunflashes();
-        drawDebris(false);
-        drawBats();
-        drawRats();
-        drawSpiders();
-		drawLittleBeetles();
+        drawEffects(view,false);
+        drawGunFlashes(view);
+        drawGunShells(view);
+        drawBaddieGunflashes(view);
+        drawDebris(view,false);
+        drawBats(view);
+        drawRats(view);
+        drawSpiders(view);
+		drawLittleBeetles(view);
 
         // Transparent geometry
         m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
@@ -2028,51 +1896,37 @@ namespace T5M::Renderer
         drawRooms(true, false, view);
         drawRooms(true, true, view);
         drawStatics(true, view);
-        drawLara(true, false);
+        drawLara(view,true, false);
         drawItems(true, false, view);
         drawItems(true, true, view);
-        drawEffects(true);
-        drawWaterfalls();
-        drawDebris(true);
+        drawEffects(view,true);
+        drawDebris(view,true);
 
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
         // Do special effects and weather
-        drawFires();
-        drawSmokes();
-        drawSmokeParticles();
-        drawSimpleParticles();
-        drawSparkParticles();
-        drawExplosionParticles();
-        drawFootprints();
-        drawDripParticles();
-        drawBlood();
-        drawSparks();
-        drawBubbles();
-        drawDrips();
-        drawRipples();
-        drawUnderwaterDust();
-        drawSplahes();
-        drawShockwaves();
-        drawEnergyArcs();
+        drawFires(view);
+        drawSmokes(view);
+        drawSmokeParticles(view);
+        drawSimpleParticles(view);
+        drawSparkParticles(view);
+        drawExplosionParticles(view);
+        drawFootprints(view);
+        drawDripParticles(view);
+        drawBlood(view);
+        drawSparks(view);
+        drawBubbles(view);
+        drawDrips(view);
+        drawRipples(view);
+        drawUnderwaterDust(view);
+        drawSplahes(view);
+        drawShockwaves(view);
+        drawEnergyArcs(view);
 
-        switch (level->Weather)
-        {
-        case WEATHER_NORMAL:
-            // no weather in normal
-            break;
-        case WEATHER_RAIN:
-            doRain();
-            break;
-        case WEATHER_SNOW:
-            doSnow();
-            break;
-        }
-
-        drawRopes();
-        drawSprites();
-        drawLines3D();
+        drawRopes(view);
+        drawSprites(view);
+        drawLines3D(view);
 
         time2 = std::chrono::high_resolution_clock::now();
         m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -2086,12 +1940,12 @@ namespace T5M::Renderer
         UpdateAirBar(flash);
         DrawAllPickups();
 
-        drawLines2D();
+        drawLines2D(view);
 
         if (CurrentLevel != 0)
         {
             // Draw binoculars or lasersight
-            drawOverlays();
+            drawOverlays(view);
 
             m_currentY = 60;
 #ifdef _DEBUG
@@ -2100,10 +1954,6 @@ namespace T5M::Renderer
             printDebugMessage("Update time: %d", m_timeUpdate);
             printDebugMessage("Frame time: %d", m_timeFrame);
             printDebugMessage("Draw calls: %d", m_numDrawCalls);
-            printDebugMessage("Rooms: %d", m_roomsToDraw.size());
-            printDebugMessage("Items: %d", m_itemsToDraw.size());
-            printDebugMessage("Statics: %d", m_staticsToDraw.size());
-            printDebugMessage("Lights: %d", m_lightsToDraw.size());
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
             printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
@@ -2212,7 +2062,7 @@ namespace T5M::Renderer
                 || objectNumber == ID_JOBY_SPIKES)
             {
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
-                drawScaledSpikes(item, transparent, animated);
+                drawScaledSpikes(view,item, transparent, animated);
             }
             else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
             {
@@ -2222,18 +2072,18 @@ namespace T5M::Renderer
 			else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
 			{
 				// Wraiths have some additional special effects
-				drawAnimatingItem(item, transparent, animated);
-				drawWraithExtra(item, transparent, animated);
+				drawAnimatingItem(view,item, transparent, animated);
+				drawWraithExtra(view,item, transparent, animated);
 			}
             else
             {
-                drawAnimatingItem(item, transparent, animated);
+                drawAnimatingItem(view,item, transparent, animated);
             }
         }
 
     }
 
-    void Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
+    void Renderer11::drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2297,7 +2147,7 @@ namespace T5M::Renderer
 
     }
 
-    void Renderer11::drawScaledSpikes(RendererItem* item, bool transparent, bool animated)
+    void Renderer11::drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated)
     {
         short objectNumber = item->Item->objectNumber;
         if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
@@ -2305,11 +2155,11 @@ namespace T5M::Renderer
             item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
             item->World = item->Scale * item->Rotation * item->Translation;
 
-            return drawAnimatingItem(item, transparent, animated);
+            return drawAnimatingItem(view,item, transparent, animated);
         }
     }
 
-	void Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
+	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
 	{
 		ITEM_INFO* nativeItem = item->Item;
 		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;

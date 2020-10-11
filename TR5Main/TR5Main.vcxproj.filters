@@ -798,21 +798,6 @@
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\memory\pool.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\memory\linearPool.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\memory\linearPoolAllocator.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\memory\PoolAllocator.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\memory\memory.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\debug\debug.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -937,6 +922,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\LinearArrayBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererSprites.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1719,6 +1710,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RendererSprites.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
