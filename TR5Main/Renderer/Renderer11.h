@@ -23,19 +23,19 @@
 #include <level.h>
 #include "ConstantBuffer/ConstantBuffer.h"
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
-struct CAMERA_INFO;
 #include <wrl/client.h>
-#include <../packages/directxtk_desktop_2015.2018.11.20.1/include/CommonStates.h>
-#include <../packages/directxtk_desktop_2015.2019.10.17.1/include/SpriteFont.h>
-#include <../packages/directxtk_desktop_2015.2019.10.17.1/include/PrimitiveBatch.h>
+#include <CommonStates.h>
+#include <SpriteFont.h>
+#include <PrimitiveBatch.h>
 #include <d3d9types.h>
+struct CAMERA_INFO;
 namespace T5M::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
 	constexpr auto NUM_ANIMATED_SETS = 1024;
-	constexpr auto MAX_LIGHTS_DRAW = 16384;
+	//constexpr auto MAX_LIGHTS_DRAW = 16384;
 	constexpr auto MAX_DYNAMIC_LIGHTS = 16384;
 	constexpr auto MAX_DRAW_STATICS = 16384;
 	constexpr auto MAX_Bones = 32;
@@ -295,26 +295,6 @@ namespace T5M::Renderer
 		}
 	};
 	
-	struct RendererSpriteToDraw
-	{
-		RENDERER_SPRITE_TYPE Type;
-		RendererSprite* Sprite;
-		float Distance;
-		float Scale;
-		DirectX::SimpleMath::Vector3 pos;
-		DirectX::SimpleMath::Vector3 vtx1;
-		DirectX::SimpleMath::Vector3 vtx2;
-		DirectX::SimpleMath::Vector3 vtx3;
-		DirectX::SimpleMath::Vector3 vtx4;
-		DirectX::SimpleMath::Vector4 color;
-		float Rotation;
-		float Width;
-		float Height;
-		BLEND_MODES BlendMode;
-		DirectX::SimpleMath::Vector3 ConstrainAxis;
-		DirectX::SimpleMath::Vector3 LookAtAxis;
-	};
-	
 	struct RendererLine3D
 	{
 		DirectX::SimpleMath::Vector3 start;
@@ -457,16 +437,9 @@ namespace T5M::Renderer
 		short m_numHairIndices;
 		std::vector<RendererVertex> m_hairVertices;
 		std::vector<short> m_hairIndices;
-		std::vector<RendererRoom*> m_roomsToDraw;
-		std::vector<RendererItem*> m_itemsToDraw;
-		std::vector<RendererEffect*> m_effectsToDraw;
-		std::vector<RendererStatic*> m_staticsToDraw;
-		std::vector<RendererLight*> m_lightsToDraw;
 		std::vector<RendererLight*> m_dynamicLights;
-		std::vector<RendererSpriteToDraw> m_spritesToDraw;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
-		std::vector<RendererLight*> m_tempItemLights;
 		int m_nextSprite;
 		RendererLine3D* m_lines3DBuffer;
 		int m_nextLine3D;
@@ -523,14 +496,13 @@ namespace T5M::Renderer
 	
 		// Private functions
 		void drawAllStrings();
-		int												getAnimatedTextureInfo(short textureId);
-		void											initialiseHairRemaps();
-		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
-		void											fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
-		void											buildHierarchy(RendererObject* obj);
-		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void											updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
-		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
+		int getAnimatedTextureInfo(short textureId);
+		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
+		void fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
+		void buildHierarchy(RendererObject* obj);
+		void buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
+		void updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
+		bool printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void getVisibleObjects(int from, int to, RenderView& renderView);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal,const Matrix& viewProjection);
 		void collectRooms(RenderView& renderView);
@@ -539,71 +511,68 @@ namespace T5M::Renderer
 		void collectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
 		void collectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
 		void collectLightsForRoom(short roomNumber, RenderView& renderView);
-		void											prepareLights();
+		void prepareLights(RenderView& view);
 		void collectEffects(short roomNumber, RenderView& renderView);
-		void											clearSceneItems();
-		void											updateItemsAnimations(RenderView& view);
-		void											updateEffects(RenderView& view);
-		int												getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
-		bool											drawAmbientCubeMap(short roomNumber);
-		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
+		void clearSceneItems();
+		void updateItemsAnimations(RenderView& view);
+		void updateEffects(RenderView& view);
+		int	getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
+		bool drawAmbientCubeMap(short roomNumber);
+		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
-		void drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
-		void drawBaddieGunflashes();
-		void drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
+		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
+		void drawBaddieGunflashes(RenderView& view);
+		void drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawStatics(bool transparent, RenderView& view);
-		void drawWaterfalls();
 		void renderShadowMap(RenderView& view);
-		void drawWraithExtra(RendererItem* item, bool transparent, bool animated);
+		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
-		void drawLara(bool transparent, bool shadowMap);
-		void											printDebugMessage(LPCSTR message, ...);
-		void											drawFires();
-		void											drawSparks();
-		void											drawSmokes();
-		void											drawEnergyArcs();
-		void											drawBlood();
-		void											drawDrips();
-		void											drawBubbles();
-		void drawEffects(bool transparent);
-		void drawEffect(RendererEffect* effect, bool transparent);
-		void											drawSplahes();
-		void drawSprites();
-		void drawLines3D();
-		void drawLines2D();
-		void drawOverlays();
-		void drawRopes();
-		void drawBats();
-		void drawRats();
-		void drawLittleBeetles();
-		void drawSpiders();
-		bool											drawGunFlashes();
-		void drawGunShells();
+		void drawLara(RenderView& view,bool transparent, bool shadowMap);
+		void printDebugMessage(LPCSTR message, ...);
+		void drawFires(RenderView& view);
+		void drawSparks(RenderView& view);
+		void drawSmokes(RenderView& view);
+		void drawEnergyArcs(RenderView& view);
+		void drawBlood(RenderView& view);
+		void drawDrips(RenderView& view);
+		void drawBubbles(RenderView& view);
+		void drawEffects(RenderView& view,bool transparent);
+		void drawEffect(RenderView& view,RendererEffect* effect, bool transparent);
+		void drawSplahes(RenderView& view);
+		void drawSprites(RenderView& view);
+		void drawLines3D(RenderView& view);
+		void drawLines2D(RenderView& view);
+		void drawOverlays(RenderView& view);
+		void drawRopes(RenderView& view);
+		void drawBats(RenderView& view);
+		void drawRats(RenderView& view);
+		void drawLittleBeetles(RenderView& view);
+		void drawSpiders(RenderView& view);
+		bool drawGunFlashes(RenderView& view);
+		void drawGunShells(RenderView& view);
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
-		void drawDebris(bool transparent);
+		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
-		void											updateAnimatedTextures();
-		void											createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
-		void											drawShockwaves();
-		void											drawRipples();
-		void											drawUnderwaterDust();	
-		void doRain();
-		void doSnow();
+		void updateAnimatedTextures();
+		void createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
+		void drawShockwaves(RenderView& view);
+		void drawRipples(RenderView& view);
+		void drawUnderwaterDust(RenderView& view);
 		void drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars);
-		bool											isRoomUnderwater(short roomNumber);
-		bool											isInRoom(int x, int y, int z, short roomNumber);
+		bool isRoomUnderwater(short roomNumber);
+		bool isInRoom(int x, int y, int z, short roomNumber);
 		void drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color);
 		void initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
 		void initialiseBars();
-		void drawSmokeParticles();
-		void drawSparkParticles();
-		void drawDripParticles();
-		void drawExplosionParticles();
+		void drawSmokeParticles(RenderView& view);
+		void drawSparkParticles(RenderView& view);
+		void drawDripParticles(RenderView& view);
+		void drawExplosionParticles(RenderView& view);
 		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumber);
 		void drawLaraHolsters(bool transparent);
-		void drawSimpleParticles();
+		void drawSimpleParticles(RenderView& view);
 	public:
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;
@@ -645,10 +614,6 @@ namespace T5M::Renderer
 		std::vector<RendererVideoAdapter>* getAdapters();
 		void renderTitleImage();
 		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
-		void addSpriteBillboard(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos,DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-		void addSpriteBillboardConstrained(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 constrainAxis);
-		void addSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis);
-		void addSprite3D(RendererSprite* sprite, DirectX::SimpleMath::Vector3 vtx1, DirectX::SimpleMath::Vector3 vtx2, DirectX::SimpleMath::Vector3 vtx3, DirectX::SimpleMath::Vector3 vtx4, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		void changeScreenResolution(int width, int height, int frequency, bool windowed);
 		void drawBar(float percent, const RendererHUDBar* const bar);
@@ -664,7 +629,7 @@ namespace T5M::Renderer
 		RendererMesh* getMesh(int meshIndex);
 	private:
 		Texture2D createDefaultNormalTexture();
-		void drawFootprints();
+		void drawFootprints(RenderView& view);
 
 		template <typename C>
 		ConstantBuffer<C> createConstantBuffer() {

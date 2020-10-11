@@ -27,7 +27,6 @@ namespace T5M::Renderer {
 	using std::array;
 	Renderer11 g_Renderer;
 	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) {
-		initialiseHairRemaps();
 
 		m_blinkColorDirection = 1;
 	}
@@ -51,12 +50,6 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::clearSceneItems() {
-		m_roomsToDraw.clear();
-		m_itemsToDraw.clear();
-		m_effectsToDraw.clear();
-		m_lightsToDraw.clear();
-		m_staticsToDraw.clear();
-		m_spritesToDraw.clear();
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
 		gameCamera.clear();
