@@ -146,7 +146,7 @@ std::optional<int> FLOOR_INFO::GetBottomRoom(int startRoomNumber, int x, int y, 
 	auto floor = GetFloor(roomNumber, x, z);
 	auto plane = floor->SectorPlane(x, z);
 
-	if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z))
+	if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
 		return std::nullopt;
 
 	auto roomBelow = floor->RoomBelow(plane);
@@ -163,7 +163,7 @@ std::optional<int> FLOOR_INFO::GetBottomRoom(int startRoomNumber, int x, int y, 
 		}
 		plane = floor->SectorPlane(x, z);
 
-		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z))
+		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
 			return std::optional{roomNumber};
 
 		roomBelow = floor->RoomBelow(plane);
@@ -178,7 +178,7 @@ std::optional<int> FLOOR_INFO::GetTopRoom(int startRoomNumber, int x, int y, int
 	auto floor = GetFloor(roomNumber, x, z);
 	auto plane = floor->SectorPlane(x, z);
 
-	if (!floor->IsWall(plane) && y >= floor->CeilingHeight(x, z))
+	if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
 		return std::nullopt;
 
 	auto roomAbove = floor->RoomAbove(plane);
@@ -195,7 +195,7 @@ std::optional<int> FLOOR_INFO::GetTopRoom(int startRoomNumber, int x, int y, int
 		}
 		plane = floor->SectorPlane(x, z);
 
-		if (!floor->IsWall(plane) && y >= floor->CeilingHeight(x, z))
+		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
 			return std::optional{roomNumber};
 
 		roomAbove = floor->RoomAbove(plane);
