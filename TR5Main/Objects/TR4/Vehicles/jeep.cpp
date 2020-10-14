@@ -882,8 +882,8 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 
 		if (abs(jeep->velocity) <= JEEP_MAX_SPEED / 2)
 		{
-			rot1 = (int)ANGLE(5) * abs(jeep->velocity) >> W2V_SHIFT;
-			rot2 = (60 * abs(jeep->velocity) >> W2V_SHIFT) + ANGLE(1);
+			rot1 = ANGLE(5) * abs(jeep->velocity) / 16384;
+			rot2 = 60 * abs(jeep->velocity) / 16384 + ANGLE(1);
 		}
 		else
 		{

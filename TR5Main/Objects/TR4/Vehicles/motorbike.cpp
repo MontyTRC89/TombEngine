@@ -1135,13 +1135,13 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         {
             if (TrInput & IN_LEFT)
             {
-                motorbike->bikeTurn -= motorbike->velocity <= MOTORBIKE_ACCEL_1 ? ONE_DEGREE - (MOTORBIKE_HTURN * motorbike->velocity >> W2V_SHIFT) : MOTORBIKE_DEFAULT_HTURN;
+                motorbike->bikeTurn -= motorbike->velocity <= MOTORBIKE_ACCEL_1 ? ONE_DEGREE - MOTORBIKE_HTURN * motorbike->velocity / 16384 : MOTORBIKE_DEFAULT_HTURN;
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
             }
             else if (TrInput & IN_RIGHT)
             {
-                motorbike->bikeTurn += motorbike->velocity <= MOTORBIKE_ACCEL_1 ? ONE_DEGREE + (MOTORBIKE_HTURN * motorbike->velocity >> W2V_SHIFT) : MOTORBIKE_DEFAULT_HTURN;
+                motorbike->bikeTurn += motorbike->velocity <= MOTORBIKE_ACCEL_1 ? ONE_DEGREE + MOTORBIKE_HTURN * motorbike->velocity / 16384 : MOTORBIKE_DEFAULT_HTURN;
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
             }

@@ -721,14 +721,14 @@ void InitialiseDoor(short itemNumber)
 
 	r = &g_Level.Rooms[item->roomNumber];
 
-	door->d1.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
+	door->d1.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
 	roomNumber = GetDoor(door->d1.floor);
 	if (roomNumber == NO_ROOM)
 		boxNumber = door->d1.floor->box;
 	else
 	{
 		b = &g_Level.Rooms[roomNumber];
-		boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
+		boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 	}
 	door->d1.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -738,14 +738,14 @@ void InitialiseDoor(short itemNumber)
 	{
 		r = &g_Level.Rooms[r->flippedRoom];
 
-		door->d1flip.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
+		door->d1flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
 		roomNumber = GetDoor(door->d1flip.floor);
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d1flip.floor->box;
 		else
 		{
 			b = &g_Level.Rooms[roomNumber];
-			boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
+			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 		}
 		door->d1flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -768,14 +768,14 @@ void InitialiseDoor(short itemNumber)
 	{
 		r = &g_Level.Rooms[twoRoom];
 
-		door->d2.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
+		door->d2.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
 		roomNumber = GetDoor(door->d2.floor);
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d2.floor->box;
 		else
 		{
 			b = &g_Level.Rooms[roomNumber];
-			boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
+			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 		}
 		door->d2.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -785,14 +785,14 @@ void InitialiseDoor(short itemNumber)
 		{
 			r = &g_Level.Rooms[r->flippedRoom];
 
-			door->d2flip.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
+			door->d2flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
 			roomNumber = GetDoor(door->d2flip.floor);
 			if (roomNumber == NO_ROOM)
 				boxNumber = door->d2flip.floor->box;
 			else
 			{
 				b = &g_Level.Rooms[roomNumber];
-				boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
+				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 			}
 			door->d2flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -818,11 +818,11 @@ void InitialiseClosedDoors()
 
 void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx)
 {
-	int absX = (dx << WALL_SHIFT) + item->pos.xPos;
-	int absZ = (dz << WALL_SHIFT) + item->pos.zPos;
+	int absX = dx * SECTOR(1) + item->pos.xPos;
+	int absZ = dz * SECTOR(1) + item->pos.zPos;
 
-	dx <<= WALL_SHIFT;
-	dz <<= WALL_SHIFT;
+	dx *= SECTOR(1);
+	dz *= SECTOR(1);
 
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 	GetClosedDoorNormal(r, &doorData->dptr1, &doorData->dn1, dz, dx, absX, absZ);
