@@ -9,8 +9,8 @@ void SpringBoardControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->currentAnimState == 0 && LaraItem->pos.yPos == item->pos.yPos &&
-		(LaraItem->pos.xPos >> WALL_SHIFT) == (item->pos.xPos >> WALL_SHIFT) &&
-		(LaraItem->pos.zPos >> WALL_SHIFT) == (item->pos.zPos >> WALL_SHIFT))
+		LaraItem->pos.xPos / SECTOR(1) == item->pos.xPos / SECTOR(1) &&
+		LaraItem->pos.zPos / SECTOR(1) == item->pos.zPos / SECTOR(1))
 	{
 		if (LaraItem->hitPoints <= 0)
 			return;

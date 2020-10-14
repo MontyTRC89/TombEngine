@@ -129,7 +129,7 @@ void InitialiseVentilator(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->itemFlags[0] = item->triggerFlags << WALL_SHIFT;
+	item->itemFlags[0] = item->triggerFlags * SECTOR(1);
 	if (item->itemFlags[0] < 2048)
 		item->itemFlags[0] = 3072;
 }

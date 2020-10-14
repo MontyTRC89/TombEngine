@@ -370,9 +370,9 @@ void LarsonControl(short itemNumber)
 			short floorHeight = item->itemFlags[2] & 0xFF00;
 			ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 			
-			int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
+			int x = r->x + (item->TOSSPAD / 256 & 0xFF) * SECTOR(1) + 512;
 			int y = r->minfloor + floorHeight;
-			int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
+			int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			GetFloorHeight(floor, x, y, z);

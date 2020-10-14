@@ -166,8 +166,7 @@ void KnightTemplarControl(short itemNumber)
 
 			ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
-			FLOOR_INFO* currentFloor = &room->floor[((pos.z - room->z) >> WALL_SHIFT) +
-				((pos.z - room->x) >> WALL_SHIFT) * room->xSize];
+			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->xSize];
 
 			if (currentFloor->stopper)
 			{

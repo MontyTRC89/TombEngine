@@ -629,7 +629,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		dx -= c * rx + s * rz;
 		dz -= c * rz - s * rx;
 
-		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
+		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
 		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
 		{
@@ -1018,7 +1018,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					
 					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
-						int angle = (l->pos.yRot - phd_atan(z - c * rx - s * rz, x - c * rx + s * rz) - ANGLE(135)) >> W2V_SHIFT;
+						int angle = (l->pos.yRot - phd_atan(z - c * rx - s * rz, x - c * rx + s * rz) - ANGLE(135)) / 16384;
 						Lara.hitDirection = (short)angle;
 						// TODO: check if a second Lara.hitFrame++; is required there !
 						Lara.hitFrame++; 
