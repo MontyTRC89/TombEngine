@@ -89,9 +89,9 @@ void InitialiseAhmet(short itemNumber)
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = AHMET_IDLE;
     item->currentAnimState = AHMET_IDLE;
-    item->itemFlags[0] = item->pos.xPos >> (WALL_SHIFT);
-    item->itemFlags[1] = item->pos.yPos >> (WALL_SHIFT - 2);
-    item->itemFlags[2] = item->pos.zPos >> (WALL_SHIFT);
+    item->itemFlags[0] = item->pos.xPos / SECTOR(1);
+    item->itemFlags[1] = item->pos.yPos * 4 / SECTOR(1);
+    item->itemFlags[2] = item->pos.zPos / SECTOR(1);
 }
 
 void AhmetControl(short itemNumber)

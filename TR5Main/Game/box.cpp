@@ -413,7 +413,7 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 	x = creature->target.x - item->pos.xPos;
 	z = creature->target.z - item->pos.zPos;
 	angle = phd_atan(z, x) - item->pos.yRot;
-	range = (item->speed << W2V_SHIFT) / maximumTurn;
+	range = item->speed * 16384 / maximumTurn;
 	distance = SQUARE(x) + SQUARE(z);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < SQUARE(range))
@@ -910,8 +910,8 @@ int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	BOX_INFO* box = &g_Level.Boxes[boxNumber];
 	int x, z;
 
-	x = (int(box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	z = (int(box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->pos.xPos;
+	z = (box->left + box->right) * SECTOR(1) / 2 - enemy->pos.zPos;
 	
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST && z > -ESCAPE_DIST && z < ESCAPE_DIST)
 		return false;
@@ -1087,13 +1087,13 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 
 	xrange	= STALK_DIST + ((box->bottom - box->top + 3) * SECTOR(1));
 	zrange	= STALK_DIST + ((box->right - box->left + 3) * SECTOR(1));
-	x		= ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	z		= ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	x		= (box->top + box->bottom) * SECTOR(1) / 2 - enemy->pos.xPos;
+	z		= (box->left + box->right) * SECTOR(1) / 2 - enemy->pos.zPos;
 	
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
 		return false;
 
-	enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
+	enemyQuad = enemy->pos.yRot / 16384 + 2;
 	
 	// boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
 	if (z > 0)
@@ -1508,7 +1508,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	switch (creature->mood)
 	{
 		case BORED_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber)
 				&& !(GetRandomControl() & 0x0F))
 			{
@@ -1538,7 +1538,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			break;
 
 		case ESCAPE_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber) && LOT->requiredBox == NO_BOX)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
@@ -1556,7 +1556,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 		case STALK_MOOD:
 			if (LOT->requiredBox == NO_BOX || !StalkBox(item, enemy, LOT->requiredBox))
 			{
-				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 				if (ValidBox(item, info->zoneNumber, boxNumber))
 				{
 					if (StalkBox(item, enemy, boxNumber))

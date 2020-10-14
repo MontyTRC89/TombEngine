@@ -231,7 +231,7 @@ struct EntityStoringInfo
 };
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
-#define XZ_GET_SECTOR(room, x, z) (room->floor[((z) >> WALL_SHIFT) + ((x) >> WALL_SHIFT) * room->xSize])
+#define XZ_GET_SECTOR(room, x, z) (room->floor[(z) / SECTOR(1) + (x) / SECTOR(1) * room->xSize])
 
 constexpr auto UNIT_SHADOW = 256;
 constexpr auto NO_SHADOW = 0;

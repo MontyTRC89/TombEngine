@@ -1504,8 +1504,8 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	r = &g_Level.Rooms[*roomNumber];
 	do
 	{
-		xFloor = (z - r->z) >> WALL_SHIFT;
-		yFloor = (x - r->x) >> WALL_SHIFT;
+		xFloor = (z - r->z) / SECTOR(1);
+		yFloor = (x - r->x) / SECTOR(1);
 
 		if (xFloor <= 0)
 		{

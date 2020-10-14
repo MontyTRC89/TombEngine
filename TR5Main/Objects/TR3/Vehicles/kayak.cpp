@@ -510,11 +510,11 @@ int KayakDoShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	int x_old, z_old;
 	int shift_x, shift_z;
 
-	x = pos->x >> WALL_SHIFT;
-	z = pos->z >> WALL_SHIFT;
+	x = pos->x / SECTOR(1);
+	z = pos->z / SECTOR(1);
 
-	x_old = old->x >> WALL_SHIFT;
-	z_old = old->z >> WALL_SHIFT;
+	x_old = old->x / SECTOR(1);
+	z_old = old->z / SECTOR(1);
 
 	shift_x = pos->x & (WALL_SIZE - 1);
 	shift_z = pos->z & (WALL_SIZE - 1);

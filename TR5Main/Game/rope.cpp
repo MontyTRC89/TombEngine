@@ -122,21 +122,21 @@ void _0x0046D130(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z) //
 
 int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v) // (F) (D)
 {
-	return u->x * v->x + u->y * v->y + u->z * v->z >> W2V_SHIFT;
+	return (u->x * v->x + u->y * v->y + u->z * v->z) / 16384;
 }
 
 void ScaleVector(PHD_VECTOR* u, int c, PHD_VECTOR* destination) // (F) (D)
 {
-	destination->x = c * u->x >> W2V_SHIFT;
-	destination->y = c * u->y >> W2V_SHIFT;
-	destination->z = c * u->z >> W2V_SHIFT;
+	destination->x = c * u->x / 16384;
+	destination->y = c * u->y / 16384;
+	destination->z = c * u->z / 16384;
 }
 
 void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination) // (F) (D)
 {
-	destination->x = u->y * v->z - u->z * v->y >> W2V_SHIFT;
-	destination->y = u->z * v->x - u->x * v->z >> W2V_SHIFT;
-	destination->z = u->x * v->y - u->y * v->x >> W2V_SHIFT;
+	destination->x = (u->y * v->z - u->z * v->y) / 16384;
+	destination->y = (u->z * v->x - u->x * v->z) / 16384;
+	destination->z = (u->x * v->y - u->y * v->x) / 16384;
 }
 
 void _0x0046D420(int* matrix, short* angle) // (F) (D)
