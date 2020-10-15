@@ -191,7 +191,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
+void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)

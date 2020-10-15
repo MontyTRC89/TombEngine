@@ -40,7 +40,7 @@ namespace T5M::Renderer {
 		staticsToDraw.clear();
 		lightsToDraw.clear();
 		itemsToDraw.clear();
-
+		spritesToDraw.clear();
 	}
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h) {

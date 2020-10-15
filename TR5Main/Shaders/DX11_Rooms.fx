@@ -55,7 +55,17 @@ Texture2D CausticsTexture : register(t1);
 
 Texture2D ShadowMap : register(t2);
 SamplerComparisonState ShadowMapSampler : register(s1);
-PixelShaderInput VS(VertexShaderInput input)
+
+
+float hash(float3 n)
+{
+	float x = n.x;
+	float y = n.y;
+	float z = n.z;
+	return float((frac(sin(x)) * 7385.6093) + (frac(cos(y)) * 1934.9663) - (frac(sin(z)) * 8349.2791));
+}
+
+PixelShaderInput VS(VertexShaderInput input,uint vid : SV_VertexID)
 {
 	PixelShaderInput output;
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
@@ -68,9 +78,17 @@ PixelShaderInput VS(VertexShaderInput input)
 		screenPos.x += xOffset;
 		screenPos.y += yOffset;
 	}
+	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
+	if (water) {
+		static const float PI = 3.14159265f;
+		float offset = hash(input.Position.xyz);
+		float wibble = sin(((((float)Frame + offset) % 64) / 64)* PI)*0.5f+0.5f;
+		wibble = lerp(0.4f, 1.0f, wibble);
+		output.Color *= wibble;
+	}
 	output.UV = input.UV;
 	output.WorldPosition = input.Position.xyz;
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
@@ -91,7 +109,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	//Normal = float3(0.5, 0.5, 1);
-	Normal.g = 1 - Normal.g;
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
 	//Normal = input.Normal;
@@ -160,7 +177,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
 		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
 
-		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
+		float attenuation = saturate(dot(float3(0.0f, 1.0f, 0.0f), normal));
 
 		float3 blending = abs(normal);
 		blending = normalize(max(blending, 0.00001f));

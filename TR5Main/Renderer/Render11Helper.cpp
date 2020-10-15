@@ -12,6 +12,7 @@
 #include <Renderer\RenderView\RenderView.h>
 #include "quad.h"
 #include "rubberboat.h"
+#include "upv.h"
 #include <algorithm>
 
 extern GameConfiguration g_Configuration;
@@ -157,7 +158,7 @@ namespace T5M::Renderer
 	{
 		for (int i = 0; i < view.effectsToDraw.size(); i++)
 		{
-			RendererEffect *fx = m_effectsToDraw[i];
+			RendererEffect *fx = view.effectsToDraw[i];
 
 			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
@@ -298,6 +299,12 @@ namespace T5M::Renderer
 					RUBBER_BOAT_INFO* boat = (RUBBER_BOAT_INFO*)item->data;
 					if (j == 2)
 						currentBone->ExtraRotation.z = TO_RAD(boat->propRot);
+				}
+				else if (item->objectNumber == ID_UPV)
+				{
+					SUB_INFO* upv = (SUB_INFO*)item->data;
+					if (j == 3)
+						currentBone->ExtraRotation.z = TO_RAD(upv->FanRot);
 				}
 				else
 				{
