@@ -127,7 +127,6 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
-		// if lara have ammo, reduce it.
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
 			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0]--;
 		Savegame.Game.AmmoUsed++;
@@ -190,6 +189,8 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 
 void SubEffects(short item_number)
 {
+	if (item_number == NO_ITEM)
+		return;
 	ITEM_INFO* v;
 	SUB_INFO* sub;
 	PHD_VECTOR pos;
@@ -229,10 +230,7 @@ void SubEffects(short item_number)
 			}
 		}
 	}
-
-	// TODO: enable the light for UPV
-
-	/*
+	
 	for (lp = 0; lp < 2; lp++)
 	{
 		GAME_VECTOR	source, target;
@@ -262,11 +260,11 @@ void SubEffects(short item_number)
 			source.z = pos.z;
 			source.roomNumber = v->roomNumber;
 		}
-
-		// TODO: enable the light for UPV
-		//TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
 	}
-	*/
+	// wake stuff?
+	if (sub->WeaponTimer)
+		sub->WeaponTimer--; // fix shooting
 }
 
 static int CanGetOff(ITEM_INFO* v)
@@ -498,10 +496,30 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if (sub->Flags & UPV_SURFACE)
 		{
-			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(0.1f);
+			int xa = v->pos.xRot - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - v->pos.xRot;
+			if (xa > 0)
+			{
+				if (xa > ANGLE(1))
+					v->pos.xRot -= ANGLE(1.0f);
+				else
+					v->pos.xRot -= ANGLE(0.1f);
+			}
+			else if (ax)
+			{
+				if (ax > ANGLE(1))
+				{
+					v->pos.xRot += ANGLE(1.0f);
+				}
+				else
+					v->pos.xRot += ANGLE(0.1f);
+			}
+			else
+				v->pos.xRot = SURFACE_DIST;
+/*			if (v->pos.xRot > SURFACE_ANGLE)
+				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
@@ -538,10 +556,31 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if (sub->Flags & UPV_SURFACE)
 		{
+			int xa = v->pos.xRot - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - v->pos.xRot;
+			if (xa > 0)
+			{
+				if (xa > ANGLE(1))
+					v->pos.xRot -= ANGLE(1.0f);
+				else
+					v->pos.xRot -= ANGLE(0.1f);
+			}
+			else if (ax)
+			{
+				if (ax > ANGLE(1))
+				{
+					v->pos.xRot += ANGLE(1.0f);
+				}
+				else
+					v->pos.xRot += ANGLE(0.1f);
+			}
+			else
+				v->pos.xRot = SURFACE_DIST;
+			/*
 			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(1.0f);
+				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
 			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(1.0f);
+				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
@@ -949,7 +988,7 @@ int SubControl(void)
 	}
 
 	TestTriggers(TriggerIndex, false, 0);
-//	SubEffects(Lara.Vehicle);
+	SubEffects(Lara.Vehicle);
 
 	/* -------- update vehicle & Lara */
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))

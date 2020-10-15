@@ -3,8 +3,8 @@
 cbuffer StaticMatrixBuffer : register(b1)
 {
 	float4x4 World;
-	float4 StaticPosition;
-	float4 AmbientLight;
+	float4 Position;
+	float4 Color;
 };
 
 #include "./VertexInput.hlsli"
@@ -26,7 +26,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection); 
 	output.Normal = input.Normal;
-	output.Color = input.Color;
+	output.Color = input.Color*Color;
 	output.UV = input.UV;
 
 	return output;

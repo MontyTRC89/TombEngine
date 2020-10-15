@@ -516,7 +516,7 @@ void ReadRooms()
 			for (int k = 0; k < numPolygons; k++)
 			{
 				POLYGON poly;
-
+				
 				poly.shape = ReadInt32();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
@@ -645,9 +645,11 @@ void ReadRooms()
 			mesh.y = ReadInt32();
 			mesh.z = ReadInt32();
 			mesh.yRot = ReadUInt16();
-			mesh.shade = ReadUInt16();
 			mesh.flags = ReadUInt16();
+			Vector3 rgb = ReadVector3();
+			float a = ReadFloat();
 			mesh.staticNumber = ReadUInt16();
+			mesh.color = Vector4(rgb.x, rgb.y, rgb.z, a);
 			mesh.hitPoints = ReadInt16();
 
 			room.mesh.push_back(mesh);
