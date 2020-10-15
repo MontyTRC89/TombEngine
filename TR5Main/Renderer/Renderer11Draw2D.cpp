@@ -123,7 +123,7 @@ namespace T5M::Renderer {
 		m_lines2DToDraw.push_back(line);
 	}
 
-	void Renderer11::drawOverlays()
+	void Renderer11::drawOverlays(RenderView& view)
 {
 		if (!BinocularRange && !SpotcamOverlay)
 			return;

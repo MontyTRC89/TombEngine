@@ -793,10 +793,10 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 	// control Kayak 
 	frame = l->frameNumber - g_Level.Anims[l->animNumber].frameBase;
 
-	char lr = 0;
 
 	switch (l->currentAnimState)
 	{
+		static char lr;
 	case STATE_KAYAK_POSE:
 		if ((TrInput & IN_ROLL)
 			&& (!Lara.currentActive)
@@ -928,8 +928,6 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 	case STATE_KAYAK_RIGHT:	
 		if (Kayak->Forward)
 		{
-			int lr = 0;
-
 			if (!frame)
 				lr = 0;
 

@@ -147,12 +147,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
-    <ClInclude Include="Game\memory\linearPool.h" />
+    <ClInclude Include="Game\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
-    <ClInclude Include="Game\memory\pool.h" />
-    <ClInclude Include="Game\memory\linearPoolAllocator.h" />
-    <ClInclude Include="Game\memory\PoolAllocator.h" />
-    <ClInclude Include="Game\memory\memory.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
     <ClInclude Include="Game\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -353,6 +349,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h" />
+    <ClInclude Include="Renderer\RendererSprites.h" />
     <ClInclude Include="Renderer\RenderView\RenderView.h" />
     <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
     <ClInclude Include="Renderer\Utils.h" />
@@ -623,6 +620,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
     <ClCompile Include="Renderer\Renderer11Frame.cpp" />
+    <ClCompile Include="Renderer\RendererSprites.cpp" />
     <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
     <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Renderer\Utils.cpp" />

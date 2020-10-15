@@ -206,8 +206,9 @@ void SkidooExplode(ITEM_INFO* skidoo)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 
-	ExplodingDeath(Lara.Vehicle, -1, 256);
-	KillItem(Lara.Vehicle);
+	TriggerShockwave(&PHD_3DPOS(skidoo->pos.xPos, skidoo->pos.yPos - 128, skidoo->pos.zPos, 0, skidoo->pos.yRot, 0), 50, 180, 40, frandMinMax(160, 200), 60, 60, 64, frandMinMax(0, 359), 0);
+//	ExplodingDeath(Lara.Vehicle, -1, 256);
+//	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
@@ -251,65 +252,70 @@ bool SkidooCheckGetOffOK(int direction)
 // control (it is falling) and her needing normal control (so is she)
 bool SkidooCheckGetOff()
 {
-	ITEM_INFO* skidoo = &g_Level.Items[Lara.Vehicle];
-
-	if ((LaraItem->currentAnimState == STATE_SKIDOO_GETOFF 
-		|| LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL) 
-		&& LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
+	if (Lara.Vehicle != NO_ITEM)
 	{
-		// Wait for last frame of GETOFF anim before returning to normal Lara control
-		if (LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL)
-			LaraItem->pos.yRot += ANGLE(90);
-		else
-			LaraItem->pos.yRot -= ANGLE(90);
+		ITEM_INFO* skidoo = &g_Level.Items[Lara.Vehicle];
 
-		LaraItem->animNumber = LA_STAND_SOLID;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
-		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot);
-		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot);
-		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		Lara.Vehicle = NO_ITEM;
-		Lara.gunStatus = LG_NO_ARMS;
-	}
-	else if (LaraItem->currentAnimState == STATE_SKIDOO_LETGO 
-		&& (skidoo->pos.yPos == skidoo->floor 
-			|| LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
-	{
-		// Lara is falling
-		LaraItem->animNumber = LA_FREEFALL;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->currentAnimState = LS_FREEFALL;
-
-		if (skidoo->pos.yPos == skidoo->floor)
+		if ((LaraItem->currentAnimState == STATE_SKIDOO_GETOFF
+			|| LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL)
+			&& LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			// Skidoo has hit the floor, then explode
-			LaraItem->goalAnimState = LS_DEATH;
-			LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
-			LaraItem->speed = 0;
-			SkidooExplode(skidoo);
+			// Wait for last frame of GETOFF anim before returning to normal Lara control
+			if (LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL)
+				LaraItem->pos.yRot += ANGLE(90);
+			else
+				LaraItem->pos.yRot -= ANGLE(90);
+
+			LaraItem->animNumber = LA_STAND_SOLID;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+			LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
+			LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot);
+			LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot);
+			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
+			Lara.Vehicle = NO_ITEM;
+			Lara.gunStatus = LG_NO_ARMS;
 		}
-		else
+		else if (LaraItem->currentAnimState == STATE_SKIDOO_LETGO
+			&& (skidoo->pos.yPos == skidoo->floor
+				|| LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
 		{
-			// Continue the freefall
-			LaraItem->goalAnimState = LS_FREEFALL;
-			LaraItem->pos.yPos -= 200;
-			LaraItem->fallspeed = skidoo->fallspeed;
-			LaraItem->speed = skidoo->speed;
-			SoundEffect(SFX_LARA_FALL, &LaraItem->pos, 0);
+			// Lara is falling
+			LaraItem->animNumber = LA_FREEFALL;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+			LaraItem->currentAnimState = LS_FREEFALL;
+
+			if (skidoo->pos.yPos == skidoo->floor)
+			{
+				// Skidoo has hit the floor, then explode
+				LaraItem->goalAnimState = LS_DEATH;
+				LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
+				LaraItem->speed = 0;
+				SkidooExplode(skidoo);
+			}
+			else
+			{
+				// Continue the freefall
+				LaraItem->goalAnimState = LS_FREEFALL;
+				LaraItem->pos.yPos -= 200;
+				LaraItem->fallspeed = skidoo->fallspeed;
+				LaraItem->speed = skidoo->speed;
+				SoundEffect(SFX_LARA_FALL, &LaraItem->pos, 0);
+			}
+
+			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
+			LaraItem->gravityStatus = true;
+			Lara.gunStatus = LG_NO_ARMS;
+			Lara.moveAngle = skidoo->pos.yRot - LaraItem->pos.yRot;
+			skidoo->flags |= ONESHOT; // skidoo is dead
+			skidoo->collidable = false;
+
+			return false;
 		}
 
-		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		LaraItem->gravityStatus = true;
-		Lara.gunStatus = LG_NO_ARMS;
-		Lara.moveAngle = skidoo->pos.yRot - LaraItem->pos.yRot;
-		skidoo->flags |= ONESHOT; // skidoo is dead
-		skidoo->collidable = false;
-
-		return false;
+		return true;
 	}
-
-	return true;
+	else
+		return true;
 }
 
 void DoSnowEffect(ITEM_INFO* skidoo)
@@ -447,6 +453,15 @@ void SkidooAnimation(ITEM_INFO* skidoo, int collide, bool dead)
 			break;
 		}
 	}
+
+	if (g_Level.Rooms[skidoo->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	{
+		LaraItem->goalAnimState = STATE_SKIDOO_LETGO;
+		LaraItem->hitPoints = 0;
+		LaraItem->roomNumber = skidoo->roomNumber;
+		SkidooExplode(skidoo);
+	}
+
 }
 
 int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
@@ -589,10 +604,10 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 	else
 	{
 		// On ground: get up push from height change
-		kick = height - *y * 4;
+		kick = (height - *y) * 4;
 		if (kick < SKIDOO_MAX_KICK)
 			kick = SKIDOO_MAX_KICK;
-		fallspeed += (kick - fallspeed / 8);
+		fallspeed += ((kick - fallspeed) / 8);
 		if (*y > height)
 			*y = height;
 	}
