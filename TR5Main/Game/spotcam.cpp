@@ -462,14 +462,14 @@ void CalculateSpotCameras()
 					break;
 			}
 
-			temp >>= 1;
+			temp /= 2;
 			sp = cp - 2 * (temp & 0xFE); // << 2 ?
 
 			if (sp < 0)
 				sp = 0;
 		}
 
-		CurrentSplinePosition += (cp - CurrentSplinePosition) >> 5;
+		CurrentSplinePosition += (cp - CurrentSplinePosition) / 32;
 
 		if ((s->flags & SCF_CUT_PAN))
 		{
@@ -536,7 +536,7 @@ void CalculateSpotCameras()
 
 			if (sqrt(SQUARE(dx) * SQUARE(dy) * SQUARE(dz)) < QuakeCam.epos.boxNumber)
 			{
-				dz = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber) >> 1;
+				dz = (QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber)) / 2;
 				dy = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber);
 				if (dy > 0)
 				{
@@ -844,7 +844,7 @@ void CalculateSpotCameras()
 					CameraYtarget[4] = Camera.target.y;
 					CameraZtarget[4] = Camera.target.z;
 					CameraFOV[4] = CurrentFOV;
-					CameraSpeed[4] = CameraSpeed[2] >> 1;
+					CameraSpeed[4] = CameraSpeed[2] / 2;
 					CameraRoll[4] = 0;
 
 					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));
@@ -883,29 +883,29 @@ void CalculateSpotCameras()
 // It just works (tm)!
 int Spline(int x, int* knots, int nk)
 {
-	int64_t v3 = x * (int64_t)(nk - 3) << 16 >> 16;
-	int32_t v4 = (int32_t)v3 >> 16;
-	if ((int32_t)v3 >> 16 >= nk - 3)
+	int64_t v3 = (x * (int64_t)(nk - 3)) * 65536 / 65536; // lmao?
+	int32_t v4 = (int32_t)v3 / 65536;
+	if (((int32_t)v3 / 65536) >= nk - 3)
 		v4 = nk - 4;
 	int32_t v5 = knots[v4];
 	int32_t v6 = knots[v4 + 2];
-	int32_t nka = knots[v4 + 3] >> 1;
+	int32_t nka = knots[v4 + 3] / 2;
 	int32_t v7 = knots[v4 + 1];
 	return (int32_t)(v7
-		+ (int64_t)(uint64_t)((int32_t)((~v5 >> 1)
-			+ (v6 >> 1)
-			+ (int64_t)(uint64_t)((int32_t)(v5
-				+ (int64_t)(uint64_t)(((~v5 >> 1)
+		+ (int64_t)(uint64_t)(((int32_t)((~v5 / 2)
+			+ (v6 / 2)
+			+ (int64_t)(uint64_t)(((int32_t)(v5
+				+ (int64_t)(uint64_t)((((~v5 / 2)
 					+ nka
 					+ v7
-					+ (v7 >> 1)
-					- (v6 >> 1)
+					+ (v7 / 2)
+					- (v6 / 2)
 					- v6)
-					* (int64_t)((int32_t)v3 - (v4 << 16)) >> 16)
+					* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536)
 				- 2 * v7
 				+ 2 * v6
-				- (v7 >> 1)
+				- (v7 / 2)
 				- nka)
-				* (int64_t)((int32_t)v3 - (v4 << 16)) >> 16))
-			* (int64_t)((int32_t)v3 - (v4 << 16)) >> 16));
+				* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536))
+			* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536));
 }

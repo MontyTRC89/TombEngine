@@ -365,8 +365,8 @@ int mGetAngle(int x1, int y1, int x2, int y2)
 
 	while ((short)y != y) 
 	{
-		y >>= 1;
-		x >>= 1;
+		y /= 2;
+		x /= 2;
 	}
 
 	int n = atanTab[(y << 11) / x] + atanOctantTab[octant];
@@ -409,8 +409,8 @@ int phd_atan(int x, int y)
 
 	while ((short)y != y)
 	{
-		y >>= 1;
-		x >>= 1;
+		y /= 2;
+		x /= 2;
 	}
 
 	if (!x)
@@ -433,9 +433,9 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 
 	while ((short)x != x || (short)y != y || (short)z != z)
 	{
-		x >>= 2;
-		y >>= 2;
-		z >>= 2;
+		x /= 4;
+		y /= 4;
+		z /= 4;
 	}
 
 	int d = sqrt(SQUARE(x) + SQUARE(z));
