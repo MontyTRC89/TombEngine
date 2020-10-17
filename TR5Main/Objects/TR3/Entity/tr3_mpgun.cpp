@@ -60,13 +60,13 @@ void MPGunControl(short itemNumber)
 		pos.z = mpgunBite.z;
 
 		GetJointAbsPosition(item, &pos, mpgunBite.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, (item->firedWeapon << 1) + 4, 24, 16, 4);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (item->firedWeapon * 2) + 4, 24, 16, 4);
 		item->firedWeapon--;
 	}
 
 	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
 	{
-		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
+		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->roomNumber, 3);
 		item->hitPoints -= 20;
 	}
 
@@ -97,7 +97,7 @@ void MPGunControl(short itemNumber)
 					torsoY = info.angle;
 					head = info.angle;
 					ShotLara(item, &info, &mpgunBite, torsoY, 32);
-					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->pos, 3 << 13);
+					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->pos, 24576);
 				}
 			}
 

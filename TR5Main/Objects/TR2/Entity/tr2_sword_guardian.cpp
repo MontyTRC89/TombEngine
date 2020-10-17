@@ -29,9 +29,9 @@ static void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 
-	pos.x = (GetRandomControl() << 8 >> 15) + item->pos.xPos - 128;
-	pos.y = (GetRandomControl() << 8 >> 15) + item->pos.yPos - 256;
-	pos.z = (GetRandomControl() << 8 >> 15) + item->pos.zPos - 128;
+	pos.x = (GetRandomControl() * 256 / 32768) + item->pos.xPos - 128;
+	pos.y = (GetRandomControl() * 256 / 32768) + item->pos.yPos - 256;
+	pos.z = (GetRandomControl() * 256 / 32768) + item->pos.zPos - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, WEAPON_GRENADE_LAUNCHER, 32);
 	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->pos, 0);

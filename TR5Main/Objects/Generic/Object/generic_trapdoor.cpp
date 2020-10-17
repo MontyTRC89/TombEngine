@@ -173,7 +173,7 @@ void CloseTrapDoor(ITEM_INFO* item)
 		floor->pitRoom = NO_ROOM;
 		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky |= floor->skyRoom << 8;
+		pitsky |= floor->skyRoom * 256;
 		floor->skyRoom = NO_ROOM;
 	}
 	else if (item->pos.yPos == r->maxceiling)
@@ -182,7 +182,7 @@ void CloseTrapDoor(ITEM_INFO* item)
 		floor->skyRoom = NO_ROOM;
 		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky = pitsky << 8 | floor->pitRoom;
+		pitsky = ((pitsky * 256) | floor->pitRoom);
 		floor->pitRoom = NO_ROOM;
 	}
 
@@ -205,11 +205,11 @@ void OpenTrapDoor(ITEM_INFO* item)
 		floor->pitRoom = (unsigned char)pitsky;
 		r = &g_Level.Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		floor->skyRoom = pitsky >> 8;
+		floor->skyRoom = pitsky / 256;
 	}
 	else
 	{
-		floor->skyRoom = pitsky >> 8;
+		floor->skyRoom = pitsky / 256;
 		r = &g_Level.Rooms[floor->skyRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		floor->pitRoom = (unsigned char)pitsky;

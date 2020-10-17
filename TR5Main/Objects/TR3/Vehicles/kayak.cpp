@@ -83,7 +83,7 @@ enum
 #define KAYAK_X				128
 #define KAYAK_Z				128
 #define SKIDOO_MAX_KICK		-80
-#define SKIDOO_MIN_BOUNCE	((MAX_SPEED/2)>>8)
+#define SKIDOO_MIN_BOUNCE	((MAX_SPEED/2)/ 256)
 
 struct WAKE_PTS 
 {
