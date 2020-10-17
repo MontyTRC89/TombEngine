@@ -2186,8 +2186,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
-		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
-			Lara.target = &g_Level.Items[itemNumber];
+//		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
+//			Lara.target = &g_Level.Items[itemNumber];
+		// this is crashing and it's not really doing anything..
 
 		if (firing)
 		{
