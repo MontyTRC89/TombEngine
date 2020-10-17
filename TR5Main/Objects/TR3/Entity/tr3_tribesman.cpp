@@ -147,11 +147,11 @@ void TribemanAxeControl(short itemNum)
 		case 2:
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(9);
-			tilt = angle >> 3;
+			tilt = angle / 8;
 
 			if (creature->mood == BORED_MOOD)
 			{
-				creature->maximumTurn >>= 2;
+				creature->maximumTurn /= 4;
 				if (GetRandomControl() < 0x100)
 				{
 					if (GetRandomControl() < 0x2000)
@@ -176,11 +176,11 @@ void TribemanAxeControl(short itemNum)
 		case 3:
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(6);
-			tilt = angle >> 2;
+			tilt = angle / 4;
 
 			if (creature->mood == BORED_MOOD)
 			{
-				creature->maximumTurn >>= 2;
+				creature->maximumTurn /= 4;
 				if (GetRandomControl() < 0x100)
 				{
 					if (GetRandomControl() < 0x4000)
@@ -284,7 +284,7 @@ static void TribesmanShotDart(ITEM_INFO* item)
 		PHD_VECTOR pos2;
 		pos2.x = tribesmanDartsBite2.x;
 		pos2.y = tribesmanDartsBite2.y;
-		pos2.z = tribesmanDartsBite2.z << 1;
+		pos2.z = tribesmanDartsBite2.z * 2;
 		GetJointAbsPosition(item, &pos2, tribesmanDartsBite2.meshNum);
 
 		short angles[2];
@@ -360,8 +360,8 @@ void TribemanDartsControl(short itemNum)
 		angle = CreatureTurn(item, creature->mood == BORED_MOOD ? ANGLE(2) : creature->maximumTurn);
 		if (info.ahead)
 		{
-			headY = info.angle >> 1;
-			torsoY = info.angle >> 1;
+			headY = info.angle / 2;
+			torsoY = info.angle / 2;
 		}
 
 		if (item->hitStatus || 
@@ -375,7 +375,7 @@ void TribemanDartsControl(short itemNum)
 			if (info.ahead)
 			{
 				torsoY = info.angle;
-				torsoX = info.xAngle >> 1;
+				torsoX = info.xAngle / 2;
 			}
 			creature->flags &= 0x0FFF;
 			creature->maximumTurn = ANGLE(2);
@@ -472,7 +472,7 @@ void TribemanDartsControl(short itemNum)
 		case 3:
 			creature->flags &= 0x0FFF;
 			creature->maximumTurn = ANGLE(6);
-			tilt = angle >> 2;
+			tilt = angle / 4;
 
 			if (info.bite && info.distance < SQUARE(512))
 				item->goalAnimState = 11;

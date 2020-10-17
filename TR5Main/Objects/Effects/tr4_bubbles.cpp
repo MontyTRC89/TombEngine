@@ -242,8 +242,8 @@ void BubblesControl(short fxNum)
 		if (abs(dx) > ANGLE(180.0f))
 			dx = -dx;
 
-		dy >>= 3;
-		dx >>= 3;
+		dy /= 8;
+		dx /= 8;
 
 		if (dy < -maxRotation)
 			dy = -maxRotation;
@@ -291,7 +291,7 @@ void BubblesControl(short fxNum)
 		
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
+			TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 		}
 		else
@@ -400,7 +400,7 @@ void BubblesControl(short fxNum)
 		}
 		else
 		{
-			TriggerShockwave( &fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
+			TriggerShockwave( &fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 		}
 	}
 	else

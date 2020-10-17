@@ -70,7 +70,7 @@ void SpearGuardianControl(short itemNum)
 	if (item->hitPoints <= 0)
 	{
 		item->currentAnimState = 17;
-		item->meshBits >>= 1;
+		item->meshBits /= 2;
 
 		if (!item->meshBits)
 		{

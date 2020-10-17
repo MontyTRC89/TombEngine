@@ -76,7 +76,7 @@ static void TriggerTonyEffect(const TONY_FLAME flame)
 		switch (flame.type)
 		{
 		case T_ZAPPDEBRIS:
-			fx->flag2 <<= 1;
+			fx->flag2 *= 2;
 			break;
 		case T_ZAPP:
 			fx->flag2 = 0;
@@ -142,7 +142,7 @@ static void TriggerTonyFlame(short itemNum, int hand)
 	unsigned char size = (GetRandomControl() & 31) + 32;
 	sptr->size = size;
 	sptr->sSize = size;
-	sptr->dSize = size >> 2;
+	sptr->dSize = size / 4;
 }
 
 static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
@@ -197,13 +197,13 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	unsigned char size = (GetRandomControl() & 31) + 64;
 	sptr->size = size;
 	sptr->sSize = size;
-	sptr->dSize = size >> 2;
+	sptr->dSize = size / 4;
 
 	if (type == T_ROCKZAPPL || type == T_ROCKZAPPR)
 	{
 		sptr->gravity = (GetRandomControl() & 31) + 16;
 		sptr->maxYvel = (GetRandomControl() & 15) + 48;
-		sptr->yVel = -sptr->yVel << 4;
+		sptr->yVel = -sptr->yVel * 16;
 		sptr->scalar = 2;
 	}
 	else if (type == T_ROCKZAPPDEBRIS || type == T_ZAPPDEBRIS || type == T_DROPPERDEBRIS)
@@ -215,7 +215,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	{
 		sptr->gravity = -(GetRandomControl() & 31) - 16;
 		sptr->maxYvel = -(GetRandomControl() & 31) - 64;
-		sptr->yVel = sptr->yVel << 4;
+		sptr->yVel = sptr->yVel * 16;
 		sptr->scalar = 2;
 	}
 	else if (type == T_ZAPP)
@@ -286,7 +286,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lar
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = (GetRandomControl() & 3) - 2;
 		flame.speed = zdspeed + (GetRandomControl() & 3);
-		flame.yRot = GetRandomControl() << 1;
+		flame.yRot = GetRandomControl() * 2;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPDEBRIS;
 		break;
@@ -309,7 +309,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lar
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = -(GetRandomControl() & 31) - 32;
 		flame.speed = (GetRandomControl() & 31) + 32;
-		flame.yRot = GetRandomControl() << 1;
+		flame.yRot = GetRandomControl() * 2;
 		flame.room_number = roomNumber;
 		flame.type = T_DROPPERDEBRIS;
 		break;
@@ -336,7 +336,7 @@ void ControlTonyFireBall(short fxNumber)
 
 	if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 	{
-		fx->fallspeed += (fx->fallspeed >> 3) + 1;
+		fx->fallspeed += (fx->fallspeed / 8) + 1;
 		if (fx->fallspeed < -4096)
 			fx->fallspeed = -4096;
 		fx->pos.yPos += fx->fallspeed;
@@ -360,11 +360,11 @@ void ControlTonyFireBall(short fxNumber)
 		fx->fallspeed += fx->flag2;
 		if (fx->fallspeed > 512)
 			fx->fallspeed = 512;
-		fx->pos.yPos += fx->fallspeed >> 1;
+		fx->pos.yPos += fx->fallspeed / 2;
 		fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
 		fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
 		if (Wibble & 4)
-			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((old_x - fx->pos.xPos) << 3), (short)((old_y - fx->pos.yPos) << 3), (short)((old_z - fx->pos.zPos) << 3));
+			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((old_x - fx->pos.xPos) * 8), (short)((old_y - fx->pos.yPos) * 8), (short)((old_z - fx->pos.zPos) * 4));
 	}
 
 	room_number = fx->roomNumber;
@@ -397,7 +397,7 @@ void ControlTonyFireBall(short fxNumber)
 				type = T_ROCKZAPPDEBRIS;
 
 			for (x = 0; x < j; x++)
-				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.yRot, 32 + (x << 2));
+				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.yRot, 32 + (x * 4));
 
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
@@ -438,8 +438,8 @@ void ControlTonyFireBall(short fxNumber)
 	if (radtab[fx->flag1])
 	{
 		rnd = GetRandomControl();
-		BYTE r3 = 31 - ((rnd >> 4) & 3);
-		BYTE g3 = 24 - ((rnd >> 6) & 3);
+		BYTE r3 = 31 - ((rnd / 16) & 3);
+		BYTE g3 = 24 - ((rnd / 64) & 3);
 		BYTE b3 = rnd & 7;
 		TriggerDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, radtab[fx->flag1], r3, g3, b3);
 	}
@@ -639,7 +639,7 @@ void TonyControl(short itemNum)
 			case TONYBOSS_ZAPP:	// Shooting at ceiling.
 				torso_y = info.angle;
 				torso_x = info.xAngle;
-				tonyboss->maximumTurn = TONYBOSS_TURN >> 1;
+				tonyboss->maximumTurn = TONYBOSS_TURN / 2;
 
 				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 28)
 					TriggerFireBall(item, T_ZAPP, NULL, item->roomNumber, item->pos.yRot, 0);
@@ -673,12 +673,12 @@ void TonyControl(short itemNum)
 		}
 
 		rnd = GetRandomControl();
-		r = 31 - ((rnd >> 4) & 3);
-		g = 24 - ((rnd >> 6) & 3);
+		r = 31 - ((rnd / 16) & 3);
+		g = 24 - ((rnd / 64) & 3);
 		b = rnd & 7;
-		r = (r * bright) >> 4;
-		g = (g * bright) >> 4;
-		b = (b * bright) >> 4;
+		r = (r * bright) / 16;
+		g = (g * bright) / 16;
+		b = (b * bright) / 16;
 
 		pos1.x = pos1.y = pos1.z = 0;
 		GetJointAbsPosition(item, &pos1, 10);

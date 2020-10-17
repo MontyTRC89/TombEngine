@@ -51,9 +51,9 @@ void RaptorControl(short itemNum)
 
 				target = &g_Level.Items[currentCreature->itemNum];
 
-				int x = (target->pos.xPos - item->pos.xPos) >> 6;
-				int y = (target->pos.yPos - item->pos.yPos) >> 6;
-				int z = (target->pos.zPos - item->pos.zPos) >> 6;
+				int x = (target->pos.xPos - item->pos.xPos) / 64;
+				int y = (target->pos.yPos - item->pos.yPos) / 64;
+				int z = (target->pos.zPos - item->pos.zPos) / 64;
 				int distance = x * x + y * y + z * z;
 				if (distance < minDistance && item->hitPoints > 0)
 				{
@@ -67,9 +67,9 @@ void RaptorControl(short itemNum)
 			if (nearestItem != NULL && (nearestItem->objectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < SQUARE(2048))))
 				creature->enemy = nearestItem;
 
-			int x = (LaraItem->pos.xPos - item->pos.xPos) >> 6;
-			int y = (LaraItem->pos.yPos - item->pos.yPos) >> 6;
-			int z = (LaraItem->pos.zPos - item->pos.zPos) >> 6;
+			int x = (LaraItem->pos.xPos - item->pos.xPos) / 64;
+			int y = (LaraItem->pos.yPos - item->pos.yPos) / 64;
+			int z = (LaraItem->pos.zPos - item->pos.zPos) / 64;
 			int distance = x * x + y * y + z * z;
 			if (distance <= minDistance)
 				creature->enemy = LaraItem;
@@ -88,7 +88,7 @@ void RaptorControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 
 		if (creature->mood == BORED_MOOD)
-			creature->maximumTurn >>= 1;
+			creature->maximumTurn /= 2;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 		neck = -(angle * 6);
@@ -189,7 +189,7 @@ void RaptorControl(short itemNum)
 						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
 						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->enemy->hitPoints -= 100 >> 2;
+						creature->enemy->hitPoints -= 25;
 						creature->enemy->hitStatus = 1;
 						if (creature->enemy->hitPoints <= 0)
 							creature->flags |= 2;
@@ -227,7 +227,7 @@ void RaptorControl(short itemNum)
 						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
 						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->enemy->hitPoints -= 100 >> 2;
+						creature->enemy->hitPoints -= 25;
 						creature->enemy->hitStatus = 1;
 						if (creature->enemy->hitPoints <= 0)
 							creature->flags |= 2;
@@ -265,7 +265,7 @@ void RaptorControl(short itemNum)
 						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
 						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->enemy->hitPoints -= 100 >> 2;
+						creature->enemy->hitPoints -= 25;
 						creature->enemy->hitStatus = 1;
 						if (creature->enemy->hitPoints <= 0)
 							creature->flags |= 2;

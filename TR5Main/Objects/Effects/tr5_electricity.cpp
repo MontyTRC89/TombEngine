@@ -92,7 +92,7 @@ void TriggerLaraElectricitySparks(int flame)
 	spark->sB = color;
 	spark->sG = color;
 	spark->dB = color;
-	spark->dG = color >> 1;
+	spark->dG = color / 2;
 	spark->transType = COLADD;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
@@ -219,7 +219,7 @@ void ElectricityWiresControl(short itemNumber)
 
 		if (GetRandomControl() & 1 && !flag)
 		{
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 0, ((GetRandomControl() & 0x3F) + 128) >> 1, (GetRandomControl() & 0x3F) + 128);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 0, ((GetRandomControl() & 0x3F) + 128) / 2, (GetRandomControl() & 0x3F) + 128);
 		}
 
 		roomNumber = item->roomNumber;
