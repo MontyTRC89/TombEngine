@@ -66,7 +66,7 @@ void ApeControl(short itemNum)
 			else if (!(creature->flags & 1) &&
 				info.zoneNumber == info.enemyZone && info.ahead)
 			{
-				random = (short)(GetRandomControl() >> 5);
+				random = (short)(GetRandomControl() / 32);
 				if (random < 0xA0)
 					item->goalAnimState = 10;
 				else if (random < 0x140)

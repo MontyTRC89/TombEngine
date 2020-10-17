@@ -307,7 +307,7 @@ void DragonControl(short backNum)
 			if (dragon->flags == DRAGON_LIVE_TIME)
 				item->goalAnimState = DRAGON_STOP;
 			if (dragon->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE) // too late !
-				item->hitPoints = Objects[ID_DRAGON_FRONT].hitPoints >> 1; // half
+				item->hitPoints = Objects[ID_DRAGON_FRONT].hitPoints / 2; // half
 		}
 		else
 		{
