@@ -852,7 +852,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		data++;
 	}
 
-	short triggerType = (*(data++) / 256) & 0x3F;
+	short triggerType = (*(data++) >> 8) & 0x3F;
 	short flags = *(data++);
 	short timer = flags & 0xFF;
 
@@ -999,7 +999,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		trigger = *(data++);
 		value = trigger & VALUE_BITS;
-		targetType = (trigger / 1024) & 0xF;
+		targetType = (trigger >> 10) & 0xF;
 
 		switch (targetType)
 		{
@@ -1149,7 +1149,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 				if (trigger & 0x100)
 					FixedCameras[Camera.number].flags |= 0x100;
 
-				Camera.speed = ((trigger & CODE_BITS) / 64) + 1;
+				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
 				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 			}
 			break;
