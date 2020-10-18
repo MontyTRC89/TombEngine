@@ -70,7 +70,7 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 		}
 
 		spark->scalar = 3;
-		spark->dSize = v * ((GetRandomControl() & 7) + 60) >> 8;
+		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
 		spark->sSize = spark->dSize / 8;
 		spark->size = spark->dSize / 8;
 	}
@@ -146,7 +146,7 @@ void SentryGunControl(short itemNum)
 							{
 								// Throw fire
 								SentryGunThrowFire(item);
-								c = phd_sin((GlobalCounter & 0x1F) << 11) * 4096;
+								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
 							}
 							else
 							{

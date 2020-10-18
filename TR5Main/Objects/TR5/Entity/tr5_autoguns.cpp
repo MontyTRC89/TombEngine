@@ -43,8 +43,8 @@ static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 	spark->gravity = -4 - (GetRandomControl() & 3);
 	spark->mirror = 0;
 	spark->dSize = (GetRandomControl() & 0xF) + 24;
-	spark->sSize = spark->dSize >> 2;
-	spark->size = spark->dSize >> 2;
+	spark->sSize = spark->dSize / 4;
+	spark->size = spark->dSize / 4;
 }
 
 void AutoGunsControl(short itemNumber)
@@ -166,7 +166,7 @@ void AutoGunsControl(short itemNumber)
 			}
 
 			if (item->itemFlags[2])
-				TriggerAutoGunSmoke((PHD_VECTOR*)&pos1, item->itemFlags[2] >> 4);
+				TriggerAutoGunSmoke((PHD_VECTOR*)&pos1, item->itemFlags[2] / 16);
 		}
 		else
 		{

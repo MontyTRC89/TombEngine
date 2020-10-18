@@ -30,7 +30,7 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->sB = (r & 0xF) + 16;
 		spark->sR = 0;
 		spark->dG = 96;
-		spark->dB = ((r >> 4) & 0x1F) + 48;
+		spark->dB = ((r / 16) & 0x1F) + 48;
 		spark->dR = 0;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 4;
@@ -43,7 +43,7 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->friction = 34;
 		spark->yVel = (r & 0xFFF) - 2048;
 		spark->flags = SP_NONE;
-		spark->gravity = (r >> 7) & 0x1F;
+		spark->gravity = (r / 128) & 0x1F;
 		spark->maxYvel = 0;
 		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) * 4096;
 		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) * 4096;
@@ -63,7 +63,7 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->dR = 0;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 4;
-		spark->dB = ((r >> 4) & 0x1F) + 48;
+		spark->dB = ((r / 16) & 0x1F) + 48;
 		spark->life = 9;
 		spark->sLife = 9;
 		spark->transType = COLADD;
@@ -71,8 +71,8 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		spark->y = pos->y;
 		spark->z = pos->z;
 		spark->yVel = (r & 0xFFF) - 2048;
-		spark->gravity = (r >> 7) & 0x1F;
-		spark->rotAng = r >> 3;
+		spark->gravity = (r / 128) & 0x1F;
+		spark->rotAng = r / 8;
 		if (r & 1)
 		{
 			spark->rotAdd = -16 - (r & 0xF);
@@ -83,7 +83,7 @@ static void HorsemanSparks(PHD_VECTOR* pos, int param1, int num)
 		}
 		spark->scalar = 3;
 		spark->friction = 34;
-		spark->sSize = spark->size = ((r >> 5) & 7) + 4;
+		spark->sSize = spark->size = ((r / 32) & 7) + 4;
 		spark->dSize = spark->sSize / 2;
 		spark->flags = 26;
 		spark->maxYvel = 0;

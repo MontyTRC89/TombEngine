@@ -179,7 +179,7 @@ void UpdateRats()
 							rat->pos.yRot += 512;
 						else
 							rat->pos.yRot -= 512;
-						rat->speed = 48 - (abs(angle) >> 10);
+						rat->speed = 48 - (abs(angle) / 1024);
 					}
 					else
 					{

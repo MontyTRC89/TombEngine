@@ -397,6 +397,6 @@ void EnemyJeepControl(short itemNumber)
 			item->gravityStatus = false;
 		}
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] << 10) + 16777220);
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] * 1024) + 16777220);
 	}
 }

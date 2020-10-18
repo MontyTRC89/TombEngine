@@ -24,7 +24,7 @@ void SmashObject(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-	int sector = ((item->pos.zPos - r->z) >> 10) + r->xSize * ((item->pos.xPos - r->x) >> 10);
+	int sector = ((item->pos.zPos - r->z) / 1024) + r->xSize * ((item->pos.xPos - r->x) / 1024);
 
 	BOX_INFO* box = &g_Level.Boxes[r->floor[sector].box];
 	if (box->flags & 0x8000)
@@ -46,5 +46,5 @@ void SmashObject(short itemNumber)
 
 void SmashObjectControl(short itemNumber)
 {
-	SmashObject(itemNumber << 16);
+	SmashObject(itemNumber * 65536);
 }

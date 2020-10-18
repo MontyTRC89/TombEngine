@@ -78,8 +78,8 @@ static void ImpThrowStones(ITEM_INFO* item)
 	if (distance < 8)
 		distance = 8;
 
-	angles[0] += GetRandomControl() % (distance >> 2) - (distance >> 3);
-	angles[1] += GetRandomControl() % (distance >> 1) - (distance >> 2);
+	angles[0] += GetRandomControl() % (distance / 4) - (distance / 8);
+	angles[1] += GetRandomControl() % (distance / 2) - (distance / 4);
 	
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
@@ -89,7 +89,7 @@ static void ImpThrowStones(ITEM_INFO* item)
 		fx->pos.yPos = pos1.y;
 		fx->pos.zPos = pos1.z;
 		fx->roomNumber = item->roomNumber;
-		fx->pos.xRot = angles[1] + distance >> 1;
+		fx->pos.xRot = (angles[1] + distance) / 2;
 		fx->pos.yRot = angles[0];
 		fx->pos.zRot = 0;
 		fx->speed = 4 * sqrt(distance);
@@ -166,10 +166,10 @@ void ImpControl(short itemNumber)
 			CreatureMood(item, &info, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
-			joint1 = info.angle >> 1;
-			joint0 = info.xAngle >> 1;
-			joint3 = info.angle >> 1;
-			joint2 = info.xAngle >> 1;
+			joint1 = info.angle / 2;
+			joint0 = info.xAngle / 2;
+			joint3 = info.angle / 2;
+			joint2 = info.xAngle / 2;
 
 			if (Wibble & 0x10)
 				item->swapMeshFlags = 1024;

@@ -40,8 +40,8 @@ void ElementPuzzleControl(short itemNumber)
                 on = 1;
             if (on <= 255)
             {
-                r = r * on >> 8;
-                g = g * on >> 8;
+                r = (r * on) / 256;
+				g = (g * on) / 256;
             }
         }
         else

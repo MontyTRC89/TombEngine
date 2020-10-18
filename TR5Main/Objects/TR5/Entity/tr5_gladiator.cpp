@@ -101,8 +101,8 @@ void ControlGladiator(short itemNumber)
 			
 			if (info.ahead)
 			{
-				joint0 = info.angle >> 1;
-				joint2 = info.angle >> 1;
+				joint0 = info.angle / 2;
+				joint2 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
 

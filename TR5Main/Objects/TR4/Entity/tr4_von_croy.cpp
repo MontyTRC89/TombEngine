@@ -252,9 +252,9 @@ void VonCroyControl(short itemNumber)
 		short rot2 = 0;
 
 		if (dx <= dz)
-			laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
+			laraInfo.xAngle = phd_atan(dz + (dx / 2), dy);
 		else
-			laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
+			laraInfo.xAngle = phd_atan(dx + (dz / 2), dy);
 	}
 
 	if (abs(laraInfo.angle) < 6144 && laraInfo.distance < SQUARE(1024))
@@ -663,8 +663,8 @@ void VonCroyControl(short itemNumber)
 	case STATE_VON_CROY_KNIFE_ATTACK_HIGH:
 		if (info.ahead) 
 		{
-			joint2 = info.angle >> 1;
-			joint1 = info.xAngle >> 1;
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle / 2;
 			joint0 = joint2;
 		}
 
@@ -733,8 +733,8 @@ void VonCroyControl(short itemNumber)
 	case STATE_VON_CROY_KNIFE_ATTACK_LOW:
 		if (info.ahead)
 		{
-			joint2 = info.angle >> 1;
-			joint1 = info.xAngle >> 1;
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle / 2;
 			joint0 = joint2;
 		}
 
@@ -785,13 +785,13 @@ void VonCroyControl(short itemNumber)
 	case 32:
 		if (info.ahead) 
 		{
-			joint2 = info.angle >> 1;
+			joint2 = info.angle / 2;
 			joint1 = info.xAngle;
 			joint0 = joint2;
 		}
 		
 		creature->maximumTurn = 0;
-		ClampRotation(&item->pos, info.angle >> 1, ANGLE(6));
+		ClampRotation(&item->pos, info.angle / 2, ANGLE(6));
 
 		if (item->animNumber == Objects[item->objectNumber].animIndex + 47) 
 		{

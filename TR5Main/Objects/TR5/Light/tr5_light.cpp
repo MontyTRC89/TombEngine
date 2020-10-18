@@ -26,9 +26,9 @@ void PulseLightControl(short itemNumber)
 			item->pos.yPos,
 			item->pos.zPos,
 			24,
-			pulse * 8 * (item->triggerFlags & 0x1F) >> 9,
-			pulse * ((item->triggerFlags >> 2) & 0xF8) >> 9,
-			pulse * ((item->triggerFlags >> 7) & 0xF8) >> 9);
+			(pulse * 8 * (item->triggerFlags & 0x1F)) / 512,
+			(pulse * ((item->triggerFlags / 4) & 0xF8)) / 512,
+			(pulse * ((item->triggerFlags / 128) & 0xF8)) / 512);
 	}
 }
 
@@ -57,15 +57,15 @@ void StrobeLightControl(short itemNumber)
 		item->pos.yRot += ANGLE(16.0f);
 
 		byte r = 8 * (item->triggerFlags & 0x1F);
-		byte g = (item->triggerFlags >> 2) & 0xF8;
-		byte b = (item->triggerFlags >> 7) & 0xF8;
+		byte g = (item->triggerFlags / 4) & 0xF8;
+		byte b = (item->triggerFlags / 128) & 0xF8;
 
 		TriggerAlertLight(
 			item->pos.xPos,
 			item->pos.yPos - 512,
 			item->pos.zPos,
 			r, g, b,
-			((item->pos.yRot + 22528) >> 4) & 0xFFF,
+			((item->pos.yRot + 22528) / 16) & 0xFFF,
 			item->roomNumber,
 			12);
 
@@ -90,8 +90,8 @@ void ColorLightControl(short itemNumber)
 			item->pos.zPos,
 			24,
 			8 * (item->triggerFlags & 0x1F),
-			(item->triggerFlags >> 2) & 0xF8,
-			(item->triggerFlags >> 7) & 0xF8);
+			(item->triggerFlags / 4) & 0xF8,
+			(item->triggerFlags / 128) & 0xF8);
 	}
 }
 
@@ -177,9 +177,9 @@ void ElectricalLightControl(short itemNumber)
 		item->pos.yPos,
 		item->pos.zPos,
 		24,
-		intensity * 8 * (item->triggerFlags & 0x1F) >> 8,
-		intensity * ((item->triggerFlags >> 2) & 0xF8) >> 8,
-		intensity * ((item->triggerFlags >> 7) & 0xF8) >> 8);
+		(intensity * 8 * (item->triggerFlags & 0x1F)) / 256,
+		(intensity * ((item->triggerFlags / 4) & 0xF8)) / 256,
+		(intensity * ((item->triggerFlags / 128) & 0xF8)) / 256);
 }
 
 void BlinkingLightControl(short itemNumber)
@@ -208,8 +208,8 @@ void BlinkingLightControl(short itemNumber)
 				pos.z,
 				16,
 				8 * (item->triggerFlags & 0x1F),
-				(item->triggerFlags >> 2) & 0xF8,
-				(item->triggerFlags >> 7) & 0xF8);
+				(item->triggerFlags / 4) & 0xF8,
+				(item->triggerFlags / 128) & 0xF8);
 
 			item->meshBits = 2;
 
