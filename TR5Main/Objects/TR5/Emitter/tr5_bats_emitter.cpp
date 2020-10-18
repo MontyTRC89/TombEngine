@@ -182,10 +182,10 @@ void UpdateBats()
 
 		if (bat->counter > 90)
 		{
-			short speed = bat->speed << 7;
+			short speed = bat->speed * 128;
 
-			short xAngle = abs(angles[1] - bat->pos.xRot) >> 3;
-			short yAngle = abs(angles[0] - bat->pos.yRot) >> 3;
+			short xAngle = abs(angles[1] - bat->pos.xRot) / 8;
+			short yAngle = abs(angles[0] - bat->pos.yRot) / 8;
 
 			if (xAngle < -speed)
 				xAngle = -speed;

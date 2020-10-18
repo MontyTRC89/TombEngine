@@ -68,7 +68,7 @@ static void TriggerAhmetDeathEffect(ITEM_INFO* item)
         // cant be FALSE here because else it will be local space not world
         // because of that it cant be GetJointAbsPosition() !
         meshCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-        sphere = &CreatureSpheres[(Wibble >> 3) & 1];
+        sphere = &CreatureSpheres[(Wibble / 8) & 1];
 
         for (int i = meshCount; i > 0; i--, sphere += 2)
             TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
@@ -369,9 +369,9 @@ bool RespawnAhmet(short itemNumber)
     FlashFadeB = 0;
     FlashFader = 32;
 
-    item->pos.xPos = (item->itemFlags[0] << 10) + 512;
-    item->pos.yPos = (item->itemFlags[1] << 8);
-    item->pos.zPos = (item->itemFlags[2] << 10) + 512;
+    item->pos.xPos = (item->itemFlags[0] * 1024) + 512;
+    item->pos.yPos = (item->itemFlags[1] * 256);
+    item->pos.zPos = (item->itemFlags[2] * 1024) + 512;
 
     IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 

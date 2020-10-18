@@ -175,7 +175,7 @@ void UpdateSpiders()
 							spider->pos.yRot += 512;
 						else
 							spider->pos.yRot -= 512;
-						spider->speed = 48 - (abs(angle) >> 10);
+						spider->speed = 48 - (abs(angle) / 1024);
 					}
 					else
 					{

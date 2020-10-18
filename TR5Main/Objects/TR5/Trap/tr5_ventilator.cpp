@@ -54,10 +54,10 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				spark->sR = 0;
 				spark->sG = 0;
 				spark->sB = 0;
-				spark->dR = spark->dG = 48 * speed >> 7;
+				spark->dR = spark->dG = (48 * speed) / 128;
 				spark->colFadeSpeed = 4;
 				spark->fadeToBlack = 8;
-				spark->dB = speed * ((GetRandomControl() & 8) + 48) >> 7;
+				spark->dB = (speed * ((GetRandomControl() & 8) + 48)) / 128;
 				spark->transType = COLADD;
 				spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 
@@ -114,9 +114,9 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				}
 
 				spark->friction = 85;
-				spark->xVel = speed * spark->xVel >> 7;
-				spark->yVel = speed * spark->yVel >> 7;
-				spark->zVel = speed * spark->zVel >> 7;
+				spark->xVel = (speed * spark->xVel) / 128;
+				spark->yVel = (speed * spark->yVel) / 128;
+				spark->zVel = (speed * spark->zVel) / 128;
 				spark->maxYvel = 0;
 				spark->gravity = 0;
 				spark->flags = SP_NONE;

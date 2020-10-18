@@ -65,7 +65,7 @@ static void TriggerLaserHeadSparks(PHD_VECTOR* pos, int count, byte r, byte g, b
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
-			spark->gravity = (GetRandomControl() >> 7) & 0x1F;
+			spark->gravity = (GetRandomControl() / 128) & 0x1F;
 			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
@@ -84,8 +84,8 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 	if (item->itemFlags[3] <= 32)
 	{
-		g = item->itemFlags[3] * g >> 5;
-		b = item->itemFlags[3] * b >> 5;
+		g = (item->itemFlags[3] * g) / 32;
+		b = (item->itemFlags[3] * b) / 32;
 	}
 	else
 	{
@@ -331,7 +331,7 @@ void LaserHeadControl(short itemNumber)
 
 					if (item->itemFlags[3] <= 0 || condition)
 					{
-						short xRot = (GetRandomControl() >> 2) - 4096;
+						short xRot = (GetRandomControl() / 4) - 4096;
 						short yRot;
 						if (condition)
 							yRot = item->pos.yRot + (GetRandomControl() & 0x3FFF) + ANGLE(135);
@@ -458,7 +458,7 @@ void LaserHeadControl(short itemNumber)
 							&& arc
 							&& arc->life < 16)
 						{
-							g = b = arc->life * g >> 4;
+							g = b = (arc->life * g) / 16;
 						}
 
 						for (int i = 0, j = 0; i < 5; i += 4, j++)
@@ -546,9 +546,9 @@ void LaserHeadControl(short itemNumber)
 											dest.z = src.z + dl * (dest.z - src.z) / 8192;
 										}
 
-										int dx = (dest.x - src.x) >> 5;
-										int dy = (dest.y - src.y) >> 5;
-										int dz = (dest.z - src.z) >> 5;
+										int dx = (dest.x - src.x) / 32;
+										int dy = (dest.y - src.y) / 32;
+										int dz = (dest.z - src.z) / 32;
 
 										int adx = currentArc->pos4.x - src.z;
 										int ady = currentArc->pos4.y - src.y;

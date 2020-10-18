@@ -31,8 +31,8 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 		fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
 		fx->roomNumber = item->roomNumber;
 		fx->pos.yRot = 2 * GetRandomControl();
-		fx->speed = GetRandomControl() >> 11;
-		fx->fallspeed = -(GetRandomControl() >> 10);
+		fx->speed = GetRandomControl() / 2048;
+		fx->fallspeed = -(GetRandomControl() / 1024);
 		fx->frameNumber = Objects[103].meshIndex;
 		fx->objectNumber = ID_BODY_PART;
 		fx->shade = 0x4210;

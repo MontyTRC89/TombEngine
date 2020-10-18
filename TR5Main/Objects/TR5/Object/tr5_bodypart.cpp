@@ -48,7 +48,7 @@ void ControlBodyPart(short fxNumber)
 		{
 			fx->pos.yPos = ceiling;
 			fx->fallspeed = -fx->fallspeed;
-			fx->speed -= (fx->speed >> 3);
+			fx->speed -= (fx->speed / 8);
 		}
 
 		int height = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
@@ -76,7 +76,7 @@ void ControlBodyPart(short fxNumber)
 				if (fx->fallspeed <= 32)
 					fx->fallspeed = 0;
 				else
-					fx->fallspeed = -fx->fallspeed >> 2;
+					fx->fallspeed = -fx->fallspeed / 4;
 			}
 			else
 			{
@@ -85,7 +85,7 @@ void ControlBodyPart(short fxNumber)
 				fx->pos.zPos = z;
 			}
 
-			fx->speed -= (fx->speed >> 2);
+			fx->speed -= (fx->speed / 4);
 			if (abs(fx->speed) < 4)
 				fx->speed = 0;
 			fx->pos.yPos = y;

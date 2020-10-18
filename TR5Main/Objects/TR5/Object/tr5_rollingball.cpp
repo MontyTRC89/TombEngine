@@ -39,9 +39,9 @@ void RollingBallControl(short itemNumber)
 		return;
 
 	item->fallspeed += GRAVITY;
-	item->pos.xPos += item->itemFlags[0] >> 5;
+	item->pos.xPos += item->itemFlags[0] / 32;
 	item->pos.yPos += item->fallspeed;
-	item->pos.zPos += item->itemFlags[1] >> 5;
+	item->pos.zPos += item->itemFlags[1] / 32;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -58,7 +58,7 @@ void RollingBallControl(short itemNumber)
 				SQUARE(Camera.pos.z - item->pos.zPos));
 
 			if (distance < 16384)
-				Camera.bounce = -((16384 - distance) * abs(item->fallspeed) >> 14);
+				Camera.bounce = -(((16384 - distance) * abs(item->fallspeed)) / 16384);
 		}
 
 		if (item->pos.yPos - dh < 512)
@@ -69,11 +69,11 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->speed) <= 512 || GetRandomControl() & 0x1F)
 				item->fallspeed = 0;
 			else
-				item->fallspeed = -(short)(GetRandomControl() % (item->speed >> 3));
+				item->fallspeed = -(short)(GetRandomControl() % (item->speed / 8));
 		}
 		else
 		{
-			item->fallspeed = -(short)(item->fallspeed >> 2);
+			item->fallspeed = -(short)(item->fallspeed / 4);
 		}
 	}
 
@@ -126,7 +126,7 @@ void RollingBallControl(short itemNumber)
 				}
 				else
 				{
-					item->itemFlags[1] = -item->itemFlags[1] >> 1;
+					item->itemFlags[1] = -item->itemFlags[1] / 2;
 					item->pos.zPos = (item->pos.zPos & -512) + 512;
 				}
 			}
@@ -136,7 +136,7 @@ void RollingBallControl(short itemNumber)
 			}
 			else
 			{
-				item->itemFlags[1] += (y1a - dh) >> 1;
+				item->itemFlags[1] += (y1a - dh) / 2;
 			}
 		}
 
@@ -153,7 +153,7 @@ void RollingBallControl(short itemNumber)
 				}
 				else
 				{
-					item->itemFlags[1] = -item->itemFlags[1] >> 1;
+					item->itemFlags[1] = -item->itemFlags[1] / 2;
 					item->pos.zPos = (item->pos.zPos & -512) + 512;
 				}
 			}
@@ -163,7 +163,7 @@ void RollingBallControl(short itemNumber)
 			}
 			else
 			{
-				item->itemFlags[1] -= (y2a - dh) >> 1;
+				item->itemFlags[1] -= (y2a - dh) / 2;
 			}
 		}
 
@@ -172,7 +172,7 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->itemFlags[1]) <= 64)
 				item->itemFlags[1] = 0;
 			else
-				item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] >> 6);
+				item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] / 64);
 		}
 
 		int counterX = 0;
@@ -190,7 +190,7 @@ void RollingBallControl(short itemNumber)
 				}
 				else
 				{
-					item->itemFlags[0] = -item->itemFlags[0] >> 1;
+					item->itemFlags[0] = -item->itemFlags[0] / 2;
 					item->pos.xPos = (item->pos.xPos & -512) + 512;
 				}
 			}
@@ -200,7 +200,7 @@ void RollingBallControl(short itemNumber)
 			}
 			else
 			{
-				item->itemFlags[0] -= (y4a - dh) >> 1;
+				item->itemFlags[0] -= (y4a - dh) / 2;
 			}
 		}
 
@@ -217,7 +217,7 @@ void RollingBallControl(short itemNumber)
 				}
 				else
 				{
-					item->itemFlags[0] = -item->itemFlags[0] >> 1;
+					item->itemFlags[0] = -item->itemFlags[0] / 2;
 					item->pos.xPos = (item->pos.xPos & -512) + 512;
 				}
 			}
@@ -227,7 +227,7 @@ void RollingBallControl(short itemNumber)
 			}
 			else
 			{
-				item->itemFlags[0] += (y3a - dh) >> 1;
+				item->itemFlags[0] += (y3a - dh) / 2;
 			}
 		}
 
@@ -236,7 +236,7 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->itemFlags[0]) <= 64)
 				item->itemFlags[0] = 0;
 			else
-				item->itemFlags[0] = item->itemFlags[0] - (item->itemFlags[0] >> 6);
+				item->itemFlags[0] = item->itemFlags[0] - (item->itemFlags[0] / 64);
 		}
 	}
 
@@ -287,7 +287,7 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) >> 1;
+	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) / 2;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
