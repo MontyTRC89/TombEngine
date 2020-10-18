@@ -64,12 +64,12 @@ void MissileControl(short itemNumber)
 			int dy = angles[0] - fx->pos.yRot;
 			if (abs(dy) > 0x8000)
 				dy = -dy;
-			dy >>= 3;
+			dy /= 8;
 
 			int dx = angles[1] - fx->pos.xRot;
 			if (abs(dx) > 0x8000)
 				dx = -dx;
-			dx >>= 3;
+			dx /= 8;
 
 			if (dy <= dh)
 			{

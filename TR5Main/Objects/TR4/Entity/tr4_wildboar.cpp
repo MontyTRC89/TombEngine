@@ -89,8 +89,8 @@ void WildBoarControl(short itemNumber)
 
 		if (info.ahead)
 		{
-			joint1 = info.angle >> 1;
-			joint3 = info.angle >> 1;
+			joint1 = info.angle / 2;
+			joint3 = info.angle / 2;
 		}
 
 		switch (item->currentAnimState)
@@ -103,7 +103,7 @@ void WildBoarControl(short itemNumber)
 			}
 			else if (GetRandomControl() & 0x7F)
 			{
-				joint1 = AIGuard(creature) >> 1;
+				joint1 = AIGuard(creature) / 2;
 				joint3 = joint1;
 			}
 			else

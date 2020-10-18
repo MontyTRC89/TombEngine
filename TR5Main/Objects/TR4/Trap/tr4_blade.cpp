@@ -38,7 +38,7 @@ void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
 						l->pos.yPos - (GetRandomControl() & 0x1FF) - 256,
 						(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
-						(GetRandomControl() & 3) + (item->itemFlags[3] >> 5) + 2,
+						(GetRandomControl() & 3) + (item->itemFlags[3] / 32) + 2,
 						2 * GetRandomControl(),
 						l->roomNumber);
 				}

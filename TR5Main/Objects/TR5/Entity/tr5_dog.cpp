@@ -84,7 +84,7 @@ void Tr5DogControl(short itemNumber)
 		CreatureMood(item, &info, VIOLENT);
 
 		if (!creature->mood)
-			creature->maximumTurn >>= 1;
+			creature->maximumTurn /= 2;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 		joint0 = 4 * angle;

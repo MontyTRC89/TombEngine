@@ -236,8 +236,8 @@ static void DemigodHammerAttack(int x, int y, int z, int something)
 			spark->gravity = -4 - (GetRandomControl() & 3);
 			spark->maxYvel = -4 - (GetRandomControl() & 3);
 			spark->dSize = ((GetRandomControl() & 0x3F) + 64);
-			spark->sSize = spark->dSize >> 3;
-			spark->size = spark->dSize >> 3;
+			spark->sSize = spark->dSize / 8;
+			spark->size = spark->dSize / 8;
 
 			angle += deltaAngle;
 		}
@@ -349,9 +349,9 @@ void DemigodControl(short itemNumber)
 			dz = abs(dz);
 
 			if (dx <= dz)
-				laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
+				laraInfo.xAngle = phd_atan(dz + (dx / 2), dy);
 			else
-				laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
+				laraInfo.xAngle = phd_atan(dx + (dz / 2), dy);
 		}
 
 		GetCreatureMood(item, &info, VIOLENT);
@@ -361,17 +361,17 @@ void DemigodControl(short itemNumber)
 
 		if (laraInfo.ahead)
 		{
-			joint0 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
 			joint1 = -laraInfo.xAngle;
-			joint2 = laraInfo.angle >> 1;
-			joint3 = laraInfo.angle >> 1;
+			joint2 = laraInfo.angle / 2;
+			joint3 = laraInfo.angle / 2;
 		}
 		else if (info.ahead)
 		{
-			joint0 = info.angle >> 1;
+			joint0 = info.angle / 2;
 			joint1 = -info.xAngle;
-			joint2 = info.angle >> 1;
-			joint3 = info.angle >> 1;
+			joint2 = info.angle / 2;
+			joint3 = info.angle / 2;
 		}
 
 		switch (item->currentAnimState)

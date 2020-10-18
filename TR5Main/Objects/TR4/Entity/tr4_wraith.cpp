@@ -64,7 +64,7 @@ void WraithControl(short itemNumber)
 		y = target->pos.yPos;
 		z = target->pos.zPos - item->pos.zPos;
 		distance = SQUARE(x) + SQUARE(z);
-		dy = abs((distance >> 13) - 512);
+		dy = abs((distance / 8192) - 512);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void WraithControl(short itemNumber)
 		z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
 
 		distance = SQUARE(x) + SQUARE(z);
-		dy = abs((distance >> 13) - 768);
+		dy = abs((distance / 8192) - 768);
 		y = room->y + ((room->minfloor - room->maxceiling) / 2);
 	}
 
@@ -327,13 +327,13 @@ void WraithControl(short itemNumber)
 	int j = 0;
 	for (int i = WRAITH_COUNT - 1; i > 0; i--)
 	{
-		creature[i - 1].xPos += (creature[i - 1].xRot >> 4);
-		creature[i - 1].yPos += (creature[i - 1].yRot >> 4);
-		creature[i - 1].zPos += (creature[i - 1].zRot >> 4);
+		creature[i - 1].xPos += (creature[i - 1].xRot / 16);
+		creature[i - 1].yPos += (creature[i - 1].yRot / 16);
+		creature[i - 1].zPos += (creature[i - 1].zRot / 16);
 
-		creature[i - 1].xRot -= (creature[i - 1].xRot >> 4);
-		creature[i - 1].yRot -= (creature[i - 1].yRot >> 4);
-		creature[i - 1].zRot -= (creature[i - 1].zRot >> 4);
+		creature[i - 1].xRot -= (creature[i - 1].xRot / 16);
+		creature[i - 1].yRot -= (creature[i - 1].yRot / 16);
+		creature[i - 1].zRot -= (creature[i - 1].zRot / 16);
 
 		creature[i].xPos = creature[i - 1].xPos;
 		creature[i].yPos = creature[i - 1].yPos;
@@ -552,7 +552,7 @@ void WraithWallsEffect(int x, int y, int z, short yrot, short objNumber)
 		short size = (GetRandomControl() & 0x1F) + 48;
 		spark->sSize = size;
 		spark->size = size;
-		spark->dSize = size >> 2;
+		spark->dSize = size / 4;
 	}
 }
 

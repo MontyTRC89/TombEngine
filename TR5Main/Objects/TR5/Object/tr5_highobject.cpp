@@ -23,7 +23,7 @@ void InitialiseHighObject1(short itemNumber)
 		{
 			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
-				item->itemFlags[3] |= (i << 8);
+				item->itemFlags[3] |= (i * 256);
 				currentItem->pos.yPos = item->pos.yPos - 512;
 				continue;
 			}
@@ -39,7 +39,7 @@ void InitialiseHighObject1(short itemNumber)
 		{
 			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
-				item->itemFlags[3] |= (i << 8);
+				item->itemFlags[3] |= (i * 256);
 				currentItem->pos.yPos = item->pos.yPos - 512;
 				continue;
 			}
@@ -102,18 +102,18 @@ void ControlHighObject1(short itemNumber)
 					if (item->itemFlags[1] <= 512)
 						flags = 31;
 					else
-						flags = (768 - item->itemFlags[1]) >> 3;
+						flags = (768 - item->itemFlags[1]) / 8;
 				}
 				else
 				{
-					flags = item->itemFlags[1] >> 3;
+					flags = item->itemFlags[1] / 8;
 				}
 
-				SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags << 8) | 8);
+				SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags * 256) | 8);
 
 				item->pos.yPos += 8;
 
-				ITEM_INFO* targetItem = &g_Level.Items[(item->itemFlags[3] >> 8) & 0xFF];
+				ITEM_INFO* targetItem = &g_Level.Items[(item->itemFlags[3] / 256) & 0xFF];
 				targetItem->flags |= 0x20u;
 				targetItem->pos.yPos = item->pos.yPos - 560;
 			}
@@ -142,7 +142,7 @@ void ControlHighObject1(short itemNumber)
 			item->itemFlags[0] = 5;
 			item->itemFlags[1] = 0;
 		}
-		else if (item->itemFlags[0] == 5 && !item->itemFlags[1] && g_Level.Items[(item->itemFlags[3] >> 8) & 0xFF].flags < 0)
+		else if (item->itemFlags[0] == 5 && !item->itemFlags[1] && g_Level.Items[(item->itemFlags[3] / 256) & 0xFF].flags < 0)
 		{
 			DoFlipMap(3);
 			FlipMap[3] ^= 0x3E00u;
@@ -201,12 +201,12 @@ void ControlHighObject1(short itemNumber)
 			flags = item->itemFlags[1];
 		}
 
-		SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags << 8) | 8);
+		SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags * 256) | 8);
 
 		item->itemFlags[1] += 16;
 		item->pos.yPos -= 16;
 
-		short targetItemNumber = (item->itemFlags[3] >> 8) & 0xFF;
+		short targetItemNumber = (item->itemFlags[3] / 256) & 0xFF;
 		ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 		targetItem->flags |= 0x20;
 		targetItem->pos.yPos = item->pos.yPos - 560;

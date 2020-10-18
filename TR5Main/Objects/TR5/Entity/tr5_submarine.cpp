@@ -26,8 +26,8 @@ static void TriggerSubmarineSparks(short itemNumber)
 	spark->colFadeSpeed = 2;
 	spark->dG = (GetRandomControl() & 0x1F) - 32;
 	spark->life = 2;
-	spark->dR = spark->dG >> 1;
-	spark->dB = spark->dG >> 1;
+	spark->dR = spark->dG / 2;
+	spark->dB = spark->dG / 2;
 	spark->sLife = 2;
 	spark->transType = COLADD;
 	spark->fadeToBlack = 0;
@@ -212,7 +212,7 @@ void SubmarineControl(short itemNumber)
 		laraInfo.ahead = true;
 	}
 
-	int tilt = item->itemFlags[0] + (angle >> 1);
+	int tilt = item->itemFlags[0] + (angle / 2);
 	
 	if (tilt > 2048)
 	{
@@ -372,8 +372,8 @@ void SubmarineControl(short itemNumber)
 		if (distance < 16384)
 		{
 			distance = 16384 - distance;
-			byte color = (GetRandomControl() & 0xF) + (distance >> 7) + 64;
-			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 1) + (distance >> 11) + 12, color >> 1, color, color >> 1);
+			byte color = (GetRandomControl() & 0xF) + (distance / 128) + 64;
+			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
 		}
 	}
 
@@ -411,8 +411,8 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		item->fallspeed += (5 - item->fallspeed) >> 1;
-		item->speed += (5 - item->speed) >> 1;
+		item->fallspeed += (5 - item->fallspeed) / 2;
+		item->speed += (5 - item->speed) / 2;
 	}
 	else
 	{
@@ -499,9 +499,9 @@ void TorpedoControl(short itemNumber)
 			pos.x = chaffItem->pos.xPos;
 			pos.y = chaffItem->pos.yPos;
 			pos.z = chaffItem->pos.zPos;
-			item->currentAnimState = pos.x >> 2;
-			item->goalAnimState = pos.y >> 2;
-			item->requiredAnimState = pos.z >> 2;
+			item->currentAnimState = pos.x / 4;
+			item->goalAnimState = pos.y / 4;
+			item->requiredAnimState = pos.z / 4;
 		}
 		else
 		{
@@ -536,8 +536,8 @@ void TorpedoControl(short itemNumber)
 		if (abs(drx) > 0x8000)
 			drx = -drx;
 
-		drx >>= 3;
-		dry >>= 3;
+		drx /= 8;
+		dry /= 8;
 
 		if (drx <= 512)
 		{

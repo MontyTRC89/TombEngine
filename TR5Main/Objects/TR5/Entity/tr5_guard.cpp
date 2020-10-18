@@ -368,7 +368,7 @@ void GuardControl(short itemNum)
 			{
 				if (!(item->aiBits & FOLLOW))
 				{
-					joint0 = info.angle >> 1;
+					joint0 = info.angle / 2;
 					joint1 = info.xAngle;
 				}
 			}
@@ -458,8 +458,8 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_FIRE_SINGLE:
 		case STATE_GUARD_FIRE_FAST:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			if (abs(info.angle) >= ANGLE(2))
@@ -502,8 +502,8 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_AIM:
 			creature->flags = 0;
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			if (abs(info.angle) >= ANGLE(2))
@@ -935,8 +935,8 @@ void SniperControl(short itemNumber)
 			angle = CreatureTurn(item, creature->maximumTurn);
 			if (info.ahead)
 			{
-				joint0 = info.angle >> 1;
-				joint2 = info.angle >> 1;
+				joint0 = info.angle / 2;
+				joint2 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
 			creature->maximumTurn = 0;
@@ -1107,7 +1107,7 @@ void Mafia2Control(short itemNum)
 			creature->maximumTurn = 0;
 			if (info.ahead && !(item->aiBits & GUARD))
 			{
-				joint0 = info.angle >> 1;
+				joint0 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
 			if (item->aiBits & GUARD)
@@ -1191,8 +1191,8 @@ void Mafia2Control(short itemNum)
 			}
 			break;
 		case STATE_MAFIA2_FIRE:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
@@ -1209,14 +1209,14 @@ void Mafia2Control(short itemNum)
 			}
 			if (!creature->flags)
 			{
-				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle >> 1, 35);
+				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle / 2, 35);
 				creature->flags = 1;
 				item->firedWeapon = 2;
 			}
 			break;
 		case STATE_MAFIA2_AIM:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 			if (info.ahead)

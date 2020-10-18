@@ -1025,7 +1025,7 @@ void BaddyControl(short itemNum)
 			}
 			if (currentCreature->enemy->objectNumber == ID_SMALLMEDI_ITEM)
 			{
-				item->hitPoints += Objects[item->objectNumber].hitPoints >> 1;
+				item->hitPoints += Objects[item->objectNumber].hitPoints / 2;
 			}
 			else
 			{

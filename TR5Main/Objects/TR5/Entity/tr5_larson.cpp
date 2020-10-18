@@ -159,8 +159,8 @@ void LarsonControl(short itemNumber)
 		switch (item->currentAnimState)
 		{
 		case STATE_TR5_LARSON_STOP:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 
@@ -278,8 +278,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_AIM:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
@@ -302,8 +302,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_IDLE:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 
@@ -322,8 +322,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_ATTACK:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;

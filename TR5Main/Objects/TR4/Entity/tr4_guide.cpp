@@ -63,7 +63,7 @@ void GuideControl(short itemNumber)
 		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		short random = GetRandomControl();
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 255 - ((random >> 4) & 0x1F), 192 - ((random >> 6) & 0x1F), random & 0x3F);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 255 - ((random / 16) & 0x1F), 192 - ((random / 64) & 0x1F), random & 0x3F);
 
 		if (item->animNumber == obj->animIndex + 61)
 		{
@@ -72,8 +72,8 @@ void GuideControl(short itemNumber)
 			{
 				GrenadeLauncherSpecialEffect1(
 					(random & 0x3F) + pos.x - 32,
-					((random >> 3) & 0x3F) + pos.y - 128,
-					pos.z + ((random >> 6) & 0x3F) - 32,
+					((random / 8) & 0x3F) + pos.y - 128,
+					pos.z + ((random / 64) & 0x3F) - 32,
 					-1,
 					1);
 			}
@@ -109,9 +109,9 @@ void GuideControl(short itemNumber)
 	short rot2 = 0;
 
 	if (dx <= dz)
-		laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
+		laraInfo.xAngle = phd_atan(dz + (dx / 2), dy);
 	else
-		laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
+		laraInfo.xAngle = phd_atan(dx + (dz / 2), dy);
 
 	ITEM_INFO* foundEnemy = NULL;
 
@@ -183,19 +183,19 @@ void GuideControl(short itemNumber)
 		creature->LOT.isJumping = false;
 		creature->flags = 0;
 		creature->maximumTurn = 0;
-		joint2 = info.angle >> 1;
+		joint2 = info.angle / 2;
 
 		if (laraInfo.ahead)
 		{
-			joint0 = laraInfo.angle >> 1;
-			joint1 = laraInfo.xAngle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint1 = laraInfo.xAngle / 2;
+			joint2 = laraInfo.angle / 2;
 		}
 		else if (info.ahead)
 		{
-			joint0 = info.angle >> 1;
-			joint1 = info.xAngle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint1 = info.xAngle / 2;
+			joint2 = info.angle / 2;
 		}
 
 		/*if (Objects[ID_WRAITH1].loaded & 0x10000)
@@ -457,8 +457,8 @@ void GuideControl(short itemNumber)
 					{
 						GrenadeLauncherSpecialEffect1(
 							(random & 0x3F) + pos1.x - 64,
-							((random >> 5) & 0x3F) + pos1.y - 96,
-							((random >> 10) & 0x3F) + pos1.z - 64,
+							((random / 32) & 0x3F) + pos1.y - 96,
+							((random / 1024) & 0x3F) + pos1.z - 64,
 							-1,
 							7);
 
@@ -467,8 +467,8 @@ void GuideControl(short itemNumber)
 							pos1.y - 64,
 							pos1.z - 32,
 							10,
-							192 - ((random >> 4) & 0x1F),
-							128 - ((random >> 6) & 0x1F),
+							192 - ((random / 16) & 0x1F),
+							128 - ((random / 64) & 0x1F),
 							random & 0x1F);
 
 						item->itemFlags[1] = 2;
@@ -477,24 +477,24 @@ void GuideControl(short itemNumber)
 				else
 				{
 					TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
-					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random / 64) & 0x1F), 128 - ((random / 16) & 0x1F));
 				}
 			}
 			else
 			{
-				TriggerDynamicLight(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random >> 4) & 0x1F), 128 - ((random >> 6) & 0x1F), random & 0x1F);
+				TriggerDynamicLight(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random / 16) & 0x1F), 128 - ((random / 64) & 0x1F), random & 0x1F);
 
 				GrenadeLauncherSpecialEffect1(
 					(random & 0x3F) + pos1.x - 64,
-					((random >> 5) & 0x3F) + pos1.y - 96,
-					((random >> 10) & 0x3F) + pos1.z - 64,
+					((random / 32) & 0x3F) + pos1.y - 96,
+					((random / 1024) & 0x3F) + pos1.z - 64,
 					-1,
 					7);
 			}
 		}
 		else
 		{
-			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random / 64) & 0x1F), 128 - ((random / 16) & 0x1F));
 			TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
 		}
 
@@ -513,9 +513,9 @@ void GuideControl(short itemNumber)
 	case 31:
 		if (info.ahead)
 		{
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
-			joint1 = info.xAngle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle / 2;
 		}
 
 		creature->maximumTurn = 0;
