@@ -632,13 +632,13 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
 
-		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
+		if ((!Lara.hitFrame) && (!hitSoundTimer))
 		{
 				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
 				hitSoundTimer = frandMinMax(5, 15);
 		}
 
-		if (hitSoundTimer > 0)
+		if (hitSoundTimer)
 			hitSoundTimer--;
 
 		Lara.hitFrame++;
