@@ -592,15 +592,15 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 		if ((TrInput & IN_ROLL) && (CanGetOff(v)))
 		{
-			if (!sub->Vel) // this check isn't in TR3, but it fixes some bug when exiting on the surface. also fixes a few instances of the infamous UPV glitch
+			if (sub->Vel > 0)
+				sub->Vel -= ACCELERATION;
+			else
 			{
 				if (sub->Flags & UPV_SURFACE)
 					l->goalAnimState = SUBS_GETOFFS;
 				else
 					l->goalAnimState = SUBS_GETOFF;
-
-				sub->Flags &= ~UPV_CONTROL;
-
+				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 				StopSoundEffect(346);
 				SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
 			}
@@ -643,6 +643,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	case SUBS_GETOFF:
 		if ((anim == 12) && (frame == 42))
 		{
+			sub->Flags &= ~UPV_CONTROL;
 			PHD_VECTOR vec = { 0, 0, 0 };
 			GAME_VECTOR VPos, LPos;
 
@@ -683,6 +684,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	case SUBS_GETOFFS:
 		if ((anim == 9) && (frame == 51))
 		{
+			sub->Flags &= ~UPV_CONTROL;
 			int wd, wh, hfw;
 			PHD_VECTOR vec = { 0, 0, 0 };
 
