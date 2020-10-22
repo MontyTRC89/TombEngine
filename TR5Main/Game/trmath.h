@@ -29,6 +29,7 @@ constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
 
 short ANGLE(float angle);
+short FROM_RAD(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle);
 
