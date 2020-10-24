@@ -1,5 +1,5 @@
 #pragma once
-#include <random>
+#include <limits>
 
 namespace T5M::Math::Random
 {
