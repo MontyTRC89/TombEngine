@@ -1104,15 +1104,32 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	LaraUnderWater(item, coll);
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		Lara.waterStatus = LW_ABOVE_WATER;
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->pos.zRot = 0;
-		item->pos.xRot = 0;
-		Lara.torsoYrot = 0;
-		Lara.torsoXrot = 0;
-		Lara.headYrot = 0;
-		Lara.headXrot = 0;
+		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER || 
+			(Lara.waterSurfaceDist > 0 && 
+			Lara.waterSurfaceDist != NO_HEIGHT))
+		{
+			Lara.waterStatus = LW_UNDERWATER;
+			item->animNumber = LA_UNDERWATER_IDLE;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = LS_UNDERWATER_STOP;
+			item->goalAnimState = LS_UNDERWATER_STOP;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+		}
+		else
+		{
+			Lara.waterStatus = LW_ABOVE_WATER;
+			item->animNumber = LA_STAND_SOLID;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->pos.zRot = 0;
+			item->pos.xRot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+		}
 		Lara.gunStatus = LG_NO_ARMS;
 		LaraInitialiseMeshes();
 		Lara.meshEffects = 0;
