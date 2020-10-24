@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "prng.h"
-#include <limits>
+#include <random>
 
 namespace T5M::Math::Random
 {
@@ -8,7 +8,7 @@ namespace T5M::Math::Random
 
 	int32_t generateInt(int32_t low, int32_t high)
 	{
-		return std::clamp(static_cast<int32_t>(Engine()), low, high);
+		return Engine() / (Engine.max() / (high - low + 1) + 1) + low;
 	}
 
 	float generateFloat(float low, float high)
