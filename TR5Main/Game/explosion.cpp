@@ -5,6 +5,8 @@
 #include "tomb4fx.h"
 #include "setup.h"
 #include "effect2.h"
+#include "prng.h"
+using namespace T5M::Math::Random;
 namespace T5M {
 	namespace Effects {
 		namespace Explosion {
@@ -16,7 +18,7 @@ namespace T5M {
 			{
 				SpawnExplosionParticle(pos);
 				for (int i = 0; i < 3; i++) {
-					Vector3 particlePos = pos + Vector3(frandMinMax(-size / 2, size / 2), frandMinMax(-size / 2, size / 2), frandMinMax(-size / 2, size / 2));
+					Vector3 particlePos = pos + Vector3(generateFloat(-size / 2, size / 2), generateFloat(-size / 2, size / 2), generateFloat(-size / 2, size / 2));
 					SpawnExplosionParticle(particlePos);
 				}
 				if (triggerSparks) {
@@ -71,13 +73,13 @@ namespace T5M {
 				e = {};
 				e.pos = pos;
 				const float maxVel = 10;
-				e.vel = Vector3(frand() * maxVel - (maxVel / 2), frand() * maxVel - (maxVel / 2), frand() * maxVel - (maxVel / 2));
+				e.vel = Vector3(generateFloat(-maxVel / 2, maxVel / 2), generateFloat(-maxVel / 2, maxVel / 2), generateFloat(-maxVel / 2, maxVel / 2));
 				e.active = true;
 				e.tint = Vector4(1, 1, 1, 1);
-				e.life = frandMinMax(60, 90);
-				e.size = frandMinMax(512, 768);
-				e.angularVel = frandMinMax(-RADIAN, RADIAN);
-				e.rotation = frand() * 0.1f - 0.05f;
+				e.life = generateFloat(60, 90);
+				e.size = generateFloat(512, 768);
+				e.angularVel = generateFloat(-RADIAN, RADIAN);
+				e.rotation = generateFloat(-0.05, 0.05);
 			}
 		}
 	}
