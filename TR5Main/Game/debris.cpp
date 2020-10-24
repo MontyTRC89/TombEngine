@@ -4,6 +4,7 @@
 #include "setup.h"
 #include "control.h"
 #include "trmath.h"
+#include "prng.h"
 using std::vector;
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
@@ -12,6 +13,7 @@ MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
 vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 using namespace T5M::Renderer;
+using namespace T5M::Math::Random;
 DebrisFragment* GetFreeDebrisFragment()
 {
 	for (auto frag = DebrisFragments.begin(); frag != DebrisFragments.end(); frag++) {
@@ -70,8 +72,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->restitution = 0.6f;
 				fragment->friction = 0.6f;
 				fragment->linearDrag = .99f;
-				fragment->angularVelocity = Vector3(frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39);
-				fragment->angularDrag = frandMinMax(0.9f, 0.999f);
+				fragment->angularVelocity = Vector3(generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39);
+				fragment->angularDrag = generateFloat(0.9f, 0.999f);
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
@@ -90,10 +92,10 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 	radiusNormVec.Normalize();
 	float radiusStrenght =  1-((fragmentWorldPosition - impactLocation).Length() / 1024);
 	radiusStrenght = fmax(radiusStrenght, 0);
-	Vector3 radiusRandomVector = Vector3(frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f)) + radiusNormVec;
+	Vector3 radiusRandomVector = Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
 	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
-	Vector3 impactDirectionVelocity = (impactDirection + Vector3(frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f))) * 80 ;
+	Vector3 impactDirectionVelocity = (impactDirection + Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }
 

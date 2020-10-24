@@ -15,7 +15,9 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "prng.h"
 using std::vector;
+using namespace T5M::Math::Random;
 typedef enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
@@ -150,7 +152,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
-	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, frandMinMax(160, 200), 60, 60, 64, frandMinMax(0, 359), 0);
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
 //	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 

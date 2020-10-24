@@ -10,7 +10,9 @@
 #include "setup.h"
 #include "sound.h"
 #include "trmath.h"
+#include "prng.h"
 using std::vector;
+using namespace T5M::Math::Random;
 char LM[] =
 {
 	LM_HIPS,
@@ -634,7 +636,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
 		{
 				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
-				hitSoundTimer = frandMinMax(5, 15);
+				hitSoundTimer = generateFloat(5, 15);
 		}
 
 		if (hitSoundTimer > 0)

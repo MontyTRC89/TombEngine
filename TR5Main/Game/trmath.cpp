@@ -1,6 +1,9 @@
 #include "framework.h"
 #include "trmath.h"
 #include <cmath>
+#include "prng.h"
+
+using namespace T5M::Math::Random;
 
 short ANGLE(float angle)
 {
@@ -22,16 +25,6 @@ float TO_RAD(short angle)
 	return angle * 360.0f / 65536.0f * RADIAN;
 }
 
-const float frand()
-{
-	return rand()/static_cast<float>(RAND_MAX);
-}
-
-const float frandMinMax(float min, float max)
-{
-	return frand() * (max - min) + min;
-}
-
 const float lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;
@@ -39,16 +32,16 @@ const float lerp(float v0, float v1, float t)
 
 const Vector3 getRandomVector()
 {
-	Vector3 v = {frandMinMax(-1,1),frandMinMax(-1,1),frandMinMax(-1,1)};
+	Vector3 v = {generateFloat(-1,1),generateFloat(-1,1),generateFloat(-1,1)};
 	v.Normalize();
 	return v;
 }
 
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
 {
-	float x = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
-	float y = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
-	float z = frandMinMax(-angleDegrees, angleDegrees) * RADIAN;
+	float x = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
+	float y = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
+	float z = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	Matrix m = Matrix::CreateRotationX(x)* Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 	Vector3 result = direction.TransformNormal(direction, m);
 	result.Normalize();
