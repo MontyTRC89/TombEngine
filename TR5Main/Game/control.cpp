@@ -46,6 +46,7 @@
 #include "drip.h"
 #include "particle/SimpleParticle.h"
 #include <process.h>
+#include "prng.h"
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -53,6 +54,7 @@ using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
 using namespace T5M::Effects;
 using T5M::Renderer::g_Renderer;
+using namespace T5M::Math::Random;
 
 short ShatterSounds[18][10] =
 	{
@@ -81,8 +83,6 @@ short los_rooms[20];
 int ClosestItem;
 int ClosestDist;
 PHD_VECTOR ClosestCoord;
-int rand_1 = -747505337;
-int rand_2 = -747505337;
 int RumbleTimer = 0;
 int InGameCnt = 0;
 byte IsAtmospherePlaying = 0;
@@ -2461,26 +2461,14 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 	return ClosestItem;
 }
 
-int GetRandomControl() // (F) (D)
+int GetRandomControl()
 {
-	rand_1 = 1103515245 * rand_1 + 12345;
-	return (rand_1 / 1024) & 0x7FFF;
+	return generateInt();
 }
 
-void SeedRandomControl(int seed) // (F) (D)
+int GetRandomDraw()
 {
-	rand_1 = seed;
-}
-
-int GetRandomDraw() // (F) (D)
-{
-	rand_2 = 1103515245 * rand_2 + 12345;
-	return (rand_2 / 1024) & 0x7FFF;
-}
-
-void SeedRandomDraw(int seed) // (F) (D)
-{
-	rand_2 = seed;
+	return generateInt();
 }
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)

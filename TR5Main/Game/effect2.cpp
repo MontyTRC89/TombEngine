@@ -16,9 +16,11 @@
 #include <Game\drip.h>
 #include <Game\bubble.h>
 #include "smoke.h"
+#include "prng.h"
 using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
+using namespace T5M::Math::Random;
 
 unsigned char TES_extra_tab[] =
 {
@@ -775,7 +777,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	}
 	else
 	{
-		spark->sSize = frandMinMax(128, 156);
+		spark->sSize = generateFloat(128, 156);
 		spark->dSize = spark->sSize / 16;
 		if (type == 7)
 		{
@@ -887,7 +889,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = frandMinMax(64,128);
+				float thickness = generateFloat(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -895,10 +897,10 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				splash.isRipple = true;
 				float vel;
 				if (numSplashesSetup == 2) {
-					vel = (splashVelocity / 16) + frandMinMax(2, 4);
+					vel = (splashVelocity / 16) + generateFloat(2, 4);
 				}
 				else {
-					vel = (splashVelocity / 7) + frandMinMax(3, 7);
+					vel = (splashVelocity / 7) + generateFloat(3, 7);
 				}
 				
 				float innerRadius = 0;
@@ -1042,12 +1044,12 @@ void SetupRipple(int x, int y, int z, float size, char flags,unsigned int sprite
 				ripple->initialColor *= 0.6f;
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
-				ripple->worldPos.x += frandMinMax(-32, 32);
-				ripple->worldPos.z += frandMinMax(-32, 32);
+				ripple->worldPos.x += generateFloat(-32, 32);
+				ripple->worldPos.z += generateFloat(-32, 32);
 			}
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
-				ripple->rotation += frandMinMax(-PI, PI);
+				ripple->rotation += generateFloat(-PI, PI);
 			}
 			break;
 		}

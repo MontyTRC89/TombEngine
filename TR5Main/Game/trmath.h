@@ -36,9 +36,6 @@ float TO_RAD(short angle);
 float phd_sin(short a);
 float phd_cos(short a);
 
-// returns a float between 0-1
-const float frand();
-const float frandMinMax(float min, float max);
 const float lerp(float v0, float v1, float t);
 const Vector3 getRandomVector();
 const Vector3 getRandomVectorInCone(const Vector3& direction,const float angleDegrees);

@@ -11,6 +11,8 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
+#include "prng.h"
+using namespace T5M::Math::Random;
 struct PISTOL_DEF
 {
 	short objectNum;
@@ -334,7 +336,7 @@ void PistolHandler(int weaponType)
 		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LM_LHAND : LM_RHAND);
-			TriggerDynamicLight(pos.x+frandMinMax(-128,128), pos.y + frandMinMax(-128, 128), pos.z + frandMinMax(-128, 128), frandMinMax(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+			TriggerDynamicLight(pos.x+generateFloat(-128,128), pos.y + generateFloat(-128, 128), pos.z + generateFloat(-128, 128), generateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
 

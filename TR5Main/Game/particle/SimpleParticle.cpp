@@ -3,6 +3,8 @@
 #include "items.h"
 #include "trmath.h"
 #include <Specific\setup.h>
+#include "prng.h"
+using namespace T5M::Math::Random;
 
 namespace T5M::Effects{
 	std::array<SimpleParticle, 15> simpleParticles;
@@ -16,7 +18,7 @@ namespace T5M::Effects{
 	void TriggerSnowmobileSnow(ITEM_INFO* snowMobile)
 	{
 		float angle = TO_RAD(snowMobile->pos.yRot);
-		const float angleVariation = frandMinMax(-10, 10) * RADIAN;
+		const float angleVariation = generateFloat(-10, 10) * RADIAN;
 		float x = std::sin(angle + angleVariation);
 		float z = std::cos(angle + angleVariation);
 		x = x* -500 + snowMobile->pos.xPos;
@@ -24,13 +26,13 @@ namespace T5M::Effects{
 		SimpleParticle& p = getFreeSimpleParticle();
 		p = {};
 		p.active = true;
-		p.life = frandMinMax(8, 14);
+		p.life = generateFloat(8, 14);
 		p.room = snowMobile->roomNumber;
-		p.ageRate = frandMinMax(0.9, 1.3);
-		float size = frandMinMax(96, 128);
+		p.ageRate = generateFloat(0.9, 1.3);
+		float size = generateFloat(96, 128);
 		p.worldPosition = {x,float(snowMobile->pos.yPos) - size/2,z};
 		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;
-		p.size = frandMinMax(256, 512);
+		p.size = generateFloat(256, 512);
 
 	}
 
@@ -46,13 +48,13 @@ namespace T5M::Effects{
 			SimpleParticle& p = getFreeSimpleParticle();
 			p = {};
 			p.active = true;
-			p.life = frandMinMax(5, 9);
+			p.life = generateFloat(5, 9);
 			p.room = boat->roomNumber;
-			p.ageRate = frandMinMax(0.9, 1.3);
-			float size = frandMinMax(96, 128);
+			p.ageRate = generateFloat(0.9, 1.3);
+			float size = generateFloat(96, 128);
 			p.worldPosition = { x,float(boat->pos.yPos) - size / 2,z };
 			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
-			p.size = frandMinMax(256, 512);
+			p.size = generateFloat(256, 512);
 		}
 		
 	}
