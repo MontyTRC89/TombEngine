@@ -13,6 +13,7 @@
 #include "quad.h"
 #include "rubberboat.h"
 #include "upv.h"
+#include "biggun.h"
 #include <algorithm>
 
 extern GameConfiguration g_Configuration;
@@ -305,6 +306,12 @@ namespace T5M::Renderer
 					SUB_INFO* upv = (SUB_INFO*)item->data;
 					if (j == 3)
 						currentBone->ExtraRotation.z = TO_RAD(upv->FanRot);
+				}
+				else if (item->objectNumber == ID_BIGGUN)
+				{
+					BIGGUNINFO* biggun = (BIGGUNINFO*)item->data;
+					if (j == 2)
+						currentBone->ExtraRotation.z = biggun->barrelZ;
 				}
 				else
 				{
