@@ -58,7 +58,7 @@ void FireBigGun(ITEM_INFO *obj)
 			PHD_VECTOR pos;
 			pos.x = 0;
 			pos.y = 0;
-			pos.z = 520;
+			pos.z = 256;//520;
 
 			GetJointAbsPosition(obj, &pos, 2);
 
@@ -156,6 +156,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 		Lara.gunStatus = LG_HANDS_BUSY;
 
+		obj->hitPoints = 1;
 		lara->pos.xPos = obj->pos.xPos;
 		lara->pos.xRot = obj->pos.xRot;
 		lara->pos.yPos = obj->pos.yPos;
@@ -284,6 +285,7 @@ int BigGunControl(COLL_INFO *coll)
 			lara->goalAnimState = LS_STOP;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
+			obj->hitPoints = 0;
 		}
 		break;
 	case BGUN_UPDOWN:
