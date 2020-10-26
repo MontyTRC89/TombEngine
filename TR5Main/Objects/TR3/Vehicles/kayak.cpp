@@ -1418,7 +1418,7 @@ int KayakControl()
 		}
 
 		l->pos.xPos = v->pos.xPos;
-		l->pos.yPos = v->pos.yPos + KAYAK_DRAW_SHIFT;
+		l->pos.yPos = v->pos.yPos;// +KAYAK_DRAW_SHIFT;
 		l->pos.zPos = v->pos.zPos;
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;

@@ -441,7 +441,15 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		else if (sub->RotX < -FRONT_TOLERANCE)
 			sub->RotX -= WALLDEFLECT;
 		else
+		{
+			if (abs(sub->Vel) > 0x40000)
+			{
+				l->goalAnimState = SUBS_HIT;
+				sub->Vel = -sub->Vel / 2;
+			}
+			else
 			sub->Vel = 0;
+		}
 	}
 	else if (coll->collType == CT_TOP)
 	{
@@ -999,6 +1007,9 @@ int SubControl(void)
 
 		if ((TrInput & IN_ACTION) && (sub->Flags & UPV_CONTROL) && (!sub->WeaponTimer))
 		{
+			if (l->currentAnimState != SUBS_GETOFF 
+				&& l->currentAnimState != SUBS_GETOFFS 
+				&& l->currentAnimState != SUBS_GETON)
 			FireSubHarpoon(v);
 			sub->WeaponTimer = HARPOON_RELOAD;
 		}
@@ -1010,7 +1021,7 @@ int SubControl(void)
 		}
 
 		l->pos.xPos = v->pos.xPos;
-		l->pos.yPos = v->pos.yPos + SUB_DRAW_SHIFT;
+		l->pos.yPos = v->pos.yPos;// +SUB_DRAW_SHIFT;
 		l->pos.zPos = v->pos.zPos;
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
