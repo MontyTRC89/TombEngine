@@ -314,15 +314,18 @@ int KayakGetIn(short itemNumber, COLL_INFO* coll)
 		short ang = phd_atan(v->pos.zPos - l->pos.zPos, v->pos.xPos - l->pos.xPos);
 		ang -= v->pos.yRot;
 
-		unsigned short tempang = l->pos.yRot - v->pos.yRot;
+		int tempang;
 
+		tempang = l->pos.yRot - v->pos.yRot;
 		if ((ang > -ANGLE(45)) && (ang < ANGLE(135)))
 		{
+			tempang = l->pos.yRot - v->pos.yRot;
 			if (tempang > ANGLE(45) && tempang < ANGLE(135))
 				return -1;
 		}
 		else
 		{
+			tempang = l->pos.yRot - v->pos.yRot;
 			if (tempang > ANGLE(225) && tempang < ANGLE(315))
 				return 1;
 		}
