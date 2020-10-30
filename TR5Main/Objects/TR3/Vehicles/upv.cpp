@@ -74,6 +74,35 @@ enum SUB_BITE_FLAG {
 	SUB_RIGHT_FIN_LEFT
 };
 
+/*Animations and frames*/
+
+//death
+#define SUB_DEATH1		0
+#define DEATH_FRAME1	16
+#define DEATH_FRAME2	17
+
+//pose
+#define SUB_POSE_A			5
+
+//get off on the surface
+#define SUB_GETOFFSURF1_A	9
+#define GETOFFSURF_FRAME	51
+
+//get on on the surface
+#define SUB_GETONSURF_A		10
+#define SUB_GETONSURF1_A	11
+#define GETONSURF_SOUND_FRAME	30
+#define GETONSURF_CONTROL_FRAME	50
+
+//get off underwater
+#define SUB_GETOFF_A		12
+#define GETOFF_FRAME		42
+
+//get on underwater
+#define SUB_GETON_A			13
+#define GETON_SOUND_FRAME	30
+#define GETON_CONTROL_FRAME	42
+
 enum UPV_STATE {
 	SUBS_DIE,
 	SUBS_HIT,
@@ -101,7 +130,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		item = &g_Level.Items[itemNum];
 
 		item->objectNumber = ID_HARPOON;
-		item->shade = 0x4210 | 0x8000;
+		item->shade = 0xC210;// 0x4210 | 0x8000;
 		item->roomNumber = v->roomNumber;
 
 		pos.x = (lr) ? 22 : -22;
@@ -127,8 +156,8 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
-		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
-			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0]--;
+		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
+			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
 		Savegame.Game.AmmoUsed++;
 
 		lr ^= 1;
@@ -320,9 +349,13 @@ static int GetOnSub(short item_number, COLL_INFO* coll)
 	x = l->pos.xPos - v->pos.xPos;
 	z = l->pos.zPos - v->pos.zPos;
 
-	dist = (x * x) + (z * z);
+	dist = SQUARE(x) + SQUARE(z);
 	if (dist > SQUARE(512))
 		return 0;
+
+	short yr = abs(l->pos.yRot - v->pos.yRot);
+	if (yr > ANGLE(35.0f) || yr < -ANGLE(35.0f))
+		return 0;	//make sure Lara is facing the thing!
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
@@ -625,31 +658,31 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		break;
 
 	case SUBS_GETON:
-		if (anim == 11)
+		if (anim == SUB_GETONSURF1_A)
 		{
 			v->pos.yPos += 4;
 			v->pos.xRot += ANGLE(1);
 
-			if (frame == 30)
+			if (frame == GETONSURF_SOUND_FRAME)
 				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
 
-			if (frame == 50)
+			if (frame == GETONSURF_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
 		}
 
-		else if (anim == 13)
+		else if (anim == SUB_GETON_A)
 		{
-			if (frame == 30)
+			if (frame == GETON_SOUND_FRAME)
 				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
 
-			if (frame == 42)
+			if (frame == GETON_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
 		}
 
 		break;
 
 	case SUBS_GETOFF:
-		if ((anim == 12) && (frame == 42))
+		if ((anim == SUB_GETOFF_A) && (frame == GETOFF_FRAME))
 		{
 			sub->Flags &= ~UPV_CONTROL;
 			PHD_VECTOR vec = { 0, 0, 0 };
@@ -690,7 +723,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		break;
 
 	case SUBS_GETOFFS:
-		if ((anim == 9) && (frame == 51))
+		if ((anim == SUB_GETOFFSURF1_A) && (frame == GETOFFSURF_FRAME))
 		{
 			sub->Flags &= ~UPV_CONTROL;
 			int wd, wh, hfw;
@@ -734,7 +767,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		break;
 
 	case SUBS_DIE:
-		if (((anim == 0) && (frame == 16)) || ((anim == 0) && (frame == 17)))
+		if (((anim == SUB_DEATH1) && (frame == DEATH_FRAME1)) || ((anim == SUB_DEATH1) && (frame == DEATH_FRAME2)))
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
 
@@ -876,16 +909,16 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
 
-		if ((l->currentAnimState == LS_ONWATER_STOP) || (l->currentAnimState == LS_ONWATER_FORWARD))
+		if (Lara.waterStatus == LW_SURFACE)//((l->currentAnimState == LS_ONWATER_STOP) || (l->currentAnimState == LS_ONWATER_FORWARD))
 		{
-			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + 10;
-			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, 10, 0);
+			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETONSURF_A;
+			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, SUB_GETONSURF_A, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
 		else
 		{
-			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + 13;
-			l->frameNumber = GF2(ID_UPV, 13, 0);
+			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETON_A;
+			l->frameNumber = GF2(ID_UPV, SUB_GETON_A, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
 
@@ -1054,8 +1087,8 @@ int SubControl(void)
 
 		sub->RotX = 0;
 
-		v->animNumber = 5;
-		v->frameNumber = GF2(ID_UPV, 5, 0);
+		v->animNumber = SUB_POSE_A;
+		v->frameNumber = GF2(ID_UPV, SUB_POSE_A, 0);
 		v->goalAnimState = v->currentAnimState = SUBS_POSE;
 		v->fallspeed = 0;
 		v->speed = 0;
