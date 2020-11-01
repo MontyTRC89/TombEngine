@@ -16,6 +16,7 @@
 #include "tr3_tony.h" // OK
 #include "tr3_trex.h" // OK
 #include "tr3_tribesman.h" // OK
+#include "Objects/TR3/Object/tr3_moveblock.h"
 /// objects
 
 /// traps
@@ -352,7 +353,19 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 static void StartObject(OBJECT_INFO* obj)
 {
-
+	/*for (int i=ID_PUSHABLE_OBJECT10;i<= ID_PUSHABLE_OBJECT10;i++)
+	{
+		obj = &Objects[i];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseMovingBlock;
+			obj->control = MovableBlockControl;
+			obj->collision = MovableBlockCollision;
+			obj->saveFlags = true;
+			obj->savePosition = true;
+			obj->saveAnim = true;
+		}
+	}*/
 }
 
 static void StartTrap(OBJECT_INFO* obj)
