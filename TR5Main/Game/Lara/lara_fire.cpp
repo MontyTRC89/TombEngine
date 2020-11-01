@@ -839,7 +839,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 		}
 		else
 		{*/
-			if (GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE))
+			if (!GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE))
 				HitTarget(target, &vDest, weapon->damage, NULL);
 		//}
 		
