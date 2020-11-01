@@ -22,6 +22,7 @@ typedef struct WEAPON_INFO
 	byte flashTime;
 	byte drawFrame;
 	short sampleNum;
+	byte explosiveDamage;
 };
 
 constexpr auto WSTATE_AIM = 0;

@@ -11,13 +11,6 @@
 #include "input.h"
 #include "sound.h"
 
-OBJECT_COLLISION_BOUNDS MovingBlockBounds = {
-	-300, 300, 0, 0, -692, -512,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
-};
-
 OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 	0x0000, 0x0000, 0xFF00, 0x0000,
 	0x0000, 0x0000, 0xF8E4, 0x071C,
@@ -72,8 +65,8 @@ void InitialisePushableBlock(short itemNum)
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
-	//if (item->status != ITEM_INVISIBLE)
-	//	AlterFloorHeight(item, -1024); 
+	if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
+		AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 }
 
 void PushableBlockControl(short itemNumber)
@@ -241,52 +234,14 @@ void PushableBlockControl(short itemNumber)
 			TestTriggers(TriggerIndex, 1, item->flags & 0x3E00);
 			RemoveActiveItem(itemNumber);
 			item->status = ITEM_NOT_ACTIVE;
+
+			if (item->triggerFlags >= 64)
+			{
+				AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+			}
 		}
 		break;
-	}
-
-	return;
-
-	// TR3 code below, to add in the future
-	if (item->flags & ONESHOT)
-	{
-		AlterFloorHeight(item, 1024);
-		KillItem(itemNumber);
-		return;
-	}
-
-	AnimateItem(item);
-
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	if (item->pos.yPos < height)
-		item->gravityStatus = true;
-	else if (item->gravityStatus)
-	{
-		item->gravityStatus = false;
-		item->pos.yPos = height;
-		item->status = ITEM_DEACTIVATED;
-		floor_shake_effect(item);
-		SoundEffect(SFX_LARA_THUD, &item->pos, 0);
-	}
-
-	if (item->roomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-	if (item->status == ITEM_DEACTIVATED)
-	{
-		item->status = ITEM_NOT_ACTIVE;
-		RemoveActiveItem(itemNumber);
-
-		AlterFloorHeight(item, -1024);
-		AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
-
-		roomNumber = item->roomNumber;
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-		TestTriggers(TriggerIndex, 1, 0);
 	}
 }
 
@@ -296,9 +251,9 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
-	item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-	if (item->roomNumber != roomNumber)
-		ItemNewRoom(itemNum, roomNumber);
+	//item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
+	//if (item->roomNumber != roomNumber)
+	//	ItemNewRoom(itemNum, roomNumber);
 
 	if ((!(TrInput & IN_ACTION)
 		|| l->currentAnimState != LS_STOP
@@ -309,11 +264,12 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| item->triggerFlags < 0)
 		&& (!Lara.isMoving || Lara.generalPtr != item))
 	{
-		if (l->currentAnimState != LS_PUSHABLE_GRAB
+		if ((l->currentAnimState != LS_PUSHABLE_GRAB
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
-			|| Lara.cornerX != (int)item)
+			|| Lara.cornerX != (int)item))
 		{
-			ObjectCollision(itemNum, l, coll);
+			if (item->triggerFlags < 64)
+				ObjectCollision(itemNum, l, coll);
 			return;
 		}
 
@@ -355,6 +311,12 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		item->itemFlags[0] = item->pos.xPos;
 		item->itemFlags[2] = item->pos.zPos;
+
+		if (item->triggerFlags >= 64)
+		{
+			AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
+			AdjustStopperFlag(item, item->itemFlags[0], 1);
+		}
 	}
 	else
 	{
@@ -406,110 +368,6 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->pos.yRot = rot;
 			}
 		}
-	}
-
-	return;
-
-	// TR3 code to add in the future
-	if (!(TrInput & IN_ACTION) ||
-		item->status == ITEM_ACTIVE ||
-		l->gravityStatus ||
-		l->pos.yPos != item->pos.yPos)
-		return;
-
-	unsigned short quadrant = (unsigned short)(l->pos.yRot + 0x2000) / 0x4000;
-	if (l->currentAnimState == LS_STOP)
-	{
-		if (Lara.gunStatus != LG_NO_ARMS)
-			return;
-
-		switch (quadrant)
-		{
-		case NORTH:
-			item->pos.yRot = 0;
-			break;
-
-		case EAST:
-			item->pos.yRot = ANGLE(90);
-			break;
-
-		case SOUTH:
-			item->pos.yRot = -ANGLE(180);
-			break;
-
-		case WEST:
-			item->pos.yRot = -ANGLE(90);
-			break;
-		}
-		if (!TestLaraPosition(&MovingBlockBounds, item, l))
-			return;
-
-		short roomNumber = l->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		if (roomNumber != item->roomNumber)
-			return;
-
-		switch (quadrant)
-		{
-		case NORTH:
-			l->pos.zPos &= -1024;
-			l->pos.zPos += 1024 - LARA_RAD;
-			break;
-
-		case SOUTH:
-			l->pos.zPos &= -1024;
-			l->pos.zPos += LARA_RAD;
-			break;
-
-		case EAST:
-			l->pos.xPos &= -1024;
-			l->pos.xPos += 1024 - LARA_RAD;
-			break;
-
-		case WEST:
-			l->pos.xPos &= -1024;
-			l->pos.xPos += LARA_RAD;
-			break;
-		}
-		l->pos.yRot = item->pos.yRot;
-		l->goalAnimState = LS_PUSHABLE_GRAB;
-		AnimateLara(l);
-		if (l->currentAnimState == LS_PUSHABLE_GRAB)
-			Lara.gunStatus = LG_HANDS_BUSY;
-	}
-	else if (l->currentAnimState == LS_PUSHABLE_GRAB)
-	{
-		if (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
-			return;
-		if (!TestLaraPosition(&MovingBlockBounds, item, l))
-			return;
-		if (TrInput & IN_FORWARD)
-		{
-			if (!TestBlockPush(item, 1024, quadrant))
-				return;
-			item->goalAnimState = 2;
-			l->goalAnimState = LS_PUSHABLE_PUSH;
-		}
-		else if (TrInput & IN_BACK)
-		{
-			if (!TestBlockPull(item, 1024, quadrant))
-				return;
-			item->goalAnimState = 3;
-			l->goalAnimState = LS_PUSHABLE_PULL;
-		}
-		else
-			return;
-
-		AddActiveItem(itemNum);
-		AlterFloorHeight(item, 1024);
-		AdjustStopperFlag(item, item->itemFlags[0], 1);
-		item->status = ITEM_ACTIVE;
-
-		AnimateItem(item);
-		AnimateLara(l);
-
-		Lara.headXrot = Lara.headYrot = 0;
-		Lara.torsoXrot = Lara.torsoYrot = 0;
 	}
 }
 
