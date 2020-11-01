@@ -1328,7 +1328,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != CROSSBOW_EXPLODE || explode)
+		if (item->itemFlags[0] != CROSSBOW_POISON || explode)
 		{
 			if (CollidedItems[0])
 			{
@@ -1686,7 +1686,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 				OBJECT_INFO* obj = &Objects[dest->objectNumber];
 				if (!obj->undead)
 				{
-					HitTarget(dest, 0, Weapons[weapon].damage, 1);
+					HitTarget(dest, 0, Weapons[weapon].explosiveDamage, 1);
 					if (dest != LaraItem)
 					{
 						Savegame.Game.AmmoHits++;
