@@ -200,7 +200,18 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 						itemNumber = item->nextItem;
 						continue;
 					}
-
+					/*this is awful*/
+					if (item->objectNumber == ID_UPV && item->hitPoints == 1)
+					{
+						itemNumber = item->nextItem;
+						continue;
+					}
+					if (item->objectNumber == ID_BIGGUN && item->hitPoints == 1)
+					{
+						itemNumber = item->nextItem;
+						continue;
+					}
+					/*we need a better system*/
 					if (item->flags & 0x8000)
 					{
 						itemNumber = item->nextItem;

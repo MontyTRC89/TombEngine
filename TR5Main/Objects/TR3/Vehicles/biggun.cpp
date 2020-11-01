@@ -13,7 +13,34 @@
 #include "tomb4fx.h"
 #include "draw.h"
 
-int fireCount = 0;
+//int fireCount = 0;
+static long GunRotYAdd = 0;
+bool barrelRotating;
+
+#define RECOIL_TIME 26
+#define RECOIL_Z	25
+
+//flags
+#define FLAG_UPDOWN	1
+#define FLAG_AUTOROT	2
+#define FLAG_GETOFF	4
+#define FLAG_FIRE	8
+//frames
+#define BGUN_UPDOWN_FRAMES	59
+#define GETOFF_FRAME 30//the frame where Lara isn't looking either up or down in her "main" animation, aka when she can get off
+
+enum {//states
+	BGUN_GETON,
+	BGUN_GETOFF,
+	BGUN_UPDOWN,
+	BGUN_RECOIL
+};
+enum {//anims
+	BGUN_GETON_A,
+	BGUN_GETOFF_A,
+	BGUN_UPDOWN_A,
+	BGUN_RECOIL_A
+};
 
 void FireBigGun(ITEM_INFO *obj)
 {
@@ -31,7 +58,7 @@ void FireBigGun(ITEM_INFO *obj)
 			PHD_VECTOR pos;
 			pos.x = 0;
 			pos.y = 0;
-			pos.z = 520;
+			pos.z = 256;//520;
 
 			GetJointAbsPosition(obj, &pos, 2);
 
@@ -65,7 +92,7 @@ void FireBigGun(ITEM_INFO *obj)
 static int CanUseGun(ITEM_INFO *obj, ITEM_INFO *lara)
 {
 	int dist;
-	long x, z;
+	long long x, z;
 
 	if ((!(TrInput & IN_ACTION))
 		|| (Lara.gunStatus != LG_NO_ARMS)
@@ -79,7 +106,11 @@ static int CanUseGun(ITEM_INFO *obj, ITEM_INFO *lara)
 
 	if (dist > 30000)
 		return 0;
-	else
+
+	short ang = abs(lara->pos.yRot - obj->pos.yRot);
+	if (ang > ANGLE(35.0f) || ang < -ANGLE(35.0f))
+		return 0;
+
 		return 1;
 }
 
@@ -94,8 +125,8 @@ void BigGunInitialise(short itemNum)
 	obj->data = malloc(sizeof(BIGGUNINFO));
 
 	gun->flags = 0;
-	fireCount = 0;
-	gun->yRot = 30;
+	gun->fireCount = 0;
+	gun->xRot = GETOFF_FRAME;
 	gun->yRot = 0;
 	gun->startYRot = obj->pos.yRot;
 }
@@ -103,7 +134,6 @@ void BigGunInitialise(short itemNum)
 void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	ITEM_INFO* obj;
-	BIGGUNINFO *gun;
 
 	if (lara->hitPoints <= 0 || Lara.Vehicle != NO_ITEM)
 		return;
@@ -112,6 +142,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 	if (CanUseGun(obj, lara))
 	{
+		BIGGUNINFO *gun;
 		Lara.Vehicle = itemNum;
 
 		if (Lara.gunType == WEAPON_FLARE)
@@ -125,6 +156,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 		Lara.gunStatus = LG_HANDS_BUSY;
 
+		obj->hitPoints = 1;
 		lara->pos.xPos = obj->pos.xPos;
 		lara->pos.xRot = obj->pos.xRot;
 		lara->pos.yPos = obj->pos.yPos;
@@ -132,14 +164,14 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 		lara->pos.zPos = obj->pos.zPos;
 		lara->pos.zRot = obj->pos.zRot;
 
-		lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 0;
-		lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex].frameBase;
-		lara->currentAnimState = 0;
-		lara->goalAnimState = 0;
+		lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_GETON_A;
+		lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_GETON_A].frameBase;
+		lara->currentAnimState = BGUN_GETON;
+		lara->goalAnimState = BGUN_GETON;
 
 		gun = (BIGGUNINFO*)obj->data;
 		gun->flags = 0;
-		gun->xRot = 30;
+		gun->xRot = GETOFF_FRAME;
 
 	}
 	else
@@ -156,57 +188,96 @@ int BigGunControl(COLL_INFO *coll)
 	obj = &g_Level.Items[Lara.Vehicle];
 	gun = (BIGGUNINFO *)obj->data;
 
-	if (gun->flags & 1)
+	if (gun->flags & FLAG_UPDOWN)
 	{
+		if (barrelRotating)
+			gun->barrelZ--;
+
+		if (!gun->barrelZ)
+			barrelRotating = false;
+
 		if ((lara->hitPoints <= 0) || (TrInput & IN_ROLL))
 		{
-			gun->flags = 2;
-		}
-		else if ((TrInput & IN_ACTION) && fireCount == 0)
-		{
-			FireBigGun(obj);
-			fireCount = 26;
+			gun->flags = FLAG_AUTOROT;
 		}
 		else
 		{
-			if (TrInput & IN_LEFT)
-				gun->yRot -= 8;
-			else 
-			if (TrInput & IN_RIGHT)
-				gun->yRot += 8;
+			if ((TrInput & IN_ACTION) && gun->fireCount == 0)
+			{
+				FireBigGun(obj);
+				gun->fireCount = RECOIL_TIME;
+				gun->barrelZ = RECOIL_Z;
+				barrelRotating = true;
+			}
 
-			if ((TrInput & IN_FORWARD) && (gun->xRot < 59))
-				gun->xRot++;
-			else if ((TrInput & IN_BACK) && (gun->xRot))
+			if (TrInput & IN_LEFT)
+			{
+				if (GunRotYAdd > 0)
+					GunRotYAdd /= 2;
+
+				GunRotYAdd -= 8;
+
+				if (GunRotYAdd < -64)
+					GunRotYAdd = -64;
+				//				if ((Wibble & 7) == 0 && (abs(gun->yRot) < (136 << 2)))
+				//					SoundEffect(44, &obj->pos, 0); // gross
+			}
+			else
+			if (TrInput & IN_RIGHT)
+			{		
+				if (GunRotYAdd < 0)
+					GunRotYAdd /= 2;
+
+				GunRotYAdd += 8;
+
+				if (GunRotYAdd > 64)
+					GunRotYAdd = 64;
+
+				//				if ((Wibble & 7) == 0 && (abs(gun->yRot) < (136 << 2)))
+				//					SoundEffect(44, &obj->pos, 0); // gross
+			}
+			else
+			{
+				GunRotYAdd -= GunRotYAdd / 4;
+				if (abs(GunRotYAdd) < 8)			
+					GunRotYAdd = 0;
+			}
+
+			gun->yRot += GunRotYAdd / 4;
+
+			if ((TrInput & IN_FORWARD) && (gun->xRot < BGUN_UPDOWN_FRAMES))
+				gun->xRot++;			
+			else 
+			if ((TrInput & IN_BACK) && (gun->xRot))
 				gun->xRot--;
 		}
 	}
 
-	if (gun->flags & 2)
+	if (gun->flags & FLAG_AUTOROT)
 	{
-		if (gun->xRot < 30)
-			gun->xRot++;
-		else if (gun->xRot > 30)
-			gun->xRot--;
-		else
+		if (gun->xRot == GETOFF_FRAME)
 		{
-			lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 1;
-			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + 1].frameBase;
-			lara->currentAnimState = 1;
-			lara->goalAnimState = 1;
-			gun->flags = 4;
+			lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_GETOFF_A;
+			lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_GETOFF_A].frameBase;
+			lara->currentAnimState = BGUN_GETOFF;
+			lara->goalAnimState = BGUN_GETOFF;
+			gun->flags = FLAG_GETOFF;
 		}
+		else if (gun->xRot > GETOFF_FRAME)
+			gun->xRot--;
+		else if (gun->xRot < GETOFF_FRAME)
+			gun->xRot++;
 	}
 
 	switch (lara->currentAnimState)
 	{
-	case 0:
-	case 1:
+	case BGUN_GETON:
+	case BGUN_GETOFF:
 		AnimateItem(lara);
 		obj->animNumber = Objects[ID_BIGGUN].animIndex + (lara->animNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
 		obj->frameNumber = g_Level.Anims[obj->animNumber].frameBase + (lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase);
 
-		if ((gun->flags & 4) && lara->frameNumber == g_Level.Anims[lara->animNumber].frameEnd)
+		if ((gun->flags & FLAG_GETOFF) && lara->frameNumber == g_Level.Anims[lara->animNumber].frameEnd)
 		{
 			lara->animNumber = LA_STAND_SOLID;
 			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
@@ -214,24 +285,26 @@ int BigGunControl(COLL_INFO *coll)
 			lara->goalAnimState = LS_STOP;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
+			obj->hitPoints = 0;
 		}
 		break;
-	case 2:
-		lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + 2;
-		lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + 2].frameBase + gun->xRot;
+	case BGUN_UPDOWN:
+		lara->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_UPDOWN_A;
+		lara->frameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_UPDOWN_A].frameBase + gun->xRot;
 
 		obj->animNumber = Objects[ID_BIGGUN].animIndex + (lara->animNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
 		obj->frameNumber = g_Level.Anims[obj->animNumber].frameBase + (lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase);
 
-		if (fireCount)
-			fireCount--;
+		if (gun->fireCount > 0)
+			gun->fireCount--;
+		else if (gun->fireCount <= 0)
+			gun->fireCount = 0;
 
-		gun->flags = 1;
+		gun->flags = FLAG_UPDOWN;
 		break;
 	}
 	
-	lara->pos.yRot = gun->startYRot + (gun->yRot * (ANGLE(1) >> 2));
-	obj->pos.yRot = gun->startYRot + (gun->yRot * (ANGLE(1) >> 2));
+	lara->pos.yRot = obj->pos.yRot = gun->startYRot + (gun->yRot * (ANGLE(1) / 4));
 
 	coll->enableSpaz = false;
 	coll->enableBaddiePush = false;
