@@ -274,7 +274,7 @@ bool TestBlockPush3(ITEM_INFO* item, int blokhite, unsigned short quadrant)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
 
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
-	if (r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize].stopper)
+	if (r->floor[(z - r->z) / SECTOR(1) + (x - r->x) / SECTOR(1) * r->xSize].stopper)
 		return false;
 
 	COLL_INFO scoll;
@@ -337,7 +337,7 @@ bool TestBlockPull3(ITEM_INFO* item, int blokhite, unsigned short quadrant)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
 
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
-	if (r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize].stopper)
+	if (r->floor[(z - r->z) / SECTOR(1) + (x - r->x) / SECTOR(1) * r->xSize].stopper)
 		return false;
 
 	COLL_INFO scoll;
