@@ -94,8 +94,17 @@ void Renderer11::updateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(-Lara.leftArm.yRot), TO_RAD(Lara.leftArm.zRot));
-		laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(-Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
+
+		if (Lara.gunType == WEAPON_REVOLVER) // im so sorry but it's either this or crazy arms with the revolver
+		{
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+		}
+		else
+		{
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
+		}
+		// yRot still messed up in some situations but it's definitely better now!!
 
 		LARA_ARM *leftArm = &Lara.leftArm;
 		LARA_ARM *rightArm = &Lara.rightArm;
@@ -132,17 +141,17 @@ void Renderer11::updateLaraAnimations(bool force)
 			break;
 		case WEAPON_REVOLVER:
 		{
-			ANIM_FRAME* shotgunFramePtr;
+			ANIM_FRAME* revolverFramePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			shotgunFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber];
-			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			revolverFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber - g_Level.Anims[Lara.leftArm.animNumber].frameBase];
+			updateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			shotgunFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber];
-			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			revolverFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber - g_Level.Anims[Lara.rightArm.animNumber].frameBase];
+			updateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 		}
 			break;
 

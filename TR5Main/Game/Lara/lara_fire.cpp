@@ -35,6 +35,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		0,
 		0,
+		0,
 		0
 	},
 	/* Pistols */
@@ -50,7 +51,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		0,
-		SFX_LARA_FIRE
+		SFX_LARA_FIRE,
+		0
 	},
 	/* Revolver */
 	{
@@ -65,7 +67,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		16,
 		3,
 		0,
-		SFX_REVOLVER
+		SFX_REVOLVER,
+		0
 	},
 	/* Uzis */
 	{
@@ -80,7 +83,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		3,
 		3,
 		0,
-		SFX_LARA_UZI_FIRE
+		SFX_LARA_UZI_FIRE,
+		0
 	},
 	/* Shotgun */
 	{
@@ -95,7 +99,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		10,
-		SFX_LARA_SHOTGUN
+		SFX_LARA_SHOTGUN,
+		0
 	},
 	/* HK */
 	{
@@ -110,7 +115,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		3,
 		10,
-		0     // FIRE/SILENCER_FIRE
+		0,     // FIRE/SILENCER_FIRE
+		0
 	},
 	/* Crossbow */
 	{
@@ -125,13 +131,15 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
-		SFX_LARA_CROSSBOW
+		SFX_LARA_CROSSBOW,
+		20
 	},
 	/* Flare */
 	{
 		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
 		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
 		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		0,
 		0,
 		0,
 		0,
@@ -155,7 +163,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		0,
-		SFX_LARA_UZI_FIRE
+		SFX_LARA_UZI_FIRE,
+		0
 	},
 	/* Grenade launcher */
 	{
@@ -170,7 +179,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
-		0
+		0,
+		30
 	},
 	/* Harpoon gun */
 	{
@@ -185,6 +195,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
+		0,
 		0
 	},
 	/* Rocket launcher */
@@ -200,7 +211,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		12,
-		77
+		77,
+		30
 	},
 	/* Snowmobile */
 	{
@@ -215,7 +227,8 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		0,
 		0,
-		SFX_LARA_UZI_FIRE
+		SFX_LARA_UZI_FIRE,
+		0
 	}
 };
 
