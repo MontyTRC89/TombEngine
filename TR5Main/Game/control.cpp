@@ -2005,8 +2005,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	dz = end->z - start->z;
 	if (!dz)
 		return 1;
-	dx = ((end->x - start->x) / 1024) / dz;
-	dy = ((end->y - start->y) / 1024) / dz;
+	dx = ((end->x - start->x) * 1024) / dz;
+	dy = ((end->y - start->y) * 1024) / dz;
 	number_los_rooms = 1;
 	los_rooms[0] = start->roomNumber;
 	room = start->roomNumber;
