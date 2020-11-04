@@ -377,7 +377,7 @@ int TestBlockMovable(ITEM_INFO* item, int blokhite)
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
 	if (floor->floor == NO_HEIGHT / CLICK(1))
 		return true;
-	else if (floor->floor * CLICK(1) != item->pos.yPos - blockHeight)
+	else if (floor->floor * CLICK(1) != item->pos.yPos - blokhite)
 		return false;
 
 	return true;
@@ -424,7 +424,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (HeightType)
 		return false;
 
-	int ceiling = y - blockHeight + 100;
+	int ceiling = y - blockhite + 100;
 	floor = GetFloor(x, ceiling, z, &roomNum);
 	if (GetCeiling(floor, x, ceiling, z) > ceiling)
 		return false;
@@ -502,7 +502,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (GetFloorHeight(floor, x, y - CLICK(1), z) != y)
 		return false;
 
-	if (GetFloor(x, y - blockHeight, z, &quadrant)->ceiling * CLICK(1) > y - blockHeight)
+	if (GetFloor(x, y - blockhite, z, &quadrant)->ceiling * CLICK(1) > y - blockhite)
 		return false;
 
 	int oldX = item->pos.xPos;
