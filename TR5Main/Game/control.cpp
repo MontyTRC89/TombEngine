@@ -1469,7 +1469,7 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
 
-	if (floor->floor == NO_HEIGHT / STEP_SIZE)
+	/*if (floor->floor == NO_HEIGHT / STEP_SIZE)
 	{
 		floor->floor = ceiling->ceiling + height / STEP_SIZE;
 	}
@@ -1478,7 +1478,10 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 		floor->floor += height / STEP_SIZE;
 		if (floor->floor == ceiling->ceiling && !flag)
 			floor->floor = NO_HEIGHT / STEP_SIZE;
-	}
+	}*/
+
+	floor->FloorCollision.Planes[0].z += height;
+	floor->FloorCollision.Planes[1].z += height;
 
 	box = &g_Level.Boxes[floor->box];
 	if (box->flags & BLOCKABLE)
@@ -2186,8 +2189,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
-		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
-			Lara.target = &g_Level.Items[itemNumber];
+//		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
+//			Lara.target = &g_Level.Items[itemNumber];
+		// this is crashing and it's not really doing anything..
 
 		if (firing)
 		{
