@@ -161,6 +161,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\Generic\generic_objects.h" />
     <ClInclude Include="Objects\Generic\Object\generic_bridge.h" />
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
+    <ClInclude Include="Objects\TR3\Object\tr3_moveblock.h" />
     <ClInclude Include="Objects\TR3\Trap\train.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_big_beetle.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_enemy_jeep.h" />
@@ -462,6 +463,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_bridge.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />
+    <ClCompile Include="Objects\TR3\Object\tr3_moveblock.cpp" />
     <ClCompile Include="Objects\TR3\Trap\train.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_big_beetle.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_enemy_jeep.cpp" />

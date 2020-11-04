@@ -930,6 +930,9 @@
     <ClInclude Include="Game\prng.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR3\Object\tr3_moveblock.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1713,6 +1716,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\prng.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Object\tr3_moveblock.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
