@@ -2217,7 +2217,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 				else
 				{
 					item = &g_Level.Items[itemNumber];
-					if (item->objectNumber < ID_SHOOT_SWITCH1 && item->objectNumber > ID_SHOOT_SWITCH4)
+					if (item->objectNumber < ID_SHOOT_SWITCH1 || item->objectNumber > ID_SHOOT_SWITCH4)
 					{
 						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit) && LaserSight)
 						{
