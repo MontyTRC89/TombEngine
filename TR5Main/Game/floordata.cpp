@@ -322,16 +322,29 @@ namespace T5M::Floordata
 
 				for (const auto stackNumber : list)
 				{
+					auto done = false;
 					for (auto itemNumber = g_Level.Rooms[stackNumber].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 					{
 						const auto& item = g_Level.Items[itemNumber];
 						if (Objects[item.objectNumber].floor)
 						{
-							const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
-							if (itemHeight && *itemHeight >= y && *itemHeight < height)
-								height = *itemHeight;
+							const auto [itemHeight, inside] = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+							if (itemHeight)
+							{
+								if (inside)
+								{
+									height = *itemHeight;
+									done = true;
+									break;
+								}
+								if (*itemHeight >= y && *itemHeight < height)
+									height = *itemHeight;
+							}
 						}
 					}
+
+					if (done)
+						break;
 				}
 			}
 
@@ -355,16 +368,29 @@ namespace T5M::Floordata
 
 				for (const auto stackNumber : list)
 				{
+					auto done = false;
 					for (auto itemNumber = g_Level.Rooms[stackNumber].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 					{
 						const auto& item = g_Level.Items[itemNumber];
 						if (Objects[item.objectNumber].ceiling)
 						{
-							const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
-							if (itemHeight && *itemHeight <= y && *itemHeight > height)
-								height = *itemHeight;
+							const auto [itemHeight, inside] = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
+							if (itemHeight)
+							{
+								if (inside)
+								{
+									height = *itemHeight;
+									done = true;
+									break;
+								}
+								if (*itemHeight <= y && *itemHeight > height)
+									height = *itemHeight;
+							}
 						}
 					}
+
+					if (done)
+						break;
 				}
 			}
 

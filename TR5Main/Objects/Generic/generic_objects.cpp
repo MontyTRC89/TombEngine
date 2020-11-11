@@ -83,36 +83,36 @@ static void StartObject()
 	obj = &Objects[ID_BRIDGE_FLAT];
 	if (obj->loaded)
 	{
-		obj->floor = BridgeHeight<0, 0>;
-		obj->ceiling = BridgeHeight<0, SECTOR(1) / 4>;
+		obj->floor = BridgeFloor<0>;
+		obj->ceiling = BridgeCeiling<0>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT1];
 	if (obj->loaded)
 	{
-		obj->floor = BridgeHeight<1, 0>;
-		obj->ceiling = BridgeHeight<1, SECTOR(1) / 4>;
+		obj->floor = BridgeFloor<1>;
+		obj->ceiling = BridgeCeiling<1>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT2];
 	if (obj->loaded)
 	{
-		obj->floor = BridgeHeight<2, 0>;
-		obj->ceiling = BridgeHeight<2, SECTOR(1) / 4>;
+		obj->floor = BridgeFloor<2>;
+		obj->ceiling = BridgeCeiling<2>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT3];
 	if (obj->loaded)
 	{
-		obj->floor = BridgeHeight<3, 0>;
-		obj->ceiling = BridgeHeight<3, SECTOR(1) / 4>;
+		obj->floor = BridgeFloor<3>;
+		obj->ceiling = BridgeCeiling<3>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT4];
 	if (obj->loaded)
 	{
-		obj->floor = BridgeHeight<4, 0>;
-		obj->ceiling = BridgeHeight<4, SECTOR(1) / 4>;
+		obj->floor = BridgeFloor<4>;
+		obj->ceiling = BridgeCeiling<4>;
 	}
 }
 

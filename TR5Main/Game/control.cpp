@@ -3022,13 +3022,13 @@ void AddRoomFlipItems(ROOM_INFO *r)
 	{
 		ITEM_INFO *item = &g_Level.Items[linkNum];
 
-		if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
-			AlterFloorHeight(item, -1024);
+		//if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
+		//	AlterFloorHeight(item, -1024);
 
 		if (item->objectNumber == ID_RAISING_BLOCK2)
 		{
-			if (item->itemFlags[1])
-				AlterFloorHeight(item, -2048);
+			//if (item->itemFlags[1])
+			//	AlterFloorHeight(item, -2048);
 		}
 	}
 }
