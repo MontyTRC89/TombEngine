@@ -53,6 +53,7 @@ using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
 using namespace T5M::Effects;
 using T5M::Renderer::g_Renderer;
+using namespace T5M::Floordata;
 
 short ShatterSounds[18][10] =
 	{
@@ -1581,11 +1582,8 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	return floor;
 #endif
 
-	auto floor = FLOOR_INFO::GetNearBottomFloor(*roomNumber, x, z);
-	if (!floor)
-		floor = FLOOR_INFO::GetFloor(*roomNumber, x, z);
-	*roomNumber = FLOOR_INFO::GetRoom(*roomNumber, x, y, z);
-	return floor;
+	*roomNumber = GetRoom(*roomNumber, x, y, z);
+	return &GetFloor(*roomNumber, x, z);
 }
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
@@ -1862,7 +1860,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 
 	/*return height;*/
 
-	return FLOOR_INFO::GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
+	return GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
@@ -2672,7 +2670,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 	return ceiling;
 #endif
 
-	return FLOOR_INFO::GetCeilingHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
+	return GetCeilingHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
 int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)
