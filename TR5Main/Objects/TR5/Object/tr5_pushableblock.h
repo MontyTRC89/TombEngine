@@ -9,3 +9,5 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 int TestBlockMovable(ITEM_INFO* item, int blockhite);
 int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant);
+std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z);
+std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z);
