@@ -65,8 +65,8 @@ void InitialisePushableBlock(short itemNum)
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
-	if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
-		AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
+	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 }
 
 void PushableBlockControl(short itemNumber)
@@ -237,7 +237,7 @@ void PushableBlockControl(short itemNumber)
 
 			if (item->triggerFlags >= 64)
 			{
-				AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
 			}
 		}
@@ -311,7 +311,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (item->triggerFlags >= 64)
 		{
-			AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
+			//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
 			AdjustStopperFlag(item, item->itemFlags[0], 0);
 		}
 	}
@@ -537,4 +537,26 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	LaraItem->pos.zPos = oldZ;
 
 	return (CollidedItems[0] == NULL);
+}
+
+std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::make_tuple(std::optional{height}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
+}
+
+std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::make_tuple(std::optional{item.pos.yPos}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
 }
