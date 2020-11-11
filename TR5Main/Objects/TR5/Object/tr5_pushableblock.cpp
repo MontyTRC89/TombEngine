@@ -65,8 +65,8 @@ void InitialisePushableBlock(short itemNum)
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
-	if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
-		AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
+	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 }
 
 void PushableBlockControl(short itemNumber)
@@ -176,25 +176,25 @@ void PushableBlockControl(short itemNumber)
 
 		switch (quadrant)
 		{
-		case 0:
+		case NORTH:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
 			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
-		case 1:
+		case EAST:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
 			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
-		case 2:
+		case SOUTH:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
 			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
-		case 3:
+		case WEST:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
 			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos < x)
 				item->pos.xPos = x;
@@ -237,7 +237,7 @@ void PushableBlockControl(short itemNumber)
 
 			if (item->triggerFlags >= 64)
 			{
-				AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
 			}
 		}
@@ -251,9 +251,6 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
-	//item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-	//if (item->roomNumber != roomNumber)
-	//	ItemNewRoom(itemNum, roomNumber);
 
 	if ((!(TrInput & IN_ACTION)
 		|| l->currentAnimState != LS_STOP
@@ -314,8 +311,8 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (item->triggerFlags >= 64)
 		{
-			AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
-			AdjustStopperFlag(item, item->itemFlags[0], 1);
+			//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
+			AdjustStopperFlag(item, item->itemFlags[0], 0);
 		}
 	}
 	else
@@ -336,13 +333,20 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			if (TestLaraPosition(&PushableBlockBounds, item, l))
 			{
-				if (((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000)) & 1)
+				unsigned short quadrant = (unsigned short)((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000));
+				if (quadrant & 1)
 					PushableBlockPos.z = bounds->X1 - 35;
 				else
 					PushableBlockPos.z = bounds->Z1 - 35;
 
-				if (MoveLaraPosition(&PushableBlockPos, item, l))
-				{
+				if (item->triggerFlags > 64)
+				{					
+					// For now don't use auto-align function because it can collide with climb up moves of Lara
+
+					LaraItem->pos.xRot = item->pos.xRot;
+					LaraItem->pos.yRot = item->pos.yRot;
+					LaraItem->pos.zRot = item->pos.zRot;
+
 					l->animNumber = LA_PUSHABLE_GRAB;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					l->currentAnimState = LS_PUSHABLE_GRAB;
@@ -354,8 +358,22 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				else
 				{
-					Lara.generalPtr = item;
-					item->pos.yRot = rot;
+					if (MoveLaraPosition(&PushableBlockPos, item, l))
+					{
+						l->animNumber = LA_PUSHABLE_GRAB;
+						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						l->currentAnimState = LS_PUSHABLE_GRAB;
+						l->goalAnimState = LS_PUSHABLE_GRAB;
+						Lara.isMoving = false;
+						Lara.gunStatus = LG_HANDS_BUSY;
+						Lara.cornerX = (int)item;
+						item->pos.yRot = rot;
+					}
+					else
+					{
+						Lara.generalPtr = item;
+						item->pos.yRot = rot;
+					}
 				}
 			}
 			else
@@ -385,9 +403,6 @@ int TestBlockMovable(ITEM_INFO* item, int blokhite)
 
 int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 {
-	//if (!TestBlockMovable(item, blokhite))
-	//	return 0;
-
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
@@ -433,40 +448,15 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 0);
+	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
 	return CollidedItems[0] == NULL;
-
-	// TR3 code
-	/*COLL_INFO scoll;
-	scoll.quadrant = quadrant;
-	scoll.radius = 500;
-	if (CollideStaticObjects(&scoll, x, y, z, roomNum, 1000))
-		return 0;
-
-	if (((int)floor->floor << 8) != y)
-		return 0;
-
-	GetFloorHeight(floor, x, y, z);
-	if (HeightType != WALL)
-		return 0;
-
-	int cmax = y - (blokhite - 100);
-	floor = GetFloor(x, cmax, z, &roomNum);
-	if (GetCeiling(floor, x, cmax, z) > cmax)
-		return 0;
-
-	item->itemFlags[0] = LaraItem->pos.yRot;
-	 return 1;*/
 }
 
 int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 {
-	//if (!TestBlockMovable(item, blokhite))
-	//	return (0);
-
 	int xadd = 0;
 	int zadd = 0;
 
@@ -509,7 +499,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 0);
+	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
@@ -541,51 +531,31 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	oldZ = LaraItem->pos.zPos;
 	LaraItem->pos.xPos = x;
 	LaraItem->pos.zPos = z;
-	GetCollidedObjects(LaraItem, 256, 1, &CollidedItems[0], 0, 0);
+	GetCollidedObjects(LaraItem, 256, 1, &CollidedItems[0], 0, 1);
 	LaraItem->pos.xPos = oldX;
 	LaraItem->pos.zPos = oldZ;
 
 	return (CollidedItems[0] == NULL);
+}
 
-	/*
-	COLL_INFO scoll;
-	scoll.quadrant = quadrant;
-	scoll.radius = 500;
-	if (CollideStaticObjects(&scoll, x, y, z, roomNum, 1000))
-		return 0;
+std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::make_tuple(std::optional{height}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
+}
 
-	if (((int)floor->floor << 8) != y)
-		return 0;
-
-	int cmax = y - blokhite;
-	floor = GetFloor(x, cmax, z, &roomNum);
-	if (((int)floor->ceiling << 8) > cmax)
-		return 0;
-
-	x += xadd;
-	z += zadd;
-	roomNum = item->roomNumber;
-	floor = GetFloor(x, y, z, &roomNum);
-
-	if (((int)floor->floor << 8) != y)
-		return 0;
-
-	cmax = y - LARA_HITE;
-	floor = GetFloor(x, cmax, z, &roomNum);
-	if (((int)floor->ceiling << 8) > cmax)
-		return 0;
-
-	x = LaraItem->pos.xPos + xadd;
-	y = LaraItem->pos.yPos;
-	z = LaraItem->pos.zPos + zadd;
-	roomNum = LaraItem->roomNumber;
-	floor = GetFloor(x, y, z, &roomNum);
-	scoll.quadrant = (quadrant + 2) & 3;
-	scoll.radius = LARA_RAD;
-	if (CollideStaticObjects(&scoll, x, y, z, roomNum, LARA_HITE))
-		return 0;
-
-	item->itemFlags[0] = LaraItem->pos.yRot + ANGLE(180);
-
-	return 1;*/
+std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::make_tuple(std::optional{item.pos.yPos}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
 }
