@@ -24,10 +24,14 @@ void InitialiseDoppelganger(short itemNum)
 void DoppelgangerControl(short itemNum)
 {
 	ITEM_INFO* item;
+	ITEM_INFO* ref;
 	FLOOR_INFO* floor;
 	int h, lh;
 	int x, y, z;
 	short room_num;
+	short xRef, zRef;
+
+	ref = find_a_fucking_item(ID_BACON_REFERENCE);
 
 	item = &g_Level.Items[itemNum];
 
@@ -41,9 +45,11 @@ void DoppelgangerControl(short itemNum)
 	{
 		// TODO: fix evil lara moving.
 		room_num = item->roomNumber;
-		x = item->pos.xPos; // 2*36*WALL_SIZE - LaraItem->pos.xPos;
-		y = item->pos.yPos; // LaraItem->pos.yPos;
-		z = item->pos.zPos; // 2*60*WALL_SIZE - LaraItem->pos.zPos;
+		xRef = ref->pos.xPos;
+		zRef = ref->pos.zPos;
+		x = 2 * ref->pos.xPos - LaraItem->pos.xPos;
+		y = LaraItem->pos.yPos;
+		z = 2 * ref->pos.zPos - LaraItem->pos.zPos;
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
 		item->floor = h;
@@ -52,9 +58,9 @@ void DoppelgangerControl(short itemNum)
 		lh = GetFloorHeight(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 		item->frameNumber = LaraItem->frameNumber;
 		item->animNumber = LaraItem->animNumber;
-		//item->pos.xPos = x;
-		//item->pos.yPos = y;
-		//item->pos.zPos = z;
+		item->pos.xPos = x;
+		item->pos.yPos = y;
+		item->pos.zPos = z;
 		item->pos.xRot = LaraItem->pos.xRot;
 		item->pos.yRot = LaraItem->pos.yRot - ANGLE(180);
 		item->pos.zRot = LaraItem->pos.zRot;
