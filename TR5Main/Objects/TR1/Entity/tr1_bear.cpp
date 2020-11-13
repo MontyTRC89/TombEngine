@@ -8,6 +8,40 @@
 
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 
+enum bearStates{
+	BEAR_STROLL,
+	BEAR_STOP,
+	BEAR_WALK,
+	BEAR_RUN,
+	BEAR_REAR,
+	BEAR_ROAR,
+	BEAR_ATTACK1,
+	BEAR_ATTACK2,
+	BEAR_EAT,
+	BEAR_DEATH
+};
+#define TOUCH 0x2406C
+
+
+#define ROAR_CHANCE 0x50
+#define REAR_CHANCE 0x300
+#define DROP_CHANCE 0x600
+
+#define REAR_RANGE   SQUARE(WALL_SIZE*2)
+#define ATTACK_RANGE SQUARE(WALL_SIZE)
+#define PAT_RANGE    SQUARE(600)
+
+#define RUN_TURN  ANGLE(5)
+#define WALK_TURN ANGLE(2)
+
+#define EAT_RANGE     SQUARE(WALL_SIZE*3/4)
+
+
+#define CHARGE_DAMAGE 3
+#define SLAM_DAMAGE   200
+#define ATTACK_DAMAGE 200
+#define PAT_DAMAGE    400
+
 void BearControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
@@ -17,48 +51,55 @@ void BearControl(short itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;
-	short angle = 0;
+	short angle;
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
-		{
+//		if (item->currentAnimState != 9)
+//		{
 			angle = CreatureTurn(item, ANGLE(1));
 
 			switch (item->currentAnimState)
 			{
-			case 2:
-				item->goalAnimState = 4;
+			case BEAR_WALK:
+			{
+				item->goalAnimState = BEAR_REAR;
 				break;
-			case 3:
-			case 0:
-				item->goalAnimState = 1;
+			}
+			case BEAR_RUN:
+			case BEAR_STROLL:
+			{
+				item->goalAnimState = BEAR_STOP;
 				break;
-
-			case 4:
+			}
+			case BEAR_REAR:
+			{
 				creature->flags = 1;
-				item->goalAnimState = 9;
+				item->goalAnimState = BEAR_DEATH;
 				break;
-
-			case 1:
+			}
+			case BEAR_STOP:
+			{
 				creature->flags = 0;
-				item->goalAnimState = 9;
+				item->goalAnimState = BEAR_DEATH;
 				break;
-
-			case 9:
-				if (creature->flags && (item->touchBits & 0x2406C))
+			}
+			case BEAR_DEATH:
+			{
+				if (creature->flags && (item->touchBits & TOUCH))
 				{
-					LaraItem->hitPoints -= 200;
+					LaraItem->hitPoints -= SLAM_DAMAGE;
 					LaraItem->hitStatus = 1;
 					creature->flags = 0;
 				}
 
-				item->animNumber = Objects[item->objectNumber].animIndex + 20;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = 9;
+				//				item->animNumber = Objects[item->objectNumber].animIndex + 20;
+				//				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				//				item->currentAnimState = 9;
 				break;
 			}
-		}
+			}
+//		}
 	}
 	else
 	{
@@ -76,18 +117,20 @@ void BearControl(short itemNum)
 		if (item->hitStatus)
 			creature->flags = 1;
 
+		const bool Laradead = (LaraItem->hitPoints <= 0);
+
 		switch (item->currentAnimState)
 		{
-		case 1:
-			if (LaraItem->hitPoints <= 0)
+		case BEAR_STOP:
+			if (Laradead)
 			{
-				if (info.bite && info.distance < SQUARE(768))
+				if (info.bite && info.distance < EAT_RANGE)
 				{
-					item->goalAnimState = 8;
+					item->goalAnimState = BEAR_EAT;
 				}
 				else
 				{
-					item->goalAnimState = 0;
+					item->goalAnimState = BEAR_STROLL;
 				}
 			}
 			else if (item->requiredAnimState)
@@ -96,70 +139,70 @@ void BearControl(short itemNum)
 			}
 			else if (creature->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = BEAR_STROLL;
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->goalAnimState = BEAR_RUN;
 			}
 			break;
 
-		case 0:
-			creature->maximumTurn = ANGLE(2);
+		case BEAR_STROLL:
+			creature->maximumTurn = WALK_TURN;
 
-			if (LaraItem->hitPoints <= 0 && (item->touchBits & 0x2406C) && info.ahead)
+			if (Laradead && (item->touchBits & TOUCH) && info.ahead)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = BEAR_STOP;
 			}
 			else if (creature->mood != BORED_MOOD)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = BEAR_STOP;
 				if (creature->mood == ESCAPE_MOOD)
 				{
-					item->requiredAnimState = 0;
+					item->requiredAnimState = BEAR_STROLL;
 				}
 			}
-			else if (GetRandomControl() < 0x50)
+			else if (GetRandomControl() < ROAR_CHANCE)
 			{
-				item->requiredAnimState = 5;
-				item->goalAnimState = 1;
+				item->requiredAnimState = BEAR_ROAR;
+				item->goalAnimState = BEAR_STOP;
 			}
 			break;
 
-		case 3:
-			creature->maximumTurn = ANGLE(5);
+		case BEAR_RUN:
+			creature->maximumTurn = RUN_TURN;
 
 			// if the bear slams you it hurts
-			if (item->touchBits & 0x2406C)
+			if (item->touchBits & TOUCH)
 			{
-				LaraItem->hitPoints -= 3;
+				LaraItem->hitPoints -= CHARGE_DAMAGE;
 				LaraItem->hitStatus = true;
 			}
 
-			if (creature->mood == BORED_MOOD || LaraItem->hitPoints <= 0)
+			if (creature->mood == BORED_MOOD || Laradead)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = BEAR_STOP;
 			}
 			else if (info.ahead && !item->requiredAnimState)
 			{
 				// bear may rear up, but not after he's taken some bullets!
-				if (!creature->flags && info.distance < SQUARE(2048) && GetRandomControl() < 0x300)
+				if (!creature->flags && info.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
-					item->requiredAnimState = 4;
-					item->goalAnimState = 1;
+					item->requiredAnimState = BEAR_REAR;
+					item->goalAnimState = BEAR_STOP;
 				}
-				else if (info.distance < SQUARE(1024))
+				else if (info.distance < ATTACK_RANGE)
 				{
-					item->goalAnimState = 6;
+					item->goalAnimState = BEAR_ATTACK1;
 				}
 			}
 			break;
 
-		case 4:
+		case BEAR_REAR:
 			if (creature->flags)
 			{
-				item->requiredAnimState = 0;
-				item->goalAnimState = 1;
+				item->requiredAnimState = BEAR_STROLL;
+				item->goalAnimState = BEAR_STOP;
 			}
 			else if (item->requiredAnimState)
 			{
@@ -167,62 +210,62 @@ void BearControl(short itemNum)
 			}
 			else if (creature->mood == BORED_MOOD || creature->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = BEAR_STOP;
 			}
-			else if (info.bite && info.distance < SQUARE(600))
+			else if (info.bite && info.distance < PAT_RANGE)
 			{
-				item->goalAnimState = 7;
+				item->goalAnimState = BEAR_ATTACK2;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = BEAR_WALK;
 			}
 			break;
 
-		case 2:
+		case BEAR_WALK:
 			if (creature->flags)
 			{
-				item->requiredAnimState = 0;
-				item->goalAnimState = 4;
+				item->requiredAnimState = BEAR_STROLL;
+				item->goalAnimState = BEAR_REAR;
 			}
-			else if (info.ahead && (item->touchBits & 0x2406C))
+			else if (info.ahead && (item->touchBits & TOUCH))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = BEAR_REAR;
 			}
 			else if (creature->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 4;
-				item->requiredAnimState = 0;
+				item->goalAnimState = BEAR_REAR;
+				item->requiredAnimState = BEAR_STROLL;
 			}
-			else if (creature->mood == BORED_MOOD || GetRandomControl() < 0x50)
+			else if (creature->mood == BORED_MOOD || GetRandomControl() < ROAR_CHANCE)
 			{
-				item->requiredAnimState = 5;
-				item->goalAnimState = 4;
+				item->requiredAnimState = BEAR_ROAR;
+				item->goalAnimState = BEAR_REAR;
 			}
-			else if (info.distance > SQUARE(2048) || GetRandomControl() < 0x600)
+			else if (info.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
 			{
-				item->requiredAnimState = 1;
-				item->goalAnimState = 4;
+				item->requiredAnimState = BEAR_STOP;
+				item->goalAnimState = BEAR_REAR;
 			}
 			break;
 
-		case 7:
-			if (!item->requiredAnimState && (item->touchBits & 0x2406C))
+		case BEAR_ATTACK2:
+			if (!item->requiredAnimState && (item->touchBits & TOUCH))
 			{
-				LaraItem->hitPoints -= 400;
+				LaraItem->hitPoints -= PAT_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = 4;
+				item->requiredAnimState = BEAR_REAR;
 			}
 
 			break;
 
-		case 6:
-			if (!item->requiredAnimState && (item->touchBits & 0x2406C))
+		case BEAR_ATTACK1:
+			if (!item->requiredAnimState && (item->touchBits & TOUCH))
 			{
 				CreatureEffect(item, &bearBite, DoBloodSplat);
-				LaraItem->hitPoints -= 200;
+				LaraItem->hitPoints -= ATTACK_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = 1;
+				item->requiredAnimState = BEAR_STOP;
 			}
 			break;
 
