@@ -152,7 +152,13 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 static void StartObject(OBJECT_INFO* obj)
 {
-
+	obj = &Objects[ID_BACON_REFERENCE];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+		obj->collision = AIPickupCollision;
+		obj->hitPoints = 0;
+	}
 }
 
 static void StartTrap(OBJECT_INFO* obj)
