@@ -26,7 +26,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->initialise = InitialiseWolf;
 		obj->control = WolfControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 6;
 		obj->pivotLength = 375;
 		obj->radius = 340;
