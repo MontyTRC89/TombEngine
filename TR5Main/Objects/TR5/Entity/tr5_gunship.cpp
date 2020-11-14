@@ -33,24 +33,24 @@ void ControlGunShip(short itemNumber)
 
 		if (!item->itemFlags[0] && !item->itemFlags[1] && !item->itemFlags[2])
 		{
-			item->itemFlags[0] = pos.x >> 4;
-			item->itemFlags[1] = pos.y >> 4;
-			item->itemFlags[2] = pos.z >> 4;
+			item->itemFlags[0] = pos.x / 16;
+			item->itemFlags[1] = pos.y / 16;
+			item->itemFlags[2] = pos.z / 16;
 		}
 
 		pos.x = (pos.x + 80 * item->itemFlags[0]) / 6;
 		pos.y = (pos.y + 80 * item->itemFlags[1]) / 6;
 		pos.z = (pos.z + 80 * item->itemFlags[2]) / 6;
 
-		item->itemFlags[0] = pos.x >> 4;
-		item->itemFlags[1] = pos.y >> 4;
-		item->itemFlags[2] = pos.z >> 4;
+		item->itemFlags[0] = pos.x / 16;
+		item->itemFlags[1] = pos.y / 16;
+		item->itemFlags[2] = pos.z / 16;
 
 		if (item->triggerFlags == 1)
-			item->pos.zPos += (pos.z - item->pos.zPos) >> 5;
+			item->pos.zPos += (pos.z - item->pos.zPos) / 32;
 		else
-			item->pos.xPos += (pos.x - item->pos.xPos) >> 5;
-		item->pos.yPos += (pos.y - item->pos.yPos - 256) >> 5;
+			item->pos.xPos += (pos.x - item->pos.xPos) / 32;
+		item->pos.yPos += (pos.y - item->pos.yPos - 256) / 32;
 
 		GAME_VECTOR start;
 		start.x = GetRandomControl() + item->pos.xPos - 128;
@@ -157,7 +157,7 @@ void ControlGunShip(short itemNumber)
 			SPARKS* spark = &Sparks[GetFreeSpark()];
 			spark->on = 1;
 			spark->sR = spark->dR = (GetRandomControl() & 0x7F) + -128;
-			spark->sG = (spark->dR >> 1) + (GetRandomControl() & 0x7F);
+			spark->sG = (spark->dR / 2) + (GetRandomControl() & 0x7F);
 			if (spark->sG > spark->sR)
 				spark->sG = spark->sR;
 			spark->sB = 0;

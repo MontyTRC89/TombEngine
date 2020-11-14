@@ -256,9 +256,9 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)//1D244, 1D3D8 (F)
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 	{
-		item->pos.xPos += 700 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += 700 * phd_sin(item->pos.yRot);
 		item->pos.yPos -= 361;
-		item->pos.zPos += 700 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos += 700 * phd_cos(item->pos.yRot);
 
 		item->animNumber = LA_REACH;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -486,7 +486,7 @@ void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 		if (TrInput & IN_SPRINT)
 		{
-			Lara.ropeDFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
+			Lara.ropeDFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) * 256;
 			Lara.ropeFrame = Lara.ropeDFrame;
 
 			item->goalAnimState = LS_ROPE_SWING;
@@ -538,7 +538,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 			ApplyVelocityToRope(Lara.ropeSegment - 2,
 				item->pos.yRot + (Lara.ropeDirection ? ANGLE(0.0f) : ANGLE(180.0f)),
-				vel >> 5);
+				vel / 32);
 		}
 
 		if (Lara.ropeFrame > Lara.ropeDFrame)
@@ -554,7 +554,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				Lara.ropeFrame = Lara.ropeDFrame;
 		}
 
-		item->frameNumber = Lara.ropeFrame >> 8;
+		item->frameNumber = Lara.ropeFrame / 256;
 
 		if (!(TrInput & IN_SPRINT) &&
 			item->frameNumber == g_Level.Anims[LA_ROPE_SWING].frameBase + 32 &&
@@ -677,8 +677,8 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		}
 		else
 		{
-			item->pos.xPos -= (phd_sin(item->pos.yRot)) << 6 >> W2V_SHIFT;
-			item->pos.zPos -= (phd_cos(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+			item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
 			item->goalAnimState = LS_FREEFALL;
 		}
 	}
@@ -768,7 +768,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	else if (item->itemFlags[2] > ANGLE(90.0f))
 		item->itemFlags[2] = ANGLE(90.0f);
 
-	item->pos.yPos += item->itemFlags[2] >> 8;
+	item->pos.yPos += item->itemFlags[2] / 256;
 }
 
 void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)//17020(<), 17154(<) (F)

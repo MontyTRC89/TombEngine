@@ -54,10 +54,10 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				spark->sR = 0;
 				spark->sG = 0;
 				spark->sB = 0;
-				spark->dR = spark->dG = 48 * speed >> 7;
+				spark->dR = spark->dG = (48 * speed) / 128;
 				spark->colFadeSpeed = 4;
 				spark->fadeToBlack = 8;
-				spark->dB = speed * ((GetRandomControl() & 8) + 48) >> 7;
+				spark->dB = (speed * ((GetRandomControl() & 8) + 48)) / 128;
 				spark->transType = COLADD;
 				spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 
@@ -66,8 +66,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 					int factor = 3 * (bounds->X2 - bounds->X1) / 8;
 					short angle = 2 * GetRandomControl();
 
-					spark->x = ((bounds->X1 + bounds->X2) / 2) + ((GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT);
-					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+					spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * phd_sin(angle);
+					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
 
 					if (intensity >= 0)
 						spark->y = bounds->Y2;
@@ -92,8 +92,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 						else
 							spark->z = bounds->Z1;
 
-						spark->x = ((bounds->X1 + bounds->X2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
-						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
+						spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
+						spark->y += (GetRandomControl() % factor) * phd_sin(angle);
 						spark->xVel = 0;
 						spark->zVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -104,8 +104,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 						else
 							spark->x = bounds->X1;
 
-						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
-						spark->z = ((bounds->Z1 + bounds->Z2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+						spark->y += (GetRandomControl() % factor) * phd_sin(angle);
+						spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
 						spark->zVel = 0;
 						spark->xVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -114,9 +114,9 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				}
 
 				spark->friction = 85;
-				spark->xVel = speed * spark->xVel >> 7;
-				spark->yVel = speed * spark->yVel >> 7;
-				spark->zVel = speed * spark->zVel >> 7;
+				spark->xVel = (speed * spark->xVel) / 128;
+				spark->yVel = (speed * spark->yVel) / 128;
+				spark->zVel = (speed * spark->zVel) / 128;
 				spark->maxYvel = 0;
 				spark->gravity = 0;
 				spark->flags = SP_NONE;
@@ -129,7 +129,7 @@ void InitialiseVentilator(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->itemFlags[0] = item->triggerFlags << WALL_SHIFT;
+	item->itemFlags[0] = item->triggerFlags * SECTOR(1);
 	if (item->itemFlags[0] < 2048)
 		item->itemFlags[0] = 3072;
 }

@@ -20,10 +20,10 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 		return false;
 
 	short angle = item->pos.yRot;
-	int xb = x >> WALL_SHIFT;
-	int zb = z >> WALL_SHIFT;
-	int itemxb = item->pos.xPos >> WALL_SHIFT;
-	int itemzb = item->pos.zPos >> WALL_SHIFT;
+	int xb = x / SECTOR(1);
+	int zb = z / SECTOR(1);
+	int itemxb = item->pos.xPos / SECTOR(1);
+	int itemzb = item->pos.zPos / SECTOR(1);
 
 	if (!angle && (xb == itemxb || xb == itemxb - 1) && (zb == itemzb || zb == itemzb + 1))
 		return true;

@@ -8,7 +8,9 @@
 #include "level.h"
 #include "smoke.h"
 #include "spark.h"
+#include "prng.h"
 #define	MAX_TRIGGER_RANGE	0x4000
+using namespace T5M::Math::Random;
 
 void TriggerChaffEffects(int flareAge)
 {
@@ -62,7 +64,7 @@ void TriggerChaffEffects(ITEM_INFO* Item,int age)
 
 void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool isUnderwater,int age)
 {
-	int numSparks = (int)frandMinMax(2, 5);
+	int numSparks = (int)generateFloat(2, 5);
 	for (int i = 0; i < numSparks; i++)
 	{
 		long	dx, dz;
@@ -148,7 +150,7 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->sShade = 0;
 	if (moving)
 	{
-		trans = (speed << 7) >> 5;
+		trans = (speed * 128) / 32;
 		smoke->dShade = trans;
 	}
 	else
@@ -157,7 +159,7 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->colFadeSpeed = 4 + (GetRandomDraw() & 3);
 	smoke->fadeToBlack = 4;
 
-	rnd = (GetRandomControl() & 3) - (speed >> 12) + 20;
+	rnd = (GetRandomControl() & 3) - (speed / 4096) + 20;
 	if (rnd < 9)
 	{
 		smoke->life = 9;
@@ -199,8 +201,8 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->scalar = 1;
 	smoke->gravity = (GetRandomControl() & 3) - 4;
 	smoke->maxYvel = 0;
-	size = (GetRandomControl() & 7) + (speed >> 7) + 32;
-	smoke->sSize = size >> 2;
+	size = (GetRandomControl() & 7) + (speed/ 128) + 32;
+	smoke->sSize = size / 4;
 	smoke->size = smoke->dSize = size;
 }
 
@@ -213,19 +215,19 @@ void TriggerChaffBubbles(PHD_VECTOR* pos, int FlareRoomNumber)
 	bubble.active = true;
 	bubble.size = 0;
 	bubble.age = 0;
-	bubble.speed = frandMinMax(4, 16);
+	bubble.speed = generateFloat(4, 16);
 	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = frandMinMax(0.3, 0.8);
+	float shade = generateFloat(0.3, 0.8);
 	bubble.destinationColor = Vector4(shade, shade, shade, 0.8);
 	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = frandMinMax(32, 96);
+	bubble.destinationSize = generateFloat(32, 96);
 	bubble.spriteNum = SPR_BUBBLES;
 	bubble.rotation = 0;
 	bubble.worldPosition = Vector3(pos->x, pos->y, pos->z);
 	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude));
+	bubble.amplitude = Vector3(generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude));
 	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(frandMinMax(-3.14, 3.14), frandMinMax(-3.14, 3.14), frandMinMax(-3.14, 3.14));
-	bubble.waveSpeed = Vector3(1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16));
+	bubble.wavePeriod = Vector3(generateFloat(-3.14, 3.14), generateFloat(-3.14, 3.14), generateFloat(-3.14, 3.14));
+	bubble.waveSpeed = Vector3(1 / generateFloat(8, 16), 1 / generateFloat(8, 16), 1 / generateFloat(8, 16));
 	bubble.roomNumber = FlareRoomNumber;
 }

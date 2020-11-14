@@ -16,7 +16,7 @@ void PulseLightControl(short itemNumber)
 	{
 		item->itemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
+		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
@@ -26,28 +26,26 @@ void PulseLightControl(short itemNumber)
 			item->pos.yPos,
 			item->pos.zPos,
 			24,
-			pulse * 8 * (item->triggerFlags & 0x1F) >> 9,
-			pulse * ((item->triggerFlags >> 2) & 0xF8) >> 9,
-			pulse * ((item->triggerFlags >> 7) & 0xF8) >> 9);
+			(pulse * 8 * (item->triggerFlags & 0x1F)) / 512,
+			(pulse * ((item->triggerFlags / 4) & 0xF8)) / 512,
+			(pulse * ((item->triggerFlags / 128) & 0xF8)) / 512);
 	}
 }
 
-void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, short roomNumber, short falloff)
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
 {
-	GAME_VECTOR from;
-	from.x = x;
-	from.y = y;
-	from.z = z;
-	GetFloor(x, y, z, &roomNumber);
-	from.roomNumber = roomNumber;
+	GAME_VECTOR source, target;
 
-	GAME_VECTOR to;
-	to.x = x + rcossin_tbl[2 * rot];
-	to.y = y;
-	to.z = z + rcossin_tbl[2 * rot + 1];
-
-	if (!LOS(&from, &to))
-		TriggerDynamicLight(to.x, to.y, to.z, falloff, r, g, b);
+	source.x = x;
+	source.y = y;
+	source.z = z;
+	GetFloor(x, y, z, &room);
+	source.roomNumber = room;
+	target.x = x + 16384 * phd_sin(16 * angle);
+	target.y = y;
+	target.z = z + 16384 * phd_cos(16 * angle);
+	if (!LOS(&source, &target))
+		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
 
 void StrobeLightControl(short itemNumber)
@@ -59,22 +57,22 @@ void StrobeLightControl(short itemNumber)
 		item->pos.yRot += ANGLE(16.0f);
 
 		byte r = 8 * (item->triggerFlags & 0x1F);
-		byte g = (item->triggerFlags >> 2) & 0xF8;
-		byte b = (item->triggerFlags >> 7) & 0xF8;
+		byte g = (item->triggerFlags / 4) & 0xF8;
+		byte b = (item->triggerFlags / 128) & 0xF8;
 
 		TriggerAlertLight(
 			item->pos.xPos,
 			item->pos.yPos - 512,
 			item->pos.zPos,
 			r, g, b,
-			((item->pos.yRot + 22528) >> 4) & 0xFFF,
+			((item->pos.yRot + 22528) / 16) & 0xFFF,
 			item->roomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528),
 			item->pos.yPos - 768,
-			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528),
 			8,
 			r, g, b);
 	}
@@ -92,8 +90,8 @@ void ColorLightControl(short itemNumber)
 			item->pos.zPos,
 			24,
 			8 * (item->triggerFlags & 0x1F),
-			(item->triggerFlags >> 2) & 0xF8,
-			(item->triggerFlags >> 7) & 0xF8);
+			(item->triggerFlags / 4) & 0xF8,
+			(item->triggerFlags / 128) & 0xF8);
 	}
 }
 
@@ -179,9 +177,9 @@ void ElectricalLightControl(short itemNumber)
 		item->pos.yPos,
 		item->pos.zPos,
 		24,
-		intensity * 8 * (item->triggerFlags & 0x1F) >> 8,
-		intensity * ((item->triggerFlags >> 2) & 0xF8) >> 8,
-		intensity * ((item->triggerFlags >> 7) & 0xF8) >> 8);
+		(intensity * 8 * (item->triggerFlags & 0x1F)) / 256,
+		(intensity * ((item->triggerFlags / 4) & 0xF8)) / 256,
+		(intensity * ((item->triggerFlags / 128) & 0xF8)) / 256);
 }
 
 void BlinkingLightControl(short itemNumber)
@@ -210,8 +208,8 @@ void BlinkingLightControl(short itemNumber)
 				pos.z,
 				16,
 				8 * (item->triggerFlags & 0x1F),
-				(item->triggerFlags >> 2) & 0xF8,
-				(item->triggerFlags >> 7) & 0xF8);
+				(item->triggerFlags / 4) & 0xF8,
+				(item->triggerFlags / 128) & 0xF8);
 
 			item->meshBits = 2;
 

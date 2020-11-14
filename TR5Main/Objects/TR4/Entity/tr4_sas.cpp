@@ -592,9 +592,9 @@ void SasDragBlokeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		{
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
-				int x = l->pos.xPos - (512 * phd_sin(l->pos.yRot) >> W2V_SHIFT);
+				int x = l->pos.xPos - 512 * phd_sin(l->pos.yRot);
 				int y = l->pos.yPos;
-				int z = l->pos.xPos - (512 * phd_cos(l->pos.yRot) >> W2V_SHIFT);
+				int z = l->pos.xPos - 512 * phd_cos(l->pos.yRot);
 
 				short roomNumber = l->roomNumber;
 				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

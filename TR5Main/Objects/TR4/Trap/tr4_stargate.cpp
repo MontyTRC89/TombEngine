@@ -92,9 +92,9 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 						}
 					}
 
-					result >>= 1;
+					result /= 2;
 					j++;
-					flags >>= 1;
+					flags /= 2;
 
 				} while (result);
 			}

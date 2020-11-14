@@ -34,10 +34,10 @@
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
-#define UPDOWN_ACCEL		(ANGLE(2) << 16)
-#define UPDOWN_SLOWACCEL	(ANGLE(1) << 16)
-#define UPDOWN_FRICTION		(ANGLE(1) << 16)
-#define MAX_UPDOWN			(ANGLE(2) << 16)
+#define UPDOWN_ACCEL		(ANGLE(2) * 65536)
+#define UPDOWN_SLOWACCEL	(ANGLE(1) * 65536)
+#define UPDOWN_FRICTION		(ANGLE(1) * 65536)
+#define MAX_UPDOWN			(ANGLE(2) * 65536)
 #define UPDOWN_LIMIT		ANGLE(80)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
@@ -48,9 +48,9 @@
 #define SUB_RADIUS			300
 #define SUB_HEIGHT			400
 #define SUB_LENGTH			WALL_SIZE
-#define FRONT_TOLERANCE		(ANGLE(45) << 16)
-#define TOP_TOLERANCE		(ANGLE(45) << 16)
-#define WALLDEFLECT			(ANGLE(2) << 16)
+#define FRONT_TOLERANCE		(ANGLE(45) * 65536)
+#define TOP_TOLERANCE		(ANGLE(45) * 65536)
+#define WALLDEFLECT			(ANGLE(2) * 65536)
 #define GETOFF_DIST 		WALL_SIZE
 #define HARPOON_SPEED		256
 #define HARPOON_TIME		256
@@ -147,8 +147,8 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		item->pos.yRot = v->pos.yRot;
 		item->pos.zRot = 0;
 
-		item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
-		item->speed =     (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+		item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
 		item->hitPoints = HARPOON_TIME;
 		item->itemFlags[0] = 1;
 
@@ -190,8 +190,8 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->x = x + ((GetRandomControl() & 15) - 8);
 	sptr->y = y + ((GetRandomControl() & 15) - 8);
 	sptr->z = z + ((GetRandomControl() & 15) - 8);
-	zv = (speed * phd_cos(angle)) >> (W2V_SHIFT + 2);
-	xv = (speed * phd_sin(angle)) >> (W2V_SHIFT + 2);
+	zv = speed * phd_cos(angle) / 4;
+	xv = speed * phd_sin(angle) / 4;
 	sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
 	sptr->yVel = 0;
 	sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
@@ -211,8 +211,8 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 
 	sptr->scalar = 3;
 	sptr->gravity = sptr->maxYvel = 0;
-	size = (GetRandomControl() & 7) + (speed >> 1) + 16;
-	sptr->size = sptr->sSize = size >> 2;
+	size = (GetRandomControl() & 7) + (speed / 2) + 16;
+	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 }
 
@@ -235,7 +235,7 @@ void SubEffects(short item_number)
 		if (!sub->Vel)
 			sub->FanRot += ANGLE(2);
 		else
-			sub->FanRot += sub->Vel >> 12;
+			sub->FanRot += (sub->Vel / 4069);
 
 		if (sub->Vel)
 		{
@@ -243,7 +243,7 @@ void SubEffects(short item_number)
 			pos.y = sub_bites[SUB_FAN].y;
 			pos.z = sub_bites[SUB_FAN].z;
 			GetJointAbsPosition(v, &pos, sub_bites[SUB_FAN].meshNum);
-			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) >> 16, v->pos.yRot + ANGLE(180));
+			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(sub->Vel) / 65536, v->pos.yRot + ANGLE(180));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
@@ -307,10 +307,10 @@ static int CanGetOff(ITEM_INFO* v)
 		return 0;
 
 	yangle = v->pos.yRot + ANGLE(180);
-	speed = (GETOFF_DIST * phd_cos(v->pos.xRot)) >> W2V_SHIFT;
-	x = v->pos.xPos + (speed * phd_sin(yangle) >> W2V_SHIFT);
-	z = v->pos.zPos + (speed * phd_cos(yangle) >> W2V_SHIFT);
-	y = v->pos.yPos - ((GETOFF_DIST * phd_sin(-v->pos.xRot)) >> W2V_SHIFT);
+	speed = GETOFF_DIST * phd_cos(v->pos.xRot);
+	x = v->pos.xPos + speed * phd_sin(yangle);
+	z = v->pos.zPos + speed * phd_cos(yangle);
+	y = v->pos.yPos - GETOFF_DIST * phd_sin(-v->pos.xRot);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -411,22 +411,22 @@ static void DoCurrent(ITEM_INFO* item)
 		target.x = FixedCameras[sinkval].x;
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
-		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
+		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) / 16) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
 		speed = FixedCameras[sinkval].data;
-		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
-		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
+		dx = phd_sin(angle * 16) * speed * 1024;
+		dz = phd_cos(angle * 16) * speed * 1024;
 
-		Lara.currentXvel += (dx - Lara.currentXvel) >> 4;
-		Lara.currentZvel += (dz - Lara.currentZvel) >> 4;
+		Lara.currentXvel += ((dx - Lara.currentXvel) / 16);
+		Lara.currentZvel += ((dz - Lara.currentZvel) / 16);
 	}
 
 	/* Move Lara in direction of sink. */
-	item->pos.xPos += Lara.currentXvel >> 8;
-	item->pos.zPos += Lara.currentZvel >> 8;
+	item->pos.xPos += (Lara.currentXvel / 256);
+	item->pos.zPos += (Lara.currentZvel / 256);
 
 	/* Reset current (will get set again so long as Lara is over triggers) */
 	Lara.currentActive = 0;
@@ -456,7 +456,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	else
 		coll->facing = Lara.moveAngle = v->pos.yRot - ANGLE(180);
 
-	height = phd_sin(v->pos.xRot) * SUB_LENGTH >> W2V_SHIFT;
+	height = phd_sin(v->pos.xRot) * SUB_LENGTH;
 	if (height < 0)
 		height = -height;
 	if (height < 200)
@@ -949,20 +949,20 @@ int SubControl(void)
 	{
 		UserInput(v, l, sub);
 
-		v->speed = sub->Vel >> 16;
+		v->speed = sub->Vel / 65536;
 
-		v->pos.xRot += sub->RotX >> 16;
-		v->pos.yRot += (sub->Rot >> 16);
-		v->pos.zRot = (sub->Rot >> 12);
+		v->pos.xRot += sub->RotX / 65536;
+		v->pos.yRot += (sub->Rot / 65536);
+		v->pos.zRot = (sub->Rot / 65536);
 
 		if (v->pos.xRot > UPDOWN_LIMIT)
 			v->pos.xRot = UPDOWN_LIMIT;
 		else if (v->pos.xRot < -UPDOWN_LIMIT)
 			v->pos.xRot = -UPDOWN_LIMIT;
 
-		v->pos.xPos += (((phd_sin(v->pos.yRot) * v->speed) >> W2V_SHIFT)* phd_cos(v->pos.xRot)) >> W2V_SHIFT;
-		v->pos.yPos -= (phd_sin(v->pos.xRot) * v->speed) >> W2V_SHIFT;
-		v->pos.zPos += (((phd_cos(v->pos.yRot) * v->speed) >> W2V_SHIFT)* phd_cos(v->pos.xRot)) >> W2V_SHIFT;
+		v->pos.xPos += phd_sin(v->pos.yRot) * v->speed * phd_cos(v->pos.xRot);
+		v->pos.yPos -= phd_sin(v->pos.xRot) * v->speed;
+		v->pos.zPos += phd_cos(v->pos.yRot) * v->speed * phd_cos(v->pos.xRot);
 	}
 
 	/* -------- determine if vehicle is near the surface */
@@ -1064,7 +1064,7 @@ int SubControl(void)
 		BackgroundCollision(v, l, sub);
 
 		if (sub->Flags & UPV_CONTROL)
-			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed << 16));
+			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);

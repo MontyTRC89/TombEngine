@@ -73,7 +73,7 @@ void FireBigGun(ITEM_INFO *obj)
 			item->pos.xRot = -((gun->xRot - 32) * (ANGLE(1)));
 			item->pos.yRot = obj->pos.yRot;
 			item->pos.zRot = 0;
-			item->speed = 512 >> 5;
+			item->speed = 16;
 			item->itemFlags[0] = 1;
 
 			AddActiveItem(itemNumber);

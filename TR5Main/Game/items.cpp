@@ -13,7 +13,7 @@ void ClearItem(short itemNum)
 
 	item->collidable = true;
 	item->data = NULL;
-	item->drawRoom = (((item->pos.zPos - room->z) >> WALL_SHIFT) & 0xFF) | ((((item->pos.xPos - room->x) >> WALL_SHIFT) & 0xFF) << 8);
+	item->drawRoom = (((item->pos.zPos - room->z) / SECTOR(1)) & 0xFF) | ((((item->pos.xPos - room->x) / SECTOR(1)) & 0xFF) * 256);
 	item->TOSSPAD = item->pos.yRot & 0xE000;
 	item->itemFlags[2] = item->roomNumber | ((item->pos.yPos - room->minfloor) & 0xFF00);
 }

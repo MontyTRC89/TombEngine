@@ -148,7 +148,7 @@ short AIGuard(CREATURE_INFO* creature)
 	}
 
 	if (!creature->headLeft)
-		return (creature->headRight) << 12;
+		return (creature->headRight) * 4096;
 
 	if (creature->headRight)
 		return 0;
@@ -382,7 +382,7 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 
 void CreatureTilt(ITEM_INFO* item, short angle) 
 {
-	angle = (angle << 2) - item->pos.zRot;
+	angle = (angle * 4) - item->pos.zRot;
 
 	if (angle < -ANGLE(3))
 		angle = -ANGLE(3);
@@ -393,7 +393,7 @@ void CreatureTilt(ITEM_INFO* item, short angle)
 
 	short absRot = abs(item->pos.zRot);
 	if (absRot < ANGLE(15) || absRot > ANGLE(30))
-		angle >>= 1;
+		angle /= 2;
 	
 	item->pos.zRot += angle;
 }
@@ -413,11 +413,11 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 	x = creature->target.x - item->pos.xPos;
 	z = creature->target.z - item->pos.zPos;
 	angle = phd_atan(z, x) - item->pos.yRot;
-	range = (item->speed << W2V_SHIFT) / maximumTurn;
+	range = item->speed * 16384 / maximumTurn;
 	distance = SQUARE(x) + SQUARE(z);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < SQUARE(range))
-		maximumTurn >>= 1;
+		maximumTurn /= 2;
 
 	if (angle > maximumTurn)
 		angle = maximumTurn;
@@ -496,10 +496,10 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	if (floor->box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && zone[item->boxNumber] != zone[floor->box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
 	{
-		xPos = item->pos.xPos >> WALL_SHIFT;
-		zPos = item->pos.zPos >> WALL_SHIFT;
-		shiftX = old.x >> WALL_SHIFT;
-		shiftZ = old.z >> WALL_SHIFT;
+		xPos = item->pos.xPos / SECTOR(1);
+		zPos = item->pos.zPos / SECTOR(1);
+		shiftX = old.x / SECTOR(1);
+		shiftZ = old.z / SECTOR(1);
 
 		if (xPos < shiftX)
 			item->pos.xPos = old.x & (~(WALL_SIZE - 1));
@@ -869,9 +869,9 @@ int CreatureCreature(short itemNumber)
 			zDistance = abs(linked->pos.zPos - z);
 			
 			if (xDistance > zDistance)
-				distance = xDistance + (zDistance >> 1);
+				distance = xDistance + (zDistance / 2);
 			else
-				distance = zDistance + (xDistance >> 1);
+				distance = zDistance + (xDistance / 2);
 
 			if (distance < radius + Objects[linked->objectNumber].radius)
 				return phd_atan(linked->pos.zPos - z, linked->pos.xPos - x) - item->pos.yRot;
@@ -898,8 +898,8 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	if (box->flags & creature->LOT.blockMask)
 		return false;
 
-	if ((item->pos.zPos > (box->left << WALL_SHIFT)) && item->pos.zPos < ((box->right  << WALL_SHIFT)) &&
-		(item->pos.xPos > (box->top  << WALL_SHIFT)) && item->pos.xPos < ((box->bottom << WALL_SHIFT)))
+	if ((item->pos.zPos > (box->left * SECTOR(1))) && item->pos.zPos < ((box->right  * SECTOR(1))) &&
+		(item->pos.xPos > (box->top  * SECTOR(1))) && item->pos.xPos < ((box->bottom * SECTOR(1))))
 		return false;
 
 	return true;
@@ -910,8 +910,8 @@ int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	BOX_INFO* box = &g_Level.Boxes[boxNumber];
 	int x, z;
 
-	x = (int(box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	z = (int(box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->pos.xPos;
+	z = (box->left + box->right) * SECTOR(1) / 2 - enemy->pos.zPos;
 	
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST && z > -ESCAPE_DIST && z < ESCAPE_DIST)
 		return false;
@@ -929,8 +929,8 @@ void TargetBox(LOT_INFO* LOT, int boxNumber)
 	boxNumber &= NO_BOX;
 	box = &g_Level.Boxes[boxNumber];
 
-	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE / 2;
-	LOT->target.z = ((box->left << WALL_SHIFT) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + WALL_SIZE / 2;
+	LOT->target.x = (((box->top * SECTOR(1)) + GetRandomControl() * ((box->bottom - box->top) - 1)) / 32) + WALL_SIZE / 2;
+	LOT->target.z = (((box->left * SECTOR(1)) + GetRandomControl() * ((box->right - box->left) - 1)) / 32) + WALL_SIZE / 2;
 	LOT->requiredBox = boxNumber;
 
 	if (LOT->fly == NO_FLYING)
@@ -1085,15 +1085,15 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 
 	box = &g_Level.Boxes[boxNumber];
 
-	xrange	= STALK_DIST + ((box->bottom - box->top + 3) << WALL_SHIFT);
-	zrange	= STALK_DIST + ((box->right - box->left + 3) << WALL_SHIFT);
-	x		= ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	z		= ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	xrange	= STALK_DIST + ((box->bottom - box->top + 3) * SECTOR(1));
+	zrange	= STALK_DIST + ((box->right - box->left + 3) * SECTOR(1));
+	x		= (box->top + box->bottom) * SECTOR(1) / 2 - enemy->pos.xPos;
+	z		= (box->left + box->right) * SECTOR(1) / 2 - enemy->pos.zPos;
 	
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
 		return false;
 
-	enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
+	enemyQuad = enemy->pos.yRot / 16384 + 2;
 	
 	// boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
 	if (z > 0)
@@ -1124,8 +1124,8 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 	int xBlock, zBlock, y, newXblock, newZblock;
 	short roomNumber;
 
-	xBlock = item->pos.xPos >> WALL_SHIFT;
-	zBlock = item->pos.zPos >> WALL_SHIFT;
+	xBlock = item->pos.xPos / SECTOR(1);
+	zBlock = item->pos.zPos / SECTOR(1);
 	y = item->pos.yPos;
 	roomNumber = item->roomNumber;
 
@@ -1150,8 +1150,8 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 	else
 		vault = 4;
 
-	newXblock = item->pos.xPos >> WALL_SHIFT;
-	newZblock = item->pos.zPos >> WALL_SHIFT;
+	newXblock = item->pos.xPos / SECTOR(1);
+	newZblock = item->pos.zPos / SECTOR(1);
 	
 	if (zBlock == newZblock)
 	{
@@ -1160,12 +1160,12 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 
 		if (xBlock < newXblock)
 		{
-			item->pos.xPos = (newXblock << WALL_SHIFT) - shift;
+			item->pos.xPos = (newXblock * SECTOR(1)) - shift;
 			item->pos.yRot = ANGLE(90);
 		}
 		else
 		{
-			item->pos.xPos = (xBlock << WALL_SHIFT) + shift;
+			item->pos.xPos = (xBlock * SECTOR(1)) + shift;
 			item->pos.yRot = -ANGLE(90);
 		}
 	}
@@ -1173,12 +1173,12 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 	{
 		if (zBlock < newZblock)
 		{
-			item->pos.zPos = (newZblock << WALL_SHIFT) - shift;
+			item->pos.zPos = (newZblock * SECTOR(1)) - shift;
 			item->pos.yRot = 0;
 		}
 		else
 		{
-			item->pos.zPos = (zBlock << WALL_SHIFT) + shift;
+			item->pos.zPos = (zBlock * SECTOR(1)) + shift;
 			item->pos.yRot = -ANGLE(180);
 		}
 	}
@@ -1387,8 +1387,8 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 			if (!(creature->aiTarget.flags & 0x20))
 			{
-				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) >> 4;   
-				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) >> 4;
+				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) * 1024;
+				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) * 1024;
 			}
 		}
 	}
@@ -1437,13 +1437,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 	else
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 
 	y = item->pos.yPos - enemy->pos.yPos;
@@ -1482,9 +1482,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	if (x > z)
-		info->xAngle = phd_atan(x + (z >> 1), y);
+		info->xAngle = phd_atan(x + (z / 2), y);
 	else
-		info->xAngle = phd_atan(z + (x >> 1), y);
+		info->xAngle = phd_atan(z + (x / 2), y);
 
 	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE * 2));
@@ -1508,7 +1508,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	switch (creature->mood)
 	{
 		case BORED_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber)
 				&& !(GetRandomControl() & 0x0F))
 			{
@@ -1538,7 +1538,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			break;
 
 		case ESCAPE_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber) && LOT->requiredBox == NO_BOX)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
@@ -1556,7 +1556,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 		case STALK_MOOD:
 			if (LOT->requiredBox == NO_BOX || !StalkBox(item, enemy, LOT->requiredBox))
 			{
-				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
+				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
 				if (ValidBox(item, info->zoneNumber, boxNumber))
 				{
 					if (StalkBox(item, enemy, boxNumber))
@@ -1740,10 +1740,10 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 		return TARGET_TYPE::NO_TARGET;
 
 	box = &g_Level.Boxes[boxNumber];
-	boxLeft = ((int)box->left << WALL_SHIFT);
-	boxRight = ((int)box->right << WALL_SHIFT) - 1;
-	boxTop = ((int)box->top << WALL_SHIFT);
-	boxBottom = ((int)box->bottom << WALL_SHIFT) - 1;
+	boxLeft = ((int)box->left * SECTOR(1));
+	boxRight = ((int)box->right * SECTOR(1)) - 1;
+	boxTop = ((int)box->top * SECTOR(1));
+	boxBottom = ((int)box->bottom * SECTOR(1)) - 1;
 	left = boxLeft;
 	right = boxRight;
 	top = boxTop;
@@ -1765,10 +1765,10 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 				target->y = box->height - WALL_SIZE;
 		}
 
-		boxLeft = ((int)box->left << WALL_SHIFT);
-		boxRight = ((int)box->right << WALL_SHIFT) - 1;
-		boxTop = ((int)box->top << WALL_SHIFT);
-		boxBottom = ((int)box->bottom << WALL_SHIFT) - 1;
+		boxLeft = ((int)box->left * SECTOR(1));
+		boxRight = ((int)box->right * SECTOR(1)) - 1;
+		boxTop = ((int)box->top * SECTOR(1));
+		boxBottom = ((int)box->bottom * SECTOR(1)) - 1;
 
 		if (item->pos.zPos >= boxLeft && item->pos.zPos <= boxRight &&
 			item->pos.xPos >= boxTop && item->pos.xPos <= boxBottom)
@@ -1921,7 +1921,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 
 	if (direction & (CLIP_LEFT | CLIP_RIGHT))
 	{
-		target->z = boxLeft + WALL_SIZE / 2 + (GetRandomControl() * (boxRight - boxLeft - WALL_SIZE) >> 15);
+		target->z = boxLeft + WALL_SIZE / 2 + ((GetRandomControl() * (boxRight - boxLeft - WALL_SIZE)) / 32768);
 	}
 	else if (!(direction & SECONDARY_CLIP))
 	{
@@ -1933,7 +1933,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 
 	if (direction & (CLIP_TOP | CLIP_BOTTOM))
 	{
-		target->x = boxTop + WALL_SIZE / 2 + (GetRandomControl() * (boxBottom - boxTop - WALL_SIZE) >> 15);
+		target->x = boxTop + WALL_SIZE / 2 + ((GetRandomControl() * (boxBottom - boxTop - WALL_SIZE)) / 32768);
 	}
 	else if (!(direction & SECONDARY_CLIP))
 	{
@@ -1961,8 +1961,8 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;
 
-	x = item->pos.xPos + ((1024 * phd_sin(dir)) >> W2V_SHIFT);
-	z = item->pos.zPos + ((1024 * phd_cos(dir)) >> W2V_SHIFT);
+	x = item->pos.xPos + 1024 * phd_sin(dir);
+	z = item->pos.zPos + 1024 * phd_cos(dir);
 
 	short roomNumber = item->roomNumber;
 	GetFloor(x, item->pos.yPos, z, &roomNumber);

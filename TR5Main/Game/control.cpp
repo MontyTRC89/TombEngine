@@ -46,6 +46,7 @@
 #include "drip.h"
 #include "particle/SimpleParticle.h"
 #include <process.h>
+#include "prng.h"
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -53,6 +54,7 @@ using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
 using namespace T5M::Effects;
 using T5M::Renderer::g_Renderer;
+using namespace T5M::Math::Random;
 using namespace T5M::Floordata;
 
 short ShatterSounds[18][10] =
@@ -82,8 +84,6 @@ short los_rooms[20];
 int ClosestItem;
 int ClosestDist;
 PHD_VECTOR ClosestCoord;
-int rand_1 = -747505337;
-int rand_2 = -747505337;
 int RumbleTimer = 0;
 int InGameCnt = 0;
 byte IsAtmospherePlaying = 0;
@@ -1347,12 +1347,12 @@ short GetDoor(FLOOR_INFO *floor)
 
 void TranslateItem(ITEM_INFO *item, int x, int y, int z)
 {
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
 
-	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
+	item->pos.xPos += c * x + s * z;
 	item->pos.yPos += y;
-	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
+	item->pos.zPos += -s * x + c * z;
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)
@@ -1366,7 +1366,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->skyRoom];
 			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->ceiling << 8);
+				return (floor->ceiling * 256);
 			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
@@ -1377,7 +1377,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->pitRoom];
 			if (room->flags & ENV_FLAG_WATER)
-				return (floor->floor << 8);
+				return (floor->floor * 256);
 			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
@@ -1508,8 +1508,8 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	r = &g_Level.Rooms[*roomNumber];
 	do
 	{
-		xFloor = (z - r->z) >> WALL_SHIFT;
-		yFloor = (x - r->x) >> WALL_SHIFT;
+		xFloor = (z - r->z) / SECTOR(1);
+		yFloor = (x - r->x) / SECTOR(1);
 
 		if (xFloor <= 0)
 		{
@@ -1898,8 +1898,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	dx = end->x - start->x;
 	if (!dx)
 		return 1;
-	dy = (end->y - start->y << 10) / dx;
-	dz = (end->z - start->z << 10) / dx;
+	dy = ((end->y - start->y) * 1024) / dx;
+	dz = ((end->z - start->z) * 1024) / dx;
 	number_los_rooms = 1;
 	los_rooms[0] = start->roomNumber;
 	room = start->roomNumber;
@@ -1908,8 +1908,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	if (dx < 0)
 	{
 		x = start->x & 0xFFFFFC00;
-		y = ((x - start->x) * dy >> 10) + start->y;
-		z = ((x - start->x) * dz >> 10) + start->z;
+		y = (((x - start->x) * dy) / 1024) + start->y;
+		z = (((x - start->x) * dz) / 1024) + start->z;
 		while (x > end->x)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -1951,8 +1951,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	else
 	{
 		x = start->x | 0x3FF;
-		y = ((x - start->x) * dy >> 10) + start->y;
-		z = ((x - start->x) * dz >> 10) + start->z;
+		y = (((x - start->x) * dy) / 1024) + start->y;
+		z = (((x - start->x) * dz) / 1024) + start->z;
 		while (x < end->x)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -2003,8 +2003,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	dz = end->z - start->z;
 	if (!dz)
 		return 1;
-	dx = (end->x - start->x << 10) / dz;
-	dy = (end->y - start->y << 10) / dz;
+	dx = ((end->x - start->x) * 1024) / dz;
+	dy = ((end->y - start->y) * 1024) / dz;
 	number_los_rooms = 1;
 	los_rooms[0] = start->roomNumber;
 	room = start->roomNumber;
@@ -2013,8 +2013,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	if (dz < 0)
 	{
 		z = start->z & 0xFFFFFC00;
-		x = ((z - start->z) * dx >> 10) + start->x;
-		y = ((z - start->z) * dy >> 10) + start->y;
+		x = (((z - start->z) * dx) / 1024) + start->x;
+		y = (((z - start->z) * dy) / 1024) + start->y;
 		while (z > end->z)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -2056,8 +2056,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	else
 	{
 		z = start->z | 0x3FF;
-		x = ((z - start->z) * dx >> 10) + start->x;
-		y = ((z - start->z) * dy >> 10) + start->y;
+		x = (((z - start->z) * dx) / 1024) + start->x;
+		y = (((z - start->z) * dy) / 1024) + start->y;
 		while (z < end->z)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -2107,14 +2107,14 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
 	room = target->roomNumber;
 	if (target->y > GetFloorHeight(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
 	{
-		x = (7 * (target->x - start->x) >> 3) + start->x;
-		y = (7 * (target->y - start->y) >> 3) + start->y;
-		z = (7 * (target->z - start->z) >> 3) + start->z;
+		x = ((7 * (target->x - start->x)) / 8) + start->x;
+		y = ((7 * (target->y - start->y)) / 8) + start->y;
+		z = ((7 * (target->z - start->z)) / 8) + start->z;
 		for (int i = 3; i > 0; --i)
 		{
-			wx = ((target->x - x) * i >> 2) + x;
-			wy = ((target->y - y) * i >> 2) + y;
-			wz = ((target->z - z) * i >> 2) + z;
+			wx = (((target->x - x) * i) / 4) + x;
+			wy = (((target->y - y) * i) / 4) + y;
+			wz = (((target->z - z) * i) / 4) + z;
 			if (wy < GetFloorHeight(GetFloor(wx, wy, wz, &room), wx, wy, wz))
 				break;
 		}
@@ -2127,14 +2127,14 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
 	room = target->roomNumber;
 	if (target->y < GetCeiling(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
 	{
-		x = (7 * (target->x - start->x) >> 3) + start->x;
-		y = (7 * (target->y - start->y) >> 3) + start->y;
-		z = (7 * (target->z - start->z) >> 3) + start->z;
+		x = ((7 * (target->x - start->x)) / 8) + start->x;
+		y = ((7 * (target->y - start->y)) / 8) + start->y;
+		z = ((7 * (target->z - start->z)) / 8) + start->z;
 		for (int i = 3; i > 0; --i)
 		{
-			wx = ((target->x - x) * i >> 2) + x;
-			wy = ((target->y - y) * i >> 2) + y;
-			wz = ((target->z - z) * i >> 2) + z;
+			wx = (((target->x - x) * i) / 4) + x;
+			wy = (((target->y - y) * i) / 4) + y;
+			wz = (((target->z - z) * i) / 4) + z;
 			if (wy > GetCeiling(GetFloor(wx, wy, wz, &room), wx, wy, wz))
 				break;
 		}
@@ -2181,9 +2181,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != 999)
 	{
-		target.x = vector.x - (vector.x - src->x >> 5);
-		target.y = vector.y - (vector.y - src->y >> 5);
-		target.z = vector.z - (vector.z - src->z >> 5);
+		target.x = vector.x - ((vector.x - src->x) / 32);
+		target.y = vector.y - ((vector.y - src->y) / 32);
+		target.z = vector.z - ((vector.z - src->z) / 32);
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
@@ -2368,9 +2368,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	{
 		if (Lara.gunType != WEAPON_CROSSBOW)
 		{
-			target.x -= target.x - src->x >> 5;
-			target.y -= target.y - src->y >> 5;
-			target.z -= target.z - src->z >> 5;
+			target.x -= (target.x - src->x) / 32;
+			target.y -= (target.y - src->y) / 32;
+			target.z -= (target.z - src->z) / 32;
 			if (firing && !result)
 				TriggerRicochetSpark(&target, LaraItem->pos.yRot, 8, 0);
 		}
@@ -2463,26 +2463,14 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 	return ClosestItem;
 }
 
-int GetRandomControl() // (F) (D)
+int GetRandomControl()
 {
-	rand_1 = 1103515245 * rand_1 + 12345;
-	return rand_1 >> 10 & 0x7FFF;
+	return generateInt();
 }
 
-void SeedRandomControl(int seed) // (F) (D)
+int GetRandomDraw()
 {
-	rand_1 = seed;
-}
-
-int GetRandomDraw() // (F) (D)
-{
-	rand_2 = 1103515245 * rand_2 + 12345;
-	return rand_2 >> 10 & 0x7FFF;
-}
-
-void SeedRandomDraw(int seed) // (F) (D)
-{
-	rand_2 = seed;
+	return generateInt();
 }
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
@@ -2951,20 +2939,20 @@ void AnimateItem(ITEM_INFO *item)
 		int velocity = anim->velocity;
 		if (anim->acceleration)
 			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
-		item->speed = velocity >> 16;
+		item->speed = velocity / 65536;
 
 		lateral = anim->Xvelocity;
 		if (anim->Xacceleration)
 			lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
 
-		lateral >>= 16;
+		lateral /= 65536;
 	}
 
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
 
-	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90));
+	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90));
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();
@@ -3170,7 +3158,7 @@ int TriggerActive(ITEM_INFO *item)
 {
 	int flag;
 
-	flag = (~item->flags & IFLAG_REVERSE) >> 14;
+	flag = (~item->flags & IFLAG_REVERSE) / 16384;
 	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 	{
 		flag = !flag;
@@ -3206,8 +3194,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	do
 	{
-		int xBlock = (x - r->x) >> WALL_SHIFT;
-		int zBlock = (z - r->z) >> WALL_SHIFT;
+		int xBlock = (x - r->x) / SECTOR(1);
+		int zBlock = (z - r->z) / SECTOR(1);
 
 		if (zBlock <= 0)
 		{

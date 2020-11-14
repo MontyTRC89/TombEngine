@@ -8,6 +8,8 @@
 #include "trmath.h"
 #include "effect2.h"
 #include "setup.h"
+#include "prng.h"
+using namespace T5M::Math::Random;
 namespace T5M {
 	namespace Effects {
 		namespace Drip {
@@ -41,7 +43,7 @@ namespace T5M {
 					}
 					if (d.pos.y > wh) {
 						d.active = false;
-						SetupRipple(d.pos.x, wh, d.pos.z, frandMinMax(16,24), RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+						SetupRipple(d.pos.x, wh, d.pos.z, generateFloat(16,24), RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 					}
 
 				}
@@ -65,21 +67,21 @@ namespace T5M {
 				d.pos = pos;
 				d.room = room;
 				d.life = DRIP_LIFE;
-				d.gravity = frandMinMax(3, 6);
+				d.gravity = generateFloat(3, 6);
 			}
 
 			void SpawnSplashDrips(Vector3& pos, int num,int room)
 			{
 				for (int i = 0; i < num; i++) {
-					Vector3 dripPos = pos + Vector3(frandMinMax(-128, 128), frandMinMax(-128, 128), frandMinMax(-128, 128));
+					Vector3 dripPos = pos + Vector3(generateFloat(-128, 128), generateFloat(-128, 128), generateFloat(-128, 128));
 					Vector3 dir = (dripPos - pos);
 					dir.Normalize();
 					DripParticle& drip = getFreeDrip();
 					drip = {};
 					drip.pos = dripPos;
 					drip.velocity = dir*16;
-					drip.velocity -= Vector3(0, frandMinMax(32, 64), 0);
-					drip.gravity = frandMinMax(3, 6);
+					drip.velocity -= Vector3(0, generateFloat(32, 64), 0);
+					drip.gravity = generateFloat(3, 6);
 					drip.room = room;
 					drip.life = DRIP_LIFE_LONG;
 					drip.active = true;
@@ -89,15 +91,15 @@ namespace T5M {
 			void SpawnGunshellDrips(Vector3& pos, int room)
 			{
 				for (int i = 0; i < 4; i++) {
-					Vector3 dripPos = pos + Vector3(frandMinMax(-16, 16), frandMinMax(-16, 16), frandMinMax(-16, 16));
+					Vector3 dripPos = pos + Vector3(generateFloat(-16, 16), generateFloat(-16, 16), generateFloat(-16, 16));
 					Vector3 dir = (dripPos - pos);
 					dir.Normalize();
 					DripParticle& drip = getFreeDrip();
 					drip = {};
 					drip.pos = dripPos;
 					drip.velocity = dir * 16;
-					drip.velocity -= Vector3(0, frandMinMax(16, 24), 0);
-					drip.gravity = frandMinMax(2, 3);
+					drip.velocity -= Vector3(0, generateFloat(16, 24), 0);
+					drip.gravity = generateFloat(2, 3);
 					drip.room = room;
 					drip.life = DRIP_LIFE_LONG;
 					drip.active = true;

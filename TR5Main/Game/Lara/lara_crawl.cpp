@@ -198,9 +198,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
-			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
 			d.y = s.y + 160;
-			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 			{
@@ -224,9 +224,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
-			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
 			d.y = s.y + 160;
-			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex3clickE == true)
 			{
@@ -248,9 +248,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
-			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
 			d.y = s.y + 160;
-			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex2clickE == true)
 			{
@@ -271,9 +271,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
-			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
 			d.y = s.y + 160;
-			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex1clickE == true)
 			{
@@ -400,13 +400,13 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 								int x = item->pos.xPos;
 								int z = item->pos.zPos;
 
-								item->pos.xPos += 128 * phd_sin(item->pos.yRot - ANGLE(90.0f)) >> W2V_SHIFT;
-								item->pos.zPos += 128 * phd_cos(item->pos.yRot - ANGLE(90.0f)) >> W2V_SHIFT;
+								item->pos.xPos += 128 * phd_sin(item->pos.yRot - ANGLE(90.0f));
+								item->pos.zPos += 128 * phd_cos(item->pos.yRot - ANGLE(90.0f));
 
 								heightl = LaraFloorFront(item, item->pos.yRot, -300);
 
-								item->pos.xPos += 256 * phd_sin(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
-								item->pos.zPos += 256 * phd_cos(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
+								item->pos.xPos += 256 * phd_sin(item->pos.yRot + ANGLE(90.0f));
+								item->pos.zPos += 256 * phd_cos(item->pos.yRot + ANGLE(90.0f));
 
 								heightr = LaraFloorFront(item, item->pos.yRot, -300);
 
@@ -431,8 +431,8 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 										int x = item->pos.xPos;
 										int z = item->pos.zPos;
 
-										item->pos.xPos -= 100 * phd_sin(coll->facing) >> W2V_SHIFT;
-										item->pos.zPos -= 100 * phd_cos(coll->facing) >> W2V_SHIFT;
+										item->pos.xPos -= 100 * phd_sin(coll->facing);
+										item->pos.zPos -= 100 * phd_cos(coll->facing);
 
 										tmp = GetCollidedObjects(item, 100, 1, &tmp1, &tmp2, 0);
 

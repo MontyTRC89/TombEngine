@@ -147,9 +147,9 @@ void UpdateRats()
 				int oldY = rat->pos.yPos;
 				int oldZ = rat->pos.zPos;
 
-				rat->pos.xPos += rat->speed * phd_sin(rat->pos.yRot) >> W2V_SHIFT;
+				rat->pos.xPos += rat->speed * phd_sin(rat->pos.yRot);
 				rat->pos.yPos += rat->fallspeed;
-				rat->pos.zPos += rat->speed * phd_cos(rat->pos.yRot) >> W2V_SHIFT;
+				rat->pos.zPos += rat->speed * phd_cos(rat->pos.yRot);
 
 				rat->fallspeed += GRAVITY;
 
@@ -179,7 +179,7 @@ void UpdateRats()
 							rat->pos.yRot += 512;
 						else
 							rat->pos.yRot -= 512;
-						rat->speed = 48 - (abs(angle) >> 10);
+						rat->speed = 48 - (abs(angle) / 1024);
 					}
 					else
 					{

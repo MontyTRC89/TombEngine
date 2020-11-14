@@ -7,6 +7,8 @@
 #include "setup.h"
 #include "lara.h"
 #include <algorithm>
+#include "prng.h"
+using namespace T5M::Math::Random;
 namespace T5M {
 	namespace Effects {
 		namespace Smoke {
@@ -60,19 +62,19 @@ namespace T5M {
 				s.position = pos;
 				s.age = 0;
 				constexpr float d = 0.2f;
-				Vector3 randomDir = Vector3(frandMinMax(-d, d), frandMinMax(-d, d), frandMinMax(-d, d));
+				Vector3 randomDir = Vector3(generateFloat(-d, d), generateFloat(-d, d), generateFloat(-d, d));
 				Vector3 dir;
 				(direction + randomDir).Normalize(dir);
-				s.velocity = dir * frandMinMax(7, 9);
+				s.velocity = dir * generateFloat(7, 9);
 				s.gravity = -0.2f;
-				s.friction = frandMinMax(0.7f, 0.85f);
+				s.friction = generateFloat(0.7f, 0.85f);
 				s.sourceColor = Vector4(1, 131 / 255.0f, 100 / 255.0f, 1);
 				s.destinationColor = Vector4(1, 1, 1, 0);
-				s.life = frandMinMax(25, 35);
-				s.angularVelocity = frandMinMax(-0.3f, 0.3f);
+				s.life = generateFloat(25, 35);
+				s.angularVelocity = generateFloat(-0.3f, 0.3f);
 				s.angularDrag = 0.97f;
-				s.sourceSize = age > 4 ? frandMinMax(16, 24) : frandMinMax(100, 128);
-				s.destinationSize = age > 4 ? frandMinMax(160, 200) : frandMinMax(256, 300);
+				s.sourceSize = age > 4 ? generateFloat(16, 24) : generateFloat(100, 128);
+				s.destinationSize = age > 4 ? generateFloat(160, 200) : generateFloat(256, 300);
 				s.affectedByWind = true;
 				s.active = true;
 				s.room = room;
@@ -97,37 +99,37 @@ namespace T5M {
 				{
 					
 					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
-						float size = (frand() * 32) + 48;
+						float size = generateFloat(48, 80);
 						s.sourceSize = size * 2;
 						
 						s.destinationSize = size * 8;
 						s.sourceColor = {0.75,0.75,1,1};
 						s.terminalVelocity = 0;
 						s.friction = 0.82f;
-						s.life = frand() * 30 + 60;
+						s.life = generateFloat(60, 90);
 						if(initial == 1){
-							float size = (frand() * 32) + 48;
+							float size = generateFloat(48, 80);
 							s.sourceSize = size * 2;
 							s.destinationSize = size * 16;
 							s.velocity = getRandomVectorInCone(dir,25);
-							s.velocity *= frand() * 32;
+							s.velocity *= generateFloat(0, 32);
 						} else{
-							float size = (frand() * 32) + 48;
+							float size = generateFloat(48, 80);
 							s.sourceSize = size;
 							s.destinationSize = size * 8;
 							s.velocity = getRandomVectorInCone(dir,3);
-							s.velocity *= (frand() * 16);
+							s.velocity *= generateFloat(0, 16);
 						}
 						
 					} else{
-						float size = (frand() * 25) + 48;
+						float size = generateFloat(48, 73);
 						s.sourceSize = size * 2;
 						s.destinationSize = size * 8;
 						s.terminalVelocity = 0;
 						s.friction = 0.88f;
-						s.life = frand() * 30 + 60;
+						s.life = generateFloat(60, 90);
 						s.velocity = getRandomVectorInCone(dir, 10);
-						s.velocity *= frand() * 14 + 16;
+						s.velocity *= generateFloat(16, 30);
 					}
 				}
 				else
@@ -141,13 +143,13 @@ namespace T5M {
 					s.destinationSize = size * 4;
 					s.terminalVelocity = 0;
 					s.friction = 0.97f;
-					s.life = frand() * 20 + 42;
-					s.velocity *= frand() * 24 + 16;
+					s.life = generateFloat(42, 62);
+					s.velocity *= generateFloat(16, 40);
 					
 				}
 				s.position = Vector3(x, y, z);
-				s.position += Vector3(frandMinMax(-8, 8), frandMinMax(-8, 8), frandMinMax(-8, 8));
-				s.angularVelocity = frandMinMax(-PI / 4, PI / 4);
+				s.position += Vector3(generateFloat(-8, 8), generateFloat(-8, 8), generateFloat(-8, 8));
+				s.angularVelocity = generateFloat(-PI / 4, PI / 4);
 
 				s.angularDrag = 0.95f;
 				s.room = LaraItem->roomNumber;
@@ -158,40 +160,40 @@ namespace T5M {
 			{
 				SmokeParticle& s = getFreeSmokeParticle();
 				s = {};
-				s.position = Vector3(x, y, z) + Vector3(frandMinMax(8, 16), frandMinMax(8, 16), frandMinMax(8, 16));
+				s.position = Vector3(x, y, z) + Vector3(generateFloat(8, 16), generateFloat(8, 16), generateFloat(8, 16));
 				float xVel = std::sin(TO_RAD(angle))*speed;
 				float zVel = std::cos(TO_RAD(angle))*speed;
-				s.velocity = Vector3(xVel, frandMinMax(-1, 4), zVel);
+				s.velocity = Vector3(xVel, generateFloat(-1, 4), zVel);
 				s.sourceColor = Vector4(1, 1, 1, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
-				s.sourceSize = frandMinMax(8,24);
+				s.sourceSize = generateFloat(8,24);
 				s.active = true;
 				s.affectedByWind = true;
 				s.friction = 0.999f;
 				s.gravity = -0.1f;
-				s.life = frandMinMax(16, 24);
-				s.destinationSize = 128 + frand()*32;
-				s.angularVelocity = frandMinMax(-1, 1);
-				s.angularDrag = frandMinMax(0.97, 0.999);
+				s.life = generateFloat(16, 24);
+				s.destinationSize = generateFloat(128, 160);
+				s.angularVelocity = generateFloat(-1, 1);
+				s.angularDrag = generateFloat(0.97, 0.999);
 			}
 
 			void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 			{
 				SmokeParticle& s = getFreeSmokeParticle();
 				s = {};
-				s.position = Vector3(x, y, z) + Vector3(frandMinMax(8, 16), frandMinMax(8, 16), frandMinMax(8, 16));
+				s.position = Vector3(x, y, z) + Vector3(generateFloat(8, 16), generateFloat(8, 16), generateFloat(8, 16));
 				s.sourceColor = Vector4(0.8, 0.8, 1, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
-				s.sourceSize = frandMinMax(32, 64);
+				s.sourceSize = generateFloat(32, 64);
 				s.active = true;
-				s.velocity = getRandomVector() * frandMinMax(1, 3);
+				s.velocity = getRandomVector() * generateFloat(1, 3);
 				s.affectedByWind = true;
 				s.friction = 0.979f;
 				s.gravity = -0.1f;
-				s.life = frandMinMax(80, 120);
-				s.destinationSize = 1024 + frand() * 128;
-				s.angularVelocity = frandMinMax(-0.6, 0.6);
-				s.angularDrag = frandMinMax(0.87, 0.99);
+				s.life = generateFloat(80, 120);
+				s.destinationSize = generateFloat(1024, 1152);
+				s.angularVelocity = generateFloat(-0.6, 0.6);
+				s.angularDrag = generateFloat(0.87, 0.99);
 			}
 		}
 	}

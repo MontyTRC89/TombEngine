@@ -140,9 +140,9 @@ void UpdateLittleBeetles()
 			int oldy = beetle->pos.yPos;
 			int oldz = beetle->pos.zPos;
 
-			beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot) >> W2V_SHIFT;
+			beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
 			beetle->pos.yPos += beetle->fallspeed;
-			beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot) >> W2V_SHIFT;
+			beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
 
 			beetle->fallspeed += GRAVITY;
 

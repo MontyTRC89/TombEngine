@@ -57,7 +57,7 @@ static void TriggerPilotFlame(int itemnum)
 	//spark->def = Objects[EXPLOSION1].mesh_index;
 	spark->scalar = 0;
 	int size = (GetRandomControl() & 7) + 32;
-	spark->size = size >> 1;
+	spark->size = size / 2;
 	spark->dSize = size;
 }
 
@@ -129,7 +129,7 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 
 	if (xv || yv || zv)
 	{
-		spark->size = size >> 5;
+		spark->size = size / 32;
 		if (fxnum == -2)
 			spark->scalar = 2;
 		else
@@ -137,11 +137,11 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	}
 	else
 	{
-		spark->size = size >> 4;
+		spark->size = size / 16;
 		spark->scalar = 4;
 	}
 
-	spark->dSize = size >> 1;
+	spark->dSize = size / 2;
 }
 
 static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
@@ -180,7 +180,7 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		fx->pos.xRot = angles[1];
 		fx->pos.zRot = 0;
 		fx->pos.yRot = angles[0];
-		fx->speed = speed << 2;
+		fx->speed = speed * 4;
 		//fx->objectNumber = DRAGON_FIRE;
 		fx->counter = 20;
 		fx->flag1 = 0;	// Set to orange flame.
@@ -189,22 +189,22 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 
 		for (int i = 0; i < 2; i++)
 		{
-			speed = (GetRandomControl() % (speed << 2)) + 32;
-			velocity = (speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+			speed = (GetRandomControl() % (speed * 4)) + 32;
+			velocity = speed * phd_cos(fx->pos.xRot);
 
-			xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-			yv = -((speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
-			zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+			xv = velocity * phd_sin(fx->pos.yRot);
+			yv = -speed * phd_sin(fx->pos.xRot);
+			zv = velocity * phd_cos(fx->pos.yRot);
 
-			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -1);
+			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -1);
 		}
 
-		velocity = ((speed << 1) * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
-		zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
-		xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-		yv = -(((speed << 1) * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
+		velocity = (speed * 2) * phd_cos(fx->pos.xRot);
+		zv = velocity * phd_cos(fx->pos.yRot);
+		xv = velocity * phd_sin(fx->pos.yRot);
+		yv = -(speed * 2) * phd_sin(fx->pos.xRot);
 
-		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -2);
+		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -2);
 	}
 
 	return effectNumber;
@@ -233,11 +233,11 @@ void FlameThrowerControl(short itemNumber)
 	int random = GetRandomControl();
 	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
-		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
 		TriggerPilotFlame(itemNumber);
 	}
 	else
-		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random >> 4) & 3), 24 - ((random >> 6) & 3), random & 7);  
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);  
 
 	if (item->hitPoints <= 0)
 	{
@@ -444,7 +444,7 @@ void FlameThrowerControl(short itemNumber)
 
 		case 11:
 			if (creature->flags < 40)
-				creature->flags += (creature->flags >> 2) + 1;
+				creature->flags += (creature->flags / 4) + 1;
 
 			if (info.ahead)
 			{
@@ -478,7 +478,7 @@ void FlameThrowerControl(short itemNumber)
 			
 		case 6:
 			if (creature->flags < 40)
-				creature->flags += (creature->flags >> 2) + 1;	// Length of flame.
+				creature->flags += (creature->flags / 4) + 1;	// Length of flame.
 
 			if (info.ahead)
 			{

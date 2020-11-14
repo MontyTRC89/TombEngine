@@ -162,7 +162,7 @@ void CrocodileControl(short itemNumber)
             AlertAllGuards(itemNumber);
         }
 
-        boneAngle = angle << 2;
+        boneAngle = angle * 4;
         switch (item->currentAnimState)
         {
         case CROC_IDLE:

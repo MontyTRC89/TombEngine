@@ -70,15 +70,15 @@ static int TestMinecartHeight(ITEM_INFO* v, int x, int z)
 {
 	PHD_VECTOR pos;
 	FLOOR_INFO* floor;
-	int s, c;
+	float s, c;
 	short roomNumber;
 
 	c = phd_cos(v->pos.yRot);
 	s = phd_sin(v->pos.yRot);
 
-	pos.x = v->pos.xPos + (((z * s) + (x * c)) >> W2V_SHIFT);
-	pos.y = v->pos.yPos - (z * phd_sin(v->pos.xRot) >> W2V_SHIFT) + (x * phd_sin(v->pos.zRot) >> W2V_SHIFT);
-	pos.z = v->pos.zPos + (((z * c) - (x * s)) >> W2V_SHIFT);
+	pos.x = v->pos.xPos + z * s + x * c;
+	pos.y = v->pos.yPos - z * phd_sin(v->pos.xRot) + x * phd_sin(v->pos.zRot);
+	pos.z = v->pos.zPos + z * c - x * s;
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -91,9 +91,9 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 	int x, y, z, height, cheight;
 	short roomNumber;
 
-	x = v->pos.xPos + ((phd_sin(ang) * dist) >> W2V_SHIFT);
+	x = v->pos.xPos + phd_sin(ang) * dist;
 	y = v->pos.yPos - LARA_HITE;
-	z = v->pos.zPos + ((phd_cos(ang) * dist) >> W2V_SHIFT);
+	z = v->pos.zPos + phd_cos(ang) * dist;
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -156,9 +156,9 @@ static bool CanGetOut(int direction)
 		angle = v->pos.yRot - 0x4000;
 
 
-	x = v->pos.xPos - (GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
+	x = v->pos.xPos - GETOFF_DIST * phd_sin(angle);
 	y = v->pos.yPos;
-	z = v->pos.zPos - (GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
+	z = v->pos.zPos - GETOFF_DIST * phd_cos(angle);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -274,7 +274,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if ((Lara.mineL || Lara.mineR) && (!(Lara.mineL && Lara.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
 	{
 		short ang;
-		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (Lara.mineL << 2);
+		unsigned short rot = (((unsigned short)v->pos.yRot) / 16384) | (Lara.mineL * 4);
 
 		switch (rot)
 		{
@@ -337,9 +337,9 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if (cart->Speed < CART_MIN_SPEED)
 		cart->Speed = CART_MIN_SPEED;
 
-	cart->Speed += (-cart->Gradient << 2);
+	cart->Speed += (-cart->Gradient * 4);
 
-	if ((v->speed = cart->Speed >> 8) < CART_MIN_VEL)
+	if ((v->speed = cart->Speed / 256) < CART_MIN_VEL)
 	{
 		v->speed = CART_MIN_VEL;
 
@@ -357,13 +357,13 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (cart->YVel)
 			StopSoundEffect(209);
 		else
-			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed << 15));
+			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
 	}
 
 	// move cart around corners
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
-		int x, z;
+		float x, z;
 		unsigned short quad, deg;
 
 		if ((cart->TurnLen += (v->speed * 3)) > ANGLE(90))
@@ -385,7 +385,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 		if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 		{
-			quad = ((unsigned short)v->pos.yRot) >> 14;
+			quad = ((unsigned short)v->pos.yRot) / 16384;
 			deg = v->pos.yRot & 16383;
 
 			switch (quad)
@@ -414,15 +414,15 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 				z = -z;
 			}
 
-			v->pos.xPos = cart->TurnX + ((x * 3584) >> W2V_SHIFT);
-			v->pos.zPos = cart->TurnZ + ((z * 3584) >> W2V_SHIFT);
+			v->pos.xPos = cart->TurnX + x * 3584;
+			v->pos.zPos = cart->TurnZ + z * 3584;
 		}
 	}
 	else
 	{
 		// move cart normally
-		v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
-		v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
+		v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
+		v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
 	}
 
 	// tilt cart on slopes
@@ -451,24 +451,24 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			if (cart->YVel > MAX_CART_YVEL)
 				cart->YVel = MAX_CART_YVEL;
 
-			v->pos.yPos += cart->YVel >> 8;
+			v->pos.yPos += (cart->YVel / 256);
 		}
 	}
 
-	v->pos.xRot = cart->Gradient << 5;
+	v->pos.xRot = cart->Gradient * 32;
 
 	// tilt cart around corners
 	val = v->pos.yRot & 16383;
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
 		if (cart->Flags & CF_TURNINGR)
-			v->pos.zRot = -(val * v->speed) >> 9;
+			v->pos.zRot = -(val * v->speed) / 512;
 		else
-			v->pos.zRot = ((0x4000 - val) * v->speed) >> 9;
+			v->pos.zRot = ((0x4000 - val) * v->speed) / 512;
 	}
 	else
 	{
-		v->pos.zRot -= v->pos.zRot >> 3;
+		v->pos.zRot -= (v->pos.zRot / 8);
 	}
 }
 
@@ -698,8 +698,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			if ((Wibble & 7) == 0)
 				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &v->pos, 2);
 
-			v->pos.xPos += (TURN_DEATH_VEL * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
-			v->pos.zPos += (TURN_DEATH_VEL * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
+			v->pos.xPos += TURN_DEATH_VEL * phd_sin(v->pos.yRot);
+			v->pos.zPos += TURN_DEATH_VEL * phd_cos(v->pos.yRot);
 		}
 		else
 		{
@@ -774,7 +774,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 				l->currentAnimState = l->goalAnimState = CART_HIT;
 				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->speed, v->pos.yRot, l->roomNumber, 3);
 
-				hits = (CART_NHITS * short((cart->Speed) >> 11));
+				hits = (CART_NHITS * short((cart->Speed) / 2048));
 				if (hits < 20)
 					hits = 20;
 

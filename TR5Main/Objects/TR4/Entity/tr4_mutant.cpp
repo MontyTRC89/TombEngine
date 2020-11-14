@@ -72,11 +72,11 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
     color = (GetRandomControl() & 0x3F) - 128;
     sptr->sB = 0;
     sptr->sR = color;
-    sptr->sG = color >> 1;
+	sptr->sG = color / 2;
     color = (GetRandomControl() & 0x3F) - 128;
     sptr->dB = 0;
     sptr->dR = color;
-    sptr->dG = color >> 1;
+    sptr->dG = color / 2;
     sptr->fadeToBlack = 8;
     sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
     sptr->transType = COLADD;
@@ -107,7 +107,7 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
     size = (GetRandomControl() & 0xF) + 128;
     sptr->size = size;
     sptr->sSize = size;
-    sptr->dSize = size >> 2;
+	sptr->dSize = size / 4;
 }
 
 static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short roomNumber, int timer)

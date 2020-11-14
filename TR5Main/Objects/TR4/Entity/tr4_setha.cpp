@@ -40,8 +40,8 @@ void SethaControl(short itemNumber)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
