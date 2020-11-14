@@ -80,15 +80,39 @@ static void StartObject()
 		obj->saveFlags = true;
 	}
 
-	for (int objNumber = ID_BRIDGE1; objNumber <= ID_BRIDGE8; ++objNumber)
+	obj = &Objects[ID_BRIDGE_FLAT];
+	if (obj->loaded)
 	{
-		obj = &Objects[objNumber];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseBridge;
-			obj->floor = BridgeFloor;
-			obj->ceiling = BridgeCeiling;
-		}
+		obj->floor = BridgeFloor<0>;
+		obj->ceiling = BridgeCeiling<0>;
+	}
+
+	obj = &Objects[ID_BRIDGE_TILT1];
+	if (obj->loaded)
+	{
+		obj->floor = BridgeFloor<1>;
+		obj->ceiling = BridgeCeiling<1>;
+	}
+
+	obj = &Objects[ID_BRIDGE_TILT2];
+	if (obj->loaded)
+	{
+		obj->floor = BridgeFloor<2>;
+		obj->ceiling = BridgeCeiling<2>;
+	}
+
+	obj = &Objects[ID_BRIDGE_TILT3];
+	if (obj->loaded)
+	{
+		obj->floor = BridgeFloor<3>;
+		obj->ceiling = BridgeCeiling<3>;
+	}
+
+	obj = &Objects[ID_BRIDGE_TILT4];
+	if (obj->loaded)
+	{
+		obj->floor = BridgeFloor<4>;
+		obj->ceiling = BridgeCeiling<4>;
 	}
 }
 
