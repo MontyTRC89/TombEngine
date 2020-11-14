@@ -22,6 +22,10 @@ void InitialiseRaisingBlock(short itemNumber)
 		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 	}
+
+	// Get height from animations
+	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
+	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
 }
 
 void ControlRaisingBlock(short itemNumber)
@@ -44,12 +48,12 @@ void ControlRaisingBlock(short itemNumber)
 				}
 				else
 				{
-					AlterFloorHeight(item, -1024);
+					AlterFloorHeight(item, -item->itemFlags[7]);
 				}
 			}
 			else
 			{
-				AlterFloorHeight(item, -2048);
+				AlterFloorHeight(item, -item->itemFlags[7]);
 			}
 
 			item->itemFlags[2] = 1;
@@ -99,12 +103,12 @@ void ControlRaisingBlock(short itemNumber)
 				}
 				else
 				{
-					AlterFloorHeight(item, 1024);
+					AlterFloorHeight(item, item->itemFlags[7]);
 				}
 			}
 			else
 			{
-				AlterFloorHeight(item, 2048);
+				AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
 			item->itemFlags[2] = 0;
