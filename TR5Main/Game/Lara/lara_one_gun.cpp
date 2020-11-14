@@ -93,8 +93,8 @@ void FireHarpoon()
 
 			item->pos.zRot = 0;
 
-			item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
-			item->speed = (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
+			item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+			item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
 			item->hitPoints = HARPOON_TIME;
 
 			AddActiveItem(itemNumber);
@@ -166,8 +166,8 @@ void ControlHarpoonBolt(short itemNumber)
 		item->pos.xRot -= ANGLE(1);
 		if (item->pos.xRot < -16384)
 			item->pos.xRot = -16384;
-		item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
-		item->speed = (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+		item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
 		aboveWater = true;
 	}
 	else
@@ -176,15 +176,15 @@ void ControlHarpoonBolt(short itemNumber)
 		if ((Wibble & 15) == 0)
 			CreateBubble((PHD_VECTOR*)& item->pos, item->roomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 		TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
-		item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * phd_sin(item->pos.xRot) >> W2V_SHIFT);
-		item->speed = (short)((HARPOON_SPEED >> 1) * phd_cos(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot) / 2;
+		item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot) / 2;
 		aboveWater = false;
 	}
 
 	// Update bolt's position
-	item->pos.xPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -356,7 +356,7 @@ void FireGrenade()
 			}
 
 			item->speed = GRENADE_SPEED;
-			item->fallspeed = (-512 * phd_sin(item->pos.xRot)) >> W2V_SHIFT;
+			item->fallspeed = -512 * phd_sin(item->pos.xRot);
 			item->currentAnimState = item->pos.xRot;
 			item->goalAnimState = item->pos.yRot;
 			item->requiredAnimState = 0;
@@ -437,7 +437,7 @@ void ControlGrenade(short itemNumber)
 					newGrenade->pos.yRot = GetRandomControl() * 2;
 					newGrenade->pos.zRot = 0;
 					newGrenade->speed = 64;
-					newGrenade->fallspeed = -64 * phd_sin(newGrenade->pos.xRot) >> W2V_SHIFT;
+					newGrenade->fallspeed = -64 * phd_sin(newGrenade->pos.xRot);
 					newGrenade->currentAnimState = newGrenade->pos.xRot;
 					newGrenade->goalAnimState = newGrenade->pos.yRot;
 					newGrenade->requiredAnimState = 0;
@@ -477,15 +477,15 @@ void ControlGrenade(short itemNumber)
 	if (g_Level.Rooms[item->roomNumber].flags & 1)
 	{
 		aboveWater = false;
-		item->fallspeed += (5 - item->fallspeed) >> 1;
-		item->speed -= item->speed >> 2;
+		item->fallspeed += (5 - item->fallspeed) / 2;
+		item->speed -= item->speed / 4;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 4) + 3) * ANGLE(1));
+			item->pos.zRot += (((item->speed / 16) + 3) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 2) + 3) * ANGLE(1));
+				item->pos.yRot += (((item->speed / 4) + 3) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 2) + 3) * ANGLE(1));
+				item->pos.xRot += (((item->speed / 4) + 3) * ANGLE(1));
 		}
 	}
 	else
@@ -494,11 +494,11 @@ void ControlGrenade(short itemNumber)
 		item->fallspeed += 3;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 2) + 7) * ANGLE(1));
+			item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 1) + 7) * ANGLE(1));
+				item->pos.yRot += (((item->speed / 2) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 1) + 7) * ANGLE(1));
+				item->pos.xRot += (((item->speed / 2) + 7) * ANGLE(1));
 
 		}
 	}
@@ -521,9 +521,9 @@ void ControlGrenade(short itemNumber)
 	}
 
 	// Update grenade position
-	xv = ((item->speed * phd_sin(item->goalAnimState)) >> W2V_SHIFT);
+	xv = item->speed * phd_sin(item->goalAnimState);
 	yv = item->fallspeed;
-	zv = ((item->speed * phd_cos(item->goalAnimState)) >> W2V_SHIFT);
+	zv = item->speed * phd_cos(item->goalAnimState);
 
 	item->pos.xPos += xv;
 	item->pos.yPos += yv;
@@ -799,10 +799,10 @@ void ControlRocket(short itemNumber)
 	}
 
 	// Update rocket's position
-	short speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
-	item->pos.xPos += (speed * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.yPos += -((item->speed * phd_sin(item->pos.xRot)) >> W2V_SHIFT);
-	item->pos.zPos += (speed * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
+	short speed = item->speed * phd_cos(item->pos.xRot);
+	item->pos.xPos += speed * phd_sin(item->pos.yRot);
+	item->pos.yPos += -item->speed * phd_sin(item->pos.xRot);
+	item->pos.zPos += speed * phd_cos(item->pos.yRot);
 
 	bool explode = false;
 	
@@ -1260,7 +1260,7 @@ void ControlCrossbowBolt(short itemNumber)
 	{
 		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->speed > 64)
-			item->speed -= (item->speed >> 4);
+			item->speed -= (item->speed / 16);
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, roomNumber, 4, 7, 0, 0, 0, 0);
 		aboveWater = false;
@@ -1271,9 +1271,9 @@ void ControlCrossbowBolt(short itemNumber)
 	}
 
 	// Update bolt's position
-	item->pos.xPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -1660,7 +1660,7 @@ void FireRocket()
 				item->pos.yRot += Lara.torsoYrot;
 			}
 
-			item->speed = 512 >> 5;
+			item->speed = 16;
 			item->itemFlags[0] = 0;
 
 			AddActiveItem(itemNumber);
@@ -1720,19 +1720,20 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
 		spark->life = 24;
-		spark->dR = spark->sR >> 1;
-		spark->dG = spark->sG >> 1;
-		spark->dB = spark->sB >> 1;
+		spark->dR = spark->sR / 2;
+		spark->dG = spark->sG / 2;
+		spark->dB = spark->sB / 2;
 		spark->sLife = 24;
 		spark->transType = COLADD;
 		spark->friction = 5;
-		spark->xVel = -128 * phd_sin(GetRandomControl());
+		int random = GetRandomControl() & 0xFFF;
+		spark->xVel = -128 * phd_sin(random * 16);
 		spark->yVel = -640 - (byte)GetRandomControl();
-		spark->zVel = -128 * phd_cos(GetRandomControl());
+		spark->zVel = 128 * phd_cos(random * 16);
 		spark->flags = 0;
-		spark->x = x + (spark->xVel >> 3);
-		spark->y = y - (spark->yVel >> 5);
-		spark->z = z + (spark->zVel >> 3);
+		spark->x = x + (spark->xVel / 8);
+		spark->y = y - (spark->yVel / 32);
+		spark->z = z + (spark->zVel / 8);
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}

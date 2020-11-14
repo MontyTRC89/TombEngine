@@ -14,17 +14,16 @@
 
 long TrainTestHeight(ITEM_INFO *item, long x, long z, short *room_number)
 {
-	long s, c;
+	float s, c;
 	PHD_VECTOR pos;
 	FLOOR_INFO *floor;
 
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
 
-	pos.x = item->pos.xPos + (((z * s) + (x * c)) >> W2V_SHIFT);
-	pos.y = item->pos.yPos - (z * phd_sin(item->pos.xRot) >> W2V_SHIFT)
-		+ (x * phd_sin(item->pos.zRot) >> W2V_SHIFT);
-	pos.z = item->pos.zPos + (((z * c) - (x * s)) >> W2V_SHIFT);
+	pos.x = item->pos.xPos + z * s + x * c;
+	pos.y = item->pos.yPos - z * phd_sin(item->pos.xRot) + x * phd_sin(item->pos.zRot);
+	pos.z = item->pos.zPos + z * c - x * s;
 
 	*room_number = item->roomNumber;
 	floor = GetFloor(pos.x, pos.y, pos.z, room_number);
@@ -34,9 +33,10 @@ long TrainTestHeight(ITEM_INFO *item, long x, long z, short *room_number)
 void TrainControl(short trainNum)
 {
 	ITEM_INFO *train;
-	long s, c, fh, rh;
+	long fh, rh;
 	FLOOR_INFO *floor;
 	short roomNum;
+	float s, c;
 
 	train = &g_Level.Items[trainNum];
 
@@ -49,8 +49,8 @@ void TrainControl(short trainNum)
 	c = phd_cos(train->pos.yRot);
 	s = phd_sin(train->pos.yRot);
 
-	train->pos.xPos += ((train->itemFlags[1] * s) >> W2V_SHIFT);
-	train->pos.zPos += ((train->itemFlags[1] * c) >> W2V_SHIFT);
+	train->pos.xPos += train->itemFlags[1] * s;
+	train->pos.zPos += train->itemFlags[1] * c;
 
 	rh = TrainTestHeight(train, 0, 5120, &roomNum);
 	train->pos.yPos = fh = TrainTestHeight(train, 0, 0, &roomNum);
@@ -69,9 +69,9 @@ void TrainControl(short trainNum)
 	if (roomNum != train->roomNumber)
 		ItemNewRoom(trainNum, roomNum);
 
-	train->pos.xRot = -(rh - fh) << 1;
+	train->pos.xRot = -(rh - fh) * 2;
 
-	TriggerDynamicLight(train->pos.xPos + ((3072 * s) >> W2V_SHIFT), train->pos.yPos, train->pos.zPos + ((3072 * c) >> W2V_SHIFT), 16, 31, 31, 31);
+	TriggerDynamicLight(train->pos.xPos + 3072 * s, train->pos.yPos, train->pos.zPos + 3072 * c, 16, 31, 31, 31);
 
 	if (train->itemFlags[1] != TRAIN_VEL)
 	{
@@ -80,10 +80,10 @@ void TrainControl(short trainNum)
 
 		if (!UseForcedFixedCamera)
 		{
-			ForcedFixedCamera.x = train->pos.xPos + ((8192 * s) >> W2V_SHIFT),
-				ForcedFixedCamera.z = train->pos.zPos + ((8192 * c) >> W2V_SHIFT),
+			ForcedFixedCamera.x = train->pos.xPos + 8192 * s;
+			ForcedFixedCamera.z = train->pos.zPos + 8192 * c;
 
-				roomNum = train->roomNumber;
+			roomNum = train->roomNumber;
 			floor = GetFloor(ForcedFixedCamera.x, train->pos.yPos - 512, ForcedFixedCamera.z, &roomNum);
 			ForcedFixedCamera.y = GetFloorHeight(floor, ForcedFixedCamera.x, train->pos.yPos - 512, ForcedFixedCamera.z);
 
@@ -99,7 +99,8 @@ void TrainControl(short trainNum)
 void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 {
 	ITEM_INFO *train;
-	long s, c, x, z;
+	long x, z;
+	float s, c;
 
 	train = &g_Level.Items[trainNum];
 
@@ -137,8 +138,8 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 	c = phd_cos(train->pos.yRot);
 	s = phd_sin(train->pos.yRot);
 
-	x = larA->pos.xPos + ((256 * s) >> W2V_SHIFT);
-	z = larA->pos.zPos + ((256 * c) >> W2V_SHIFT);
+	x = larA->pos.xPos + 256 * s;
+	z = larA->pos.zPos + 256 * c;
 
 	DoLotsOfBlood(x, larA->pos.yPos - 512, z, 1024, train->pos.yRot, larA->roomNumber, 15);
 

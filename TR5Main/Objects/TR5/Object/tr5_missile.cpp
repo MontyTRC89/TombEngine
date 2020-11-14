@@ -64,12 +64,12 @@ void MissileControl(short itemNumber)
 			int dy = angles[0] - fx->pos.yRot;
 			if (abs(dy) > 0x8000)
 				dy = -dy;
-			dy >>= 3;
+			dy /= 8;
 
 			int dx = angles[1] - fx->pos.xRot;
 			if (abs(dx) > 0x8000)
 				dx = -dx;
-			dx >>= 3;
+			dx /= 8;
 
 			if (dy <= dh)
 			{
@@ -105,11 +105,11 @@ void MissileControl(short itemNumber)
 	int y = fx->pos.yPos;
 	int z = fx->pos.zPos;
 
-	int c = fx->speed * phd_cos(fx->pos.xRot) >> W2V_SHIFT;
+	int c = fx->speed * phd_cos(fx->pos.xRot);
 
-	fx->pos.xPos += c * phd_sin(fx->pos.yRot) >> W2V_SHIFT;
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT;
-	fx->pos.zPos += c * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.xPos += c * phd_sin(fx->pos.yRot);
+	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
+	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

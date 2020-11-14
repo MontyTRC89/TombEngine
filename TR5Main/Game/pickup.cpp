@@ -957,7 +957,7 @@ void PickupControl(short itemNum)
             if (item->fallspeed <= 64)
                 item->triggerFlags &= 0xC0;
             else
-                item->fallspeed = -item->fallspeed >> 2;
+                item->fallspeed = -item->fallspeed / 4;
         }
 
         if (item->roomNumber != roomNumber)

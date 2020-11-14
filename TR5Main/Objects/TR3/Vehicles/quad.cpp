@@ -15,7 +15,9 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "prng.h"
 using std::vector;
+using namespace T5M::Math::Random;
 typedef enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
@@ -103,7 +105,7 @@ typedef enum QUAD_ANIM_STATES {
 #define QUAD_SNOW 500
 
 #define QUAD_MAX_HEIGHT (STEP_SIZE)
-#define QUAD_MIN_BOUNCE ((MAX_VELOCITY/2)>>8)
+#define QUAD_MIN_BOUNCE ((MAX_VELOCITY/2)/256)
 
 #define QUADBIKE_TURNL_A		3
 #define QUADBIKE_TURNL_F		GF2(ID_QUAD, QUADBIKE_TURNL_A, 0)
@@ -150,7 +152,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
-	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, frandMinMax(160, 200), 60, 60, 64, frandMinMax(0, 359), 0);
+	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
 //	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
@@ -171,9 +173,9 @@ static int CanQuadbikeGetOff(int direction)
 	else
 		angle = item->pos.yRot + ANGLE(90);
 
-	int x = item->pos.xPos + (512 * phd_sin(angle) >> W2V_SHIFT);
+	int x = item->pos.xPos + 512 * phd_sin(angle);
 	int y = item->pos.yPos;
-	int z = item->pos.zPos + (512 * phd_cos(angle) >> W2V_SHIFT);
+	int z = item->pos.zPos + 512 * phd_cos(angle);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -214,8 +216,8 @@ static int QuadCheckGetOff()
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
 			LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
-			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
-			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
+			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -362,10 +364,10 @@ static int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 	if (p->x || p->z)
 	{
-		int c = phd_cos(item->pos.yRot);
-		int s = phd_sin(item->pos.yRot);
-		int front = ((p->z * c) + (p->x * s)) >> W2V_SHIFT;
-		int side = ((-p->z * s) + (p->x * c)) >> W2V_SHIFT;
+		float c = phd_cos(item->pos.yRot);
+		float s = phd_sin(item->pos.yRot);
+		int front = p->z * c + p->x * s;
+		int side = -p->z * s + p->x * c;
 
 		if (abs(front) > abs(side))
 		{
@@ -388,13 +390,13 @@ static int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 static int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - dz * phd_sin(item->pos.xRot) + dx * phd_sin(item->pos.zRot);
 
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
 
-	pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
-	pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+	pos->z = item->pos.zPos + dz * c - dx * s;
+	pos->x = item->pos.xPos + dz * s + dx * c;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -407,11 +409,11 @@ static int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 
 static int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-	int x = pos->x >> WALL_SHIFT;
-	int z = pos->z >> WALL_SHIFT;
+	int x = pos->x / SECTOR(1);
+	int z = pos->z / SECTOR(1);
 
-	int  oldX= old->x >> WALL_SHIFT;
-	int oldZ = old->z >> WALL_SHIFT;
+	int oldX= old->x / SECTOR(1);
+	int oldZ = old->z / SECTOR(1);
 
 	int shiftX = pos->x & (WALL_SIZE - 1);
 	int shiftZ = pos->z & (WALL_SIZE - 1);
@@ -520,12 +522,12 @@ static int DoQuadDynamics(int height, int fallspeed, int *y)
 	}
 	else
 	{
-		int kick = (height - *y) << 2;
+		int kick = (height - *y) * 4;
 
 		if (kick < -80)
 			kick = -80;
 
-		fallspeed += ((kick - fallspeed) >> 3);
+		fallspeed += ((kick - fallspeed) / 8);
 
 		if (*y > height)
 			*y = height;
@@ -556,10 +558,10 @@ static int QuadDynamics(ITEM_INFO* item)
 	holdBottomRight = TestQuadHeight(item, -QUAD_FRONT, QUAD_SIDE, &oldBottomRight);
 	hmml_old = TestQuadHeight(item, 0, -QUAD_SIDE, &mml_old);
 	hmmr_old = TestQuadHeight(item, 0, QUAD_SIDE, &mmr_old);
-	hmtl_old = TestQuadHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl_old);
-	hmtr_old = TestQuadHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr_old);
-	hmoldBottomLeft = TestQuadHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &moldBottomLeft);
-	hmoldBottomRight = TestQuadHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &moldBottomRight);
+	hmtl_old = TestQuadHeight(item, QUAD_FRONT / 2, -QUAD_SIDE, &mtl_old);
+	hmtr_old = TestQuadHeight(item, QUAD_FRONT / 2, QUAD_SIDE, &mtr_old);
+	hmoldBottomLeft = TestQuadHeight(item, -QUAD_FRONT / 2, -QUAD_SIDE, &moldBottomLeft);
+	hmoldBottomRight = TestQuadHeight(item, -QUAD_FRONT / 2, QUAD_SIDE, &moldBottomRight);
 
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
@@ -604,9 +606,9 @@ static int QuadDynamics(ITEM_INFO* item)
 
 		rot = item->pos.yRot - quad->momentumAngle;
 
-		momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) << 8) / MAX_VELOCITY) * quad->velocity) >> 8);
+		momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) * 256) / MAX_VELOCITY) * quad->velocity) / 256);
 		if (!(TrInput & IN_ACTION) && quad->velocity > 0)
-			momentum += momentum >> 2;
+			momentum += (momentum / 4);
 
 		if (rot < -MAX_MOMENTUM_TURN)
 		{
@@ -640,29 +642,29 @@ static int QuadDynamics(ITEM_INFO* item)
 	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int speed = 0;
 	if (item->pos.yPos >= height)
-		speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
+		speed = item->speed * phd_cos(item->pos.xRot);
 	else
 		speed = item->speed;
 
-	item->pos.zPos += (speed * phd_cos(quad->momentumAngle)) >> W2V_SHIFT;
-	item->pos.xPos += (speed * phd_sin(quad->momentumAngle)) >> W2V_SHIFT;
+	item->pos.zPos += speed * phd_cos(quad->momentumAngle);
+	item->pos.xPos += speed * phd_sin(quad->momentumAngle);
 
-	slip = QUAD_SLIP * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+	slip = QUAD_SLIP * phd_sin(item->pos.xRot);
 	if (abs(slip) > QUAD_SLIP / 2)
 	{
 		if (slip > 0)
 			slip -= 10;
 		else
 			slip += 10;
-		item->pos.zPos -= slip * phd_cos(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.xPos -= slip * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos -= slip * phd_cos(item->pos.yRot);
+		item->pos.xPos -= slip * phd_sin(item->pos.yRot);
 	}
 
-	slip = QUAD_SLIP_SIDE * phd_sin(item->pos.zRot) >> W2V_SHIFT;
+	slip = QUAD_SLIP_SIDE * phd_sin(item->pos.zRot);
 	if (abs(slip) > QUAD_SLIP_SIDE / 2)
 	{
-		item->pos.zPos -= slip * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.xPos += slip * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos -= slip * phd_sin(item->pos.yRot);
+		item->pos.xPos += slip * phd_cos(item->pos.yRot);
 	}
 
 	moved.x = item->pos.xPos;
@@ -677,7 +679,7 @@ static int QuadDynamics(ITEM_INFO* item)
 	if (hfl < oldFrontLeft.y - STEP_SIZE)
 		rot = DoQuadShift(item, &fl, &oldFrontLeft);
 
-	hmtl = TestQuadHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl);
+	hmtl = TestQuadHeight(item, QUAD_FRONT / 2, -QUAD_SIDE, &mtl);
 	if (hmtl < mtl_old.y - STEP_SIZE)
 		DoQuadShift(item, &mtl, &mtl_old);
 
@@ -685,7 +687,7 @@ static int QuadDynamics(ITEM_INFO* item)
 	if (hmml < mml_old.y - STEP_SIZE)
 		DoQuadShift(item, &mml, &mml_old);
 
-	hmbl = TestQuadHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &mbl);
+	hmbl = TestQuadHeight(item, -QUAD_FRONT / 2, -QUAD_SIDE, &mbl);
 	if (hmbl < moldBottomLeft.y - STEP_SIZE)
 		DoQuadShift(item, &mbl, &moldBottomLeft);
 
@@ -705,7 +707,7 @@ static int QuadDynamics(ITEM_INFO* item)
 			rot += rotadd;
 	}
 
-	hmtr = TestQuadHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr);
+	hmtr = TestQuadHeight(item, QUAD_FRONT / 2, QUAD_SIDE, &mtr);
 	if (hmtr < mtr_old.y - STEP_SIZE)
 		DoQuadShift(item, &mtr, &mtr_old);
 
@@ -713,7 +715,7 @@ static int QuadDynamics(ITEM_INFO* item)
 	if (hmmr < mmr_old.y - STEP_SIZE)
 		DoQuadShift(item, &mmr, &mmr_old);
 
-	hmbr = TestQuadHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &mbr);
+	hmbr = TestQuadHeight(item, -QUAD_FRONT / 2, QUAD_SIDE, &mbr);
 	if (hmbr < moldBottomRight.y - STEP_SIZE)
 		DoQuadShift(item, &mbr, &moldBottomRight);
 
@@ -738,15 +740,15 @@ static int QuadDynamics(ITEM_INFO* item)
 
 	if (collide)
 	{
-		newspeed = ((item->pos.zPos - old.z) * phd_cos(quad->momentumAngle) + (item->pos.xPos - old.x) * phd_sin(quad->momentumAngle)) >> W2V_SHIFT;
+		newspeed = (item->pos.zPos - old.z) * phd_cos(quad->momentumAngle) + (item->pos.xPos - old.x) * phd_sin(quad->momentumAngle);
 
-		newspeed <<= 8;
+		newspeed *= 256;
 
 		if ((&g_Level.Items[Lara.Vehicle] == item)
 			&& (quad->velocity == MAX_VELOCITY)
 			&& (newspeed < (quad->velocity - 10)))
 		{
-			LaraItem->hitPoints -= (quad->velocity - newspeed) >> 7;
+			LaraItem->hitPoints -= ((quad->velocity - newspeed) / 128);
 			LaraItem->hitStatus = 1;
 		}
 
@@ -846,7 +848,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 				else
 					LaraItem->goalAnimState = QUAD_STATE_BIKEDEATH;
 			}
-			else if (((quad->velocity >> 8) == 0)
+			else if (((quad->velocity / 256) == 0)
 				&& (!(TrInput & (IN_ACTION | IN_JUMP))))
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 
@@ -868,7 +870,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 		case QUAD_STATE_BRAKE:
 		case QUAD_STATE_SLOW:
 		case QUAD_STATE_STOPSLOWLY:
-			if ((quad->velocity >> 8) == 0)
+			if ((quad->velocity / 256) == 0)
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 
 			else if (TrInput & IN_LEFT)
@@ -879,7 +881,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			break;
 
 		case QUAD_STATE_TURNL:
-			if ((quad->velocity >> 8) == 0)
+			if ((quad->velocity / 256) == 0)
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 			else if (TrInput & IN_RIGHT)
 			{
@@ -895,7 +897,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			break;
 
 		case QUAD_STATE_TURNR:
-			if ((quad->velocity >> 8) == 0)
+			if ((quad->velocity / 256) == 0)
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 			else if (TrInput & IN_LEFT)
 			{
@@ -960,8 +962,8 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 	{
 		if (quad->revs > 0x10)
 		{
-			quad->velocity += quad->revs >> 4;
-			quad->revs -= quad->revs >> 3;
+			quad->velocity += (quad->revs / 16);
+			quad->revs -= (quad->revs / 8);
 		}
 		else
 			quad->revs = 0;
@@ -1071,16 +1073,16 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 			else if (quad->velocity < MAX_VELOCITY)
 			{
 				if (quad->velocity < 0x4000)
-					quad->velocity += 8 + ((0x4000 + 0x800 - quad->velocity) >> 3);
+					quad->velocity += (8 + ((0x4000 + 0x800 - quad->velocity)) / 8);
 				else if (quad->velocity < 0x7000)
-					quad->velocity += 4 + ((0x7000 + 0x800 - quad->velocity) >> 4);
+					quad->velocity += (4 + ((0x7000 + 0x800 - quad->velocity)) / 16);
 				else if (quad->velocity < MAX_VELOCITY)
-					quad->velocity += 2 + ((MAX_VELOCITY - quad->velocity) >> 3);
+					quad->velocity += (2 + ((MAX_VELOCITY - quad->velocity)) / 8);
 			}
 			else
 				quad->velocity = MAX_VELOCITY;
 
-			quad->velocity -= (abs(item->pos.yRot - quad->momentumAngle)) >> 6;
+			quad->velocity -= ((abs(item->pos.yRot - quad->momentumAngle)) / 64);
 		}
 
 		else if (quad->velocity > 0x0100)
@@ -1099,30 +1101,30 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 		if (QuadHandbrakeStarting && quad->revs && !(TrInput & (IN_ACTION | IN_JUMP)))
 		{
 			if (quad->revs > 0x8)
-				quad->revs -= quad->revs >> 3;
+				quad->revs -= (quad->revs / 8);
 			else
 				quad->revs = 0;
 		}
 
-		item->speed = quad->velocity >> 8;
+		item->speed = (quad->velocity / 256);
 
 		if (quad->engineRevs > 0x7000)
 			quad->engineRevs = -0x2000;
 
 		if (quad->velocity < 0)
-			revs = abs(quad->velocity >> 1);
+			revs = abs(quad->velocity / 2);
 		else if (quad->velocity < 0x7000)
 			revs = -0x2000 + ((quad->velocity * (0x6800 - -0x2000)) / 0x7000);
 		else if (quad->velocity <= MAX_VELOCITY)
 			revs = -0x2800 + (((quad->velocity - 0x7000) * (0x7000 - -0x2800)) / (MAX_VELOCITY - 0x7000));
 
 		revs += abs(quad->revs);
-		quad->engineRevs += (revs - quad->engineRevs) >> 3;
+		quad->engineRevs += ((revs - quad->engineRevs) / 8);
 	}
 	else
 	{
 		if (quad->engineRevs < 0xA000)
-			quad->engineRevs += (0xA000 - quad->engineRevs) >> 3;
+			quad->engineRevs += ((0xA000 - quad->engineRevs) / 8);
 	}
 
 	*pitch = quad->engineRevs;
@@ -1223,14 +1225,14 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 
 	if (moving)
 	{
-		spark->dR = (spark->dR * speed) >> 5;
-		spark->dG = (spark->dG * speed) >> 5;
-		spark->dB = (spark->dB * speed) >> 5;
+		spark->dR = (spark->dR * speed) / 32;
+		spark->dG = (spark->dG * speed) / 32;
+		spark->dB = (spark->dB * speed) / 32;
 	}
 
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
-	spark->sLife = spark->life = (GetRandomControl() & 3) + 20 - (speed >> 12);
+	spark->sLife = spark->life = (GetRandomControl() & 3) + 20 - (speed / 4096);
 	if (spark->sLife < 9)
 		spark->sLife = spark->life = 9;
 
@@ -1240,8 +1242,8 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->x = x + ((GetRandomControl() & 15) - 8);
 	spark->y = y + ((GetRandomControl() & 15) - 8);
 	spark->z = z + ((GetRandomControl() & 15) - 8);
-	int zv = (speed * phd_cos(angle)) >> (W2V_SHIFT + 2);
-	int xv = (speed * phd_sin(angle)) >> (W2V_SHIFT + 2);
+	int zv = speed * phd_cos(angle) / 4;
+	int xv = speed * phd_sin(angle) / 4;
 	spark->xVel = xv + ((GetRandomControl() & 255) - 128);
 	spark->yVel = -(GetRandomControl() & 7) - 8;
 	spark->zVel = zv + ((GetRandomControl() & 255) - 128);
@@ -1263,7 +1265,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->scalar = 2;
 	spark->gravity = -(GetRandomControl() & 3) - 4;
 	spark->maxYvel = -(GetRandomControl() & 7) - 8;
-	int size = (GetRandomControl() & 7) + 64 + (speed >> 7);
+	int size = (GetRandomControl() & 7) + 64 + (speed / 128);
 	spark->dSize = size;
 	spark->size = spark->sSize =  size / 2;
 }
@@ -1336,7 +1338,7 @@ int QuadBikeControl(void)
 			quad->pitch = -0x8000;
 		else if (quad->pitch > 0xa000)
 			quad->pitch = 0xa000;
-		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, PITCH_SHIFT + ((0x10000 + quad->pitch) << 8));
+		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, (PITCH_SHIFT + ((0x10000 + quad->pitch)) * 256));
 	}
 	else
 	{
@@ -1347,21 +1349,21 @@ int QuadBikeControl(void)
 
 	item->floor = height;
 
-	rotadd = quad->velocity >> 2;
+	rotadd = quad->velocity / 4;
 	quad->rearRot -= rotadd;
-	quad->rearRot -= (quad->revs >> 3);
+	quad->rearRot -= (quad->revs / 8);
 	quad->frontRot -= rotadd;
 
 	quad->leftFallspeed = DoQuadDynamics(hfl, quad->leftFallspeed, (int *)&fl.y);
 	quad->rightFallspeed = DoQuadDynamics(hfr, quad->rightFallspeed, (int *)&fr.y);
 	item->fallspeed = DoQuadDynamics(height, item->fallspeed, (int *)&item->pos.yPos);
 
-	height = (fl.y + fr.y) >> 1;
+	height = (fl.y + fr.y) / 2;
 	xRot = phd_atan(QUAD_FRONT, item->pos.yPos - height);
 	zRot = phd_atan(QUAD_SIDE, height - fl.y);
 
-	item->pos.xRot += (xRot - item->pos.xRot) >> 1;
-	item->pos.zRot += (zRot - item->pos.zRot) >> 1;
+	item->pos.xRot += ((xRot - item->pos.xRot) / 2);
+	item->pos.zRot += ((zRot - item->pos.zRot) / 2);
 
 	if (!(quad->flags & QUAD_FLAGS_DEAD))
 	{
@@ -1426,13 +1428,13 @@ int QuadBikeControl(void)
 			{
 				if (QuadSmokeStart < 16)
 				{
-					speed = ((QuadSmokeStart << 1) + (GetRandomControl() & 7) + (GetRandomControl() & 16)) << 7;
+					speed = ((QuadSmokeStart * 2) + (GetRandomControl() & 7) + (GetRandomControl() & 16)) * 128;
 					QuadSmokeStart++;
 				}
 				else if (QuadHandbrakeStarting)
-					speed = (abs(quad->revs) >> 2) + ((GetRandomControl() & 7) << 7);
+					speed = (abs(quad->revs) * 2) + ((GetRandomControl() & 7) * 128);
 				else if ((GetRandomControl() & 3) == 0)
-					speed = ((GetRandomControl() & 15) + (GetRandomControl() & 16)) << 7;
+					speed = ((GetRandomControl() & 15) + (GetRandomControl() & 16)) * 128;
 				else
 					speed = 0;
 				TriggerQuadExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 0);

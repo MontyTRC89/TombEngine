@@ -170,7 +170,7 @@ void UpdateLocusts(void)
                 angles);
 
             distance = SQUARE(locust->target->pos.zPos - locust->pos.zPos) + SQUARE(locust->target->pos.xPos - locust->pos.xPos);
-            square = int(sqrt(distance)) >> 3;
+            square = int(sqrt(distance)) / 8;
             if (square <= 128)
             {
                 if (square < 48)
@@ -190,15 +190,15 @@ void UpdateLocusts(void)
             {
                 short resultYrot, resultXrot;
                 int shiftYrot, shiftXrot;
-                int random = locust->randomRotation << 7;
+                int random = locust->randomRotation * 128;
                 resultYrot = angles[0] - locust->pos.yRot;
                 if (abs(resultYrot) > 0x8000)
                     resultYrot = locust->pos.yRot - angles[0];
                 resultXrot = angles[1] - locust->pos.xRot;
                 if (abs(resultXrot) > 0x8000)
                     resultXrot = locust->pos.xRot - angles[0];
-                shiftYrot = resultYrot >> 3;
-                shiftXrot = resultXrot >> 3;
+                shiftYrot = resultYrot / 8;
+                shiftXrot = resultXrot / 8;
                 if (shiftYrot > random || shiftYrot < -random)
                     shiftYrot = -random;
                 if (shiftXrot > random || shiftXrot < -random)
@@ -207,9 +207,9 @@ void UpdateLocusts(void)
                 locust->pos.xRot += shiftXrot;
             }
 
-            locust->pos.xPos += (locust->randomRotation * phd_cos(locust->pos.xRot) >> W2V_SHIFT) * phd_sin(locust->pos.yRot) >> W2V_SHIFT;
-            locust->pos.yPos += locust->randomRotation * phd_sin(-locust->pos.xRot) >> W2V_SHIFT;
-            locust->pos.zPos += (locust->randomRotation * phd_cos(locust->pos.xRot) >> W2V_SHIFT) * phd_cos(locust->pos.yRot) >> W2V_SHIFT;
+            locust->pos.xPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_sin(locust->pos.yRot);
+            locust->pos.yPos += locust->randomRotation * phd_sin(-locust->pos.xRot);
+            locust->pos.zPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_cos(locust->pos.yRot);
             if (ItemNearTarget(&locust->pos, locust->target, CLICK(1) / 2))
             {
                 TriggerBlood(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 2 * GetRandomControl(), 2);

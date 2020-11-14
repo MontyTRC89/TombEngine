@@ -58,7 +58,7 @@ void MPStickControl(short itemNumber)
 
 	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
 	{
-		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
+		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->roomNumber, 3);
 		item->hitPoints -= 20;
 	}
 
@@ -333,7 +333,7 @@ void MPStickControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 80 >> 4;
+						enemy->hitPoints -= 5;
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
@@ -372,7 +372,7 @@ void MPStickControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 80 >> 4;
+						enemy->hitPoints -= 5;
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
@@ -415,7 +415,7 @@ void MPStickControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 100 >> 4;
+						enemy->hitPoints -= 6;
 						enemy->hitStatus = 1;
 						creature->flags = 2;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
@@ -451,7 +451,7 @@ void MPStickControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 150 >> 4;
+						enemy->hitPoints -= 9;
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite2, DoBloodSplat);

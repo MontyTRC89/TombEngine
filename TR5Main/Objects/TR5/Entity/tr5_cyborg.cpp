@@ -65,13 +65,13 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 		spark->scalar = 1;
 		spark->flags = SP_SCALE;
 		spark->x = (rand() & 7) + x - 3;
-		spark->y = ((rand() >> 3) & 7) + y - 3;
-		spark->z = ((rand() >> 6) & 7) + z - 3;
-		spark->xVel = (byte)(rand() >> 2) + xv - 128;
-		spark->yVel = (byte)(rand() >> 4) + yv - 128;
-		spark->zVel = (byte)(rand() >> 6) + zv - 128;
-		spark->sSize = spark->size= ((rand() >> 9) & 3) + 4;
-		spark->dSize = ((rand() >> 12) & 1) + 1;
+		spark->y = ((rand() / 8) & 7) + y - 3;
+		spark->z = ((rand() / 64) & 7) + z - 3;
+		spark->xVel = (byte)(rand() / 4) + xv - 128;
+		spark->yVel = (byte)(rand() / 16) + yv - 128;
+		spark->zVel = (byte)(rand() / 64) + zv - 128;
+		spark->sSize = spark->size= ((rand() / 512) & 3) + 4;
+		spark->dSize = ((rand() / 4096) & 1) + 1;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 	}
@@ -93,8 +93,8 @@ void HitmanControl(short itemNumber)
 		int x = item->pos.xPos;
 		int z = item->pos.zPos;
 
-		int dx = 808 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		int dz = 808 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		int dx = 808 * phd_sin(item->pos.yRot);
+		int dz = 808 * phd_cos(item->pos.yRot);
 
 		x += dx;
 		z += dz;
@@ -278,7 +278,7 @@ void HitmanControl(short itemNumber)
 
 				if (info.ahead && item->aiBits != GUARD)
 				{
-					joint0 = info.angle >> 1;
+					joint0 = info.angle / 2;
 					joint1 = info.xAngle;
 				}
 				
@@ -467,8 +467,8 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_AIM:
-				joint0 = laraInfo.angle >> 1;
-				joint2 = laraInfo.angle >> 1;
+				joint0 = laraInfo.angle / 2;
+				joint2 = laraInfo.angle / 2;
 				creature->flags = 0;
 				creature->maximumTurn = 0;
 
@@ -496,8 +496,8 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_FIRE:
-				joint0 = laraInfo.angle >> 1;
-				joint2 = laraInfo.angle >> 1;
+				joint0 = laraInfo.angle / 2;
+				joint2 = laraInfo.angle / 2;
 
 				if (info.ahead)
 					joint1 = info.xAngle;

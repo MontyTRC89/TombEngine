@@ -85,12 +85,12 @@ void ControlDeathSlide(short itemNumber)
 		if (item->fallspeed < 100)
 			item->fallspeed += 5;
 
-		int c = phd_cos(item->pos.yRot);
-		int s = phd_sin(item->pos.yRot);
+		float c = phd_cos(item->pos.yRot);
+		float s = phd_sin(item->pos.yRot);
 
-		item->pos.zPos += item->fallspeed * c >> W2V_SHIFT;
-		item->pos.xPos += item->fallspeed * s >> W2V_SHIFT;
-		item->pos.yPos += item->fallspeed >> 2;
+		item->pos.zPos += item->fallspeed * c;
+		item->pos.xPos += item->fallspeed * s;
+		item->pos.yPos += item->fallspeed / 4;
 
 		short roomNumber = item->roomNumber;
 		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -104,9 +104,9 @@ void ControlDeathSlide(short itemNumber)
 			LaraItem->pos.zPos = item->pos.zPos;
 		}
 
-		int x = item->pos.xPos + (1024 * s >> W2V_SHIFT);
+		int x = item->pos.xPos + 1024 * s;
 		int y = item->pos.yPos + 64;
-		int z = item->pos.zPos + (1024 * c >> W2V_SHIFT);
+		int z = item->pos.zPos + 1024 * c;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 
@@ -118,7 +118,7 @@ void ControlDeathSlide(short itemNumber)
 				AnimateLara(LaraItem);
 				LaraItem->gravityStatus = true;
 				LaraItem->speed = item->fallspeed;
-				LaraItem->fallspeed = item->fallspeed >> 2;
+				LaraItem->fallspeed = item->fallspeed / 4;
 			}
 
 			// TODO: sounds

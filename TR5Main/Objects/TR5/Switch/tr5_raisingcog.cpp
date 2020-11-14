@@ -111,7 +111,7 @@ void RaisingCogControl(short itemNumber)
 					flags = item->itemFlags[2];
 				}
 
-				SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags << 8) | 8);
+				SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags * 256) | 8);
 
 				item->itemFlags[2] += 2;
 				item->pos.yPos -= 2;

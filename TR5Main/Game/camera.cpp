@@ -93,9 +93,9 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	y = start->y;
 	z = start->z;
 	room = start->roomNumber;
-	dx = target->x - x >> 3;
-	dy = target->y - y >> 3;
-	dz = target->z - z >> 3;
+	dx = (target->x - x) / 8;
+	dy = (target->y - y) / 8;
+	dz = (target->z - z) / 8;
 	flag = 0;
 	result = 0;
 	for (i = 0; i < 8; ++i)
@@ -261,7 +261,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
-			int bounce2 = -Camera.bounce >> 2;
+			int bounce2 = -Camera.bounce / 4;
 			Camera.target.x += GetRandomControl() % bounce - bounce2;
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
@@ -314,7 +314,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	int ceiling = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 	if (Camera.pos.y - 255 < ceiling && Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = (height + ceiling) >> 1;
+		Camera.pos.y = (height + ceiling) / 2;
 	else if (Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
 		Camera.pos.y = height - 255;
 	else if (Camera.pos.y - 255 < ceiling && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
@@ -340,9 +340,9 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	else
 	{
 		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * phd_sin(angle) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(angle);
 		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
 		Camera.oldType = Camera.type;
 	}
 }
@@ -362,7 +362,7 @@ void ChaseCamera(ITEM_INFO* item)
 	else if (Camera.actualElevation < -ANGLE(85))
 		Camera.actualElevation = -ANGLE(85);
 
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
 	if (g_Level.Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
@@ -392,7 +392,7 @@ void ChaseCamera(ITEM_INFO* item)
 	
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -412,8 +412,8 @@ void ChaseCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
+		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -513,7 +513,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = LaraItem->pos.yRot + Camera.targetAngle;
 	}
 
-	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) >> 3;
+	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 
 void CombatCamera(ITEM_INFO* item)
@@ -538,7 +538,7 @@ void CombatCamera(ITEM_INFO* item)
 	
 	if (c + 64 > h - 64 && h != NO_HEIGHT && c != NO_HEIGHT)
 	{
-		Camera.target.y = (c + h) >> 1;
+		Camera.target.y = (c + h) / 2;
 		Camera.targetElevation = 0;
 	}
 	else if (Camera.target.y > h - 64 && h != NO_HEIGHT)
@@ -579,11 +579,11 @@ void CombatCamera(ITEM_INFO* item)
 	UpdateCameraElevation();
 
 	Camera.targetDistance = 1536;
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -603,8 +603,8 @@ void CombatCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
+		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -697,7 +697,7 @@ int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		c = GetCeiling(floor, x, y, z);
 
 		if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = (h + c) >> 1;
+			y = (h + c) / 2;
 		else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 			y = h - 255;
 		else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
@@ -740,7 +740,7 @@ int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		c = GetCeiling(floor, x, y, z);
 
 		if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = (h + c) >> 1;
+			y = (h + c) / 2;
 		else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 			y = h - 255;
 		else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
@@ -786,7 +786,7 @@ void FixedCamera(ITEM_INFO* item)
 		{
 			if (FlashFader > 2)
 			{
-				FlashFader = (FlashFader >> 1) & 0xFE;
+				FlashFader = (FlashFader / 2) & 0xFE;
 			}
 
 			SniperOverlay = 1;
@@ -801,9 +801,9 @@ void FixedCamera(ITEM_INFO* item)
 			}
 			else
 			{
-				to.x = Camera.target.x + ((Camera.target.x - Camera.pos.x) >> 1);
-				to.y = Camera.target.y + ((Camera.target.y - Camera.pos.y) >> 1);
-				to.z = Camera.target.z + ((Camera.target.z - Camera.pos.z) >> 1);
+				to.x = Camera.target.x + ((Camera.target.x - Camera.pos.x) / 2);
+				to.y = Camera.target.y + ((Camera.target.y - Camera.pos.y) / 2);
+				to.z = Camera.target.z + ((Camera.target.z - Camera.pos.z) / 2);
 				
 				int los = LOS(&from, &to);
 				GetLaraOnLOS = 1;
@@ -876,8 +876,8 @@ void LookCamera(ITEM_INFO* item)
 
 	Lara.torsoXrot = 0;
 	Lara.torsoYrot = 0;
-	Lara.headXrot <<= 1;
-	Lara.headYrot <<= 1;
+	Lara.headXrot *= 2;
+	Lara.headYrot *= 2;
 
 	if (Lara.headXrot > ANGLE(55)) 
 		Lara.headXrot = ANGLE(55);
@@ -889,11 +889,11 @@ void LookCamera(ITEM_INFO* item)
 		Lara.headYrot = ANGLE(80);
 
 	if (abs(Lara.headXrot - OldCam.pos.xRot) >= 16)
-		OldCam.pos.xRot = (Lara.headXrot + OldCam.pos.xRot) >> 1;
+		OldCam.pos.xRot = (Lara.headXrot + OldCam.pos.xRot) / 2;
 	else
 		OldCam.pos.xRot = Lara.headXrot;
 	if (abs(Lara.headYrot - OldCam.pos.yRot) >= 16)
-		OldCam.pos.yRot = (Lara.headYrot + OldCam.pos.yRot) >> 1;
+		OldCam.pos.yRot = (Lara.headYrot + OldCam.pos.yRot) / 2;
 	else
 		OldCam.pos.yRot = Lara.headYrot;
 
@@ -947,9 +947,9 @@ void LookCamera(ITEM_INFO* item)
 	pos3.z = 2048;
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
-	int dx = (pos2.x - pos.x) >> 3;
-	int dy = (pos2.y - pos.y) >> 3;
-	int dz = (pos2.z - pos.z) >> 3;
+	int dx = (pos2.x - pos.x) / 8;
+	int dy = (pos2.y - pos.y) / 8;
+	int dz = (pos2.z - pos.z) / 8;
 	int x = pos.x;
 	int y = pos.y;
 	int z = pos.z;
@@ -1038,12 +1038,12 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.pos.x += (ideal.x - Camera.pos.x) >> 2;
-		Camera.pos.y += (ideal.y - Camera.pos.y) >> 2;
-		Camera.pos.z += (ideal.z - Camera.pos.z) >> 2;
-		Camera.target.x += (pos3.x - Camera.target.x) >> 2;
-		Camera.target.y += (pos3.y - Camera.target.y) >> 2;
-		Camera.target.z += (pos3.z - Camera.target.z) >> 2;
+		Camera.pos.x += (ideal.x - Camera.pos.x) / 4;
+		Camera.pos.y += (ideal.y - Camera.pos.y) / 4;
+		Camera.pos.z += (ideal.z - Camera.pos.z) / 4;
+		Camera.target.x += (pos3.x - Camera.target.x) / 4;
+		Camera.target.y += (pos3.y - Camera.target.y) / 4;
+		Camera.target.z += (pos3.z - Camera.target.z) / 4;
 		Camera.target.roomNumber = LaraItem->roomNumber;
 	}
 
@@ -1051,9 +1051,9 @@ void LookCamera(ITEM_INFO* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
-			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
-			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
+			Camera.target.x += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
+			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
+			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
 			Camera.bounce += 5;
 		}
 		else
@@ -1073,7 +1073,7 @@ void LookCamera(ITEM_INFO* item)
 	c = GetCeiling(floor, x, y, z);
 
 	if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = (h + c) >> 1;
+		Camera.pos.y = (h + c) / 2;
 	else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 		Camera.pos.y = h - 255;
 	else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
@@ -1119,8 +1119,8 @@ void LookCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1214,11 +1214,11 @@ void BinocularCamera(ITEM_INFO* item)
 	Camera.pos.z = z;	
 	Camera.pos.roomNumber = roomNumber;
 	
-	int l = 20736 * phd_cos(headXrot) >> W2V_SHIFT;
+	int l = 20736 * phd_cos(headXrot);
 	
-	int tx = x + (l * phd_sin(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
-	int ty = y - (20736 * phd_sin(headXrot) >> W2V_SHIFT);
-	int tz = z + (l * phd_cos(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
+	int tx = x + l * phd_sin(LaraItem->pos.yRot + headYrot);
+	int ty = y - 20736 * phd_sin(headXrot);
+	int tz = z + l * phd_cos(LaraItem->pos.yRot + headYrot);
 
 	if (Camera.oldType == FIXED_CAMERA)
 	{
@@ -1229,9 +1229,9 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.target.x += (tx - Camera.target.x) >> 2;
-		Camera.target.y += (ty - Camera.target.y) >> 2;
-		Camera.target.z += (tz - Camera.target.z) >> 2;
+		Camera.target.x += (tx - Camera.target.x) / 4;
+		Camera.target.y += (ty - Camera.target.y) / 4;
+		Camera.target.z += (tz - Camera.target.z) / 4;
 		Camera.target.roomNumber = LaraItem->roomNumber;
 	}
 	
@@ -1239,9 +1239,9 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.y += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.z += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.x += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
 			Camera.bounce += 5;
 		}
 		else
@@ -1264,8 +1264,8 @@ void BinocularCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1291,7 +1291,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange < 128)
 			BinocularRange = 128;
 		else 
-			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
+			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
 	}
 	else if (InputBusy & IN_DUCK)
 	{
@@ -1299,7 +1299,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange > 1536)
 			BinocularRange = 1536;
 		else
-			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
+			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
 	}
 
 	PHD_VECTOR src;
@@ -1460,7 +1460,7 @@ void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
 	pos2.y = target->y;
 	pos2.z = target->z;
 
-	TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
+	TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color / 2);
 	
 	if (!LOS(&pos1, &pos2))
 	{
@@ -1492,7 +1492,7 @@ void ConfirmCameraTargetPos()
 	else
 	{
 		Camera.target.x = LaraItem->pos.xPos;
-		Camera.target.y = (Camera.target.y + pos.y) >> 1;
+		Camera.target.y = (Camera.target.y + pos.y) / 2;
 		Camera.target.z = LaraItem->pos.zPos;
 	}
 
@@ -1605,8 +1605,8 @@ void CalculateCamera()
 			short angle = phd_atan(dz, dx) - item->pos.yRot;
 			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);
-			angle >>= 1;
-			tilt >>= 1;
+			angle /= 2;
+			tilt /= 2;
 
 			if (angle > -ANGLE(50) && angle < ANGLE(50) && tilt > -ANGLE(85) && tilt < ANGLE(85))
 			{
@@ -1653,7 +1653,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			Camera.target.y += (y - Camera.target.y) >> 2;
+			Camera.target.y += (y - Camera.target.y) / 4;
 			Camera.speed = Camera.type != LOOK_CAMERA ? 8 : 4;
 		}
 
@@ -1694,8 +1694,8 @@ void CalculateCamera()
 		else
 		{
 			int shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->pos.xPos + (shift * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-			z = item->pos.zPos + (shift * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+			x = item->pos.xPos + shift * phd_sin(item->pos.yRot);
+			z = item->pos.zPos + shift * phd_cos(item->pos.yRot);
 
 			Camera.target.x = x;
 			Camera.target.z = z;
@@ -1716,11 +1716,11 @@ void CalculateCamera()
 			{
 				if (TargetSnaps <= 8)
 				{
-					x = LastTarget.x + ((x - LastTarget.x) >> 2);
+					x = LastTarget.x + ((x - LastTarget.x) / 4);
 					Camera.target.x = x;
-					y = LastTarget.y + ((y - LastTarget.y) >> 2);
+					y = LastTarget.y + ((y - LastTarget.y) / 4);
 					Camera.target.y = y;
-					z = LastTarget.z + ((z - LastTarget.z) >> 2);
+					z = LastTarget.z + ((z - LastTarget.z) / 4);
 					Camera.target.z = z;
 				}
 				else

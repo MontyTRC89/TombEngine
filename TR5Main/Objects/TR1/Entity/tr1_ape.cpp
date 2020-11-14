@@ -187,7 +187,7 @@ void ApeControl(short itemNum)
 			else if (!(creature->flags & ATTACK_FLAG) &&
 				info.zoneNumber == info.enemyZone && info.ahead)
 			{
-				random = (short)(GetRandomControl() >> 5);
+				random = (short)(GetRandomControl() / 32);
 				if (random < JUMP_CHANCE)
 					item->goalAnimState = APE_JUMP;
 				else if (random < WARN1_CHANCE)

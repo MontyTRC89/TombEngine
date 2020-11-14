@@ -72,10 +72,10 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->on = true;
 	spark->sB = 0;
 	spark->sR = (GetRandomControl() & 0x3F) - 96;
-	spark->sG = spark->sR >> 1;
+	spark->sG = spark->sR / 2;
 	spark->dB = 0;
 	spark->dR = (GetRandomControl() & 0x3F) - 96;
-	spark->dG = spark->dR >> 1;
+	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 	spark->transType = COLADD;
@@ -115,11 +115,11 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->dB = 0;
 	if (frame < 16)
 	{
-		spark->sR = frame * spark->sR >> 4;
-		spark->dR = frame * spark->dR >> 4;
+		spark->sR = frame * spark->sR / 16;
+		spark->dR = frame * spark->dR / 16;
 	}
-	spark->sG = spark->sR >> 1;
-	spark->dG = spark->dR >> 1;
+	spark->sG = spark->sR / 2;
+	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 	spark->transType = COLADD;
@@ -141,7 +141,7 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->gravity = -8 - (GetRandomControl() & 7);
 	spark->scalar = 0;
 	spark->dSize = 4;
-	spark->sSize = spark->size = frame * ((GetRandomControl() & 0xF) + 16) >> 4;
+	spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 16)) / 16;
 }
 
 void HydraControl(short itemNumber)
@@ -203,8 +203,8 @@ void HydraControl(short itemNumber)
 
 		if (item->currentAnimState != 12)
 		{
-			joint1 = info.angle >> 1;
-			joint3 = info.angle >> 1;
+			joint1 = info.angle / 2;
+			joint3 = info.angle / 2;
 			joint2 = -info.xAngle;
 		}
 
@@ -316,7 +316,7 @@ void HydraControl(short itemNumber)
 
 			if (!(GlobalCounter & 3))
 			{
-				frame = ((g_Level.Anims[item->animNumber].frameBase - item->frameNumber) >> 3) + 1;
+				frame = ((g_Level.Anims[item->animNumber].frameBase - item->frameNumber) / 8) + 1;
 				if (frame > 16)
 					frame = 16;
 				TriggerHydraSparks(itemNumber, frame);

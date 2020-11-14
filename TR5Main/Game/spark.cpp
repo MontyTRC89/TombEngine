@@ -3,7 +3,9 @@
 #include "spark.h"
 #include <array>
 #include <Game\trmath.h>
+#include "prng.h"
 using namespace DirectX::SimpleMath;
+using namespace T5M::Math::Random;
 
 namespace T5M {
 	namespace Effects {
@@ -44,16 +46,16 @@ namespace T5M {
 				SparkParticle& s = getFreeSparkParticle();
 				s = {};
 				s.age = 0;
-				s.life = frand() * 10 + 10;
+				s.life = generateFloat(10, 20);
 				s.friction = 0.98f;
 				s.gravity = 1.2f;
 				s.width = 8;
 				s.room = room;
 				s.pos = Vector3(pos->x, pos->y, pos->z);
 				Vector3 v = Vector3(vel->x, vel->y, vel->z);
-				v += Vector3(frandMinMax(-64, 64), frandMinMax(-64, 64), frandMinMax(-64, 64));
+				v += Vector3(generateFloat(-64, 64), generateFloat(-64, 64), generateFloat(-64, 64));
 				v.Normalize(v);
-				s.velocity = v *frandMinMax(17,24);
+				s.velocity = v *generateFloat(17,24);
 				s.sourceColor = Vector4(1, 1, 1, 1);
 				s.destinationColor = Vector4(color->r/255.0f,color->g/255.0f,color->b/255.0f,1);
 				s.active = true;
@@ -65,17 +67,17 @@ namespace T5M {
 					SparkParticle& s = getFreeSparkParticle();
 					s = {};
 					s.age = 0;
-					s.life = frand() * 10 + 10;
+					s.life = generateFloat(10, 20);
 					s.friction = 0.98f;
 					s.gravity = 1.2f;
 					s.width = 8;
 					s.room = pos->roomNumber;
 					s.pos = Vector3(pos->x, pos->y, pos->z);
 					float ang = TO_RAD(angle);
-					Vector3 v = Vector3(sin(ang + frandMinMax(-PI / 2, PI / 2)), frandMinMax(-1, 1), cos(ang + frandMinMax(-PI / 2, PI / 2)));
-					v += Vector3(frandMinMax(-64, 64), frandMinMax(-64, 64), frandMinMax(-64, 64));
+					Vector3 v = Vector3(sin(ang + generateFloat(-PI / 2, PI / 2)), generateFloat(-1, 1), cos(ang + generateFloat(-PI / 2, PI / 2)));
+					v += Vector3(generateFloat(-64, 64), generateFloat(-64, 64), generateFloat(-64, 64));
 					v.Normalize(v);
-					s.velocity = v * frandMinMax(17, 24);
+					s.velocity = v * generateFloat(17, 24);
 					s.sourceColor = Vector4(1, 0.8, 0.2f, 1) * 3;
 					s.destinationColor = Vector4(0, 0, 0, 0);
 					s.active = true;

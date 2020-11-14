@@ -31,9 +31,9 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		grenadeItem->pos.yRot = item->pos.yRot + -ANGLE(180);
 		grenadeItem->pos.zRot = 0;
 
-		grenadeItem->pos.xPos = item->pos.xPos + (1024 * phd_sin(grenadeItem->pos.yRot) >> W2V_SHIFT);
+		grenadeItem->pos.xPos = item->pos.xPos + 1024 * phd_sin(grenadeItem->pos.yRot);
 		grenadeItem->pos.yPos = item->pos.yPos - 768;
-		grenadeItem->pos.zPos = item->pos.xPos + (1024 * phd_cos(grenadeItem->pos.yRot) >> W2V_SHIFT);
+		grenadeItem->pos.zPos = item->pos.xPos + 1024 * phd_cos(grenadeItem->pos.yRot);
 
 		SmokeCountL = 32;
 		SmokeWeapon = 5;
@@ -54,7 +54,7 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 
 		grenadeItem->speed = 32;
 		grenadeItem->currentAnimState = grenadeItem->pos.xRot;
-		grenadeItem->fallspeed = -32 * phd_sin(grenadeItem->pos.xRot) >> W2V_SHIFT;
+		grenadeItem->fallspeed = -32 * phd_sin(grenadeItem->pos.xRot);
 		grenadeItem->goalAnimState = grenadeItem->pos.yRot;
 		grenadeItem->requiredAnimState = 0;
 		grenadeItem->hitPoints = 120;
@@ -96,8 +96,8 @@ void EnemyJeepControl(short itemNumber)
 		int y = item->pos.yPos;
 		int z = item->pos.zPos;
 
-		int dx = 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		int dz = 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		int dx = 682 * phd_sin(item->pos.yRot);
+		int dz = 682 * phd_cos(item->pos.yRot);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x - dz, y, z - dx, &roomNumber);
@@ -337,8 +337,8 @@ void EnemyJeepControl(short itemNumber)
 					target->boxNumber = aiObject->boxNumber;
 					if (!(aiObject->flags & 0x20))
 					{
-						target->pos.xPos += 256 * phd_sin(target->pos.yRot) >> W2V_SHIFT;
-						target->pos.zPos += 256 * phd_cos(target->pos.yRot) >> W2V_SHIFT;
+						target->pos.xPos += 256 * phd_sin(target->pos.yRot);
+						target->pos.zPos += 256 * phd_cos(target->pos.yRot);
 					}
 				}
 			}
@@ -366,8 +366,8 @@ void EnemyJeepControl(short itemNumber)
 		if (item->itemFlags[0] < 0)
 			item->itemFlags[0] = 0;
 
-		dx = item->itemFlags[0] * phd_sin(-2 - xRot / 512) >> W2V_SHIFT;
-		dz = item->itemFlags[0] * phd_cos(-2 - xRot / 512) >> W2V_SHIFT;
+		dx = item->itemFlags[0] * phd_sin(-2 - xRot / 512);
+		dz = item->itemFlags[0] * phd_cos(-2 - xRot / 512);
 
 		item->pos.xPos += dx / 64;
 		item->pos.zPos += dz / 64;
@@ -397,6 +397,6 @@ void EnemyJeepControl(short itemNumber)
 			item->gravityStatus = false;
 		}
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] << 10) + 16777220);
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] * 1024) + 16777220);
 	}
 }

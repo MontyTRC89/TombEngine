@@ -10,7 +10,9 @@
 #include "setup.h"
 #include "sound.h"
 #include "trmath.h"
+#include "prng.h"
 using std::vector;
+using namespace T5M::Math::Random;
 char LM[] =
 {
 	LM_HIPS,
@@ -133,7 +135,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	short roomsArray[255];
 	short numRooms;
 	short numItems = 0, numMeshes = 0;
-	int c, s;
+	float c, s;
 	int rx, rz;
 
 	// Collect all the rooms where to check
@@ -158,8 +160,8 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 						{
 							s = phd_sin(mesh->yRot);
 							c = phd_cos(mesh->yRot);
-							rx = ((collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z)) >> W2V_SHIFT;
-							rz = ((collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x)) >> W2V_SHIFT;
+							rx = (collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z);
+							rz = (collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x);
 
 							if (radius + rx + STEP_SIZE/2 >= staticMesh->collisionBox.X1 && rx - radius - STEP_SIZE/2 <= staticMesh->collisionBox.X2)
 							{
@@ -242,11 +244,11 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1
 						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
 					{
-						int s = phd_sin(item->pos.yRot);
-						int c = phd_cos(item->pos.yRot);
+						float s = phd_sin(item->pos.yRot);
+						float c = phd_cos(item->pos.yRot);
 
-						int rx = (dx * c - s * dz) >> W2V_SHIFT;
-						int rz = (dz * c + s * dx) >> W2V_SHIFT;
+						int rx = dx * c - s * dz;
+						int rz = dz * c + s * dx;
 
 						if (item->objectNumber == ID_TURN_SWITCH)
 						{
@@ -291,14 +293,14 @@ int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* c
 	if (item->pos.yPos + GlobalCollisionBounds.Y1 >= framePtr->boundingBox.Y2)
 		return false;
 
-	int s = phd_sin(item->pos.yRot);
-	int c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->pos.yRot);
 
 	int dx = lara->pos.xPos - item->pos.xPos;
 	int dz = lara->pos.zPos - item->pos.zPos;
 
-	int x = (c * dx - s * dz) >> W2V_SHIFT;
-	int z = (c * dz + s * dx) >> W2V_SHIFT;
+	int x = c * dx - s * dz;
+	int z = c * dz + s * dx;
 
 	if (x < GlobalCollisionBounds.X1 - coll->radius ||
 		x > GlobalCollisionBounds.X2 + coll->radius ||
@@ -329,7 +331,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) 
 	for (int i = 0; i < 2; i++)
 	{
 		GAME_VECTOR s;
-		s.x = (i << 8) - 0x80;
+		s.x = (i * 256) - 0x80;
 		s.y = -256;
 		s.z = 0;
 
@@ -337,11 +339,10 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) 
 		s.roomNumber = LaraItem->roomNumber;
 
 		GAME_VECTOR d;
-		d.x = 0;
-		d.x = (s.x + ((phd_sin(LaraItem->pos.yRot) << 1) + phd_sin(LaraItem->pos.yRot))) >> 4;
+		d.x = s.x + phd_sin(LaraItem->pos.yRot) * 768;
 		d.y = s.y;
-		d.z = (s.z + ((phd_cos(LaraItem->pos.yRot) << 1) + phd_cos(LaraItem->pos.yRot))) >> 4;
-		
+		d.z = s.z + phd_cos(LaraItem->pos.yRot) * 768;
+
 		LOS(&s, &d);
 		
 		PHD_VECTOR v;
@@ -418,9 +419,9 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 
 	tilt = data[1];
 	t0 = tilt & DATA_TILT;
-	t1 = (tilt >> 4) & DATA_TILT;
-	t2 = (tilt >> 8) & DATA_TILT;
-	t3 = (tilt >> 12) & DATA_TILT;
+	t1 = (tilt / 16) & DATA_TILT;
+	t2 = (tilt / 256) & DATA_TILT;
+	t3 = (tilt / 4096) & DATA_TILT;
 	dx = x & (WALL_SIZE - 1);
 	dz = z & (WALL_SIZE - 1);
 	xOff = 0;
@@ -450,15 +451,15 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 		yOff = t3 - t2;
 	}
 
-	return ((xOff << 8) | (yOff & DATA_STATIC));
+	return ((xOff * 256) | (yOff & DATA_STATIC));
 }
 
 int FindGridShift(int x, int z)
 {
-	if ((x >> WALL_SHIFT) == (z >> WALL_SHIFT))
+	if ((x / SECTOR(1)) == (z / SECTOR(1)))
 		return 0;
 
-	if ((z >> WALL_SHIFT) <= (x >> WALL_SHIFT))
+	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
 		return (-1 - (x & (WALL_SIZE - 1)));
 	else
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
@@ -476,15 +477,15 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 	if (pos->yPos + bounds->Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
 		return false;
 
-	int c, s;
+	float c, s;
 	int x, z, dx, dz;
 
 	c = phd_cos(pos->yRot);
 	s = phd_sin(pos->yRot);
 	x = LaraItem->pos.xPos - pos->xPos;
 	z = LaraItem->pos.zPos - pos->zPos;
-	dx = (c * x - s * z) >> W2V_SHIFT;
-	dz = (c * z + s * x) >> W2V_SHIFT;
+	dx = c * x - s * z;
+	dz = c * z + s * x;
 	
 	if (dx <= radius + bounds->X2
 	&&  dx >= bounds->X1 - radius
@@ -501,7 +502,7 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 
 int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
 {
-	int c, s;
+	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
 	int left, right, top, bottom;
 	short oldFacing;
@@ -510,8 +511,8 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	s = phd_sin(pos->yRot);
 	dx = LaraItem->pos.xPos - pos->xPos;
 	dz = LaraItem->pos.zPos - pos->zPos;
-	rx = (c * dx - s * dz) >> W2V_SHIFT;
-	rz = (c * dz + s * dx) >> W2V_SHIFT;
+	rx = c * dx - s * dz;
+	rz = c * dz + s * dx;
 	minX = bounds->X1 - coll->radius;
 	maxX = bounds->X2 + coll->radius;
 	minZ = bounds->Z1 - coll->radius;
@@ -539,8 +540,8 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	else
 		rz -= bottom;
 
-	item->pos.xPos = pos->xPos + ((c * rx + s * rz) >> W2V_SHIFT);
-	item->pos.zPos = pos->zPos + ((c * rz - s * rx) >> W2V_SHIFT);
+	item->pos.xPos = pos->xPos + c * rx + s * rz;
+	item->pos.zPos = pos->zPos + c * rz - s * rx;
 	
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -576,7 +577,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 
 int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
 {
-	int c, s;
+	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
 	int left, right, bottom, top;
 	BOUNDING_BOX* bounds;
@@ -586,8 +587,8 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	s = phd_sin(item->pos.yRot);
 	dx = LaraItem->pos.xPos - item->pos.xPos;
 	dz = LaraItem->pos.zPos - item->pos.zPos;
-	rx = (c * dx - s * dz) >> W2V_SHIFT;
-	rz = (c * dz + s * dx) >> W2V_SHIFT;
+	rx = c * dx - s * dz;
+	rz = c * dz + s * dx;
 
 	if (bigpush & 2)
 		bounds = &GlobalCollisionBounds;
@@ -630,23 +631,23 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	else
 		rz -= bottom;
 
-	l->pos.xPos = item->pos.xPos + ((c * rx + s * rz) >> W2V_SHIFT);
-	l->pos.zPos = item->pos.zPos + ((c * rz - s * rx) >> W2V_SHIFT);
+	l->pos.xPos = item->pos.xPos + c * rx + s * rz;
+	l->pos.zPos = item->pos.zPos + c * rz - s * rx;
 
 	if (spazon && bounds->Y2 - bounds->Y1 > STEP_SIZE)
 	{
 		rx = (bounds->X1 + bounds->X2) / 2;	 
 		rz = (bounds->Z1 + bounds->Z2) / 2;
 
-		dx -= (c * rx + s * rz) >> W2V_SHIFT;  
-		dz -= (c * rz - s * rx) >> W2V_SHIFT;
+		dx -= c * rx + s * rz;
+		dz -= c * rz - s * rx;
 
-		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
+		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
 		if ((!Lara.hitFrame) && (!hitSoundTimer))
 		{
 				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
-				hitSoundTimer = frandMinMax(5, 15);
+				hitSoundTimer = generateFloat(5, 15);
 		}
 
 		if (hitSoundTimer)
@@ -749,7 +750,7 @@ void TriggerLaraBlood()
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
 		}
 
-		node <<= 1;
+		node *= 2;
 	}
 }
 
@@ -970,7 +971,7 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 {
 	BOUNDING_BOX* bounds;
 	BOUNDING_BOX* laraBounds;
-	int c, s;
+	float c, s;
 	int x, z;
 	int dx, dz;
 
@@ -985,8 +986,8 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 			s = phd_sin(item->pos.yRot);
 			x = l->pos.xPos - item->pos.xPos;
 			z = l->pos.zPos - item->pos.zPos;
-			dx = (c * x - s * z) >> W2V_SHIFT;
-			dz = (c * z + s * x) >> W2V_SHIFT;
+			dx = c * x - s * z;
+			dz = c * z + s * x;
 
 			if (dx >= bounds->X1 - radius
 			&&  dx <= radius + bounds->X2
@@ -1004,7 +1005,7 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	int c, s;
+	float c, s;
 	int x, z, rx, rz;
 	ANIM_FRAME* frame;
 
@@ -1030,7 +1031,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					
 					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
-						int angle = (l->pos.yRot - phd_atan(z - ((c * rx - s * rz) >> W2V_SHIFT), x - ((c * rx + s * rz) >> W2V_SHIFT)) - ANGLE(135)) >> W2V_SHIFT;
+						int angle = (l->pos.yRot - phd_atan(z - c * rx - s * rz, x - c * rx + s * rz) - ANGLE(135)) / 16384;
 						Lara.hitDirection = (short)angle;
 						// TODO: check if a second Lara.hitFrame++; is required there !
 						Lara.hitFrame++; 
@@ -1089,7 +1090,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
 	coll->tiltX = tilt;
-	coll->tiltZ = tilt >> 8;
+	coll->tiltZ = tilt / 256;
 	
 	int xright, xleft, zright, zleft;
 
@@ -1138,8 +1139,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 	}*/
 
-	XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
-	ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
+	XFront = phd_sin(coll->facing) * coll->radius;
+	ZFront = phd_cos(coll->facing) * coll->radius;
 	xleft = -ZFront;
 	zleft = XFront;
 	xright = ZFront;
@@ -1581,7 +1582,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushLara(item, l, coll, (item->itemFlags[0] & (coll->enableSpaz >> 5) & 1), 3) && item->itemFlags[0] & 1)
+						if (ItemPushLara(item, l, coll, (item->itemFlags[0] & (coll->enableSpaz / 32) & 1), 3) && item->itemFlags[0] & 1)
 						{
 							l->hitPoints -= item->itemFlags[3];
 							
@@ -1604,7 +1605,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						}
 					}
 
-					collided >>= 1;
+					collided /= 2;
 					sphere++;
 				}
 			}
@@ -1631,8 +1632,8 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	radiusZ = bounds->Z2 / radiusDivide; // need divide in any case else it's too much !
 
 	ratioXZ = radiusZ / radiusX;
-	frontX = (phd_sin(item->pos.yRot) * radiusZ) >> W2V_SHIFT;
-	frontZ = (phd_cos(item->pos.yRot) * radiusZ) >> W2V_SHIFT;
+	frontX = phd_sin(item->pos.yRot) * radiusZ;
+	frontZ = phd_cos(item->pos.yRot) * radiusZ;
 	leftX = -frontZ * ratioXZ;
 	leftZ = frontX * ratioXZ;
 	rightX = frontZ * ratioXZ;

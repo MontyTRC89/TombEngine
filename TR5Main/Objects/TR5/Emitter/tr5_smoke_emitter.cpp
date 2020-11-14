@@ -38,7 +38,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 	}
 	else if (item->triggerFlags & 8)
 	{
-		item->itemFlags[0] = item->triggerFlags >> 4;
+		item->itemFlags[0] = item->triggerFlags / 16;
 
 		if (item->pos.yRot > 0)
 		{
@@ -59,7 +59,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 				item->pos.xPos -= 256;
 		}
 
-		if ((signed short)(item->triggerFlags >> 4) <= 0)
+		if ((signed short)(item->triggerFlags / 16) <= 0)
 		{
 			item->itemFlags[2] = 4096;
 			item->triggerFlags |= 4;

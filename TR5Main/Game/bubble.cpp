@@ -5,7 +5,9 @@
 #include "trmath.h"
 #include "objectslist.h"
 #include "setup.h"
+#include "prng.h"
 using std::vector;
+using namespace T5M::Math::Random;
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
 void UpdateBubbles()
@@ -84,20 +86,20 @@ void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags,
 		bubble->active = true;
 		bubble->size = 0;
 		bubble->age = 0;
-		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? frandMinMax(8, 16) : frandMinMax(8, 12);
+		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? generateFloat(8, 16) : generateFloat(8, 12);
 		bubble->sourceColor = Vector4(0, 0, 0, 1);
-		float shade = frandMinMax(0.3, 0.8);
+		float shade = generateFloat(0.3, 0.8);
 		bubble->destinationColor = Vector4(shade, shade, shade, 1);
 		bubble->color = bubble->sourceColor;
-		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? frandMinMax(256, 512) : frandMinMax(32, 128);
+		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? generateFloat(256, 512) : generateFloat(32, 128);
 		bubble->spriteNum = flags & BUBBLE_FLAG_CLUMP ? SPR_UNKNOWN1 : SPR_BUBBLES;
 		bubble->rotation = 0;
 		bubble->worldPosition = Vector3(pos->x, pos->y, pos->z);
 		float maxAmplitude = flags & BUBBLE_FLAG_HIGH_AMPLITUDE ? 256 : 32;
-		bubble->amplitude = Vector3(frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude));
+		bubble->amplitude = Vector3(generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude));
 		bubble->worldPositionCenter = bubble->worldPosition;
 		bubble->wavePeriod = Vector3::Zero;
-		bubble->waveSpeed = Vector3(1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16));
+		bubble->waveSpeed = Vector3(1 / generateFloat(8, 16), 1 / generateFloat(8, 16), 1 / generateFloat(8, 16));
 		bubble->roomNumber = roomNum;
 	}
 }

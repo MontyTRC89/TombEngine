@@ -141,12 +141,12 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	if (flags)
 	{
 		spark->dG = (GetRandomControl() & 0x3F) - 64;
-		spark->dB = spark->dG >> 1;
+		spark->dB = spark->dG / 2;
 	}
 	else
 	{
 		spark->dB = (GetRandomControl() & 0x3F) - 64;
-		spark->dG = spark->dB >> 1;
+		spark->dG = spark->dB / 2;
 	}
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
@@ -176,11 +176,11 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->dR = 0;
 	if (factor < 16)
 	{
-		spark->sB = factor * spark->sB >> 4;
-		spark->dB = factor * spark->dB >> 4;
+		spark->sB = (factor * spark->sB) / 16;
+		spark->dB = (factor * spark->dB) / 16;
 	}
-	spark->sG = spark->sB >> 1;
-	spark->dG = spark->dB >> 1;
+	spark->sG = spark->sB / 2;
+	spark->dG = spark->dB / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 	spark->transType = COLADD;
@@ -202,7 +202,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->gravity = -8 - (GetRandomControl() & 7);
 	spark->scalar = 2;
 	spark->dSize = 4;
-	spark->sSize = spark->size = factor * ((GetRandomControl() & 0x1F) + 64) >> 4;
+	spark->sSize = (spark->size = factor * ((GetRandomControl() & 0x1F) + 64)) / 16;
 }
 
 static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
@@ -235,10 +235,10 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 	spark->on = 1;
 	spark->sR = 0;
 	spark->sG = (GetRandomControl() & 0x3F) - 96;
-	spark->sB = spark->sG >> 1;
+	spark->sB = spark->sG / 2;
 	spark->dR = 0;
 	spark->dG = (GetRandomControl() & 0x3F) - 96;
-	spark->dB = spark->dG >> 1;
+	spark->dB = spark->dG / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 	spark->transType = COLADD;
@@ -273,8 +273,8 @@ void InitialiseRomanStatue(short itemNum)
     item->currentAnimState = 13;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->status = ITEM_NOT_ACTIVE;
-	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
-    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
+	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f));
+    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(ROMAN_STATUE_STRUCT));
 }
@@ -344,8 +344,8 @@ void RomanStatueControl(short itemNumber)
 		
 		if (info.ahead)
 		{
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			joint1 = info.xAngle;
 		}
 
@@ -449,9 +449,9 @@ void RomanStatueControl(short itemNumber)
 			pos2.z = 490;
 			GetJointAbsPosition(item, &pos2, 14);
 
-			pos.x = (pos1.x + pos2.x) >> 1;
-			pos.y = (pos1.y + pos2.y) >> 1;
-			pos.z = (pos1.z + pos2.z) >> 1;
+			pos.x = (pos1.x + pos2.x) / 2;
+			pos.y = (pos1.y + pos2.y) / 2;
+			pos.z = (pos1.z + pos2.z) / 2;
 
 			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
@@ -468,12 +468,12 @@ void RomanStatueControl(short itemNumber)
 					deltaFrame2 = 4 * (62 - deltaFrame);
 				}
 				
-				color = deltaFrame2 * ((GetRandomControl() & 0x3F) + 128) >> 4;
+				color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 				
 				if (item->triggerFlags)
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color, color >> 1);
+					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
 				else
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color >> 1, color);
+					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
 				
 				for (int i = 0; i < 2; i++)
 				{
@@ -529,9 +529,9 @@ void RomanStatueControl(short itemNumber)
 					arc->pos4.z = pos2.z;
 
 					if (item->triggerFlags)
-						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color >> 1);
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color / 2);
 					else
-						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color >> 1, color);
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color / 2, color);
 
 					continue;
 				}
@@ -553,7 +553,7 @@ void RomanStatueControl(short itemNumber)
 						48,
 						5);*/
 
-					TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color >> 1);
+					TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
 					unk = 1;
 					continue;
 				}
@@ -567,7 +567,7 @@ void RomanStatueControl(short itemNumber)
 					48,
 					5);*/
 
-				TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color >> 1, color);
+				TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
 				unk = 1;
 			}
 
@@ -752,8 +752,8 @@ void RomanStatueControl(short itemNumber)
 			if (RomanStatueData.counter)
 			{
 				RomanStatueData.counter--;
-				color = RomanStatueData.counter * ((GetRandomControl() & 0x3F) + 128) >> 4;
-				TriggerDynamicLight(RomanStatueData.pos.x, RomanStatueData.pos.y, RomanStatueData.pos.z, 16, 0, color, color >> 1);
+				color = (RomanStatueData.counter * ((GetRandomControl() & 0x3F) + 128)) / 16;
+				TriggerDynamicLight(RomanStatueData.pos.x, RomanStatueData.pos.y, RomanStatueData.pos.z, 16, 0, color, color / 2);
 			}
 			
 			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
@@ -789,7 +789,7 @@ void RomanStatueControl(short itemNumber)
 					attackPos.yPos,
 					attackPos.zPos,
 					0, 
-					(((GetRandomControl() & 0x3F) + 128) >> 1),
+					(((GetRandomControl() & 0x3F) + 128) / 2),
 					(((GetRandomControl() & 0x3F) + 128)),
 					64);
 				
@@ -821,9 +821,9 @@ void RomanStatueControl(short itemNumber)
 				
 				for (i = 0; i < 4; i++)
 				{
-					r = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5;
-					g = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 4;
-					b = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5;
+					r = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32;
+					g = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 16;
+					b = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32;
 					
 					if (i == 0)
 					{
@@ -833,8 +833,8 @@ void RomanStatueControl(short itemNumber)
 							pos2.z,
 							8,
 							0,
-							deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5,
-							deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 6);
+							(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32,
+							(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 64);
 					}
 
 					arc = RomanStatueData.energyArcs[i];
@@ -861,7 +861,7 @@ void RomanStatueControl(short itemNumber)
 						if (deltaFrame == 24)
 						{
 							TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
-								(((GetRandomControl() & 0x3F) + 128) >> 1), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
+								(((GetRandomControl() & 0x3F) + 128) / 2), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
 								ENERGY_ARC_STRAIGHT_LINE);
 						}
 					}
@@ -909,9 +909,9 @@ void RomanStatueControl(short itemNumber)
 				short floorHeight = item->itemFlags[2] & 0xFF00;
 				ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
-				int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
+				int x = r->x + (item->TOSSPAD / 256 & 0xFF) * SECTOR(1) + 512;
 				int y = r->minfloor + floorHeight;
-				int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
+				int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
 				FLOOR_INFO * floor = GetFloor(x, y, z, &roomNumber);
 				GetFloorHeight(floor, x, y, z);

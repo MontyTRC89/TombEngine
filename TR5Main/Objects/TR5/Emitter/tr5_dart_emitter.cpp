@@ -21,9 +21,9 @@ void DartControl(short itemNumber)
 	}
 	else
 	{
-		item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.yPos -= item->speed * phd_sin(item->pos.xRot) >> W2V_SHIFT;
-		item->pos.xPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
+		item->pos.yPos -= item->speed * phd_sin(item->pos.xRot);
+		item->pos.xPos += item->speed * phd_cos(item->pos.yRot);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

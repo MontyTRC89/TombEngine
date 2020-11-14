@@ -52,10 +52,10 @@ void ScubaHarpoonControl(short itemNum)
 		int ox = item->pos.xPos;
 		int oz = item->pos.zPos;
 
-		short speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
-		item->pos.zPos += (speed * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
-		item->pos.xPos += (speed * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
-		item->pos.yPos += -((item->speed * phd_sin(item->pos.xRot)) >> W2V_SHIFT);
+		short speed = item->speed * phd_cos(item->pos.xRot);
+		item->pos.zPos += speed * phd_cos(item->pos.yRot);
+		item->pos.xPos += speed * phd_sin(item->pos.yRot);
+		item->pos.yPos += -item->speed * phd_sin(item->pos.xRot);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

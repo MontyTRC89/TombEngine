@@ -236,8 +236,8 @@ void InitialiseBaddy(short itemNum)
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_CLIMB_4_CLICKS;
 		item->currentAnimState = STATE_BADDY_CLIMB_4_CLICKS;
-		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
-		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
+		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4);
+		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4);
 
 		return;
 	}
@@ -248,8 +248,8 @@ void InitialiseBaddy(short itemNum)
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_CROUCH;
 		item->currentAnimState = STATE_BADDY_CROUCH;
-		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
-		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
+		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4);
+		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4);
 		item->itemFlags[3] = ocb;
 
 		return;
@@ -298,8 +298,8 @@ void BaddyControl(short itemNum)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 942 * phd_sin(item->pos.yRot) >> W2V_SHIFT; 
-	int dz = 942 * phd_cos(item->pos.yRot) >> W2V_SHIFT; 
+	int dx = 942 * phd_sin(item->pos.yRot);
+	int dz = 942 * phd_cos(item->pos.yRot);
 
 	x += dx;
 	z += dz;
@@ -492,8 +492,8 @@ void BaddyControl(short itemNum)
 			jump = false;
 		}
 
-		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
-		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45));
+		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45));
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -503,8 +503,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height4 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * phd_sin(item->pos.yRot + ANGLE(78.75f)) >> W2V_SHIFT;
-		dz = 942 * phd_cos(item->pos.yRot + ANGLE(78.75f)) >> W2V_SHIFT;
+		dx = 942 * phd_sin(item->pos.yRot + ANGLE(78.75f));
+		dz = 942 * phd_cos(item->pos.yRot + ANGLE(78.75f));
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -523,8 +523,8 @@ void BaddyControl(short itemNum)
 				jump = false;
 		}
 
-		dx = 942 * phd_sin(item->pos.yRot - ANGLE(45)) >> W2V_SHIFT;
-		dz = 942 * phd_cos(item->pos.yRot - ANGLE(45)) >> W2V_SHIFT;
+		dx = 942 * phd_sin(item->pos.yRot - ANGLE(45));
+		dz = 942 * phd_cos(item->pos.yRot - ANGLE(45));
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -534,8 +534,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height6 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * phd_sin(item->pos.yRot - ANGLE(78.75f)) >> W2V_SHIFT;
-		dz = 942 * phd_cos(item->pos.yRot - ANGLE(78.75f)) >> W2V_SHIFT;
+		dx = 942 * phd_sin(item->pos.yRot - ANGLE(78.75f));
+		dz = 942 * phd_cos(item->pos.yRot - ANGLE(78.75f));
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -1025,7 +1025,7 @@ void BaddyControl(short itemNum)
 			}
 			if (currentCreature->enemy->objectNumber == ID_SMALLMEDI_ITEM)
 			{
-				item->hitPoints += Objects[item->objectNumber].hitPoints >> 1;
+				item->hitPoints += Objects[item->objectNumber].hitPoints / 2;
 			}
 			else
 			{

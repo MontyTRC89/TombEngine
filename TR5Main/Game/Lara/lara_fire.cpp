@@ -807,9 +807,9 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 		{
 			long dx, dy, dz;
 
-			dx = (vDest.x - vSrc.x) >> 5;
-			dy = (vDest.y - vSrc.y) >> 5;
-			dz = (vDest.z - vSrc.z) >> 5;
+			dx = (vDest.x - vSrc.x) / 32;
+			dy = (vDest.y - vSrc.y) / 32;
+			dz = (vDest.z - vSrc.z) / 32;
 			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
 		}
 		else if (target->objectNumber == ID_ARMY_WINSTON || target->objectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
@@ -817,7 +817,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 			short ricochet_angle;
 			target->hitStatus = true; //need to do this to maintain defence state
 			target->hitPoints--;
-			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
+			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
 			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
 			SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
 		}
@@ -830,7 +830,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
 				target->hitStatus = true; //need to do this to maintain defence state
-				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
+				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
 				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
 				SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
 			}
@@ -850,7 +850,8 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
 	BOUNDING_BOX* bounds;
-	int x, y, z, c, s;
+	int x, y, z;
+	float c, s;
 
 	bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	x = (int)(bounds->X1 + bounds->X2) / 2;
@@ -859,9 +860,9 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
 
-	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
+	target->x = item->pos.xPos + c * x + s * z;
 	target->y = item->pos.yPos + y;
-	target->z = item->pos.zPos + ((c * z - s * x) >> W2V_SHIFT);
+	target->z = item->pos.zPos + c * z - s * x;
 	target->roomNumber = item->roomNumber;
 }
 
@@ -1129,8 +1130,8 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
 
 		if (y > (height + 32) && bs == 0 &&
-			(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
-			((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+			(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
+			((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 		{
 			// Need to know which direction the wall is.
 
@@ -1157,7 +1158,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 			else		// Z crossed boundary.
 				item->pos.yRot = 0x8000 - item->pos.yRot;
 
-			item->speed >>= 1;
+			item->speed /= 2;
 
 			/* Put item back in its last position */
 			item->pos.xPos = x;
@@ -1168,7 +1169,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 		{
 			// Need to know which direction the slope is.
 
-			item->speed -= item->speed >> 2;
+			item->speed -= (item->speed / 4);
 
 			if (TiltYOffset < 0 && ((abs(TiltYOffset)) - (abs(TiltXOffset)) >= 2))	// Hit angle = 0x4000
 			{
@@ -1176,13 +1177,13 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0x4000 + (0xc000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= TiltYOffset << 1;
+						item->speed -= TiltYOffset * 2;
 						if ((unsigned short)item->pos.yRot > 0x4000 && (unsigned short)item->pos.yRot < 0xc000)
 						{
 							item->pos.yRot -= 4096;
@@ -1198,7 +1199,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1209,13 +1210,13 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0xc000 + (0x4000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltYOffset << 1;
+						item->speed += TiltYOffset * 2;
 						if ((unsigned short)item->pos.yRot > 0xc000 || (unsigned short)item->pos.yRot < 0x4000)
 						{
 							item->pos.yRot -= 4096;
@@ -1231,7 +1232,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1242,13 +1243,13 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = (0x8000 - item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= TiltXOffset << 1;
+						item->speed -= TiltXOffset * 2;
 
 						if ((unsigned short)item->pos.yRot < 0x8000)
 						{
@@ -1265,7 +1266,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1276,13 +1277,13 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = (0x8000 - item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltXOffset << 1;
+						item->speed += TiltXOffset * 2;
 
 						if ((unsigned short)item->pos.yRot > 0x8000)
 						{
@@ -1299,7 +1300,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1310,7 +1311,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0x2000 + (0xa000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
@@ -1332,7 +1333,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1343,7 +1344,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0x6000 + (0xe000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
@@ -1365,7 +1366,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1376,7 +1377,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0xa000 + (0x2000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
@@ -1398,7 +1399,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1409,7 +1410,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					item->pos.yRot = 0xe000 + (0x6000 - (unsigned short)item->pos.yRot - 1);
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 				}
 				else
 				{
@@ -1431,7 +1432,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->fallspeed > 0)
-						item->fallspeed = -(item->fallspeed >> 1);
+						item->fallspeed = -(item->fallspeed / 2);
 					else
 						item->fallspeed = 0;
 				}
@@ -1450,10 +1451,10 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				if (item->fallspeed > 16)
 				{
 					if (item->objectNumber == ID_GRENADE)
-						item->fallspeed = -(item->fallspeed - (item->fallspeed >> 1));
+						item->fallspeed = -(item->fallspeed - (item->fallspeed / 2));
 					else
 					{
-						item->fallspeed = -(item->fallspeed >> 2);
+						item->fallspeed = -(item->fallspeed / 2);
 						if (item->fallspeed < -100)
 							item->fallspeed = -100;
 					}
@@ -1499,10 +1500,10 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					if (item->fallspeed > 16)
 					{
 						if (item->objectNumber == ID_GRENADE)
-							item->fallspeed = -(item->fallspeed - (item->fallspeed >> 1));
+							item->fallspeed = -(item->fallspeed - (item->fallspeed / 2));
 						else
 						{
-							item->fallspeed = -(item->fallspeed >> 2);
+							item->fallspeed = -(item->fallspeed / 4);
 							if (item->fallspeed < -100)
 								item->fallspeed = -100;
 						}
@@ -1536,8 +1537,8 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 			if (item->pos.yPos < ceiling)
 			{
 				if (y < ceiling &&
-					(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
-					((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+					(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
+					((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 				{
 					// Need to know which direction the wall is.
 
@@ -1554,9 +1555,9 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					}
 
 					if (item->objectNumber == ID_GRENADE)
-						item->speed -= item->speed >> 3;
+						item->speed -= item->speed / 8;
 					else
-						item->speed >>= 1;
+						item->speed /= 2;
 
 					/* Put item back in its last position */
 					item->pos.xPos = x;

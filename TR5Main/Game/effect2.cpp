@@ -16,9 +16,11 @@
 #include <Game\drip.h>
 #include <Game\bubble.h>
 #include "smoke.h"
+#include "prng.h"
 using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
+using namespace T5M::Math::Random;
 
 unsigned char TES_extra_tab[] =
 {
@@ -194,10 +196,10 @@ void UpdateSparks()
 			int life = spark->sLife - spark->life;
 			if (life < spark->colFadeSpeed)
 			{
-				int dl = (life << 16) / spark->colFadeSpeed;
-				spark->r = spark->sR + (dl * (spark->dR - spark->sR) >> 16);
-				spark->g = spark->sG + (dl * (spark->dG - spark->sG) >> 16);
-				spark->b = spark->sB + (dl * (spark->dB - spark->sB) >> 16);
+				int dl = (life * 65536) / spark->colFadeSpeed;
+				spark->r = spark->sR + ((dl * (spark->dR - spark->sR)) / 65536);
+				spark->g = spark->sG + ((dl * (spark->dG - spark->sG)) / 65536);
+				spark->b = spark->sB + ((dl * (spark->dB - spark->sB)) / 65536);
 			}
 			else if (spark->life >= spark->fadeToBlack)
 			{
@@ -207,9 +209,9 @@ void UpdateSparks()
 			}
 			else
 			{
-				spark->r = (spark->dR * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
-				spark->g = (spark->dG * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
-				spark->b = (spark->dB * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
+				spark->r = (spark->dR * (((spark->life - spark->fadeToBlack) * 65536) / spark->fadeToBlack + 0x10000)) / 65536;
+				spark->g = (spark->dG * (((spark->life - spark->fadeToBlack) * 65536) / spark->fadeToBlack + 0x10000)) / 65536;
+				spark->b = (spark->dB * (((spark->life - spark->fadeToBlack) * 65536) / spark->fadeToBlack + 0x10000)) / 65536;
 
 				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
 				{
@@ -227,14 +229,14 @@ void UpdateSparks()
 			if (spark->flags & 0x10)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
 
-			if (spark->sLife - spark->life == spark->extras >> 3
+			if (spark->sLife - spark->life == spark->extras / 8
 				&& spark->extras & 7)
 			{
 				int unk;
 				if (spark->flags & 0x800)
 					unk = 1;
 				else
-					unk = (spark->flags & 0x2000) >> 12;
+					unk = (spark->flags & 0x2000) / 4096;
 
 				for (int j = 0; j < (spark->extras & 7); j++)
 				{
@@ -273,19 +275,19 @@ void UpdateSparks()
 			}
 
 			if (spark->friction & 0xF0)
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
+				spark->yVel -= spark->yVel >> (spark->friction / 16);
 
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+			spark->x += (spark->xVel / 32);
+			spark->y += (spark->yVel / 32);
+			spark->z += (spark->zVel / 32);
 
 			if (spark->flags & 0x100)
 			{
-				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ >> 1;
+				spark->x += (SmokeWindX / 2);
+				spark->z += (SmokeWindZ / 2);
 			}
 
-			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
+			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
 			int ds = dl * (spark->dSize - spark->sSize);
 			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
@@ -327,7 +329,7 @@ void UpdateSparks()
 
 				byte x = spark->x + 16 * (random & 0xF);
 				byte y = spark->y + (random & 0xF0);
-				byte z = spark->z + ((random >> 4) & 0xF0);
+				byte z = spark->z + ((random / 16) & 0xF0);
 
 				byte r, g, b;
 
@@ -339,9 +341,9 @@ void UpdateSparks()
 						if (dynsp->Falloff)
 							dynsp->Falloff--;
 
-						b = ((random >> 4) & 0x1F) + 128;
+						b = ((random / 16) & 0x1F) + 128;
 						g = (random & 0x1F) + 224;
-						r = (random >> 8) & 0x3F;
+						r = (random / 256) & 0x3F;
 					}
 					else
 					{
@@ -362,7 +364,7 @@ void UpdateSparks()
 
 					g = 255 - 8 * dl - (random & 0x1F);
 					b = 255 - 16 * dl - (random & 0x1F);
-					r = 255 - (dl << 6) - (random & 0x1F);
+					r = 255 - (dl * 64) - (random & 0x1F);
 				}
 
 				if (spark->flags & 0x2000)
@@ -420,14 +422,14 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->x = (random & 7) + x - 3;
-		spark->y = ((random >> 3) & 7) + y - 3;
-		spark->z = ((random >> 6) & 7) + z - 3;
+		spark->y = ((random / 8) & 7) + y - 3;
+		spark->z = ((random / 64) & 7) + z - 3;
 		spark->flags = SP_SCALE;
-		spark->xVel = (random >> 2) + xv - 128;
-		spark->yVel = (random >> 4) + yv - 128;
-		spark->zVel = (random >> 6) + zv - 128;
-		spark->sSize = spark->size = ((random >> 9) & 3) + 4;
-		spark->dSize = ((random >> 12) & 1) + 1;
+		spark->xVel = (random / 4) + xv - 128;
+		spark->yVel = (random / 16) + yv - 128;
+		spark->zVel = (random / 64) + zv - 128;
+		spark->sSize = spark->size = ((random / 512) & 3) + 4;
+		spark->dSize = ((random / 4096) & 1) + 1;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 	}
@@ -472,8 +474,8 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->gravity = 0;
 		spark->maxYvel = 0;
 		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
+		spark->sSize = size / 2;
+		spark->size = size / 2;
 		spark->dSize = 2 * size;
 
 		for (int i = 0; i < 8; i++)
@@ -519,13 +521,13 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) / 4;
 	spark->yVel = GetRandomControl() - 128;
-	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) / 4;
 	if (uw)
 	{
 		spark->friction = 20;
-		spark->yVel >>= 4;
+		spark->yVel /= 16;
 		spark->y += 32;
 	}
 	else
@@ -576,9 +578,9 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
 		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
 		spark->z = (GetRandomControl() & 0x1FF) + z - 256;
-		spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+		spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) / 4;
 		spark->yVel = GetRandomControl() - 128;
-		spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+		spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) / 4;
 		if (uw)
 			spark->friction = 2;
 		else
@@ -634,7 +636,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			}
 			else if (Lara.burnBlue == 2)
 			{
-				spark->sB = spark->sG >> 1;
+				spark->sB = spark->sG / 2;
 				spark->sG = -1;
 				spark->sR = 0;
 			}
@@ -735,7 +737,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 		spark->maxYvel = -16 - (GetRandomControl() & 7);
 		spark->flags = 538;
 		if (type == 254)
-			spark->gravity >>= 1;
+			spark->gravity /= 2;
 	}
 	else
 	{
@@ -775,14 +777,14 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	}
 	else
 	{
-		spark->sSize = frandMinMax(128, 156);
+		spark->sSize = generateFloat(128, 156);
 		spark->dSize = spark->sSize / 16;
 		if (type == 7)
 		{
-			spark->colFadeSpeed >>= 2;
-			spark->fadeToBlack >>= 2;
-			spark->life = spark->life >> 2;
-			spark->sLife = spark->life >> 2;
+			spark->colFadeSpeed /= 4;
+			spark->fadeToBlack /= 4;
+			spark->life = spark->life / 4;
+			spark->sLife = spark->life / 4;
 		}
 	}
 }
@@ -809,7 +811,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 8;
 		sptr->transType = COLADD;
-		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
+		sptr->life = sptr->sLife = (size / 512) + (GetRandomControl() & 7) + 16;
 		sptr->x = (GetRandomControl() & 0x1F) + item->pos.xPos - 16;
 		sptr->y = (GetRandomControl() & 0x1F) + item->pos.yPos - 16;
 		sptr->z = (GetRandomControl() & 0x1F) + item->pos.zPos - 16;
@@ -819,7 +821,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 		if (deadly)
 			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FLAT;
 		sptr->scalar = 2;
-		sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
+		sptr->dSize = (GetRandomControl() & 0xF) + (size / 64) + 16;
 		sptr->sSize = sptr->size = sptr->dSize / 2;
 
 		if ((-(item->triggerFlags & 0xFF) & 7) == 1)
@@ -833,26 +835,26 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 		}
 
 		sptr->y -= 64;
-		sptr->gravity = -((size >> 9) + GetRandomControl() % (size >> 8));
+		sptr->gravity = -((size / 512) + GetRandomControl() % (size / 256));
 		sptr->yVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
 		if (item->pos.yRot == 0)
 		{
-			sptr->zVel = -(size - (size >> 2));
+			sptr->zVel = -(size - (size / 4));
 		}
 		else if (item->pos.yRot == ANGLE(90))
 		{
-			sptr->xVel = -(size - (size >> 2));
+			sptr->xVel = -(size - (size / 4));
 		}
 		else if (item->pos.yRot == ANGLE(-180))
 		{
-			sptr->zVel = size - (size >> 2);
+			sptr->zVel = size - (size / 4);
 		}
 		else
 		{
-			sptr->xVel = size - (size >> 2);
+			sptr->xVel = size - (size / 4);
 		}
 	}
 }
@@ -887,7 +889,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = frandMinMax(64,128);
+				float thickness = generateFloat(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -895,10 +897,10 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				splash.isRipple = true;
 				float vel;
 				if (numSplashesSetup == 2) {
-					vel = (splashVelocity / 16) + frandMinMax(2, 4);
+					vel = (splashVelocity / 16) + generateFloat(2, 4);
 				}
 				else {
-					vel = (splashVelocity / 7) + frandMinMax(3, 7);
+					vel = (splashVelocity / 7) + generateFloat(3, 7);
 				}
 				
 				float innerRadius = 0;
@@ -1042,12 +1044,12 @@ void SetupRipple(int x, int y, int z, float size, char flags,unsigned int sprite
 				ripple->initialColor *= 0.6f;
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
-				ripple->worldPos.x += frandMinMax(-32, 32);
-				ripple->worldPos.z += frandMinMax(-32, 32);
+				ripple->worldPos.x += generateFloat(-32, 32);
+				ripple->worldPos.z += generateFloat(-32, 32);
 			}
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
-				ripple->rotation += frandMinMax(-PI, PI);
+				ripple->rotation += generateFloat(-PI, PI);
 			}
 			break;
 		}
@@ -1082,10 +1084,10 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
-		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
-		spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + x - 8;
+		dl = ((dh + (GlobalCounter * 64)) % 1536) + (GetRandomControl() & 0x3F) - 32;
+		spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + z - 8;
+		spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0xF) + z - 8;
 		spark->xVel = 0;
 		spark->zVel = 0;
 		spark->friction = 0;
@@ -1095,7 +1097,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->scalar = 3;
 		spark->maxYvel = 0;
 		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-		spark->gravity = -spark->yVel >> 2;
+		spark->gravity = -spark->yVel / 4;
 		spark->sSize = spark->size = (GetRandomControl() & 3) + 16;
 		spark->dSize = 2 * spark->size;
 
@@ -1117,11 +1119,11 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
-	spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + x - 16;
+	spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->xVel = 0;
 	spark->zVel = 0;
-	spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + z - 16;
+	spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0x1F) + z - 16;
 	spark->friction = 0;
 	spark->flags = 10;
 	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;
@@ -1196,12 +1198,12 @@ void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
 	if (hit)
 	{
 		spark->maxYvel = 0;
-		spark->sSize = spark->size = spark->dSize = size >> 3;
+		spark->sSize = spark->size = spark->dSize = size / 8;
 		spark->gravity = 0;
 	}
 	else
 	{
-		spark->sSize = spark->size = size >> 4;
+		spark->sSize = spark->size = size / 16;
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->dSize = size;
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
@@ -1324,7 +1326,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->xVel = xv;
 	sptr->yVel = yv;
 	sptr->zVel = zv;
-	sptr->friction = 3 | (3 << 4);
+	sptr->friction = 3 | 48;
 
 	if (GetRandomControl() & 1)
 	{
@@ -1399,7 +1401,7 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 
 	int size = (GetRandomControl() & 7) + 128;
-	sptr->size = sptr->sSize = size >> 2;
+	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 }
 
@@ -1711,10 +1713,10 @@ void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 				spark->dSize = spark->size / 16;
 				if (flag2 == 7)
 				{
-					spark->colFadeSpeed >>= 2;
-					spark->fadeToBlack = spark->fadeToBlack >> 2;
-					spark->life = spark->life >> 2;
-					spark->sLife = spark->life >> 2;
+					spark->colFadeSpeed /= 4;
+					spark->fadeToBlack = spark->fadeToBlack / 4;
+					spark->life = spark->life / 4;
+					spark->sLife = spark->life / 4;
 				}
 			}
 
@@ -1746,18 +1748,18 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
-		spark->y = ((r >> 3) & 7) + y - 3;
+		spark->y = ((r / 8) & 7) + y - 3;
 		spark->transType = COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
-		spark->z = ((r >> 6) & 7) + z - 3;
+		spark->z = ((r / 64) & 7) + z - 3;
 		spark->flags = 2;
-		spark->xVel = (byte)(r >> 2) + xv - 128;
-		spark->yVel = (byte)(r >> 4) + yv - 128;
-		spark->zVel = (byte)(r >> 6) + zv - 128;
-		spark->sSize = ((r >> 9) & 3) + 4;
-		spark->size = ((r >> 9) & 3) + 4;
-		spark->dSize = ((r >> 12) & 1) + 1;
+		spark->xVel = (byte)(r / 4) + xv - 128;
+		spark->yVel = (byte)(r / 16) + yv - 128;
+		spark->zVel = (byte)(r / 64) + zv - 128;
+		spark->sSize = ((r / 512) & 3) + 4;
+		spark->size = ((r / 512) & 3) + 4;
+		spark->dSize = ((r / 512) & 1) + 1;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 
@@ -1766,28 +1768,28 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			r = rand();
 			spark = &Sparks[GetFreeSpark()];
 			spark->on = 1;
-			spark->sR = spark->dR >> 1;
-			spark->sG = spark->dG >> 1;
+			spark->sR = spark->dR / 2;
+			spark->sG = spark->dG / 2;
 			spark->fadeToBlack = 4;
 			spark->transType = COLADD;
 			spark->colFadeSpeed = (r & 3) + 8;
-			spark->sB = spark->dB >> 1;
+			spark->sB = spark->dB / 2;
 			spark->dR = 32;
 			spark->dG = 32;
 			spark->dB = 32;
 			spark->yVel = yv;
-			spark->life = ((r >> 3) & 7) + 13;
-			spark->sLife = ((r >> 3) & 7) + 13;
+			spark->life = ((r / 8) & 7) + 13;
+			spark->sLife = ((r / 8) & 7) + 13;
 			spark->friction = 4;
-			spark->x = x + (xv >> 5);
-			spark->y = y + (yv >> 5);
-			spark->z = z + (zv >> 5);
+			spark->x = x + (xv / 32);
+			spark->y = y + (yv / 32);
+			spark->z = z + (zv / 32);
 			spark->xVel = (r & 0x3F) + xv - 32;
-			spark->zVel = ((r >> 6) & 0x3F) + zv - 32;
+			spark->zVel = ((r / 64) & 0x3F) + zv - 32;
 			if (r & 1)
 			{
 				spark->flags = 538;
-				spark->rotAng = r >> 3;
+				spark->rotAng = r / 8;
 				if (r & 2)
 				{
 					spark->rotAdd = -16 - (r & 0xF);
@@ -1801,12 +1803,12 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			{
 				spark->flags = 522;
 			}
-			spark->gravity = -8 - (r >> 3 & 3);
+			spark->gravity = -8 - ((r / 8) & 3);
 			spark->scalar = 2;
-			spark->maxYvel = -4 - (r >> 6 & 3);
-			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->dSize = ((r >> 8) & 0xF) + 24;
+			spark->maxYvel = -4 - ((r / 64) & 3);
+			spark->sSize = (((r / 256) & 0xF) + 24) / 8;
+			spark->size = (((r / 256) & 0xF) + 24) / 8;
+			spark->dSize = ((r / 256) & 0xF) + 24;
 		}
 	}
 }
