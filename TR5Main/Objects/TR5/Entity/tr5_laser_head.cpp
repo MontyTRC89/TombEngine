@@ -65,7 +65,7 @@ static void TriggerLaserHeadSparks(PHD_VECTOR* pos, int count, byte r, byte g, b
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
-			spark->gravity = (GetRandomControl() >> 7) & 0x1F;
+			spark->gravity = (GetRandomControl() / 128) & 0x1F;
 			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
@@ -84,8 +84,8 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 	if (item->itemFlags[3] <= 32)
 	{
-		g = item->itemFlags[3] * g >> 5;
-		b = item->itemFlags[3] * b >> 5;
+		g = (item->itemFlags[3] * g) / 32;
+		b = (item->itemFlags[3] * b) / 32;
 	}
 	else
 	{
@@ -239,7 +239,7 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - (192 - item->speed) * phd_sin(item->itemFlags[2]);
 			item->itemFlags[2] += ONE_DEGREE * item->speed;
 
 			if (!(GlobalCounter & 7))
@@ -281,7 +281,7 @@ void LaserHeadControl(short itemNumber)
 		else
 		{
 			item->triggerFlags++;
-			item->pos.yPos = item->itemFlags[1] - (128 * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - 128 * phd_sin(item->itemFlags[2]);
 			item->itemFlags[2] += ANGLE(3);
 
 			// Get guardian head's position
@@ -331,17 +331,17 @@ void LaserHeadControl(short itemNumber)
 
 					if (item->itemFlags[3] <= 0 || condition)
 					{
-						short xRot = (GetRandomControl() >> 2) - 4096;
+						short xRot = (GetRandomControl() / 4) - 4096;
 						short yRot;
 						if (condition)
 							yRot = item->pos.yRot + (GetRandomControl() & 0x3FFF) + ANGLE(135);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
-						int c = v * phd_cos(-xRot) >> W2V_SHIFT;
-						dest.x = src.x + (c * phd_sin(yRot) >> W2V_SHIFT);
-						dest.y = src.y + (v * phd_sin(-xRot) >> W2V_SHIFT);
-						dest.z = src.z + (c * phd_cos(yRot) >> W2V_SHIFT);
+						int c = v * phd_cos(-xRot);
+						dest.x = src.x + c * phd_sin(yRot);
+						dest.y = src.y + v * phd_sin(-xRot);
+						dest.z = src.z + c * phd_cos(yRot);
 
 						if (condition)
 						{
@@ -375,11 +375,11 @@ void LaserHeadControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = 8192 * phd_cos(item->pos.xRot + 3328) >> W2V_SHIFT;
+					int c = 8192 * phd_cos(item->pos.xRot + 3328);
 					
-					dest.x = LaserHeadData.target.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-					dest.y = LaserHeadData.target.y = src.y + (8192 * phd_sin(3328 - item->pos.xRot) >> W2V_SHIFT);
-					dest.z = LaserHeadData.target.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+					dest.x = LaserHeadData.target.x = src.x + c * phd_sin(item->pos.yRot);
+					dest.y = LaserHeadData.target.y = src.y + 8192 * phd_sin(3328 - item->pos.xRot);
+					dest.z = LaserHeadData.target.z = src.z + c * phd_cos(item->pos.yRot);
 				}
 				else
 				{
@@ -458,7 +458,7 @@ void LaserHeadControl(short itemNumber)
 							&& arc
 							&& arc->life < 16)
 						{
-							g = b = arc->life * g >> 4;
+							g = b = (arc->life * g) / 16;
 						}
 
 						for (int i = 0, j = 0; i < 5; i += 4, j++)
@@ -471,10 +471,10 @@ void LaserHeadControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (PHD_VECTOR*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * phd_cos(angles[1]) >> W2V_SHIFT;
-								dest.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-								dest.y = src.y + (8192 * phd_sin(-angles[1]) >> W2V_SHIFT);
-								dest.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+								int c = 8192 * phd_cos(angles[1]);
+								dest.x = src.x + c * phd_sin(item->pos.yRot);
+								dest.y = src.y + 8192 * phd_sin(-angles[1]);
+								dest.z = src.z + c * phd_cos(item->pos.yRot);
 
 								if (item->itemFlags[3] != 90 
 									&& LaserHeadData.fireArcs[j] != NULL)
@@ -546,9 +546,9 @@ void LaserHeadControl(short itemNumber)
 											dest.z = src.z + dl * (dest.z - src.z) / 8192;
 										}
 
-										int dx = (dest.x - src.x) >> 5;
-										int dy = (dest.y - src.y) >> 5;
-										int dz = (dest.z - src.z) >> 5;
+										int dx = (dest.x - src.x) / 32;
+										int dy = (dest.y - src.y) / 32;
+										int dz = (dest.z - src.z) / 32;
 
 										int adx = currentArc->pos4.x - src.z;
 										int ady = currentArc->pos4.y - src.y;

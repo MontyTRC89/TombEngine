@@ -140,8 +140,8 @@ void InitialiseGuard(short itemNum)
         case 9:
             item->goalAnimState = STATE_GUARD_USE_COMPUTER;
             item->animNumber = anim + 59;
-            item->pos.xPos -= phd_sin(item->pos.yRot); // 4 * not exist there ??
-            item->pos.zPos -= phd_cos(item->pos.yRot); // 4 * not exist there ??
+            item->pos.xPos -= 512 * phd_sin(item->pos.yRot);
+            item->pos.zPos -= 512 * phd_cos(item->pos.yRot);
             break;
         case 8:
             item->goalAnimState = STATE_GUARD_HUNTING_IDLE;
@@ -166,8 +166,8 @@ void InitialiseSniper(short itemNum)
     item->goalAnimState = STATE_SNIPER_STOP;
     item->currentAnimState = STATE_SNIPER_STOP;
 	item->pos.yPos += STEP_SIZE * 2;
-    item->pos.xPos += phd_sin(item->pos.yRot);
-    item->pos.zPos += phd_cos(item->pos.yRot);
+    item->pos.xPos += 1024 * phd_sin(item->pos.yRot + ANGLE(90));
+    item->pos.zPos += 1024 * phd_cos(item->pos.yRot + ANGLE(90));
 }
 
 void InitialiseGuardLaser(short itemNum)
@@ -205,8 +205,8 @@ void GuardControl(short itemNum)
 	short joint0 = 0;
 	int x = item->pos.xPos;
 	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;
@@ -368,7 +368,7 @@ void GuardControl(short itemNum)
 			{
 				if (!(item->aiBits & FOLLOW))
 				{
-					joint0 = info.angle >> 1;
+					joint0 = info.angle / 2;
 					joint1 = info.xAngle;
 				}
 			}
@@ -458,8 +458,8 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_FIRE_SINGLE:
 		case STATE_GUARD_FIRE_FAST:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			if (abs(info.angle) >= ANGLE(2))
@@ -502,8 +502,8 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_AIM:
 			creature->flags = 0;
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			if (abs(info.angle) >= ANGLE(2))
@@ -935,8 +935,8 @@ void SniperControl(short itemNumber)
 			angle = CreatureTurn(item, creature->maximumTurn);
 			if (info.ahead)
 			{
-				joint0 = info.angle >> 1;
-				joint2 = info.angle >> 1;
+				joint0 = info.angle / 2;
+				joint2 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
 			creature->maximumTurn = 0;
@@ -1018,8 +1018,8 @@ void Mafia2Control(short itemNum)
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;
@@ -1107,7 +1107,7 @@ void Mafia2Control(short itemNum)
 			creature->maximumTurn = 0;
 			if (info.ahead && !(item->aiBits & GUARD))
 			{
-				joint0 = info.angle >> 1;
+				joint0 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
 			if (item->aiBits & GUARD)
@@ -1191,8 +1191,8 @@ void Mafia2Control(short itemNum)
 			}
 			break;
 		case STATE_MAFIA2_FIRE:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
@@ -1209,14 +1209,14 @@ void Mafia2Control(short itemNum)
 			}
 			if (!creature->flags)
 			{
-				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle >> 1, 35);
+				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle / 2, 35);
 				creature->flags = 1;
 				item->firedWeapon = 2;
 			}
 			break;
 		case STATE_MAFIA2_AIM:
-			joint0 = laraInfo.angle >> 1;
-			joint2 = laraInfo.angle >> 1;
+			joint0 = laraInfo.angle / 2;
+			joint2 = laraInfo.angle / 2;
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 			if (info.ahead)

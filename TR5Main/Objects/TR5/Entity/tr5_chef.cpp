@@ -34,8 +34,8 @@ void InitialiseChef(short itemNumber)
 	item->goalAnimState = STATE_CHEF_COOKING;
 	item->currentAnimState = STATE_CHEF_COOKING;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->pos.xPos += 192 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += 192 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += 192 * phd_sin(item->pos.yRot);
+	item->pos.zPos += 192 * phd_cos(item->pos.yRot);
 }
 
 void ControlChef(short itemNumber)
@@ -100,9 +100,9 @@ void ControlChef(short itemNumber)
 
 		if (info.ahead)
 		{
-			joint0 = info.angle >> 1;
+			joint0 = info.angle / 2;
 			//joint1 = info.xAngle;
-			joint2 = info.angle >> 1;
+			joint2 = info.angle / 2;
 		}
 
 		creature->maximumTurn = 0;

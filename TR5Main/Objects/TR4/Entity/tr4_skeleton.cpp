@@ -31,8 +31,8 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 		fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
 		fx->roomNumber = item->roomNumber;
 		fx->pos.yRot = 2 * GetRandomControl();
-		fx->speed = GetRandomControl() >> 11;
-		fx->fallspeed = -(GetRandomControl() >> 10);
+		fx->speed = GetRandomControl() / 2048;
+		fx->fallspeed = -(GetRandomControl() / 1024);
 		fx->frameNumber = Objects[103].meshIndex;
 		fx->objectNumber = ID_BODY_PART;
 		fx->shade = 0x4210;
@@ -52,9 +52,9 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 		spark->x = fx->pos.xPos;
 		spark->y = fx->pos.yPos;
 		spark->z = fx->pos.zPos;
-		spark->xVel = phd_sin(fx->pos.yRot) >> 2;
+		spark->xVel = phd_sin(fx->pos.yRot) * 4096;
 		spark->yVel = 0;
-		spark->zVel = phd_cos(fx->pos.yRot) >> 2;
+		spark->zVel = phd_cos(fx->pos.yRot) * 4096;
 		spark->transType = COLADD;
 		spark->friction = 68;
 		spark->flags = 26;
@@ -139,8 +139,8 @@ void SkeletonControl(short itemNumber)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 870 * phd_sin(item->pos.yRot) >> 14;
-	int dz = 870 * phd_cos(item->pos.yRot) >> 14;
+	int dx = 870 * phd_sin(item->pos.yRot);
+	int dz = 870 * phd_cos(item->pos.yRot);
 
 	x += dx;
 	z += dz;
@@ -256,8 +256,8 @@ void SkeletonControl(short itemNumber)
 		}
 		else
 		{
-			dx = 870 * phd_sin(item->pos.yRot + ANGLE(45)) >> 14;
-			dz = 870 * phd_cos(item->pos.yRot + ANGLE(45)) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot + ANGLE(45));
+			dz = 870 * phd_cos(item->pos.yRot + ANGLE(45));
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -267,8 +267,8 @@ void SkeletonControl(short itemNumber)
 			floor = GetFloor(x, y, z, &roomNumber);
 			int height4 = GetFloorHeight(floor, x, y, z);
 
-			dx = 870 * phd_sin(item->pos.yRot + 14336) >> 14;
-			dz = 870 * phd_cos(item->pos.yRot + 14336) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot + 14336);
+			dz = 870 * phd_cos(item->pos.yRot + 14336);
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -287,8 +287,8 @@ void SkeletonControl(short itemNumber)
 					someFlag2 = false;
 			}
 
-			dx = 870 * phd_sin(item->pos.yRot - 8192) >> 14;
-			dz = 870 * phd_cos(item->pos.yRot - 8192) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot - 8192);
+			dz = 870 * phd_cos(item->pos.yRot - 8192);
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -298,8 +298,8 @@ void SkeletonControl(short itemNumber)
 			floor = GetFloor(x, y, z, &roomNumber);
 			int height6 = GetFloorHeight(floor, x, y, z);
 
-			dx = 870 * phd_sin(item->pos.yRot - 14336) >> 14;
-			dz = 870 * phd_cos(item->pos.yRot - 14336) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot - 14336);
+			dz = 870 * phd_cos(item->pos.yRot - 14336);
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;

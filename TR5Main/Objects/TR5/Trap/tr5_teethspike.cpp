@@ -108,7 +108,7 @@ void ControlTeethSpikes(short itemNumber)
 		if (TriggerActive(item))
 		{
 			item->itemFlags[1] -= item->itemFlags[0];
-			item->itemFlags[0] += (item->itemFlags[0] >> 3) + 32;
+			item->itemFlags[0] += (item->itemFlags[0] / 8) + 32;
 
 			if (item->itemFlags[1] < 0)
 			{
@@ -131,7 +131,7 @@ void ControlTeethSpikes(short itemNumber)
 		}
 		else if (!item->timer)
 		{
-			item->itemFlags[0] += (item->itemFlags[0] >> 3) + 32;
+			item->itemFlags[0] += (item->itemFlags[0] / 8) + 32;
 
 			if (item->itemFlags[1] > 0)
 			{
@@ -247,7 +247,7 @@ void ControlTeethSpikes(short itemNumber)
 			}
 			else
 			{
-				item->itemFlags[0] = -item->itemFlags[0] >> 1;
+				item->itemFlags[0] = -item->itemFlags[0] / 2;
 			}
 		}
 	}

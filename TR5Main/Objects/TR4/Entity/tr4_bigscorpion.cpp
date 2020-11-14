@@ -50,16 +50,16 @@ void ScorpionControl(short itemNumber)
 	short joint3 = 0;
 	short roomNumber = item->roomNumber;
 
-	int x = item->pos.xPos + 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int z = item->pos.zPos + 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 682 * phd_sin(item->pos.yRot);
+	int z = item->pos.zPos + 682 * phd_cos(item->pos.yRot);
 
 	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height1) > 512)
 		height1 = item->pos.yPos;
 
-	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot);
+	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot);
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
@@ -68,16 +68,16 @@ void ScorpionControl(short itemNumber)
 
 	short angle1 = phd_atan(1344, height2 - height1);
 
-	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos + 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot);
+	z = item->pos.zPos + 682 * phd_cos(item->pos.yRot);
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height3) > 512)
 		height3 = item->pos.yPos;
 
-	x = item->pos.xPos + 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos + 682 * phd_sin(item->pos.yRot);
+	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot);
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height4 = GetFloorHeight(floor, x, item->pos.yPos, z);

@@ -19,7 +19,7 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 
 	if (info->distance <= SQUARE(8192) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->speed >> W2V_SHIFT * SQUARE(8192) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(8192) / 300;
 		distance = info->distance + SQUARE(distance);
 		if (distance <= SQUARE(8192))
 		{
@@ -85,9 +85,9 @@ short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	GAME_VECTOR pos;
 
-	pos.x = LaraItem->pos.xPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
+	pos.x = LaraItem->pos.xPos + ((GetRandomControl() - 0x4000) * 512) / 0x7FFF;
 	pos.y = LaraItem->floor;
-	pos.z = LaraItem->pos.zPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
+	pos.z = LaraItem->pos.zPos + ((GetRandomControl() - 0x4000) * 512) / 0x7FFF;
 	pos.roomNumber = LaraItem->roomNumber;
 
 	Richochet((PHD_3DPOS*)&pos);
@@ -103,7 +103,7 @@ short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 	pos.y = 0;
 	pos.z = 0;
 
-	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
+	GetLaraJointPosition(&pos, (25 * GetRandomControl()) / 32768);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->pos.yRot, LaraItem->roomNumber);
 	SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);

@@ -182,10 +182,10 @@ void UpdateBats()
 
 		if (bat->counter > 90)
 		{
-			short speed = bat->speed << 7;
+			short speed = bat->speed * 128;
 
-			short xAngle = abs(angles[1] - bat->pos.xRot) >> 3;
-			short yAngle = abs(angles[0] - bat->pos.yRot) >> 3;
+			short xAngle = abs(angles[1] - bat->pos.xRot) / 8;
+			short yAngle = abs(angles[0] - bat->pos.yRot) / 8;
 
 			if (xAngle < -speed)
 				xAngle = -speed;
@@ -201,11 +201,11 @@ void UpdateBats()
 			bat->pos.xRot += xAngle;
 		}
 
-		int sp = bat->speed * phd_cos(bat->pos.xRot) >> W2V_SHIFT;
+		int sp = bat->speed * phd_cos(bat->pos.xRot);
 
-		bat->pos.xPos += sp * phd_sin(bat->pos.yRot) >> W2V_SHIFT;
-		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot) >> W2V_SHIFT;
-		bat->pos.zPos += sp * phd_cos(bat->pos.yRot) >> W2V_SHIFT;
+		bat->pos.xPos += sp * phd_sin(bat->pos.yRot);
+		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot);
+		bat->pos.zPos += sp * phd_cos(bat->pos.yRot);
 
 		if ((i % 2 == 0)
 			&& bat->pos.xPos > x1

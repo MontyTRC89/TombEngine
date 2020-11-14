@@ -899,16 +899,12 @@ unsigned CALLBACK LoadLevel(void* data)
 	// Initialise the game
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	SeedRandomDraw(0xD371F947);
-	SeedRandomControl(0xD371F947);
 	Wibble = 0;
 	TorchRoom = -1;
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1 || level->ResetHub));
 	GetCarriedItems();
 	GetAIPickups();
-	SeedRandomDraw(0xD371F947);
-	SeedRandomControl(0xD371F947);
 	Lara.Vehicle = -1;
 	g_GameScript->AssignItemsAndLara();
 

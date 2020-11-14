@@ -140,10 +140,10 @@ void SetupFish(int leader, ITEM_INFO* item)
 
 	for (int i = 0; i < 24; i++)
 	{
-		Fishes[MAX_FISH + (leader * 24) + i].x = (GetRandomControl() % (fishXRange << 1)) - fishXRange;
+		Fishes[MAX_FISH + (leader * 24) + i].x = (GetRandomControl() % (fishXRange * 2)) - fishXRange;
 		Fishes[MAX_FISH + (leader * 24) + i].y = (GetRandomControl() % fishYRange);
 		Fishes[MAX_FISH + (leader * 24) + i].destY = (GetRandomControl() % fishYRange);
-		Fishes[MAX_FISH + (leader * 24) + i].z = (GetRandomControl() % (fishZRange << 1)) - fishZRange;
+		Fishes[MAX_FISH + (leader * 24) + i].z = (GetRandomControl() % (fishZRange * 2)) - fishZRange;
 		Fishes[MAX_FISH + (leader * 24) + i].angle = GetRandomControl() & 4095;
 		Fishes[MAX_FISH + (leader * 24) + i].speed = (GetRandomControl() & 31) + 32;
 		Fishes[MAX_FISH + (leader * 24) + i].swim = GetRandomControl() & 63;
@@ -198,7 +198,7 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].angle = fish->angle = (-(mGetAngle(fish->x + item->pos.xPos, fish->z + item->pos.zPos, enemy->pos.xPos, enemy->pos.zPos) + 0x4000) >> 4) & 4095;
+		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->pos.xPos, fish->z + item->pos.zPos, enemy->pos.xPos, enemy->pos.zPos) + 0x4000)) / 16) & 4095;
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 	}
 
@@ -223,7 +223,7 @@ void ControlFish(short itemNumber)
 	}
 	else
 	{
-		fish->angAdd -= fish->angAdd >> 2;
+		fish->angAdd -= fish->angAdd / 4;
 		if (abs(fish->angAdd) < 4)
 			fish->angAdd = 0;
 	}
@@ -231,7 +231,7 @@ void ControlFish(short itemNumber)
 	fish->angle += fish->angAdd;
 
 	if (diff > 1024)
-		fish->angle += fish->angAdd >> 2;
+		fish->angle += fish->angAdd / 4;
 	fish->angle &= 4095;
 
 	diff = fish->speed - LeaderInfo[leader].speed;
@@ -252,14 +252,14 @@ void ControlFish(short itemNumber)
 		fish->speed = diff;
 	}
 
-	fish->swim += fish->speed >> 4;
+	fish->swim += fish->speed / 16;
 	fish->swim &= 63;
 
 	int x = fish->x;
 	int z = fish->z;
 	
-	x += -fish->speed * phd_sin(fish->angle << 4) >> W2V_SHIFT;  //   -(((rcossin_tbl[(fish->angle << 1)]) * (fish->speed)) >> 13);
-	z += fish->speed * phd_cos(fish->angle << 4) >> W2V_SHIFT;  //   (((rcossin_tbl[(fish->angle << 1) + 1]) * (fish->speed)) >> 13);
+	x -= fish->speed * phd_sin(fish->angle * 16) / 2;
+	z += fish->speed * phd_cos(fish->angle * 16) / 2;
 	
 	if (pirahnaAttack == 0)
 	{
@@ -317,7 +317,7 @@ void ControlFish(short itemNumber)
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			int angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
 			if ((GetRandomControl() & 3) == 0)
-				LeaderInfo[leader].angle += angAdd << 5;
+				LeaderInfo[leader].angle += angAdd * 32;
 			else
 				LeaderInfo[leader].angle += angAdd;
 			LeaderInfo[leader].angle &= 4095;
@@ -371,9 +371,9 @@ void ControlFish(short itemNumber)
 			}
 		}
 
-		angle = (-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000) >> 4) & 4095;
-		int dx = fish->x - ftx + ((24 - i) << 7);
-		int dz = fish->z - ftz - ((24 - i) << 7);
+		angle = ((-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000)) / 16) & 4095;
+		int dx = fish->x - ftx + ((24 - i) * 128);
+		int dz = fish->z - ftz - ((24 - i) * 128);
 
 		dx *= dx;
 		dz *= dz;
@@ -388,18 +388,18 @@ void ControlFish(short itemNumber)
 		if (diff > 128)
 		{
 			fish->angAdd -= 4;
-			if (fish->angAdd < -92 - (i >> 1))
-				fish->angAdd = -92 - (i >> 1);
+			if (fish->angAdd < -92 - (i / 2))
+				fish->angAdd = -92 - (i / 2);
 		}
 		else	if (diff < -128)
 		{
 			fish->angAdd += 4;
-			if (fish->angAdd > 92 + (i >> 1))
-				fish->angAdd = 92 + (i >> 1);
+			if (fish->angAdd > 92 + (i / 2))
+				fish->angAdd = 92 + (i / 2);
 		}
 		else
 		{
-			fish->angAdd -= fish->angAdd >> 2;
+			fish->angAdd -= fish->angAdd / 4;
 			if (abs(fish->angAdd) < 4)
 				fish->angAdd = 0;
 		}
@@ -407,20 +407,20 @@ void ControlFish(short itemNumber)
 		fish->angle += fish->angAdd;
 
 		if (diff > 1024)
-			fish->angle += fish->angAdd >> 2;
+			fish->angle += fish->angAdd / 4;
 		fish->angle &= 4095;
 
-		if ((dx + dz) < (0x100000 + ((i << 7) * (i << 7))))
+		if ((dx + dz) < (0x100000 + ((i * 128) * (i * 128))))
 		{
-			if (fish->speed > 32 + (i << 1))
-				fish->speed -= fish->speed >> 5;
+			if (fish->speed > 32 + (i * 2))
+				fish->speed -= fish->speed / 32;
 		}
 		else
 		{
-			if (fish->speed < 160 + (i >> 1))
-				fish->speed += (GetRandomControl() & 3) + 1 + (i >> 1);
-			if (fish->speed > 160 + (i >> 1) - (i << 2))
-				fish->speed = 160 + (i >> 1) - (i << 2);
+			if (fish->speed < 160 + (i / 2))
+				fish->speed += (GetRandomControl() & 3) + 1 + (i / 2);
+			if (fish->speed > 160 + (i / 2) - (i * 4))
+				fish->speed = 160 + (i / 2) - (i * 4);
 		}
 
 		if (GetRandomControl() & 1)
@@ -433,11 +433,11 @@ void ControlFish(short itemNumber)
 		else if (fish->speed > 200)
 			fish->speed = 200;
 
-		fish->swim += (fish->speed >> 4) + (fish->speed >> 5);
+		fish->swim += (fish->speed / 16) + (fish->speed / 32);
 		fish->swim &= 63;
 
-		x = fish->x - fish->speed * phd_sin(fish->angle << 4) >> W2V_SHIFT; //   (((rcossin_tbl[(fish->angle << 1)])* (fish->speed)) >> 13);
-		z = fish->z + fish->speed * phd_cos(fish->angle << 4) >> W2V_SHIFT; //
+		x = fish->x - fish->speed * phd_sin(fish->angle * 16) / 2;
+		z = fish->z + fish->speed * phd_cos(fish->angle * 16) / 2;
 
 		if (z < -32000)
 			z = -32000;
@@ -463,7 +463,7 @@ void ControlFish(short itemNumber)
 				fish->destY = y + (GetRandomControl() & 255); 
 		}
 
-		fish->y += (fish->destY - fish->y) >> 4;
+		fish->y += (fish->destY - fish->y) / 16;
 		fish++;
 	}
 }

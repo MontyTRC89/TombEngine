@@ -424,7 +424,7 @@ void MonkeyControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 40 >> 1;
+						enemy->hitPoints -= 20;
 						enemy->hitStatus = true;
 						creature->flags = 1;
 						CreatureEffect(item, &monkeyBite, DoBloodSplat);
@@ -468,7 +468,7 @@ void MonkeyControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 40 >> 1;
+						enemy->hitPoints -= 20;
 						enemy->hitStatus = true;
 						creature->flags = 1;
 						CreatureEffect(item, &monkeyBite, DoBloodSplat);
@@ -512,7 +512,7 @@ void MonkeyControl(short itemNumber)
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
 						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						enemy->hitPoints -= 50 >> 1;
+						enemy->hitPoints -= 25;
 						enemy->hitStatus = true;
 						creature->flags = 1;
 						CreatureEffect(item, &monkeyBite, DoBloodSplat);

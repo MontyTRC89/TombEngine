@@ -162,7 +162,7 @@ void MonkControl(short itemNum)
 			if (MonksAttackLara)
 				monk->maximumTurn += ANGLE(1);
 
-			tilt = angle >> 2;
+			tilt = angle / 4;
 
 			if (monk->mood == BORED_MOOD)
 			{

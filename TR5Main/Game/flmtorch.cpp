@@ -203,8 +203,8 @@ void TorchControl(short itemNumber) // (F) (D)
 		item->pos.zRot = 0;
 	}
 
-	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot);
+	int zv = item->speed * phd_cos(item->pos.yRot);
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
@@ -242,7 +242,7 @@ void TorchControl(short itemNumber) // (F) (D)
 			pos.yRot = CollidedMeshes[0]->yRot;
 			ItemPushLaraStatic(item, &sobj->collisionBox, &pos, &lara_coll);
 		}
-		item->speed >>= 1;
+		item->speed /= 2;
 	}
 	if (item->itemFlags[3])
 	{
@@ -315,7 +315,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
+				l->animNumber = (dy / 256) + LA_TORCH_LIGHT_1;
 			}
 			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;

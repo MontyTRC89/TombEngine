@@ -83,7 +83,7 @@ enum
 #define KAYAK_X				128
 #define KAYAK_Z				128
 #define SKIDOO_MAX_KICK		-80
-#define SKIDOO_MIN_BOUNCE	((MAX_SPEED/2)>>8)
+#define SKIDOO_MIN_BOUNCE	((MAX_SPEED/2)/ 256)
 
 struct WAKE_PTS 
 {
@@ -107,11 +107,11 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 	if (WakePts[CurrentStartWake][rotate].life)
 		return;
 
-	int s = phd_sin(v->pos.yRot);
-	int c = phd_cos(v->pos.yRot);
+	float s = phd_sin(v->pos.yRot);
+	float c = phd_cos(v->pos.yRot);
 	
-	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
-	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+	int x = v->pos.xPos + zoff * s + xoff * c;
+	int z = v->pos.zPos + zoff * c - xoff * s;
 
 	short angle1, angle2;
 
@@ -147,10 +147,10 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 			}
 		}
 
-		xv[0] = (WAKE_SPEED * phd_sin(angle1)) >> W2V_SHIFT;
-		zv[0] = (WAKE_SPEED * phd_cos(angle1)) >> W2V_SHIFT;
-		xv[1] = ((WAKE_SPEED + 2) * phd_sin(angle2)) >> W2V_SHIFT;
-		zv[1] = ((WAKE_SPEED + 2) * phd_cos(angle2)) >> W2V_SHIFT;
+		xv[0] = WAKE_SPEED * phd_sin(angle1);
+		zv[0] = WAKE_SPEED * phd_cos(angle1);
+		xv[1] = (WAKE_SPEED + 2) * phd_sin(angle2);
+		zv[1] = (WAKE_SPEED + 2) * phd_cos(angle2);
 
 		WakePts[CurrentStartWake][rotate].y = v->pos.yPos + KAYAK_DRAW_SHIFT;
 		WakePts[CurrentStartWake][rotate].life = 0x40;
@@ -173,11 +173,11 @@ void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate)
 
 void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff)
 {
-	int s = phd_sin(v->pos.yRot);
-	int c = phd_cos(v->pos.yRot);
+	float s = phd_sin(v->pos.yRot);
+	float c = phd_cos(v->pos.yRot);
 
-	int x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
-	int z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
+	int x = v->pos.xPos + zoff * s + xoff * c;
+	int z = v->pos.zPos + zoff * c - xoff * s;
 
 	short roomNumber = v->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
@@ -341,11 +341,11 @@ int KayakGetCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 
 	if ((xdiff) || (zdiff))
 	{
-		int s = phd_sin(v->pos.yRot);
-		int c = phd_cos(v->pos.yRot);
+		float s = phd_sin(v->pos.yRot);
+		float c = phd_cos(v->pos.yRot);
 		
-		int front = ((zdiff * c) + (xdiff * s)) >> W2V_SHIFT;
-		int side = ((-zdiff * s) + (xdiff * c)) >> W2V_SHIFT;
+		int front = zdiff * c + xdiff * s;
+		int side = -zdiff * s + xdiff * c;
 
 		if (abs(front) > abs(side))
 		{
@@ -385,12 +385,12 @@ int KayakDoDynamics(int height, int fallspeed, int* y)
 	{
 		
 		// On ground: get up push from height change (if not a closed door and so NO_HEIGHT) 
-		int kick = (height - *y) << 2;
+		int kick = (height - *y) * 4;
 
 		if (kick < SKIDOO_MAX_KICK)
 			kick = SKIDOO_MAX_KICK;
 
-		fallspeed += ((kick - fallspeed) >> 3);
+		fallspeed += ((kick - fallspeed) / 8);
 
 		if (*y > height)
 			*y = height;
@@ -445,14 +445,14 @@ void KayakDoCurrent(ITEM_INFO* item)
 		target.y = FixedCameras[sinkval].y;
 		target.z = FixedCameras[sinkval].z;
 		
-		int angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) >> 4) & 4095;
+		int angle = (((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90))) / 16) & 4095;
 
 		int dx = target.x - LaraItem->pos.xPos;
 		int dz = target.z - LaraItem->pos.zPos;
 
 		int speed = FixedCameras[sinkval].data;
-		dx = (((rcossin_tbl[(angle << 1)] * speed))) / 4; // / distance)<<4;
-		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) / 4;// / distance)<<4;
+		dx = phd_sin(angle * 16) * speed * 1024;
+		dz = phd_cos(angle * 16) * speed * 1024;
 
 		Lara.currentXvel += (dx - Lara.currentXvel) / 16;
 		Lara.currentZvel += (dz - Lara.currentZvel) / 16;
@@ -513,11 +513,11 @@ int KayakDoShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	int x_old, z_old;
 	int shift_x, shift_z;
 
-	x = pos->x >> WALL_SHIFT;
-	z = pos->z >> WALL_SHIFT;
+	x = pos->x / SECTOR(1);
+	z = pos->z / SECTOR(1);
 
-	x_old = old->x >> WALL_SHIFT;
-	z_old = old->z >> WALL_SHIFT;
+	x_old = old->x / SECTOR(1);
+	z_old = old->z / SECTOR(1);
 
 	shift_x = pos->x & (WALL_SIZE - 1);
 	shift_z = pos->z & (WALL_SIZE - 1);
@@ -660,10 +660,10 @@ void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 	int lh = KayakTestHeight(v, -KAYAK_X, KAYAK_Z, &lpos);
 	int rh = KayakTestHeight(v, KAYAK_X, KAYAK_Z, &rpos);
 
-	v->pos.yRot += (Kayak->Rot >> 16);
+	v->pos.yRot += (Kayak->Rot / 65536);
 
-	v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
-	v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
+	v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
+	v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
 
 	KayakDoCurrent(v);
 
@@ -756,8 +756,7 @@ void KayakToBackground(ITEM_INFO* v, KAYAK_INFO* Kayak)
 	{
 		int newspeed;
 
-		newspeed = ((v->pos.zPos - oldpos[8].z) * phd_cos(v->pos.yRot)
-			+ (v->pos.xPos - oldpos[8].x) * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+		newspeed = (v->pos.zPos - oldpos[8].z) * phd_cos(v->pos.yRot) + (v->pos.xPos - oldpos[8].x) * phd_sin(v->pos.yRot);
 
 		newspeed *= 256;
 
@@ -1183,7 +1182,7 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 	else if (Kayak->Vel < -MAX_SPEED)
 		Kayak->Vel = -MAX_SPEED;
 
-	v->speed = (Kayak->Vel >> 16);
+	v->speed = (Kayak->Vel / 65536);
 
 	// unwind rotation 
 	if (Kayak->Rot >= 0)
@@ -1406,7 +1405,7 @@ int KayakControl()
 	{
 		int damage;
 		if ((damage = (ofs - v->fallspeed)) > 160)
-			l->hitPoints -= (damage - 160) << 3;
+			l->hitPoints -= (damage - 160) * 8;
 
 		KayakSplash(v, ofs - v->fallspeed, water);
 	}
@@ -1425,7 +1424,7 @@ int KayakControl()
 		l->pos.zPos = v->pos.zPos;
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
-		l->pos.zRot = v->pos.zRot >> 1;
+		l->pos.zRot = v->pos.zRot / 2;
 
 		// animate Lara then Kayak */
 
@@ -1461,9 +1460,9 @@ int KayakControl()
 			{
 				//dest.x = (GetRandomControl()%MistXPos[lp]) - (MistXPos[lp]>>1);
 				if (GetRandomControl() & 1)
-					dest.x = (MistXPos[i] >> 1);
+					dest.x = (MistXPos[i] / 2);
 				else
-					dest.x = -(MistXPos[i] >> 1);
+					dest.x = -(MistXPos[i] / 2);
 				dest.y = 50;
 				dest.z = MistZPos[i];
 			}

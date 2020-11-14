@@ -11,13 +11,13 @@
 #include "collide.h"
 #include "effect2.h"
 #include "chaffFX.h"
-
+#include "prng.h"
 
 constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920,0.8020,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.84642,0.7896,0.817634,0.923424,0.7589,0.81399,0.92834,0.9978,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.74642 };
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
 constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.920,0.8020,0.07610,0.197878,0.38978,0.09983,0.00934763,0.8485,0.0762573,0.84642,0.7896,0.517634,0.0923424,0.7589,0.081399,0.92834,0.01978,0.17610,0.497878,0.8978,0.69983,0.934763,0.28485,0.1762573,0.374642 };
 
-
+using namespace T5M::Math::Random;
 
 void FlareControl(short itemNumber) // (AF) (D)
 {
@@ -44,8 +44,8 @@ void FlareControl(short itemNumber) // (AF) (D)
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot);
+	int zv = item->speed * phd_cos(item->pos.yRot);
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
@@ -328,8 +328,8 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		{
 			flag = true;
 			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180);
-			item->pos.xPos = LaraItem->pos.xPos + (320 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-			item->pos.zPos = LaraItem->pos.zPos + (320 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+			item->pos.xPos = LaraItem->pos.xPos + 320 * phd_sin(item->pos.yRot);
+			item->pos.zPos = LaraItem->pos.zPos + 320 * phd_cos(item->pos.yRot);
 			item->roomNumber = LaraItem->roomNumber;
 		}
 		else
@@ -359,7 +359,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		}
 
 		if (flag)
-			item->speed >>= 1;
+			item->speed /= 2;
 
 		if (objectNum == ID_FLARE_ITEM)
 		{
@@ -416,7 +416,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 	int falloff;
 	if (age >= 900 || age == 0)
 		return 0;
-	random = frand();
+	random = generateFloat();
 
 	x = pos->x + (random* 120);
 	y = pos->y + (random * 120) - 256;

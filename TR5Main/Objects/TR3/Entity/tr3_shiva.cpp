@@ -62,15 +62,15 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->x = x + (GetRandomControl() & 31) - 16;
 	sptr->y = y + (GetRandomControl() & 31) - 16;
 	sptr->z = z + (GetRandomControl() & 31) - 16;
-	sptr->xVel = ((GetRandomControl() & 4095) - 2048) >> 2;
+	sptr->xVel = ((GetRandomControl() & 4095) - 2048) / 4;
 	sptr->yVel = (GetRandomControl() & 255) - 128;
-	sptr->zVel = ((GetRandomControl() & 4095) - 2048) >> 2;
+	sptr->zVel = ((GetRandomControl() & 4095) - 2048) / 4;
 
 	if (uw)
 	{
-		sptr->yVel >>= 4;
+		sptr->yVel /= 16;
 		sptr->y += 32;
-		sptr->friction = 4 | (1 << 4);
+		sptr->friction = 4 | (16);
 	}
 	else
 	{
@@ -95,10 +95,10 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 		sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 	}
 	size = (GetRandomControl() & 31) + 128;
-	sptr->size = sptr->sSize = size >> 2;
+	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 	size += (GetRandomControl() & 31) + 32;
-	sptr->size = sptr->sSize = size >> 3;
+	sptr->size = sptr->sSize = size / 8;
 	sptr->dSize = size;
 }
 
@@ -200,7 +200,7 @@ void ShivaControl(short itemNum)
 			{
 				if (item->meshBits == 0)
 					effect_mesh = 0;
-				item->meshBits = (item->meshBits << 1) + 1;
+				item->meshBits = (item->meshBits * 2) + 1;
 				shiva->flags = 1;
 
 				GetJointAbsPosition(item, &pos, effect_mesh++);
@@ -240,8 +240,8 @@ void ShivaControl(short itemNum)
 			if (shiva->mood == ESCAPE_MOOD)
 			{
 				roomNumber = item->roomNumber;
-				x = item->pos.xPos + (WALL_SIZE * phd_sin(item->pos.yRot + 0x8000) >> W2V_SHIFT);
-				z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + 0x8000) >> W2V_SHIFT);
+				x = item->pos.xPos + WALL_SIZE * phd_sin(item->pos.yRot + 0x8000);
+				z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + 0x8000);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 				if (!shiva->flags && floor->box != NO_BOX && !(g_Level.Boxes[floor->box].flags & BLOCKABLE))

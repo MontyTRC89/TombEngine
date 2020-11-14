@@ -159,8 +159,8 @@ void LarsonControl(short itemNumber)
 		switch (item->currentAnimState)
 		{
 		case STATE_TR5_LARSON_STOP:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 
@@ -278,8 +278,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_AIM:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
@@ -302,8 +302,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_IDLE:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 
@@ -322,8 +322,8 @@ void LarsonControl(short itemNumber)
 			break;
 
 		case STATE_TR5_LARSON_ATTACK:
-			joint0 = info.angle >> 1;
-			joint2 = info.angle >> 1;
+			joint0 = info.angle / 2;
+			joint2 = info.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
@@ -370,9 +370,9 @@ void LarsonControl(short itemNumber)
 			short floorHeight = item->itemFlags[2] & 0xFF00;
 			ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 			
-			int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
+			int x = r->x + (item->TOSSPAD / 256 & 0xFF) * SECTOR(1) + 512;
 			int y = r->minfloor + floorHeight;
-			int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
+			int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			GetFloorHeight(floor, x, y, z);

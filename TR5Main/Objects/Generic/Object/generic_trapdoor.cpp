@@ -55,9 +55,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		item->goalAnimState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 16;
+		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 1024;
 		ForcedFixedCamera.y = item->pos.yPos + 1024;
-		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 16;
+		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 1024;
 		ForcedFixedCamera.roomNumber = item->roomNumber;
 	}
 	else
@@ -96,11 +96,11 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				item->goalAnimState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 8;
+				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 2048;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
 				if (ForcedFixedCamera.y < g_Level.Rooms[item->roomNumber].maxceiling)
 					ForcedFixedCamera.y = g_Level.Rooms[item->roomNumber].maxceiling;
-				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 8;
+				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 2048;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 			}
 			else
@@ -173,7 +173,7 @@ void CloseTrapDoor(ITEM_INFO* item)
 		floor->pitRoom = NO_ROOM;
 		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky |= floor->skyRoom << 8;
+		pitsky |= floor->skyRoom * 256;
 		floor->skyRoom = NO_ROOM;
 	}
 	else if (item->pos.yPos == r->maxceiling)
@@ -182,7 +182,7 @@ void CloseTrapDoor(ITEM_INFO* item)
 		floor->skyRoom = NO_ROOM;
 		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky = pitsky << 8 | floor->pitRoom;
+		pitsky = ((pitsky * 256) | floor->pitRoom);
 		floor->pitRoom = NO_ROOM;
 	}
 
@@ -205,11 +205,11 @@ void OpenTrapDoor(ITEM_INFO* item)
 		floor->pitRoom = (unsigned char)pitsky;
 		r = &g_Level.Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		floor->skyRoom = pitsky >> 8;
+		floor->skyRoom = pitsky / 256;
 	}
 	else
 	{
-		floor->skyRoom = pitsky >> 8;
+		floor->skyRoom = pitsky / 256;
 		r = &g_Level.Rooms[floor->skyRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		floor->pitRoom = (unsigned char)pitsky;

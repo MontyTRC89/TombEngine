@@ -584,8 +584,8 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->animNumber = Objects[item->objectNumber].animIndex + 4;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->itemFlags[0] = 1;
-				ForcedFixedCamera.x = item->pos.xPos - (1024 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-				ForcedFixedCamera.z = item->pos.zPos - (1024 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+				ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot);
+				ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot);
 				Lara.isMoving = 0;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
@@ -626,8 +626,8 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					flag = 1;
 					l->frameNumber = g_Level.Anims[319].frameBase;
 					item->itemFlags[0] = 2;
-					ForcedFixedCamera.x = item->pos.xPos + (1024 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
-					ForcedFixedCamera.z = item->pos.zPos + (1024 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
+					ForcedFixedCamera.x = item->pos.xPos + 1024 * phd_sin(item->pos.yRot);
+					ForcedFixedCamera.z = item->pos.zPos + 1024 * phd_cos(item->pos.yRot);
 				}
 				else
 				{
@@ -854,9 +854,9 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			AddActiveItem(itemNum);
 			
-			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90));
 			ForcedFixedCamera.y = item->pos.yPos - 1024;
-			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90));
 			ForcedFixedCamera.roomNumber = item->roomNumber;
 
 			return;
@@ -885,9 +885,9 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			AddActiveItem(itemNum);
 
-			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90));
 			ForcedFixedCamera.y = item->pos.yPos - 1024;
-			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90));
 			ForcedFixedCamera.roomNumber = item->roomNumber;
 		}
 	}
@@ -1148,7 +1148,7 @@ int GetKeyTrigger(ITEM_INFO* item)
 		}
 		if (*trigger & 4)
 		{
-			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
+			for (short* j = &trigger[2]; (*j / 256) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
 			{
 				if (*j & 0x8000)
 					return 0;
@@ -1232,7 +1232,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return (item->flags & 0x100u) >> 8;
+		return ((item->flags & 0x100u) / 256);
 	}
 	else
 	{

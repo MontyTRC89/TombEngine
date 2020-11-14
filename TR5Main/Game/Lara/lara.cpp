@@ -1025,9 +1025,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_sin(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
-	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) >> (W2V_SHIFT + 2);
-	item->pos.zPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_cos(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
+	item->pos.xPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_sin(item->pos.yRot) / 4;
+	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) / 4;
+	item->pos.zPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_cos(item->pos.yRot) / 4;
 
 	LaraBaddieCollision(item, coll);
 
@@ -1083,8 +1083,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * phd_sin(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
-	item->pos.zPos += item->fallspeed * phd_cos(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.xPos += item->fallspeed * phd_sin(item->pos.yRot + Lara.moveAngle) / 4;
+	item->pos.zPos += item->fallspeed * phd_cos(item->pos.yRot + Lara.moveAngle) / 4;
 
 	LaraBaddieCollision(item, coll);
 
@@ -1257,21 +1257,21 @@ void AnimateLara(ITEM_INFO* item)
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
-	lateral >>= 16;
+	lateral /= 65536;
 
 	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
 	{
 		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			item->speed -= item->speed >> 3;
+			item->speed -= item->speed * 8;
 			if (abs(item->speed) < 8)
 			{
 				item->speed = 0;
 				item->gravityStatus = false;
 			}
 			if (item->fallspeed > 128)
-				item->fallspeed >>= 1;
-			item->fallspeed -= item->fallspeed >> 2;
+				item->fallspeed /= 2;
+			item->fallspeed -= item->fallspeed / 4;
 			if (item->fallspeed < 4)
 				item->fallspeed = 4;
 			item->pos.yPos += item->fallspeed;
@@ -1279,8 +1279,8 @@ void AnimateLara(ITEM_INFO* item)
 		else
 		{
 			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
-			item->speed -= velocity >> 16;
-			item->speed += (velocity + anim->acceleration) >> 16;
+			item->speed -= (velocity / 65536);
+			item->speed += ((velocity + anim->acceleration) / 65536);
 			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
 			item->pos.yPos += item->fallspeed;
 		}
@@ -1291,9 +1291,9 @@ void AnimateLara(ITEM_INFO* item)
 
 		if (Lara.waterStatus == LW_WADE && g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			velocity = (anim->velocity >> 1);
+			velocity = (anim->velocity / 2);
 			if (anim->acceleration)
-				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
+				velocity += ((anim->acceleration * (item->frameNumber - anim->frameBase)) / 4);
 		}
 		else
 		{
@@ -1302,7 +1302,7 @@ void AnimateLara(ITEM_INFO* item)
 				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
 		}
 
-		item->speed = velocity >> 16;
+		item->speed = velocity / 65536;
 	}
 
 	if (Lara.ropePtr != -1)
@@ -1310,11 +1310,11 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
-		item->pos.xPos += item->speed * phd_sin(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
-		item->pos.zPos += item->speed * phd_cos(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(item->pos.yRot + Lara.moveAngle);
+		item->pos.zPos += item->speed * phd_cos(item->pos.yRot + Lara.moveAngle);
 
-		item->pos.xPos += lateral * phd_sin(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
-		item->pos.zPos += lateral * phd_cos(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.xPos += lateral * phd_sin(item->pos.yRot + Lara.moveAngle + ANGLE(90));
+		item->pos.zPos += lateral * phd_cos(item->pos.yRot + Lara.moveAngle + ANGLE(90));
 	}
 
 	// Update matrices
