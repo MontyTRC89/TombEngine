@@ -545,16 +545,16 @@ bool SaveGame::readItem()
 
 	if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
 	{
-		if (item->triggerFlags == -1)
-			AlterFloorHeight(item, -255);
-		else if (item->triggerFlags == -3)
-			AlterFloorHeight(item, -1023);
-		else
-			AlterFloorHeight(item, -1024);
+		//if (item->triggerFlags == -1)
+		//	AlterFloorHeight(item, -255);
+		//else if (item->triggerFlags == -3)
+		//	AlterFloorHeight(item, -1023);
+		//else
+		//	AlterFloorHeight(item, -1024);
 	}
 
-	if (item->objectNumber == ID_RAISING_BLOCK2 && item->itemFlags[1])
-		AlterFloorHeight(item, -2048);
+	//if (item->objectNumber == ID_RAISING_BLOCK2 && item->itemFlags[1])
+	//	AlterFloorHeight(item, -2048);
 	   
 	return true;
 }
