@@ -18,7 +18,7 @@ OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 };
 
 PHD_VECTOR PushableBlockPos = { 0, 0, 0 };
-bool DoPushPull = 0;
+int DoPushPull = 0;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
@@ -27,35 +27,35 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	short height = g_Level.Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
 
-	floor = GetFloor(x + SECTOR(1), y, z, &roomNumber);
+	floor = GetFloor(x + 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x + SECTOR(1), y, z, roomNumber);
+			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x - SECTOR(1), y, z, &roomNumber);
+	floor = GetFloor(x - 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x - SECTOR(1), y, z, roomNumber);
+			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z + SECTOR(1), &roomNumber);
+	floor = GetFloor(x, y, z + 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z + SECTOR(1), roomNumber);
+			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z - SECTOR(1), &roomNumber);
+	floor = GetFloor(x, y, z - 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z - SECTOR(1), roomNumber);
+			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
 }
 
@@ -112,27 +112,27 @@ void PushableBlockControl(short itemNumber)
 
 		switch (quadrant)
 		{
-		case NORTH:
+		case 0:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
-			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos < z)
+			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
-		case EAST:
+		case 1:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
-			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos < x)
+			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
 				item->pos.xPos = x;
 			break;
 
-		case SOUTH:
+		case 2:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
-			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos > z)
+			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
-		case WEST:
+		case 3:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
-			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos > x)
+			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
@@ -144,7 +144,7 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				if (!TestBlockPush(item, CLICK(4), quadrant))
+				if (!TestBlockPush(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
 			}
 			else
@@ -163,13 +163,13 @@ void PushableBlockControl(short itemNumber)
 			if (DoPushPull)
 			{
 				SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, 2);
-				DoPushPull = false;
+				DoPushPull = 0;
 			}
 		}
 		else
 		{
 			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, 2);
-			DoPushPull = true;
+			DoPushPull = 1;
 		}
 
 		GetLaraJointPosition(&pos, LM_LHAND);
@@ -178,25 +178,25 @@ void PushableBlockControl(short itemNumber)
 		{
 		case NORTH:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
-			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos > z)
+			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
 		case EAST:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
-			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos > x)
+			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
 		case SOUTH:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
-			if (abs(item->pos.zPos - z) < SECTOR(1) / 2 && item->pos.zPos < z)
+			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
 		case WEST:
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
-			if (abs(item->pos.xPos - x) < SECTOR(1) / 2 && item->pos.xPos < x)
+			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
 				item->pos.xPos = x;
 			break;
 
@@ -208,7 +208,7 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				if (!TestBlockPull(item, CLICK(4), quadrant))
+				if (!TestBlockPull(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
 			}
 			else
@@ -229,8 +229,8 @@ void PushableBlockControl(short itemNumber)
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
 			roomNumber = item->roomNumber;
-			floor = GetFloor(item->pos.xPos, item->pos.yPos - CLICK(1), item->pos.zPos, &roomNumber);
-			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - CLICK(1), item->pos.zPos);
+			floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
 			TestTriggers(TriggerIndex, 1, item->flags & 0x3E00);
 			RemoveActiveItem(itemNumber);
 			item->status = ITEM_NOT_ACTIVE;
@@ -274,13 +274,13 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (!TestBlockPush(item, CLICK(4), quadrant))
+			if (!TestBlockPush(item, 1024, quadrant))
 				return;
 			l->goalAnimState = LS_PUSHABLE_PUSH;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (!TestBlockPull(item, CLICK(4), quadrant))
+			if (!TestBlockPull(item, 1024, quadrant))
 				return;
 			l->goalAnimState = LS_PUSHABLE_PULL;
 		}
@@ -318,7 +318,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 	{
 		short roomNumber = l->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - CLICK(1), item->pos.zPos, &roomNumber);
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 		if (roomNumber == item->roomNumber)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
@@ -391,14 +391,15 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 int TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
-	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
-	if (floor->floor == NO_HEIGHT / CLICK(1))
-		return true;
-	else if (floor->floor * CLICK(1) != item->pos.yPos - blokhite)
-		return false;
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	if (floor->floor == NO_HEIGHT / 256)
+		return 1;
 
-	return true;
+	if (floor->floor * 256 != item->pos.yPos - blokhite)
+		return 0;
+
+	return 1;
 }
 
 int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
@@ -411,38 +412,38 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		z += SECTOR(1);
+		z += 1024;
 		break;
 
 	case EAST:
-		x += SECTOR(1);
+		x += 1024;
 		break;
 
 	case SOUTH:
-		z -= SECTOR(1);
+		z -= 1024;
 		break;
 
 	case WEST:
-		x -= SECTOR(1);
+		x -= 1024;
 		break;
 	}
 
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
-		return false;
+		return 0;
 
-	if (GetFloorHeight(floor, x, y - CLICK(1), z) != y)
-		return false;
+	if (GetFloorHeight(floor, x, y - 256, z) != y)
+		return 0;
 
 	GetFloorHeight(floor, x, y, z);
 	if (HeightType)
-		return false;
+		return 0;
 
 	int ceiling = y - blockhite + 100;
 	floor = GetFloor(x, ceiling, z, &roomNum);
 	if (GetCeiling(floor, x, ceiling, z) > ceiling)
-		return false;
+		return 0;
 
 	int oldX = item->pos.xPos;
 	int oldZ = item->pos.zPos;
@@ -463,19 +464,19 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		zadd = -SECTOR(1);
+		zadd = -1024;
 		break;
 
 	case EAST:
-		xadd = -SECTOR(1);
+		xadd = -1024;
 		break;
 
 	case SOUTH:
-		zadd = SECTOR(1);
+		zadd = 1024;
 		break;
 
 	case WEST:
-		xadd = SECTOR(1);
+		xadd = 1024;
 		break;
 	}
 
@@ -487,13 +488,13 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
-		return false;
+		return 0;
 
-	if (GetFloorHeight(floor, x, y - CLICK(1), z) != y)
-		return false;
+	if (GetFloorHeight(floor, x, y - 256, z) != y)
+		return 0;
 
-	if (GetFloor(x, y - blockhite, z, &quadrant)->ceiling * CLICK(1) > y - blockhite)
-		return false;
+	if (GetFloor(x, y - blockhite, z, &quadrant)->ceiling * 256 > y - blockhite)
+		return 0;
 
 	int oldX = item->pos.xPos;
 	int oldZ = item->pos.zPos;
@@ -504,18 +505,18 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	item->pos.zPos = oldZ;
 
 	if (CollidedItems[0] != NULL)
-		return false;
+		return 0;
 
 	x += xadd;
 	z += zadd;
 	roomNum = item->roomNumber;
-	floor = GetFloor(x, y - CLICK(1), z, &roomNum);
+	floor = GetFloor(x, y - 256, z, &roomNum);
 
-	if (GetFloorHeight(floor, x, y - CLICK(1), z) != y)
-		return false;
+	if (GetFloorHeight(floor, x, y - 256, z) != y)
+		return 0;
 
-	if (GetFloor(x, y - 762, z, &roomNum)->ceiling * CLICK(1) > y - 762)
-		return false;
+	if (GetFloor(x, y - 762, z, &roomNum)->ceiling * 256 > y - 762)
+		return 0;
 
 	x = LaraItem->pos.xPos + xadd;
 	z = LaraItem->pos.zPos + zadd;
@@ -525,7 +526,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
-		return false;
+		return 0;
 
 	oldX = LaraItem->pos.xPos;
 	oldZ = LaraItem->pos.zPos;
