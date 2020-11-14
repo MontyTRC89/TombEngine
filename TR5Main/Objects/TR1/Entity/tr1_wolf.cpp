@@ -9,11 +9,47 @@
 
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 
+enum wolfStates {
+	STATE_EMPTY, 
+	STATE_STOP, 
+	STATE_WALK, 
+	STATE_RUN,
+	STATE_JUMP, 
+	STATE_STALK, 
+	STATE_ATTACK,
+	STATE_HOWL, 
+	STATE_SLEEP, 
+	STATE_CROUCH, 
+	STATE_FASTTURN, 
+	STATE_DEATH, 
+	STATE_BITE
+};
+
+#define TOUCH (0x774f)
+
+#define SLEEP_FRAME 96
+
+#define DIE_ANIM  20
+
+#define ATTACK_RANGE SQUARE(WALL_SIZE*3/2)
+#define STALK_RANGE  SQUARE(WALL_SIZE*3)
+
+#define BITE_DAMAGE   100
+#define LUNGE_DAMAGE 50
+
+#define WAKE_CHANCE  0x20
+#define SLEEP_CHANCE 0x20
+#define HOWL_CHANCE  0x180
+
+#define WALK_TURN  ANGLE(2)
+#define RUN_TURN   ANGLE(5)
+#define STALK_TURN ANGLE(2)
+
 void InitialiseWolf(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
-	item->frameNumber = 96;
+	item->frameNumber = SLEEP_FRAME;
 }
 
 void WolfControl(short itemNum)
@@ -21,25 +57,26 @@ void WolfControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
+	short head;
+	short angle;
+	short tilt;
+
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
+	head = angle = tilt = 0;
+	AI_INFO info;
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 11)
+		if (item->currentAnimState != STATE_DEATH)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (short)(GetRandomControl() / 11000);
+			item->animNumber = Objects[ID_WOLF].animIndex + DIE_ANIM + (short)(GetRandomControl() / 11000);
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 11;
+			item->currentAnimState = STATE_DEATH;
 		}
 	}
 	else
 	{
-		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
 		if (info.ahead)
@@ -52,128 +89,128 @@ void WolfControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-		case 8:
+		case STATE_SLEEP:
 			head = 0;
 
 			if (creature->mood == ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
 			{
-				item->requiredAnimState = 9;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_CROUCH;
+				item->goalAnimState = STATE_STOP;
 			}
-			else if (GetRandomControl() < 0x20)
+			else if (GetRandomControl() < WAKE_CHANCE)
 			{
-				item->requiredAnimState = 2;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_WALK;
+				item->goalAnimState = STATE_STOP;
 			}
 			break;
 
-		case 1:
+		case STATE_STOP:
 			if (item->requiredAnimState)
 				item->goalAnimState = item->requiredAnimState;
 			else
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_WALK;
 			break;
 
-		case 2:
-			creature->maximumTurn = ANGLE(2);
+		case STATE_WALK:
+			creature->maximumTurn = WALK_TURN;
 
 			if (creature->mood != BORED_MOOD)
 			{
-				item->goalAnimState = 5;
-				item->requiredAnimState = 0;
+				item->goalAnimState = STATE_STALK;
+				item->requiredAnimState = STATE_EMPTY;
 			}
-			else if (GetRandomControl() < 0x20)
+			else if (GetRandomControl() < SLEEP_CHANCE)
 			{
-				item->requiredAnimState = 8;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_SLEEP;
+				item->goalAnimState = STATE_STOP;
 			}
 			break;
 
-		case 9:
+		case STATE_CROUCH:
 			if (item->requiredAnimState)
 				item->goalAnimState = item->requiredAnimState;
 			else if (creature->mood == ESCAPE_MOOD)
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_RUN;
 			else if (info.distance < SQUARE(345) && info.bite)
-				item->goalAnimState = 12;
+				item->goalAnimState = STATE_BITE;
 			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = 5;
+				item->goalAnimState = STATE_STALK;
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_STOP;
 			else
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_RUN;
 			break;
 
-		case 5:
-			creature->maximumTurn = ANGLE(2);
+		case STATE_STALK:
+			creature->maximumTurn = STALK_TURN;
 
 			if (creature->mood == ESCAPE_MOOD)
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_RUN;
 			else if (info.distance < SQUARE(345) && info.bite)
-				item->goalAnimState = 12;
+				item->goalAnimState = STATE_BITE;
 			else if (info.distance > SQUARE(3072))
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_RUN;
 			else if (creature->mood == ATTACK_MOOD)
 			{
 				if (!info.ahead || info.distance > SQUARE(1536) ||
 					(info.enemyFacing < FRONT_ARC && info.enemyFacing > -FRONT_ARC))
-					item->goalAnimState = 3;
+					item->goalAnimState = STATE_RUN;
 			}
-			else if (GetRandomControl() < 0x180)
+			else if (GetRandomControl() < HOWL_CHANCE)
 			{
-				item->requiredAnimState = 7;
-				item->goalAnimState = 9;
+				item->requiredAnimState = STATE_HOWL;
+				item->goalAnimState = STATE_CROUCH;
 			}
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 9;
+				item->goalAnimState = STATE_CROUCH;
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(5);
+			creature->maximumTurn = RUN_TURN;
 			tilt = angle;
 
-			if (info.ahead && info.distance < SQUARE(1536))
+			if (info.ahead && info.distance < ATTACK_RANGE)
 			{
-				if (info.distance > (SQUARE(1536) / 2) &&
+				if (info.distance > (ATTACK_RANGE / 2) &&
 					(info.enemyFacing > FRONT_ARC || info.enemyFacing < -FRONT_ARC))
 				{
-					item->requiredAnimState = 5;
-					item->goalAnimState = 9;
+					item->requiredAnimState = STATE_STALK;
+					item->goalAnimState = STATE_CROUCH;
 				}
 				else
 				{
-					item->goalAnimState = 6;
-					item->requiredAnimState = 0;
+					item->goalAnimState = STATE_ATTACK;
+					item->requiredAnimState = STATE_EMPTY;
 				}
 			}
-			else if (creature->mood == STALK_MOOD && info.distance < SQUARE(3072))
+			else if (creature->mood == STALK_MOOD && info.distance < STALK_RANGE)
 			{
-				item->requiredAnimState = 5;
-				item->goalAnimState = 9;
+				item->requiredAnimState = STATE_STALK;
+				item->goalAnimState = STATE_CROUCH;
 			}
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 9;
+				item->goalAnimState = STATE_CROUCH;
 			break;
 
-		case 6:
+		case STATE_ATTACK:
 			tilt = angle;
-			if (!item->requiredAnimState && (item->touchBits & 0x774F))
+			if (!item->requiredAnimState && (item->touchBits & TOUCH))
 			{
 				CreatureEffect(item, &wolfBite, DoBloodSplat);
-				LaraItem->hitPoints -= 50;
+				LaraItem->hitPoints -= LUNGE_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = 3;
+				item->requiredAnimState = STATE_RUN;
 			}
-			item->goalAnimState = 3;
+			item->goalAnimState = STATE_RUN;
 			break;
 
 		case 12:
-			if (!item->requiredAnimState && (item->touchBits & 0x774F) && info.ahead)
+			if (!item->requiredAnimState && (item->touchBits & TOUCH) && info.ahead)
 			{
 				CreatureEffect(item, &wolfBite, DoBloodSplat);
-				LaraItem->hitPoints -= 100;
+				LaraItem->hitPoints -= BITE_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = 9;
+				item->requiredAnimState = STATE_CROUCH;
 			}
 			break;
 		}

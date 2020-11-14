@@ -144,6 +144,8 @@ void InitPushableObject(OBJECT_INFO* obj, int objectNumber)
 		obj->initialise = InitialisePushableBlock;
 		obj->control = PushableBlockControl;
 		obj->collision = PushableBlockCollision;
+		obj->floor = PushableBlockFloor;
+		obj->ceiling = PushableBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
