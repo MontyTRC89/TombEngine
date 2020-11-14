@@ -40,20 +40,20 @@ void ControlRaisingBlock(short itemNumber)
 			{
 				if (item->triggerFlags == -1)
 				{
-					AlterFloorHeight(item, -255);
+					//AlterFloorHeight(item, -255);
 				}
 				else if (item->triggerFlags == -3)
 				{
-					AlterFloorHeight(item, -1023);
+					//AlterFloorHeight(item, -1023);
 				}
 				else
 				{
-					AlterFloorHeight(item, -item->itemFlags[7]);
+					//AlterFloorHeight(item, -item->itemFlags[7]);
 				}
 			}
 			else
 			{
-				AlterFloorHeight(item, -item->itemFlags[7]);
+				//AlterFloorHeight(item, -item->itemFlags[7]);
 			}
 
 			item->itemFlags[2] = 1;
@@ -93,22 +93,22 @@ void ControlRaisingBlock(short itemNumber)
 			{
 				if (item->triggerFlags == -1)
 				{
-					AlterFloorHeight(item, 255);
+					//AlterFloorHeight(item, 255);
 					item->itemFlags[2] = 0;
 				}
 				else if (item->triggerFlags == -3)
 				{
-					AlterFloorHeight(item, 1023);
+					//AlterFloorHeight(item, 1023);
 					item->itemFlags[2] = 0;
 				}
 				else
 				{
-					AlterFloorHeight(item, item->itemFlags[7]);
+					//AlterFloorHeight(item, item->itemFlags[7]);
 				}
 			}
 			else
 			{
-				AlterFloorHeight(item, item->itemFlags[7]);
+				//AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
 			item->itemFlags[2] = 0;
@@ -133,4 +133,26 @@ void ControlRaisingBlock(short itemNumber)
 
 		item->itemFlags[1] -= 64;
 	}
+}
+
+std::tuple<std::optional<int>, bool> RaisingBlockFloor(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
+		return std::make_tuple(std::optional{height}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
+}
+
+std::tuple<std::optional<int>, bool> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	if (abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	{
+		auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
+		return std::make_tuple(std::optional{item.pos.yPos}, y > height && y < item.pos.yPos);
+	}
+	return std::make_tuple(std::nullopt, false);
 }
