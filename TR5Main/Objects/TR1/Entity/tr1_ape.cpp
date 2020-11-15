@@ -69,8 +69,8 @@ void ApeVault(short item_number, short angle)
 		ape->flags -= TURNR_FLAG;
 	}
 
-	xx = item->pos.zPos >> WALL_SHIFT;
-	yy = item->pos.xPos >> WALL_SHIFT;
+	xx = item->pos.zPos / SECTOR(1);
+	yy = item->pos.xPos / SECTOR(1);
 	y = item->pos.yPos;
 	room_number = item->roomNumber;
 
@@ -79,8 +79,8 @@ void ApeVault(short item_number, short angle)
 	if (item->pos.yPos > y - STEP_SIZE * 3 / 2)
 		return;
 
-	x_floor = item->pos.zPos >> WALL_SHIFT;
-	y_floor = item->pos.xPos >> WALL_SHIFT;
+	x_floor = item->pos.zPos / SECTOR(1);
+	y_floor = item->pos.xPos / SECTOR(1);
 	if (xx == x_floor)
 	{
 		if (yy == y_floor)
@@ -88,12 +88,12 @@ void ApeVault(short item_number, short angle)
 
 		if (yy < y_floor)
 		{
-			item->pos.xPos = (y_floor << WALL_SHIFT) - SHIFT;
+			item->pos.xPos = (y_floor * SECTOR(1)) - SHIFT;
 			item->pos.yRot = 0x4000;
 		}
 		else
 		{
-			item->pos.xPos = (yy << WALL_SHIFT) + SHIFT;
+			item->pos.xPos = (yy * SECTOR(1)) + SHIFT;
 			item->pos.yRot = -0x4000;
 		}
 	}
@@ -101,12 +101,12 @@ void ApeVault(short item_number, short angle)
 	{
 		if (xx < x_floor)
 		{
-			item->pos.zPos = (x_floor << WALL_SHIFT) - SHIFT;
+			item->pos.zPos = (x_floor * SECTOR(1)) - SHIFT;
 			item->pos.yRot = 0;
 		}
 		else
 		{
-			item->pos.zPos = (xx << WALL_SHIFT) + SHIFT;
+			item->pos.zPos = (xx * SECTOR(1)) + SHIFT;
 			item->pos.yRot = -0x8000;
 		}
 	}
@@ -115,7 +115,7 @@ void ApeVault(short item_number, short angle)
 		// diagonal
 	}
 
-	switch (CreatureVault(item_number, angle, 2, 75))
+	switch (CreatureVault(item_number, angle, 2, SHIFT))
 	{
 	case 2:
 //		creature->maximumTurn = 0;
