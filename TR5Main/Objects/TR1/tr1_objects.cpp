@@ -5,9 +5,10 @@
 #include "tr1_bear.h" // OK
 #include "tr1_doppelganger.h" // OK
 #include "tr1_natla.h" // OK
-#include "tr1_natla_mutant.h" // OK
+#include "tr1_giant_mutant.h" // OK
 #include "tr1_wolf.h" // OK
 #include "tr1_bigrat.h" // OK
+#include "tr1_centaur.h"
 /// objects
 
 /// traps
@@ -112,12 +113,12 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 2 * 4] |= (ROT_Z | ROT_X);
 	}
 
-	obj = &Objects[ID_WINGED_NATLA];
+	obj = &Objects[ID_GIANT_MUTANT];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = NatlaEvilControl;
+		obj->control = AbortionControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 500;
 		obj->radius = 341;
@@ -148,6 +149,22 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 	}
+
+	obj = &Objects[ID_CENTAUR_MUTANT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = CentaurControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 3;
+		obj->hitPoints = 120;
+		obj->pivotLength = 400;
+		obj->radius = WALL_SIZE / 3;
+		obj->intelligent = 1;
+		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
+		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y | ROT_X;
+	}
+
 }
 
 static void StartObject(OBJECT_INFO* obj)
