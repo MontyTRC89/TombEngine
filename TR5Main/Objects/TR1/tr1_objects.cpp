@@ -18,6 +18,7 @@
 #include "collide.h"
 #include "setup.h"
 #include "level.h"
+#include "object_helper.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {
@@ -164,7 +165,6 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y | ROT_X;
 	}
-
 }
 
 static void StartObject(OBJECT_INFO* obj)
@@ -183,10 +183,16 @@ static void StartTrap(OBJECT_INFO* obj)
 
 }
 
+static void StartProjectiles(OBJECT_INFO* obj)
+{
+	InitProjectile(obj, ControlCentaurBomb, ID_PROJ_BOMB);
+}
+
 static OBJECT_INFO* objToInit;
 void InitialiseTR1Objects()
 {
 	StartBaddy(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
+	StartProjectiles(objToInit);
 }
