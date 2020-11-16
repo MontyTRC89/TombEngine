@@ -7,6 +7,10 @@
 #include "sound.h"
 #include "tomb4fx.h"
 #include "tr1_centaur.h"
+#include "sphere.h"
+#include "lara_one_gun.h"
+#include "effect2.h"
+#include "draw.h"
 
 enum centaur_anims { 
 	CENTAUR_EMPTY, 
@@ -19,6 +23,8 @@ enum centaur_anims {
 
 BITE_INFO centaur_rocket = { 11, 415, 41, 13 };
 BITE_INFO centaur_rear = { 50, 30, 0, 5 };
+
+#define BOMB_SPEED		256
 
 #define CENTAUR_TOUCH 0x30199
 
@@ -34,31 +40,156 @@ BITE_INFO centaur_rear = { 50, 30, 0, 5 };
 
 #define CENTAUR_REAR_DAMAGE 200
 
-short RocketGun(long long x, long long y, long long z, short speed, short yrot, short room_number)
+void ControlCentaurBomb(short itemNumber)
 {
-	// MISSILE3
-	short fx_number;
-	FX_INFO *fx;
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	fx_number = CreateItem();
-	if (fx_number != NO_ITEM)
+	// Store old position for later
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
+	short roomNumber = item->roomNumber;
+
+	bool aboveWater = false;
+
+	// Update speed and check if above water
+	item->pos.zRot += ANGLE(35);
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER))
 	{
-		fx = &EffectList[fx_number];
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = 220;
-		fx->frameNumber = 0;
-//		fx->objectNumber = MISSILE3;
-		fx->objectNumber = ID_HARPOON; //whatever
-		fx->shade = 16 * 256;
-//		ShootAtLara(fx);
+		item->pos.xRot -= ANGLE(1);
+		if (item->pos.xRot < -16384)
+			item->pos.xRot = -16384;
+		item->fallspeed = -BOMB_SPEED * phd_sin(item->pos.xRot);
+		item->speed = BOMB_SPEED * phd_cos(item->pos.xRot);
+		aboveWater = true;
+	}
+	else
+	{
+		aboveWater = true;
+		item->fallspeed += 3;
+		if (item->speed)
+		{
+			item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
+			if (item->requiredAnimState)
+				item->pos.yRot += (((item->speed / 2) + 7) * ANGLE(1));
+			else
+				item->pos.xRot += (((item->speed / 2) + 7) * ANGLE(1));
+
+		}
 	}
 
-	return (fx_number);
+	// Update bomb's position
+	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
+	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+
+	roomNumber = item->roomNumber;
+	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+	// Check if bolt has hit a solid wall
+	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
+		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
+	{
+		// I have hit a solid wall
+		item->pos.xPos = oldX;
+		item->pos.yPos = oldY;
+		item->pos.zPos = oldZ;
+		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		{
+			TriggerUnderwaterExplosion(item, 0);
+		}
+		else
+		{
+			item->pos.yPos -= 128;
+			TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+
+			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
+			for (int x = 0; x < 2; x++)
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
+		}
+		return;
+	}
+
+	// Has harpoon changed room?
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	// If now in water and before in land, add a ripple
+	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
+	{
+		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+	}
+
+	int n = 0;
+	bool foundCollidedObjects = false;
+
+	// Found possible collided items and statics
+	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 0);
+
+	// If no collided items and meshes are found, then exit the loop
+	if (!CollidedItems[0] && !CollidedMeshes[0])
+		return;
+
+	foundCollidedObjects = true;
+
+	if (CollidedItems[0])
+	{
+		ITEM_INFO* currentItem = CollidedItems[0];
+
+		int k = 0;
+		do
+		{
+			OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+
+			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+			{
+				DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
+			}
+
+			// All other items (like puzzles) can't be hit
+
+			k++;
+			currentItem = CollidedItems[k];
+
+		} while (currentItem);
+	}
+}//shameless cut down copy of control harpoon bolt
+
+static void RocketGun(ITEM_INFO* v)
+{
+	short itemNum;
+	itemNum = CreateItem();
+	if (itemNum != NO_ITEM)
+	{
+		PHD_VECTOR pos;
+		ITEM_INFO* item;
+
+		item = &g_Level.Items[itemNum];
+
+		item->objectNumber = ID_PROJ_BOMB;
+		item->shade = 16 * 256;
+		item->roomNumber = v->roomNumber;
+
+		pos.x = 11;
+		pos.y = 415;
+		pos.z = 41;
+		GetJointAbsPosition(v, &pos, 13);
+
+		item->pos.xPos = pos.x;
+		item->pos.yPos = pos.y;
+		item->pos.zPos = pos.z;
+		InitialiseItem(itemNum);
+
+		item->pos.xRot = 0;
+		item->pos.yRot = v->pos.yRot;
+		item->pos.zRot = 0;
+
+		item->fallspeed = -BOMB_SPEED * phd_cos(item->pos.xRot);
+		item->speed = BOMB_SPEED *phd_cos(item->pos.xRot);
+		item->itemFlags[0] = 1;
+
+		AddActiveItem(itemNum);
+	}
 }
 
 void CentaurControl(short itemNum)
@@ -142,12 +273,7 @@ void CentaurControl(short itemNum)
 			if (!item->requiredAnimState)
 			{
 				item->requiredAnimState = CENTAUR_AIM;
-
-//				fx_number = CreatureEffect(item, &centaur_rocket, RocketGun);
-				fx_number = CreatureEffect(item, &centaur_rocket, RocketGun);
-				if (fx_number != NO_ITEM)
-					CreatureJoint(item, 17, EffectList[fx_number].pos.xRot);
-				/*shoot*/
+				RocketGun(item);
 			}
 			break;
 
