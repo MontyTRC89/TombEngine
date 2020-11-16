@@ -1,5 +1,4 @@
 #include "framework.h"
-#include "tr1_natla_mutant.h"
 #include "box.h"
 #include "effect2.h"
 #include "items.h"
@@ -9,6 +8,8 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
+
+// TORSO
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
@@ -29,7 +30,7 @@ enum abortion_anims {
 #define ABORT_TOUCH_DAMAGE 5
 #define ABORT_DIE_ANIM 13
 
-void NatlaEvilControl(short itemNum)
+void AbortionControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
