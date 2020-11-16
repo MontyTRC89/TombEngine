@@ -15,6 +15,26 @@ static short GetWeaponDamage(int weaponType)
 	return short(Weapons[weaponType].damage) * 25;
 }
 
+ITEM_INFO* findReference(ITEM_INFO* item, short objectNum)
+{
+	int itemNum;
+	bool found = false;
+
+	for (int i = 0; i < g_Level.NumItems; i++)
+	{
+		ITEM_INFO* itemz = &g_Level.Items[i];
+		if (itemz->objectNumber == objectNum && itemz->roomNumber == item->roomNumber)
+		{
+			itemNum = i;
+			found = true;
+		}
+	}
+	if (!found)
+		itemNum = NO_ITEM;
+
+	return (itemNum == NO_ITEM ? NULL : &g_Level.Items[itemNum]);
+}
+
 // original:
 void InitialiseDoppelganger(short itemNum)
 {
@@ -29,11 +49,9 @@ void DoppelgangerControl(short itemNum)
 	int h, lh;
 	int x, y, z;
 	short room_num;
-	short xRef, zRef;
-
-	ref = find_a_fucking_item(ID_BACON_REFERENCE);
 
 	item = &g_Level.Items[itemNum];
+
 
 	if (item->hitPoints < 1000)                   			// If Evil Lara being Injured
 	{                                                       // then take the hits off Lara instead...
@@ -41,32 +59,45 @@ void DoppelgangerControl(short itemNum)
 		item->hitPoints = 1000;
 	}
 
+	ref = findReference(item, ID_BACON_REFERENCE); // find reference point
+
 	if (item->data == NULL)
 	{
-		// TODO: fix evil lara moving.
+		if (ref == nullptr) // if no reference found, she doesn't move
+		{
+			x = item->pos.xPos;
+			y = LaraItem->pos.yPos;
+			z = item->pos.zPos;
+		}
+		else
+		{
+			x = 2 * ref->pos.xPos - LaraItem->pos.xPos;
+			y = LaraItem->pos.yPos;
+			z = 2 * ref->pos.zPos - LaraItem->pos.zPos;
+		}
+		// get bacon height
 		room_num = item->roomNumber;
-		xRef = ref->pos.xPos;
-		zRef = ref->pos.zPos;
-		x = 2 * ref->pos.xPos - LaraItem->pos.xPos;
-		y = LaraItem->pos.yPos;
-		z = 2 * ref->pos.zPos - LaraItem->pos.zPos;
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
 		item->floor = h;
+		// get lara height
 		room_num = LaraItem->roomNumber;
 		floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &room_num);
 		lh = GetFloorHeight(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		// animate bacon
 		item->frameNumber = LaraItem->frameNumber;
 		item->animNumber = LaraItem->animNumber;
+		// move bacon
 		item->pos.xPos = x;
 		item->pos.yPos = y;
 		item->pos.zPos = z;
 		item->pos.xRot = LaraItem->pos.xRot;
-		item->pos.yRot = LaraItem->pos.yRot - ANGLE(180);
+		item->pos.yRot = LaraItem->pos.yRot - ANGLE(180); // make sure she's facing Lara
 		item->pos.zRot = LaraItem->pos.zRot;
+
 		ItemNewRoom(itemNum, LaraItem->roomNumber);				// Follow Laras Room
 
-		if (h >= lh + WALL_SIZE && !LaraItem->gravityStatus)
+		if (h >= lh + WALL_SIZE + 1 && !LaraItem->gravityStatus) // added +1 to avoid bacon dying when exiting water rooms
 		{
 			item->goalAnimState = LS_FREEFALL;      	// Make Player Stop Immediately
 			item->currentAnimState = LS_FREEFALL;   	// and Skip directly into fastfall
