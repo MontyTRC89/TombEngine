@@ -671,11 +671,11 @@ namespace T5M::Renderer
 	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView)
 	{
 		// Avoid allocations, 1024 should be fine
-		RendererRoomNode nodes[256];
+		RendererRoomNode nodes[512];
 		int nextNode = 0;
 
 		// Avoid reallocations, 1024 should be fine
-		RendererRoomNode *stack[256];
+		RendererRoomNode *stack[512];
 		int stackDepth = 0;
 
 		RendererRoomNode *node = &nodes[nextNode++];
