@@ -201,6 +201,7 @@ void InitialiseSlot(short itemNum, short slot)
 			{
 				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // is more slow than the other underwater entity
 				creature->LOT.isAmphibious = true; // crocodile can walk and swim.
+				creature->LOT.zone = ZONE_FLYER;
 			}
 			else if (item->objectNumber == ID_BIG_RAT)
 			{
