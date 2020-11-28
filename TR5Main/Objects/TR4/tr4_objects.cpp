@@ -500,7 +500,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = CrocodileControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 36;
+		obj->hitPoints = 36; 
 		obj->pivotLength = 300;
 		obj->radius = 409;
 		obj->intelligent = true;
