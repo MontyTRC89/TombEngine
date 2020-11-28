@@ -1437,13 +1437,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
-		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 	else
 	{
-		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos + obj->pivotLength * phd_sin(item->pos.yRot);
-		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos + obj->pivotLength * phd_cos(item->pos.yRot);
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 
 	y = item->pos.yPos - enemy->pos.yPos;
