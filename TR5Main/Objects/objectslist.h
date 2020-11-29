@@ -88,7 +88,7 @@ typedef enum GAME_OBJECT_ID
 	ID_FISH_EMITTER,		// TR3 - 338 - OK - Needs testing and drawing
 	ID_RAT,					// TR2 - TR3 - OK
 	ID_BIG_RAT,				// TR1 - (Land And Water)
-	ID_CROCODILE,
+	ID_CROCODILE,			// TR4 - OK - We just need to fix land/water transition but it was bugged also in TR4
 	ID_BAT,
 	ID_SPHINX,
 	ID_WILD_BOAR,
