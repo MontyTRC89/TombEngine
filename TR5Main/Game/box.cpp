@@ -454,13 +454,13 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	old.y = item->pos.yPos;
 	old.z = item->pos.zPos;
 	
-	if (!Objects[item->objectNumber].waterCreature)
+	/*if (!Objects[item->objectNumber].waterCreature)
 	{
 		roomNumber = item->roomNumber;
 		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		if (roomNumber != item->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
-	}
+	}*/
 
 	AnimateItem(item);
 	if (item->status == ITEM_DEACTIVATED)
@@ -775,15 +775,17 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		item->pos.xRot = 0;
 	}
 
-	roomNumber = item->roomNumber;
+	/*roomNumber = item->roomNumber;
 	if (!Objects[item->objectNumber].waterCreature)
 	{
 		GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE*2, item->pos.zPos, &roomNumber);
 
 		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 			item->hitPoints = 0;
-	}
+	}*/
 
+	roomNumber = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE * 2, item->pos.zPos, &roomNumber);
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
