@@ -89,7 +89,7 @@ typedef enum GAME_OBJECT_ID
 	ID_RAT,					// TR2 - TR3 - OK
 	ID_BIG_RAT,				// TR1 - (Land And Water)
 	ID_CROCODILE,			// TR4 - OK - We just need to fix land/water transition but it was bugged also in TR4
-	ID_BAT,
+	ID_BAT,					// TR4 - OK
 	ID_SPHINX,
 	ID_WILD_BOAR,
 	ID_HARPY,
