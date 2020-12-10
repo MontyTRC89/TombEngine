@@ -9,6 +9,19 @@
 #include "lara.h"
 #include "sound.h"
 
+enum SPHIX_STATES {
+	SPHINX_EMPTY,
+	SPHINX_SLEEPING,
+	SPHINX_ALERTED,
+	SPHINX_WAKING_UP,
+	SPHINX_WALK,
+	SPHINX_RUN,
+	SPHINX_WALK_BACK,
+	SPHINX_HIT,
+	SPHINX_SHAKING,
+	SPHINX_STOP
+};
+
 BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 
 void InitialiseSphinx(short itemNumber)
@@ -19,8 +32,8 @@ void InitialiseSphinx(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 1;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = SPHINX_SLEEPING;
+	item->currentAnimState = SPHINX_SLEEPING;
 }
 
 void SphinxControl(short itemNumber)
@@ -51,7 +64,7 @@ void SphinxControl(short itemNumber)
 			if (((mesh->z / 1024) == (z / 1024)) && ((mesh->x / 1024) == (x / 1024)) && mesh->staticNumber >= 50)
 			{
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
+				SoundEffect(SFX_SMASH_ROCK, &item->pos, 0);
 
 				mesh->flags &= ~0x100;
 				floor->stopper = false;
@@ -88,59 +101,60 @@ void SphinxControl(short itemNumber)
 
 	short angle = CreatureTurn(item, creature->maximumTurn);
 
-	int dx = abs(item->itemFlags[2] - item->pos.xPos);
-	int dz = abs(item->itemFlags[3] - item->pos.zPos);
+	int dx = abs(item->itemFlags[2] - (short)item->pos.xPos);
+	int dz = abs(item->itemFlags[3] - (short)item->pos.zPos);
 
 	switch (item->currentAnimState)
 	{
-	case 1:
+	case SPHINX_SLEEPING:
 		creature->maximumTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->triggerFlags)
 		{
-			item->goalAnimState = 3;
+			item->goalAnimState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->goalAnimState = 2;
+			item->goalAnimState = SPHINX_ALERTED;
 		}
 
 		break;
 
-	case 2:
+	case SPHINX_ALERTED:
 		creature->maximumTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->triggerFlags)
 		{
-			item->goalAnimState = 3;
+			item->goalAnimState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = SPHINX_SLEEPING;
 		}
 
 		break;
 
-	case 4:
+	case SPHINX_WALK:
 		creature->maximumTurn = ANGLE(3);
-		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredAnimState == 5)
+
+		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredAnimState == SPHINX_RUN)
 		{
-			item->goalAnimState = 5;
+			item->goalAnimState = SPHINX_RUN;
 		}
-		else if (info.distance < SQUARE(2048) && item->goalAnimState != 5)
+		else if (info.distance < SQUARE(2048) && item->goalAnimState != SPHINX_RUN)
 		{
 			if (height2 <= item->pos.yPos + 256 && height2 >= item->pos.yPos - 256)
 			{
-				item->goalAnimState = 9;
-				item->requiredAnimState = 6;
+				item->goalAnimState = SPHINX_STOP;
+				item->requiredAnimState = SPHINX_WALK_BACK;
 			}
 		}
 
 		break;
 
-	case 5:
+	case SPHINX_RUN:
 		creature->maximumTurn = 60;
 
 		if (creature->flags == 0)
@@ -158,38 +172,35 @@ void SphinxControl(short itemNumber)
 				creature->flags = 1;
 			}
 		}
-		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[ID_SPHINX].animIndex)
+
+		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[item->objectNumber].animIndex)
 		{
 			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
 			{
-				item->goalAnimState = 9;
+				item->goalAnimState = SPHINX_STOP;
 			}
 		}
 		else
 		{
-			item->goalAnimState = 7;
-			item->requiredAnimState = 6;
+			item->goalAnimState = SPHINX_HIT;
+			item->requiredAnimState = SPHINX_WALK_BACK;
 			creature->maximumTurn = 0;
 		}
 
 		break;
 
-	case 6:
+	case SPHINX_WALK_BACK:
 		creature->maximumTurn = ANGLE(3);
 		if (info.distance > SQUARE(2048) || height2 > item->pos.yPos + 256 || height2 < item->pos.yPos - 256)
 		{
-			item->goalAnimState = 9;
-			item->requiredAnimState = 5;
+			item->goalAnimState = SPHINX_STOP;
+			item->requiredAnimState = SPHINX_RUN;
 		}
 
 		break;
 
-	case 7:
-		//v32 = item->roomNumber;
-		//v36 = (signed short)item->currentAnimState - 1;
-
+	case SPHINX_HIT:
 		roomNumber = item->roomNumber;
-
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
@@ -212,16 +223,16 @@ void SphinxControl(short itemNumber)
 
 		break;
 
-	case 9:
+	case SPHINX_STOP:
 		creature->flags = 0;
 
-		if (item->requiredAnimState == 6)
+		if (item->requiredAnimState == SPHINX_WALK_BACK)
 		{
-			item->goalAnimState = 6;
+			item->goalAnimState = SPHINX_WALK_BACK;
 		}
 		else
 		{
-			item->goalAnimState = 4;
+			item->goalAnimState = SPHINX_WALK;
 		}
 
 		break;
@@ -230,8 +241,8 @@ void SphinxControl(short itemNumber)
 		break;
 	}
 
-	item->itemFlags[2] = item->pos.xPos;
-	item->itemFlags[3] = item->pos.zPos;
+	item->itemFlags[2] = (short)item->pos.xPos;
+	item->itemFlags[3] = (short)item->pos.zPos;
 
 	CreatureAnimation(itemNumber, angle, 0);
 }

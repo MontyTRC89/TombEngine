@@ -860,6 +860,8 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	if (Camera.type != HEAVY_CAMERA)
 		RefreshCamera(triggerType, data);
 
+	short value = 0;
+
 	if (heavy)
 	{
 		switch (triggerType)
@@ -890,104 +892,104 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			return;
 		}
 	}
-
-	short value = 0;
-
-	switch (triggerType)
+	else
 	{
-	case TRIGGER_TYPES::SWITCH:
-		value = *(data++) & 0x3FF;
+		switch (triggerType)
+		{
+		case TRIGGER_TYPES::SWITCH:
+			value = *(data++) & 0x3FF;
 
-		if (flags & 0x100)
-			g_Level.Items[value].itemFlags[0] = 1;
+			if (flags & 0x100)
+				g_Level.Items[value].itemFlags[0] = 1;
 
-		if (!SwitchTrigger(value, timer))
+			if (!SwitchTrigger(value, timer))
+				return;
+
+			objectNumber = g_Level.Items[value].objectNumber;
+			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].triggerFlags == 5)
+				switchFlag = 1;
+
+			switchOff = (g_Level.Items[value].currentAnimState == 1);
+
+			break;
+
+		case TRIGGER_TYPES::MONKEY:
+			if (LaraItem->currentAnimState >= 75 &&
+				(LaraItem->currentAnimState <= 79 ||
+					LaraItem->currentAnimState == 82 ||
+					LaraItem->currentAnimState == 83))
+				break;
 			return;
 
-		objectNumber = g_Level.Items[value].objectNumber;
-		if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].triggerFlags == 5)
-			switchFlag = 1;
-
-		switchOff = (g_Level.Items[value].currentAnimState == 1);
-
-		break;
-
-	case TRIGGER_TYPES::MONKEY:
-		if (LaraItem->currentAnimState >= 75 &&
-			(LaraItem->currentAnimState <= 79 ||
-			 LaraItem->currentAnimState == 82 ||
-			 LaraItem->currentAnimState == 83))
-			break;
-		return;
-
-	case TRIGGER_TYPES::TIGHTROPE_T:
-		if (LaraItem->currentAnimState >= 119 &&
-			LaraItem->currentAnimState <= 127 &&
-			LaraItem->currentAnimState != 126)
-			break;
-		return;
-
-	case TRIGGER_TYPES::CRAWLDUCK_T:
-		if (LaraItem->currentAnimState == 80 ||
-			LaraItem->currentAnimState == 81 ||
-			LaraItem->currentAnimState == 84 ||
-			LaraItem->currentAnimState == 85 ||
-			LaraItem->currentAnimState == 86 ||
-			LaraItem->currentAnimState == 71 ||
-			LaraItem->currentAnimState == 72 ||
-			LaraItem->currentAnimState == 105 ||
-			LaraItem->currentAnimState == 106)
-			break;
-		return;
-
-	case TRIGGER_TYPES::CLIMB_T:
-		if (LaraItem->currentAnimState == 10 ||
-			LaraItem->currentAnimState == 56 ||
-			LaraItem->currentAnimState == 57 ||
-			LaraItem->currentAnimState == 58 ||
-			LaraItem->currentAnimState == 59 ||
-			LaraItem->currentAnimState == 60 ||
-			LaraItem->currentAnimState == 61 ||
-			LaraItem->currentAnimState == 75)
-			break;
-		return;
-
-	case TRIGGER_TYPES::PAD:
-	case TRIGGER_TYPES::ANTIPAD:
-		if (LaraItem->pos.yPos == LaraItem->floor)
-			break;
-		return;
-
-	case TRIGGER_TYPES::KEY:
-		value = *(data++) & 0x3FF;
-		keyResult = KeyTrigger(value);
-		if (keyResult != -1)
-			break;
-		return;
-
-	case TRIGGER_TYPES::PICKUP:
-		value = *(data++) & 0x3FF;
-		if (!PickupTrigger(value))
+		case TRIGGER_TYPES::TIGHTROPE_T:
+			if (LaraItem->currentAnimState >= 119 &&
+				LaraItem->currentAnimState <= 127 &&
+				LaraItem->currentAnimState != 126)
+				break;
 			return;
-		break;
 
-	case TRIGGER_TYPES::COMBAT:
-		if (Lara.gunStatus == LG_READY)
+		case TRIGGER_TYPES::CRAWLDUCK_T:
+			if (LaraItem->currentAnimState == 80 ||
+				LaraItem->currentAnimState == 81 ||
+				LaraItem->currentAnimState == 84 ||
+				LaraItem->currentAnimState == 85 ||
+				LaraItem->currentAnimState == 86 ||
+				LaraItem->currentAnimState == 71 ||
+				LaraItem->currentAnimState == 72 ||
+				LaraItem->currentAnimState == 105 ||
+				LaraItem->currentAnimState == 106)
+				break;
+			return;
+
+		case TRIGGER_TYPES::CLIMB_T:
+			if (LaraItem->currentAnimState == 10 ||
+				LaraItem->currentAnimState == 56 ||
+				LaraItem->currentAnimState == 57 ||
+				LaraItem->currentAnimState == 58 ||
+				LaraItem->currentAnimState == 59 ||
+				LaraItem->currentAnimState == 60 ||
+				LaraItem->currentAnimState == 61 ||
+				LaraItem->currentAnimState == 75)
+				break;
+			return;
+
+		case TRIGGER_TYPES::PAD:
+		case TRIGGER_TYPES::ANTIPAD:
+			if (LaraItem->pos.yPos == LaraItem->floor)
+				break;
+			return;
+
+		case TRIGGER_TYPES::KEY:
+			value = *(data++) & 0x3FF;
+			keyResult = KeyTrigger(value);
+			if (keyResult != -1)
+				break;
+			return;
+
+		case TRIGGER_TYPES::PICKUP:
+			value = *(data++) & 0x3FF;
+			if (!PickupTrigger(value))
+				return;
 			break;
-		return;
 
-	case TRIGGER_TYPES::SKELETON_T:
-		Lara.skelebob = 2;
-		break;
+		case TRIGGER_TYPES::COMBAT:
+			if (Lara.gunStatus == LG_READY)
+				break;
+			return;
 
-	case TRIGGER_TYPES::HEAVY:
-	case TRIGGER_TYPES::DUMMY:
-	case TRIGGER_TYPES::HEAVYSWITCH:
-	case TRIGGER_TYPES::HEAVYANTITRIGGER:
-		return;
+		case TRIGGER_TYPES::SKELETON_T:
+			Lara.skelebob = 2;
+			break;
 
-	default:
-		break;
+		case TRIGGER_TYPES::HEAVY:
+		case TRIGGER_TYPES::DUMMY:
+		case TRIGGER_TYPES::HEAVYSWITCH:
+		case TRIGGER_TYPES::HEAVYANTITRIGGER:
+			return;
+
+		default:
+			break;
+		}
 	}
 
 	short targetType = 0;
