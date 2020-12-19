@@ -3,7 +3,6 @@
 #include "items.h"
 #include "level.h"
 #include "control.h"
-#include "switch.h"
 #include "sound.h"
 #include "objectslist.h"
 

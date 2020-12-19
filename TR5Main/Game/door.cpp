@@ -7,7 +7,6 @@
 #include "inventory.h"
 #include "draw.h"
 #include "sphere.h"
-#include "switch.h"
 #include "misc.h"
 #include "box.h"
 #include "level.h"
