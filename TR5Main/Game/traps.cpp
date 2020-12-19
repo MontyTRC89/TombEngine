@@ -7,7 +7,6 @@
 #include "effect.h"
 #include "lara.h"
 #include "collide.h"
-#include "switch.h"
 #include "sphere.h"
 #include "camera.h"
 #include "tr5_light.h"

@@ -20,7 +20,6 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void SwitchControl(short itemNumber);
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags);
 int GetKeyTrigger(ITEM_INFO* item);
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch);
 int SwitchTrigger(short itemNum, short timer);

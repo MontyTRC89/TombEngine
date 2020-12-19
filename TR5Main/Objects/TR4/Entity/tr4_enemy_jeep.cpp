@@ -268,7 +268,7 @@ void EnemyJeepControl(short itemNumber)
 
 		if (creature->reachedGoal)
 		{
-			GetFloorAndTestTriggers(target->pos.xPos, target->pos.yPos, target->pos.zPos, target->roomNumber, 1, 0);
+			TestTriggersAtXYZ(target->pos.xPos, target->pos.yPos, target->pos.zPos, target->roomNumber, 1, 0);
 
 			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
 			{

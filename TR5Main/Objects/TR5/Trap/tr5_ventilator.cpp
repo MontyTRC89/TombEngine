@@ -3,7 +3,6 @@
 #include "draw.h"
 #include "level.h"
 #include "control.h"
-#include "switch.h"
 #include "lara.h"
 #include "camera.h"
 #include "effect2.h"

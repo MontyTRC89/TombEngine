@@ -4,9 +4,9 @@
 #include "control.h"
 #include "draw.h"
 #include "tomb4fx.h"
-#include "switch.h"
 #include "lara.h"
 #include "input.h"
+
 using namespace T5M::Renderer;
 int LastSequence;
 int SpotcamTimer;
