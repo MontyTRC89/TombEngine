@@ -1126,12 +1126,6 @@ void SwitchControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags) 
-{
-	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
-	TestTriggers(TriggerIndex, heavy, flags);
-}
-
 int GetKeyTrigger(ITEM_INFO* item) 
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);

@@ -2,7 +2,6 @@
 #include "tr5_pushableblock.h"
 #include "lara.h"
 #include "draw.h"
-
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
@@ -146,6 +145,12 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPush(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
+
+				int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				if (newRoomNumber != item->roomNumber)
+					ItemNewRoom(itemNumber, newRoomNumber);
+
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
 			}
 			else
 			{
@@ -210,6 +215,12 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPull(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
+
+				int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				if (newRoomNumber != item->roomNumber)
+					ItemNewRoom(itemNumber, newRoomNumber);
+
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
 			}
 			else
 			{
@@ -228,6 +239,10 @@ void PushableBlockControl(short itemNumber)
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
+			int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			if (newRoomNumber != item->roomNumber)
+				ItemNewRoom(itemNumber, newRoomNumber);
+
 			roomNumber = item->roomNumber;
 			floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
@@ -493,7 +508,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (GetFloorHeight(floor, x, y - 256, z) != y)
 		return 0;
 
-	if (GetFloor(x, y - blockhite, z, &quadrant)->ceiling * 256 > y - blockhite)
+	if (GetFloor(x, y - blockhite, z, &roomNum)->ceiling * 256 > y - blockhite)
 		return 0;
 
 	int oldX = item->pos.xPos;

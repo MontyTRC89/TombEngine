@@ -6,7 +6,6 @@
 #include "control.h"
 #include "misc.h"
 #include "Lara.h"
-#include "switch.h"
 #include "tomb4fx.h"
 using std::vector;
 BaboonRespawnClass BaboonRespawn;

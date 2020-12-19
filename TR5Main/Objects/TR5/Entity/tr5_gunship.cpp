@@ -7,7 +7,6 @@
 #include "camera.h"
 #include "effect2.h"
 #include "debris.h"
-#include "switch.h"
 #include "objects.h"
 #include "items.h"
 #include "effect.h"

@@ -198,7 +198,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 if (!item->triggerFlags)
                 {
                     item->meshBits = 48;                
-                    GetFloorAndTestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);       
+                    TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);       
                     item->itemFlags[0] = 1;
                     item->pos.yRot = oldRot;
                     
@@ -215,7 +215,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 }
                  
                 item->meshBits = 12;
-                GetFloorAndTestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+                TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
                 Lara.Pickups[0]--;
                 item->itemFlags[0] = 1;
                 
@@ -245,7 +245,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
         }
         else
         {
-            GetFloorAndTestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+            TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
             AddActiveItem(itemNumber);
             item->status = ITEM_ACTIVE;
             item->itemFlags[0] = 3;

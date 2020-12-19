@@ -5,7 +5,6 @@
 #include "lara_flare.h"
 #include "lara.h"
 #include "lara_fire.h"
-#include "switch.h"
 #include "draw.h"
 #include "items.h"
 #include "level.h"
