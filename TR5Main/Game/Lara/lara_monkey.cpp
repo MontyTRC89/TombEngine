@@ -54,7 +54,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
@@ -195,7 +195,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//16828, 1695C (F)
 		coll->badNeg = NO_HEIGHT;
 		coll->badCeiling = 0;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 		coll->enableSpaz = false;
 		coll->enableBaddiePush = false;
@@ -408,7 +408,7 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)//16C94(<), 16DC8(<) (
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = 0;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 		coll->facing = item->pos.yRot;
 		coll->radius = 100;
@@ -432,7 +432,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)//161EC(<), 16320(<) (F)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	coll->slopesAreWalls = 0;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
@@ -468,7 +468,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)//160CC(<), 16200(<) (F)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = NO_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	coll->slopesAreWalls = 0;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;

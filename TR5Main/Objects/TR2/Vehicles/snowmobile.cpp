@@ -307,7 +307,7 @@ bool SkidooCheckGetOff()
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 			LaraItem->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
-			Lara.moveAngle = skidoo->pos.yRot - LaraItem->pos.yRot;
+			Lara.moveAngle = skidoo->pos.yRot;
 			skidoo->flags |= ONESHOT; // skidoo is dead
 			skidoo->collidable = false;
 

@@ -628,7 +628,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = BAD_JUMP_CEILING;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
@@ -722,14 +722,13 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->slopesAreWalls = true;
 
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
-	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 
 	if (coll->midFloor < 0)
@@ -820,7 +819,7 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)//1B038, 1B16C (F)
 		LaraItem->speed = 100;
 		LaraItem->fallspeed = 40;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 	}
 }
 /*end deathslide*/

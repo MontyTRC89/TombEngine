@@ -295,18 +295,18 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	delta = 0;
 	flag = 0;
 	angle = Lara.moveAngle;
-	if (angle == -ANGLE(90))
+	if (angle == (short) (item->pos.yRot - ANGLE(90)))
 	{
 		delta = -100;
 	}
-	else if (angle == ANGLE(90))
+	else if (angle == (short) (item->pos.yRot + ANGLE(90)))
 	{
 		delta = 100;
 	}
-	hdif = LaraFloorFront(item, item->pos.yRot + angle, 100);
+	hdif = LaraFloorFront(item, angle, 100);
 	if (hdif < 200)
 		flag = 1;
-	cdif = LaraCeilingFront(item, item->pos.yRot + angle, 100, 0);
+	cdif = LaraCeilingFront(item, angle, 100, 0);
 	dir = GetQuadrant(item->pos.yRot);
 	switch (dir)
 	{
@@ -326,7 +326,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 	result = 0;
@@ -506,7 +506,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = 0;
+				Lara.moveAngle = oldYrot;
 				return result;
 			}
 		}
@@ -517,7 +517,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = 0;
+				Lara.moveAngle = oldYrot;
 				return result;
 			}
 		}
@@ -526,7 +526,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = oldYrot;
 
 	if (LaraFloorFront(item, oldYrot - ANGLE(90.0f), 116) < 0)
 		return 0;
@@ -567,14 +567,14 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.xPos = oldXpos;
 		item->pos.zPos = oldZpos;
 		item->pos.yRot = oldYrot;
-		Lara.moveAngle = 0;
+		Lara.moveAngle = oldYrot;
 		return result;
 	}
 
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = oldYrot;
 
 	if (!Lara.climbStatus)
 	{
@@ -661,7 +661,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = 0;
+				Lara.moveAngle = oldYrot;
 				return result;
 			}
 		}
@@ -672,7 +672,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = 0;
+				Lara.moveAngle = oldYrot;
 				return result;
 			}
 		}
@@ -681,7 +681,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = oldYrot;
 
 	if (LaraFloorFront(item, oldYrot + ANGLE(90.0f), 116) < 0)
 		return 0;
@@ -722,14 +722,14 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.xPos = oldXpos;
 		item->pos.zPos = oldZpos;
 		item->pos.yRot = oldYrot;
-		Lara.moveAngle = 0;
+		Lara.moveAngle = oldYrot;
 		return result;
 	}
 
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = oldYrot;
 
 	if (!Lara.climbStatus)
 	{
@@ -774,7 +774,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (LaraFloorFront(item, item->pos.yRot + Lara.moveAngle, 100) < 200)
+	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return 0;
 
 	short angle = GetQuadrant(item->pos.yRot);
@@ -800,7 +800,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	coll->badNeg = -512;
 	coll->badCeiling = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
@@ -876,10 +876,10 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 	bounds = GetBoundsAccurate(item);
 
-	if (Lara.moveAngle)
+	if (Lara.moveAngle != item->pos.yRot)
 	{
 		short l = LaraCeilingFront(item, item->pos.yRot, 0, 0);
-		short r = LaraCeilingFront(item, item->pos.yRot + Lara.moveAngle, 128, 0);
+		short r = LaraCeilingFront(item, Lara.moveAngle, 128, 0);
 
 		if (abs(l - r) > 60)
 			return 0;
@@ -1059,9 +1059,9 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	int z = item->pos.zPos;
 	int res;
 
-	Lara.moveAngle = angle;
+	Lara.moveAngle = item->pos.yRot + angle;
 
-	switch (GetQuadrant(item->pos.yRot + Lara.moveAngle))
+	switch (GetQuadrant(Lara.moveAngle))
 	{
 	case 0:
 		z += 16;
@@ -1087,7 +1087,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	item->pos.xPos = oldx;
 	item->pos.zPos = oldz;
 
-	Lara.moveAngle = angle;
+	Lara.moveAngle = item->pos.yRot + angle;
 
 	return !res;
 }

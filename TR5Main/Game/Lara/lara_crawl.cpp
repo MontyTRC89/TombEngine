@@ -86,7 +86,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)//147C4, 148CC (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->facing = item->pos.yRot;
 	coll->badPos = 384;
@@ -145,7 +145,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->facing = item->pos.yRot;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -345,7 +345,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 	if (item->goalAnimState != LS_CRAWL_TO_HANG)
 	{
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 		coll->facing = Lara.moveAngle;
 
 		coll->radius = 200;
@@ -549,7 +549,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)//1523C, 15370 (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->radius = 200;
 
@@ -699,7 +699,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
 
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	coll->facing = Lara.moveAngle;
 
@@ -727,7 +727,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 		if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
 			item->pos.yPos += coll->midFloor;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 	}
 }
 
@@ -763,7 +763,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->facing = item->pos.yRot;
 	coll->badPos = 384;
@@ -812,7 +812,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = BAD_JUMP_CEILING;
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 		coll->facing = Lara.moveAngle;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
