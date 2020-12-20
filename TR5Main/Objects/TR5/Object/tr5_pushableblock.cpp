@@ -145,12 +145,14 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPush(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
+				else
+				{
+					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+					if (newRoomNumber != item->roomNumber)
+						ItemNewRoom(itemNumber, newRoomNumber);
 
-				int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-				if (newRoomNumber != item->roomNumber)
-					ItemNewRoom(itemNumber, newRoomNumber);
-
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+				}
 			}
 			else
 			{
@@ -215,12 +217,14 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPull(item, 1024, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
+				else
+				{
+					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+					if (newRoomNumber != item->roomNumber)
+						ItemNewRoom(itemNumber, newRoomNumber);
 
-				int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-				if (newRoomNumber != item->roomNumber)
-					ItemNewRoom(itemNumber, newRoomNumber);
-
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+				}
 			}
 			else
 			{
@@ -468,7 +472,14 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
-	return CollidedItems[0] == NULL;
+	int i = 0;
+	while (CollidedItems[i] != NULL)
+	{
+		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
+			return 0;
+		i++;
+	}
+	return 1;
 }
 
 int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
@@ -519,8 +530,13 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
-	if (CollidedItems[0] != NULL)
-		return 0;
+	int i = 0;
+	while (CollidedItems[i] != NULL)
+	{
+		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
+			return 0;
+		i++;
+	}
 
 	x += xadd;
 	z += zadd;
@@ -551,7 +567,14 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	LaraItem->pos.xPos = oldX;
 	LaraItem->pos.zPos = oldZ;
 
-	return (CollidedItems[0] == NULL);
+	i = 0;
+	while (CollidedItems[i] != NULL)
+	{
+		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
+			return 0;
+		i++;
+	}
+	return 1;
 }
 
 std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
