@@ -73,7 +73,6 @@ struct COLL_INFO
 	short oldFrameNumber;
 	short facing;
 	short quadrant;
-	short octant;
 	short collType; // CT_enum
 	short* trigger;
 	signed char tiltX;
@@ -131,7 +130,6 @@ void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
-int GetOctant(short angle);
 void RotateBoundingBox(std::array<float, 4>& box, short angle);
 // New function for rotating item along XZ slopes.
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
