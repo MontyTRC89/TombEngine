@@ -1083,8 +1083,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * phd_sin(item->pos.yRot + Lara.moveAngle) / 4;
-	item->pos.zPos += item->fallspeed * phd_cos(item->pos.yRot + Lara.moveAngle) / 4;
+	item->pos.xPos += item->fallspeed * phd_sin(Lara.moveAngle) / 4;
+	item->pos.zPos += item->fallspeed * phd_cos(Lara.moveAngle) / 4;
 
 	LaraBaddieCollision(item, coll);
 
@@ -1310,11 +1310,11 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
-		item->pos.xPos += item->speed * phd_sin(item->pos.yRot + Lara.moveAngle);
-		item->pos.zPos += item->speed * phd_cos(item->pos.yRot + Lara.moveAngle);
+		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle);
+		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle);
 
-		item->pos.xPos += lateral * phd_sin(item->pos.yRot + Lara.moveAngle + ANGLE(90));
-		item->pos.zPos += lateral * phd_cos(item->pos.yRot + Lara.moveAngle + ANGLE(90));
+		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
+		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
 	}
 
 	// Update matrices

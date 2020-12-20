@@ -21,7 +21,7 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)//19928(<), 19A5C(<) (F)
 
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)//1C80C(<), 1C940(<) (F)
 {
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -121,7 +121,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)//1B3E8, 1B51C (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -287,7 +287,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)//1B64C, 1B780 (F)
 {
 	/*state 1*/
 	/*state code: lara_col_run*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -472,7 +472,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!wade)
 			{
-				Lara.moveAngle = 0;
+				Lara.moveAngle = item->pos.yRot;
 				coll->badPos = NO_BAD_POS;
 				coll->badNeg = -STEPUP_HEIGHT;
 				coll->badCeiling = 0;
@@ -535,7 +535,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	/*state 2*/
 	/*state code: lara_as_stop*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -614,9 +614,9 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
 	/*state 3*/
 	/*state code: lara_as_forwardjump*/
 	if (item->speed < 0)
-		Lara.moveAngle = ANGLE(180);
+		Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	else
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -627,7 +627,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 	if (coll->midFloor <= 0 && item->fallspeed > 0)
 	{
@@ -694,7 +694,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)//1B89C, 1B9D0 (F)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	coll->slopesAreWalls = 0;
 	coll->slopesArePits = true;
@@ -786,7 +786,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	/*state code: lara_as_turn_r*/
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -903,7 +903,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)//1BADC(<), 1BC10(<) (F)
 	/*state code: lara_as_death*/
 	StopSoundEffect(SFX_LARA_FALL);
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -983,7 +983,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 	if (Lara.ropePtr == -1)
 		item->gravityStatus = true;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = 0;
@@ -1148,7 +1148,7 @@ void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)//1A340(<), 1A474(<) (F)
 
 void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)//1BC74(<), 1BDA8(<) (F)
 {
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->slopesAreWalls = true;
 	coll->slopesArePits = true;
@@ -1181,22 +1181,22 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
-			Lara.moveAngle = 0;
+			Lara.moveAngle = item->pos.yRot;
 		}
 		else if (TrInput & IN_LEFT && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_LEFT;
-			Lara.moveAngle = -ANGLE(90);
+			Lara.moveAngle = item->pos.yRot - ANGLE(90);
 		}
 		else if (TrInput & IN_RIGHT && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_RIGHT;
-			Lara.moveAngle = ANGLE(90);
+			Lara.moveAngle = item->pos.yRot + ANGLE(90);
 		}
 		else if (TrInput & IN_BACK && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
-			Lara.moveAngle = ANGLE(180);
+			Lara.moveAngle = item->pos.yRot + ANGLE(180);
 		}
 	}
 
@@ -1279,7 +1279,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	/*state code: lara_as_back*/
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	if (Lara.waterStatus == LW_WADE)
 		coll->badPos = NO_BAD_POS;
@@ -1393,9 +1393,9 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)//1BFB0, 1C0E4 (F)
 	/*state 21*/
 	/*state code: lara_as_stepright*/
 	if (item->currentAnimState == LS_STEP_RIGHT)
-		Lara.moveAngle = ANGLE(90);
+		Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	else
-		Lara.moveAngle = -ANGLE(90);
+		Lara.moveAngle = item->pos.yRot - ANGLE(90);
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -1470,7 +1470,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)//1C384, 1C4B8 (F)
 	/*state 23*/
 	/*state code: lara_void_func*/
 	Camera.laraNode = 0;
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1531,7 +1531,7 @@ void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)//1C130(<), 1C264(<) (F)
 {
 	/*state 25*/
 	/*state code: lara_as_backjump*/
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	lara_col_jumper(item, coll);
 }
 
@@ -1550,7 +1550,7 @@ void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1C15C(<), 1C290(<) (F
 {
 	/*state 26*/
 	/*state code: lara_as_rightjump*/
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
@@ -1569,7 +1569,7 @@ void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)//1C188(<), 1C2BC(<) (F)
 {
 	/*state 27*/
 	/*state code: lara_as_leftjump*/
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
@@ -1620,7 +1620,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		return;
 	}
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1790,7 +1790,7 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
 {
 	/*state 29*/
 	/*state code: lara_as_fallback*/
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1819,7 +1819,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 {
 	/*state 45*/
 	/*state code: lara_void_func*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1865,7 +1865,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 {
 	/*state 52*/
 	/*state code: lara_as_swandive*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1901,7 +1901,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1C558(<), 1C68C(<) (F)
 {
 	/*state 53*/
 	/*state code: lara_as_fastdive*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -2027,7 +2027,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 65*/
 	/*state code: lara_as_wade*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -2147,7 +2147,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)//15C50, 15D84 (F)
 {
 	/*state 73*/
 	/*state code: lara_as_dash*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -2221,9 +2221,9 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E5C, 15F90 (F)
 	/*state 74*/
 	/*state code: lara_as_dashdive*/
 	if (item->speed < 0)
-		Lara.moveAngle = ANGLE(180);
+		Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	else
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -256;
@@ -2238,7 +2238,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E5C, 15F90 (F)
 	if (!LaraFallen(item, coll))
 	{
 		if (item->speed < 0)
-			Lara.moveAngle = 0;
+			Lara.moveAngle = item->pos.yRot;
 
 		if (coll->midFloor <= 0 && item->fallspeed > 0)
 		{

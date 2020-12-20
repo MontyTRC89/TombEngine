@@ -1061,7 +1061,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->shift.x = 0;
 	coll->shift.y = 0;
 	coll->shift.z = 0;
-	coll->facing = LaraItem->pos.yRot;
 	coll->quadrant = GetQuadrant(coll->facing);
 	coll->octant = GetOctant(coll->facing);
 
