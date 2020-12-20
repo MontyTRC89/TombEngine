@@ -513,12 +513,12 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 
 	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
-		Lara.moveAngle = ANGLE(180);
+		Lara.moveAngle = item->pos.yRot + ANGLE(180);
 		coll->facing = item->pos.yRot - ANGLE(180);
 	}
 	else
 	{
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 		coll->facing = item->pos.yRot;
 	}
 

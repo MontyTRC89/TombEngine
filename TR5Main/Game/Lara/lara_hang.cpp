@@ -82,7 +82,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 		}
 	}
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	LaraHangTest(item, coll);
 
@@ -190,10 +190,10 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -212,10 +212,10 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	/*state 31*/
 	/*state code: lara_as_hangright*/
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
 
 /*go around corners*/
@@ -298,7 +298,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 
 	LaraHangTest(item, coll);
 
@@ -411,7 +411,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 					}*///commenting till daniel makes anims
 
-		Lara.moveAngle = 0;
+		Lara.moveAngle = item->pos.yRot;
 		LaraHangTest(item, coll);
 	}
 }
@@ -433,10 +433,10 @@ void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 140*/
 	/*state code: lara_as_hang_feet_shimmyr*/
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
-	Lara.moveAngle = ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
 
 void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
@@ -455,10 +455,10 @@ void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 141*/
 	/*state code: lara_as_hang_feet_shimmyl*/
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
-	Lara.moveAngle = -ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
 
 /*go around corners feet*/

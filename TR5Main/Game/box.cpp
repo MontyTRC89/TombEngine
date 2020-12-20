@@ -1439,8 +1439,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
-		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(LaraItem->pos.yRot + Lara.moveAngle) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
+		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.moveAngle) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.moveAngle) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 	else
 	{

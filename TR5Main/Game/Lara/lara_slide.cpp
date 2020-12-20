@@ -39,7 +39,6 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->currentAnimState = LS_SLIDE_BACK;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->pos.yRot = angle + ANGLE(180.0f);
-		Lara.moveAngle = ANGLE(180);
 	}
 	else
 	{
@@ -51,9 +50,9 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->currentAnimState = LS_SLIDE_FORWARD;
 		item->pos.yRot = angle;
-		Lara.moveAngle = 0;
 	}
 
+	Lara.moveAngle = angle;
 	OldAngle = angle;
 
 	return 1;
@@ -166,7 +165,7 @@ void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
 {
 	/*state 24*/
 	/*state code: lara_as_slide*/
-	Lara.moveAngle = 0;
+	Lara.moveAngle = item->pos.yRot;
 	lara_slide_slope(item, coll);
 }
 
@@ -184,7 +183,7 @@ void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F
 {
 	/*state 32*/
 	/*state code: lara_as_slideback*/
-	Lara.moveAngle = ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	lara_slide_slope(item, coll);
 }
 /*end Lara state code*/
