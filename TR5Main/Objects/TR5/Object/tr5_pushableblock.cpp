@@ -560,7 +560,7 @@ std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x,
 	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
 	{
 		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
-		return std::make_tuple(std::optional{height}, y > height && y < item.pos.yPos);
+		return std::make_tuple(std::optional{height}, y > height && y <= item.pos.yPos);
 	}
 	return std::make_tuple(std::nullopt, false);
 }
@@ -571,7 +571,7 @@ std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int 
 	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
 	{
 		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
-		return std::make_tuple(std::optional{item.pos.yPos}, y > height && y < item.pos.yPos);
+		return std::make_tuple(std::optional{item.pos.yPos}, y >= height && y < item.pos.yPos);
 	}
 	return std::make_tuple(std::nullopt, false);
 }

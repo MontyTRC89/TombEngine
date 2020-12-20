@@ -314,16 +314,22 @@ namespace T5M::Floordata
 
 		if (!floor.IsWall(x, z))
 		{
-			auto height = floor.FloorHeight(x, z);
+			auto floorHeight = floor.FloorHeight(x, z);
+			auto height = floorHeight;
+
 			if (!raw)
 			{
+				if (y > height)
+					y = height;
+
 				auto list = std::vector<int>{};
 				GetRoomList(roomNumber, x, z, list);
 
-				for (const auto stackNumber : list)
+				auto it = list.begin();
+				while (it != list.end())
 				{
-					auto done = false;
-					for (auto itemNumber = g_Level.Rooms[stackNumber].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
+					auto reset = false;
+					for (auto itemNumber = g_Level.Rooms[*it].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 					{
 						const auto& item = g_Level.Items[itemNumber];
 						if (Objects[item.objectNumber].floor)
@@ -333,8 +339,8 @@ namespace T5M::Floordata
 							{
 								if (inside)
 								{
-									height = *itemHeight;
-									done = true;
+									y = *itemHeight;
+									reset = true;
 									break;
 								}
 								if (*itemHeight >= y && *itemHeight < height)
@@ -343,8 +349,15 @@ namespace T5M::Floordata
 						}
 					}
 
-					if (done)
-						break;
+					if (reset)
+					{
+						height = floorHeight;
+						it = list.begin();
+					}
+					else
+					{
+						++it;
+					}
 				}
 			}
 
@@ -360,16 +373,22 @@ namespace T5M::Floordata
 
 		if (!floor.IsWall(x, z))
 		{
-			auto height = floor.CeilingHeight(x, z);
+			auto ceilingHeight = floor.CeilingHeight(x, z);
+			auto height = ceilingHeight;
+
 			if (!raw)
 			{
+				if (y < height)
+					y = height;
+
 				auto list = std::vector<int>{};
 				GetRoomList(roomNumber, x, z, list);
 
-				for (const auto stackNumber : list)
+				auto it = list.begin();
+				while (it != list.end())
 				{
-					auto done = false;
-					for (auto itemNumber = g_Level.Rooms[stackNumber].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
+					auto reset = false;
+					for (auto itemNumber = g_Level.Rooms[*it].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 					{
 						const auto& item = g_Level.Items[itemNumber];
 						if (Objects[item.objectNumber].ceiling)
@@ -379,8 +398,8 @@ namespace T5M::Floordata
 							{
 								if (inside)
 								{
-									height = *itemHeight;
-									done = true;
+									y = *itemHeight;
+									reset = true;
 									break;
 								}
 								if (*itemHeight <= y && *itemHeight > height)
@@ -389,8 +408,15 @@ namespace T5M::Floordata
 						}
 					}
 
-					if (done)
-						break;
+					if (reset)
+					{
+						height = ceilingHeight;
+						it = list.begin();
+					}
+					else
+					{
+						++it;
+					}
 				}
 			}
 
