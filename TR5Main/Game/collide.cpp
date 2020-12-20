@@ -1062,7 +1062,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->shift.y = 0;
 	coll->shift.z = 0;
 	coll->quadrant = GetQuadrant(coll->facing);
-	coll->octant = GetOctant(coll->facing);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
@@ -1093,10 +1092,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	int xright, xleft, zright, zleft;
 
-	/*switch (coll->quadrant)
+	switch (coll->quadrant)
 	{
 	case 0:
-		XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		XFront = phd_sin(coll->facing) * coll->radius;
 		ZFront = coll->radius;
 		xleft = -(coll->radius);
 		zleft = coll->radius;
@@ -1106,7 +1105,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	case 1:
 		XFront = coll->radius;
-		ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		ZFront = phd_cos(coll->facing) * coll->radius;
 		xleft = coll->radius;
 		zleft = coll->radius;
 		xright = coll->radius;
@@ -1114,7 +1113,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 
 	case 2:
-		XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		XFront = phd_sin(coll->facing) * coll->radius;
 		ZFront = -coll->radius;
 		xleft = coll->radius;
 		zleft = -(coll->radius);
@@ -1124,7 +1123,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	case 3:
 		XFront = -(coll->radius);
-		ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		ZFront = phd_cos(coll->facing) * coll->radius;
 		xleft = -(coll->radius);
 		zleft = -(coll->radius);
 		xright = -(coll->radius);
@@ -1136,14 +1135,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		xright = zright = 0;
 		XFront = ZFront = 0;
 		break;
-	}*/
+	}
 
-	XFront = phd_sin(coll->facing) * coll->radius;
-	ZFront = phd_cos(coll->facing) * coll->radius;
-	xleft = -ZFront;
-	zleft = XFront;
-	xright = ZFront;
-	zright = -XFront;
+	//XFront = phd_sin(coll->facing) * coll->radius;
+	//ZFront = phd_cos(coll->facing) * coll->radius;
+	//xleft = -ZFront;
+	//zleft = XFront;
+	//xright = ZFront;
+	//zright = -XFront;
 
 	x = XFront + xPos;
 	z = ZFront + zPos;
@@ -1707,11 +1706,6 @@ bool SnapToDiagonal(short& angle, int interval)
 		return true;
 	}
 	return false;
-}
-
-int GetOctant(short angle)
-{
-	return (unsigned short) (angle + ANGLE(22.5)) / ANGLE(45);
 }
 
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot)
