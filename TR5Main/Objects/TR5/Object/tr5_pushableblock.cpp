@@ -63,7 +63,7 @@ void InitialisePushableBlock(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-
+	item->itemFlags[1] = NO_ITEM; // used for linking pushables together in stack
 	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
 	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 }
@@ -71,7 +71,7 @@ void InitialisePushableBlock(short itemNum)
 void PushableBlockControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
+	
 	PHD_VECTOR pos;
 	pos.x = 0;
 	pos.y = 0;
@@ -84,6 +84,7 @@ void PushableBlockControl(short itemNumber)
 	ROOM_INFO* r;
 	int height;
 	short roomNumber;
+	int stackIndex; // used for moving pushables in stack
 
 	switch (LaraItem->animNumber)
 	{
@@ -121,6 +122,7 @@ void PushableBlockControl(short itemNumber)
 			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
 			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
 				item->pos.xPos = x;
+			
 			break;
 
 		case 2:
@@ -137,6 +139,38 @@ void PushableBlockControl(short itemNumber)
 
 		default:
 			break;
+		}
+
+		stackIndex = item->itemFlags[1];
+		while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
+		{
+			auto stackItem = &g_Level.Items[stackIndex];
+			stackItem->pos.xPos = item->pos.xPos;
+			stackItem->pos.zPos = item->pos.zPos;
+
+			stackIndex = stackItem->itemFlags[1];
+		}
+
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+		{
+			// unlink pushable from stack if linked
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if (i == itemNumber)
+					continue;
+
+				auto belowItem = &g_Level.Items[i];
+
+				int objectNum = belowItem->objectNumber;
+				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+				{
+					if (belowItem->itemFlags[1] == itemNumber)
+					{
+						belowItem->itemFlags[1] = NO_ITEM;
+						printf("Unlinked pushable! belowItem.itemFlags[1]: %d\n", belowItem->itemFlags[1]);
+					}
+				}
+			}
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
@@ -211,6 +245,39 @@ void PushableBlockControl(short itemNumber)
 			break;
 		}
 
+		stackIndex = item->itemFlags[1];
+		while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
+		{
+			auto stackItem = &g_Level.Items[stackIndex];
+			stackItem->pos.xPos = item->pos.xPos;
+			stackItem->pos.zPos = item->pos.zPos;
+
+			stackIndex = stackItem->itemFlags[1];
+		}
+
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+		{
+			// unlink pushable from stack if linked
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if (i == itemNumber)
+					continue;
+
+				auto belowItem = &g_Level.Items[i];
+
+				int objectNum = belowItem->objectNumber;
+				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+				{
+					if (belowItem->itemFlags[1] == itemNumber)
+					{
+						belowItem->itemFlags[1] = NO_ITEM;
+						printf("Unlinked pushable! belowItem.itemFlags[1]: %d\n", belowItem->itemFlags[1]);
+					}
+
+				}
+			}
+		}
+
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
 		{
 			if (TrInput & IN_ACTION)
@@ -239,6 +306,16 @@ void PushableBlockControl(short itemNumber)
 		{
 			item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 			item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
+
+			stackIndex = item->itemFlags[1];
+			while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
+			{
+				auto stackItem = &g_Level.Items[stackIndex];
+				stackItem->pos.xPos = item->pos.xPos;
+				stackItem->pos.zPos = item->pos.zPos;
+
+				stackIndex = stackItem->itemFlags[1];
+			}
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
@@ -258,6 +335,44 @@ void PushableBlockControl(short itemNumber)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+			}
+
+			int stackTop = -1; // index of heighest (yPos) pushable in stack
+			int stackYmin = CLICK(256); // set starting height
+
+			//Check for pushable directly below current one in same sector
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if (i == itemNumber)
+					continue;
+				
+				auto belowItem = &g_Level.Items[i];
+
+				int objectNum = belowItem->objectNumber;
+				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+				{
+					int x = item->pos.xPos;
+					int y = item->pos.yPos;
+					int z = item->pos.zPos;
+
+					if (belowItem->pos.xPos == x && belowItem->pos.zPos == z)
+					{
+						int belowY = belowItem->pos.yPos;
+						if (belowY > y && belowY < stackYmin)
+						{
+							// set heighest pushable so far as top of stack
+							stackTop = i;
+							stackYmin = belowItem->pos.yPos;
+						}
+					}
+				}
+			}
+
+			// if top pushable in stack was located, link index of current pushable to below pushable via itemFlags[1]
+			if (stackTop >= 0)
+			{
+				g_Level.Items[stackTop].itemFlags[1] = itemNumber;
+				printf("Pushable index: %d\nStack top: %d\nstackTop.itemFlags[1]: %d\n", itemNumber, stackTop, g_Level.Items[stackTop].itemFlags[1]);
 			}
 		}
 		break;
