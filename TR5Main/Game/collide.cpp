@@ -673,7 +673,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		coll->old.y = l->pos.yPos;
 		coll->old.z = l->pos.zPos;
 
-		UpdateLaraRoom(l, -10);
+		//UpdateLaraRoom(l, 0);
 	}
 	else
 	{
