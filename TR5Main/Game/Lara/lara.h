@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "lara_struct.h"
 
 #define FRONT_ARC ANGLE(90.0f)
