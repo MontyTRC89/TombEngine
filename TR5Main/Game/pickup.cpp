@@ -1087,7 +1087,7 @@ void InitialiseSearchObject(short itemNumber)
         {
             item2 = &g_Level.Items[itemNumber2];
 
-            if (item2->objectNumber == 149) /* @FIXME In TRC OBJECTS.H this is the EXPLOSION slot */
+            if (item2->objectNumber == ID_EXPLOSION)
             {
                 if (item->pos.xPos == item2->pos.xPos && item->pos.yPos == item2->pos.yPos && item->pos.zPos == item2->pos.zPos)
                 {
