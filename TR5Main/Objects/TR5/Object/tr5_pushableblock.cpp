@@ -84,7 +84,25 @@ void PushableBlockControl(short itemNumber)
 	ROOM_INFO* r;
 	int height;
 	short roomNumber;
-	int stackIndex; // used for moving pushables in stack
+
+	int stackIndex; // used for stacked pushables
+	
+	int blockHeight = 1024;
+	if (item->triggerFlags > 64)
+		blockHeight = CLICK(item->triggerFlags - 64);
+
+	// get total height of stack
+	stackIndex = item->itemFlags[1];
+	while (stackIndex != NO_ITEM)
+	{
+		auto stackItem = &g_Level.Items[stackIndex];
+		if (stackItem->triggerFlags > 64)
+			blockHeight += CLICK(item->triggerFlags - 64);
+		else
+			blockHeight += 1024;
+
+		stackIndex = stackItem->itemFlags[1];
+	}
 
 	switch (LaraItem->animNumber)
 	{
@@ -165,10 +183,7 @@ void PushableBlockControl(short itemNumber)
 				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
 				{
 					if (belowItem->itemFlags[1] == itemNumber)
-					{
 						belowItem->itemFlags[1] = NO_ITEM;
-						printf("Unlinked pushable! belowItem.itemFlags[1]: %d\n", belowItem->itemFlags[1]);
-					}
 				}
 			}
 		}
@@ -177,7 +192,7 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				if (!TestBlockPush(item, 1024, quadrant))
+				if (!TestBlockPush(item, blockHeight, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
@@ -269,10 +284,7 @@ void PushableBlockControl(short itemNumber)
 				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
 				{
 					if (belowItem->itemFlags[1] == itemNumber)
-					{
 						belowItem->itemFlags[1] = NO_ITEM;
-						printf("Unlinked pushable! belowItem.itemFlags[1]: %d\n", belowItem->itemFlags[1]);
-					}
 
 				}
 			}
@@ -282,7 +294,7 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				if (!TestBlockPull(item, 1024, quadrant))
+				if (!TestBlockPull(item, blockHeight, quadrant))
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
@@ -337,7 +349,8 @@ void PushableBlockControl(short itemNumber)
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
 			}
 
-			int stackTop = -1; // index of heighest (yPos) pushable in stack
+
+			int stackTop = NO_ITEM; // index of heighest (yPos) pushable in stack
 			int stackYmin = CLICK(256); // set starting height
 
 			//Check for pushable directly below current one in same sector
@@ -369,11 +382,8 @@ void PushableBlockControl(short itemNumber)
 			}
 
 			// if top pushable in stack was located, link index of current pushable to below pushable via itemFlags[1]
-			if (stackTop >= 0)
-			{
+			if (stackTop != NO_ITEM)
 				g_Level.Items[stackTop].itemFlags[1] = itemNumber;
-				printf("Pushable index: %d\nStack top: %d\nstackTop.itemFlags[1]: %d\n", itemNumber, stackTop, g_Level.Items[stackTop].itemFlags[1]);
-			}
 		}
 		break;
 	}
@@ -385,6 +395,25 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+
+	int stackIndex; // used for stacked pushables
+
+	int blockHeight = 1024;
+	if (item->triggerFlags > 64)
+		blockHeight = CLICK(item->triggerFlags - 64);
+
+	// get total height of stack
+	stackIndex = item->itemFlags[1];
+	while (stackIndex != NO_ITEM) 
+	{
+		auto stackItem = &g_Level.Items[stackIndex];
+		if (stackItem->triggerFlags > 64)
+			blockHeight += CLICK(item->triggerFlags - 64);
+		else
+			blockHeight += 1024;
+
+		stackIndex = stackItem->itemFlags[1];
+	}
 
 	if ((!(TrInput & IN_ACTION)
 		|| l->currentAnimState != LS_STOP
@@ -408,13 +437,13 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (!TestBlockPush(item, 1024, quadrant))
+			if (!TestBlockPush(item, blockHeight, quadrant))
 				return;
 			l->goalAnimState = LS_PUSHABLE_PUSH;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (!TestBlockPull(item, 1024, quadrant))
+			if (!TestBlockPull(item, blockHeight, quadrant))
 				return;
 			l->goalAnimState = LS_PUSHABLE_PULL;
 		}
