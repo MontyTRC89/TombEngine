@@ -86,12 +86,10 @@ void PushableBlockControl(short itemNumber)
 	short roomNumber;
 
 	int stackIndex; // used for stacked pushables
-	int blockHeight;
-
+	
+	int blockHeight = 1024;
 	if (item->triggerFlags > 64)
 		blockHeight = CLICK(item->triggerFlags - 64);
-	else
-		blockHeight = -(GetBoundsAccurate(item)->Y1);
 
 	// get total height of stack
 	stackIndex = item->itemFlags[1];
@@ -99,9 +97,9 @@ void PushableBlockControl(short itemNumber)
 	{
 		auto stackItem = &g_Level.Items[stackIndex];
 		if (stackItem->triggerFlags > 64)
-			blockHeight += CLICK(stackItem->triggerFlags - 64);
+			blockHeight += CLICK(item->triggerFlags - 64);
 		else
-			blockHeight += -(GetBoundsAccurate(stackItem)->Y1);
+			blockHeight += 1024;
 
 		stackIndex = stackItem->itemFlags[1];
 	}
@@ -399,22 +397,20 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 
 	int stackIndex; // used for stacked pushables
-	int blockHeight;
 
+	int blockHeight = 1024;
 	if (item->triggerFlags > 64)
 		blockHeight = CLICK(item->triggerFlags - 64);
-	else
-		blockHeight = -(GetBoundsAccurate(item)->Y1);
 
 	// get total height of stack
 	stackIndex = item->itemFlags[1];
-	while (stackIndex != NO_ITEM)
+	while (stackIndex != NO_ITEM) 
 	{
 		auto stackItem = &g_Level.Items[stackIndex];
 		if (stackItem->triggerFlags > 64)
-			blockHeight += CLICK(stackItem->triggerFlags - 64);
+			blockHeight += CLICK(item->triggerFlags - 64);
 		else
-			blockHeight += -(GetBoundsAccurate(stackItem)->Y1);
+			blockHeight += 1024;
 
 		stackIndex = stackItem->itemFlags[1];
 	}
