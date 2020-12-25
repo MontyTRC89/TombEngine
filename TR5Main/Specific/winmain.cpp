@@ -253,7 +253,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	if constexpr (DebugBuild)
-	getCurrentCommit();
+	//getCurrentCommit();
 	int RetVal;
 	int n;
 
