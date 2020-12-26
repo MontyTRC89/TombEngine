@@ -10,6 +10,16 @@
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 
+enum SMALL_SCORPION_STATES {
+	SMALL_SCORPION_STOP = 1,
+	SMALL_SCORPION_WALK = 2,
+	SMALL_SCORPION_RUN = 3,
+	SMALL_SCORPION_ATTACK1 = 4,
+	SMALL_SCORPION_ATTACK2 = 5,
+	SMALL_SCORPION_DEATH1 = 6,
+	SMALL_SCORPION_DEATH2 = 7
+};
+
 void InitialiseSmallScorpion(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -18,8 +28,8 @@ void InitialiseSmallScorpion(short itemNumber)
 
 	item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = SMALL_SCORPION_STOP;
+	item->currentAnimState = SMALL_SCORPION_STOP;
 }
 
 void SmallScorpionControl(short itemNumber)
@@ -39,7 +49,17 @@ void SmallScorpionControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	if (item->hitPoints > 0)
+	if (item->hitPoints <= 0)
+	{
+		item->hitPoints = 0;
+		if (item->currentAnimState != SMALL_SCORPION_DEATH1 && item->currentAnimState != SMALL_SCORPION_DEATH2)
+		{
+			item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = SMALL_SCORPION_DEATH1;
+		}
+	}
+	else
 	{
 		int dx = LaraItem->pos.xPos - item->pos.xPos;
 		int dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -60,66 +80,66 @@ void SmallScorpionControl(short itemNumber)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case SMALL_SCORPION_STOP:
 			creature->maximumTurn = 0;
 			creature->flags = 0;
-			if (info.distance > 116281)
+			if (info.distance > SQUARE(341))
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = SMALL_SCORPION_WALK;
 			}
 			else if (info.bite)
 			{
-				creature->maximumTurn = 1092;
-				if (GetRandomControl() & 1 /*|| creature->enemy->objectNumber == 59 && creature->enemy->hitPoints <= 2*/)
+				creature->maximumTurn = ANGLE(6);
+				if (GetRandomControl() & 1)
 				{
-					item->goalAnimState = 4;
+					item->goalAnimState = SMALL_SCORPION_ATTACK1;
 				}
 				else
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = SMALL_SCORPION_ATTACK2;
 				}
 			}
 			else if (!info.ahead)
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = SMALL_SCORPION_RUN;
 			}
 			break;
 
-		case 3:
-			creature->maximumTurn = 1456;
-			if (info.distance < 116281)
+		case SMALL_SCORPION_WALK:
+			creature->maximumTurn = ANGLE(6);
+			if (info.distance >= SQUARE(341))
 			{
-				item->goalAnimState = 1;
-			}
-			break;
-
-		case 2:
-			creature->maximumTurn = 1092;
-			if (info.distance >= 116281)
-			{
-				if (info.distance > 45369)
+				if (info.distance > SQUARE(213))
 				{
-					item->goalAnimState = 3;
+					item->goalAnimState = SMALL_SCORPION_RUN;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = SMALL_SCORPION_STOP;
 			}
 			break;
 
-		case 4:
-		case 5:
+		case SMALL_SCORPION_RUN:
+			creature->maximumTurn = ANGLE(8);
+			if (info.distance < SQUARE(341))
+			{
+				item->goalAnimState = SMALL_SCORPION_STOP;
+			}
+			break;
+
+		case SMALL_SCORPION_ATTACK1:
+		case SMALL_SCORPION_ATTACK2:
 			creature->maximumTurn = 0;
-			if (abs(info.angle) >= 1092)
+			if (abs(info.angle) >= ANGLE(6))
 			{
 				if (info.angle >= 0)
 				{
-					item->pos.yRot += 1092;
+					item->pos.yRot += ANGLE(6);
 				}
 				else
 				{
-					item->pos.yRot -= 1092;
+					item->pos.yRot -= ANGLE(6);
 				}
 			}
 			else
@@ -139,7 +159,7 @@ void SmallScorpionControl(short itemNumber)
 						BITE_INFO* biteInfo;
 						short rot;
 
-						if (item->currentAnimState == 5)
+						if (item->currentAnimState == SMALL_SCORPION_ATTACK1)
 						{
 							rot = item->pos.yRot + -ANGLE(180);
 							biteInfo = &smallScorpionBiteInfo1;
@@ -155,16 +175,6 @@ void SmallScorpionControl(short itemNumber)
 				}
 			}
 			break;
-		}
-	}
-	else
-	{
-		item->hitPoints = 0;
-		if (item->currentAnimState != 6 && item->currentAnimState != 7)
-		{
-			item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 6;
 		}
 	}
 
