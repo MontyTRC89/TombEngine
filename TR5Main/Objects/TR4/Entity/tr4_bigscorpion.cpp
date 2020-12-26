@@ -11,6 +11,17 @@
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
 BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };
 
+enum SCORPION_STATES {
+	SCORPION_STOP = 1,
+	SCORPION_WALK = 2,
+	SCORPION_RUN = 3,
+	SCORPION_ATTACK1 = 4,
+	SCORPION_ATTACK2 = 5,
+	SCORPION_DEATH = 6,
+	SCORPION_SPECIAL_DEATH = 7,
+	SCORPION_TROOPS_ATTACK = 8
+};
+
 void InitialiseScorpion(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -19,14 +30,14 @@ void InitialiseScorpion(short itemNumber)
 
 	if (item->triggerFlags == 1)
 	{
-		item->goalAnimState = 8;
-		item->currentAnimState = 8;
+		item->goalAnimState = SCORPION_TROOPS_ATTACK;
+		item->currentAnimState = SCORPION_TROOPS_ATTACK;
 		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
 	}
 	else
 	{
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
+		item->goalAnimState = SCORPION_STOP;
+		item->currentAnimState = SCORPION_STOP;
 		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
@@ -102,42 +113,7 @@ void ScorpionControl(short itemNumber)
 		if (item->aiBits)
 			GetAITarget(creature);
 		else
-		{
-			if (creature->hurtByLara && item->currentAnimState != 8)
-				creature->enemy = LaraItem;
-			{
-				// Search for active troops
-				creature->enemy = NULL;
-				CREATURE_INFO* baddy = &BaddieSlots[0];
-				int minDistance = 0x7FFFFFFF;
-
-				for (int i = 0; i < NUM_SLOTS; i++)
-				{
-					baddy = &BaddieSlots[i];
-
-					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
-					{
-						ITEM_INFO* currentItem = &g_Level.Items[baddy->itemNum];
-
-						if (currentItem->objectNumber != ID_BIG_SCORPION &&
-							(currentItem != LaraItem || creature->hurtByLara))
-						{
-							int dx = currentItem->pos.xPos - item->pos.xPos;
-							int dy = currentItem->pos.yPos - item->pos.yPos;
-							int dz = currentItem->pos.zPos - item->pos.zPos;
-							int distance = dx * dx + dy * dy + dz * dz;
-
-							if (distance < minDistance)
-							{
-								minDistance = distance;
-								creature->enemy = currentItem;
-							}
-						}
-					}
-				}
-			}
-		}
-
+			creature->enemy = LaraItem;
 
 		AI_INFO info;
 
@@ -150,13 +126,13 @@ void ScorpionControl(short itemNumber)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case SCORPION_STOP:
 			creature->maximumTurn = 0;
 			creature->flags = 0;
 
 			if (info.distance > SQUARE(1365))
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = SCORPION_WALK;
 				break;
 			}
 
@@ -164,40 +140,39 @@ void ScorpionControl(short itemNumber)
 			{
 				creature->maximumTurn = ANGLE(2);
 
-				if (GetRandomControl() & 1 || creature->enemy->objectNumber == ID_TROOPS &&
-					creature->enemy->hitPoints <= 15)
+				if (GetRandomControl() & 1 && creature->enemy->hitPoints <= 15)
 				{
-					item->goalAnimState = 4;
+					item->goalAnimState = SCORPION_ATTACK1;
 				}
 				else
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = SCORPION_ATTACK2;
 				}
 			}
 			else if (!info.ahead)
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = SCORPION_WALK;
 			}
 
 			break;
 
-		case 2:
+		case SCORPION_WALK:
 			creature->maximumTurn = ANGLE(2);
 
 			if (info.distance < SQUARE(1365))
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = SCORPION_STOP;
 				break;
 			}
 
 			if (info.distance > SQUARE(853))
 			{
-				item->goalAnimState = 3;
+				item->goalAnimState = SCORPION_RUN;
 			}
 
 			break;
 
-		case 3:
+		case SCORPION_RUN:
 			creature->maximumTurn = ANGLE(3);
 
 			if (info.distance >= SQUARE(1365))
@@ -205,12 +180,12 @@ void ScorpionControl(short itemNumber)
 				break;
 			}
 
-			item->goalAnimState = 1;
+			item->goalAnimState = SCORPION_STOP;
 
 			break;
 
-		case 4:
-		case 5:
+		case SCORPION_ATTACK1:
+		case SCORPION_ATTACK2:
 			creature->maximumTurn = 0;
 
 			if (abs(info.angle) >= ANGLE(2))
@@ -238,7 +213,7 @@ void ScorpionControl(short itemNumber)
 				creature->enemy->hitPoints -= 15;
 				if (creature->enemy->hitPoints <= 0)
 				{
-					item->goalAnimState = 7;
+					item->goalAnimState = SCORPION_SPECIAL_DEATH;
 					creature->maximumTurn = 0;
 				}
 
@@ -289,7 +264,7 @@ void ScorpionControl(short itemNumber)
 
 			break;
 
-		case 8:
+		case SCORPION_TROOPS_ATTACK:
 			creature->maximumTurn = 0;
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
@@ -297,7 +272,7 @@ void ScorpionControl(short itemNumber)
 			}
 			if (creature->enemy && creature->enemy->hitPoints <= 0 || item->triggerFlags > 6)
 			{
-				item->goalAnimState = 7;
+				item->goalAnimState = SCORPION_SPECIAL_DEATH;
 				creature->enemy->hitPoints = 0;
 			}
 
