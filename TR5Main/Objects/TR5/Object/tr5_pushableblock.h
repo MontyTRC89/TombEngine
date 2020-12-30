@@ -2,6 +2,27 @@
 #include "items.h"
 #include "collide.h"
 
+typedef struct PUSHABLE_INFO // void* data of pushable
+{
+	int height;				// height for collision, also in floor procedure
+	int weight;
+	int stackLimit;
+	short linkedIndex;		// using itemFlags[1] for now
+	short gravity;			// fall acceleration
+	short loopSound;		// looped sound index for movement
+	short stopSound;		// ending sound index
+	short fallSound;		// sound on hitting floor (if dropped)
+	short climb;			// not used for now
+	bool canFall;			// OCB 32
+	bool hasFloorCeiling;	// has floor and ceiling procedures (OCB 64)
+	bool disablePull;		// OCB 128
+	bool disablePush;		// OCB 256
+	bool disableW;			// OCB 512 (W+E)
+	bool disableE;			// OCB 512 (W+E)
+	bool disableN;			// OCB 1024 (N+S)
+	bool disableS;			// OCB 1024 (N+S)
+};
+
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
 void InitialisePushableBlock(short itemNum);
 void PushableBlockControl(short itemNum);
@@ -9,5 +30,14 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 int TestBlockMovable(ITEM_INFO* item, int blokhite);
 int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant);
+void MoveStackXZ(int itemNum);
+void MoveStackY(int itemNum, int y);
+void RemoveFromStack(int itemNum);
+int FindStack(int itemNum);
+int GetStackHeight(ITEM_INFO* item);
+int CheckStackLimit(ITEM_INFO* item);
+void pushLoop(ITEM_INFO* item);
+void pushEnd(ITEM_INFO* item);
+PUSHABLE_INFO* pushable_info(ITEM_INFO* item);
 std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z);
 std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z);
