@@ -25,7 +25,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	g_Level.Boxes[floor->box].flags &= (~BLOCKED);
 	short height = g_Level.Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
-
+	
 	floor = GetFloor(x + 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
@@ -61,17 +61,57 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 void InitialisePushableBlock(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
+	item->itemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	item->itemFlags[1] = NO_ITEM; // used for linking pushables together in stack
-	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
-	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+	
+	
+	PUSHABLE_INFO* pushable = new PUSHABLE_INFO;
+
+	pushable->stackLimit = 3; // LUA
+	pushable->gravity = 9; // LUA
+	pushable->weight = 100; // LUA
+
+	// read flags from OCB
+	int OCB = item->triggerFlags;
+
+	pushable->canFall = OCB & 0x20;
+	pushable->hasFloorCeiling = OCB & 0x40;
+	pushable->disablePull = OCB & 0x80;
+	pushable->disablePush = OCB & 0x100;
+	pushable->disableW = pushable->disableE = OCB & 0x200;
+	pushable->disableN = pushable->disableS = OCB & 0x400;
+	
+	pushable->climb = 0; // maybe there will be better way to handle this than OCBs?
+	/*
+	pushable->climb |= (OCB & 0x800) ? CLIMB_WEST : 0;
+	pushable->climb |= (OCB & 0x1000) ? CLIMB_NORTH : 0;
+	pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
+	pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
+	*/
+
+	int height;
+	if (pushable->hasFloorCeiling)
+		height = (OCB & 0x1F) * CLICK(1);
+	else
+		height = -GetBoundsAccurate(item)->Y1;
+
+	pushable->height = height;
+
+	pushable->loopSound = SFX_PUSHABLE_SOUND; // LUA
+	pushable->stopSound = SFX_PUSH_BLOCK_END; // LUA
+	pushable->fallSound = SFX_TR4_BOULDER_FALL; // LUA
+
+	item->data = (void*) pushable;
+
+	FindStack(itemNum); // check for stack formation on init (can't use pushable->linkedIndex with current setup)
 }
 
 void PushableBlockControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	
+	Lara.generalPtr = (void*)itemNumber;
+
 	PHD_VECTOR pos;
 	pos.x = 0;
 	pos.y = 0;
@@ -80,58 +120,86 @@ void PushableBlockControl(short itemNumber)
 	short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 
 	int x, z;
+	short roomNumber;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
-	int height;
-	short roomNumber;
+	PUSHABLE_INFO* pushable = pushable_info(item);
+	int blockHeight = GetStackHeight(item);
 
-	int stackIndex; // used for stacked pushables
-	int blockHeight;
-
-	if (item->triggerFlags > 64)
-		blockHeight = CLICK(item->triggerFlags - 64);
-	else
-		blockHeight = -(GetBoundsAccurate(item)->Y1);
-
-	// get total height of stack
-	stackIndex = item->itemFlags[1];
-	while (stackIndex != NO_ITEM)
+	// do sound effects, it works for now
+	if (DoPushPull > 0)
 	{
-		auto stackItem = &g_Level.Items[stackIndex];
-		if (stackItem->triggerFlags > 64)
-			blockHeight += CLICK(stackItem->triggerFlags - 64);
-		else
-			blockHeight += -(GetBoundsAccurate(stackItem)->Y1);
-
-		stackIndex = stackItem->itemFlags[1];
+		int blockIndex = (short)Lara.generalPtr;
+		ITEM_INFO* block = &g_Level.Items[blockIndex];
+		SoundEffect(pushable_info(block)->loopSound, &block->pos, 2);
+	}
+	else if (DoPushPull < 0)
+	{
+		DoPushPull = 0;
+		int blockIndex = (short)Lara.generalPtr;
+		ITEM_INFO* block = &g_Level.Items[blockIndex];
+		SoundEffect(pushable_info(block)->stopSound, &block->pos, 2);
 	}
 
+	// control block falling
+	if (item->gravityStatus)
+	{
+		roomNumber = item->roomNumber;
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		int floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos + 10, item->pos.zPos);
+
+		if (item->pos.yPos < floorHeight - item->fallspeed)
+		{
+			if (item->fallspeed + pushable->gravity < 128)
+				item->fallspeed += pushable->gravity;
+			else
+				item->fallspeed = 128;
+			item->pos.yPos += item->fallspeed;
+
+			MoveStackY(itemNumber, item->fallspeed);
+		}
+		else
+		{
+			item->gravityStatus = false;
+			int relY = floorHeight - item->pos.yPos;
+			item->pos.yPos = floorHeight;
+			if (item->fallspeed >= 128)
+				floor_shake_effect(item);
+			item->fallspeed = 0;
+			SoundEffect(pushable->fallSound, &item->pos, 2);
+
+			MoveStackY(itemNumber, relY);
+
+			if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
+			{
+				roomNumber = item->roomNumber;
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
+			}
+			
+			RemoveActiveItem(itemNumber);
+			item->status = ITEM_NOT_ACTIVE;
+
+			if (pushable->hasFloorCeiling)
+			{
+				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+			}
+		}
+
+		return;
+	}
 
 	switch (LaraItem->animNumber)
 	{
 	case LA_PUSHABLE_PUSH:
-		if ((LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 30
-			|| LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 67)
-			&& (LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 78
-				|| LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 125)
-			&& (LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 140
-				|| LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 160))
-		{
-			if (DoPushPull)
-			{
-				SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, 2);
-				DoPushPull = 0;
-			}
-		}
-		else
-		{
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, 2);
-			DoPushPull = 1;
-		}
+
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+			RemoveFromStack(itemNumber);
 
 		GetLaraJointPosition(&pos, LM_LHAND);
 
-		switch (quadrant)
+		// TODO: come up with better code that doesn't rely on itemFlags
+		switch (quadrant) 
 		{
 		case 0:
 			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
@@ -162,31 +230,24 @@ void PushableBlockControl(short itemNumber)
 			break;
 		}
 
-		stackIndex = item->itemFlags[1];
-		while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
-		{
-			auto stackItem = &g_Level.Items[stackIndex];
-			stackItem->pos.xPos = item->pos.xPos;
-			stackItem->pos.zPos = item->pos.zPos;
+		MoveStackXZ(itemNumber);
 
-			stackIndex = stackItem->itemFlags[1];
-		}
-
-		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 16)
 		{
-			// unlink pushable from stack if linked
-			for (int i = 0; i < g_Level.NumItems; i++)
+			if (pushable->canFall)
 			{
-				if (i == itemNumber)
-					continue;
-
-				auto belowItem = &g_Level.Items[i];
-
-				int objectNum = belowItem->objectNumber;
-				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+				roomNumber = item->roomNumber;
+				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos + 10, item->pos.zPos) > item->pos.yPos)
 				{
-					if (belowItem->itemFlags[1] == itemNumber)
-						belowItem->itemFlags[1] = NO_ITEM;
+					item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
+					item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
+					MoveStackXZ(itemNumber);
+					SoundEffect(pushable->stopSound, &item->pos, 2);
+					DoPushPull = 0;
+					LaraItem->goalAnimState = LS_STOP;
+
+					item->gravityStatus = true; // do fall
 				}
 			}
 		}
@@ -196,13 +257,11 @@ void PushableBlockControl(short itemNumber)
 			if (TrInput & IN_ACTION)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
+				{
 					LaraItem->goalAnimState = LS_STOP;
+				}
 				else
 				{
-					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-					if (newRoomNumber != item->roomNumber)
-						ItemNewRoom(itemNumber, newRoomNumber);
-
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
 				}
 			}
@@ -214,22 +273,9 @@ void PushableBlockControl(short itemNumber)
 		break;
 
 	case LA_PUSHABLE_PULL:
-		if ((LaraItem->frameNumber <  g_Level.Anims[LaraItem->animNumber].frameBase + 40
-			|| LaraItem->frameNumber >  g_Level.Anims[LaraItem->animNumber].frameBase + 122)
-			&& (LaraItem->frameNumber <  g_Level.Anims[LaraItem->animNumber].frameBase + 130
-				|| LaraItem->frameNumber >  g_Level.Anims[LaraItem->animNumber].frameBase + 170))
-		{
-			if (DoPushPull)
-			{
-				SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, 2);
-				DoPushPull = 0;
-			}
-		}
-		else
-		{
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, 2);
-			DoPushPull = 1;
-		}
+
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+			RemoveFromStack(itemNumber);
 
 		GetLaraJointPosition(&pos, LM_LHAND);
 
@@ -263,48 +309,18 @@ void PushableBlockControl(short itemNumber)
 			break;
 		}
 
-		stackIndex = item->itemFlags[1];
-		while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
-		{
-			auto stackItem = &g_Level.Items[stackIndex];
-			stackItem->pos.xPos = item->pos.xPos;
-			stackItem->pos.zPos = item->pos.zPos;
-
-			stackIndex = stackItem->itemFlags[1];
-		}
-
-		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
-		{
-			// unlink pushable from stack if linked
-			for (int i = 0; i < g_Level.NumItems; i++)
-			{
-				if (i == itemNumber)
-					continue;
-
-				auto belowItem = &g_Level.Items[i];
-
-				int objectNum = belowItem->objectNumber;
-				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
-				{
-					if (belowItem->itemFlags[1] == itemNumber)
-						belowItem->itemFlags[1] = NO_ITEM;
-
-				}
-			}
-		}
+		MoveStackXZ(itemNumber);
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
 		{
 			if (TrInput & IN_ACTION)
 			{
 				if (!TestBlockPull(item, blockHeight, quadrant))
+				{
 					LaraItem->goalAnimState = LS_STOP;
+				}
 				else
 				{
-					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-					if (newRoomNumber != item->roomNumber)
-						ItemNewRoom(itemNumber, newRoomNumber);
-
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
 				}
 			}
@@ -314,6 +330,7 @@ void PushableBlockControl(short itemNumber)
 			}
 		}
 		break;
+
 	case LA_PUSHABLE_PUSH_TO_STAND:
 	case LA_PUSHABLE_PULL_TO_STAND:
 		if (LaraItem->frameNumber == g_Level.Anims[LA_PUSHABLE_PUSH_TO_STAND].frameBase
@@ -322,71 +339,23 @@ void PushableBlockControl(short itemNumber)
 			item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 			item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
 
-			stackIndex = item->itemFlags[1];
-			while (stackIndex != NO_ITEM) // move pushblock stack together with bottom pushblock
-			{
-				auto stackItem = &g_Level.Items[stackIndex];
-				stackItem->pos.xPos = item->pos.xPos;
-				stackItem->pos.zPos = item->pos.zPos;
+			MoveStackXZ(itemNumber);
+			FindStack(itemNumber);
 
-				stackIndex = stackItem->itemFlags[1];
-			}
+			roomNumber = item->roomNumber;
+			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			if (newRoomNumber != item->roomNumber)
-				ItemNewRoom(itemNumber, newRoomNumber);
-
-			roomNumber = item->roomNumber;
-			floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
-			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-			TestTriggers(TriggerIndex, 1, item->flags & 0x3E00);
 			RemoveActiveItem(itemNumber);
 			item->status = ITEM_NOT_ACTIVE;
 
-			if (item->triggerFlags >= 64)
+			if (pushable->hasFloorCeiling)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
 			}
-
-
-			int stackTop = NO_ITEM; // index of heighest (yPos) pushable in stack
-			int stackYmin = CLICK(256); // set starting height
-
-			//Check for pushable directly below current one in same sector
-			for (int i = 0; i < g_Level.NumItems; i++)
-			{
-				if (i == itemNumber)
-					continue;
-				
-				auto belowItem = &g_Level.Items[i];
-
-				int objectNum = belowItem->objectNumber;
-				if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
-				{
-					int x = item->pos.xPos;
-					int y = item->pos.yPos;
-					int z = item->pos.zPos;
-
-					if (belowItem->pos.xPos == x && belowItem->pos.zPos == z)
-					{
-						int belowY = belowItem->pos.yPos;
-						if (belowY > y && belowY < stackYmin)
-						{
-							// set heighest pushable so far as top of stack
-							stackTop = i;
-							stackYmin = belowItem->pos.yPos;
-						}
-					}
-				}
-			}
-
-			// if top pushable in stack was located, link index of current pushable to below pushable via itemFlags[1]
-			if (stackTop != NO_ITEM)
-				g_Level.Items[stackTop].itemFlags[1] = itemNumber;
 		}
 		break;
 	}
@@ -398,29 +367,10 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+	PUSHABLE_INFO* pushable = pushable_info(item);
 
-	int stackIndex; // used for stacked pushables
-	int blockHeight;
-
-	if (item->triggerFlags > 64)
-		blockHeight = CLICK(item->triggerFlags - 64);
-	else
-		blockHeight = -(GetBoundsAccurate(item)->Y1);
-
-	// get total height of stack
-	stackIndex = item->itemFlags[1];
-	while (stackIndex != NO_ITEM)
-	{
-		auto stackItem = &g_Level.Items[stackIndex];
-		if (stackItem->triggerFlags > 64)
-			blockHeight += CLICK(stackItem->triggerFlags - 64);
-		else
-			blockHeight += -(GetBoundsAccurate(stackItem)->Y1);
-
-		stackIndex = stackItem->itemFlags[1];
-	}
-
-
+	int blockHeight = GetStackHeight(item);
+	
 	if ((!(TrInput & IN_ACTION)
 		|| l->currentAnimState != LS_STOP
 		|| l->animNumber != LA_STAND_IDLE
@@ -434,22 +384,45 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
 			|| Lara.cornerX != (int)item))
 		{
-			if (item->triggerFlags < 64)
+			if (!pushable->hasFloorCeiling)
 				ObjectCollision(itemNum, l, coll);
 			return;
 		}
 
 		short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 
+		bool quadrantDisabled = false;
+		switch (quadrant)
+		{
+		case NORTH:
+			quadrantDisabled = pushable->disableN;
+			break;
+		case EAST:
+			quadrantDisabled = pushable->disableE;
+			break;
+		case SOUTH:
+			quadrantDisabled = pushable->disableS;
+			break;
+		case WEST:
+			quadrantDisabled = pushable->disableW;
+			break;
+		}
+
+		if (quadrantDisabled)
+			return;
+
+		if (!CheckStackLimit(item))
+			return;
+
 		if (TrInput & IN_FORWARD)
 		{
-			if (!TestBlockPush(item, blockHeight, quadrant))
+			if (!TestBlockPush(item, blockHeight, quadrant) || pushable->disablePush)
 				return;
 			l->goalAnimState = LS_PUSHABLE_PUSH;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (!TestBlockPull(item, blockHeight, quadrant))
+			if (!TestBlockPull(item, blockHeight, quadrant) || pushable->disablePull)
 				return;
 			l->goalAnimState = LS_PUSHABLE_PULL;
 		}
@@ -472,13 +445,14 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		GetLaraJointPosition(&pos, LM_LHAND);
 
+		// TODO: come up with better code that doesn't rely on itemFlags
 		l->itemFlags[0] = pos.x;
 		l->itemFlags[2] = pos.z;
-
+		
 		item->itemFlags[0] = item->pos.xPos;
 		item->itemFlags[2] = item->pos.zPos;
 
-		if (item->triggerFlags >= 64)
+		if (pushable->hasFloorCeiling)
 		{
 			//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
 			AdjustStopperFlag(item, item->itemFlags[0], 0);
@@ -508,7 +482,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				else
 					PushableBlockPos.z = bounds->Z1 - 35;
 
-				if (item->triggerFlags > 64)
+				if (pushable->hasFloorCeiling)
 				{					
 					// For now don't use auto-align function because it can collide with climb up moves of Lara
 
@@ -558,6 +532,19 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
+void pushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
+{
+	DoPushPull = 1;
+}
+
+void pushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
+{
+	if (DoPushPull == 1)
+	{
+		DoPushPull = -1;
+	}
+}
+
 int TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
 	short roomNumber = item->roomNumber;
@@ -602,9 +589,18 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	if (GetFloorHeight(floor, x, y - 256, z) != y)
-		return 0;
-
+	int floorHeight = GetFloorHeight(floor, x, y - 256, z);
+	if (pushable_info(item)->canFall)
+	{
+		if (floorHeight < y)
+			return 0;
+	}
+	else
+	{
+		if (floorHeight != y)
+			return 0;
+	}
+	
 	GetFloorHeight(floor, x, y, z);
 	if (HeightType)
 		return 0;
@@ -727,12 +723,154 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	return 1;
 }
 
+void MoveStackXZ(int itemNum)
+{
+	auto item = &g_Level.Items[itemNum];
+
+	int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	if (newRoomNumber != item->roomNumber)
+		ItemNewRoom(itemNum, newRoomNumber);
+
+	auto stackItem = item;
+	while (stackItem->itemFlags[1] != NO_ITEM) // move pushblock stack together with bottom pushblock
+	{
+		int stackIndex = stackItem->itemFlags[1];
+		stackItem = &g_Level.Items[stackIndex];
+
+		stackItem->pos.xPos = item->pos.xPos;
+		stackItem->pos.zPos = item->pos.zPos;
+
+		int newRoomNumber = T5M::Floordata::GetRoom(stackItem->roomNumber, stackItem->pos.xPos, stackItem->pos.yPos, stackItem->pos.zPos);
+		if (newRoomNumber != stackItem->roomNumber)
+			ItemNewRoom(stackIndex, newRoomNumber);
+	}
+}
+
+void MoveStackY(int itemNum, int y)
+{
+	auto item = &g_Level.Items[itemNum];
+
+	int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	if (newRoomNumber != item->roomNumber)
+		ItemNewRoom(itemNum, newRoomNumber);
+
+	while (item->itemFlags[1] != NO_ITEM) // move pushblock stack together with bottom pushblock
+	{
+		int stackIndex = item->itemFlags[1];
+		item = &g_Level.Items[stackIndex];
+
+		item->pos.yPos += y;
+
+		int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (newRoomNumber != item->roomNumber)
+			ItemNewRoom(stackIndex, newRoomNumber);
+	}
+}
+
+void RemoveFromStack(int itemNum) // unlink pushable from stack if linked
+{
+	for (int i = 0; i < g_Level.NumItems; i++)
+	{
+		if (i == itemNum)
+			continue;
+
+		auto belowItem = &g_Level.Items[i];
+
+		int objectNum = belowItem->objectNumber;
+		if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+		{
+			if (belowItem->itemFlags[1] == itemNum)
+				belowItem->itemFlags[1] = NO_ITEM;
+		}
+	}
+}
+
+int FindStack(int itemNum)
+{
+	int stackTop = NO_ITEM; // index of heighest (yPos) pushable in stack
+	int stackYmin = CLICK(256); // set starting height
+
+	//Check for pushable directly below current one in same sector
+	for (int i = 0; i < g_Level.NumItems; i++)
+	{
+		if (i == itemNum)
+			continue;
+
+		auto belowItem = &g_Level.Items[i];
+
+		int objectNum = belowItem->objectNumber;
+		if (objectNum >= ID_PUSHABLE_OBJECT1 && objectNum <= ID_PUSHABLE_OBJECT10)
+		{
+			auto item = &g_Level.Items[itemNum];
+			int x = item->pos.xPos;
+			int y = item->pos.yPos;
+			int z = item->pos.zPos;
+
+			if (belowItem->pos.xPos == x && belowItem->pos.zPos == z)
+			{
+				int belowY = belowItem->pos.yPos;
+				if (belowY > y && belowY < stackYmin)
+				{
+					// set heighest pushable so far as top of stack
+					stackTop = i;
+					stackYmin = belowItem->pos.yPos;
+				}
+			}
+		}
+	}
+
+	if (stackTop != NO_ITEM)
+		g_Level.Items[stackTop].itemFlags[1] = itemNum;
+
+	return stackTop;
+}
+
+int GetStackHeight(ITEM_INFO* item)
+{
+	int height = pushable_info(item)->height;
+
+	auto stackItem = item;
+	while (stackItem->itemFlags[1] != NO_ITEM)
+	{
+		stackItem = &g_Level.Items[stackItem->itemFlags[1]];
+		height += pushable_info(stackItem)->height;
+	}
+
+	return height;
+}
+
+int CheckStackLimit(ITEM_INFO* item)
+{
+	int limit = pushable_info(item)->stackLimit;
+	
+	int count = 1;
+	auto stackItem = item;
+	while (stackItem->itemFlags[1] != NO_ITEM)
+	{
+		stackItem = &g_Level.Items[stackItem->itemFlags[1]];
+		count++;
+
+		if (count > limit)
+			return 0;
+	}
+
+	return 1;
+}
+
+PUSHABLE_INFO* pushable_info(ITEM_INFO* item) // retrieve PUSHABLE_INFO* from void* data
+{
+	return (PUSHABLE_INFO*)item->data;
+}
+
 std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	const auto pushable = pushable_info(&g_Level.Items[itemNumber]);
+
+	if (item.status != ITEM_INVISIBLE && pushable->hasFloorCeiling && !item.gravityStatus &&
+		abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
 	{
-		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		auto height = item.pos.yPos - pushable->height;
 		return std::make_tuple(std::optional{height}, y > height && y <= item.pos.yPos);
 	}
 	return std::make_tuple(std::nullopt, false);
@@ -741,9 +879,12 @@ std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x,
 std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	const auto pushable = pushable_info(&g_Level.Items[itemNumber]);
+
+	if (item.status != ITEM_INVISIBLE && pushable->hasFloorCeiling && !item.gravityStatus &&
+		abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
 	{
-		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		auto height = item.pos.yPos - pushable->height;
 		return std::make_tuple(std::optional{item.pos.yPos}, y >= height && y < item.pos.yPos);
 	}
 	return std::make_tuple(std::nullopt, false);
