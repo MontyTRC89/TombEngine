@@ -67,10 +67,12 @@ void InitialisePushableBlock(short itemNum)
 	
 	
 	PUSHABLE_INFO* pushable = new PUSHABLE_INFO;
-
+	
 	pushable->stackLimit = 3; // LUA
 	pushable->gravity = 9; // LUA
 	pushable->weight = 100; // LUA
+	pushable->moveX = item->pos.xPos;
+	pushable->moveZ = item->pos.zPos;
 
 	// read flags from OCB
 	int OCB = item->triggerFlags;
@@ -129,16 +131,12 @@ void PushableBlockControl(short itemNumber)
 	// do sound effects, it works for now
 	if (DoPushPull > 0)
 	{
-		int blockIndex = (short)Lara.generalPtr;
-		ITEM_INFO* block = &g_Level.Items[blockIndex];
-		SoundEffect(pushable_info(block)->loopSound, &block->pos, 2);
+		SoundEffect(pushable_info(item)->loopSound, &item->pos, 2);
 	}
 	else if (DoPushPull < 0)
 	{
 		DoPushPull = 0;
-		int blockIndex = (short)Lara.generalPtr;
-		ITEM_INFO* block = &g_Level.Items[blockIndex];
-		SoundEffect(pushable_info(block)->stopSound, &block->pos, 2);
+		SoundEffect(pushable_info(item)->stopSound, &item->pos, 2);
 	}
 
 	// control block falling
@@ -189,6 +187,9 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
+
+	int displaceBox = GetBoundsAccurate(LaraItem)->Z2 - 80; // move pushable based on bbox->Z2 of Lara
+
 	switch (LaraItem->animNumber)
 	{
 	case LA_PUSHABLE_PUSH:
@@ -196,32 +197,28 @@ void PushableBlockControl(short itemNumber)
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
 			RemoveFromStack(itemNumber);
 
-		GetLaraJointPosition(&pos, LM_LHAND);
-
-		// TODO: come up with better code that doesn't rely on itemFlags
 		switch (quadrant) 
 		{
 		case 0:
-			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
+			z = pushable->moveZ + displaceBox;
 			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
 		case 1:
-			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
+			x = pushable->moveX + displaceBox;
 			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
 				item->pos.xPos = x;
-			
 			break;
 
 		case 2:
-			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
+			z = pushable->moveZ - displaceBox;
 			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
 		case 3:
-			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
+			x = pushable->moveX - displaceBox;
 			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
@@ -263,6 +260,8 @@ void PushableBlockControl(short itemNumber)
 				else
 				{
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					pushable->moveX = item->pos.xPos;
+					pushable->moveZ = item->pos.zPos;
 				}
 			}
 			else
@@ -277,30 +276,28 @@ void PushableBlockControl(short itemNumber)
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
 			RemoveFromStack(itemNumber);
 
-		GetLaraJointPosition(&pos, LM_LHAND);
-
 		switch (quadrant)
 		{
 		case NORTH:
-			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
+			z = pushable->moveZ + displaceBox;
 			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
 		case EAST:
-			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
+			x = pushable->moveX + displaceBox;
 			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
 		case SOUTH:
-			z = pos.z + item->itemFlags[2] - LaraItem->itemFlags[2];
+			z = pushable->moveZ - displaceBox;
 			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
 		case WEST:
-			x = pos.x + item->itemFlags[0] - LaraItem->itemFlags[0];
+			x = pushable->moveX - displaceBox;
 			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
 				item->pos.xPos = x;
 			break;
@@ -322,6 +319,8 @@ void PushableBlockControl(short itemNumber)
 				else
 				{
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					pushable->moveX = item->pos.xPos;
+					pushable->moveZ = item->pos.zPos;
 				}
 			}
 			else
@@ -437,20 +436,9 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.headXrot = 0;
 		Lara.torsoYrot = 0;
 		Lara.torsoXrot = 0;
-
-		PHD_VECTOR pos;
-		pos.x = 0;
-		pos.y = 0;
-		pos.z = 0;
-
-		GetLaraJointPosition(&pos, LM_LHAND);
-
-		// TODO: come up with better code that doesn't rely on itemFlags
-		l->itemFlags[0] = pos.x;
-		l->itemFlags[2] = pos.z;
 		
-		item->itemFlags[0] = item->pos.xPos;
-		item->itemFlags[2] = item->pos.zPos;
+		pushable->moveX = item->pos.xPos;
+		pushable->moveZ = item->pos.zPos;
 
 		if (pushable->hasFloorCeiling)
 		{
