@@ -2,11 +2,13 @@
 #include "items.h"
 #include "collide.h"
 
-typedef struct PUSHABLE_INFO // void* data of pushable
+typedef struct PUSHABLE_INFO
 {
 	int height;				// height for collision, also in floor procedure
 	int weight;
 	int stackLimit;
+	int moveX;				// used for pushable movement code
+	int moveZ;				// used for pushable movement code
 	short linkedIndex;		// using itemFlags[1] for now
 	short gravity;			// fall acceleration
 	short loopSound;		// looped sound index for movement
