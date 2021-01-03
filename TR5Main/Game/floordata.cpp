@@ -92,6 +92,14 @@ bool FLOOR_INFO::IsWall(int x, int z) const
 
 namespace T5M::Floordata
 {
+	VectorInt2 GetSectorPoint(int x, int z)
+	{
+		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
+		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
+
+		return VectorInt2{xPoint, yPoint};
+	}
+
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
@@ -120,7 +128,7 @@ namespace T5M::Floordata
 		return pos;
 	}
 
-	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2 pos)
+	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 		return room.floor[room.xSize * pos.y + pos.x];
@@ -131,23 +139,32 @@ namespace T5M::Floordata
 		return GetFloor(roomNumber, GetRoomPosition(roomNumber, x, z));
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetBottomFloor(int startRoomNumber, int x, int z, bool first)
+	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
 	{
-		auto roomNumber = startRoomNumber;
 		auto floor = &GetFloor(roomNumber, x, z);
+
+		const auto roomSide = floor->RoomSide();
+		if (roomSide)
+		{
+			roomNumber = *roomSide;
+			floor = &GetFloor(roomNumber, x, z);
+		}
+
+		if (sideRoomNumber)
+			*sideRoomNumber = roomNumber;
+
+		return *floor;
+	}
+
+	std::tuple<FLOOR_INFO&, int> GetBottomFloor(int roomNumber, int x, int z, bool firstOutside)
+	{
+		auto floor = &GetFloorSide(roomNumber, x, z);
 		auto plane = floor->SectorPlane(x, z);
 		auto roomBelow = floor->RoomBelow(plane);
 
-		while ((!first || floor->IsWall(plane)) && roomBelow)
+		while ((!firstOutside || floor->IsWall(plane)) && roomBelow)
 		{
-			roomNumber = *roomBelow;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
+			floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
 			plane = floor->SectorPlane(x, z);
 			roomBelow = floor->RoomBelow(plane);
 		}
@@ -155,23 +172,15 @@ namespace T5M::Floordata
 		return std::tie(*floor, roomNumber);
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetTopFloor(int startRoomNumber, int x, int z, bool first)
+	std::tuple<FLOOR_INFO&, int> GetTopFloor(int roomNumber, int x, int z, bool firstOutside)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto floor = &GetFloorSide(roomNumber, x, z);
 		auto plane = floor->SectorPlane(x, z);
 		auto roomAbove = floor->RoomAbove(plane);
 
-		while ((!first || floor->IsWall(plane)) && roomAbove)
+		while ((!firstOutside || floor->IsWall(plane)) && roomAbove)
 		{
-			roomNumber = *roomAbove;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
+			floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
 			plane = floor->SectorPlane(x, z);
 			roomAbove = floor->RoomAbove(plane);
 		}
@@ -209,10 +218,9 @@ namespace T5M::Floordata
 		return floor->IsWall(x, z) ? GetBottomFloor(roomNumber, x, z, true) : GetTopFloor(roomNumber, x, z);
 	}
 
-	std::optional<int> GetBottomRoom(int startRoomNumber, int x, int y, int z)
+	std::optional<int> GetBottomRoom(int roomNumber, int x, int y, int z)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto floor = &GetFloorSide(roomNumber, x, z);
 		auto plane = floor->SectorPlane(x, z);
 
 		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
@@ -222,14 +230,7 @@ namespace T5M::Floordata
 
 		while (roomBelow)
 		{
-			roomNumber = *roomBelow;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
+			floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
 			plane = floor->SectorPlane(x, z);
 
 			if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
@@ -241,10 +242,9 @@ namespace T5M::Floordata
 		return std::nullopt;
 	}
 
-	std::optional<int> GetTopRoom(int startRoomNumber, int x, int y, int z)
+	std::optional<int> GetTopRoom(int roomNumber, int x, int y, int z)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto floor = &GetFloorSide(roomNumber, x, z);
 		auto plane = floor->SectorPlane(x, z);
 
 		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
@@ -254,14 +254,7 @@ namespace T5M::Floordata
 
 		while (roomAbove)
 		{
-			roomNumber = *roomAbove;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
+			floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
 			plane = floor->SectorPlane(x, z);
 
 			if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
@@ -273,18 +266,8 @@ namespace T5M::Floordata
 		return std::nullopt;
 	}
 
-	int GetRoom(int startRoomNumber, int x, int y, int z)
+	int GetRoom(int roomNumber, int x, int y, int z)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
-
-		const auto roomSide = floor->RoomSide();
-		if (roomSide)
-		{
-			roomNumber = *roomSide;
-			floor = &GetFloor(roomNumber, x, z);
-		}
-
 		const auto roomBelow = GetBottomRoom(roomNumber, x, y, z);
 		const auto roomAbove = GetTopRoom(roomNumber, x, y, z);
 
@@ -298,14 +281,6 @@ namespace T5M::Floordata
 		}
 
 		return roomNumber;
-	}
-
-	VectorInt2 GetSectorPoint(int x, int z)
-	{
-		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
-		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
-
-		return VectorInt2{xPoint, yPoint};
 	}
 
 	std::optional<int> GetFloorHeight(int startRoomNumber, int x, int y, int z, bool raw)
