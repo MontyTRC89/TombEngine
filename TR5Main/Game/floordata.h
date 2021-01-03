@@ -43,17 +43,18 @@ public:
 
 namespace T5M::Floordata
 {
+	VectorInt2 GetSectorPoint(int x, int z);
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
-	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2 pos);
+	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos);
 	FLOOR_INFO& GetFloor(int roomNumber, int x, int z);
-	std::tuple<FLOOR_INFO&, int> GetBottomFloor(int startRoomNumber, int x, int z, bool first = false);
-	std::tuple<FLOOR_INFO&, int> GetTopFloor(int startRoomNumber, int x, int z, bool first = false);
+	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
+	std::tuple<FLOOR_INFO&, int> GetBottomFloor(int roomNumber, int x, int z, bool firstOutside = false);
+	std::tuple<FLOOR_INFO&, int> GetTopFloor(int roomNumber, int x, int z, bool firstOutside = false);
 	std::tuple<FLOOR_INFO&, int> GetNearestBottomFloor(int startRoomNumber, int x, int z);
 	std::tuple<FLOOR_INFO&, int> GetNearestTopFloor(int startRoomNumber, int x, int z);
-	std::optional<int> GetBottomRoom(int startRoomNumber, int x, int y, int z);
-	std::optional<int> GetTopRoom(int startRoomNumber, int x, int y, int z);
-	int GetRoom(int startRoomNumber, int x, int y, int z);
-	VectorInt2 GetSectorPoint(int x, int z);
+	std::optional<int> GetBottomRoom(int roomNumber, int x, int y, int z);
+	std::optional<int> GetTopRoom(int roomNumber, int x, int y, int z);
+	int GetRoom(int roomNumber, int x, int y, int z);
 	std::optional<int> GetFloorHeight(int startRoomNumber, int x, int y, int z, bool raw = false);
 	std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int y, int z, bool raw = false);
 	void GetBottomRoomList(int startRoomNumber, int x, int z, std::vector<int>& list);
