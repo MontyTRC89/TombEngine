@@ -66,6 +66,7 @@ void InitialisePushableBlock(short itemNum)
 	item->itemFlags[1] = NO_ITEM; // used for linking pushables together in stack
 	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
 	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
+	T5M::Floordata::AddBridge(itemNum);
 }
 
 void PushableBlockControl(short itemNumber)
@@ -199,7 +200,8 @@ void PushableBlockControl(short itemNumber)
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
-					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+					short newRoomNumber = item->roomNumber;
+					GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 					if (newRoomNumber != item->roomNumber)
 						ItemNewRoom(itemNumber, newRoomNumber);
 
@@ -301,7 +303,8 @@ void PushableBlockControl(short itemNumber)
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
-					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+					short newRoomNumber = item->roomNumber;
+					GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 					if (newRoomNumber != item->roomNumber)
 						ItemNewRoom(itemNumber, newRoomNumber);
 
@@ -335,7 +338,8 @@ void PushableBlockControl(short itemNumber)
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			short newRoomNumber = item->roomNumber;
+			GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 			if (newRoomNumber != item->roomNumber)
 				ItemNewRoom(itemNumber, newRoomNumber);
 
@@ -727,24 +731,21 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	return 1;
 }
 
-std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
+std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
 	{
-		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
-		return std::make_tuple(std::optional{height}, y > height && y <= item.pos.yPos);
+		const auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::optional{height};
 	}
-	return std::make_tuple(std::nullopt, false);
+	return std::nullopt;
 }
 
-std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64 && abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
-	{
-		auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
-		return std::make_tuple(std::optional{item.pos.yPos}, y >= height && y < item.pos.yPos);
-	}
-	return std::make_tuple(std::nullopt, false);
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
+		return std::optional{item.pos.yPos};
+	return std::nullopt;
 }
