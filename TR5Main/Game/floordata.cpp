@@ -28,6 +28,19 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int z) const
 	return RoomBelow(SectorPlane(x, z));
 }
 
+std::optional<int> FLOOR_INFO::RoomBelow(int x, int z, int y) const
+{
+	for (const auto itemNumber : BridgeItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		if (itemHeight && *itemHeight >= y)
+			return std::nullopt;
+	}
+
+	return RoomBelow(x, z);
+}
+
 std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
 {
 	const auto room = CeilingCollision.Portals[plane];
@@ -37,6 +50,19 @@ std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const
 {
 	return RoomAbove(SectorPlane(x, z));
+}
+
+std::optional<int> FLOOR_INFO::RoomAbove(int x, int z, int y) const
+{
+	for (const auto itemNumber : BridgeItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
+		if (itemHeight && *itemHeight <= y)
+			return std::nullopt;
+	}
+
+	return RoomAbove(x, z);
 }
 
 std::optional<int> FLOOR_INFO::RoomSide() const
@@ -52,12 +78,42 @@ int FLOOR_INFO::FloorHeight(int x, int z) const
 	return FloorCollision.Planes[plane].x * vector.x + FloorCollision.Planes[plane].y * vector.y + FloorCollision.Planes[plane].z;
 }
 
+int FLOOR_INFO::FloorHeight(int x, int z, int y) const
+{
+	auto height = FloorHeight(x, z);
+
+	for (const auto itemNumber : BridgeItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		if (itemHeight && *itemHeight >= y && *itemHeight < height)
+			height = *itemHeight;
+	}
+
+	return height;
+}
+
 int FLOOR_INFO::CeilingHeight(int x, int z) const
 {
 	const auto plane = SectorPlane(x, z);
 	const auto vector = GetSectorPoint(x, z);
 
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
+}
+
+int FLOOR_INFO::CeilingHeight(int x, int z, int y) const
+{
+	auto height = CeilingHeight(x, z);
+
+	for (const auto itemNumber : BridgeItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
+		if (itemHeight && *itemHeight <= y && *itemHeight > height)
+			height = *itemHeight;
+	}
+
+	return height;
 }
 
 Vector2 FLOOR_INFO::FloorSlope(int plane) const
@@ -88,6 +144,42 @@ bool FLOOR_INFO::IsWall(int plane) const
 bool FLOOR_INFO::IsWall(int x, int z) const
 {
 	return IsWall(SectorPlane(x, z));
+}
+
+std::optional<int> FLOOR_INFO::InsideBridge(int x, int z, int y, bool floor) const
+{
+	for (const auto itemNumber : BridgeItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto floorHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		const auto ceilingHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
+		if (floorHeight && ceilingHeight && (y > *floorHeight && y < *ceilingHeight || y == (floor ? *ceilingHeight : *floorHeight)))
+			return floor ? floorHeight : ceilingHeight;
+	}
+
+	return std::nullopt;
+}
+
+int FLOOR_INFO::LogicalHeight(int x, int z, int y, bool floor) const
+{
+	auto height = InsideBridge(x, z, y, floor);
+	while (height)
+	{
+		y = *height;
+		height = InsideBridge(x, z, y, floor);
+	}
+
+	return y;
+}
+
+void FLOOR_INFO::AddItem(short itemNumber)
+{
+	BridgeItem.insert(itemNumber);
+}
+
+void FLOOR_INFO::RemoveItem(short itemNumber)
+{
+	BridgeItem.erase(itemNumber);
 }
 
 namespace T5M::Floordata
@@ -156,316 +248,188 @@ namespace T5M::Floordata
 		return *floor;
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetBottomFloor(int roomNumber, int x, int z, bool firstOutside)
+	FLOOR_INFO& GetBottomFloor(const ROOM_VECTOR& location, int x, int z, int& y, bool firstOutside)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
-		auto roomBelow = floor->RoomBelow(plane);
+		auto floor = &GetFloorSide(location.roomNumber, x, z);
+		auto wall = floor->IsWall(x, z);
+		y = location.yNumber;
+		if (!wall)
+			y = std::clamp(y, floor->CeilingHeight(x, z), floor->FloorHeight(x, z));
+		auto roomBelow = floor->RoomBelow(x, z, y);
 
-		while ((!firstOutside || floor->IsWall(plane)) && roomBelow)
+		while ((firstOutside && wall || !firstOutside && !floor->InsideBridge(x, z, y, true)) && roomBelow)
 		{
-			floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
-			plane = floor->SectorPlane(x, z);
-			roomBelow = floor->RoomBelow(plane);
+			floor = &GetFloorSide(*roomBelow, x, z);
+			wall = floor->IsWall(x, z);
+			if (!wall)
+				y = floor->CeilingHeight(x, z);
+			roomBelow = floor->RoomBelow(x, z, y);
 		}
 
-		return std::tie(*floor, roomNumber);
+		return *floor;
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetTopFloor(int roomNumber, int x, int z, bool firstOutside)
+	FLOOR_INFO& GetTopFloor(const ROOM_VECTOR& location, int x, int z, int& y, bool firstOutside)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
-		auto roomAbove = floor->RoomAbove(plane);
+		auto floor = &GetFloorSide(location.roomNumber, x, z);
+		auto wall = floor->IsWall(x, z);
+		y = location.yNumber;
+		if (!wall)
+			y = std::clamp(y, floor->CeilingHeight(x, z), floor->FloorHeight(x, z));
+		auto roomAbove = floor->RoomAbove(x, z, y);
 
-		while ((!firstOutside || floor->IsWall(plane)) && roomAbove)
+		while ((firstOutside && wall || !firstOutside && !floor->InsideBridge(x, z, y, false)) && roomAbove)
 		{
-			floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
-			plane = floor->SectorPlane(x, z);
-			roomAbove = floor->RoomAbove(plane);
+			floor = &GetFloorSide(*roomAbove, x, z);
+			wall = floor->IsWall(x, z);
+			if (!wall)
+				y = floor->FloorHeight(x, z);
+			roomAbove = floor->RoomAbove(x, z, y);
 		}
 
-		return std::tie(*floor, roomNumber);
+		return *floor;
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetNearestBottomFloor(int startRoomNumber, int x, int z)
+	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto floor = &GetFloorSide(location.roomNumber, x, z);
 
-		const auto roomSide = floor->RoomSide();
-		if (roomSide)
+		int y;
+		floor = floor->IsWall(x, z) ? &GetTopFloor(location, x, z, y, true) : &GetBottomFloor(location, x, z, y);
+
+		if (!floor->IsWall(x, z))
 		{
-			roomNumber = *roomSide;
-			floor = &GetFloor(roomNumber, x, z);
+			y = floor->LogicalHeight(x, z, y, true);
+			return std::optional{floor->FloorHeight(x, z, y)};
 		}
 
-		return floor->IsWall(x, z) ? GetTopFloor(roomNumber, x, z, true) : GetBottomFloor(roomNumber, x, z);
+		return std::nullopt;
 	}
 
-	std::tuple<FLOOR_INFO&, int> GetNearestTopFloor(int startRoomNumber, int x, int z)
+	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z)
 	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto floor = &GetFloorSide(location.roomNumber, x, z);
 
-		const auto roomSide = floor->RoomSide();
-		if (roomSide)
+		int y;
+		floor = floor->IsWall(x, z) ? &GetBottomFloor(location, x, z, y, true) : &GetTopFloor(location, x, z, y);
+
+		if (!floor->IsWall(x, z))
 		{
-			roomNumber = *roomSide;
-			floor = &GetFloor(roomNumber, x, z);
+			y = floor->LogicalHeight(x, z, y, false);
+			return std::optional{floor->CeilingHeight(x, z, y)};
 		}
 
-		return floor->IsWall(x, z) ? GetBottomFloor(roomNumber, x, z, true) : GetTopFloor(roomNumber, x, z);
+		return std::nullopt;
 	}
 
-	std::optional<int> GetBottomRoom(int roomNumber, int x, int y, int z)
+	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
+		auto floor = &GetFloorSide(location.roomNumber, x, z, &location.roomNumber);
 
-		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
-			return std::nullopt;
+		if (!floor->IsWall(x, z))
+		{
+			location.yNumber = floor->LogicalHeight(x, z, std::clamp(location.yNumber, floor->CeilingHeight(x, z), floor->FloorHeight(x, z)), false);
+			const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
+			const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		auto roomBelow = floor->RoomBelow(plane);
+			if (y < ceilingHeight || floorHeight <= ceilingHeight)
+				return std::nullopt;
+			if (y <= floorHeight && y >= ceilingHeight)
+				return std::optional{location};
+		}
+
+		auto roomBelow = floor->RoomBelow(x, z, location.yNumber);
 
 		while (roomBelow)
 		{
-			floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
-			plane = floor->SectorPlane(x, z);
+			floor = &GetFloorSide(*roomBelow, x, z, &location.roomNumber);
 
-			if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
-				return std::optional{roomNumber};
+			if (!floor->IsWall(x, z))
+			{
+				location.yNumber = floor->LogicalHeight(x, z, floor->CeilingHeight(x, z), false);
+				const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
+				const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-			roomBelow = floor->RoomBelow(plane);
+				if (y < ceilingHeight || floorHeight <= ceilingHeight)
+					return std::nullopt;
+				if (y <= floorHeight && y >= ceilingHeight)
+					return std::optional{location};
+			}
+
+			roomBelow = floor->RoomBelow(x, z, location.yNumber);
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<int> GetTopRoom(int roomNumber, int x, int y, int z)
+	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, int x, int y, int z)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
+		auto floor = &GetFloorSide(location.roomNumber, x, z, &location.roomNumber);
 
-		if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
-			return std::nullopt;
+		if (!floor->IsWall(x, z))
+		{
+			location.yNumber = floor->LogicalHeight(x, z, std::clamp(location.yNumber, floor->CeilingHeight(x, z), floor->FloorHeight(x, z)), true);
+			const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
+			const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		auto roomAbove = floor->RoomAbove(plane);
+			if (y > floorHeight || floorHeight <= ceilingHeight)
+				return std::nullopt;
+			if (y <= floorHeight && y >= ceilingHeight)
+				return std::optional{location};
+		}
+
+		auto roomAbove = floor->RoomAbove(x, z, location.yNumber);
 
 		while (roomAbove)
 		{
-			floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
-			plane = floor->SectorPlane(x, z);
+			floor = &GetFloorSide(*roomAbove, x, z, &location.roomNumber);
 
-			if (!floor->IsWall(plane) && y <= floor->FloorHeight(x, z) && y >= floor->CeilingHeight(x, z))
-				return std::optional{roomNumber};
+			if (!floor->IsWall(x, z))
+			{
+				location.yNumber = floor->LogicalHeight(x, z, floor->FloorHeight(x, z), true);
+				const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
+				const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-			roomAbove = floor->RoomAbove(plane);
+				if (y > floorHeight || floorHeight <= ceilingHeight)
+					return std::nullopt;
+				if (y <= floorHeight && y >= ceilingHeight)
+					return std::optional{location};
+			}
+
+			roomAbove = floor->RoomAbove(x, z, location.yNumber);
 		}
 
 		return std::nullopt;
 	}
 
-	int GetRoom(int roomNumber, int x, int y, int z)
+	ROOM_VECTOR GetRoom(ROOM_VECTOR location, int x, int y, int z)
 	{
-		const auto roomBelow = GetBottomRoom(roomNumber, x, y, z);
-		const auto roomAbove = GetTopRoom(roomNumber, x, y, z);
+		const auto locationBelow = GetBottomRoom(location, x, y, z);
+		const auto locationAbove = GetTopRoom(location, x, y, z);
 
-		if (roomBelow)
+		if (locationBelow)
 		{
-			roomNumber = *roomBelow;
+			location = *locationBelow;
 		}
-		else if (roomAbove)
+		else if (locationAbove)
 		{
-			roomNumber = *roomAbove;
+			location = *locationAbove;
 		}
 
-		return roomNumber;
+		return location;
 	}
 
-	std::optional<int> GetFloorHeight(int startRoomNumber, int x, int y, int z, bool raw)
+	void AddBridge(short itemNumber)
 	{
-		const auto [floor, roomNumber] = GetNearestBottomFloor(startRoomNumber, x, z);
-
-		if (!floor.IsWall(x, z))
-		{
-			auto floorHeight = floor.FloorHeight(x, z);
-			auto height = floorHeight;
-
-			if (!raw)
-			{
-				if (y > height)
-					y = height;
-
-				auto list = std::vector<int>{};
-				GetRoomList(roomNumber, x, z, list);
-
-				auto it = list.begin();
-				while (it != list.end())
-				{
-					auto reset = false;
-					for (auto itemNumber = g_Level.Rooms[*it].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
-					{
-						const auto& item = g_Level.Items[itemNumber];
-						if (Objects[item.objectNumber].floor)
-						{
-							const auto [itemHeight, inside] = Objects[item.objectNumber].floor(itemNumber, x, y, z);
-							if (itemHeight)
-							{
-								if (inside)
-								{
-									y = *itemHeight;
-									reset = true;
-									break;
-								}
-								if (*itemHeight >= y && *itemHeight < height)
-									height = *itemHeight;
-							}
-						}
-					}
-
-					if (reset)
-					{
-						height = floorHeight;
-						it = list.begin();
-					}
-					else
-					{
-						++it;
-					}
-				}
-			}
-
-			return std::optional{height};
-		}
-
-		return std::nullopt;
+		const auto& item = g_Level.Items[itemNumber];
+		auto& floor = GetFloor(item.roomNumber, item.pos.xPos, item.pos.zPos);
+		floor.AddItem(itemNumber);
 	}
 
-	std::optional<int> GetCeilingHeight(int startRoomNumber, int x, int y, int z, bool raw)
+	void RemoveBridge(short itemNumber)
 	{
-		const auto [floor, roomNumber] = GetNearestTopFloor(startRoomNumber, x, z);
-
-		if (!floor.IsWall(x, z))
-		{
-			auto ceilingHeight = floor.CeilingHeight(x, z);
-			auto height = ceilingHeight;
-
-			if (!raw)
-			{
-				if (y < height)
-					y = height;
-
-				auto list = std::vector<int>{};
-				GetRoomList(roomNumber, x, z, list);
-
-				auto it = list.begin();
-				while (it != list.end())
-				{
-					auto reset = false;
-					for (auto itemNumber = g_Level.Rooms[*it].itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
-					{
-						const auto& item = g_Level.Items[itemNumber];
-						if (Objects[item.objectNumber].ceiling)
-						{
-							const auto [itemHeight, inside] = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
-							if (itemHeight)
-							{
-								if (inside)
-								{
-									y = *itemHeight;
-									reset = true;
-									break;
-								}
-								if (*itemHeight <= y && *itemHeight > height)
-									height = *itemHeight;
-							}
-						}
-					}
-
-					if (reset)
-					{
-						height = ceilingHeight;
-						it = list.begin();
-					}
-					else
-					{
-						++it;
-					}
-				}
-			}
-
-			return std::optional{height};
-		}
-
-		return std::nullopt;
-	}
-
-	void GetBottomRoomList(int startRoomNumber, int x, int z, std::vector<int>& list)
-	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
-		auto roomBelow = floor->RoomBelow(plane);
-
-		while (!floor->IsWall(plane) && roomBelow)
-		{
-			roomNumber = *roomBelow;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
-
-			plane = floor->SectorPlane(x, z);
-			roomBelow = floor->RoomBelow(plane);
-
-			list.push_back(roomNumber);
-		}
-	}
-
-	void GetTopRoomList(int startRoomNumber, int x, int z, std::vector<int>& list)
-	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
-		auto plane = floor->SectorPlane(x, z);
-		auto roomAbove = floor->RoomAbove(plane);
-
-		while (!floor->IsWall(plane) && roomAbove)
-		{
-			roomNumber = *roomAbove;
-			floor = &GetFloor(roomNumber, x, z);
-			const auto roomSide = floor->RoomSide();
-			if (roomSide)
-			{
-				roomNumber = *roomSide;
-				floor = &GetFloor(roomNumber, x, z);
-			}
-
-			plane = floor->SectorPlane(x, z);
-			roomAbove = floor->RoomAbove(plane);
-
-			list.push_back(roomNumber);
-		}
-	}
-
-	void GetRoomList(int startRoomNumber, int x, int z, std::vector<int>& list)
-	{
-		auto roomNumber = startRoomNumber;
-		auto floor = &GetFloor(roomNumber, x, z);
-
-		const auto roomSide = floor->RoomSide();
-		if (roomSide)
-		{
-			roomNumber = *roomSide;
-			floor = &GetFloor(roomNumber, x, z);
-		}
-
-		list.push_back(roomNumber);
-
-		GetBottomRoomList(roomNumber, x, z, list);
-		GetTopRoomList(roomNumber, x, z, list);
+		const auto& item = g_Level.Items[itemNumber];
+		auto& floor = GetFloor(item.roomNumber, item.pos.xPos, item.pos.zPos);
+		floor.RemoveItem(itemNumber);
 	}
 }
