@@ -332,7 +332,7 @@ namespace T5M::Floordata
 			const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 			const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-			if (y < ceilingHeight || floorHeight <= ceilingHeight)
+			if (y < ceilingHeight)
 				return std::nullopt;
 			if (y <= floorHeight && y >= ceilingHeight)
 			{
@@ -353,7 +353,7 @@ namespace T5M::Floordata
 				const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 				const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-				if (y < ceilingHeight || floorHeight <= ceilingHeight)
+				if (y < ceilingHeight)
 					return std::nullopt;
 				if (y <= floorHeight && y >= ceilingHeight)
 				{
@@ -378,7 +378,7 @@ namespace T5M::Floordata
 			const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 			const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-			if (y > floorHeight || floorHeight <= ceilingHeight)
+			if (y > floorHeight)
 				return std::nullopt;
 			if (y <= floorHeight && y >= ceilingHeight)
 			{
@@ -399,7 +399,7 @@ namespace T5M::Floordata
 				const auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 				const auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-				if (y > floorHeight || floorHeight <= ceilingHeight)
+				if (y > floorHeight)
 					return std::nullopt;
 				if (y <= floorHeight && y >= ceilingHeight)
 				{
