@@ -335,7 +335,10 @@ namespace T5M::Floordata
 			if (y < ceilingHeight || floorHeight <= ceilingHeight)
 				return std::nullopt;
 			if (y <= floorHeight && y >= ceilingHeight)
+			{
+				location.yNumber = y;
 				return std::optional{location};
+			}
 		}
 
 		auto roomBelow = floor->RoomBelow(x, z, location.yNumber);
@@ -353,7 +356,10 @@ namespace T5M::Floordata
 				if (y < ceilingHeight || floorHeight <= ceilingHeight)
 					return std::nullopt;
 				if (y <= floorHeight && y >= ceilingHeight)
+				{
+					location.yNumber = y;
 					return std::optional{location};
+				}
 			}
 
 			roomBelow = floor->RoomBelow(x, z, location.yNumber);
@@ -375,7 +381,10 @@ namespace T5M::Floordata
 			if (y > floorHeight || floorHeight <= ceilingHeight)
 				return std::nullopt;
 			if (y <= floorHeight && y >= ceilingHeight)
+			{
+				location.yNumber = y;
 				return std::optional{location};
+			}
 		}
 
 		auto roomAbove = floor->RoomAbove(x, z, location.yNumber);
@@ -393,7 +402,10 @@ namespace T5M::Floordata
 				if (y > floorHeight || floorHeight <= ceilingHeight)
 					return std::nullopt;
 				if (y <= floorHeight && y >= ceilingHeight)
+				{
+					location.yNumber = y;
 					return std::optional{location};
+				}
 			}
 
 			roomAbove = floor->RoomAbove(x, z, location.yNumber);
