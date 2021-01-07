@@ -2,12 +2,6 @@
 #include "trmath.h"
 #include "items.h"
 
-struct ROOM_VECTOR
-{
-	int roomNumber;
-	int yNumber;
-};
-
 struct SECTOR_COLLISION_INFO
 {
 	float SplitAngle;

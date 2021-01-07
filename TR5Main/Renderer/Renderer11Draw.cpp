@@ -1955,7 +1955,8 @@ namespace T5M::Renderer
             printDebugMessage("Frame time: %d", m_timeFrame);
             printDebugMessage("Draw calls: %d", m_numDrawCalls);
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-            printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
+			printDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
+			printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
             printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
             printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
@@ -1967,7 +1968,6 @@ namespace T5M::Renderer
             printDebugMessage("Lara.gunType: %d", Lara.gunType);
             printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
             printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
-			printDebugMessage("true X Z speed: %d %d", abs(lara_coll.old.x - LaraItem->pos.xPos), abs(lara_coll.old.z - LaraItem->pos.zPos));
             printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
             printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
             printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
