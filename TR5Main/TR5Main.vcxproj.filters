@@ -933,6 +933,9 @@
     <ClInclude Include="Objects\TR1\Entity\tr1_centaur.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1719,6 +1722,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR1\Entity\tr1_centaur.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
