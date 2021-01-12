@@ -190,6 +190,15 @@ void PushableBlockControl(short itemNumber)
 						belowItem->itemFlags[1] = NO_ITEM;
 				}
 			}
+
+			T5M::Floordata::RemoveBridge(itemNumber);
+
+			stackIndex = item->itemFlags[1];
+			while (stackIndex != NO_ITEM) // remove all attached bridges from stack
+			{
+				T5M::Floordata::RemoveBridge(stackIndex);
+				stackIndex = g_Level.Items[stackIndex].itemFlags[1];
+			}
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
@@ -293,6 +302,15 @@ void PushableBlockControl(short itemNumber)
 
 				}
 			}
+
+			T5M::Floordata::RemoveBridge(itemNumber);
+
+			stackIndex = item->itemFlags[1];
+			while (stackIndex != NO_ITEM) // remove all attached bridges from stack
+			{
+				T5M::Floordata::RemoveBridge(stackIndex);
+				stackIndex = g_Level.Items[stackIndex].itemFlags[1];
+			}
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
@@ -354,6 +372,15 @@ void PushableBlockControl(short itemNumber)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+			}
+
+			T5M::Floordata::AddBridge(itemNumber);
+
+			stackIndex = item->itemFlags[1];
+			while (stackIndex != NO_ITEM) // remove all attached bridges from stack
+			{
+				T5M::Floordata::AddBridge(stackIndex);
+				stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 			}
 
 
