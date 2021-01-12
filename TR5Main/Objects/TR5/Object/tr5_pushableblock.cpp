@@ -377,7 +377,7 @@ void PushableBlockControl(short itemNumber)
 			T5M::Floordata::AddBridge(itemNumber);
 
 			stackIndex = item->itemFlags[1];
-			while (stackIndex != NO_ITEM) // remove all attached bridges from stack
+			while (stackIndex != NO_ITEM) // add bridges back to stack
 			{
 				T5M::Floordata::AddBridge(stackIndex);
 				stackIndex = g_Level.Items[stackIndex].itemFlags[1];
