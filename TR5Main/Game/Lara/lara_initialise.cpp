@@ -12,6 +12,8 @@ void InitialiseLara(int restore)
 
 	LaraItem->data = &Lara;
 	LaraItem->collidable = false;
+	LaraItem->location.roomNumber = LaraItem->roomNumber;
+	LaraItem->location.yNumber = LaraItem->pos.yPos;
 
 	if (restore)
 	{

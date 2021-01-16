@@ -850,30 +850,21 @@ PUSHABLE_INFO* pushable_info(ITEM_INFO* item) // retrieve PUSHABLE_INFO* from vo
 	return (PUSHABLE_INFO*)item->data;
 }
 
-std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z)
+std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	const auto pushable = pushable_info(&g_Level.Items[itemNumber]);
-
-	if (item.status != ITEM_INVISIBLE && pushable->hasFloorCeiling && !item.gravityStatus &&
-		abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
 	{
-		auto height = item.pos.yPos - pushable->height;
-		return std::make_tuple(std::optional{height}, y > height && y <= item.pos.yPos);
+		const auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		return std::optional{height};
 	}
-	return std::make_tuple(std::nullopt, false);
+	return std::nullopt;
 }
 
-std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	const auto pushable = pushable_info(&g_Level.Items[itemNumber]);
-
-	if (item.status != ITEM_INVISIBLE && pushable->hasFloorCeiling && !item.gravityStatus &&
-		abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
-	{
-		auto height = item.pos.yPos - pushable->height;
-		return std::make_tuple(std::optional{item.pos.yPos}, y >= height && y < item.pos.yPos);
-	}
-	return std::make_tuple(std::nullopt, false);
+	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
+		return std::optional{item.pos.yPos};
+	return std::nullopt;
 }

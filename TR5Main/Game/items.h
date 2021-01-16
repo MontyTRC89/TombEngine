@@ -30,6 +30,12 @@ typedef enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
+struct ROOM_VECTOR
+{
+	int roomNumber;
+	int yNumber;
+};
+
 typedef struct ITEM_INFO
 {
 	int floor;
@@ -42,6 +48,7 @@ typedef struct ITEM_INFO
 	short animNumber;
 	short frameNumber;
 	short roomNumber;
+	ROOM_VECTOR location;
 	short nextItem;
 	short nextActive;
 	short speed;
@@ -74,7 +81,7 @@ typedef struct ITEM_INFO
 	short drawRoom;
 	short TOSSPAD;
 	PHD_3DPOS startPos;
-	short location;
+	short locationAI;
 };
 
 // used by fx->shade !

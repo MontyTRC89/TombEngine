@@ -41,5 +41,5 @@ int CheckStackLimit(ITEM_INFO* item);
 void pushLoop(ITEM_INFO* item);
 void pushEnd(ITEM_INFO* item);
 PUSHABLE_INFO* pushable_info(ITEM_INFO* item);
-std::tuple<std::optional<int>, bool> PushableBlockFloor(short itemNumber, int x, int y, int z);
-std::tuple<std::optional<int>, bool> PushableBlockCeiling(short itemNumber, int x, int y, int z);
+std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
+std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);

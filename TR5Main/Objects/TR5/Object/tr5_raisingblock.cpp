@@ -26,6 +26,7 @@ void InitialiseRaisingBlock(short itemNumber)
 	// Get height from animations
 	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
 	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
+	T5M::Floordata::AddBridge(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)
@@ -135,24 +136,15 @@ void ControlRaisingBlock(short itemNumber)
 	}
 }
 
-std::tuple<std::optional<int>, bool> RaisingBlockFloor(short itemNumber, int x, int y, int z)
+std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
-	{
-		auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
-		return std::make_tuple(std::optional{height}, y > height && y <= item.pos.yPos);
-	}
-	return std::make_tuple(std::nullopt, false);
+	const auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
+	return std::optional{height};
 }
 
-std::tuple<std::optional<int>, bool> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (abs(item.pos.xPos - x) <= SECTOR(1) / 2 && abs(item.pos.zPos - z) <= SECTOR(1) / 2)
-	{
-		auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
-		return std::make_tuple(std::optional{item.pos.yPos}, y >= height && y < item.pos.yPos);
-	}
-	return std::make_tuple(std::nullopt, false);
+	return std::optional{item.pos.yPos};
 }
