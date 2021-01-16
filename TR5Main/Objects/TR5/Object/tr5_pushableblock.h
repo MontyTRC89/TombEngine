@@ -27,17 +27,19 @@ typedef struct PUSHABLE_INFO
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
 void InitialisePushableBlock(short itemNum);
-void PushableBlockControl(short itemNum);
+void PushableBlockControl(short itemNumber);
 void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
 int TestBlockMovable(ITEM_INFO* item, int blokhite);
 int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant);
-void MoveStackXZ(int itemNum);
-void MoveStackY(int itemNum, int y);
-void RemoveFromStack(int itemNum);
-int FindStack(int itemNum);
+void MoveStackXZ(short itemNum);
+void MoveStackY(short itemNum, int y);
+void RemoveBridgeStack(short itemNum);
+void AddBridgeStack(short itemNum);
+void RemoveFromStack(short itemNum);
+int FindStack(short itemNum);
 int GetStackHeight(ITEM_INFO* item);
-int CheckStackLimit(ITEM_INFO* item);
+bool CheckStackLimit(ITEM_INFO* item);
 void pushLoop(ITEM_INFO* item);
 void pushEnd(ITEM_INFO* item);
 PUSHABLE_INFO* pushable_info(ITEM_INFO* item);

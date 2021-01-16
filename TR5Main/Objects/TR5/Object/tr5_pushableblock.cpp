@@ -63,9 +63,11 @@ void InitialisePushableBlock(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	item->itemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
 
+	T5M::Floordata::AddBridge(itemNum);
+
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	
-	
+	// allocate new pushable info
 	PUSHABLE_INFO* pushable = new PUSHABLE_INFO;
 	
 	pushable->stackLimit = 3; // LUA
@@ -106,7 +108,7 @@ void InitialisePushableBlock(short itemNum)
 
 	item->data = (void*) pushable;
 
-	FindStack(itemNum); // check for stack formation on init (can't use pushable->linkedIndex with current setup)
+	FindStack(itemNum); // check for stack formation on init
 }
 
 void PushableBlockControl(short itemNumber)
@@ -167,6 +169,7 @@ void PushableBlockControl(short itemNumber)
 			SoundEffect(pushable->fallSound, &item->pos, 2);
 
 			MoveStackY(itemNumber, relY);
+			AddBridgeStack(itemNumber);
 
 			if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
 			{
@@ -187,7 +190,6 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-
 	int displaceBox = GetBoundsAccurate(LaraItem)->Z2 - 80; // move pushable based on bbox->Z2 of Lara
 
 	switch (LaraItem->animNumber)
@@ -195,7 +197,10 @@ void PushableBlockControl(short itemNumber)
 	case LA_PUSHABLE_PUSH:
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+		{
 			RemoveFromStack(itemNumber);
+			RemoveBridgeStack(itemNumber);
+		}
 
 		switch (quadrant) 
 		{
@@ -229,9 +234,10 @@ void PushableBlockControl(short itemNumber)
 
 		MoveStackXZ(itemNumber);
 
-		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 16)
+
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
 		{
-			if (pushable->canFall)
+			if (pushable->canFall) // check if pushable is about to fall
 			{
 				roomNumber = item->roomNumber;
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -245,12 +251,11 @@ void PushableBlockControl(short itemNumber)
 					LaraItem->goalAnimState = LS_STOP;
 
 					item->gravityStatus = true; // do fall
+					return;
 				}
 			}
-		}
 
-		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
-		{
+
 			if (TrInput & IN_ACTION)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
@@ -274,7 +279,10 @@ void PushableBlockControl(short itemNumber)
 	case LA_PUSHABLE_PULL:
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase)
+		{
 			RemoveFromStack(itemNumber);
+			RemoveBridgeStack(itemNumber);
+		}
 
 		switch (quadrant)
 		{
@@ -340,6 +348,7 @@ void PushableBlockControl(short itemNumber)
 
 			MoveStackXZ(itemNumber);
 			FindStack(itemNumber);
+			AddBridgeStack(itemNumber);
 
 			roomNumber = item->roomNumber;
 			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
@@ -356,6 +365,7 @@ void PushableBlockControl(short itemNumber)
 				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
 			}
 		}
+
 		break;
 	}
 }
@@ -711,11 +721,12 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	return 1;
 }
 
-void MoveStackXZ(int itemNum)
+void MoveStackXZ(short itemNum)
 {
 	auto item = &g_Level.Items[itemNum];
 
-	int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	short newRoomNumber = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 	if (newRoomNumber != item->roomNumber)
 		ItemNewRoom(itemNum, newRoomNumber);
 
@@ -728,17 +739,19 @@ void MoveStackXZ(int itemNum)
 		stackItem->pos.xPos = item->pos.xPos;
 		stackItem->pos.zPos = item->pos.zPos;
 
-		int newRoomNumber = T5M::Floordata::GetRoom(stackItem->roomNumber, stackItem->pos.xPos, stackItem->pos.yPos, stackItem->pos.zPos);
+		newRoomNumber = stackItem->roomNumber;
+		GetFloor(stackItem->pos.xPos, stackItem->pos.yPos, stackItem->pos.zPos, &newRoomNumber);
 		if (newRoomNumber != stackItem->roomNumber)
 			ItemNewRoom(stackIndex, newRoomNumber);
 	}
 }
 
-void MoveStackY(int itemNum, int y)
+void MoveStackY(short itemNum, int y)
 {
 	auto item = &g_Level.Items[itemNum];
 
-	int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	short newRoomNumber = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 	if (newRoomNumber != item->roomNumber)
 		ItemNewRoom(itemNum, newRoomNumber);
 
@@ -749,13 +762,38 @@ void MoveStackY(int itemNum, int y)
 
 		item->pos.yPos += y;
 
-		int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		short newRoomNumber = item->roomNumber;
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
 		if (newRoomNumber != item->roomNumber)
 			ItemNewRoom(stackIndex, newRoomNumber);
 	}
 }
 
-void RemoveFromStack(int itemNum) // unlink pushable from stack if linked
+void AddBridgeStack(short itemNum)
+{
+	T5M::Floordata::AddBridge(itemNum);
+
+	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
+	while (stackIndex != NO_ITEM)
+	{
+		T5M::Floordata::AddBridge(stackIndex);
+		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
+	}
+}
+
+void RemoveBridgeStack(short itemNum)
+{
+	T5M::Floordata::RemoveBridge(itemNum);
+
+	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
+	while (stackIndex != NO_ITEM)
+	{
+		T5M::Floordata::RemoveBridge(stackIndex);
+		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
+	}
+}
+
+void RemoveFromStack(short itemNum) // unlink pushable from stack if linked
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
@@ -773,7 +811,7 @@ void RemoveFromStack(int itemNum) // unlink pushable from stack if linked
 	}
 }
 
-int FindStack(int itemNum)
+int FindStack(short itemNum)
 {
 	int stackTop = NO_ITEM; // index of heighest (yPos) pushable in stack
 	int stackYmin = CLICK(256); // set starting height
@@ -827,7 +865,7 @@ int GetStackHeight(ITEM_INFO* item)
 	return height;
 }
 
-int CheckStackLimit(ITEM_INFO* item)
+bool CheckStackLimit(ITEM_INFO* item)
 {
 	int limit = pushable_info(item)->stackLimit;
 	
@@ -839,10 +877,10 @@ int CheckStackLimit(ITEM_INFO* item)
 		count++;
 
 		if (count > limit)
-			return 0;
+			return false;
 	}
 
-	return 1;
+	return true;
 }
 
 PUSHABLE_INFO* pushable_info(ITEM_INFO* item) // retrieve PUSHABLE_INFO* from void* data
@@ -853,9 +891,9 @@ PUSHABLE_INFO* pushable_info(ITEM_INFO* item) // retrieve PUSHABLE_INFO* from vo
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
+	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x40))
 	{
-		const auto height = item.pos.yPos - (item.triggerFlags - 64) * CLICK(1);
+		const auto height = item.pos.yPos - (item.triggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
 	}
 	return std::nullopt;
@@ -864,7 +902,7 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && item.triggerFlags >= 64)
+	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 64))
 		return std::optional{item.pos.yPos};
 	return std::nullopt;
 }
