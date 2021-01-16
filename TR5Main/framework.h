@@ -14,6 +14,7 @@
 #include "memory/malloc.h"
 #include "Game/debug/debug.h"
 #include <algorithm>
+#include <set>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

@@ -153,7 +153,7 @@ void VonCroyControl(short itemNumber)
 	// Try to find a possible enemy or target
 	ITEM_INFO* foundTarget = NULL;
 
-	if (Lara.location <= item->location)
+	if (Lara.location <= item->locationAI)
 	{
 		int minDistance = 0x7FFFFFFF;
 		int distance;
@@ -497,7 +497,7 @@ void VonCroyControl(short itemNumber)
 		creature->maximumTurn = ANGLE(11);
 		tilt = abs(angle) / 2;
 
-		if (info.distance < SQUARE(2048) || Lara.location < item->location)
+		if (info.distance < SQUARE(2048) || Lara.location < item->locationAI)
 		{
 			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
@@ -510,7 +510,6 @@ void VonCroyControl(short itemNumber)
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
-				item->location;
 
 				break;
 			}
@@ -608,7 +607,7 @@ void VonCroyControl(short itemNumber)
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
-			item->location++;
+			item->locationAI++;
 		}
 
 		break;
@@ -655,7 +654,7 @@ void VonCroyControl(short itemNumber)
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
-			item->location++;
+			item->locationAI++;
 		}
 
 		break;
@@ -721,7 +720,7 @@ void VonCroyControl(short itemNumber)
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
-			item->location++;
+			item->locationAI++;
 		//}
 		break;
 
@@ -778,7 +777,7 @@ void VonCroyControl(short itemNumber)
 		creature->reachedGoal = false;
 		creature->enemy = NULL;
 		item->aiBits = FOLLOW;
-		item->location++;
+		item->locationAI++;
 
 		break;
 
@@ -808,7 +807,7 @@ void VonCroyControl(short itemNumber)
 		creature->reachedGoal = false;
 		creature->enemy = NULL;
 		item->aiBits = FOLLOW;
-		item->location++;
+		item->locationAI++;
 
 		break;
 
@@ -829,7 +828,7 @@ void VonCroyControl(short itemNumber)
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
-			item->location++;
+			item->locationAI++;
 		}
 
 		break;
