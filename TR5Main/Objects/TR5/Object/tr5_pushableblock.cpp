@@ -66,7 +66,6 @@ void InitialisePushableBlock(short itemNum)
 	item->itemFlags[1] = NO_ITEM; // used for linking pushables together in stack
 	//if (item->status != ITEM_INVISIBLE && item->triggerFlags >= 64)
 	//	AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-	T5M::Floordata::AddBridge(itemNum);
 }
 
 void PushableBlockControl(short itemNumber)
@@ -200,8 +199,7 @@ void PushableBlockControl(short itemNumber)
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
-					short newRoomNumber = item->roomNumber;
-					GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (newRoomNumber != item->roomNumber)
 						ItemNewRoom(itemNumber, newRoomNumber);
 
@@ -303,8 +301,7 @@ void PushableBlockControl(short itemNumber)
 					LaraItem->goalAnimState = LS_STOP;
 				else
 				{
-					short newRoomNumber = item->roomNumber;
-					GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+					int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (newRoomNumber != item->roomNumber)
 						ItemNewRoom(itemNumber, newRoomNumber);
 
@@ -338,8 +335,7 @@ void PushableBlockControl(short itemNumber)
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			short newRoomNumber = item->roomNumber;
-			GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+			int newRoomNumber = T5M::Floordata::GetRoom(item->roomNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			if (newRoomNumber != item->roomNumber)
 				ItemNewRoom(itemNumber, newRoomNumber);
 
