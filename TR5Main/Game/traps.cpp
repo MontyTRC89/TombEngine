@@ -292,14 +292,14 @@ void LavaBurn(ITEM_INFO* item)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, 32000, item->pos.zPos, &roomNumber);
 		if (item->floor == GetFloorHeight(floor, item->pos.xPos, 32000, item->pos.zPos))
 		{
-			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-
-				KayakLaraRapidsDrown();
-			else
-			{
+//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
+//				KayakLaraRapidsDrown();
+//			else
+//			{
 				item->hitPoints = -1;
 				item->hitStatus = true;
 				LaraBurn();
-			}
+//			}
 		}
 	}
 }
