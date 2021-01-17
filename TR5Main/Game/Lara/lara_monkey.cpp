@@ -5,6 +5,8 @@
 #include "lara_tests.h"
 #include "lara_monkey.h"
 
+using namespace T5M::Floordata;
+
 /*this file has all the related functions to monkeyswinging*/
 
 /*monkeyswing state handling functions*/
@@ -87,7 +89,8 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
 
-		MonkeySwingSnap(item, coll);
+		if (abs(coll->midCeiling - coll->frontCeiling) < 50)
+			MonkeySwingSnap(item, coll);
 	}
 	else
 	{
@@ -500,9 +503,10 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)//160CC(<), 16200(<) (F)
 
 void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)//1605C(<), 16190(<) (F)
 {
-	short roomNum = item->roomNumber;
-	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos) + 704;
+	ROOM_VECTOR location = GetRoom(item->location, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int height = GetCeilingHeight(location, item->pos.xPos, item->pos.zPos).value_or(NO_HEIGHT);
+	if (height != NO_HEIGHT)
+		item->pos.yPos = height + 704;
 }
 
 void MonkeySwingFall(ITEM_INFO* item)//16004(<), 16138(<) (F)
