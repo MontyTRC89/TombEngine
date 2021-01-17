@@ -6,6 +6,8 @@
 #include "lara_climb.h"
 #include "lara_collide.h"
 
+using namespace T5M::Floordata;
+
 static short LeftClimbTab[4] = // offset 0xA0638
 {
 	0x0200, 0x0400, 0x0800, 0x0100
@@ -1173,15 +1175,15 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
-short LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
+int LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 {
-	short room = item->roomNumber;
-
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - 762;
 	int z = item->pos.zPos + dist * phd_cos(ang);
 
-	int height = GetFloorHeight(GetFloor(x, y, z, &room), x, y, z);
+	ROOM_VECTOR location = GetRoom(item->location, x, y, z);
+
+	int height = GetFloorHeight(location, x, z).value_or(NO_HEIGHT);
 
 	if (height != NO_HEIGHT)
 		height -= item->pos.yPos;
@@ -1189,15 +1191,15 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 	return height;
 }
 
-short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
+int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 {
-	short room = item->roomNumber;
-
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - h;
 	int z = item->pos.zPos + dist * phd_cos(ang);
 
-	int height = GetCeiling(GetFloor(x, y, z, &room), x, y, z);
+	ROOM_VECTOR location = GetRoom(item->location, x, y, z);
+
+	int height = GetCeilingHeight(location, x, z).value_or(NO_HEIGHT);
 
 	if (height != NO_HEIGHT)
 		height += h - item->pos.yPos;
