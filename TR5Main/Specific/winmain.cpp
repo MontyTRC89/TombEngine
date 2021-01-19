@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <process.h>
 #include <corecrt_io.h>
+#include <iostream>
 using namespace T5M::Renderer;
 using std::exception;
 using std::string;
@@ -95,6 +96,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 }
 
 void getCurrentCommit() {
+#if _DEBUG
 	LPSTR cmdLine = {TEXT("git.exe log -1 --oneline")};
 
 	SECURITY_ATTRIBUTES sa = {0};
@@ -145,6 +147,7 @@ void getCurrentCommit() {
 	CloseHandle(hStdOutWr);
 	CloseHandle(hStdErrRd);
 	CloseHandle(hStdErrWr);
+#endif
 }
 
 void HandleScriptMessage(WPARAM wParam)
