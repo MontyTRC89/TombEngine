@@ -1801,8 +1801,10 @@ namespace T5M::Renderer
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+#if _DEBUG
         drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255,255, 255), 0);
         drawAllStrings();
+#endif
         m_swapChain->Present(0, 0);
     }
 
