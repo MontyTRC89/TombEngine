@@ -827,11 +827,69 @@ struct HolsterInfo {
 	HOLSTER_SLOT rightHolster;
 	HOLSTER_SLOT backHolster;
 };
+struct Ammo {
+	unsigned short count;
+	bool isInfinite;
 
+	Ammo operator --() {
+		Ammo tmp;
+		tmp.isInfinite = this->isInfinite;
+		tmp.count = static_cast<unsigned int>(--this->count);
+		return tmp;
+	}
+
+	Ammo operator --(int) {
+		Ammo tmp;
+		tmp.isInfinite = this->isInfinite;
+		tmp.count = --this->count;
+		return tmp;
+	}
+
+	Ammo operator ++() {
+		Ammo tmp;
+		tmp.isInfinite = this->isInfinite;
+		tmp.count = ++this->count;
+		return tmp;
+	}
+
+	Ammo operator ++(int) {
+		Ammo tmp;
+		tmp.isInfinite = this->isInfinite;
+		tmp.count = ++this->count;
+		return tmp;
+	}
+
+	Ammo& operator =(unsigned val) {
+		this->count = static_cast<unsigned short>(val);
+		return *this;
+	}
+
+	Ammo& operator +(unsigned val) {
+		int tmp = this->count + val;
+		this->count = static_cast<unsigned short>(tmp);
+		return *this;
+	}
+
+	Ammo& operator +=(unsigned val) {
+		int tmp = this->count + val;
+		this->count = static_cast<unsigned short>(tmp);
+		return *this;
+	}
+
+	Ammo& operator -=(unsigned val) {
+		int tmp = this->count - val;
+		this->count = static_cast<unsigned short>(tmp);
+		return *this;
+	}
+
+	operator bool() {
+		return isInfinite || (count > 0);
+	}
+};
 typedef struct CarriedWeaponInfo
 {
 	bool Present;
-	short Ammo[MAX_AMMOTYPE];
+	Ammo Ammo[MAX_AMMOTYPE];
 	int SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight;
 	bool HasSilencer;

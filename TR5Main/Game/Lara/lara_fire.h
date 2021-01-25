@@ -36,11 +36,11 @@ constexpr auto WSTATE_UW_UNAIM = 7;
 extern WEAPON_INFO Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);
-int WeaponObject(int weaponType);
+GAME_OBJECT_ID WeaponObject(int weaponType);
 void LaraGun();
-short* GetAmmo(int weaponType);
+Ammo& GetAmmo(int weaponType);
 void InitialiseNewWeapon();
-int WeaponObjectMesh(int weaponType);
+GAME_OBJECT_ID WeaponObjectMesh(int weaponType);
 void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
 FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
