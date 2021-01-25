@@ -258,7 +258,7 @@ bool MonksAttackLara;
 ITEM_INFO* LastTargets[8];
 ITEM_INFO* TargetList[8];
 
-int WeaponObject(int weaponType) // (F) (D)
+GAME_OBJECT_ID WeaponObject(int weaponType) // (F) (D)
 {
 	switch (weaponType)
 	{
@@ -522,7 +522,7 @@ void LaraGun() // (F) (D)
 
 			if (TrInput & IN_ACTION)
 			{
-				if (!*GetAmmo(Lara.gunType))
+				if (!GetAmmo(Lara.gunType))
 				{
 					Lara.requestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
 					return;
@@ -594,9 +594,8 @@ void LaraGun() // (F) (D)
 	}
 }
 
-short* GetAmmo(int weaponType)
-{
-	return &Lara.Weapons[weaponType].Ammo[Lara.Weapons[weaponType].SelectedAmmo];
+Ammo& GetAmmo(int weaponType){
+	return Lara.Weapons[weaponType].Ammo[Lara.Weapons[weaponType].SelectedAmmo];
 }
 
 void InitialiseNewWeapon()
@@ -651,8 +650,7 @@ void InitialiseNewWeapon()
 	}
 }
 
-int WeaponObjectMesh(int weaponType)
-{
+GAME_OBJECT_ID WeaponObjectMesh(int weaponType) {
 	switch (weaponType)
 	{
 	case WEAPON_REVOLVER:
@@ -724,11 +722,11 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 
 FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
 {
-	short* ammo = GetAmmo(weaponType);
-	if (*ammo == 0)
+	Ammo& ammo = GetAmmo(weaponType);
+	if (ammo.count == 0 && !ammo.isInfinite)
 		return FW_NOAMMO;
-	if (*ammo != -1)
-		*ammo--;
+	if (!ammo.isInfinite)
+		ammo--;
 
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 	int r;

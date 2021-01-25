@@ -1315,9 +1315,9 @@ void BinocularCamera(ITEM_INFO* item)
 	if (LaserSight)
 	{
 		int firing = 0;
-		short* ammo = GetAmmo(Lara.gunType);
+		Ammo& ammo = GetAmmo(Lara.gunType);
 
-		if (!(InputBusy & IN_ACTION) || WeaponDelay || !*ammo)
+		if (!(InputBusy & IN_ACTION) || WeaponDelay || !ammo)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
@@ -1334,8 +1334,8 @@ void BinocularCamera(ITEM_INFO* item)
 				firing = 1;
 				WeaponDelay = 16;
 				Savegame.Game.AmmoUsed++;
-				if (*ammo != -1)
-					(*ammo)--;
+				if (!ammo.isInfinite)
+					(ammo)--;
 			}
 			else if (Lara.gunType == WEAPON_CROSSBOW)
 			{
@@ -1426,8 +1426,8 @@ void BinocularCamera(ITEM_INFO* item)
 					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
 
-				if (*ammo != -1)
-					(*ammo)--;
+				if (!ammo.isInfinite)
+					(ammo)--;
 			}
 		}
 
