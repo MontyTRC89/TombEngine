@@ -723,9 +723,9 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
 {
 	Ammo& ammo = GetAmmo(weaponType);
-	if (ammo.count == 0 && !ammo.isInfinite)
+	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return FW_NOAMMO;
-	if (!ammo.isInfinite)
+	if (!ammo.hasInfinite())
 		ammo--;
 
 	WEAPON_INFO* weapon = &Weapons[weaponType];
