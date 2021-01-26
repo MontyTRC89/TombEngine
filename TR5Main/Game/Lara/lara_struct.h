@@ -828,62 +828,90 @@ struct HolsterInfo {
 	HOLSTER_SLOT backHolster;
 };
 struct Ammo {
-	unsigned short count;
+	using CountType = uint16_t;
+private:
+	CountType count;
 	bool isInfinite;
+public:
 
-	Ammo operator --() {
-		Ammo tmp;
-		tmp.isInfinite = this->isInfinite;
-		tmp.count = static_cast<unsigned int>(--this->count);
-		return tmp;
+	Ammo& operator --() {
+		--count;
+		return *this;
 	}
 
 	Ammo operator --(int) {
-		Ammo tmp;
-		tmp.isInfinite = this->isInfinite;
-		tmp.count = --this->count;
+		Ammo tmp = *this;
+		--*this;
 		return tmp;
 	}
 
-	Ammo operator ++() {
-		Ammo tmp;
-		tmp.isInfinite = this->isInfinite;
-		tmp.count = ++this->count;
-		return tmp;
+	Ammo& operator ++() {
+		++count;
+		return *this;
 	}
 
 	Ammo operator ++(int) {
-		Ammo tmp;
-		tmp.isInfinite = this->isInfinite;
-		tmp.count = ++this->count;
+		Ammo tmp = *this;
+		++*this;
 		return tmp;
 	}
 
-	Ammo& operator =(unsigned val) {
-		this->count = static_cast<unsigned short>(val);
+	Ammo& operator =(size_t val) {
+		count = clamp(val);
 		return *this;
 	}
 
-	Ammo& operator +(unsigned val) {
+	bool operator ==(size_t val) {
+		return count == clamp(val);
+	}
+
+	Ammo& operator =(Ammo& rhs) {
+		count = rhs.count;
+		isInfinite = rhs.count;
+		return *this;
+	}
+
+	Ammo operator +(size_t val) {
+		Ammo tmp = *this;
+		tmp += val;
+		return tmp;
+	}
+
+	Ammo operator -(size_t val) {
+		Ammo tmp = *this;
+		tmp -= val;
+		return tmp;
+	}
+
+	Ammo& operator +=(size_t val) {
 		int tmp = this->count + val;
-		this->count = static_cast<unsigned short>(tmp);
+		this->count = clamp(tmp);
 		return *this;
 	}
 
-	Ammo& operator +=(unsigned val) {
-		int tmp = this->count + val;
-		this->count = static_cast<unsigned short>(tmp);
-		return *this;
-	}
-
-	Ammo& operator -=(unsigned val) {
+	Ammo& operator -=(size_t val) {
 		int tmp = this->count - val;
-		this->count = static_cast<unsigned short>(tmp);
+		this->count = clamp(tmp);
 		return *this;
 	}
 
 	operator bool() {
 		return isInfinite || (count > 0);
+	}
+	static CountType clamp(int val) {
+		return std::clamp(val, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
+	}
+
+	bool hasInfinite() const {
+		return isInfinite;
+	}
+
+	CountType getCount() const {
+		return count;
+	}
+
+	void setInfinite(bool infinite) {
+		isInfinite = infinite;
 	}
 };
 typedef struct CarriedWeaponInfo

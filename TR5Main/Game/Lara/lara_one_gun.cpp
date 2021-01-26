@@ -36,7 +36,7 @@ extern GameFlow* g_GameFlow;
 void FireHarpoon()
 {
 	Ammo& ammos = GetAmmo(WEAPON_CROSSBOW);
-	if (ammos.count != 0)
+	if (ammos.getCount() != 0)
 	{
 		Lara.hasFired = true;
 
@@ -44,7 +44,7 @@ void FireHarpoon()
 		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
 		{
-			if (!ammos.isInfinite)
+			if (!ammos.hasInfinite())
 				(ammos)--;
 
 			GAME_VECTOR pos;
@@ -365,7 +365,7 @@ void FireGrenade()
 
 			AddActiveItem(itemNumber);
 
-			if (!ammo.isInfinite)
+			if (!ammo.hasInfinite())
 				(ammo)--;
 
 			item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
@@ -1542,7 +1542,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 			}
 			else
 			{
-				if (!ammos.isInfinite)
+				if (!ammos.hasInfinite())
 					(ammos)--;
 
 				PHD_VECTOR jointPos;
@@ -1611,7 +1611,7 @@ void FireRocket()
 			item->objectNumber = ID_ROCKET;
 			item->roomNumber = LaraItem->roomNumber;
 
-			if (!ammos.isInfinite)
+			if (!ammos.hasInfinite())
 				(ammos)--;
 
 			PHD_VECTOR jointPos;
