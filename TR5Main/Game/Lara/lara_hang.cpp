@@ -224,8 +224,9 @@ void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A1F0(<), 1A324(<) (F
 {
 	/*state 107*/
 	/*collision: lara_default_col*/
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
+	Camera.laraNode = LM_TORSO;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(33.0f);
 	SetCornerAnim(item, coll, ANGLE(90.0f),
 		item->animNumber == LA_SHIMMY_LEFT_CORNER_OUTER_END ||
 		item->animNumber == LA_LADDER_LEFT_CORNER_OUTER_END);
@@ -235,8 +236,9 @@ void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)//1A244(<), 1A378(<) (F
 {
 	/*state 108*/
 	/*collision: lara_default_col*/
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
+	Camera.laraNode = LM_TORSO;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(33.0f);
 	SetCornerAnim(item, coll, -ANGLE(90.0f),
 		item->animNumber == LA_SHIMMY_RIGHT_CORNER_OUTER_END ||
 		item->animNumber == LA_LADDER_RIGHT_CORNER_OUTER_END);
@@ -246,8 +248,9 @@ void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A298(<), 1A3CC(<) (F
 {
 	/*state 109*/
 	/*collision: lara_default_col*/
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
+	Camera.targetAngle = 0;
+	Camera.laraNode = LM_TORSO;
+	Camera.targetElevation = -ANGLE(33.0f);
 	SetCornerAnim(item, coll, -ANGLE(90.0f),
 		item->animNumber == LA_SHIMMY_LEFT_CORNER_INNER_END ||
 		item->animNumber == LA_LADDER_LEFT_CORNER_INNER_END);
@@ -257,8 +260,9 @@ void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)//1A2EC(<), 1A420(<) (F
 {
 	/*state 110*/
 	/*collision: lara_default_col*/
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
+	Camera.laraNode = LM_TORSO;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(33.0f);
 	SetCornerAnim(item, coll, ANGLE(90.0f),
 		item->animNumber == LA_SHIMMY_RIGHT_CORNER_INNER_END ||
 		item->animNumber == LA_LADDER_RIGHT_CORNER_INNER_END);
