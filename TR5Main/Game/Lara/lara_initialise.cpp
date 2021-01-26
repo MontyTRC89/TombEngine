@@ -73,7 +73,7 @@ void InitialiseLara(int restore)
 	if (gun == WEAPON_PISTOLS)
 	{
 		Lara.Weapons[WEAPON_PISTOLS].Present = true;
-		Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
+		Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 	else if (gun == WEAPON_HK)
 	{
