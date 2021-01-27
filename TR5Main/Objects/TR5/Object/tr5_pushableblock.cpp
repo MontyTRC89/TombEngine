@@ -9,6 +9,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#define GET_PUSHABLEINFO(item) ((PUSHABLE_INFO*) item->data)
 
 OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 	0x0000, 0x0000, 0xFF00, 0x0000,
@@ -127,18 +128,18 @@ void PushableBlockControl(short itemNumber)
 	short roomNumber;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
-	PUSHABLE_INFO* pushable = pushable_info(item);
+	PUSHABLE_INFO* pushable = GET_PUSHABLEINFO(item);
 	int blockHeight = GetStackHeight(item);
 
 	// do sound effects, it works for now
 	if (DoPushPull > 0)
 	{
-		SoundEffect(pushable_info(item)->loopSound, &item->pos, 2);
+		SoundEffect(pushable->loopSound, &item->pos, 2);
 	}
 	else if (DoPushPull < 0)
 	{
 		DoPushPull = 0;
-		SoundEffect(pushable_info(item)->stopSound, &item->pos, 2);
+		SoundEffect(pushable->stopSound, &item->pos, 2);
 	}
 
 	// control block falling
@@ -246,7 +247,7 @@ void PushableBlockControl(short itemNumber)
 					item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
 					MoveStackXZ(itemNumber);
-					SoundEffect(pushable->stopSound, &item->pos, 2);
+					//SoundEffect(pushable->stopSound, &item->pos, 2);
 					DoPushPull = 0;
 					LaraItem->goalAnimState = LS_STOP;
 
@@ -376,7 +377,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
-	PUSHABLE_INFO* pushable = pushable_info(item);
+	PUSHABLE_INFO* pushable = GET_PUSHABLEINFO(item);
 
 	int blockHeight = GetStackHeight(item);
 	
@@ -582,13 +583,16 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 		break;
 	}
 
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
+	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	int floorHeight = GetFloorHeight(floor, x, y - 256, z);
-	if (pushable_info(item)->canFall)
+	int floorHeight = GetFloorHeight(floor, x, y - blockhite, z);
+	if (HeightType)
+		return 0;
+
+	if (GET_PUSHABLEINFO(item)->canFall)
 	{
 		if (floorHeight < y)
 			return 0;
@@ -599,9 +603,6 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 			return 0;
 	}
 	
-	GetFloorHeight(floor, x, y, z);
-	if (HeightType)
-		return 0;
 
 	int ceiling = y - blockhite + 100;
 	floor = GetFloor(x, ceiling, z, &roomNum);
@@ -654,16 +655,16 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos + zadd;
 	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y - 256, z, &roomNum);
+	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
 
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	if (GetFloorHeight(floor, x, y - 256, z) != y)
+	if (GetFloorHeight(floor, x, y - blockhite, z) != y)
 		return 0;
 
-	if (GetFloor(x, y - blockhite, z, &roomNum)->ceiling * 256 > y - blockhite)
+	if (floor->ceiling * 256 > y - blockhite)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -685,12 +686,12 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	x += xadd;
 	z += zadd;
 	roomNum = item->roomNumber;
-	floor = GetFloor(x, y - 256, z, &roomNum);
+	floor = GetFloor(x, y - blockhite, z, &roomNum);
 
-	if (GetFloorHeight(floor, x, y - 256, z) != y)
+	if (GetFloorHeight(floor, x, y - blockhite, z) != y)
 		return 0;
 
-	if (GetFloor(x, y - 762, z, &roomNum)->ceiling * 256 > y - 762)
+	if (floor->ceiling * 256 > y - LARA_HITE)
 		return 0;
 
 	x = LaraItem->pos.xPos + xadd;
@@ -853,13 +854,13 @@ int FindStack(short itemNum)
 
 int GetStackHeight(ITEM_INFO* item)
 {
-	int height = pushable_info(item)->height;
+	int height = GET_PUSHABLEINFO(item)->height;
 
 	auto stackItem = item;
 	while (stackItem->itemFlags[1] != NO_ITEM)
 	{
 		stackItem = &g_Level.Items[stackItem->itemFlags[1]];
-		height += pushable_info(stackItem)->height;
+		height += GET_PUSHABLEINFO(stackItem)->height;
 	}
 
 	return height;
@@ -867,7 +868,7 @@ int GetStackHeight(ITEM_INFO* item)
 
 bool CheckStackLimit(ITEM_INFO* item)
 {
-	int limit = pushable_info(item)->stackLimit;
+	int limit = GET_PUSHABLEINFO(item)->stackLimit;
 	
 	int count = 1;
 	auto stackItem = item;
@@ -881,11 +882,6 @@ bool CheckStackLimit(ITEM_INFO* item)
 	}
 
 	return true;
-}
-
-PUSHABLE_INFO* pushable_info(ITEM_INFO* item) // retrieve PUSHABLE_INFO* from void* data
-{
-	return (PUSHABLE_INFO*)item->data;
 }
 
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
