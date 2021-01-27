@@ -45,3 +45,5 @@ void pushEnd(ITEM_INFO* item);
 PUSHABLE_INFO* pushable_info(ITEM_INFO* item);
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
+int PushableBlockFloorBorder(short itemNumber);
+int PushableBlockCeilingBorder(short itemNumber);
