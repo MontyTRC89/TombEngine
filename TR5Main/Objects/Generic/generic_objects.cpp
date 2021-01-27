@@ -86,6 +86,8 @@ static void StartObject()
 		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFloor<0>;
 		obj->ceiling = BridgeCeiling<0>;
+		obj->floorBorder = BridgeFloorBorder<0>;
+		obj->ceilingBorder = BridgeCeilingBorder<0>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT1];
@@ -94,6 +96,8 @@ static void StartObject()
 		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFloor<1>;
 		obj->ceiling = BridgeCeiling<1>;
+		obj->floorBorder = BridgeFloorBorder<1>;
+		obj->ceilingBorder = BridgeCeilingBorder<1>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT2];
@@ -102,6 +106,8 @@ static void StartObject()
 		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFloor<2>;
 		obj->ceiling = BridgeCeiling<2>;
+		obj->floorBorder = BridgeFloorBorder<2>;
+		obj->ceilingBorder = BridgeCeilingBorder<2>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT3];
@@ -110,6 +116,8 @@ static void StartObject()
 		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFloor<3>;
 		obj->ceiling = BridgeCeiling<3>;
+		obj->floorBorder = BridgeFloorBorder<3>;
+		obj->ceilingBorder = BridgeCeilingBorder<3>;
 	}
 
 	obj = &Objects[ID_BRIDGE_TILT4];
@@ -118,6 +126,8 @@ static void StartObject()
 		obj->initialise = InitialiseBridge;
 		obj->floor = BridgeFloor<4>;
 		obj->ceiling = BridgeCeiling<4>;
+		obj->floorBorder = BridgeFloorBorder<4>;
+		obj->ceilingBorder = BridgeCeilingBorder<4>;
 	}
 }
 

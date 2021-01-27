@@ -906,3 +906,16 @@ std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 		return std::optional{item.pos.yPos};
 	return std::nullopt;
 }
+
+int PushableBlockFloorBorder(short itemNumber)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	const auto height = item.pos.yPos - (item.triggerFlags & 0x1F) * CLICK(1);
+	return height;
+}
+
+int PushableBlockCeilingBorder(short itemNumber)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	return item.pos.yPos;
+}
