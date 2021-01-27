@@ -30,13 +30,14 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int z) const
 
 std::optional<int> FLOOR_INFO::RoomBelow(int x, int z, int y) const
 {
-	const auto height = FloorHeight(x, z);
+	const auto floorHeight = FloorHeight(x, z);
+	const auto ceilingHeight = CeilingHeight(x, z);
 
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight >= y && *itemHeight <= height)
+		if (itemHeight && *itemHeight >= y && *itemHeight <= floorHeight && *itemHeight >= ceilingHeight)
 			return std::nullopt;
 	}
 
@@ -56,13 +57,14 @@ std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z, int y) const
 {
-	const auto height = CeilingHeight(x, z);
+	const auto floorHeight = FloorHeight(x, z);
+	const auto ceilingHeight = CeilingHeight(x, z);
 
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight <= y && *itemHeight >= height)
+		if (itemHeight && *itemHeight <= y && *itemHeight <= floorHeight && *itemHeight >= ceilingHeight)
 			return std::nullopt;
 	}
 
@@ -85,12 +87,13 @@ int FLOOR_INFO::FloorHeight(int x, int z) const
 int FLOOR_INFO::FloorHeight(int x, int z, int y) const
 {
 	auto height = FloorHeight(x, z);
+	const auto ceilingHeight = CeilingHeight(x, z);
 
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight >= y && *itemHeight < height)
+		if (itemHeight && *itemHeight >= y && *itemHeight < height && *itemHeight >= ceilingHeight)
 			height = *itemHeight;
 	}
 
@@ -122,12 +125,13 @@ int FLOOR_INFO::CeilingHeight(int x, int z) const
 int FLOOR_INFO::CeilingHeight(int x, int z, int y) const
 {
 	auto height = CeilingHeight(x, z);
+	const auto floorHeight = FloorHeight(x, z);
 
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight <= y && *itemHeight > height)
+		if (itemHeight && *itemHeight <= y && *itemHeight > height && *itemHeight <= floorHeight)
 			height = *itemHeight;
 	}
 
@@ -255,11 +259,12 @@ namespace T5M::Floordata
 	{
 		auto floor = &GetFloor(roomNumber, x, z);
 
-		const auto roomSide = floor->RoomSide();
-		if (roomSide)
+		auto roomSide = floor->RoomSide();
+		while (roomSide)
 		{
 			roomNumber = *roomSide;
 			floor = &GetFloor(roomNumber, x, z);
+			roomSide = floor->RoomSide();
 		}
 
 		if (sideRoomNumber)
@@ -491,7 +496,7 @@ namespace T5M::Floordata
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
-			const auto height = GetBottomHeight(*floor, x, z, location.yNumber, &location.roomNumber);
+			const auto height = GetBottomHeight(*floor, x, z, location.yNumber, &location.roomNumber, &floor);
 			if (!height)
 				return std::nullopt;
 
@@ -553,7 +558,7 @@ namespace T5M::Floordata
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
-			const auto height = GetTopHeight(*floor, x, z, location.yNumber, &location.roomNumber);
+			const auto height = GetTopHeight(*floor, x, z, location.yNumber, &location.roomNumber, &floor);
 			if (!height)
 				return std::nullopt;
 
