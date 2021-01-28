@@ -905,6 +905,8 @@ static void StartObject(OBJECT_INFO *obj)
 			obj->control = ControlRaisingBlock;
 			obj->floor = RaisingBlockFloor;
 			obj->ceiling = RaisingBlockCeiling;
+			obj->floorBorder = RaisingBlockFloorBorder;
+			obj->ceilingBorder = RaisingBlockCeilingBorder;
 			obj->saveFlags = true;
 		}
 	}
