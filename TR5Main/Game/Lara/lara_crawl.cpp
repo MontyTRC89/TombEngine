@@ -393,7 +393,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 						short heightl = 0;
 						short heightr = 0;
 
-						if (height != NO_HEIGHT && height <= 256)
+						if (height != NO_HEIGHT && height <= -256)
 						{
 							if (TrInput & IN_ACTION)
 							{
