@@ -146,5 +146,18 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	return std::optional{item.pos.yPos};
+	return std::optional{item.pos.yPos + 1};
+}
+
+int RaisingBlockFloorBorder(short itemNumber)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	const auto height = item.pos.yPos - item.itemFlags[7];
+	return height;
+}
+
+int RaisingBlockCeilingBorder(short itemNumber)
+{
+	const auto& item = g_Level.Items[itemNumber];
+	return item.pos.yPos + 1;
 }
