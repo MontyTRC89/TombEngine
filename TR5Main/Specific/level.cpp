@@ -130,7 +130,7 @@ int LoadItems()
 		{
 			FLOOR_INFO* floor = &r.floor[((mesh.z - r.z) / 1024) + r.xSize * ((mesh.x - r.x) / 1024)];
 			 
-			if (floor->box == -1)
+			if (floor->box == NO_BOX)
 				continue;
 
 			if (!(g_Level.Boxes[floor->box].flags & BLOCKED))
