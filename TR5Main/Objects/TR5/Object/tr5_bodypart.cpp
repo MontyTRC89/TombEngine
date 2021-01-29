@@ -20,15 +20,17 @@ void ControlBodyPart(short fxNumber)
 	}
 	else
 	{
+		int modulus = 62 - fx->counter;
+		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
 		if (fxNumber & 1)
 		{
-			fx->pos.zRot -= 2 * (GetRandomControl() % (62 - fx->counter));
-			fx->pos.xRot += 2 * (GetRandomControl() % (62 - fx->counter));
+			fx->pos.zRot -= random;
+			fx->pos.xRot += random;
 		}
 		else
 		{
-			fx->pos.zRot += 2 * (GetRandomControl() % (62 - fx->counter));
-			fx->pos.xRot -= 2 * (GetRandomControl() % (62 - fx->counter));
+			fx->pos.zRot += random;
+			fx->pos.xRot -= random;
 		}
 		if (--fx->counter < 8)
 			fx->fallspeed += 2;
