@@ -426,15 +426,13 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 										slope < 120)
 									{
 										int tmp;
-										ITEM_INFO* tmp1;
-										MESH_INFO* tmp2;
 										int x = item->pos.xPos;
 										int z = item->pos.zPos;
 
 										item->pos.xPos -= 100 * phd_sin(coll->facing);
 										item->pos.zPos -= 100 * phd_cos(coll->facing);
 
-										tmp = GetCollidedObjects(item, 100, 1, &tmp1, &tmp2, 0);
+										tmp = GetCollidedObjects(item, 100, 1, CollidedItems, CollidedMeshes, 0);
 
 										item->pos.xPos = x;
 										item->pos.zPos = z;
