@@ -64,8 +64,6 @@ void InitialisePushableBlock(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	item->itemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
 
-	T5M::Floordata::AddBridge(itemNum);
-
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	
 	// allocate new pushable info
@@ -97,7 +95,10 @@ void InitialisePushableBlock(short itemNum)
 
 	int height;
 	if (pushable->hasFloorCeiling)
+	{
 		height = (OCB & 0x1F) * CLICK(1);
+		T5M::Floordata::AddBridge(itemNum);
+	}
 	else
 		height = -GetBoundsAccurate(item)->Y1;
 
@@ -772,24 +773,38 @@ void MoveStackY(short itemNum, int y)
 
 void AddBridgeStack(short itemNum)
 {
-	T5M::Floordata::AddBridge(itemNum);
+	auto item = &g_Level.Items[itemNum];
+
+	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
+		T5M::Floordata::AddBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
 	{
-		T5M::Floordata::AddBridge(stackIndex);
+		auto stackItem = &g_Level.Items[stackIndex];
+
+		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
+			T5M::Floordata::AddBridge(stackIndex);
+
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}
 }
 
 void RemoveBridgeStack(short itemNum)
 {
-	T5M::Floordata::RemoveBridge(itemNum);
+	auto item = &g_Level.Items[itemNum];
+
+	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
+		T5M::Floordata::RemoveBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
 	{
-		T5M::Floordata::RemoveBridge(stackIndex);
+		auto stackItem = &g_Level.Items[stackIndex];
+
+		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
+			T5M::Floordata::RemoveBridge(stackIndex);
+
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}
 }
