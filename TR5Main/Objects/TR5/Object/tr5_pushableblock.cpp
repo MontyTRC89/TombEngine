@@ -460,36 +460,45 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		short roomNumber = l->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
-		if (roomNumber == item->roomNumber)
+		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+
+		PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
+		PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
+		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
+		PushableBlockBounds.boundingBox.Z2 = 0;
+
+		short rot = item->pos.yRot;
+		item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
+
+		if (TestLaraPosition(&PushableBlockBounds, item, l))
 		{
-			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+			unsigned short quadrant = (unsigned short)((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000));
+			if (quadrant & 1)
+				PushableBlockPos.z = bounds->X1 - 35;
+			else
+				PushableBlockPos.z = bounds->Z1 - 35;
 
-			PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
-			PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
-			PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
-			PushableBlockBounds.boundingBox.Z2 = 0;
+			if (pushable->hasFloorCeiling)
+			{					
+				// For now don't use auto-align function because it can collide with climb up moves of Lara
 
-			short rot = item->pos.yRot;
-			item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
+				LaraItem->pos.xRot = item->pos.xRot;
+				LaraItem->pos.yRot = item->pos.yRot;
+				LaraItem->pos.zRot = item->pos.zRot;
 
-			if (TestLaraPosition(&PushableBlockBounds, item, l))
+				l->animNumber = LA_PUSHABLE_GRAB;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				l->currentAnimState = LS_PUSHABLE_GRAB;
+				l->goalAnimState = LS_PUSHABLE_GRAB;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.cornerX = (int)item;
+				item->pos.yRot = rot;
+			}
+			else
 			{
-				unsigned short quadrant = (unsigned short)((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000));
-				if (quadrant & 1)
-					PushableBlockPos.z = bounds->X1 - 35;
-				else
-					PushableBlockPos.z = bounds->Z1 - 35;
-
-				if (pushable->hasFloorCeiling)
-				{					
-					// For now don't use auto-align function because it can collide with climb up moves of Lara
-
-					LaraItem->pos.xRot = item->pos.xRot;
-					LaraItem->pos.yRot = item->pos.yRot;
-					LaraItem->pos.zRot = item->pos.zRot;
-
+				if (MoveLaraPosition(&PushableBlockPos, item, l))
+				{
 					l->animNumber = LA_PUSHABLE_GRAB;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					l->currentAnimState = LS_PUSHABLE_GRAB;
@@ -501,33 +510,19 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				else
 				{
-					if (MoveLaraPosition(&PushableBlockPos, item, l))
-					{
-						l->animNumber = LA_PUSHABLE_GRAB;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-						l->currentAnimState = LS_PUSHABLE_GRAB;
-						l->goalAnimState = LS_PUSHABLE_GRAB;
-						Lara.isMoving = false;
-						Lara.gunStatus = LG_HANDS_BUSY;
-						Lara.cornerX = (int)item;
-						item->pos.yRot = rot;
-					}
-					else
-					{
-						Lara.generalPtr = item;
-						item->pos.yRot = rot;
-					}
+					Lara.generalPtr = item;
+					item->pos.yRot = rot;
 				}
 			}
-			else
+		}
+		else
+		{
+			if (Lara.isMoving && Lara.generalPtr == item)
 			{
-				if (Lara.isMoving && Lara.generalPtr == item)
-				{
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
-				}
-				item->pos.yRot = rot;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_NO_ARMS;
 			}
+			item->pos.yRot = rot;
 		}
 	}
 }
@@ -902,7 +897,7 @@ bool CheckStackLimit(ITEM_INFO* item)
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x40))
+	if (item.status != ITEM_INVISIBLE)
 	{
 		const auto height = item.pos.yPos - (item.triggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -913,7 +908,7 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 64))
+	if (item.status != ITEM_INVISIBLE)
 		return std::optional{item.pos.yPos};
 	return std::nullopt;
 }
