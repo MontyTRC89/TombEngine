@@ -29,25 +29,25 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DD90(<), 4E1F4(<) (F)
+void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DD64(<), 4E1C8(<) (F)
+void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)//4DD38(<), 4E19C(<) (F)
+void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
+void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->badNeg = -384;
 	Lara.moveAngle = item->pos.yRot;
@@ -56,7 +56,7 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
 	LaraTestLadderClimbOut(item, coll);
 }
 
-void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
+void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->fallspeed -= 4;
 	if (item->fallspeed < 0)
@@ -113,7 +113,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 	}
 }
 
-void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
+void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -142,7 +142,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 		item->fallspeed = 60;
 }
 
-void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
+void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -171,7 +171,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 		item->fallspeed = 60;
 }
 
-void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
+void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -200,7 +200,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 		item->fallspeed = 60;
 }
 
-void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
+void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -229,7 +229,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 		item->fallspeed = 60;
 }
 
-void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) (F)
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->facing = Lara.moveAngle;
 	
@@ -269,7 +269,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) 
 	}
 }
 
-int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
+int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
@@ -388,7 +388,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	return 1;
 }
 
-int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
+int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType == CT_FRONT 
 		|| coll->midType == BIG_SLOPE 
@@ -501,7 +501,7 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 	return 1;
 }
 
-void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)//1AEE4(<), 1B018(<) (F)
+void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;

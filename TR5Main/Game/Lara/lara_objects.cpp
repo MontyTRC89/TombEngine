@@ -9,7 +9,7 @@
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
 /*pickups*/
-void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)//1AB00(<), 1AC34(<) (F)
+void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 39, 98*/
 	/*collision: lara_default_col*/
@@ -21,7 +21,7 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)//1AB00(<), 1AC34(<) (F)
 	Camera.targetDistance = SECTOR(1);
 }
 
-void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)//1AB5C(<), 1AC90(<) (F)
+void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 67*/
 	/*collison: lara_default_col*/
@@ -37,7 +37,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)//1AB5C(<), 1AC90(<) (
 /*end pickups*/
 /*-*/
 /*switches*/
-void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)//1ABEC(<), 1AD20(<) (F)
+void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 40, 126*/
 	/*collision: lara_default_col*/
@@ -50,7 +50,7 @@ void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)//1ABEC(<), 1AD20(<) (F)
 	Camera.speed = 6;
 }
 
-void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)//1AC54(<), 1AD88(<) (F)
+void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 41*/
 	/*collision: lara_default_col*/
@@ -63,7 +63,7 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)//1AC54(<), 1AD88(<) (F)
 	Camera.speed = 6;
 }
 
-void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)//1B1B4(<), 1B2E8(<) (F)
+void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 95*/
 	/*state code: lara_as_controlledl*/
@@ -89,7 +89,7 @@ void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)//1B1B4(<), 1B2E8(<) (
 /*end switches*/
 /*-*/
 /*puzzles and keys*/
-void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)//1ACBC(<), 1ADF0(<) (F)
+void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 42*/
 	/*collision: lara_default_col*/
@@ -101,7 +101,7 @@ void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)//1ACBC(<), 1ADF0(<) (F)
 	Camera.targetDistance = SECTOR(1);
 }
 
-void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)//1AD18(<), 1AE4C(<) (F)
+void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 43*/
 	/*collision: lara_default_col*/
@@ -127,7 +127,7 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)//1AD18(<), 1AE4C(<) (F)
 /*end puzzles and keys*/
 /*-*/
 /*pushables*/
-void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)//1AA04(<), 1AB38(<) (F)
+void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 36*/
 	/*collision: lara_default_col*/
@@ -139,7 +139,7 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)//1AA04(<), 1AB38(<) (F)
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)//1AA60(<), 1AB94(<) (F)
+void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 37*/
 	/*collision: lara_default_col*/
@@ -151,7 +151,7 @@ void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)//1AA60(<), 1AB94(<) (F)
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)//1AABC(<), 1ABF0(<) (F)
+void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 38*/
 	/*collision: lara_default_col*/
@@ -164,7 +164,7 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)//1AABC(<), 1ABF0(<) (F)
 /*end pushables*/
 /*-*/
 /*pulley*/
-void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)//1B288, 1B3BC (F)
+void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 104*/
 	/*collision: lara_default_col*/
@@ -229,7 +229,7 @@ void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)//1D244, 1D3D8 (F)
+void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 129*/
 	/*collision: lara_default_col*/
@@ -425,7 +425,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 /*end tightropes*/
 /*-*/
 /*ropes*/
-void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 90*/
 	/*collision: lara_void_func*/
@@ -446,7 +446,7 @@ void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_ACTION)
 	{
@@ -465,7 +465,7 @@ void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 111, 114, 115*/
 	/*collison: lara_col_rope(111), lara_col_ropefwd(114, 115)*/
@@ -476,7 +476,7 @@ void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		LookUpDown();
 }
 
-void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 111*/
 	/*state code: lara_as_rope*/
@@ -517,7 +517,7 @@ void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 114, 115*/
 	/*state code: lara_as_rope(for both)*/
@@ -577,7 +577,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 112*/
 	/*collision: lara_void_func*/
@@ -600,7 +600,7 @@ void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 113*/
 	/*collision: lara_void_func*/
@@ -609,7 +609,7 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 /*end ropes*/
 /*-*/
 /*poles*/
-void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
+void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 99*/
 	/*state code: lara_as_null*/
@@ -684,7 +684,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 	}
 }
 
-void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll)//170D8(<), 1720C(<) (F)
+void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 100*/
 	/*state code: lara_as_null*/
@@ -705,7 +705,7 @@ void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll)//170D8(<), 1720C(<) (F)
 		item->goalAnimState = LS_POLE_IDLE;
 }
 
-void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
+void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 101*/
 	/*state code: lara_as_null*/
@@ -770,7 +770,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	item->pos.yPos += item->itemFlags[2] / 256;
 }
 
-void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)//17020(<), 17154(<) (F)
+void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 102*/
 	/*collision: lara_void_func*/
@@ -782,7 +782,7 @@ void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)//17020(<), 17154(<) (F)
 		item->pos.yRot += 256;
 }
 
-void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)//1707C(<), 171B0(<) (F)
+void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 103*/
 	/*collision: lara_void_func*/
@@ -796,7 +796,7 @@ void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)//1707C(<), 171B0(<) (F)
 /*end poles*/
 /*-*/
 /*deathslide*/
-void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)//1B038, 1B16C (F)
+void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 70*/
 	/*collision: lara_void_func*/

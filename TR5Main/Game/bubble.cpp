@@ -57,7 +57,7 @@ void UpdateBubbles()
 	}
 }
 
-int GetFreeBubble() //8BEAC(<), 8DEF0(<) (F)
+int GetFreeBubble()
 {
 	int oldestAgeIndex = 0;
 	int oldestAge = 0;
@@ -78,7 +78,7 @@ int GetFreeBubble() //8BEAC(<), 8DEF0(<) (F)
 	return oldestAgeIndex;
 }
 
-void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv) //8BF14(<), 8DF58(<) (F)
+void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv)
 {
 	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
 	{

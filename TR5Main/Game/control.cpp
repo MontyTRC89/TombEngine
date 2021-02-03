@@ -1865,7 +1865,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	return GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
 }
 
-int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int LOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int result1, result2;
 
@@ -1891,7 +1891,7 @@ int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return 0;
 }
 
-int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int xLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -1996,7 +1996,7 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return flag;
 }
 
-int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int zLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -2101,7 +2101,7 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return flag;
 }
 
-int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
+int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 {
 	short room;
 	int x, y, z, wx, wy, wz;
@@ -2149,7 +2149,7 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
 	return 1;
 }
 
-int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing) // (AF) (D)
+int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing)
 {
 	GAME_VECTOR target;
 	int result, flag, itemNumber, count;
@@ -2397,7 +2397,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	return flag;
 }
 
-int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INFO **mesh) // (F) (D)
+int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INFO **mesh)
 {
 	int r, m;
 	ROOM_INFO *room;
@@ -2475,7 +2475,7 @@ int GetRandomDraw()
 	return generateInt();
 }
 
-int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
+int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 {
 #if 0
 	ROOM_INFO *room;

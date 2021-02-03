@@ -14,12 +14,12 @@
 bool DoJump = false;
 
 /*generic functions*/
-void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)//19928(<), 19A5C(<) (F)
+void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return;
 }
 
-void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)//1C80C(<), 1C940(<) (F)
+void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = 384;
@@ -31,20 +31,20 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)//1C80C(<), 1C940(<) (F)
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 }
 
-void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)//1ADDC(<), 1AF10(<) (F)
+void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)//1A5DC(<), 1A710(<) (F)
+void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 }
 
-void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)//1B0FC(<), 1B230(<) (F)
+void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = false;
 	coll->enableBaddiePush = false;
@@ -57,7 +57,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)//1B0FC(<), 1B230(<) (F
 	}
 }
 
-void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)//1B180(<), 1B2B4(<) (F)
+void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = false;
 	coll->enableBaddiePush = false;
@@ -67,7 +67,7 @@ void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)//1B180(<), 1B2B4(<) (
 /*end generic functions*/
 /*-*/
 /*basic movement*/
-void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)//191B8(<), 192EC(<) (F)
+void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 0*/
 	/*collision: lara_col_walk*/
@@ -114,7 +114,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)//191B8(<), 192EC(<) (F)
 	}
 }
 
-void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)//1B3E8, 1B51C (F)
+void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 0*/
 	/*state code: lara_as_walk*/
@@ -180,7 +180,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)//1B3E8, 1B51C (F)
 	}
 }
 
-void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)//192EC, 19420 (F)
+void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 1*/
 	/*collision: lara_col_run*/
@@ -283,7 +283,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)//192EC, 19420 (F)
 	}
 }
 
-void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)//1B64C, 1B780 (F)
+void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 1*/
 	/*state code: lara_col_run*/
@@ -531,7 +531,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 2*/
 	/*state code: lara_as_stop*/
@@ -568,7 +568,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 #endif
 }
 
-void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18A34, 18B68 (F)
+void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 3*/
 	/*collision: */
@@ -609,7 +609,7 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18A34, 18B68 (F)
 	}
 }
 
-void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
+void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 3*/
 	/*state code: lara_as_forwardjump*/
@@ -661,14 +661,14 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
 	}
 }
 
-void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)//1B87C(<), 1B9B0(<) (F)
+void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 4*/
 	/*state code: lara_void_func*/
 	lara_col_stop(item, coll);
 }
 
-void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)//1959C(<), 196D0(<) (F)
+void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 5*/
 	/*collision: lara_col_fastback*/
@@ -687,7 +687,7 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)//1959C(<), 196D0(<) (F)
 	}
 }
 
-void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)//1B89C, 1B9D0 (F)
+void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 5*/
 	/*state code: lara_as_fastback*/
@@ -730,7 +730,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)//1B89C, 1B9D0 (F)
 	}
 }
 
-void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)//19628(<), 1975C(<) (F)
+void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 6*/
 	/*collision: */
@@ -780,7 +780,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)//19628(<), 1975C(<) (F)
 	}
 }
 
-void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 6*/
 	/*state code: lara_as_turn_r*/
@@ -824,7 +824,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 #endif
 }
 
-void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)//1972C(<), 19860(<) (F)
+void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 7*/
 	/*collision: lara_col_turn_l*/
@@ -873,14 +873,14 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)//1972C(<), 19860(<) (F)
 	}
 }
 
-void lara_col_turn_l(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 7*/
 	/*state code: lara_as_turn_l*/
 	lara_col_turn_r(item, coll);
 }
 
-void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)//19830(<), 19964(<) (F)
+void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 8*/
 	/*collision: lara_col_death*/
@@ -897,7 +897,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)//19830(<), 19964(<) (F)
 	}
 }
 
-void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)//1BADC(<), 1BC10(<) (F)
+void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 8*/
 	/*state code: lara_as_death*/
@@ -920,7 +920,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)//1BADC(<), 1BC10(<) (F)
 		item->pos.yPos += coll->midFloor;
 }
 
-void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)//198BC(<), 199F0(<) (F)
+void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 9*/
 	/*collision: lara_col_fastfall*/
@@ -929,7 +929,7 @@ void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)//198BC(<), 199F0(<) (F)
 		SoundEffect(SFX_LARA_FALL, &item->pos, 0);
 }
 
-void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)//1BB88, 1BCBC (F)
+void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 9*/
 	/*state code: lara_as_fastfall*/
@@ -967,7 +967,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)//1BB88, 1BCBC (F)
 	}
 }
 
-void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)//18CE0(<), 18E14(<) (F)
+void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 11*/
 	/*collision: lara_col_reach*/
@@ -976,7 +976,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)//18CE0(<), 18E14(<) (F)
 		item->goalAnimState = LS_FREEFALL;
 }
 
-void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
+void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 11*/
 	/*state code: lara_as_reach*/
@@ -1141,12 +1141,12 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 	}
 }
 
-void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)//1A340(<), 1A474(<) (F)
+void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = false;
 }
 
-void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)//1BC74(<), 1BDA8(<) (F)
+void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 
@@ -1165,7 +1165,7 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)//1BC74(<), 1BDA8(<) (F)
 		item->pos.yPos += coll->midFloor;
 }
 
-void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)//1BD10(<), 1BE44(<) (F)
+void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 14*/
 	/*state code: lara_void_func*/
@@ -1204,7 +1204,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 }
 
-void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)//1BD30, 1BE64 (F)
+void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 15*/
 	/*state code: lara_as_compress*/
@@ -1241,7 +1241,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)//1BD30, 1BE64 (F)
 	}
 }
 
-void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)//1A4F0(<), 1A624(<) (F)
+void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 16*/
 	/*collision: lara_col_back*/
@@ -1273,7 +1273,7 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)//1A4F0(<), 1A624(<) (F)
 	}
 }
 
-void lara_col_back(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 16*/
 	/*state code: lara_as_back*/
@@ -1321,7 +1321,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 #endif
 }
 
-void lara_as_fastturn(ITEM_INFO* item, COLL_INFO* coll)//1A5F8(<), 1A72C(<) (F)
+void lara_as_fastturn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 20*/
 	/*collision: lara_col_fastturn*/
@@ -1347,14 +1347,14 @@ void lara_as_fastturn(ITEM_INFO* item, COLL_INFO* coll)//1A5F8(<), 1A72C(<) (F)
 	}
 }
 
-void lara_col_fastturn(ITEM_INFO* item, COLL_INFO* coll)//1A65C(<), 1A790(<) (F)
+void lara_col_fastturn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 20*/
 	/*state code: lara_as_fastturn*/
 	lara_col_stop(item, coll);
 }
 
-void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)//1A67C(<), 1A7B0(<) (F)
+void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 21*/
 	/*collision: lara_col_stepright*/
@@ -1388,7 +1388,7 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)//1A67C(<), 1A7B0(<) (F)
 	}
 }
 
-void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)//1BFB0, 1C0E4 (F)
+void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 21*/
 	/*state code: lara_as_stepright*/
@@ -1424,7 +1424,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)//1BFB0, 1C0E4 (F)
 	}
 }
 
-void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1A750(<), 1A884(<) (F)
+void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 22*/
 	/*collision: lara_col_stepleft*/
@@ -1458,14 +1458,14 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1A750(<), 1A884(<) (F)
 	}
 }
 
-void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1C0E8(<), 1C21C(<) (F)
+void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 22*/
 	/*state code: lara_as_stepleft*/
 	lara_col_stepright(item, coll);
 }
 
-void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)//1C384, 1C4B8 (F)
+void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 23*/
 	/*state code: lara_void_func*/
@@ -1505,7 +1505,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)//1C384, 1C4B8 (F)
 		item->pos.yPos += coll->midFloor;
 }
 
-void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)//1A854(<), 1A988(<) (F)
+void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 25*/
 	/*collision: lara_col_backjump*/
@@ -1527,7 +1527,7 @@ void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)//1A854(<), 1A988(<) (F)
 	}
 }
 
-void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)//1C130(<), 1C264(<) (F)
+void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 25*/
 	/*state code: lara_as_backjump*/
@@ -1535,7 +1535,7 @@ void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)//1C130(<), 1C264(<) (F)
 	lara_col_jumper(item, coll);
 }
 
-void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1A8C4(<), 1A9F8(<) (F)
+void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 26*/
 	/*collision: lara_col_rightjump*/
@@ -1546,7 +1546,7 @@ void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1A8C4(<), 1A9F8(<) (F)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 }
 
-void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1C15C(<), 1C290(<) (F)
+void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 26*/
 	/*state code: lara_as_rightjump*/
@@ -1554,7 +1554,7 @@ void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1C15C(<), 1C290(<) (F
 	lara_col_jumper(item, coll);
 }
 
-void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)//1A92C(<), 1AA60(<) (F)
+void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 27*/
 	/*collision: lara_col_leftjump*/
@@ -1565,7 +1565,7 @@ void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)//1A92C(<), 1AA60(<) (F)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 }
 
-void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)//1C188(<), 1C2BC(<) (F)
+void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 27*/
 	/*state code: lara_as_leftjump*/
@@ -1600,7 +1600,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 28*/
 	/*collision: lara_col_upjump*/
@@ -1610,7 +1610,7 @@ void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 28*/
 	/*state code: lara_as_upjump*/
@@ -1774,7 +1774,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)//1959C(<), 196D0(<) (F)
+void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 29*/
 	/*collision: lara_col_fallback*/
@@ -1786,7 +1786,7 @@ void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)//1959C(<), 196D0(<) (F)
 			item->goalAnimState = LS_REACH;
 }
 
-void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
+void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 29*/
 	/*state code: lara_as_fallback*/
@@ -1815,7 +1815,7 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
 	}
 }
 
-void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
+void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 45*/
 	/*state code: lara_void_func*/
@@ -1851,7 +1851,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 		item->pos.yPos += coll->midFloor;
 }
 
-void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)//1AE08(<), 1AF3C(<) (F)
+void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 52*/
 	/*collision: lara_col_swandive*/
@@ -1861,7 +1861,7 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)//1AE08(<), 1AF3C(<) (F)
 		item->goalAnimState = LS_SWANDIVE_END;
 }
 
-void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
+void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 52*/
 	/*state code: lara_as_swandive*/
@@ -1886,7 +1886,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 	}
 }
 
-void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1AE4C(<), 1AF80(<) (F)
+void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 53*/
 	/*collision: lara_col_fastdive*/
@@ -1897,7 +1897,7 @@ void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1AE4C(<), 1AF80(<) (F)
 	item->speed = (item->speed * 95) / 100;
 }
 
-void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1C558(<), 1C68C(<) (F)
+void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 53*/
 	/*state code: lara_as_fastdive*/
@@ -1926,7 +1926,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1C558(<), 1C68C(<) (F)
 	}
 }
 
-void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)//1AEC8(<), 1AFFC(<) (F)
+void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 54*/
 	/*collision: lara_default_col*/
@@ -1934,7 +1934,7 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)//1AEC8(<), 1AFFC(<) (F)
 	coll->enableSpaz = false;
 }
 
-void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)//1AF10, 1B044 (F)
+void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 65*/
 	/*collision: lara_col_wade*/
@@ -2078,7 +2078,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += SWAMP_GRAVITY;
 }
 
-void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)//15A28, 15B5C (F)
+void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 73*/
 	/*collision: lara_col_dash*/
@@ -2143,7 +2143,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)//15A28, 15B5C (F)
 	}
 }
 
-void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)//15C50, 15D84 (F)
+void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 73*/
 	/*state code: lara_as_dash*/
@@ -2205,7 +2205,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)//15C50, 15D84 (F)
 	}
 }
 
-void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E1C(<), 15F50(<) (F)
+void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 74*/
 	/*collision: lara_col_dashdive*/
@@ -2216,7 +2216,7 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E1C(<), 15F50(<) (F)
 		item->goalAnimState = LS_FREEFALL;
 }
 
-void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E5C, 15F90 (F)
+void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 74*/
 	/*state code: lara_as_dashdive*/
