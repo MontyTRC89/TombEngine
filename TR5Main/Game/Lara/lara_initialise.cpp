@@ -100,7 +100,7 @@ void InitialiseLara(int restore)
 	Lara.wetcloth = CLOTH_MISSING;
 }
 
-void LaraInitialiseMeshes() // (AF) (D)
+void LaraInitialiseMeshes()
 {
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
@@ -133,7 +133,7 @@ void LaraInitialiseMeshes() // (AF) (D)
 	Lara.leftArm.lock = false;
 }
 
-void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
+void InitialiseLaraAnims(ITEM_INFO* item)
 {
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -154,7 +154,7 @@ void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum) // (F) (D)
+void InitialiseLaraLoad(short itemNum)
 {
 	Lara.itemNumber = itemNum;
 	LaraItem = &g_Level.Items[itemNum];

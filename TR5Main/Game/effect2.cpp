@@ -69,7 +69,7 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 
 extern GameFlow* g_GameFlow;
 
-void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
+void DetatchSpark(int num, SpriteEnumFlag type)
 {
 	FX_INFO* fx;
 	ITEM_INFO* item;
@@ -789,7 +789,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	}
 }
 
-void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (F)
+void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 {
 	long dx = LaraItem->pos.xPos - item->pos.xPos;
 	long dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -1813,7 +1813,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 	}
 }
 
-void KillEverything()//338AC(<), 33DAC(<) (F)
+void KillEverything()
 {
 	KillEverythingFlag = 0;
 }

@@ -6,7 +6,7 @@
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
 /*normal hanging and shimmying*/
-void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)//19A28, 19B5C (F)
+void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 10*/
 	/*collision: lara_col_hang*/
@@ -28,7 +28,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)//19A28, 19B5C (F)
 	Camera.targetElevation = -ANGLE(45.0f);
 }
 
-void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
+void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 10*/
 	/*state code: lara_as_hang*/
@@ -174,7 +174,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 	}
 }
 
-void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
@@ -186,7 +186,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->goalAnimState = LS_HANG;
 }
 
-void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
@@ -196,7 +196,7 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
 
-void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*collision: lara_col_hangright*/
@@ -208,7 +208,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->goalAnimState = LS_HANG;
 }
 
-void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*state code: lara_as_hangright*/
@@ -220,7 +220,7 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 /*go around corners*/
 
-void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A1F0(<), 1A324(<) (F)
+void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 107*/
 	/*collision: lara_default_col*/
@@ -232,7 +232,7 @@ void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A1F0(<), 1A324(<) (F
 		item->animNumber == LA_LADDER_LEFT_CORNER_OUTER_END);
 }
 
-void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)//1A244(<), 1A378(<) (F)
+void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 108*/
 	/*collision: lara_default_col*/
@@ -244,7 +244,7 @@ void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)//1A244(<), 1A378(<) (F
 		item->animNumber == LA_LADDER_RIGHT_CORNER_OUTER_END);
 }
 
-void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A298(<), 1A3CC(<) (F)
+void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 109*/
 	/*collision: lara_default_col*/
@@ -256,7 +256,7 @@ void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)//1A298(<), 1A3CC(<) (F
 		item->animNumber == LA_LADDER_LEFT_CORNER_INNER_END);
 }
 
-void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)//1A2EC(<), 1A420(<) (F)
+void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 110*/
 	/*collision: lara_default_col*/

@@ -160,7 +160,7 @@ int Key(int number)
 	return 0;
 }
 
-int S_UpdateInput()// (F)
+int S_UpdateInput()
 {
 	DI_ReadKeyboard(KeyMap);
 
