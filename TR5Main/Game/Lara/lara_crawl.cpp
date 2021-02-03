@@ -9,7 +9,7 @@
 /*this file has all the related functions to ducking and crawling*/
 
 /*crouch/duck start*/
-void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
+void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*collision: lara_col_duck*/
@@ -79,7 +79,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 	}
 }
 
-void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)//147C4, 148CC (F)
+void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*state code: lara_as_duck*/
@@ -161,7 +161,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 /*crouch/duck end*/
 /*-*/
 /*crawl start*/
-void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
+void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*collision: lara_col_all4s*/
@@ -336,7 +336,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 	}
 }
 
-void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
+void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*state code: lara_as_all4s*/
@@ -494,7 +494,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 	}
 }
 
-void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)//150F4, 15228 (F)
+void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*collision: lara_col_crawl*/
@@ -540,7 +540,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)//150F4, 15228 (F)
 	}
 }
 
-void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)//1523C, 15370 (F)
+void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*state code: lara_as_crawl*/
@@ -586,7 +586,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)//1523C, 15370 (F)
 	}
 }
 
-void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)//15390(<), 154C4(<) (F)
+void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 84*/
 	/*collision: lara_col_all4turnlr*/
@@ -607,7 +607,7 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)//15390(<), 154C4(<) (F)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
-void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)//15484(<), 155B8(<) (F)
+void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 85*/
 	/*collision: lara_col_all4turnlr*/
@@ -628,7 +628,7 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)//15484(<), 155B8(<) (F)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
-void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)//153FC, 15530 (F)
+void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 84 and 85*/
 	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
@@ -641,7 +641,7 @@ void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)//153FC, 15530 (F)
 	}
 }
 
-void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)//154F0, 15624 (F)
+void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 86*/
 	/*collision: lara_col_crawlb*/
@@ -683,7 +683,7 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)//154F0, 15624 (F)
 	}
 }
 
-void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
+void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 86*/
 	/*state code: lara_as_crawlb*/
@@ -729,7 +729,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 	}
 }
 
-void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 105*/
 	/*collision: lara_col_ducklr*/
@@ -739,7 +739,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.yRot -= ANGLE(1.5f);
 }
 
-void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 106*/
 	/*collision: lara_col_ducklr*/
@@ -749,7 +749,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.yRot += ANGLE(1.5f);
 }
 
-void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
+void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 105 and 106*/
 	/*state code: lara_as_duckl(105) and lara_col_ducklr(106)*/
@@ -790,7 +790,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 }
 /*crawling end*/
 
-void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
+void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);

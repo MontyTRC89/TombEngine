@@ -258,7 +258,7 @@ bool MonksAttackLara;
 ITEM_INFO* LastTargets[8];
 ITEM_INFO* TargetList[8];
 
-GAME_OBJECT_ID WeaponObject(int weaponType) // (F) (D)
+GAME_OBJECT_ID WeaponObject(int weaponType)
 {
 	switch (weaponType)
 	{
@@ -285,7 +285,7 @@ GAME_OBJECT_ID WeaponObject(int weaponType) // (F) (D)
 	}
 }
 
-void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
+void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 {
 	short rotY, rotX, speed, x, y;
 
@@ -328,14 +328,14 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 	arm->zRot = 0;
 }
 
-void SmashItem(short itemNum) // (F) (D)
+void SmashItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
 }
 
-void LaraGun() // (F) (D)
+void LaraGun()
 {
 	if (Lara.leftArm.flash_gun > 0)
 		--Lara.leftArm.flash_gun;
@@ -720,7 +720,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 	}
 }
 
-FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
+FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 {
 	Ammo& ammo = GetAmmo(weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
@@ -845,7 +845,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 	}
 }
 
-void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
 {
 	BOUNDING_BOX* bounds;
 	int x, y, z;
@@ -864,7 +864,7 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	target->roomNumber = item->roomNumber;
 }
 
-void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
+void LaraTargetInfo(WEAPON_INFO* weapon)
 {
 	if (Lara.target == nullptr)
 	{
@@ -931,7 +931,7 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	Lara.targetAngles[1] = angles[1];
 }
 
-bool CheckForHoldingState(int state) // (F) (D)
+bool CheckForHoldingState(int state)
 {
 #if 0
 	if (Lara.ExtraAnim != NO_ITEM)
@@ -949,7 +949,7 @@ bool CheckForHoldingState(int state) // (F) (D)
 	return false;
 }
 
-void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
+void LaraGetNewTarget(WEAPON_INFO* weapon)
 {
 	GAME_VECTOR src, target;
 	PHD_VECTOR muzzleOffset;

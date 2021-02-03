@@ -142,7 +142,7 @@ void invisibility_on(ITEM_INFO* item)
 	item->status = ITEM_INVISIBLE;
 }
 
-void SetFog(ITEM_INFO* item)//39A44(<), 39F44(<) (F)
+void SetFog(ITEM_INFO* item)
 {
 	FlipEffect = -1;
 }
@@ -175,22 +175,22 @@ void draw_right_pistol(ITEM_INFO* item)
 	}
 }
 
-void shoot_left_gun(ITEM_INFO* item)//39A34(<), 39F34(<) (F)
+void shoot_left_gun(ITEM_INFO* item)
 {
 	Lara.leftArm.flash_gun = 3;
 }
 
-void shoot_right_gun(ITEM_INFO* item)//39A24(<), 39F24(<) (F)
+void shoot_right_gun(ITEM_INFO* item)
 {
 	Lara.rightArm.flash_gun = 3;
 }
 
-void lara_hands_free(ITEM_INFO* item)//39A18(<), 39F18(<) (F)
+void lara_hands_free(ITEM_INFO* item)
 {
 	Lara.gunStatus = LG_NO_ARMS;
 }
 
-void KillActiveBaddies(ITEM_INFO* item)//39938(<), 39E38(<) (F)
+void KillActiveBaddies(ITEM_INFO* item)
 {
 	if (NextItemActive != NO_ITEM)
 	{
@@ -220,7 +220,7 @@ void KillActiveBaddies(ITEM_INFO* item)//39938(<), 39E38(<) (F)
 	FlipEffect = -1;
 }
 
-void LaraLocationPad(ITEM_INFO* item)//39710(<), 39C10(<) (F)
+void LaraLocationPad(ITEM_INFO* item)
 {
 	FlipEffect = -1;
 
@@ -228,7 +228,7 @@ void LaraLocationPad(ITEM_INFO* item)//39710(<), 39C10(<) (F)
 	Lara.locationPad = TriggerTimer;
 }
 
-void LaraLocation(ITEM_INFO* item)//396D0(<), 39BD0(<) (F)
+void LaraLocation(ITEM_INFO* item)
 {
 	FlipEffect = -1;
 
@@ -237,14 +237,14 @@ void LaraLocation(ITEM_INFO* item)//396D0(<), 39BD0(<) (F)
 		Lara.highestLocation = TriggerTimer;
 }
 
-void ExplosionFX(ITEM_INFO* item)//39694(<), 39B94(<) (F)
+void ExplosionFX(ITEM_INFO* item)
 {
 	SoundEffect(SFX_EXPLOSION1, NULL, 0);
 	Camera.bounce = -75;
 	FlipEffect = -1;
 }
 
-void SwapCrowbar(ITEM_INFO* item)//39638(<), 39B38(<) (F)
+void SwapCrowbar(ITEM_INFO* item)
 {
 	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
@@ -252,23 +252,23 @@ void SwapCrowbar(ITEM_INFO* item)//39638(<), 39B38(<) (F)
 		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
-void ActivateKey(ITEM_INFO* item)//39624(<), 39B24(<) (F)
+void ActivateKey(ITEM_INFO* item)
 {
 	KeyTriggerActive = 1;
 }
 
-void ActivateCamera(ITEM_INFO* item)//39610(<), 39B10(<) (F)
+void ActivateCamera(ITEM_INFO* item)
 {
 	KeyTriggerActive = 2;
 }
 
-void PoseidonSFX(ITEM_INFO* item)//395E0(<), 39AE0(<) (F)
+void PoseidonSFX(ITEM_INFO* item)
 {
 	SoundEffect(SFX_GRAB_OPEN, NULL, 0);
 	FlipEffect = -1;
 }
 
-void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
+void RubbleFX(ITEM_INFO* item)
 {
 	int itemNumber = FindItemNumber(ID_EARTHQUAKE);
 
@@ -288,13 +288,13 @@ void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
 	FlipEffect = -1;
 }
 
-void SoundFlipEffect(ITEM_INFO* item)//39500(<), 39A00(<) (F)
+void SoundFlipEffect(ITEM_INFO* item)
 {
 	SoundEffect(TriggerTimer, NULL, 0);
 	FlipEffect = -1;
 }
 
-void floor_shake_effect(ITEM_INFO* item)//39410, 39910 (F)
+void floor_shake_effect(ITEM_INFO* item)
 {
 	int x = abs(item->pos.xPos - Camera.pos.x);
 	int y = abs(item->pos.yPos - Camera.pos.y);
@@ -306,18 +306,18 @@ void floor_shake_effect(ITEM_INFO* item)//39410, 39910 (F)
 	}
 }
 
-void turn180_effect(ITEM_INFO* item)//393F4(<), 398F4(<) (F)
+void turn180_effect(ITEM_INFO* item)
 {
 	item->pos.yRot -= ANGLE(180);
 	item->pos.xRot = -item->pos.xRot;
 }
 
-void finish_level_effect(ITEM_INFO* item)//393D4(<), 398D4(<) (F)
+void finish_level_effect(ITEM_INFO* item)
 {
 	LevelComplete = CurrentLevel + 1;
 }
 
-void void_effect(ITEM_INFO* item)//393CC(<), 398CC(<) (F)
+void void_effect(ITEM_INFO* item)
 {
 
 }

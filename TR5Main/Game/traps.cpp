@@ -155,7 +155,7 @@ void FlameEmitterControl(short itemNumber)
 	}
 }
 
-void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
+void FlameEmitter2Control(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -676,7 +676,7 @@ void WreckingBallControl(short itemNumber)
 	WBRoom = room;
 }
 
-void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
+void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	

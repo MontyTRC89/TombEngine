@@ -326,7 +326,7 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		ObjectCollision(itemNumber, l, c);
 }
 
-void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) (F)
+void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -1044,7 +1044,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight) // (F) (D)
+void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)

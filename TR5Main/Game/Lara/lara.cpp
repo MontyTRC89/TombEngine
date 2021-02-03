@@ -358,7 +358,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col
 };
 
-void LaraControl(short itemNumber) // (AF) (D)
+void LaraControl(short itemNumber)
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -931,7 +931,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	TestTriggers(coll->trigger, FALSE, 0);
 }
 
-void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
+void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->badPos = 32512;
 	coll->badNeg = -400;
@@ -1041,7 +1041,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 	TestTriggers(coll->trigger, 0, 0);
 }
 
-void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetElevation = -ANGLE(22);
 
@@ -1098,7 +1098,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 	TestTriggers(coll->trigger, 0, 0);
 }
 
-void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);

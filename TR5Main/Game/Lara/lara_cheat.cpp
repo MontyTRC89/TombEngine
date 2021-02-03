@@ -11,7 +11,7 @@
 extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 
-void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
+void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD)
 	{
@@ -63,7 +63,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
 	}
 }
 
-void LaraCheatyBits() // (F) (D)
+void LaraCheatyBits()
 {
 	if (g_GameFlow->FlyCheat)
 	{
@@ -108,7 +108,7 @@ void LaraCheatyBits() // (F) (D)
 		NoCheatCounter--;
 }
 
-void LaraCheatGetStuff() // (F) (D)
+void LaraCheatGetStuff()
 {
 	Lara.NumFlares = -1;
 	Lara.NumSmallMedipacks = -1;
@@ -198,7 +198,7 @@ void LaraCheatGetStuff() // (F) (D)
 	g_Inventory.LoadObjects(false);
 }
 
-void DelsGiveLaraItemsCheat() // (AF) (D)
+void DelsGiveLaraItemsCheat()
 {
 	int i;
 
