@@ -966,8 +966,9 @@ bool CheckStackLimit(ITEM_INFO* item)
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	// disable floor property if invisible or height less than 2
-	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x1F) >= 2)
+	const auto& pushable = *(PUSHABLE_INFO*)item.data;
+	
+	if (item.status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
 	{
 		const auto height = item.pos.yPos - (item.triggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -978,7 +979,9 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x1F) >= 2)
+	const auto& pushable = *(PUSHABLE_INFO*)item.data;
+
+	if (item.status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
 		return std::optional{item.pos.yPos};
 	return std::nullopt;
 }
