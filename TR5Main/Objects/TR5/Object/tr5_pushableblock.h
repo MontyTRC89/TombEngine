@@ -16,7 +16,7 @@ typedef struct PUSHABLE_INFO
 	short fallSound;		// sound on hitting floor (if dropped)
 	short climb;			// not used for now
 	bool canFall;			// OCB 32
-	bool hasFloorCeiling;	// has floor and ceiling procedures (OCB 64)
+	bool hasFloorCeiling;			// has floor and ceiling procedures (OCB 64)
 	bool disablePull;		// OCB 128
 	bool disablePush;		// OCB 256
 	bool disableW;			// OCB 512 (W+E)
