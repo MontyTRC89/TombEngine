@@ -11,8 +11,8 @@
 #include "sound.h"
 #define GET_PUSHABLEINFO(item) ((PUSHABLE_INFO*) item->data)
 
-OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
-	0x0000, 0x0000, 0xFF00, 0x0000,
+static OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
+	0x0000, 0x0000, 0xFFC0, 0x0000,
 	0x0000, 0x0000, 0xF8E4, 0x071C,
 	0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
@@ -70,7 +70,7 @@ void InitialisePushableBlock(short itemNum)
 	PUSHABLE_INFO* pushable = new PUSHABLE_INFO;
 	
 	pushable->stackLimit = 3; // LUA
-	pushable->gravity = 9; // LUA
+	pushable->gravity = 8; // LUA
 	pushable->weight = 100; // LUA
 	pushable->moveX = item->pos.xPos;
 	pushable->moveZ = item->pos.zPos;
@@ -79,7 +79,6 @@ void InitialisePushableBlock(short itemNum)
 	int OCB = item->triggerFlags;
 
 	pushable->canFall = OCB & 0x20;
-	pushable->hasFloorCeiling = OCB & 0x40;
 	pushable->disablePull = OCB & 0x80;
 	pushable->disablePush = OCB & 0x100;
 	pushable->disableW = pushable->disableE = OCB & 0x200;
@@ -92,12 +91,14 @@ void InitialisePushableBlock(short itemNum)
 	pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
 	pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
 	*/
+	pushable->hasFloorCeiling = false;
 
 	int height;
-	if (pushable->hasFloorCeiling)
+	if (OCB & 0x40 && (OCB & 0x1F) >= 2)
 	{
-		height = (OCB & 0x1F) * CLICK(1);
+		pushable->hasFloorCeiling = true;
 		T5M::Floordata::AddBridge(itemNum);
+		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
 		height = -GetBoundsAccurate(item)->Y1;
@@ -110,7 +111,7 @@ void InitialisePushableBlock(short itemNum)
 
 	item->data = (void*) pushable;
 
-	FindStack(itemNum); // check for stack formation on init
+	FindStack(itemNum); // check for stack formation when pushables are initialised
 }
 
 void PushableBlockControl(short itemNumber)
@@ -155,7 +156,7 @@ void PushableBlockControl(short itemNumber)
 			if (item->fallspeed + pushable->gravity < 128)
 				item->fallspeed += pushable->gravity;
 			else
-				item->fallspeed = 128;
+				item->fallspeed++;
 			item->pos.yPos += item->fallspeed;
 
 			MoveStackY(itemNumber, item->fallspeed);
@@ -165,7 +166,7 @@ void PushableBlockControl(short itemNumber)
 			item->gravityStatus = false;
 			int relY = floorHeight - item->pos.yPos;
 			item->pos.yPos = floorHeight;
-			if (item->fallspeed >= 128)
+			if (item->fallspeed >= 96)
 				floor_shake_effect(item);
 			item->fallspeed = 0;
 			SoundEffect(pushable->fallSound, &item->pos, 2);
@@ -266,9 +267,9 @@ void PushableBlockControl(short itemNumber)
 				}
 				else
 				{
+					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
+					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
-					pushable->moveX = item->pos.xPos;
-					pushable->moveZ = item->pos.zPos;
 				}
 			}
 			else
@@ -328,9 +329,9 @@ void PushableBlockControl(short itemNumber)
 				}
 				else
 				{
+					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
+					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
 					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
-					pushable->moveX = item->pos.xPos;
-					pushable->moveZ = item->pos.zPos;
 				}
 			}
 			else
@@ -559,7 +560,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	short roomNum = item->roomNumber;
+	
 	switch (quadrant)
 	{
 	case NORTH:
@@ -579,6 +580,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 		break;
 	}
 
+	short roomNum = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
@@ -618,8 +620,23 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	{
 		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
 			return 0;
+		else
+		{
+			const auto& object = Objects[CollidedItems[i]->objectNumber];
+			int collidedIndex = CollidedItems[i] - g_Level.Items.data(); // index of CollidedItems[i]
+
+			int xCol = CollidedItems[i]->pos.xPos;
+			int yCol = CollidedItems[i]->pos.yPos;
+			int zCol = CollidedItems[i]->pos.zPos;
+
+			// check if floor function returns nullopt
+			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+				return 0;
+		}
+
 		i++;
 	}
+
 	return 1;
 }
 
@@ -650,6 +667,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int x = item->pos.xPos + xadd;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos + zadd;
+
 	short roomNum = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
 
@@ -660,7 +678,12 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (GetFloorHeight(floor, x, y - blockhite, z) != y)
 		return 0;
 
-	if (floor->ceiling * 256 > y - blockhite)
+	if (HeightType)
+		return 0;
+
+	int ceiling = y - blockhite + 100;
+	floor = GetFloor(x, ceiling, z, &roomNum);
+	if (GetCeiling(floor, x, ceiling, z) > ceiling)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -676,6 +699,19 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	{
 		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
 			return 0;
+		else
+		{
+			const auto& object = Objects[CollidedItems[i]->objectNumber];
+			int collidedIndex = CollidedItems[i] - g_Level.Items.data();
+
+			int xCol = CollidedItems[i]->pos.xPos;
+			int yCol = CollidedItems[i]->pos.yPos;
+			int zCol = CollidedItems[i]->pos.zPos;
+
+			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+				return 0;
+		}
+
 		i++;
 	}
 
@@ -690,8 +726,25 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (floor->ceiling * 256 > y - LARA_HITE)
 		return 0;
 
-	x = LaraItem->pos.xPos + xadd;
-	z = LaraItem->pos.zPos + zadd;
+	int xAddLara = 0, zAddLara = 0;
+	switch (quadrant)
+	{
+	case NORTH:
+		zAddLara = GetBestFrame(LaraItem)->offsetZ;
+		break;
+	case EAST:
+		xAddLara = GetBestFrame(LaraItem)->offsetZ;
+		break;
+	case SOUTH:
+		zAddLara = -GetBestFrame(LaraItem)->offsetZ;
+		break;
+	case WEST:
+		zAddLara = -GetBestFrame(LaraItem)->offsetZ;
+		break;
+	}
+
+	x = LaraItem->pos.xPos + xadd + xAddLara;
+	z = LaraItem->pos.zPos + zadd + zAddLara;
 
 	roomNum = LaraItem->roomNumber;
 	GetFloor(x, y, z, &roomNum);
@@ -711,10 +764,26 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	i = 0;
 	while (CollidedItems[i] != NULL)
 	{
-		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
-			return 0;
+		if (CollidedItems[i] != item) // if collided item is not pushblock in which lara embedded
+		{
+			if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
+				return 0;
+			else
+			{
+				const auto& object = Objects[CollidedItems[i]->objectNumber];
+				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
+				int xCol = CollidedItems[i]->pos.xPos;
+				int yCol = CollidedItems[i]->pos.yPos;
+				int zCol = CollidedItems[i]->pos.zPos;
+
+				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+					return 0;
+			}
+		}
+
 		i++;
 	}
+
 	return 1;
 }
 
@@ -897,7 +966,8 @@ bool CheckStackLimit(ITEM_INFO* item)
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE)
+	// disable floor property if invisible or height less than 2
+	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x1F) >= 2)
 	{
 		const auto height = item.pos.yPos - (item.triggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -908,7 +978,7 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	if (item.status != ITEM_INVISIBLE)
+	if (item.status != ITEM_INVISIBLE && (item.triggerFlags & 0x1F) >= 2)
 		return std::optional{item.pos.yPos};
 	return std::nullopt;
 }
