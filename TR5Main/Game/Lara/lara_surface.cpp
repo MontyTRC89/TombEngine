@@ -490,6 +490,7 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 	AnimateLara(item);
 
 	item->pos.yRot = rot;
+	item->pos.yPos -= 10;//otherwise she falls back into the water
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
