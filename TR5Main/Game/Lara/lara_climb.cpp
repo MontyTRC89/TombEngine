@@ -999,7 +999,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->trigger = TriggerIndex;
 
-	if (TrInput & IN_ACTION && item->hitPoints > 0)
+	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER)//can't let go on this anim
 		return 0;
 
 	Lara.torsoYrot = 0;
