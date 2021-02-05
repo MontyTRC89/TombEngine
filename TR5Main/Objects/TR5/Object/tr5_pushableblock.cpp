@@ -670,7 +670,6 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	short roomNum = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
-
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
@@ -715,17 +714,6 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 		i++;
 	}
 
-	x += xadd;
-	z += zadd;
-	roomNum = item->roomNumber;
-	floor = GetFloor(x, y - blockhite, z, &roomNum);
-
-	if (GetFloorHeight(floor, x, y - blockhite, z) != y)
-		return 0;
-
-	if (floor->ceiling * 256 > y - LARA_HITE)
-		return 0;
-
 	int xAddLara = 0, zAddLara = 0;
 	switch (quadrant)
 	{
@@ -739,7 +727,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 		zAddLara = -GetBestFrame(LaraItem)->offsetZ;
 		break;
 	case WEST:
-		zAddLara = -GetBestFrame(LaraItem)->offsetZ;
+		xAddLara = -GetBestFrame(LaraItem)->offsetZ;
 		break;
 	}
 
@@ -747,10 +735,15 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	z = LaraItem->pos.zPos + zadd + zAddLara;
 
 	roomNum = LaraItem->roomNumber;
-	GetFloor(x, y, z, &roomNum);
-
+	floor = GetFloor(x, y - LARA_HITE, z, &roomNum);
 	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
+		return 0;
+
+	if (GetFloorHeight(floor, x, y - LARA_HITE, z) != y)
+		return 0;
+
+	if (floor->ceiling * 256 > y - LARA_HITE)
 		return 0;
 
 	oldX = LaraItem->pos.xPos;
