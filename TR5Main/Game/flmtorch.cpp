@@ -51,7 +51,7 @@ void TriggerTorchFlame(char fxObj, char node)
 	spark->dSize = spark->size / 8;
 }
 
-void DoFlameTorch() // (F) (D)
+void DoFlameTorch()
 {
 	switch (Lara.leftArm.lock)
 	{
@@ -169,7 +169,7 @@ void DoFlameTorch() // (F) (D)
 	}
 }
 
-void GetFlameTorch() // (F) (D)
+void GetFlameTorch()
 {
 	if (Lara.gunType == WEAPON_FLARE)
 		CreateFlare(ID_FLARE_ITEM, 0);
@@ -186,7 +186,7 @@ void GetFlameTorch() // (F) (D)
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 }
 
-void TorchControl(short itemNumber) // (F) (D)
+void TorchControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	

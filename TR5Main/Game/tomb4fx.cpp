@@ -630,7 +630,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->size = spark->dSize / 8;
 }
 
-int GetFreeBlood()// (F)
+int GetFreeBlood()
 {
 	BLOOD_STRUCT* blood = &Blood[NextBlood];
 	int bloodNum = NextBlood;
@@ -668,7 +668,7 @@ int GetFreeBlood()// (F)
 	return bloodNum;
 }
 
-void TriggerBlood(int x, int y, int z, int unk, int num)// (F)
+void TriggerBlood(int x, int y, int z, int unk, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -1041,7 +1041,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 	}
 }
 
-void LaraBubbles(ITEM_INFO* item)// (F)
+void LaraBubbles(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 	int num, i;
@@ -1160,7 +1160,7 @@ void UpdateDrips()
 	}
 }
 
-void TriggerLaraDrips()// (F)
+void TriggerLaraDrips()
 {
 	PHD_VECTOR pos;
 	
@@ -1316,7 +1316,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	return item->meshBits == 0;
 }
 
-int GetFreeShockwave()// (F)
+int GetFreeShockwave()
 {
 	for (int i = 0; i < MAX_SHOCKWAVE; i++)
 	{
@@ -1327,7 +1327,7 @@ int GetFreeShockwave()// (F)
 	return -1;
 }
 
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)// (F)
+void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1459,7 +1459,7 @@ void UpdateShockwaves()
 	}
 }
 
-void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
+void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -1507,7 +1507,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	}
 }
 
-/*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)// (F)
+/*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	
@@ -1577,7 +1577,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	spark->size = size >> 2;
 }
 */
-/*void DrawLensFlares(ITEM_INFO* item)// (F)
+/*void DrawLensFlares(ITEM_INFO* item)
 {
 	GAME_VECTOR pos;
 
@@ -1589,7 +1589,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	SetUpLensFlare(0, 0, 0, &pos);
 }*/
 
-void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)// (F)
+void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -1619,7 +1619,7 @@ void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
 
-void TriggerFenceSparks(int x, int y, int z, int kill, int crane)//(F)
+void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
