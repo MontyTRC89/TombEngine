@@ -155,7 +155,7 @@ void FlameEmitterControl(short itemNumber)
 	}
 }
 
-void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
+void FlameEmitter2Control(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -292,14 +292,14 @@ void LavaBurn(ITEM_INFO* item)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, 32000, item->pos.zPos, &roomNumber);
 		if (item->floor == GetFloorHeight(floor, item->pos.xPos, 32000, item->pos.zPos))
 		{
-			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-
-				KayakLaraRapidsDrown();
-			else
-			{
+//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
+//				KayakLaraRapidsDrown();
+//			else
+//			{
 				item->hitPoints = -1;
 				item->hitStatus = true;
 				LaraBurn();
-			}
+//			}
 		}
 	}
 }
@@ -676,7 +676,7 @@ void WreckingBallControl(short itemNumber)
 	WBRoom = room;
 }
 
-void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
+void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	

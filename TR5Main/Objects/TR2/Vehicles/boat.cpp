@@ -12,6 +12,8 @@
 #include <Game\effect2.h>
 #include <Game\particle\SimpleParticle.h>
 
+
+
 struct BOAT_INFO
 {
 	int boatTurn;
@@ -227,38 +229,45 @@ bool SpeedBoatCanGetOff(int direction)
 	return true;
 }
 
-int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
+BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 {
 	// Returns 0 if no get on, 1 if right get on and 2 if left get on and 3 if jump geton 
-	int geton = 0;
+	BOAT_GETON geton = BOAT_GETON::NONE;
 
 	if (Lara.gunStatus != LG_NO_ARMS)
-		return 0;
+		return BOAT_GETON::NONE;
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
+	// Is Lara actually close enough to get on the thing? 
+	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+		return BOAT_GETON::NONE;
+
+	if (!TestCollision(boat, LaraItem))
+		return BOAT_GETON::NONE;
+
 	int dist = (LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot);
 	if (dist > 200)
-		return 0;
+		return BOAT_GETON::NONE;
 
 	// Check if Lara is close enough and in right position to get onto boat 
 	short rot = boat->pos.yRot - LaraItem->pos.yRot;
 	if (Lara.waterStatus == LW_SURFACE || Lara.waterStatus == LW_WADE)
 	{
 		if (!(TrInput & IN_ACTION) || LaraItem->gravityStatus || boat->speed)
-			return 0;
+			return BOAT_GETON::NONE;
 
 		if (rot > ANGLE(45) && rot < ANGLE(135))
-			geton = 1; // Right
+			geton = BOAT_GETON::WATER_RIGHT; // Right
 		else if (rot > -ANGLE(135) && rot < -ANGLE(45))
-			geton = 2; // Left
+			geton = BOAT_GETON::WATER_LEFT; // Left
 	}
 	else if (Lara.waterStatus == LW_ABOVE_WATER)
 	{
 		if (LaraItem->fallspeed > 0)
 		{
 			if (rot > -ANGLE(135) && rot < ANGLE(135) && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
-				geton = 3; // Jump
+				geton = BOAT_GETON::JUMP; // Jump
 		}
 		else if (LaraItem->fallspeed == 0)
 		{
@@ -267,23 +276,12 @@ int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 				if (LaraItem->pos.xPos == boat->pos.xPos
 					&& LaraItem->pos.yPos == boat->pos.yPos 
 					&& LaraItem->pos.zPos == boat->pos.zPos)
-					geton = 4; // Must have started on same spot as boat
+					geton = BOAT_GETON::STARTPOS; // Must have started on same spot as boat
 				else
-					geton = 3; // Jump
+					geton = BOAT_GETON::JUMP; // Jump
 			}
 		}
 	}
-
-	if (!geton)
-		return 0;
-
-	// Is Lara actually close enough to get on the thing? 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
-		return 0;
-
-	if (!TestCollision(boat, LaraItem))
-		return 0;
-
 	return geton;
 }
 

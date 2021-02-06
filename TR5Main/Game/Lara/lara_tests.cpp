@@ -23,7 +23,7 @@ static short RightClimbTab[4] = // offset 0xA0640
 
 /*this file has all the generic test functions called in lara's state code*/
 
-int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return 0;
@@ -225,7 +225,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		return 0;
 }
 
-int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
+int TestWall(ITEM_INFO* item, int front, int right, int down)
 {
 	int x = item->pos.xPos;
 	int y = item->pos.yPos + down;
@@ -288,7 +288,7 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
 	return 0;
 }
 
-int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int delta, flag, flag2, front, dfront, x, z, result;
 	short angle, hdif, cdif, dir;
@@ -464,7 +464,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 
-int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
@@ -619,7 +619,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 
-int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
@@ -774,7 +774,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 
-int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return 0;
@@ -813,7 +813,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return abs(coll->frontFloor - coll->rightFloor2) < 60;
 }
 
-int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
+int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
@@ -848,7 +848,7 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 	return true;
 }
 
-int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	BOUNDING_BOX* bounds;
 	int shift, result;
@@ -902,7 +902,7 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge) // (F) (D)
+int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 {
 
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
@@ -931,7 +931,7 @@ int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge) // (F) (D)
 	return 1;
 }
 
-int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
+int TestHangSwingIn(ITEM_INFO* item, short angle)
 {
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
@@ -1053,7 +1053,7 @@ int TestHangFeet(ITEM_INFO* item, short angle)
 	}
 }
 
-int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 19A64 (F)
+int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	int oldx = item->pos.xPos;
 	int oldz = item->pos.zPos;
@@ -1094,7 +1094,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	return !res;
 }
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)//1A090, 1A1C4 (F)
+void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -1175,7 +1175,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
-int LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
+int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 {
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - 762;
@@ -1191,7 +1191,7 @@ int LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 	return height;
 }
 
-int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
+int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
 {
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - h;
@@ -1207,7 +1207,7 @@ int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 	return height;
 }
 
-int LaraFallen(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (Lara.waterStatus == LW_WADE || coll->midFloor <= STEPUP_HEIGHT)
 	{
@@ -1223,7 +1223,7 @@ int LaraFallen(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 1;
 }
 
-int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int landspeed = item->fallspeed - 140;
 
