@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <process.h>
 #include <corecrt_io.h>
+#include <iostream>
 using namespace T5M::Renderer;
 using std::exception;
 using std::string;
@@ -32,7 +33,6 @@ extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
-DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
 bool BlockAllInput = true;
 int skipLoop = -1;
@@ -95,6 +95,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 }
 
 void getCurrentCommit() {
+#if _DEBUG
 	LPSTR cmdLine = {TEXT("git.exe log -1 --oneline")};
 
 	SECURITY_ATTRIBUTES sa = {0};
@@ -145,6 +146,7 @@ void getCurrentCommit() {
 	CloseHandle(hStdOutWr);
 	CloseHandle(hStdErrRd);
 	CloseHandle(hStdErrWr);
+#endif
 }
 
 void HandleScriptMessage(WPARAM wParam)
@@ -188,12 +190,6 @@ void HandleScriptMessage(WPARAM wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (msg == WM_USER + 0)
-	{
-		HandleScriptMessage(wParam);
-		return 0;
-	}
-
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 		return 0;
@@ -384,44 +380,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	UpdateWindow(WindowsHandle);
 	ShowWindow(WindowsHandle, nShowCmd);
-
-	//Create debug script terminal
-	if (Debug)
-	{
-		MainThreadID = GetWindowThreadProcessId(WindowsHandle, NULL);
-		AllocConsole();
-		HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
-		DWORD consoleModeIn;
-		int hCrt = _open_osfhandle((long)handle_in, _O_BINARY);
-		FILE* hf_in = _fdopen(hCrt, "r");
-		setvbuf(hf_in, NULL, _IONBF, 512);
-		GetConsoleMode(handle_in, &consoleModeIn);
-		consoleModeIn = consoleModeIn | ENABLE_LINE_INPUT;
-		SetConsoleMode(handle_in, consoleModeIn);
-		freopen_s(&hf_in, "CONIN$", "r", stdin);
-
-		HANDLE ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		int SystemOutput = _open_osfhandle(intptr_t(ConsoleOutput), _O_TEXT);
-		FILE* COutputHandle = _fdopen(SystemOutput, "w");
-		freopen_s(&COutputHandle, "CONOUT$", "w", stdout);
-
-		LPTHREAD_START_ROUTINE readConsoleLoop = [](LPVOID params) -> DWORD {
-			DWORD read;
-			CHAR buffer[4096];
-			while (true)
-			{
-				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
-				if (success && read > 2)
-				{
-					//Only send the actual written message minus \r\n
-					string msg(buffer, read-2);
-					SendMessage(WindowsHandle, WM_USER, (WPARAM)&msg, NULL);
-				}
-			};
-			return 0;
-		};
-		CreateThread(NULL, 0, readConsoleLoop, handle_in, 0, &DebugConsoleThreadID);
-	}
 
 	SetCursor(NULL);
 	ShowCursor(FALSE);

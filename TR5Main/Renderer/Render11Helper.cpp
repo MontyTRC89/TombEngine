@@ -9,11 +9,13 @@
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"
-#include <Renderer\RenderView\RenderView.h>
+#include "Renderer\RenderView\RenderView.h"
 #include "quad.h"
 #include "rubberboat.h"
 #include "upv.h"
 #include "biggun.h"
+#include "jeep.h"
+#include "motorbike.h"
 #include <algorithm>
 
 extern GameConfiguration g_Configuration;
@@ -286,13 +288,42 @@ namespace T5M::Renderer
 				if (item->objectNumber == ID_QUAD)
 				{
 					QUAD_INFO* quad = (QUAD_INFO*)item->data;
-					if (j == 3 || j == 4)
-					{
+					if (j == 3 || j == 4) {
 						currentBone->ExtraRotation.x = TO_RAD(quad->rearRot);
 					}
-					else if (j == 6 || j == 7)
-					{
+					else if (j == 6 || j == 7) {
 						currentBone->ExtraRotation.x = TO_RAD(quad->frontRot);
+					}
+				}
+				else if (item->objectNumber == ID_JEEP) {
+					JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+					switch (j) {
+					case 9:
+						currentBone->ExtraRotation.x = TO_RAD(jeep->rot1);
+						break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(jeep->rot2);
+
+						break;
+					case 12:
+						currentBone->ExtraRotation.x = TO_RAD(jeep->rot3);
+
+						break;
+					case 13:
+						currentBone->ExtraRotation.x = TO_RAD(jeep->rot4);
+
+						break;
+					}
+				}
+				else if (item->objectNumber == ID_MOTORBIKE) {
+					MOTORBIKE_INFO* bike = (MOTORBIKE_INFO*)item->data;
+					switch (j) {
+					case 2:
+					case 4:
+						currentBone->ExtraRotation.x = TO_RAD(bike->wheelRight);
+						break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(bike->wheelLeft);
 					}
 				}
 				else if (item->objectNumber == ID_RUBBER_BOAT)
@@ -353,8 +384,7 @@ namespace T5M::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::updateItemsAnimations(RenderView& view)
-	{
+	void Renderer11::updateItemsAnimations(RenderView& view) {
 		Matrix translation;
 		Matrix rotation;
 
@@ -372,8 +402,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::fromTrAngle(Matrix *matrix, short *frameptr, int index)
-	{
+	void Renderer11::fromTrAngle(Matrix *matrix, short *frameptr, int index) {
 		short *ptr = &frameptr[0];
 
 		ptr += 9;
@@ -417,8 +446,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::buildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
-	{
+	void Renderer11::buildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode) {
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
@@ -430,8 +458,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::buildHierarchy(RendererObject *obj)
-	{
+	void Renderer11::buildHierarchy(RendererObject *obj) {
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
@@ -442,8 +469,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	RendererMesh *Renderer11::getRendererMeshFromTrMesh(RendererObject *obj, MESH *meshPtr, short boneIndex, int isJoints, int isHairs)
-	{
+	RendererMesh *Renderer11::getRendererMeshFromTrMesh(RendererObject *obj, MESH *meshPtr, short boneIndex, int isJoints, int isHairs) {
 		RendererMesh *mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;

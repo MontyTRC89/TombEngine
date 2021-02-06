@@ -6,7 +6,7 @@
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -33,7 +33,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
+void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ShiftItem(item, coll);
 
@@ -96,7 +96,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 	}
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -122,7 +122,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType == CT_TOP || coll->collType == CT_CLAMP)
 	{
@@ -145,7 +145,7 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
+void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	switch (coll->oldAnimState)
 	{
@@ -177,7 +177,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
 	}
 }
 
-void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F) (D)
+void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	if (item->currentAnimState == LS_SHIMMY_RIGHT)
 	{
@@ -260,12 +260,12 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F)
 	}
 }
 
-short GetDirOctant(int rot)//160B4(<), 161E8(<) (F)
+short GetDirOctant(int rot)
 {
 	return abs(rot) >= ANGLE(45) && abs(rot) <= ANGLE(135.0f);
 }
 
-void GetLaraDeadlyBounds() // (F) (D)
+void GetLaraDeadlyBounds()
 {
 	BOUNDING_BOX* bounds;
 	BOUNDING_BOX tbounds;

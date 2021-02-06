@@ -19,7 +19,7 @@ constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.
 
 using namespace T5M::Math::Random;
 
-void FlareControl(short itemNumber) // (AF) (D)
+void FlareControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -88,7 +88,7 @@ void FlareControl(short itemNumber) // (AF) (D)
 	item->data = (void*)age;
 }
 
-void ready_flare() // (F) (D)
+void ready_flare()
 {
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.leftArm.zRot = 0;
@@ -102,17 +102,17 @@ void ready_flare() // (F) (D)
 	Lara.target = NULL;
 }
 
-void undraw_flare_meshes() // (F) (D)
+void undraw_flare_meshes()
 {
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
-void draw_flare_meshes() // (F) (D)
+void draw_flare_meshes()
 {
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
-void undraw_flare() // (F) (D)
+void undraw_flare()
 {
 	Lara.flareControlLeft = true;
 
@@ -225,7 +225,7 @@ void undraw_flare() // (F) (D)
 	set_flare_arm(Lara.leftArm.frameNumber);
 }
 
-void draw_flare() // (F) (D)
+void draw_flare()
 {
 	short frame;
 
@@ -275,7 +275,7 @@ void draw_flare() // (F) (D)
 	}
 }
 
-void set_flare_arm(int frame) // (F) (D)
+void set_flare_arm(int frame)
 {
 	short anim = Objects[ID_LARA_FLARE_ANIM].animIndex;
 
@@ -300,7 +300,7 @@ void set_flare_arm(int frame) // (F) (D)
 	Lara.leftArm.frameBase = g_Level.Anims[anim].framePtr;
 }
 
-void CreateFlare(short objectNum, int thrown) // (F) (D)
+void CreateFlare(short objectNum, int thrown)
 {
 	short itemNum = CreateItem();
 	if (itemNum != NO_ITEM)
@@ -383,7 +383,7 @@ void DrawFlareInAir(ITEM_INFO* item)
 	printf("DrawFlareInAir() not implemented !");
 }
 
-void DoFlareInHand(int flare_age) // (AF) (D)
+void DoFlareInHand(int flare_age)
 {
 	PHD_VECTOR pos;
 
@@ -408,7 +408,7 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 	}
 }
 
-int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
+int DoFlareLight(PHD_VECTOR* pos, int age)
 {
 	int x, y, z;
 	int r, g, b;

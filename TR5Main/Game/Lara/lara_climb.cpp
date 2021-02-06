@@ -17,7 +17,7 @@ short LeftExtRightIntTab[4] = // offset 0xA0B84
 	0x0200, 0x0400, 0x0800, 0x0100
 };
 
-short GetClimbTrigger(int x, int y, int z, short roomNumber) // (F) (D)
+short GetClimbTrigger(int x, int y, int z, short roomNumber)
 {
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 
@@ -37,12 +37,12 @@ short GetClimbTrigger(int x, int y, int z, short roomNumber) // (F) (D)
 	return (*data & DATA_TYPE) == CLIMB_TYPE ? *data : 0;
 }
 
-void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)//46E30(<), 47294(<) (F)
+void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return;
 }
 
-void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)//46DF8(<), 4725C(<) (F)
+void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
@@ -51,7 +51,7 @@ void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)//46DF8(<), 4725C(<) (F)
 	Camera.targetAngle = -ANGLE(45);
 }
 
-void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
+void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (LaraCheckForLetGo(item, coll) 
 		|| item->animNumber != LA_LADDER_DOWN)
@@ -132,7 +132,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 		AnimateLara(item);
 }
 
-void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BA4(<), 47008(<) (F)
+void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
@@ -140,7 +140,7 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BA4(<), 47008(<) (F)
 	Camera.targetElevation = -ANGLE(45);
 }
 
-void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
+void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!LaraCheckForLetGo(item, coll) && item->animNumber == LA_LADDER_UP)
 	{
@@ -212,7 +212,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 	}
 }
 
-void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)//46984(<), 46DE8(<) (F)
+void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
@@ -220,7 +220,7 @@ void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)//46984(<), 46DE8(<) (F)
 	Camera.targetElevation = ANGLE(30);
 }
 
-void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)//46908(<), 46D6C(<) (F)
+void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!LaraCheckForLetGo(item, coll))
 	{
@@ -230,7 +230,7 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)//46908(<), 46D6C(<) (
 	}
 }
 
-void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)//468B8(<), 46D1C(<) (F)
+void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
@@ -242,7 +242,7 @@ void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)//468B8(<), 46D1C(<) (F
 		item->goalAnimState = LS_LADDER_IDLE;
 }
 
-void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)//46834(<), 46C98(<) (F)
+void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!LaraCheckForLetGo(item, coll))
 	{
@@ -252,7 +252,7 @@ void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)//46834(<), 46C98(<) (F
 	}
 }
 
-void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C48(<) (F)
+void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
@@ -264,7 +264,7 @@ void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C48(<) (F)
 		item->goalAnimState = LS_LADDER_IDLE;
 }
 
-void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int yShift;
 	int resultRight, resultLeft;
@@ -360,7 +360,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
+void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.isClimbing = true;
 
@@ -422,7 +422,7 @@ void lara_as_stepoff_right(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot += ANGLE(90.0f);
 }
 
-int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift) // (F) (D)
+int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift)
 {
 	int x;
 	int z;
@@ -460,7 +460,7 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	return LaraTestClimb(x, item->pos.yPos + origin, z, xFront, zFront, height, item->roomNumber, shift);
 }
 
-void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)//46100, 46564 (F)
+void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)
 {
 	if (result == 1)
 	{
@@ -592,7 +592,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	AnimateLara(item);
 }
 
-int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
+int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int result = 0;
 
@@ -690,7 +690,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 	return result;
 }
 
-int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
+int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int result = 0;
 
@@ -790,7 +790,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 	return result;
 }
 
-int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)//457F0, 45C54
+int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)
 {
 
 	*shift = 0;
@@ -886,7 +886,7 @@ int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, i
 	return -1;
 }
 
-int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge)//45530, 45994
+int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge)
 {
 	int y = item->pos.yPos - 768;
 
@@ -987,7 +987,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 	return -2;
 }
 
-int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
+int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short roomNumber = item->roomNumber;
 
@@ -999,7 +999,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
 
 	coll->trigger = TriggerIndex;
 
-	if (TrInput & IN_ACTION && item->hitPoints > 0)
+	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER)//can't let go on this anim
 		return 0;
 
 	Lara.torsoYrot = 0;

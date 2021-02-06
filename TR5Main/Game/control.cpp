@@ -1654,7 +1654,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
-#if 0
+
 	TiltYOffset = 0;
 	TiltXOffset = 0;
 	OnObject = 0;
@@ -1671,202 +1671,204 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	}
 
 	int height = floor->floor * 256;
-	if (height == NO_HEIGHT)
-		return height;
-#endif
-
-	TriggerIndex = NULL;
-
-	/*if (floor->index == 0)
-		return height;*/
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type, hadj;
-
-	int xOff, yOff, trigger;
-	/*ITEM_INFO *item;
-	OBJECT_INFO *obj;
-	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;*/
-
-	do
+	if (height != NO_HEIGHT)
 	{
-		type = *(data++);
+		//		return height;
 
-		switch (type & DATA_TYPE)
+
+		TriggerIndex = NULL;
+
+		if (floor->index != 0)
 		{
-		case DOOR_TYPE:
-		case ROOF_TYPE:
-		case SPLIT3:
-		case SPLIT4:
-		case NOCOLC1T:
-		case NOCOLC1B:
-		case NOCOLC2T:
-		case NOCOLC2B:
-			data++;
-			break;
+			//		return height;
 
-		case TILT_TYPE:
-			/*TiltXOffset = xOff = (*data >> 8);
-			TiltYOffset = yOff = *(char *)data;
+			short* data = &g_Level.FloorData[floor->index];
+			short type, hadj;
 
-			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-				HeightType = BIG_SLOPE;
-			else
-				HeightType = SMALL_SLOPE;
-
-			if (xOff >= 0)
-				height += (xOff * ((-1 - z) & 1023) >> 2);
-			else
-				height -= (xOff * (z & 1023) >> 2);
-
-			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 1023) >> 2;
-			else
-				height -= yOff * (x & 1023) >> 2;*/
-
-			data++;
-			break;
-
-		case TRIGGER_TYPE:
-			if (!TriggerIndex)
-				TriggerIndex = data - 1;
-
-			data++;
-
+			int xOff, yOff, trigger;
+			ITEM_INFO* item;
+			OBJECT_INFO* obj;
+			int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 			do
 			{
-				trigger = *(data++);
+				type = *(data++);
 
-				if (TRIG_BITS(trigger) != TO_OBJECT)
+				switch (type & DATA_TYPE)
 				{
-					if (TRIG_BITS(trigger) == TO_CAMERA ||
-						TRIG_BITS(trigger) == TO_FLYBY)
+				case DOOR_TYPE:
+				case ROOF_TYPE:
+				case SPLIT3:
+				case SPLIT4:
+				case NOCOLC1T:
+				case NOCOLC1B:
+				case NOCOLC2T:
+				case NOCOLC2B:
+					data++;
+					break;
+
+				case TILT_TYPE:
+					TiltXOffset = xOff = (*data >> 8);
+					TiltYOffset = yOff = *(char*)data;
+
+					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+						HeightType = BIG_SLOPE;
+					else
+						HeightType = SMALL_SLOPE;
+
+					if (xOff >= 0)
+						height += (xOff * ((-1 - z) & 1023) >> 2);
+					else
+						height -= (xOff * (z & 1023) >> 2);
+
+					if (yOff >= 0)
+						height += yOff * ((-1 - x) & 1023) >> 2;
+					else
+						height -= yOff * (x & 1023) >> 2;
+
+					data++;
+					break;
+
+				case TRIGGER_TYPE:
+					if (!TriggerIndex)
+						TriggerIndex = data - 1;
+
+					data++;
+
+					do
 					{
 						trigger = *(data++);
-					}
-				}
-				else
-				{
-					/*item = &g_Level.Items[trigger & VALUE_BITS];
-					obj = &Objects[item->objectNumber];
 
-					if (obj->floor && !(item->flags & 0x8000))
+						if (TRIG_BITS(trigger) != TO_OBJECT)
+						{
+							if (TRIG_BITS(trigger) == TO_CAMERA ||
+								TRIG_BITS(trigger) == TO_FLYBY)
+							{
+								trigger = *(data++);
+							}
+						}
+						else
+						{
+							/*item = &g_Level.Items[trigger & VALUE_BITS];
+							obj = &Objects[item->objectNumber];
+
+							if (obj->floor && !(item->flags & 0x8000))
+							{
+								(obj->floor)(item, x, y, z, &height);
+							}*/
+						}
+
+					} while (!(trigger & END_BIT));
+					break;
+
+				case LAVA_TYPE:
+					TriggerIndex = data - 1;
+					break;
+
+				case CLIMB_TYPE:
+				case MONKEY_TYPE:
+				case TRIGTRIGGER_TYPE:
+					if (!TriggerIndex)
+						TriggerIndex = data - 1;
+					break;
+
+				case SPLIT1:
+				case SPLIT2:
+				case NOCOLF1T:
+				case NOCOLF1B:
+				case NOCOLF2T:
+				case NOCOLF2B:
+					tilts = *data;
+					t0 = tilts & 15;
+					t1 = (tilts >> 4) & 15;
+					t2 = (tilts >> 8) & 15;
+					t3 = (tilts >> 12) & 15;
+
+					dx = x & 1023;
+					dz = z & 1023;
+
+					xOff = yOff = 0;
+
+					HeightType = SPLIT_TRI;
+					SplitFloor = (type & DATA_TYPE);
+
+					if ((type & DATA_TYPE) == SPLIT1 ||
+						(type & DATA_TYPE) == NOCOLF1T ||
+						(type & DATA_TYPE) == NOCOLF1B)
 					{
-						(obj->floor)(item, x, y, z, &height);
-					}*/
+						if (dx <= (1024 - dz))
+						{
+							hadj = (type >> 10) & 0x1F;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t2 - t1;
+							yOff = t0 - t1;
+						}
+						else
+						{
+							hadj = (type >> 5) & 0x1F;
+							if (hadj & 0x10)
+								hadj |= 0xFFF0;
+							height += 256 * hadj;
+							xOff = t3 - t0;
+							yOff = t3 - t2;
+						}
+					}
+					else
+					{
+						if (dx <= dz)
+						{
+							hadj = (type >> 10) & 0x1f;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t2 - t1;
+							yOff = t3 - t2;
+						}
+						else
+						{
+							hadj = (type >> 5) & 0x1f;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t3 - t0;
+							yOff = t0 - t1;
+						}
+					}
+
+					TiltXOffset = xOff;
+					TiltYOffset = yOff;
+
+					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+						HeightType = DIAGONAL;
+					else if (HeightType != SPLIT_TRI)
+						HeightType = SMALL_SLOPE;
+
+					if (xOff >= 0)
+						height += xOff * ((-1 - z) & 1023) >> 2;
+					else
+						height -= xOff * (z & 1023) >> 2;
+
+					if (yOff >= 0)
+						height += yOff * ((-1 - x) & 1023) >> 2;
+					else
+						height -= yOff * (x & 1023) >> 2;
+
+					data++;
+					break;
+
+				default:
+					break;
 				}
-
-			} while (!(trigger & END_BIT));
-			break;
-
-		case LAVA_TYPE:
-			TriggerIndex = data - 1;
-			break;
-
-		case CLIMB_TYPE:
-		case MONKEY_TYPE:
-		case TRIGTRIGGER_TYPE:
-			if (!TriggerIndex)
-				TriggerIndex = data - 1;
-			break;
-
-		case SPLIT1:
-		case SPLIT2:
-		case NOCOLF1T:
-		case NOCOLF1B:
-		case NOCOLF2T:
-		case NOCOLF2B:
-			/*tilts = *data;
-			t0 = tilts & 15;
-			t1 = (tilts >> 4) & 15;
-			t2 = (tilts >> 8) & 15;
-			t3 = (tilts >> 12) & 15;
-
-			dx = x & 1023;
-			dz = z & 1023;
-
-			xOff = yOff = 0;
-
-			HeightType = SPLIT_TRI;
-			SplitFloor = (type & DATA_TYPE);
-
-			if ((type & DATA_TYPE) == SPLIT1 ||
-				(type & DATA_TYPE) == NOCOLF1T ||
-				(type & DATA_TYPE) == NOCOLF1B)
-			{
-				if (dx <= (1024 - dz))
-				{
-					hadj = (type >> 10) & 0x1F;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
-					xOff = t2 - t1;
-					yOff = t0 - t1;
-				}
-				else
-				{
-					hadj = (type >> 5) & 0x1F;
-					if (hadj & 0x10)
-						hadj |= 0xFFF0;
-					height += 256 * hadj;
-					xOff = t3 - t0;
-					yOff = t3 - t2;
-				}
-			}
-			else
-			{
-				if (dx <= dz)
-				{
-					hadj = (type >> 10) & 0x1f;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
-					xOff = t2 - t1;
-					yOff = t3 - t2;
-				}
-				else
-				{
-					hadj = (type >> 5) & 0x1f;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
-					xOff = t3 - t0;
-					yOff = t0 - t1;
-				}
-			}
-
-			TiltXOffset = xOff;
-			TiltYOffset = yOff;
-
-			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-				HeightType = DIAGONAL;
-			else if (HeightType != SPLIT_TRI)
-				HeightType = SMALL_SLOPE;
-
-			if (xOff >= 0)
-				height += xOff * ((-1 - z) & 1023) >> 2;
-			else
-				height -= xOff * (z & 1023) >> 2;
-
-			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 1023) >> 2;
-			else
-				height -= yOff * (x & 1023) >> 2;
-				*/
-			data++;
-			break;
-
-		default:
-			break;
+			} while (!(type & END_BIT));
 		}
-	} while (!(type & END_BIT));
-
+	}
 	/*return height;*/
 
 	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
-int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int LOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int result1, result2;
 
@@ -1892,7 +1894,7 @@ int LOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return 0;
 }
 
-int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int xLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -1997,7 +1999,7 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return flag;
 }
 
-int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
+int zLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -2102,7 +2104,7 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end) // (F) (D)
 	return flag;
 }
 
-int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
+int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 {
 	short room;
 	int x, y, z, wx, wy, wz;
@@ -2150,7 +2152,7 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target) // (F) (D)
 	return 1;
 }
 
-int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing) // (AF) (D)
+int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing)
 {
 	GAME_VECTOR target;
 	int result, flag, itemNumber, count;
@@ -2398,7 +2400,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	return flag;
 }
 
-int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INFO **mesh) // (F) (D)
+int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INFO **mesh)
 {
 	int r, m;
 	ROOM_INFO *room;
@@ -2476,7 +2478,7 @@ int GetRandomDraw()
 	return generateInt();
 }
 
-int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
+int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 {
 #if 0
 	ROOM_INFO *room;
