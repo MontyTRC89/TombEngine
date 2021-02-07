@@ -1584,7 +1584,8 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	return floor;
 #endif
 
-	*roomNumber = GetRoom(*roomNumber, x, y, z);
+	const auto location = GetRoom(ROOM_VECTOR{*roomNumber, y}, x, y, z);
+	*roomNumber = location.roomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
 
@@ -1864,7 +1865,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	}
 	/*return height;*/
 
-	return GetFloorHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
+	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
 int LOS(GAME_VECTOR *start, GAME_VECTOR *end)
@@ -2662,7 +2663,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 	return ceiling;
 #endif
 
-	return GetCeilingHeight(floor->Room, x, y, z).value_or(NO_HEIGHT);
+	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
 int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)

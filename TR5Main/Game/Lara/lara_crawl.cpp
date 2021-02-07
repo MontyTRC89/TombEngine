@@ -701,7 +701,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->facing = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{

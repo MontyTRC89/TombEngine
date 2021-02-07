@@ -17,6 +17,7 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
+#include "tr5_pushableblock.h"
 #include "pickup.h"
 #include "puzzles_keys.h"
 #include "lara_fire.h"
@@ -48,8 +49,8 @@ function<EffectFunction> effect_routines[59] =
 	draw_left_pistol,
 	shoot_right_gun,
 	shoot_left_gun,
-	void_effect,
-	void_effect,
+	pushLoop,
+	pushEnd,
 	void_effect,
 	invisibility_on,
 	invisibility_off,
