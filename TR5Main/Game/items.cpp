@@ -491,38 +491,15 @@ int GlobalItemReplace(short search, short replace)
 	return changed;
 }
 
-ITEM_INFO* find_a_fucking_item(short objectNum)
+std::vector<int> FindItem(short objectNumber)
 {
-	int itemNumber = FindItemNumber(objectNum);
-	return (itemNumber != NO_ITEM ? &g_Level.Items[itemNumber] : NULL);
-}
+	std::vector<int> itemList;
 
-int FindItemNumber(short objectNum)
-{
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* item = &g_Level.Items[i];
-		if (item->objectNumber == objectNum)
-			return i;
+		if (g_Level.Items[i].objectNumber == objectNumber)
+			itemList.push_back(i);
 	}
 
-	return NO_ITEM;
-}
-
-ITEM_INFO* FindItem(short objectNumber)
-{
-#ifdef _DEBUG
-	printf("Called FindItem()\n");
-#endif
-
-	if (g_Level.NumItems > 0)
-	{
-		for (int i = 0; i < g_Level.NumItems; i++)
-		{
-			if (g_Level.Items[i].objectNumber == objectNumber)
-				return &g_Level.Items[i];
-		}
-	}
-
-	return NULL;
+	return itemList;
 }
