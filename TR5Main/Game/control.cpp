@@ -31,7 +31,6 @@
 #include "footprint.h"
 #include "level.h"
 #include "input.h"
-#include "init.h"
 #include "winmain.h"
 #include "Renderer11.h"
 #include "setup.h"
