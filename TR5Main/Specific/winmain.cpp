@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "winmain.h"
-#include "init.h"
 #include "resource.h"
 #include "draw.h"
 #include "sound.h"
