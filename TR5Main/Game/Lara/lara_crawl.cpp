@@ -744,7 +744,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 106*/
 	/*collision: lara_col_ducklr*/
 	coll->enableSpaz = false;
-	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0) /* @ORIGINAL_BUG: the condition checks for IN_LEFT instead of IN_RIGHT */
+	if ((TrInput & (IN_DUCK | IN_RIGHT)) != (IN_DUCK | IN_RIGHT) || item->hitPoints <= 0)
 		item->goalAnimState = LS_CROUCH_IDLE;
 	item->pos.yRot += ANGLE(1.5f);
 }

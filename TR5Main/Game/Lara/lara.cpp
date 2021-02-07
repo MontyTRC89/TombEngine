@@ -484,7 +484,7 @@ void LaraControl(short itemNumber)
 				}
 
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
+				if (hfw > 256)
 				{
 					if (hfw > 730)
 					{
@@ -635,7 +635,7 @@ void LaraControl(short itemNumber)
 				}
 				else
 				{
-					Lara.waterStatus = LW_WADE; /* @DEAD_CODE: Lara has to reach a room without water while in the surface but then GetWaterHeight() return value never will make hfw > 256 */
+					Lara.waterStatus = LW_WADE;
 					item->animNumber = LA_STAND_IDLE;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = LS_WADE_FORWARD;
@@ -656,7 +656,7 @@ void LaraControl(short itemNumber)
 
 		case LW_WADE:
 			Camera.targetElevation = -ANGLE(22);
-			if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
+			if (hfw > 256)
 			{
 				if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
 				{

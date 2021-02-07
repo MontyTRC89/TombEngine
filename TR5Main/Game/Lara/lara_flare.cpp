@@ -157,7 +157,7 @@ void undraw_flare()
 		}
 	}
 	else if (LaraItem->currentAnimState == LS_STOP 
-		&& Lara.Vehicle == NO_ITEM) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
+		&& Lara.Vehicle == NO_ITEM)
 	{
 		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;

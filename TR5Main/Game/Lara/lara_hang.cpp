@@ -191,7 +191,7 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
@@ -213,7 +213,7 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 31*/
 	/*state code: lara_as_hangright*/
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
