@@ -271,13 +271,13 @@ void PoseidonSFX(ITEM_INFO* item)
 
 void RubbleFX(ITEM_INFO* item)
 {
-	int itemNumber = FindItemNumber(ID_EARTHQUAKE);
+	const auto itemList = FindItem(ID_EARTHQUAKE);
 
-	if (itemNumber != NO_ITEM)
+	if (itemList.size() > 0)
 	{
-		ITEM_INFO* eq = &g_Level.Items[itemNumber];
+		ITEM_INFO* eq = &g_Level.Items[itemList[0]];
 
-		AddActiveItem(itemNumber);
+		AddActiveItem(itemList[0]);
 		eq->status = ITEM_ACTIVE;
 		eq->flags |= IFLAG_ACTIVATION_MASK;
 	}
