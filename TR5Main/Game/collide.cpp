@@ -1058,6 +1058,203 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
+void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
+{
+	TiltYOffset = 0;
+	TiltXOffset = 0;
+	OnObject = 0;
+	HeightType = WALL;
+	SplitFloor = 0;
+
+	ROOM_INFO* r;
+	while (floor->pitRoom != NO_ROOM)
+	{
+		if (CheckNoColFloorTriangle(floor, x, z) == 1)
+			break;
+		r = &g_Level.Rooms[floor->pitRoom];
+		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	}
+
+	int height = floor->floor * 256;
+	if (height != NO_HEIGHT)
+	{
+		TriggerIndex = NULL;
+
+		if (floor->index != 0)
+		{
+			short* data = &g_Level.FloorData[floor->index];
+			short type, hadj;
+
+			int xOff, yOff, trigger;
+			ITEM_INFO* item;
+			OBJECT_INFO* obj;
+			int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+			do
+			{
+				type = *(data++);
+
+				switch (type & DATA_TYPE)
+				{
+				case DOOR_TYPE:
+				case ROOF_TYPE:
+				case SPLIT3:
+				case SPLIT4:
+				case NOCOLC1T:
+				case NOCOLC1B:
+				case NOCOLC2T:
+				case NOCOLC2B:
+					data++;
+					break;
+
+				case TILT_TYPE:
+					TiltXOffset = xOff = (*data >> 8);
+					TiltYOffset = yOff = *(char*)data;
+
+					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+						HeightType = BIG_SLOPE;
+					else
+						HeightType = SMALL_SLOPE;
+
+					if (xOff >= 0)
+						height += (xOff * ((-1 - z) & 1023) >> 2);
+					else
+						height -= (xOff * (z & 1023) >> 2);
+
+					if (yOff >= 0)
+						height += yOff * ((-1 - x) & 1023) >> 2;
+					else
+						height -= yOff * (x & 1023) >> 2;
+
+					data++;
+					break;
+
+				case TRIGGER_TYPE:
+					if (!TriggerIndex)
+						TriggerIndex = data - 1;
+
+					data++;
+
+					do
+					{
+						trigger = *(data++);
+
+						if (TRIG_BITS(trigger) != TO_OBJECT)
+						{
+							if (TRIG_BITS(trigger) == TO_CAMERA ||
+								TRIG_BITS(trigger) == TO_FLYBY)
+							{
+								trigger = *(data++);
+							}
+						}
+
+					} while (!(trigger & END_BIT));
+					break;
+
+				case LAVA_TYPE:
+					TriggerIndex = data - 1;
+					break;
+
+				case CLIMB_TYPE:
+				case MONKEY_TYPE:
+				case TRIGTRIGGER_TYPE:
+					if (!TriggerIndex)
+						TriggerIndex = data - 1;
+					break;
+
+				case SPLIT1:
+				case SPLIT2:
+				case NOCOLF1T:
+				case NOCOLF1B:
+				case NOCOLF2T:
+				case NOCOLF2B:
+					tilts = *data;
+					t0 = tilts & 15;
+					t1 = (tilts >> 4) & 15;
+					t2 = (tilts >> 8) & 15;
+					t3 = (tilts >> 12) & 15;
+
+					dx = x & 1023;
+					dz = z & 1023;
+
+					xOff = yOff = 0;
+
+					HeightType = SPLIT_TRI;
+					SplitFloor = (type & DATA_TYPE);
+
+					if ((type & DATA_TYPE) == SPLIT1 ||
+						(type & DATA_TYPE) == NOCOLF1T ||
+						(type & DATA_TYPE) == NOCOLF1B)
+					{
+						if (dx <= (1024 - dz))
+						{
+							hadj = (type >> 10) & 0x1F;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t2 - t1;
+							yOff = t0 - t1;
+						}
+						else
+						{
+							hadj = (type >> 5) & 0x1F;
+							if (hadj & 0x10)
+								hadj |= 0xFFF0;
+							height += 256 * hadj;
+							xOff = t3 - t0;
+							yOff = t3 - t2;
+						}
+					}
+					else
+					{
+						if (dx <= dz)
+						{
+							hadj = (type >> 10) & 0x1f;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t2 - t1;
+							yOff = t3 - t2;
+						}
+						else
+						{
+							hadj = (type >> 5) & 0x1f;
+							if (hadj & 0x10)
+								hadj |= 0xfff0;
+							height += 256 * hadj;
+							xOff = t3 - t0;
+							yOff = t0 - t1;
+						}
+					}
+
+					TiltXOffset = xOff;
+					TiltYOffset = yOff;
+
+					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+						HeightType = DIAGONAL;
+					else if (HeightType != SPLIT_TRI)
+						HeightType = SMALL_SLOPE;
+
+					if (xOff >= 0)
+						height += xOff * ((-1 - z) & 1023) >> 2;
+					else
+						height -= xOff * (z & 1023) >> 2;
+
+					if (yOff >= 0)
+						height += yOff * ((-1 - x) & 1023) >> 2;
+					else
+						height -= yOff * (x & 1023) >> 2;
+
+					data++;
+					break;
+
+				default:
+					break;
+				}
+			} while (!(type & END_BIT));
+		}
+	}
+}
+
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
 {
 	int resetRoom;
@@ -1087,6 +1284,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
+	DoFloorThings(floor, x, yTop, z);
 	int height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1173,6 +1371,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
+	DoFloorThings(floor, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1188,6 +1387,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->frontType = HeightType;
 	coll->frontSplitFloor = SplitFloor;
 	coll->frontSplitCeil = SplitCeiling;
+
+	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
+	DoFloorThings(floor, x + XFront, yTop, z + ZFront);
 
 	tfLocation = GetRoom(tfLocation, x + XFront, yTop, z + ZFront);
 	height = GetFloorHeight(tfLocation, x + XFront, z + ZFront).value_or(NO_HEIGHT);
@@ -1221,6 +1423,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
+	short lrRoomNumber = roomNumber;
+	floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	DoFloorThings(floor, x, yTop, z);
+
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1245,6 +1451,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
+
+	DoFloorThings(floor, x, yTop, z);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1274,6 +1482,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
+	lrRoomNumber = roomNumber;
+	floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	DoFloorThings(floor, x, yTop, z);
+
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1298,6 +1510,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
+
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
+	DoFloorThings(floor, x, yTop, z);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
