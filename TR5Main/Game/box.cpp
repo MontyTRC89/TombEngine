@@ -1426,19 +1426,15 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	info->zoneNumber = zone[item->boxNumber];
 
 	r = &g_Level.Rooms[enemy->roomNumber];
-	int boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box;
-	if (boxNumber != NO_BOX)
-	{
-		enemy->boxNumber = boxNumber;
-		info->enemyZone = zone[enemy->boxNumber];
+	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box;
+	info->enemyZone = zone[enemy->boxNumber];
 
-		if (!obj->nonLot)
-		{
-			if (g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
-				info->enemyZone |= BLOCKED;
-			else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
-				info->enemyZone |= BLOCKED;
-		}
+	if (!obj->nonLot)
+	{
+		if (g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
+			info->enemyZone |= BLOCKED;
+		else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
+			info->enemyZone |= BLOCKED;
 	}
 
 	if (enemy == LaraItem)
