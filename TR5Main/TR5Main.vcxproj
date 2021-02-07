@@ -414,7 +414,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
-    <ClInclude Include="Game\newinv2.h" />
     <ClInclude Include="Game\objects.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup.h" />
@@ -432,7 +431,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Game\trmath.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
-    <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
@@ -680,7 +678,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
-    <ClCompile Include="Game\newinv2.cpp" />
     <ClCompile Include="Game\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup.cpp" />
@@ -704,7 +701,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />
-    <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
     <ClCompile Include="Specific\IO\ChunkId.cpp" />
     <ClCompile Include="Specific\IO\ChunkReader.cpp" />

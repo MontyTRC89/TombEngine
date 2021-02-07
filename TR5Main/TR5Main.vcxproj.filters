@@ -60,9 +60,6 @@
     <ClInclude Include="Game\missile.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\newinv2.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -139,9 +136,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\winmain.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Specific\init.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\inventory.h">
@@ -980,9 +974,6 @@
     <ClCompile Include="Game\missile.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\newinv2.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\objects.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1029,9 +1020,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\inventory.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\Init.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameFlowScript.cpp">
