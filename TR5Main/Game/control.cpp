@@ -2492,7 +2492,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 	floor2 = floor;
 	while (floor2->skyRoom != NO_ROOM)
 	{
-		if (CheckNoColCeilingTriangle(floor, x, z) == 1) /* @ORIGINAL_BUG: the call is made with floor (which is constant in the while loop) instead of floor2 */
+		if (CheckNoColCeilingTriangle(floor, x, z) == 1)
 			break;
 		room = &g_Level.Rooms[floor2->skyRoom];
 		floor2 = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
