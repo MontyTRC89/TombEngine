@@ -110,6 +110,4 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
-ITEM_INFO* find_a_fucking_item(short objectNum);
-int FindItemNumber(short objectNumber);
-ITEM_INFO* FindItem(short objectNumber);
+std::vector<int> FindItem(short objectNumber);
