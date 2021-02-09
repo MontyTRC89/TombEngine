@@ -93,61 +93,6 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 	}
 }
 
-void getCurrentCommit() {
-#if _DEBUG
-	LPSTR cmdLine = {TEXT("git.exe log -1 --oneline")};
-
-	SECURITY_ATTRIBUTES sa = {0};
-	sa.nLength = sizeof(sa);
-	sa.lpSecurityDescriptor = NULL;
-	sa.bInheritHandle = TRUE;
-
-	HANDLE hStdOutRd, hStdOutWr;
-	HANDLE hStdErrRd, hStdErrWr;
-
-	if(!CreatePipe(&hStdOutRd, &hStdOutWr, &sa, 0)){
-		// error handling...
-	}
-
-	if(!CreatePipe(&hStdErrRd, &hStdErrWr, &sa, 0)){
-		// error handling...
-	}
-
-	SetHandleInformation(hStdOutRd, HANDLE_FLAG_INHERIT, 0);
-	SetHandleInformation(hStdErrRd, HANDLE_FLAG_INHERIT, 0);
-
-	STARTUPINFO si = {};
-	si.cb = sizeof(si);
-	si.dwFlags = STARTF_USESTDHANDLES;
-	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput = hStdOutWr;
-	si.hStdError = hStdErrWr;
-
-	PROCESS_INFORMATION pi = {};
-
-	if(!CreateProcess(NULL, cmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)){
-		// error handling...
-	} else{
-		CHAR buf[256];
-		DWORD n;
-		BOOL success = ReadFile(hStdOutRd, buf, 256, &n, NULL);
-		if(!success || n == 0){
-			std::cout << "Failed to call ReadFile" << std::endl;
-		}
-		commit = std::string(buf, buf + n);
-		// read from hStdOutRd and hStdErrRd as needed until the process is terminated...
-
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-	}
-
-	CloseHandle(hStdOutRd);
-	CloseHandle(hStdOutWr);
-	CloseHandle(hStdErrRd);
-	CloseHandle(hStdErrWr);
-#endif
-}
-
 void HandleScriptMessage(WPARAM wParam)
 {
 	string ErrorMessage;
@@ -247,8 +192,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	if constexpr (DebugBuild)
-	getCurrentCommit();
 	int RetVal;
 	int n;
 
