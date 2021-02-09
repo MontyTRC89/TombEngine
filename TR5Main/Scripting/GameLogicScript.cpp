@@ -10,7 +10,6 @@
 #include "setup.h"
 #include "level.h"
 
-using namespace std;
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 bool WarningsAsErrors = false;
@@ -94,12 +93,12 @@ void GameScript::AddTrigger(LuaFunction* function)
 
 void GameScript::AddLuaId(int luaId, short itemNumber)
 {
-	m_itemsMapId.insert(pair<int, short>(luaId, itemNumber));
+	m_itemsMapId.insert(std::pair<int, short>(luaId, itemNumber));
 }
 
-void GameScript::AddLuaName(string luaName, short itemNumber)
+void GameScript::AddLuaName(std::string luaName, short itemNumber)
 {
-	m_itemsMapName.insert(pair<string, short>(luaName, itemNumber));
+	m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber));
 }
 
 void GameScript::FreeLevelScripts()
@@ -123,7 +122,7 @@ void GameScript::FreeLevelScripts()
 	*/
 }
 
-bool GameScript::ExecuteScript(const string& luaFilename, string& message)
+bool GameScript::ExecuteScript(const std::string& luaFilename, std::string& message)
 { 
 	auto result = m_lua.safe_script_file(luaFilename, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
 	if (!result.valid())
@@ -135,7 +134,7 @@ bool GameScript::ExecuteScript(const string& luaFilename, string& message)
 	return true;
 }
 
-bool GameScript::ExecuteString(const string& command, string& message)
+bool GameScript::ExecuteString(const std::string& command, std::string& message)
 {
 	auto result = m_lua.safe_script(command, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
 	if (!result.valid())
@@ -173,11 +172,11 @@ bool GameScript::ExecuteTrigger(short index)
 
 	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
 		if (value.is<bool>())
-			std::cout << key.as<string>() << " " << value.as<bool>() << std::endl;
-		else if (value.is<string>())
-			std::cout << key.as<string>() << " " << value.as<string>() << std::endl;
+			std::cout << key.as<std::string>() << " " << value.as<bool>() << std::endl;
+		else if (value.is<std::string>())
+			std::cout << key.as<std::string>() << " " << value.as<std::string>() << std::endl;
 		else
-			std::cout << key.as<string>() << " " << value.as<int>() << std::endl;		
+			std::cout << key.as<std::string>() << " " << value.as<int>() << std::endl;
 	});
 
 	return result;
@@ -252,64 +251,64 @@ void GameScript::MakeItemInvisible(short id)
 }
 */
 template <typename T>
-void GameScript::GetVariables(map<string, T>& locals, map<string, T>& globals)
+void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	for (const auto& it : m_locals.variables)
 	{
 		if (it.second.is<T>())
-			locals.insert(pair<string, T>(it.first, it.second.as<T>()));
+			locals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
 	}
 	for (const auto& it : m_globals.variables)
 	{
 		if (it.second.is<T>())
-			globals.insert(pair<string, T>(it.first, it.second.as<T>()));
+			globals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
 	}
 }
 
-template void GameScript::GetVariables<bool>(map<string, bool>& locals, map<string, bool>& globals);
-template void GameScript::GetVariables<float>(map<string, float>& locals, map<string, float>& globals);
-template void GameScript::GetVariables<string>(map<string, string>& locals, map<string, string>& globals);
+template void GameScript::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void GameScript::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void GameScript::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
 template <typename T>
-void GameScript::SetVariables(map<string, T>& locals, map<string, T>& globals)
+void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
-		m_locals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
+		m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
 	}
 	for (const auto& it : globals)
 	{
-		m_globals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
+		m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
 	}
 }
 
-template void GameScript::SetVariables<bool>(map<string, bool>& locals, map<string, bool>& globals);
-template void GameScript::SetVariables<float>(map<string, float>& locals, map<string, float>& globals);
-template void GameScript::SetVariables<string>(map<string, string>& locals, map<string, string>& globals);
+template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
-unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
+std::unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
 {
 	if (m_itemsMapId.find(id) == m_itemsMapId.end())
 	{
 		if (WarningsAsErrors)
 			throw "item id not found";
-		return unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItem>(nullptr);
 	}
 
-	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
+	return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
 }
 
-unique_ptr<GameScriptItem> GameScript::GetItemByName(string name)
+std::unique_ptr<GameScriptItem> GameScript::GetItemByName(std::string name)
 {
 	if (m_itemsMapName.find(name) == m_itemsMapName.end())
 	{
 		if (WarningsAsErrors)
 			throw "item name not found";
-		return unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItem>(nullptr);
 	}
 
-	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
+	return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
 }
 
 void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags)
@@ -377,7 +376,7 @@ GameScriptPosition::GameScriptPosition(float x, float y, float z)
 
 }
 
-GameScriptPosition::GameScriptPosition(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ)
+GameScriptPosition::GameScriptPosition(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ)
 	:
 	readXPos(readX),
 	writeXPos(writeX),
@@ -440,7 +439,7 @@ GameScriptRotation::GameScriptRotation(float x, float y, float z)
 
 }
 
-GameScriptRotation::GameScriptRotation(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ)
+GameScriptRotation::GameScriptRotation(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ)
 	:
 	readXRot(readX),
 	writeXRot(writeX),
@@ -545,7 +544,7 @@ void GameScriptItem::SetHP(short hp)
 	if (hp < 0 || hp > Objects[NativeItem->objectNumber].hitPoints)
 	{
 		if (WarningsAsErrors)
-			throw runtime_error("invalid HP");
+			throw std::runtime_error("invalid HP");
 		if (hp < 0)
 		{
 			hp = 0;
@@ -568,7 +567,7 @@ void GameScriptItem::SetRoom(short room)
 	if (room < 0 || room >= g_Level.Rooms.size())
 	{
 		if (WarningsAsErrors)
-			throw runtime_error("invalid room number");
+			throw std::runtime_error("invalid room number");
 		return;
 	}
 	NativeItem->roomNumber = room;
@@ -659,14 +658,14 @@ void GameScriptItem::SetRequiredState(short state)
 	NativeItem->requiredAnimState = state;
 }
 
-sol::object LuaVariables::GetVariable(string key)
+sol::object LuaVariables::GetVariable(std::string key)
 {
 	if (variables.find(key) == variables.end())
 		return sol::lua_nil;
 	return variables[key];
 }
 
-void LuaVariables::SetVariable(string key, sol::object value)
+void LuaVariables::SetVariable(std::string key, sol::object value)
 {
 	switch (value.get_type())
 	{
@@ -680,7 +679,7 @@ void LuaVariables::SetVariable(string key, sol::object value)
 		break;
 	default:
 		if (WarningsAsErrors)
-			throw runtime_error("unsupported variable type");
+			throw std::runtime_error("unsupported variable type");
 		break;
 	}
 }

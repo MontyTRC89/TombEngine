@@ -8,8 +8,6 @@
 #include "savegame.h"
 #include "draw.h"
 
-using std::string;
-using std::vector;
 std::unique_ptr<ChunkId> ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
 std::unique_ptr<ChunkId> ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
 std::unique_ptr<ChunkId> ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
@@ -30,7 +28,7 @@ std::unique_ptr<ChunkId> ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5
 
 ChunkReader* g_ScriptChunkIO;
 
-extern vector<AudioTrack> g_AudioTracks;
+extern std::vector<AudioTrack> g_AudioTracks;
 
 GameFlow::GameFlow()
 {
@@ -131,7 +129,7 @@ bool __cdecl readGameFlowStrings()
 	{
 		char* str;
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		lang->Strings.push_back(string(str));
+		lang->Strings.push_back(std::string(str));
 		free(str);
 	}
 
@@ -166,11 +164,11 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 		char* str;
 
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		level->FileName = string(str);
+		level->FileName = std::string(str);
 		free(str);
 
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		level->LoadScreenFileName = string(str);
+		level->LoadScreenFileName = std::string(str);
 		free(str);
 
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
@@ -325,7 +323,7 @@ bool __cdecl LoadScript()
 	return true;
 }
 
-string GameFlow::loadScriptFromFile(char* luaFilename)
+std::string GameFlow::loadScriptFromFile(char* luaFilename)
 {
 	using std::ifstream;
 	using std::ios;
@@ -334,15 +332,15 @@ string GameFlow::loadScriptFromFile(char* luaFilename)
 	ifstream::pos_type fileSize = ifs.tellg();
 	ifs.seekg(0, ios::beg);
 
-	vector<char> bytes(fileSize);
+	std::vector<char> bytes(fileSize);
 	ifs.read(bytes.data(), fileSize);
 
-	return string(bytes.data(), fileSize);
+	return std::string(bytes.data(), fileSize);
 }
 
 bool GameFlow::LoadGameStrings(char* luaFilename)
 {
-	string script = loadScriptFromFile(luaFilename);
+	std::string script = loadScriptFromFile(luaFilename);
 	m_lua.script(script);
 
 	return true;
@@ -350,7 +348,7 @@ bool GameFlow::LoadGameStrings(char* luaFilename)
 
 bool GameFlow::LoadGameSettings(char* luaFilename)
 {
-	string script = loadScriptFromFile(luaFilename);
+	std::string script = loadScriptFromFile(luaFilename);
 	m_lua.script(script);
 
 	return true;
@@ -358,7 +356,7 @@ bool GameFlow::LoadGameSettings(char* luaFilename)
 
 bool GameFlow::ExecuteScript(char* luaFilename)
 {
-	string script = loadScriptFromFile(luaFilename);
+	std::string script = loadScriptFromFile(luaFilename);
 	m_lua.script(script);
 
 	return true;
