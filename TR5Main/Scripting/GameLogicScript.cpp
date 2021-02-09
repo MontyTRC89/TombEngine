@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "GameLogicScript.h"
+#include "ExceptionScript.h"
 #include "items.h"
 #include "box.h"
 #include "lara.h"
@@ -8,38 +9,40 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
+
 using namespace std;
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 bool WarningsAsErrors = false;
 
-GameScript::GameScript(sol::state* lua)
+GameScript::GameScript()
 {
-	m_lua = lua;
+	m_lua.open_libraries(sol::lib::base);
+	m_lua.set_exception_handler(lua_exception_handler);
 
 	// Add constants
 	//ExecuteScript("Scripts\\Constants.lua");
 
-	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
+	m_lua.new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
 
 	// Add the item type
-	m_lua->new_usertype<GameScriptPosition>("Position",
+	m_lua.new_usertype<GameScriptPosition>("Position",
 		"X", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
 		"Y", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
 		"Z", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
 		"new", sol::no_constructor
 		);
 
-	m_lua->new_usertype<GameScriptRotation>("Rotation",
+	m_lua.new_usertype<GameScriptRotation>("Rotation",
 		"X", sol::property(&GameScriptRotation::GetXRot, &GameScriptRotation::SetXRot),
 		"Y", sol::property(&GameScriptRotation::GetYRot, &GameScriptRotation::SetYRot),
 		"Z", sol::property(&GameScriptRotation::GetZRot, &GameScriptRotation::SetZRot),
 		"new", sol::no_constructor
 		);
 
-	m_lua->new_usertype<GameScriptItem>("Item",
+	m_lua.new_usertype<GameScriptItem>("Item",
 		"Position", sol::property(&GameScriptItem::GetPosition),
 		"Rotation", sol::property(&GameScriptItem::GetRotation),
 		"HP", sol::property(&GameScriptItem::GetHP, &GameScriptItem::SetHP),
@@ -50,17 +53,17 @@ GameScript::GameScript(sol::state* lua)
 		"new", sol::no_constructor
 		);
 
-	m_lua->set_function("EnableItem", &GameScriptItem::EnableItem);
-	m_lua->set_function("DisableItem", &GameScriptItem::DisableItem);
+	m_lua.set_function("EnableItem", &GameScriptItem::EnableItem);
+	m_lua.set_function("DisableItem", &GameScriptItem::DisableItem);
 
-	m_lua->new_usertype<LuaVariables>("Variable",
+	m_lua.new_usertype<LuaVariables>("Variable",
 		sol::meta_function::index, &LuaVariables::GetVariable,
 		sol::meta_function::new_index, &LuaVariables::SetVariable,
 		"new", sol::no_constructor
 		);
 
 	// GameScript type
-	/*m_lua->new_usertype<GameScript>("GameScript",
+	/*m_lua.new_usertype<GameScript>("GameScript",
 		"PlayAudioTrack", &GameScript::PlayAudioTrack,
 		"ChangeAmbientSoundTrack", &GameScript::ChangeAmbientSoundTrack,
 		"MakeItemInvisible", &GameScript::MakeItemInvisible,
@@ -72,14 +75,21 @@ GameScript::GameScript(sol::state* lua)
 		"PlaySoundEffectAtPosition", &GameScript::PlaySoundEffectAtPosition
 		);*/
 
+	m_lua.set_function("GetItemByID", &GameScript::GetItemById);
+	m_lua.set_function("GetItemByName", &GameScript::GetItemByName);
+	m_lua.set_function("CreatePosition", &GameScript::CreatePosition);
+	m_lua.set_function("CreateRotation", &GameScript::CreateRotation);
+	m_lua.set_function("CalculateDistance", &GameScript::CalculateDistance);
+	m_lua.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance);
+
 	// Add global variables and namespaces
-	//(*m_lua)["TR"] = this;
+	//m_lua["TR"] = this;
 }
 
 void GameScript::AddTrigger(LuaFunction* function)
 {
 	m_triggers.push_back(function);
-	(*m_lua).script(function->Code);
+	m_lua.script(function->Code);
 }
 
 void GameScript::AddLuaId(int luaId, short itemNumber)
@@ -100,7 +110,7 @@ void GameScript::FreeLevelScripts()
 	{
 		LuaFunction* trigger = m_triggers[i];
 		char* name = (char*)trigger->Name.c_str();
-		(*m_lua)[name] = NULL;
+		m_lua[name] = NULL;
 		delete m_triggers[i];
 	}
 	m_triggers.clear();
@@ -108,14 +118,14 @@ void GameScript::FreeLevelScripts()
 	// Clear the items mapping
 	m_itemsMap.clear();
 
-	(*m_lua)["Lara"] = NULL;
+	m_lua["Lara"] = NULL;
 	//delete m_Lara;
 	*/
 }
 
 bool GameScript::ExecuteScript(const string& luaFilename, string& message)
 { 
-	auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	auto result = m_lua.safe_script_file(luaFilename, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
@@ -127,7 +137,7 @@ bool GameScript::ExecuteScript(const string& luaFilename, string& message)
 
 bool GameScript::ExecuteString(const string& command, string& message)
 {
-	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	auto result = m_lua.safe_script(command, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
@@ -156,7 +166,7 @@ bool GameScript::ExecuteTrigger(short index)
 	char* name = (char*)trigger->Name.c_str();
 
 	// Execute trigger
-	bool result = (*m_lua)[name]();
+	bool result = m_lua[name]();
 
 	// Trigger was executed, don't execute it anymore
 	trigger->Executed = result;
@@ -266,11 +276,11 @@ void GameScript::SetVariables(map<string, T>& locals, map<string, T>& globals)
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
-		m_locals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		m_locals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
 	}
 	for (const auto& it : globals)
 	{
-		m_globals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		m_globals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
 	}
 }
 
@@ -323,14 +333,14 @@ void GameScript::PlaySoundEffect(short id, int flags)
 
 void GameScript::AssignItemsAndLara()
 {
-	m_lua->set("Level", m_locals);
-	m_lua->set("Game", m_globals);
-	m_lua->set("Lara", GameScriptItem(Lara.itemNumber));
+	m_lua.set("Level", m_locals);
+	m_lua.set("Game", m_globals);
+	m_lua.set("Lara", GameScriptItem(Lara.itemNumber));
 }
 
 void GameScript::ResetVariables()
 {
-	(*m_lua)["Lara"] = NULL;
+	m_lua["Lara"] = NULL;
 }
 
 GameScriptPosition GameScript::CreatePosition(float x, float y, float z)

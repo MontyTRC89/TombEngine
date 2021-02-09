@@ -171,36 +171,9 @@ extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-extern bool BlockAllInput;
-extern int skipLoop;
-extern int skipFrames;
-extern int lockInput;
-extern int newSkipLoop;
-extern int newSkipFrames;
-extern int newLockInput;
-extern bool newSkipFramesValue;
-extern bool newSkipLoopValue;
-extern bool newLockInputValue;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
-	short oldLaraFrame;
-	if (newSkipFramesValue)
-	{
-		skipFrames = newSkipFrames;
-		newSkipFramesValue = false;
-	}
-	if (newSkipLoopValue)
-	{
-		skipLoop = newSkipLoop;
-		newSkipLoopValue = false;
-	}
-	if (newLockInputValue)
-	{
-		lockInput = newLockInput;
-		newLockInputValue = false;
-	}
-
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
@@ -213,15 +186,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	if (skipLoop != -1)
-	{
-		if (skipLoop == 0)
-			return GAME_STATUS_NONE;
-		else
-			oldLaraFrame = LaraItem->frameNumber;
-	}
-
-	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= skipFrames)
+	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
 
@@ -233,15 +198,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if (S_UpdateInput() == -1)
 				return GAME_STATUS_NONE;
 		}
-
-		if (BlockAllInput)
-		{
-			DbInput = 0;
-			TrInput = 0;
-		}
-
-		if (lockInput)
-			TrInput = lockInput;
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)
@@ -568,12 +524,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		HealthBarTimer--;
 
 		GameTimer++;
-	}
-
-	if (skipLoop != -1)
-	{
-		if (oldLaraFrame != LaraItem->frameNumber)
-			--skipLoop;
 	}
 
 	return GAME_STATUS_NONE;

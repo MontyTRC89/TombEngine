@@ -160,7 +160,7 @@ bool __cdecl LoadScript();
 class GameFlow
 {
 private:
-	sol::state*							m_lua;
+	sol::state							m_lua;
 	GameScriptSettings					m_settings;
 	
 	std::string								loadScriptFromFile(char* luaFilename);
@@ -191,8 +191,7 @@ public:
 	std::vector<LanguageScript*>				Strings;
 	std::vector<GameScriptLevel*>			Levels;
 
-	GameFlow(sol::state* lua);
-	~GameFlow();
+	GameFlow();
 
 	bool								LoadGameStrings(char* luaFilename);
 	bool								LoadGameSettings(char* luaFilename);

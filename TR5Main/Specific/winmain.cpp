@@ -33,25 +33,10 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
-bool BlockAllInput = true;
-int skipLoop = -1;
-int skipFrames = 2;
-int lockInput = 0;
-int newSkipLoop = -1;
-int newSkipFrames = 2;
-int newLockInput = 0;
-bool newSkipFramesValue = false;
-bool newSkipLoopValue = false;
-bool newLockInputValue = false;
 
 #if _DEBUG
 string commit;
 #endif
-
-int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
-{
-	return luaL_error(L, description.data());
-}
 
 void WinProcMsg()
 {
@@ -148,45 +133,6 @@ void getCurrentCommit() {
 #endif
 }
 
-void HandleScriptMessage(WPARAM wParam)
-{
-	string ErrorMessage;
-	string message = *(string*)(wParam);
-	bool status = false;
-
-	//check whether line starts with "lua "
-	if (message.find("lua ") == 0) {
-		string scriptSubstring = message.substr(4);
-		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
-	}
-	else {
-		if (message.find("SL=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newSkipLoop = stoi(scriptSubstring);
-			newSkipLoopValue = true;
-		}
-		else if (message.find("SF=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newSkipFrames = stoi(scriptSubstring);
-			newSkipFramesValue = true;
-		}
-		else if (message.find("LI=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newLockInput = stoi(scriptSubstring);
-			newLockInputValue = true;
-		}
-		else
-		{
-			status = g_GameScript->ExecuteString(message, ErrorMessage);
-		}
-	}
-	if (!status)
-		cout << ErrorMessage << endl;
-}
-
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Disables ALT + SPACE
@@ -223,7 +169,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			//DB_Log(6, "WM_ACTIVE");
-			BlockAllInput = false;
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
@@ -235,7 +180,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		BlockAllInput = true;
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
@@ -275,21 +219,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	memset(&App, 0, sizeof(WINAPP));
 	
 	// Initialise the new scripting system
-	sol::state luaState;
-	luaState.open_libraries(sol::lib::base);
-	luaState.set_exception_handler(lua_exception_handler);
-
-	g_GameFlow = new GameFlow(&luaState);
+	g_GameFlow = new GameFlow();
 	LoadScript();
 
-	g_GameScript = new GameScript(&luaState);
-
-	luaState.set_function("GetItemByID", &GameScript::GetItemById, g_GameScript);
-	luaState.set_function("GetItemByName", &GameScript::GetItemByName, g_GameScript);
-	luaState.set_function("CreatePosition", &GameScript::CreatePosition, g_GameScript);
-	luaState.set_function("CreateRotation", &GameScript::CreateRotation, g_GameScript);
-	luaState.set_function("CalculateDistance", &GameScript::CalculateDistance, g_GameScript);
-	luaState.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance, g_GameScript);
+	g_GameScript = new GameScript();
 
 	// Initialise chunks for savegames
 	SaveGame::Start();

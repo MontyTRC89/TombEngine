@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "GameFlowScript.h"
+#include "ExceptionScript.h"
 #include "items.h"
 #include "box.h"
 #include "lot.h"
 #include "sound.h"
 #include "savegame.h"
 #include "draw.h"
+
 using std::string;
 using std::vector;
 std::unique_ptr<ChunkId> ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
@@ -30,12 +32,13 @@ ChunkReader* g_ScriptChunkIO;
 
 extern vector<AudioTrack> g_AudioTracks;
 
-GameFlow::GameFlow(sol::state* lua)
+GameFlow::GameFlow()
 {
-	m_lua = lua;
-	
+	m_lua.open_libraries(sol::lib::base);
+	m_lua.set_exception_handler(lua_exception_handler);
+
 	// Settings type
-	m_lua->new_usertype<GameScriptSettings>("GameScriptSettings",
+	m_lua.new_usertype<GameScriptSettings>("GameScriptSettings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
 		"screenHeight", &GameScriptSettings::ScreenHeight,
 		"windowTitle", &GameScriptSettings::WindowTitle,
@@ -48,7 +51,7 @@ GameFlow::GameFlow(sol::state* lua)
 		);
 
 	// Layer type
-	m_lua->new_usertype<GameScriptSkyLayer>("SkyLayer",
+	m_lua.new_usertype<GameScriptSkyLayer>("SkyLayer",
 		sol::constructors<GameScriptSkyLayer(byte, byte, byte, short)>(),
 		"r", &GameScriptSkyLayer::R,
 		"g", &GameScriptSkyLayer::G,
@@ -57,7 +60,7 @@ GameFlow::GameFlow(sol::state* lua)
 		);
 
 	// Mirror type
-	m_lua->new_usertype<GameScriptMirror>("Mirror",
+	m_lua.new_usertype<GameScriptMirror>("Mirror",
 		sol::constructors<GameScriptMirror(short, int, int, int, int)>(),
 		"room", &GameScriptMirror::Room,
 		"startX", &GameScriptMirror::StartX,
@@ -67,7 +70,7 @@ GameFlow::GameFlow(sol::state* lua)
 		);
 
 	// Fog type
-	m_lua->new_usertype<GameScriptFog>("Fog",
+	m_lua.new_usertype<GameScriptFog>("Fog",
 		sol::constructors<GameScriptFog(byte, byte, byte)>(),
 		"r", &GameScriptFog::R,
 		"g", &GameScriptFog::G,
@@ -75,7 +78,7 @@ GameFlow::GameFlow(sol::state* lua)
 		);
 
 	// Level type
-	/*m_lua->new_usertype<GameScriptLevel>("Level",
+	/*m_lua.new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
 		"name", &GameScriptLevel::Name,
 		"script", &GameScriptLevel::ScriptFileName,
@@ -97,12 +100,7 @@ GameFlow::GameFlow(sol::state* lua)
 		"mirror", &GameScriptLevel::Mirror
 		);*/
 
-	(*m_lua)["Gameflow"] = this;
-}
-
-GameFlow::~GameFlow()
-{
-
+	m_lua["Gameflow"] = this;
 }
 
 bool __cdecl readGameFlowFlags()
@@ -345,7 +343,7 @@ string GameFlow::loadScriptFromFile(char* luaFilename)
 bool GameFlow::LoadGameStrings(char* luaFilename)
 {
 	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
+	m_lua.script(script);
 
 	return true;
 }
@@ -353,7 +351,7 @@ bool GameFlow::LoadGameStrings(char* luaFilename)
 bool GameFlow::LoadGameSettings(char* luaFilename)
 {
 	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
+	m_lua.script(script);
 
 	return true;
 }
@@ -361,7 +359,7 @@ bool GameFlow::LoadGameSettings(char* luaFilename)
 bool GameFlow::ExecuteScript(char* luaFilename)
 {
 	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
+	m_lua.script(script);
 
 	return true;
 }

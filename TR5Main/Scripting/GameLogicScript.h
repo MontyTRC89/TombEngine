@@ -124,7 +124,7 @@ typedef struct LuaVariable
 class GameScript
 {
 private:
-	sol::state*							m_lua;
+	sol::state							m_lua;
 	LuaVariables						m_globals;
 	LuaVariables						m_locals;
 	std::map<int, short>						m_itemsMapId;
@@ -132,7 +132,7 @@ private:
 	std::vector<LuaFunction*>				m_triggers;
 
 public:	
-	GameScript(sol::state* lua);
+	GameScript();
 
 	bool								ExecuteScript(const std::string& luaFilename, std::string& message);
 	bool								ExecuteString(const std::string& command, std::string& message);
