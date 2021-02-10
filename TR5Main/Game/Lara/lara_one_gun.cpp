@@ -26,7 +26,7 @@
 #include "sound.h"
 #include "bubble.h"
 
-extern GameFlow* g_GameFlow;
+using namespace T5M::Script;
 
 //int HKCounter = 0;
 //int HKTimer = 0;

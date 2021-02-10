@@ -21,6 +21,7 @@ using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Math::Random;
+using namespace T5M::Script;
 
 unsigned char TES_extra_tab[] =
 {
@@ -66,8 +67,6 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 	{ 0, 0, 0, 0, false }, // TR3 offset 12
 	{ 0, 0, 0, 0, false }, // Empty
 };
-
-extern GameFlow* g_GameFlow;
 
 void DetatchSpark(int num, SpriteEnumFlag type)
 {

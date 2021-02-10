@@ -10,7 +10,6 @@
 #include "effect2.h"
 #include "draw.h"
 #include "inventory.h"
-#include "gameflow.h"
 #include "lot.h"
 #include "pickup.h"
 #include "draw.h"
@@ -46,6 +45,8 @@
 #include "particle/SimpleParticle.h"
 #include <process.h>
 #include "prng.h"
+#include "GameFlowScript.h"
+#include "GameLogicScript.h"
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -55,6 +56,7 @@ using namespace T5M::Effects;
 using T5M::Renderer::g_Renderer;
 using namespace T5M::Math::Random;
 using namespace T5M::Floordata;
+using namespace T5M::Script;
 
 short ShatterSounds[18][10] =
 	{
@@ -163,8 +165,6 @@ int FramesCount;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
 
-extern GameFlow *g_GameFlow;
-extern GameScript *g_GameScript;
 extern Inventory g_Inventory;
 extern int SplashCount;
 extern short FXType;

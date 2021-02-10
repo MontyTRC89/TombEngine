@@ -7,8 +7,8 @@
 #include "effect2.h"
 #include "sound.h"
 
+using namespace T5M::Script;
 
-extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)

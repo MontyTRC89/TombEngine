@@ -42,9 +42,6 @@
     <ClInclude Include="Game\flmtorch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\gameflow.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\hair.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -960,9 +957,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\flmtorch.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\gameflow.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\hair.cpp">

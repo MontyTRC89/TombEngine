@@ -7,7 +7,6 @@
 #include "draw.h"
 #include "inventory.h"
 #include "lara.h"
-#include "gameflow.h"
 #include "rope.h"
 #include "tomb4fx.h"
 #include "door.h"
@@ -25,6 +24,9 @@
 #include "hair.h"
 #include "winmain.h"
 #include <chrono>
+#include "GameFlowScript.h"
+
+using namespace T5M::Script;
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;

@@ -9,8 +9,8 @@
 #include "sound.h"
 #include <CommCtrl.h>
 using namespace T5M::Renderer;
+using namespace T5M::Script;
 using std::vector;
-extern GameFlow* g_GameFlow;
 GameConfiguration g_Configuration;
 
 void LoadResolutionsInCombobox(HWND handle, int index)

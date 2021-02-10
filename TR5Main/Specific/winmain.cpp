@@ -5,7 +5,8 @@
 #include "sound.h"
 #include "inventory.h"
 #include "control.h"
-#include "gameflow.h"
+#include "GameFlowScript.h"
+#include "GameLogicScript.h"
 #include "savegame.h"
 #include "level.h"
 #include "configuration.h"
@@ -16,6 +17,7 @@
 #include <corecrt_io.h>
 #include <iostream>
 using namespace T5M::Renderer;
+using namespace T5M::Script;
 using std::exception;
 using std::string;
 using std::cout;
@@ -29,8 +31,6 @@ bool Debug = false;
 HWND WindowsHandle;
 int App_Unk00D9ABFD;
 extern int IsLevelLoading;
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
 

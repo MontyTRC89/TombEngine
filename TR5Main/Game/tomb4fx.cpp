@@ -15,7 +15,7 @@
 #include "Renderer11.h"
 #include <effects.h>
 #include <draw.h>
-
+using namespace T5M::Script;
 using std::vector;
 using T5M::Renderer::g_Renderer;
 

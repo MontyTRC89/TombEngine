@@ -16,6 +16,9 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
+#include "GameFlowScript.h"
+
+using namespace T5M::Script;
 using std::string;
 using std::vector;
 FileStream* SaveGame::m_stream;

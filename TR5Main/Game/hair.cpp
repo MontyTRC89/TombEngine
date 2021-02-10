@@ -8,14 +8,13 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
+using namespace T5M::Script;
 using T5M::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 int WindAngle;
 int DWindAngle;
 int Wind;
-
-extern GameFlow* g_GameFlow;
 
 void InitialiseHair()
 {

@@ -8,7 +8,6 @@
 #include "health.h"
 #include "pickup.h"
 #include "inventory.h"
-#include "gameflow.h"
 #include "Lara.h"
 #include "effect2.h"
 #include "rope.h"

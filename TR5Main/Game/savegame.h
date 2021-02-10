@@ -4,7 +4,6 @@
 #include "ChunkWriter.h"
 #include "LEB128.h"
 #include "Streams.h"
-#include "GameFlowScript.h"
 #include "GameLogicScript.h"	
 
 #define SAVEGAME_BUFFER_SIZE 1048576
@@ -58,8 +57,6 @@ typedef struct SaveGameHeader
 	bool Present;
 };
 
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
 extern SAVEGAME_INFO Savegame;
 
 class SaveGame {
@@ -67,7 +64,7 @@ private:
 	static FileStream* m_stream;
 	static ChunkReader* m_reader;
 	static ChunkWriter* m_writer;
-	static std::vector<LuaVariable> m_luaVariables;
+	static std::vector<T5M::Script::LuaVariable> m_luaVariables;
 
 	static std::unique_ptr<ChunkId> m_chunkGameStatus;
 	static std::unique_ptr<ChunkId> m_chunkItems;

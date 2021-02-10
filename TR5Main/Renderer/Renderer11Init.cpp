@@ -7,9 +7,9 @@
 #include <string>
 #include <memory>
 using namespace T5M::Renderer;
+using namespace T5M::Script;
 using std::vector;
 extern GameConfiguration g_Configuration;
-extern GameFlow* g_GameFlow;
 
 void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {

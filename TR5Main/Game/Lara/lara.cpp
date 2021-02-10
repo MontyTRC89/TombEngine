@@ -39,6 +39,7 @@
 
 using std::function;
 using T5M::Renderer::g_Renderer;
+using namespace T5M::Script;
 
 extern Inventory g_Inventory;
 

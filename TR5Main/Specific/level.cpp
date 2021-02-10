@@ -13,8 +13,10 @@
 #include "box.h"
 #include "sound.h"
 #include "GameFlowScript.h"
+#include "GameLogicScript.h"
 #include <process.h>
 #include <zlib.h>
+using namespace T5M::Script;
 using T5M::Renderer::g_Renderer;
 using std::vector;
 using std::string;
@@ -29,9 +31,6 @@ vector<int> StaticObjectsIds;
 char* LevelDataPtr;
 ChunkReader* g_levelChunkIO;
 LEVEL g_Level;
-
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
 
 short ReadInt8()
 {

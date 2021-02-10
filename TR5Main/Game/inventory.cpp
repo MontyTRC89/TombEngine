@@ -3,13 +3,12 @@
 #include "draw.h"
 #include "control.h"
 #include "lara_fire.h"
-#include "gameflow.h"
 #include "sound.h"
 #include "savegame.h"
 #include "Lara.h"
 #include "camera.h"
 #include "spotcam.h"
-
+#include "GameFlowScript.h"
 #include "input.h"
 #include "configuration.h"
 #include "lara_one_gun.h"
@@ -17,9 +16,9 @@
 #include "level.h"
 #include "input.h"
 using namespace T5M::Renderer;
+using namespace T5M::Script;
 using std::vector;
 Inventory g_Inventory;
-extern GameFlow* g_GameFlow;
 
 void CombinePuzzle(int action, short object)
 {

@@ -399,7 +399,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\effect2.h" />
     <ClInclude Include="Game\effect.h" />
     <ClInclude Include="Game\flmtorch.h" />
-    <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\inventory.h" />
@@ -665,7 +664,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\effect2.cpp" />
     <ClCompile Include="Game\effect.cpp" />
     <ClCompile Include="Game\flmtorch.cpp" />
-    <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\inventory.cpp" />

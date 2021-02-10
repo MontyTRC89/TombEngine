@@ -17,9 +17,8 @@
 #include "jeep.h"
 #include "motorbike.h"
 #include <algorithm>
-
+using namespace T5M::Script;
 extern GameConfiguration g_Configuration;
-extern GameFlow *g_GameFlow;
 
 namespace T5M::Renderer
 {

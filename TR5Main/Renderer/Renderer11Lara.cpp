@@ -12,8 +12,7 @@
 #include <Specific\setup.h>
 #include "lara_fire.h"
 using namespace T5M::Renderer;
-
-extern GameFlow *g_GameFlow;
+using namespace T5M::Script;
 
 bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 	ITEM_INFO& laraItem = *LaraItem;

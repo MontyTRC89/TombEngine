@@ -20,6 +20,8 @@
 #include "GameFlowScript.h"
 #include "lara_struct.h"
 
+using namespace T5M::Script;
+
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */
@@ -253,7 +255,6 @@ short HoldStates[] = {
 	-1
 };
 
-extern GameFlow* g_GameFlow;
 bool MonksAttackLara;
 ITEM_INFO* LastTargets[8];
 ITEM_INFO* TargetList[8];

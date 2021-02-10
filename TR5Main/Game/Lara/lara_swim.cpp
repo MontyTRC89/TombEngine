@@ -15,6 +15,8 @@
 #include "sound.h"
 #include "GameFlowScript.h"
 
+using namespace T5M::Script;
+
 typedef struct SUBSUIT_INFO
 {
 	short XRot;
