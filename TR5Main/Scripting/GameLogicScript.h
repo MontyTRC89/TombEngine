@@ -5,6 +5,7 @@
 #include "LEB128.h"
 #include "Streams.h"
 #include "items.h"
+#include <memory>
 
 #define ITEM_PARAM_currentAnimState		0
 #define ITEM_PARAM_goalAnimState			1
@@ -33,66 +34,41 @@ namespace T5M::Script
 
 	class GameScriptPosition {
 	private:
-		float								xPos;
-		float								yPos;
-		float								zPos;
-		std::function<float()>					readXPos;
-		std::function<void(float)>				writeXPos;
-		std::function<float()>					readYPos;
-		std::function<void(float)>				writeYPos;
-		std::function<float()>					readZPos;
-		std::function<void(float)>				writeZPos;
+		PHD_3DPOS& ref;
+		std::unique_ptr<PHD_3DPOS> ptr;
 
 	public:
-		GameScriptPosition(float x, float y, float z);
-		GameScriptPosition(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
+		GameScriptPosition(PHD_3DPOS& pos) : ref{ pos } {} // initialise from existing PHD_3DPOS instance
+		GameScriptPosition() : ptr{ std::make_unique<PHD_3DPOS>() }, ref{ *ptr } {} // allocate new PHD_3DPOS
 
-		float								GetXPos();
-		void								SetXPos(float x);
-		float								GetYPos();
-		void								SetYPos(float y);
-		float								GetZPos();
-		void								SetZPos(float z);
-	};
-
-	class GameScriptRotation {
-	private:
-		float								xRot;
-		float								yRot;
-		float								zRot;
-		std::function<float()>					readXRot;
-		std::function<void(float)>				writeXRot;
-		std::function<float()>					readYRot;
-		std::function<void(float)>				writeYRot;
-		std::function<float()>					readZRot;
-		std::function<void(float)>				writeZRot;
-
-	public:
-		GameScriptRotation(float x, float y, float z);
-		GameScriptRotation(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
+		int									GetXPos();
+		void								SetXPos(int x);
+		int									GetYPos();
+		void								SetYPos(int y);
+		int									GetZPos();
+		void								SetZPos(int z);
 
 		float								GetXRot();
-		void								SetXRot(float x);
+		void								SetXRot(float rotX);
 		float								GetYRot();
-		void								SetYRot(float y);
+		void								SetYRot(float rotY);
 		float								GetZRot();
-		void								SetZRot(float z);
+		void								SetZRot(float rotZ);
 	};
 
 	class GameScriptItem {
 	private:
 		short								NativeItemNumber;
-		ITEM_INFO*							NativeItem;
 
 	public:
 		GameScriptItem(short itemNumber);
 
 		GameScriptPosition					GetPosition();
-		GameScriptRotation					GetRotation();
 		short								GetHP();
 		void								SetHP(short hp);
 		short								GetRoom();
 		void								SetRoom(short room);
+		short								GetAnimation();
 		short								GetCurrentState();
 		void								SetCurrentState(short state);
 		short								GetGoalState();
@@ -157,13 +133,14 @@ namespace T5M::Script
 		void								SetSecretsCount(int secretsNum);
 		void								AddOneSecret();
 		void								MakeItemInvisible(short id);
-		std::unique_ptr<GameScriptItem>			GetItemById(int id);
-		std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
+		std::unique_ptr<GameScriptItem>		GetItemById(int id);
+		std::unique_ptr<GameScriptItem>		GetItemByName(std::string name);
 		void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 		void								PlaySoundEffect(short id, int flags);
-		GameScriptPosition					CreatePosition(float x, float y, float z);
-		GameScriptPosition					CreateSectorPosition(float x, float y, float z);
-		GameScriptRotation					CreateRotation(float x, float y, float z);
+		GameScriptPosition					NewPosition(int x, int y, int z);
+		GameScriptPosition					NewSectorPosition(int x, int y, int z);
+		GameScriptPosition					NewRotation(float x, float y, float z);
+		GameScriptPosition					NewPosRot(int xPos, int yPos, int zPos, float xRot, float yRot, float zRot);
 		float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 		float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	};

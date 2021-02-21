@@ -30,24 +30,21 @@ namespace T5M::Script
 
 		// Add the item type
 		m_lua.new_usertype<GameScriptPosition>("Position",
-			"X", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
-			"Y", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
-			"Z", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
+			"PosX", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
+			"PosY", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
+			"PosZ", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
+			"RotX", sol::property(&GameScriptPosition::GetXRot, &GameScriptPosition::SetXRot),
+			"RotY", sol::property(&GameScriptPosition::GetYRot, &GameScriptPosition::SetYRot),
+			"RotZ", sol::property(&GameScriptPosition::GetZRot, &GameScriptPosition::SetZRot),
 			"new", sol::no_constructor
 			);
 
-		m_lua.new_usertype<GameScriptRotation>("Rotation",
-			"X", sol::property(&GameScriptRotation::GetXRot, &GameScriptRotation::SetXRot),
-			"Y", sol::property(&GameScriptRotation::GetYRot, &GameScriptRotation::SetYRot),
-			"Z", sol::property(&GameScriptRotation::GetZRot, &GameScriptRotation::SetZRot),
-			"new", sol::no_constructor
-			);
-
+	
 		m_lua.new_usertype<GameScriptItem>("Item",
 			"Position", sol::property(&GameScriptItem::GetPosition),
-			"Rotation", sol::property(&GameScriptItem::GetRotation),
 			"HP", sol::property(&GameScriptItem::GetHP, &GameScriptItem::SetHP),
 			"Room", sol::property(&GameScriptItem::GetRoom, &GameScriptItem::SetRoom),
+			"Animation", sol::property(&GameScriptItem::GetAnimation),
 			"CurrentState", sol::property(&GameScriptItem::GetCurrentState, &GameScriptItem::SetCurrentState),
 			"GoalState", sol::property(&GameScriptItem::GetGoalState, &GameScriptItem::SetGoalState),
 			"RequiredState", sol::property(&GameScriptItem::GetRequiredState, &GameScriptItem::SetRequiredState),
@@ -78,8 +75,10 @@ namespace T5M::Script
 
 		m_lua.set_function("GetItemByID", &GameScript::GetItemById);
 		m_lua.set_function("GetItemByName", &GameScript::GetItemByName);
-		m_lua.set_function("CreatePosition", &GameScript::CreatePosition);
-		m_lua.set_function("CreateRotation", &GameScript::CreateRotation);
+		m_lua.set_function("NewPosition", &GameScript::NewPosition);
+		m_lua.set_function("NewSectorPosition", &GameScript::NewSectorPosition);
+		m_lua.set_function("NewRotation", &GameScript::NewRotation);
+		m_lua.set_function("NewPosRot", &GameScript::NewPosRot);
 		m_lua.set_function("CalculateDistance", &GameScript::CalculateDistance);
 		m_lua.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance);
 
@@ -92,6 +91,7 @@ namespace T5M::Script
 		m_triggers.push_back(function);
 		m_lua.script(function->Code);
 	}
+
 
 	void GameScript::AddLuaId(int luaId, short itemNumber)
 	{
@@ -344,19 +344,115 @@ namespace T5M::Script
 		m_lua["Lara"] = NULL;
 	}
 
-	GameScriptPosition GameScript::CreatePosition(float x, float y, float z)
+	GameScriptPosition GameScript::NewPosition(int x, int y, int z)
 	{
-		return GameScriptPosition(x, y, z);
+		GameScriptPosition pos;
+
+		if (x < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			x = 0;
+		}
+		if (z < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			z = 0;
+		}
+
+		pos.SetXPos(x);
+		pos.SetYPos(y);
+		pos.SetZPos(z);
+
+		return pos;
 	}
 
-	GameScriptPosition GameScript::CreateSectorPosition(float x, float y, float z)
+	GameScriptPosition GameScript::NewSectorPosition(int x, int y, int z)
 	{
-		return GameScriptPosition(1024 * x + 512, 1024 * y + 512, 1024 * z + 512);
+		GameScriptPosition pos;
+
+		if (x < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			x = 0;
+		}
+		if (z < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			z = 0;
+		}
+
+		pos.SetXPos(SECTOR(x) + CLICK(2));
+		pos.SetYPos(SECTOR(y) + CLICK(2));
+		pos.SetZPos(SECTOR(y) + CLICK(2));
+
+		return pos;
 	}
 
-	GameScriptRotation GameScript::CreateRotation(float x, float y, float z)
+	GameScriptPosition GameScript::NewRotation(float x, float y, float z)
 	{
-		return GameScriptRotation(x, y, z);
+		GameScriptPosition rot;
+
+		x = remainder(x, 360);
+		if (x < 0)
+			x += 360;
+
+		y = remainder(y, 360);
+		if (y < 0)
+			y += 360;
+
+		z = remainder(z, 360);
+		if (z < 0)
+			z += 360;
+
+		rot.SetXRot(ANGLE(x));
+		rot.SetYRot(ANGLE(y));
+		rot.SetZRot(ANGLE(z));
+
+		return rot;
+	}
+
+	GameScriptPosition GameScript::NewPosRot(int xPos, int yPos, int zPos, float xRot, float yRot, float zRot)
+	{
+		GameScriptPosition posrot;
+
+		if (xPos < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			xPos = 0;
+		}
+		if (zPos < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			zPos = 0;
+		}
+
+		posrot.SetXPos(xPos);
+		posrot.SetYPos(yPos);
+		posrot.SetZPos(zPos);
+
+		xRot = remainder(xRot, 360);
+		if (xRot < 0)
+			xRot += 360;
+
+		yRot = remainder(yRot, 360);
+		if (yRot < 0)
+			yRot += 360;
+
+		zRot = remainder(zRot, 360);
+		if (zRot < 0)
+			zRot += 360;
+
+		posrot.SetXRot(ANGLE(xRot));
+		posrot.SetYRot(ANGLE(yRot));
+		posrot.SetZRot(ANGLE(zRot));
+
+		return posrot;
 	}
 
 	float GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
@@ -369,199 +465,125 @@ namespace T5M::Script
 		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
 	}
 
-	GameScriptPosition::GameScriptPosition(float x, float y, float z)
-		:
-		xPos(x),
-		yPos(y),
-		zPos(z)
+	int GameScriptPosition::GetXPos()
 	{
-
+		return ref.xPos;
 	}
 
-	GameScriptPosition::GameScriptPosition(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ)
-		:
-		readXPos(readX),
-		writeXPos(writeX),
-		readYPos(readY),
-		writeYPos(writeY),
-		readZPos(readZ),
-		writeZPos(writeZ)
+	void GameScriptPosition::SetXPos(int x)
 	{
-
+		if (x < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			return;
+		}
+		ref.xPos = x;
 	}
 
-	float GameScriptPosition::GetXPos()
+	int GameScriptPosition::GetYPos()
 	{
-		if (readXPos)
-			xPos = readXPos();
-		return xPos;
+		return ref.yPos;
 	}
 
-	void GameScriptPosition::SetXPos(float x)
+	void GameScriptPosition::SetYPos(int y)
 	{
-		xPos = x;
-		if (writeXPos)
-			writeXPos(xPos);
+		ref.yPos = y;
 	}
 
-	float GameScriptPosition::GetYPos()
+	int GameScriptPosition::GetZPos()
 	{
-		if (readYPos)
-			yPos = readYPos();
-		return yPos;
+		return ref.zPos;
 	}
 
-	void GameScriptPosition::SetYPos(float y)
+	void GameScriptPosition::SetZPos(int z)
 	{
-		yPos = y;
-		if (writeYPos)
-			writeYPos(yPos);
+		if (z < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			return;
+		}
+		ref.xPos = z;
 	}
 
-	float GameScriptPosition::GetZPos()
+	float GameScriptPosition::GetXRot()
 	{
-		if (readZPos)
-			zPos = readZPos();
-		return zPos;
+		return TO_DEGREES(ref.xRot);
 	}
 
-	void GameScriptPosition::SetZPos(float z)
-	{
-		zPos = z;
-		if (writeZPos)
-			writeZPos(zPos);
-	}
-
-	GameScriptRotation::GameScriptRotation(float x, float y, float z)
-		:
-		xRot(x),
-		yRot(y),
-		zRot(z)
-	{
-
-	}
-
-	GameScriptRotation::GameScriptRotation(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ)
-		:
-		readXRot(readX),
-		writeXRot(writeX),
-		readYRot(readY),
-		writeYRot(writeY),
-		readZRot(readZ),
-		writeZRot(writeZ)
-	{
-
-	}
-
-	float GameScriptRotation::GetXRot()
-	{
-		if (readXRot)
-			xRot = readXRot();
-		return xRot;
-	}
-
-	void GameScriptRotation::SetXRot(float x)
+	void GameScriptPosition::SetXRot(float x)
 	{
 		x = remainder(x, 360);
 		if (x < 0)
 			x += 360;
-		xRot = x;
-		if (writeXRot)
-			writeXRot(xRot);
+		
+		ref.xRot = ANGLE(x);
 	}
 
-	float GameScriptRotation::GetYRot()
+	float GameScriptPosition::GetYRot()
 	{
-		if (readYRot)
-			yRot = readYRot();
-		return yRot;
+		return TO_DEGREES(ref.yRot);
 	}
 
-	void GameScriptRotation::SetYRot(float y)
+	void GameScriptPosition::SetYRot(float y)
 	{
 		y = remainder(y, 360);
 		if (y < 0)
 			y += 360;
-		yRot = y;
-		if (writeYRot)
-			writeYRot(yRot);
+
+		ref.xRot = ANGLE(y);
 	}
 
-	float GameScriptRotation::GetZRot()
+	float GameScriptPosition::GetZRot()
 	{
-		if (readZRot)
-			zRot = readZRot();
-		return zRot;
+		return TO_DEGREES(ref.zRot);
 	}
 
-	void GameScriptRotation::SetZRot(float z)
+	void GameScriptPosition::SetZRot(float z)
 	{
 		z = remainder(z, 360);
 		if (z < 0)
 			z += 360;
-		zRot = z;
-		if (writeZRot)
-			writeZRot(zRot);
+		
+		ref.zRot = ANGLE(z);
 	}
 
-	GameScriptItem::GameScriptItem(short itemNumber)
-		:
-		NativeItemNumber(itemNumber),
-		NativeItem(&g_Level.Items[itemNumber])
-	{
-
-	}
+	GameScriptItem::GameScriptItem(short itemNumber) : NativeItemNumber(itemNumber) {}
 
 	GameScriptPosition GameScriptItem::GetPosition()
 	{
-		return GameScriptPosition(
-			[this]() -> float { return NativeItem->pos.xPos; },
-			[this](float x) -> void { NativeItem->pos.xPos = x; },
-			[this]() -> float { return NativeItem->pos.yPos; },
-			[this](float y) -> void { NativeItem->pos.yPos = y; },
-			[this]() -> float { return NativeItem->pos.zPos; },
-			[this](float z) -> void { NativeItem->pos.zPos = z; }
-		);
-	}
-
-	GameScriptRotation GameScriptItem::GetRotation()
-	{
-		return GameScriptRotation(
-			[this]() -> float { return TO_DEGREES(NativeItem->pos.xRot); },
-			[this](float x) -> void { NativeItem->pos.xRot = ANGLE(x); },
-			[this]() -> float { return TO_DEGREES(NativeItem->pos.yRot); },
-			[this](float y) -> void { NativeItem->pos.yRot = ANGLE(y); },
-			[this]() -> float { return TO_DEGREES(NativeItem->pos.zRot); },
-			[this](float z) -> void { NativeItem->pos.zRot = ANGLE(z); }
-		);
+		return GameScriptPosition(g_Level.Items[NativeItemNumber].pos);
 	}
 
 	short GameScriptItem::GetHP()
 	{
-		return NativeItem->hitPoints;
+		return g_Level.Items[NativeItemNumber].hitPoints;
 	}
 
 	void GameScriptItem::SetHP(short hp)
 	{
-		if (hp < 0 || hp > Objects[NativeItem->objectNumber].hitPoints)
+		int maxHitPoints = Objects[g_Level.Items[NativeItemNumber].objectNumber].hitPoints;
+
+		if (hp < 0 || hp > maxHitPoints)
 		{
 			if (WarningsAsErrors)
-				throw std::runtime_error("invalid HP");
+				throw std::runtime_error("Invalid HP");
 			if (hp < 0)
 			{
 				hp = 0;
 			}
-			else if (hp > Objects[NativeItem->objectNumber].hitPoints)
+			else if (hp > maxHitPoints)
 			{
-				hp = Objects[NativeItem->objectNumber].hitPoints;
+				hp = maxHitPoints;
 			}
 		}
-		NativeItem->hitPoints = hp;
+		g_Level.Items[NativeItemNumber].hitPoints = hp;
 	}
 
 	short GameScriptItem::GetRoom()
 	{
-		return NativeItem->roomNumber;
+		return g_Level.Items[NativeItemNumber].roomNumber;
 	}
 
 	void GameScriptItem::SetRoom(short room)
@@ -569,14 +591,16 @@ namespace T5M::Script
 		if (room < 0 || room >= g_Level.Rooms.size())
 		{
 			if (WarningsAsErrors)
-				throw std::runtime_error("invalid room number");
+				throw std::runtime_error("Invalid room number");
 			return;
 		}
-		NativeItem->roomNumber = room;
+		g_Level.Items[NativeItemNumber].roomNumber = room;
 	}
 
 	void GameScriptItem::EnableItem()
 	{
+		auto NativeItem = &g_Level.Items[NativeItemNumber];
+
 		if (!NativeItem->active)
 		{
 			if (Objects[NativeItem->objectNumber].intelligent)
@@ -609,6 +633,8 @@ namespace T5M::Script
 
 	void GameScriptItem::DisableItem()
 	{
+		auto NativeItem = &g_Level.Items[NativeItemNumber];
+
 		if (NativeItem->active)
 		{
 			if (Objects[NativeItem->objectNumber].intelligent)
@@ -630,34 +656,40 @@ namespace T5M::Script
 		}
 	}
 
+	short GameScriptItem::GetAnimation()
+	{
+		short animIndex = Objects[g_Level.Items[NativeItemNumber].objectNumber].animIndex;
+		return (g_Level.Items[NativeItemNumber].animNumber - animIndex);
+	}
+
 	short GameScriptItem::GetCurrentState()
 	{
-		return NativeItem->currentAnimState;
+		return g_Level.Items[NativeItemNumber].currentAnimState;
 	}
 
 	void GameScriptItem::SetCurrentState(short state)
 	{
-		NativeItem->currentAnimState = state;
+		g_Level.Items[NativeItemNumber].currentAnimState = state;
 	}
 
 	short GameScriptItem::GetGoalState()
 	{
-		return NativeItem->goalAnimState;
+		return g_Level.Items[NativeItemNumber].goalAnimState;
 	}
 
 	void GameScriptItem::SetGoalState(short state)
 	{
-		NativeItem->goalAnimState = state;
+		g_Level.Items[NativeItemNumber].goalAnimState = state;
 	}
 
 	short GameScriptItem::GetRequiredState()
 	{
-		return NativeItem->requiredAnimState;
+		return g_Level.Items[NativeItemNumber].requiredAnimState;
 	}
 
 	void GameScriptItem::SetRequiredState(short state)
 	{
-		NativeItem->requiredAnimState = state;
+		g_Level.Items[NativeItemNumber].goalAnimState = state;
 	}
 
 	sol::object LuaVariables::GetVariable(std::string key)
