@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "GameLogicScript.h"
-#include "ExceptionScript.h"
+#include "GameScript.h"
 #include "GameFlowScript.h"
 #include "items.h"
 #include "box.h"

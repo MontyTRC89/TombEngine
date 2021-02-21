@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "ExceptionScript.h"
+#include "GameScript.h"
 
 namespace T5M::Script
 {

@@ -927,7 +927,7 @@
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\ExceptionScript.h">
+    <ClInclude Include="Scripting\GameScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1712,7 +1712,7 @@
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\ExceptionScript.cpp">
+    <ClCompile Include="Scripting\GameScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
