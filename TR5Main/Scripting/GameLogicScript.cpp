@@ -144,11 +144,11 @@ namespace T5M::Script
 
 		m_lua.set_function("GetItemByID", &GameScript::GetItemById);
 		m_lua.set_function("GetItemByName", &GameScript::GetItemByName);
-		m_lua.set_function("NewPosition", &GameScript::NewPosition);
-		m_lua.set_function("NewSectorPosition", &GameScript::NewSectorPosition);
-		m_lua.set_function("NewRotation", &GameScript::NewRotation);
-		m_lua.set_function("CalculateDistance", &GameScript::CalculateDistance);
-		m_lua.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance);
+		m_lua.set_function("NewPosition", &NewPosition);
+		m_lua.set_function("NewSectorPosition", &NewSectorPosition);
+		m_lua.set_function("NewRotation", &NewRotation);
+		m_lua.set_function("CalculateDistance", &CalculateDistance);
+		m_lua.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
 		// Add global variables and namespaces
 		//m_lua["TR"] = this;
@@ -428,75 +428,6 @@ namespace T5M::Script
 		m_lua["Lara"] = NULL;
 	}
 
-	GameScriptPosition GameScript::NewPosition(int x, int y, int z)
-	{
-		GameScriptPosition pos;
-
-		if (x < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative X coordinate");
-			x = 0;
-		}
-		if (z < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative Z coordinate");
-			z = 0;
-		}
-
-		pos.SetXPos(x);
-		pos.SetYPos(y);
-		pos.SetZPos(z);
-
-		return pos;
-	}
-
-	GameScriptPosition GameScript::NewSectorPosition(int x, int y, int z)
-	{
-		GameScriptPosition pos;
-
-		if (x < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative X coordinate");
-			x = 0;
-		}
-		if (z < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative Z coordinate");
-			z = 0;
-		}
-
-		pos.SetXPos(SECTOR(x) + CLICK(2));
-		pos.SetYPos(SECTOR(y) + CLICK(2));
-		pos.SetZPos(SECTOR(y) + CLICK(2));
-
-		return pos;
-	}
-
-	GameScriptRotation GameScript::NewRotation(float x, float y, float z)
-	{
-		GameScriptRotation rot;
-
-		rot.SetXRot(ANGLE(x));
-		rot.SetYRot(ANGLE(y));
-		rot.SetZRot(ANGLE(z));
-
-		return rot;
-	}
-
-	float GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-	{
-		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetYPos() - pos2.GetYPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
-	}
-
-	float GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-	{
-		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
-	}
-
 	int GameScriptPosition::GetXPos()
 	{
 		return ref.xPos;
@@ -753,5 +684,74 @@ namespace T5M::Script
 				throw std::runtime_error("unsupported variable type");
 			break;
 		}
+	}
+
+	GameScriptPosition NewPosition(int x, int y, int z)
+	{
+		GameScriptPosition pos;
+
+		if (x < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			x = 0;
+		}
+		if (z < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			z = 0;
+		}
+
+		pos.SetXPos(x);
+		pos.SetYPos(y);
+		pos.SetZPos(z);
+
+		return pos;
+	}
+
+	GameScriptPosition NewSectorPosition(int x, int y, int z)
+	{
+		GameScriptPosition pos;
+
+		if (x < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative X coordinate");
+			x = 0;
+		}
+		if (z < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to set negative Z coordinate");
+			z = 0;
+		}
+
+		pos.SetXPos(SECTOR(x) + CLICK(2));
+		pos.SetYPos(SECTOR(y) + CLICK(2));
+		pos.SetZPos(SECTOR(y) + CLICK(2));
+
+		return pos;
+	}
+
+	GameScriptRotation NewRotation(float x, float y, float z)
+	{
+		GameScriptRotation rot;
+
+		rot.SetXRot(ANGLE(x));
+		rot.SetYRot(ANGLE(y));
+		rot.SetZRot(ANGLE(z));
+
+		return rot;
+	}
+
+	float CalculateDistance(GameScriptPosition& pos1, GameScriptPosition& pos2)
+	{
+		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetYPos() - pos2.GetYPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
+	}
+
+	float CalculateHorizontalDistance(GameScriptPosition& pos1, GameScriptPosition& pos2)
+	{
+		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
 	}
 }

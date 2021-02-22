@@ -34,8 +34,8 @@ namespace T5M::Script
 
 	class GameScriptPosition {
 	private:
-		PHD_3DPOS& ref;
 		std::unique_ptr<PHD_3DPOS> ptr;
+		PHD_3DPOS& ref;
 
 	public:
 		GameScriptPosition(PHD_3DPOS& pos) : ref{ pos } {} // initialise from existing PHD_3DPOS instance
@@ -51,8 +51,8 @@ namespace T5M::Script
 
 	class GameScriptRotation {
 	private:
-		PHD_3DPOS& ref;
 		std::unique_ptr<PHD_3DPOS> ptr;
+		PHD_3DPOS& ref;
 
 	public:
 		GameScriptRotation(PHD_3DPOS& pos) : ref{ pos } {} // initialise from existing PHD_3DPOS instance
@@ -150,12 +150,13 @@ namespace T5M::Script
 		std::unique_ptr<GameScriptItem>		GetItemByName(std::string name);
 		void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 		void								PlaySoundEffect(short id, int flags);
-		GameScriptPosition					NewPosition(int x, int y, int z);
-		GameScriptPosition					NewSectorPosition(int x, int y, int z);
-		GameScriptRotation					NewRotation(float x, float y, float z);
-		float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-		float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	};
+
+	GameScriptPosition					NewPosition(int x, int y, int z);
+	GameScriptPosition					NewSectorPosition(int x, int y, int z);
+	GameScriptRotation					NewRotation(float x, float y, float z);
+	float								CalculateDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
+	float								CalculateHorizontalDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
 
 	extern GameScript* g_GameScript;
 }
