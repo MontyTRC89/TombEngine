@@ -101,7 +101,7 @@ namespace T5M::Script
 			"new", sol::no_constructor
 			);
 		
-		m_lua.new_usertype<GameScriptPosition>("Rotation",
+		m_lua.new_usertype<GameScriptRotation>("Rotation",
 			"X", sol::property(&GameScriptRotation::GetXRot, &GameScriptRotation::SetXRot),
 			"Y", sol::property(&GameScriptRotation::GetYRot, &GameScriptRotation::SetYRot),
 			"Z", sol::property(&GameScriptRotation::GetZRot, &GameScriptRotation::SetZRot),
