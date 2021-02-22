@@ -47,6 +47,16 @@ namespace T5M::Script
 		void								SetYPos(int y);
 		int									GetZPos();
 		void								SetZPos(int z);
+	};
+
+	class GameScriptRotation {
+	private:
+		PHD_3DPOS& ref;
+		std::unique_ptr<PHD_3DPOS> ptr;
+
+	public:
+		GameScriptRotation(PHD_3DPOS& pos) : ref{ pos } {} // initialise from existing PHD_3DPOS instance
+		GameScriptRotation() : ptr{ std::make_unique<PHD_3DPOS>() }, ref{ *ptr } {} // allocate new PHD_3DPOS
 
 		float								GetXRot();
 		void								SetXRot(float rotX);
@@ -64,6 +74,7 @@ namespace T5M::Script
 		GameScriptItem(short itemNumber);
 
 		GameScriptPosition					GetPosition();
+		GameScriptRotation					GetRotation();
 		short								GetHP();
 		void								SetHP(short hp);
 		short								GetRoom();
@@ -141,8 +152,7 @@ namespace T5M::Script
 		void								PlaySoundEffect(short id, int flags);
 		GameScriptPosition					NewPosition(int x, int y, int z);
 		GameScriptPosition					NewSectorPosition(int x, int y, int z);
-		GameScriptPosition					NewRotation(float x, float y, float z);
-		GameScriptPosition					NewPosRot(int xPos, int yPos, int zPos, float xRot, float yRot, float zRot);
+		GameScriptRotation					NewRotation(float x, float y, float z);
 		float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 		float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	};

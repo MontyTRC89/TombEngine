@@ -95,18 +95,22 @@ namespace T5M::Script
 
 		// Add the item type
 		m_lua.new_usertype<GameScriptPosition>("Position",
-			"PosX", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
-			"PosY", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
-			"PosZ", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
-			"RotX", sol::property(&GameScriptPosition::GetXRot, &GameScriptPosition::SetXRot),
-			"RotY", sol::property(&GameScriptPosition::GetYRot, &GameScriptPosition::SetYRot),
-			"RotZ", sol::property(&GameScriptPosition::GetZRot, &GameScriptPosition::SetZRot),
+			"X", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
+			"Y", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
+			"Z", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
 			"new", sol::no_constructor
 			);
-
+		
+		m_lua.new_usertype<GameScriptPosition>("Rotation",
+			"X", sol::property(&GameScriptRotation::GetXRot, &GameScriptRotation::SetXRot),
+			"Y", sol::property(&GameScriptRotation::GetYRot, &GameScriptRotation::SetYRot),
+			"Z", sol::property(&GameScriptRotation::GetZRot, &GameScriptRotation::SetZRot),
+			"new", sol::no_constructor
+			);
 	
 		m_lua.new_usertype<GameScriptItem>("Item",
-			"Position", sol::property(&GameScriptItem::GetPosition),
+			"Pos", sol::property(&GameScriptItem::GetPosition),
+			"Rot", sol::property(&GameScriptItem::GetRotation),
 			"HP", sol::property(&GameScriptItem::GetHP, &GameScriptItem::SetHP),
 			"Room", sol::property(&GameScriptItem::GetRoom, &GameScriptItem::SetRoom),
 			"Animation", sol::property(&GameScriptItem::GetAnimation),
@@ -143,7 +147,6 @@ namespace T5M::Script
 		m_lua.set_function("NewPosition", &GameScript::NewPosition);
 		m_lua.set_function("NewSectorPosition", &GameScript::NewSectorPosition);
 		m_lua.set_function("NewRotation", &GameScript::NewRotation);
-		m_lua.set_function("NewPosRot", &GameScript::NewPosRot);
 		m_lua.set_function("CalculateDistance", &GameScript::CalculateDistance);
 		m_lua.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance);
 
@@ -473,9 +476,9 @@ namespace T5M::Script
 		return pos;
 	}
 
-	GameScriptPosition GameScript::NewRotation(float x, float y, float z)
+	GameScriptRotation GameScript::NewRotation(float x, float y, float z)
 	{
-		GameScriptPosition rot;
+		GameScriptRotation rot;
 
 		x = remainder(x, 360);
 		if (x < 0)
@@ -494,46 +497,6 @@ namespace T5M::Script
 		rot.SetZRot(ANGLE(z));
 
 		return rot;
-	}
-
-	GameScriptPosition GameScript::NewPosRot(int xPos, int yPos, int zPos, float xRot, float yRot, float zRot)
-	{
-		GameScriptPosition posrot;
-
-		if (xPos < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative X coordinate");
-			xPos = 0;
-		}
-		if (zPos < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to set negative Z coordinate");
-			zPos = 0;
-		}
-
-		posrot.SetXPos(xPos);
-		posrot.SetYPos(yPos);
-		posrot.SetZPos(zPos);
-
-		xRot = remainder(xRot, 360);
-		if (xRot < 0)
-			xRot += 360;
-
-		yRot = remainder(yRot, 360);
-		if (yRot < 0)
-			yRot += 360;
-
-		zRot = remainder(zRot, 360);
-		if (zRot < 0)
-			zRot += 360;
-
-		posrot.SetXRot(ANGLE(xRot));
-		posrot.SetYRot(ANGLE(yRot));
-		posrot.SetZRot(ANGLE(zRot));
-
-		return posrot;
 	}
 
 	float GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
@@ -588,12 +551,12 @@ namespace T5M::Script
 		ref.xPos = z;
 	}
 
-	float GameScriptPosition::GetXRot()
+	float GameScriptRotation::GetXRot()
 	{
 		return TO_DEGREES(ref.xRot);
 	}
 
-	void GameScriptPosition::SetXRot(float x)
+	void GameScriptRotation::SetXRot(float x)
 	{
 		x = remainder(x, 360);
 		if (x < 0)
@@ -602,12 +565,12 @@ namespace T5M::Script
 		ref.xRot = ANGLE(x);
 	}
 
-	float GameScriptPosition::GetYRot()
+	float GameScriptRotation::GetYRot()
 	{
 		return TO_DEGREES(ref.yRot);
 	}
 
-	void GameScriptPosition::SetYRot(float y)
+	void GameScriptRotation::SetYRot(float y)
 	{
 		y = remainder(y, 360);
 		if (y < 0)
@@ -616,12 +579,12 @@ namespace T5M::Script
 		ref.xRot = ANGLE(y);
 	}
 
-	float GameScriptPosition::GetZRot()
+	float GameScriptRotation::GetZRot()
 	{
 		return TO_DEGREES(ref.zRot);
 	}
 
-	void GameScriptPosition::SetZRot(float z)
+	void GameScriptRotation::SetZRot(float z)
 	{
 		z = remainder(z, 360);
 		if (z < 0)
@@ -635,6 +598,11 @@ namespace T5M::Script
 	GameScriptPosition GameScriptItem::GetPosition()
 	{
 		return GameScriptPosition(g_Level.Items[NativeItemNumber].pos);
+	}
+
+	GameScriptRotation GameScriptItem::GetRotation()
+	{
+		return GameScriptRotation(g_Level.Items[NativeItemNumber].pos);
 	}
 
 	short GameScriptItem::GetHP()
