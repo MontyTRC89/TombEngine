@@ -480,18 +480,6 @@ namespace T5M::Script
 	{
 		GameScriptRotation rot;
 
-		x = remainder(x, 360);
-		if (x < 0)
-			x += 360;
-
-		y = remainder(y, 360);
-		if (y < 0)
-			y += 360;
-
-		z = remainder(z, 360);
-		if (z < 0)
-			z += 360;
-
 		rot.SetXRot(ANGLE(x));
 		rot.SetYRot(ANGLE(y));
 		rot.SetZRot(ANGLE(z));
