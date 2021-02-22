@@ -198,10 +198,8 @@ namespace T5M::Script
 	class GameFlow
 	{
 	private:
-		sol::state							m_lua;
 		GameScriptSettings					m_settings;
 	
-		std::string								loadScriptFromFile(char* luaFilename);
 		std::map<short, short>				m_itemsMap;
 
 	public:
@@ -229,11 +227,7 @@ namespace T5M::Script
 		std::vector<LanguageScript*>				Strings;
 		std::vector<GameScriptLevel*>			Levels;
 
-		GameFlow();
-
-		bool								LoadGameStrings(char* luaFilename);
-		bool								LoadGameSettings(char* luaFilename);
-		bool								ExecuteScript(char* luaFilename);
+		std::string								loadScriptFromFile(char* luaFilename);
 		char*								GetString(int id);
 		GameScriptSettings*					GetSettings();
 		GameScriptLevel*					GetLevel(int id);

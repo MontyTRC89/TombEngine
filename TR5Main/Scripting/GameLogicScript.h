@@ -112,6 +112,8 @@ namespace T5M::Script
 	public:	
 		GameScript();
 
+		bool								LoadGameStrings(char* luaFilename);
+		bool								LoadGameSettings(char* luaFilename);
 		bool								ExecuteScript(const std::string& luaFilename, std::string& message);
 		bool								ExecuteString(const std::string& command, std::string& message);
 		void								FreeLevelScripts();

@@ -21,6 +21,71 @@ namespace T5M::Script
 		m_lua.open_libraries(sol::lib::base);
 		m_lua.set_exception_handler(lua_exception_handler);
 
+		// Settings type
+		m_lua.new_usertype<GameScriptSettings>("GameScriptSettings",
+			"screenWidth", &GameScriptSettings::ScreenWidth,
+			"screenHeight", &GameScriptSettings::ScreenHeight,
+			"windowTitle", &GameScriptSettings::WindowTitle,
+			"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
+			"windowed", &GameScriptSettings::Windowed,
+			"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
+			"drawingDistance", &GameScriptSettings::DrawingDistance,
+			"showRendererSteps", &GameScriptSettings::ShowRendererSteps,
+			"showDebugInfo", &GameScriptSettings::ShowDebugInfo
+			);
+
+		// Layer type
+		m_lua.new_usertype<GameScriptSkyLayer>("SkyLayer",
+			sol::constructors<GameScriptSkyLayer(byte, byte, byte, short)>(),
+			"r", &GameScriptSkyLayer::R,
+			"g", &GameScriptSkyLayer::G,
+			"b", &GameScriptSkyLayer::B,
+			"speed", &GameScriptSkyLayer::CloudSpeed
+			);
+
+		// Mirror type
+		m_lua.new_usertype<GameScriptMirror>("Mirror",
+			sol::constructors<GameScriptMirror(short, int, int, int, int)>(),
+			"room", &GameScriptMirror::Room,
+			"startX", &GameScriptMirror::StartX,
+			"endX", &GameScriptMirror::EndX,
+			"startZ", &GameScriptMirror::StartZ,
+			"endZ", &GameScriptMirror::EndZ
+			);
+
+		// Fog type
+		m_lua.new_usertype<GameScriptFog>("Fog",
+			sol::constructors<GameScriptFog(byte, byte, byte)>(),
+			"r", &GameScriptFog::R,
+			"g", &GameScriptFog::G,
+			"b", &GameScriptFog::B
+			);
+
+		// Level type
+		/*m_lua.new_usertype<GameScriptLevel>("Level",
+			sol::constructors<GameScriptLevel()>(),
+			"name", &GameScriptLevel::Name,
+			"script", &GameScriptLevel::ScriptFileName,
+			"fileName", &GameScriptLevel::FileName,
+			"loadScreen", &GameScriptLevel::LoadScreenFileName,
+			"soundTrack", &GameScriptLevel::Soundtrack,
+			"layer1", &GameScriptLevel::Layer1,
+			"layer2", &GameScriptLevel::Layer2,
+			"fog", &GameScriptLevel::Fog,
+			"horizon", &GameScriptLevel::Horizon,
+			"colAddHorizon", &GameScriptLevel::ColAddHorizon,
+			"storm", &GameScriptLevel::Storm,
+			"background", &GameScriptLevel::Background,
+			"rain", &GameScriptLevel::Rain,
+			"snow", &GameScriptLevel::Snow,
+			"laraType", &GameScriptLevel::LaraType,
+			"rumble", &GameScriptLevel::Rumble,
+			"resetHub", &GameScriptLevel::ResetHub,
+			"mirror", &GameScriptLevel::Mirror
+			);*/
+
+		//m_lua["Gameflow"] = this;
+
 		// Add constants
 		//ExecuteScript("Scripts\\Constants.lua");
 
@@ -84,6 +149,22 @@ namespace T5M::Script
 
 		// Add global variables and namespaces
 		//m_lua["TR"] = this;
+	}
+
+	bool GameScript::LoadGameStrings(char* luaFilename)
+	{
+		std::string script = g_GameFlow->loadScriptFromFile(luaFilename);
+		m_lua.script(script);
+
+		return true;
+	}
+
+	bool GameScript::LoadGameSettings(char* luaFilename)
+	{
+		std::string script = g_GameFlow->loadScriptFromFile(luaFilename);
+		m_lua.script(script);
+
+		return true;
 	}
 
 	void GameScript::AddTrigger(LuaFunction* function)
