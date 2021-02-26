@@ -336,42 +336,85 @@ namespace T5M::Script
 		}
 	}
 	*/
-	template <typename T>
-	void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
+
+	VariablesMap GameScript::GetVariables(const LuaMap& luaMap)
 	{
-		for (const auto& it : m_locals.variables)
+		VariablesMap variablesMap;
+
+		for (const auto& [key, value] : luaMap)
 		{
-			if (it.second.is<T>())
-				locals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
+			if (value.is<bool>())
+			{
+				variablesMap.insert(std::pair{key, value.as<bool>()});
+			}
+			else if (value.is<double>())
+			{
+				variablesMap.insert(std::pair{key, value.as<double>()});
+			}
+			else if (value.is<std::string>())
+			{
+				variablesMap.insert(std::pair{key, value.as<std::string>()});
+			}
 		}
-		for (const auto& it : m_globals.variables)
+
+		return variablesMap;
+	}
+
+	VariablesMap GameScript::GetLocalVariables()
+	{
+		return GetVariables(m_locals);
+	}
+
+	VariablesMap GameScript::GetHubVariables()
+	{
+		return GetVariables(m_hubs);
+	}
+
+	VariablesMap GameScript::GetGlobalVariables()
+	{
+		return GetVariables(m_globals);
+	}
+
+	void GameScript::SetVariables(LuaMap& luaMap, const VariablesMap& variablesMap)
+	{
+		for (const auto& [key, value] : variablesMap)
 		{
-			if (it.second.is<T>())
-				globals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
+			std::visit([&](const auto variable) -> void
+			{
+				luaMap.insert(std::pair{key, sol::object{m_lua.lua_state(), sol::in_place, variable}});
+			}, value);
 		}
 	}
 
-	template void GameScript::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-	template void GameScript::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-	template void GameScript::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
-
-	template <typename T>
-	void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
+	void GameScript::SetLocalVariables(const VariablesMap& locals)
 	{
-		m_locals.variables.clear();
-		for (const auto& it : locals)
-		{
-			m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
-		}
-		for (const auto& it : globals)
-		{
-			m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua.lua_state(), sol::in_place, it.second)));
-		}
+		SetVariables(m_locals, locals);
 	}
 
-	template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-	template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-	template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
+	void GameScript::SetHubVariables(const VariablesMap& hubs)
+	{
+		SetVariables(m_hubs, hubs);
+	}
+
+	void GameScript::SetGlobalVariables(const VariablesMap& globals)
+	{
+		SetVariables(m_globals, globals);
+	}
+
+	void GameScript::ResetLocalVariables()
+	{
+		m_locals.clear();
+	}
+
+	void GameScript::ResetHubVariables()
+	{
+		m_hubs.clear();
+	}
+
+	void GameScript::ResetGlobalVariables()
+	{
+		m_globals.clear();
+	}
 
 	std::unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
 	{
@@ -418,14 +461,10 @@ namespace T5M::Script
 
 	void GameScript::AssignItemsAndLara()
 	{
-		m_lua.set("Level", m_locals);
-		m_lua.set("Game", m_globals);
+		m_lua.set("Level", LuaVariables{m_locals});
+		m_lua.set("Hub", LuaVariables{m_hubs});
+		m_lua.set("Game", LuaVariables{m_globals});
 		m_lua.set("Lara", GameScriptItem(Lara.itemNumber));
-	}
-
-	void GameScript::ResetVariables()
-	{
-		m_lua["Lara"] = NULL;
 	}
 
 	int GameScriptPosition::GetXPos()
@@ -660,11 +699,16 @@ namespace T5M::Script
 		g_Level.Items[NativeItemNumber].goalAnimState = state;
 	}
 
+	LuaVariables::LuaVariables(LuaMap& map) : m_map{map}
+	{
+
+	}
+
 	sol::object LuaVariables::GetVariable(std::string key)
 	{
-		if (variables.find(key) == variables.end())
+		if (m_map.find(key) == m_map.end())
 			return sol::lua_nil;
-		return variables[key];
+		return m_map[key];
 	}
 
 	void LuaVariables::SetVariable(std::string key, sol::object value)
@@ -672,12 +716,12 @@ namespace T5M::Script
 		switch (value.get_type())
 		{
 		case sol::type::lua_nil:
-			variables.erase(key);
+			m_map.erase(key);
 			break;
 		case sol::type::boolean:
 		case sol::type::number:
 		case sol::type::string:
-			variables[key] = value;
+			m_map[key] = value;
 			break;
 		default:
 			if (WarningsAsErrors)

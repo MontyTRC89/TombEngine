@@ -90,10 +90,15 @@ namespace T5M::Script
 		void								DisableItem();
 	};
 
+	using LuaMap = std::map<std::string, sol::object>;
+	using VariablesMap = std::map<std::string, std::variant<bool, double, std::string>>;
+
 	class LuaVariables
 	{
+	private:
+		LuaMap&								m_map;
 	public:
-		std::map<std::string, sol::object>			variables;
+		LuaVariables(LuaMap& map);
 
 		sol::object							GetVariable(std::string key);
 		void								SetVariable(std::string key, sol::object value);
@@ -114,8 +119,9 @@ namespace T5M::Script
 	{
 	private:
 		sol::state							m_lua;
-		LuaVariables						m_globals;
-		LuaVariables						m_locals;
+		LuaMap								m_locals;
+		LuaMap								m_hubs;
+		LuaMap								m_globals;
 		std::map<int, short>						m_itemsMapId;
 		std::map<std::string, short>					m_itemsMapName;
 		std::vector<LuaFunction*>				m_triggers;
@@ -132,12 +138,17 @@ namespace T5M::Script
 		void								AddLuaId(int luaId, short itemNumber);
 		void								AddLuaName(std::string luaName, short itemNumber);
 		void								AssignItemsAndLara();
-		void								ResetVariables();
-
-		template <typename T>
-		void								GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
-		template <typename T>
-		void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
+		VariablesMap						GetVariables(const LuaMap& variables);
+		VariablesMap						GetLocalVariables();
+		VariablesMap						GetHubVariables();
+		VariablesMap						GetGlobalVariables();
+		void								SetVariables(LuaMap& variables, const VariablesMap& map);
+		void								SetLocalVariables(const VariablesMap& locals);
+		void								SetHubVariables(const VariablesMap& hubs);
+		void								SetGlobalVariables(const VariablesMap& globals);
+		void								ResetLocalVariables();
+		void								ResetHubVariables();
+		void								ResetGlobalVariables();
 		void								PlayAudioTrack(short track);
 		void								ChangeAmbientSoundTrack(short track);
 		bool								ExecuteTrigger(short index);
