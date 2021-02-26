@@ -147,6 +147,7 @@ namespace T5M::Script
 		m_lua.set_function("NewPosition", &NewPosition);
 		m_lua.set_function("NewSectorPosition", &NewSectorPosition);
 		m_lua.set_function("NewRotation", &NewRotation);
+		m_lua.set_function("ItemCreate", &ItemCreate);
 		m_lua.set_function("CalculateDistance", &CalculateDistance);
 		m_lua.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
@@ -175,7 +176,6 @@ namespace T5M::Script
 		m_triggers.push_back(function);
 		m_lua.script(function->Code);
 	}
-
 
 	void GameScript::AddLuaId(int luaId, short itemNumber)
 	{
@@ -307,35 +307,7 @@ namespace T5M::Script
 		Savegame.Level.Secrets++;
 		S_CDPlay(6, 0);
 	}
-	/*
-	void GameScript::MakeItemInvisible(short id)
-	{
-		if (m_itemsMap.find(id) == m_itemsMap.end())
-			return;
-
-		short itemNum = m_itemsMap[id];
-
-		ITEM_INFO* item = &g_Level.Items[itemNum];
-
-		if (item->active)
-		{
-			if (Objects[item->objectNumber].intelligent)
-			{
-				if (item->status == ITEM_ACTIVE)
-				{
-					item->touchBits = 0;
-					item->status = ITEM_INVISIBLE;
-					DisableBaddieAI(itemNum);
-				}
-			}
-			else
-			{
-				item->touchBits = 0;
-				item->status = ITEM_INVISIBLE;
-			}
-		}
-	}
-	*/
+	
 	template <typename T>
 	void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 	{
@@ -565,69 +537,48 @@ namespace T5M::Script
 		g_Level.Items[NativeItemNumber].roomNumber = room;
 	}
 
-	void GameScriptItem::EnableItem()
-	{
-		auto NativeItem = &g_Level.Items[NativeItemNumber];
-
-		if (!NativeItem->active)
-		{
-			if (Objects[NativeItem->objectNumber].intelligent)
-			{
-				if (NativeItem->status == ITEM_DEACTIVATED)
-				{
-					NativeItem->touchBits = 0;
-					NativeItem->status = ITEM_ACTIVE;
-					AddActiveItem(NativeItemNumber);
-					EnableBaddieAI(NativeItemNumber, 1);
-				}
-				else if (NativeItem->status == ITEM_INVISIBLE)
-				{
-					NativeItem->touchBits = 0;
-					if (EnableBaddieAI(NativeItemNumber, 0))
-						NativeItem->status = ITEM_ACTIVE;
-					else
-						NativeItem->status = ITEM_INVISIBLE;
-					AddActiveItem(NativeItemNumber);
-				}
-			}
-			else
-			{
-				NativeItem->touchBits = 0;
-				AddActiveItem(NativeItemNumber);
-				NativeItem->status = ITEM_ACTIVE;
-			}
-		}
-	}
-
-	void GameScriptItem::DisableItem()
-	{
-		auto NativeItem = &g_Level.Items[NativeItemNumber];
-
-		if (NativeItem->active)
-		{
-			if (Objects[NativeItem->objectNumber].intelligent)
-			{
-				if (NativeItem->status == ITEM_ACTIVE)
-				{
-					NativeItem->touchBits = 0;
-					NativeItem->status = ITEM_DEACTIVATED;
-					RemoveActiveItem(NativeItemNumber);
-					DisableBaddieAI(NativeItemNumber);
-				}
-			}
-			else
-			{
-				NativeItem->touchBits = 0;
-				RemoveActiveItem(NativeItemNumber);
-				NativeItem->status = ITEM_DEACTIVATED;
-			}
-		}
-	}
-
 	short GameScriptItem::GetAnimation()
 	{
 		short animIndex = Objects[g_Level.Items[NativeItemNumber].objectNumber].animIndex;
 		return (g_Level.Items[NativeItemNumber].animNumber - animIndex);
+	}
+
+	void GameScriptItem::SetAnimation(short animNum, short frameNum)
+	{
+		auto& item = g_Level.Items[NativeItemNumber];
+
+		short animStart = Objects[item.objectNumber].animIndex;
+		short animNext = Objects[item.objectNumber + 1].animIndex;
+		short animIndex = animStart + animNum;
+
+		if (animIndex < animStart || animIndex >= animNext)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid animation number");
+
+			if (animIndex < animStart)
+				animIndex = animStart;
+			else if (animIndex >= animNext)
+				animIndex = animNext - 1;
+		}
+
+		auto& anim = g_Level.Anims[animIndex];
+		short frameIndex = anim.frameBase + frameNum;
+
+		if (frameIndex < anim.frameBase || frameIndex > anim.frameEnd)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid frame number");
+
+			if (frameIndex < anim.frameBase)
+				frameIndex = anim.frameBase;
+			else if (frameIndex > anim.frameEnd)
+				frameIndex = anim.frameEnd;
+		}
+
+		item.animNumber = animIndex;
+		item.frameNumber = frameIndex;
+		item.currentAnimState = item.goalAnimState = anim.currentAnimState;
 	}
 
 	short GameScriptItem::GetCurrentState()
@@ -658,6 +609,165 @@ namespace T5M::Script
 	void GameScriptItem::SetRequiredState(short state)
 	{
 		g_Level.Items[NativeItemNumber].goalAnimState = state;
+	}
+
+	void GameScriptItem::PositionItem(GameScriptPosition& pos)
+	{
+		auto& itempos = g_Level.Items[NativeItemNumber].pos;
+
+		itempos.xPos = pos.GetXPos();
+		itempos.yPos = pos.GetYPos();
+		itempos.zPos = pos.GetZPos();
+	}
+
+	void GameScriptItem::MoveItem(int x, int y, int z)
+	{
+		auto& itempos = g_Level.Items[NativeItemNumber].pos;
+
+		int xNew = itempos.xPos + x;
+		if (xNew < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to move item into negative X coordinates");
+			xNew = 0;
+		}
+
+		int zNew = itempos.zPos + z;
+		if (zNew < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Attempt to move item into negative Z coordinates");
+			zNew = 0;
+		}
+
+		itempos.xPos = xNew;
+		itempos.yPos += y;
+		itempos.zPos = zNew;
+	}
+
+	void GameScriptItem::OrientItem(GameScriptRotation& rot)
+	{
+		auto& itempos = g_Level.Items[NativeItemNumber].pos;
+
+		itempos.xPos = ANGLE(rot.GetXRot());
+		itempos.yPos = ANGLE(rot.GetYRot());
+		itempos.zRot = ANGLE(rot.GetZRot());
+	}
+
+	void GameScriptItem::RotateItem(float xrot, float yrot, float zrot)
+	{
+		auto& itempos = g_Level.Items[NativeItemNumber].pos;
+
+		itempos.xRot += ANGLE(xrot);
+		itempos.yRot += ANGLE(yrot);
+		itempos.zRot += ANGLE(zrot);
+	}
+
+	void GameScriptItem::EnableItem()
+	{
+		auto& NativeItem = g_Level.Items[NativeItemNumber];
+
+		if (!NativeItem.active)
+		{
+			if (Objects[NativeItem.objectNumber].intelligent)
+			{
+				if (NativeItem.status == ITEM_DEACTIVATED)
+				{
+					NativeItem.touchBits = 0;
+					NativeItem.status = ITEM_ACTIVE;
+					AddActiveItem(NativeItemNumber);
+					EnableBaddieAI(NativeItemNumber, 1);
+				}
+				else if (NativeItem.status == ITEM_INVISIBLE)
+				{
+					NativeItem.touchBits = 0;
+					if (EnableBaddieAI(NativeItemNumber, 0))
+						NativeItem.status = ITEM_ACTIVE;
+					else
+						NativeItem.status = ITEM_INVISIBLE;
+					AddActiveItem(NativeItemNumber);
+				}
+			}
+			else
+			{
+				NativeItem.touchBits = 0;
+				AddActiveItem(NativeItemNumber);
+				NativeItem.status = ITEM_ACTIVE;
+			}
+		}
+	}
+
+	void GameScriptItem::DisableItem()
+	{
+		auto& NativeItem = g_Level.Items[NativeItemNumber];
+
+		if (NativeItem.active)
+		{
+			if (Objects[NativeItem.objectNumber].intelligent)
+			{
+				if (NativeItem.status == ITEM_ACTIVE)
+				{
+					NativeItem.touchBits = 0;
+					NativeItem.status = ITEM_DEACTIVATED;
+					RemoveActiveItem(NativeItemNumber);
+					DisableBaddieAI(NativeItemNumber);
+				}
+			}
+			else
+			{
+				NativeItem.touchBits = 0;
+				RemoveActiveItem(NativeItemNumber);
+				NativeItem.status = ITEM_DEACTIVATED;
+			}
+		}
+	}
+
+	void GameScriptItem::ItemKill()
+	{
+		KillItem(NativeItemNumber);
+	}
+
+	void GameScriptItem::HideItem()
+	{
+		auto& item = g_Level.Items[NativeItemNumber];
+
+		if (item.active)
+		{
+			if (Objects[item.objectNumber].intelligent)
+			{
+				if (item.status == ITEM_ACTIVE)
+				{
+					item.touchBits = 0;
+					item.status = ITEM_INVISIBLE;
+					DisableBaddieAI(NativeItemNumber);
+				}
+			}
+			else
+			{
+				item.touchBits = 0;
+				item.status = ITEM_INVISIBLE;
+			}
+		}
+	}
+
+	void GameScriptItem::ShowItem()
+	{
+		auto& item = g_Level.Items[NativeItemNumber];
+
+		if (item.active)
+		{
+			if (Objects[item.objectNumber].intelligent)
+			{
+				item.touchBits = 0;
+				item.status = ITEM_ACTIVE;
+				EnableBaddieAI(NativeItemNumber, 0);
+			}
+			else
+			{
+				item.touchBits = 0;
+				item.status = ITEM_ACTIVE;
+			}
+		}
 	}
 
 	sol::object LuaVariables::GetVariable(std::string key)
@@ -753,5 +863,25 @@ namespace T5M::Script
 	float CalculateHorizontalDistance(GameScriptPosition& pos1, GameScriptPosition& pos2)
 	{
 		return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
+	}
+
+	GameScriptItem ItemCreate(short objNum, GameScriptPosition& pos, short roomNum)
+	{
+		short itemIndex = CreateItem();
+		if (itemIndex == NO_ITEM)
+			throw std::runtime_error("Cannot create new item");
+
+		auto& item = g_Level.Items[itemIndex];
+
+		item.objectNumber = objNum;
+		item.roomNumber = roomNum;
+		item.pos.xPos = pos.GetXPos();
+		item.pos.yPos = pos.GetYPos();
+		item.pos.zPos = pos.GetZPos();
+		item.pos.yRot = 0;
+
+		InitialiseItem(itemIndex);
+
+		return GameScriptItem(itemIndex);
 	}
 }

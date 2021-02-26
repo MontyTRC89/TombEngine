@@ -7,7 +7,7 @@
 #include "items.h"
 #include <memory>
 
-#define ITEM_PARAM_currentAnimState		0
+#define ITEM_PARAM_currentAnimState			0
 #define ITEM_PARAM_goalAnimState			1
 #define ITEM_PARAM_REQUIRED_ANIM_STATE		2
 #define ITEM_PARAM_frameNumber				3
@@ -80,14 +80,22 @@ namespace T5M::Script
 		short								GetRoom();
 		void								SetRoom(short room);
 		short								GetAnimation();
+		void								SetAnimation(short animNum, short frameNum);
 		short								GetCurrentState();
 		void								SetCurrentState(short state);
 		short								GetGoalState();
 		void								SetGoalState(short state);
 		short								GetRequiredState();
 		void								SetRequiredState(short state);
+		void								PositionItem(GameScriptPosition& pos);
+		void								OrientItem(GameScriptRotation& rot);
+		void								MoveItem(int x, int y, int z);
+		void								RotateItem(float xrot, float yrot, float zrot);
 		void								EnableItem();
 		void								DisableItem();
+		void								HideItem();
+		void								ShowItem();
+		void								ItemKill();
 	};
 
 	class LuaVariables
@@ -145,7 +153,6 @@ namespace T5M::Script
 		int									GetSecretsCount();
 		void								SetSecretsCount(int secretsNum);
 		void								AddOneSecret();
-		void								MakeItemInvisible(short id);
 		std::unique_ptr<GameScriptItem>		GetItemById(int id);
 		std::unique_ptr<GameScriptItem>		GetItemByName(std::string name);
 		void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
@@ -157,6 +164,7 @@ namespace T5M::Script
 	GameScriptRotation					NewRotation(float x, float y, float z);
 	float								CalculateDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
 	float								CalculateHorizontalDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
+	GameScriptItem						ItemCreate(short objNum, GameScriptPosition& pos, short roomNum);
 
 	extern GameScript* g_GameScript;
 }
