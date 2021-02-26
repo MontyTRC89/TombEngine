@@ -127,6 +127,7 @@ namespace T5M::Script
 	{
 	private:
 		sol::state							m_lua;
+		sol::environment					m_environment;
 		LuaMap								m_locals;
 		LuaMap								m_hubs;
 		LuaMap								m_globals;
@@ -139,8 +140,8 @@ namespace T5M::Script
 
 		bool								LoadGameStrings(char* luaFilename);
 		bool								LoadGameSettings(char* luaFilename);
-		bool								ExecuteScript(const std::string& luaFilename, std::string& message);
-		bool								ExecuteString(const std::string& command, std::string& message);
+		bool								ExecuteScript(const std::string& luaFilename);
+		bool								ExecuteString(const std::string& command);
 		void								FreeLevelScripts();
 		void								AddTrigger(LuaFunction* function);
 		void								AddLuaId(int luaId, short itemNumber);
@@ -157,6 +158,7 @@ namespace T5M::Script
 		void								ResetLocalVariables();
 		void								ResetHubVariables();
 		void								ResetGlobalVariables();
+		void								ResetEnvironment();
 		void								PlayAudioTrack(short track);
 		void								ChangeAmbientSoundTrack(short track);
 		bool								ExecuteTrigger(short index);

@@ -1804,7 +1804,6 @@ namespace T5M::Renderer
 
         renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
 #if _DEBUG
-        drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255,255, 255), 0);
         drawAllStrings();
 #endif
         m_swapChain->Present(0, 0);

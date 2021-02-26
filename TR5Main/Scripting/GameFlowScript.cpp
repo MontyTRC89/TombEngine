@@ -100,6 +100,10 @@ namespace T5M::Script
 			level->FileName = std::string(str);
 			free(str);
 
+			const auto position = level->FileName.find('\\');
+			const auto count = level->FileName.rfind('.') - position + 1;
+			level->ScriptFileName = std::string{"Scripts"} + level->FileName.substr(position, count) + std::string{"lua"};
+
 			g_ScriptChunkIO->GetRawStream()->ReadString(&str);
 			level->LoadScreenFileName = std::string(str);
 			free(str);
@@ -410,6 +414,9 @@ namespace T5M::Script
 			}
 
 			GAME_STATUS status;
+
+			g_GameScript->ResetEnvironment();
+			g_GameScript->ExecuteScript(g_GameFlow->Levels[CurrentLevel]->ScriptFileName);
 
 			if (CurrentLevel == 0)
 			{

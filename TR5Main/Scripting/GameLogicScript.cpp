@@ -20,6 +20,7 @@ namespace T5M::Script
 	{
 		m_lua.open_libraries(sol::lib::base);
 		m_lua.set_exception_handler(lua_exception_handler);
+		m_environment = sol::environment{m_lua.lua_state(), sol::create, m_lua.globals()};
 
 		// Settings type
 		m_lua.new_usertype<GameScriptSettings>("GameScriptSettings",
@@ -208,25 +209,25 @@ namespace T5M::Script
 		*/
 	}
 
-	bool GameScript::ExecuteScript(const std::string& luaFilename, std::string& message)
+	bool GameScript::ExecuteScript(const std::string& luaFilename)
 	{ 
-		auto result = m_lua.safe_script_file(luaFilename, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
+		auto result = m_lua.safe_script_file(luaFilename, m_environment, sol::script_pass_on_error);
 		if (!result.valid())
 		{
 			sol::error error = result;
-			message = error.what();
+			std::cout << error.what() << std::endl;
 			return false;
 		}
 		return true;
 	}
 
-	bool GameScript::ExecuteString(const std::string& command, std::string& message)
+	bool GameScript::ExecuteString(const std::string& command)
 	{
-		auto result = m_lua.safe_script(command, sol::environment(m_lua.lua_state(), sol::create, m_lua.globals()), sol::script_pass_on_error);
+		auto result = m_lua.safe_script(command, m_environment, sol::script_pass_on_error);
 		if (!result.valid())
 		{
 			sol::error error = result;
-			message = error.what();
+			std::cout << error.what() << std::endl;
 			return false;
 		}
 		return true;
@@ -385,6 +386,11 @@ namespace T5M::Script
 	void GameScript::ResetGlobalVariables()
 	{
 		m_globals.clear();
+	}
+
+	void GameScript::ResetEnvironment()
+	{
+		m_environment = sol::environment{m_lua.lua_state(), sol::create, m_lua.globals()};
 	}
 
 	std::unique_ptr<GameScriptItem> GameScript::GetItemById(int id)

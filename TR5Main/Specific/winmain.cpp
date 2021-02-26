@@ -32,11 +32,6 @@ HWND WindowsHandle;
 int App_Unk00D9ABFD;
 extern int IsLevelLoading;
 extern GameConfiguration g_Configuration;
-DWORD MainThreadID;
-
-#if _DEBUG
-string commit;
-#endif
 
 void WinProcMsg()
 {
@@ -157,6 +152,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			Debug = true;
 	}
 	LocalFree(argv);
+
+	//Create debug script terminal
+	if (Debug)
+	{
+		AllocConsole();
+
+		HANDLE ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+		int SystemOutput = _open_osfhandle(intptr_t(ConsoleOutput), _O_TEXT);
+		FILE* COutputHandle = _fdopen(SystemOutput, "w");
+		freopen_s(&COutputHandle, "CONOUT$", "w", stdout);
+	}
 
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
