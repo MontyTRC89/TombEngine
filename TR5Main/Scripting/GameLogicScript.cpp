@@ -123,6 +123,9 @@ namespace T5M::Script
 
 		m_lua.set_function("EnableItem", &GameScriptItem::EnableItem);
 		m_lua.set_function("DisableItem", &GameScriptItem::DisableItem);
+		m_lua.set_function("HideItem", &GameScriptItem::HideItem);
+		m_lua.set_function("ShowItem", &GameScriptItem::ShowItem);
+		m_lua.set_function("KillItem", &GameScriptItem::ItemKill);
 
 		m_lua.new_usertype<LuaVariables>("Variable",
 			sol::meta_function::index, &LuaVariables::GetVariable,
@@ -148,7 +151,7 @@ namespace T5M::Script
 		m_lua.set_function("NewPosition", &NewPosition);
 		m_lua.set_function("NewSectorPosition", &NewSectorPosition);
 		m_lua.set_function("NewRotation", &NewRotation);
-		m_lua.set_function("ItemCreate", &ItemCreate);
+		m_lua.set_function("CreateItem", &ItemCreate);
 		m_lua.set_function("CalculateDistance", &CalculateDistance);
 		m_lua.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
@@ -393,28 +396,30 @@ namespace T5M::Script
 		m_environment = sol::environment{m_lua.lua_state(), sol::create, m_lua.globals()};
 	}
 
-	std::unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
+	GameScriptItem GameScript::GetItemById(int id)
 	{
 		if (m_itemsMapId.find(id) == m_itemsMapId.end())
 		{
 			if (WarningsAsErrors)
-				throw "item id not found";
-			return std::unique_ptr<GameScriptItem>(nullptr);
+				throw "Item ID not found";
+
+			return GameScriptItem(Lara.itemNumber);
 		}
 
-		return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
+		return GameScriptItem(m_itemsMapId[id]);
 	}
 
-	std::unique_ptr<GameScriptItem> GameScript::GetItemByName(std::string name)
+	GameScriptItem GameScript::GetItemByName(std::string name)
 	{
 		if (m_itemsMapName.find(name) == m_itemsMapName.end())
 		{
 			if (WarningsAsErrors)
-				throw "item name not found";
-			return std::unique_ptr<GameScriptItem>(nullptr);
+				throw "Item name not found";
+
+			return GameScriptItem(Lara.itemNumber);
 		}
 
-		return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
+		return GameScriptItem(m_itemsMapName[name]);
 	}
 
 	void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags)
@@ -664,47 +669,18 @@ namespace T5M::Script
 		itempos.zPos = pos.GetZPos();
 	}
 
-	void GameScriptItem::MoveItem(int x, int y, int z)
-	{
-		auto& itempos = g_Level.Items[NativeItemNumber].pos;
-
-		int xNew = itempos.xPos + x;
-		if (xNew < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to move item into negative X coordinates");
-			xNew = 0;
-		}
-
-		int zNew = itempos.zPos + z;
-		if (zNew < 0)
-		{
-			if (WarningsAsErrors)
-				throw std::runtime_error("Attempt to move item into negative Z coordinates");
-			zNew = 0;
-		}
-
-		itempos.xPos = xNew;
-		itempos.yPos += y;
-		itempos.zPos = zNew;
-	}
-
 	void GameScriptItem::OrientItem(GameScriptRotation& rot)
 	{
 		auto& itempos = g_Level.Items[NativeItemNumber].pos;
 
-		itempos.xPos = ANGLE(rot.GetXRot());
-		itempos.yPos = ANGLE(rot.GetYRot());
+		itempos.xRot = ANGLE(rot.GetXRot());
+		itempos.yRot = ANGLE(rot.GetYRot());
 		itempos.zRot = ANGLE(rot.GetZRot());
 	}
 
-	void GameScriptItem::RotateItem(float xrot, float yrot, float zrot)
+	void GameScriptItem::MoveItem(int x, int y, int z)
 	{
-		auto& itempos = g_Level.Items[NativeItemNumber].pos;
-
-		itempos.xRot += ANGLE(xrot);
-		itempos.yRot += ANGLE(yrot);
-		itempos.zRot += ANGLE(zrot);
+		TranslateItem(&g_Level.Items[NativeItemNumber], x, y, z);
 	}
 
 	void GameScriptItem::EnableItem()

@@ -90,7 +90,6 @@ namespace T5M::Script
 		void								PositionItem(GameScriptPosition& pos);
 		void								OrientItem(GameScriptRotation& rot);
 		void								MoveItem(int x, int y, int z);
-		void								RotateItem(float xrot, float yrot, float zrot);
 		void								EnableItem();
 		void								DisableItem();
 		void								HideItem();
@@ -131,9 +130,9 @@ namespace T5M::Script
 		LuaMap								m_locals;
 		LuaMap								m_hubs;
 		LuaMap								m_globals;
-		std::map<int, short>						m_itemsMapId;
-		std::map<std::string, short>					m_itemsMapName;
-		std::vector<LuaFunction*>				m_triggers;
+		std::map<int, short>				m_itemsMapId;
+		std::map<std::string, short>		m_itemsMapName;
+		std::vector<LuaFunction*>			m_triggers;
 
 	public:	
 		GameScript();
@@ -166,8 +165,8 @@ namespace T5M::Script
 		int									GetSecretsCount();
 		void								SetSecretsCount(int secretsNum);
 		void								AddOneSecret();
-		std::unique_ptr<GameScriptItem>		GetItemById(int id);
-		std::unique_ptr<GameScriptItem>		GetItemByName(std::string name);
+		GameScriptItem						GetItemById(int id);
+		GameScriptItem						GetItemByName(std::string name);
 		void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 		void								PlaySoundEffect(short id, int flags);
 	};
