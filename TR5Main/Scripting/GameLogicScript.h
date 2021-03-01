@@ -5,6 +5,7 @@
 #include "LEB128.h"
 #include "Streams.h"
 #include "items.h"
+#include "lara_struct.h"
 #include <memory>
 
 #define ITEM_PARAM_currentAnimState			0
@@ -95,6 +96,33 @@ namespace T5M::Script
 		void								HideItem();
 		void								ShowItem();
 		void								ItemKill();
+
+	};
+
+	class GameScriptLara
+	{
+	private:
+		LaraInfo& ref;
+
+	public:
+		GameScriptLara(LaraInfo& l) : ref{ l } {}
+
+		short								GetLaraIndex();
+		short								GetAir();
+		void								SetAir(short air);
+		bool								CanMonkeySwing();
+		bool								IsDucked();
+		bool								IsMoving();
+		bool								IsClimbing();
+		bool								IsBurning();
+		bool                                HasFiredWeapon();
+		int									WaterSurfaceDist();
+		int									GetWaterStatus();
+		int									GetArmsStatus();
+		int									GetCurrentWeapon();
+		int									GetRequestedWeapon();
+		int									GetLastWeapon();
+		void								SetWeapon(int weaponType);
 	};
 
 	using LuaMap = std::map<std::string, sol::object>;
@@ -177,6 +205,15 @@ namespace T5M::Script
 	float								CalculateDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
 	float								CalculateHorizontalDistance(GameScriptPosition& pos1, GameScriptPosition& pos2);
 	GameScriptItem						ItemCreate(short objNum, GameScriptPosition& pos, short roomNum);
+	void								BurnLara();
+	int									InventoryGetQty(short invItem);
+	void								InventorySetQty(short invItem, int qty);
+	void								InventoryAddItem(short invItem, int qty, bool displayAnim);
+	void								InventoryDecreaseItem(short invItem, int qty);
+	void								InventoryRemoveItem(short invItem);
+	bool								InventoryItemPresent(short invItem);
+	void								InventoryCombineItems(short combine1, short combine2); // not implemented
+	void								InventorySeparateItem(short combinedItem); // not implemented
 
 	extern GameScript* g_GameScript;
 }

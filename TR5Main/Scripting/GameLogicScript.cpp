@@ -3,6 +3,8 @@
 #include "GameScript.h"
 #include "GameFlowScript.h"
 #include "items.h"
+#include "traps.h"
+#include "health.h"
 #include "box.h"
 #include "lara.h"
 #include "savegame.h"
@@ -146,6 +148,24 @@ namespace T5M::Script
 			"PlaySoundEffectAtPosition", &GameScript::PlaySoundEffectAtPosition
 			);*/
 
+		m_lua.new_usertype<GameScriptLara>("Lara",
+			"Index", sol::property(&GameScriptLara::GetLaraIndex),
+			"Air", sol::property(&GameScriptLara::GetAir, &GameScriptLara::SetAir),
+			"CanMonkeySwing", sol::property(&GameScriptLara::CanMonkeySwing),
+			"IsDucked", sol::property(&GameScriptLara::IsDucked),
+			"IsMoving", sol::property(&GameScriptLara::IsMoving),
+			"IsClimbing", sol::property(&GameScriptLara::IsClimbing),
+			"IsBurning", sol::property(&GameScriptLara::IsBurning),
+			"HasFiredWeapon", sol::property(&GameScriptLara::HasFiredWeapon),
+			"WaterSurfaceDistance", sol::property(&GameScriptLara::WaterSurfaceDist),
+			"WaterStatus", sol::property(&GameScriptLara::GetWaterStatus),
+			"HandStatus", sol::property(&GameScriptLara::GetArmsStatus),
+			"CurrentWeapon", sol::property(&GameScriptLara::GetCurrentWeapon),
+			"RequestWeapon", sol::property(&GameScriptLara::GetRequestedWeapon, &GameScriptLara::SetWeapon),
+			"LastWeapon", sol::property(&GameScriptLara::GetLastWeapon)
+			);
+
+		m_lua.set_function("AddLuaName", &GameScript::AddLuaName);
 		m_lua.set_function("GetItemByID", &GameScript::GetItemById);
 		m_lua.set_function("GetItemByName", &GameScript::GetItemByName);
 		m_lua.set_function("NewPosition", &NewPosition);
@@ -154,6 +174,13 @@ namespace T5M::Script
 		m_lua.set_function("CreateItem", &ItemCreate);
 		m_lua.set_function("CalculateDistance", &CalculateDistance);
 		m_lua.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
+		m_lua.set_function("BurnLara", &BurnLara);
+		m_lua.set_function("InventorySetQty", &InventorySetQty);
+		m_lua.set_function("InventoryGetQty", &InventoryGetQty);
+		m_lua.set_function("InventoryAddItem", &InventoryAddItem);
+		m_lua.set_function("InventoryDecreaseItem", &InventoryDecreaseItem);
+		m_lua.set_function("InventoryRemoveItem", &InventoryRemoveItem);
+		m_lua.set_function("InventoryItemPresent", &InventoryItemPresent);
 
 		// Add global variables and namespaces
 		//m_lua["TR"] = this;
@@ -790,6 +817,108 @@ namespace T5M::Script
 		}
 	}
 
+	short GameScriptLara::GetLaraIndex()
+	{
+		return ref.itemNumber;
+	}
+
+	short GameScriptLara::GetAir()
+	{
+		return ref.air;
+	}
+
+	void GameScriptLara::SetAir(short air)
+	{
+		if (air < 0 || air > 1800) // max air could be customizable?
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid air amount");
+
+			if (air < 0)
+				air = 0;
+			else if (air > 1800)
+				air = 1800;
+		}
+
+		ref.air = air;
+	}
+
+	bool GameScriptLara::CanMonkeySwing()
+	{
+		return ref.canMonkeySwing;
+	}
+
+	bool GameScriptLara::IsDucked()
+	{
+		return ref.isDucked;
+	}
+
+	bool GameScriptLara::IsMoving()
+	{
+		return ref.isMoving;
+	}
+
+	bool GameScriptLara::IsClimbing()
+	{
+		return ref.isClimbing;
+	}
+
+	bool GameScriptLara::IsBurning()
+	{
+		return ref.burn;
+	}
+
+	bool GameScriptLara::HasFiredWeapon()
+	{
+		return ref.hasFired;
+	}
+
+	int GameScriptLara::WaterSurfaceDist()
+	{
+		return ref.waterSurfaceDist;
+	}
+
+	int GameScriptLara::GetWaterStatus()
+	{
+		return static_cast<int>(ref.waterStatus);
+	}
+
+	int GameScriptLara::GetArmsStatus()
+	{
+		return static_cast<int>(ref.gunStatus);
+	}
+
+	int GameScriptLara::GetCurrentWeapon()
+	{
+		return static_cast<int>(ref.gunType);
+	}
+
+	int GameScriptLara::GetRequestedWeapon()
+	{
+		return static_cast<int>(ref.requestGunType);
+	}
+
+	int GameScriptLara::GetLastWeapon()
+	{
+		return static_cast<int>(ref.lastGunType);
+	}
+
+	void GameScriptLara::SetWeapon(int weaponType)
+	{
+		if (weaponType < 0 || weaponType >= NUM_WEAPONS)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid weapon type");
+
+			if (weaponType < 0)
+				weaponType = 0;
+			else if (weaponType >= NUM_WEAPONS)
+				weaponType = NUM_WEAPONS - 1;
+		}
+
+		ref.requestGunType = static_cast<LARA_WEAPON_TYPE>(weaponType);
+	}
+
 	LuaVariables::LuaVariables(LuaMap& map) : m_map{map}
 	{
 
@@ -908,5 +1037,196 @@ namespace T5M::Script
 		InitialiseItem(itemIndex);
 
 		return GameScriptItem(itemIndex);
+	}
+
+	void BurnLara()
+	{
+		LaraBurn();
+	}
+
+	int* GetInventoryReference(short invItem)
+	{
+		if (invItem == ID_SMALLMEDI_ITEM) { return &Lara.NumSmallMedipacks; }
+		if (invItem == ID_BIGMEDI_ITEM) { return &Lara.NumLargeMedipacks; }
+		if (invItem == ID_FLARE_INV_ITEM) { return &Lara.NumFlares; }
+		if (invItem >= ID_PUZZLE_ITEM1 && invItem <= ID_PUZZLE_ITEM16) { return &Lara.Puzzles[invItem - ID_PUZZLE_ITEM1]; }
+		if (invItem >= ID_PUZZLE_ITEM1_COMBO1 && invItem <= ID_PUZZLE_ITEM16_COMBO2) { return &Lara.PuzzlesCombo[invItem - ID_PUZZLE_ITEM1_COMBO1]; }
+		if (invItem >= ID_KEY_ITEM1 && invItem <= ID_KEY_ITEM16) { return &Lara.Keys[invItem - ID_KEY_ITEM1]; }
+		if (invItem >= ID_KEY_ITEM1_COMBO1 && invItem <= ID_KEY_ITEM16_COMBO2) { return &Lara.KeysCombo[invItem - ID_KEY_ITEM1_COMBO1]; }
+		if (invItem >= ID_PICKUP_ITEM1 && invItem <= ID_PICKUP_ITEM16) { return &Lara.Pickups[invItem - ID_PICKUP_ITEM1]; }
+		if (invItem >= ID_PICKUP_ITEM1_COMBO1 && invItem <= ID_PICKUP_ITEM16_COMBO2) { return &Lara.PickupsCombo[invItem - ID_PICKUP_ITEM1_COMBO1]; }
+		if (invItem >= ID_EXAMINE1 && invItem <= ID_EXAMINE8) { return &Lara.Examines[invItem - ID_EXAMINE1]; }
+		if (invItem >= ID_EXAMINE1_COMBO1 && invItem <= ID_EXAMINE8_COMBO2) { return &Lara.ExaminesCombo[invItem - ID_EXAMINE1_COMBO1]; }
+
+		return nullptr; // if item doesn't match any of above
+	}
+
+	int InventoryGetQty(short invItem)
+	{
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+			return *invRef;
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			return int(Lara.Lasersight);
+		else if (invItem == ID_BINOCULARS_ITEM)
+			return int(Lara.Binoculars);
+		else if (invItem == ID_CROWBAR_ITEM)
+			return int(Lara.Crowbar);
+		else if (invItem == ID_SILENCER_ITEM)
+			return int(Lara.Silencer);
+	
+		if (WarningsAsErrors)
+			throw std::runtime_error("Invalid inventory item");
+		return 0;
+	}
+
+	void InventorySetQty(short invItem, int qty)
+	{
+		if (qty < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid item quantity");
+			return;
+		}
+
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+		{
+			*invRef = qty;
+			return;
+		}
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			Lara.Lasersight = bool(qty);
+		else if (invItem == ID_BINOCULARS_ITEM)
+			Lara.Binoculars = bool(qty);
+		else if (invItem == ID_CROWBAR_ITEM)
+			Lara.Crowbar = bool(qty);
+		else if (invItem == ID_SILENCER_ITEM)
+			Lara.Silencer = bool(qty);
+		else
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid inventory item");
+		}
+	}
+
+	void InventoryAddItem(short invItem, int qty, bool displayAnim)
+	{
+		if (qty < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid item quantity");
+			return;
+		}
+
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+			*invRef += qty;
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			Lara.Lasersight = (Lara.Lasersight || qty);
+		else if (invItem == ID_BINOCULARS_ITEM)
+			Lara.Binoculars = (Lara.Binoculars || qty);
+		else if (invItem == ID_CROWBAR_ITEM)
+			Lara.Crowbar = (Lara.Crowbar || qty);
+		else if (invItem == ID_SILENCER_ITEM)
+			Lara.Silencer = (Lara.Silencer || qty);
+		else if (!invRef)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid inventory item");
+			return;
+		}
+
+		if (displayAnim)
+			AddDisplayPickup(invItem);
+	}
+
+	void InventoryDecreaseItem(short invItem, int qty)
+	{
+		if (qty < 0)
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid item quantity");
+			return;
+		}
+
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+		{
+			int amount = *invRef - qty;
+			*invRef = (amount >= 0) ? amount : 0;
+			return;
+		}
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			Lara.Lasersight = (Lara.Lasersight && !qty);
+		else if (invItem == ID_BINOCULARS_ITEM)
+			Lara.Binoculars = (Lara.Binoculars && !qty);
+		else if (invItem == ID_CROWBAR_ITEM)
+			Lara.Crowbar = (Lara.Crowbar && !qty);
+		else if (invItem == ID_SILENCER_ITEM)
+			Lara.Silencer = (Lara.Silencer && !qty);
+		else
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid inventory item");
+		}
+	}
+
+	void InventoryRemoveItem(short invItem)
+	{
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+		{
+			*invRef = 0;
+			return;
+		}
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			Lara.Lasersight = false;
+		else if (invItem == ID_BINOCULARS_ITEM)
+			Lara.Binoculars = false;
+		else if (invItem == ID_CROWBAR_ITEM)
+			Lara.Crowbar = false;
+		else if (invItem == ID_SILENCER_ITEM)
+			Lara.Silencer = false;
+		else
+		{
+			if (WarningsAsErrors)
+				throw std::runtime_error("Invalid inventory item");
+		}
+	}
+
+	bool InventoryItemPresent(short invItem)
+	{
+		int* invRef = GetInventoryReference(invItem);
+		if (invRef)
+			return (*invRef > 0);
+
+		if (invItem == ID_LASERSIGHT_ITEM)
+			return Lara.Lasersight;
+		else if (invItem == ID_BINOCULARS_ITEM)
+			return Lara.Binoculars;
+		else if (invItem == ID_CROWBAR_ITEM)
+			return Lara.Crowbar;
+		else if (invItem == ID_SILENCER_ITEM)
+			return Lara.Silencer;
+		
+		if (WarningsAsErrors)
+			throw std::runtime_error("Invalid inventory item");
+		return false;
+	}
+
+	void InventoryCombineItems(short combine1, short combine2)
+	{
+		// TODO: implement
+	}
+
+	void InventorySeparateItem(short combinedItem)
+	{
+		//TODO: implement
 	}
 }
