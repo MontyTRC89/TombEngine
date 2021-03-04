@@ -10,6 +10,7 @@
 #include <array>
 #include <d3d11.h>
 #include <SimpleMath.h>
+#define SOL_USING_CXX_LUA 1
 #include <sol.hpp>
 #include "memory/malloc.h"
 #include "Game/debug/debug.h"

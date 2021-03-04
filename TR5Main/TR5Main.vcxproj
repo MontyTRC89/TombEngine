@@ -79,7 +79,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
@@ -168,6 +168,34 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\smoke.h" />
     <ClInclude Include="Game\spark.h" />
+    <ClInclude Include="Libs\lua\lapi.h" />
+    <ClInclude Include="Libs\lua\lauxlib.h" />
+    <ClInclude Include="Libs\lua\lcode.h" />
+    <ClInclude Include="Libs\lua\lctype.h" />
+    <ClInclude Include="Libs\lua\ldebug.h" />
+    <ClInclude Include="Libs\lua\ldo.h" />
+    <ClInclude Include="Libs\lua\lfunc.h" />
+    <ClInclude Include="Libs\lua\lgc.h" />
+    <ClInclude Include="Libs\lua\ljumptab.h" />
+    <ClInclude Include="Libs\lua\llex.h" />
+    <ClInclude Include="Libs\lua\llimits.h" />
+    <ClInclude Include="Libs\lua\lmem.h" />
+    <ClInclude Include="Libs\lua\lobject.h" />
+    <ClInclude Include="Libs\lua\lopcodes.h" />
+    <ClInclude Include="Libs\lua\lopnames.h" />
+    <ClInclude Include="Libs\lua\lparser.h" />
+    <ClInclude Include="Libs\lua\lprefix.h" />
+    <ClInclude Include="Libs\lua\lstate.h" />
+    <ClInclude Include="Libs\lua\lstring.h" />
+    <ClInclude Include="Libs\lua\ltable.h" />
+    <ClInclude Include="Libs\lua\ltm.h" />
+    <ClInclude Include="Libs\lua\lua.h" />
+    <ClInclude Include="Libs\lua\lua.hpp" />
+    <ClInclude Include="Libs\lua\luaconf.h" />
+    <ClInclude Include="Libs\lua\lualib.h" />
+    <ClInclude Include="Libs\lua\lundump.h" />
+    <ClInclude Include="Libs\lua\lvm.h" />
+    <ClInclude Include="Libs\lua\lzio.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
     <ClInclude Include="Objects\Generic\Object\generic_bridge.h" />
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
@@ -190,10 +218,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\bass\bassmix.h" />
     <ClInclude Include="Libs\bass\bass_fx.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.h" />
-    <ClInclude Include="Libs\lua\lauxlib.h" />
-    <ClInclude Include="Libs\lua\lua.h" />
-    <ClInclude Include="Libs\lua\luaconf.h" />
-    <ClInclude Include="Libs\lua\lualib.h" />
     <ClInclude Include="Libs\sol2\sol.hpp" />
     <ClInclude Include="Libs\zlib\ioapi.h" />
     <ClInclude Include="Libs\zlib\unzip.h" />
@@ -469,6 +493,105 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
     <ClCompile Include="Game\spark.cpp" />
+    <ClCompile Include="Libs\lua\lapi.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lauxlib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lbaselib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lcode.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lcorolib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lctype.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ldblib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ldebug.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ldo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ldump.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lfunc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lgc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\linit.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\liolib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\llex.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lmathlib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lmem.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\loadlib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lobject.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lopcodes.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\loslib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lparser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lstate.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lstring.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lstrlib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ltable.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ltablib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\ltm.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\luac.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lundump.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lutf8lib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lvm.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libs\lua\lzio.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_bridge.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />
