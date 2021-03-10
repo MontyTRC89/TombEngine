@@ -41,6 +41,25 @@ struct TEXTURE
 	std::vector<byte> normalMapData;
 };
 
+struct ANIMATED_TEXTURES_FRAME
+{
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	float x3;
+	float y3;
+	float x4;
+	float y4;
+};
+
+struct ANIMATED_TEXTURES_SEQUENCE
+{
+	int atlas;
+	int numFrames;
+	std::vector<ANIMATED_TEXTURES_FRAME> frames;
+};
+
 struct AIOBJECT
 {
 	short objectNumber;
@@ -117,6 +136,7 @@ struct LEVEL
 	std::vector<TEXTURE> RoomTextures;
 	std::vector<TEXTURE> MoveablesTextures;
 	std::vector<TEXTURE> StaticsTextures;
+	std::vector<TEXTURE> AnimatedTextures;
 	std::vector<TEXTURE> SpritesTextures;
 	TEXTURE MiscTextures;
 	std::vector<ROOM_INFO> Rooms;
@@ -137,6 +157,7 @@ struct LEVEL
 	std::vector<int> Zones[MAX_ZONES][2];
 	std::vector<short> SoundMap;
 	std::vector<SAMPLE_INFO> SoundDetails;
+	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
 	int NumItems;
 	int NumSpritesSequences;
 };

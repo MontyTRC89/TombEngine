@@ -453,6 +453,30 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	g_Level.AnimatedTextures.reserve(numTextures);
+	for (int i = 0; i < numTextures; i++)
+	{
+		TEXTURE texture;
+
+		texture.width = ReadInt32();
+		texture.height = ReadInt32();
+
+		size = ReadInt32();
+		texture.colorMapData.resize(size);
+		ReadBytes(texture.colorMapData.data(), size);
+
+		bool hasNormalMap = ReadInt8();
+		if (hasNormalMap)
+		{
+			size = ReadInt32();
+			texture.normalMapData.resize(size);
+			ReadBytes(texture.normalMapData.data(), size);
+		}
+
+		g_Level.AnimatedTextures.push_back(texture);
+	}
+
+	numTextures = ReadInt32();
 	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -690,7 +714,9 @@ void FreeLevel()
 	g_Level.RoomTextures.clear();
 	g_Level.MoveablesTextures.clear();
 	g_Level.StaticsTextures.clear();
+	g_Level.AnimatedTextures.clear();
 	g_Level.SpritesTextures.clear();
+	g_Level.AnimatedTexturesSequences.clear();
 	g_Level.Rooms.clear(); 
 	g_Level.ObjectTextures.clear();
 	g_Level.Bones.clear();
@@ -740,8 +766,29 @@ void LoadAnimatedTextures()
 {
 	NumAnimatedTextures = ReadInt32();
 	
-	AnimTextureRanges = game_malloc<short>(NumAnimatedTextures);
-	ReadBytes(AnimTextureRanges, NumAnimatedTextures * sizeof(short));
+	/*AnimTextureRanges = game_malloc<short>(NumAnimatedTextures);
+	ReadBytes(AnimTextureRanges, NumAnimatedTextures * sizeof(short));*/
+
+	for (int i = 0; i < NumAnimatedTextures; i++)
+	{
+		ANIMATED_TEXTURES_SEQUENCE sequence;
+		sequence.atlas = ReadInt32();
+		sequence.numFrames = ReadInt32();
+		for (int j = 0; j < sequence.numFrames; j++)
+		{
+			ANIMATED_TEXTURES_FRAME frame;
+			frame.x1 = ReadFloat();
+			frame.y1 = ReadFloat();
+			frame.x2 = ReadFloat();
+			frame.y2 = ReadFloat();
+			frame.x3 = ReadFloat();
+			frame.y3 = ReadFloat();
+			frame.x4 = ReadFloat();
+			frame.y4 = ReadFloat();
+			sequence.frames.push_back(frame);
+		}
+		g_Level.AnimatedTexturesSequences.push_back(sequence);
+	}
 	
 	nAnimUVRanges = ReadInt8();
 }
