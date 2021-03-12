@@ -200,6 +200,8 @@ void LoadObjects()
 				POLYGON poly;
 
 				poly.shape = ReadInt32();
+				poly.animatedSequence = ReadInt32();
+				poly.animatedFrame = ReadInt32();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
@@ -541,6 +543,8 @@ void ReadRooms()
 				POLYGON poly;
 				
 				poly.shape = ReadInt32();
+				poly.animatedSequence = ReadInt32();
+				poly.animatedFrame = ReadInt32();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
