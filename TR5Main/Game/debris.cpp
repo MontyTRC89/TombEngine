@@ -41,8 +41,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
 	fragmentsMesh = g_Renderer.getMesh(0);
-	for (int bucket = RENDERER_BUCKET_SOLID; bucket <= RENDERER_BUCKET_TRANSPARENT; bucket++) {
-		RendererBucket renderBucket = fragmentsMesh->Buckets[bucket];
+	for (auto& renderBucket : fragmentsMesh->buckets) {
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
 		{
@@ -52,9 +51,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 			}
 			if (!fragment->active) {
 				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
-				RendererVertex vtx0 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i]);
-				RendererVertex vtx1 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i + 1]);
-				RendererVertex vtx2 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i + 2]);
+				RendererVertex vtx0 = meshVertices->at(renderBucket.Indices[i]);
+				RendererVertex vtx1 = meshVertices->at(renderBucket.Indices[i + 1]);
+				RendererVertex vtx2 = meshVertices->at(renderBucket.Indices[i + 2]);
 				//Take the average of all 3 local positions
 				Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
 				vtx0.Position -= localPos;
@@ -65,7 +64,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->mesh.vertices[0] = vtx0;
 				fragment->mesh.vertices[1] = vtx1;
 				fragment->mesh.vertices[2] = vtx2;
-				fragment->mesh.bucket = (RENDERER_BUCKETS)bucket;
+				fragment->mesh.blendMode = renderBucket.blendMode;
 				fragment->active = true;
 				fragment->terminalVelocity = 1024;
 				fragment->gravity = Vector3(0, 7, 0);

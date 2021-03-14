@@ -930,6 +930,18 @@
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\RendererBucket.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererVertex.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererPolygon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">

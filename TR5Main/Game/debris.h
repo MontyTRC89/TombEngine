@@ -3,7 +3,7 @@
 #include <Renderer11.h>
 #include <newtypes.h>
 #include <level.h>
-
+#include "RendererVertex.h"
 #define MAX_DEBRIS 256
 
 typedef struct ILIGHT
@@ -41,7 +41,7 @@ typedef struct ShatterImpactInfo
 
 typedef struct DebrisMesh
 {
-	RENDERER_BUCKETS bucket;
+	BLEND_MODES blendMode;
 	std::array<T5M::Renderer::RendererVertex, 3> vertices;
 };
 
