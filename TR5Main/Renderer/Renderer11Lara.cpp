@@ -202,6 +202,9 @@ void Renderer11::updateLaraAnimations(bool force)
 
 void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool shadowMap)
 {
+	if (transparent)
+		if (shadowMap)
+			return;
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
 		return;
@@ -267,15 +270,17 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 	{
 		RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
 
-		for (int j = firstBucket; j < lastBucket; j++)
+		for (auto& bucket : mesh->buckets)
 		{
-			RendererBucket *bucket = &mesh->Buckets[j];
 
-			if (bucket->Vertices.size() == 0)
+			if (bucket.Vertices.size() == 0)
+				continue;
+			
+			if (transparent && bucket.blendMode == 0)
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}
@@ -289,15 +294,17 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 		{
 			RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
 
-			for (int j = firstBucket; j < lastBucket; j++)
+			for (auto& bucket : mesh->buckets)
 			{
-				RendererBucket *bucket = &mesh->Buckets[j];
 
-				if (bucket->Vertices.size() == 0)
+				if (bucket.Vertices.size() == 0)
+					continue;
+
+				if (transparent && bucket.blendMode == 0)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 				m_numDrawCalls++;
 			}
 		}
@@ -326,15 +333,17 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 		{
 			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
 
-			for (int j = firstBucket; j < lastBucket; j++)
+			for (auto& bucket : mesh->buckets)
 			{
-				RendererBucket* bucket = &mesh->Buckets[j];
 
-				if (bucket->Vertices.size() == 0)
+				if (bucket.Vertices.size() == 0)
+					continue;
+
+				if (transparent && bucket.blendMode == 0)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 				m_numDrawCalls++;
 			}
 		}	
@@ -353,36 +362,51 @@ void Renderer11::drawLaraHolsters(bool transparent)
 	if(m_moveableObjects[static_cast<int>(leftHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
-		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
+		for (auto& bucket : mesh->buckets)
+		{
+
+			if (bucket.Vertices.size() == 0)
 				continue;
+
+			if (transparent && bucket.blendMode == 0)
+				continue;
+
 			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}
 	if(m_moveableObjects[static_cast<int>(rightHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
-		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
+		for (auto& bucket : mesh->buckets)
+		{
+
+			if (bucket.Vertices.size() == 0)
 				continue;
+
+			if (transparent && bucket.blendMode == 0)
+				continue;
+
 			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}
 	if(backHolsterID != HOLSTER_SLOT::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
-		for(int j = firstBucket; j < lastBucket; j++){
-			RendererBucket* bucket = &mesh->Buckets[j];
-			if(bucket->Vertices.size() == 0)
+		for (auto& bucket : mesh->buckets)
+		{
+
+			if (bucket.Vertices.size() == 0)
 				continue;
+
+			if (transparent && bucket.blendMode == 0)
+				continue;
+
 			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}

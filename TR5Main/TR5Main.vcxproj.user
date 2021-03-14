@@ -8,7 +8,8 @@
     <LocalDebuggerCommand>Tr5Main.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\Build\</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerCommandArguments>/debug</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>TR5Main.exe</LocalDebuggerCommand>

@@ -87,75 +87,6 @@ namespace T5M::Renderer
 		*/
 	}
 
-	void Renderer11::updateAnimatedTextures()
-	{
-		// Update room's animated textures
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
-			if (m_rooms.size() <= i)
-				continue;
-			RendererRoom &const room = m_rooms[i];
-
-			for (int bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
-			{
-				RendererBucket *bucket = &room.AnimatedBuckets[bucketIndex];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				for (int p = 0; p < bucket->Polygons.size(); p++)
-				{
-					RendererPolygon *polygon = &bucket->Polygons[p];
-					RendererAnimatedTextureSet &const set = m_animatedTextureSets[polygon->AnimatedSet];
-					int textureIndex = -1;
-					for (int j = 0; j < set.NumTextures; j++)
-					{
-						if (set.Textures[j].Id == polygon->TextureId)
-						{
-							textureIndex = j;
-							break;
-						}
-					}
-					if (textureIndex == -1)
-						continue;
-
-					if (textureIndex == set.NumTextures - 1)
-						textureIndex = 0;
-					else
-						textureIndex++;
-
-					polygon->TextureId = set.Textures[textureIndex].Id;
-
-					/*for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
-					{
-						bucket->Vertices[polygon->Indices[v]].UV.x = set.Textures[textureIndex].UV[v].x;
-						bucket->Vertices[polygon->Indices[v]].UV.y = set.Textures[textureIndex].UV[v].y;
-					}*/
-				}
-			}
-		}
-
-		// Update waterfalls textures
-		/*for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++) {
-			OBJECT_INFO* obj = &Objects[i];
-
-			if (obj->loaded) {
-				RendererObject* waterfall = m_moveableObjects[i];
-
-				for (int m = 0; m < waterfall->ObjectMeshes.size(); m++) {
-					RendererMesh* mesh = waterfall->ObjectMeshes[m];
-					RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_TRANSPARENT_DS];
-
-					for (int v = 0; v < bucket->Vertices.size(); v++) {
-						RendererVertex* vertex = &bucket->Vertices[v];
-						int y = vertex->UV.y * TEXTURE_ATLAS_SIZE + 64;
-						y %= 128;
-						vertex->UV.y = (float)y / TEXTURE_ATLAS_SIZE;
-					}
-				}
-			}
-		}*/
-	}
 
 	void Renderer11::updateEffects(RenderView& view)
 	{
@@ -484,18 +415,13 @@ namespace T5M::Renderer
 		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
 			BUCKET *levelBucket = &meshPtr->buckets[n];
-			RendererBucket *bucket;
+			RendererBucket bucket{};
 			int bucketIndex;
-
-			if (levelBucket->blendMode != 0)
-				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-			else
-				bucketIndex = RENDERER_BUCKET_SOLID;
-
-			bucket = &mesh->Buckets[bucketIndex];
-			
-			bucket->Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-			bucket->Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+			bucket.animated = levelBucket->animated;
+			bucket.texture = levelBucket->texture;
+			bucket.blendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
+			bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+			bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 
 			int lastVertex = 0;
 			int lastIndex = 0;
@@ -533,17 +459,17 @@ namespace T5M::Renderer
 					/*if (isHairs)
 						vertex.Bone = v;*/
 
-					bucket->Vertices[lastVertex++] = vertex;
+					bucket.Vertices[lastVertex++] = vertex;
 				}
 
 				if (poly->shape == 0)
 				{
-					bucket->Indices[lastIndex++] = baseVertices;
-					bucket->Indices[lastIndex++] = baseVertices + 1;
-					bucket->Indices[lastIndex++] = baseVertices + 3;
-					bucket->Indices[lastIndex++] = baseVertices + 2;
-					bucket->Indices[lastIndex++] = baseVertices + 3;
-					bucket->Indices[lastIndex++] = baseVertices + 1;
+					bucket.Indices[lastIndex++] = baseVertices;
+					bucket.Indices[lastIndex++] = baseVertices + 1;
+					bucket.Indices[lastIndex++] = baseVertices + 3;
+					bucket.Indices[lastIndex++] = baseVertices + 2;
+					bucket.Indices[lastIndex++] = baseVertices + 3;
+					bucket.Indices[lastIndex++] = baseVertices + 1;
 
 					/*bucket->Indices.push_back(baseVertices);
 					bucket->Indices.push_back(baseVertices + 1);
@@ -554,15 +480,16 @@ namespace T5M::Renderer
 				}
 				else
 				{
-					bucket->Indices[lastIndex++] = baseVertices;
-					bucket->Indices[lastIndex++] = baseVertices + 1;
-					bucket->Indices[lastIndex++] = baseVertices + 2;
+					bucket.Indices[lastIndex++] = baseVertices;
+					bucket.Indices[lastIndex++] = baseVertices + 1;
+					bucket.Indices[lastIndex++] = baseVertices + 2;
 					
 					/*bucket->Indices.push_back(baseVertices);
 					bucket->Indices.push_back(baseVertices + 1);
 					bucket->Indices.push_back(baseVertices + 2);*/
 				}
 			}
+			mesh->buckets.push_back(bucket);
 		}
 
 		m_meshes.push_back(mesh);
@@ -570,22 +497,8 @@ namespace T5M::Renderer
 		return mesh;
 	}
 
-	int Renderer11::getAnimatedTextureInfo(short textureId)
-	{
-		for (int i = 0; i < m_numAnimatedTextureSets; i++)
-		{
-			RendererAnimatedTextureSet &const set = m_animatedTextureSets[i];
-			for (int j = 0; j < set.NumTextures; j++)
-			{
-				if (set.Textures[j].Id == textureId)
-					return i;
-			}
-		}
 
-		return -1;
-	}
-	bool Renderer11::isFullsScreen()
-{
+	bool Renderer11::isFullsScreen() {
 		return (!Windowed);
 	}
 	bool Renderer11::isFading()

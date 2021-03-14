@@ -8,8 +8,9 @@
 #include "ConstantBuffers/ShadowLightBuffer.h"
 #include "ConstantBuffers/RoomBuffer.h"
 #include "ConstantBuffers/ItemBuffer.h"
+#include "ConstantBuffers/AnimatedBuffer.h"
 #include "Frustum.h"
-
+#include "RendererBucket.h"
 #include "items.h"
 #include "effect.h"
 #include "IndexBuffer/IndexBuffer.h"
@@ -59,22 +60,6 @@ namespace T5M::Renderer
 		std::vector<RendererDisplayMode> DisplayModes;
 	};
 	
-	struct RendererVertex
-	{
-		DirectX::SimpleMath::Vector3 Position;
-		DirectX::SimpleMath::Vector3 Normal;
-		DirectX::SimpleMath::Vector2 UV;
-		DirectX::SimpleMath::Vector4 Color;
-		DirectX::SimpleMath::Vector3 Tangent;
-		DirectX::SimpleMath::Vector3 BiTangent;
-		float Bone;
-		int IndexInPoly;
-		int OriginalIndex;
-	};
-	
-	
-	
-	
 	struct RendererHUDBar
 	{
 		VertexBuffer vertexBufferBorder;
@@ -100,15 +85,6 @@ namespace T5M::Renderer
 		int Flags;
 		std::wstring String;
 		DirectX::SimpleMath::Vector3 Color;
-	};
-	
-	struct RendererPolygon 
-	{
-		byte Shape;
-		int AnimatedSet;
-		int TextureId;
-		int Distance;
-		int Indices[4];
 	};
 	
 	struct RendererBone 
@@ -147,7 +123,6 @@ namespace T5M::Renderer
 	
 	struct RendererAnimatedTexture 
 	{
-		int Id;
 		DirectX::SimpleMath::Vector2 UV[4];
 	};
 	
@@ -157,16 +132,7 @@ namespace T5M::Renderer
 		std::vector<RendererAnimatedTexture> Textures;
 	};
 	
-	struct RendererBucket
-	{
-		std::vector<RendererVertex> Vertices;
-		std::vector<int> Indices;
-		std::vector<RendererPolygon> Polygons;
-		std::vector<RendererPolygon> AnimatedPolygons;
-		int StartVertex;
-		int StartIndex;
-		int NumTriangles;
-	};
+
 	
 	struct RendererStatic
 	{
@@ -180,8 +146,7 @@ namespace T5M::Renderer
 	{
 		ROOM_INFO* Room;
 		DirectX::SimpleMath::Vector4 AmbientLight;
-		RendererBucket Buckets[NUM_BUCKETS];
-		RendererBucket AnimatedBuckets[NUM_BUCKETS];
+		std::vector<RendererBucket> buckets;
 		std::vector<RendererLight> Lights;
 		std::vector<RendererStatic> Statics;
 		bool Visited;
@@ -213,8 +178,7 @@ namespace T5M::Renderer
 	struct RendererMesh
 	{
 		BoundingSphere Sphere;
-		RendererBucket Buckets[NUM_BUCKETS];
-		RendererBucket AnimatedBuckets[NUM_BUCKETS];
+		std::vector<RendererBucket> buckets;
 		std::vector<DirectX::SimpleMath::Vector3> Positions;
 	};
 	
@@ -357,6 +321,7 @@ namespace T5M::Renderer
 		T5M::Renderer::RenderTargetCube m_reflectionCubemap;
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psRooms;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsItems;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psItems;
@@ -396,6 +361,8 @@ namespace T5M::Renderer
 		ConstantBuffer<CMiscBuffer> m_cbMisc;
 		CRoomBuffer m_stRoom;
 		ConstantBuffer<CRoomBuffer> m_cbRoom;
+		CAnimatedBuffer m_stAnimated;
+		ConstantBuffer<CAnimatedBuffer> m_cbAnimated;
 		CShadowLightBuffer m_stShadowMap;
 		ConstantBuffer<CShadowLightBuffer> m_cbShadowMap;
 		CHUDBuffer m_stHUD;
@@ -440,6 +407,7 @@ namespace T5M::Renderer
 		std::vector<RendererLight*> m_dynamicLights;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
+		std::vector<RendererBucket*> m_bucketsToDraw;
 		int m_nextSprite;
 		RendererLine3D* m_lines3DBuffer;
 		int m_nextLine3D;
@@ -463,6 +431,7 @@ namespace T5M::Renderer
 		bool m_firstUnderwaterDustParticles = true;
 		std::vector<RendererMesh*> m_meshes;
 		std::vector<TexturePair> m_roomTextures;
+		std::vector<TexturePair> m_animatedTextures;
 		std::vector<TexturePair> m_moveablesTextures;
 		std::vector<TexturePair> m_staticsTextures;
 		std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
@@ -496,7 +465,6 @@ namespace T5M::Renderer
 	
 		// Private functions
 		void drawAllStrings();
-		int getAnimatedTextureInfo(short textureId);
 		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
 		void fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void buildHierarchy(RendererObject* obj);
@@ -555,7 +523,6 @@ namespace T5M::Renderer
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
-		void updateAnimatedTextures();
 		void createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
 		void drawShockwaves(RenderView& view);
 		void drawRipples(RenderView& view);

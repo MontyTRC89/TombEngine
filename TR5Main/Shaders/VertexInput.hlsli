@@ -6,4 +6,7 @@ struct VertexShaderInput {
 	float3 Tangent: TANGENT0;
 	float3 Bitangent: BITANGENT0;
 	float Bone: BLENDINDICES;
+	uint PolyIndex : POLYINDEX;
+	uint Index: DRAWINDEX;
+	int Hash : HASH;
 };
