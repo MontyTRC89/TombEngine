@@ -445,10 +445,10 @@ namespace T5M::Renderer {
 			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-			for (int b = 0; b < NUM_BUCKETS; b++) {
-				RendererBucket* flashBucket = &flashMesh->Buckets[b];
-
-				if (flashBucket->Vertices.size() != 0) {
+			for (auto& flashBucket : flashMesh->buckets) {
+				if (flashBucket.blendMode == 0)
+					continue;
+				if (flashBucket.Vertices.size() != 0) {
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
@@ -461,7 +461,7 @@ namespace T5M::Renderer {
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 						m_numDrawCalls++;
 					}
 
@@ -474,7 +474,7 @@ namespace T5M::Renderer {
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 						m_numDrawCalls++;
 					}
 				}
@@ -533,10 +533,10 @@ namespace T5M::Renderer {
 
 				RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-				for (int b = 0; b < NUM_BUCKETS; b++) {
-					RendererBucket* flashBucket = &flashMesh->Buckets[b];
-
-					if (flashBucket->Vertices.size() != 0) {
+				for (auto& flashBucket : flashMesh->buckets) {
+					if (flashBucket.blendMode == 0)
+						continue;
+					if (flashBucket.Vertices.size() != 0) {
 						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
@@ -550,7 +550,7 @@ namespace T5M::Renderer {
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 						m_numDrawCalls++;
 					}
 				}
@@ -805,14 +805,15 @@ namespace T5M::Renderer {
 
 		RendererMesh* mesh = effect->Mesh;
 
-		for (int j = firstBucket; j < lastBucket; j++) {
-			RendererBucket* bucket = &mesh->Buckets[j];
+		for (auto& bucket : mesh->buckets) {
 
-			if (bucket->Vertices.size() == 0)
+			if (bucket.Vertices.size() == 0)
+				continue;
+			if (transparent && bucket.blendMode == 0)
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 

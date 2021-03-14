@@ -36,6 +36,18 @@ cbuffer RoomBuffer : register(b5)
 	float4 AmbientColor;
 	int water;
 };
+struct AnimatedFrameUV
+{
+	float2 topLeft;
+	float2 topRight;
+	float2 bottomRight;
+	float2 bottomLeft;
+};
+cbuffer AnimatedBuffer : register(b6) {
+	AnimatedFrameUV AnimFrames[32];
+	uint numAnimFrames;
+	
+}
 
 struct PixelShaderInput
 {
@@ -65,7 +77,7 @@ float hash(float3 n)
 	return float((frac(sin(x)) * 7385.6093) + (frac(cos(y)) * 1934.9663) - (frac(sin(z)) * 8349.2791));
 }
 
-PixelShaderInput VS(VertexShaderInput input,uint vid : SV_VertexID)
+PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
@@ -84,12 +96,31 @@ PixelShaderInput VS(VertexShaderInput input,uint vid : SV_VertexID)
 	output.Color = input.Color;
 	if (water) {
 		static const float PI = 3.14159265f;
-		float offset = hash(input.Position.xyz);
-		float wibble = sin(((((float)Frame + offset) % 64) / 64)* PI)*0.5f+0.5f;
-		wibble = lerp(0.4f, 1.0f, wibble);
+		int offset = input.Hash;
+		float wibble = sin((((Frame + offset) % 64) / 64.0)* PI)*0.5f+0.5f;
+		wibble = lerp(0.1f, 1.0f, wibble);
 		output.Color *= wibble;
 	}
+#ifdef ANIMATED
+	int frame = (Frame / 8) % numAnimFrames;
+	switch (input.PolyIndex) {
+	case 0:
+		output.UV = AnimFrames[frame].topLeft;
+		break;
+	case 1:
+		output.UV = AnimFrames[frame].topRight;
+		break;
+	case 2:
+		output.UV = AnimFrames[frame].bottomRight;
+		break;
+	case 3:
+		output.UV = AnimFrames[frame].bottomLeft;
+		break;
+	}
+#else
 	output.UV = input.UV;
+
+#endif
 	output.WorldPosition = input.Position.xyz;
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
