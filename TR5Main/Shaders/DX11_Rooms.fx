@@ -102,7 +102,7 @@ PixelShaderInput VS(VertexShaderInput input)
 		output.Color *= wibble;
 	}
 #ifdef ANIMATED
-	int frame = (Frame / 8) % numAnimFrames;
+	int frame = (Frame / 2) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
 		output.UV = AnimFrames[frame].topLeft;

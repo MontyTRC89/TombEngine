@@ -2329,28 +2329,34 @@ namespace T5M::Renderer
             m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
             for (auto& bucket : room->buckets)
             {
-				if (transparent && bucket.blendMode == 0)
-					continue;
-
-				if (animated) {
-					if (bucket.animated) {
-						m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-						m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-						RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
-						m_stAnimated.NumFrames = set.NumTextures;
-						for (unsigned char i = 0; i < set.NumTextures; i++) {
-							auto& tex = set.Textures[i];
-							m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
-							m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
-							m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
-							m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
-						}
-						m_cbAnimated.updateData(m_stAnimated,m_context.Get());
-					}
-					else
+				if (transparent) {
+					if (bucket.blendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
 				}
 				else {
+					if (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE)
+						continue;
+				}
+					
+				if (animated) {
+					if (!bucket.animated)
+						continue;
+					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+					m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+					RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
+					m_stAnimated.NumFrames = set.NumTextures;
+					for (unsigned char i = 0; i < set.NumTextures; i++) {
+						auto& tex = set.Textures[i];
+						m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
+						m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
+						m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
+						m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
+					}
+					m_cbAnimated.updateData(m_stAnimated,m_context.Get());
+				}
+				else {
+					if (bucket.animated)
+						continue;
 					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
 					m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
 				}
