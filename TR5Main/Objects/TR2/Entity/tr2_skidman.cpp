@@ -72,7 +72,6 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			ItemPushLara(item, laraitem, coll, 0, 0);
 	}
 
-	/* If Lara is walking and hit by skidoo, gets hurt a lot */
 	if (Lara.Vehicle == NO_ITEM && item->speed > 0)
 	{
 		laraitem->hitStatus = true;
@@ -98,7 +97,6 @@ void SkidManControl(short riderNum)
 	item_number = (short)rider->data;
 	item = &g_Level.Items[item_number];
 
-	/* Need to activate AI for skidoo (it's the skidoo that holds the brain) if not done yet */
 	if (!item->data)
 	{
 		EnableBaddieAI(item_number, TRUE);
@@ -112,7 +110,6 @@ void SkidManControl(short riderNum)
 	{
 		if (rider->currentAnimState != SMAN_DEATH)
 		{
-			/* Separate skidoo from rider */
 			rider->pos.xPos = item->pos.xPos;
 			rider->pos.yPos = item->pos.yPos;
 			rider->pos.zPos = item->pos.zPos;
@@ -123,14 +120,12 @@ void SkidManControl(short riderNum)
 			rider->frameNumber = g_Level.Anims[rider->animNumber].frameBase;
 			rider->currentAnimState = SMAN_DEATH;
 
-			/* Break Lara's lock */
 			if (Lara.target == item)
 				Lara.target = NULL;
 		}
 		else
 			AnimateItem(rider);
 
-		/* Make skidoo stop */
 		if (item->currentAnimState == SMAN_MOVING || item->currentAnimState == SMAN_WAIT)
 			item->goalAnimState = SMAN_WAIT;
 		else
@@ -138,7 +133,6 @@ void SkidManControl(short riderNum)
 	}
 	else
 	{
-		/* As skidoo has the brain, it needs to know if the rider was hurt */
 		CreatureAIInfo(item, &info);
 
 		GetCreatureMood(item, &info, VIOLENT);
@@ -185,13 +179,11 @@ void SkidManControl(short riderNum)
 		}
 	}
 
-
-	/* Shoot them guns */
 	if (rider->currentAnimState != SMAN_DEATH)
 	{
 		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->hitPoints > 0)
 		{
-			damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50; // more damage if Lara on foot
+			damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
 
 			if (ShotLara(item, &info, &skidooLeft, 0, damage) + ShotLara(item, &info, &skidooRight, 0, damage))
 				skidman->flags = 5;
@@ -204,7 +196,6 @@ void SkidManControl(short riderNum)
 		}
 	}
 
-	/* Use 'head_rotation' to store which track is required */
 	if (item->currentAnimState == SMAN_WAIT)
 	{
 		SoundEffect(153, &item->pos, 0);
@@ -219,7 +210,6 @@ void SkidManControl(short riderNum)
 
 	CreatureAnimation(item_number, angle, 0);
 
-	/* Move rider to save position and animation as skidoo */
 	if (rider->currentAnimState != SMAN_DEATH)
 	{
 		rider->pos.xPos = item->pos.xPos;
@@ -234,7 +224,6 @@ void SkidManControl(short riderNum)
 	}
 	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
 	{
-		/* If rider has reached end of his death animation, turn his skidoo into one that Lara can ride */
 		RemoveActiveItem(riderNum);
 		rider->collidable = false;
 		rider->hitPoints = -16384;

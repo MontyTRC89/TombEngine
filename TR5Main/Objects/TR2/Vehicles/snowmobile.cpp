@@ -171,7 +171,6 @@ void SkidooGuns()
 	ITEM_INFO* skidoo = &g_Level.Items[Lara.Vehicle];
 	SKIDOO_INFO* skinfo = (SKIDOO_INFO*)skidoo->data;
 
-	// Get the new target 
 	LaraGetNewTarget(winfo);
 	AimWeapon(winfo, &Lara.rightArm);
 
@@ -185,7 +184,7 @@ void SkidooGuns()
 		if (FireWeapon(WEAPON_PISTOLS, Lara.target, LaraItem, angles) +
 			FireWeapon(WEAPON_PISTOLS, Lara.target, LaraItem, angles))
 		{
-			skinfo->flashTimer = 2; // for custom render
+			skinfo->flashTimer = 2;
 			SoundEffect(winfo->sampleNum, &LaraItem->pos, 0);
 			skidoo->itemFlags[0] = 4;
 		}
@@ -250,8 +249,6 @@ bool SkidooCheckGetOffOK(int direction)
 	return true;
 }
 
-// Check if Lara is still under skidoo control. Return 0 if she is in that limbo state of the skidoo still needing
-// control (it is falling) and her needing normal control (so is she)
 bool SkidooCheckGetOff()
 {
 	if (Lara.Vehicle != NO_ITEM)
@@ -262,7 +259,6 @@ bool SkidooCheckGetOff()
 			|| LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL)
 			&& LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
-			// Wait for last frame of GETOFF anim before returning to normal Lara control
 			if (LaraItem->currentAnimState == STATE_SKIDOO_GETOFFL)
 				LaraItem->pos.yRot += ANGLE(90);
 			else
@@ -281,14 +277,12 @@ bool SkidooCheckGetOff()
 			&& (skidoo->pos.yPos == skidoo->floor
 				|| LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
 		{
-			// Lara is falling
 			LaraItem->animNumber = LA_FREEFALL;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LS_FREEFALL;
 
 			if (skidoo->pos.yPos == skidoo->floor)
 			{
-				// Skidoo has hit the floor, then explode
 				LaraItem->goalAnimState = LS_DEATH;
 				LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 				LaraItem->speed = 0;
@@ -296,7 +290,6 @@ bool SkidooCheckGetOff()
 			}
 			else
 			{
-				// Continue the freefall
 				LaraItem->goalAnimState = LS_FREEFALL;
 				LaraItem->pos.yPos -= 200;
 				LaraItem->fallspeed = skidoo->fallspeed;
@@ -308,7 +301,7 @@ bool SkidooCheckGetOff()
 			LaraItem->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
 			Lara.moveAngle = skidoo->pos.yRot;
-			skidoo->flags |= ONESHOT; // skidoo is dead
+			skidoo->flags |= ONESHOT;
 			skidoo->collidable = false;
 
 			return false;
@@ -323,6 +316,7 @@ bool SkidooCheckGetOff()
 void DoSnowEffect(ITEM_INFO* skidoo)
 {
 	T5M::Effects::TriggerSnowmobileSnow(skidoo);
+	// OLD SPARK EFFECT
 	/*SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
 	spark->sR = 64;
@@ -385,13 +379,6 @@ void SkidooAnimation(ITEM_INFO* skidoo, int collide, bool dead)
 		switch (LaraItem->currentAnimState)
 		{
 		case STATE_SKIDOO_STILL:
-			// TODO: script this
-			/*cd = (skinfo->alreadyCdPlayed == false) ? 53 : 52;
-			if (!skinfo->alreadyCdPlayed)
-			{
-				S_CDPlay(cd, FALSE);
-				skinfo->alreadyCdPlayed = true;
-			}*/
 
 			if (dead)
 			{
@@ -473,7 +460,6 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 
 	if (moved->x || moved->z)
 	{
-		// Get direction of movement relative to facing 
 		float s = phd_sin(skidoo->pos.yRot);
 		float c = phd_cos(skidoo->pos.yRot);
 		
@@ -506,16 +492,13 @@ bool SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 	bool drive = false;
 	int maxSpeed = 0;
 
-	// Handle user input. It will affect the next frame.
 	if (skidoo->pos.yPos >= height - STEP_SIZE)
 	{
-		// Engine pitch depends on speed + height off ground
 		*pitch = skidoo->speed + (height - skidoo->pos.yPos);
 
 		if (skidoo->speed == 0 && (TrInput & IN_LOOK))
 			LookUpDown();
 
-		// If tracks on the ground, user has control; allow for reversing! 
 		if (((TrInput & IN_LEFT) 
 			&& !(TrInput & IN_BACK)) 
 			|| ((TrInput & IN_RIGHT) 
@@ -549,7 +532,7 @@ bool SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 		}
 		else if (TrInput & IN_FORWARD)
 		{
-			if ((TrInput & IN_ACTION) && !skinfo->armed) // Red skidoo can go faster than bandit ones
+			if ((TrInput & IN_ACTION) && !skinfo->armed)
 				maxSpeed = SKIDOO_FAST_SPEED;
 			else if (TrInput & IN_STEPSHIFT)
 				maxSpeed = SKIDOO_SLOW_SPEED;
@@ -566,7 +549,7 @@ bool SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 			&& skidoo->speed < SKIDOO_MIN_SPEED 
 			&& (TrInput & (IN_LEFT | IN_RIGHT)))
 		{
-			skidoo->speed = SKIDOO_MIN_SPEED; // If user wants to turn, skidoo will move forward
+			skidoo->speed = SKIDOO_MIN_SPEED;
 			drive = true;
 		}
 		else if (skidoo->speed > SKIDOO_SLOWDOWN)
@@ -593,7 +576,6 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 
 	if (height > * y)
 	{
-		// In air
 		*y += fallspeed;
 		if (*y > height - SKIDOO_MIN_BOUNCE)
 		{
@@ -605,7 +587,6 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 	}
 	else
 	{
-		// On ground: get up push from height change
 		kick = (height - *y) * 4;
 		if (kick < SKIDOO_MAX_KICK)
 			kick = SKIDOO_MAX_KICK;
@@ -618,8 +599,7 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 }
 
 int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
-{
-	// Check if Lara is close enough and in right position to get onto skidoo 
+{ 
 	if (!(TrInput & IN_ACTION) 
 		|| Lara.gunStatus != LG_NO_ARMS 
 		|| LaraItem->gravityStatus)
@@ -631,9 +611,9 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	int geton = 0;
 
 	if (rot > ANGLE(45) && rot < ANGLE(135))
-		geton = 1; // Right
+		geton = 1;
 	else if (rot > -ANGLE(135) && rot < -ANGLE(45))
-		geton = 2; // Left
+		geton = 2;
 	else
 		return 0;
 
@@ -653,11 +633,9 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 
 void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
-	// Don't do collision if Lara is dead or if it's already on the skidoo
 	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
-	// If Lara can't get on, the do normal object collision  
 	int geton = SkidooCheckGetOn(itemNum, coll);
 	if (!geton)
 	{
@@ -665,10 +643,8 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 		return;
 	}
 
-	// If here, it means that Lara can get on
 	Lara.Vehicle = itemNum;
 
-	// Flares are not allowed on the skidoo
 	if (Lara.gunType == WEAPON_FLARE)
 	{
 		CreateFlare(ID_FLARE_ITEM, FALSE);
@@ -728,19 +704,16 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (z == zOld)
 		{
-			// Neither shift; may have hit a very steep slope, so need to push back to old position  
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 		}
 		else if (z > zOld)
 		{
-			// Z shift left 
 			skidoo->pos.zPos -= shiftZ + 1;
 			return (pos->x - skidoo->pos.xPos);
 		}
 		else
 		{
-			// Z shift right 
 			skidoo->pos.zPos += WALL_SIZE - shiftZ;
 			return (skidoo->pos.xPos - pos->x);
 		}
@@ -749,20 +722,17 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (x > xOld)
 		{
-			// X shift up 
 			skidoo->pos.xPos -= shiftX + 1;
 			return (skidoo->pos.zPos - pos->z);
 		}
 		else
 		{
-			// X shift down 
 			skidoo->pos.xPos += WALL_SIZE - shiftX;
 			return (pos->z - skidoo->pos.zPos);
 		}
 	}
 	else
 	{
-		// A diagonal hit; means a barrage of tests needed to determine best shift 
 		x = z = 0;
 
 		short roomNumber = skidoo->roomNumber;
@@ -789,7 +759,6 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		if (x && z)
 		{
-			// Corner or side collision 
 			skidoo->pos.zPos += z;
 			skidoo->pos.xPos += x;
 			skidoo->speed -= 50;
@@ -814,7 +783,6 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 		}
 		else
 		{
-			// Pure diagonal collision 
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 			skidoo->speed -= 50;
@@ -826,13 +794,11 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 int SkidooDynamics(ITEM_INFO* skidoo)
 {
-	// Does all skidoo movement and collision and returns if collide value 
 	PHD_VECTOR moved, fl, fr, br, bl;
 	PHD_VECTOR old, flOld, frOld, blOld, brOld;
 	
 	SKIDOO_INFO* skinfo = (SKIDOO_INFO*)skidoo->data;
 
-	// First get positions and heights of skidoo's corners + centre 
 	int hflOld = TestSkidooHeight(skidoo, SKIDOO_FRONT, -SKIDOO_SIDE, &flOld);
 	int hfrOld = TestSkidooHeight(skidoo, SKIDOO_FRONT, SKIDOO_SIDE, &frOld);
 	int hblOld = TestSkidooHeight(skidoo, -SKIDOO_FRONT, -SKIDOO_SIDE, &blOld);
@@ -841,7 +807,6 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	old.y = skidoo->pos.yPos;
 	old.z = skidoo->pos.zPos;
 
-	// Back left/right may be slightly below ground, so correct for this 
 	if (blOld.y > hblOld)
 		blOld.y = hblOld;
 	if (brOld.y > hbrOld)
@@ -853,7 +818,6 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 
 	short rot;
 
-	// First undo any turn the skidoo may have applied 
 	if (skidoo->pos.yPos > skidoo->floor - STEP_SIZE)
 	{
 		if (skinfo->skidooTurn < -SKIDOO_UNDO_TURN)
@@ -864,7 +828,6 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 			skinfo->skidooTurn = 0;
 		skidoo->pos.yRot += skinfo->skidooTurn + skinfo->extraRotation;
 
-		// Deal with momentum; do it with an angle that tracks direction of travel, but slower than turn 
 		rot = skidoo->pos.yRot - skinfo->momentumAngle;
 		if (rot < -SKIDOO_MOMENTUM_TURN)
 		{
@@ -892,11 +855,9 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	else
 		skidoo->pos.yRot += skinfo->skidooTurn + skinfo->extraRotation;
 
-	// Move skidoo according to speed 
 	skidoo->pos.zPos += skidoo->speed * phd_cos(skinfo->momentumAngle);
 	skidoo->pos.xPos += skidoo->speed * phd_sin(skinfo->momentumAngle);
 
-	// Slide skidoo according to tilts (to avoid getting stuck on slopes) 
 	int slip = SKIDOO_SLIP * phd_sin(skidoo->pos.xRot);
 	if (abs(slip) > SKIDOO_SLIP / 2)
 	{
@@ -911,15 +872,12 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 		skidoo->pos.xPos += slip * phd_cos(skidoo->pos.yRot);
 	}
 
-	// Remember desired position in case of collisions moving us about 
 	moved.x = skidoo->pos.xPos;
 	moved.z = skidoo->pos.zPos;
 
-	// Test against bad guys too 
-	if (!(skidoo->flags & ONESHOT)) // ONESHOT flag set if skidoo no longer travelling with Lara
+	if (!(skidoo->flags & ONESHOT))
 		SkidooBaddieCollision(skidoo);
 
-	// Test new positions of points (one at a time) and shift skidoo accordingly 
 	rot = 0;
 	int hbl = TestSkidooHeight(skidoo, -SKIDOO_FRONT, -SKIDOO_SIDE, &bl);
 	if (hbl < blOld.y - STEP_SIZE)
@@ -945,10 +903,8 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 
 	skinfo->extraRotation = rot;
 
-	// Get collision anim if skidoo has been moved from desired position by collisions 
 	int collide = GetSkidooCollisionAnim(skidoo, &moved);
 
-	// Check final actual movement; if speed is more than halved then reduce to zero 
 	if (collide)
 	{
 		int newspeed = (skidoo->pos.zPos - old.z) * phd_cos(skinfo->momentumAngle) + (skidoo->pos.xPos - old.x) * phd_sin(skinfo->momentumAngle);
@@ -978,8 +934,6 @@ bool SkidooControl()
 	SKIDOO_INFO* skinfo = (SKIDOO_INFO*)skidoo->data;
 	int collide = SkidooDynamics(skidoo);
 
-	// Now got final position, so get heights under middle and corners (will only have changed
-	// from above if collision occurred, but recalc anyway as hardly big maths) 
 	int hfl = TestSkidooHeight(skidoo, SKIDOO_FRONT, -SKIDOO_SIDE, &fl);
 	int hfr = TestSkidooHeight(skidoo, SKIDOO_FRONT, SKIDOO_SIDE, &fr);
 
@@ -993,10 +947,8 @@ bool SkidooControl()
 	bool dead = false;
 	int drive = 0;
 
-	// Need to know what status Lara has w.r.t. the skidoo; has she died or fallen off? 
 	if (LaraItem->hitPoints <= 0)
 	{
-		// Disable user input if Lara is dead 
 		TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 		dead = true;
 	}
@@ -1008,7 +960,6 @@ bool SkidooControl()
 
 	int pitch = 0;
 
-	// Deal with user input (if allowed) 
 	if (skidoo->flags & ONESHOT)
 	{
 		drive = false;
@@ -1022,25 +973,21 @@ bool SkidooControl()
 		case STATE_SKIDOO_GETOFF:
 		case STATE_SKIDOO_GETOFFL:
 		case STATE_SKIDOO_LETGO:
-			// No control 
 			drive = -1;
 			collide = 0;
 			break;
 
 		default:
-			// Reduce user input if Lara is dead 
 			drive = SkidooUserControl(skidoo, height, &pitch);
 			break;
 		}
 	}
 
-	// Do track meshes 
 	bool banditSkidoo = skinfo->armed;
 	if (drive > 0)
 	{
 		skinfo->trackMesh = ((skinfo->trackMesh & 3) == 1) ? 2 : 1;
 
-		// Do engine noise 
 		skinfo->pitch += (pitch - skinfo->pitch) / 4;
 		SoundEffect(SFX_TR2_SNOWMOBILE_HIGH_ENGINE_RPM, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) * 256));
 	}
@@ -1053,12 +1000,10 @@ bool SkidooControl()
 	}
 	skidoo->floor = height;
 
-	// Do fallspeed effects on skidoo 
 	skinfo->leftFallspeed = DoSkidooDynamics(hfl, skinfo->leftFallspeed, (int*)&fl.y);
 	skinfo->rightFallspeed = DoSkidooDynamics(hfr, skinfo->rightFallspeed, (int*)&fr.y);
 	skidoo->fallspeed = DoSkidooDynamics(height, skidoo->fallspeed, (int*)&skidoo->pos.yPos);
 
-	// Rotate skidoo to match these heights 
 	height = (fl.y + fr.y) / 2;
 	short xRot = phd_atan(SKIDOO_FRONT, skidoo->pos.yPos - height);
 	short zRot = phd_atan(SKIDOO_SIDE, height - fl.y);
@@ -1068,7 +1013,6 @@ bool SkidooControl()
 
 	if (skidoo->flags & ONESHOT)
 	{
-		// This is a falling skidoo - Lara is elsewhere 
 		if (roomNumber != skidoo->roomNumber)
 		{
 			ItemNewRoom(Lara.Vehicle, roomNumber);
@@ -1077,7 +1021,6 @@ bool SkidooControl()
 
 		AnimateItem(LaraItem);
 
-		// Has it hit the ground? If so, explode 
 		if (skidoo->pos.yPos == skidoo->floor)
 			SkidooExplode(skidoo);
 		return 0;
@@ -1091,7 +1034,6 @@ bool SkidooControl()
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
-	// Move Lara to the skidoo position 
 	if (LaraItem->currentAnimState != STATE_SKIDOO_FALLOFF)
 	{
 		LaraItem->pos.xPos = skidoo->pos.xPos;
@@ -1104,7 +1046,7 @@ bool SkidooControl()
 			LaraItem->pos.zRot = skidoo->pos.zRot;
 		}
 		else
-			// Don't tilt Lara during geton/off 
+	
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 	}
 	else
@@ -1115,7 +1057,6 @@ bool SkidooControl()
 	if (!dead && drive >= 0 && banditSkidoo)
 		SkidooGuns();
 
-	// Set skidoo on the exact same anim frame 
 	if (!dead)
 	{
 		skidoo->animNumber = Objects[ID_SNOWMOBILE].animIndex + (LaraItem->animNumber - Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex);
@@ -1127,8 +1068,7 @@ bool SkidooControl()
 		skidoo->frameNumber = g_Level.Anims[skidoo->animNumber].frameBase;
 	}
 
-	// If skidoo is moving, then set off a snow spray sprite 
-	if (skidoo->speed && skidoo->floor == skidoo->pos.yPos /*&& Utils.getFloorSound(skidoo, FS_SNOW)*/)
+	if (skidoo->speed && skidoo->floor == skidoo->pos.yPos)
 	{
 		DoSnowEffect(skidoo);
 		if (skidoo->speed < 50)

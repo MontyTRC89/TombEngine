@@ -41,15 +41,6 @@ void KnifeControl(short fxNum)
 
 	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) || fx->pos.yPos <= GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
-		/*
-		GAME_VECTOR pos;
-		pos.x = fx->pos.xPos;
-		pos.y = fx->pos.yPos;
-		pos.z = fx->pos.zPos;
-		pos.roomNumber = fx->roomNumber;
-		*/
-		// TODO: add Richochet(&pos);
-
 		KillEffect(fxNum);
 		return;
 	}
@@ -68,7 +59,7 @@ void KnifeControl(short fxNum)
 		fx->speed = LaraItem->speed;
 		fx->frameNumber = fx->counter = 0;
 
-		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0); // knife hit lara sound
+		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
 		DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 80, fx->pos.yRot, fx->roomNumber);
 		KillEffect(fxNum);
 	}
@@ -77,26 +68,7 @@ void KnifeControl(short fxNum)
 static short ThrowKnife(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = 0;
-	/*
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
-	if (fx_number != NO_ITEM)
-	{
-		fx = &Effects[fx_number];
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
-		fx->roomNumber = roomNumber;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = 150;
-		fx->frameNumber = 0;
-		fx->objectNumber = ID_GUARD1; // TODO: change the ID to ID_KNIFETHOWER_KNIFE
-		fx->shade = 14 * 256;
-		ShootAtLara(fx);
-	}
-	*/
+	// TODO: add fx parameters
 	return fx_number;
 }
 
