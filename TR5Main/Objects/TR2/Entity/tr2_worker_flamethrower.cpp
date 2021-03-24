@@ -28,13 +28,7 @@ static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
-		/*phd_GetVectorAngles(fx->pos.xPos - Camera.pos.x,
-							fx->pos.yPos - Camera.pos.y,
-							fx->pos.zPos - Camera.pos.z, &cam_rot);
-		fx->pos.x_rot = fx->pos.z_rot = 0;
-		fx->pos.y_rot = cam_rot;
-		fx->speed = 200;*/
-		//fx->objectNumber = Utils.getObjects(TR2_DRAGON_FIRE);
+		//TODO: complete fx parameters
 		fx->shade = 14 * 256;
 		fx->counter = 40;
 		ShootAtLara(fx);
@@ -71,7 +65,6 @@ void WorkerFlamethrower(short itemNum)
 	flame = (CREATURE_INFO*)item->data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
-	// get the exact flame start position
 	pos.x = workerFlameThrower.x;
 	pos.y = workerFlameThrower.y;
 	pos.z = workerFlameThrower.z;
@@ -222,8 +215,6 @@ void WorkerFlamethrower(short itemNum)
 			{
 				torso_y = info.angle;
 				torso_x = info.xAngle;
-
-				//CreatureEffect(item, &workerFlameThrower, Flame);
 			}
 
 			if (item->goalAnimState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
