@@ -19,13 +19,10 @@
 #include "savegame.h"
 #include "sound.h"
 
-//enum UPV_FLAG
-//{
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
 #define	UPV_DIVE 4
 #define	UPV_DEAD 8
-//};
 
 #define ACCELERATION		0x40000
 #define FRICTION			0x18000
@@ -57,12 +54,12 @@
 #define HARPOON_RELOAD		15
 
 BITE_INFO sub_bites[6] = {
-	{ 0, 0, 0, 3 },			// Fan.
-	{ 0, 96, 256, 0 },		// Front light.
-	{ -128, 0, -64, 1 },	// Left Fin Left.
-	{ 0, 0, -64, 1 },		// Left Fin right.
-	{ 128, 0, -64, 2 },		// Right Fin Right.
-	{ 0, 0, -64, 2 }		// Right fin left.
+	{ 0, 0, 0, 3 },
+	{ 0, 96, 256, 0 },
+	{ -128, 0, -64, 1 },
+	{ 0, 0, -64, 1 },
+	{ 128, 0, -64, 2 },
+	{ 0, 0, -64, 2 }
 };
 
 enum SUB_BITE_FLAG {
@@ -130,7 +127,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		item = &g_Level.Items[itemNum];
 
 		item->objectNumber = ID_HARPOON;
-		item->shade = 0xC210;// 0x4210 | 0x8000;
+		item->shade = 0xC210;
 		item->roomNumber = v->roomNumber;
 
 		pos.x = (lr) ? 22 : -22;
@@ -228,8 +225,6 @@ void SubEffects(short item_number)
 	v = &g_Level.Items[item_number];
 	sub = (SUB_INFO*)v->data;
 
-	/* -------- Lara is using this vehicle */
-
 	if (Lara.Vehicle == item_number)
 	{
 		if (!sub->Vel)
@@ -255,7 +250,7 @@ void SubEffects(short item_number)
 				pos3d.zPos = pos.z + (GetRandomControl() & 63) - 32;
 				roomNumber = v->roomNumber;
 				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &roomNumber);
-				CreateBubble((PHD_VECTOR*)&pos3d, roomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0); // CHECK
+				CreateBubble((PHD_VECTOR*)&pos3d, roomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
 			}
 		}
 	}
@@ -271,7 +266,7 @@ void SubEffects(short item_number)
 		pos.z = sub_bites[SUB_FRONT_LIGHT].z << (lp * 6);
 		GetJointAbsPosition(v, &pos, sub_bites[SUB_FRONT_LIGHT].meshNum);
 
-		if (lp == 1)	// LOS light?
+		if (lp == 1)
 		{
 			target.x = pos.x;
 			target.y = pos.y;
@@ -291,9 +286,9 @@ void SubEffects(short item_number)
 		}
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
 	}
-	// wake stuff?
+
 	if (sub->WeaponTimer)
-		sub->WeaponTimer--; // fix shooting
+		sub->WeaponTimer--;
 }
 
 static int CanGetOff(ITEM_INFO* v)
@@ -328,7 +323,6 @@ static int CanGetOff(ITEM_INFO* v)
 
 static int GetOnSub(short item_number, COLL_INFO* coll)
 {
-	/* Returns 0 if no get on, 1 if right get on and 2 if left get on */
 	int dist;
 	int x, y, z;
 	ITEM_INFO* v, * l;
@@ -355,7 +349,7 @@ static int GetOnSub(short item_number, COLL_INFO* coll)
 
 	short yr = abs(l->pos.yRot - v->pos.yRot);
 	if (yr > ANGLE(35.0f) || yr < -ANGLE(35.0f))
-		return 0;	//make sure Lara is facing the thing!
+		return 0;
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
@@ -424,11 +418,8 @@ static void DoCurrent(ITEM_INFO* item)
 		Lara.currentZvel += ((dz - Lara.currentZvel) / 16);
 	}
 
-	/* Move Lara in direction of sink. */
 	item->pos.xPos += (Lara.currentXvel / 256);
 	item->pos.zPos += (Lara.currentZvel / 256);
-
-	/* Reset current (will get set again so long as Lara is over triggers) */
 	Lara.currentActive = 0;
 }
 
@@ -557,10 +548,6 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			}
 			else
 				v->pos.xRot = SURFACE_ANGLE;
-/*			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
-			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
@@ -617,11 +604,6 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			}
 			else
 				v->pos.xRot = SURFACE_ANGLE;
-			/*
-			if (v->pos.xRot > SURFACE_ANGLE)
-				v->pos.xRot -= ANGLE(0.1f);//ANGLE(1.0f); - causes jitters
-			else if (v->pos.xRot < SURFACE_ANGLE)
-				v->pos.xRot += ANGLE(0.1f);//ANGLE(1.0f); - x2*/
 		}
 		else
 		{
@@ -777,7 +759,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
 			l->animNumber = LA_UNDERWATER_DEATH;
-			l->frameNumber = GF(LA_UNDERWATER_DEATH, 17); //i.e l->frameNumber = g_Level.Anims[l->animNumber].frameBase + 17;
+			l->frameNumber = GF(LA_UNDERWATER_DEATH, 17);
 			l->currentAnimState = l->goalAnimState = LS_WATER_DEATH;
 			l->fallspeed = 0;
 			l->gravityStatus = 0;
@@ -888,8 +870,6 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.Vehicle = itemNum;
 		Lara.waterStatus = LW_ABOVE_WATER;
 
-		/* -------- throw flare away if using */
-
 		if (Lara.gunType == WEAPON_FLARE)
 		{
 			CreateFlare(ID_FLARE_ITEM, 0);
@@ -898,7 +878,6 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 
-		/* -------- determine animation */
 		Lara.gunStatus = LG_HANDS_BUSY;
 
 		v->hitPoints = 1;
@@ -909,7 +888,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
 
-		if (Lara.waterStatus == LW_SURFACE)//((l->currentAnimState == LS_ONWATER_STOP) || (l->currentAnimState == LS_ONWATER_FORWARD))
+		if (Lara.waterStatus == LW_SURFACE)
 		{
 			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETONSURF_A;
 			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, SUB_GETONSURF_A, 0);
@@ -944,7 +923,6 @@ int SubControl(void)
 	v = &g_Level.Items[Lara.Vehicle];
 	sub = (SUB_INFO*)v->data;
 
-	/* -------- update dynamics */
 	if (!(sub->Flags & UPV_DEAD))
 	{
 		UserInput(v, l, sub);
@@ -965,7 +943,6 @@ int SubControl(void)
 		v->pos.zPos += phd_cos(v->pos.yRot) * v->speed * phd_cos(v->pos.xRot);
 	}
 
-	/* -------- determine if vehicle is near the surface */
 	roomNumber = v->roomNumber;
 	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	v->floor = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
@@ -1004,7 +981,6 @@ int SubControl(void)
 		else
 			sub->Flags &= ~UPV_SURFACE;
 
-		/* -------- update air bar */
 		if (!(sub->Flags & UPV_SURFACE))
 		{
 			if (l->hitPoints > 0)
@@ -1033,7 +1009,6 @@ int SubControl(void)
 	TestTriggers(TriggerIndex, false, 0);
 	SubEffects(Lara.Vehicle);
 
-	/* -------- update vehicle & Lara */
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))
 	{
 		DoCurrent(v);
@@ -1054,7 +1029,7 @@ int SubControl(void)
 		}
 
 		l->pos.xPos = v->pos.xPos;
-		l->pos.yPos = v->pos.yPos;// +SUB_DRAW_SHIFT;
+		l->pos.yPos = v->pos.yPos;
 		l->pos.zPos = v->pos.zPos;
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;

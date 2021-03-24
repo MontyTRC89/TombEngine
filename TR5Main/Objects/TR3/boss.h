@@ -42,9 +42,9 @@ struct EXPLOSION_VERTS
 struct EXPLOSION_RING
 {
 	short on;
-	short life;   // 0 - 32.
+	short life;
 	short speed;
-	short radius; // Width is 1/4 of radius.
+	short radius;
 	short xrot;
 	short zrot;
 	int x;

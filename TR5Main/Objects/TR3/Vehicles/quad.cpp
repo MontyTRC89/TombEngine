@@ -127,12 +127,12 @@ typedef enum QUAD_ANIM_STATES {
 #define QUADBIKE_FALLSTART2_A	25
 
 BITE_INFO quadEffectsPositions[6] = { 
-	{ -56, -32, -380, 0	},	// Left smoke
-	{ 56, -32, -380, 0 },	// Right smoke
-	{ -8, 180, -48, 3 },	// Left back
-	{ 8, 180, -48, 4 },	// Right back
-	{ 90, 180, -32, 6 },	// Right front
-	{ -90, 180, -32, 7 }	// Left front
+	{ -56, -32, -380, 0	},
+	{ 56, -32, -380, 0 },
+	{ -8, 180, -48, 3 },
+	{ 8, 180, -48, 4 },
+	{ 90, 180, -32, 6 },
+	{ -90, 180, -32, 7 }
 };
 
 bool QuadHandbrakeStarting;
@@ -153,7 +153,6 @@ static void QuadbikeExplode(ITEM_INFO* item)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
 	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
-//	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_EXPLOSION1, NULL, 0);
@@ -538,7 +537,6 @@ static int DoQuadDynamics(int height, int fallspeed, int *y)
 
 static int QuadDynamics(ITEM_INFO* item)
 {
-	/* Does all skidoo movement and collision and returns if collide value */
 	PHD_VECTOR moved, fl, fr, br, bl, mtl, mbl, mtr, mbr, mml, mmr;
 	PHD_VECTOR old, oldFrontLeft, oldFrontRight, oldBottomLeft, oldBottomRight, mtl_old, moldBottomLeft, mtr_old, moldBottomRight, mml_old, mmr_old;
 	int hfl, hfr, hbr, hbl, hmtl, hmbl, hmtr, hmbr, hmml, hmmr;
@@ -551,7 +549,6 @@ static int QuadDynamics(ITEM_INFO* item)
 
 	QUAD_INFO* quad = (QUAD_INFO*)item->data;
 
-	/* First get positions and heights of skidoo's corners + centre */
 	holdFrontLeft = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &oldFrontLeft);
 	holdFrontRight = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &oldFrontRight);
 	holdBottomLeft = TestQuadHeight(item, -QUAD_FRONT, -QUAD_SIDE, &oldBottomLeft);
@@ -835,7 +832,6 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			else if (TrInput & (IN_ACTION | IN_JUMP))
 			{
 				LaraItem->goalAnimState = QUAD_STATE_DRIVE;
-				//slowdamp = 0;
 			}
 
 			break;
@@ -892,7 +888,6 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			else if (!(TrInput & IN_LEFT))
 			{
 				LaraItem->goalAnimState = QUAD_STATE_DRIVE;
-				//slowdamp = 0;
 			}
 			break;
 
@@ -908,7 +903,6 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			else if (!(TrInput & IN_RIGHT))
 			{
 				LaraItem->goalAnimState = QUAD_STATE_DRIVE;
-				//slowdamp = 0;
 			}
 			break;
 
@@ -1058,9 +1052,6 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 					quad->velocity += REVERSE_ACC;
 			}
 		}
-
-		/* -------- accelerate */
-
 		else if (TrInput & IN_ACTION)
 		{
 			if ((TrInput & (IN_DUCK | IN_SPRINT)) && (QuadCanHandbrakeStart || QuadHandbrakeStarting))
@@ -1408,7 +1399,6 @@ int QuadBikeControl(void)
 		int speed = 0;
 		short angle = 0;
 		
-		// Do smoke
 		for (int i = 0; i < 2; i++)
 		{
 			pos.x = quadEffectsPositions[i].x;

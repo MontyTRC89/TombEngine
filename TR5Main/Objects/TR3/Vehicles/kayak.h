@@ -20,7 +20,6 @@ struct KAYAK_INFO
 void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate);
 void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff);
 void KayakUpdateWakeFX();
-void KayakSplash(ITEM_INFO* item, long fallspeed, long water);
 int KayakGetIn(short itemNumber, COLL_INFO* coll);
 int KayakGetCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff);
 int KayakDoDynamics(int height, int fallspeed, int* y);

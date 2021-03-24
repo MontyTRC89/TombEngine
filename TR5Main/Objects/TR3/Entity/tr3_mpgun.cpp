@@ -123,7 +123,7 @@ void MPGunControl(short itemNumber)
 					continue;
 
 				target = &g_Level.Items[currentCreature->itemNum];
-				if (target->objectNumber != ID_LARA /*&& target->objectNumber != ID_BOB*/)
+				if (target->objectNumber != ID_LARA)
 					continue;
 
 				dx = target->pos.xPos - item->pos.xPos;

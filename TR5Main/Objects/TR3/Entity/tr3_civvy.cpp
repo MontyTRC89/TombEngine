@@ -43,8 +43,6 @@ void InitialiseCivvy(short item_number)
 
 	item = &g_Level.Items[item_number];
 	InitialiseCreature(item_number);
-
-	/* Start Civvy in stop pose */
 	item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_STOP_ANIM;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = item->goalAnimState = CIVVY_STOP;
@@ -55,7 +53,6 @@ void CivvyControl(short item_number)
 	if (!CreatureActive(item_number))
 		return;
 
-	// Area 51 - Civvy Man
 	ITEM_INFO* item, *real_enemy;
 	CREATURE_INFO* civvy;
 	short angle, torso_y, torso_x, head, tilt;
@@ -68,7 +65,6 @@ void CivvyControl(short item_number)
 
 	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
 	{
-		// DoLotsOfBloodD
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
 		item->hitPoints -= 20;
 	}
@@ -101,7 +97,7 @@ void CivvyControl(short item_number)
 		{
 			lara_dz = LaraItem->pos.zPos - item->pos.zPos;
 			lara_dx = LaraItem->pos.xPos - item->pos.xPos;
-			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
+			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot;
 			lara_info.distance = lara_dz * lara_dz + lara_dx * lara_dx;
 		}
 
@@ -115,10 +111,10 @@ void CivvyControl(short item_number)
 
 		angle = CreatureTurn(item, civvy->maximumTurn);
 
-		real_enemy = civvy->enemy; //TargetVisible uses enemy, so need to fill this in as lara if we're doing other things
+		real_enemy = civvy->enemy;
 		civvy->enemy = LaraItem;
 
-		if ((lara_info.distance < CIVVY_AWARE_DISTANCE || item->hitStatus || TargetVisible(item, &lara_info)) && !(item->aiBits & FOLLOW)) //Maybe move this into LONDSEC_WAIT case?
+		if ((lara_info.distance < CIVVY_AWARE_DISTANCE || item->hitStatus || TargetVisible(item, &lara_info)) && !(item->aiBits & FOLLOW))
 		{
 			if (!civvy->alerted)
 				SoundEffect(300, &item->pos, 0);
@@ -206,7 +202,7 @@ void CivvyControl(short item_number)
 				item->goalAnimState = CIVVY_STOP;
 			else if (info.bite && info.distance < CIVVY_ATTACK2_RANGE)
 				item->goalAnimState = CIVVY_AIM2;
-			else //if (!info.ahead || info.distance > CIVVY_WALK_RANGE)
+			else
 				item->goalAnimState = CIVVY_RUN;
 			break;
 
@@ -226,7 +222,7 @@ void CivvyControl(short item_number)
 				break;
 			}
 			else if ((item->aiBits & FOLLOW) && (civvy->reachedGoal || lara_info.distance > SQUARE(WALL_SIZE * 2)))
-				item->goalAnimState = CIVVY_STOP;	//Maybe CIVVY_STOP
+				item->goalAnimState = CIVVY_STOP;
 			else if (civvy->mood == BORED_MOOD)
 				item->goalAnimState = CIVVY_WALK;
 			else if (info.ahead && info.distance < CIVVY_WALK_RANGE)
@@ -345,12 +341,11 @@ void CivvyControl(short item_number)
 	CreatureJoint(item, 1, torso_x);
 	CreatureJoint(item, 2, head);
 
-	if (item->currentAnimState < CIVVY_DEATH) // Know CLIMB3 marks the start of the CLIMB states
+	if (item->currentAnimState < CIVVY_DEATH)
 	{
 		switch (CreatureVault(item_number, angle, 2, CIVVY_VAULT_SHIFT))
 		{
 		case 2:
-			/* Half block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB1_ANIM;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -358,7 +353,6 @@ void CivvyControl(short item_number)
 			break;
 
 		case 3:
-			/* 3/4 block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB2_ANIM;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -366,14 +360,12 @@ void CivvyControl(short item_number)
 			break;
 
 		case 4:
-			/* Full block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB3_ANIM;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_CLIMB3;
 			break;
 		case -4:
-			/* Full block fall */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_FALL3_ANIM;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -388,180 +380,3 @@ void CivvyControl(short item_number)
 	}
 }
 
-/*
-#define FENCE_WIDTH		128
-#define FENCE_LENGTH	1024+32
-
-void ControlElectricFence(short item_number)
-{
-	ITEM_INFO *item;
-	long x,z,xsize,zsize;
-	long dx,dz,tx,ty,tz,xand,zand;
-
-	item = &g_Level.Items[item_number];
-
-	if (!TriggerActive(item))
-		return;
-
-	dx = lara_item->pos.x_pos - item->pos.x_pos;
-	dz = lara_item->pos.z_pos - item->pos.z_pos;
-
-	if (dx < -0x5000 || dx > 0x5000 || dz < -0x5000 || dz > 0x5000)
-		return;
-
-	switch (item->pos.y_rot)
-	{
-		case 0:
-			x = item->pos.x_pos + 512;
-			z = item->pos.z_pos + 512;
-			tx = x-FENCE_LENGTH;
-			tz = z-256;
-			xand = 2047;
-			zand = 0;
-			xsize = FENCE_LENGTH;
-			zsize = FENCE_WIDTH;
-			break;
-
-		case 16384:
-			x = item->pos.x_pos + 512;
-			z = item->pos.z_pos - 512;
-			tx = x-256;
-			tz = z-FENCE_LENGTH;
-			xand = 0;
-			zand = 2047;
-			xsize = FENCE_WIDTH;
-			zsize = FENCE_LENGTH;
-			break;
-
-		case -32768:
-			x = item->pos.x_pos - 512;
-			z = item->pos.z_pos - 512;
-			tx = x-FENCE_LENGTH;
-			tz = z+256;
-			xand = 2047;
-			zand = 0;
-			xsize = FENCE_LENGTH;
-			zsize = FENCE_WIDTH;
-			break;
-
-		case -16384:
-			x = item->pos.x_pos - 512;
-			z = item->pos.z_pos + 512;
-			tx = x+256;
-			tz = z-FENCE_LENGTH;
-			xand = 0;
-			zand = 2047;
-			xsize = FENCE_WIDTH;
-			zsize = FENCE_LENGTH;
-			break;
-
-		default:
-			x = z = xsize = zsize = tx = tz = xand = zand = 0;
-			break;
-	}
-
-	if ((GetRandomControl()&63) == 0)
-	{
-		long	lp,cnt;
-
-		cnt = (GetRandomControl()&3)+3;
-		if (xand)
-			tx += (GetRandomControl()&xand);
-		else
-			tz += (GetRandomControl()&zand);
-
-		if (CurrentLevel != LV_OFFICE)
-			ty = item->pos.y_pos-(GetRandomControl()&2047)-(GetRandomControl()&1023);
-		else
-			ty = item->pos.y_pos - (GetRandomControl()&0x1F);
-
-		for (lp=0;lp<cnt;lp++)
-		{
-			TriggerFenceSparks(tx,ty,tz,0);
-			if (xand)
-				tx += ((GetRandomControl()&xand)&7)-4;
-			else
-				tz += ((GetRandomControl()&zand)&7)-4;
-			ty += (GetRandomControl()&7)-4;
-		}
-	}
-
-	if (lara.electric ||
-		lara_item->pos.x_pos < x-xsize || lara_item->pos.x_pos > x+xsize ||
-		lara_item->pos.z_pos < z-zsize || lara_item->pos.z_pos > z+zsize ||
-		lara_item->pos.y_pos > item->pos.y_pos + 32 || lara_item->pos.y_pos < item->pos.y_pos - 3072)
-		return;
-
-	{
-		long	lp,cnt,lp2,cnt2,sx,sz;
-
-		sx = tx;
-		sz = tz;
-
-		cnt = (GetRandomControl()&15)+3;
-		for (lp=0;lp<cnt;lp++)
-		{
-			if (xand)
-				tx = lara_item->pos.x_pos + (GetRandomControl()&511) - 256;
-			else
-				tz = lara_item->pos.z_pos + (GetRandomControl()&511) - 256;
-			ty = lara_item->pos.y_pos - (GetRandomControl()%768);
-
-			cnt2 = (GetRandomControl()&3)+6;
-			for (lp2=0;lp2<cnt2;lp2++)
-			{
-				TriggerFenceSparks(tx,ty,tz,1);
-				if (xand)
-					tx += ((GetRandomControl()&xand)&7)-4;
-				else
-					tz += ((GetRandomControl()&zand)&7)-4;
-				ty += (GetRandomControl()&7)-4;
-			}
-			tx = sx;
-			tz = sz;
-		}
-	}
-
-	lara.electric = 1;
-	lara_item->hit_points = 0;
-}
-
-static void TriggerFenceSparks(long x, long y, long z, long kill)
-{
-	SPARKS	*sptr;
-
-	sptr = &spark[GetFreeSpark()];
-
-	sptr->On = 1;
-	sptr->sB = (GetRandomControl()&63)+192;
-	sptr->sR = sptr->sB;
-	sptr->sG = sptr->sB;
-
-	sptr->dB = (GetRandomControl()&63)+192;
-	sptr->dR = sptr->sB>>2;
-	sptr->dG = sptr->sB>>1;
-
-	sptr->ColFadeSpeed = 8;
-	sptr->FadeToBlack = 16;
-	sptr->sLife = sptr->Life = 32+(GetRandomControl()&7);
-	sptr->TransType = COLADD;
-	sptr->Dynamic = -1;
-
-	sptr->x = x;
-	sptr->y = y;
-	sptr->z = z;
-	sptr->Xvel = ((GetRandomControl()&255)-128)<<1;
-	sptr->Yvel = (GetRandomControl()&15)-8-(kill<<5);
-	sptr->Zvel = ((GetRandomControl()&255)-128)<<1;
-
-	sptr->Friction = 4;//|(4<<4);
-	sptr->Flags = SP_SCALE;
-	sptr->Scalar = 1+kill;
-	sptr->Width = sptr->sWidth = (GetRandomControl()&3)+4;
-	sptr->dWidth = sptr->sWidth = 1;
-	sptr->Height = sptr->sHeight = sptr->Width;
-	sptr->dHeight = sptr->dWidth;
-	sptr->Gravity = 16+(GetRandomControl()&15);
-	sptr->MaxYvel = 0;
-}
-*/
