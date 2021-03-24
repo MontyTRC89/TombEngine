@@ -30,98 +30,12 @@ unsigned char FishRanges[1][3] =
 int PirahnaHitWait = false;
 int CarcassItem = NO_ITEM;
 
-/*uchar	temple_fish_ranges[3][3] = {
-								{	1 << 2,1 << 2,2	},
-								{	1 << 2,4 << 2,2	},
-								{	1 << 2,7 << 2,4	},
-};
-
-uchar	quadchase_fish_ranges[8][3] = {
-								{	1 << 2,3 << 2,1	},
-								{	0 << 2,3 << 2,2	},
-								{	2 << 2,1 << 2,2	},
-								{	1 << 2,2 << 2,1	},
-								{	1 << 2,4 << 2,2	},
-								{	1 << 2,6 << 2,1	},
-								{	3 << 2,1 << 2,1	},
-								{	4 << 2,1 << 2,1	},
-};
-
-uchar	house_fish_ranges[7][3] = {
-								{	1 << 2,1 << 2,1	},	// Unused.
-								{	4 << 2,2 << 2,2	},
-								{	6 << 2,2 << 2,2	},
-								{	2 << 2,4 << 2,2	},
-								{	2 << 2,3 << 2,1	},
-								{	5 << 2,2 << 2,2	},
-								{	4 << 2,2 << 2,1	},
-};
-
-uchar	shore_fish_ranges[3][3] = {
-								{	3 << 2,3 << 2,6	},
-								{	3 << 2,5 << 2,6	},
-								{	5 << 2,1 << 2,8	},
-};
-
-uchar	crash_fish_ranges[1][3] = {
-								{	5 << 2,1 << 2,6	},
-};
-
-uchar	rapids_fish_ranges[2][3] = {
-								{	4 << 2,4 << 2,8	},
-								{	1 << 2,2 << 2,5	},
-};*/
 
 void SetupShoal(int shoalNumber)
 {
-	//if (CurrentLevel == LV_JUNGLE)
-	//{
 		LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
 		LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
 		LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
-	//}
-	/*else if (CurrentLevel == LV_TEMPLE)
-	{
-		LeaderInfo[shoalNumber].xRange = (temple_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (temple_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (temple_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else if (CurrentLevel == LV_QUADBIKE)
-	{
-		LeaderInfo[shoalNumber].xRange = (quadchase_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (quadchase_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (quadchase_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else if (CurrentLevel == LV_GYM)
-	{
-		LeaderInfo[shoalNumber].xRange = (house_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (house_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (house_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else if (CurrentLevel == LV_SHORE)
-	{
-		LeaderInfo[shoalNumber].xRange = (shore_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (shore_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (shore_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else if (CurrentLevel == LV_CRASH)
-	{
-		LeaderInfo[shoalNumber].xRange = (crash_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (crash_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (crash_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else if (CurrentLevel == LV_RAPIDS)
-	{
-		LeaderInfo[shoalNumber].xRange = (rapids_fish_ranges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].zRange = (rapids_fish_ranges[shoalNumber][1] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (rapids_fish_ranges[shoalNumber][2]) << 8;
-	}
-	else
-	{
-		LeaderInfo[shoalNumber].xRange = 1 << 8;
-		LeaderInfo[shoalNumber].zRange = 1 << 8;
-		LeaderInfo[shoalNumber].yRange = 1 << 8;
-	}*/
 }
 
 

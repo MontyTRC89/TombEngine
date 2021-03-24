@@ -192,19 +192,16 @@ static int DoRubberBoatShift2(ITEM_INFO *skidoo, PHD_VECTOR *pos, PHD_VECTOR *ol
 	{
 		if (z == z_old)
 		{
-			/* Neither shift; may have hit a very steep slope, so need to push back to old position */
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 		}
 		else if (z > z_old)
 		{
-			/* Z shift left */
 			skidoo->pos.zPos -= shift_z + 1;
 			return (pos->x - skidoo->pos.xPos);
 		}
 		else
 		{
-			/* Z shift right */
 			skidoo->pos.zPos += WALL_SIZE - shift_z;
 			return (skidoo->pos.xPos - pos->x);
 		}
@@ -213,20 +210,17 @@ static int DoRubberBoatShift2(ITEM_INFO *skidoo, PHD_VECTOR *pos, PHD_VECTOR *ol
 	{
 		if (x > x_old)
 		{
-			/* X shift up */
 			skidoo->pos.xPos -= shift_x + 1;
 			return (skidoo->pos.zPos - pos->z);
 		}
 		else
 		{
-			/* X shift down */
 			skidoo->pos.xPos += WALL_SIZE - shift_x;
 			return (pos->z - skidoo->pos.zPos);
 		}
 	}
 	else
 	{
-		/* A diagonal hit; means a barrage of tests needed to determine best shift */
 		short roomNumber;
 		FLOOR_INFO* floor;
 		int height;
@@ -257,7 +251,6 @@ static int DoRubberBoatShift2(ITEM_INFO *skidoo, PHD_VECTOR *pos, PHD_VECTOR *ol
 
 		if (x && z)
 		{
-			/* Corner or side collision */
 			skidoo->pos.zPos += z;
 			skidoo->pos.xPos += x;
 		}
@@ -279,7 +272,6 @@ static int DoRubberBoatShift2(ITEM_INFO *skidoo, PHD_VECTOR *pos, PHD_VECTOR *ol
 		}
 		else
 		{
-			/* Pure diagonal collision */
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 		}
@@ -352,10 +344,8 @@ static int RubberBoatDynamics(short boat_number)
 	boat = &g_Level.Items[boat_number];
 	binfo = (RUBBER_BOAT_INFO*)boat->data;
 
-	/* Remove tilt angle (and add again at the end) as effects control */
 	boat->pos.zRot -= binfo->tiltAngle;
 
-	/* First get positions and heights of boat's corners + centre */
 	hfl_old = TestWaterHeight(boat, RUBBER_BOAT_FRONT, -RUBBER_BOAT_SIDE, &fl_old);
 	hfr_old = TestWaterHeight(boat, RUBBER_BOAT_FRONT, RUBBER_BOAT_SIDE, &fr_old);
 	hbl_old = TestWaterHeight(boat, -RUBBER_BOAT_FRONT, -RUBBER_BOAT_SIDE, &bl_old);
@@ -365,7 +355,6 @@ static int RubberBoatDynamics(short boat_number)
 	old.y = boat->pos.yPos;
 	old.z = boat->pos.zPos;
 
-	/* Back left/right may be slightly below ground, so correct for this */
 	if (bl_old.y > hbl_old)
 		bl_old.y = hbl_old;
 	if (br_old.y > hbr_old)
@@ -380,7 +369,6 @@ static int RubberBoatDynamics(short boat_number)
 	boat->pos.yRot += binfo->boatTurn + binfo->extraRotation;
 	binfo->tiltAngle = binfo->boatTurn * 6;
 
-	/* Move boat according to speed */
 	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot);
 	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot);
 	if (boat->speed >= 0)
@@ -388,7 +376,6 @@ static int RubberBoatDynamics(short boat_number)
 	else
 		binfo->propRot += ONE_DEGREE * 33;
 
-	/* Slide boat according to tilts (to avoid getting stuck on slopes) */
 	slip = RUBBER_BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot);
 	if (!slip && boat->pos.zRot)
 		slip = (boat->pos.zRot > 0) ? 1 : -1;
@@ -401,14 +388,11 @@ static int RubberBoatDynamics(short boat_number)
 	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot);
 	boat->pos.xPos -= slip * phd_sin(boat->pos.yRot);
 
-	/* Remember desired position in case of collisions moving us about */
 	moved.x = boat->pos.xPos;
 	moved.z = boat->pos.zPos;
 
-	/* Collision with other boat? */
 	DoRubberBoatShift(boat_number);
 
-	/* Test new positions of points (one at a time) and shift boat accordingly */
 	rot = 0;
 	hbl = TestWaterHeight(boat, -RUBBER_BOAT_FRONT, -RUBBER_BOAT_SIDE, &bl);
 	if (hbl < bl_old.y - STEP_SIZE / 2)
@@ -443,10 +427,8 @@ static int RubberBoatDynamics(short boat_number)
 
 	binfo->extraRotation = rot;
 
-	/* Get collision anim if boat has been moved from desired position by collisions */
 	collide = GetRubberBoatCollisionAnim(boat, &moved);
 
-	/* Check final movement if slipped or collided and adjust speed */
 	if (slip || collide)
 	{
 		newspeed = (boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot);
@@ -460,10 +442,8 @@ static int RubberBoatDynamics(short boat_number)
 			boat->speed /= 2;
 		}
 
-		/* Adjust speed if serious change */
 		if (slip)
 		{
-			/* Only if slip is above certain amount, and boat is not in FAST speed range */
 			if (boat->speed <= RUBBER_BOAT_MAX_SPEED + 10)
 				boat->speed = newspeed;
 		}
@@ -518,7 +498,7 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 	{
 		if ((!(TrInput & IN_ROLL) && !(TrInput & IN_LOOK) || boat->speed))
 		{
-			if (((TrInput & (IN_LEFT/* | IN_LSTEP*/)) && !(TrInput & IN_JUMP)) || ((TrInput & (IN_RIGHT/* | IN_RSTEP*/)) && (TrInput & IN_JUMP)))
+			if (((TrInput & (IN_LEFT)) && !(TrInput & IN_JUMP)) || ((TrInput & (IN_RIGHT)) && (TrInput & IN_JUMP)))
 			{
 				if (binfo->boatTurn > 0)
 					binfo->boatTurn -= ANGLE(1)/4;
@@ -530,7 +510,7 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 				}
 				noTurn = 0;
 			}
-			else if (((TrInput & (IN_RIGHT/* | IN_RSTEP*/)) && !(TrInput & IN_JUMP)) || ((TrInput & (IN_LEFT/* | IN_LSTEP*/)) && (TrInput & IN_JUMP)))
+			else if (((TrInput & (IN_RIGHT)) && !(TrInput & IN_JUMP)) || ((TrInput & (IN_LEFT)) && (TrInput & IN_JUMP)))
 			{
 				if (binfo->boatTurn < 0)
 					binfo->boatTurn += ANGLE(1) / 4;
@@ -563,7 +543,7 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 					boat->speed -= 1;
 
 			}
-			else if (boat->speed >= 0 && boat->speed < 20 && (TrInput & (IN_LEFT | IN_RIGHT))) // (TrInput & (IN_LEFT | IN_LSTEP) | (IN_RIGHT | IN_RSTEP)))
+			else if (boat->speed >= 0 && boat->speed < 20 && (TrInput & (IN_LEFT | IN_RIGHT)))
 			{
 				if (boat->speed == 0 && !(TrInput & IN_ROLL))
 					boat->speed = 20;
@@ -575,7 +555,7 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 		}
 		else
 		{
-			if (boat->speed >= 0 && boat->speed < 20 && (TrInput & (IN_LEFT | IN_RIGHT)))//(TrInput & (IN_LEFT | IN_LSTEP) | (IN_RIGHT | IN_RSTEP)))
+			if (boat->speed >= 0 && boat->speed < 20 && (TrInput & (IN_LEFT | IN_RIGHT)))
 			{
 				if (boat->speed == 0 && !(TrInput & IN_ROLL))
 					boat->speed = 20;
@@ -590,35 +570,6 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 		}
 	}
 	return noTurn;
-}
-
-static void RubberBoatSplash(ITEM_INFO* item, long fallspeed, long water)
-{
-	/*
-	splash_setup.x = item->pos.xPos;
-	splash_setup.y = water;
-	splash_setup.z = item->pos.z_pos;
-	splash_setup.InnerXZoff = 16<<2;
-	splash_setup.InnerXZsize = 12<<2;
-	splash_setup.InnerYsize = -96<<2;
-	splash_setup.InnerXZvel = 0xa0;
-	splash_setup.InnerYvel = -fallspeed<<7;
-	splash_setup.InnerGravity = 0x80;
-	splash_setup.InnerFriction = 7;
-	splash_setup.MiddleXZoff = 24<<2;
-	splash_setup.MiddleXZsize = 24<<2;
-	splash_setup.MiddleYsize = -64<<2;
-	splash_setup.MiddleXZvel = 0xe0;
-	splash_setup.MiddleYvel = -fallspeed<<6;
-	splash_setup.MiddleGravity = 0x48;
-	splash_setup.MiddleFriction = 8;
-	splash_setup.OuterXZoff = 32<<2;
-	splash_setup.OuterXZsize = 32<<2;
-	splash_setup.OuterXZvel = 0x110;
-	splash_setup.OuterFriction = 9;
-	SetupSplash(&splash_setup);
-	SplashCount = 16;
-	*/
 }
 
 void InitialiseRubberBoat(short itemNum)
@@ -693,9 +644,6 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 		AddActiveItem(itemNum);
 		g_Level.Items[itemNum].status = ITEM_ACTIVE;
 	}
-
-	/*if you wanna hardcode which music track to play when you get on the boat, put it here.*/
-	/*but I'm not doing that :P*/
 }
 
 static int CanGetOffRubberBoat(int direction)
@@ -777,9 +725,9 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 			{
 				if (boat->speed == 0)
 				{
-					if ((TrInput & IN_RIGHT/* | IN_RSTEP*/) && CanGetOffRubberBoat(boat->pos.yRot + ANGLE(90)))
+					if ((TrInput & IN_RIGHT) && CanGetOffRubberBoat(boat->pos.yRot + ANGLE(90)))
 						LaraItem->goalAnimState = RUBBER_BOAT_JUMPR;
-					else if ((TrInput & IN_LEFT/* | IN_LSTEP*/) && CanGetOffRubberBoat(boat->pos.yRot - ANGLE(90)))
+					else if ((TrInput & IN_LEFT) && CanGetOffRubberBoat(boat->pos.yRot - ANGLE(90)))
 						LaraItem->goalAnimState = RUBBER_BOAT_JUMPL;
 				}
 			}
@@ -791,9 +739,9 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 		case RUBBER_BOAT_MOVING:
 			if (boat->speed <= 0)
 				LaraItem->goalAnimState = RUBBER_BOAT_STILL;
-			if (TrInput & IN_RIGHT)// | IN_RSTEP)
+			if (TrInput & IN_RIGHT)
 				LaraItem->goalAnimState = RUBBER_BOAT_TURNR;
-			else if (TrInput & IN_LEFT)// | IN_LSTEP)
+			else if (TrInput & IN_LEFT)
 				LaraItem->goalAnimState = RUBBER_BOAT_TURNL;
 			
 			break;
@@ -803,13 +751,13 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 		case RUBBER_BOAT_TURNR:
 			if (boat->speed <= 0)
 				LaraItem->goalAnimState = RUBBER_BOAT_STILL;
-			else if (!(TrInput & IN_RIGHT))// | IN_RSTEP))
+			else if (!(TrInput & IN_RIGHT))
 				LaraItem->goalAnimState = RUBBER_BOAT_MOVING;
 			break;
 		case RUBBER_BOAT_TURNL:
 			if (boat->speed <= 0)
 				LaraItem->goalAnimState = RUBBER_BOAT_STILL;
-			else if (!(TrInput & IN_LEFT))// | IN_LSTEP))
+			else if (!(TrInput & IN_LEFT))
 				LaraItem->goalAnimState = RUBBER_BOAT_MOVING;
 			break;
 		}
@@ -938,9 +886,6 @@ void RubberBoatControl(short itemNum)
 	boat = &g_Level.Items[itemNum];
 	binfo = (RUBBER_BOAT_INFO*)boat->data;
 	collide = RubberBoatDynamics(itemNum);
-//	collide = 0; what the hell
-	/* Now got final position, so get heights under middle and corners (will only have changed
-		from above if collision occurred, but recalc anyway as hardly big maths) */
 	hfl = TestWaterHeight(boat, RUBBER_BOAT_FRONT, -RUBBER_BOAT_SIDE, &fl);
 	hfr = TestWaterHeight(boat, RUBBER_BOAT_FRONT, RUBBER_BOAT_SIDE, &fr);
 
@@ -952,12 +897,11 @@ void RubberBoatControl(short itemNum)
 	if (Lara.Vehicle == itemNum)
 	{
 		TestTriggers(TriggerIndex, 0, 0);
-		TestTriggers(TriggerIndex, 1, 0); // HEAVY too
+		TestTriggers(TriggerIndex, 1, 0);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
 
-	/* Deal with user input; will effect next frame, but relies on info calced this frame */
 	if (Lara.Vehicle == itemNum && LaraItem->hitPoints > 0)
 	{
 		switch (LaraItem->currentAnimState)
@@ -975,7 +919,6 @@ void RubberBoatControl(short itemNum)
 	}
 	else
 	{
-		/* Boat has no driver */
 		if (boat->speed > RUBBER_BOAT_SLOWDOWN)
 			boat->speed -= RUBBER_BOAT_SLOWDOWN;
 		else
@@ -984,7 +927,6 @@ void RubberBoatControl(short itemNum)
 
 	if (no_turn)
 	{
-		/* Straighten up if not under control */
 		if (binfo->boatTurn < -RUBBER_BOAT_UNDO_TURN)
 			binfo->boatTurn += RUBBER_BOAT_UNDO_TURN;
 		else if (binfo->boatTurn > RUBBER_BOAT_UNDO_TURN)
@@ -993,22 +935,17 @@ void RubberBoatControl(short itemNum)
 			binfo->boatTurn = 0;
 	}
 
-	/* Get floor height (keep slightly above water surface) */
 	boat->floor = height - 5;
 	if (binfo->water == NO_HEIGHT)
 		binfo->water = height;
 	else
 		binfo->water -= 5;
 
-	/* Do fallspeed effects on boat */
 	binfo->leftFallspeed = DoRubberBoatDynamics(hfl, binfo->leftFallspeed, (int*)&fl.y);
 	binfo->rightFallspeed = DoRubberBoatDynamics(hfr, binfo->rightFallspeed, (int*)&fr.y);
 	ofs = boat->fallspeed;
 	boat->fallspeed = DoRubberBoatDynamics(binfo->water, boat->fallspeed, (int*)&boat->pos.yPos);
-	if (ofs - boat->fallspeed > 32 && boat->fallspeed == 0 && water != NO_HEIGHT)
-		RubberBoatSplash(boat, ofs - boat->fallspeed, water);
 
-	/* Rotate boat to match these heights */
 	height = (fl.y + fr.y);
 	if (height < 0)
 		height = -(abs(height) / 2);
@@ -1021,7 +958,6 @@ void RubberBoatControl(short itemNum)
 	boat->pos.xRot += ((x_rot - boat->pos.xRot) / 2);
 	boat->pos.zRot += ((z_rot - boat->pos.zRot) / 2);
 
-	/* Auto level the boat on flat water (to stop evil shifts) */
 	if (!x_rot && abs(boat->pos.xRot) < 4)
 		boat->pos.xRot = 0;
 	if (!z_rot && abs(boat->pos.zRot) < 4)
@@ -1085,11 +1021,6 @@ void RubberBoatControl(short itemNum)
 	else
 		h = 1;
 
-/*	if (LaraItem->currentAnimState == 3 || LaraItem->currentAnimState == 4)
-		nowake = 1;
-	else
-		nowake = 0;*/
-
 	prop.x = 0;
 	prop.y = 0;
 	prop.z = -80;
@@ -1129,5 +1060,4 @@ void RubberBoatControl(short itemNum)
 
 		}
 	}
-	//update wake effects
 }
