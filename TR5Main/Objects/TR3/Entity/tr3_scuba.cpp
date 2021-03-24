@@ -31,8 +31,6 @@ static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, s
 
 		AddActiveItem(harpoonItemNum);
 		harpoon->status = ITEM_ACTIVE;
-
-		//SoundEffect(247, &dart->pos, 0);
 	}
 }
 
@@ -63,12 +61,7 @@ void ScubaHarpoonControl(short itemNum)
 			ItemNewRoom(itemNum, roomNumber);
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->pos.yPos >= item->floor)
-		{
-			//for (int i = 0; i < 4; i++)
-			//	TriggerDartSmoke(ox, item->pos.yPos, oz, 0, 0, 1);
 			KillItem(itemNum);
-			//		SoundEffect(258, &item->pos, 0);
-		}
 	}
 }
 
@@ -116,7 +109,7 @@ void ScubaControl(short itemNumber)
 			start.roomNumber = item->roomNumber;
 
 			target.x = LaraItem->pos.xPos;
-			target.y = LaraItem->pos.yPos - (LARA_HITE - 150); // don't look at her origin, aim higher
+			target.y = LaraItem->pos.yPos - (LARA_HITE - 150);
 			target.z = LaraItem->pos.zPos;
 
 			shoot = LOS(&start, &target);
@@ -152,7 +145,6 @@ void ScubaControl(short itemNumber)
 		switch (item->currentAnimState)
 		{
 		case 1:
-			// Diver underwater
 			creature->maximumTurn = ANGLE(3);
 			if (shoot)
 				neck = -info.angle;

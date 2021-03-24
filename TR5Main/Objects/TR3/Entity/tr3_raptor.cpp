@@ -37,7 +37,7 @@ void RaptorControl(short itemNum)
 	}
 	else
 	{
-		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F)) 													   // Decide on target - this can be Lara, another creature, or an ambush point
+		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F))
 		{
 			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
@@ -129,7 +129,6 @@ void RaptorControl(short itemNum)
 				item->requiredAnimState = 6;
 				item->goalAnimState = 1;
 				creature->flags &= ~2;
-
 			}
 			break;
 

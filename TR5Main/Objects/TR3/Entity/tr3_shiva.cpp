@@ -137,8 +137,6 @@ void InitialiseShiva(short itemNum)
 
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
-	//item->status = ITEM_NOT_ACTIVE;
-	//item->meshBits = 0;
 }
 
 void ShivaControl(short itemNum)
@@ -160,8 +158,8 @@ void ShivaControl(short itemNum)
 	shiva = (CREATURE_INFO*)item->data;
 	head_x = head_y = torso_x = torso_y = angle = tilt = 0;
 	lara_alive = (LaraItem->hitPoints > 0);
-	pos.x = 0;             // Copy Offsets from mesh
-	pos.y = 0;             // Pivot
+	pos.x = 0;
+	pos.y = 0;
 	pos.z = 256;
 
 	if (item->hitPoints <= 0)
@@ -217,7 +215,7 @@ void ShivaControl(short itemNum)
 			{
 				item->goalAnimState = 0;
 				effect_mesh = 0;
-				shiva->flags = -45; //set up the delay before actually moving
+				shiva->flags = -45;
 			}
 			break;
 
@@ -225,7 +223,7 @@ void ShivaControl(short itemNum)
 			if (info.ahead)
 				head_y = info.angle;
 
-			if (shiva->flags < 0)   //delay before moving
+			if (shiva->flags < 0)
 			{
 				shiva->flags++;
 				TriggerShivaSmoke(item->pos.xPos + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->pos.zPos + (GetRandomControl() & 0x5FF) - 0x300, 1);
@@ -403,7 +401,7 @@ void ShivaControl(short itemNum)
 
 	if (lara_alive && LaraItem->hitPoints <= 0)
 	{
-		CreatureKill(item, 18, 6, 2); // uses EXTRA_YETIKILL slot
+		CreatureKill(item, 18, 6, 2);
 		return;
 	}
 

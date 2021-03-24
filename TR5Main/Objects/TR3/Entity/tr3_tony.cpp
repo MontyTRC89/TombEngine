@@ -17,13 +17,13 @@
 enum TonyFlameType
 {
 	T_NOFLAME = 0,
-	T_ROCKZAPPL = 0,      // To ceiling from left hand
-	T_ROCKZAPPR,          // To ceiling from right hand
-	T_ZAPP,               // From right hand.
-	T_DROPPER,            // From ceiling.
-	T_ROCKZAPPDEBRIS,     // Small bits from ceiling explosions.
-	T_ZAPPDEBRIS,         // Small bits from hand flame explosions.
-	T_DROPPERDEBRIS       // Small bits from droppers explosions.
+	T_ROCKZAPPL = 0,
+	T_ROCKZAPPR,
+	T_ZAPP,
+	T_DROPPER,
+	T_ROCKZAPPDEBRIS,
+	T_ZAPPDEBRIS,
+	T_DROPPERDEBRIS
 };
 
 struct TONY_FLAME
@@ -48,8 +48,7 @@ enum TONY_STATE
 	TONYBOSS_DEATH
 };
 
-static BOSS_STRUCT BossData;             // exclusive for tony unlike TR3
-
+static BOSS_STRUCT BossData;
 #define TONYBOSS_TURN ANGLE(2.0f)
 #define TONYBOSS_HITS 100
 #define MAX_TONY_TRIGGER_RANGE 0x4000
@@ -271,7 +270,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lar
 	case T_DROPPER:
 		flame.on = true;
 		flame.pos.x = lara_pos->x;
-		flame.pos.y = lara_pos->y + 64; // avoid some ceiling problem (only for TR3 thought)...
+		flame.pos.y = lara_pos->y + 64;
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = (GetRandomControl() & 3) + 4;
 		flame.speed = 0;
@@ -376,7 +375,7 @@ void ControlTonyFireBall(short fxNumber)
 		{
 			PHD_VECTOR pos;
 
-			TriggerExplosionSparks(old_x, old_y, old_z, 3, -2, 0, fx->roomNumber); // -2 = Set off a dynamic light controller.
+			TriggerExplosionSparks(old_x, old_y, old_z, 3, -2, 0, fx->roomNumber);
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
 				for (x = 0; x < 2; x++)
@@ -406,7 +405,7 @@ void ControlTonyFireBall(short fxNumber)
 				pos.y = GetCeiling(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos) + 256;
 				pos.x = LaraItem->pos.xPos + (GetRandomControl() & 1023) - 512;
 				pos.z = LaraItem->pos.zPos + (GetRandomControl() & 1023) - 512;
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, room_number); // -2 = Set off a dynamic light controller.
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, room_number);
 				TriggerFireBall(NULL, T_DROPPER, &pos, room_number, 0, 0);
 			}
 		}
@@ -466,7 +465,7 @@ void InitialiseTony(short itemNum)
 	BossData.ExplodeCount = 0;
 	BossData.RingCount = 0;
 	BossData.DroppedIcon = false;
-	BossData.DrawExplode = false; // not draw it when triggered !
+	BossData.DrawExplode = false;
 	BossData.Dead = false;
 }
 
@@ -489,7 +488,6 @@ static void ExplodeTonyBoss(ITEM_INFO* item)
 		y = item->pos.yPos - (GetRandomDraw() & 0x3FF) - 256;
 		z = item->pos.zPos + (GetRandomDraw() & 0x3FF) - 512;
 		BossData.DrawExplode = true;
-		// TODO: AddExplosionRings(x, y, z); // random position for rings
 
 		TriggerExplosionSparks(x, y, z, 3, -2, 0, item->roomNumber);
 		for (int i = 0; i < 2; i++)
@@ -500,7 +498,6 @@ static void ExplodeTonyBoss(ITEM_INFO* item)
 
 	if (BossData.DrawExplode)
 	{
-		// TODO: AddExplosionGeometry(item->pos.xPos, item->pos.yPos - 512, item->pos.zPos, BossData.ExplodeCount); // int x, int y, int z, int size
 		BossData.DrawExplode = false;
 	}
 }
@@ -552,12 +549,12 @@ void TonyControl(short itemNum)
 	}
 	else
 	{
-		if (item->itemFlags[3] != 2)	        // Still invincible ?
+		if (item->itemFlags[3] != 2)
 			item->hitPoints = TONYBOSS_HITS;
 
 		CreatureAIInfo(item, &info);
 
-		if (!item->itemFlags[3])	            // Is she close enough yet ?
+		if (!item->itemFlags[3])
 		{
 			int dx, dz;
 			dx = item->pos.xPos - LaraItem->pos.xPos;
@@ -578,20 +575,20 @@ void TonyControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-			case TONYBOSS_WAIT:		// Waiting.
+			case TONYBOSS_WAIT:
 				tonyboss->maximumTurn = 0;
 				if (item->goalAnimState != TONYBOSS_RISE && item->itemFlags[3])
 					item->goalAnimState = TONYBOSS_RISE;
 				break;
 
-			case TONYBOSS_RISE:		// Rising.
+			case TONYBOSS_RISE:
 				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) > 16)
 					tonyboss->maximumTurn = TONYBOSS_TURN;
 				else
 					tonyboss->maximumTurn = 0;
 				break;
 
-			case TONYBOSS_FLOAT:	// Rising.
+			case TONYBOSS_FLOAT:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
 				tonyboss->maximumTurn = TONYBOSS_TURN;
@@ -624,7 +621,7 @@ void TonyControl(short itemNum)
 				}
 				break;
 
-			case TONYBOSS_ROCKZAPP:	// Shooting at ceiling.
+			case TONYBOSS_ROCKZAPP:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
 				tonyboss->maximumTurn = 0;
@@ -636,7 +633,7 @@ void TonyControl(short itemNum)
 				}
 				break;
 
-			case TONYBOSS_ZAPP:	// Shooting at ceiling.
+			case TONYBOSS_ZAPP:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
 				tonyboss->maximumTurn = TONYBOSS_TURN / 2;
@@ -645,12 +642,12 @@ void TonyControl(short itemNum)
 					TriggerFireBall(item, T_ZAPP, NULL, item->roomNumber, item->pos.yRot, 0);
 				break;
 
-			case TONYBOSS_BIGBOOM:	// Changing room.
+			case TONYBOSS_BIGBOOM:
 				tonyboss->maximumTurn = 0;
 				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 56)
 				{
 					item->itemFlags[3] = 2;
-					BossData.DrawExplode = true; // EXPLOOOOOOOOOOSION (if you have the ref (O.~))
+					BossData.DrawExplode = true;
 				}
 				break;
 
@@ -699,8 +696,6 @@ void TonyControl(short itemNum)
 		ExplodeTonyBoss(item);
 		BossData.ExplodeCount++;
 
-		//if (bossdata.explode_count == 32)
-		//	DoFlipMap(1);
 		if (BossData.ExplodeCount > 64)
 		{
 			BossData.ExplodeCount = 0;
@@ -708,7 +703,6 @@ void TonyControl(short itemNum)
 		}
 	}
 
-	/* Actually do animation allowing for collisions */
 	CreatureJoint(item, 0, torso_y >> 1);
 	CreatureJoint(item, 1, torso_x);
 	CreatureJoint(item, 2, torso_y >> 1);
@@ -718,11 +712,4 @@ void TonyControl(short itemNum)
 void S_DrawTonyBoss(ITEM_INFO* item)
 {
 	DrawAnimatingItem(item);
-
-	// TODO: psx draw (need to be rewrited !)
-	//if (bossdata.explode_count && item->hitPoints <= 0)
-	//	DrawExplosionRings();
-
-	//if (bossdata.explode_count && bossdata.explode_count <= 64)
-	//	DrawTonyBossShield(item);
 }

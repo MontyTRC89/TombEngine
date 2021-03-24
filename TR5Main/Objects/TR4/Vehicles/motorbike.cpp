@@ -1319,13 +1319,13 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         {
             motorbike->velocity -= MOTORBIKE_FRICTION;
             if (motorbike->velocity < 0)
-                motorbike->velocity = 0;//because bitch.
+                motorbike->velocity = 0;
         }
         else if (motorbike->velocity < MOTORBIKE_FRICTION)
         {
             motorbike->velocity += MOTORBIKE_FRICTION;
             if (motorbike->velocity > 0)
-                motorbike->velocity = 0;//because bitch.
+                motorbike->velocity = 0;
         }
         else
             motorbike->velocity = 0;
