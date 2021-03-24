@@ -22,7 +22,7 @@ void SilencerControl(short itemNum)
 	{
 		if (item->currentAnimState != 12 && item->currentAnimState != 13)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 20; // die 21 is for heavy weapon.
+			item->animNumber = Objects[item->objectNumber].animIndex + 20;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 13;
 		}

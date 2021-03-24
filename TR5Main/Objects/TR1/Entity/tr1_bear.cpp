@@ -55,12 +55,10 @@ void BearControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-//		if (item->currentAnimState != 9)
-//		{
-			angle = CreatureTurn(item, ANGLE(1));
+		angle = CreatureTurn(item, ANGLE(1));
 
-			switch (item->currentAnimState)
-			{
+		switch (item->currentAnimState)
+		{
 			case BEAR_WALK:
 			{
 				item->goalAnimState = BEAR_REAR;
@@ -93,13 +91,9 @@ void BearControl(short itemNum)
 					creature->flags = 0;
 				}
 
-				//				item->animNumber = Objects[item->objectNumber].animIndex + 20;
-				//				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				//				item->currentAnimState = 9;
 				break;
 			}
-			}
-//		}
+		}
 	}
 	else
 	{
@@ -172,7 +166,6 @@ void BearControl(short itemNum)
 		case BEAR_RUN:
 			creature->maximumTurn = RUN_TURN;
 
-			// if the bear slams you it hurts
 			if (item->touchBits & TOUCH)
 			{
 				LaraItem->hitPoints -= CHARGE_DAMAGE;
@@ -185,7 +178,6 @@ void BearControl(short itemNum)
 			}
 			else if (info.ahead && !item->requiredAnimState)
 			{
-				// bear may rear up, but not after he's taken some bullets!
 				if (!creature->flags && info.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
 					item->requiredAnimState = BEAR_REAR;

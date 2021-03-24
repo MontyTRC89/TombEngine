@@ -270,16 +270,15 @@ void YetiControl(short itemNum)
 		case 11:
 		case 12:
 		case 13:
-			yeti->maximumTurn = 0; // stop yeti to rotate when climbing !
+			yeti->maximumTurn = 0;
 			break;
 		}
 	}
 
-	// if lara dead, play special kill anim:
 	if (!lara_alive)
 	{
 		yeti->maximumTurn = 0;
-		CreatureKill(item, 31, 14, 103); // TODO: need to create a function for old extra anim use.
+		CreatureKill(item, 31, 14, 103);
 		return;
 	}
 
