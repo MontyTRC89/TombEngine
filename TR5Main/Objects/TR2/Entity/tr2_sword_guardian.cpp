@@ -20,9 +20,6 @@ void InitialiseSwordGuardian(short itemNum)
 	item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
-
-	//item->status = ITEM_NOT_ACTIVE;
-	//item->meshBits = 0;
 }
 
 static void SwordGuardianFly(ITEM_INFO* item)
@@ -69,27 +66,11 @@ void SwordGuardianControl(short itemNum)
 			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;
 			item->currentAnimState = 12;
-
-			/*
-			if (!item->meshBits)
-			{
-				SoundEffect(105, NULL, 0);
-				item->meshBits = 0xFFFFFFFF;
-				item->objectNumber = ID_SAS;
-				ExplodingDeath(itemNum, -1, 256);
-				item->objectNumber = ID_SWAT;
-				DisableBaddieAI(itemNum);
-				KillItem(itemNum);
-				item->status = ITEM_DESACTIVATED;
-				item->flags |= ONESHOT;
-			}
-			*/
 		}
 		return;
 	}
 	else
 	{
-		/* Get ground based information */
 		sword->LOT.step = STEP_SIZE;
 		sword->LOT.drop = -STEP_SIZE;
 		sword->LOT.fly = NO_FLYING;
@@ -98,7 +79,6 @@ void SwordGuardianControl(short itemNum)
 
 		if (item->currentAnimState == 8)
 		{
-			/* If flying and not in same zone, then use fly zone */
 			if (info.zoneNumber != info.enemyZone)
 			{
 				sword->LOT.step = WALL_SIZE * 20;
@@ -114,7 +94,7 @@ void SwordGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, sword->maximumTurn);
 
-		if (item->currentAnimState != 9) // for reload
+		if (item->currentAnimState != 9)
 			item->meshBits = 0xFFFFFFFF;
 
 		switch (item->currentAnimState)

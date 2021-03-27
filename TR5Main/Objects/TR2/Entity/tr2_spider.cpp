@@ -13,7 +13,6 @@
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 
-// fix blood pos for small spider.
 static void S_SpiderBite(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
@@ -35,11 +34,9 @@ static void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 
 	CreatureAnimation(itemNum, angle, 0);
 
-	/* is this move less than 1.5 STEP_L height, if so dont do leap */
 	if (item->pos.yPos > (vec.y - (STEP_SIZE * 3) / 2))
 		return;
 
-	/* else move spider back and do a jump instead ! */
 	item->pos.xPos = vec.x;
 	item->pos.yPos = vec.y;
 	item->pos.zPos = vec.z;
@@ -200,7 +197,7 @@ void BigSpiderControl(short itemNum)
 				else
 					break;
 			}
-			else if (info.ahead && info.distance < (SQUARE(STEP_SIZE * 3) + 15)) // +15 fix attack distance !
+			else if (info.ahead && info.distance < (SQUARE(STEP_SIZE * 3) + 15))
 			{
 				item->goalAnimState = 4;
 			}

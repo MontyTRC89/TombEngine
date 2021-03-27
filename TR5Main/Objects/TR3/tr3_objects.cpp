@@ -224,9 +224,6 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
-		//if (!Objects[MESHSWAP2].loaded)
-		//	S_ExitSystem("FATAL: Monkey requires MESHSWAP2 (Monkey + Pickups)");
-		//obj->draw_routine = DrawMonkey;
 		obj->initialise = InitialiseMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;

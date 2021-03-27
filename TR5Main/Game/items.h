@@ -30,6 +30,12 @@ typedef enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
+struct ROOM_VECTOR
+{
+	int roomNumber;
+	int yNumber;
+};
+
 typedef struct ITEM_INFO
 {
 	int floor;
@@ -42,6 +48,7 @@ typedef struct ITEM_INFO
 	short animNumber;
 	short frameNumber;
 	short roomNumber;
+	ROOM_VECTOR location;
 	short nextItem;
 	short nextActive;
 	short speed;
@@ -74,7 +81,7 @@ typedef struct ITEM_INFO
 	short drawRoom;
 	short TOSSPAD;
 	PHD_3DPOS startPos;
-	short location;
+	short locationAI;
 };
 
 // used by fx->shade !
@@ -103,6 +110,4 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
-ITEM_INFO* find_a_fucking_item(short objectNum);
-int FindItemNumber(short objectNumber);
-ITEM_INFO* FindItem(short objectNumber);
+std::vector<int> FindItem(short objectNumber);

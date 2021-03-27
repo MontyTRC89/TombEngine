@@ -60,7 +60,7 @@ void BirdMonsterControl(short itemNum)
 				if (info.zoneNumber != info.enemyZone)
 				{
 					item->goalAnimState = 2;
-					monster->mood = ESCAPE_MOOD; // fix some problem with the GetCreatureMood()/CreatureMood().
+					monster->mood = ESCAPE_MOOD;
 				}
 				else
 					item->goalAnimState = 8;

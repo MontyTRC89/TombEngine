@@ -103,7 +103,7 @@ void MPStickControl(short itemNumber)
 					continue;
 
 				target = &g_Level.Items[currentCreature->itemNum];
-				if (target->objectNumber != ID_LARA /*&& target->objectNumber != ID_BOB*/)
+				if (target->objectNumber != ID_LARA)
 					continue;
 
 				dx = target->pos.xPos - item->pos.xPos;
@@ -143,7 +143,7 @@ void MPStickControl(short itemNumber)
 
 		enemy = creature->enemy;
 		creature->enemy = LaraItem;
-		if (item->hitStatus || ((laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) && (abs(LaraItem->pos.yPos - item->pos.yPos) < 1024))) // TS- TODO: take this back out after demo!!
+		if (item->hitStatus || ((laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) && (abs(LaraItem->pos.yPos - item->pos.yPos) < 1024)))
 		{
 			if (!creature->alerted)
 				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->pos, 0);

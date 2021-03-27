@@ -82,13 +82,11 @@ static bool RatIsInWater(ITEM_INFO* item, CREATURE_INFO* big_rat)
     }
 }
 
-// initialised at loading level
 void InitialiseBigRat(short itemNumber)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];
     InitialiseCreature(itemNumber);
 
-    // if the room is a "water room"
     if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
     {
         item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_SWIM;
@@ -96,7 +94,6 @@ void InitialiseBigRat(short itemNumber)
         item->currentAnimState = BIG_RAT_SWIM;
         item->goalAnimState = BIG_RAT_SWIM;
     }
-    // else it's a "ground room"
     else
     {
         item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_EMPTY;
@@ -106,7 +103,6 @@ void InitialiseBigRat(short itemNumber)
     }
 }
 
-// when triggered !
 void BigRatControl(short itemNumber)
 {
     if (!CreatureActive(itemNumber))
@@ -129,7 +125,6 @@ void BigRatControl(short itemNumber)
     {
         if (item->currentAnimState != BIG_RAT_LAND_DEATH && item->currentAnimState != BIG_RAT_WATER_DEATH)
         {
-            // water
             if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             {
                 item->animNumber = obj->animIndex + BIG_RAT_ANIM_WATER_DEATH;
@@ -137,7 +132,6 @@ void BigRatControl(short itemNumber)
                 item->currentAnimState = BIG_RAT_WATER_DEATH;
                 item->goalAnimState = BIG_RAT_WATER_DEATH;
             }
-            // land
             else
             {
                 item->animNumber = obj->animIndex + BIG_RAT_ANIM_LAND_DEATH;
@@ -147,7 +141,6 @@ void BigRatControl(short itemNumber)
             }
         }
 
-        // creatures in water are floating after death.
         if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             CreatureFloat(itemNumber);
     }
@@ -189,7 +182,6 @@ void BigRatControl(short itemNumber)
         case BIG_RAT_RUN:
             big_rat->maximumTurn = BIG_RAT_RUN_TURN;
 
-            // land to water transition:
             if (RatIsInWater(item, big_rat))
             {
                 item->requiredAnimState = BIG_RAT_SWIM;
@@ -236,7 +228,6 @@ void BigRatControl(short itemNumber)
         case BIG_RAT_SWIM:
             big_rat->maximumTurn = BIG_RAT_SWIM_TURN;
 
-            // water to land transition:
             if (!RatIsInWater(item, big_rat))
             {
                 item->requiredAnimState = BIG_RAT_RUN;

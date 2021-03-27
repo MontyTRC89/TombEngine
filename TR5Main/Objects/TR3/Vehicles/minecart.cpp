@@ -49,7 +49,6 @@ typedef enum MINECART_FLAGS
 	CF_DEAD = 128
 };
 
-/// ANIMATION:
 #define GETOFF_DIST 330
 #define CART_DEC -1536
 #define CART_MIN_SPEED 2560
@@ -118,7 +117,6 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
 		return 0;
 
-	/* -------- is Lara close enough to use the vehicle */
 	if (!TestBoundsCollide(v, l, coll->radius))
 		return false;
 
@@ -225,14 +223,14 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 										roomNumber = item->roomNumber;
 										floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-										TestTriggers(TriggerIndex, TRUE, 0); // heavytrigger enabled
+										TestTriggers(TriggerIndex, TRUE, 0);
 										item->frameNumber++;
 									}
 								}
 							}
 							else if (item->objectNumber == ID_ROLLINGBALL)
 							{
-								// KILL lara and stop rolling ball and minecart !
+								/*code, kill lara and stop both the boulder and the minecart*/
 							}
 							else
 							{
@@ -248,19 +246,15 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 	}
 }
 
-
-// TODO: add special trigger (MINER_TYPE and MINEL_TYPE) and Lara.MineR and Lara.MineL to have a fully minecart working !
 static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 {
 	short val;
-
-	// check for end of track
 	if (cart->StopDelay)
 		cart->StopDelay--;
 
 	if (((Lara.mineL) && (Lara.mineR) && (!cart->StopDelay)) && (((v->pos.xPos & 0x380) == 512) || ((v->pos.zRot & 0x380) == 512)))
 	{
-		if (cart->Speed < 0xf000)	// can't do this - bastard
+		if (cart->Speed < 0xf000)
 		{
 			cart->Flags |= CF_STOPPED | CF_CONTROL;
 			cart->Speed = v->speed = 0;
@@ -270,7 +264,6 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			cart->StopDelay = 16;
 	}
 
-	// initiate turns
 	if ((Lara.mineL || Lara.mineR) && (!(Lara.mineL && Lara.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
 	{
 		short ang;
@@ -333,7 +326,6 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		cart->Flags |= (Lara.mineL) ? CF_TURNINGL : CF_TURNINGR;
 	}
 
-	// move vehicle
 	if (cart->Speed < CART_MIN_SPEED)
 		cart->Speed = CART_MIN_SPEED;
 
@@ -360,7 +352,6 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
 	}
 
-	// move cart around corners
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
 		float x, z;
@@ -420,12 +411,10 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 	else
 	{
-		// move cart normally
 		v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
 		v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
 	}
 
-	// tilt cart on slopes
 	cart->MidPos = TestMinecartHeight(v, 0, 0);
 
 	if (!cart->YVel)
@@ -457,7 +446,6 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 	v->pos.xRot = cart->Gradient * 32;
 
-	// tilt cart around corners
 	val = v->pos.yRot & 16383;
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
@@ -612,10 +600,6 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			if ((l->frameNumber == GF2(ID_MINECART, 7, 0) + 20) && (cart->Flags & CF_MESH))
 			{
-				/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
-				
-				LARA_MESHES(ID_MINECART_LARA_ANIMS, LM_RHAND);
-				Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
 				Lara.meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 
 				cart->Flags &= ~CF_MESH;
@@ -721,7 +705,6 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 	}
 
-	/* -------- sync vehicle's anims with Lara */
 	if ((Lara.Vehicle != NO_ITEM) && (!(cart->Flags & CF_NOANIM)))
 	{
 		AnimateItem(l);
@@ -729,11 +712,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		v->animNumber = Objects[ID_MINECART].animIndex + (l->animNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
 	}
-
-	/* -------- initiate animations according to collision */
 	if ((l->currentAnimState != CART_TURNDEATH) && (l->currentAnimState != CART_WALLDEATH) && (l->hitPoints > 0))
 	{
-		/* -------- fall off corners */
 		if ((v->pos.zRot > TERMINAL_ANGLE) || (v->pos.zRot < -TERMINAL_ANGLE))
 		{
 			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
@@ -744,7 +724,6 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			return;
 		}
 
-		/* -------- smack into walls */
 		fh = GetCollision(v, v->pos.yRot, 512, &ch);
 		if (fh < -(STEP_SIZE * 2))
 		{
@@ -757,7 +736,6 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			return;
 		}
 
-		/* -------- smack into ceilings */
 		if ((l->currentAnimState != CART_DUCK) && (l->currentAnimState != CART_HIT))
 		{
 			COLL_INFO coll;
@@ -783,11 +761,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			}
 		}
 
-		/* -------- initiate jumps */
 		if ((fh > 512 + 64) && (!cart->YVel))
 			cart->YVel = CART_JUMP_VEL;
 
-		/* -------- collide with baddies */
 		CartToBaddieCollision(v);
 	}
 }
@@ -822,7 +798,6 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		Lara.Vehicle = itemNum;
 
-		/* -------- throw flare away if using */
 		if (Lara.gunType == WEAPON_FLARE)
 		{
 			CreateFlare(ID_FLARE_ITEM, FALSE);
@@ -832,8 +807,6 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 
 		Lara.gunStatus = LG_HANDS_BUSY;
-
-		/* -------- initiate animation */
 
 		ang = short(mGetAngle(v->pos.xPos, v->pos.zPos, l->pos.xPos, l->pos.zPos) - v->pos.yRot);
 
@@ -876,7 +849,6 @@ int MineCartControl(void)
 	if (cart->Flags & CF_CONTROL)
 		MoveCart(v, LaraItem, cart);
 
-	/* -------- move Lara to vehicle pos */
 	if (Lara.Vehicle != NO_ITEM)
 	{
 		LaraItem->pos.xPos = v->pos.xPos;

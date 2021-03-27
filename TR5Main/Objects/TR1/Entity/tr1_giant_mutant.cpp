@@ -9,8 +9,6 @@
 #include "lara.h"
 #include "sound.h"
 
-// TORSO
-
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
 	ABORT_ATTACK3, ABORT_FORWARD, ABORT_SET, ABORT_FALL, ABORT_DEATH, ABORT_KILL
@@ -45,7 +43,6 @@ void AbortionControl(short itemNum)
 	abort = (CREATURE_INFO*)item->data;
 	head = angle = 0;
 
-	/* Has abortion been killed? */
 	if (item->hitPoints <= 0)
 	{
 		if (item->currentAnimState != ABORT_DEATH)
@@ -65,10 +62,8 @@ void AbortionControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		/* Work out required turn */
 		angle = (short)phd_atan(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
 
-		/* Touch damage */
 		if (item->touchBits)
 		{
 			LaraItem->hitPoints -= ABORT_TOUCH_DAMAGE;
@@ -93,7 +88,6 @@ void AbortionControl(short itemNum)
 				item->goalAnimState = ABORT_TURNL;
 			else if (info.distance < ABORT_ATTACK_RANGE)
 			{
-				/* If Lara is gonna get killed by this, do it the pretty way */
 				if (LaraItem->hitPoints <= ABORT_ATTACK_DAMAGE)
 				{
 					if (info.distance < ABORT_CLOSE_RANGE)
@@ -125,7 +119,6 @@ void AbortionControl(short itemNum)
 			break;
 
 		case ABORT_TURNR:
-			/* Turn 27 degrees to right (only turning when abortion pushes with hands) */
 			if (!abort->flags)
 				abort->flags = item->frameNumber;
 			else if (item->frameNumber - abort->flags > 16 && item->frameNumber - abort->flags < 23)
@@ -136,7 +129,6 @@ void AbortionControl(short itemNum)
 			break;
 
 		case ABORT_TURNL:
-			/* Turn 27 degrees to left (only turning when abortion pushes with hands) */
 			if (!abort->flags)
 				abort->flags = item->frameNumber;
 			else if (item->frameNumber - abort->flags > 13 && item->frameNumber - abort->flags < 23)
@@ -198,7 +190,6 @@ void AbortionControl(short itemNum)
 
 	CreatureJoint(item, 0, head);
 
-	/* Actually do animation allowing for collisions */
 	if (item->currentAnimState == ABORT_FALL)
 	{
 		AnimateItem(item);
@@ -214,7 +205,6 @@ void AbortionControl(short itemNum)
 	else
 		CreatureAnimation(itemNum, 0, 0);
 
-	/* Explode on death and set off heavy trigger into the bargain */
 	if (item->status == ITEM_DEACTIVATED)
 	{
 		SoundEffect(171, &item->pos, NULL);

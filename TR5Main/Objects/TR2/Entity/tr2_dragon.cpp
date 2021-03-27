@@ -13,9 +13,6 @@
 #include "input.h"
 #include "sound.h"
 
-// TODO: test the dragon and bartoli to check if it work !
-// TODO: upgrade the collision of dragon to pick the dagger correctly.
-// TODO: finish the dragon, like light when spawning, dragon breath, dragon bone slot, etc...
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -74,27 +71,7 @@ static void createBartoliLight(short ItemIndex, int type)
 static short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = NO_ITEM;
-	/*
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
-	if (fx_number != NO_ITEM)
-	{
-		fx = &Effects[fx_number];
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
-		fx->roomNumber = roomNumber;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = 200;
-		fx->objectNumber = ID_DRAGON_FIRE;
-		fx->shade = 14 * 256;
-		fx->counter = 0x4000;
-		fx->flag1 = 0;
-		ShootAtLara(fx);
-	}
-	*/
+	// TODO:: set correct fx parameters
 	return fx_number;
 }
 
@@ -134,7 +111,6 @@ static void createExplosion(ITEM_INFO* item)
 
 static void createDragonBone(short front_number)
 {
-	/* Create the Bones of the dragon */
 	short bone_back, bone_front;
 	ITEM_INFO* back_dragon, *front_dragon, *item;
 
@@ -178,7 +154,6 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	int anim, frame;
 	float c, s;
 
-	/* If Lara has collided with correct bit of dragon, then start him up */
 	item = &g_Level.Items[itemNum];
 
 	if (!TestBoundsCollide(item, laraitem, coll->radius))
@@ -186,7 +161,6 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (!TestCollision(item, laraitem))
 		return;
 
-	/* Check for possible Lara extraction of knife */
 	if (item->currentAnimState == DRAGON_DEATH)
 	{
 		rx = laraitem->pos.xPos - item->pos.xPos;
@@ -194,7 +168,6 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 		c = phd_cos(item->pos.yRot);
 		s = phd_sin(item->pos.yRot);
 
-		/* See if Lara within leg space of dragon; if so use different collision to sphere stuff */
 		side_shift = rx * s + rz * c;
 		if (side_shift > DRAGON_LCOL&& side_shift < DRAGON_RCOL)
 		{
@@ -204,7 +177,6 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 			angle = laraitem->pos.yRot - item->pos.yRot;
 
-			/* Check if in a position to pull dagger from dragon */
 			anim = item->animNumber - Objects[ID_DRAGON_BACK].animIndex;
 			frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 			if ((anim == DRAGON_DEAD_ANIM || (anim == DRAGON_DEAD_ANIM + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
@@ -212,13 +184,11 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				shift <= DRAGON_MID && shift > DRAGON_CLOSE - 350 && side_shift > -350 && side_shift < 350 &&
 				angle > 0x4000 - ANGLE(30) && angle < 0x4000 + ANGLE(30))
 			{
-				/* Jump to animation state in LARA_EXTRA */
 				laraitem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
 				laraitem->currentAnimState = 0;
 				laraitem->goalAnimState = 7;
 
-				/* Move to position */
 				laraitem->pos.xPos = item->pos.xPos;
 				laraitem->pos.yPos = item->pos.yPos;
 				laraitem->pos.zPos = item->pos.zPos;
@@ -232,29 +202,21 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				if (item->roomNumber != laraitem->roomNumber)
 					ItemNewRoom(Lara.itemNumber, item->roomNumber);
 
-				/* Jump to that animation */
 				AnimateItem(LaraItem);
 
-				/* Flag that Lara is running animations from another project */
 				Lara.ExtraAnim = 1;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 
-				//LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
 				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
-				/* Do cinematic camera */
 				Camera.type = CINEMATIC_CAMERA;
-				//CineFrame = 0;
-				//memcpy(&CinematicPos, &laraitem->pos, sizeof(PHD_3DPOS));
-
-				/* Flag dragon is dead forever */
+				
 				((CREATURE_INFO*)g_Level.Items[(short)item->data].data)->flags = -1;
 
 				return;
 			}
 
-			/* Push away from body part (but not like ItemPushLara does it) */
 			if (shift < DRAGON_MID)
 				shift = DRAGON_CLOSE - shift;
 			else
@@ -280,7 +242,7 @@ void DragonControl(short backNum)
 	short itemNum;
 
 	back = &g_Level.Items[backNum];
-	if (back->data != NULL && back->objectNumber == ID_DRAGON_FRONT) // check if data is not null and back is front
+	if (back->data != NULL && back->objectNumber == ID_DRAGON_FRONT)
 		return;
 
 	itemNum = (short)back->data;
@@ -306,12 +268,11 @@ void DragonControl(short backNum)
 			dragon->flags++;
 			if (dragon->flags == DRAGON_LIVE_TIME)
 				item->goalAnimState = DRAGON_STOP;
-			if (dragon->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE) // too late !
-				item->hitPoints = Objects[ID_DRAGON_FRONT].hitPoints / 2; // half
+			if (dragon->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
+				item->hitPoints = Objects[ID_DRAGON_FRONT].hitPoints / 2;
 		}
 		else
 		{
-			// dragon has truly popped his clogs
 			if (dragon->flags > -20)
 				createBartoliLight(itemNum, 2);
 
@@ -321,7 +282,6 @@ void DragonControl(short backNum)
 			}
 			else if (dragon->flags == -200)
 			{
-				// all over
 				DisableBaddieAI(itemNum);
 				KillItem(backNum);
 				back->status = ITEM_DEACTIVATED;
@@ -349,7 +309,6 @@ void DragonControl(short backNum)
 
 		ahead = (info.ahead && info.distance > DRAGON_CLOSE_RANGE && info.distance < DRAGON_STOP_RANGE);
 
-		/* Hurts just to touch dragon */
 		if (item->touchBits)
 		{
 			LaraItem->hitStatus = true;
@@ -367,7 +326,7 @@ void DragonControl(short backNum)
 					item->goalAnimState = DRAGON_WALK;
 				else if (info.ahead && info.distance < DRAGON_CLOSE_RANGE && !dragon->flags)
 				{
-					dragon->flags = 1; // if not reset by swipe, then didn't hit Lara, so move next time
+					dragon->flags = 1;
 					if (info.angle < 0)
 						item->goalAnimState = DRAGON_SWIPELEFT;
 					else
@@ -480,7 +439,6 @@ void DragonControl(short backNum)
 	CreatureJoint(item, 0, head);
 	CreatureAnimation(itemNum, angle, 0);
 
-	/* Set back end to same frame */
 	back->currentAnimState = item->currentAnimState;
 	back->animNumber = Objects[ID_DRAGON_BACK].animIndex + (item->animNumber - Objects[ID_DRAGON_FRONT].animIndex);
 	back->frameNumber = g_Level.Anims[back->animNumber].frameBase + (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
@@ -503,7 +461,6 @@ void InitialiseBartoli(short itemNum)
 	item->pos.xPos -= STEP_SIZE * 2;
 	item->pos.zPos -= STEP_SIZE * 2;
 
-	/* Create dragon (but keep INVISIBLE for time being) */
 	back_item = CreateItem();
 	front_item = CreateItem();
 	if (back_item != NO_ITEM && front_item != NO_ITEM)
@@ -519,9 +476,9 @@ void InitialiseBartoli(short itemNum)
 		back->shade = -1;
 
 		InitialiseItem(back_item);
-		back->meshBits = 0x1FFFFF; // turn off spine
+		back->meshBits = 0x1FFFFF;
 
-		item->data = (void*)back_item; // Bartoli points at back of dragon
+		item->data = (void*)back_item;
 
 		front = &g_Level.Items[front_item];
 		front->objectNumber = ID_DRAGON_FRONT;
@@ -535,7 +492,7 @@ void InitialiseBartoli(short itemNum)
 
 		InitialiseItem(front_item);
 
-		back->data = (void*)front_item; // back of dragon points at front
+		back->data = (void*)front_item;
 
 		g_Level.NumItems += 2;
 	}
@@ -582,7 +539,6 @@ void BartoliControl(short itemNum)
 		}
 		else if (item->timer >= 30 * 5)
 		{
-			/* Convert Bartoli into a dragon */
 			back_item = (short)item->data;
 			back = &g_Level.Items[back_item];
 
@@ -591,7 +547,7 @@ void BartoliControl(short itemNum)
 
 			front->touchBits = back->touchBits = 0;
 			EnableBaddieAI(front_item, 1);
-			AddActiveItem(front_item); // needed so dragon targeted, but no actual control routine
+			AddActiveItem(front_item);
 			AddActiveItem(back_item);
 			back->status = ITEM_ACTIVE;
 
