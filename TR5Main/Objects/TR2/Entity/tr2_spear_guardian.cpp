@@ -46,9 +46,6 @@ void InitialiseSpearGuardian(short itemNum)
 
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
-
-	//item->status = ITEM_NOT_ACTIVE;
-	//item->meshBits = 0;
 }
 
 void SpearGuardianControl(short itemNum)
@@ -75,16 +72,7 @@ void SpearGuardianControl(short itemNum)
 		if (!item->meshBits)
 		{
 			SoundEffect(105, NULL, 0);
-			/*
-			item->meshBits = 0xffffffff;
-			item->objectNumber = ID_SPEAR_GUARDIAN_STATUE; // just to fool ExplodingDeath to produce jade chunks
-			ExplodingDeath(itemNum, 0xffffffff, 0);
-			item->objectNumber = ID_SPEAR_GUARDIAN;
-			DisableBaddieAI(itemNum);
-			KillItem(itemNum);
-			item->status = ITEM_DESACTIVATED;
-			item->flags |= ONESHOT;
-			*/
+			// TODO: exploding death
 		}
 		return;
 	}
@@ -97,13 +85,12 @@ void SpearGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, xian->maximumTurn);
 
-		if (item->currentAnimState != 18) // for reload
+		if (item->currentAnimState != 18)
 			item->meshBits = 0xFFFFFFFF;
 
 		switch (item->currentAnimState)
 		{
 		case 18:
-			/* Make jade man come to life!! */
 			if (!xian->flags)
 			{
 				item->meshBits = (item->meshBits << 1) + 1;
@@ -199,7 +186,7 @@ void SpearGuardianControl(short itemNum)
 				else
 					item->goalAnimState = 2;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2)) // the only way he'll ever break out of a run is to attack Lara
+			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 15;
 			break;
 
@@ -327,7 +314,7 @@ void SpearGuardianControl(short itemNum)
 
 	if (lara_alive && LaraItem->hitPoints <= 0)
 	{
-		CreatureKill(item, 49, 19, 2); // uses EXTRA_YETIKILL slot
+		CreatureKill(item, 49, 19, 2);
 		return;
 	}
 

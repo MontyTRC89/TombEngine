@@ -377,58 +377,6 @@ void ObjectObjects()
 	InitAnimating(obj, ID_LASERHEAD_BASE);
 	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
 
-	obj = &Objects[ID_ANIMATING13];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAnimating;
-		obj->control = AnimatingControl;
-		obj->collision = nullptr;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-		g_Level.Bones[obj->boneIndex] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_ANIMATING14];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAnimating;
-		obj->control = AnimatingControl;
-		obj->collision = nullptr;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-		g_Level.Bones[obj->boneIndex] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_ANIMATING15];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAnimating;
-		obj->control = AnimatingControl;
-		obj->collision = nullptr;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-		g_Level.Bones[obj->boneIndex] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_ANIMATING16];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAnimating;
-		obj->control = AnimatingControl;
-		obj->collision = nullptr;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-		g_Level.Bones[obj->boneIndex] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
-	}
-
 	obj = &Objects[ID_TIGHT_ROPE];
 	if (obj->loaded)
 	{

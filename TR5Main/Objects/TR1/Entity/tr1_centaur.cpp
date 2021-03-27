@@ -44,7 +44,6 @@ void ControlCentaurBomb(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	// Store old position for later
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
@@ -52,7 +51,6 @@ void ControlCentaurBomb(short itemNumber)
 
 	bool aboveWater = false;
 
-	// Update speed and check if above water
 	item->pos.zRot += ANGLE(35);
 	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER))
 	{
@@ -78,7 +76,6 @@ void ControlCentaurBomb(short itemNumber)
 		}
 	}
 
-	// Update bomb's position
 	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
 	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
 	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
@@ -86,11 +83,9 @@ void ControlCentaurBomb(short itemNumber)
 	roomNumber = item->roomNumber;
 	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	// Check if bolt has hit a solid wall
 	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
 		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
 	{
-		// I have hit a solid wall
 		item->pos.xPos = oldX;
 		item->pos.yPos = oldY;
 		item->pos.zPos = oldZ;
@@ -110,11 +105,9 @@ void ControlCentaurBomb(short itemNumber)
 		return;
 	}
 
-	// Has harpoon changed room?
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	// If now in water and before in land, add a ripple
 	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
 	{
 		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
@@ -123,10 +116,8 @@ void ControlCentaurBomb(short itemNumber)
 	int n = 0;
 	bool foundCollidedObjects = false;
 
-	// Found possible collided items and statics
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 0);
 
-	// If no collided items and meshes are found, then exit the loop
 	if (!CollidedItems[0] && !CollidedMeshes[0])
 		return;
 
@@ -146,14 +137,12 @@ void ControlCentaurBomb(short itemNumber)
 				DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
 			}
 
-			// All other items (like puzzles) can't be hit
-
 			k++;
 			currentItem = CollidedItems[k];
 
 		} while (currentItem);
 	}
-}//shameless cut down copy of control harpoon bolt
+}
 
 static void RocketGun(ITEM_INFO* v)
 {
@@ -207,7 +196,6 @@ void CentaurControl(short itemNum)
 	centaur = (CREATURE_INFO *)item->data;
 	head = angle = 0;
 
-	/* Has centaur been killed? */
 	if (item->hitPoints <= 0)
 	{
 		if (item->currentAnimState != CENTAUR_DEATH)
@@ -292,11 +280,8 @@ void CentaurControl(short itemNum)
 	}
 
 	CreatureJoint(item, 0, head);
-
-	/* Actually do animation allowing for collisions */
 	CreatureAnimation(itemNum, angle, 0);
 
-	/* Explode on death */
 	if (item->status == ITEM_DEACTIVATED)
 	{
 		SoundEffect(171, &item->pos, NULL);

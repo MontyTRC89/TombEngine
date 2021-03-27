@@ -12,7 +12,7 @@ PENDULUM AlternatePendulum;
 ROPE_STRUCT Ropes[12];
 int NumRopes, RopeSwing = 0;
 
-void InitialiseRope(short itemNumber) // (F) (D)
+void InitialiseRope(short itemNumber)
 {
 	PHD_VECTOR itemPos;
 
@@ -39,7 +39,7 @@ void InitialiseRope(short itemNumber) // (F) (D)
 	NumRopes++;
 }
 
-void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item) // (F) (D)
+void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item)
 {
 	rope->position = *pos1;
 	rope->segmentLength = length * 65536;
@@ -87,7 +87,7 @@ void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int leng
 	rope->active = 0;
 }
 
-PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec) // (F) (D)
+PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec)
 {
 	int x = vec->x / 65536;
 	int y = vec->y / 65536;
@@ -108,7 +108,7 @@ PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec) // (F) (D)
 	return vec;
 }
 
-void _0x0046D130(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z) // (F) (D)
+void _0x0046D130(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z)
 {
 	int segment;
 	short frame;
@@ -120,26 +120,26 @@ void _0x0046D130(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z) //
 	*z = ((rope->normalisedSegment[segment].z * frame) / 65536) + ((rope->meshSegment[segment].z) / 65536) + rope->position.z;
 }
 
-int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v) // (F) (D)
+int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v)
 {
 	return (u->x * v->x + u->y * v->y + u->z * v->z) / 16384;
 }
 
-void ScaleVector(PHD_VECTOR* u, int c, PHD_VECTOR* destination) // (F) (D)
+void ScaleVector(PHD_VECTOR* u, int c, PHD_VECTOR* destination)
 {
 	destination->x = c * u->x / 16384;
 	destination->y = c * u->y / 16384;
 	destination->z = c * u->z / 16384;
 }
 
-void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination) // (F) (D)
+void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination)
 {
 	destination->x = (u->y * v->z - u->z * v->y) / 16384;
 	destination->y = (u->z * v->x - u->x * v->z) / 16384;
 	destination->z = (u->x * v->y - u->y * v->x) / 16384;
 }
 
-void _0x0046D420(int* matrix, short* angle) // (F) (D)
+void _0x0046D420(int* matrix, short* angle)
 {
 	angle[0] = phd_atan(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
 	if (matrix[M12] >= 0 && angle[0] > 0 || matrix[M12] < 0 && angle[0] < 0)
@@ -148,7 +148,7 @@ void _0x0046D420(int* matrix, short* angle) // (F) (D)
 	angle[2] = phd_atan(matrix[M00] * phd_cos(angle[1]) - matrix[M20] * phd_sin(angle[1]), matrix[M21] * phd_sin(angle[1]) - matrix[M01] * phd_cos(angle[1]));
 }
 
-void RopeControl(short itemNumber) // (F) (D)
+void RopeControl(short itemNumber)
 {
 	ITEM_INFO* item;
 	ROPE_STRUCT* rope;
@@ -166,7 +166,7 @@ void RopeControl(short itemNumber) // (F) (D)
 	}
 }
 
-void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
+void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 	ROPE_STRUCT* rope;
@@ -209,7 +209,7 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void RopeDynamics(ROPE_STRUCT* rope) // (F) (D)
+void RopeDynamics(ROPE_STRUCT* rope)
 {
 	int flag, i;
 	PENDULUM* pendulumPointer;
@@ -369,7 +369,7 @@ void RopeDynamics(ROPE_STRUCT* rope) // (F) (D)
 	}
 }
 
-int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius) // (F) (D)
+int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius)
 {
 	int dx, dy, dz;
 
@@ -387,7 +387,7 @@ int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius) // (F) (D)
 	return -1;
 }
 
-void ApplyVelocityToRope(int node, short angle, short n) // (F) (D)
+void ApplyVelocityToRope(int node, short angle, short n)
 {
 	SetPendulumVelocity(
 		(unsigned short) n * phd_sin(angle) * 4096,
@@ -395,7 +395,7 @@ void ApplyVelocityToRope(int node, short angle, short n) // (F) (D)
 		(unsigned short) n * phd_cos(angle) * 4096); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
 }
 
-void SetPendulumVelocity(int x, int y, int z) // (F) (D)
+void SetPendulumVelocity(int x, int y, int z)
 {
 	int node;
 
@@ -414,7 +414,7 @@ void SetPendulumVelocity(int x, int y, int z) // (F) (D)
 	CurrentPendulum.Velocity.z += z;
 }
 
-void _0x0046E1C0(ROPE_STRUCT* rope, int node) // (F) (D)
+void _0x0046E1C0(ROPE_STRUCT* rope, int node)
 {
 	CurrentPendulum.Position.x = rope->segment[node].x;
 	CurrentPendulum.Position.y = rope->segment[node].y;
@@ -429,7 +429,7 @@ void _0x0046E1C0(ROPE_STRUCT* rope, int node) // (F) (D)
 	CurrentPendulum.Rope = rope;
 }
 
-void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value) // (F) (D)
+void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value)
 {
 	PHD_VECTOR vec;
 	int result;
@@ -444,7 +444,7 @@ void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeV
 	pendulumVelocity->z -= ((int64_t) result * vec.z) / 65536;
 }
 
-void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length) // (F) (D)
+void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length)
 {
 	PHD_VECTOR vec;
 	int result;
@@ -465,7 +465,7 @@ void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* veloc
 	nextVelocity->z -= vec.z;
 }
 
-void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
+void UpdateRopeSwing(ITEM_INFO* item)
 {
 	if (Lara.ropeMaxXForward > 9000)
 	{
@@ -558,7 +558,7 @@ void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
 	}
 }
 
-void JumpOffRope(ITEM_INFO* item) // (F) (D)
+void JumpOffRope(ITEM_INFO* item)
 {
 	if (Lara.ropePtr != -1)
 	{
@@ -599,7 +599,7 @@ void JumpOffRope(ITEM_INFO* item) // (F) (D)
 	}
 }
 
-void FallFromRope(ITEM_INFO* item) // (F) (D)
+void FallFromRope(ITEM_INFO* item)
 {
 	item->speed = (abs(CurrentPendulum.Velocity.x / 65536) + abs(CurrentPendulum.Velocity.z / 65536)) / 2;
 	item->pos.xRot = 0;
@@ -617,7 +617,7 @@ void FallFromRope(ITEM_INFO* item) // (F) (D)
 	Lara.ropePtr = -1;
 }
 
-void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!(TrInput & IN_ACTION))
 	{
@@ -665,7 +665,7 @@ void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
+void DelAlignLaraToRope(ITEM_INFO* item)
 {
 	ROPE_STRUCT* rope;
 	short ropeY;

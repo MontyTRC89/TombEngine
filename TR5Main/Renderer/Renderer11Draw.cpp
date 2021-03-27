@@ -1801,8 +1801,10 @@ namespace T5M::Renderer
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+#if _DEBUG
         drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255,255, 255), 0);
         drawAllStrings();
+#endif
         m_swapChain->Present(0, 0);
     }
 
@@ -1955,7 +1957,8 @@ namespace T5M::Renderer
             printDebugMessage("Frame time: %d", m_timeFrame);
             printDebugMessage("Draw calls: %d", m_numDrawCalls);
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-            printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
+			printDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
+			printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
             printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
             printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
@@ -1967,7 +1970,6 @@ namespace T5M::Renderer
             printDebugMessage("Lara.gunType: %d", Lara.gunType);
             printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
             printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
-			printDebugMessage("true X Z speed: %d %d", abs(lara_coll.old.x - LaraItem->pos.xPos), abs(lara_coll.old.z - LaraItem->pos.zPos));
             printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
             printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
             printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);

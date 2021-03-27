@@ -47,6 +47,7 @@
 #include "tr5_romehammer.h"
 #include "tr5_fallingceiling.h"
 #include "tr5_rollingball.h"
+#include "tr5_explosion.h"
 /// switch
 
 /// shatter
@@ -905,6 +906,8 @@ static void StartObject(OBJECT_INFO *obj)
 			obj->control = ControlRaisingBlock;
 			obj->floor = RaisingBlockFloor;
 			obj->ceiling = RaisingBlockCeiling;
+			obj->floorBorder = RaisingBlockFloorBorder;
+			obj->ceilingBorder = RaisingBlockCeilingBorder;
 			obj->saveFlags = true;
 		}
 	}
@@ -1163,6 +1166,16 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_EXPLOSION];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseExplosion;
+		obj->control = ExplosionControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 }
 

@@ -124,21 +124,20 @@ int LoadItems()
 			InitialiseItem(i);
 	}
 
-	for (int r = 0; r < g_Level.Rooms.size(); r++)
+	for (auto& r : g_Level.Rooms)
 	{
-		MESH_INFO* mesh = g_Level.Rooms[r].mesh.data();
-
-		for (int m = 0; m < g_Level.Rooms[r].mesh.size(); m++)
+		for (const auto& mesh : r.mesh)
 		{
-			FLOOR_INFO* floor = &g_Level.Rooms[r].floor[((mesh->z - g_Level.Rooms[r].z) / 1024) +
-				g_Level.Rooms[r].xSize * ((mesh->x - g_Level.Rooms[r].x) / 1024)];
+			FLOOR_INFO* floor = &r.floor[((mesh.z - r.z) / 1024) + r.xSize * ((mesh.x - r.x) / 1024)];
 			 
-			if (!(g_Level.Boxes[floor->box].flags & BLOCKED)
-				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
+			if (floor->box == NO_BOX)
+				continue;
+
+			if (!(g_Level.Boxes[floor->box].flags & BLOCKED))
 			{
 				int fl = floor->floor * 4;
-				STATIC_INFO* st = &StaticObjects[mesh->staticNumber];
-				if (fl <= mesh->y - st->collisionBox.Y2 + 512 && fl < mesh->y - st->collisionBox.Y1)
+				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
+				if (fl <= mesh.y - st->collisionBox.Y2 + 512 && fl < mesh.y - st->collisionBox.Y1)
 				{
 					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
 						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
@@ -770,10 +769,6 @@ void LoadSoundEffects()
 void LoadAnimatedTextures()
 {
 	NumAnimatedTextures = ReadInt32();
-
-	/*AnimTextureRanges = game_malloc<short>(NumAnimatedTextures);
-	ReadBytes(AnimTextureRanges, NumAnimatedTextures * sizeof(short));*/
-
 	for (int i = 0; i < NumAnimatedTextures; i++)
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
@@ -794,7 +789,6 @@ void LoadAnimatedTextures()
 		}
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-
 	nAnimUVRanges = ReadInt8();
 }
 

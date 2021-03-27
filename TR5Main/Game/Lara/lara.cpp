@@ -358,7 +358,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col
 };
 
-void LaraControl(short itemNumber) // (AF) (D)
+void LaraControl(short itemNumber)
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -484,7 +484,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 				}
 
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
+				if (hfw > 256)
 				{
 					if (hfw > 730)
 					{
@@ -635,7 +635,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 				}
 				else
 				{
-					Lara.waterStatus = LW_WADE; /* @DEAD_CODE: Lara has to reach a room without water while in the surface but then GetWaterHeight() return value never will make hfw > 256 */
+					Lara.waterStatus = LW_WADE;
 					item->animNumber = LA_STAND_IDLE;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = LS_WADE_FORWARD;
@@ -656,7 +656,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 
 		case LW_WADE:
 			Camera.targetElevation = -ANGLE(22);
-			if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
+			if (hfw > 256)
 			{
 				if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
 				{
@@ -931,7 +931,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	TestTriggers(coll->trigger, FALSE, 0);
 }
 
-void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
+void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->badPos = 32512;
 	coll->badNeg = -400;
@@ -1041,7 +1041,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 	TestTriggers(coll->trigger, 0, 0);
 }
 
-void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetElevation = -ANGLE(22);
 
@@ -1098,7 +1098,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 	TestTriggers(coll->trigger, 0, 0);
 }
 
-void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);

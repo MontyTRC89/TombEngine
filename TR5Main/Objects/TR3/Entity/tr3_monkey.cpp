@@ -90,16 +90,16 @@ void MonkeyControl(short itemNumber)
 		if (item->aiBits != MODIFY)
 		{
 			if (item->carriedItem != NO_ITEM)
-				item->meshBits = 0xFFFFFEFF;  // Swap the head
+				item->meshBits = 0xFFFFFEFF;
 			else
 				item->meshBits = -1;
 		}
 		else
 		{
 			if (item->carriedItem != NO_ITEM)
-				item->meshBits = 0xFFFF6E6F; //Swap the head and the feet
+				item->meshBits = 0xFFFF6E6F;
 			else
-				item->meshBits = 0xFFFF6F6F; //Just swap the feet
+				item->meshBits = 0xFFFF6F6F;
 		}
 
 		AI_INFO info;
@@ -107,7 +107,7 @@ void MonkeyControl(short itemNumber)
 
 		CreatureAIInfo(item, &info);
 
-		// Monkeys are friendly until Lara hurts them
+
 		if (!creature->hurtByLara && creature->enemy == LaraItem)
 			creature->enemy = NULL;
 
@@ -121,7 +121,7 @@ void MonkeyControl(short itemNumber)
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 
-			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot; //only need to fill out the bits of laraInfo that will be needed by TargetVisible
+			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
@@ -132,7 +132,7 @@ void MonkeyControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		ITEM_INFO* enemy = creature->enemy; //TargetVisible uses enemy, so need to fill this in as lara if we're doing other things
+		ITEM_INFO* enemy = creature->enemy;
 		creature->enemy = LaraItem;
 
 		if (item->hitStatus)
@@ -285,13 +285,11 @@ void MonkeyControl(short itemNumber)
 					creature->enemy = NULL;
 				else
 				{
-					// Pickup the item!
 					item->carriedItem = creature->enemy - g_Level.Items.data();
 					RemoveDrawnItem(creature->enemy - g_Level.Items.data());
 					creature->enemy->roomNumber = NO_ROOM;
 					creature->enemy->carriedItem = NO_ITEM;
 
-					// Stop other entities to interest to this item
 					CREATURE_INFO* currentCreature = BaddieSlots.data();
 					for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 					{

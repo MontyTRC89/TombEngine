@@ -12,6 +12,8 @@
 #include <Game\effect2.h>
 #include <Game\particle\SimpleParticle.h>
 
+
+
 struct BOAT_INFO
 {
 	int boatTurn;
@@ -83,6 +85,8 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 {
 	SetupRipple(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(boat->pos.yRot));
 	T5M::Effects::TriggerSpeedboatFoam(boat);
+
+	// OLD WAKE EFFECT
 	/*int c = phd_cos(boat->pos.yRot);
 	int s = phd_sin(boat->pos.yRot);
 	int c = phd_cos(boat->pos.yRot);
@@ -156,7 +160,6 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 
 void SpeedBoatGetOff(ITEM_INFO* boat)
 {
-	// Wait for last frame of getoff anims before returning to normal Lara control 
 	if ((LaraItem->currentAnimState == STATE_BOAT_JUMPR 
 		|| LaraItem->currentAnimState == STATE_BOAT_JUMPL) 
 		&& LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
@@ -190,7 +193,6 @@ void SpeedBoatGetOff(ITEM_INFO* boat)
 		}
 		LaraItem->pos.yPos = y;
 
-		// Set boat to still anim 
 		boat->animNumber = Objects[ID_SPEEDBOAT].animIndex;
 		boat->frameNumber = g_Level.Anims[boat->animNumber].frameBase;
 	}
@@ -227,38 +229,42 @@ bool SpeedBoatCanGetOff(int direction)
 	return true;
 }
 
-int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
+BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 {
-	// Returns 0 if no get on, 1 if right get on and 2 if left get on and 3 if jump geton 
-	int geton = 0;
+	BOAT_GETON geton = BOAT_GETON::NONE;
 
 	if (Lara.gunStatus != LG_NO_ARMS)
-		return 0;
+		return BOAT_GETON::NONE;
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
+	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+		return BOAT_GETON::NONE;
+
+	if (!TestCollision(boat, LaraItem))
+		return BOAT_GETON::NONE;
+
 	int dist = (LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot);
 	if (dist > 200)
-		return 0;
+		return BOAT_GETON::NONE;
 
-	// Check if Lara is close enough and in right position to get onto boat 
 	short rot = boat->pos.yRot - LaraItem->pos.yRot;
 	if (Lara.waterStatus == LW_SURFACE || Lara.waterStatus == LW_WADE)
 	{
 		if (!(TrInput & IN_ACTION) || LaraItem->gravityStatus || boat->speed)
-			return 0;
+			return BOAT_GETON::NONE;
 
 		if (rot > ANGLE(45) && rot < ANGLE(135))
-			geton = 1; // Right
+			geton = BOAT_GETON::WATER_RIGHT;
 		else if (rot > -ANGLE(135) && rot < -ANGLE(45))
-			geton = 2; // Left
+			geton = BOAT_GETON::WATER_LEFT;
 	}
 	else if (Lara.waterStatus == LW_ABOVE_WATER)
 	{
 		if (LaraItem->fallspeed > 0)
 		{
 			if (rot > -ANGLE(135) && rot < ANGLE(135) && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
-				geton = 3; // Jump
+				geton = BOAT_GETON::JUMP;
 		}
 		else if (LaraItem->fallspeed == 0)
 		{
@@ -267,32 +273,17 @@ int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 				if (LaraItem->pos.xPos == boat->pos.xPos
 					&& LaraItem->pos.yPos == boat->pos.yPos 
 					&& LaraItem->pos.zPos == boat->pos.zPos)
-					geton = 4; // Must have started on same spot as boat
+					geton = BOAT_GETON::STARTPOS;
 				else
-					geton = 3; // Jump
+					geton = BOAT_GETON::JUMP;
 			}
 		}
 	}
-
-	if (!geton)
-		return 0;
-
-	// Is Lara actually close enough to get on the thing? 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
-		return 0;
-
-	if (!TestCollision(boat, LaraItem))
-		return 0;
-
 	return geton;
 }
 
 int SpeedBoatTestWaterHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* pos)
 {
-	// Get water height at a position offset from the origin.
-	// Moves the vector in 'pos' to the required test position too 
-
-	// Get y pos correctly, but don't bother changing zOff and xOff using x_rot and z_rot 
 	pos->y = item->pos.yPos - zOff * phd_sin(item->pos.xRot) + xOff * phd_sin(item->pos.zRot);
 
 	float s = phd_sin(item->pos.yRot);
@@ -301,9 +292,8 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* po
 	pos->x = item->pos.xPos + zOff * s + xOff * c;
 	pos->z = item->pos.zPos + zOff * c - xOff * s;
 	
-	// Try to get water height; if none get ground height instead 
 	short roomNumber = item->roomNumber;
-	GetFloor(pos->x, pos->y, pos->z, &roomNumber); // get correct room (as GetWaterHeight doesn't)
+	GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 	int height = GetWaterHeight(pos->x, pos->y, pos->z, roomNumber);
 	if (height == NO_HEIGHT)
 	{
@@ -313,7 +303,7 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* po
 			return height;
 	}
 
-	return height - 5; // make sure boat is above water line else all sorts of weirdness results
+	return height - 5;
 }
 
 void SpeedBoatDoBoatShift(int itemNum)
@@ -323,7 +313,6 @@ void SpeedBoatDoBoatShift(int itemNum)
 
 	boat = &g_Level.Items[itemNum];
 
-	// Check if hit something in the water 
 	item_number = g_Level.Rooms[boat->roomNumber].itemNumber;
 	while (item_number != NO_ITEM)
 	{
@@ -331,7 +320,6 @@ void SpeedBoatDoBoatShift(int itemNum)
 
 		if (item->objectNumber == ID_SPEEDBOAT && item_number != itemNum && Lara.Vehicle != item_number)
 		{
-			// other boat
 			x = item->pos.xPos - boat->pos.xPos;
 			z = item->pos.zPos - boat->pos.zPos;
 			radius = SQUARE(BOAT_RADIUS * 2);
@@ -344,7 +332,7 @@ void SpeedBoatDoBoatShift(int itemNum)
 			return;
 		}
 
-		// TODO: adding mine and gondola ! (boat)
+		// TODO: mine and gondola
 
 		item_number = item->nextItem;
 	}
@@ -365,19 +353,16 @@ short SpeedBoatDoShif(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (z == zOld)
 		{
-			// Neither shift; may have hit a very steep slope, so need to push back to old position 
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 		}
 		else if (z > zOld)
 		{
-			// Z shift left 
 			skidoo->pos.zPos -= shiftZ + 1;
 			return (pos->x - skidoo->pos.xPos);
 		}
 		else
 		{
-			// Z shift right 
 			skidoo->pos.zPos += WALL_SIZE - shiftZ;
 			return (skidoo->pos.xPos - pos->x);
 		}
@@ -386,20 +371,17 @@ short SpeedBoatDoShif(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (x > xOld)
 		{
-			// X shift up 
 			skidoo->pos.xPos -= shiftX + 1;
 			return (skidoo->pos.zPos - pos->z);
 		}
 		else
-		{
-			// X shift down 
+		{ 
 			skidoo->pos.xPos += WALL_SIZE - shiftX;
 			return (pos->z - skidoo->pos.zPos);
 		}
 	}
 	else
 	{
-		// A diagonal hit; means a barrage of tests needed to determine best shift 
 		x = z = 0;
 
 		short roomNumber = skidoo->roomNumber;
@@ -426,7 +408,6 @@ short SpeedBoatDoShif(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		if (x && z)
 		{
-			// Corner or side collision 
 			skidoo->pos.zPos += z;
 			skidoo->pos.xPos += x;
 		}
@@ -448,7 +429,6 @@ short SpeedBoatDoShif(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 		}
 		else
 		{
-			// Pure diagonal collision 
 			skidoo->pos.zPos += (old->z - pos->z);
 			skidoo->pos.xPos += (old->x - pos->x);
 		}
@@ -464,7 +444,6 @@ int SpeedBoatGetCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 
 	if (moved->x || moved->z)
 	{
-		// Get direction of movement relative to facing 
 		float s = phd_sin(skidoo->pos.yRot);
 		float c = phd_cos(skidoo->pos.yRot);
 		
@@ -494,7 +473,6 @@ int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y)
 {
 	if (height > * y)
 	{
-		// In air 
 		*y += fallspeed;
 		if (*y > height)
 		{
@@ -506,7 +484,6 @@ int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y)
 	}
 	else
 	{
-		// On ground: get up push from height change (if not a closed door and so NO_HEIGHT) 
 		fallspeed += ((height - *y - fallspeed) / 8);
 		if (fallspeed < BOAT_MAX_BACK)
 			fallspeed = BOAT_MAX_BACK;
@@ -534,10 +511,8 @@ int SpeedBoatDynamics(short itemNum)
 	boat = &g_Level.Items[itemNum];
 	binfo = (BOAT_INFO*)boat->data;
 
-	// Remove tilt angle (and add again at the end) as effects control 
 	boat->pos.zRot -= binfo->tiltAngle;
 
-	// First get positions and heights of boat's corners + centre 
 	hfl_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl_old);
 	hfr_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr_old);
 	hbl_old = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl_old);
@@ -547,7 +522,6 @@ int SpeedBoatDynamics(short itemNum)
 	old.y = boat->pos.yPos;
 	old.z = boat->pos.zPos;
 
-	// Back left/right may be slightly below ground, so correct for this 
 	if (bl_old.y > hbl_old)
 		bl_old.y = hbl_old;
 	if (br_old.y > hbr_old)
@@ -562,16 +536,9 @@ int SpeedBoatDynamics(short itemNum)
 	boat->pos.yRot += binfo->boatTurn + binfo->extraRotation;
 	binfo->tiltAngle = binfo->boatTurn * 6;
 
-	// Move boat according to speed 
 	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot);
 	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot);
 	
-	/*if (boat->speed >= 0)
-		binfo->propRot += (boat->speed * ANGLE(3));
-	else
-		binfo->propRot += ANGLE(33);*/
-
-	// Slide boat according to tilts (to avoid getting stuck on slopes) 
 	slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot);
 	if (!slip && boat->pos.zRot)
 		slip = (boat->pos.zRot > 0) ? 1 : -1;
@@ -584,14 +551,11 @@ int SpeedBoatDynamics(short itemNum)
 	boat->pos.xPos -= slip * phd_sin(boat->pos.yRot);
 	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot);
 	
-	// Remember desired position in case of collisions moving us about 
 	moved.x = boat->pos.xPos;
 	moved.z = boat->pos.zPos;
 
-	// Collision with other boat? 
 	SpeedBoatDoBoatShift(itemNum);
 
-	// Test new positions of points (one at a time) and shift boat accordingly 
 	rot = 0;
 	hbl = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl);
 	if (hbl < bl_old.y - STEP_SIZE / 2)
@@ -628,15 +592,11 @@ int SpeedBoatDynamics(short itemNum)
 
 	binfo->extraRotation = rot;
 
-	// Get collision anim if boat has been moved from desired position by collisions 
 	collide = SpeedBoatGetCollisionAnim(boat, &moved);
 
-	// Check final movement if slipped or collided and adjust speed 
 	if (slip || collide)
 	{
 		newspeed = (boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot);
-
-		// this check is required otherwise Lara takes damage if the boat bumps even if she had jumped out of it
 
 		if (Lara.Vehicle == itemNum && boat->speed > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < boat->speed - 10)
 		{
@@ -647,10 +607,8 @@ int SpeedBoatDynamics(short itemNum)
 			boat->speed /= 2;
 		}
 
-		// Adjust speed if serious change 
 		if (slip)
-		{
-			// Only if slip is above certain amount, and boat is not in FAST speed range 
+		{ 
 			if (boat->speed <= BOAT_MAX_SPEED + 10)
 				boat->speed = newspeed;
 		}
@@ -671,14 +629,12 @@ int SpeedBoatDynamics(short itemNum)
 
 bool SpeedBoatUserControl(ITEM_INFO* boat)
 {
-	// Return whether to straighten up or not 
 	int no_turn = 1, max_speed;
 	
 	BOAT_INFO* binfo = (BOAT_INFO*)boat->data;
 
 	if (boat->pos.yPos >= binfo->water - STEP_SIZE / 2 && binfo->water != NO_HEIGHT)
 	{
-		// If on the water surface, user has control; allow for reversing! 
 		if ((!(TrInput & IN_DISMOUNT) && !(TrInput & IN_LOOK)) || boat->speed)
 		{
 			if (((TrInput & IN_TURNL) && !(TrInput & IN_REVERSE)) || ((TrInput & IN_TURNR) && (TrInput & IN_REVERSE)))
@@ -728,7 +684,7 @@ bool SpeedBoatUserControl(ITEM_INFO* boat)
 			else if (boat->speed >= 0 && boat->speed < BOAT_MIN_SPEED && (TrInput & (IN_TURNL | IN_TURNR)))
 			{
 				if (boat->speed == 0 && !(TrInput & IN_DISMOUNT))
-					boat->speed = BOAT_MIN_SPEED; // If user wants to turn, boat will move forward
+					boat->speed = BOAT_MIN_SPEED;
 			}
 			else if (boat->speed > BOAT_SLOWDOWN)
 				boat->speed -= BOAT_SLOWDOWN;
@@ -740,7 +696,7 @@ bool SpeedBoatUserControl(ITEM_INFO* boat)
 			if (boat->speed >= 0 && boat->speed < BOAT_MIN_SPEED && (TrInput & (IN_TURNL | IN_TURNR)))
 			{
 				if (boat->speed == 0 && !(TrInput & IN_DISMOUNT))
-					boat->speed = BOAT_MIN_SPEED; // If user wants to turn, boat will move forward
+					boat->speed = BOAT_MIN_SPEED;
 			}
 			else if (boat->speed > BOAT_SLOWDOWN)
 				boat->speed -= BOAT_SLOWDOWN;
@@ -761,7 +717,6 @@ void SpeedBoatAnimation(ITEM_INFO* boat, int collide)
 
 	binfo = (BOAT_INFO*)boat->data;
 
-	// Do animation stuff 
 	if (LaraItem->hitPoints <= 0)
 	{
 		if (LaraItem->currentAnimState != STATE_BOAT_DEATH)
@@ -840,6 +795,7 @@ void SpeedBoatAnimation(ITEM_INFO* boat, int collide)
 
 void SpeedBoatSplash(ITEM_INFO* item, long fallspeed, long water)
 {
+	//OLD SPLASH
 	/*
 	splash_setup.x = item->pos.x_pos;
 	splash_setup.y = water;
@@ -886,17 +842,14 @@ void InitialiseSpeedBoat(short itemNum)
 
 void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
-	// This routine is only for when Lara is not on the boat and she would like to be 
 	int geton;
 	ITEM_INFO* boat;
 
-	// If Lara dead or already on the boat, then no collision 
 	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
 	boat = &g_Level.Items[itemNum];
 
-	// If player isn't pressing control or Lara is busy, then do normal object collision 
 	geton = SpeedBoatCheckGeton(itemNum, coll);
 	if (!geton)
 	{
@@ -931,7 +884,6 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 
 	AnimateItem(litem);
 
-	// Add to active item list from this point onward 
 	if (g_Level.Items[itemNum].status != ITEM_ACTIVE)
 	{
 		AddActiveItem(itemNum);
@@ -940,8 +892,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 
 	// TODO: play a cd when starting ! (boat)
 	//S_CDPlay(12, 0);
-
-	// Yeeha! Get in that boat girly 
+ 
 	Lara.Vehicle = itemNum;
 }
 
@@ -959,8 +910,6 @@ void SpeedBoatControl(short itemNumber)
 	binfo = (BOAT_INFO*)boat->data;
 	collide = SpeedBoatDynamics(itemNumber);
 
-	// Now got final position, so get heights under middle and corners (will only have changed
-	// from above if collision occurred, but recalc anyway as hardly big maths) 
 	hfl = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
 	hfr = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
 
@@ -972,12 +921,11 @@ void SpeedBoatControl(short itemNumber)
 	if (Lara.Vehicle == itemNumber)
 	{
 		TestTriggers(TriggerIndex, 0, 0);
-		TestTriggers(TriggerIndex, 1, 0); // HEAVY too
+		TestTriggers(TriggerIndex, 1, 0);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
 
-	// Deal with user input; will effect next frame, but relies on info calced this frame 
 	if (Lara.Vehicle == itemNumber && LaraItem->hitPoints > 0)
 	{
 		switch (LaraItem->currentAnimState)
@@ -995,7 +943,7 @@ void SpeedBoatControl(short itemNumber)
 	}
 	else
 	{
-		// Boat has no driver 
+
 		if (boat->speed > BOAT_SLOWDOWN)
 			boat->speed -= BOAT_SLOWDOWN;
 		else
@@ -1004,7 +952,6 @@ void SpeedBoatControl(short itemNumber)
 
 	if (no_turn)
 	{
-		// Straighten up if not under control 
 		if (binfo->boatTurn < -BOAT_UNDO_TURN)
 			binfo->boatTurn += BOAT_UNDO_TURN;
 		else if (binfo->boatTurn > BOAT_UNDO_TURN)
@@ -1013,14 +960,12 @@ void SpeedBoatControl(short itemNumber)
 			binfo->boatTurn = 0;
 	}
 
-	// Get floor height (keep slightly above water surface) 
 	boat->floor = height - 5;
 	if (binfo->water == NO_HEIGHT)
 		binfo->water = height;
 	else
 		binfo->water -= 5;
 
-	// Do fallspeed effects on boat 
 	binfo->leftFallspeed = SpeedBoatDoBoatDynamics(hfl, binfo->leftFallspeed, (int*)&fl.y);
 	binfo->rightFallspeed = SpeedBoatDoBoatDynamics(hfr, binfo->rightFallspeed, (int*)&fr.y);
 	ofs = boat->fallspeed;
@@ -1028,7 +973,6 @@ void SpeedBoatControl(short itemNumber)
 	if (ofs - boat->fallspeed > 32 && boat->fallspeed == 0 && water != NO_HEIGHT)
 		SpeedBoatSplash(boat, ofs - boat->fallspeed, water);
 
-	// Rotate boat to match these heights 
 	height = (fl.y + fr.y);
 	if (height < 0)
 		height = -(abs(height) / 2);
@@ -1040,14 +984,12 @@ void SpeedBoatControl(short itemNumber)
 
 	boat->pos.xRot += ((x_rot - boat->pos.xRot) / 2);
 	boat->pos.zRot += ((z_rot - boat->pos.zRot) / 2);
-
-	// Auto level the boat on flat water (to stop evil shifts) 
+ 
 	if (!x_rot && abs(boat->pos.xRot) < 4)
 		boat->pos.xRot = 0;
 	if (!z_rot && abs(boat->pos.zRot) < 4)
 		boat->pos.zRot = 0;
 
-	// If Lara is on the boat, do all her animation and move her to same position as boat, etc 
 	if (Lara.Vehicle == itemNumber)
 	{
 		SpeedBoatAnimation(boat, collide);
@@ -1058,7 +1000,6 @@ void SpeedBoatControl(short itemNumber)
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
-		// Move Lara to the boat position 
 		boat->pos.zRot += binfo->tiltAngle;
 		LaraItem->pos.xPos = boat->pos.xPos;
 		LaraItem->pos.yPos = boat->pos.yPos;
@@ -1069,26 +1010,22 @@ void SpeedBoatControl(short itemNumber)
 
 		AnimateItem(LaraItem);
 
-		// Set boat on the exact same anim frame 
 		if (LaraItem->hitPoints > 0)
 		{
 			boat->animNumber = Objects[ID_SPEEDBOAT].animIndex + (LaraItem->animNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
 			boat->frameNumber = g_Level.Anims[boat->animNumber].frameBase + (LaraItem->frameNumber - g_Level.Anims[LaraItem->animNumber].frameBase);
 		}
 
-		// Set camera 
 		Camera.targetElevation = -ANGLE(20);
 		Camera.targetDistance = WALL_SIZE * 2;
 	}
 	else
 	{
-		// If Lara isn't in the boat, then just move the boat 
 		if (roomNumber != boat->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 		boat->pos.zRot += binfo->tiltAngle;
 	}
 
-	// Do sound effect 
 	pitch = boat->speed;
 	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
@@ -1097,7 +1034,6 @@ void SpeedBoatControl(short itemNumber)
 	else if (drive)
 		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
 
-	// If boat is moving, then do wake 
 	if (boat->speed && water - 5 == boat->pos.yPos)
 		DoBoatWakeEffect(boat);
 

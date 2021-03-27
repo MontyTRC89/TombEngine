@@ -118,7 +118,6 @@ void ApeVault(short item_number, short angle)
 	switch (CreatureVault(item_number, angle, 2, SHIFT))
 	{
 	case 2:
-//		creature->maximumTurn = 0;
 		item->pos.yPos = y;
 		item->animNumber = Objects[ID_APE].animIndex + VAULT_ANIM;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

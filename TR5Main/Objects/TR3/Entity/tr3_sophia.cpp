@@ -127,19 +127,15 @@ void S_DrawLondonBoss(ITEM_INFO* item)
 
 	if (BossData.ExplodeCount)
 	{
-		//DrawLondonBossShield(item);
-		//DrawExplosionRings();
+		/*code*/
 	}
 	else
 	{
-		//DrawSummonRings();
-		//DrawKnockBackRings();
+		/*code*/
 	}
 
 	if (item->hitPoints <= 0 && BossData.ExplodeCount == 0)
 	{
-		//UpdateElectricityPoints();
-		//LaraElectricDeath(0, item);
-		//LaraElectricDeath(1, item);
+		/*code*/
 	}
 }

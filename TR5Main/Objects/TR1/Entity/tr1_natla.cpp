@@ -10,7 +10,6 @@
 #include "effect.h"
 #include "trmath.h"
 
-/* HIT POINTS for Natla when she enters her second stage */
 #define NATLA_NEAR_DEATH 200
 
 enum natla_anims {
@@ -68,7 +67,6 @@ void NatlaControl(short itemNum)
 		angle = CreatureTurn(item, NATLA_RUN_TURN);
 		shoot = (info.angle > -NATLA_FIRE_ARC && info.angle < NATLA_FIRE_ARC && Targetable(item, &info));
 
-		/* Reset facing */
 		if (facing)
 		{
 			item->pos.yRot += facing;
@@ -189,7 +187,6 @@ void NatlaControl(short itemNum)
 		item->pos.yRot -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
-		/* Adjust facing if flying, else reset */
 		if (item->currentAnimState == NATLA_FLY)
 		{
 			if (info.angle > NATLA_FLY_TURN)
@@ -245,7 +242,6 @@ void NatlaControl(short itemNum)
 		case NATLA_SHOOT:
 			if (!item->requiredAnimState)
 			{
-				/* Eat this ... */
 				fx_number = CreatureEffect(item, &natla_gun, BombGun);
 				if (fx_number != NO_ITEM)
 					gun = EffectList[fx_number].pos.xRot;
@@ -263,8 +259,6 @@ void NatlaControl(short itemNum)
 	}
 
 	CreatureTilt(item, tilt);
-
-	/* Aim Natla's gun arm */
 	CreatureJoint(item, 0, -head);
 	if (gun)
 		CreatureJoint(item, 0, gun);
@@ -272,7 +266,6 @@ void NatlaControl(short itemNum)
 	timer++;
 	natla->flags = (natla->flags & NATLA_FLYMODE) + timer;
 
-	/* Actually do animation allowing for collisions */
 	item->pos.yRot -= facing;
 	CreatureAnimation(itemNum, angle, tilt);
 	item->pos.yRot += facing;

@@ -92,7 +92,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->waterCreature = true; // dont want the rat to be killed when going in water !
+		obj->waterCreature = true;
 		obj->zoneType = ZONE_WATER;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
 	}
@@ -134,7 +134,6 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LARA_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		// use lara animation.
 		if (Objects[ID_LARA].loaded)
 			obj->animIndex = Objects[ID_LARA].animIndex;
 
