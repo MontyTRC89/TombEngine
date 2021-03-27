@@ -1431,7 +1431,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (!obj->nonLot)
 	{
-		if (g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
+		if (enemy->boxNumber != NO_BOX && g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
 			info->enemyZone |= BLOCKED;
 		else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 			info->enemyZone |= BLOCKED;
