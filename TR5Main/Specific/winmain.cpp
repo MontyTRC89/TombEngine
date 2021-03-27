@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "winmain.h"
-#include "init.h"
 #include "resource.h"
 #include "draw.h"
 #include "sound.h"
@@ -15,6 +14,7 @@
 #include <fcntl.h>
 #include <process.h>
 #include <corecrt_io.h>
+#include <iostream>
 using namespace T5M::Renderer;
 using std::exception;
 using std::string;
@@ -32,7 +32,6 @@ extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
-DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
 bool BlockAllInput = true;
 int skipLoop = -1;
@@ -94,59 +93,6 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 	}
 }
 
-void getCurrentCommit() {
-	LPSTR cmdLine = {TEXT("git.exe log -1 --oneline")};
-
-	SECURITY_ATTRIBUTES sa = {0};
-	sa.nLength = sizeof(sa);
-	sa.lpSecurityDescriptor = NULL;
-	sa.bInheritHandle = TRUE;
-
-	HANDLE hStdOutRd, hStdOutWr;
-	HANDLE hStdErrRd, hStdErrWr;
-
-	if(!CreatePipe(&hStdOutRd, &hStdOutWr, &sa, 0)){
-		// error handling...
-	}
-
-	if(!CreatePipe(&hStdErrRd, &hStdErrWr, &sa, 0)){
-		// error handling...
-	}
-
-	SetHandleInformation(hStdOutRd, HANDLE_FLAG_INHERIT, 0);
-	SetHandleInformation(hStdErrRd, HANDLE_FLAG_INHERIT, 0);
-
-	STARTUPINFO si = {};
-	si.cb = sizeof(si);
-	si.dwFlags = STARTF_USESTDHANDLES;
-	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput = hStdOutWr;
-	si.hStdError = hStdErrWr;
-
-	PROCESS_INFORMATION pi = {};
-
-	if(!CreateProcess(NULL, cmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)){
-		// error handling...
-	} else{
-		CHAR buf[256];
-		DWORD n;
-		BOOL success = ReadFile(hStdOutRd, buf, 256, &n, NULL);
-		if(!success || n == 0){
-			std::cout << "Failed to call ReadFile" << std::endl;
-		}
-		commit = std::string(buf, buf + n);
-		// read from hStdOutRd and hStdErrRd as needed until the process is terminated...
-
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-	}
-
-	CloseHandle(hStdOutRd);
-	CloseHandle(hStdOutWr);
-	CloseHandle(hStdErrRd);
-	CloseHandle(hStdErrWr);
-}
-
 void HandleScriptMessage(WPARAM wParam)
 {
 	string ErrorMessage;
@@ -188,12 +134,6 @@ void HandleScriptMessage(WPARAM wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (msg == WM_USER + 0)
-	{
-		HandleScriptMessage(wParam);
-		return 0;
-	}
-
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 		return 0;
@@ -252,8 +192,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	if constexpr (DebugBuild)
-	getCurrentCommit();
 	int RetVal;
 	int n;
 
@@ -384,44 +322,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	UpdateWindow(WindowsHandle);
 	ShowWindow(WindowsHandle, nShowCmd);
-
-	//Create debug script terminal
-	if (Debug)
-	{
-		MainThreadID = GetWindowThreadProcessId(WindowsHandle, NULL);
-		AllocConsole();
-		HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
-		DWORD consoleModeIn;
-		int hCrt = _open_osfhandle((long)handle_in, _O_BINARY);
-		FILE* hf_in = _fdopen(hCrt, "r");
-		setvbuf(hf_in, NULL, _IONBF, 512);
-		GetConsoleMode(handle_in, &consoleModeIn);
-		consoleModeIn = consoleModeIn | ENABLE_LINE_INPUT;
-		SetConsoleMode(handle_in, consoleModeIn);
-		freopen_s(&hf_in, "CONIN$", "r", stdin);
-
-		HANDLE ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		int SystemOutput = _open_osfhandle(intptr_t(ConsoleOutput), _O_TEXT);
-		FILE* COutputHandle = _fdopen(SystemOutput, "w");
-		freopen_s(&COutputHandle, "CONOUT$", "w", stdout);
-
-		LPTHREAD_START_ROUTINE readConsoleLoop = [](LPVOID params) -> DWORD {
-			DWORD read;
-			CHAR buffer[4096];
-			while (true)
-			{
-				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
-				if (success && read > 2)
-				{
-					//Only send the actual written message minus \r\n
-					string msg(buffer, read-2);
-					SendMessage(WindowsHandle, WM_USER, (WPARAM)&msg, NULL);
-				}
-			};
-			return 0;
-		};
-		CreateThread(NULL, 0, readConsoleLoop, handle_in, 0, &DebugConsoleThreadID);
-	}
 
 	SetCursor(NULL);
 	ShowCursor(FALSE);

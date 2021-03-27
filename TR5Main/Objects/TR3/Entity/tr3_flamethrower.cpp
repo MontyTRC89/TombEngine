@@ -124,7 +124,6 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	spark->fxObj = fxnum;
 	spark->gravity = 0;
 	spark->maxYvel = 0;
-	//spark->def = Objects[EXPLOSION1].mesh_index;
 	int size = (GetRandomControl() & 31) + 64;
 
 	if (xv || yv || zv)
@@ -181,9 +180,8 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		fx->pos.zRot = 0;
 		fx->pos.yRot = angles[0];
 		fx->speed = speed * 4;
-		//fx->objectNumber = DRAGON_FIRE;
 		fx->counter = 20;
-		fx->flag1 = 0;	// Set to orange flame.
+		fx->flag1 = 0;
 
 		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
 
@@ -256,7 +254,6 @@ void FlameThrowerControl(short itemNumber)
 			creature->enemy = LaraItem;
 		else
 		{
-			// Find another enemy different from Lara
 			creature->enemy = NULL;
 
 			int minDistance = 0x7FFFFFFF;
@@ -269,7 +266,7 @@ void FlameThrowerControl(short itemNumber)
 					continue;
 
 				target = &g_Level.Items[currentCreature->itemNum];
-				if (target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/ || target->hitPoints <= 0)
+				if (target->objectNumber == ID_LARA || target->hitPoints <= 0)
 					continue;
 
 				int x = target->pos.xPos - item->pos.xPos;
@@ -467,8 +464,7 @@ void FlameThrowerControl(short itemNumber)
 				TriggerFlameThrower(item, &flamerBite, (GetRandomControl() & 31) + 12);
 				if (realEnemy)
 				{
-					/*if (realEnemy->objectNumber == BURNT_MUTANT)
-						realEnemy->item_flags[0]++;*/
+					/*code*/
 				}
 			}
 
@@ -478,7 +474,7 @@ void FlameThrowerControl(short itemNumber)
 			
 		case 6:
 			if (creature->flags < 40)
-				creature->flags += (creature->flags / 4) + 1;	// Length of flame.
+				creature->flags += (creature->flags / 4) + 1;
 
 			if (info.ahead)
 			{
@@ -501,8 +497,7 @@ void FlameThrowerControl(short itemNumber)
 				TriggerFlameThrower(item, &flamerBite, (GetRandomControl() & 31) + 12);
 				if (realEnemy)
 				{
-					/*if (realEnemy->objectNumber == BURNT_MUTANT)
-						realEnemy->item_flags[0]++;*/
+					/*code*/
 				}
 			}
 

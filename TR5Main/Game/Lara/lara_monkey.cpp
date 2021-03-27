@@ -5,10 +5,12 @@
 #include "lara_tests.h"
 #include "lara_monkey.h"
 
+using namespace T5M::Floordata;
+
 /*this file has all the related functions to monkeyswinging*/
 
 /*monkeyswing state handling functions*/
-void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)//1630C(<), 16440(<) (F) 
+void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*collision: lara_col_hang2*/
@@ -37,7 +39,7 @@ void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)//1630C(<), 16440(<) (F)
 		LookUpDown();
 }
 
-void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
+void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*state code: lara_as_hang2*/
@@ -87,7 +89,8 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
 
-		MonkeySwingSnap(item, coll);
+		if (abs(coll->midCeiling - coll->frontCeiling) < 50)
+			MonkeySwingSnap(item, coll);
 	}
 	else
 	{
@@ -145,7 +148,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 	}
 }
 
-void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//1670C, 16840 (F)
+void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 76*/
 	/*collision: lara_col_monkeyswing*/
@@ -185,7 +188,7 @@ void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//1670C, 16840 (F)
 	}
 }
 
-void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//16828, 1695C (F)
+void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 76*/
 	/*state code: lara_as_monkeyswing*/
@@ -239,7 +242,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//16828, 1695C (F)
 	}
 }
 
-void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)//16B24(<), 16C58(<) (F)
+void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 78*/
 	/*collision: lara_col_monkeyr*/
@@ -267,7 +270,7 @@ void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)//16B24(<), 16C58(<) (F)
 	}
 }
 
-void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)//16B9C(<), 16CD0(<) (F)
+void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 78*/
 	/*state code: lara_as_monkeyr*/
@@ -291,7 +294,7 @@ void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)//16B9C(<), 16CD0(<) (F)
 	}
 }
 
-void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)//16A0C(<), 16B40(<) (F)
+void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 77*/
 	/*collision: lara_col_monkeyl*/
@@ -320,7 +323,7 @@ void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)//16A0C(<), 16B40(<) (F)
 	}
 }
 
-void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)//16A80(<), 16BB4(<) (F)
+void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 77*/
 	/*state code: lara_as_monkeyl*/
@@ -344,7 +347,7 @@ void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)//16A80(<), 16BB4(<) (F)
 	}
 }
 
-void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)//16DB8(<), 16EEC(<) (F)
+void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 79*/
 	/*collision: lara_col_monkey180*/
@@ -353,14 +356,14 @@ void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)//16DB8(<), 16EEC(<) (F)
 	item->goalAnimState = LS_MONKEYSWING_IDLE;
 }
 
-void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll)//16DDC, 16F10 (F)
+void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 79*/
 	/*state code: lara_as_monkey180*/
 	lara_col_monkeyswing(item, coll);
 }
 
-void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)//16D64(<), 16E98(<) (F)
+void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 83*/
 	/*collision: lara_col_hangturnlr*/
@@ -379,7 +382,7 @@ void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)//16D64(<), 16E98(<) (F)
 		item->goalAnimState = LS_MONKEYSWING_IDLE;
 }
 //both lara_as_hangturnl and lara_as_hangturnr states use lara_col_hangturnlr for collision//
-void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)//16C40(<), 16D74(<) (F)
+void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 82*/
 	/*collision: lara_col_hangturnlr*/
@@ -398,7 +401,7 @@ void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)//16C40(<), 16D74(<) (F)
 		item->goalAnimState = LS_MONKEYSWING_IDLE;
 }
 
-void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)//16C94(<), 16DC8(<) (F)
+void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 82 and 83*/
 	/*state code: lara_as_hangturnr(83), lara_as_hangturnl(82)*/
@@ -425,7 +428,7 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)//16C94(<), 16DC8(<) (
 
 /*tests and other functions*/
 
-short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)//161EC(<), 16320(<) (F)
+short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short oct;
 
@@ -461,7 +464,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)//161EC(<), 16320(<) (F)
 	return 0;
 }
 
-short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)//160CC(<), 16200(<) (F)
+short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short oct;
 
@@ -498,14 +501,15 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)//160CC(<), 16200(<) (F)
 	return 0;
 }
 
-void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)//1605C(<), 16190(<) (F)
+void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
-	short roomNum = item->roomNumber;
-	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos) + 704;
+	ROOM_VECTOR location = GetRoom(item->location, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int height = GetCeilingHeight(location, item->pos.xPos, item->pos.zPos).value_or(NO_HEIGHT);
+	if (height != NO_HEIGHT)
+		item->pos.yPos = height + 704;
 }
 
-void MonkeySwingFall(ITEM_INFO* item)//16004(<), 16138(<) (F)
+void MonkeySwingFall(ITEM_INFO* item)
 {
 	item->goalAnimState = LS_JUMP_UP;
 	item->currentAnimState = LS_JUMP_UP;

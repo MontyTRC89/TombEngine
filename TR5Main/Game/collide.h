@@ -126,11 +126,11 @@ int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
+void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
-void RotateBoundingBox(std::array<float, 4>& box, short angle);
 // New function for rotating item along XZ slopes.
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
 // Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).

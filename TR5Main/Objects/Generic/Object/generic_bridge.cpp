@@ -5,6 +5,11 @@
 
 using namespace T5M::Floordata;
 
+void InitialiseBridge(short itemNumber)
+{
+	AddBridge(itemNumber);
+}
+
 int GetOffset(short angle, int x, int z)
 {
 	const auto point = GetSectorPoint(x, z);

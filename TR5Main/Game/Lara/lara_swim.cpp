@@ -26,7 +26,7 @@ typedef struct SUBSUIT_INFO
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
 
-void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
+void LaraWaterCurrent(COLL_INFO* coll)
 {
 	if (Lara.currentActive)
 	{
@@ -108,7 +108,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 	coll->old.z = LaraItem->pos.zPos;
 }
 
-int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
+int GetWaterDepth(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor;
 	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
@@ -181,12 +181,12 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 	}
 }
 
-void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)//4CA18(<), 4CE7C(<) (F)
+void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C980(<), 4CDE4(<) (F)
+void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->hitPoints = -1;
 	Lara.air = -1;
@@ -200,32 +200,32 @@ void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C980(<), 4CDE4(<) (F)
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll)//4C960(<), 4CDC4(<) (F)
+void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_tread(ITEM_INFO* item, COLL_INFO* coll)//4C940(<), 4CDA4(<) (F)
+void lara_col_tread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_glide(ITEM_INFO* item, COLL_INFO* coll)//4C920(<), 4CD84(<) (F)
+void lara_col_glide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_swim(ITEM_INFO* item, COLL_INFO* coll)//4C900(<), 4CD64(<) (F)
+void lara_col_swim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)//4C8F8(<), 4CD5C(<) (F)
+void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->fallspeed = 0;
 }
 
-void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C884(<), 4CCE8(<) (F)
+void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = 0;
 
@@ -246,7 +246,7 @@ void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C884(<), 4CCE8(<) (F)
 	}
 }
 
-void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)//4C854, 4CCB8 (F)
+void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD)
 	{
@@ -254,7 +254,7 @@ void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)//4C854, 4CCB8 (F)
 	}
 }
 
-void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
+void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -291,7 +291,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
 	}
 }
 
-void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
+void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -329,7 +329,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
 		item->goalAnimState = LS_UNDERWATER_STOP;
 }
 
-void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
+void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -365,7 +365,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 		item->goalAnimState = LS_UNDERWATER_INERTIA;
 }
 
-void UpdateSubsuitAngles()//4BD20, 4C184 (F)
+void UpdateSubsuitAngles()
 {
 	if (Subsuit.YVel != 0)
 	{
@@ -437,7 +437,7 @@ void UpdateSubsuitAngles()//4BD20, 4C184 (F)
 	}
 }
 
-void SwimTurnSubsuit(ITEM_INFO* item)//4BBDC, 4C040 (F)
+void SwimTurnSubsuit(ITEM_INFO* item)
 {
 	if (item->pos.yPos < 14080)
 		Subsuit.YVel += ((14080 - item->pos.yPos) / 16);
@@ -475,7 +475,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)//4BBDC, 4C040 (F)
 	}
 }
 
-void SwimTurn(ITEM_INFO* item)//4BAF4(<), 4BF58(<) (F)
+void SwimTurn(ITEM_INFO* item)
 {
 	if (TrInput & IN_FORWARD)
 	{
@@ -502,7 +502,7 @@ void SwimTurn(ITEM_INFO* item)//4BAF4(<), 4BF58(<) (F)
 	}
 }
 
-void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
+void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
@@ -664,7 +664,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		LaraTestWaterDepth(item, coll);
 }
 
-void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F)
+void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

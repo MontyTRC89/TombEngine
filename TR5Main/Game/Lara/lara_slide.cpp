@@ -9,7 +9,7 @@ short OldAngle = 1;
 /*this file has all the related functions to sliding*/
 
 /*tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 		return 0;
@@ -58,7 +58,7 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 1;
 }
 
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
+void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -512;
@@ -115,7 +115,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
 	}
 }
 
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
+void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ShiftItem(item, coll);
 
@@ -152,7 +152,7 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
 /*end tests and others*/
 /*-*/
 /*Lara state code*/
-void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)//1A824(<), 1A958(<) (F)
+void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 24*/
 	/*collision: lara_col_slide*/
@@ -161,7 +161,7 @@ void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)//1A824(<), 1A958(<) (F)
 		item->goalAnimState = LS_JUMP_FORWARD;
 }
 
-void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
+void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 24*/
 	/*state code: lara_as_slide*/
@@ -169,7 +169,7 @@ void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
 	lara_slide_slope(item, coll);
 }
 
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)//1A9E0(<), 1AB14(<) (F)
+void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 32*/
 	/*collision: lara_col_slideback*/
@@ -179,7 +179,7 @@ void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)//1A9E0(<), 1AB14(<) (F)
 	}
 }
 
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F)
+void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 32*/
 	/*state code: lara_as_slideback*/

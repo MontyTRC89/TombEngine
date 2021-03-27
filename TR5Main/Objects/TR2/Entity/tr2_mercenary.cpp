@@ -167,7 +167,6 @@ void MercenaryUziControl(short itemNum)
 
 			if (!ShotLara(item, &info, &mercUziBite, torso_y, 8))
 				item->goalAnimState = 1;
-			// TODO: item->fired_weapon = 1; for Mercenary Uzi (Include stateid 10 & 14)
 
 			if (info.distance < 0x400000)
 				item->goalAnimState = 1;
@@ -183,7 +182,6 @@ void MercenaryUziControl(short itemNum)
 
 			if (!ShotLara(item, &info, &mercUziBite, torso_y, 8))
 				item->goalAnimState = 1;
-			// item->fired_weapon = 1;
 
 			if (info.distance < 0x400000)
 				item->goalAnimState = 2;
@@ -338,7 +336,6 @@ void MercenaryAutoPistolControl(short itemNum)
 						item->goalAnimState = 2;
 
 					ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50);
-					// TODO: item->fired_weapon = 1; include 9 and 10
 					mc2->flags = 1;
 				}
 			}
@@ -360,7 +357,6 @@ void MercenaryAutoPistolControl(short itemNum)
 				{
 					if (!ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50))
 						item->goalAnimState = 3;
-					//item->firedWeapon = 1;
 					mc2->flags = 1;
 				}
 			}
@@ -396,7 +392,6 @@ void MercenaryAutoPistolControl(short itemNum)
 				{
 					if (!ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50))
 						item->goalAnimState = 3;
-					//item->firedWeapon = 1;
 					mc2->flags = 2;
 				}
 			}

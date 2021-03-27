@@ -1,14 +1,20 @@
 #pragma once
 #include "items.h"
 #include "collide.h"
-
+enum BOAT_GETON {
+	NONE = 0,
+	WATER_RIGHT = 1,
+	WATER_LEFT = 2,
+	JUMP = 3,
+	STARTPOS=4
+};
 void InitialiseSpeedBoat(short itemNum);
 void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);
 void SpeedBoatControl(short itemNumber);
 void DoBoatWakeEffect(ITEM_INFO* boat);
 void SpeedBoatGetOff(ITEM_INFO* boat);
 bool SpeedBoatCanGetOff(int direction);
-int SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll);
+BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll);
 int SpeedBoatTestWaterHeight(ITEM_INFO* item, int zOff, int xOff, PHD_VECTOR* pos);
 void SpeedBoatDoBoatShift(int itemNum);
 int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y);

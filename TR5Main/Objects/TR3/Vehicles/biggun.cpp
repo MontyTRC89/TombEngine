@@ -13,7 +13,6 @@
 #include "tomb4fx.h"
 #include "draw.h"
 
-//int fireCount = 0;
 static long GunRotYAdd = 0;
 bool barrelRotating;
 
@@ -219,8 +218,6 @@ int BigGunControl(COLL_INFO *coll)
 
 				if (GunRotYAdd < -64)
 					GunRotYAdd = -64;
-				//				if ((Wibble & 7) == 0 && (abs(gun->yRot) < (136 << 2)))
-				//					SoundEffect(44, &obj->pos, 0); // gross
 			}
 			else
 			if (TrInput & IN_RIGHT)
@@ -232,9 +229,6 @@ int BigGunControl(COLL_INFO *coll)
 
 				if (GunRotYAdd > 64)
 					GunRotYAdd = 64;
-
-				//				if ((Wibble & 7) == 0 && (abs(gun->yRot) < (136 << 2)))
-				//					SoundEffect(44, &obj->pos, 0); // gross
 			}
 			else
 			{
