@@ -23,7 +23,7 @@ namespace T5M::Renderer
 		m_meshes.clear();
 
 		// Step 0: prepare animated textures
-		short numSets = *AnimTextureRanges;
+		/*short numSets = *AnimTextureRanges;
 		short *animatedPtr = AnimTextureRanges;
 		animatedPtr++;
 
@@ -59,7 +59,7 @@ namespace T5M::Renderer
 					newTexture.UV[k] = Vector2(x, y);
 				}
 			}
-		}
+		}*/
 
 		// Step 1: create the texture atlas
 		/*byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
