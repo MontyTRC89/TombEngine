@@ -399,6 +399,8 @@ void CalculateSpotCameras()
 		spline_cnt = CurrentCameraCnt + 2;
 	}
 
+	printf("%d %d\n", spline_cnt, spline_cnt);
+
 	//loc_37F64
 	cpx = Spline(CurrentSplinePosition, &CameraXposition[1], spline_cnt);
 	cpy = Spline(CurrentSplinePosition, &CameraYposition[1], spline_cnt);
@@ -883,6 +885,93 @@ void CalculateSpotCameras()
 // It just works (tm)!
 int Spline(int x, int* knots, int nk)
 {
+	/*int num = nk - 1;
+
+	float gamma[100];
+	float delta[100];
+	float D[100]; 
+
+	gamma[0] = 1.0f / 2.0f;
+	for (int i = 1; i < num; i++)
+		gamma[i] = 1.0f / (4.0f - gamma[i - 1]);
+
+	gamma[num] = 1.0f / (2.0f - gamma[num - 1]);
+
+	float p0 = knots[0];
+	float p1 = knots[1];
+
+	delta[0] = 3.0f * (p1 - p0) * gamma[0];
+
+	for (int i = 1; i < num; i++)
+	{
+		p0 = knots[i - 1];
+		p1 = knots[i + 1];
+		delta[i] = (3.0f * (p1 - p0) - delta[i - 1]) * gamma[i];
+	}
+
+	p0 = knots[num - 1];
+	p1 = knots[num];
+
+	delta[num] = (3.0f * (p1 - p0) - delta[num - 1]) * gamma[num];
+
+	D[num] = delta[num];
+	for (int i = num - 1; i >= 0; i--)
+		D[i] = delta[i] - gamma[i] * D[i + 1];
+
+	p0 = knots[0];
+	p1 = knots[1];
+
+	float a = p0;
+	float b = D[0];
+	float c = 3 * (p1 - p0) - 2 * D[0] - D[1];
+	float d = 2 * (p0 - p1) + D[0] + D[1];
+
+	return ((((d * x) + c) * x + b) * x + a);
+
+	/*int num = nk - 1;
+
+	float gamma = 0;
+	float delta = 0;
+	float D = 0;
+
+	gamma = 1.0f / 2.0f;
+	for (int i = 1; i < num; i++)
+		gamma[i] = 1.0f / (4.0f - gamma[i - 1]);
+
+	gamma[num] = 1.0f / (2.0f - gamma[num - 1]);
+
+	float p0 = knots[0];
+	float p1 = knots[1];
+
+	delta[0] = 3.0f * (p1 - p0) * gamma[0];
+
+	for (int i = 1; i < num; i++)
+	{
+		p0 = knots[i - 1];
+		p1 = knots[i + 1];
+		delta[i] = (3.0f * (p1 - p0) - delta[i - 1]) * gamma[i];
+	}
+
+	p0 = points[num - 1];
+	p1 = points[num];
+
+	delta[num] = (3.0f * (p1 - p0) - delta[num - 1]) * gamma[num];
+
+	D[num] = delta[num];
+	for (int i = num - 1; i >= 0; i--)
+		D[i] = delta[i] - gamma[i] * D[i + 1];
+
+	float D1 = 
+	float D0 = delta - gamma * D1;
+
+	float a = p0;
+	float b = D;
+	float c = 3 * (p1 - p0) - 2 * D0 - D1;
+	float d = 2 * (p0 - p1) + D0 + D1;
+
+	return ((((d * x) + c) * x + b) * x + a);
+	*/
+
 	int64_t v3 = (x * (int64_t)(nk - 3)) * 65536 / 65536; // lmao?
 	int32_t v4 = (int32_t)v3 / 65536;
 	if (((int32_t)v3 / 65536) >= nk - 3)

@@ -37,6 +37,58 @@ namespace T5M::Renderer {
 	using std::vector;
 
 	void Renderer11::drawEnergyArcs(RenderView& view) {
+		return;
+
+		for (int i = 0; i < 16; i++)
+		{
+			ENERGY_ARC* arc = &EnergyArcs[i];
+
+			if (arc->life)
+			{
+				LightningPos[0].x = arc->pos1.x;
+				LightningPos[0].y = arc->pos1.y;
+				LightningPos[0].z = arc->pos1.z;
+
+				memcpy(&LightningPos[1], arc, 48);
+
+				LightningPos[5].x = arc->pos4.x;
+				LightningPos[5].y = arc->pos4.y;
+				LightningPos[5].z = arc->pos4.z;
+
+				for (int j = 0; j < 6; j++)
+				{
+					LightningPos[j].x -= LaraItem->pos.xPos;
+					LightningPos[j].y -= LaraItem->pos.yPos;
+					LightningPos[j].z -= LaraItem->pos.zPos;
+				}
+
+				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
+
+				if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
+				{
+					short* interpolatedPos = &LightningBuffer[0];
+
+					for (int s = 0; s < arc->segments - 1; s++)
+					{
+						int ix = LaraItem->pos.xPos + interpolatedPos[0];
+						int iy = LaraItem->pos.yPos + interpolatedPos[1];
+						int iz = LaraItem->pos.zPos + interpolatedPos[2];
+
+						interpolatedPos += 4;
+
+						int ix2 = LaraItem->pos.xPos + interpolatedPos[0];
+						int iy2 = LaraItem->pos.yPos + interpolatedPos[1];
+						int iz2 = LaraItem->pos.zPos + interpolatedPos[2];
+
+						addLine3D(Vector3(ix, iy, iz), Vector3(ix2, iy2, iz2), Vector4::One);
+					}
+				}
+			}
+		}
+		
+		
+		return;
+
 		for (int i = 0; i < MAX_GUNFLASH; i++) {
 			ENERGY_ARC* arc = &EnergyArcs[i];
 

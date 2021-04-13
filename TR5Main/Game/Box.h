@@ -259,6 +259,7 @@ constexpr auto OVERLAP_INDEX = 0x3FFF;
 constexpr auto SEARCH_NUMBER = 0x7FFF;
 constexpr auto BLOCKED_SEARCH = 0x8000;
 constexpr auto NO_BOX = -1;
+constexpr auto NO_ZONE = -1;
 constexpr auto BOX_JUMP = 0x800;
 constexpr auto BOX_MONKEY = 0x2000;
 constexpr auto BOX_NUMBER = 0x7FF;

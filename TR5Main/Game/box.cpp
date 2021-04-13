@@ -449,7 +449,10 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
 	zone = g_Level.Zones[LOT->zone][FlipStatus].data();
-	boxHeight = g_Level.Boxes[item->boxNumber].height;
+	if (item->boxNumber != NO_BOX)
+		boxHeight = g_Level.Boxes[item->boxNumber].height;
+	else
+		boxHeight = item->floor;
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
 	old.z = item->pos.zPos;
@@ -494,7 +497,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		nextHeight = g_Level.Boxes[nextBox].height;
 
-	if (floor->box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && zone[item->boxNumber] != zone[floor->box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
+	if (floor->box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && item->boxNumber != NO_BOX && zone[item->boxNumber] != zone[floor->box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
 	{
 		xPos = item->pos.xPos / SECTOR(1);
 		zPos = item->pos.zPos / SECTOR(1);
@@ -887,6 +890,9 @@ int CreatureCreature(short itemNumber)
 
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
 {
+	if (boxNumber == NO_BOX)
+		return false;
+
 	CREATURE_INFO* creature;
 	BOX_INFO* box;
 	int* zone;
@@ -909,6 +915,9 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber) 
 {
+	if (boxNumber == NO_BOX)
+		return false;
+
 	BOX_INFO* box = &g_Level.Boxes[boxNumber];
 	int x, z;
 
@@ -926,6 +935,9 @@ int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 
 void TargetBox(LOT_INFO* LOT, int boxNumber)
 {
+	if (boxNumber == NO_BOX)
+		return;
+
 	BOX_INFO* box;
 
 	boxNumber &= NO_BOX;
@@ -1078,6 +1090,9 @@ void InitialiseCreature(short itemNumber)
 
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 {
+	if (boxNumber == NO_BOX)
+		return false;
+
 	if (enemy == NULL)
 		return false;
 
@@ -1423,17 +1438,23 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	r = &g_Level.Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
-	info->zoneNumber = zone[item->boxNumber];
+	if (item->boxNumber != NO_BOX)
+		info->zoneNumber = zone[item->boxNumber];
+	else
+		info->zoneNumber = NO_ZONE;
 
 	r = &g_Level.Rooms[enemy->roomNumber];
 	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box;
-	info->enemyZone = zone[enemy->boxNumber];
+	if (enemy->boxNumber != NO_BOX)
+		info->enemyZone = zone[enemy->boxNumber];
+	else
+		info->enemyZone = NO_ZONE;
 
 	if (!obj->nonLot)
 	{
 		if (enemy->boxNumber != NO_BOX && g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
 			info->enemyZone |= BLOCKED;
-		else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
+		else if (item->boxNumber != NO_BOX && creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 			info->enemyZone |= BLOCKED;
 	}
 
@@ -1584,30 +1605,30 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	creature->jumpAhead = false;
 	creature->monkeyAhead = false;
 
-	startBox = LOT->node[item->boxNumber].exitBox;
-	if (startBox != NO_BOX)
+	if (item->boxNumber != NO_BOX)
 	{
-		overlapIndex = g_Level.Boxes[item->boxNumber].overlapIndex;
-		nextBox = 0;
-		flags = 0;
-		if (overlapIndex >= 0)
+		startBox = LOT->node[item->boxNumber].exitBox;
+		if (startBox != NO_BOX)
 		{
-			do
+			overlapIndex = g_Level.Boxes[item->boxNumber].overlapIndex;
+			nextBox = 0;
+			flags = 0;
+			if (overlapIndex >= 0)
 			{
-				//overlapIndex++;
-				//if (g_Level.Overlaps[overlapIndex++].flags & (BOX_JUMP|BOX_MONKEY))
-				//{
-				nextBox = g_Level.Overlaps[overlapIndex].box;
-				flags = g_Level.Overlaps[overlapIndex++].flags;
-			} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
-		}
+				do
+				{
+					nextBox = g_Level.Overlaps[overlapIndex].box;
+					flags = g_Level.Overlaps[overlapIndex++].flags;
+				} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
+			}
 
-		if (nextBox == startBox)
-		{
-			if (flags & BOX_JUMP)
-				creature->jumpAhead = true;
-			if (flags & BOX_MONKEY)
-				creature->monkeyAhead = true;
+			if (nextBox == startBox)
+			{
+				if (flags & BOX_JUMP)
+					creature->jumpAhead = true;
+				if (flags & BOX_MONKEY)
+					creature->monkeyAhead = true;
+			}
 		}
 	}
 }
@@ -1626,7 +1647,7 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 	enemy = creature->enemy;
 	LOT = &creature->LOT;
 
-	if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
+	if (item->boxNumber == NO_BOX || creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 		creature->LOT.requiredBox = NO_BOX;
 
 	if (creature->mood != ATTACK_MOOD 
