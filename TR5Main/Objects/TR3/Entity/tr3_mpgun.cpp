@@ -64,7 +64,7 @@ void MPGunControl(short itemNumber)
 		item->firedWeapon--;
 	}
 
-	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
+	if (item->boxNumber != NO_BOX && (g_Level.Boxes[item->boxNumber].flags & BLOCKED))
 	{
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->roomNumber, 3);
 		item->hitPoints -= 20;
