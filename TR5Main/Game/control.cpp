@@ -534,6 +534,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			} while (SmashedMeshCount != 0);
 		}
 
+		/*if (GlobalCounter % 10 == 0 && CurrentLevel > 0)
+		{
+			PHD_VECTOR src = { 1024,-512,1024 };
+			PHD_VECTOR dest = { 3072,-512,3072 };
+
+			TriggerLightning(&src , &dest , (GetRandomControl() & 0x1F) + 64, 255, 255, 255, 90, 0, 32, 3);
+		}*/
+
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -544,6 +552,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		updateFootprints();
 		UpdateSplashes();
 		UpdateEnergyArcs();
+		//UpdateLightning();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
