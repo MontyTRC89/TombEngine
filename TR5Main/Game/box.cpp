@@ -104,20 +104,23 @@ void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd)
 	srcpos->yRot += angle;
 }
 
-short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
+bool SameZone(CREATURE_INFO* creature, ITEM_INFO* target)
 {
+	int* zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
-	ROOM_INFO* r;
-	int* zone;
+	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+	FLOOR_INFO* floor = &XZ_GET_SECTOR(room, item->pos.xPos - room->x, item->pos.zPos - room->z);
+	if (floor->box == NO_BOX)
+		return false;
+	item->boxNumber = floor->box;
 
-	r = &g_Level.Rooms[item->roomNumber];
-	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
+	room = &g_Level.Rooms[target->roomNumber];
+	floor = &XZ_GET_SECTOR(room, target->pos.xPos - room->x, target->pos.zPos - room->z);
+	if (floor->box == NO_BOX)
+		return false;
+	target->boxNumber = floor->box;
 
-	r = &g_Level.Rooms[targetItem->roomNumber];
-	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
-
-	zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
-	return zone[item->boxNumber] == zone[targetItem->boxNumber];
+	return (zone[item->boxNumber] == zone[target->boxNumber]);
 }
 
 short AIGuard(CREATURE_INFO* creature) 
