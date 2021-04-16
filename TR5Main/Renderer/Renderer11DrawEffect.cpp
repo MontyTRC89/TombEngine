@@ -706,10 +706,10 @@ namespace T5M::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				//Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
-				billboardMatrix = scale*rotation * Matrix::CreateConstrainedBillboard(
+				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
