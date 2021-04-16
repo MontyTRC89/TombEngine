@@ -37,8 +37,6 @@ namespace T5M::Renderer {
 	using std::vector;
 
 	void Renderer11::drawEnergyArcs(RenderView& view) {
-		return;
-
 		for (int i = 0; i < 16; i++)
 		{
 			ENERGY_ARC* arc = &EnergyArcs[i];
@@ -68,7 +66,7 @@ namespace T5M::Renderer {
 				{
 					short* interpolatedPos = &LightningBuffer[0];
 
-					for (int s = 0; s < arc->segments - 1; s++)
+					for (int s = 0; s < 3 * arc->segments - 1; s++)
 					{
 						int ix = LaraItem->pos.xPos + interpolatedPos[0];
 						int iy = LaraItem->pos.yPos + interpolatedPos[1];
@@ -80,79 +78,39 @@ namespace T5M::Renderer {
 						int iy2 = LaraItem->pos.yPos + interpolatedPos[1];
 						int iz2 = LaraItem->pos.zPos + interpolatedPos[2];
 
-						addLine3D(Vector3(ix, iy, iz), Vector3(ix2, iy2, iz2), Vector4::One);
+						byte r, g, b;
+
+						if (arc->life >= 16)
+						{
+							r = arc->r;
+							g = arc->g;
+							b = arc->b;
+						}
+						else
+						{
+							r = arc->life * arc->r / 16;
+							g = arc->life * arc->g / 16;
+							b = arc->life * arc->b / 16;
+						}
+
+						Vector3 pos1 = Vector3(ix, iy, iz);
+						Vector3 pos2 = Vector3(ix2, iy2, iz2);
+
+						Vector3 d = pos2 - pos1;
+						d.Normalize();
+
+						Vector3 c = (pos1 + pos2) / 2.0f;
+
+						addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+							c,
+							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+							SPRITE_ROTATION_90_DEGREES,
+							1.0f,
+							{ 64.0f,
+							Vector3::Distance(pos1, pos2) },
+							BLENDMODE_ADDITIVE,
+							d, view);
 					}
-				}
-			}
-		}
-		
-		
-		return;
-
-		for (int i = 0; i < MAX_GUNFLASH; i++) {
-			ENERGY_ARC* arc = &EnergyArcs[i];
-
-			if (arc->life > 0) {
-				Vector3 start = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z);
-				Vector3 end = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z);
-
-				if (!(arc->flags & ENERGY_ARC_NO_RANDOMIZE)) {
-					start += Vector3(rand() % 32 - 16, rand() % 32 - 16, rand() % 32 - 16);
-					end += Vector3(rand() % 64 - 32, rand() % 64 - 32, rand() % 64 - 32);
-				}
-
-				Vector3 direction = (end - start);
-				direction.Normalize();
-
-				float length = Vector3::Distance(start, end);
-				int numSegments = (length / arc->segmentSize) + 1;
-
-				Vector3 pos1 = start;
-
-				float delta = 2 * PI / numSegments;
-				float deltaAmplitude = arc->sAmplitude / 2 / 5;
-
-				float amplitude = arc->amplitude + deltaAmplitude * arc->direction;
-				if (amplitude > arc->sAmplitude / 2) {
-					amplitude = arc->sAmplitude / 2;
-					arc->direction = -1;
-				} else if (amplitude < -arc->sAmplitude / 2) {
-					amplitude = -arc->sAmplitude / 2;
-					arc->direction = 1;
-				}
-				arc->amplitude = amplitude;
-
-				float alpha = (float)arc->life / (float)arc->sLife;
-
-				Matrix rotationMatrix = Matrix::CreateFromAxisAngle(direction, TO_RAD(arc->rotation));
-
-				for (int j = 0; j < numSegments; j++) {
-					float shift1 = arc->amplitude / 2 * sin(delta * j);
-					float shift2 = arc->amplitude / 2 * sin(delta * (j + 1));
-
-					Vector3 sv1 = Vector3(0, shift1, 0);
-					Vector3 sv2 = Vector3(0, shift2, 0);
-
-					sv1 = Vector3::Transform(sv1, rotationMatrix);
-					sv2 = Vector3::Transform(sv2, rotationMatrix);
-
-					Vector3 pos1 = start + direction * (length / numSegments) * j + sv1;
-					Vector3 pos2 = start + direction * (length / numSegments) * (j + 1) + sv2;
-
-					Vector3 c = (pos1 + pos2) / 2.0f;
-
-					Vector3 d = pos2 - pos1;
-					d.Normalize();
-
-					addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-												  c,
-												  Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, alpha),
-												  SPRITE_ROTATION_90_DEGREES,
-												  1.0f,
-												  { 32.0f,
-												  Vector3::Distance(pos1, pos2) },
-												  BLENDMODE_ADDITIVE,
-												  d,view);
 				}
 			}
 		}
@@ -737,10 +695,10 @@ namespace T5M::Renderer {
 			m_context->PSSetSamplers(0, 1, &sampler);
 			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				Matrix billboardMatrix = scale* rotation *Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				Matrix billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
