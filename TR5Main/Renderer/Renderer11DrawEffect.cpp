@@ -106,7 +106,7 @@ namespace T5M::Renderer {
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
 							SPRITE_ROTATION_90_DEGREES,
 							1.0f,
-							{ 64.0f,
+							{ arc->width * 8.0f,
 							Vector3::Distance(pos1, pos2) },
 							BLENDMODE_ADDITIVE,
 							d, view);

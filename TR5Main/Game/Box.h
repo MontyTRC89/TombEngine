@@ -286,7 +286,7 @@ int CreatureVault(short itemNum, short angle, int vault, int shift);
 void DropBaddyPickups(ITEM_INFO* item);
 int MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angdif, int angadd);
 void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd);
-short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem);
+bool SameZone(CREATURE_INFO* creature, ITEM_INFO* target);
 void FindAITargetObject(CREATURE_INFO* creature, short objNum);
 short AIGuard(CREATURE_INFO* creature);
 void AlertNearbyGuards(ITEM_INFO* item);

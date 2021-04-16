@@ -343,18 +343,28 @@ void BaddyControl(short itemNum)
 		canJump2sectors = false;
 	}
 
-	CREATURE_INFO* currentCreature;
+	CREATURE_INFO* currentCreature = creature;
 
 	if (item->itemFlags[1] == item->roomNumber
-		|| g_Level.Rooms[item->roomNumber].flippedRoom == -1)
+		|| g_Level.Rooms[item->roomNumber].itemNumber == NO_ITEM)
 	{
 		currentCreature = creature;
 	}
 	else
 	{
 		currentCreature = creature;
-
-		// TODO: picking
+		ITEM_INFO* currentItem = &g_Level.Items[g_Level.Rooms[item->roomNumber].itemNumber];
+		for (short itemNum = g_Level.Rooms[item->roomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->nextItem)
+		{
+			currentItem = &g_Level.Items[itemNum];
+			if ((currentItem->objectNumber == ID_SMALLMEDI_ITEM || currentItem->objectNumber == ID_UZI_AMMO_ITEM) 
+				&& SameZone(creature, currentItem))
+			{
+				if (item->status != ITEM_INVISIBLE)
+					break;
+			}
+		}
+		creature->enemy = currentItem;
 	}
 
 	item->itemFlags[1] = item->roomNumber;
