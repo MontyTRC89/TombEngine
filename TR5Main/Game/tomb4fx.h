@@ -8,15 +8,15 @@ typedef struct ENERGY_ARC
 	PHD_VECTOR pos2;
 	PHD_VECTOR pos3;
 	PHD_VECTOR pos4;
-	byte interpolation[9];
+	signed char interpolation[9];
 	byte r;
 	byte g;
 	byte b;
 	byte life;
 	byte amplitude;
-	byte segments;
-	byte width;
 	byte flags;
+	byte width;
+	byte segments;
 
 	int sAmplitude;
 	int segmentSize;

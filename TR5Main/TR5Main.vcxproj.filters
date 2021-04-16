@@ -930,9 +930,6 @@
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="lightning.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1718,7 +1715,7 @@
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="lightning.cpp">
+    <ClCompile Include="Game\lightning.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
