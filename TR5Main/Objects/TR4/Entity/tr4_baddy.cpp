@@ -10,6 +10,7 @@
 #include "setup.h"
 #include "level.h"
 #include <draw.h>
+#include <Game/lot.h>
 
 enum BADDY_STATES {
 	STATE_BADDY_STOP = 0,
@@ -181,12 +182,13 @@ void InitialiseBaddy(short itemNum)
 	
 	item->itemFlags[1] = -1;
 
-	short ocb = item->triggerFlags;
+	short ocb = item->triggerFlags % 1000;
 
+	// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 	if (ocb > 9 && ocb < 20)
 	{
 		item->itemFlags[2] += 24;
-		item->triggerFlags = item->triggerFlags % 1000 - 10;
+		item->triggerFlags -= 10;
 		ocb -= 10;
 	}
 	
@@ -200,6 +202,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 
+	// OCB: jump right
 	if (ocb == 1)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_RIGHT;
@@ -210,6 +213,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 
+	// OCB: jump left
 	if (ocb == 2)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_ROLL_LEFT;
@@ -220,6 +224,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 	
+	// OCB: crouch
 	if (ocb == 3)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
@@ -230,6 +235,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 
+	// OCB: climb up 4 or 6 clicks 
 	if (ocb == 4)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
@@ -242,6 +248,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 
+	// OCB: crouch and jump in train levels?
 	if (ocb > 100)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
@@ -353,7 +360,8 @@ void BaddyControl(short itemNum)
 	else
 	{
 		currentCreature = creature;
-		ITEM_INFO* currentItem = &g_Level.Items[g_Level.Rooms[item->roomNumber].itemNumber];
+		creature->enemy = LaraItem;
+		ITEM_INFO* currentItem = NULL;
 		for (short itemNum = g_Level.Rooms[item->roomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->nextItem)
 		{
 			currentItem = &g_Level.Items[itemNum];
@@ -361,10 +369,12 @@ void BaddyControl(short itemNum)
 				&& SameZone(creature, currentItem))
 			{
 				if (item->status != ITEM_INVISIBLE)
+				{
+					creature->enemy = currentItem;
 					break;
+				}
 			}
 		}
-		creature->enemy = currentItem;
 	}
 
 	item->itemFlags[1] = item->roomNumber;
@@ -440,7 +450,30 @@ void BaddyControl(short itemNum)
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = STATE_BADDY_DEATH;
 
-			// TODO: baddy respawn setup with OCB
+			// OCB: respawn code for BADDY_1
+			if (item->triggerFlags > 999)
+			{
+				for (int i = 0; i < g_Level.NumItems; i++)
+				{
+					ITEM_INFO* possibleEnemy = &g_Level.Items[i];
+					if (possibleEnemy->objectNumber == ID_BADDY1 || possibleEnemy->objectNumber == ID_BADDY2
+						&& (item->triggerFlags / 1000) == (possibleEnemy->triggerFlags / 1000) - 1 
+						&& !(possibleEnemy->flags & IFLAG_KILLED))
+					{
+						if (EnableBaddieAI(i, 0))
+						{
+							possibleEnemy->status = ITEM_ACTIVE;
+						}
+						else
+						{
+							possibleEnemy->status = ITEM_INVISIBLE;
+						}
+						AddActiveItem(i);
+						break;
+					}
+				}
+			}
+
 			break;
 		}
 	}
@@ -1046,23 +1079,19 @@ void BaddyControl(short itemNum)
 				}
 				item->itemFlags[2] += 24;
 			}
-			//KillItem(currentCreature->enemy->);
+			
+			KillItem(currentCreature->enemy - g_Level.Items.data());
 
-			// Search for the next enemy
-			/*v82 = creature2;
-			v113 = BaddieSlots + 18;
-			v114 = 5;
-			do
+			// cancel enemy pointer for other active baddies
+			for (int i = 0; i < NUM_SLOTS; i++)
 			{
-				v115 = *(_WORD *)(v113 + 5628);
-				if (v115 != -1 && v115 != (_WORD)itemNum && *(ITEM_INFO_OK **)v113 == creature2->enemy)
+				if (BaddieSlots[i].itemNum != NO_ITEM && BaddieSlots[i].itemNum != itemNum && BaddieSlots[i].enemy == creature->enemy)
 				{
-					*(_DWORD *)v113 = 0;
+					BaddieSlots[i].enemy = NULL;
 				}
-				v113 += 5702;
-				--v114;
-			} while (v114);
-			creature2->enemy = 0;*/
+			}
+			creature->enemy = NULL;
+
 			break;
 
 		case STATE_BADDY_AIM:
