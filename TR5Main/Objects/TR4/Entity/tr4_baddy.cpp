@@ -156,6 +156,8 @@ enum BADDY_SWAP_MESH_FLAGS {
 	SWAPMESHFLAGS_BADDY_GUN = 0x7FC010,
 };
 
+#define BADDY_USE_UZI	24
+
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
 
@@ -171,7 +173,7 @@ void InitialiseBaddy(short itemNum)
 	{
 		item->swapMeshFlags = SWAPMESHFLAGS_BADDY_GUN;
 		item->meshBits = 0xFF81FFFF;
-		item->itemFlags[2] = 24;
+		item->itemFlags[2] = BADDY_USE_UZI;
 	}
 	else
 	{
@@ -187,7 +189,7 @@ void InitialiseBaddy(short itemNum)
 	// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 	if (ocb > 9 && ocb < 20)
 	{
-		item->itemFlags[2] += 24;
+		item->itemFlags[2] += BADDY_USE_UZI;
 		item->triggerFlags -= 10;
 		ocb -= 10;
 	}
@@ -365,7 +367,9 @@ void BaddyControl(short itemNum)
 		for (short itemNum = g_Level.Rooms[item->roomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->nextItem)
 		{
 			currentItem = &g_Level.Items[itemNum];
-			if ((currentItem->objectNumber == ID_SMALLMEDI_ITEM || currentItem->objectNumber == ID_UZI_AMMO_ITEM) 
+			if ((currentItem->objectNumber == ID_SMALLMEDI_ITEM 
+				|| currentItem->objectNumber == ID_BIGMEDI_ITEM
+				|| currentItem->objectNumber == ID_UZI_AMMO_ITEM) 
 				&& SameZone(creature, currentItem))
 			{
 				if (item->status != ITEM_INVISIBLE)
@@ -672,7 +676,8 @@ void BaddyControl(short itemNum)
 			if (currentCreature->enemy)
 			{
 				short objNum = currentCreature->enemy->objectNumber;
-				if ((objNum == ID_SMALLMEDI_ITEM || objNum == ID_UZI_AMMO_ITEM) && info.distance < 0x40000)
+				if ((objNum == ID_SMALLMEDI_ITEM || objNum == ID_UZI_AMMO_ITEM || objNum == ID_BIGMEDI_ITEM) 
+					&& info.distance < SQUARE(512))
 				{
 					item->goalAnimState = STATE_BADDY_STAND_TO_CROUCH;
 					item->requiredAnimState = STATE_BADDY_CROUCH_PICKUP;
@@ -1021,8 +1026,9 @@ void BaddyControl(short itemNum)
 				if (currentCreature->enemy)
 				{
 					if ((currentCreature->enemy->objectNumber == ID_SMALLMEDI_ITEM
+						|| currentCreature->enemy->objectNumber == ID_BIGMEDI_ITEM
 						|| currentCreature->enemy->objectNumber == ID_UZI_AMMO_ITEM) 
-						&& info.distance < 0x40000)
+						&& info.distance < SQUARE(512))
 					{
 						item->goalAnimState = STATE_BADDY_CROUCH_PICKUP;
 						break;
@@ -1055,6 +1061,7 @@ void BaddyControl(short itemNum)
 				break;
 			}
 			if (currentCreature->enemy->objectNumber != ID_SMALLMEDI_ITEM &&
+				currentCreature->enemy->objectNumber != ID_BIGMEDI_ITEM &&
 				currentCreature->enemy->objectNumber != ID_UZI_AMMO_ITEM)
 			{
 				break;
@@ -1070,14 +1077,18 @@ void BaddyControl(short itemNum)
 			{
 				item->hitPoints += Objects[item->objectNumber].hitPoints / 2;
 			}
+			else if (currentCreature->enemy->objectNumber == ID_BIGMEDI_ITEM)
+			{
+				item->hitPoints = Objects[item->objectNumber].hitPoints;
+			}
+			else if (currentCreature->enemy->objectNumber == ID_UZI_AMMO_ITEM)
+			{
+				item->itemFlags[2] += BADDY_USE_UZI;
+			}
 			else
 			{
-				if (currentCreature->enemy->objectNumber != ID_UZI_AMMO_ITEM)
-				{
-					currentCreature->enemy = NULL;
-					break;
-				}
-				item->itemFlags[2] += 24;
+				currentCreature->enemy = NULL;
+				break;
 			}
 			
 			KillItem(currentCreature->enemy - g_Level.Items.data());
