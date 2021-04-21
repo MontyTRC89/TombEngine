@@ -524,82 +524,90 @@ void BaddyControl(short itemNum)
 
 		//currentCreature->enemy = LaraItem;
 
+		//ITEM_INFO* oldEnemy = creature->enemy;
+		//creature->enemy = LaraItem;
+
 		// Is baddy alerted?
 		if (item->hitStatus
 			|| laraInfo.distance < SQUARE(1024)
-			|| TargetVisible(item, &laraInfo) && abs(LaraItem->pos.yPos - item->pos.yPos) < STEP_SIZE * 4)
+			|| TargetVisible(item, &laraInfo) 
+			&& abs(LaraItem->pos.yPos - item->pos.yPos) < STEP_SIZE * 4)
 		{
 			currentCreature->alerted = true;
 		}
 
-		if (item != Lara.target || laraInfo.distance <= 942 ||
-			laraInfo.angle <= -ANGLE(56.25f) || laraInfo.angle >= ANGLE(56.25f))
+		if (item != Lara.target 
+			|| laraInfo.distance <= 942 
+			|| laraInfo.angle <= -ANGLE(56.25f) 
+			|| laraInfo.angle >= ANGLE(56.25f))
 		{
 			roll = false;
 			jump = false;
 		}
-
-		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45));
-		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45));
-
-		x = item->pos.xPos + dx;
-		y = item->pos.yPos;
-		z = item->pos.zPos + dz;
-
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height4 = GetFloorHeight(floor, x, y, z);
-
-		dx = 942 * phd_sin(item->pos.yRot + ANGLE(78.75f));
-		dz = 942 * phd_cos(item->pos.yRot + ANGLE(78.75f));
-
-		x = item->pos.xPos + dx;
-		y = item->pos.yPos;
-		z = item->pos.zPos + dz;
-
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height5 = GetFloorHeight(floor, x, y, z);
-
-		if (abs(height5 - item->pos.yPos) > STEP_SIZE)
-			jump = false;
 		else
 		{
-			jump = true;
-			if (height4 + 512 >= item->pos.yPos)
+			dx = 942 * phd_sin(item->pos.yRot + ANGLE(45));
+			dz = 942 * phd_cos(item->pos.yRot + ANGLE(45));
+
+			x = item->pos.xPos + dx;
+			y = item->pos.yPos;
+			z = item->pos.zPos + dz;
+
+			roomNumber = item->roomNumber;
+			floor = GetFloor(x, y, z, &roomNumber);
+			int height4 = GetFloorHeight(floor, x, y, z);
+
+			dx = 942 * phd_sin(item->pos.yRot + ANGLE(78.75f));
+			dz = 942 * phd_cos(item->pos.yRot + ANGLE(78.75f));
+
+			x = item->pos.xPos + dx;
+			y = item->pos.yPos;
+			z = item->pos.zPos + dz;
+
+			roomNumber = item->roomNumber;
+			floor = GetFloor(x, y, z, &roomNumber);
+			int height5 = GetFloorHeight(floor, x, y, z);
+
+			if (abs(height5 - item->pos.yPos) > STEP_SIZE)
 				jump = false;
-		}
+			else
+			{
+				jump = true;
+				if (height4 + 512 >= item->pos.yPos)
+					jump = false;
+			}
 
-		dx = 942 * phd_sin(item->pos.yRot - ANGLE(45));
-		dz = 942 * phd_cos(item->pos.yRot - ANGLE(45));
+			dx = 942 * phd_sin(item->pos.yRot - ANGLE(45));
+			dz = 942 * phd_cos(item->pos.yRot - ANGLE(45));
 
-		x = item->pos.xPos + dx;
-		y = item->pos.yPos;
-		z = item->pos.zPos + dz;
+			x = item->pos.xPos + dx;
+			y = item->pos.yPos;
+			z = item->pos.zPos + dz;
 
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height6 = GetFloorHeight(floor, x, y, z);
+			roomNumber = item->roomNumber;
+			floor = GetFloor(x, y, z, &roomNumber);
+			int height6 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * phd_sin(item->pos.yRot - ANGLE(78.75f));
-		dz = 942 * phd_cos(item->pos.yRot - ANGLE(78.75f));
+			dx = 942 * phd_sin(item->pos.yRot - ANGLE(78.75f));
+			dz = 942 * phd_cos(item->pos.yRot - ANGLE(78.75f));
 
-		x = item->pos.xPos + dx;
-		y = item->pos.yPos;
-		z = item->pos.zPos + dz;
+			x = item->pos.xPos + dx;
+			y = item->pos.yPos;
+			z = item->pos.zPos + dz;
 
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height7 = GetFloorHeight(floor, x, y, z);
+			roomNumber = item->roomNumber;
+			floor = GetFloor(x, y, z, &roomNumber);
+			int height7 = GetFloorHeight(floor, x, y, z);
 
-		if (abs(height7 - item->pos.yPos) > STEP_SIZE || height6 + (STEP_SIZE * 2) >= item->pos.yPos)
-		{
-			roll = false;
-			someFlag3 = false;
-		}
-		else
-		{
-			roll = true;
+			if (abs(height7 - item->pos.yPos) > STEP_SIZE || height6 + (STEP_SIZE * 2) >= item->pos.yPos)
+			{
+				roll = false;
+				someFlag3 = false;
+			}
+			else
+			{
+				roll = true;
+			}
 		}
 
 		switch (item->currentAnimState)
@@ -610,7 +618,7 @@ void BaddyControl(short itemNum)
 			currentCreature->flags = 0;
 			currentCreature->maximumTurn = 0;
 			joint3 = info.angle / 2;
-			if (info.ahead && item->aiBits & FOLLOW)
+			if (info.ahead && item->aiBits != GUARD)
 			{
 				joint1 = info.angle / 2;
 				joint2 = info.xAngle;
@@ -646,7 +654,7 @@ void BaddyControl(short itemNum)
 					break;
 				}
 
-				item->goalAnimState = STATE_BADDY_STOP;
+				item->goalAnimState = STATE_BADDY_HOLSTER_SWORD;
 				break;
 			}
 
@@ -737,7 +745,7 @@ void BaddyControl(short itemNum)
 					{
 						item->goalAnimState = STATE_BADDY_HOLSTER_GUN;
 					}
-					else if (info.distance >= 0x40000)
+					else if (info.distance >= SQUARE(512))
 					{
 						item->goalAnimState = STATE_BADDY_SWORD_HIT_FRONT;
 					}
@@ -752,6 +760,7 @@ void BaddyControl(short itemNum)
 					break;
 				}
 			}
+
 			item->goalAnimState = STATE_BADDY_WALK;
 			break;
 
