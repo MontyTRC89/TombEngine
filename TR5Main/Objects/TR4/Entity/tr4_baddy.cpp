@@ -12,6 +12,36 @@
 #include <draw.h>
 #include <Game/lot.h>
 
+/*
+ID_BADDY_1
+1 - Rolls to the right 1 square
+2 - Jumps to the left 1 square
+3 - ducks when triggered
+4 - Climbs up 4 clicks when triggered
+101-104 – Slides to the left while crouching when triggered (eg. train level – just doesn’t work in trainmode)
+1004 - Climbs up 6 clicks when triggered
+1000 – N x 1000 – Is activated once the baddie with the previous thousand is dead and needs no trigger (have tested up to 20.000). Must be placed in room 2 of a level.
+This means that:
+2000 - Attacks Lara after she kills 1st baddie triggered
+3000 - Same as above but after she kills 2nd baddie triggered
+4000 - Same as above but after she kills 3rd baddie triggered
+6000 - Same as above but after she kills 5th baddie triggered
+etc.
+
+ID_BADDY_2
+1 - Jumps to right when triggered
+2 - Rolls to left when triggered
+3 - Crouches when triggered
+4 - Climbs up 4 clicks when triggered
+10 - Draws uzi when triggered
+11 - Jumps to the right when triggered and draws uzi
+12 - Rolls to the left when triggered and draws uzi
+13 - Crouches when triggered and draws uzi
+14 - Climbs up 4 clicks when triggered and draws uzi
+101 - Slides to the left while crouching when triggered (eg. Train level)
+101-104 - Slides to the left while crouching when triggered. The setup requires an enemy jeep and an AI_X1 nullmesh with the same OCB as the jeep and the baddy. It works only in trainmode. When triggered, the baddy will ride the roof of the enemy jeep parallel to the railtracks, until they reach the AI_X1 nullmesh. The baddy will jump off in the direction he’s placed in the map, while the jeep will fall back.
+*/
+
 enum BADDY_STATES {
 	STATE_BADDY_STOP = 0,
 	STATE_BADDY_WALK = 1,
