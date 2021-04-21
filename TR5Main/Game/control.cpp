@@ -534,7 +534,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			} while (SmashedMeshCount != 0);
 		}
 
-		PHD_VECTOR src = { 1024,-512,1024 };
+		/*PHD_VECTOR src = { 1024,-512,1024 };
 		PHD_VECTOR dest = { 4096,-1024,4096 };
 
 		byte b = (GetRandomControl() & 0x1F) + 224 - (GetRandomControl() & 0x3F);
@@ -562,7 +562,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				1,
 				32,
 				5);
-		}
+		}*/
 
 		UpdateSparks();
 		UpdateFireSparks();
