@@ -176,7 +176,7 @@ void SasControl(short itemNumber)
 					item->pos.yRot += info.angle;
 				}
 			}
-			else if (item->aiBits & MODIFY /*|| Lara.bike*/)
+			else if (item->aiBits & MODIFY || Lara.Vehicle != NO_ITEM)
 			{
 				if (abs(info.angle) >= ANGLE(2))
 				{
@@ -204,11 +204,14 @@ void SasControl(short itemNumber)
 					item->goalAnimState = STATE_SAS_STOP;
 				}
 			}
-			else if (!(item->aiBits & PATROL1) || (item->aiBits & 0x1F) == MODIFY /* || Lara_Bike*/)
+			else if (!(item->aiBits & PATROL1) 
+				|| item->aiBits & MODIFY 
+				|| Lara.Vehicle != NO_ITEM)
 			{
 				if (Targetable(item, &info))
 				{
-					if (info.distance < 9437184 || info.zoneNumber != info.enemyZone)
+					if (info.distance < SQUARE(3072) 
+						|| info.zoneNumber != info.enemyZone)
 					{
 						if (GetRandomControl() & 1)
 						{
@@ -242,10 +245,14 @@ void SasControl(short itemNumber)
 						}
 						else
 						{
-							if ((creature->alerted || creature->mood != BORED_MOOD) && 
-								(!item->hitStatus || !creature->reachedGoal && distance <= 0x400000))
+							if ((creature->alerted 
+								|| creature->mood != BORED_MOOD) 
+								&& (!(item->aiBits & FOLLOW)
+									|| !creature->reachedGoal 
+									&& distance <= SQUARE(2048)))
 							{
-								if (creature->mood == BORED_MOOD || info.distance <= 0x400000)
+								if (creature->mood == BORED_MOOD 
+									|| info.distance <= SQUARE(2048))
 								{
 									item->goalAnimState = STATE_SAS_WALK;
 									break;
@@ -283,8 +290,8 @@ void SasControl(short itemNumber)
 			else if (Targetable(item, &info)
 				|| creature->mood != BORED_MOOD
 				|| !info.ahead
-				|| item->hitStatus
-				/*|| Lara_Bike*/)
+				|| item->aiBits & MODIFY  
+				|| Lara.Vehicle != NO_ITEM)
 			{
 				item->goalAnimState = STATE_SAS_STOP;
 			}
@@ -299,7 +306,9 @@ void SasControl(short itemNumber)
 			{
 				item->goalAnimState = STATE_SAS_WALK;
 			}
-			else if (/*!Lara_Bike ||*/ !(item->aiBits & GUARD) && item->aiBits)
+			else if (Lara.Vehicle == NO_ITEM 
+				|| !(item->aiBits & MODIFY) 
+				&& item->aiBits)
 			{
 				if (creature->mood == ESCAPE_MOOD)
 				{
@@ -307,14 +316,18 @@ void SasControl(short itemNumber)
 				}
 				else
 				{
-					if (item->aiBits & GUARD || item->aiBits & FOLLOW && (creature->reachedGoal || distance > 0x400000))
+					if (item->aiBits & GUARD 
+						|| item->aiBits & FOLLOW 
+						&& (creature->reachedGoal 
+							|| distance > SQUARE(2048)))
 					{
 						item->goalAnimState = STATE_SAS_STOP;
 						break;
 					}
 					if (Targetable(item, &info))
 					{
-						if (info.distance < 9437184 || info.enemyZone != info.zoneNumber)
+						if (info.distance < SQUARE(3072) 
+							|| info.enemyZone != info.zoneNumber)
 						{
 							item->goalAnimState = STATE_SAS_STOP;
 							break;
@@ -323,7 +336,7 @@ void SasControl(short itemNumber)
 					}
 					else if (creature->mood)
 					{
-						if (info.distance > 0x400000)
+						if (info.distance > SQUARE(2048))
 						{
 							item->goalAnimState = STATE_SAS_RUN;
 						}
