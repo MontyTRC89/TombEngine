@@ -2,6 +2,15 @@
 #include "items.h"
 #include "trmath.h"
 
+enum GRENADE_TYPE
+{
+	GRENADE_NORMAL,
+	GRENADE_SUPER,
+	GRENADE_FLASH,
+	GRENADE_ULTRA,
+	GRENADE_FLAGS
+};
+
 #define PELLET_SCATTER ANGLE(20.0f)
 constexpr auto HARPOON_DRAW_ANIM = 1;
 constexpr auto ROCKET_DRAW_ANIM = 0;
