@@ -9,6 +9,7 @@
 #include "setup.h"
 #include "level.h"
 #include <Specific\input.h>
+#include <Game/tomb4fx.h>
 
 enum SAS_STATES
 {
@@ -360,20 +361,24 @@ void SasControl(short itemNumber)
 			creature->maximumTurn = ANGLE(10);
 			tilt = angle / 2;
 			
-			/*if (Lara_Bike)
+			if (Lara.Vehicle != NO_ITEM)
 			{
-				v22 = (item->MainFlags >> 9) & 0x1F;
-				if (v22 == 8 || !v22)
+				if (item->aiBits & MODIFY || !item->aiBits)
 				{
-					goto LABEL_99;
+					item->goalAnimState = STATE_SAS_WAIT;
+					break;
 				}
-			}*/
+			}
 
-			if (item->aiBits & GUARD || item->aiBits & FOLLOW && (creature->reachedGoal || distance > 0x400000))
+			if (item->aiBits & GUARD 
+				|| item->aiBits & FOLLOW 
+				&& (creature->reachedGoal 
+					|| distance > SQUARE(2048)))
 			{
 				item->goalAnimState = STATE_SAS_WALK;
 				break;
 			}
+
 			if (creature->mood != ESCAPE_MOOD)
 			{
 				if (Targetable(item, &info))
@@ -382,8 +387,10 @@ void SasControl(short itemNumber)
 				}
 				else
 				{
-					if (creature->mood != BORED_MOOD || creature->mood == STALK_MOOD && 
-						item->aiBits & FOLLOW && info.distance < 0x400000)
+					if (creature->mood != BORED_MOOD 
+						|| creature->mood == STALK_MOOD 
+						&& item->aiBits & FOLLOW 
+						&& info.distance < SQUARE(2048))
 					{
 						item->goalAnimState = STATE_SAS_WALK;
 					}
@@ -409,14 +416,13 @@ void SasControl(short itemNumber)
 					{
 						item->goalAnimState = STATE_SAS_KNEEL_SHOOT;
 					}
+					else if (GetRandomControl() & 1)
+					{
+						item->goalAnimState = STATE_SAS_HOLD_SHOOT;
+					}
 					else
 					{
-						if (!(GetRandomControl() & 1))
-						{
-							item->goalAnimState = STATE_SAS_HOLD_PREPARE_GRENADE;
-							break;
-						}
-						item->goalAnimState = STATE_SAS_HOLD_SHOOT;
+						item->goalAnimState = STATE_SAS_HOLD_PREPARE_GRENADE;						
 					}
 				}
 				else
@@ -459,10 +465,16 @@ void SasControl(short itemNumber)
 				joint1 = info.xAngle;
 				joint0 = info.angle;
 
-				if (info.distance > 9437184)
+				if (info.distance > SQUARE(3072))
 				{
-					joint1 = sqrt(info.distance) + info.xAngle - 1024;
+					angle2 = sqrt(info.distance) + info.xAngle - 1024;
+					joint1 = angle2;
 				}
+			}
+			else
+			{
+				angle1 = 0;
+				angle2 = 0;
 			}
 
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
@@ -474,7 +486,9 @@ void SasControl(short itemNumber)
 					angle1 += (GetRandomControl() & 0x1FF) - 256;
 					joint0 = angle1;
 				}
-				//ShotGreanade((int)item, v28, v27);
+				
+				SasFireGrenade(item, angle2, angle1);
+				
 				if (Targetable(item, &info))
 					item->goalAnimState = STATE_SAS_HOLD_PREPARE_GRENADE;
 			}
@@ -484,9 +498,13 @@ void SasControl(short itemNumber)
 		case STATE_SAS_KNEEL_SHOOT:
 		case STATE_SAS_SIGHT_SHOOT:
 		case STATE_SAS_WALK_SHOOT:
-			if (item->currentAnimState == STATE_SAS_HOLD_SHOOT || item->currentAnimState == STATE_SAS_KNEEL_SHOOT)
+			if (item->currentAnimState == STATE_SAS_HOLD_SHOOT 
+				|| item->currentAnimState == STATE_SAS_KNEEL_SHOOT)
 			{
-				if (item->goalAnimState != STATE_SAS_STOP && item->goalAnimState != STATE_SAS_KNEEL_STOP && (creature->mood == ESCAPE_MOOD || !Targetable(item, &info)))
+				if (item->goalAnimState != STATE_SAS_STOP 
+					&& item->goalAnimState != STATE_SAS_KNEEL_STOP 
+					&& (creature->mood == ESCAPE_MOOD 
+						|| !Targetable(item, &info)))
 				{
 					if(item->currentAnimState == STATE_SAS_HOLD_SHOOT)
 						item->goalAnimState = STATE_SAS_STOP;
@@ -520,7 +538,8 @@ void SasControl(short itemNumber)
 			break;
 		}
 
-		if (WeaponEnemyTimer > 100 && item->currentAnimState != STATE_SAS_BLIND)
+		if (WeaponEnemyTimer > 100 
+			&& item->currentAnimState != STATE_SAS_BLIND)
 		{
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_BLIND;
@@ -529,11 +548,14 @@ void SasControl(short itemNumber)
 		}
 
 	}
-	else if (item->currentAnimState != STATE_SAS_DEATH)
+	else 
 	{
-		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_DEATH;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = STATE_SAS_DEATH;
+		if (item->currentAnimState != STATE_SAS_DEATH)
+		{
+			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_DEATH;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = STATE_SAS_DEATH;
+		}
 	}
 
 	CreatureTilt(item, tilt);
@@ -542,6 +564,74 @@ void SasControl(short itemNumber)
 	CreatureJoint(item, 2, joint2);
 
 	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void SasFireGrenade(ITEM_INFO* item, short angle1, short angle2)
+{
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
+	{
+		ITEM_INFO* grenadeItem = &g_Level.Items[itemNumber];
+
+		grenadeItem->shade = -15856;
+		grenadeItem->objectNumber = ID_GRENADE;
+		grenadeItem->roomNumber = item->roomNumber;
+
+		PHD_VECTOR pos;
+		pos.x = sasGun.x;
+		pos.y = sasGun.y;
+		pos.z = sasGun.z;
+
+		GetJointAbsPosition(item, &pos, sasGun.meshNum);
+		
+		grenadeItem->pos.xPos = pos.x;
+		grenadeItem->pos.yPos = pos.y;
+		grenadeItem->pos.zPos = pos.z;
+		
+		FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &grenadeItem->roomNumber);
+		int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+		
+		if (height < grenadeItem->pos.yPos)
+		{
+			grenadeItem->pos.xPos = item->pos.xPos;
+			grenadeItem->pos.yPos = height;
+			grenadeItem->pos.zPos = item->pos.zPos;
+			grenadeItem->roomNumber = item->roomNumber;
+		}
+		
+		SmokeCountL = 32;
+		SmokeWeapon = 5;
+		
+		for (int i=0;i<5;i++)
+		{
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, 5, 32);
+		}
+
+		InitialiseItem(itemNumber);
+
+		grenadeItem->pos.xRot = angle1 + item->pos.xRot;
+		grenadeItem->pos.yRot = angle2 + item->pos.yRot;
+		grenadeItem->pos.zRot = 0;
+		
+		if (GetRandomControl() & 3)
+		{
+			grenadeItem->itemFlags[0] = 1;
+		}
+		else
+		{
+			grenadeItem->itemFlags[0] = 2;
+		}
+	
+		grenadeItem->itemFlags[2] = 1;
+		grenadeItem->speed = 128;
+		grenadeItem->currentAnimState = grenadeItem->pos.xRot;
+		grenadeItem->fallspeed = -128 * phd_sin(grenadeItem->pos.xRot);
+		grenadeItem->goalAnimState = grenadeItem->pos.yRot;
+		grenadeItem->requiredAnimState = 0;
+		grenadeItem->hitPoints = 120;
+		
+		AddActiveItem(itemNumber);
+	}
 }
 
 void InitialiseSasDying(short itemNumber)
