@@ -376,15 +376,6 @@ void FireGrenade()
 	}
 }
 
-enum GRENADE_TYPE
-{
-	GRENADE_NORMAL,
-	GRENADE_SUPER,
-	GRENADE_FLASH,
-	GRENADE_ULTRA,
-	GRENADE_FLAGS
-};
-
 void ControlGrenade(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

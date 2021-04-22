@@ -10,6 +10,7 @@
 #include "level.h"
 #include <Specific\input.h>
 #include <Game/tomb4fx.h>
+#include <Game/Lara/lara_one_gun.h>
 
 enum SAS_STATES
 {
@@ -615,11 +616,11 @@ void SasFireGrenade(ITEM_INFO* item, short angle1, short angle2)
 		
 		if (GetRandomControl() & 3)
 		{
-			grenadeItem->itemFlags[0] = 1;
+			grenadeItem->itemFlags[0] = GRENADE_NORMAL;
 		}
 		else
 		{
-			grenadeItem->itemFlags[0] = 2;
+			grenadeItem->itemFlags[0] = GRENADE_SUPER;
 		}
 	
 		grenadeItem->itemFlags[2] = 1;
