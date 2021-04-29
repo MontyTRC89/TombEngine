@@ -31,6 +31,7 @@
 #include "tr4_moving_blade.h"
 #include "tr4_element_puzzle.h"
 #include "tr4_von_croy.h"
+#include "tr4_hammerhead.h"
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -101,6 +102,24 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_HAMMERHEAD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseHammerhead;
+		obj->control = HammerheadControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 8;
+		obj->pivotLength = 20;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->zoneType = ZONE_WATER;
 	}
 
 	obj = &Objects[ID_WILD_BOAR];

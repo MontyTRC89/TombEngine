@@ -175,6 +175,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR3\Trap\train.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_big_beetle.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_enemy_jeep.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_hammerhead.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_setha.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_von_croy.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_element_puzzle.h" />
@@ -477,6 +478,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR3\Trap\train.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_big_beetle.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_enemy_jeep.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_hammerhead.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_setha.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_von_croy.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_element_puzzle.cpp" />
