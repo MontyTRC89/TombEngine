@@ -7,6 +7,8 @@
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
+#define MAX_COLLIDED_OBJECTS 1024
+
 struct COLL_FLOOR
 {
 	int floor;

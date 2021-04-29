@@ -60,7 +60,7 @@ void GuideControl(short itemNumber)
 
 		AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
 		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
-		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
+		TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		short random = GetRandomControl();
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 255 - ((random / 16) & 0x1F), 192 - ((random / 64) & 0x1F), random & 0x3F);
@@ -70,7 +70,7 @@ void GuideControl(short itemNumber)
 			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 32 &&
 				item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 42)
 			{
-				GrenadeLauncherSpecialEffect1(
+				TriggerFireFlame(
 					(random & 0x3F) + pos.x - 32,
 					((random / 8) & 0x3F) + pos.y - 128,
 					pos.z + ((random / 64) & 0x3F) - 32,
@@ -455,7 +455,7 @@ void GuideControl(short itemNumber)
 				{
 					if (frameNumber > 163 && frameNumber < 181)
 					{
-						GrenadeLauncherSpecialEffect1(
+						TriggerFireFlame(
 							(random & 0x3F) + pos1.x - 64,
 							((random / 32) & 0x3F) + pos1.y - 96,
 							((random / 1024) & 0x3F) + pos1.z - 64,
@@ -484,7 +484,7 @@ void GuideControl(short itemNumber)
 			{
 				TriggerDynamicLight(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random / 16) & 0x1F), 128 - ((random / 64) & 0x1F), random & 0x1F);
 
-				GrenadeLauncherSpecialEffect1(
+				TriggerFireFlame(
 					(random & 0x3F) + pos1.x - 64,
 					((random / 32) & 0x3F) + pos1.y - 96,
 					((random / 1024) & 0x3F) + pos1.z - 64,

@@ -209,8 +209,8 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 void ClearDynamicLights();
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
-void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2);
-void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
+void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);
+void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void WadeSplash(ITEM_INFO* item, int wh, int wd);
 void Splash(ITEM_INFO* item);
