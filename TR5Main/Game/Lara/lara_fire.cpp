@@ -683,7 +683,7 @@ GAME_OBJECT_ID WeaponObjectMesh(int weaponType) {
 	}
 }
 
-void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
+void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -698,24 +698,40 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 		{
 			switch (obj->hitEffect)
 			{
-				case 1:
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
-					break;
-				case 3:
+			case HIT_BLOOD:
+				if (item->objectNumber == ID_BADDY2
+					&& (item->currentAnimState == 8 || GetRandomControl() & 1)
+					&& (Lara.gunType == WEAPON_PISTOLS 
+						|| Lara.gunType == WEAPON_SHOTGUN
+						|| Lara.gunType == WEAPON_UZI))
+				{
+					// Baddy2 gun hitting sword
+					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &item->pos, 0);
 					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, 0);
-					break;
-				case 2:
-					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, -5);
-					SoundEffect(SFX_SWORD_GOD_HITMET, &item->pos, 0);
-					break;
+					return;
+				}
+				else
+				{
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
+				}
+				break;
+
+			case HIT_FRAGMENT:
+				TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, 0);
+				break;
+
+			case HIT_SMOKE:
+				TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, -5);
+				break;
+
 			}
 		}
 	}
 
-	if ((!obj->undead || flag) && item->hitPoints != NOT_TARGETABLE)
+	if (!obj->undead || grenade || item->hitPoints == NOT_TARGETABLE)
 	{
 		if (item->hitPoints > 0 && item->hitPoints <= damage)
-			++Savegame.Level.Kills;
+			Savegame.Level.AmmoHits++;
 		item->hitPoints -= damage;
 	}
 }

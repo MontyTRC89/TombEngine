@@ -37,8 +37,8 @@ extern int SplitFloor, SplitCeiling;
 int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
-ITEM_INFO* CollidedItems[1024];
-MESH_INFO* CollidedMeshes[1024];
+ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
+MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
@@ -189,13 +189,20 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 				{
 					ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-					if (item == collidingItem || ignoreLara && item == LaraItem)
+					if ((item == collidingItem || ignoreLara && item == LaraItem) 
+						|| (item->flags & 0x8000)
+						|| (item->meshBits == 0)
+						|| (Objects[item->objectNumber].drawRoutine == NULL)
+						|| (Objects[item->objectNumber].collision == NULL && item->objectNumber != ID_LARA) 
+						|| (onlyVisible && item->status == ITEM_INVISIBLE) 
+						|| item->objectNumber == ID_BURNING_FLOOR)
 					{
 						itemNumber = item->nextItem;
 						continue;
 					}
+
 					/*this is awful*/
-					if (item->objectNumber == ID_UPV && item->hitPoints == 1)
+					/*if (item->objectNumber == ID_UPV && item->hitPoints == 1)
 					{
 						itemNumber = item->nextItem;
 						continue;
@@ -204,19 +211,8 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 					{
 						itemNumber = item->nextItem;
 						continue;
-					}
+					}*/
 					/*we need a better system*/
-					if (item->flags & 0x8000)
-					{
-						itemNumber = item->nextItem;
-						continue;
-					}
-
-					if (!Objects[item->objectNumber].collision && item->objectNumber != ID_LARA)
-					{
-						itemNumber = item->nextItem;
-						continue;
-					}
 
 					int dx = collidingItem->pos.xPos - item->pos.xPos;
 					int dy = collidingItem->pos.yPos - item->pos.yPos;
@@ -224,10 +220,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if ((Objects[item->objectNumber].drawRoutine || item->objectNumber == ID_LARA)
-						&& item->meshBits
-						&& (!onlyVisible || item->status != ITEM_INVISIBLE)
-						&& dx >= -2048
+					if (dx >= -2048
 						&& dx <= 2048
 						&& dy >= -2048
 						&& dy <= 2048
@@ -244,12 +237,10 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 						if (item->objectNumber == ID_TURN_SWITCH)
 						{
-							// TODO: implement
-							/*v59 = -256;
-							  v57 = -256;
-							  v60 = 256;
-							  v58 = 256;
-							  bounds = &v57;*/
+							framePtr->boundingBox.X1 = -256;
+							framePtr->boundingBox.X2 = 256;
+							framePtr->boundingBox.Z1 = -256;
+							framePtr->boundingBox.Z1 = 256;
 						}
 
 						if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
