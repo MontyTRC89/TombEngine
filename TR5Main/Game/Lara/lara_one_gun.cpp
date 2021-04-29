@@ -404,8 +404,8 @@ void ControlGrenade(short itemNumber)
 
 				FlashFader = 32;
 
-				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			}
 			else
 			{
@@ -437,8 +437,8 @@ void ControlGrenade(short itemNumber)
 					
 					newGrenade->status = ITEM_INVISIBLE;
 					newGrenade->itemFlags[2] = item->itemFlags[2];
-					newGrenade->hitPoints = 60; // 3000;
-					newGrenade->itemFlags[0] = GRENADE_NORMAL;
+					newGrenade->hitPoints = 3000; // 60; // 3000;
+					newGrenade->itemFlags[0] = GRENADE_ULTRA;
 
 					if (g_Level.Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
 						newGrenade->hitPoints = 1;
@@ -465,9 +465,11 @@ void ControlGrenade(short itemNumber)
 
 	// Check if above water and update speed and fallspeed
 	bool aboveWater = false;
+	bool someFlag = false;
 	if (g_Level.Rooms[item->roomNumber].flags & 1)
 	{
 		aboveWater = false;
+		someFlag = false;
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed -= item->speed / 4;
 		if (item->speed)
@@ -482,6 +484,7 @@ void ControlGrenade(short itemNumber)
 	else
 	{
 		aboveWater = true;
+		someFlag = true;
 		item->fallspeed += 3;
 		if (item->speed)
 		{
@@ -525,7 +528,7 @@ void ControlGrenade(short itemNumber)
 	int ceiling;
 	short roomNumber;
 
-	// Never implemented in original game
+	// Grenades that originate from first grenade when special ammo is selected
 	if (item->itemFlags[0] == GRENADE_ULTRA)
 	{
 		roomNumber = item->roomNumber;
@@ -552,8 +555,35 @@ void ControlGrenade(short itemNumber)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
+	// TODO: splash effect
+	/*
+	if ( *(Rooms + 148 * v78 + 78) & 1 && someFlag )
+  {
+    dword_804E20 = item->pos.xPos;
+    dword_804E24 = *(Rooms + 148 * v78 + 36);
+    dword_804E28 = item->pos.zPos;
+    word_804E2C = 32;
+    word_804E2E = 8;
+    word_804E30 = 320;
+    v45 = item->fallSpeed;
+    word_804E34 = 48;
+    word_804E32 = -40 * v45;
+    word_804E36 = 32;
+    word_804E38 = 480;
+    word_804E3A = -20 * item->fallSpeed;
+    word_804E3C = 32;
+    word_804E3E = 128;
+    word_804E40 = 544;
+    SetupSplash(&dword_804E20);
+    if ( item->itemFlags[0] != 4 )
+    {
+      goto LABEL_35;
+    }
+    item->hitPoints = 1;
+  }*/
+
 	if (item->itemFlags[0] == GRENADE_ULTRA)
-		GrenadeLauncherSpecialEffect1(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
+		TriggerFireFlame(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
 
 	// Check if it's time to explode
 	int radius = 0;
@@ -573,14 +603,14 @@ void ControlGrenade(short itemNumber)
 		else
 		{
 			radius = 2048;
-			explode = 1;
+			explode = true;
 		}
 	}
 
 	// If is not a flash grenade then try to destroy surrounding objects
 	if (!(item->itemFlags[0] == GRENADE_FLASH && explode))
 	{
-		int radius = (explode ? GRENADE_EXPLODE_RADIUS : GRENADE_HIT_RADIUS);
+		//int radius = (explode ? GRENADE_EXPLODE_RADIUS : GRENADE_HIT_RADIUS);
 		bool foundCollidedObjects = false;
 
 		for (int n = 0; n < 2; n++)
@@ -591,94 +621,119 @@ void ControlGrenade(short itemNumber)
 			// Found possible collided items and statics
 			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], false);
 
-			// If no collided items and meshes are found, then exit the loop
-			if (!CollidedItems[0] && !CollidedMeshes[0])
-				break;
-
-			foundCollidedObjects = true;
-
-			if (item->itemFlags[0] != GRENADE_FLASH || explode)
+			if (explode)
 			{
-				if (CollidedItems[0])
+				for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 				{
-					if (explode)
-					{
-						ITEM_INFO* currentItem = CollidedItems[0];
-						
-						int k = 0;
-						do
-						{
-							OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+					if (CollidedItems[i] == NULL)
+						break;
 
-							if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
-								|| currentItem->objectNumber == ID_LARA
-								|| (currentItem->flags & 0x40 &&
-								(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
+					ITEM_INFO* currentItem = CollidedItems[i];
+
+					if (currentItem->objectNumber < ID_SMASH_OBJECT1
+						|| currentItem->objectNumber > ID_SMASH_OBJECT16)
+					{
+						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 ||
+							currentItem->objectNumber > ID_SHOOT_SWITCH4 ||
+							(currentItem->flags & 0x40))
+						{
+							if (Objects[currentItem->objectNumber].intelligent
+								|| currentItem->objectNumber != ID_LARA)
 							{
-								// All active intelligent creatures explode, if their HP is <= 0
-								// Explosion is handled by CreatureDie()
-								// Also Lara can be damaged
-								// HitTarget() is called inside this
 								DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_GRENADE_LAUNCHER);
 							}
-							else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
-							{
-								// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
-								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-								TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
-								ExplodeItemNode(currentItem, 0, 0, 128);
-								short currentItemNumber = (currentItem - CollidedItems[0]);
-								SmashObject(currentItemNumber);
-								KillItem(currentItemNumber);
-							}
-							// TODO_LUA: we need to handle it with an event like OnDestroy
-							/*else if (currentObj->hitEffect == HIT_SPECIAL)
-							{
-								// Some objects need a custom behaviour
-								//HitSpecial(item, currentItem, 1);
-							}*/
-
-							// All other items (like puzzles) don't explode
-
-							k++;
-							currentItem = CollidedItems[k];
-
-						} while (currentItem);
-					}
-
-					if (CollidedMeshes[0])
-					{
-						MESH_INFO* currentMesh = CollidedMeshes[0];
-						int k = 0;
-
-						do
+						}
+						else
 						{
-							STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
-							if (s->shatterType != SHT_NONE)
+							if ((currentItem->flags & 0x3E00) &&
+								(currentItem->flags & 0x3E00) != 0x3E00)
 							{
-								currentMesh->hitPoints -= Weapons[WEAPON_GRENADE_LAUNCHER].damage;
-								if (currentMesh->hitPoints <= 0)
+								roomNumber = currentItem->roomNumber;
+								FLOOR_INFO* floor = GetFloor(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, &roomNumber);
+								GetFloorHeight(floor, currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos);
+								TestTriggers(TriggerIndex, 1, currentItem->flags & 0x3E00);
+							}
+							else
+							{
+								short itemNos[100];
+								int numSwitchItems = GetSwitchTrigger(currentItem, itemNos, 0);
+								if (numSwitchItems > 0)
 								{
-									TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-									TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
-									ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
-									SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
-									SmashedMesh[SmashedMeshCount] = currentMesh;
-									SmashedMeshCount++;
-									currentMesh->flags &= ~1;
+									for (int j = 0; j < numSwitchItems; j++)
+									{
+										AddActiveItem(itemNos[j]);
+										g_Level.Items[itemNos[j]].status = ITEM_ACTIVE;
+										g_Level.Items[itemNos[j]].flags |= 0x3E00;
+									}
 								}
 							}
 
-							k++;
-							currentMesh = CollidedMeshes[k];
+							if (currentItem->objectNumber == ID_SHOOT_SWITCH1)
+							{
+								ExplodeItemNode(currentItem, Objects[currentItem->objectNumber].nmeshes - 1, 0, 64);
+							}
 
-						} while (currentMesh);
+							AddActiveItem(currentItem - g_Level.Items.data());
+
+							currentItem->status = ITEM_ACTIVE;
+							currentItem->flags |= 0x3E40;
+						}
+					}
+					else
+					{
+						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
+						TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
+						TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
+						ExplodeItemNode(currentItem, 0, 0, 128);
+						short currentItemNumber = (currentItem - CollidedItems[0]);
+						SmashObject(currentItemNumber);
+						KillItem(currentItemNumber);
 					}
 				}
-			}
 
-			explode = true;
-			radius = GRENADE_EXPLODE_RADIUS;
+				if (CollidedMeshes[0])
+				{
+					MESH_INFO* currentMesh = CollidedMeshes[0];
+					int k = 0;
+
+					do
+					{
+						STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
+						if (s->shatterType != SHT_NONE)
+						{
+							currentMesh->hitPoints -= Weapons[WEAPON_GRENADE_LAUNCHER].damage;
+							if (currentMesh->hitPoints <= 0)
+							{
+								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
+								TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
+								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
+								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+								SmashedMesh[SmashedMeshCount] = currentMesh;
+								SmashedMeshCount++;
+								currentMesh->flags &= ~1;
+							}
+						}
+
+						k++;
+						currentMesh = CollidedMeshes[k];
+
+					} while (currentMesh);
+				}
+			}
+			else
+			{
+				// If no collided items and meshes are found, then exit the loop
+				if (!CollidedItems[0] && !CollidedMeshes[0])
+					return;
+
+				explode = true;
+				if (item->itemFlags[0] == GRENADE_FLASH)
+				{
+					break;
+				}
+
+				radius = GRENADE_EXPLODE_RADIUS;
+			}
 		}
 	}
 
@@ -692,8 +747,8 @@ void ControlGrenade(short itemNumber)
 			FlashFadeG = 255;
 			FlashFadeB = 255;
 
-			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 		}
 		else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		{
@@ -1674,6 +1729,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 				dest->hitStatus = true;
 
 				OBJECT_INFO* obj = &Objects[dest->objectNumber];
+				// TODO: in TR4 condition was objectNumber != (ID_MUMMY, ID_SKELETON, ID_SETHA)
 				if (!obj->undead)
 				{
 					HitTarget(dest, 0, Weapons[weapon].explosiveDamage, 1);

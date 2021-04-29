@@ -1075,11 +1075,17 @@ int CreatureActive(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!(item->flags & IFLAG_KILLED) 
-		&& item->status & ITEM_INVISIBLE)
+	if (item->flags & IFLAG_KILLED)
 	{
-		if (!EnableBaddieAI(itemNumber, false))
+		return false;
+	}
+
+	if (item->status == ITEM_INVISIBLE)
+	{
+		if (!EnableBaddieAI(itemNumber, 0))
+		{
 			return false;
+		}
 		item->status = ITEM_ACTIVE;
 	}
 

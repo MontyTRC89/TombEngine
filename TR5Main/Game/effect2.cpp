@@ -597,7 +597,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	}
 }
 
-void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
+/*void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -787,7 +787,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			spark->sLife = spark->life / 4;
 		}
 	}
-}
+}*/
 
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 {
@@ -1457,7 +1457,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	T5M::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
-void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
+void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
@@ -1517,7 +1517,7 @@ void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
+void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;

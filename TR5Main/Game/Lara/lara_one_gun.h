@@ -35,7 +35,7 @@ constexpr auto HARPOON_HIT_RADIUS = 128;
 
 void FireGrenade();
 void ControlGrenade(short itemNumber);
-void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
+//void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireHarpoon();
 void ControlHarpoonBolt(short itemNumber);
 void draw_shotgun(int weaponType);
