@@ -15,6 +15,7 @@ BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 #define STATE_TROOPS_STOP						1
 #define STATE_TROOPS_WALK						2
 #define STATE_TROOPS_RUN						3
+#define STATE_TROOPS_GUARD						4
 #define STATE_TROOPS_ATTACK1					5
 #define STATE_TROOPS_ATTACK2					6
 #define STATE_TROOPS_DEATH						7
@@ -24,6 +25,7 @@ BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 #define STATE_TROOPS_ATTACK3					11
 #define STATE_TROOPS_KILLED_BY_SCORPION			15
 #define STATE_TROOPS_ATTACKED_BY_SCORPION		16
+#define STATE_TROOPS_FLASHED					17
 
 void InitialiseTroops(short itemNumber)
 {
@@ -113,6 +115,7 @@ void TroopsControl(short itemNumber)
 					item->pos.zPos = creature->enemy->pos.zPos;
 
 					item->pos.xRot = creature->enemy->pos.xRot;
+					item->pos.yRot = creature->enemy->pos.yRot;
 					item->pos.zRot = creature->enemy->pos.zRot;
 
 					creature->enemy->triggerFlags = 99;
@@ -150,18 +153,21 @@ void TroopsControl(short itemNumber)
 				{
 					ITEM_INFO* currentItem = &g_Level.Items[baddy->itemNum];
 
-					if (currentItem->objectNumber != ID_TROOPS &&
-						(currentItem != LaraItem || creature->hurtByLara))
+					if (currentItem->objectNumber != ID_LARA)
 					{
-						dx = currentItem->pos.xPos - item->pos.xPos;
-						dy = currentItem->pos.yPos - item->pos.yPos;
-						dz = currentItem->pos.zPos - item->pos.zPos;
-						distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
-
-						if (distance < minDistance)
+						if (currentItem->objectNumber != ID_TROOPS &&
+							(currentItem != LaraItem || creature->hurtByLara))
 						{
-							minDistance = distance;
-							creature->enemy = currentItem;
+							dx = currentItem->pos.xPos - item->pos.xPos;
+							dy = currentItem->pos.yPos - item->pos.yPos;
+							dz = currentItem->pos.zPos - item->pos.zPos;
+							distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+
+							if (distance < minDistance)
+							{
+								minDistance = distance;
+								creature->enemy = currentItem;
+							}
 						}
 					}
 				}
@@ -236,7 +242,7 @@ void TroopsControl(short itemNumber)
 				{
 					if (item->currentAnimState == STATE_TROOPS_STOP)
 					{
-						item->goalAnimState = 4;
+						item->goalAnimState = STATE_TROOPS_GUARD;
 						break;
 					}
 					item->goalAnimState = STATE_TROOPS_STOP;
@@ -367,7 +373,7 @@ void TroopsControl(short itemNumber)
 
 			break;
 
-		case 4:
+		case STATE_TROOPS_GUARD:
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 			joint2 = rot;
@@ -483,16 +489,28 @@ void TroopsControl(short itemNumber)
 			creature->maximumTurn = 0;
 			break;
 
-		case 17:
+		case STATE_TROOPS_FLASHED:
 			if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_TROOPS_GUARD;
 			}
 
 			break;
 
 		default:
 			break;
+		}
+
+		if (WeaponEnemyTimer > 100)
+		{
+			if (item->currentAnimState != STATE_TROOPS_FLASHED 
+				&& item->currentAnimState != STATE_TROOPS_ATTACKED_BY_SCORPION)
+			{
+				creature->maximumTurn = 0;
+				item->animNumber = Objects[item->objectNumber].animIndex + 28;
+				item->currentAnimState = STATE_TROOPS_FLASHED;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
+			}
 		}
 	}
 
