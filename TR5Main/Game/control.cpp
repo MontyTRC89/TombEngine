@@ -46,6 +46,7 @@
 #include "particle/SimpleParticle.h"
 #include <process.h>
 #include "prng.h"
+#include <Game/Lara/lara_one_gun.h>
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -2182,10 +2183,32 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 	return 1;
 }
 
+void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
+{
+	short angles[2];
+	PHD_3DPOS pos;
+
+	target->x &= ~1023;
+	target->z &= ~1023;
+	target->x |= 512;
+	target->z |= 512;
+
+	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
+	
+	pos.xPos = src->x;
+	pos.yPos = src->y;
+	pos.zPos = src->z;
+	pos.xRot = angles[1];
+	pos.yRot = angles[0];
+	pos.zRot = 0;
+
+	FireCrossbow(&pos);
+}
+
 int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing)
 {
 	GAME_VECTOR target;
-	int result, flag, itemNumber, count;
+	int result, hit, itemNumber, count;
 	MESH_INFO *mesh;
 	PHD_VECTOR vector;
 	ITEM_INFO *item;
@@ -2212,7 +2235,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 		}
 	}
 
-	flag = 0;
+	hit = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != 999)
 	{
@@ -2222,6 +2245,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
+		// TODO: for covering scientist
 //		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
 //			Lara.target = &g_Level.Items[itemNumber];
 		// this is crashing and it's not really doing anything..
@@ -2237,7 +2261,6 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 						ShatterImpactData.impactDirection = direction;
 						ShatterImpactData.impactLocation = Vector3(mesh->x, mesh->y, mesh->z);
 						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
-						//ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
@@ -2252,16 +2275,17 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 					item = &g_Level.Items[itemNumber];
 					if (item->objectNumber < ID_SHOOT_SWITCH1 || item->objectNumber > ID_SHOOT_SWITCH4)
 					{
-						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit) && LaserSight)
+						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit) 
+							&& LaserSight)
 						{
-							if (!Objects[item->objectNumber].intelligent)
-							{
+							//if (!Objects[item->objectNumber].intelligent)
+							//{
 								item->meshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = direction;
 								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
 								TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
-							}
+							/*}
 							else
 							{
 								if (item->objectNumber != ID_GUARD_LASER)
@@ -2280,7 +2304,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 									}
 								}
-							}
+							}*/
 						}
 						else
 						{
@@ -2292,7 +2316,8 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 								}
 								else
 								{
-									if (Objects[item->objectNumber].hitEffect == 3)
+									// TR5
+									if (Objects[item->objectNumber].hitEffect == HIT_RICOCHET)
 										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
 								}
 							}
@@ -2304,15 +2329,15 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 								}
 								else
 								{
-									if (Objects[item->objectNumber].hitEffect == 1)
+									if (Objects[item->objectNumber].hitEffect == HIT_BLOOD)
 									{
 										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
 									}
-									else if (Objects[item->objectNumber].hitEffect == 2)
+									else if (Objects[item->objectNumber].hitEffect == HIT_SMOKE)
 									{
 										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, -5);
 									}
-									else if (Objects[item->objectNumber].hitEffect == 3)
+									else if (Objects[item->objectNumber].hitEffect == HIT_RICOCHET)
 									{
 										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
 									}
@@ -2340,11 +2365,11 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 								}
 								else 
 								{
-									if (item->objectNumber == ID_SHOOT_SWITCH3)
+									/*if (item->objectNumber == ID_SHOOT_SWITCH3)
 									{
 										// TR4 ID_SWITCH_TYPE7
 										ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
-									}
+									}*/
 
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
@@ -2376,32 +2401,23 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 			}
 			else
 			{
-				if (LaserSight && itemNumber >= 0)
+				if (LaserSight && firing)
 				{
-					item = &g_Level.Items[itemNumber];
-					if (item->objectNumber == ID_ENEMY_JEEP && item->meshBits & 1)
-					{
-						/* @FIXME This turns the LaserSight sprite of the Grappling Gun green and calls FireGrapplingBoltFromLasersight() */
-					}
+					FireCrossBowFromLaserSight(src, &target);
 				}
 			}
 		}
-		else
-		{
-			if (itemNumber >= 0)
-			{
-				item = &g_Level.Items[itemNumber];
-				if (item->objectNumber == ID_ENEMY_JEEP && Lara.gunType == WEAPON_CROSSBOW && item->meshBits & 1)
-				{
-					/* @FIXME This turns the LaserSight sprite of the Grappling Gun green */
-				}
-			}
-		}
-		flag = 1;
+
+		hit = 1;
 	}
 	else
 	{
-		if (Lara.gunType != WEAPON_CROSSBOW)
+		if (Lara.gunType == WEAPON_CROSSBOW)
+		{
+			if (firing && LaserSight)
+				FireCrossBowFromLaserSight(src, &target);
+		}
+		else
 		{
 			target.x -= (target.x - src->x) / 32;
 			target.y -= (target.y - src->y) / 32;
@@ -2409,16 +2425,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 			if (firing && !result)
 				TriggerRicochetSpark(&target, LaraItem->pos.yRot, 8, 0);
 		}
-		else
-		{
-			if (firing && LaserSight)
-			{
-				/* @FIXME This calls FireGrapplingBoltFromLasersight() */
-			}
-		}
 	}
 
-	if (DrawTarget && (flag || !result))
+	if (DrawTarget && (hit || !result))
 	{
 		TriggerDynamicLight(target.x, target.y, target.z, 64, 255, 0, 0);
 		LaserSightActive = 1;
@@ -2427,7 +2436,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 		LaserSightZ = target.z;
 	}
 
-	return flag;
+	return hit;
 }
 
 int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INFO **mesh)
@@ -2760,6 +2769,11 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 			{
 				SPHERE *sphere = &CreatureSpheres[i];
 
+				// TODO: this approach is the correct one but, again, Core's math is a mistery and this test was meant
+				// to fail delberately in some way. I've so added again Core's legacy test for allowing the current game logic
+				// but after more testing we should trash it in the future and restore the new way.
+					
+#if 0
 				// Create the bounding sphere and test it against the ray
 				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
 				float newDist;
@@ -2777,6 +2791,65 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 						meshPtr = &g_Level.Meshes[obj->meshIndex + i];
 						bit = 1 << i;
 						sp = i;
+					}
+				}
+#endif
+
+				PHD_VECTOR p[4];
+
+				p[1].x = start->x;
+				p[1].y = start->y;
+				p[1].z = start->z;
+				p[2].x = end->x;
+				p[2].y = end->y;
+				p[2].z = end->z;
+				p[3].x = sphere->x;
+				p[3].y = sphere->y;
+				p[3].z = sphere->z;
+
+				int r0 = (p[3].x - p[1].x) * (p[2].x - p[1].x) + 
+					(p[3].y - p[1].y) * (p[2].y - p[1].y) +
+					(p[3].z - p[1].z) * (p[2].z - p[1].z);
+
+				int r1 = SQUARE(p[2].x - p[1].x) + 
+					SQUARE(p[2].y - p[1].y) + 
+					SQUARE(p[2].z - p[1].z);
+
+				if (((r0 < 0 && r1 < 0) 
+					|| (r1 > 0 && r0 > 0))
+					&& (abs(r0) <= abs(r1))) 
+				{
+					r1 >>= 16;
+					if (r1)
+						r0 /= r1;
+					else
+						r0 = 0;
+
+					p[0].x = p[1].x + ((r0 * (p[2].x - p[1].x)) >> 16);
+					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
+					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
+					
+					int dx = p[0].x - p[3].x;
+					int dy = p[0].y - p[3].y;
+					int dz = p[0].z - p[3].z;
+
+					int distance = dx + dy + dz;
+
+					if (distance < SQUARE(sphere->r))
+					{
+						dx = SQUARE(sphere->x - start->x);
+						dy = SQUARE(sphere->y - start->y);
+						dz = SQUARE(sphere->z - start->z);
+
+						distance = dx + dy + dz;
+
+						if (distance < minDistance)
+						{
+							minDistance = distance;
+							meshPtr = &g_Level.Meshes[obj->meshIndex + i];
+							bit = 1 << i;
+							sp = i;
+						}
 					}
 				}
 			}

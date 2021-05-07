@@ -325,7 +325,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->zoneType = ZONE_FLYER;
 		obj->undead = true;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
@@ -529,7 +529,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
@@ -581,7 +581,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
@@ -606,7 +606,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
@@ -832,7 +832,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveMesh = true;
 	}
 

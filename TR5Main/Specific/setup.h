@@ -8,7 +8,7 @@ enum HitEffectEnum
     HIT_NONE,
     HIT_BLOOD,
     HIT_SMOKE,
-    HIT_FRAGMENT,
+    HIT_RICOCHET,
 	HIT_SPECIAL,
     MAX_HIT_EFFECT
 };
