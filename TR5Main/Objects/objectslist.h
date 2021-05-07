@@ -91,7 +91,7 @@ typedef enum GAME_OBJECT_ID
 	ID_CROCODILE,			// TR4 - OK - We just need to fix land/water transition but it was bugged also in TR4
 	ID_BAT,					// TR4 - OK
 	ID_SPHINX,				// TR4 - OK
-	ID_WILD_BOAR,
+	ID_WILD_BOAR,			// TR4 - OK
 	ID_HARPY,
 	ID_BIG_SCORPION,		// TR4 - OK
 	ID_SMALL_SCORPION,		// TR4 - OK
@@ -139,13 +139,13 @@ typedef enum GAME_OBJECT_ID
 	ID_MP_WITH_GUN,
 	ID_BADDY1,						// TR4 - OK
 	ID_BADDY2,						// TR4 - OK
-	ID_SAS_CAIRO,
+	ID_SAS_CAIRO,					// TR4 - OK
 	ID_SAS_DYING,
 	ID_SAS_CAPTAIN,
 	ID_SAS_DRAG_BLOKE,
 	ID_GUIDE,
 	ID_VON_CROY,
-	ID_TROOPS,				// TR4 - OK - Needs testing
+	ID_TROOPS,						// TR4 - OK
 	ID_SAS,
 	ID_SWAT,
 	ID_SWAT_PLUS,

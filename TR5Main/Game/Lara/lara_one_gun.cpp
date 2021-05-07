@@ -1028,7 +1028,7 @@ void draw_shotgun(int weaponType)
 	{
 		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
 			draw_shotgun_meshes(weaponType);
-		else if (Lara.waterStatus == 1)
+		else if (Lara.waterStatus == LW_UNDERWATER)
 			item->goalAnimState = 6;
 	}
 	else
