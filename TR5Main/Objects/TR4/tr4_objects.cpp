@@ -371,7 +371,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
 
@@ -394,7 +394,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
@@ -415,7 +415,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
