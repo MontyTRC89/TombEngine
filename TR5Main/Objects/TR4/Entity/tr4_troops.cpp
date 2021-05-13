@@ -97,7 +97,7 @@ void TroopsControl(short itemNumber)
 					item->animNumber = Objects[item->objectNumber].animIndex + 23;
 					if (item->currentAnimState == STATE_TROOPS_ATTACKED_BY_SCORPION)
 					{
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase += 37;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 37;
 					}
 					else
 					{
