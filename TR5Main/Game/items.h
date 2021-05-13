@@ -15,10 +15,10 @@ typedef enum AIObjectType
 
 typedef enum ItemStatus
 {
-	ITEM_ACTIVE,
-	ITEM_NOT_ACTIVE,
-	ITEM_DEACTIVATED,
-	ITEM_INVISIBLE
+	ITEM_NOT_ACTIVE = 0,
+	ITEM_ACTIVE = 1,
+	ITEM_DEACTIVATED = 2,
+	ITEM_INVISIBLE = 3
 };
 
 typedef enum ItemFlags
