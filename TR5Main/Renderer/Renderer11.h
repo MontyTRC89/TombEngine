@@ -553,6 +553,7 @@ namespace T5M::Renderer
 		bool drawGunFlashes(RenderView& view);
 		void drawGunShells(RenderView& view);
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
+		void renderTitleMenu();
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void updateAnimatedTextures();

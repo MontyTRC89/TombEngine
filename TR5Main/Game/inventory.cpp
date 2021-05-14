@@ -16,10 +16,19 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
+
 using namespace T5M::Renderer;
 using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
+/*Troye's lame shit*/
+titleSettings CurrentSettings;
+bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
+bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
+long rptRight, rptLeft;
+__int64 title_selected_option = 1;
+int title_menu_to_display = 0;
+int settings_flag;
 
 void CombinePuzzle(int action, short object)
 {
@@ -526,6 +535,7 @@ void Inventory::SelectObject(int r, int object, float scale)
 void Inventory::Initialise()
 {
 	LoadObjects(false);
+	clear_input_vars(0);
 
 	m_activeRing = INV_RING_WEAPONS;
 	m_type = INV_TYPE_GAME;
@@ -558,7 +568,7 @@ void Inventory::SetSelectedObject(short objNum)
 
 int Inventory::DoInventory()
 {
-	Initialise();
+	Initialise();//also clears input vars now
 
 	// If Lara is dead, then we can use only the passport
 	if (LaraItem->hitPoints <= 0 && CurrentLevel > 0)
@@ -629,8 +639,10 @@ int Inventory::DoInventory()
 
 		GameTimer++;
 
+		do_debounced_input();
+
 		// Handle input
-		if (DbInput & IN_DESELECT)
+		if (goDeselect)
 		{
 			//SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -639,7 +651,8 @@ int Inventory::DoInventory()
 			result = INV_RESULT_NONE;
 			break;
 		}
-		else if (DbInput & IN_FORWARD && (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 || m_activeRing == INV_RING_OPTIONS))
+
+		if (goUp && (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 || m_activeRing == INV_RING_OPTIONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -654,7 +667,8 @@ int Inventory::DoInventory()
 			m_movement = 0;
 			continue;
 		}
-		else if (DbInput & IN_BACK && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
+
+		if (goDown && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -669,7 +683,8 @@ int Inventory::DoInventory()
 			m_movement = 0;
 			continue;
 		}
-		else if (TrInput & IN_LEFT)
+
+		if (goLeft)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -691,7 +706,8 @@ int Inventory::DoInventory()
 			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
 			m_rings[m_activeRing].rotation = 0;
 		}
-		else if (TrInput & IN_RIGHT)
+
+		if (goRight)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -713,7 +729,8 @@ int Inventory::DoInventory()
 			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
 			m_rings[m_activeRing].rotation = 0;
 		}
-		else if (DbInput & IN_SELECT)
+
+		if (dbSelect)
 		{
 			// Handle action 
 			if (m_activeRing == INV_RING_OPTIONS)
@@ -1154,12 +1171,13 @@ bool Inventory::DoCombine()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & IN_DESELECT || closeObject)
+		if (goDeselect || closeObject)
 		{
 			closeObject = true;
 			break;
 		}
-		else if (TrInput & IN_LEFT && combineRing->numObjects > 1)
+
+		if (goLeft && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1183,7 +1201,8 @@ bool Inventory::DoCombine()
 
 			combineRing->rotation = 0;
 		}
-		else if (TrInput & IN_RIGHT && combineRing->numObjects > 1)
+
+		if (goRight && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1206,7 +1225,8 @@ bool Inventory::DoCombine()
 
 			combineRing->rotation = 0;
 		}
-		else if (DbInput & IN_SELECT)
+
+		if (goSelect)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -1334,12 +1354,13 @@ void Inventory::DoSelectAmmo()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & IN_DESELECT || closeObject)
+		if (goDeselect || closeObject)
 		{
 			closeObject = true;
 			break;
 		}
-		else if (TrInput & IN_LEFT && ammoRing->numObjects > 1)
+
+		if (goLeft && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1363,7 +1384,8 @@ void Inventory::DoSelectAmmo()
 
 			ammoRing->rotation = 0;
 		}
-		else if (TrInput & IN_RIGHT && ammoRing->numObjects > 1)
+
+		if (goRight && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1386,7 +1408,8 @@ void Inventory::DoSelectAmmo()
 
 			ammoRing->rotation = 0;
 		}
-		else if (DbInput & IN_SELECT)
+
+		if (goDeselect)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -1502,7 +1525,7 @@ void Inventory::UseCurrentItem()
 	// Binoculars
 	if (objectNumber == ID_BINOCULARS_ITEM)
 	{
-		if (LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
+		if (LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE || Lara.isDucked && !(TrInput & IN_DUCK))
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{
@@ -1782,7 +1805,7 @@ void Inventory::UseCurrentItem()
 			{
 				if (Lara.gunType != WEAPON_FLARE)
 				{
-					TrInput = 0x80000;
+					TrInput = IN_FLARE;
 					LaraGun();
 					TrInput = 0;
 
@@ -1811,8 +1834,16 @@ void Inventory::InitialiseTitle()
 {
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 
+	clear_input_vars(0);
+
+	m_activeRing = INV_RING_OPTIONS;
+	m_deltaMovement = 0;
+	m_movement = INV_MOVE_STOPPED;
+	m_type = INV_TYPE_TITLE;
+	m_selectedObject = NO_ITEM;
+
 	// Reset the objects in inventory
-	ring->numObjects = 0;
+/*	ring->numObjects = 0;
 	ring->rotation = 0;
 	ring->currentObject = 0;
 	ring->focusState = INV_FOCUS_STATE_NONE;
@@ -1834,12 +1865,12 @@ void Inventory::InitialiseTitle()
 	m_deltaMovement = 0;
 	m_movement = INV_MOVE_STOPPED;
 	m_type = INV_TYPE_TITLE;
-	m_selectedObject = NO_ITEM;
+	m_selectedObject = NO_ITEM;*/
 }
 
 bool Inventory::UpdateSceneAndDrawInventory()
 {
-	int nframes;
+/*	int nframes;
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
@@ -1849,7 +1880,7 @@ bool Inventory::UpdateSceneAndDrawInventory()
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);
 	}
-	else
+	else*/
 	{
 		g_Renderer.renderInventory();
 		g_Renderer.SyncRenderer();
@@ -1860,11 +1891,33 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 int Inventory::DoTitleInventory()
 {
+	int nframes, status = 0;
+
 	InitialiseTitle();
 
+	while (!status)
+	{
+		g_Renderer.renderTitle();
+
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		status = TitleOptions();
+
+		if (status)
+			break;
+
+		Camera.numberFrames = g_Renderer.SyncRenderer();
+		nframes = Camera.numberFrames;
+		status = ControlPhase(nframes, 0);
+	}
+
+	return status;
+	/*
 	m_rings[INV_RING_PUZZLES].draw = false;
 	m_rings[INV_RING_WEAPONS].draw = false;
-	m_rings[INV_RING_OPTIONS].draw = true;
+	m_rings[INV_RING_OPTIONS].draw = false;//true;
 
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 	m_activeRing = INV_RING_OPTIONS;
@@ -1884,7 +1937,7 @@ int Inventory::DoTitleInventory()
 
 	int result = INV_RESULT_NONE;
 
-	while (true /*!ResetFlag*/)
+	while (true /*!ResetFlag)
 	{
 		SetDebounce = true;
 
@@ -1893,8 +1946,9 @@ int Inventory::DoTitleInventory()
 
 		GameTimer++;
 
+		do_debounced_input();
 		// Handle input
-		if (TrInput & IN_LEFT)
+		if (goLeft)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -1916,7 +1970,8 @@ int Inventory::DoTitleInventory()
 
 			ring->rotation = 0;
 		}
-		else if (TrInput & IN_RIGHT)
+
+		if (goRight)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -1938,7 +1993,8 @@ int Inventory::DoTitleInventory()
 
 			ring->rotation = 0;
 		}
-		else if (DbInput & IN_SELECT)
+
+		if (goSelect)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -1967,7 +2023,7 @@ int Inventory::DoTitleInventory()
 		UpdateSceneAndDrawInventory();
 	}
 
-	CloseRing(INV_RING_OPTIONS, true);
+//	CloseRing(INV_RING_OPTIONS, true);
 
 	// Fade out
 	g_Renderer.fadeOut();
@@ -1976,7 +2032,7 @@ int Inventory::DoTitleInventory()
 		UpdateSceneAndDrawInventory();
 	}
 
-	return result;
+	return result;*/
 }
 
 InventoryObjectDefinition* Inventory::GetInventoryObject(int index)
@@ -3180,4 +3236,759 @@ float Inventory::GetCameraTilt()
 bool Inventory::HasWeaponMultipleAmmos(short object)
 {
 	return (object == INV_OBJECT_SHOTGUN || object == INV_OBJECT_CROSSBOW || object == INV_OBJECT_GRENADE_LAUNCHER);
+}
+
+/*Troye's lame attempt at fixing the inventory begins*/
+void Inventory::clear_input_vars(bool flag)
+{
+	goUp = goDown = goRight = goLeft = goSelect = goDeselect = 0;
+	if (flag) 
+		return;
+	else //don't wanna make another function for the rest
+	{
+		dbUp = dbDown = dbRight = dbLeft = dbSelect = dbDeselect = 0;
+		rptRight = rptLeft = 0;
+	}
+}
+
+void Inventory::do_debounced_input()
+{
+	clear_input_vars(1);
+
+	if (TrInput & IN_LEFT)
+	{
+		if (rptLeft >= 8)
+			goLeft = 1;
+		else
+			rptLeft++;
+
+		if (!dbLeft)
+			goLeft = 1;
+
+		dbLeft = 1;
+	}
+	else
+	{
+		dbLeft = 0;
+		rptLeft = 0;
+	}
+
+	if (TrInput & IN_RIGHT)
+	{
+		if (rptRight >= 8)
+			goRight = 1;
+		else
+			rptRight++;
+
+		if (!dbRight)
+			goRight = 1;
+
+		dbRight = 1;
+	}
+	else
+	{
+		dbRight = 0;
+		rptRight = 0;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		if (!dbUp)
+			goUp = 1;
+
+		dbUp = 1;
+	}
+	else
+		dbUp = 0;
+
+	if (TrInput & IN_BACK)
+	{
+		if (!dbDown)
+			goDown = 1;
+
+		dbDown = 1;
+	}
+	else
+		dbDown = 0;
+
+	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
+		dbSelect = 1;
+	else
+	{
+		if (dbSelect == 1)
+			goSelect = 1;
+
+		dbSelect = 0;
+	}
+
+	if ((TrInput & IN_DESELECT))
+		dbDeselect = 1;
+	else
+	{
+		if (dbDeselect == 1)
+			goDeselect = 1;
+
+		dbDeselect = 0;
+	}
+}
+
+int Inventory::TitleOptions()
+{
+	int ret, ret2, i, n, n2, load, flag;
+
+	static int always0 = 0;
+	static __int64 selected_option_bak = 0;
+
+	ret = 0;
+
+	/*stuff for credits go here!*/
+
+	if (always0 == 0)
+	{
+		switch (title_menu_to_display)
+		{
+		case title_main_menu:
+			flag = 8;
+			break;
+
+		case title_select_level:
+			ret = 0;
+			flag = 1 << (g_GameFlow->GetNumLevels() - 2);
+			break;
+
+		case title_load_game:
+			if (title_selected_option == 1)//shitty but works
+				title_selected_option = 2;
+
+				flag = 1 << (MAX_SAVEGAMES);
+			break;
+		case title_options_menu:
+			flag = 1 << 2;
+			break;
+
+		case title_display_menu:
+			settings_flag = 1 << 6;
+			handle_display_setting_input();
+			break;
+
+		case title_controls_menu:
+			settings_flag = 1 << 19;
+			handle_control_settings_input();
+			break;
+
+		case title_sounds_menu:
+			settings_flag = 1 << 5;
+			handle_sound_settings_input();
+			break;
+		}
+
+		do_debounced_input();
+
+		if (title_menu_to_display <= title_options_menu)
+		{
+			if (goUp)
+			{
+				if (title_selected_option > 1)
+					title_selected_option >>= 1;
+
+				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			}
+
+			if (goDown)
+			{
+				if (title_selected_option < flag)
+					title_selected_option <<= 1;
+
+				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			}
+
+			if (goDeselect && title_menu_to_display != title_main_menu)
+			{
+				title_menu_to_display = title_main_menu;
+				title_selected_option = selected_option_bak;
+				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			}
+		}
+
+		if (goSelect)
+		{
+			if (title_menu_to_display <= 2)
+			{
+				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+
+				if (title_menu_to_display != 0)
+				{
+					if (title_menu_to_display == title_select_level)
+					{
+						LevelComplete = 0;
+
+						n = 0;
+						n2 = (int)title_selected_option;
+
+						if (n2)
+						{
+							do
+							{
+								n2 >>= 1;
+								n++;
+
+							} while (n2);
+
+							LevelComplete = n;
+						}
+
+						ret = INV_RESULT_NEW_GAME_SELECTED_LEVEL;
+					}
+				}
+				else if (title_selected_option > 0 && title_selected_option <= 8)
+				{
+					switch (title_selected_option)
+					{
+					case 1:
+						if (g_GameFlow->PlayAnyLevel)
+						{
+							selected_option_bak = title_selected_option;
+							title_menu_to_display = title_select_level;
+						}
+						else
+						{
+							LevelComplete = 1;
+							ret = INV_RESULT_NEW_GAME;
+						}
+
+						break;
+
+					case 2:
+						selected_option_bak = title_selected_option;
+						title_menu_to_display = title_load_game;
+						break;
+
+					case 3:
+					case 5:
+					case 6:
+					case 7:
+
+						break;
+
+					case 4:
+						selected_option_bak = title_selected_option;
+						title_selected_option = 1;
+						title_menu_to_display = title_options_menu;
+						break;
+
+					case 8:
+						ret = INV_RESULT_EXIT_GAME;
+						break;
+					}
+				}
+			}
+			else if (title_menu_to_display == 3)
+			{
+				switch (title_selected_option)
+				{
+				case 1:
+					FillDisplayOptions();
+					title_menu_to_display = title_display_menu;
+					break;
+
+				case 2:
+					title_menu_to_display = title_controls_menu;
+					title_selected_option = 1;
+					break;
+
+				case 4:
+					fillSound();
+					title_menu_to_display = title_sounds_menu;
+					title_selected_option = 1;
+					break;
+				}
+			}
+		}
+	}
+
+	if (ret == INV_RESULT_EXIT_GAME)
+		return INV_RESULT_EXIT_GAME;
+
+	if (ret)
+	{
+		LevelComplete = 0;
+		ret = INV_RESULT_NEW_GAME;
+	}
+
+	return ret;
+}
+
+__int64 Inventory::getTitleSelection()
+{
+	return title_selected_option;
+}
+
+int Inventory::getTitleMenu()
+{
+	return title_menu_to_display;
+}
+
+void Inventory::FillDisplayOptions()
+{
+	// Copy configuration to a temporary object
+	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+
+	// Get current display mode
+	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
+	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
+	CurrentSettings.videoMode = 0;
+	for (int i = 0; i < adapter->DisplayModes.size(); i++)
+	{
+		RendererDisplayMode* mode = &adapter->DisplayModes[i];
+		if (mode->Width == CurrentSettings.conf.Width && mode->Height == CurrentSettings.conf.Height &&
+			mode->RefreshRate == CurrentSettings.conf.RefreshRate)
+		{
+			CurrentSettings.videoMode = i;
+			break;
+		}
+	}
+}
+
+void Inventory::handle_display_setting_input()
+{
+	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
+	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
+
+	SetDebounce = true;
+	S_UpdateInput();
+	SetDebounce = false;
+
+	do_debounced_input();
+
+	if (goDeselect)
+	{
+		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		title_menu_to_display = title_options_menu;
+		title_selected_option = 1;
+		return;
+	}
+
+	if (goLeft)
+	{
+		switch (title_selected_option)
+		{
+		case 1:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (CurrentSettings.videoMode > 0)
+				CurrentSettings.videoMode--;
+			break;
+
+		case 2:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			break;
+
+		case 4:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			break;
+
+		case 8:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			break;
+
+		case 16:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			break;
+		}
+	}
+
+	if (goRight)
+	{
+		switch (title_selected_option)
+		{
+		case 1:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
+				CurrentSettings.videoMode++;
+			break;
+
+		case 2:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			break;
+
+		case 4:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			break;
+
+		case 8:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			break;
+
+		case 16:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			break;
+		}
+	}
+
+	if (goUp)
+	{
+		if (title_selected_option > 1)
+			title_selected_option >>= 1;
+
+		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goDown)
+	{
+		if (title_selected_option < settings_flag)
+			title_selected_option <<= 1;
+
+		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goSelect)
+	{
+		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+		if (title_selected_option & (1 << 5))
+		{
+			// Save the configuration
+			RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
+			CurrentSettings.conf.Width = mode->Width;
+			CurrentSettings.conf.Height = mode->Height;
+			CurrentSettings.conf.RefreshRate = mode->RefreshRate;
+
+			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			SaveConfiguration();
+
+			// Reset screen and go back
+			g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
+				CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
+			return;
+		}
+
+		if (title_selected_option & (1 << 6))
+		{
+			title_menu_to_display = title_options_menu;
+			title_selected_option = 1;
+			return;
+		}
+	}
+}
+
+void Inventory::handle_control_settings_input()
+{
+	CurrentSettings.waitingForkey = 0;
+
+	memcpy(&CurrentSettings.conf.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
+
+	SetDebounce = true;
+	S_UpdateInput();
+	SetDebounce = false;
+
+	do_debounced_input();
+
+	if (goDeselect)
+	{
+		if (!CurrentSettings.waitingForkey)
+		{
+			title_menu_to_display = title_options_menu;
+			title_selected_option = 2;
+		}
+		else
+			CurrentSettings.waitingForkey = 0;
+
+		return;
+	}
+
+	if (!CurrentSettings.waitingForkey)
+	{
+		if (goUp)
+		{
+			if (title_selected_option > 1)
+				title_selected_option >>= 1;
+
+			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		}
+
+		if (goDown)
+		{
+			if (title_selected_option < settings_flag)
+				title_selected_option <<= 1;
+
+			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		}
+
+		if (goSelect)
+		{
+			if (title_selected_option & (1 << 18))//apply
+			{
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				SaveConfiguration();
+				title_menu_to_display = title_options_menu;
+				title_selected_option = 2;
+				return;
+			}
+			else if (title_selected_option & (1 << 19))//cancel
+			{
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				title_menu_to_display = title_options_menu;
+				title_selected_option = 2;
+				return;
+			}
+			else
+				SayNo();
+		}
+	}
+
+	if (KeyMap[DIK_RETURN])
+	{
+		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		CurrentSettings.waitingForkey = 1;
+	}
+
+	if (CurrentSettings.waitingForkey)
+	{
+		TrInput = 0;
+		DbInput = 0;
+		ZeroMemory(KeyMap, 256);
+
+		while (true)
+		{
+			if (DbInput & IN_DESELECT)
+			{
+				CurrentSettings.waitingForkey = false;
+				break;
+			}
+
+			int selectedKey = 0;
+			for (selectedKey = 0; selectedKey < 256; selectedKey++)
+			{
+				if (KeyMap[selectedKey] & 0x80)
+					break;
+			}
+
+			if (selectedKey == 256)
+				selectedKey = 0;
+
+			if (selectedKey && g_KeyNames[selectedKey])
+			{
+				if (!(selectedKey == DIK_RETURN || selectedKey == DIK_LEFT || selectedKey == DIK_RIGHT ||
+					selectedKey == DIK_UP || selectedKey == DIK_DOWN))
+				{
+					if (selectedKey != DIK_ESCAPE)
+					{
+						int index;
+						int selection = (int)title_selected_option;
+
+						index = 0;
+
+						if (selection)
+						{
+							do
+							{
+								selection >>= 1;
+								index++;
+
+							} while (selection);
+						}
+
+						KeyboardLayout[1][index - 1] = selectedKey;
+						DefaultConflict();
+						DbInput = 0;
+						CurrentSettings.waitingForkey = false;
+						return;
+					}
+				}
+			}
+
+			g_Renderer.renderTitle();
+			Camera.numberFrames = g_Renderer.SyncRenderer();
+			int nframes = Camera.numberFrames;
+			ControlPhase(nframes, 0);
+
+			SetDebounce = true;
+			S_UpdateInput();
+			SetDebounce = false;
+		}
+	}
+}
+
+void Inventory::fillSound()
+{
+	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+}
+
+void Inventory::handle_sound_settings_input()
+{
+	int oldVolume = CurrentSettings.conf.MusicVolume;
+	int oldSfxVolume = CurrentSettings.conf.SfxVolume;
+	bool wasSoundEnabled = CurrentSettings.conf.EnableSound;
+
+	SetDebounce = true;
+	S_UpdateInput();
+	SetDebounce = false;
+
+	do_debounced_input();
+
+	if (goDeselect)
+	{
+		GlobalMusicVolume = oldVolume;
+		GlobalFXVolume = oldSfxVolume;
+		title_menu_to_display = title_options_menu;
+		title_selected_option = 4;
+		return;
+	}
+
+	if (goLeft)
+	{
+		switch (title_selected_option)
+		{
+		case 1:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
+
+			break;
+
+		case 2:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 4:
+			if (CurrentSettings.conf.MusicVolume > 0)
+			{
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume--;
+				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				if (!db)
+				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					db = 10;
+				}
+				else
+					db -= 2;
+			}
+
+			break;
+
+		case 8:
+			if (CurrentSettings.conf.SfxVolume > 0)
+			{
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume--;
+				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				if (!db)
+				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					db = 10;
+				}
+				else
+					db -= 2;
+			}
+
+			break;
+		}
+	}
+
+	if (goRight)
+	{
+		switch (title_selected_option)
+		{
+		case 1:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
+			break;
+
+		case 2:
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 4:
+			if (CurrentSettings.conf.MusicVolume < 100)
+			{
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume++;
+				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				if (!db)
+				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					db = 10;
+				}
+				else
+					db -= 2;
+			}
+
+			break;
+
+		case 8:
+			if (CurrentSettings.conf.SfxVolume < 100)
+			{
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume++;
+				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				if (!db)
+				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					db = 10;
+				}
+				else
+					db -= 2;
+			}
+
+			break;
+		}
+	}
+
+	if (goUp)
+	{
+		if (title_selected_option > 1)
+			title_selected_option >>= 1;
+
+		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goDown)
+	{
+		if (title_selected_option < settings_flag)
+			title_selected_option <<= 1;
+
+		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goSelect)
+	{
+		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+		if (title_selected_option & (1 << 4))
+		{
+			// Save the configuration
+			GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+			GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			SaveAudioConfig();
+
+			// Init or deinit the sound system
+			if (wasSoundEnabled && !g_Configuration.EnableSound)
+				Sound_DeInit();
+			else if (!wasSoundEnabled && g_Configuration.EnableSound)
+				Sound_Init();
+
+			return;
+		}
+
+		if (title_selected_option & (1 << 5))
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			GlobalMusicVolume = oldVolume;
+			GlobalFXVolume = oldSfxVolume;
+			title_menu_to_display = title_options_menu;
+			title_selected_option = 4;
+			return;
+		}
+	}
 }
