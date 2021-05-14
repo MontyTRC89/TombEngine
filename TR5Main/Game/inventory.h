@@ -20,6 +20,24 @@
 #define INV_RING_COMBINE			3
 #define INV_RING_CHOOSE_AMMO		4
 
+enum title_menus
+{
+	title_main_menu,
+	title_select_level,
+	title_load_game,
+	title_options_menu,
+	title_display_menu,
+	title_controls_menu,
+	title_sounds_menu
+};
+
+typedef struct titleSettings
+{
+	bool waitingForkey;//waiting for a key to be pressed when configuring controls
+	int videoMode;
+	GameConfiguration conf;
+};
+
 enum INVENTORY_OBJECTS {
 	// Weapons and ammos
 	INV_OBJECT_PISTOLS,
@@ -395,6 +413,18 @@ public:
 	short						GetSelectedObject();
 	void						SetEnterObject(short objNum);
 	void						SetSelectedObject(short objNum);
+	/*start troye's lame shit*/
+	void						do_debounced_input();
+	void						clear_input_vars(bool flag);
+	int							TitleOptions();
+	__int64						getTitleSelection();
+	int							getTitleMenu();
+	void						FillDisplayOptions();
+	void						handle_display_setting_input();
+	void						handle_control_settings_input();
+	void						handle_sound_settings_input();
+	void						fillSound();
 };
 
 extern Inventory g_Inventory;
+extern titleSettings CurrentSettings;
