@@ -67,7 +67,7 @@ void LaraCheatyBits()
 {
 	if (g_GameFlow->FlyCheat)
 	{
-		if (TrInput & IN_PAUSE)
+		if (KeyMap[DIK_O])
 		{
 			if (Lara.Vehicle == NO_ITEM)
 			{
