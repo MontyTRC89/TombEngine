@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "draw.h"
 #include "inventory.h"
+#include "newinv2.h"
 #include "lara.h"
 #include "gameflow.h"
 #include "rope.h"
@@ -471,8 +472,8 @@ namespace T5M::Renderer
     void Renderer11::renderTitleMenu()
     {
         char stringBuffer[255];
-        int title_menu_to_display = g_Inventory.getTitleMenu();
-        __int64 title_selected_option = g_Inventory.getTitleSelection();
+        int title_menu_to_display = getTitleMenu();
+        __int64 title_selected_option = getTitleSelection();
         int y = 400;
         short lastY;
         RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
@@ -497,9 +498,9 @@ namespace T5M::Renderer
             y += 25;
 
             if (title_selected_option & 4)
-                drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+                drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
-                drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+                drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
             y += 25;
 
@@ -757,6 +758,252 @@ namespace T5M::Renderer
         }
     }
 
+    void Renderer11::renderPauseMenu()
+    {
+        char stringBuffer[255];
+        int pause_menu_to_display_ = GetPauseMenu();
+        __int64 pause_selected_option_ = GetPauseSelection();
+        int y;
+        RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+        RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
+
+        switch (pause_menu_to_display_)
+        {
+        case pause_main_menu:
+            y = 275;
+
+            if (pause_selected_option_ & 1)
+                drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            y += 25;
+
+            if (pause_selected_option_ & 2)
+                drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            y += 25;
+
+            if (pause_selected_option_ & 4)
+                drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            break;
+
+        case pause_statistics:
+            y = 200;
+            drawString(400, y, "Statistics", PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
+            y += 25;
+            drawString(400, y, "todo, stats", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            break;
+
+        case pause_options_menu:
+            y = 275;
+
+            if (pause_selected_option_ & 1)
+                drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            y += 25;
+
+            if (pause_selected_option_ & 2)
+                drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            y += 25;
+
+            if (pause_selected_option_ & 4)
+                drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+            else
+                drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+
+            break;
+
+        case pause_display_menu:
+            y = 200;
+
+            drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
+                PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+
+            y += 25;
+
+            // Screen resolution
+            drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & 1) ? PRINTSTRING_BLINK : 0));
+
+            ZeroMemory(stringBuffer, 255);
+            sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+
+            drawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Windowed mode
+            drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Enable dynamic shadows
+            drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Enable caustics
+            drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Enable volumetric fog
+            drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Apply
+            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            //cancel
+            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 6)) ? PRINTSTRING_BLINK : 0));
+            break;
+
+        case pause_controls_menu:
+            y = 40;
+
+            drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
+                PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+
+            y += 25;
+
+            for (int k = 0; k < 18; k++)
+            {
+                drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+                    PRINTSTRING_COLOR_WHITE,
+                    PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << k)) ? PRINTSTRING_BLINK : 0) |
+                    (CurrentSettings.waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+                if (CurrentSettings.waitingForkey && (pause_selected_option_ & (1 << k)))
+                {
+                    drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
+                        PRINTSTRING_COLOR_YELLOW,
+                        PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
+                }
+                else
+                {
+                    drawString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
+                        PRINTSTRING_COLOR_ORANGE,
+                        PRINTSTRING_OUTLINE);
+                }
+
+                y += 25;
+            }
+
+            break;
+
+        case pause_sounds_menu:
+            y = 200;
+
+            drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
+                PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+
+            y += 25;
+
+            // Enable sound
+            drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableSound ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Enable sound special effects
+            drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
+                PRINTSTRING_COLOR_WHITE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            // Music volume
+            drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar);
+
+            y += 25;
+
+            // Sound FX volume
+            drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar);
+            y += 25;
+
+            // Apply and cancel
+            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+            break;
+        }
+        drawAllStrings();
+    }
+
+    void Renderer11::renderNewInventory()
+    {
+        draw_current_object_list(RING_INVENTORY);
+       
+        handle_inventry_menu();
+
+        if (rings[RING_AMMO]->ringactive)
+            draw_current_object_list(RING_AMMO);
+
+        draw_ammo_selector();
+        fade_ammo_selector();
+        drawAllStrings();
+    }
+
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
         char stringBuffer[255];
@@ -831,9 +1078,10 @@ namespace T5M::Renderer
         m_cbCameraMatrices.updateData(inventoryCam, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
-        if (g_Inventory.GetType() == INV_TYPE_TITLE)//sorry
+#ifdef NEW_INV
+        if (CurrentLevel == 0)//sorry
         {
-            int menu = g_Inventory.getTitleMenu();
+            int menu = getTitleMenu();
             if (menu == title_main_menu || menu == title_options_menu)
                 drawLogo = 1;
             else
@@ -858,6 +1106,35 @@ namespace T5M::Renderer
             renderTitleMenu();
             return;
         }
+        
+        if (GLOBAL_invMode == IM_INGAME)
+        {
+          renderNewInventory();
+          return;
+        }
+
+        if (GLOBAL_invMode == IM_PAUSE)//sorry again
+        {
+            int menu = GetPauseMenu();
+            bool drawThing;
+            if (menu == pause_main_menu || menu == pause_options_menu)
+                drawThing = 1;
+            else
+                drawThing = 0;
+
+            if (drawThing)
+            {
+                guiRect.left = 345;
+                guiRect.right = 115;
+                guiRect.top = 265;
+                guiRect.bottom = 100;
+                drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
+            }
+
+            renderPauseMenu();
+            return;
+        }
+#endif
 
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
         {
@@ -1008,7 +1285,7 @@ namespace T5M::Renderer
                     if (g_Inventory.GetActiveRing() == INV_RING_OPTIONS)
                     {
                         /* **************** PASSAPORT ************* */
-                        if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        if (inventoryItem == _INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
                         {
                             /* **************** LOAD AND SAVE MENU ************* */
                             if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME)
@@ -1095,7 +1372,7 @@ namespace T5M::Renderer
                             drawString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                         /* **************** GRAPHICS SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        else if (inventoryItem == _INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
                         {
                             // Draw settings menu
                             RendererVideoAdapter *adapter = &m_adapters[g_Configuration.Adapter];
@@ -1186,7 +1463,7 @@ namespace T5M::Renderer
                             //drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
                         }
                         /* **************** AUDIO SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        else if (inventoryItem == _INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
                         {
                             // Draw sound menu
 
@@ -1258,7 +1535,7 @@ namespace T5M::Renderer
                             //drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
                         }
                         /* **************** CONTROLS SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        else if (inventoryItem == _INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
                         {
                             // Draw sound menu
                             y = 40;
@@ -2267,7 +2544,7 @@ namespace T5M::Renderer
             drawOverlays(view);
 
             m_currentY = 60;
-#ifdef _DEBUG
+#ifndef _DEBUG
             ROOM_INFO *r = &g_Level.Rooms[LaraItem->roomNumber];
 
             printDebugMessage("Update time: %d", m_timeUpdate);
