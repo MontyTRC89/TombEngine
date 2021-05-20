@@ -43,6 +43,8 @@ void draw_ammo_selector();
 void spinback(unsigned short* angle);
 void update_laras_weapons_status();
 int S_CallInventory2();
+void do_stats_mode();
+void draw_compass();
 void combine_revolver_lasersight(int flag);
 void combine_crossbow_lasersight(int flag);
 void combine_HK_SILENCER(int flag);
@@ -66,6 +68,7 @@ void combine_PickupItem1(int flag);
 void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
+
 
 // Inventory results
 #define INV_RESULT_NONE						0
@@ -149,12 +152,13 @@ enum inv_objects
 	INV_OBJECT_SMALL_MEDIPACK,
 	INV_OBJECT_BINOCULARS,
 	INV_OBJECT_FLARES,
-	INV_OBJECT_COMPASS,
+	INV_OBJECT_TIMEX,
 	INV_OBJECT_LOAD_FLOPPY,
 	INV_OBJECT_SAVE_FLOPPY,
 	INV_OBJECT_BRUNING_TORCH,
 	INV_OBJECT_CROWBAR,
 	INV_OBJECT_DIARY,
+	INV_OBJECT_COMPASS,
 
 	// Puzzle, keys, pickups, examines
 	INV_OBJECT_PUZZLE1,
@@ -247,7 +251,8 @@ enum inv_modes
 {
 	IM_NONE,
 	IM_INGAME,
-	IM_PAUSE
+	IM_PAUSE,
+	IM_STATS
 };
 
 typedef struct titleSettings
@@ -321,6 +326,8 @@ extern int GLOBAL_invMode;
 extern bool pauseMenu;
 extern int pause_menu_to_display;
 extern __int64 pause_selected_option;
+extern int GLOBAL_inventoryitemchosen;
+extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
 extern RINGME pcring1;//items ring
 extern RINGME pcring2;//other ring

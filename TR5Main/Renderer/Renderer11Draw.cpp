@@ -794,11 +794,7 @@ namespace T5M::Renderer
             break;
 
         case pause_statistics:
-            y = 200;
-            drawString(400, y, "Statistics", PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
-            y += 25;
-            drawString(400, y, "todo, stats", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
-
+            drawStatistics();
             break;
 
         case pause_options_menu:
@@ -1001,7 +997,44 @@ namespace T5M::Renderer
 
         draw_ammo_selector();
         fade_ammo_selector();
+        draw_compass();
         drawAllStrings();
+    }
+
+    void Renderer11::drawStatistics()
+    {
+        unsigned short ypos;
+        short Days, Hours, Min, Sec;
+        char buffer[40];
+        int seconds;
+
+        ypos = 150;
+        drawString(400, ypos, "Statistics", PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
+        drawString(400, ypos + 2 * 25, "Level name here", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+        drawString(200, ypos + 3 * 25, "Time Taken", PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 4 * 25, "Distance travelled", PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 5 * 25, "Ammo used", PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 6 * 25, "HealthPacks used", PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 7 * 25, "Secrets found", PRINTSTRING_COLOR_WHITE, 0);
+
+        seconds = GameTimer / 30;
+        Days = seconds / (24 * 60 * 60);
+        Hours = (seconds % (24 * 60 * 60)) / (60 * 60);
+        Min = (seconds / 60) % 60;
+        Sec = (seconds % 60);
+
+        sprintf(buffer, "%02d:%02d:%02d", (Days * 24) + Hours, Min, Sec);
+        drawString(500, ypos + 3 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+        sprintf(buffer, "%dm", Savegame.Game.Distance / 419);
+        drawString(500, ypos + 4 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+        sprintf(buffer, "%d", Savegame.Game.AmmoUsed);
+        drawString(500, ypos + 5 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+        sprintf(buffer, "%d", Savegame.Game.HealthUsed);
+        drawString(500, ypos + 6 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+        sprintf(buffer, "%d / 36", Savegame.Game.Secrets);
+        drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+
+        g_Renderer.drawAllStrings();
     }
 
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
@@ -1079,7 +1112,7 @@ namespace T5M::Renderer
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
 #ifdef NEW_INV
-        if (CurrentLevel == 0)//sorry
+        if (CurrentLevel == 0)
         {
             int menu = getTitleMenu();
             if (menu == title_main_menu || menu == title_options_menu)
@@ -1113,7 +1146,13 @@ namespace T5M::Renderer
           return;
         }
 
-        if (GLOBAL_invMode == IM_PAUSE)//sorry again
+        if (GLOBAL_invMode == IM_STATS)
+        {
+            drawStatistics();
+            return;
+        }
+
+        if (GLOBAL_invMode == IM_PAUSE)
         {
             int menu = GetPauseMenu();
             bool drawThing;
@@ -2544,7 +2583,7 @@ namespace T5M::Renderer
             drawOverlays(view);
 
             m_currentY = 60;
-#ifndef _DEBUG
+#ifdef _DEBUG
             ROOM_INFO *r = &g_Level.Rooms[LaraItem->roomNumber];
 
             printDebugMessage("Update time: %d", m_timeUpdate);

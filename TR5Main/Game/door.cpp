@@ -13,6 +13,9 @@
 #include "input.h"
 #include "sound.h"
 #include "trmath.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#endif
 
 PHD_VECTOR DoubleDoorPos(0, 0, 220);
 PHD_VECTOR PullDoorPos(-201, 0, 322);
@@ -45,7 +48,9 @@ extern byte SequenceResults[3][3][3];
 extern byte Sequences[3];
 extern byte CurrentSequence;
 extern PHD_VECTOR OldPickupPos;
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 
 void SequenceDoorControl(short itemNumber) 
 {
@@ -331,7 +336,13 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->triggerFlags == 2
 	&&  item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
-	&&  ((TrInput & IN_ACTION || g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM)
+	&&  ((TrInput & IN_ACTION || 
+#ifdef NEW_INV
+		GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
+#else
+		g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
+#endif
+		)
 	&&  l->currentAnimState == LS_STOP
 	&&  l->animNumber == LA_STAND_IDLE
 	&&  !l->hitStatus
@@ -343,13 +354,25 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!Lara.isMoving)
 			{
+#ifdef NEW_INV
+				if (GLOBAL_inventoryitemchosen == NO_ITEM)
+#else
 				if (g_Inventory.GetSelectedObject() == NO_ITEM)
+#endif
 				{
+#ifdef NEW_INV
+					if (have_i_got_object(ID_CROWBAR_ITEM))
+					{
+						GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+						item->pos.yRot ^= ANGLE(180);
+					}
+#else
 					if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
 					{
 						g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
 						item->pos.yRot ^= ANGLE(180);
 					}
+#endif
 					else
 					{
 						if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
@@ -363,14 +386,21 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					}
 					return;
 				}
+#ifdef NEW_INV
+				if (GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+#else
 				if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
+#endif
 				{
 					item->pos.yRot ^= ANGLE(180);
 					return;
 				}
 			}
-
+#ifdef NEW_INV
+			GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
 			g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 			if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 			{
 				l->animNumber = LA_DOOR_OPEN_CROWBAR;

@@ -24,6 +24,9 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#endif
 
 OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
@@ -90,7 +93,9 @@ short RPickups[16];
 short pickupitem;
 PHD_VECTOR OldPickupPos;
 extern int KeyTriggerActive;
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 
 static bool SilencerIsEquiped()
 {
@@ -351,8 +356,9 @@ void PickedUpObject(short objectNumber)
                 Lara.ExaminesCombo[objectNumber - ID_EXAMINE1_COMBO1] = 1;
             break;
     }
-
+#ifndef NEW_INV
     g_Inventory.LoadObjects(false);
+#endif
 }
 
 void RemoveObjectFromInventory(short objectNumber, int count)
@@ -381,7 +387,9 @@ void RemoveObjectFromInventory(short objectNumber, int count)
     else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
         Lara.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1] = 0;
 
+#ifndef NEW_INV
     g_Inventory.LoadObjects(false);
+#endif
 }
 
 void CollectCarriedItems(ITEM_INFO* item) 
@@ -600,7 +608,13 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         return;
     }
     
-    if (!(TrInput & IN_ACTION) && (g_Inventory.GetSelectedObject() == NO_ITEM || triggerFlags != 2)
+    if (!(TrInput & IN_ACTION) && (
+#ifdef NEW_INV
+        GLOBAL_inventoryitemchosen == NO_ITEM
+#else
+        g_Inventory.GetSelectedObject() == NO_ITEM 
+#endif
+        || triggerFlags != 2)
         || BinocularRange
         || (l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || Lara.gunStatus)
         && (l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || Lara.gunStatus)
@@ -692,8 +706,28 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             item->pos.zRot = oldZrot;
             return;
         }
-        if (!Lara.isMoving)
+        if (!Lara.isMoving)//TROYE INVENTORY FIX ME PLEASE
         {
+#ifdef NEW_INV
+            if (GLOBAL_inventoryitemchosen == NO_ITEM)
+            {
+                if (have_i_got_object(ID_CROWBAR_ITEM))
+                    GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+
+                item->pos.xRot = oldXrot;
+                item->pos.yRot = oldYrot;
+                item->pos.zRot = oldZrot;
+                return;
+            }
+
+            if (GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+            {
+                item->pos.xRot = oldXrot;
+                item->pos.yRot = oldYrot;
+                item->pos.zRot = oldZrot;
+                return;
+            }
+#else
             if (g_Inventory.GetSelectedObject() == NO_ITEM)
             {
                 if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
@@ -703,6 +737,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 item->pos.zRot = oldZrot;
                 return;
             }
+
             if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
             {
                 item->pos.xRot = oldXrot;
@@ -710,7 +745,9 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 item->pos.zRot = oldZrot;
                 return;
             }
+
             g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
         }
         if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
         {
@@ -1337,7 +1374,11 @@ int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 	item->currentAnimState = LS_MISC_CONTROL;
 
 	Lara.gunStatus = LG_HANDS_BUSY;
+#ifdef NEW_INV
+    GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
 	g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 
 	return true;
 }

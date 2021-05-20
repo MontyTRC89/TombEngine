@@ -84,7 +84,6 @@ static char Stashedcurrent_selected_option;
 static char StashedCurrentHKAmmoType;
 static char StashedCurrentHarpoonAmmoType;
 static char StashedCurrentRocketAmmoType;
-
 int GLOBAL_inventoryitemchosen = NO_ITEM;
 int GLOBAL_enterinventory = NO_ITEM;
 int GLOBAL_lastinvitem = NO_ITEM;
@@ -95,9 +94,10 @@ char combine_type_flag;
 short combine_obj1;
 short combine_obj2;
 short examine_mode = 0;
-short stats_mode = 0;
-short	inventry_xpos = 0;
-short	inventry_ypos = 0;
+bool stats_mode = 0;
+bool stop_killing_me_you_dumb_input_system;
+bool stop_killing_me_you_dumb_input_system2;
+int compassNeedleAngle;
 
 uhmG current_options[3];
 
@@ -119,10 +119,10 @@ short optmessages[] =
 };
 
 #define phd_winxmax g_Configuration.Width
-#define phd_winymax CurrentSettings.conf.Height
+#define phd_winymax g_Configuration.Height
 #define phd_centerx 400
 #define phd_centery phd_winymax / 2
-#define max_combines	24//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
+#define max_combines	23//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
 
 COMBINELIST combine_table[max_combines] =
 {
@@ -198,12 +198,13 @@ INVOBJ	inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_SMALLMEDI_ITEM, 0, 512, 0, 20480, 0, 2, STRING_SMALL_MEDIPACK, -1},
 {ID_BINOCULARS_ITEM, -1, 700, 4096, 2000, 0, 2, STRING_BINOCULARS, -1},
 {ID_FLARE_INV_ITEM, 2, 1100, 16384, 0, 0, 2, STRING_FLARES, -1},
-{ID_COMPASS_ITEM, 2, 1100, 32768, 0, 0, 2, STRING_TIMEX, -1},
-{ID_INVENTORY_PASSPORT, 52, 2200, 32768, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_INVENTORY_PASSPORT, 52, 2200, 32768, 0, 0, 2, STRING_SAVE_GAME, -1},
+{ID_TIMEX_ITEM, 2, 1100, 32768, 0, 0, 2, STRING_TIMEX, -1},
+{PC_LOAD_INV_ITEM, 52, 2200, 32768, 0, 0, 2, STRING_LOAD_GAME, -1},
+{PC_LOAD_SAVE_ITEM, 52, 2200, 32768, 0, 0, 2, STRING_SAVE_GAME, -1},
 {ID_BURNING_TORCH_ITEM, 14, 1200, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
 {ID_CROWBAR_ITEM, 4, 1900, 0, 16384, 0, 2, STRING_CROWBAR, -1},
 {ID_DIARY_ITEM, 0, 0, 0, 0, 0, 2, STRING_DIARY, -1},
+{ID_COMPASS_ITEM, 0x0FFF2, 0x258, 0, 0x36B0, 0, 0, STRING_LOAD_GAME, -1},
 
 	//puzzles
 
@@ -337,12 +338,13 @@ unsigned short options_table[] =
 	OPT_USE, //small med
 	OPT_USE, //binocs
 	OPT_USE, //flares
-	OPT_STATS, //compass/timex
+	OPT_STATS, //timex
 	OPT_LOAD, //load floppy
 	OPT_SAVE, //save floppy
 	OPT_USE, //torch?
 	OPT_USE, //crowbar
 	OPT_USE, //diary
+	0, //compass
 
 	//puzzles
 	OPT_USE,
@@ -510,20 +512,22 @@ void do_debounced_input()
 		dbSelect = 1;
 	else
 	{
-		if (dbSelect == 1)
+		if (dbSelect == 1 && !stop_killing_me_you_dumb_input_system)
 			goSelect = 1;
 
 		dbSelect = 0;
+		stop_killing_me_you_dumb_input_system = 0;
 	}
 
 	if ((TrInput & IN_DESELECT))
 		dbDeselect = 1;
 	else
 	{
-		if (dbDeselect == 1)
+		if (dbDeselect == 1 && !stop_killing_me_you_dumb_input_system2)
 			goDeselect = 1;
 
 		dbDeselect = 0;
+		stop_killing_me_you_dumb_input_system2 = 0;
 	}
 }
 
@@ -1819,7 +1823,7 @@ void seperate_object(short obj)
 
 void setup_objectlist_startposition(short newobj)
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (rings[RING_INVENTORY]->current_object_list[i].invitem == newobj)
 			rings[RING_INVENTORY]->curobjinlist = i;
 }
@@ -1859,26 +1863,26 @@ void setup_ammo_selector()
 		{
 			ammo_object_list[0].invitem = INV_OBJECT_UZI_AMMO;
 			ammo_object_list[0].amount = AmountUziAmmo;
-			num = 1;
-			num_ammo_slots = 1;
+			num++;
+			num_ammo_slots = num;
 			current_ammo_type = &CurrentUziAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_PISTOLS)
 		{
-			num = 1;
+			num++;
 			ammo_object_list[0].invitem = INV_OBJECT_PISTOLS_AMMO;
 			ammo_object_list[0].amount = -1;
-			num_ammo_slots = 1;
+			num_ammo_slots = num;
 			current_ammo_type = &CurrentPistolsAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_REVOLVER)
 		{
-			num = 1;
+			num++;
 			ammo_object_list[0].invitem = INV_OBJECT_REVOLVER_AMMO;
 			ammo_object_list[0].amount = AmountRevolverAmmo;
-			num_ammo_slots = 1;
+			num_ammo_slots = num;
 			current_ammo_type = &CurrentRevolverAmmoType;
 		}
 
@@ -1902,8 +1906,8 @@ void setup_ammo_selector()
 			current_ammo_type = &CurrentHKAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_HK_AMMO;
 			ammo_object_list[num].amount = AmountHKAmmo1;
-			num = 1;
-			num_ammo_slots = 1;
+			num++;
+			num_ammo_slots = num;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_SHOTGUN)
@@ -1938,8 +1942,8 @@ void setup_ammo_selector()
 			current_ammo_type = &CurrentHarpoonAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_HARPOON_AMMO;
 			ammo_object_list[num].amount = AmountHarpoonAmmo;
-			num = 1;
-			num_ammo_slots = 1;
+			num++;
+			num_ammo_slots = num;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_ROCKET)
@@ -1947,8 +1951,8 @@ void setup_ammo_selector()
 			current_ammo_type = &CurrentRocketAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_ROCKET_AMMO;
 			ammo_object_list[num].amount = AmountRocketsAmmo;
-			num = 1;
-			num_ammo_slots = 1;
+			num++;
+			num_ammo_slots = num;
 		}
 	}
 }
@@ -2106,7 +2110,7 @@ void construct_object_list()
 			insert_object_into_list(INV_OBJECT_FLARES);
 	}
 
-	insert_object_into_list(INV_OBJECT_COMPASS);//every level has a compass? what's a good way to check?!
+	insert_object_into_list(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
 	if (Lara.NumSmallMedipacks)
 		insert_object_into_list(INV_OBJECT_SMALL_MEDIPACK);
@@ -2172,8 +2176,8 @@ void construct_combine_object_list()
 {
 	rings[RING_AMMO]->numobjectsinlist = 0;
 
-	for (int i = 0; i < 100; i++)
-		rings[RING_AMMO]->current_object_list[i].invitem = -1;
+	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		rings[RING_AMMO]->current_object_list[i].invitem = NO_ITEM;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG))
 	{
@@ -2222,6 +2226,7 @@ void construct_combine_object_list()
 
 void init_inventry()
 {
+	compassNeedleAngle = 4096;
 	examine_mode = 0;
 	stats_mode = 0;
 	AlterFOV(14560);
@@ -2289,22 +2294,22 @@ void init_inventry()
 int have_i_got_object(short object_number)
 {
 	if (object_number >= ID_PUZZLE_ITEM1_COMBO1 && object_number <= ID_PUZZLE_ITEM8_COMBO2)
-		return Lara.PuzzlesCombo[object_number];
+		return Lara.PuzzlesCombo[object_number - ID_PUZZLE_ITEM1_COMBO1];
 
 	if (object_number >= ID_PUZZLE_ITEM1 && object_number <= ID_PUZZLE_ITEM8)
-		return Lara.Puzzles[object_number];
+		return Lara.Puzzles[object_number - ID_PUZZLE_ITEM1];
 
 	if (object_number >= ID_KEY_ITEM1_COMBO1 && object_number <= ID_KEY_ITEM8_COMBO2)
-		return Lara.KeysCombo[object_number];
+		return Lara.KeysCombo[object_number - ID_KEY_ITEM1_COMBO1];
 
 	if (object_number >= ID_KEY_ITEM1 && object_number <= ID_KEY_ITEM8)
-		return Lara.Keys[object_number];
+		return Lara.Keys[object_number - ID_KEY_ITEM1];
 
 	if (object_number >= ID_PICKUP_ITEM1_COMBO1 && object_number <= ID_PICKUP_ITEM4_COMBO2)
-		return Lara.PickupsCombo[object_number];
+		return Lara.PickupsCombo[object_number - ID_PICKUP_ITEM1_COMBO1];
 
 	if (object_number >= ID_PICKUP_ITEM1 && object_number <= ID_PICKUP_ITEM4)
-		return Lara.Pickups[object_number];
+		return Lara.Pickups[object_number - ID_PICKUP_ITEM1];
 
 	if (object_number == ID_CROWBAR_ITEM)
 		return Lara.Crowbar;
@@ -2314,7 +2319,7 @@ int have_i_got_object(short object_number)
 
 void setup_objectlist_startposition2(short newobj)
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (inventry_objects_list[rings[RING_INVENTORY]->current_object_list[i].invitem].object_number == newobj)
 			rings[RING_INVENTORY]->curobjinlist = i;
 }
@@ -2753,7 +2758,7 @@ void handle_inventry_menu()
 			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
 			n = 2;
 
-			if ((options_table[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem] & 0x100))
+			if ((options_table[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem] & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN)))
 			{
 				n = 3;
 				current_options[2].type = 8;
@@ -3017,32 +3022,34 @@ void draw_ammo_selector()
 
 			yrot = ammo_object_list[n].yrot;
 			x = phd_centerx - 300 + xpos;
-			y = 600;
+			y = 430;
+			short obj = convert_invobj_to_obj(ammo_object_list[n].invitem);
 
 			if (n == current_ammo_type[0])
 			{
 				if (ammo_object_list[n].amount == -1)
-					sprintf(&invTextBuffer[0], "unlimited", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
+					sprintf(&invTextBuffer[0], "unlimited %s", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 				else
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.drawString(phd_centerx, 280, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+					g_Renderer.drawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 				//		PrintString(phd_centerx, font_height + phd_centery + 2 * font_height - 9, 8, &invTextBuffer[0], FF_CENTER);
 
+				
 				if (n == current_ammo_type[0])
 					//g_Renderer.drawObjectOn2DPosition(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 0, 0);
-					g_Renderer.drawObjectOn2DPosition(x, y, ammo_object_list[n].invitem, 0, yrot, 0);
+					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
 				else
 					//DrawThreeDeeObject2D(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 1, 0);
-					g_Renderer.drawObjectOn2DPosition(x, y, ammo_object_list[n].invitem, 0, yrot, 0);
+					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
 
 
 				//drawObjectOn2DPosition
 				//DrawThreeDeeObject2D(int x, int y, int num, int shade, int xrot, int yrot, int zrot, int bright, int overlay)
 			}
 			else
-				g_Renderer.drawObjectOn2DPosition(x, y, ammo_object_list[n].invitem, 0, yrot, 0);
+				g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
 		//	else
 		//		DrawThreeDeeObject2D(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 1, 0);
 
@@ -3323,7 +3330,7 @@ void draw_current_object_list(int ringnum)
 					if (nummeup)
 					{
 						if (nummeup == -1)
-							sprintf(textbufme, "unlimited", g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 						else
 							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 					}
@@ -3384,10 +3391,10 @@ void draw_current_object_list(int ringnum)
 
 			int x, y;
 			x = 400 + xoff + i * OBJLIST_SPACING;
-			y = 250;
-
-			
-			g_Renderer.drawObjectOn2DPosition(x, y, rings[ringnum]->current_object_list[n].invitem, 0, yrot, 0);
+			y = 150;
+			short obj = convert_invobj_to_obj(rings[ringnum]->current_object_list[n].invitem);
+			short scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
+			g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
 
 		/*	DrawThreeDeeObject2D((int)((phd_centerx * 0.00390625 * 256.0 + inventry_xpos) + xoff + i * OBJLIST_SPACING),
 				(int)(phd_centery * 0.0083333338 * ymeup + inventry_ypos),
@@ -3469,10 +3476,10 @@ int S_CallInventory2()
 {
 	int return_value;
 
-	OldLaraBusy = Lara.busy != 0;
+	OldLaraBusy = Lara.busy;
 
-/*	if (TrInput & IN_SELECT)
-		friggrimmer = 1;*/
+	if (TrInput & IN_SELECT)
+		stop_killing_me_you_dumb_input_system = 1;
 
 	rings[RING_INVENTORY] = &pcring1;
 	rings[RING_AMMO] = &pcring2;
@@ -3486,6 +3493,10 @@ int S_CallInventory2()
 		int val = 0;
 
 		OBJLIST_SPACING = phd_centerx >> 1;
+
+		if (compassNeedleAngle != 1024)
+			compassNeedleAngle -= 32;
+
 		SetDebounce = 1;
 		S_UpdateInput();
 		TrInput = InputBusy;
@@ -3507,9 +3518,10 @@ int S_CallInventory2()
 
 	/*	if (examine_mode)
 			do_examine_mode();
-		else if (stats_mode)
-			do_stats_mode();
 		else*/
+		if (stats_mode)
+			do_stats_mode();
+	//	else
 		{
 			DrawInv();
 		/*	draw_current_object_list(RING_INVENTORY);
@@ -3531,6 +3543,8 @@ int S_CallInventory2()
 		if (loading_or_saving)
 		{
 			loading_or_saving = 0;//fix meeeeeeeeeeeee
+			stop_killing_me_you_dumb_input_system2 = 1;
+			stop_killing_me_you_dumb_input_system = 1;
 		/*	do
 			{
 				S_InitialisePolyList();
@@ -3552,8 +3566,8 @@ int S_CallInventory2()
 				val = 1;
 			}
 
-			friggrimmer2 = 1;
-			friggrimmer = 1;
+			stop_killing_me_you_dumb_input_system2 = 1;
+			stop_killing_me_you_dumb_input_system = 1;
 			deselect_debounce = 0;
 			go_deselect = 0;
 			loading_or_saving = 0;*/
@@ -3570,7 +3584,7 @@ int S_CallInventory2()
 	if (useItem)
 		use_current_item();
 
-	Lara.busy = OldLaraBusy & 1;
+	Lara.busy = OldLaraBusy;
 	GLOBAL_invMode = IM_NONE;
 
 /*	if (GLOBAL_invkeypadmode)
@@ -3598,7 +3612,24 @@ int S_CallInventory2()
 	return return_value;
 }
 
+void do_stats_mode()
+{
+	GLOBAL_invMode = IM_STATS;
 
+	if (goDeselect)
+	{
+		GLOBAL_invMode = IM_NONE;
+		stats_mode = 0;
+	}
+}
+
+void draw_compass()
+{
+	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180));
+	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
+	short compass_angle = (LaraItem->pos.yRot + compass_speed) - 32768;
+	Matrix::CreateRotationY(compass_angle);
+}
 
 
 

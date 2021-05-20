@@ -169,7 +169,9 @@ short IsRoomOutsideNo;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 extern int SplashCount;
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
@@ -829,8 +831,14 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
+
+#ifdef NEW_INV
+	GLOBAL_inventoryitemchosen = NO_ITEM;
+	GLOBAL_enterinventory = NO_ITEM;
+#else
 	g_Inventory.SetEnterObject(NO_ITEM);
 	g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
