@@ -16,6 +16,9 @@
 #include "health.h"
 #include "camera.h"
 #include "prng.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#endif
 using namespace T5M::Math::Random;
 
 /*collision stuff*/
@@ -116,7 +119,9 @@ enum MOTORBIKE_FLAGS
     FL_DEATH = 128
 };
 
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 static char ExhaustStart = 0;
 static bool NoGetOff = false;
 
@@ -299,7 +304,13 @@ static BOOL GetOnMotorBike(short itemNumber)
     if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
         return false;
 
-    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1)
+    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && 
+#ifdef NEW_INV
+        GLOBAL_inventoryitemchosen != ID_PUZZLE_ITEM1
+#else
+        g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1
+#endif
+        )
         return false;
 
     dx = LaraItem->pos.xPos - item->pos.xPos;
@@ -367,11 +378,19 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             short angle = phd_atan(item->pos.zPos - laraitem->pos.zPos, item->pos.xPos - laraitem->pos.xPos) - item->pos.yRot;
             if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
             {
+#ifdef NEW_INV
+                if (GLOBAL_inventoryitemchosen == ID_PUZZLE_ITEM1)
+                {
+                    laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_UNLOCK;
+                    GLOBAL_inventoryitemchosen = NO_ITEM;
+                }
+#else
                 if (g_Inventory.GetSelectedObject() == ID_PUZZLE_ITEM1)
                 {
                     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_UNLOCK;
                     g_Inventory.SetSelectedObject(NO_ITEM);
                 }
+#endif
                 else
                 {
                     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_ENTER;
