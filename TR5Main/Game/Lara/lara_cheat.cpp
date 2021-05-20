@@ -195,7 +195,9 @@ void LaraCheatGetStuff()
 		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
 	}
 
+#ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
+#endif
 }
 
 void DelsGiveLaraItemsCheat()
@@ -224,7 +226,8 @@ void DelsGiveLaraItemsCheat()
 		Lara.PickupsCombo[2 * i + 1] = false;
 	}
 
+#ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
-
+#endif
 	/* Hardcoded code */
 }

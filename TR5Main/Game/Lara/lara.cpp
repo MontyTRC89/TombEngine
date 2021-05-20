@@ -40,7 +40,9 @@
 using std::function;
 using T5M::Renderer::g_Renderer;
 
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 
 short Elevation = 57346;
 extern short FXType;

@@ -555,6 +555,7 @@ namespace T5M::Renderer
 		void renderTitleMenu();
 		void renderPauseMenu();
 		void renderNewInventory();
+		void drawStatistics();
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void updateAnimatedTextures();
