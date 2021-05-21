@@ -13,7 +13,9 @@
 #include "trmath.h"
 #include "objectslist.h"
 
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
 static void SentryGunThrowFire(ITEM_INFO* item)

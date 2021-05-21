@@ -13,6 +13,11 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#endif
+
+
 
 byte SequenceUsed[6];
 byte SequenceResults[3][3][3];
@@ -21,8 +26,9 @@ byte CurrentSequence;
 int PulleyItemNumber = NO_ITEM;
 
 extern PHD_VECTOR OldPickupPos;
+#ifndef NEW_INV
 extern Inventory g_Inventory;
-
+#endif
 static PHD_VECTOR CogSwitchPos(0, 0, -856);
 OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 {
@@ -288,7 +294,12 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int doSwitch = 0;
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if ((!(TrInput & IN_ACTION) && g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM
+	if ((!(TrInput & IN_ACTION) && 
+#ifdef NEW_INV
+		GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM
+#else
+		g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM
+#endif
 		|| l->currentAnimState != LS_STOP
 		|| l->animNumber != LA_STAND_IDLE
 		|| Lara.gunStatus
@@ -310,7 +321,13 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot ^= (short)ANGLE(180);
 		if (TestLaraPosition(&CrowbarBounds2, item, l))
 		{
-			if (Lara.isMoving || g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM)
+			if (Lara.isMoving || 
+#ifdef NEW_INV
+				GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
+#else
+				g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
+#endif
+				)
 			{
 				if (MoveLaraPosition(&CrowbarPos2, item, l))
 				{
@@ -323,7 +340,11 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				{
 					Lara.generalPtr = (void*)itemNum;
 				}
+#ifdef NEW_INV
+				GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
 				g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 			}
 			else
 			{
@@ -350,10 +371,20 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		if (!(Lara.isMoving && g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM))
+		if (!(Lara.isMoving && 
+#ifdef NEW_INV
+			GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+#else
+			g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
+#endif
+			)
 		{
 			if (Lara.Crowbar)
+#ifdef NEW_INV
+				GLOBAL_inventoryitemchosen = ID_CROWBAR_ITEM;
+#else
 				g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
+#endif
 			else
 			{
 				if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
@@ -378,8 +409,11 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			Lara.generalPtr = (void*)itemNum;
 		}
-
+#ifdef NEW_INV
+		GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
 		g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 	}
 
 	if (!doSwitch)
@@ -407,7 +441,11 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 
 	if (Lara.Crowbar)
+#ifdef NEW_INV
+		GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+#else
 		g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
+#endif
 	else
 	{
 		if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
