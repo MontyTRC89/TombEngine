@@ -169,6 +169,8 @@ void ControlTriggerTriggerer(short itemNumber)
 
 void AnimateWaterfalls()
 {
+	return;
+
 	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
 	float y = lastWaterfallY * 0.00390625f;
 	float theY;
