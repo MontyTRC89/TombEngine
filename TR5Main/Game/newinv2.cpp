@@ -2246,18 +2246,18 @@ void init_inventry()
 	else
 		AmountShotGunAmmo2 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].getCount() / 6;
 
-	AmountHKAmmo1 = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
-	AmountCrossBowAmmo1 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
-	AmountCrossBowAmmo2 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
-	AmountCrossBowAmmo3 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
-	AmountUziAmmo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
-	AmountRevolverAmmo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
-	AmountPistolsAmmo = Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].getCount();
-	AmountRocketsAmmo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
-	AmountHarpoonAmmo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
-	AmountGrenadeAmmo1 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
-	AmountGrenadeAmmo2 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
-	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
+	AmountHKAmmo1 = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo1 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo2 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
+	AmountCrossBowAmmo3 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
+	AmountUziAmmo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
+	AmountRevolverAmmo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
+	AmountPistolsAmmo = Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].getCount();
+	AmountRocketsAmmo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+	AmountHarpoonAmmo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo1 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo2 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
+	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
 	construct_object_list();
 
 	if (GLOBAL_enterinventory == NO_ITEM)
@@ -2470,17 +2470,23 @@ void use_current_item()
 				return;
 			}
 
-			if (Lara.NumSmallMedipacks != -1)
-				Lara.NumSmallMedipacks--;
+			if (Lara.NumSmallMedipacks != 0)
+			{
+				if (Lara.NumSmallMedipacks != -1)
+					Lara.NumSmallMedipacks--;
 
-			Lara.dpoisoned = 0;
-			LaraItem->hitPoints += 500;
+				Lara.dpoisoned = 0;
+				LaraItem->hitPoints += 500;
 
-			if (LaraItem->hitPoints > 1000)
-				LaraItem->hitPoints = 1000;
+				if (LaraItem->hitPoints > 1000)
+					LaraItem->hitPoints = 1000;
 
-			SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
-			Savegame.Game.HealthUsed++;
+				SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
+				Savegame.Game.HealthUsed++;
+			}
+			else
+				SayNo();
+
 			return;
 
 		case INV_OBJECT_LARGE_MEDIPACK:
@@ -2491,14 +2497,20 @@ void use_current_item()
 				return;
 			}
 
-			if (Lara.NumLargeMedipacks != -1)
-				Lara.NumLargeMedipacks--;
+			if (Lara.NumLargeMedipacks != 0)
+			{
+				if (Lara.NumLargeMedipacks != -1)
+					Lara.NumLargeMedipacks--;
 
-			Lara.dpoisoned = 0;
-			LaraItem->hitPoints = 1000;
+				Lara.dpoisoned = 0;
+				LaraItem->hitPoints = 1000;
 
-			SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
-			Savegame.Game.HealthUsed++;
+				SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
+				Savegame.Game.HealthUsed++;
+			}
+			else
+				SayNo();
+
 			return;
 
 		default:
@@ -3343,7 +3355,7 @@ void draw_current_object_list(int ringnum)
 				else
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
-				g_Renderer.drawString(phd_centerx, 230, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+				g_Renderer.drawString(phd_centerx, ringnum == RING_INVENTORY ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 			//	PrintString(phd_centerx, objmeup, 8, textbufme, 0x8000);
 			}
 
@@ -3384,17 +3396,13 @@ void draw_current_object_list(int ringnum)
 					rings[ringnum]->current_object_list[n].bright = 32;
 			}
 
-			if (ringnum == RING_INVENTORY)
-				ymeup = 42;
-			else
-				ymeup = 190;
-
-			int x, y;
+			int x, y, y2;
 			x = 400 + xoff + i * OBJLIST_SPACING;
 			y = 150;
+			y2 = 430;//combine 
 			short obj = convert_invobj_to_obj(rings[ringnum]->current_object_list[n].invitem);
 			short scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
+			g_Renderer.drawObjectOn2DPosition(x, ringnum == RING_INVENTORY ? y : y2, obj, 0, yrot, 0);
 
 		/*	DrawThreeDeeObject2D((int)((phd_centerx * 0.00390625 * 256.0 + inventry_xpos) + xoff + i * OBJLIST_SPACING),
 				(int)(phd_centery * 0.0083333338 * ymeup + inventry_ypos),
