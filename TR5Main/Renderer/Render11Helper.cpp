@@ -185,7 +185,7 @@ namespace T5M::Renderer
 		{
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
-
+			if (!bone) return;//otherwise inventory crashes mm
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 
 			if (calculateMatrix)

@@ -17,7 +17,9 @@
 
 #define ANIMATION_LAGOON_WITCH_DEATH	7
 
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 
 BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
