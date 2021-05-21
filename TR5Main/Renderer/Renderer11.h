@@ -495,7 +495,7 @@ namespace T5M::Renderer
 		int m_pickupRotation;
 	
 		// Private functions
-		void drawAllStrings();
+		
 		int getAnimatedTextureInfo(short textureId);
 		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
 		void fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
@@ -528,7 +528,6 @@ namespace T5M::Renderer
 		void drawStatics(bool transparent, RenderView& view);
 		void renderShadowMap(RenderView& view);
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
-		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 		void drawLara(RenderView& view,bool transparent, bool shadowMap);
 		void printDebugMessage(LPCSTR message, ...);
 		void drawFires(RenderView& view);
@@ -553,6 +552,10 @@ namespace T5M::Renderer
 		bool drawGunFlashes(RenderView& view);
 		void drawGunShells(RenderView& view);
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
+		void renderTitleMenu();
+		void renderPauseMenu();
+		void renderNewInventory();
+		void drawStatistics();
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void updateAnimatedTextures();
@@ -625,6 +628,8 @@ namespace T5M::Renderer
 		void getItemAbsBonePosition(int itemNumber, DirectX::SimpleMath::Vector3* pos, int joint);
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
 		void getBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
+		void drawAllStrings();
+		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 	
 		RendererMesh* getMesh(int meshIndex);
 	private:
