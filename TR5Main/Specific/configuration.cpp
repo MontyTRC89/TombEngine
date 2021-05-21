@@ -308,11 +308,13 @@ bool SaveConfiguration()
 		}
 	}
 
-	//OptionAutoTarget = g_Configuration.AutoTarget;
+	return true;
+}
+
+void SaveAudioConfig()
+{
 	GlobalMusicVolume = g_Configuration.MusicVolume;
 	GlobalFXVolume = g_Configuration.SfxVolume;
-
-	return true;
 }
 
 void InitDefaultConfiguration()
