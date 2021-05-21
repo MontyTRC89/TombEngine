@@ -67,7 +67,7 @@ void LaraCheatyBits()
 {
 	if (g_GameFlow->FlyCheat)
 	{
-		if (TrInput & IN_PAUSE)
+		if (KeyMap[DIK_O])
 		{
 			if (Lara.Vehicle == NO_ITEM)
 			{
@@ -195,7 +195,9 @@ void LaraCheatGetStuff()
 		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
 	}
 
+#ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
+#endif
 }
 
 void DelsGiveLaraItemsCheat()
@@ -224,7 +226,8 @@ void DelsGiveLaraItemsCheat()
 		Lara.PickupsCombo[2 * i + 1] = false;
 	}
 
+#ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
-
+#endif
 	/* Hardcoded code */
 }

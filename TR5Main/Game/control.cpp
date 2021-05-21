@@ -47,6 +47,9 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
+#ifdef NEW_INV
+#include <Game/newinv2.h>
+#endif
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -166,7 +169,9 @@ short IsRoomOutsideNo;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
+#ifndef NEW_INV
 extern Inventory g_Inventory;
+#endif
 extern int SplashCount;
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
@@ -258,6 +263,38 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Does the player want to enter inventory?
 		SetDebounce = false;
+#ifdef NEW_INV
+		if (CurrentLevel != 0 && !g_Renderer.isFading())
+		{
+			if (TrInput & IN_PAUSE && !pauseMenu && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			{
+				SOUND_Stop();
+				g_Renderer.DumpGameScene();
+				pauseMenu = 1;
+				pause_menu_to_display = pause_main_menu;
+				pause_selected_option = 1;
+			}
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0 && !pauseMenu)
+			{
+				// Stop all sounds
+				SOUND_Stop();
+
+				if (S_CallInventory2())
+					return GAME_STATUS_LOAD_GAME;
+			}
+		}
+
+		while (pauseMenu)
+		{
+			DrawInv();
+			g_Renderer.SyncRenderer();
+
+			int z = DoPauseMenu();
+
+			if (z == INV_RESULT_EXIT_TO_TILE)
+				return GAME_STATUS_EXIT_TO_TITLE;
+		}
+#else
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
 			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
@@ -274,6 +311,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				}
 			}
 		}
+#endif
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
@@ -683,11 +721,38 @@ GAME_STATUS DoTitle(int index)
 		InitialiseHair();
 
 		ControlPhase(2, 0);
+#ifdef NEW_INV
+		int status = 0, frames;
+		while (!status)
+		{
+			g_Renderer.renderTitle();
+
+			SetDebounce = true;
+			S_UpdateInput();
+			SetDebounce = false;
+
+			status = TitleOptions();
+
+			if (status)
+				break;
+
+			Camera.numberFrames = g_Renderer.SyncRenderer();
+			frames = Camera.numberFrames;
+			ControlPhase(frames, 0);
+		}
+
+		inventoryResult = status;
+#else
 		inventoryResult = g_Inventory.DoTitleInventory();
+#endif
 	}
 	else
 	{
+#ifdef NEW_INV
+		inventoryResult = TitleOptions();
+#else
 		inventoryResult = g_Inventory.DoTitleInventory();
+#endif
 	}
 
 	UseSpotCam = false;
@@ -766,8 +831,14 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
+
+#ifdef NEW_INV
+	GLOBAL_inventoryitemchosen = NO_ITEM;
+	GLOBAL_enterinventory = NO_ITEM;
+#else
 	g_Inventory.SetEnterObject(NO_ITEM);
 	g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
