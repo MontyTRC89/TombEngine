@@ -791,6 +791,52 @@ static void StartObject(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveMesh = true;
 	}
+
+	obj = &Objects[ID_WHEEL_OF_FORTUNE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseGameStix;
+		obj->control = GameStixControl;
+		obj->collision = GameStixCollision;
+		g_Level.Bones[obj->boneIndex] |= 0x10;
+		g_Level.Bones[obj->boneIndex + 4] |= 0x10;
+		g_Level.Bones[obj->boneIndex + 8] |= 0x10;
+		g_Level.Bones[obj->boneIndex + 12] |= 0x10;
+		obj->saveAnim = 1;
+		obj->saveFlags = 1;
+		obj->hitPoints = 1;
+	}
+
+	obj = &Objects[ID_ENEMY_PIECE];
+	if (obj->loaded)
+	{
+		obj->collision = ObjectCollision;
+		obj->saveAnim = 1;
+	}
+
+	obj = &Objects[ID_GOD_HEAD];
+	if (obj->loaded)
+	{
+		obj->control = ControlGodHead;
+	//	obj->drawRoutine = DrawGodHead;
+	//	obj->usingDrawAnimatingItem = 0;
+		obj->saveFlags = 1;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		obj = &Objects[ID_GAME_PIECE1 + i];
+
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseGamePiece;
+			obj->control = SenetControl;
+			obj->collision = ObjectCollision;
+			obj->savePosition = 1;
+			obj->saveHitpoints = 1;
+			obj->saveFlags = 1;
+		}
+	}
 }
 
 static void StartTrap(OBJECT_INFO* obj)
