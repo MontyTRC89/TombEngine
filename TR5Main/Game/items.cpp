@@ -138,7 +138,7 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->roomNumber != 255)
+		if (item->roomNumber != NO_ROOM)
 		{
 			ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
