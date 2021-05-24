@@ -197,6 +197,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		return 1;
 	}
+#if 0
 	else// if (EnableMonkeyVault == true)
 	{
 		if (Lara.canMonkeySwing)
@@ -223,6 +224,9 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 //	else
 		return 0;
+#else
+	else return 0;
+#endif
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)
