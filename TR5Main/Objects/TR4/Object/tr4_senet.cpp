@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_wheel_of_fortune.h"
+#include "tr4_senet.h"
 #include "sound.h"
 #include "items.h"
 #include "control.h"
@@ -426,6 +426,43 @@ void ControlGodHead(short itemNumber)
 			}
 			else
 				item->itemFlags[1] += 128;
+		}
+	}
+}
+
+void InitialiseGamePiece(short itemNumber)
+{
+	int i;
+	ITEM_INFO* item;
+
+	if (!SenetPiecesNumber[0])
+	{
+		for (i = 1; i < 17; ++i)
+			SenetBoard[i] = 0;
+		for (i = 0; i < 6; ++i)
+			ActiveSenetPieces[i] = 0;
+		SenetBoard[0] = 3;
+		for (i = 0; i < g_Level.NumItems; ++i)
+		{
+			item = &g_Level.Items[itemNumber];
+			if (item->objectNumber == ID_GAME_PIECE1)
+			{
+				SenetPiecesNumber[0] = i;
+				SenetTargetX = item->pos.xPos + 1024;
+				SenetTargetZ = item->pos.zPos;
+			}
+			else if (item->objectNumber == ID_GAME_PIECE2)
+			{
+				SenetPiecesNumber[1] = i;
+			}
+			else if (item->objectNumber == ID_GAME_PIECE3)
+			{
+				SenetPiecesNumber[2] = i;
+			}
+			else if (item->objectNumber == ID_ENEMY_PIECE)
+			{
+				SenetPiecesNumber[3 + item->triggerFlags] = i;
+			}
 		}
 	}
 }
