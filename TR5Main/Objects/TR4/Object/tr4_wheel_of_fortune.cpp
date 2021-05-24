@@ -5,10 +5,20 @@
 #include "control.h"
 #include "setup.h"
 #include "tomb4fx.h"
+#include "lara.h"
+#include "lara_struct.h"
+#include "input.h"
 
 short SenetPiecesNumber[6];
 char ActivePiece, SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
+
+OBJECT_COLLISION_BOUNDS GameStixBounds =
+{
+	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0x0, 0x0
+};
+
+static PHD_VECTOR GameStixPosition = { 0, 0, -100 };
 
 void InitialiseGameStix(short itemNumber)
 {
@@ -341,4 +351,40 @@ void MakeMove(int piece, int displacement)
 			SenetDisplacement = -1;
 		}
 	}
+}
+
+void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &g_Level.Items[item_num];
+
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_STOP && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS &&
+		!item->active || Lara.isMoving && Lara.generalPtr == (void*)item_num)
+	{
+		laraitem->pos.yRot ^= 0x8000;
+
+		if (TestLaraPosition(&GameStixBounds, item, laraitem))
+		{
+			if (MoveLaraPosition(&GameStixPosition, item, laraitem))
+			{
+				laraitem->animNumber = LA_SENET_ROLL;
+				laraitem->frameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
+				laraitem->currentAnimState = LS_MISC_CONTROL;
+				Lara.isMoving = 0;
+				Lara.torsoXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoZrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				item->status = ITEM_ACTIVE;
+				AddActiveItem(item_num);
+				laraitem->pos.yRot ^= 0x8000;
+				return;
+			}
+
+			Lara.generalPtr = (void*)item_num;
+		}
+
+		laraitem->pos.yRot ^= 0x8000;
+	}
+	else
+		ObjectCollision(item_num, laraitem, coll);
 }
