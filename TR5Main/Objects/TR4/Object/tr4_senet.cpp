@@ -388,3 +388,44 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 	else
 		ObjectCollision(item_num, laraitem, coll);
 }
+
+void ControlGodHead(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (TriggerActive(item))
+	{
+		if (item->pos.yRot == 0)
+			item->pos.zPos &= ~1023;
+		else if (item->pos.yRot == 0x4000)
+			item->pos.xPos &= ~1023;
+		else if (item->pos.yRot == -0x4000)
+			item->pos.xPos |= 1023;
+		else if (item->pos.yRot == -0x8000)
+			item->pos.zPos |= 1023;
+
+		if (item->itemFlags[0])
+		{
+			if (item->itemFlags[2])
+				item->itemFlags[2]--;
+			else
+			{
+				if (item->itemFlags[1] < 128)
+					KillItem(itemNumber);
+				else
+					item->itemFlags[1] -= 128;
+			}
+		}
+		else
+		{
+			if (item->itemFlags[1] > 0x1000)
+			{
+				item->itemFlags[0] = 1;
+				item->itemFlags[1] = 4096;
+				item->itemFlags[2] = 210;
+			}
+			else
+				item->itemFlags[1] += 128;
+		}
+	}
+}
