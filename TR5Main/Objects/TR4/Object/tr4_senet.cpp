@@ -466,3 +466,15 @@ void InitialiseGamePiece(short itemNumber)
 		}
 	}
 }
+
+void SenetControl(short itemNumber)
+{
+	ITEM_INFO* item;
+
+	item = &g_Level.Items[itemNumber];
+
+	if (SenetDisplacement > 0 && item->triggerFlags != 1)
+		MakeMove(item->objectNumber - ID_GAME_PIECE1, SenetDisplacement);
+
+	RemoveActiveItem(itemNumber);
+}

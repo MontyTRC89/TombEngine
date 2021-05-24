@@ -13,3 +13,4 @@ void MakeMove(int piece, int displacement);
 void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll);
 void ControlGodHead(short itemNumber);
 void InitialiseGamePiece(short itemNumber);
+void SenetControl(short itemNumber);
