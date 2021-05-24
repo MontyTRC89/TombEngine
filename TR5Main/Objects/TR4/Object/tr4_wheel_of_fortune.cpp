@@ -4,6 +4,7 @@
 #include "items.h"
 #include "control.h"
 #include "setup.h"
+#include "tomb4fx.h"
 
 short SenetPiecesNumber[6];
 char ActivePiece, SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
@@ -115,13 +116,13 @@ void GameStixControl(short itemNumber)
 			{
 				if (number == 1)
 				{
-					_0x0041CE70(item2, 0x6060E0, -32);
-					_0x0041CE70(item2, 0x6060E0, 48);
+					SenetPieceExplosionEffect(item2, 0x6060E0, -32);
+					SenetPieceExplosionEffect(item2, 0x6060E0, 48);
 				}
 				else
 				{
-					_0x0041CE70(item2, 0xFF8020, -32);
-					_0x0041CE70(item2, 0xFF8020, 48);
+					SenetPieceExplosionEffect(item2, 0xFF8020, -32);
+					SenetPieceExplosionEffect(item2, 0xFF8020, 48);
 				}
 				KillItem(SenetPiecesNumber[ActivePiece]);
 				if (CheckSenetWinner(number))
@@ -148,14 +149,14 @@ void GameStixControl(short itemNumber)
 						item2 = &g_Level.Items[SenetPiecesNumber[i]];
 						if (x == item2->pos.xPos && z == item2->pos.zPos)
 						{
-							_0x0041CE70(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
+							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
 							item2->pos.xPos = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
 							item2->pos.zPos = SenetTargetZ + SECTOR(i % 3);
 							roomNumber = item2->roomNumber;
 							GetFloor(item2->pos.xPos, item2->pos.yPos - 32, item2->pos.zPos, &roomNumber);
 							if (item2->roomNumber != roomNumber)
 								ItemNewRoom(SenetPiecesNumber[i], roomNumber);
-							_0x0041CE70(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
+							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
 						}
 					}
 				}
@@ -198,4 +199,40 @@ void GameStixControl(short itemNumber)
 				SenetDisplacement = SenetDisplacement == 6 ? 0 : -1;
 		}
 	}
+}
+
+void _0x0040FAE0(ITEM_INFO* item)
+{
+	SenetDisplacement = 0;
+	item->triggerFlags = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		SenetDisplacement += GetRandomControl() & 1;
+
+		if (GetRandomControl() & 1)
+			item->triggerFlags |= (1 << i);
+	}
+
+	if (!SenetDisplacement)
+		SenetDisplacement = 6;
+
+	item->hitPoints = 120;
+
+	for (int i = 0; i > 3; i++)
+	{
+		g_Level.Items[SenetPiecesNumber[i]].triggerFlags = 1;
+	}
+}
+
+void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
+{
+	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
+	int clr = color | 0x18000000;
+	item->pos.yPos -= STEPUP_HEIGHT;
+	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
+	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
+	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
+	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
+	item->pos.yPos += STEPUP_HEIGHT;
 }
