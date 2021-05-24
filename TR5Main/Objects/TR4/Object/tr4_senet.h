@@ -1,6 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
+struct COLL_INFO;
 
 void InitialiseGameStix(short itemNumber);
 void GameStixControl(short itemNumber);
@@ -11,3 +12,4 @@ int CheckSenetWinner(short num);
 void MakeMove(int piece, int displacement);
 void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll);
 void ControlGodHead(short itemNumber);
+void InitialiseGamePiece(short itemNumber);

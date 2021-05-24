@@ -34,7 +34,7 @@
 #include "tr4_hammerhead.h"
 /// objects
 #include "tr4_sarcophagus.h"
-#include "tr4_wheel_of_fortune.h"
+#include "tr4_senet.h"
 /// puzzle
 #include "tr4_scales.h"
 /// switch
