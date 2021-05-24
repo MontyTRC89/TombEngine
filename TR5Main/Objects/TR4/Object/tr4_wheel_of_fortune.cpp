@@ -236,3 +236,60 @@ void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
 	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
 	item->pos.yPos += STEPUP_HEIGHT;
 }
+
+void trigger_item_in_room(short room_number, int object)//originally this is in deltapak
+{
+	short num, nex;
+	ITEM_INFO* item;
+
+	num = g_Level.Rooms[room_number].itemNumber;
+
+	while (num != NO_ITEM)
+	{
+		item = &g_Level.Items[num];
+		nex = item->nextItem;
+
+		if (item->objectNumber == object)
+		{
+			AddActiveItem(num);
+			item->status = ITEM_ACTIVE;
+			item->flags |= IFLAG_ACTIVATION_MASK;
+		}
+
+		num = nex;
+	}
+}
+
+int CheckSenetWinner(short num)//original TR4 numbers :>
+{
+	if (num == 1)
+	{
+		int i = 0;
+		while (ActiveSenetPieces[i] == -1)
+		{
+			if (++i >= 3)
+			{
+				trigger_item_in_room(0, ID_RAISING_BLOCK2);
+				trigger_item_in_room(19, ID_RAISING_BLOCK2);
+				return 1;
+			}
+		}
+	}
+	else
+	{
+		int j = 3;
+		while (ActiveSenetPieces[j] == -1)
+		{
+			if (++j >= 6)
+			{
+				trigger_item_in_room(20, ID_TRAPDOOR1);
+				trigger_item_in_room(21, ID_TRAPDOOR1);
+				trigger_item_in_room(22, ID_TRAPDOOR1);
+				trigger_item_in_room(81, ID_TRAPDOOR1);
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
