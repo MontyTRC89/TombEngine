@@ -293,3 +293,52 @@ int CheckSenetWinner(short num)//original TR4 numbers :>
 
 	return 0;
 }
+
+void MakeMove(int piece, int displacement)
+{
+	int number, i;
+
+	number = piece >= 3 ? 2 : 1;
+	if (ActiveSenetPieces[piece] != -1 && displacement && ActiveSenetPieces[piece] + displacement <= 16 && !(SenetBoard[ActiveSenetPieces[piece] + displacement] & number))
+	{
+		SenetBoard[ActiveSenetPieces[piece]] &= ~number;
+		if (!ActiveSenetPieces[piece])
+		{
+			for (i = 3 * number - 3; i < 3 * number; ++i)
+			{
+				if (i != displacement && !ActiveSenetPieces[i])
+					SenetBoard[0] |= number;
+			}
+		}
+		ActivePiece = displacement;
+		ActiveSenetPieces[ActivePiece] += displacement;
+		if (ActiveSenetPieces[ActivePiece] > 4)
+		{
+			SenetBoard[ActiveSenetPieces[ActivePiece]] = 0;
+			for (i = 6 - 3 * number; i < 9 - 3 * number; ++i)
+			{
+				if (ActiveSenetPieces[i] == ActiveSenetPieces[ActivePiece])
+				{
+					ActiveSenetPieces[i] = 0;
+					SenetBoard[0] |= 3 - number;
+				}
+			}
+		}
+		if (ActiveSenetPieces[ActivePiece] < 16)
+		{
+			SenetBoard[ActiveSenetPieces[ActivePiece]] |= number;
+		}
+		else
+		{
+			ActiveSenetPieces[displacement] = -1;
+		}
+		if (!(ActiveSenetPieces[ActivePiece] & 3) || SenetDisplacement == 6)
+		{
+			SenetDisplacement = 0;
+		}
+		else
+		{
+			SenetDisplacement = -1;
+		}
+	}
+}
