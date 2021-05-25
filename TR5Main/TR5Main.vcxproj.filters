@@ -934,6 +934,18 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\newinv2.h">
+	 <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererBucket.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererVertex.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererPolygon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

@@ -759,7 +759,7 @@ void InitialiseDoor(short itemNumber)
 		b = &g_Level.Rooms[roomNumber];
 		boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 	}
-	door->d1.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+	door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
 
@@ -776,7 +776,7 @@ void InitialiseDoor(short itemNumber)
 			b = &g_Level.Rooms[roomNumber];
 			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 		}
-		door->d1flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
 	}
@@ -806,7 +806,7 @@ void InitialiseDoor(short itemNumber)
 			b = &g_Level.Rooms[roomNumber];
 			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 		}
-		door->d2.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
 
@@ -823,7 +823,7 @@ void InitialiseDoor(short itemNumber)
 				b = &g_Level.Rooms[roomNumber];
 				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 			}
-			door->d2flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			door->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
 		}

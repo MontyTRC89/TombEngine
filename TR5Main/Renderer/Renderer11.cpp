@@ -46,6 +46,8 @@ namespace T5M::Renderer {
 		m_moveablesTextures.clear();
 		m_staticsTextures.clear();
 		m_spritesTextures.clear();
+		m_animatedTextures.clear();
+		m_animatedTextureSets.clear();
 		gameCamera.clear();
 	}
 
