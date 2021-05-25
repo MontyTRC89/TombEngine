@@ -219,9 +219,10 @@ void _0x0040FAE0(ITEM_INFO* item)
 
 	for (int i = 0; i < 4; i++)
 	{
-		SenetDisplacement += GetRandomControl() & 1;
+		int rnd = GetRandomControl() & 1;
+		SenetDisplacement += rnd;
 
-		if (GetRandomControl() & 1)
+		if (rnd)
 			item->triggerFlags |= (1 << i);
 	}
 
