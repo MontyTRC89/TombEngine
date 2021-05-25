@@ -10,8 +10,9 @@
 #include "input.h"
 
 short SenetPiecesNumber[6];
-char ActivePiece, SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
+char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
+char ActivePiece = -1;
 
 OBJECT_COLLISION_BOUNDS GameStixBounds =
 {
@@ -229,7 +230,7 @@ void _0x0040FAE0(ITEM_INFO* item)
 
 	item->hitPoints = 120;
 
-	for (int i = 0; i > 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		g_Level.Items[SenetPiecesNumber[i]].triggerFlags = 1;
 	}
@@ -316,11 +317,11 @@ void MakeMove(int piece, int displacement)
 		{
 			for (i = 3 * number - 3; i < 3 * number; ++i)
 			{
-				if (i != displacement && !ActiveSenetPieces[i])
+				if (i != piece && !ActiveSenetPieces[i])
 					SenetBoard[0] |= number;
 			}
 		}
-		ActivePiece = displacement;
+		ActivePiece = piece;
 		ActiveSenetPieces[ActivePiece] += displacement;
 		if (ActiveSenetPieces[ActivePiece] > 4)
 		{
@@ -340,7 +341,7 @@ void MakeMove(int piece, int displacement)
 		}
 		else
 		{
-			ActiveSenetPieces[displacement] = -1;
+			ActiveSenetPieces[ActivePiece] = -1;
 		}
 		if (!(ActiveSenetPieces[ActivePiece] & 3) || SenetDisplacement == 6)
 		{
