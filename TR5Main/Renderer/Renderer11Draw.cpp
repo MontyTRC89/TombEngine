@@ -997,10 +997,11 @@ namespace T5M::Renderer
         short Days, Hours, Min, Sec;
         char buffer[40];
         int seconds;
+        GameScriptLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 
         ypos = 150;
         drawString(400, ypos, "Statistics", PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
-        drawString(400, ypos + 2 * 25, "Level name here", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+        drawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringIndex), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
         drawString(200, ypos + 3 * 25, "Time Taken", PRINTSTRING_COLOR_WHITE, 0);
         drawString(200, ypos + 4 * 25, "Distance travelled", PRINTSTRING_COLOR_WHITE, 0);
         drawString(200, ypos + 5 * 25, "Ammo used", PRINTSTRING_COLOR_WHITE, 0);
