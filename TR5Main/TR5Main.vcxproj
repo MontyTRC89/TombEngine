@@ -181,6 +181,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_von_croy.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_element_puzzle.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_mapper.h" />
+    <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_hammer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_joby_spikes.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_moving_blade.h" />
@@ -489,6 +490,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_von_croy.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_element_puzzle.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_mapper.cpp" />
+    <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_hammer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_joby_spikes.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_moving_blade.cpp" />
