@@ -948,6 +948,9 @@
     <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Object\tr4_senet.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1740,6 +1743,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\newinv2.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
