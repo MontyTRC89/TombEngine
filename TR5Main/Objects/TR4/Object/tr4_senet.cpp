@@ -120,7 +120,7 @@ void GameStixControl(short itemNumber)
 		GetFloor(item2->pos.xPos, item2->pos.yPos - 32, item2->pos.zPos, &roomNumber);
 		if (item2->roomNumber != roomNumber)
 			ItemNewRoom(SenetPiecesNumber[ActivePiece], roomNumber);
-		if (x != item2->pos.xPos || z != item2->pos.zPos)
+		if (x == item2->pos.xPos && z == item2->pos.zPos)
 		{
 			item2->afterDeath = 0;
 			if (piece == 16)
@@ -201,14 +201,14 @@ void GameStixControl(short itemNumber)
 	else if (!SenetDisplacement)
 	{
 		_0x0040FAE0(item);
+		flag = false;
 		for (i = 0; i < 3; ++i)
 		{
-			flag = false;
 			if (ActiveSenetPieces[i] != -1 && SenetDisplacement && ActiveSenetPieces[i] + SenetDisplacement < 17 && !(SenetBoard[ActiveSenetPieces[i] + SenetDisplacement] & 1))
 				flag = true;
-			if (!flag)
-				SenetDisplacement = SenetDisplacement == 6 ? 0 : -1;
 		}
+		if (!flag)
+			SenetDisplacement = SenetDisplacement == 6 ? 0 : -1;
 	}
 }
 
@@ -445,7 +445,7 @@ void InitialiseGamePiece(short itemNumber)
 		SenetBoard[0] = 3;
 		for (i = 0; i < g_Level.NumItems; ++i)
 		{
-			item = &g_Level.Items[itemNumber];
+			item = &g_Level.Items[i];
 			if (item->objectNumber == ID_GAME_PIECE1)
 			{
 				SenetPiecesNumber[0] = i;
