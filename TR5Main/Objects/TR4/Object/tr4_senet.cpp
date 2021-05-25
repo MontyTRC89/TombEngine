@@ -26,8 +26,10 @@ void InitialiseGameStix(short itemNumber)
 	ITEM_INFO* item;
 	
 	item = &g_Level.Items[itemNumber];
-	item->triggerFlags = -1;
+	item->itemFlags[7] = -1;
 	item->data = &item->itemFlags;
+	ActivePiece = -1;
+	SenetDisplacement = 0;
 }
 
 void GameStixControl(short itemNumber)
@@ -38,7 +40,7 @@ void GameStixControl(short itemNumber)
 	short piece, roomNumber;
 
 	item = &g_Level.Items[itemNumber];
-	if (item->triggerFlags > -1)
+	if (item->itemFlags[7] > -1)
 	{
 		if (item->hitPoints == 100)
 			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->pos, 0);
@@ -49,11 +51,11 @@ void GameStixControl(short itemNumber)
 				item->itemFlags[i] -= 128 * item->hitPoints;
 				if (item->hitPoints < 40 - 2 * i)
 				{
-					if (abs(item->itemFlags[i]) < 4096 && item->triggerFlags & 1 << i)
+					if (abs(item->itemFlags[i]) < 4096 && item->itemFlags[7] & 1 << i)
 					{
 						item->itemFlags[i] = 0;
 					}
-					else if ((item->itemFlags[i] > 28672 || item->itemFlags[i] < -28672) && !(item->triggerFlags & 1 << i))
+					else if ((item->itemFlags[i] > 28672 || item->itemFlags[i] < -28672) && !(item->itemFlags[7] & 1 << i))
 					{
 						item->itemFlags[i] = -32768;
 					}
@@ -65,7 +67,7 @@ void GameStixControl(short itemNumber)
 		{
 			for (i = 0; i < 3; ++i)
 				g_Level.Items[SenetPiecesNumber[i]].triggerFlags = 0;
-			item->triggerFlags = -1;
+			item->itemFlags[7] = -1;
 			if (ActivePiece == -1 && !SenetDisplacement)
 			{
 				RemoveActiveItem(itemNumber);
@@ -183,11 +185,63 @@ void GameStixControl(short itemNumber)
 	else if (SenetDisplacement == -1)
 	{
 		_0x0040FAE0(item);
-		for (i = 3; i < 6; ++i)
+		flag = false;
+		if (item->triggerFlags)
 		{
-			MakeMove(i, SenetDisplacement);
-			if (SenetDisplacement == -1 || !SenetDisplacement)
-				break;
+			for (i = 3; i < 6; ++i)
+			{
+				if (ActiveSenetPieces[i] != -1 && SenetDisplacement && ActiveSenetPieces[i] + SenetDisplacement == 16)
+				{
+					MakeMove(i, SenetDisplacement);
+					if (SenetDisplacement == -1 || !SenetDisplacement)
+					{
+						flag = true;
+						break;
+					}
+				}
+
+			}
+			if (!flag)
+			{
+				for (i = 3; i < 6; ++i)
+				{
+					if (ActiveSenetPieces[i] != -1 && SenetDisplacement && ActiveSenetPieces[i] + SenetDisplacement >= 5 && ActiveSenetPieces[i] + SenetDisplacement <= 16 && SenetBoard[ActiveSenetPieces[i] + SenetDisplacement] & 1)
+					{
+						MakeMove(i, SenetDisplacement);
+						if (SenetDisplacement == -1 || !SenetDisplacement)
+						{
+							flag = true;
+							break;
+						}
+					}
+
+				}
+			}
+			if (!flag && SenetDisplacement != 6)
+			{
+				for (i = 3; i < 6; ++i)
+				{
+					if (ActiveSenetPieces[i] != -1 && SenetDisplacement && ActiveSenetPieces[i] + SenetDisplacement <= 16 && !(ActiveSenetPieces[i] + SenetDisplacement & 3))
+					{
+						MakeMove(i, SenetDisplacement);
+						if (SenetDisplacement == -1 || !SenetDisplacement)
+						{
+							flag = true;
+							break;
+						}
+					}
+
+				}
+			}
+		}
+		if (!flag)
+		{
+			for (i = 3; i < 6; ++i)
+			{
+				MakeMove(i, SenetDisplacement);
+				if (SenetDisplacement == -1 || !SenetDisplacement)
+					break;
+			}
 		}
 		if (SenetDisplacement && SenetDisplacement != 6)
 		{
@@ -215,7 +269,7 @@ void GameStixControl(short itemNumber)
 void _0x0040FAE0(ITEM_INFO* item)
 {
 	SenetDisplacement = 0;
-	item->triggerFlags = 0;
+	item->itemFlags[7] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -223,7 +277,7 @@ void _0x0040FAE0(ITEM_INFO* item)
 		SenetDisplacement += rnd;
 
 		if (rnd)
-			item->triggerFlags |= (1 << i);
+			item->itemFlags[7] |= (1 << i);
 	}
 
 	if (!SenetDisplacement)
