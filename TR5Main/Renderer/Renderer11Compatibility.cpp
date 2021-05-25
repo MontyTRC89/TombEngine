@@ -61,6 +61,24 @@ namespace T5M::Renderer
 			}
 		}*/
 
+		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(m_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
+			RendererAnimatedTextureSet set{};
+			set.NumTextures = sequence.numFrames;
+			std::transform(sequence.frames.begin(), sequence.frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm) {
+				RendererAnimatedTexture tex{};
+				tex.UV[0].x = frm.x1;
+				tex.UV[0].y = frm.y1;
+				tex.UV[1].x = frm.x2;
+				tex.UV[1].y = frm.y2;
+				tex.UV[2].x = frm.x3;
+				tex.UV[2].y = frm.y3;
+				tex.UV[3].x = frm.x4;
+				tex.UV[3].y = frm.y4;
+				return tex;
+			});
+			return set;
+		});
+
 		// Step 1: create the texture atlas
 		/*byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 		ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
@@ -118,8 +136,23 @@ namespace T5M::Renderer
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex =std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_roomTextures[i] = tex;
+		}
+
+		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
+		for (int i = 0; i < g_Level.AnimatedTextures.size(); i++)
+		{
+			TEXTURE *texture = &g_Level.AnimatedTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = createDefaultNormalTexture();
+			}
+			else {
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_animatedTextures[i] = tex;
 		}
 
 		m_moveablesTextures.resize(g_Level.MoveablesTextures.size());
@@ -182,22 +215,16 @@ namespace T5M::Renderer
 
 			int baseRoomVertex = 0;
 			int baseRoomIndex = 0;
-
+			
 			for (int n = 0; n < room->buckets.size(); n++)
 			{
 				BUCKET* levelBucket = &room->buckets[n];
-				RendererBucket* bucket;
-				int bucketIndex;
-
-				if (levelBucket->blendMode != 0)
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-
-				bucket = &r->Buckets[bucketIndex];
-
-				bucket->Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-				bucket->Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+				RendererBucket bucket{};
+				bucket.animated = levelBucket->animated;
+				bucket.blendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
+				bucket.texture = levelBucket->texture;
+				bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+				bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 
 				int lastVertex = 0;
 				int lastIndex = 0;
@@ -210,7 +237,7 @@ namespace T5M::Renderer
 
 					for (int k = 0; k < poly->indices.size(); k++)
 					{
-						RendererVertex* vertex = &bucket->Vertices[lastVertex];
+						RendererVertex* vertex = &bucket.Vertices[lastVertex];
 						int v = poly->indices[k];
 
 						vertex->Position.x = room->x + room->positions[v].x;
@@ -222,7 +249,9 @@ namespace T5M::Renderer
 						vertex->Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z, 1.0f);
 						vertex->Tangent = poly->tangents[k];
 						vertex->BiTangent = poly->bitangents[k];
-
+						vertex->IndexInPoly = k;
+						vertex->OriginalIndex = v;
+						vertex->hash = std::hash<float>{}(vertex->Position.x) ^ std::hash<float>{}(vertex->Position.y) ^ std::hash<float>{}(vertex->Position.z);
 						vertex->Bone = 0;
 
 						lastVertex++;
@@ -231,26 +260,28 @@ namespace T5M::Renderer
 
 					if (poly->shape == 0)
 					{
-						bucket->Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
-						bucket->Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
-						bucket->Indices[lastIndex + 2] = baseVertices + 3; //.push_back(baseVertices + 3);
-						bucket->Indices[lastIndex + 3] = baseVertices + 2; //.push_back(baseVertices + 2);
-						bucket->Indices[lastIndex + 4] = baseVertices + 3; //.push_back(baseVertices + 3);
-						bucket->Indices[lastIndex + 5] = baseVertices + 1; //.push_back(baseVertices + 1);
+						bucket.Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
+						bucket.Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
+						bucket.Indices[lastIndex + 2] = baseVertices + 3; //.push_back(baseVertices + 3);
+						bucket.Indices[lastIndex + 3] = baseVertices + 2; //.push_back(baseVertices + 2);
+						bucket.Indices[lastIndex + 4] = baseVertices + 3; //.push_back(baseVertices + 3);
+						bucket.Indices[lastIndex + 5] = baseVertices + 1; //.push_back(baseVertices + 1);
 
 						lastIndex += 6;
 						totalRoomsIndices += 6;
 					}
 					else
 					{
-						bucket->Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
-						bucket->Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
-						bucket->Indices[lastIndex + 2] = baseVertices + 2; //.push_back(baseVertices + 2);
+						bucket.Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
+						bucket.Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
+						bucket.Indices[lastIndex + 2] = baseVertices + 2; //.push_back(baseVertices + 2);
 
 						lastIndex += 3;
 						totalRoomsIndices += 3;
 					}
 				}
+				r->buckets.push_back(bucket);
+				
 			}
 
 			if (room->lights.size() != 0)
@@ -314,23 +345,19 @@ namespace T5M::Renderer
 		{
 			ROOM_INFO* room = &g_Level.Rooms[i];
 			RendererRoom* r = &m_rooms[i];
-
 			// Merge vertices and indices in a single list
-			for (int j = 0; j < NUM_BUCKETS; j++)
-			{
-				RendererBucket *bucket = &r->Buckets[j];
+			for (auto& bucket : r->buckets) {
+				bucket.StartVertex = baseRoomVertex;
+				bucket.StartIndex = baseRoomIndex;
 
-				bucket->StartVertex = baseRoomVertex;
-				bucket->StartIndex = baseRoomIndex;
+				for (int k = 0; k < bucket.Vertices.size(); k++)
+					roomVertices[baseRoomVertex + k] = bucket.Vertices[k];
 
-				for (int k = 0; k < bucket->Vertices.size(); k++)
-					roomVertices[baseRoomVertex + k] = bucket->Vertices[k];
+				for (int k = 0; k < bucket.Indices.size(); k++)
+					roomIndices[baseRoomIndex + k] = baseRoomVertex + bucket.Indices[k];
 
-				for (int k = 0; k < bucket->Indices.size(); k++)
-					roomIndices[baseRoomIndex + k] = baseRoomVertex + bucket->Indices[k];
-
-				baseRoomVertex += bucket->Vertices.size();
-				baseRoomIndex += bucket->Indices.size();
+				baseRoomVertex += bucket.Vertices.size();
+				baseRoomIndex += bucket.Indices.size();
 			}
 		}
 
@@ -484,9 +511,9 @@ namespace T5M::Renderer
 							BonesToCheck[0] = jointBone->Parent->Index;
 							BonesToCheck[1] = j;
 
-							for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
+							for (int b1 = 0; b1 < jointMesh->buckets.size(); b1++)
 							{
-								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
+								RendererBucket *jointBucket = &jointMesh->buckets[b1];
 
 								for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
 								{
@@ -499,9 +526,9 @@ namespace T5M::Renderer
 										RendererMesh *skinMesh = objSkin.ObjectMeshes[BonesToCheck[k]];
 										RendererBone *skinBone = objSkin.LinearizedBones[BonesToCheck[k]];
 
-										for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+										for (int b2 = 0; b2 < skinMesh->buckets.size(); b2++)
 										{
-											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
+											RendererBucket *skinBucket = &skinMesh->buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
 											{
 												RendererVertex *skinVertex = &skinBucket->Vertices[v2];
@@ -546,9 +573,9 @@ namespace T5M::Renderer
 							RendererMesh* currentMesh = moveable.ObjectMeshes[j];
 							RendererBone* currentBone = moveable.LinearizedBones[j];
 
-							for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
+							for (int b1 = 0; b1 < currentMesh->buckets.size(); b1++)
 							{
-								RendererBucket* currentBucket = &currentMesh->Buckets[b1];
+								RendererBucket* currentBucket = &currentMesh->buckets[b1];
 
 								for (int v1 = 0; v1 < currentBucket->Vertices.size(); v1++)
 								{
@@ -566,9 +593,9 @@ namespace T5M::Renderer
 
 										if (currentVertex->OriginalIndex < 4)
 										{
-											for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+											for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
 											{
-												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+												RendererBucket* parentBucket = &parentMesh->buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
 												{
 													RendererVertex* parentVertex = &parentBucket->Vertices[v2];
@@ -589,9 +616,9 @@ namespace T5M::Renderer
 										RendererMesh* parentMesh = moveable.ObjectMeshes[j - 1];
 										RendererBone* parentBone = moveable.LinearizedBones[j - 1];
 
-										for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+										for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
 										{
-											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+											RendererBucket* parentBucket = &parentMesh->buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
 											{
 												RendererVertex* parentVertex = &parentBucket->Vertices[v2];
@@ -627,9 +654,9 @@ namespace T5M::Renderer
 				{
 					RendererMesh *msh = moveable.ObjectMeshes[m];
 
-					for (int j = 0; j < NUM_BUCKETS; j++)
+					for (int j = 0; j < msh->buckets.size(); j++)
 					{
-						RendererBucket *bucket = &msh->Buckets[j];
+						RendererBucket *bucket = &msh->buckets[j];
 
 						bucket->StartVertex = baseMoveablesVertex;
 						bucket->StartIndex = baseMoveablesIndex;
@@ -673,9 +700,9 @@ namespace T5M::Renderer
 			// Merge vertices and indices in a single list
 			RendererMesh *msh = staticObject.ObjectMeshes[0];
 
-			for (int j = 0; j < NUM_BUCKETS; j++)
+			for (int j = 0; j < msh->buckets.size(); j++)
 			{
-				RendererBucket *bucket = &msh->Buckets[j];
+				RendererBucket *bucket = &msh->buckets[j];
 
 				bucket->StartVertex = baseStaticsVertex;
 				bucket->StartIndex = baseStaticsIndex;
@@ -730,7 +757,7 @@ namespace T5M::Renderer
 				m_spriteSequences[MoveablesIds[i]] = sequence;
 			}
 		}
-
+		/*
 		for (int i = 0; i < 6; i++)
 		{
 			if (Objects[ID_WATERFALL1 + i].loaded)
@@ -738,8 +765,8 @@ namespace T5M::Renderer
 				// Get the first textured bucket
 				RendererBucket *bucket = NULL;
 				for (int j = 0; j < NUM_BUCKETS; j++)
-					if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j].Polygons.size() > 0)
-						bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j];
+					if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->buckets[j].Polygons.size() > 0)
+						bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->buckets[j];
 
 				if (bucket == NULL)
 					continue;
@@ -749,7 +776,7 @@ namespace T5M::Renderer
 				WaterfallY[i] = texture->vertices[0].y;
 			}
 		}
-
+		*/
 		return true;
 	}
 } // namespace T5M::Renderer

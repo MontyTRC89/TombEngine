@@ -120,22 +120,21 @@ namespace T5M::Renderer
             m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
-            for (int m = 0; m < NUM_BUCKETS; m++)
+            for (auto& bucket : mesh->buckets)
             {
-                RendererBucket *bucket = &mesh->Buckets[m];
-                if (bucket->Vertices.size() == 0)
+                if (bucket.Vertices.size() == 0)
                     continue;
 
-                if (m < 2)
+                if (bucket.blendMode == 0)
                     m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
                 else
                     m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
-                m_stMisc.AlphaTest = (m < 2);
+                m_stMisc.AlphaTest = (bucket.blendMode == 0);
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
             }
         }
 
@@ -293,15 +292,13 @@ namespace T5M::Renderer
         {
             RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
 
-            for (int j = 0; j < 2; j++)
+            for (auto& bucket : mesh->buckets)
             {
-                RendererBucket *bucket = &mesh->Buckets[j];
-
-                if (bucket->Vertices.size() == 0)
+                if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -314,17 +311,15 @@ namespace T5M::Renderer
             {
                 RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
 
-                for (int j = 0; j < 2; j++)
-                {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+						continue;
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
-                }
+					// Draw vertices
+					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+					m_numDrawCalls++;
+				}
             }
         }
 
@@ -332,17 +327,15 @@ namespace T5M::Renderer
         {
             RendererMesh *mesh = laraSkin.ObjectMeshes[k];
 
-            for (int j = 0; j < NUM_BUCKETS; j++)
-            {
-                RendererBucket *bucket = &mesh->Buckets[j];
+			for (auto& bucket : mesh->buckets)
+			{
+				if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+					continue;
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
-            }
+				// Draw vertices
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				m_numDrawCalls++;
+			}
         }
 
         // Draw items
@@ -368,17 +361,15 @@ namespace T5M::Renderer
         {
             RendererMesh *mesh = hairsObj.ObjectMeshes[k];
 
-            for (int j = 0; j < 4; j++)
-            {
-                RendererBucket *bucket = &mesh->Buckets[j];
+			for (auto& bucket : mesh->buckets)
+			{
+				if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+					continue;
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
-            }
+				// Draw vertices
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				m_numDrawCalls++;
+			}
         }
 
     }
@@ -454,16 +445,15 @@ namespace T5M::Renderer
 
                 RendererMesh *mesh = moveableObj.ObjectMeshes[0];
 
-                for (int b = 0; b < NUM_BUCKETS; b++)
-                {
-                    RendererBucket *bucket = &mesh->Buckets[b];
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.Vertices.size() == 0 && bucket.blendMode == 0)
+						continue;
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
-                }
+					// Draw vertices
+					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+					m_numDrawCalls++;
+				}
             }
         }
 
@@ -1297,23 +1287,22 @@ namespace T5M::Renderer
                     m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
                     m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
-                    for (int m = 0; m < NUM_BUCKETS; m++)
-                    {
-                        RendererBucket *bucket = &mesh->Buckets[m];
-                        if (bucket->Vertices.size() == 0)
-                            continue;
+					for (auto& bucket : mesh->buckets)
+					{
+						if (bucket.Vertices.size() == 0)
+							continue;
 
-                        if (m < 2)
-                            m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-                        else
-                            m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+						if (bucket.blendMode == 0)
+							m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+						else
+							m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
-                        m_stMisc.AlphaTest = (m < 2);
-                        m_cbMisc.updateData(m_stMisc, m_context.Get());
-                        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+						m_stMisc.AlphaTest = (bucket.blendMode == 0);
+						m_cbMisc.updateData(m_stMisc, m_context.Get());
+						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    }
+						m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+					}
                 }
 
                 short inventoryItem = ring->objects[objectIndex].inventoryObject;
@@ -2130,8 +2119,8 @@ namespace T5M::Renderer
         }*/
     }
 
-    void Renderer11::drawRats(RenderView& view)
-{
+    void Renderer11::drawRats(RenderView& view) {
+		/*
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2177,11 +2166,11 @@ namespace T5M::Renderer
                 }
             }
         }
-
+		*/
     }
 
-    void Renderer11::drawBats(RenderView& view)
-{
+    void Renderer11::drawBats(RenderView& view) {
+		/*
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2227,11 +2216,11 @@ namespace T5M::Renderer
                 }
             }
         }
-
+		*/
     }
 
-	void Renderer11::drawLittleBeetles(RenderView& view)
-{
+	void Renderer11::drawLittleBeetles(RenderView& view) {
+		/*
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -2277,11 +2266,12 @@ namespace T5M::Renderer
 				}
 			}
 		}
+		*/
 	}
 
 
-    void Renderer11::drawLines3D(RenderView& view)
-{
+    void Renderer11::drawLines3D(RenderView& view) {
+
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -2476,10 +2466,6 @@ namespace T5M::Renderer
         m_items[Lara.itemNumber].Item = LaraItem;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
-        // Update animated textures every 2 frames
-        if (GnFrameCounter % 2 == 0)
-            updateAnimatedTextures();
-
         auto time2 = std::chrono::high_resolution_clock::now();
         m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
         time1 = time2;
@@ -2525,7 +2511,7 @@ namespace T5M::Renderer
 		drawLittleBeetles(view);
 
         // Transparent geometry
-        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
         drawRooms(true, false, view);
@@ -2554,7 +2540,7 @@ namespace T5M::Renderer
         drawBubbles(view);
         drawDrips(view);
         drawRipples(view);
-        drawUnderwaterDust(view);
+        //drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
         drawEnergyArcs(view);
@@ -2726,8 +2712,7 @@ namespace T5M::Renderer
 
         int firstBucket = (transparent ? 2 : 0);
         int lastBucket = (transparent ? 4 : 2);
-        if (m_rooms.size() <= item->Item->roomNumber)
-        {
+        if (m_rooms.size() <= item->Item->roomNumber){
             return;
         }
         RendererRoom &const room = m_rooms[item->Item->roomNumber];
@@ -2752,33 +2737,31 @@ namespace T5M::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-        {
+        for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
             if (!(item->Item->meshBits & (1 << k)))
                 continue;
 
             RendererMesh *mesh;
-            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1))
-            {
+            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) {
                 RendererObject &swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
                 mesh = swapMeshObj.ObjectMeshes[k];
             }
-            else
-            {
+            else {
                 mesh = moveableObj.ObjectMeshes[k];
             }
 
-            for (int j = firstBucket; j < lastBucket; j++)
-            {
-                RendererBucket *bucket = &mesh->Buckets[j];
+			for (auto& bucket : mesh->buckets) {
+				if (animated) {
+					if (!bucket.animated)
+						continue;
+				}
+				if (bucket.Vertices.size() == 0)
+					continue;
+				if (transparent && bucket.blendMode == 0)
+					continue;
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
-
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
-            }
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+			}
         }
 
     }
@@ -2895,17 +2878,15 @@ namespace T5M::Renderer
                 m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
-                for (int j = firstBucket; j < lastBucket; j++)
-                {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.Vertices.size() == 0)
+						continue;
+					if (transparent && bucket.blendMode == 0)
+						continue;
 
-                    if (bucket->Vertices.size() == 0)
-                        continue;
-
-                    // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
-                }
+					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				}
             }
         }
     }
@@ -2914,26 +2895,26 @@ namespace T5M::Renderer
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
-
-		int firstBucket = (transparent ? 1 : 0);
-		int lastBucket = (transparent ? 2 : 1);
-
+		// Set vertex buffer
+		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		// Set shaders
         if (!animated)
         {
-            // Set vertex buffer
-            m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-            m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            m_context->IASetInputLayout(m_inputLayout.Get());
-            m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-        }
+			m_context->VSSetShader(m_vsRooms.Get(), nullptr, 0);
+		}
+		else {
+			m_context->VSSetConstantBuffers(6, 1, m_cbAnimated.get());
+			m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
+		}
 
-        // Set shaders
-        m_context->VSSetShader(m_vsRooms.Get(), NULL, 0);
+
         m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
         m_context->PSSetSamplers(0, 1, &sampler);
         m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
@@ -2955,9 +2936,6 @@ namespace T5M::Renderer
         m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
         m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
         m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
-
-        if (animated)
-            m_primitiveBatch->Begin();
         for (int i = 0; i < view.roomsToDraw.size(); i++)
         {
             //Draw transparent back-to-front
@@ -2982,45 +2960,46 @@ namespace T5M::Renderer
             m_cbRoom.updateData(m_stRoom, m_context.Get());
             m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
             m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
-            for (int j = firstBucket; j < lastBucket; j++)
+            for (auto& bucket : room->buckets)
             {
-                RendererBucket *bucket;
-                if (!animated)
-                    bucket = &room->Buckets[j];
-                else
-                    bucket = &room->AnimatedBuckets[j];
-
-                if (bucket->Vertices.size() == 0)
+				if (transparent) {
+					if (bucket.blendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+						continue;
+				}
+				else {
+					if (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE)
+						continue;
+				}
+					
+				if (animated) {
+					if (!bucket.animated)
+						continue;
+					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+					m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+					RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
+					m_stAnimated.NumFrames = set.NumTextures;
+					for (unsigned char i = 0; i < set.NumTextures; i++) {
+						auto& tex = set.Textures[i];
+						m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
+						m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
+						m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
+						m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
+					}
+					m_cbAnimated.updateData(m_stAnimated,m_context.Get());
+				}
+				else {
+					if (bucket.animated)
+						continue;
+					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+					m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+				}
+                if (bucket.Vertices.size() == 0)
                     continue;
 
-                if (!animated)
-                {
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                    m_numDrawCalls++;
-                }
-                /*else
-                {
-                    for (int k = 0; k < bucket->Polygons.size(); k++)
-                    {
-                        RendererPolygon *poly = &bucket->Polygons[k];
-
-                        if (poly->Shape == SHAPE_RECTANGLE)
-                        {
-                            m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
-                                                       bucket->Vertices[poly->Indices[2]], bucket->Vertices[poly->Indices[3]]);
-                        }
-                        else
-                        {
-                            m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
-                                                           bucket->Vertices[poly->Indices[2]]);
-                        }
-                    }
-                }*/
+				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				m_numDrawCalls++;
             }
         }
-
-        if (animated)
-            m_primitiveBatch->End();
     }
 
     void Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget)
@@ -3161,24 +3140,21 @@ namespace T5M::Renderer
             m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-            for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-            {
+            for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
                 RendererMesh *mesh = moveableObj.ObjectMeshes[k];
 
-                for (int j = 0; j < NUM_BUCKETS; j++)
-                {
-                    RendererBucket *bucket = &mesh->Buckets[j];
+                for (auto& bucket: mesh->buckets) {
 
-                    if (bucket->Vertices.size() == 0)
+                    if (bucket.Vertices.size() == 0)
                         continue;
 
-                    if (j == RENDERER_BUCKET_TRANSPARENT)
+                    if (bucket.blendMode != 0)
                         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
                     else
                         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
