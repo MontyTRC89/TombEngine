@@ -4,7 +4,11 @@
 #include "lot.h"
 #include "objects.h"
 #include "Lara.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "draw.h"
 #include "sphere.h"
 #include "misc.h"
@@ -13,9 +17,7 @@
 #include "input.h"
 #include "sound.h"
 #include "trmath.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
+
 
 PHD_VECTOR DoubleDoorPos(0, 0, 220);
 PHD_VECTOR PullDoorPos(-201, 0, 322);

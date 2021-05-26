@@ -7,7 +7,9 @@
 #include "draw.h"
 #include "health.h"
 #include "pickup.h"
+#ifndef NEW_INV
 #include "inventory.h"
+#endif
 #include "gameflow.h"
 #include "Lara.h"
 #include "effect2.h"

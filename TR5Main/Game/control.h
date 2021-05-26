@@ -95,7 +95,9 @@ extern int GameTimer;
 extern short GlobalCounter;
 extern byte LevelComplete;
 extern short DelCutSeqPlayer;
+#ifndef NEW_INV
 extern int LastInventoryItem;
+#endif
 extern int TrackCameraInit;
 extern short TorchRoom;
 extern int InitialiseGame;
