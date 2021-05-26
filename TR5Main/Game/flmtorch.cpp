@@ -163,7 +163,7 @@ void DoFlameTorch()
 		if (!(Wibble & 7))
 			TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 		
-		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
 
 		TorchRoom = LaraItem->roomNumber;
 	}
@@ -249,7 +249,7 @@ void TorchControl(short itemNumber)
 		if (!(Wibble & 7))
 			TriggerTorchFlame(itemNumber, 1);
 		TorchRoom = item->roomNumber;
-		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 	}
 }
 

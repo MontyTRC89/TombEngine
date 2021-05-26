@@ -968,7 +968,7 @@ void UpdateGunShells()
 			int ceiling = GetCeiling(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
 			if (gs->pos.yPos < ceiling)
 			{
-				SoundEffect(SFX_LARA_SHOTGUN_SHELL, &gs->pos, 0);
+				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 4;
 
 				if (gs->speed < 8)
@@ -984,7 +984,7 @@ void UpdateGunShells()
 			int height = GetFloorHeight(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
 			if (gs->pos.yPos >= height)
 			{
-				SoundEffect(SFX_LARA_SHOTGUN_SHELL, &gs->pos, 0);
+				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 8;
 				if (gs->speed >= 8)
 				{
@@ -1046,7 +1046,7 @@ void LaraBubbles(ITEM_INFO* item)
 	PHD_VECTOR pos;
 	int num, i;
 
-	SoundEffect(SFX_LARA_BUBBLES, &item->pos, 1);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->pos, 1);
 
 	pos.x = 0;
 
@@ -1349,7 +1349,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_IMP_STONE_HIT, pos, 0);
+		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos, 0);
 	}
 }
 

@@ -366,7 +366,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT && item->animNumber != LA_SPRINT_TO_STAND_LEFT)
-		StopSoundEffect(SFX_LARA_SLIPPING);
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 
 	// Handles waterskin and clockwork beetle
 	if (UseSpecialItem(item))
@@ -901,7 +901,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 8*/
 	/*state code: lara_as_death*/
-	StopSoundEffect(SFX_LARA_FALL);
+	StopSoundEffect(SFX_TR4_LARA_FALL);
 
 	Lara.moveAngle = item->pos.yRot;
 	coll->badPos = 384;
@@ -926,7 +926,7 @@ void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_fastfall*/
 	item->speed = (item->speed * 95) / 100;
 	if (item->fallspeed == 154)
-		SoundEffect(SFX_LARA_FALL, &item->pos, 0);
+		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
 }
 
 void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
@@ -957,7 +957,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
-		StopSoundEffect(SFX_LARA_FALL);
+		StopSoundEffect(SFX_TR4_LARA_FALL);
 
 		item->fallspeed = 0;
 		item->gravityStatus = false;

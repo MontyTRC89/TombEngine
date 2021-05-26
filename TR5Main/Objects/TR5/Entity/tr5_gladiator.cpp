@@ -345,7 +345,7 @@ void ControlGladiator(short itemNumber)
 							LaraItem->hitPoints -= 120;
 							LaraItem->hitStatus = true;
 							CreatureEffect2(item, &GladiatorBite, 10, item->pos.yRot, DoBloodSplat);
-							SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 							creature->flags = 1;
 						}
 					}

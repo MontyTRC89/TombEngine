@@ -935,7 +935,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 	soundPosition.xRot = 0;
 	soundPosition.zRot = 0;
 
-	SoundEffect(SFX_LARA_SPLASH, &soundPosition, 0);
+	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition, 0);
 }
 
 void UpdateSplashes()

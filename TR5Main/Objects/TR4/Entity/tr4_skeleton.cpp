@@ -590,7 +590,7 @@ void SkeletonControl(short itemNumber)
 					LaraItem->hitPoints -= 80;
 					LaraItem->hitStatus = true;
 					CreatureEffect2(item, &skeletonBite, 15, -1, DoBloodSplat);
-					SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 					creature->flags = 1;
 				}
 			}
@@ -651,7 +651,7 @@ void SkeletonControl(short itemNumber)
 						LaraItem->hitStatus = true;
 						CreatureEffect2(item, &skeletonBite, 10, item->pos.yRot, DoBloodSplat);
 						
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 						
 						creature->flags = 1;
 					}

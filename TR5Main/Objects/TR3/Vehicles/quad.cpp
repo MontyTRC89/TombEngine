@@ -155,8 +155,8 @@ static void QuadbikeExplode(ITEM_INFO* item)
 	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
 	item->status = ITEM_DEACTIVATED;
 
-	SoundEffect(SFX_EXPLOSION1, NULL, 0);
-	SoundEffect(SFX_EXPLOSION2, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION2, NULL, 0);
 
 	Lara.Vehicle = NO_ITEM;
 }

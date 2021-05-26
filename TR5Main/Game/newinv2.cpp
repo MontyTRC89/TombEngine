@@ -588,7 +588,7 @@ int TitleOptions()
 			if (title_selected_option > 1)
 				title_selected_option >>= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
@@ -596,14 +596,14 @@ int TitleOptions()
 			if (title_selected_option < flag)
 				title_selected_option <<= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDeselect && title_menu_to_display != title_main_menu)
 		{
 			title_menu_to_display = title_main_menu;
 			title_selected_option = selected_option_bak;
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		}
 	}
 
@@ -611,7 +611,7 @@ int TitleOptions()
 	{
 		if (title_menu_to_display <= 2)
 		{
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 
 			if (title_menu_to_display != 0)
 			{
@@ -758,7 +758,7 @@ void handle_display_setting_input()
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		title_menu_to_display = title_options_menu;
 		title_selected_option = 1;
@@ -770,28 +770,28 @@ void handle_display_setting_input()
 		switch (title_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (CurrentSettings.videoMode > 0)
 				CurrentSettings.videoMode--;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 4:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 8:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 16:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -802,28 +802,28 @@ void handle_display_setting_input()
 		switch (title_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
 				CurrentSettings.videoMode++;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 4:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 8:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 16:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -834,7 +834,7 @@ void handle_display_setting_input()
 		if (title_selected_option > 1)
 			title_selected_option >>= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
@@ -842,12 +842,12 @@ void handle_display_setting_input()
 		if (title_selected_option < settings_flag)
 			title_selected_option <<= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		if (title_selected_option & (1 << 5))
 		{
@@ -907,7 +907,7 @@ void handle_control_settings_input()
 			if (title_selected_option > 1)
 				title_selected_option >>= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
@@ -915,14 +915,14 @@ void handle_control_settings_input()
 			if (title_selected_option < settings_flag)
 				title_selected_option <<= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goSelect)
 		{
 			if (title_selected_option & (1 << 18))//apply
 			{
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 				title_menu_to_display = title_options_menu;
@@ -932,7 +932,7 @@ void handle_control_settings_input()
 
 			if (title_selected_option & (1 << 19))//cancel
 			{
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				title_menu_to_display = title_options_menu;
 				title_selected_option = 2;
 				return;
@@ -942,7 +942,7 @@ void handle_control_settings_input()
 
 	if (KeyMap[DIK_RETURN])
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
 	}
 
@@ -1044,13 +1044,13 @@ void handle_sound_settings_input()
 		switch (title_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
 
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1062,7 +1062,7 @@ void handle_sound_settings_input()
 				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1079,7 +1079,7 @@ void handle_sound_settings_input()
 				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1095,12 +1095,12 @@ void handle_sound_settings_input()
 		switch (title_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1112,7 +1112,7 @@ void handle_sound_settings_input()
 				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1129,7 +1129,7 @@ void handle_sound_settings_input()
 				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1145,7 +1145,7 @@ void handle_sound_settings_input()
 		if (title_selected_option > 1)
 			title_selected_option >>= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
@@ -1153,12 +1153,12 @@ void handle_sound_settings_input()
 		if (title_selected_option < settings_flag)
 			title_selected_option <<= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		if (title_selected_option & (1 << 4))
 		{
@@ -1179,7 +1179,7 @@ void handle_sound_settings_input()
 
 		if (title_selected_option & (1 << 5))
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 			GlobalMusicVolume = oldVolume;
 			GlobalFXVolume = oldSfxVolume;
 			title_menu_to_display = title_options_menu;
@@ -1238,7 +1238,7 @@ int DoPauseMenu()
 			if (pause_selected_option > 1)
 				pause_selected_option >>= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
@@ -1246,7 +1246,7 @@ int DoPauseMenu()
 			if (pause_selected_option < pause_flag)
 				pause_selected_option <<= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 	}
 
@@ -1256,7 +1256,7 @@ int DoPauseMenu()
 		{
 			pauseMenu = 0;
 			GLOBAL_invMode = IM_NONE;
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			return INV_RESULT_NONE;
 		}
 
@@ -1264,7 +1264,7 @@ int DoPauseMenu()
 		{
 			pause_selected_option = pause_menu_to_display == pause_statistics ? 1 : 2;
 			pause_menu_to_display = pause_main_menu;
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		}
 	}
 
@@ -1332,7 +1332,7 @@ void handle_display_setting_input_pause()
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		pause_menu_to_display = pause_options_menu;
 		pause_selected_option = 1;
@@ -1344,28 +1344,28 @@ void handle_display_setting_input_pause()
 		switch (pause_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (CurrentSettings.videoMode > 0)
 				CurrentSettings.videoMode--;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 4:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 8:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 16:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -1376,28 +1376,28 @@ void handle_display_setting_input_pause()
 		switch (pause_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
 				CurrentSettings.videoMode++;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 4:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 8:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 16:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -1408,7 +1408,7 @@ void handle_display_setting_input_pause()
 		if (pause_selected_option > 1)
 			pause_selected_option >>= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
@@ -1416,12 +1416,12 @@ void handle_display_setting_input_pause()
 		if (pause_selected_option < pause_flag)
 			pause_selected_option <<= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		if (pause_selected_option & (1 << 5))
 		{
@@ -1475,7 +1475,7 @@ void handle_control_settings_input_pause()
 			if (pause_selected_option > 1)
 				pause_selected_option >>= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
@@ -1483,14 +1483,14 @@ void handle_control_settings_input_pause()
 			if (pause_selected_option < pause_flag)
 				pause_selected_option <<= 1;
 
-			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goSelect)
 		{
 			if (pause_selected_option & (1 << 18))//apply
 			{
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 				pause_menu_to_display = pause_options_menu;
@@ -1500,7 +1500,7 @@ void handle_control_settings_input_pause()
 
 			if (pause_selected_option & (1 << 19))//cancel
 			{
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				pause_menu_to_display = pause_options_menu;
 				pause_selected_option = 2;
 				return;
@@ -1510,7 +1510,7 @@ void handle_control_settings_input_pause()
 
 	if (KeyMap[DIK_RETURN])
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
 	}
 
@@ -1599,13 +1599,13 @@ void handle_sound_settings_input_pause()
 		switch (pause_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
 
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1617,7 +1617,7 @@ void handle_sound_settings_input_pause()
 				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1634,7 +1634,7 @@ void handle_sound_settings_input_pause()
 				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1650,12 +1650,12 @@ void handle_sound_settings_input_pause()
 		switch (pause_selected_option)
 		{
 		case 1:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
 			break;
 
 		case 2:
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1667,7 +1667,7 @@ void handle_sound_settings_input_pause()
 				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1684,7 +1684,7 @@ void handle_sound_settings_input_pause()
 				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 				if (!db)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					db = 10;
 				}
 				else
@@ -1700,7 +1700,7 @@ void handle_sound_settings_input_pause()
 		if (pause_selected_option > 1)
 			pause_selected_option >>= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
@@ -1708,12 +1708,12 @@ void handle_sound_settings_input_pause()
 		if (pause_selected_option < pause_flag)
 			pause_selected_option <<= 1;
 
-		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 		if (pause_selected_option & (1 << 4))
 		{
@@ -1734,7 +1734,7 @@ void handle_sound_settings_input_pause()
 
 		if (pause_selected_option & (1 << 5))
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 			GlobalMusicVolume = oldVolume;
 			GlobalFXVolume = oldSfxVolume;
 			pause_menu_to_display = pause_options_menu;
@@ -2481,7 +2481,7 @@ void use_current_item()
 				if (LaraItem->hitPoints > 1000)
 					LaraItem->hitPoints = 1000;
 
-				SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Savegame.Game.HealthUsed++;
 			}
 			else
@@ -2505,7 +2505,7 @@ void use_current_item()
 				Lara.dpoisoned = 0;
 				LaraItem->hitPoints = 1000;
 
-				SoundEffect(SFX_MENU_MEDI, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Savegame.Game.HealthUsed++;
 			}
 			else
@@ -2655,7 +2655,7 @@ void handle_inventry_menu()
 				combine_type_flag = 1;
 				combine_obj1 = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
 				combine_obj2 = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
-				SoundEffect(SFX_MENU_COMBINE, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
 			}
 			else
 			{
@@ -2666,7 +2666,7 @@ void handle_inventry_menu()
 
 		if (goDeselect)
 		{
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			combine_ring_fade_dir = 2;
 			goDeselect = 0;
 		}
@@ -2811,12 +2811,12 @@ void handle_inventry_menu()
 			if (goUp && current_selected_option > 0)
 			{
 				current_selected_option--;
-				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			}
 			else if (goDown && current_selected_option < n - 1)
 			{
 				current_selected_option++;
-				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			}
 
 			if (ammo_active)
@@ -2824,13 +2824,13 @@ void handle_inventry_menu()
 				if (goLeft && current_selected_option > 0)
 				{
 					current_selected_option--;
-					SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				}
 
 				if (goRight && current_selected_option < n - 1)
 				{
 					current_selected_option++;
-					SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				}
 
 				current_ammo_type[0] = current_selected_option;
@@ -2839,7 +2839,7 @@ void handle_inventry_menu()
 			if (goSelect)
 			{
 				if (current_options[current_selected_option].type != 5 && current_options[current_selected_option].type != 1)
-					SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
 				switch (current_options[current_selected_option].type)
 				{
@@ -2906,7 +2906,7 @@ void handle_inventry_menu()
 
 			if (goDeselect && ammo_active)
 			{
-				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				goDeselect = 0;
 				ammo_active = 0;
 				rings[RING_INVENTORY]->ringactive = 1;
@@ -3427,7 +3427,7 @@ void draw_current_object_list(int ringnum)
 				{
 					if (!rings[ringnum]->objlistmovement)
 					{
-						SoundEffect(SFX_MENU_ROTATE, 0, SFX_ALWAYS);
+						SoundEffect(SFX_TR4_MENU_ROTATE, 0, SFX_ALWAYS);
 						rings[ringnum]->objlistmovement += 8192;
 
 						if (ammo_selector_flag)
@@ -3439,7 +3439,7 @@ void draw_current_object_list(int ringnum)
 				{
 					if (!rings[ringnum]->objlistmovement)
 					{
-						SoundEffect(SFX_MENU_ROTATE, 0, SFX_ALWAYS);
+						SoundEffect(SFX_TR4_MENU_ROTATE, 0, SFX_ALWAYS);
 						rings[ringnum]->objlistmovement -= 8192;
 
 						if (ammo_selector_flag)
@@ -3513,7 +3513,7 @@ int S_CallInventory2()
 
 		if (DbInput & IN_OPTION)
 		{
-			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			val = 1;
 		}
 
