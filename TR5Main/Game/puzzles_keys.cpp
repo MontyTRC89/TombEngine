@@ -2,14 +2,16 @@
 #include "collide.h"
 #include "input.h"
 #include "lara.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "switch.h"
 #include "pickup.h"
 #include "draw.h"
 #include "puzzles_keys.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
+
 
 /*vars*/
 short puzzleItem;

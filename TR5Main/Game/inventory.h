@@ -1,3 +1,4 @@
+#ifndef NEW_INV
 #pragma once
 #include "configuration.h"
 
@@ -385,3 +386,4 @@ public:
 };
 
 extern Inventory g_Inventory;
+#endif

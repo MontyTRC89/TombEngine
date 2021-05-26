@@ -3,7 +3,11 @@
 #include "box.h"
 #include "effect2.h"
 #include "items.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "level.h"
 #include "lot.h"
 #include "tomb4fx.h"
@@ -142,7 +146,11 @@ void SentryGunControl(short itemNum)
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
+#ifdef NEW_INV
+						if (!have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+#else
 						if (!g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+#endif
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{
