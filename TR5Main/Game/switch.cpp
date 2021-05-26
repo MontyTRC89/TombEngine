@@ -5,7 +5,11 @@
 #include "lot.h"
 #include "objects.h"
 #include "Lara.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "draw.h"
 #include "sphere.h"
 #include "camera.h"
@@ -13,11 +17,6 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
-
-
 
 byte SequenceUsed[6];
 byte SequenceResults[3][3][3];

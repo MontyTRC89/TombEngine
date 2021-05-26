@@ -5,7 +5,11 @@
 #include "control.h"
 #include "effect2.h"
 #include "lara.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "collide.h"
 #include "lara_flare.h"
 #include "setup.h"
@@ -16,9 +20,7 @@
 #include "health.h"
 #include "camera.h"
 #include "prng.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
+
 using namespace T5M::Math::Random;
 
 /*collision stuff*/
