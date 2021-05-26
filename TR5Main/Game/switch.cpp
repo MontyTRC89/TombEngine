@@ -193,7 +193,7 @@ void CrowDoveSwitchControl(short itemNumber)
 	if ((item->meshBits & 2))
 	{
 		ExplodeItemNode(item, 1, 0, 0x100);
-		SoundEffect(SFX_RAVENSWITCH_EXP, &item->pos, 0);
+		SoundEffect(SFX_TR5_RAVENSWITCH_EXP, &item->pos, 0);
 		item->meshBits = 5;
 		RemoveActiveItem(itemNumber);
 		item->itemFlags[0] = 1; // I use this for not making it activable again by trigger
@@ -754,7 +754,7 @@ void TurnSwitchControl(short itemNum)
 			l->frameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 58 &&
 			l->frameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 115)
 		{
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, 2);
+			SoundEffect(SFX_TR4_PUSHABLE_SOUND, &item->pos, 2);
 		}
 	}
 	else
@@ -781,7 +781,7 @@ void TurnSwitchControl(short itemNum)
 			l->frameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 58 &&
 			l->frameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 115)
 		{
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, 2);
+			SoundEffect(SFX_TR4_PUSHABLE_SOUND, &item->pos, 2);
 		}
 	}
 
@@ -1395,43 +1395,44 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void CogSwitchControl(short itemNum)
+void CogSwitchControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
-
+	
 	if (item->currentAnimState == 1)
 	{
 		if (item->goalAnimState == 1 && !(TrInput & IN_ACTION))
 		{
-			LaraItem->goalAnimState = LS_COGWHEEL_UNGRAB;
+			LaraItem->goalAnimState = LS_STOP;
 			item->goalAnimState = 0;
 		}
 
 		if (LaraItem->animNumber == LA_COGWHEEL_PULL)
 		{
-			if (LaraItem->frameNumber == (g_Level.Anims[LA_COGWHEEL_PULL].frameBase + 10))
+			if (LaraItem->frameNumber == g_Level.Anims[LA_COGWHEEL_PULL].frameBase + 10)
 			{
 				ITEM_INFO* it = (ITEM_INFO*)Lara.generalPtr;
 				it->itemFlags[0] = 40;
 				Lara.generalPtr = (ITEM_INFO*)it;
-				SoundEffect(SFX_STONE_SCRAPE_FAST, &it->pos, 0);
 			}
 		}
 	}
 	else
 	{
-		if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd && LaraItem->animNumber != LA_COGWHEEL_RELEASE)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
 			item->currentAnimState = 0;
 			item->status = ITEM_NOT_ACTIVE;
-			RemoveActiveItem(itemNum);
-//			LaraItem->animNumber = LA_STAND_SOLID;
-//			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_COGWHEEL_UNGRAB;
-//			LaraItem->currentAnimState = LS_STOP;
-//			Lara.gunStatus = LG_NO_ARMS; /*must add this as an anim command instead to avoid trouble!*/
+			
+			RemoveActiveItem(itemNumber);
+			
+			LaraItem->animNumber = LA_STAND_SOLID;
+			LaraItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			LaraItem->goalAnimState = LS_STOP;
+			LaraItem->currentAnimState = LS_STOP;
+			Lara.gunStatus = LG_NO_ARMS;
 		}
 	}
 }

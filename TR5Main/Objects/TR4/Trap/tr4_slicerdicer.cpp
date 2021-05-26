@@ -26,7 +26,7 @@ void SlicerDicerControl(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->pos, 0);
 
 	int factor = 4608 * phd_cos(item->triggerFlags) * phd_cos(item->pos.yRot);
 

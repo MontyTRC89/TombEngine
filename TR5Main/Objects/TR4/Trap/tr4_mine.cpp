@@ -23,9 +23,9 @@ void MineControl(short itemNum)
 	int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	if (item->itemFlags[0] >= 150)
 	{
-		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
-		SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
-		SoundEffect(SFX_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
 
 		if (num > 0)
 		{
@@ -85,7 +85,7 @@ void MineControl(short itemNum)
 			sphere++;
 		}
 
-		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 	}
 }
 

@@ -225,8 +225,8 @@ void SentryGunControl(short itemNum)
 			for (int i = 0; i < 2; i++)
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
 
-			SoundEffect(SFX_EXPLOSION1, &item->pos, 25165828);
-			SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 		}
 	}
 }

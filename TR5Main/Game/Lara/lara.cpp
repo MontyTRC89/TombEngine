@@ -451,7 +451,7 @@ void LaraControl(short itemNumber)
 					item->pos.yPos += 100;
 
 					UpdateLaraRoom(LaraItem, 0);
-					StopSoundEffect(SFX_LARA_FALL);
+					StopSoundEffect(SFX_TR4_LARA_FALL);
 
 					if (item->currentAnimState == LS_SWANDIVE_START)
 					{
@@ -596,7 +596,7 @@ void LaraControl(short itemNumber)
 						Lara.headXrot = 0;
 
 						UpdateLaraRoom(item, -381);
-						SoundEffect(SFX_LARA_BREATH, &LaraItem->pos, 2);
+						SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 					}
 				}
 			}
@@ -618,7 +618,7 @@ void LaraControl(short itemNumber)
 				Lara.headXrot = 0;
 
 				UpdateLaraRoom(item, 0);
-				SoundEffect(SFX_LARA_BREATH, &LaraItem->pos, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 			}
 			break;
 

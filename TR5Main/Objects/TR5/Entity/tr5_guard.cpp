@@ -310,7 +310,7 @@ void GuardControl(short itemNum)
 				item->itemFlags[0]++;
 				if (item->itemFlags[0] > 60 && !(GetRandomControl() & 0xF))
 				{
-					SoundEffect(SFX_BIO_BREATHE_OUT, &item->pos, 0);
+					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->pos, 0);
 					item->itemFlags[0] = 0;
 				}
 			}
@@ -616,7 +616,7 @@ void GuardControl(short itemNum)
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 				TestTriggers(TriggerIndex, 1, 0);
-				SoundEffect(SFX_LARA_ROPEDOWN_LOOP, &item->pos, 0);
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->pos, 0);
 			}
 			if (abs(info.angle) >= 364)
 			{

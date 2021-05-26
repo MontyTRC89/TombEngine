@@ -635,7 +635,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 		if ((!Lara.hitFrame) && (!hitSoundTimer))
 		{
-				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+				SoundEffect(SFX_TR4_LARA_INJURY, &l->pos, 0);
 				hitSoundTimer = generateFloat(5, 15);
 		}
 

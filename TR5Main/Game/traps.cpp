@@ -68,7 +68,7 @@ void FlameEmitterControl(short itemNumber)
 			if ((flags & 7) == 2 || (flags & 7) == 7)
 			{
 				PHD_3DPOS* pos = &item->pos;
-				SoundEffect(SFX_D_METAL_CAGE_OPEN, &item->pos, 0);
+				SoundEffect(SFX_TR4_FLAME_EMITTER, &item->pos, 0);
 				TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 				g = (GetRandomControl() & 0x1F) + 96;
 				r = (GetRandomControl() & 0x3F) + 192;
@@ -110,7 +110,7 @@ void FlameEmitterControl(short itemNumber)
 
 				if (item->itemFlags[1])
 				{
-					SoundEffect(SFX_D_METAL_CAGE_OPEN, &item->pos, 0);
+					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->pos, 0);
 					
 					if (item->itemFlags[1] <= -8192)
 						TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
@@ -131,7 +131,7 @@ void FlameEmitterControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 			return;
 		}
 
@@ -142,7 +142,7 @@ void FlameEmitterControl(short itemNumber)
 		falloff = 16 - (GetRandomControl() & 1);
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, falloff, r, g, 0);
 		
-		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 		
 		if (!Lara.burn
 			&& item->triggerFlags != 33
@@ -204,7 +204,7 @@ void FlameEmitter2Control(short itemNumber)
 				TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 10, r, g, 0);
 			}
 
-			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 		}
 	}
 }
@@ -266,7 +266,7 @@ void FlameControl(short fxNumber)
 	int wh = GetWaterHeight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 	if (wh == NO_HEIGHT || fx->pos.yPos <= wh || Lara.burnBlue)
 	{
-		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &fx->pos, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos, 0);
 
 		LaraItem->hitPoints -= 7;
 		LaraItem->hitStatus = true;
@@ -316,7 +316,7 @@ void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (!((item->pos.xPos ^ l->pos.xPos) & 0xFFFFFC00) && !((l->pos.zPos ^ item->pos.zPos) & 0xFFFFFC00))
 		{
-			SoundEffect(SFX_ROCK_FALL_CRUMBLE, &item->pos, 0);
+			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->pos, 0);
 			AddActiveItem(itemNum);
 
 			item->itemFlags[0] = 0;
@@ -534,7 +534,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->itemFlags[0] == 1)
 		{
-			SoundEffect(SFX_GRAB_MOTOR_B_LP, &item->pos, 0);
+			SoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP, &item->pos, 0);
 			adx = abs(dx);
 			if (adx >= 32)
 				adx = 32;
@@ -553,7 +553,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->itemFlags[0] == 2)
 		{
-			SoundEffect(SFX_GRAB_MOTOR_B_LP, &item->pos, 0);
+			SoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP, &item->pos, 0);
 			adz = abs(dz);
 			if (adz >= 32)
 				adz = 32;
@@ -573,7 +573,7 @@ void WreckingBallControl(short itemNumber)
 		if (item->itemFlags[1] == -1 && (oldX != item->pos.xPos || oldZ != item->pos.zPos))
 		{
 			item->itemFlags[1] = 0;
-			SoundEffect(SFX_GRAB_MOTOR_A, &item->pos, 0);
+			SoundEffect(SFX_TR5_J_GRAB_MOTOR_A, &item->pos, 0);
 		}
 		if ((item->pos.xPos & 0x3FF) == 512 && (item->pos.zPos & 0x3FF) == 512)
 			item->itemFlags[0] = 0;
@@ -581,8 +581,8 @@ void WreckingBallControl(short itemNumber)
 		{
 			if (item->itemFlags[1] != -1)
 			{
-				StopSoundEffect(SFX_GRAB_MOTOR_B_LP);
-				SoundEffect(SFX_GRAB_MOTOR_C, &item->pos, 0);
+				StopSoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP);
+				SoundEffect(SFX_TR5_J_GRAB_MOTOR_C, &item->pos, 0);
 			}
 			item->itemFlags[1] = 1;
 			item->triggerFlags = 30;
@@ -600,7 +600,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
-			SoundEffect(SFX_GRAB_DROP, &item->pos, 0);
+			SoundEffect(SFX_TR5_J_GRAB_DROP, &item->pos, 0);
 			++item->itemFlags[1];
 			item->fallspeed = 6;
 			item->pos.yPos += item->fallspeed;
@@ -637,12 +637,12 @@ void WreckingBallControl(short itemNumber)
 		item->pos.yPos += item->fallspeed;
 		if (item->pos.yPos < item2->pos.yPos + 1644)
 		{
-			StopSoundEffect(SFX_GRAB_WINCH_UP_LP);
+			StopSoundEffect(SFX_TR5_J_GRAB_WINCH_UP_LP);
 			item->itemFlags[0] = 1;
 			item->pos.yPos = item2->pos.yPos + 1644;
 			if (item->fallspeed < -32)
 			{
-				SoundEffect(SFX_GRAB_IMPACT, &item->pos, 4104);
+				SoundEffect(SFX_TR5_J_GRAB_IMPACT, &item->pos, 4104);
 				item->fallspeed = -item->fallspeed / 8;
 				BounceCamera(item, 16, 8192);
 			}
@@ -655,7 +655,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->itemFlags[0])
 		{
-			SoundEffect(SFX_GRAB_WINCH_UP_LP, &item->pos, 0);
+			SoundEffect(SFX_TR5_J_GRAB_WINCH_UP_LP, &item->pos, 0);
 		}
 	}
 	item2->pos.xPos = item->pos.xPos;
@@ -899,7 +899,7 @@ void FlameEmitter3Control(short itemNumber)
 		{
 			// Electricity bolts
 
-			SoundEffect(SFX_2GUNTEX_HIT_GUNS, &item->pos, 0);
+			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &item->pos, 0);
 
 			byte g = (GetRandomControl() & 0x3F) + 192;
 			byte b = (GetRandomControl() & 0x3F) + 192;
@@ -1005,7 +1005,7 @@ void FlameEmitter3Control(short itemNumber)
 				TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
 			}
 
-			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 
 			TriggerDynamicLight(x, item->pos.yPos, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() / 16) & 0x1F) + 96, 0);
 			

@@ -51,7 +51,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		0,
-		SFX_LARA_FIRE,
+		SFX_TR4_LARA_FIRE,
 		0
 	},
 	/* Revolver */
@@ -67,7 +67,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		16,
 		3,
 		0,
-		SFX_REVOLVER,
+		SFX_TR4_DESSERT_EAGLE_FIRE,
 		0
 	},
 	/* Uzis */
@@ -83,7 +83,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		3,
 		3,
 		0,
-		SFX_LARA_UZI_FIRE,
+		SFX_TR4_LARA_UZI_FIRE,
 		0
 	},
 	/* Shotgun */
@@ -99,7 +99,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		10,
-		SFX_LARA_SHOTGUN,
+		SFX_TR4_LARA_SHOTGUN,
 		0
 	},
 	/* HK */
@@ -131,7 +131,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
-		SFX_LARA_CROSSBOW,
+		SFX_TR4_LARA_CROSSBOW,
 		20
 	},
 	/* Flare */
@@ -163,7 +163,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		0,
-		SFX_LARA_UZI_FIRE,
+		SFX_TR4_LARA_UZI_FIRE,
 		0
 	},
 	/* Grenade launcher */
@@ -227,7 +227,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		0,
 		0,
-		SFX_LARA_UZI_FIRE,
+		SFX_TR4_LARA_UZI_FIRE,
 		0
 	}
 };
@@ -731,7 +731,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 				if (item->objectNumber == ID_ROMAN_GOD1 ||
 					item->objectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(SFX_SWORD_GOD_HITMET, &item->pos, 0);
+					SoundEffect(SFX_TR5_SWORD_GOD_HITMET, &item->pos, 0);
 				}
 				break;
 
@@ -844,7 +844,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 			target->hitPoints--;
 			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
 			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-			SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
+			SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
 		}
 		else if (target->objectNumber == ID_SHIVA) //So must be Shiva
 		{
@@ -857,7 +857,7 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 				target->hitStatus = true; //need to do this to maintain defence state
 				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
 				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-				SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
+				SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
 			}
 			else //Shiva's not in defence mode or has its back to Lara
 				HitTarget(target, &vDest, weapon->damage, 0);
