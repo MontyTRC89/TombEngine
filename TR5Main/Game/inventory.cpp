@@ -632,7 +632,7 @@ int Inventory::DoInventory()
 		// Handle input
 		if (DbInput & IN_DESELECT)
 		{
-			//SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			//SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			// Exit from inventory
 			m_enterObject = NO_ITEM;
@@ -641,7 +641,7 @@ int Inventory::DoInventory()
 		}
 		else if (DbInput & IN_FORWARD && (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 || m_activeRing == INV_RING_OPTIONS))
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			int newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
@@ -656,7 +656,7 @@ int Inventory::DoInventory()
 		}
 		else if (DbInput & IN_BACK && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			int newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
@@ -671,7 +671,7 @@ int Inventory::DoInventory()
 		}
 		else if (TrInput & IN_LEFT)
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object left
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
@@ -693,7 +693,7 @@ int Inventory::DoInventory()
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object right
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
@@ -865,7 +865,7 @@ int Inventory::DoPuzzle()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
@@ -873,13 +873,13 @@ int Inventory::DoPuzzle()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex < ring->numActions)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (ring->actions[ring->selectedIndex] == INV_ACTION_USE)
 			{
@@ -954,7 +954,7 @@ int Inventory::DoWeapon()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
@@ -962,13 +962,13 @@ int Inventory::DoWeapon()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex < ring->numActions)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (ring->actions[ring->selectedIndex] == INV_ACTION_USE)
 			{
@@ -1163,7 +1163,7 @@ bool Inventory::DoCombine()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object left
 			float deltaAngle = 360.0f / combineRing->numObjects / INV_NUM_FRAMES_ROTATE;
@@ -1198,7 +1198,7 @@ bool Inventory::DoCombine()
 				UpdateSceneAndDrawInventory();
 			}
 
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 			if (combineRing->currentObject < combineRing->numObjects - 1)
 				combineRing->currentObject++;
 			else
@@ -1208,7 +1208,7 @@ bool Inventory::DoCombine()
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			// Check if can be combined
 			short currentObject = combineRing->objects[combineRing->currentObject].inventoryObject;
@@ -1219,7 +1219,7 @@ bool Inventory::DoCombine()
 					combination->piece2 == currentObject && combination->piece1 == ring->objects[ring->currentObject].inventoryObject)
 				{
 					// I can do the combination
-					SoundEffect(SFX_MENU_COMBINE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_COMBINE, NULL, 0);
 					combination->combineRoutine(INV_COMBINE_COMBINE, combination->combinedObject);
 					LoadObjects(true);
 					SelectObject(oldRing, combination->combinedObject, 2 * INV_OBJECTS_SCALE);
@@ -1256,7 +1256,7 @@ bool Inventory::DoSepare()
 		if (combination->combinedObject == currentObject)
 		{
 			// Separation can be done
-			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_COMBINE, NULL, 0);
 			combination->combineRoutine(INV_COMBINE_SEPARE, combination->combinedObject);
 			LoadObjects(true);
 			SelectObject(m_activeRing, combination->piece1, 2 * INV_OBJECTS_SCALE);
@@ -1343,7 +1343,7 @@ void Inventory::DoSelectAmmo()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object left
 			float deltaAngle = 360.0f / ammoRing->numObjects / INV_NUM_FRAMES_ROTATE;
@@ -1378,7 +1378,7 @@ void Inventory::DoSelectAmmo()
 				UpdateSceneAndDrawInventory();
 			}
 
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 			if (ammoRing->currentObject < ammoRing->numObjects - 1)
 				ammoRing->currentObject++;
 			else
@@ -1388,7 +1388,7 @@ void Inventory::DoSelectAmmo()
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			// Choose ammo
 			switch (ring->objects[ring->currentObject].inventoryObject)
@@ -1462,7 +1462,7 @@ void Inventory::UseCurrentItem()
 		SoundEffect(116, 0, 2);
 		Savegame.Game.HealthUsed++;
 
-		SoundEffect(SFX_MENU_MEDI, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_MEDI, NULL, 0);
 
 		return;
 	}
@@ -1494,7 +1494,7 @@ void Inventory::UseCurrentItem()
 		SoundEffect(116, 0, 2);
 		Savegame.Game.HealthUsed++;
 
-		SoundEffect(SFX_MENU_MEDI, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_MEDI, NULL, 0);
 
 		return;
 	}
@@ -1535,7 +1535,7 @@ void Inventory::UseCurrentItem()
 		{
 			m_selectedObject = objectNumber;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 
 			return;
 		}
@@ -1553,7 +1553,7 @@ void Inventory::UseCurrentItem()
 		{
 			m_selectedObject = objectNumber;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 
 			return;
 		}
@@ -1586,7 +1586,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_PISTOLS)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1605,7 +1605,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_UZI)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1624,7 +1624,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1643,7 +1643,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_SHOTGUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1662,7 +1662,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_GRENADE_LAUNCHER)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1681,7 +1681,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON_GUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1700,7 +1700,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1719,7 +1719,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON_GUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1738,7 +1738,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_ROCKET_LAUNCHER)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1757,7 +1757,7 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_HK)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -1786,7 +1786,7 @@ void Inventory::UseCurrentItem()
 					LaraGun();
 					TrInput = 0;
 
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				}
 			}
 		}
@@ -1896,7 +1896,7 @@ int Inventory::DoTitleInventory()
 		// Handle input
 		if (TrInput & IN_LEFT)
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object right
 			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
@@ -1918,7 +1918,7 @@ int Inventory::DoTitleInventory()
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_ROTATE, NULL, 0);
 
 			// Change object left
 			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
@@ -1940,7 +1940,7 @@ int Inventory::DoTitleInventory()
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (ring->objects[ring->currentObject].inventoryObject == _INV_OBJECT_PASSPORT)
 			{
@@ -2110,13 +2110,13 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -2138,7 +2138,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					//ReadSavegame(selectedSavegame);
 					g_GameFlow->SelectedSaveGame = selectedSavegame;
@@ -2182,13 +2182,13 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -2210,7 +2210,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					// Use the new savegame system
 					char fileName[255];
@@ -2257,13 +2257,13 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedLevel > 0)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedLevel--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedLevel < g_GameFlow->GetNumLevels() - 1)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 					selectedLevel++;
 					continue;
 				}
@@ -2285,7 +2285,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					result = INV_RESULT_NEW_GAME;
 					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
@@ -2342,7 +2342,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					result = INV_RESULT_NEW_GAME;
 					moveLeft = false;
@@ -2396,7 +2396,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					result = INV_RESULT_EXIT_GAME;
 					moveLeft = false;
@@ -2450,7 +2450,7 @@ int Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 					result = INV_RESULT_EXIT_TO_TILE;
 					moveLeft = false;
@@ -2598,7 +2598,7 @@ void Inventory::DoControlsSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
@@ -2606,13 +2606,13 @@ void Inventory::DoControlsSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex < NUM_CONTROLS + 2 - 1)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 
 			if (ring->selectedIndex == NUM_CONTROLS)
 			{
@@ -2638,7 +2638,7 @@ void Inventory::DoControlsSettings()
 		// If RETURN is pressed, then wait for a new key
 		if (KeyMap[DIK_RETURN] & 0x80)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (!ring->waitingForKey)
 			{
@@ -2748,29 +2748,29 @@ void Inventory::DoGraphicsSettings()
 			switch (ring->selectedIndex)
 			{
 			case INV_DISPLAY_RESOLUTION:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				if (ring->SelectedVideoMode > 0)
 					ring->SelectedVideoMode--;
 
 				break;
 
 			case INV_DISPLAY_WINDOWED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.Windowed = !ring->Configuration.Windowed;
 				break;
 
 			case INV_DISPLAY_SHADOWS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableShadows = !ring->Configuration.EnableShadows;
 				break;
 
 			case INV_DISPLAY_CAUSTICS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableCaustics = !ring->Configuration.EnableCaustics;
 				break;
 
 			case INV_DISPLAY_VOLUMETRIC_FOG:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableVolumetricFog = !ring->Configuration.EnableVolumetricFog;
 				break;
 			}
@@ -2782,28 +2782,28 @@ void Inventory::DoGraphicsSettings()
 			switch (ring->selectedIndex)
 			{
 			case INV_DISPLAY_RESOLUTION:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
 					ring->SelectedVideoMode++;
 				break;
 
 			case INV_DISPLAY_WINDOWED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.Windowed = !ring->Configuration.Windowed;
 				break;
 
 			case INV_DISPLAY_SHADOWS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableShadows = !ring->Configuration.EnableShadows;
 				break;
 
 			case INV_DISPLAY_CAUSTICS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableCaustics = !ring->Configuration.EnableCaustics;
 				break;
 
 			case INV_DISPLAY_VOLUMETRIC_FOG:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableVolumetricFog = !ring->Configuration.EnableVolumetricFog;
 				break;
 			}
@@ -2812,7 +2812,7 @@ void Inventory::DoGraphicsSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
@@ -2820,13 +2820,13 @@ void Inventory::DoGraphicsSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex < INV_DISPLAY_COUNT)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (ring->selectedIndex == INV_DISPLAY_APPLY)
 			{
@@ -2848,7 +2848,7 @@ void Inventory::DoGraphicsSettings()
 			}
 			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
 			{
-				SoundEffect(SFX_MENU_SELECT, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 				closeObject = true;
 				break;
@@ -2907,13 +2907,13 @@ void Inventory::DoSoundSettings()
 			switch (ring->selectedIndex)
 			{
 			case INV_SOUND_ENABLED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
 
 				break;
 
 			case INV_SOUND_SPECIAL_EFFECTS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
 				break;
 
@@ -2931,7 +2931,7 @@ void Inventory::DoSoundSettings()
 				{
 					ring->Configuration.SfxVolume--;
 					GlobalFXVolume = ring->Configuration.SfxVolume;
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				}
 
 				break;
@@ -2944,13 +2944,13 @@ void Inventory::DoSoundSettings()
 			switch (ring->selectedIndex)
 			{
 			case INV_SOUND_ENABLED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
 
 				break;
 
 			case INV_SOUND_SPECIAL_EFFECTS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
 				break;
 
@@ -2968,7 +2968,7 @@ void Inventory::DoSoundSettings()
 				{
 					ring->Configuration.SfxVolume++;
 					GlobalFXVolume = ring->Configuration.SfxVolume;
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				}
 
 				break;
@@ -2978,7 +2978,7 @@ void Inventory::DoSoundSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
@@ -2986,13 +2986,13 @@ void Inventory::DoSoundSettings()
 		{
 			closeObject = false;
 
-			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex < INV_DISPLAY_COUNT)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 			if (ring->selectedIndex == INV_DISPLAY_APPLY)
 			{
@@ -3014,7 +3014,7 @@ void Inventory::DoSoundSettings()
 			}
 			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
 			{
-				SoundEffect(SFX_MENU_SELECT, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
 				closeObject = true;
 				GlobalMusicVolume = oldVolume;

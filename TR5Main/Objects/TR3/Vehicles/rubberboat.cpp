@@ -437,7 +437,7 @@ static int RubberBoatDynamics(short boat_number)
 		{
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
-			SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->pos, 0);
 			newspeed /= 2;
 			boat->speed /= 2;
 		}

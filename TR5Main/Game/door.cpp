@@ -551,7 +551,7 @@ void DoorControl(short itemNumber)
 		else
 		{
 			if (!item->itemFlags[0])
-				SoundEffect(SFX_LIFT_DOORS, &item->pos, 0);
+				SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
 			item->itemFlags[0] += STEP_SIZE;
 		}
 	}
@@ -560,7 +560,7 @@ void DoorControl(short itemNumber)
 		if (item->itemFlags[0] > 0)
 		{
 			if (item->itemFlags[0] == SECTOR(4))
-				SoundEffect(SFX_LIFT_DOORS, &item->pos, 0);
+				SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
 			item->itemFlags[0] -= STEP_SIZE;
 		}
 		if (!door->opened)

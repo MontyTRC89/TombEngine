@@ -136,6 +136,6 @@ void DartEmitterControl(short itemNumber)
 
 		AddActiveItem(dartItemNumber);
 		dartItem->status = ITEM_ACTIVE;
-		SoundEffect(SFX_LIFT_DOORS, &dartItem->pos, 0);
+		SoundEffect(SFX_TR4_DART_SPITT, &dartItem->pos, 0);
 	}
 }

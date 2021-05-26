@@ -495,7 +495,7 @@ void UpdateRopeSwing(ITEM_INFO* item)
 				RopeSwing = 0;
 			}
 
-			SoundEffect(SFX_LARA_ROPE_CREAK, &item->pos, 0);
+			SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->pos, 0);
 		}
 		else if (Lara.ropeLastX < 0 && Lara.ropeFrame == Lara.ropeDFrame)
 		{
@@ -528,7 +528,7 @@ void UpdateRopeSwing(ITEM_INFO* item)
 				RopeSwing = 0;
 			}
 
-			SoundEffect(SFX_LARA_ROPE_CREAK, &item->pos, 0);
+			SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->pos, 0);
 		}
 		else if (Lara.ropeLastX > 0 && Lara.ropeFrame == Lara.ropeDFrame)
 		{
@@ -653,7 +653,7 @@ void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->animNumber == LA_ROPE_DOWN && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
-			SoundEffect(SFX_LARA_ROPEDOWN_LOOP, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->pos, 0);
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			Lara.ropeFlag = 0;
 			++Lara.ropeSegment;

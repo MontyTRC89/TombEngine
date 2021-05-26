@@ -320,7 +320,7 @@ void MPStickControl(short itemNumber)
 					LaraItem->hitPoints -= 80;
 					LaraItem->hitStatus = 1;
 					CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-					SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 
 					creature->flags = 1;
 				}
@@ -337,7 +337,7 @@ void MPStickControl(short itemNumber)
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 					}
 				}
 			}
@@ -359,7 +359,7 @@ void MPStickControl(short itemNumber)
 					LaraItem->hitPoints -= 80;
 					LaraItem->hitStatus = 1;
 					CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-					SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 
 					creature->flags = 1;
 				}
@@ -376,7 +376,7 @@ void MPStickControl(short itemNumber)
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 
 					}
 				}
@@ -419,7 +419,7 @@ void MPStickControl(short itemNumber)
 						enemy->hitStatus = 1;
 						creature->flags = 2;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 					}
 				}
 			}
@@ -438,7 +438,7 @@ void MPStickControl(short itemNumber)
 					LaraItem->hitPoints -= 150;
 					LaraItem->hitStatus = 1;
 					CreatureEffect(item, &mpstickBite2, DoBloodSplat);
-					SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 
 					creature->flags = 1;
 				}
@@ -455,7 +455,7 @@ void MPStickControl(short itemNumber)
 						enemy->hitStatus = 1;
 						creature->flags = 1;
 						CreatureEffect(item, &mpstickBite2, DoBloodSplat);
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 					}
 				}
 			}
