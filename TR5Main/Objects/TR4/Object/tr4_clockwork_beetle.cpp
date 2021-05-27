@@ -305,78 +305,82 @@ void UseClockworkBeetle(short flag)
 	ITEM_INFO* item;
 	short itemNum;
 
-	if (!flag && LaraItem->currentAnimState != LS_STOP || LaraItem->animNumber != LA_STAND_IDLE || LaraItem->hitStatus || Lara.gunStatus != LG_NO_ARMS)
-		return;
-
-	itemNum = CreateItem();
-
-	if (itemNum != NO_ITEM)
+	if (flag
+		|| LaraItem->currentAnimState == LS_STOP
+		&& LaraItem->animNumber == LA_STAND_IDLE
+		&& !LaraItem->hitStatus
+		&& Lara.gunStatus == LG_NO_ARMS)
 	{
-		item = &g_Level.Items[itemNum];
-		Lara.hasBeetleThings &= 0xFE;
-		item->shade = -15856;
-		item->objectNumber = ID_CLOCKWORK_BEETLE;
-		item->roomNumber = LaraItem->roomNumber;
-		item->pos.xPos = LaraItem->pos.xPos;
-		item->pos.yPos = LaraItem->pos.yPos;
-		item->pos.zPos = LaraItem->pos.zPos;
-		InitialiseItem(itemNum);
-		item->pos.zRot = 0;
-		item->pos.xRot = 0;
-		item->pos.yRot = LaraItem->pos.yRot;
+		itemNum = CreateItem();
 
-		if (Lara.BeetleLife)
-			item->itemFlags[0] = Lara.ClockworkBeetleFlag;
-		else
-			item->itemFlags[0] = 0;
-
-		item->speed = 0;
-		AddActiveItem(itemNum);
-
-		if (item->itemFlags[0])
+		if (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* item2;
-			short roomItem, nex;
-			int dx, dy, dz;
+			item = &g_Level.Items[itemNum];
+			Lara.hasBeetleThings &= 0xFE;
+			item->shade = -15856;
+			item->objectNumber = ID_CLOCKWORK_BEETLE;
+			item->roomNumber = LaraItem->roomNumber;
+			item->pos.xPos = LaraItem->pos.xPos;
+			item->pos.yPos = LaraItem->pos.yPos;
+			item->pos.zPos = LaraItem->pos.zPos;
+			InitialiseItem(itemNum);
+			item->pos.zRot = 0;
+			item->pos.xRot = 0;
+			item->pos.yRot = LaraItem->pos.yRot;
 
-			roomItem = g_Level.Rooms[item->roomNumber].itemNumber;
+			if (Lara.BeetleLife)
+				item->itemFlags[0] = Lara.ClockworkBeetleFlag;
+			else
+				item->itemFlags[0] = 0;
 
-			if (roomItem != NO_ITEM)
+			item->speed = 0;
+			AddActiveItem(itemNum);
+
+			if (item->itemFlags[0])
 			{
-				while (1)
+				ITEM_INFO* item2;
+				short roomItem, nex;
+				int dx, dy, dz;
+
+				roomItem = g_Level.Rooms[item->roomNumber].itemNumber;
+
+				if (roomItem != NO_ITEM)
 				{
-					item2 = &g_Level.Items[roomItem];
-					nex = item2->nextItem;
-
-					if (item2->objectNumber == ID_MAPPER)
+					while (1)
 					{
-						dx = item->pos.xPos - item2->pos.xPos;
-						dy = item->pos.yPos - item2->pos.yPos;
-						dz = item->pos.zPos - item2->pos.zPos;
-						if (dx > -1024 && dx < 1024 && dz > -1024 && dz < 1024 && dy > -1024 && dy < 1024)
-							break;
-					}
-					roomItem = nex;
+						item2 = &g_Level.Items[roomItem];
+						nex = item2->nextItem;
 
-					if (roomItem == NO_ITEM)
-					{
-						if (!item->itemFlags[0])
-							item->itemFlags[3] = 150;
+						if (item2->objectNumber == ID_MAPPER)
+						{
+							dx = item->pos.xPos - item2->pos.xPos;
+							dy = item->pos.yPos - item2->pos.yPos;
+							dz = item->pos.zPos - item2->pos.zPos;
+							if (dx > -1024 && dx < 1024 && dz > -1024 && dz < 1024 && dy > -1024 && dy < 1024)
+								break;
+						}
+						roomItem = nex;
 
-						return;
+						if (roomItem == NO_ITEM)
+						{
+							if (!item->itemFlags[0])
+								item->itemFlags[3] = 150;
+
+							return;
+						}
 					}
+
+					item->itemFlags[1] = item2->pos.yRot + 0x8000;
+
+					if (item2->itemFlags[0])
+						item->itemFlags[0] = 0;
+					else
+						item2->itemFlags[0] = 1;
 				}
-
-				item->itemFlags[1] = item2->pos.yRot + 0x8000;
-
-				if (item2->itemFlags[0])
-					item->itemFlags[0] = 0;
-				else
-					item2->itemFlags[0] = 1;
 			}
-		}
 
-		if (!item->itemFlags[0])
-			item->itemFlags[3] = 150;
+			if (!item->itemFlags[0])
+				item->itemFlags[3] = 150;
+		}
 	}
 }
