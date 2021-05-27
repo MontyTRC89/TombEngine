@@ -35,6 +35,7 @@
 /// objects
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
+#include "tr4_clockwork_beetle.h"
 /// puzzle
 #include "tr4_scales.h"
 /// switch
@@ -836,6 +837,13 @@ static void StartObject(OBJECT_INFO* obj)
 			obj->saveHitpoints = 1;
 			obj->saveFlags = 1;
 		}
+	}
+
+	obj = &Objects[ID_CLOCKWORK_BEETLE];
+	if (obj->loaded)
+	{
+		obj->initialise = 0;
+		obj->control = ClockworkBeetleControl;
 	}
 }
 
