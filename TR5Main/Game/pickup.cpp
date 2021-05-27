@@ -3,7 +3,11 @@
 #include "phd_global.h"
 #include "lara.h"
 #include "draw.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "effect.h"
 #include "effect2.h"
 #include "control.h"
@@ -24,9 +28,7 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
+
 
 OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
@@ -706,7 +708,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             item->pos.zRot = oldZrot;
             return;
         }
-        if (!Lara.isMoving)//TROYE INVENTORY FIX ME PLEASE
+        if (!Lara.isMoving)
         {
 #ifdef NEW_INV
             if (GLOBAL_inventoryitemchosen == NO_ITEM)
@@ -1324,8 +1326,11 @@ void SearchObjectControl(short itemNumber)
 
 int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 {
-
+#ifdef NEW_INV
+    short selectedObject = GLOBAL_inventoryitemchosen;
+#else
 	short selectedObject = g_Inventory.GetSelectedObject();
+#endif
 
 	if (item->animNumber != LA_STAND_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
 		return false;

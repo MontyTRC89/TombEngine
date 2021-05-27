@@ -3,7 +3,9 @@
 #include "lara_cheat.h"
 #include "input.h"
 #include "GameFlowScript.h"
+#ifndef NEW_INV
 #include "inventory.h"
+#endif
 #include "effect2.h"
 #include "sound.h"
 

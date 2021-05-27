@@ -1,4 +1,5 @@
 #include "framework.h"
+#ifndef NEW_INV
 #include "inventory.h"
 #include "draw.h"
 #include "control.h"
@@ -3181,3 +3182,4 @@ bool Inventory::HasWeaponMultipleAmmos(short object)
 {
 	return (object == _INV_OBJECT_SHOTGUN || object == _INV_OBJECT_CROSSBOW || object == _INV_OBJECT_GRENADE_LAUNCHER);
 }
+#endif

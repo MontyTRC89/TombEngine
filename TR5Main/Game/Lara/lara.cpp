@@ -7,7 +7,11 @@
 #include "lara_objects.h"
 #include "lara_hang.h"
 #include "lara_slide.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "lara_fire.h"
 #include "lara_surface.h"
 #include "lara_swim.h"

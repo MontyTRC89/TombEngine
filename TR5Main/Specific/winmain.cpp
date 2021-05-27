@@ -3,7 +3,9 @@
 #include "resource.h"
 #include "draw.h"
 #include "sound.h"
+#ifndef NEW_INV
 #include "inventory.h"
+#endif
 #include "control.h"
 #include "gameflow.h"
 #include "savegame.h"
