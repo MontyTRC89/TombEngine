@@ -5,8 +5,11 @@
 #include "health.h"
 #include "camera.h"
 #include "draw.h"
-#include "inventory.h"
+#ifdef NEW_INV
 #include "newinv2.h"
+#else
+#include "inventory.h"
+#endif
 #include "lara.h"
 #include "gameflow.h"
 #include "rope.h"
@@ -458,7 +461,7 @@ namespace T5M::Renderer
         }
 
     }
-
+#ifdef NEW_INV
     void Renderer11::renderTitleMenu()
     {
         char stringBuffer[255];
@@ -508,7 +511,6 @@ namespace T5M::Renderer
             for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
             {
                 int i2 = i - 1;
-                InventoryRing* ring = g_Inventory.GetRing(INV_TYPE_TITLE);
                 GameScriptLevel* levelScript = g_GameFlow->GetLevel(i);
 
                 drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
@@ -746,6 +748,10 @@ namespace T5M::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
             break;
         }
+
+#ifndef _DEBUG
+        drawAllStrings();//nothing shows on release otherwise!
+#endif
     }
 
     void Renderer11::renderPauseMenu()
@@ -1027,7 +1033,7 @@ namespace T5M::Renderer
 
         g_Renderer.drawAllStrings();
     }
-
+#endif
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
         char stringBuffer[255];
@@ -1086,7 +1092,7 @@ namespace T5M::Renderer
 
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
-
+#ifndef NEW_INV
         InventoryRing *activeRing = g_Inventory.GetRing(g_Inventory.GetActiveRing());
         int lastRing = 0;
 
@@ -1101,6 +1107,7 @@ namespace T5M::Renderer
 
         m_cbCameraMatrices.updateData(inventoryCam, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+#endif
 
 #ifdef NEW_INV
         if (CurrentLevel == 0)
@@ -1164,8 +1171,8 @@ namespace T5M::Renderer
             renderPauseMenu();
             return;
         }
-#endif
 
+#else
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
         {
             InventoryRing *ring = g_Inventory.GetRing(k);
@@ -1796,7 +1803,7 @@ namespace T5M::Renderer
             m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One);
             m_spriteBatch->End();
         }
-
+#endif
     }
 
     void Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars)

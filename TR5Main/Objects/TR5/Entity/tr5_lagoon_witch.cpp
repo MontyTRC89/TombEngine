@@ -5,7 +5,11 @@
 #include "effect.h"
 #include "effect2.h"
 #include "tomb4fx.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
@@ -62,7 +66,11 @@ void LagoonWitchControl(short itemNumber)
 	}
 	else
 	{
+#ifdef NEW_INV
+		if (have_i_got_object(ID_PUZZLE_ITEM2))
+#else
 		if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM2))
+#endif
 		{
 			item->aiBits = 0;
 			creature->enemy = LaraItem;
