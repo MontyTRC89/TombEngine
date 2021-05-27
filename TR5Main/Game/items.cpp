@@ -25,7 +25,7 @@ void KillItem(short itemNum)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNum | 0x8000;
 		ItemNewRoomNo++;
 	}
-	else if (NextItemActive != NO_ITEM)
+	else// if (NextItemActive != NO_ITEM)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 

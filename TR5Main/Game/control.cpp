@@ -9,7 +9,11 @@
 #include "items.h"
 #include "effect2.h"
 #include "draw.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "gameflow.h"
 #include "lot.h"
 #include "pickup.h"
@@ -47,9 +51,6 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
-#ifdef NEW_INV
-#include <Game/newinv2.h>
-#endif
 
 using std::vector;
 using namespace T5M::Effects::Explosion;
@@ -119,7 +120,9 @@ int GameTimer;
 short GlobalCounter;
 byte LevelComplete;
 short DelCutSeqPlayer;
+#ifndef NEW_INV
 int LastInventoryItem;
+#endif
 int TrackCameraInit;
 short TorchRoom;
 int InitialiseGame;
@@ -322,6 +325,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
+#ifdef NEW_INV
+			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
+#else
 			int inventoryResult = g_Inventory.DoInventory();
 			switch (inventoryResult)
 			{
@@ -332,6 +338,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			case INV_RESULT_EXIT_TO_TILE:
 				return GAME_STATUS_EXIT_TO_TITLE;
 			}
+#endif
 		}
 
 		if (demoMode && TrInput == -1)
@@ -701,8 +708,9 @@ GAME_STATUS DoTitle(int index)
 		Savegame.Level.Timer = 0;
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
-
+#ifndef NEW_INV
 		LastInventoryItem = -1;
+#endif
 		DelCutSeqPlayer = 0;
 
 		// Initialise flyby cameras
@@ -828,8 +836,9 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
 	}
-
+#ifndef NEW_INV
 	LastInventoryItem = -1;
+#endif
 	DelCutSeqPlayer = 0;
 
 #ifdef NEW_INV

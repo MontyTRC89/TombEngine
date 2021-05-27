@@ -1,7 +1,11 @@
 #include "framework.h"
 #include "jeep.h"
 #include "lara.h"
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
 #include "inventory.h"
+#endif
 #include "effect2.h"
 #include "collide.h"
 #include "effect.h"
@@ -15,9 +19,7 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#endif
+
 using std::vector;
 
 
