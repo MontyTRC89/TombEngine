@@ -955,6 +955,18 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		data++;
 	}
 
+	//for the stupid beetle
+	if ((*data & 0x1F) == MINER_TYPE)
+	{
+		if (!heavy)
+			Lara.ClockworkBeetleFlag = 1;
+
+		if (*data & 0x8000)
+			return;
+
+		data++;
+	}
+
 	// Trigger triggerer
 	if ((*data & 0x1F) == TRIGTRIGGER_TYPE)
 	{
