@@ -221,7 +221,7 @@ int S_UpdateInput()
 				LaraItem->currentAnimState == LS_CRAWL_BACK ||
 				LaraItem->currentAnimState == LS_CRAWL_TO_HANG)
 			{
-				SoundEffect(SFX_LARA_NO, nullptr, 2);
+				SoundEffect(SFX_TR4_LARA_NO, nullptr, 2);
 				flare_no = true;
 			}
 			else
@@ -329,12 +329,12 @@ int S_UpdateInput()
 
 					Lara.dpoisoned = 0;
 					LaraItem->hitPoints += 500;
-					SoundEffect(SFX_MENU_MEDI, nullptr, 2);//Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
+					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);//Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
 
 					if (LaraItem->hitPoints > 1000)
 					{
 						LaraItem->hitPoints = 1000;
-						SoundEffect(SFX_MENU_MEDI, nullptr, 2);
+						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Savegame.Game.HealthUsed++;
 					}
 				}
@@ -360,7 +360,7 @@ int S_UpdateInput()
 					if (LaraItem->hitPoints > 1000)
 					{
 						LaraItem->hitPoints = 1000;
-						SoundEffect(SFX_MENU_MEDI, nullptr, 2);
+						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Savegame.Game.HealthUsed++;
 					}
 				}

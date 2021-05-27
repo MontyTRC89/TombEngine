@@ -433,7 +433,7 @@ void UpdateSubsuitAngles()
 
 	if (Subsuit.Vel[0] != 0 || Subsuit.Vel[1] != 0)
 	{
-		SoundEffect(SFX_LARA_UNDERWATER_ENGINE, &LaraItem->pos, (((Subsuit.Vel[0] + Subsuit.Vel[1]) * 4) & 0x1F00) + 10);
+		SoundEffect(SFX_TR5_LARA_UNDERWATER_ENGINE, &LaraItem->pos, (((Subsuit.Vel[0] + Subsuit.Vel[1]) * 4) & 0x1F00) + 10);
 	}
 }
 
@@ -651,7 +651,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (LaraDrawType == 5)
 		{
-			SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) * 256) | 6);
+			SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) * 256) | 6);
 		}
 
 		if (Lara.anxiety < 96)

@@ -407,7 +407,7 @@ void HydraControl(short itemNumber)
 			if (item->itemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->itemFlags[3], 0, 64);
-				SoundEffect(SFX_SMASH_ROCK, &item->pos, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 				item->itemFlags[3]++;
 			}
 		}

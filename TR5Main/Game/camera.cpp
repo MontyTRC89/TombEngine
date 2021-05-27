@@ -816,8 +816,8 @@ void FixedCamera(ITEM_INFO* item)
 					|| !(GlobalCounter & 0x3F)
 					|| objLos && !(GlobalCounter & 0xF) && GetRandomControl() & 1)
 				{
-					SoundEffect(SFX_EXPLOSION1, 0, 83886084);
-					SoundEffect(SFX_HK_FIRE, 0, 0);
+					SoundEffect(SFX_TR4_EXPLOSION1, 0, 83886084);
+					SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 					
 					FlashFadeR = 192;
 					FlashFadeB = 0;
@@ -1291,7 +1291,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange < 128)
 			BinocularRange = 128;
 		else 
-			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
+			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
 	}
 	else if (InputBusy & IN_DUCK)
 	{
@@ -1299,7 +1299,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange > 1536)
 			BinocularRange = 1536;
 		else
-			SoundEffect(SFX_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
+			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags * 256) | 6);
 	}
 
 	PHD_VECTOR src;
@@ -1350,12 +1350,12 @@ void BinocularCamera(ITEM_INFO* item)
 					firing = 1;
 					if (Lara.Weapons[WEAPON_HK].HasSilencer)
 					{
-						SoundEffect(SFX_HK_SILENCED, 0, 0);
+						SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 					}
 					else
 					{
-						SoundEffect(SFX_EXPLOSION1, 0, 83888140);
-						SoundEffect(SFX_HK_FIRE, 0, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
+						SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 					}
 				}
 				else if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
@@ -1371,12 +1371,12 @@ void BinocularCamera(ITEM_INFO* item)
 						firing = 1;
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
-							SoundEffect(SFX_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						}
 						else
 						{
-							SoundEffect(SFX_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 					else
@@ -1385,12 +1385,12 @@ void BinocularCamera(ITEM_INFO* item)
 
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
-							SoundEffect(SFX_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						}
 						else
 						{
-							SoundEffect(SFX_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 				}
@@ -1400,12 +1400,12 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
-							SoundEffect(SFX_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						}
 						else
 						{
-							SoundEffect(SFX_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 					else
@@ -1414,12 +1414,12 @@ void BinocularCamera(ITEM_INFO* item)
 						firing = 1;
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
-							SoundEffect(SFX_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						}
 						else
 						{
-							SoundEffect(SFX_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 
@@ -1556,7 +1556,7 @@ void CalculateCamera()
 		//Camera is in a water room, play water sound effect.
 		if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 		{
-			SoundEffect(SFX_UNDERWATER, NULL, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
 			if (Camera.underwater == 0)
 			{
 				Camera.underwater = 1;

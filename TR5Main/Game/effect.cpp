@@ -240,7 +240,7 @@ void LaraLocation(ITEM_INFO* item)
 
 void ExplosionFX(ITEM_INFO* item)
 {
-	SoundEffect(SFX_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
 	Camera.bounce = -75;
 	FlipEffect = -1;
 }
@@ -265,7 +265,7 @@ void ActivateCamera(ITEM_INFO* item)
 
 void PoseidonSFX(ITEM_INFO* item)
 {
-	SoundEffect(SFX_GRAB_OPEN, NULL, 0);
+	SoundEffect(SFX_TR4_WATER_FLUSHES, NULL, 0);
 	FlipEffect = -1;
 }
 
@@ -332,7 +332,7 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
 
 	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
-	SoundEffect(SFX_WATERFALL_LOOP, &item->pos, 0);
+	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
 }
 
 short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
@@ -406,7 +406,7 @@ void Richochet(PHD_3DPOS* pos)
 	target.y = pos->yPos;
 	target.z = pos->zPos;
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_LARA_RICOCHET, pos, 0);
+	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
 }
 
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)

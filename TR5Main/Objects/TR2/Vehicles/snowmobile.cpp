@@ -212,8 +212,8 @@ void SkidooExplode(ITEM_INFO* skidoo)
 //	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;
 
-	SoundEffect(SFX_EXPLOSION1, 0, 0);
-	SoundEffect(SFX_EXPLOSION2, 0, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
+	SoundEffect(SFX_TR4_EXPLOSION2, 0, 0);
 
 	Lara.Vehicle = NO_ITEM;
 }
@@ -294,7 +294,7 @@ bool SkidooCheckGetOff()
 				LaraItem->pos.yPos -= 200;
 				LaraItem->fallspeed = skidoo->fallspeed;
 				LaraItem->speed = skidoo->speed;
-				SoundEffect(SFX_LARA_FALL, &LaraItem->pos, 0);
+				SoundEffect(SFX_TR4_LARA_FALL, &LaraItem->pos, 0);
 			}
 
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
@@ -989,13 +989,13 @@ bool SkidooControl()
 		skinfo->trackMesh = ((skinfo->trackMesh & 3) == 1) ? 2 : 1;
 
 		skinfo->pitch += (pitch - skinfo->pitch) / 4;
-		SoundEffect(SFX_TR2_SNOWMOBILE_HIGH_ENGINE_RPM, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) * 256));
+		SoundEffect(SFX_TR2_SKIDOO_ACCELERATE, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) * 256));
 	}
 	else
 	{
 		skinfo->trackMesh = 0;
 		if (!drive)
-			SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &skidoo->pos, 0);
+			SoundEffect(SFX_TR2_SKIDOO_IDLE, &skidoo->pos, 0);
 		skinfo->pitch = 0;
 	}
 	skidoo->floor = height;

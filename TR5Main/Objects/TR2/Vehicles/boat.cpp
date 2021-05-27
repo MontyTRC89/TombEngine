@@ -602,7 +602,7 @@ int SpeedBoatDynamics(short itemNum)
 		{
 			LaraItem->hitPoints -= boat->speed;
 			LaraItem->hitStatus = 1;
-			SoundEffect(SFX_TR2_LARA_GETTING_HURT, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->pos, 0);
 			newspeed /= 2;
 			boat->speed /= 2;
 		}
@@ -1030,7 +1030,7 @@ void SpeedBoatControl(short itemNumber)
 	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
 	if (boat->speed > 8)
-		SoundEffect(SFX_TR2_BOAT_HIGH_ENGINE_RPM, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
+		SoundEffect(SFX_TR2_BOAT_ACCELERATE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
 	else if (drive)
 		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
 

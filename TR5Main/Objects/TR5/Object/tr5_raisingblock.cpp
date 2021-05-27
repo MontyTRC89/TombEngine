@@ -66,7 +66,7 @@ void ControlRaisingBlock(short itemNumber)
 		}
 		else if (item->itemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, 0);
+			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, 0);
 
 			item->itemFlags[1] += 64;
 
@@ -117,7 +117,7 @@ void ControlRaisingBlock(short itemNumber)
 	}
 	else
 	{
-		SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, 0);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, 0);
 
 		if (item->triggerFlags >= 0)
 		{

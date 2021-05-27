@@ -253,7 +253,7 @@ void UpdateSpiders()
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(SFX_BEETLES, &spider->pos, 0);
+					SoundEffect(SFX_TR5_BEETLES, &spider->pos, 0);
 			}
 		}
 	}

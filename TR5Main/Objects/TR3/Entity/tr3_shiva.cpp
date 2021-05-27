@@ -110,7 +110,7 @@ static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaRightBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH3, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
 	}
 
 	if (!(shiva->flags) && (item->touchBits & 0x2400))
@@ -119,7 +119,7 @@ static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaLeftBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH3, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
 	}
 }
 

@@ -85,7 +85,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 				}
 				else
 					item->goalAnimState = LS_STOP;
-				StopSoundEffect(SFX_LARA_SLIPPING);
+				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			}
 		}
 		else
@@ -107,7 +107,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_FALL_BACK;
 			}
 
-			StopSoundEffect(SFX_LARA_SLIPPING);
+			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 
 			item->gravityStatus = true;
 			item->fallspeed = 0;

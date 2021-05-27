@@ -64,7 +64,7 @@ void SphinxControl(short itemNumber)
 			if (((mesh->z / 1024) == (z / 1024)) && ((mesh->x / 1024) == (x / 1024)) && mesh->staticNumber >= 50)
 			{
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
-				SoundEffect(SFX_SMASH_ROCK, &item->pos, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 				mesh->flags &= ~0x100;
 				floor->stopper = false;

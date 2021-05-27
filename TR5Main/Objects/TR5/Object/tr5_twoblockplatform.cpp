@@ -92,7 +92,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 					}
 					else
 					{
-						SoundEffect(SFX_2GUNTEX_FALL_BIG, &item->pos, 0);
+						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
 						item->pos.yPos -= 4;
 					}
 				}
@@ -105,7 +105,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 				}
 				else
 				{
-					SoundEffect(SFX_2GUNTEX_FALL_BIG, &item->pos, 0);
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
 					item->pos.yPos += 4;
 				}
 			}

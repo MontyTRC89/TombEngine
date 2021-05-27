@@ -105,8 +105,8 @@ void InitialisePushableBlock(short itemNum)
 
 	pushable->height = height;
 
-	pushable->loopSound = SFX_PUSHABLE_SOUND; // LUA
-	pushable->stopSound = SFX_PUSH_BLOCK_END; // LUA
+	pushable->loopSound = SFX_TR4_PUSHABLE_SOUND; // LUA
+	pushable->stopSound = SFX_TR4_PUSH_BLOCK_END; // LUA
 	pushable->fallSound = SFX_TR4_BOULDER_FALL; // LUA
 
 	item->data = (void*) pushable;

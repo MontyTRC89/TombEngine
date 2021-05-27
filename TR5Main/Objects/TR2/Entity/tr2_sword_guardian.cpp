@@ -55,8 +55,8 @@ void SwordGuardianControl(short itemNum)
 		if (item->currentAnimState != 12)
 		{
 			//item->meshBits >>= 1;
-			SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 0);
-			SoundEffect(SFX_EXPLOSION2, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->pos, 0);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
 			ExplodingDeath(itemNum, -1, 256);
