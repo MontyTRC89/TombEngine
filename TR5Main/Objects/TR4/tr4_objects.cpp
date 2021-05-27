@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr4_objects.h"
+#include "pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
@@ -781,6 +782,7 @@ static void StartObject(OBJECT_INFO* obj)
 		obj->control = MapperControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->drawRoutine = nullptr;
 	}
 
 	obj = &Objects[ID_ELEMENT_PUZZLE];
@@ -844,6 +846,19 @@ static void StartObject(OBJECT_INFO* obj)
 	{
 		obj->initialise = 0;
 		obj->control = ClockworkBeetleControl;
+		obj->collision = PickupCollision;
+	}
+
+	obj = &Objects[ID_CLOCKWORK_BEETLE_COMBO1];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+	}
+
+	obj = &Objects[ID_CLOCKWORK_BEETLE_COMBO2];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
 	}
 }
 
