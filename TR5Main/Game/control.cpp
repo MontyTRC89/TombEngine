@@ -1890,6 +1890,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				case CLIMB_TYPE:
 				case MONKEY_TYPE:
 				case TRIGTRIGGER_TYPE:
+				case MINER_TYPE:
 					if (!TriggerIndex)
 						TriggerIndex = data - 1;
 					break;
