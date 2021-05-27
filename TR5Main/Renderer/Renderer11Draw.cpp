@@ -2603,6 +2603,7 @@ namespace T5M::Renderer
             printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
             printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 			printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
+            printDebugMessage("Lara.ClockworkBeetleFlag: %d", Lara.ClockworkBeetleFlag);
 #endif
         }
 
