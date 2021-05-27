@@ -144,7 +144,7 @@ void ControlTeethSpikes(short itemNumber)
 	else
 	{
 		if (item->itemFlags[0] == 1024)
-			SoundEffect(SFX_TEETH_SPIKES, &item->pos, 0);
+			SoundEffect(SFX_TR4_TEETH_SPIKES, &item->pos, 0);
 
 		item->status = ITEM_ACTIVE;
 

@@ -109,7 +109,7 @@ void ControlBrowsBeast(short itemNumber)
 			case 3:
 				if (distance < SQUARE(1024) || creature->mood != ATTACK_MOOD)
 					item->goalAnimState = 1;
-				SoundEffect(SFX_IMP_BARREL_ROLL, &item->pos, 0);
+				SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->pos, 0);
 				break;
 
 			case 4:

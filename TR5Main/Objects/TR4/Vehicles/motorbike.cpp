@@ -548,8 +548,8 @@ static void MotorBikeExplode(ITEM_INFO* item)
 	LaraItem->hitPoints = 0;
 	item->status = ITEM_DEACTIVATED;
 
-	SoundEffect(SFX_EXPLOSION1, NULL, 0);
-	SoundEffect(SFX_EXPLOSION2, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION2, NULL, 0);
 
 	Lara.Vehicle = NO_ITEM;
 }

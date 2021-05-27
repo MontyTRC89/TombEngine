@@ -25,7 +25,7 @@ void ElementPuzzleControl(short itemNumber)
 
     if (item->triggerFlags == 1)
     {
-        SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+        SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 
         byte r = (GetRandomControl() & 0x3F) + 192;
         byte g = (GetRandomControl() & 0x1F) + 96;

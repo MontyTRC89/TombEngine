@@ -635,7 +635,7 @@ void RomanStatueControl(short itemNumber)
 						LaraItem->hitPoints -= 200;
 						LaraItem->hitStatus = true;
 						CreatureEffect2(item, &RomanStatueBite, 20, item->pos.yRot, DoBloodSplat);
-						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 						creature->flags = 1;
 					}
 				}

@@ -147,7 +147,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_ELECTRIC_WIRES, &item->pos, 0);
+		SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->pos, 0);
 
 		counter = (abs(LaraItem->pos.xPos - item->pos.xPos) > 2048)
 			+ (abs(LaraItem->pos.zPos - item->pos.zPos) > 2048)
@@ -265,7 +265,7 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				if (LaraItem->hitPoints > 32)
 				{
-					SoundEffect(SFX_LARA_ELECTRIC_CRACKLES, &LaraItem->pos, 0);
+					SoundEffect(SFX_TR4_LARA_ELECTRIC_CRACKLES, &LaraItem->pos, 0);
 					TriggerLaraElectricitySparks(0);
 					TriggerLaraElectricitySparks(1);
 					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, GetRandomControl() & 0x7F, (GetRandomControl() & 0x3F) + 128);

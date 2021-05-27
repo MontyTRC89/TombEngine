@@ -121,9 +121,8 @@ void ControlDeathSlide(short itemNumber)
 				LaraItem->fallspeed = item->fallspeed / 4;
 			}
 
-			// TODO: sounds
 			// Stop
-			SoundEffect(SFX_COGS_ROME, &item->pos, 0);
+			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &item->pos, 0);
 			RemoveActiveItem(itemNumber);
 			item->status = ITEM_NOT_ACTIVE;
 			item->flags -= ONESHOT;
@@ -131,7 +130,7 @@ void ControlDeathSlide(short itemNumber)
 		else
 		{
 			// Whizz
-			SoundEffect(SFX_GOD_HEAD_LASER_LOOPS, &item->pos, 0);
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &item->pos, 0);
 		}
 	}
 }
