@@ -171,8 +171,8 @@ void MissileControl(short itemNumber)
 					ExplodeFX(fx, 0, 32);
 					LaraItem->hitPoints -= 50;
 					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->pos.yRot, LaraItem->roomNumber);
-					SoundEffect(SFX_IMP_STONE_HIT, &fx->pos, 0);
-					SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);
+					SoundEffect(SFX_TR5_IMP_STONE_HIT, &fx->pos, 0);
+					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->pos, 0);
 				}
 				
 				KillEffect(itemNumber);

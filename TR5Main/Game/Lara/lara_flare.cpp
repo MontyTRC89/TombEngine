@@ -254,7 +254,7 @@ void draw_flare()
 		{
 			if (frame == 72)
 			{
-				SoundEffect(SFX_RAVESTICK, &LaraItem->pos, g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER);
+				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &LaraItem->pos, g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER);
 				Lara.flareAge = 1;
 			}
 

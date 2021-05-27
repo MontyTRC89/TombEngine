@@ -126,7 +126,7 @@ void AnimatePistols(int weaponType)
 
 						Lara.rightArm.flash_gun = weapon->flashTime;
 
-						SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
+						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
 						SoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
 						soundPlayed = true;
 
@@ -224,7 +224,7 @@ void AnimatePistols(int weaponType)
 
 					if (!soundPlayed)
 					{
-						SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
+						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
 						SoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
 					}
 
@@ -426,7 +426,7 @@ void undraw_pistols(int weaponType)
 		if (frameLeft == p->draw2Anim - 1)
 		{
 			undraw_pistol_mesh_left(weaponType);
-			SoundEffect(SFX_LARA_HOLSTER_AWAY, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_LARA_HOLSTER, &LaraItem->pos, 0);
 		}
 	}
 	set_arm_info(&Lara.leftArm, frameLeft);
@@ -463,7 +463,7 @@ void undraw_pistols(int weaponType)
 		if (frameRight == p->draw2Anim - 1)
 		{
 			undraw_pistol_mesh_right(weaponType);
-			SoundEffect(SFX_LARA_HOLSTER_AWAY, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_LARA_HOLSTER, &LaraItem->pos, 0);
 		}
 	}
 	set_arm_info(&Lara.rightArm, frameRight);
@@ -517,7 +517,7 @@ void draw_pistols(int weaponType)
 	else if (frame == p->draw2Anim)
 	{
 		draw_pistol_meshes(weaponType);
-		SoundEffect(SFX_LARA_HOLSTER_DRAW, &LaraItem->pos, 0);
+		SoundEffect(SFX_TR4_LARA_DRAW, &LaraItem->pos, 0);
 	}
 	else if (frame == p->recoilAnim - 1)
 	{

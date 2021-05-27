@@ -20,7 +20,7 @@ void ControlGunShip(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_HELICOPTER_LOOP, &item->pos, 0);
+		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->pos, 0);
 
 		GAME_VECTOR pos;
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
@@ -74,7 +74,7 @@ void ControlGunShip(short itemNumber)
 			item->meshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_HK_FIRE, &item->pos, 0xC00004);
+			SoundEffect(SFX_TR5_HK_FIRE, &item->pos, 0xC00004);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);

@@ -83,7 +83,7 @@ void FireBigGun(ITEM_INFO *obj)
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, WEAPON_ROCKET_LAUNCHER, 32);
 
-			SoundEffect(SFX_EXPLOSION1, 0, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
 		}
 
 }

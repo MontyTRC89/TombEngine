@@ -23,7 +23,7 @@ void ControlSpikyWall(short itemNum)
 		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
 		{
 			item->status = ITEM_DEACTIVATED;
-			StopSoundEffect(SFX_ROLLING_BALL);
+			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 		}
 		else
 		{
@@ -31,7 +31,7 @@ void ControlSpikyWall(short itemNum)
 			item->pos.zPos = z;
 			if (roomNumber != item->roomNumber)
 				ItemNewRoom(itemNum, roomNumber);
-			SoundEffect(SFX_ROLLING_BALL, &item->pos, 0);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->pos, 0);
 		}
 	}
 

@@ -30,7 +30,7 @@ void SmashObject(short itemNumber)
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 
-	SoundEffect(SFX_SMASH_GLASS, &item->pos, 0);
+	SoundEffect(SFX_TR5_SMASH_GLASS, &item->pos, 0);
 
 	item->collidable = 0;
 	item->meshBits = 0xFFFE;

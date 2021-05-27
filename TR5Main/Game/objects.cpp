@@ -199,30 +199,26 @@ void AnimateWaterfalls()
 	}
 }
 
-void ControlWaterfall(short itemNumber) 
+void ControlWaterfall(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	TriggerActive(item);
 
-	if (itemNumber != 0)
-	{
-		item->status = ITEM_ACTIVE;
+	int dx = item->pos.xPos - LaraItem->pos.xPos;
+	int dy = item->pos.yPos - LaraItem->pos.yPos;
+	int dz = item->pos.zPos - LaraItem->pos.zPos;
 
-		if (item->triggerFlags == 0x29C)
-		{
-			SoundEffect(SFX_D_METAL_KICKOPEN, &item->pos, 0);
-		}
-		else if (item->triggerFlags == 0x309)
-		{
-			SoundEffect(SFX_WATERFALL_LOOP, &item->pos, 0);
-		}
-	}
-	else
+	if (dx >= -16384 && dx <= 16384 && dy >= -16384 && dy <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		if (item->triggerFlags == 2 || item->triggerFlags == 0x29C)
+		if (!(Wibble & 0xC))
 		{
-			item->status = ITEM_INVISIBLE;
+			TriggerWaterfallMist(
+				item->pos.xPos + 68 * phd_sin(item->pos.yRot),
+				item->pos.yPos,
+				item->pos.zPos + 68 * phd_cos(item->pos.yRot),
+				item->pos.yRot >> 4);
 		}
+
+		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
 	}
 }
 

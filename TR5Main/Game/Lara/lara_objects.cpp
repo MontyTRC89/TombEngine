@@ -760,7 +760,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// CHECK
-	SoundEffect(SFX_LARA_ROPEDOWN_LOOP, &item->pos, 0);
+	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->pos, 0);
 
 	if (item->itemFlags[2] < 0)
 		item->itemFlags[2] = 0;
