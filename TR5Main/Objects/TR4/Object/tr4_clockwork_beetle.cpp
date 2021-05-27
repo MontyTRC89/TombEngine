@@ -93,8 +93,8 @@ void ClockworkBeetleControl(short item_number)
 		{
 			int x, z;
 
-			x = (beetle->pos.xPos & -512) | 2;
-			z = ((beetle->pos.zPos & -512) >> 8) | 2;//check this shit
+			x = (beetle->pos.xPos & -512) | 0x200;
+			z = (beetle->pos.zPos & -512) | 0x200;
 			x -= beetle->pos.xPos;
 			z -= beetle->pos.zPos;
 
@@ -131,8 +131,8 @@ void ClockworkBeetleControl(short item_number)
 		{
 			int x, z;
 
-			x = (beetle->pos.xPos & -512) | 2;
-			z = ((beetle->pos.zPos & -512) >> 8) | 2;//check this shit
+			x = (beetle->pos.xPos & -512) | 0x200;
+			z = (beetle->pos.zPos & -512) | 0x200;
 			x -= beetle->pos.xPos;
 			z -= beetle->pos.zPos;
 
@@ -143,7 +143,7 @@ void ClockworkBeetleControl(short item_number)
 
 				if (SQUARE(x) + SQUARE(z) >= 0x19000)
 				{
-					if (beetle->speed)
+					if (beetle->speed < 32)
 						beetle->speed++;
 				}
 				else
@@ -157,13 +157,13 @@ void ClockworkBeetleControl(short item_number)
 						beetle->speed = beetle->speed - (beetle->itemFlags[2] == 4) - 1;
 				}
 
-				beetle->pos.xPos = beetle->speed * phd_sin(beetle->speed);
-				beetle->pos.zPos = beetle->speed * phd_cos(beetle->speed);
+				beetle->pos.xPos += beetle->speed * phd_sin(beetle->speed);
+				beetle->pos.zPos += beetle->speed * phd_cos(beetle->speed);
 			}
 			else
 			{
-				beetle->pos.xPos = (beetle->pos.xPos & -512) | 2;
-				beetle->pos.zPos = ((beetle->pos.zPos & -512) >> 8) | 2;
+				beetle->pos.xPos = (beetle->pos.xPos & -512) | 0x200;
+				beetle->pos.zPos = (beetle->pos.zPos & -512) | 0x200;
 
 				if (beetle->itemFlags[2] == 1)
 					beetle->itemFlags[2] = 2;

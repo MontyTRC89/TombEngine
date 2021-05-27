@@ -910,6 +910,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		Lara.canMonkeySwing = false;
 		Lara.climbStatus = false;
+		Lara.ClockworkBeetleFlag = false;
 	}
 
 	if (!data)
