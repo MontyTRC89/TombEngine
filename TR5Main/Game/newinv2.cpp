@@ -122,7 +122,7 @@ short optmessages[] =
 #define phd_winymax g_Configuration.Height
 #define phd_centerx 400
 #define phd_centery phd_winymax / 2
-#define max_combines	23//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
+#define max_combines	24//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
 
 COMBINELIST combine_table[max_combines] =
 {
@@ -149,6 +149,7 @@ COMBINELIST combine_table[max_combines] =
 	{combine_PickupItem2, INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2},
 	{combine_PickupItem3, INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3},
 	{combine_PickupItem4, INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4},
+	{combine_ClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
 /*
@@ -205,6 +206,9 @@ INVOBJ	inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_CROWBAR_ITEM, 4, 1900, 0, 16384, 0, 2, STRING_CROWBAR, -1},
 {ID_DIARY_ITEM, 0, 0, 0, 0, 0, 2, STRING_DIARY, -1},
 {ID_COMPASS_ITEM, 0x0FFF2, 0x258, 0, 0x36B0, 0, 0, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE, 14, 1200, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE_COMBO1, 18, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE_COMBO2, 14, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//puzzles
 
@@ -345,6 +349,9 @@ unsigned short options_table[] =
 	OPT_USE, //crowbar
 	OPT_USE, //diary
 	0, //compass
+	OPT_USE,//clockwork beetle
+	OPT_COMBINABLE,//clockwork beetle combo 1
+	OPT_COMBINABLE,//clockwork beetle combo 2
 
 	//puzzles
 	OPT_USE,
@@ -2121,6 +2128,18 @@ void construct_object_list()
 	if (Lara.Crowbar)
 		insert_object_into_list(INV_OBJECT_CROWBAR);
 
+	if (Lara.hasBeetleThings)
+	{
+		if (Lara.hasBeetleThings & 1)
+			insert_object_into_list(INV_OBJECT_BEETLE);
+
+		if (Lara.hasBeetleThings & 2)
+			insert_object_into_list(INV_OBJECT_BEETLE_PART1);
+
+		if (Lara.hasBeetleThings & 4)
+			insert_object_into_list(INV_OBJECT_BEETLE_PART2);
+	}
+
 	for (int i = 0; i < 8; i++)
 		if (Lara.Puzzles[i])
 			insert_object_into_list(INV_OBJECT_PUZZLE1 + i);
@@ -2205,6 +2224,15 @@ void construct_combine_object_list()
 
 		if (Lara.Silencer)
 			insert_object_into_list_v2(INV_OBJECT_SILENCER);
+	}
+
+	if (Lara.hasBeetleThings)
+	{
+		if (Lara.hasBeetleThings & 2)
+			insert_object_into_list_v2(INV_OBJECT_BEETLE_PART1);
+
+		if (Lara.hasBeetleThings & 4)
+			insert_object_into_list_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
 	for (int i = 0; i < 16; i++)
@@ -3040,7 +3068,7 @@ void draw_ammo_selector()
 			if (n == current_ammo_type[0])
 			{
 				if (ammo_object_list[n].amount == -1)
-					sprintf(&invTextBuffer[0], "unlimited %s", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
+					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 				else
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
@@ -3342,7 +3370,7 @@ void draw_current_object_list(int ringnum)
 					if (nummeup)
 					{
 						if (nummeup == -1)
-							sprintf(textbufme, "unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 						else
 							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 					}
@@ -3834,4 +3862,11 @@ void combine_PickupItem4(int flag)
 	Lara.Pickups[3] = 1;
 	Lara.PickupsCombo[6] = 0;
 	Lara.PickupsCombo[7] = 0;
+}
+
+void combine_ClockWorkBeetle(int flag)
+{
+	Lara.hasBeetleThings &= 2;
+	Lara.hasBeetleThings &= 4;
+	Lara.hasBeetleThings |= 1;
 }
