@@ -85,7 +85,7 @@ void ClockworkBeetleControl(short item_number)
 
 	if (beetle->itemFlags[0])
 	{
-		beetle->pos.zRot = phd_sin(GlobalCounter & 0xF);//check this! it's probably better if we use GetRandomControl anyway
+		beetle->pos.zRot = 4096 * phd_sin(4096 * (GlobalCounter & 0xF));
 
 		switch (beetle->itemFlags[2])
 		{
@@ -255,7 +255,7 @@ void ClockworkBeetleControl(short item_number)
 	}
 	else
 	{
-		beetle->pos.zRot = phd_sin(GlobalCounter & 7);//check pls thx
+		beetle->pos.zRot = 8192 * phd_sin(8192 * (GlobalCounter & 0x7));
 
 		if (beetle->itemFlags[3])
 			beetle->itemFlags[3]--;
