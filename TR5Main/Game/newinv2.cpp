@@ -25,7 +25,6 @@ long rptRight, rptLeft;
 __int64 title_selected_option = 1;
 int title_menu_to_display = 0;
 int settings_flag;
-bool pauseMenu;
 int pause_menu_to_display = 0;
 __int64 pause_selected_option = 1;
 int pause_flag;
@@ -638,7 +637,9 @@ int TitleOptions()
 
 						} while (n2);
 
-						LevelComplete = n;
+						g_GameFlow->SelectedLevelForNewGame = n;
+						title_menu_to_display = title_main_menu;
+						title_selected_option = 1;
 					}
 
 					ret = INV_RESULT_NEW_GAME_SELECTED_LEVEL;
@@ -656,7 +657,7 @@ int TitleOptions()
 					}
 					else
 					{
-						LevelComplete = 1;
+					//	LevelComplete = 1;
 						ret = INV_RESULT_NEW_GAME;
 					}
 
@@ -1200,8 +1201,6 @@ int DoPauseMenu()
 {
 	//basically mini title
 
-	GLOBAL_invMode = IM_PAUSE;
-
 	switch (pause_menu_to_display)
 	{
 	case pause_main_menu:
@@ -1261,7 +1260,6 @@ int DoPauseMenu()
 	{
 		if (pause_menu_to_display == pause_main_menu)
 		{
-			pauseMenu = 0;
 			GLOBAL_invMode = IM_NONE;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			return INV_RESULT_NONE;
@@ -1292,7 +1290,6 @@ int DoPauseMenu()
 				break;
 
 			case 4:
-				pauseMenu = 0;
 				GLOBAL_invMode = IM_NONE;
 				return INV_RESULT_EXIT_TO_TILE;
 			}
@@ -1312,6 +1309,7 @@ int DoPauseMenu()
 				break;
 
 			case 4:
+				fillSound();
 				pause_selected_option = 1;
 				pause_menu_to_display = pause_sounds_menu;
 				break;
@@ -3866,7 +3864,7 @@ void combine_PickupItem4(int flag)
 
 void combine_ClockWorkBeetle(int flag)
 {
-	Lara.hasBeetleThings &= 2;
-	Lara.hasBeetleThings &= 4;
-	Lara.hasBeetleThings |= 1;
+	Lara.hasBeetleThings &= 2;//remove combo1
+	Lara.hasBeetleThings &= 4;//remove combo2
+	Lara.hasBeetleThings |= 1;//get beetle
 }

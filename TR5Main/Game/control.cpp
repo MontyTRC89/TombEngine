@@ -269,15 +269,15 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && !pauseMenu && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0 && !CutSeqTriggered)
 			{
 				SOUND_Stop();
 				g_Renderer.DumpGameScene();
-				pauseMenu = 1;
+				GLOBAL_invMode = IM_PAUSE;
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0 && !pauseMenu)
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -287,7 +287,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 		}
 
-		while (pauseMenu)
+		while (GLOBAL_invMode == IM_PAUSE)
 		{
 			DrawInv();
 			g_Renderer.SyncRenderer();

@@ -29,7 +29,7 @@ void ClockworkBeetleControl(short item_number)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = -32;
-			GetLaraJointPosition(&pos, LM_LINARM);
+			GetLaraJointPosition(&pos, LM_RHAND);
 
 			beetle->pos.xPos = pos.x;
 			beetle->pos.yPos = pos.y;
