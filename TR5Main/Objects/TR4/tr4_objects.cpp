@@ -32,6 +32,7 @@
 #include "tr4_element_puzzle.h"
 #include "tr4_von_croy.h"
 #include "tr4_hammerhead.h"
+#include "tr4_dog.h"
 /// objects
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
@@ -144,6 +145,26 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_DOG];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTr4Dog;
+		obj->collision = CreatureCollision;
+		obj->control = Tr4DogControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 18;
+		obj->pivotLength = 50;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
+		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BAT];

@@ -378,7 +378,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_DOG];
+	obj = &Objects[ID_DOBERMAN];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseDoberman;
