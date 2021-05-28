@@ -1259,9 +1259,6 @@ static void StartPickup(OBJECT_INFO *obj)
 	InitPickup(obj, ID_FLARE_INV_ITEM);
 	InitPickup(obj, ID_WATERSKIN1_EMPTY);
 	InitPickup(obj, ID_WATERSKIN2_EMPTY);
-	InitPickup(obj, ID_CLOCKWORK_BEETLE);
-	InitPickup(obj, ID_CLOCKWORK_BEETLE_COMBO1);
-	InitPickup(obj, ID_CLOCKWORK_BEETLE_COMBO2);
 	InitPickup(obj, ID_GOLDROSE_ITEM);
 }
 

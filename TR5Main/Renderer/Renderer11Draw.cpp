@@ -2502,6 +2502,8 @@ namespace T5M::Renderer
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
+		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+
         drawRooms(false, false, view);
         drawRooms(false, true, view);
         drawStatics(false, view);
@@ -2603,6 +2605,7 @@ namespace T5M::Renderer
             printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
             printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 			printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
+            printDebugMessage("Lara.ClockworkBeetleFlag: %d", Lara.ClockworkBeetleFlag);
 #endif
         }
 

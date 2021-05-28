@@ -68,7 +68,7 @@ void combine_PickupItem1(int flag);
 void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
-
+void combine_ClockWorkBeetle(int flag);
 
 // Inventory results
 #define INV_RESULT_NONE						0
@@ -159,6 +159,9 @@ enum inv_objects
 	INV_OBJECT_CROWBAR,
 	INV_OBJECT_DIARY,
 	INV_OBJECT_COMPASS,
+	INV_OBJECT_BEETLE,
+	INV_OBJECT_BEETLE_PART1,
+	INV_OBJECT_BEETLE_PART2,
 
 	// Puzzle, keys, pickups, examines
 	INV_OBJECT_PUZZLE1,
@@ -323,7 +326,6 @@ struct INVOBJ
 };
 
 extern int GLOBAL_invMode;
-extern bool pauseMenu;
 extern int pause_menu_to_display;
 extern __int64 pause_selected_option;
 extern int GLOBAL_inventoryitemchosen;

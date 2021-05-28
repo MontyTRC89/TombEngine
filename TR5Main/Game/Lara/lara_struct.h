@@ -993,6 +993,7 @@ typedef struct LaraInfo
 	bool litTorch;
 	bool isClimbing;
 	bool fired;
+	bool ClockworkBeetleFlag;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
@@ -1042,6 +1043,8 @@ typedef struct LaraInfo
 	byte tightRopeFall;
 	byte chaffTimer;
 	/// =================================== NEW:
+	byte BeetleLife;
+	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;

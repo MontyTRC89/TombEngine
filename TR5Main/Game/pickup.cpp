@@ -28,7 +28,7 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
-
+#include "tr4_clockwork_beetle.h"
 
 OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
@@ -337,6 +337,18 @@ void PickedUpObject(short objectNumber)
 
         case ID_DIARY_ITEM:
             Lara.Diary.Present = true;
+            break;
+
+        case ID_CLOCKWORK_BEETLE:
+            Lara.hasBeetleThings |= 1 << 0;
+            break;
+
+        case ID_CLOCKWORK_BEETLE_COMBO1:
+            Lara.hasBeetleThings |= 1 << 1;
+            break;
+
+        case ID_CLOCKWORK_BEETLE_COMBO2:
+            Lara.hasBeetleThings |= 1 << 2;
             break;
 
         default:
@@ -1367,7 +1379,7 @@ int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 	else if (selectedObject == ID_CLOCKWORK_BEETLE)
 	{
 		item->animNumber = LA_MECHANICAL_BEETLE_USE;
-		//UseClockworkBeetle(1);
+		UseClockworkBeetle(1);
 	}
 	else
 	{
