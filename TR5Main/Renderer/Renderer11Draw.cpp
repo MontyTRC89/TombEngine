@@ -2502,6 +2502,8 @@ namespace T5M::Renderer
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
+		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+
         drawRooms(false, false, view);
         drawRooms(false, true, view);
         drawStatics(false, view);
