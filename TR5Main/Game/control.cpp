@@ -269,15 +269,15 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && !pauseMenu && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0 && !CutSeqTriggered)
 			{
 				SOUND_Stop();
 				g_Renderer.DumpGameScene();
-				pauseMenu = 1;
+				GLOBAL_invMode = IM_PAUSE;
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0 && !pauseMenu)
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -287,7 +287,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 		}
 
-		while (pauseMenu)
+		while (GLOBAL_invMode == IM_PAUSE)
 		{
 			DrawInv();
 			g_Renderer.SyncRenderer();
@@ -910,6 +910,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		Lara.canMonkeySwing = false;
 		Lara.climbStatus = false;
+		Lara.ClockworkBeetleFlag = false;
 	}
 
 	if (!data)
@@ -948,6 +949,18 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		if (!heavy)
 			Lara.canMonkeySwing = true;
+
+		if (*data & 0x8000)
+			return;
+
+		data++;
+	}
+
+	//for the stupid beetle
+	if ((*data & 0x1F) == MINER_TYPE)
+	{
+		if (!heavy)
+			Lara.ClockworkBeetleFlag = 1;
 
 		if (*data & 0x8000)
 			return;
@@ -1878,6 +1891,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 				case CLIMB_TYPE:
 				case MONKEY_TYPE:
 				case TRIGTRIGGER_TYPE:
+				case MINER_TYPE:
 					if (!TriggerIndex)
 						TriggerIndex = data - 1;
 					break;

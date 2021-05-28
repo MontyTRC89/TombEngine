@@ -95,7 +95,7 @@ void InitialiseLara(int restore)
 	}
 
 	InitialiseLaraAnims(LaraItem);
-
+	Lara.BeetleLife = 3;
 	DashTimer = 120;
 
 	Lara.bottle = 0;
