@@ -157,8 +157,8 @@ void ClockworkBeetleControl(short item_number)
 						beetle->speed = beetle->speed - (beetle->itemFlags[2] == 4) - 1;
 				}
 
-				beetle->pos.xPos += beetle->speed * phd_sin(beetle->speed);
-				beetle->pos.zPos += beetle->speed * phd_cos(beetle->speed);
+				beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
+				beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
 			}
 			else
 			{
