@@ -326,7 +326,6 @@ struct INVOBJ
 };
 
 extern int GLOBAL_invMode;
-extern bool pauseMenu;
 extern int pause_menu_to_display;
 extern __int64 pause_selected_option;
 extern int GLOBAL_inventoryitemchosen;
