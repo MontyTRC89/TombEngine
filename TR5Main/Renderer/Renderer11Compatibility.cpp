@@ -169,7 +169,7 @@ namespace T5M::Renderer
 			m_moveablesTextures[i] = tex;
 		}
 
-		m_staticsTextures.resize(g_Level.RoomTextures.size());
+		m_staticsTextures.resize(g_Level.StaticsTextures.size());
 		for (int i = 0; i < g_Level.StaticsTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
