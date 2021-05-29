@@ -235,8 +235,8 @@ void ClockworkBeetleControl(short item_number)
 			if (beetle->speed < 32)
 				beetle->speed++;
 
-			beetle->pos.xPos += beetle->speed * phd_sin(beetle->speed);
-			beetle->pos.zPos += beetle->speed * phd_cos(beetle->speed);
+			beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
+			beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
 
 			if (!Lara.ClockworkBeetleFlag)
 				beetle->itemFlags[3] = 1;
