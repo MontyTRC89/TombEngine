@@ -390,14 +390,6 @@ void MakeMove(int piece, int displacement)
 				}
 			}
 		}
-		if (ActiveSenetPieces[ActivePiece] < 16)
-		{
-			SenetBoard[ActiveSenetPieces[ActivePiece]] |= number;
-		}
-		else
-		{
-			ActiveSenetPieces[ActivePiece] = -1;
-		}
 		if (!(ActiveSenetPieces[ActivePiece] & 3) || SenetDisplacement == 6)
 		{
 			SenetDisplacement = 0;
@@ -405,6 +397,14 @@ void MakeMove(int piece, int displacement)
 		else
 		{
 			SenetDisplacement = -1;
+		}
+		if (ActiveSenetPieces[ActivePiece] < 16)
+		{
+			SenetBoard[ActiveSenetPieces[ActivePiece]] |= number;
+		}
+		else
+		{
+			ActiveSenetPieces[ActivePiece] = -1;
 		}
 	}
 }
