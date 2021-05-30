@@ -6,6 +6,7 @@
 #include "items.h"
 #include "pickup.h"
 #include "setup.h"
+#include "health.h"
 
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
@@ -81,6 +82,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					PickedUpObject(currentItem->objectNumber);
 					currentItem->status = ITEM_ACTIVE;
 					currentItem->itemFlags[3] = 1;
+					AddDisplayPickup(currentItem->objectNumber);
 				}
 			}
 		}
