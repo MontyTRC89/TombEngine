@@ -297,7 +297,6 @@ static void StartBaddy(OBJECT_INFO* obj)
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		//g_Level.Bones[obj->boneIndex + 72 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_SKELETON];
