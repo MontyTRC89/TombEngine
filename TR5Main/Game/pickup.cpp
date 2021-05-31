@@ -754,6 +754,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 item->pos.zRot = oldZrot;
                 return;
             }
+
+            GLOBAL_inventoryitemchosen = -1;
 #else
             if (g_Inventory.GetSelectedObject() == NO_ITEM)
             {
