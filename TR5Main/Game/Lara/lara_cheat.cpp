@@ -122,6 +122,9 @@ void LaraCheatGetStuff()
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
 		Lara.Lasersight = true;
 
+	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
+		Lara.hasBeetleThings |= 1;
+
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
 		Lara.Weapons[WEAPON_REVOLVER].Present = true;

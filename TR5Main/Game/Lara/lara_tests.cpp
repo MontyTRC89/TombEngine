@@ -38,13 +38,13 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		short angle = item->pos.yRot;
 		bool result;
 
-		if (coll->midSplitFloor)
+		/*if (coll->midSplitFloor)
 		{
 			if (coll->frontSplitFloor != coll->midSplitFloor)
 				return 0;
 			result = SnapToDiagonal(angle, 30);
 		}
-		else
+		else*/
 		{
 			result = SnapToQuadrant(angle, 30);
 		}
@@ -183,13 +183,13 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = angle;
 		ShiftItem(item, coll);
 
-		if (coll->midSplitFloor) // diagonal alignment
+		/*if (coll->midSplitFloor) // diagonal alignment
 		{
 			Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, item->pos.yRot);
 			item->pos.xPos = v.x;
 			item->pos.zPos = v.y;
 		}
-		else // regular aligment
+		else*/ // regular aligment
 		{
 			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
 			item->pos.xPos = v.x;
