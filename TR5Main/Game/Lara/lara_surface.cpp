@@ -297,11 +297,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	int slope = 0;
 	bool result;
 
-	if (coll->midSplitFloor)
+	/*if (coll->midSplitFloor)
 	{
 		result = SnapToDiagonal(rot, 35);
 	}
-	else
+	else*/
 	{
 		if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60)
 			return 0;
@@ -316,13 +316,13 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateLaraRoom(item, -LARA_HITE / 2);
 
-	if (coll->midSplitFloor)
+	/*if (coll->midSplitFloor)
 	{
 		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, -LARA_RAD, item->pos.yRot);
 		item->pos.xPos = v.x;
 		item->pos.zPos = v.y;
 	}
-	else
+	else*/
 	{
 		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
 		item->pos.xPos = v.x;
