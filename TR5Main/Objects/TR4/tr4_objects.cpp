@@ -293,11 +293,12 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		//g_Level.Bones[obj->boneIndex + 72 * 4] |= ROT_Y;
+
 	}
 
 	obj = &Objects[ID_SKELETON];
