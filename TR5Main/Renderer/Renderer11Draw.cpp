@@ -748,10 +748,6 @@ namespace T5M::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
             break;
         }
-
-#ifndef _DEBUG
-        drawAllStrings();//nothing shows on release otherwise!
-#endif
     }
 
     void Renderer11::renderPauseMenu()
@@ -1031,7 +1027,7 @@ namespace T5M::Renderer
         sprintf(buffer, "%d / 36", Savegame.Game.Secrets);
         drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 
-        g_Renderer.drawAllStrings();
+        drawAllStrings();
     }
 #endif
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
@@ -2434,6 +2430,8 @@ namespace T5M::Renderer
         renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
 #if _DEBUG
         drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255,255, 255), 0);
+        drawAllStrings();
+#else
         drawAllStrings();
 #endif
         m_swapChain->Present(0, 0);

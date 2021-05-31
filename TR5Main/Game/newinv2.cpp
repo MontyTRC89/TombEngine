@@ -93,7 +93,6 @@ char combine_type_flag;
 short combine_obj1;
 short combine_obj2;
 short examine_mode = 0;
-bool stats_mode = 0;
 bool stop_killing_me_you_dumb_input_system;
 bool stop_killing_me_you_dumb_input_system2;
 int compassNeedleAngle;
@@ -2254,7 +2253,6 @@ void init_inventry()
 {
 	compassNeedleAngle = 4096;
 	examine_mode = 0;
-	stats_mode = 0;
 	AlterFOV(14560);
 	Lara.busy = 0;
 	GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -2897,7 +2895,7 @@ void handle_inventry_menu()
 					break;
 
 				case 12:
-					stats_mode = 1;
+					GLOBAL_invMode = IM_STATS;
 					break;
 
 				case 6:
@@ -3534,7 +3532,6 @@ int S_CallInventory2()
 		SetDebounce = 1;
 		S_UpdateInput();
 		TrInput = InputBusy;
-	//	UpdatePulseColour();
 		GameTimer++;
 
 		if (DbInput & IN_OPTION)
@@ -3550,28 +3547,14 @@ int S_CallInventory2()
 
 		do_debounced_input();
 
-	/*	if (examine_mode)
-			do_examine_mode();
-		else*/
-		if (stats_mode)
+		if (GLOBAL_invMode == IM_STATS)
 			do_stats_mode();
-	//	else
-		{
+
 			DrawInv();
-		/*	draw_current_object_list(RING_INVENTORY);
-			handle_inventry_menu();
-
-			if (rings[RING_AMMO]->ringactive)
-				draw_current_object_list(RING_AMMO);
-
-			draw_ammo_selector();
-			fade_ammo_selector();*/
-		}
 
 		if (useItem & !TrInput)
 			val = 1;
 
-	//	S_OutputPolyList();
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		if (loading_or_saving)
@@ -3621,28 +3604,6 @@ int S_CallInventory2()
 	Lara.busy = OldLaraBusy;
 	GLOBAL_invMode = IM_NONE;
 
-/*	if (GLOBAL_invkeypadmode)
-	{
-		short room_number;
-		ITEM_INFO* item;
-		int val;
-
-		val = 0;
-		GLOBAL_invkeypadmode = 0;
-
-		if (keypadnuminputs == 4)
-			val = keypadinputs[3] + 10 * (keypadinputs[2] + 10 * (keypadinputs[1] + 10 * keypadinputs[0]));
-
-		if (GLOBAL_invkeypadcombination == val)
-		{
-			item = lara_item;
-			room_number = lara_item->room_number;
-			GetHeight(GetFloor(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos, &room_number),
-				item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
-			TestTriggers(trigger_index, 1, 0);
-		}
-	}*/
-
 	return return_value;
 }
 
@@ -3651,10 +3612,7 @@ void do_stats_mode()
 	GLOBAL_invMode = IM_STATS;
 
 	if (goDeselect)
-	{
 		GLOBAL_invMode = IM_NONE;
-		stats_mode = 0;
-	}
 }
 
 void draw_compass()
