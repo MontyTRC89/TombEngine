@@ -1027,11 +1027,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
+				/*if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
 				{
 					result = SnapToDiagonal(angle, 35);
 				}
-				else
+				else*/
 				{
 					result = SnapToQuadrant(angle, 35);
 				}
@@ -1117,13 +1117,13 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += coll->frontFloor - bounds->Y1;
 
-			if (coll->midSplitFloor)
+			/*if (coll->midSplitFloor)
 			{
 				Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, angle);
 				item->pos.xPos = v.x;
 				item->pos.zPos = v.y;
 			}
-			else
+			else*/
 			{
 				Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
 				item->pos.xPos = v.x;
@@ -1661,11 +1661,11 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 					short angle = item->pos.yRot;
 					bool result;
 
-					if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
+					/*if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
 					{
 						result = SnapToDiagonal(angle, 35);
 					}
-					else
+					else*/
 					{
 						result = SnapToQuadrant(angle, 35);
 					}
@@ -1706,13 +1706,13 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						else
 							item->pos.yPos += coll->frontFloor - bounds->Y1;
 
-						if (coll->midSplitFloor)
+						/*if (coll->midSplitFloor)
 						{
 							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, item->pos.yRot);
 							item->pos.xPos = v.x;
 							item->pos.zPos = v.y;
 						}
-						else
+						else*/
 						{
 							Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
 							item->pos.xPos = v.x;
