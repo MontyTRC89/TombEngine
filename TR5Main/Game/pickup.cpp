@@ -792,7 +792,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         PlinthPickUpBounds.boundingBox.X1 = plinth->X1;
         PlinthPickUpBounds.boundingBox.X2 = plinth->X2;
         PlinthPickUpBounds.boundingBox.Y2 = l->pos.yPos - item->pos.yPos + 100;
-        PlinthPickUpBounds.boundingBox.Z1 = plinth->Z2 + 320;
+        PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
         PlinthPickUpPosition.z = -200 - plinth->Z2;
 
         if (TestLaraPosition(&PlinthPickUpBounds, item, l) && !Lara.isDucked)
