@@ -528,6 +528,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
+			if (GLOBAL_inventoryitemchosen != -1)
+			{
+				SayNo();
+				GLOBAL_inventoryitemchosen = -1;
+			}
+
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
 			if (level->LaraType == LARA_YOUNG)
