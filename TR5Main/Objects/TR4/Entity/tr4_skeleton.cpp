@@ -14,9 +14,17 @@
 #include "tomb4fx.h"
 #include "level.h"
 
+#define STATE_SKELETON_UNDER_FLOOR		0
+#define STATE_SKELETON_STOP				1
+#define STATE_SKELETON_WALK				2
+#define STATE_SKELETON_RUN				3
+#define STATE_SKELETON_JUMP_LEFT		19
+#define STATE_SKELETON_JUMP_RIGHT		20
+#define STATE_SKELETON_JUMP_LIE_DOWN	25
+
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 
-static void WakeUpSkeleton(ITEM_INFO* item)
+void WakeUpSkeleton(ITEM_INFO* item)
 {
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
@@ -78,7 +86,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 void InitialiseSkeleton(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[ID_SKELETON];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	ClearItem(itemNumber);
 
@@ -92,22 +100,22 @@ void InitialiseSkeleton(short itemNumber)
 		break;
 
 	case 1:
-		item->goalAnimState = 20;
-		item->currentAnimState = 20;
+		item->goalAnimState = STATE_SKELETON_JUMP_RIGHT;
+		item->currentAnimState = STATE_SKELETON_JUMP_RIGHT;
 		item->animNumber = obj->animIndex + 37;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		break;
 
 	case 2:
-		item->goalAnimState = 19;
-		item->currentAnimState = 19;
+		item->goalAnimState = STATE_SKELETON_JUMP_LEFT;
+		item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
 		item->animNumber = obj->animIndex + 34;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		break;
 
 	case 3:
-		item->goalAnimState = 25;
-		item->currentAnimState = 25;
+		item->goalAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
+		item->currentAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
 		item->animNumber = obj->animIndex;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->status = ITEM_DEACTIVATED;
@@ -231,7 +239,7 @@ void SkeletonControl(short itemNumber)
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
-			laraInfo.distance = dx * dx + dz * dz;
+			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
 		GetCreatureMood(item, &info, VIOLENT);
@@ -245,7 +253,9 @@ void SkeletonControl(short itemNumber)
 
 		ITEM_INFO* tempEnemy = creature->enemy;
 		creature->enemy = LaraItem;
-		if (item->hitStatus || distance < SQUARE(1024) || TargetVisible(item, &laraInfo))
+		if (item->hitStatus 
+			|| distance < SQUARE(1024) 
+			|| TargetVisible(item, &laraInfo))
 			creature->alerted = true;
 		creature->enemy = tempEnemy;
 
@@ -318,7 +328,7 @@ void SkeletonControl(short itemNumber)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case STATE_SKELETON_STOP:
 			if (!(GetRandomControl() & 0xF))
 			{
 				item->goalAnimState = 2;
