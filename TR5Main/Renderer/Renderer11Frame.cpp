@@ -83,20 +83,23 @@ namespace T5M::Renderer
 		for (int i = 0; i < numStatics; i++)
 		{
 			MESH_INFO *mesh = &r->mesh[i];
-			RendererStatic *newStatic = &room.Statics[i];
-			STATIC_INFO *sinfo = &StaticObjects[mesh->staticNumber];
-			Vector3 min = Vector3(sinfo->collisionBox.X1, sinfo->collisionBox.Y1, sinfo->collisionBox.Z1);
-			Vector3 max = Vector3(sinfo->collisionBox.X2, sinfo->collisionBox.Y2, sinfo->collisionBox.Z2);
-			min += Vector3(mesh->x, mesh->y, mesh->z);
-			max += Vector3(mesh->x, mesh->y, mesh->z);
-			if (!renderView.camera.frustum.AABBInFrustum(min, max))
-				continue;
-			Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
-			Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
-			newStatic->Mesh = mesh;
-			newStatic->RoomIndex = roomNumber;
-			newStatic->World = rotation * Matrix::CreateTranslation(translation);
-			renderView.staticsToDraw.push_back(newStatic);
+			if (mesh->flags > 0)
+			{
+				RendererStatic* newStatic = &room.Statics[i];
+				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
+				Vector3 min = Vector3(sinfo->collisionBox.X1, sinfo->collisionBox.Y1, sinfo->collisionBox.Z1);
+				Vector3 max = Vector3(sinfo->collisionBox.X2, sinfo->collisionBox.Y2, sinfo->collisionBox.Z2);
+				min += Vector3(mesh->x, mesh->y, mesh->z);
+				max += Vector3(mesh->x, mesh->y, mesh->z);
+				if (!renderView.camera.frustum.AABBInFrustum(min, max))
+					continue;
+				Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
+				Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
+				newStatic->Mesh = mesh;
+				newStatic->RoomIndex = roomNumber;
+				newStatic->World = rotation * Matrix::CreateTranslation(translation);
+				renderView.staticsToDraw.push_back(newStatic);
+			}
 		}
 	}
 

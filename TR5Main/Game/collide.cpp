@@ -769,15 +769,19 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 		return false;
 	if (zRotRel < bounds->rotZ1)
 		return false;
-	if (zRotRel > bounds->rotX2)
+	if (zRotRel > bounds->rotZ2)
 		return false;
-	
-	Vector3 pos = Vector3(l->pos.xPos - item->pos.xPos, l->pos.yPos - item->pos.yPos, l->pos.zPos - item->pos.zPos);
 
-	// HACK: it seems that a minus sign is required here. I don't know why, but it just works (tm) but we must 
+	x = l->pos.xPos - item->pos.xPos; 
+	y = l->pos.yPos - item->pos.yPos;
+	z = l->pos.zPos - item->pos.zPos;
+
+	Vector3 pos = Vector3(x, y, z);
+
+	// HACK (REMOVED FOR NOW): it seems that a minus sign is required here. I don't know why, but it just works (tm) but we must 
 	// do more tests
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(-(item->pos.yRot)),
+		TO_RAD(item->pos.yRot),
 		TO_RAD(item->pos.xRot),
 		TO_RAD(item->pos.zRot)
 	);
@@ -788,8 +792,7 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	ry = pos.y;
 	rz = pos.z;
 
-
-	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2 
+	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2
 		|| ry < bounds->boundingBox.Y1 || ry > bounds->boundingBox.Y2
 		|| rz < bounds->boundingBox.Z1 || rz > bounds->boundingBox.Z2)
 		return false;
