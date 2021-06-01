@@ -12,6 +12,8 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 
 	item->itemFlags[0] = item->pos.yPos;
 	item->itemFlags[1] = 1;
+
+	T5M::Floordata::AddBridge(itemNumber);
 }
 
 BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
@@ -37,17 +39,25 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 	return false;
 }
 
-void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
+	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	int height = floor->FloorHeight(x, z);
+
 	if (IsOnTwoBlocksPlatform(item, x, z))
 	{
-		if (y <= (item->pos.yPos + 32) && item->pos.yPos < *height)
-		{
-			*height = item->pos.yPos;
-			OnFloor = 1;
-			HeightType = WALL;
+		if (y <= (item->pos.yPos + 32) && item->pos.yPos < height)
+		{	
+			height = item->pos.yPos;
+			OnObject = true;
+			HeightType = WALL; 
 		}
 	}
+
+	return std::optional{ height };
 }
 
 void TwoBlocksPlatformControl(short itemNumber)
@@ -72,32 +82,38 @@ void TwoBlocksPlatformControl(short itemNumber)
 		}
 		else
 		{
-			OnFloor = false;
+			OnObject = false;
 
 			int height = LaraItem->pos.yPos + 1;
-			TwoBlocksPlatformFloor(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &height);
+			if (IsOnTwoBlocksPlatform(item, LaraItem->pos.xPos, LaraItem->pos.zPos))
+			{
+				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
+				{
+					if (item->pos.yPos < height)
+					{
+						OnObject = true;
+					}
+				}
+			}
 
-			if (OnFloor && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
+			if (OnObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
 				item->itemFlags[1] = 1;
 			else
 				item->itemFlags[1] = -1;
 
-			if (item->itemFlags[1] <= 0)
+			if (item->itemFlags[1] < 0)
 			{
-				if (item->itemFlags[1] <= 0)
+				if (item->pos.yPos <= item->itemFlags[0])
 				{
-					if (item->pos.yPos <= item->itemFlags[0])
-					{
-						item->itemFlags[1] = 1;
-					}
-					else
-					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-						item->pos.yPos -= 4;
-					}
+					item->itemFlags[1] = 1;
+				}
+				else
+				{
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
+					item->pos.yPos -= 4;
 				}
 			}
-			else
+			else if (item->itemFlags[1] > 0)
 			{
 				if (item->pos.yPos >= item->itemFlags[0] + 128)
 				{
@@ -113,13 +129,33 @@ void TwoBlocksPlatformControl(short itemNumber)
 	}
 }
 
-void TwoBlocksPlatformCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
 {
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
+	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	int height = floor->FloorHeight(x, z);
+
 	if (IsOnTwoBlocksPlatform(item, x, z))
 	{
-		if (y > item->pos.yPos + 32 && item->pos.yPos > * height)
+		if (y > item->pos.yPos + 32 && item->pos.yPos > height)
 		{
-			*height = item->pos.yPos + 256;
+			height = item->pos.yPos + 256;
 		}
 	}
+
+	return std::optional{ height };
+}
+
+int TwoBlocksPlatformFloorBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int TwoBlocksPlatformCeilingBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return (item->pos.yPos + 256);
 }
