@@ -839,14 +839,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else
 					{
-						if (TestHangFeet(item, angle))
+					/*	if (TestHangFeet(item, angle))
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG_FEET;
 						}
-						else
+						else*/
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
