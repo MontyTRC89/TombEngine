@@ -439,13 +439,13 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 					item->animNumber = LA_REACH_TO_HANG;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 21;
 				}
-				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT || item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
+			/*	else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT || item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
 				{
 					item->currentAnimState = LS_HANG_FEET;
 					item->goalAnimState = LS_HANG_FEET;
 					item->animNumber = LA_HANG_FEET_IDLE;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				}
+				}*/
 				result = 1;
 			}
 		}
@@ -470,7 +470,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
+	if (item->animNumber != LA_REACH_TO_HANG)// && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
 
 	if (coll->hitStatic)
@@ -625,7 +625,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
+	if (item->animNumber != LA_REACH_TO_HANG)// && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
 
 	if (coll->hitStatic)
@@ -990,7 +990,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)
 	return(0);
 }
 
-int TestHangFeet(ITEM_INFO* item, short angle)
+/*int TestHangFeet(ITEM_INFO* item, short angle)
 {
 	return 0;
 	if (Lara.climbStatus)
@@ -1055,7 +1055,7 @@ int TestHangFeet(ITEM_INFO* item, short angle)
 		}
 		return(1);
 	}
-}
+}*/
 
 int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
@@ -1143,7 +1143,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
-void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
+/*void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -1177,7 +1177,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 
 		item->pos.yRot += rot;
 	}
-}
+}*/
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 {
