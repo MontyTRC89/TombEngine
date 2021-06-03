@@ -947,7 +947,7 @@ void handle_control_settings_input()
 		}
 	}
 
-	if (KeyMap[DIK_RETURN])
+	if (KeyMap[DIK_RETURN] && !(title_selected_option & (1 << 18)) && !(title_selected_option & (1 << 19)))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
