@@ -62,7 +62,7 @@ std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const
 {
-	return RoomAbove(SectorPlane(x, z));
+	return RoomAbove(SectorPlaneCeiling(x, z));
 }
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z, int y) const
@@ -179,7 +179,7 @@ Vector2 FLOOR_INFO::CeilingSlope(int plane) const
 
 Vector2 FLOOR_INFO::CeilingSlope(int x, int z) const
 {
-	return CeilingSlope(SectorPlane(x, z));
+	return CeilingSlope(SectorPlaneCeiling(x, z));
 }
 
 bool FLOOR_INFO::IsWall(int plane) const
