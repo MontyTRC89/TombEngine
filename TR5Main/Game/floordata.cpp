@@ -17,6 +17,16 @@ int FLOOR_INFO::SectorPlane(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
+int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
+{
+	const auto point = GetSectorPoint(x, z);
+	auto vector = Vector2(point.x, point.y);
+	const auto matrix = Matrix::CreateRotationZ(CeilingCollision.SplitAngle);
+	Vector2::Transform(vector, matrix, vector);
+
+	return vector.x < 0 ? 0 : 1;
+}
+
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
 {
 	const auto room = FloorCollision.Portals[plane];
@@ -116,7 +126,7 @@ int FLOOR_INFO::BridgeFloorHeight(int x, int z, int y) const
 
 int FLOOR_INFO::CeilingHeight(int x, int z) const
 {
-	const auto plane = SectorPlane(x, z);
+	const auto plane = SectorPlaneCeiling(x, z);
 	const auto vector = GetSectorPoint(x, z);
 
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
