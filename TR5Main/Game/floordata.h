@@ -27,6 +27,7 @@ public:
 	int Room;
 
 	int SectorPlane(int x, int z) const;
+	int SectorPlaneCeiling(int x, int z) const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;
