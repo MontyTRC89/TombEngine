@@ -20,6 +20,7 @@ void SethBladeControl(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	item->itemFlags[0] = 0;
+
 	if (TriggerActive(item))
 	{
 		if (item->currentAnimState == 2)
@@ -33,7 +34,7 @@ void SethBladeControl(short itemNum)
 				item->goalAnimState = 1;
 				item->itemFlags[2] = 0;
 			}
-			else if (!item->itemFlags[2])
+			else if (item->itemFlags[2] == 0)
 			{
 				if (item->triggerFlags > 0)
 				{
@@ -45,7 +46,7 @@ void SethBladeControl(short itemNum)
 		{
 			short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase && frameNumber <= 6)
+			if (frameNumber >= 0 && frameNumber <= 6)
 			{
 				item->itemFlags[0] = -1;
 				item->itemFlags[3] = 1000;
