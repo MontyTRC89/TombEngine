@@ -1029,7 +1029,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		case TRIGGER_TYPES::SWITCH:
 			value = *(data++) & 0x3FF;
 
-			if (flags & 0x100)
+			if (flags & ONESHOT)
 				g_Level.Items[value].itemFlags[0] = 1;
 
 			if (!SwitchTrigger(value, timer))
@@ -1044,42 +1044,42 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->currentAnimState >= 75 &&
-				(LaraItem->currentAnimState <= 79 ||
-					LaraItem->currentAnimState == 82 ||
-					LaraItem->currentAnimState == 83))
+			if (LaraItem->currentAnimState >= LS_MONKEYSWING_IDLE &&
+				(LaraItem->currentAnimState <= LS_MONKEYSWING_TURN_180 ||
+					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT ||
+					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
 				break;
 			return;
 
 		case TRIGGER_TYPES::TIGHTROPE_T:
-			if (LaraItem->currentAnimState >= 119 &&
-				LaraItem->currentAnimState <= 127 &&
-				LaraItem->currentAnimState != 126)
+			if (LaraItem->currentAnimState >= LS_TIGHTROPE_IDLE &&
+				LaraItem->currentAnimState <= LS_TIGHTROPE_RECOVER_BALANCE &&
+				LaraItem->currentAnimState != LS_DOVESWITCH)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->currentAnimState == 80 ||
-				LaraItem->currentAnimState == 81 ||
-				LaraItem->currentAnimState == 84 ||
-				LaraItem->currentAnimState == 85 ||
-				LaraItem->currentAnimState == 86 ||
-				LaraItem->currentAnimState == 71 ||
-				LaraItem->currentAnimState == 72 ||
-				LaraItem->currentAnimState == 105 ||
-				LaraItem->currentAnimState == 106)
+			if (LaraItem->currentAnimState == LS_DOVESWITCH ||
+				LaraItem->currentAnimState == LS_CRAWL_IDLE ||
+				LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->currentAnimState == LS_CRAWL_BACK ||
+				LaraItem->currentAnimState == LS_CROUCH_IDLE ||
+				LaraItem->currentAnimState == LS_CROUCH_ROLL ||
+				LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->currentAnimState == 10 ||
-				LaraItem->currentAnimState == 56 ||
-				LaraItem->currentAnimState == 57 ||
-				LaraItem->currentAnimState == 58 ||
-				LaraItem->currentAnimState == 59 ||
-				LaraItem->currentAnimState == 60 ||
-				LaraItem->currentAnimState == 61 ||
-				LaraItem->currentAnimState == 75)
+			if (LaraItem->currentAnimState == LS_HANG ||
+				LaraItem->currentAnimState == LS_LADDER_IDLE ||
+				LaraItem->currentAnimState == LS_LADDER_UP ||
+				LaraItem->currentAnimState == LS_LADDER_LEFT ||
+				LaraItem->currentAnimState == LS_LADDER_STOP ||
+				LaraItem->currentAnimState == LS_LADDER_RIGHT ||
+				LaraItem->currentAnimState == LS_LADDER_DOWN ||
+				LaraItem->currentAnimState == LS_MONKEYSWING_IDLE)
 				break;
 			return;
 

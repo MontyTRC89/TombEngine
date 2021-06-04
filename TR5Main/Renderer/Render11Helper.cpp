@@ -854,7 +854,9 @@ namespace T5M::Renderer
 
 		world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
 
-		RendererObject &moveable = *m_moveableObjects[item->objectNumber];
+		short objNum = item->objectNumber;
+		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
+		RendererObject &moveable = *m_moveableObjects[objNum];
 
 		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
 		{
