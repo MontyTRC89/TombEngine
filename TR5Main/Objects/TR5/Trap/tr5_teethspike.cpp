@@ -10,17 +10,17 @@
 
 short SPyoffs[8] =
 {
-	0xFC00, 0x0000, 0xFE00, 0x0000, 0x0000, 0x0000, 0xFE00, 0x0000
+	-1024, 0, -512, 0, 0, 0, -512, 0
 };
 
 short SPxzoffs[8] =
 {
-	0x0000, 0x0000, 0x0200, 0x0000, 0x0000, 0x0000, 0xFE00, 0x0000
+	0, 0, 512, 0, 0, 0, -512, 0
 };
 
 short SPDETyoffs[8] =
 {
-	0x0400, 0x0200, 0x0200, 0x0200, 0x0000, 0x0200, 0x0200, 0x0200
+	1024, 512, 512, 512, 0, 512, 512, 512
 };
 
 void InitialiseTeethSpikes(short itemNumber)
@@ -53,8 +53,8 @@ void InitialiseTeethSpikes(short itemNumber)
 	else
 	{
 		angle = item->triggerFlags & 7;
-		item->pos.zRot = rotations[angle];
 		item->pos.xPos += SPxzoffs[angle];
+		item->pos.zRot = rotations[angle];
 	}
 
 	item->itemFlags[0] = 1024;
@@ -62,41 +62,42 @@ void InitialiseTeethSpikes(short itemNumber)
 	item->pos.yPos += SPyoffs[angle];
 }
 
-static int CollidedWithTeethSpikes(ITEM_INFO* item)
+bool TestBoundsCollideTeethSpikes(ITEM_INFO* item)
 {
-	short angle;
 	int x;
 	int z;
 
+	short angle = item->triggerFlags & 7;
+	
 	if (item->triggerFlags & 8)
 	{
-		angle = item->triggerFlags & 7;
-		x = item->pos.xPos & 0xFFFFFE00 | 0x200;
-		z = (item->pos.zPos + SPxzoffs[angle]) & 0xFFFFFE00 | 0x200;
+		x = item->pos.xPos & (~1023) | 512;
+		z = (item->pos.zPos + SPxzoffs[angle]) & (~1023) | 512;
 	}
 	else
 	{
-		angle = item->triggerFlags & 7;
-		x = (item->pos.xPos - SPxzoffs[angle]) & 0xFFFFFE00 | 0x200;
-		z = item->pos.zPos & 0xFFFFFE00 | 0x200;
+		x = (item->pos.xPos - SPxzoffs[angle]) & (~1023) | 512;
+		z = item->pos.zPos & (~1023) | 512;
 	}
 
-	int delta = -((angle & 1) != 0);
-	delta = delta & 0xFF4C;
-	delta += 480;
+	int size = (item->triggerFlags & 1 ? 300 : 480);
 	int y = item->pos.yPos + SPDETyoffs[angle];
+
 	ANIM_FRAME* frames = GetBestFrame(LaraItem);
 
-	if (LaraItem->pos.yPos + frames->boundingBox.Y1 <= y && LaraItem->pos.yPos + frames->boundingBox.Y2 >= y - 900)
+	if (LaraItem->pos.yPos + frames->boundingBox.Y1 <= y 
+		&& LaraItem->pos.yPos + frames->boundingBox.Y2 >= y - 900)
 	{
-		if (LaraItem->pos.xPos + frames->boundingBox.X1 <= (x + delta) && LaraItem->pos.xPos + frames->boundingBox.X2 >= (x - delta))
+		if (LaraItem->pos.xPos + frames->boundingBox.X1 <= (x + size) 
+			&& LaraItem->pos.xPos + frames->boundingBox.X2 >= (x - size))
 		{
-			if (LaraItem->pos.zPos + frames->boundingBox.Z1 <= (z + delta) && LaraItem->pos.zPos + frames->boundingBox.Z2 >= (z - delta))
-				return 1;
+			if (LaraItem->pos.zPos + frames->boundingBox.Z1 <= (z + size) 
+				&& LaraItem->pos.zPos + frames->boundingBox.Z2 >= (z - size))
+				return true;
 		}
 	}
 
-	return 0;
+	return false;
 }
 
 void ControlTeethSpikes(short itemNumber)
@@ -117,7 +118,7 @@ void ControlTeethSpikes(short itemNumber)
 				item->status = ITEM_INVISIBLE;
 			}
 
-			if (item->triggerFlags & 0x20)
+			if (item->triggerFlags & 32)
 			{
 				item->itemFlags[2] = 1;
 			}
@@ -148,7 +149,7 @@ void ControlTeethSpikes(short itemNumber)
 
 		item->status = ITEM_ACTIVE;
 
-		if (LaraItem->hitPoints > 0 && CollidedWithTeethSpikes(item))
+		if (LaraItem->hitPoints > 0 && TestBoundsCollideTeethSpikes(item))
 		{
 			ANIM_FRAME* itemFrames = GetBestFrame(item);
 			ANIM_FRAME* laraFrames = GetBestFrame(LaraItem);
@@ -156,9 +157,13 @@ void ControlTeethSpikes(short itemNumber)
 			short angle = item->triggerFlags & 7;
 			int numBloods = 0;
 
-			if ((item->itemFlags[0] > 1024 || LaraItem->gravityStatus) && angle > 2 && angle < 6)
+			if ((item->itemFlags[0] > 1024
+				|| LaraItem->gravityStatus)
+				&& angle > 2 
+				&& angle < 6)
 			{
-				if (LaraItem->fallspeed > 6 || item->itemFlags[0] > 1024)
+				if (LaraItem->fallspeed > GRAVITY
+					|| item->itemFlags[0] > 1024)
 				{
 					LaraItem->hitPoints = -1;
 					numBloods = 20;
@@ -177,7 +182,8 @@ void ControlTeethSpikes(short itemNumber)
 			int laraY1 = LaraItem->pos.yPos + laraFrames->boundingBox.Y1;
 			int laraY2 = LaraItem->pos.yPos + laraFrames->boundingBox.Y2;
 
-			short triggerFlags = item->triggerFlags & 0xF;
+			short triggerFlags = item->triggerFlags & 15;
+
 			int itemY1;
 			int itemY2;
 
@@ -196,19 +202,17 @@ void ControlTeethSpikes(short itemNumber)
 			if (laraY2 > item->pos.yPos + itemY2)
 				laraY2 = itemY2 + item->pos.yPos;
 
-			long dy = laraY1 - laraY2;
-			int modulus = abs(dy) + 1;
-
-			angle = item->triggerFlags & 7;
+			int dy = abs(laraY1 - laraY2) + 1;
+			
 			if (angle == 2 || angle == 6)
 				numBloods /= 2;
 
 			for (int i = 0; i < numBloods; i++)
 			{
 				TriggerBlood(
-					(GetRandomControl() & 0x7F) + LaraItem->pos.xPos - 64,
-					laraY2 - GetRandomControl() % modulus,
-					(GetRandomControl() & 0x7F) + LaraItem->pos.zPos - 64,
+					(GetRandomControl() & 127) + LaraItem->pos.xPos - 64,
+					laraY2 - GetRandomControl() % dy,
+					(GetRandomControl() & 127) + LaraItem->pos.zPos - 64,
 					2 * GetRandomControl(),
 					1);
 			}
@@ -239,7 +243,7 @@ void ControlTeethSpikes(short itemNumber)
 			if (item->itemFlags[0] <= 1024)
 			{
 				item->itemFlags[0] = 0;
-				if (!(item->triggerFlags & 0x10))
+				if (!(item->triggerFlags & 16))
 				{
 					if (LaraItem->hitPoints > 0)
 						item->itemFlags[2] = 64;
