@@ -28,11 +28,9 @@ void SlicerDicerControl(short itemNum)
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->pos, 0);
 
-	int factor = 4608 * phd_cos(item->triggerFlags) * phd_cos(item->pos.yRot);
-
-	item->pos.xPos = (item->itemFlags[0] * 256) + factor;
+	item->pos.xPos = (item->itemFlags[0] * 256) + 4608 * phd_cos(item->triggerFlags) * phd_sin(item->pos.yRot);
 	item->pos.yPos = (item->itemFlags[1] * 256) - 4608 * phd_sin(item->triggerFlags);
-	item->pos.zPos = (item->itemFlags[2] * 256) + factor;
+	item->pos.zPos = (item->itemFlags[2] * 256) + 4608 * phd_cos(item->triggerFlags) * phd_cos(item->pos.yRot);
 
 	item->triggerFlags += 170;
 

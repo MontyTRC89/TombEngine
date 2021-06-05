@@ -48,7 +48,7 @@ void RollingBallControl(short itemNumber)
 	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int dh = height - 512;
 
-	if (item->pos.yPos > height - 512)
+	if (item->pos.yPos > dh)
 	{
 		if (abs(item->fallspeed) > 16)
 		{
@@ -66,7 +66,7 @@ void RollingBallControl(short itemNumber)
 
 		if (item->fallspeed <= 64)
 		{
-			if (abs(item->speed) <= 512 || GetRandomControl() & 0x1F)
+			if (abs(item->speed) <= 512 || (GetRandomControl() & 0x1F))
 				item->fallspeed = 0;
 			else
 				item->fallspeed = -(short)(GetRandomControl() % (item->speed / 8));
@@ -81,89 +81,101 @@ void RollingBallControl(short itemNumber)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	floor = GetFloor(x, y, z + 128, &roomNumber);
-	int y1a = GetFloorHeight(floor, x, y, z + 128) - 512;
+	int frontX = item->pos.xPos;
+	int frontZ = item->pos.zPos + 128;
+	int backX = item->pos.xPos;
+	int backZ = item->pos.zPos - 128;
+	int rightX = item->pos.xPos + 128;
+	int rightZ = item->pos.zPos;
+	int leftX = item->pos.xPos - 128;
+	int leftZ = item->pos.zPos;
 
-	floor = GetFloor(x, y, z - 128, &roomNumber);
-	int y2a = GetFloorHeight(floor, x, y, z - 128) - 512;
+	floor = GetFloor(frontX, item->pos.yPos, frontZ, &roomNumber);
+	int frontHeight = GetFloorHeight(floor, frontX, item->pos.yPos, frontZ) - 512;
+	floor = GetFloor(backX, item->pos.yPos, backZ, &roomNumber);
+	int backHeight = GetFloorHeight(floor, backX, item->pos.yPos, backZ) - 512;
+	floor = GetFloor(rightX, item->pos.yPos, rightZ, &roomNumber);
+	int rightHeight = GetFloorHeight(floor, rightX, item->pos.yPos, rightZ) - 512;
+	floor = GetFloor(leftX, item->pos.yPos, leftZ, &roomNumber);
+	int leftHeight = GetFloorHeight(floor, leftX, item->pos.yPos, leftZ) - 512;
 
-	floor = GetFloor(x + 128, y, z, &roomNumber);
-	int y3a = GetFloorHeight(floor, x + 128, y, z) - 512;
+	frontX = item->pos.xPos;
+	frontZ = item->pos.zPos + 512;
+	backX = item->pos.xPos;
+	backZ = item->pos.zPos - 512;
+	rightX = item->pos.xPos + 512;
+	rightZ = item->pos.zPos;
+	leftX = item->pos.xPos - 512;
+	leftZ = item->pos.zPos;
 
-	floor = GetFloor(x - 128, y, z, &roomNumber);
-	int y4a = GetFloorHeight(floor, x - 128, y, z) - 512;
+	floor = GetFloor(frontX, item->pos.yPos, frontZ, &roomNumber);
+	int frontFarHeight = GetFloorHeight(floor, frontX, item->pos.yPos, frontZ) - 512;
+	floor = GetFloor(backX, item->pos.yPos, backZ, &roomNumber);
+	int backFarHeight = GetFloorHeight(floor, backX, item->pos.yPos, backZ) - 512;
+	floor = GetFloor(rightX, item->pos.yPos, rightZ, &roomNumber);
+	int rightFarHeight = GetFloorHeight(floor, rightX, item->pos.yPos, rightZ) - 512;
+	floor = GetFloor(leftX, item->pos.yPos, leftZ, &roomNumber);
+	int leftFarHeight = GetFloorHeight(floor, leftX, item->pos.yPos, leftZ) - 512;
 
-	floor = GetFloor(x, y, z + 512, &roomNumber);
-	int y1b = GetFloorHeight(floor, x, y, z + 512) - 512;
-
-	floor = GetFloor(x, y, z - 512, &roomNumber);
-	int y2b = GetFloorHeight(floor, x, y, z - 512) - 512;
-
-	floor = GetFloor(x + 512, y, z, &roomNumber);
-	int y3b = GetFloorHeight(floor, x + 512, y, z) - 512;
-
-	floor = GetFloor(x - 512, y, z, &roomNumber);
-	int y4b = GetFloorHeight(floor, x - 512, y, z) - 512;
-
-	if (item->pos.yPos - dh  > -256
-	||  item->pos.yPos - y1b >= 512
-	||  item->pos.yPos - y3b >= 512
-	||  item->pos.yPos - y2b >= 512
-	||  item->pos.yPos - y4b >= 512)
+	if (item->pos.yPos - dh > -256 ||
+		item->pos.yPos - frontFarHeight >= 512 ||
+		item->pos.yPos - rightFarHeight >= 512 ||
+		item->pos.yPos - backFarHeight >= 512 ||
+		item->pos.yPos - leftFarHeight >= 512)
 	{
 		int counterZ = 0;
 
-		if (y1a - dh <= 256)
+		if (frontFarHeight - dh <= 256)
 		{
-			if (y1b - dh < -1024 || y1a - dh < -256)
+			if (frontFarHeight - dh < -1024 || frontHeight - dh < -256)
 			{
 				if (item->itemFlags[1] <= 0)
 				{
 					if (!item->itemFlags[1] && item->itemFlags[0])
 					{
-						item->pos.zPos = (item->pos.zPos & -512) + 512;
+						item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
 					}
 				}
 				else
 				{
 					item->itemFlags[1] = -item->itemFlags[1] / 2;
-					item->pos.zPos = (item->pos.zPos & -512) + 512;
+					item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
 				}
 			}
-			else if (y1a == dh)
-			{
-				counterZ = 1;
-			}
-			else
-			{
-				item->itemFlags[1] += (y1a - dh) / 2;
-			}
-		}
-
-		if (y2a - dh <= 256)
-		{
-			if (y2b - dh < -1024 || y2a - dh < -256)
-			{
-				if (item->itemFlags[1] >= 0)
-				{
-					if (!item->itemFlags[1] && item->itemFlags[0])
-					{
-						item->pos.zPos = (item->pos.zPos & -512) + 512;
-					}
-				}
-				else
-				{
-					item->itemFlags[1] = -item->itemFlags[1] / 2;
-					item->pos.zPos = (item->pos.zPos & -512) + 512;
-				}
-			}
-			else if (y2a == dh)
+			else if (frontHeight == dh)
 			{
 				counterZ++;
 			}
 			else
 			{
-				item->itemFlags[1] -= (y2a - dh) / 2;
+				item->itemFlags[1] += (frontHeight - dh) / 2;
+			}
+		}
+
+		if (backHeight - dh <= 256)
+		{
+			if (backFarHeight - dh < -1024 || backHeight - dh < -256)
+			{
+				if (item->itemFlags[1] >= 0)
+				{
+					if (!item->itemFlags[1] && item->itemFlags[0])
+					{
+						item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[1] = -item->itemFlags[1] / 2;
+					item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+				}
+			}
+			else if (backHeight == dh)
+			{
+				counterZ++;
+			}
+			else
+			{
+				item->itemFlags[1] -= (backHeight - dh) / 2;
 			}
 		}
 
@@ -172,62 +184,62 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->itemFlags[1]) <= 64)
 				item->itemFlags[1] = 0;
 			else
-				item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] / 64);
+				item->itemFlags[1] -= (item->itemFlags[1] / 64);
 		}
 
 		int counterX = 0;
 
-		if (y4a - dh <= 256)
+		if (leftHeight - dh <= 256)
 		{
-			if (y4b - dh < -1024 || y4a - dh < -256)
+			if (leftFarHeight - dh < -1024 || leftHeight - dh < -256)
 			{
 				if (item->itemFlags[0] >= 0)
 				{
 					if (!item->itemFlags[0] && item->itemFlags[1])
 					{
-						item->pos.xPos = (item->pos.xPos & -512) + 512;
+						item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
 					}
 				}
 				else
 				{
 					item->itemFlags[0] = -item->itemFlags[0] / 2;
-					item->pos.xPos = (item->pos.xPos & -512) + 512;
+					item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
 				}
 			}
-			else if (y4a == dh)
-			{
-				counterX = 1;
-			}
-			else
-			{
-				item->itemFlags[0] -= (y4a - dh) / 2;
-			}
-		}
-
-		if (y3a - dh <= 256)
-		{
-			if (y3b - dh < -1024 || y3a - dh < -256)
-			{
-				if (item->itemFlags[0] <= 0)
-				{
-					if (!item->itemFlags[0] && item->itemFlags[1])
-					{
-						item->pos.xPos = (item->pos.xPos & -512) + 512;
-					}
-				}
-				else
-				{
-					item->itemFlags[0] = -item->itemFlags[0] / 2;
-					item->pos.xPos = (item->pos.xPos & -512) + 512;
-				}
-			}
-			else if (y3a == dh)
+			else if (leftHeight == dh)
 			{
 				counterX++;
 			}
 			else
 			{
-				item->itemFlags[0] += (y3a - dh) / 2;
+				item->itemFlags[0] -= (leftHeight - dh) / 2;
+			}
+		}
+
+		if (rightHeight - dh <= 256)
+		{
+			if (rightFarHeight - dh < -1024 || rightHeight - dh < -256)
+			{
+				if (item->itemFlags[0] <= 0)
+				{
+					if (!item->itemFlags[0] && item->itemFlags[1])
+					{
+						item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[0] = -item->itemFlags[0] / 2;
+					item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+				}
+			}
+			else if (rightHeight == dh)
+			{
+				counterX++;
+			}
+			else
+			{
+				item->itemFlags[0] += (rightHeight - dh) / 2;
 			}
 		}
 
@@ -236,7 +248,7 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->itemFlags[0]) <= 64)
 				item->itemFlags[0] = 0;
 			else
-				item->itemFlags[0] = item->itemFlags[0] - (item->itemFlags[0] / 64);
+				item->itemFlags[0] -= (item->itemFlags[0] / 64);
 		}
 	}
 
@@ -245,25 +257,15 @@ void RollingBallControl(short itemNumber)
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if (item->itemFlags[0] <= 3072)
-	{
-		if (item->itemFlags[0] < -3072)
-			item->itemFlags[0] = -3072;
-	}
-	else
-	{
+	if (item->itemFlags[0] > 3072)
 		item->itemFlags[0] = 3072;
-	}
+	else if (item->itemFlags[0] < -3072)
+		item->itemFlags[0] = -3072;
 
-	if (item->itemFlags[1] <= 3072)
-	{
-		if (item->itemFlags[1] < -3072)
-			item->itemFlags[1] = -3072;
-	}
-	else
-	{
+	if (item->itemFlags[1] > 3072)
 		item->itemFlags[1] = 3072;
-	}
+	else if (item->itemFlags[1] < -3072)
+		item->itemFlags[1] = -3072;
 
 	short angle = 0;
 
@@ -274,7 +276,7 @@ void RollingBallControl(short itemNumber)
 
 	if (item->pos.yRot != angle)
 	{
-		if (((angle - item->pos.yRot) & 32767) >= 512)
+		if (((angle - item->pos.yRot) & 0x7fff) >= 512)
 		{
 			if (angle <= item->pos.yRot || angle - item->pos.yRot >= 0x8000)
 				item->pos.yRot -= 512;
@@ -292,7 +294,7 @@ void RollingBallControl(short itemNumber)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	TestTriggers(TriggerIndex, TRUE, NULL);
+	TestTriggers(TriggerIndex, true, NULL);
 }
 
 void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)

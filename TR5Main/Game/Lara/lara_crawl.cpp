@@ -152,7 +152,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
 
 	ShiftItem(item, coll);
 	if (coll->midFloor != NO_HEIGHT)
