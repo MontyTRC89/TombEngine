@@ -1061,6 +1061,7 @@ static void StartTrap(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseTeethSpikes;
 		obj->control = ControlTeethSpikes;
+		obj->saveFlags = 1;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
