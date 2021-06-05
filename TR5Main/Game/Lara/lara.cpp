@@ -195,13 +195,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_hang_feet,//139
-	lara_as_hang_feet_shimmyr,//140
-	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_inRcorner,//142
-	lara_as_hang_feet_inLcorner,//143
-	lara_as_hang_feet_outRcorner,//144
-	lara_as_hang_feet_outLcorner,//145
+	lara_as_null,//ara_as_hang_feet,//139
+	lara_as_null,//lara_as_hang_feet_shimmyr,//140
+	lara_as_null,//lara_as_hang_feet_shimmyl,//141
+	lara_as_null,//lara_as_hang_feet_inRcorner,//142
+	lara_as_null,//lara_as_hang_feet_inLcorner,//143
+	lara_as_null,//lara_as_hang_feet_outRcorner,//144
+	lara_as_null,//lara_as_hang_feet_outLcorner,//145
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -349,9 +349,9 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_hang_feet,
-	lara_col_hang_feet_shimmyr,
-	lara_col_hang_feet_shimmyl,
+	lara_void_func,//lara_col_hang_feet,
+	lara_void_func,//lara_col_hang_feet_shimmyr,
+	lara_void_func,//lara_col_hang_feet_shimmyl,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,

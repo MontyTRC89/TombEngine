@@ -152,7 +152,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
 
 	ShiftItem(item, coll);
 	if (coll->midFloor != NO_HEIGHT)
@@ -839,14 +839,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else
 					{
-						if (TestHangFeet(item, angle))
+					/*	if (TestHangFeet(item, angle))
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG_FEET;
 						}
-						else
+						else*/
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
