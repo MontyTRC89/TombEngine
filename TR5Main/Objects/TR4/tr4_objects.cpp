@@ -296,8 +296,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
 
-		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 
 	}
 
@@ -936,7 +936,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseSethBlade;
 		obj->control = SethBladeControl;
-		obj->collision = TrapCollision;
+		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -954,7 +954,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->control = BirdBladeControl;
-		obj->collision = TrapCollision;
+		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}

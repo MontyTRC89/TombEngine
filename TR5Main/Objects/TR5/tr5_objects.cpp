@@ -890,8 +890,10 @@ static void StartObject(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseTwoBlocksPlatform;
 		obj->control = TwoBlocksPlatformControl;
-		//obj->floor = TwoBlocksPlatformFloor;
-		//obj->ceiling = TwoBlocksPlatformCeiling;
+		obj->floor = TwoBlocksPlatformFloor;
+		obj->ceiling = TwoBlocksPlatformCeiling;
+		obj->floorBorder = TwoBlocksPlatformFloorBorder;
+		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
@@ -1059,6 +1061,7 @@ static void StartTrap(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseTeethSpikes;
 		obj->control = ControlTeethSpikes;
+		obj->saveFlags = 1;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
