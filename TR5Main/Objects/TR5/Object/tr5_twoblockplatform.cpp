@@ -12,6 +12,67 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 
 	item->itemFlags[0] = item->pos.yPos;
 	item->itemFlags[1] = 1;
+	AddTwoBlocksPlatform(itemNumber);
+}
+
+void AddTwoBlocksPlatform(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	T5M::Floordata::AddBridge(itemNumber);
+	switch (GetQuadrant(item->pos.yRot))
+	{
+	case NORTH:
+		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
+		T5M::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
+		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), SECTOR(1));
+		break;
+	case EAST:
+		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
+		T5M::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
+		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), SECTOR(1));
+		break;
+	case SOUTH:
+		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
+		T5M::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
+		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), -SECTOR(1));
+		break;
+	case WEST:
+		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
+		T5M::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
+		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), -SECTOR(1));
+		break;
+	}
+}
+
+void RemoveTwoBlocksPlatform(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	T5M::Floordata::RemoveBridge(itemNumber);
+	switch (GetQuadrant(item->pos.yRot))
+	{
+	case NORTH:
+		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
+		T5M::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
+		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), SECTOR(1));
+		break;
+	case EAST:
+		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
+		T5M::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
+		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), SECTOR(1));
+		break;
+	case SOUTH:
+		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
+		T5M::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
+		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), -SECTOR(1));
+		break;
+	case WEST:
+		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
+		T5M::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
+		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), -SECTOR(1));
+		break;
+	}
 }
 
 BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
@@ -29,7 +90,7 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 		return true;
 	if (angle == -ANGLE(180) && (xb == itemxb || xb == itemxb + 1) && (zb == itemzb || zb == itemzb - 1))
 		return true;
-	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb + 1))
+	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb + 1) && (xb == itemxb || xb == itemxb + 1))
 		return true;
 	if (angle == -ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb - 1))
 		return true;
@@ -37,17 +98,15 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 	return false;
 }
 
-void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
-	if (IsOnTwoBlocksPlatform(item, x, z))
-	{
-		if (y <= (item->pos.yPos + 32) && item->pos.yPos < *height)
-		{
-			*height = item->pos.yPos;
-			OnFloor = 1;
-			HeightType = WALL;
-		}
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits)
+		return std::nullopt;
+
+	int height = item->pos.yPos;
+	return std::optional{ height };
 }
 
 void TwoBlocksPlatformControl(short itemNumber)
@@ -58,7 +117,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 	{
 		if (item->triggerFlags)
 		{
-			if (item->pos.yPos > (item->itemFlags[0] - 16 * (item->triggerFlags & 0xFFFFFFF0)))
+			if (item->pos.yPos > (item->itemFlags[0] - 16 * (int) (item->triggerFlags & 0xFFFFFFF0)))
 			{
 				item->pos.yPos -= item->triggerFlags & 0xF;
 			}
@@ -68,36 +127,46 @@ void TwoBlocksPlatformControl(short itemNumber)
 			item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 			if (roomNumber != item->roomNumber)
+			{
+				RemoveTwoBlocksPlatform(itemNumber);
 				ItemNewRoom(itemNumber, roomNumber);
+				AddTwoBlocksPlatform(itemNumber);
+			}
 		}
 		else
 		{
-			OnFloor = false;
+			OnObject = false;
 
 			int height = LaraItem->pos.yPos + 1;
-			TwoBlocksPlatformFloor(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &height);
+			if (IsOnTwoBlocksPlatform(item, LaraItem->pos.xPos, LaraItem->pos.zPos))
+			{
+				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
+				{
+					if (item->pos.yPos < height)
+					{
+						OnObject = true;
+					}
+				}
+			}
 
-			if (OnFloor && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
+			if (OnObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
 				item->itemFlags[1] = 1;
 			else
 				item->itemFlags[1] = -1;
 
-			if (item->itemFlags[1] <= 0)
+			if (item->itemFlags[1] < 0)
 			{
-				if (item->itemFlags[1] <= 0)
+				if (item->pos.yPos <= item->itemFlags[0])
 				{
-					if (item->pos.yPos <= item->itemFlags[0])
-					{
-						item->itemFlags[1] = 1;
-					}
-					else
-					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-						item->pos.yPos -= 4;
-					}
+					item->itemFlags[1] = 1;
+				}
+				else
+				{
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
+					item->pos.yPos -= 4;
 				}
 			}
-			else
+			else if (item->itemFlags[1] > 0)
 			{
 				if (item->pos.yPos >= item->itemFlags[0] + 128)
 				{
@@ -113,13 +182,25 @@ void TwoBlocksPlatformControl(short itemNumber)
 	}
 }
 
-void TwoBlocksPlatformCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
 {
-	if (IsOnTwoBlocksPlatform(item, x, z))
-	{
-		if (y > item->pos.yPos + 32 && item->pos.yPos > * height)
-		{
-			*height = item->pos.yPos + 256;
-		}
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits)
+		return std::nullopt;
+
+	int height = item->pos.yPos + 256;
+	return std::optional{ height };
+}
+
+int TwoBlocksPlatformFloorBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int TwoBlocksPlatformCeilingBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return (item->pos.yPos + 256);
 }
