@@ -695,7 +695,7 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		if (TestCollision(item, l))
 		{
 			if (c->enableBaddiePush)
-				ItemPushLara(item, l, c, FALSE, TRUE);
+				ItemPushLara(item, l, c, false, true);
 		}
 	}
 }
