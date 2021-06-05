@@ -622,11 +622,11 @@ namespace T5M::Floordata
 		return location;
 	}
 
-	void AddBridge(short itemNumber)
+	void AddBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto x = item.pos.xPos;
-		const auto z = item.pos.zPos;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
 		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->AddItem(itemNumber);
@@ -654,11 +654,11 @@ namespace T5M::Floordata
 		}
 	}
 
-	void RemoveBridge(short itemNumber)
+	void RemoveBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto x = item.pos.xPos;
-		const auto z = item.pos.zPos;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
 		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->RemoveItem(itemNumber);
