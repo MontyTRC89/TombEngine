@@ -17,6 +17,16 @@ int FLOOR_INFO::SectorPlane(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
+int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
+{
+	const auto point = GetSectorPoint(x, z);
+	auto vector = Vector2(point.x, point.y);
+	const auto matrix = Matrix::CreateRotationZ(CeilingCollision.SplitAngle);
+	Vector2::Transform(vector, matrix, vector);
+
+	return vector.x < 0 ? 0 : 1;
+}
+
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
 {
 	const auto room = FloorCollision.Portals[plane];
@@ -52,7 +62,7 @@ std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const
 {
-	return RoomAbove(SectorPlane(x, z));
+	return RoomAbove(SectorPlaneCeiling(x, z));
 }
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z, int y) const
@@ -116,7 +126,7 @@ int FLOOR_INFO::BridgeFloorHeight(int x, int z, int y) const
 
 int FLOOR_INFO::CeilingHeight(int x, int z) const
 {
-	const auto plane = SectorPlane(x, z);
+	const auto plane = SectorPlaneCeiling(x, z);
 	const auto vector = GetSectorPoint(x, z);
 
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
@@ -169,7 +179,7 @@ Vector2 FLOOR_INFO::CeilingSlope(int plane) const
 
 Vector2 FLOOR_INFO::CeilingSlope(int x, int z) const
 {
-	return CeilingSlope(SectorPlane(x, z));
+	return CeilingSlope(SectorPlaneCeiling(x, z));
 }
 
 bool FLOOR_INFO::IsWall(int plane) const
@@ -612,11 +622,11 @@ namespace T5M::Floordata
 		return location;
 	}
 
-	void AddBridge(short itemNumber)
+	void AddBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto x = item.pos.xPos;
-		const auto z = item.pos.zPos;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
 		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->AddItem(itemNumber);
@@ -644,11 +654,11 @@ namespace T5M::Floordata
 		}
 	}
 
-	void RemoveBridge(short itemNumber)
+	void RemoveBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto x = item.pos.xPos;
-		const auto z = item.pos.zPos;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
 		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->RemoveItem(itemNumber);

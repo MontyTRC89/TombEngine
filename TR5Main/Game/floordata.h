@@ -27,6 +27,7 @@ public:
 	int Room;
 
 	int SectorPlane(int x, int z) const;
+	int SectorPlaneCeiling(int x, int z) const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;
@@ -67,6 +68,6 @@ namespace T5M::Floordata
 	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z);
 	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, int x, int y, int z);
 	ROOM_VECTOR GetRoom(ROOM_VECTOR location, int x, int y, int z);
-	void AddBridge(short itemNumber);
-	void RemoveBridge(short itemNumber);
+	void AddBridge(short itemNumber, int x = 0, int z = 0);
+	void RemoveBridge(short itemNumber, int x = 0, int z = 0);
 }
