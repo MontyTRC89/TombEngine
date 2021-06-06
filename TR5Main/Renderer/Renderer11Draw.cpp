@@ -918,6 +918,17 @@ namespace T5M::Renderer
                 y += 25;
             }
 
+            // Apply and cancel
+            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 18)) ? PRINTSTRING_BLINK : 0));
+
+            y += 25;
+
+            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                PRINTSTRING_COLOR_ORANGE,
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 19)) ? PRINTSTRING_BLINK : 0));
+
             break;
 
         case pause_sounds_menu:
