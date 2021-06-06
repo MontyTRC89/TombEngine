@@ -69,7 +69,7 @@ void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
 void combine_ClockWorkBeetle(int flag);
-void do_special_waterskin_combine_bullshit(int flag);
+int do_special_waterskin_combine_bullshit(int flag);
 
 // Inventory results
 #define INV_RESULT_NONE						0
