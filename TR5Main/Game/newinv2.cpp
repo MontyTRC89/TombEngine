@@ -1802,19 +1802,19 @@ int is_item_currently_combinable(short obj)
 					return 1;
 		}
 	}
-	else if (obj >= INV_OBJECT_SMOL_WATERSKIN && obj <= INV_OBJECT_SMOL_WATERSKIN3L)//if the highlighted object is one of the small waterskins, check if we have the any of the big ones
-	{
-		for (int n = 0; n < 6; n++)
-		{
-			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
-				return 1;
-		}
-	}
-	else if (obj >= INV_OBJECT_BIG_WATERSKIN && obj <= INV_OBJECT_BIG_WATERSKIN5L)//if the highlighted object is one of the big waterskins, check if we have the any of the small ones
+	else if (obj > INV_OBJECT_SMOL_WATERSKIN3L)
 	{
 		for (int n = 0; n < 4; n++)
 		{
 			if (have_i_got_item(n + INV_OBJECT_SMOL_WATERSKIN))
+				return 1;
+		}
+	}
+	else
+	{
+		for (int n = 0; n < 6; n++)
+		{
+			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
 				return 1;
 		}
 	}
@@ -2757,25 +2757,35 @@ void handle_inventry_menu()
 			{
 				combine_ring_fade_dir = 2;
 				combine_type_flag = 1;
-				combine_obj1 = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
-				combine_obj2 = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
+				combine_obj1 = invItem;
+				combine_obj2 = ammoItem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
 			}
 			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				do_special_waterskin_combine_bullshit(1);
-				combine_type_flag = 2;
+				if (do_special_waterskin_combine_bullshit(1))
+				{
+					combine_type_flag = 2;
+					combine_ring_fade_dir = 2;
+					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					return;
+				}
+
+				SayNo();
 				combine_ring_fade_dir = 2;
-				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
-				return;
 			}
 			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN && invItem <= INV_OBJECT_SMOL_WATERSKIN3L && ammoItem >= INV_OBJECT_BIG_WATERSKIN && ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				do_special_waterskin_combine_bullshit(0);
-				combine_type_flag = 2;
+				if (do_special_waterskin_combine_bullshit(0))
+				{
+					combine_type_flag = 2;
+					combine_ring_fade_dir = 2;
+					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					return;
+				}
+
+				SayNo();
 				combine_ring_fade_dir = 2;
-				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
-				return;
 			}
 			else
 			{
@@ -3929,7 +3939,7 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings |= 1;//get beetle
 }
 
-void do_special_waterskin_combine_bullshit(int flag)
+int do_special_waterskin_combine_bullshit(int flag)
 {
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
@@ -3961,6 +3971,7 @@ void do_special_waterskin_combine_bullshit(int flag)
 			Lara.small_waterskin = small_liters + 1;
 			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+			return 1;
 		}
 	}
 	else 
@@ -3985,6 +3996,9 @@ void do_special_waterskin_combine_bullshit(int flag)
 			Lara.small_waterskin = small_liters + 1;
 			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+			return 1;
 		}
 	}
+
+	return 0;
 }
