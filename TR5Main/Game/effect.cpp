@@ -31,54 +31,64 @@ FX_INFO* EffectList;
 
 function<EffectFunction> effect_routines[59] =
 {
-	turn180_effect,
-	floor_shake_effect,
-	PoseidonSFX,
-	LaraBubbles,
-	finish_level_effect,
-	ActivateCamera,
-	ActivateKey,
-	RubbleFX,
-	SwapCrowbar,
-	pickup,
-	SoundFlipEffect,
-	ExplosionFX,
-	lara_hands_free,
-	puzzle,
-	draw_right_pistol,
-	draw_left_pistol,
-	shoot_right_gun,
-	shoot_left_gun,
-	pushLoop,
-	pushEnd,
-	void_effect,
-	invisibility_on,
-	invisibility_off,
-	void_effect,
-	void_effect,
-	void_effect,
-	reset_hair,
-	void_effect,
-	SetFog,
-	void_effect,
-	LaraLocation,
-	ClearSpidersPatch,
-	AddFootprint,
-	void_effect, // resettest
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	void_effect,
-	LaraLocationPad,
-	KillActiveBaddies
+	turn180_effect,				//0
+	floor_shake_effect,			//1
+	PoseidonSFX,				//2
+	LaraBubbles,				//3
+	finish_level_effect,		//4
+	ActivateCamera,				//5
+	ActivateKey,				//6
+	RubbleFX,					//7
+	SwapCrowbar,				//8
+	pickup,						//9
+	SoundFlipEffect,			//10
+	ExplosionFX,				//11
+	lara_hands_free,			//12
+	puzzle,						//13
+	draw_right_pistol,			//14
+	draw_left_pistol,			//15
+	shoot_right_gun,			//16
+	shoot_left_gun,				//17
+	pushLoop,					//18
+	pushEnd,					//19
+	void_effect,				//20
+	invisibility_on,			//21
+	invisibility_off,			//22
+	void_effect,				//23
+	void_effect,				//24
+	void_effect,				//25
+	reset_hair,					//26
+	void_effect,				//27
+	SetFog,						//28
+	void_effect,				//29
+	LaraLocation,				//30
+	ClearSpidersPatch,			//31
+	AddFootprint,				//32
+	void_effect,				//33
+	void_effect,				//34
+	void_effect,				//35
+	void_effect,				//36
+	void_effect,				//37
+	void_effect,				//38
+	void_effect,				//39
+	void_effect,				//40
+	void_effect,				//41
+	void_effect,				//42
+	MeshSwapToPour,				//43
+	MeshSwapFromPour,			//44
+	LaraLocationPad,			//45
+	KillActiveBaddies			//46
 };
+
+void MeshSwapToPour(ITEM_INFO* item)
+{
+	Lara.meshPtrs[LM_LHAND] = Objects[item->itemFlags[2]].meshIndex + LM_LHAND;
+}
+
+void MeshSwapFromPour(ITEM_INFO* item)
+{
+	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+}
 
 void pickup(ITEM_INFO* item)
 {

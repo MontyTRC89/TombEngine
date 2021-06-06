@@ -586,16 +586,16 @@ typedef enum GAME_OBJECT_ID
 	ID_KEY_HOLE14,
 	ID_KEY_HOLE15,
 	ID_KEY_HOLE16,
-	ID_WATERSKIN1_EMPTY,
-	ID_WATERSKIN1_1,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN1_2,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN1_3,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN2_EMPTY,
-	ID_WATERSKIN2_1,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN2_2,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN2_3,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN2_4,				// TR4 - OK - Needs testing and inventory handling
-	ID_WATERSKIN2_5,				// TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN1_EMPTY,			// TR4 Small waterskin - OK
+	ID_WATERSKIN1_1,				// TR4 Small waterskin 1L - OK
+	ID_WATERSKIN1_2,				// TR4 Small waterskin 2L - OK
+	ID_WATERSKIN1_3,				// TR4 Small waterskin 3L - OK
+	ID_WATERSKIN2_EMPTY,			// TR4 Big waterskin - OK
+	ID_WATERSKIN2_1,				// TR4 Big waterskin 1L - OK
+	ID_WATERSKIN2_2,				// TR4 Big waterskin 2L - OK
+	ID_WATERSKIN2_3,				// TR4 Big waterskin 3L - OK
+	ID_WATERSKIN2_4,				// TR4 Big waterskin 4L - OK
+	ID_WATERSKIN2_5,				// TR4 Big waterskin 5L - OK
 
 	/* Misc inventory objects */
 	ID_HAMMER_ITEM = 750,
