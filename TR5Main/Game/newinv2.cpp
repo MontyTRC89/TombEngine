@@ -1533,7 +1533,7 @@ void handle_control_settings_input_pause()
 		}
 	}
 
-	if (KeyMap[DIK_RETURN])
+	if (KeyMap[DIK_RETURN] && !(pause_selected_option & (1 << 18)) && !(pause_selected_option & (1 << 19)))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
