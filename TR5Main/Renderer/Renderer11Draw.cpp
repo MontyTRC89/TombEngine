@@ -41,11 +41,11 @@ namespace T5M::Renderer
 
     void Renderer11::drawPickup(short objectNum)
     {
-        drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
+        drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
         m_pickupRotation += 45 * 360 / 30;
     }
 
-    void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
+    void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ, float scale1)
     {
         Matrix translation;
         Matrix rotation;
@@ -109,7 +109,7 @@ namespace T5M::Renderer
             // Finish the world matrix
             translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
             rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
-            scale = Matrix::CreateScale(0.5f);
+            scale = Matrix::CreateScale(scale1);
 
             world = scale * rotation;
             world = world * translation;
@@ -465,8 +465,6 @@ namespace T5M::Renderer
     void Renderer11::renderTitleMenu()
     {
         char stringBuffer[255];
-        int title_menu_to_display = getTitleMenu();
-        __int64 title_selected_option = getTitleSelection();
         int y = 400;
         short lastY;
         RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
@@ -753,32 +751,30 @@ namespace T5M::Renderer
     void Renderer11::renderPauseMenu()
     {
         char stringBuffer[255];
-        int pause_menu_to_display_ = GetPauseMenu();
-        __int64 pause_selected_option_ = GetPauseSelection();
         int y;
         RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
         RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
 
-        switch (pause_menu_to_display_)
+        switch (pause_menu_to_display)
         {
         case pause_main_menu:
             y = 275;
 
-            if (pause_selected_option_ & 1)
+            if (pause_selected_option & 1)
                 drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
             y += 25;
 
-            if (pause_selected_option_ & 2)
+            if (pause_selected_option & 2)
                 drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
             y += 25;
 
-            if (pause_selected_option_ & 4)
+            if (pause_selected_option & 4)
                 drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
@@ -792,21 +788,21 @@ namespace T5M::Renderer
         case pause_options_menu:
             y = 275;
 
-            if (pause_selected_option_ & 1)
+            if (pause_selected_option & 1)
                 drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
             y += 25;
 
-            if (pause_selected_option_ & 2)
+            if (pause_selected_option & 2)
                 drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
             y += 25;
 
-            if (pause_selected_option_ & 4)
+            if (pause_selected_option & 4)
                 drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
             else
                 drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
@@ -824,67 +820,67 @@ namespace T5M::Renderer
             // Screen resolution
             drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & 1) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & 1) ? PRINTSTRING_BLINK : 0));
 
             ZeroMemory(stringBuffer, 255);
             sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
             drawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Windowed mode
             drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Enable dynamic shadows
             drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Enable caustics
             drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Enable volumetric fog
             drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Apply
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             //cancel
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 6)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 6)) ? PRINTSTRING_BLINK : 0));
             break;
 
         case pause_controls_menu:
@@ -899,10 +895,10 @@ namespace T5M::Renderer
             {
                 drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
                     PRINTSTRING_COLOR_WHITE,
-                    PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << k)) ? PRINTSTRING_BLINK : 0) |
+                    PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << k)) ? PRINTSTRING_BLINK : 0) |
                     (CurrentSettings.waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                if (CurrentSettings.waitingForkey && (pause_selected_option_ & (1 << k)))
+                if (CurrentSettings.waitingForkey && (pause_selected_option & (1 << k)))
                 {
                     drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                         PRINTSTRING_COLOR_YELLOW,
@@ -921,13 +917,13 @@ namespace T5M::Renderer
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 18)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 18)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 19)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 19)) ? PRINTSTRING_BLINK : 0));
 
             break;
 
@@ -942,27 +938,27 @@ namespace T5M::Renderer
             // Enable sound
             drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableSound ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 0)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Enable sound special effects
             drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Music volume
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar);
 
             y += 25;
@@ -970,20 +966,20 @@ namespace T5M::Renderer
             // Sound FX volume
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar);
             y += 25;
 
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option_ & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
             break;
         }
         drawAllStrings();
@@ -1039,6 +1035,44 @@ namespace T5M::Renderer
         drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 
         drawAllStrings();
+    }
+
+    void Renderer11::drawExamines()
+    {
+        static short xrot = 0, yrot = 0, zrot = 0;
+        static float scaler = 1.2f;
+        float saved_scale;
+        short inv_item = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+        INVOBJ* obj = &inventry_objects_list[inv_item];
+
+        if (TrInput & IN_LEFT)
+            yrot += ANGLE(3);
+
+        if (TrInput & IN_RIGHT)
+            yrot -= ANGLE(3);
+
+        if (TrInput & IN_FORWARD)
+            xrot += ANGLE(3);
+
+        if (TrInput & IN_BACK)
+            xrot -= ANGLE(3);
+
+        if (TrInput & IN_SPRINT)
+            scaler += 0.03f;
+
+        if (TrInput & IN_DUCK)
+            scaler -= 0.03f;
+
+        if (scaler > 1.6f)
+            scaler = 1.6f;
+
+        if (scaler < 0.8f)
+            scaler = 0.8f;
+
+        saved_scale = obj->scale1;
+        obj->scale1 = scaler;
+        drawObjectOn2DPosition(400, 300, convert_invobj_to_obj(inv_item), xrot, yrot, zrot, obj->scale1);
+        obj->scale1 = saved_scale;
     }
 #endif
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
@@ -1119,8 +1153,7 @@ namespace T5M::Renderer
 #ifdef NEW_INV
         if (CurrentLevel == 0)
         {
-            int menu = getTitleMenu();
-            if (menu == title_main_menu || menu == title_options_menu)
+            if (title_menu_to_display == title_main_menu || title_menu_to_display == title_options_menu)
                 drawLogo = 1;
             else
                 drawLogo = 0;
@@ -1157,11 +1190,16 @@ namespace T5M::Renderer
             return;
         }
 
+        if (GLOBAL_invMode == IM_EXAMINE)
+        {
+            drawExamines();
+            return;
+        }
+
         if (GLOBAL_invMode == IM_PAUSE)
         {
-            int menu = GetPauseMenu();
             bool drawThing;
-            if (menu == pause_main_menu || menu == pause_options_menu)
+            if (pause_menu_to_display == pause_main_menu || pause_menu_to_display == pause_options_menu)
                 drawThing = 1;
             else
                 drawThing = 0;
