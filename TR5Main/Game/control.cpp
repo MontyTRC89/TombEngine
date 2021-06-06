@@ -646,7 +646,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (level->Rumble)
 			RumbleScreen();
 
-		//SoundEffects();
+		if (FlipEffect != -1)
+			effect_routines[FlipEffect](NULL);
 
 		HealthBarTimer--;
 

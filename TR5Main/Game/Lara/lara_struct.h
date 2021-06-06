@@ -1035,9 +1035,9 @@ typedef struct LaraInfo
 	byte skelebob;
 	byte wetcloth;
 	byte bottle;
-	byte location;
-	byte highestLocation;
-	byte locationPad;
+	signed char location;
+	signed char highestLocation;
+	signed char locationPad;
 	byte tightRopeOnCount;
 	byte tightRopeOff;
 	byte tightRopeFall;
