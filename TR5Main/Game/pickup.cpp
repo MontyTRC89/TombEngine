@@ -1370,7 +1370,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	{
 		if ((use >= ID_WATERSKIN1_EMPTY) && (use <= ID_WATERSKIN2_5))
 		{
-			item->itemFlags[2] = 25;
+			item->itemFlags[2] = ID_LARA_WATER_MESH;
 			flag = 1;
 		}
 		else if (use == ID_CLOCKWORK_BEETLE)
