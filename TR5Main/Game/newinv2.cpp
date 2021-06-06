@@ -1241,7 +1241,7 @@ int DoPauseMenu()
 		break;
 
 	case pause_controls_menu:
-		pause_flag = 1 << 17;
+		pause_flag = 1 << 19;
 		handle_control_settings_input_pause();
 		break;
 
