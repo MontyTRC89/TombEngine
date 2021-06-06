@@ -69,6 +69,7 @@ void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
 void combine_ClockWorkBeetle(int flag);
+void do_special_waterskin_combine_bullshit(int flag);
 
 // Inventory results
 #define INV_RESULT_NONE						0
@@ -162,6 +163,16 @@ enum inv_objects
 	INV_OBJECT_BEETLE,
 	INV_OBJECT_BEETLE_PART1,
 	INV_OBJECT_BEETLE_PART2,
+	INV_OBJECT_SMOL_WATERSKIN,
+	INV_OBJECT_SMOL_WATERSKIN1L,
+	INV_OBJECT_SMOL_WATERSKIN2L,
+	INV_OBJECT_SMOL_WATERSKIN3L,
+	INV_OBJECT_BIG_WATERSKIN,
+	INV_OBJECT_BIG_WATERSKIN1L,
+	INV_OBJECT_BIG_WATERSKIN2L,
+	INV_OBJECT_BIG_WATERSKIN3L,
+	INV_OBJECT_BIG_WATERSKIN4L,
+	INV_OBJECT_BIG_WATERSKIN5L,
 
 	// Puzzle, keys, pickups, examines
 	INV_OBJECT_PUZZLE1,

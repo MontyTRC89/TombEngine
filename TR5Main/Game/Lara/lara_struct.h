@@ -928,12 +928,6 @@ typedef struct DiaryInfo
 	bool Present;
 };
 
-typedef struct WaterskinInfo
-{
-	bool Present;
-	int Quantity;
-};
-
 typedef struct LARA_ARM
 {
 	int frameBase;
@@ -1045,14 +1039,14 @@ typedef struct LaraInfo
 	/// =================================== NEW:
 	byte BeetleLife;
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
+	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;
 	bool mineR;
 	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 	DiaryInfo Diary;
-	WaterskinInfo Waterskin1;
-	WaterskinInfo Waterskin2;
 	T5M::Renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];

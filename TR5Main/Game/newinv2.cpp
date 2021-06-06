@@ -157,6 +157,7 @@ i.e if uzi item is #2 in inv_objects (starting count from 0), IT HAS TO BE THE T
 
 note: don't forget to add your object to the proper list construction function, and EDIT THE OPTIONS TABLE ALSO!!!!
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file) 
+if it's combineable, add its things to the combine_table.
 */
 
 INVOBJ	inventry_objects_list[INVENTORY_TABLE_SIZE] =
@@ -207,6 +208,16 @@ INVOBJ	inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_CLOCKWORK_BEETLE, 14, 1200, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_CLOCKWORK_BEETLE_COMBO1, 18, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_CLOCKWORK_BEETLE_COMBO2, 14, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_WATERSKIN1_EMPTY, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_1, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_2, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_3, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_EMPTY, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_1, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_2, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_3, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_4, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_5, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
 
 	//puzzles
 
@@ -350,6 +361,16 @@ unsigned short options_table[] =
 	OPT_USE,//clockwork beetle
 	OPT_COMBINABLE,//clockwork beetle combo 1
 	OPT_COMBINABLE,//clockwork beetle combo 2
+	OPT_USE | OPT_COMBINABLE,//empty smol waterskin
+	OPT_USE | OPT_COMBINABLE,//smol waterskin 1L
+	OPT_USE | OPT_COMBINABLE,//smol waterskin 2L
+	OPT_USE | OPT_COMBINABLE,//smol waterskin 3L
+	OPT_USE | OPT_COMBINABLE,//empty big waterskin
+	OPT_USE | OPT_COMBINABLE,//big waterskin 1L
+	OPT_USE | OPT_COMBINABLE,//big waterskin 2L
+	OPT_USE | OPT_COMBINABLE,//big waterskin 3L
+	OPT_USE | OPT_COMBINABLE,//big waterskin 4L
+	OPT_USE | OPT_COMBINABLE,//big waterskin 5L
 
 	//puzzles
 	OPT_USE,
@@ -1768,15 +1789,34 @@ int do_these_objects_combine(int obj1, int obj2)
 
 int is_item_currently_combinable(short obj)
 {
-	for (int n = 0; n < max_combines; n++)
+	if (obj < INV_OBJECT_SMOL_WATERSKIN || obj > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
-		if (combine_table[n].item1 == obj)
-			if (have_i_got_item(combine_table[n].item2))
-				return 1;
+		for (int n = 0; n < max_combines; n++)
+		{
+			if (combine_table[n].item1 == obj)
+				if (have_i_got_item(combine_table[n].item2))
+					return 1;
 
-		if (combine_table[n].item2 == obj)
-			if (have_i_got_item(combine_table[n].item1))
+			if (combine_table[n].item2 == obj)
+				if (have_i_got_item(combine_table[n].item1))
+					return 1;
+		}
+	}
+	else if (obj >= INV_OBJECT_SMOL_WATERSKIN && obj <= INV_OBJECT_SMOL_WATERSKIN3L)//if the highlighted object is one of the small waterskins, check if we have the any of the big ones
+	{
+		for (int n = 0; n < 6; n++)
+		{
+			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
 				return 1;
+		}
+	}
+	else if (obj >= INV_OBJECT_BIG_WATERSKIN && obj <= INV_OBJECT_BIG_WATERSKIN5L)//if the highlighted object is one of the big waterskins, check if we have the any of the small ones
+	{
+		for (int n = 0; n < 4; n++)
+		{
+			if (have_i_got_item(n + INV_OBJECT_SMOL_WATERSKIN))
+				return 1;
+		}
 	}
 
 	return 0;
@@ -2137,6 +2177,12 @@ void construct_object_list()
 			insert_object_into_list(INV_OBJECT_BEETLE_PART2);
 	}
 
+	if (Lara.small_waterskin)
+		insert_object_into_list((Lara.small_waterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+
+	if (Lara.big_waterskin)
+		insert_object_into_list((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+
 	for (int i = 0; i < 8; i++)
 		if (Lara.Puzzles[i])
 			insert_object_into_list(INV_OBJECT_PUZZLE1 + i);
@@ -2232,6 +2278,12 @@ void construct_combine_object_list()
 			insert_object_into_list_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
+	if (Lara.small_waterskin)
+		insert_object_into_list_v2(Lara.small_waterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+
+	if (Lara.big_waterskin)
+		insert_object_into_list_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+
 	for (int i = 0; i < 16; i++)
 		if (Lara.PuzzlesCombo[i])
 			insert_object_into_list_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
@@ -2290,6 +2342,31 @@ void init_inventry()
 		{
 			if (have_i_got_item(GLOBAL_lastinvitem))
 				setup_objectlist_startposition(GLOBAL_lastinvitem);
+			else//son of a bitch
+			{
+				if (GLOBAL_lastinvitem >= INV_OBJECT_SMOL_WATERSKIN && GLOBAL_lastinvitem <= INV_OBJECT_SMOL_WATERSKIN3L)
+				{
+					for (int i = INV_OBJECT_SMOL_WATERSKIN; i <= INV_OBJECT_SMOL_WATERSKIN3L; i++)
+					{
+						if (have_i_got_item(i))
+						{
+							setup_objectlist_startposition(i);
+							break;
+						}
+					}
+				}
+				else if (GLOBAL_lastinvitem >= INV_OBJECT_BIG_WATERSKIN && GLOBAL_lastinvitem <= INV_OBJECT_BIG_WATERSKIN5L)
+				{
+					for (int i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
+					{
+						if (have_i_got_item(i))
+						{
+							setup_objectlist_startposition(i);
+							break;
+						}
+					}
+				}
+			}
 
 			GLOBAL_lastinvitem = NO_ITEM;
 		}
@@ -2673,13 +2750,32 @@ void handle_inventry_menu()
 
 		if (goSelect)
 		{
-			if (do_these_objects_combine(rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem, rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem))
+			short invItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+			short ammoItem = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
+
+			if (do_these_objects_combine(invItem, ammoItem))
 			{
 				combine_ring_fade_dir = 2;
 				combine_type_flag = 1;
 				combine_obj1 = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
 				combine_obj2 = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+			}
+			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
+			{
+				do_special_waterskin_combine_bullshit(1);
+				combine_type_flag = 2;
+				combine_ring_fade_dir = 2;
+				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+				return;
+			}
+			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN && invItem <= INV_OBJECT_SMOL_WATERSKIN3L && ammoItem >= INV_OBJECT_BIG_WATERSKIN && ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
+			{
+				do_special_waterskin_combine_bullshit(0);
+				combine_type_flag = 2;
+				combine_ring_fade_dir = 2;
+				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+				return;
 			}
 			else
 			{
@@ -3180,6 +3276,12 @@ void draw_current_object_list(int ringnum)
 			{
 				combine_type_flag = 0;
 				combine_these_two_objects(combine_obj1, combine_obj2);
+			}
+			else if (combine_type_flag == 2)
+			{
+				combine_type_flag = 0;
+				construct_object_list();
+				setup_objectlist_startposition(combine_obj1);
 			}
 			else if (seperate_type_flag)
 				seperate_object(rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem);
@@ -3825,4 +3927,64 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings &= 2;//remove combo1
 	Lara.hasBeetleThings &= 4;//remove combo2
 	Lara.hasBeetleThings |= 1;//get beetle
+}
+
+void do_special_waterskin_combine_bullshit(int flag)
+{
+	short small_liters, big_liters, small_capacity, big_capacity;
+	int i;
+
+	small_liters = Lara.small_waterskin - 1;//how many liters in the small one?
+	big_liters = Lara.big_waterskin - 1;//how many liters in the big one?
+	small_capacity = 3 - small_liters;//how many more liters can we fit in the small one?
+	big_capacity = 5 - big_liters;//how many more liters can we fit in the big one?
+
+	if (flag)
+	{
+		if (Lara.big_waterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
+		{
+			i = big_liters;
+
+			do
+			{
+				if (small_capacity)
+				{
+					small_liters++;
+					small_capacity--;
+					big_liters--;
+				}
+
+				i--;
+
+			} while (i);
+
+			Lara.small_waterskin = small_liters + 1;
+			Lara.big_waterskin = big_liters + 1;
+			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+		}
+	}
+	else 
+	{
+		if (Lara.small_waterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
+		{
+			i = Lara.small_waterskin - 1;
+
+			do
+			{
+				if (big_capacity)
+				{
+					big_liters++;
+					big_capacity--;
+					small_liters--;
+				}
+
+				i--;
+
+			} while (i);
+
+			Lara.small_waterskin = small_liters + 1;
+			Lara.big_waterskin = big_liters + 1;
+			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+		}
+	}
 }
