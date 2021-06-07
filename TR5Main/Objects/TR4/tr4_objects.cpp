@@ -317,7 +317,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->undead = true;
+		obj->zoneType = ZONE_SKELLY;
 	}
 
 	obj = &Objects[ID_KNIGHT_TEMPLAR];
