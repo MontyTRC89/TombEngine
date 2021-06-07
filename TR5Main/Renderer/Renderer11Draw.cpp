@@ -60,6 +60,17 @@ namespace T5M::Renderer
         x *= (ScreenWidth / 800.0f);
         y *= (ScreenHeight / 600.0f);
 
+        if (GLOBAL_invMode)//sorry
+        {
+            INVOBJ* objme;
+
+            objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
+            y += objme->yoff;
+            rotX += objme->xrot;
+            rotY += objme->yrot; 
+            rotZ += objme->zrot;
+        }
+
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
@@ -105,6 +116,16 @@ namespace T5M::Renderer
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
         {
             RendererMesh *mesh = moveableObj.ObjectMeshes[n];
+
+            /*if (GLOBAL_invMode)
+            {
+                INVOBJ* objme;
+
+                objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
+
+                if (!(objme->meshbits & (1 << n)))
+                    continue;
+            }*/
 
             // Finish the world matrix
             translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
