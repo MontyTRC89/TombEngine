@@ -525,6 +525,7 @@ namespace T5M::Renderer
 		void renderPauseMenu();
 		void renderNewInventory();
 		void drawStatistics();
+		void drawExamines();
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
@@ -596,7 +597,7 @@ namespace T5M::Renderer
 		void getItemAbsBonePosition(int itemNumber, DirectX::SimpleMath::Vector3* pos, int joint);
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
 		void getBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
-		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
+		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ, float scale1);
 	
 		RendererMesh* getMesh(int meshIndex);
 	private:

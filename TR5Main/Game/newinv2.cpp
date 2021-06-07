@@ -92,7 +92,6 @@ char seperate_type_flag;
 char combine_type_flag;
 short combine_obj1;
 short combine_obj2;
-short examine_mode = 0;
 bool stop_killing_me_you_dumb_input_system;
 bool stop_killing_me_you_dumb_input_system2;
 int compassNeedleAngle;
@@ -160,161 +159,161 @@ and if it's a weapon, add its ammo handling shit. (look at vars at the beginning
 if it's combineable, add its things to the combine_table.
 */
 
-INVOBJ	inventry_objects_list[INVENTORY_TABLE_SIZE] =
+INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {
 	//weps
-{ID_PISTOLS_ITEM, 6, 1000, 16384, 44364, 48448, 2, STRING_PISTOLS, -1},
-{ID_PISTOLS_AMMO_ITEM, 4, 700, 0, 16384, 0, 2, STRING_PISTOLS_AMMO, -1},
-{ID_UZI_ITEM, -4, 1000, 16384, 24576, 16384, 2, STRING_UZI , -1},
-{ID_UZI_AMMO_ITEM, 5, 700, 0, 5384, 0, 2, STRING_UZI_AMMO, -1},
-{ID_SHOTGUN_ITEM, -6, 640, 32768, 49152, 8192, 2, STRING_SHOTGUN, 1},
-{ID_SHOTGUN_AMMO1_ITEM, 0, 500, 16384, 0, 0, 2, STRING_SHOTGUN_AMMO1, -1},
-{ID_SHOTGUN_AMMO2_ITEM, 0, 500, 16384, 0, 0, 2, STRING_SHOTGUN_AMMO2, -1},
-{ID_REVOLVER_ITEM, 0, 800, 16384, 10922, 15298,	2, STRING_REVOLVER , 1},
-{ID_REVOLVER_AMMO_ITEM, 0, 700, 16384, -3000, 0, 2, STRING_REVOLVER_AMMO, -1},
-{ID_REVOLVER_ITEM, 0, 800, 16384, 10922, 15298, 2, STRING_REVOLVER_LASER, 7},
-{ID_CROSSBOW_ITEM, 0, 900, 8192, 6144, 0, 2, STRING_CROSSBOW, 1},
-{ID_CROSSBOW_ITEM, 0, 900, 8192, 6144, 0, 2, STRING_CROSSBOW_LASER, 1/*idk*/},
-{ID_CROSSBOW_AMMO1_ITEM, 0, 1100, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
-{ID_CROSSBOW_AMMO2_ITEM, 0, 1100, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
-{ID_CROSSBOW_AMMO3_ITEM, 0, 1100, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
-{ID_HK_ITEM, 0, 800, 0, 0xc000, 0, 2, STRING_HK, 1},
-{ID_HK_ITEM, 0, 800, 0, 0xc000, 0, 2, STRING_HK_SILENCED, -1},
-{ID_HK_AMMO_ITEM, 3, 800, 16384, 0, 0, 2, STRING_HK_AMMO, 2},
-{ID_GRENADE_GUN_ITEM, 0, 800, 16384, 0, 11980, 2, STRING_GRENADE_LAUNCHER, -1},
-{ID_GRENADE_AMMO1_ITEM, 3, 800, 16384, 0, 0, 2, STRING_GRENADE_AMMO1, -1},
-{ID_GRENADE_AMMO2_ITEM, 3, 800, 16384, 0, 0, 2, STRING_GRENADE_AMMO2, -1},
-{ID_GRENADE_AMMO3_ITEM, 3, 800, 16384, 0, 0, 2, STRING_GRENADE_AMMO3, -1},
-{ID_HARPOON_ITEM, 0, 800, 16384, 0, 0, 2, STRING_HARPOON_GUN, -1},
-{ID_HARPOON_AMMO_ITEM, 3, 800, 16384, 0, 0, 2, STRING_HARPOON_AMMO, -1},
-{ID_ROCKET_LAUNCHER_ITEM, 0, 800, 16384, 0, 0, 2, STRING_ROCKET_LAUNCHER, -1},
-{ID_ROCKET_LAUNCHER_AMMO_ITEM, 3, 800, 16384, 0, 0, 2, STRING_ROCKET_AMMO, -1},
+{ID_PISTOLS_ITEM, 6, 0.5f, 16384, 44364, 48448, 2, STRING_PISTOLS, -1},
+{ID_PISTOLS_AMMO_ITEM, 4, 0.5f, 0, 16384, 0, 2, STRING_PISTOLS_AMMO, -1},
+{ID_UZI_ITEM, -4, 0.5f, 16384, 24576, 16384, 2, STRING_UZI , -1},
+{ID_UZI_AMMO_ITEM, 5, 0.5f, 0, 5384, 0, 2, STRING_UZI_AMMO, -1},
+{ID_SHOTGUN_ITEM, -6, 0.5f, 32768, 49152, 8192, 2, STRING_SHOTGUN, 1},
+{ID_SHOTGUN_AMMO1_ITEM, 0, 0.5f, 16384, 0, 0, 2, STRING_SHOTGUN_AMMO1, -1},
+{ID_SHOTGUN_AMMO2_ITEM, 0, 0.5f, 16384, 0, 0, 2, STRING_SHOTGUN_AMMO2, -1},
+{ID_REVOLVER_ITEM, 0, 0.5f, 16384, 10922, 15298,	2, STRING_REVOLVER , 1},
+{ID_REVOLVER_AMMO_ITEM, 0, 0.5f, 16384, -3000, 0, 2, STRING_REVOLVER_AMMO, -1},
+{ID_REVOLVER_ITEM, 0, 0.5f, 16384, 10922, 15298, 2, STRING_REVOLVER_LASER, 7},
+{ID_CROSSBOW_ITEM, 0, 0.5f, 8192, 6144, 0, 2, STRING_CROSSBOW, 1},
+{ID_CROSSBOW_ITEM, 0, 0.5f, 8192, 6144, 0, 2, STRING_CROSSBOW_LASER, 1/*idk*/},
+{ID_CROSSBOW_AMMO1_ITEM, 0, 0.5f, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
+{ID_CROSSBOW_AMMO2_ITEM, 0, 0.5f, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
+{ID_CROSSBOW_AMMO3_ITEM, 0, 0.5f, 16384, -4096, 0, 2, STRING_CROSSBOW_AMMO1, -1},
+{ID_HK_ITEM, 0, 0.5f, 0, 0xc000, 0, 2, STRING_HK, 1},
+{ID_HK_ITEM, 0, 0.5f, 0, 0xc000, 0, 2, STRING_HK_SILENCED, -1},
+{ID_HK_AMMO_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_HK_AMMO, 2},
+{ID_GRENADE_GUN_ITEM, 0, 0.5f, 16384, 0, 11980, 2, STRING_GRENADE_LAUNCHER, -1},
+{ID_GRENADE_AMMO1_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_GRENADE_AMMO1, -1},
+{ID_GRENADE_AMMO2_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_GRENADE_AMMO2, -1},
+{ID_GRENADE_AMMO3_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_GRENADE_AMMO3, -1},
+{ID_HARPOON_ITEM, 0, 0.5f, 16384, 0, 0, 2, STRING_HARPOON_GUN, -1},
+{ID_HARPOON_AMMO_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_HARPOON_AMMO, -1},
+{ID_ROCKET_LAUNCHER_ITEM, 0, 0.5f, 16384, 0, 0, 2, STRING_ROCKET_LAUNCHER, -1},
+{ID_ROCKET_LAUNCHER_AMMO_ITEM, 3, 0.5f, 16384, 0, 0, 2, STRING_ROCKET_AMMO, -1},
 
 	//misc
 
-{ID_LASERSIGHT_ITEM, 2, 700, 16384, 2000, 0, 2, STRING_LASERSIGHT, -1},
-{ID_SILENCER_ITEM, 1, 900, 0, 2000, 0, 2, STRING_SILENCER, -1},
-{ID_BIGMEDI_ITEM, 2, 800, 0, 0, 0, 2, STRING_LARGE_MEDIPACK, -1},
-{ID_SMALLMEDI_ITEM, 0, 512, 0, 20480, 0, 2, STRING_SMALL_MEDIPACK, -1},
-{ID_BINOCULARS_ITEM, -1, 700, 4096, 2000, 0, 2, STRING_BINOCULARS, -1},
-{ID_FLARE_INV_ITEM, 2, 1100, 16384, 0, 0, 2, STRING_FLARES, -1},
-{ID_TIMEX_ITEM, 2, 1100, 32768, 0, 0, 2, STRING_TIMEX, -1},
-{ID_PC_LOAD_INV_ITEM, 52, 2200, 32768, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PC_LOAD_SAVE_ITEM, 52, 2200, 32768, 0, 0, 2, STRING_SAVE_GAME, -1},
-{ID_BURNING_TORCH_ITEM, 14, 1200, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
-{ID_CROWBAR_ITEM, 4, 1900, 0, 16384, 0, 2, STRING_CROWBAR, -1},
-{ID_DIARY_ITEM, 0, 0, 0, 0, 0, 2, STRING_DIARY, -1},
-{ID_COMPASS_ITEM, 0x0FFF2, 0x258, 0, 0x36B0, 0, 0, STRING_LOAD_GAME, -1},
-{ID_CLOCKWORK_BEETLE, 14, 1200, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_CLOCKWORK_BEETLE_COMBO1, 18, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_CLOCKWORK_BEETLE_COMBO2, 14, 700, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_WATERSKIN1_EMPTY, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN1_1, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN1_2, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN1_3, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_EMPTY, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_1, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_2, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_3, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_4, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
-{ID_WATERSKIN2_5, 2, 11200, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_LASERSIGHT_ITEM, 2, 0.5f, 16384, 2000, 0, 2, STRING_LASERSIGHT, -1},
+{ID_SILENCER_ITEM, 1, 0.5f, 0, 2000, 0, 2, STRING_SILENCER, -1},
+{ID_BIGMEDI_ITEM, 2, 0.7f, 0, 0, 0, 2, STRING_LARGE_MEDIPACK, -1},
+{ID_SMALLMEDI_ITEM, 0, 0.7f, 0, 20480, 0, 2, STRING_SMALL_MEDIPACK, -1},
+{ID_BINOCULARS_ITEM, -1, 0.5f, 4096, 2000, 0, 2, STRING_BINOCULARS, -1},
+{ID_FLARE_INV_ITEM, 2, 0.7f, 16384, 0, 0, 2, STRING_FLARES, -1},
+{ID_TIMEX_ITEM, 2, 0.4f, 32768, 0, 0, 2, STRING_TIMEX, -1},
+{ID_PC_LOAD_INV_ITEM, 52, 0.3f, 32768, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PC_LOAD_SAVE_ITEM, 52, 0.3f, 32768, 0, 0, 2, STRING_SAVE_GAME, -1},
+{ID_BURNING_TORCH_ITEM, 14, 0.5f, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
+{ID_CROWBAR_ITEM, 4, 0.5f, 0, 16384, 0, 2, STRING_CROWBAR, -1},
+{ID_DIARY_ITEM, 0, 0.5f, 0, 0, 0, 2, STRING_DIARY, -1},
+{ID_COMPASS_ITEM, 0x0FFF2, 0.5f, 0, 0x36B0, 0, 0, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE, 14, 0.5f, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE_COMBO1, 18, 0.5f, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_CLOCKWORK_BEETLE_COMBO2, 14, 0.5f, 0x4000, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_WATERSKIN1_EMPTY, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_1, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_2, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN1_3, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_EMPTY, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_1, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_2, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_3, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_4, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
+{ID_WATERSKIN2_5, 2, 0.5f, 0, 51536, 0, 2, STRING_LOAD_GAME, -1 },
 
 	//puzzles
 
-{ID_PUZZLE_ITEM1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM2, 14, 600, 0, 49152, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM3, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM4, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM5, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM6, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM7, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM8, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM2, 14, 0.5f, 0, 49152, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM3, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM4, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM5, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM6, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM7, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM8, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//puzzle combos
 
-{ID_PUZZLE_ITEM1_COMBO1, 18, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM1_COMBO2, 18, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM2_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM2_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM3_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM3_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM4_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM4_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM5_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM5_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM6_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM6_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM7_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM7_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM8_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM8_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM1_COMBO1, 18, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM1_COMBO2, 18, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM2_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM2_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM3_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM3_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM4_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM4_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM5_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM5_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM6_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM6_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM7_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM7_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM8_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM8_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//keys
 
-{ID_KEY_ITEM1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM3, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM4, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM5, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM6, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM7, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM8, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM3, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM4, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM5, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM6, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM7, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM8, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//key combos
 
-{ID_KEY_ITEM1_COMBO1, 18, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM1_COMBO2, 18, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM2_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM2_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM3_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM3_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM4_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM4_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM5_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM5_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM6_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM6_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM7_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM7_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM8_COMBO1, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_KEY_ITEM8_COMBO2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM1_COMBO1, 18, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM1_COMBO2, 18, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM2_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM2_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM3_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM3_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM4_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM4_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM5_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM5_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM6_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM6_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM7_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM7_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM8_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM8_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//pickups
 
-{ID_PICKUP_ITEM1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM2, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM3, 8, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM4, 2, 800, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM3, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM4, 2, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//pickup combos
 
-{ID_PICKUP_ITEM1_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM1_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM2_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM2_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM3_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM3_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM4_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM4_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM1_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM1_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM2_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM2_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM3_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM3_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM4_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM4_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//examines
 
-{ID_EXAMINE1, 4, 1300, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE2, 14, 1200, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE3, 14, 1200, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE1, 4, 0.5f, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE2, 14, 0.5f, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE3, 14, 0.5f, 0, 16384, 0, 2, STRING_LOAD_GAME, -1},
 
 	//examines combos
 
-{ID_EXAMINE1_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE1_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE2_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE2_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE3_COMBO1, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE3_COMBO2, 14, 1200, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE1_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE1_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE2_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE2_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE3_COMBO1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE3_COMBO2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 };
 
 //available options for each object in the list^^
-unsigned short options_table[] =
+unsigned __int64 options_table[] =
 {
 	//Weps
 	OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_PISTOLS, //pistol item
@@ -740,16 +739,6 @@ int TitleOptions()
 	}
 
 	return ret;
-}
-
-__int64 getTitleSelection()
-{
-	return title_selected_option;
-}
-
-int getTitleMenu()
-{
-	return title_menu_to_display;
 }
 
 void FillDisplayOptions()
@@ -1241,7 +1230,7 @@ int DoPauseMenu()
 		break;
 
 	case pause_controls_menu:
-		pause_flag = 1 << 17;
+		pause_flag = 1 << 19;
 		handle_control_settings_input_pause();
 		break;
 
@@ -1338,16 +1327,6 @@ int DoPauseMenu()
 	}
 
 	return INV_RESULT_NONE;
-}
-
-int GetPauseMenu()
-{
-	return pause_menu_to_display;
-}
-
-__int64 GetPauseSelection()
-{
-	return pause_selected_option;
 }
 
 void handle_display_setting_input_pause()
@@ -1533,7 +1512,7 @@ void handle_control_settings_input_pause()
 		}
 	}
 
-	if (KeyMap[DIK_RETURN])
+	if (KeyMap[DIK_RETURN] && !(pause_selected_option & (1 << 18)) && !(pause_selected_option & (1 << 19)))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
@@ -1802,19 +1781,19 @@ int is_item_currently_combinable(short obj)
 					return 1;
 		}
 	}
-	else if (obj >= INV_OBJECT_SMOL_WATERSKIN && obj <= INV_OBJECT_SMOL_WATERSKIN3L)//if the highlighted object is one of the small waterskins, check if we have the any of the big ones
-	{
-		for (int n = 0; n < 6; n++)
-		{
-			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
-				return 1;
-		}
-	}
-	else if (obj >= INV_OBJECT_BIG_WATERSKIN && obj <= INV_OBJECT_BIG_WATERSKIN5L)//if the highlighted object is one of the big waterskins, check if we have the any of the small ones
+	else if (obj > INV_OBJECT_SMOL_WATERSKIN3L)
 	{
 		for (int n = 0; n < 4; n++)
 		{
 			if (have_i_got_item(n + INV_OBJECT_SMOL_WATERSKIN))
+				return 1;
+		}
+	}
+	else
+	{
+		for (int n = 0; n < 6; n++)
+		{
+			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
 				return 1;
 		}
 	}
@@ -1882,7 +1861,7 @@ void handle_object_changeover(int ringnum)
 void setup_ammo_selector()
 {
 	int num;
-	int opts;
+	unsigned __int64 opts;
 
 	num = 0;
 	opts = options_table[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem];
@@ -1932,7 +1911,6 @@ void setup_ammo_selector()
 
 		if (opts & OPT_CHOOSEAMMO_CROSSBOW)
 		{
-			current_ammo_type = &CurrentCrossBowAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_CROSSBOW_AMMO1;
 			ammo_object_list[num].amount = AmountCrossBowAmmo1;
 			num++;
@@ -1943,20 +1921,20 @@ void setup_ammo_selector()
 			ammo_object_list[num].amount = AmountCrossBowAmmo3;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentCrossBowAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_HK)
 		{
-			current_ammo_type = &CurrentHKAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_HK_AMMO;
 			ammo_object_list[num].amount = AmountHKAmmo1;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentHKAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_SHOTGUN)
 		{
-			current_ammo_type = &CurrentShotGunAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_SHOTGUN_AMMO1;
 			ammo_object_list[num].amount = AmountShotGunAmmo1;
 			num++;
@@ -1964,11 +1942,11 @@ void setup_ammo_selector()
 			ammo_object_list[num].amount = AmountShotGunAmmo2;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentShotGunAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_GRENADEGUN)
 		{
-			current_ammo_type = &CurrentGrenadeGunAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_GRENADE_AMMO1;
 			ammo_object_list[num].amount = AmountGrenadeAmmo1;
 			num++;
@@ -1979,24 +1957,25 @@ void setup_ammo_selector()
 			ammo_object_list[num].amount = AmountGrenadeAmmo3;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentGrenadeGunAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_HARPOON)
 		{
-			current_ammo_type = &CurrentHarpoonAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_HARPOON_AMMO;
 			ammo_object_list[num].amount = AmountHarpoonAmmo;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentHarpoonAmmoType;
 		}
 
 		if (opts & OPT_CHOOSEAMMO_ROCKET)
 		{
-			current_ammo_type = &CurrentRocketAmmoType;
 			ammo_object_list[num].invitem = INV_OBJECT_ROCKET_AMMO;
 			ammo_object_list[num].amount = AmountRocketsAmmo;
 			num++;
 			num_ammo_slots = num;
+			current_ammo_type = &CurrentRocketAmmoType;
 		}
 	}
 }
@@ -2304,7 +2283,6 @@ void construct_combine_object_list()
 void init_inventry()
 {
 	compassNeedleAngle = 4096;
-	examine_mode = 0;
 	AlterFOV(14560);
 	Lara.busy = 0;
 	GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -2732,7 +2710,7 @@ void use_current_item()
 void handle_inventry_menu()
 {
 	int n;
-	int opts;
+	unsigned __int64 opts;
 	int i;
 	int ypos;
 	int num;
@@ -2757,25 +2735,35 @@ void handle_inventry_menu()
 			{
 				combine_ring_fade_dir = 2;
 				combine_type_flag = 1;
-				combine_obj1 = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
-				combine_obj2 = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
+				combine_obj1 = invItem;
+				combine_obj2 = ammoItem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
 			}
 			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				do_special_waterskin_combine_bullshit(1);
-				combine_type_flag = 2;
+				if (do_special_waterskin_combine_bullshit(1))
+				{
+					combine_type_flag = 2;
+					combine_ring_fade_dir = 2;
+					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					return;
+				}
+
+				SayNo();
 				combine_ring_fade_dir = 2;
-				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
-				return;
 			}
 			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN && invItem <= INV_OBJECT_SMOL_WATERSKIN3L && ammoItem >= INV_OBJECT_BIG_WATERSKIN && ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				do_special_waterskin_combine_bullshit(0);
-				combine_type_flag = 2;
+				if (do_special_waterskin_combine_bullshit(0))
+				{
+					combine_type_flag = 2;
+					combine_ring_fade_dir = 2;
+					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					return;
+				}
+
+				SayNo();
 				combine_ring_fade_dir = 2;
-				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
-				return;
 			}
 			else
 			{
@@ -2897,7 +2885,7 @@ void handle_inventry_menu()
 				current_options[2].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[2].invitem].objname);
 			}
 
-			current_selected_option = current_ammo_type[0];
+			current_selected_option = *current_ammo_type;
 		}
 
 		ypos = 310 - font_height;
@@ -2953,7 +2941,7 @@ void handle_inventry_menu()
 					SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				}
 
-				current_ammo_type[0] = current_selected_option;
+				*current_ammo_type = current_selected_option;
 			}
 
 			if (goSelect)
@@ -2987,7 +2975,7 @@ void handle_inventry_menu()
 					break;
 
 				case 11:
-					examine_mode = 1;
+					GLOBAL_invMode = IM_EXAMINE;
 					break;
 
 				case 12:
@@ -3144,7 +3132,7 @@ void draw_ammo_selector()
 		{
 			objme = &inventry_objects_list[ammo_object_list[n].invitem];
 
-			if (n == current_ammo_type[0])
+			if (n == *current_ammo_type)
 			{
 				if ((objme->flags & 2))
 					ammo_object_list[n].yrot += 1022;
@@ -3156,8 +3144,9 @@ void draw_ammo_selector()
 			x = phd_centerx - 300 + xpos;
 			y = 430;
 			short obj = convert_invobj_to_obj(ammo_object_list[n].invitem);
+			float scaler = inventry_objects_list[ammo_object_list[n].invitem].scale1;
 
-			if (n == current_ammo_type[0])
+			if (n == *current_ammo_type)
 			{
 				if (ammo_object_list[n].amount == -1)
 					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
@@ -3166,24 +3155,15 @@ void draw_ammo_selector()
 
 				if (ammo_selector_fade_val)
 					g_Renderer.drawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
-				//		PrintString(phd_centerx, font_height + phd_centery + 2 * font_height - 9, 8, &invTextBuffer[0], FF_CENTER);
 
 				
-				if (n == current_ammo_type[0])
-					//g_Renderer.drawObjectOn2DPosition(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 0, 0);
-					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
+				if (n == *current_ammo_type)
+					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0, scaler);
 				else
-					//DrawThreeDeeObject2D(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 1, 0);
-					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
-
-
-				//drawObjectOn2DPosition
-				//DrawThreeDeeObject2D(int x, int y, int num, int shade, int xrot, int yrot, int zrot, int bright, int overlay)
+					g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0, scaler);
 			}
 			else
-				g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0);
-		//	else
-		//		DrawThreeDeeObject2D(x, y, ammo_object_list[n].invitem, ammo_selector_fade_val, 0, yrot, 0, 1, 0);
+				g_Renderer.drawObjectOn2DPosition(x, y, obj, 0, yrot, 0, scaler);
 
 			xpos += OBJLIST_SPACING;
 		}
@@ -3527,13 +3507,8 @@ void draw_current_object_list(int ringnum)
 			y = 150;
 			y2 = 430;//combine 
 			short obj = convert_invobj_to_obj(rings[ringnum]->current_object_list[n].invitem);
-			short scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.drawObjectOn2DPosition(x, ringnum == RING_INVENTORY ? y : y2, obj, 0, yrot, 0);
-
-		/*	DrawThreeDeeObject2D((int)((phd_centerx * 0.00390625 * 256.0 + inventry_xpos) + xoff + i * OBJLIST_SPACING),
-				(int)(phd_centery * 0.0083333338 * ymeup + inventry_ypos),
-				rings[ringnum]->current_object_list[n].invitem,
-				shade, 0, yrot, 0, rings[ringnum]->current_object_list[n].bright, 0);*/
+			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
+			g_Renderer.drawObjectOn2DPosition(x, ringnum == RING_INVENTORY ? y : y2, obj, 0, yrot, 0, scaler);
 
 			if (++n >= rings[ringnum]->numobjectsinlist)
 				n = 0;
@@ -3651,6 +3626,9 @@ int S_CallInventory2()
 
 		if (GLOBAL_invMode == IM_STATS)
 			do_stats_mode();
+		
+		if (GLOBAL_invMode == IM_EXAMINE)
+			do_examine_mode();
 
 			DrawInv();
 
@@ -3714,18 +3692,33 @@ void do_stats_mode()
 	GLOBAL_invMode = IM_STATS;
 
 	if (goDeselect)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		goDeselect = 0;
 		GLOBAL_invMode = IM_NONE;
+	}
+}
+
+void do_examine_mode()
+{
+	GLOBAL_invMode = IM_EXAMINE;
+
+	if (goDeselect)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		goDeselect = 0;
+		GLOBAL_invMode = IM_NONE;
+	}
 }
 
 void draw_compass()
 {
-	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180));
+	return;
+	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[ID_COMPASS_ITEM].scale1);
 	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
 	short compass_angle = (LaraItem->pos.yRot + compass_speed) - 32768;
 	Matrix::CreateRotationY(compass_angle);
 }
-
-
 
 void combine_revolver_lasersight(int flag)
 {
@@ -3929,7 +3922,7 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings |= 1;//get beetle
 }
 
-void do_special_waterskin_combine_bullshit(int flag)
+int do_special_waterskin_combine_bullshit(int flag)
 {
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
@@ -3961,6 +3954,7 @@ void do_special_waterskin_combine_bullshit(int flag)
 			Lara.small_waterskin = small_liters + 1;
 			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+			return 1;
 		}
 	}
 	else 
@@ -3985,6 +3979,9 @@ void do_special_waterskin_combine_bullshit(int flag)
 			Lara.small_waterskin = small_liters + 1;
 			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+			return 1;
 		}
 	}
+
+	return 0;
 }

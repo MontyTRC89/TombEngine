@@ -10,6 +10,15 @@ using std::vector;
 using namespace T5M::Math::Random;
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
+void DisableBubbles()
+{
+	for (int i = 0; i < MAX_BUBBLES; i++)
+	{
+		BUBBLE_STRUCT* bubble = &Bubbles[i];
+		bubble->active = false;
+	}
+}
+
 void UpdateBubbles()
 {
 	for (int i = 0; i < MAX_BUBBLES; i++)

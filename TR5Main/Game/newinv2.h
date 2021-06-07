@@ -6,16 +6,12 @@ void DrawInv();
 void do_debounced_input();
 void clear_input_vars(bool flag);
 int TitleOptions();
-__int64 getTitleSelection();
-int getTitleMenu();
 void FillDisplayOptions();
 void handle_display_setting_input();
 void handle_control_settings_input();
 void handle_sound_settings_input();
 void fillSound();
 int DoPauseMenu();
-int GetPauseMenu();
-__int64 GetPauseSelection();
 void handle_display_setting_input_pause();
 void handle_control_settings_input_pause();
 void handle_sound_settings_input_pause();
@@ -44,6 +40,7 @@ void spinback(unsigned short* angle);
 void update_laras_weapons_status();
 int S_CallInventory2();
 void do_stats_mode();
+void do_examine_mode();
 void draw_compass();
 void combine_revolver_lasersight(int flag);
 void combine_crossbow_lasersight(int flag);
@@ -69,7 +66,7 @@ void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
 void combine_ClockWorkBeetle(int flag);
-void do_special_waterskin_combine_bullshit(int flag);
+int do_special_waterskin_combine_bullshit(int flag);
 
 // Inventory results
 #define INV_RESULT_NONE						0
@@ -266,7 +263,8 @@ enum inv_modes
 	IM_NONE,
 	IM_INGAME,
 	IM_PAUSE,
-	IM_STATS
+	IM_STATS,
+	IM_EXAMINE
 };
 
 typedef struct titleSettings
@@ -327,7 +325,7 @@ struct INVOBJ
 {
 	short object_number;
 	short yoff;
-	short scale1;
+	float scale1;
 	short yrot;
 	short xrot;
 	short zrot;
@@ -339,9 +337,12 @@ struct INVOBJ
 extern int GLOBAL_invMode;
 extern int pause_menu_to_display;
 extern __int64 pause_selected_option;
+extern __int64 title_selected_option;
+extern int title_menu_to_display;
 extern int GLOBAL_inventoryitemchosen;
 extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
 extern RINGME pcring1;//items ring
 extern RINGME pcring2;//other ring
 extern RINGME* rings[2];
+extern INVOBJ inventry_objects_list[];

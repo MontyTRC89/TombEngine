@@ -890,6 +890,7 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
 			S_CDStop();
+			DisableBubbles();
 
 			return result;
 		}
