@@ -14,7 +14,7 @@ void DrawAirBar(float value);
 void UpdateAirBar(int flash);
 void DrawDashBar(int value);
 void AddDisplayPickup(short objectNumber);
-int DrawAllPickups();
+void DrawAllPickups();
 void InitialisePickupDisplay();
 int FlashIt();
 
