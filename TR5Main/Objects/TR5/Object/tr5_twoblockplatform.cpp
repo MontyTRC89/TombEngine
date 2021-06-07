@@ -189,7 +189,8 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 	if (!item->meshBits)
 		return std::nullopt;
 
-	int height = item->pos.yPos + 256;
+	//+ 256 is more accurate, but prevents a tall block from entering underneath
+	int height = item->pos.yPos + 20;
 	return std::optional{ height };
 }
 
