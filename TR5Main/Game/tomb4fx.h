@@ -247,6 +247,7 @@ void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 int GetFreeBubble();
 void LaraBubbles(ITEM_INFO* item);
+void DisableBubbles();
 void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
