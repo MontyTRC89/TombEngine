@@ -1218,10 +1218,6 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 
 void GetAITarget(CREATURE_INFO* creature)
 {
-#define GET_REACHED_GOAL	abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&\
-							abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&\
-							abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS
-
 	ITEM_INFO* enemy;
 	ITEM_INFO* item;
 	ITEM_INFO* targetItem;
@@ -1267,12 +1263,15 @@ void GetAITarget(CREATURE_INFO* creature)
 		{
 			FindAITargetObject(creature, ID_AI_PATROL2);
 		}
-		else if (GET_REACHED_GOAL || Objects[item->objectNumber].waterCreature)
+		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS 
+			|| Objects[item->objectNumber].waterCreature)
 		{
 			floor = GetFloor(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, &(enemy->roomNumber));
 			GetFloorHeight(floor, enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos);
 			TestTriggers(TriggerIndex, TRUE, 0);
-			creature->patrol2 = ~creature->patrol2;
+			creature->patrol2 = !creature->patrol2;
 		}
 	}
 	else if (item->aiBits & AMBUSH)
@@ -1289,7 +1288,9 @@ void GetAITarget(CREATURE_INFO* creature)
 		{
 			return;
 		}
-		else if (GET_REACHED_GOAL)
+		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
 		{
 			floor = GetFloor(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, &(enemy->roomNumber));
 			GetFloorHeight(floor, enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos);
@@ -1308,7 +1309,7 @@ void GetAITarget(CREATURE_INFO* creature)
 		{
 			creature->enemy = LaraItem;
 			creature->alerted = true;
-			item->aiBits &= ~FOLLOW;
+			//item->aiBits &= ~FOLLOW;
 		}
 		else if (item->hitStatus)
 		{
@@ -1318,7 +1319,9 @@ void GetAITarget(CREATURE_INFO* creature)
 		{
 			FindAITargetObject(creature, ID_AI_FOLLOW);
 		}
-		else if (GET_REACHED_GOAL)
+		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS && 
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS && 
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
 		{
 			creature->reachedGoal = true;
 			item->aiBits &= ~FOLLOW;
@@ -1341,8 +1344,6 @@ void GetAITarget(CREATURE_INFO* creature)
 			}
 		}
 	}
-
-#undef GET_REACHED_GOAL
 }
 
 // tr3 old way..
@@ -1411,10 +1412,10 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 			aiItem->triggerFlags = foundObject->triggerFlags;
 			aiItem->boxNumber = foundObject->boxNumber;
 
-			if (!(creature->aiTarget.flags & 0x20))
+			if (!(creature->aiTarget.flags & 32))
 			{
-				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) * 1024;
-				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) * 1024;
+				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) * 256;
+				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) * 256;
 			}
 		}
 	}
