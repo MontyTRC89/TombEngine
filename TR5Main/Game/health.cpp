@@ -187,69 +187,70 @@ void DrawDashBar(int value)
 	}
 }
 
-int DrawAllPickups()
+void DrawAllPickups()
 {
-	if (Pickups[CurrentPickup].life > 0)
+	DISPLAY_PICKUP* pickup = &Pickups[CurrentPickup];
+
+	if (pickup->life > 0)
 	{
 		if (PickupX > 0)
-		{
 			PickupX += -PickupX >> 3;
-			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
-		}
 		else
-		{
-			Pickups[CurrentPickup].life--;
-			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
-		}
+			pickup->life--;
 	}
-	else if (Pickups[CurrentPickup].life == 0)
+	else if (pickup->life == 0)
 	{
 		if (PickupX < 128)
 		{
 			if (PickupVel < 16)
 				PickupVel++;
-			PickupX += PickupVel / 4;
-			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
+
+			PickupX += PickupVel;
 		}
 		else
 		{
-			Pickups[CurrentPickup].life = -1;
+			pickup->life = -1;
 			PickupVel = 0;
-			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
+		}
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < MAX_COLLECTED_PICKUPS; i++)
+		{
+			if (Pickups[CurrentPickup].life > 0)
+				break;
+
+			CurrentPickup++;
+			CurrentPickup &= (MAX_COLLECTED_PICKUPS - 1);
+		}
+
+		if (i == MAX_COLLECTED_PICKUPS)
+		{
+			CurrentPickup = 0;
+			return;
 		}
 	}
 
-	int pickupIndex = CurrentPickup;
-	int i;
-	for (i = 0; i < MAX_COLLECTED_PICKUPS; ++i)
-	{
-		if (Pickups[pickupIndex].life > 0)
-			break;
-		pickupIndex = pickupIndex + 1 & MAX_COLLECTED_PICKUPS - 1;
-	}
-
-	CurrentPickup = pickupIndex;
-	if (i != MAX_COLLECTED_PICKUPS)
-		g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
-
-	CurrentPickup = 0;
-
-	return 0;
+	g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 }
 
 
 void AddDisplayPickup(short objectNumber)
 {
+	DISPLAY_PICKUP* pickup = Pickups;
+
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
-		DISPLAY_PICKUP* pickup = &Pickups[i];
+		
 		if (pickup->life < 0)
 		{
 			pickup->life = 45;
 			pickup->objectNumber = objectNumber;
-			PickedUpObject(objectNumber);
-			return;
+			break;
 		}
+
+		pickup++;
 	}
 
 	// No free slot found, so just pickup the object ithout displaying it
@@ -259,10 +260,7 @@ void AddDisplayPickup(short objectNumber)
 void InitialisePickupDisplay()
 {
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
-	{
-		DISPLAY_PICKUP* pickup = &Pickups[i];
-		pickup->life = -1;
-	}
+		Pickups[i].life = -1;
 
 	PickupX = 128;
 	PickupY = 128;
