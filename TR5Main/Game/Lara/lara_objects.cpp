@@ -168,14 +168,14 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 104*/
 	/*collision: lara_default_col*/
-	ITEM_INFO* p = (ITEM_INFO*)Lara.generalPtr;
+	ITEM_INFO* pulley = (ITEM_INFO*)Lara.generalPtr;
 
 	Lara.look = false;
 
 	coll->enableSpaz = false;
 	coll->enableBaddiePush = false;
 
-	if (TrInput & IN_ACTION && p->triggerFlags)
+	if (TrInput & IN_ACTION && pulley->triggerFlags)
 	{
 		item->goalAnimState = LS_PULLEY;
 	}
@@ -184,36 +184,41 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 	}
 
-	if (item->animNumber == LA_PULLEY_PULL && item->frameNumber == g_Level.Anims[LA_PULLEY_PULL].frameBase + 44)
+	if (item->animNumber == LA_PULLEY_PULL 
+		&& item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 44)
 	{
-		if (p->triggerFlags)
+		if (pulley->triggerFlags)
 		{
-			p->triggerFlags--;
-
-			if (p->triggerFlags)
+			if (!pulley->itemFlags[1])
 			{
-				if (p->itemFlags[2])
+				pulley->triggerFlags--;
+				if (pulley->triggerFlags)
 				{
-					p->itemFlags[2] = 0;
-					p->status = ITEM_DEACTIVATED;
+					if (pulley->itemFlags[2])
+					{
+						pulley->itemFlags[2] = 0;
+						pulley->status = ITEM_DEACTIVATED;
+					}
 				}
-			}
-			else
-			{
-				if (!p->itemFlags[1])
-					p->status = ITEM_DEACTIVATED;
-
-				p->itemFlags[2] = 1;
-
-				if (p->itemFlags[3] >= 0)
-					p->triggerFlags = abs(p->itemFlags[3]);
 				else
-					p->itemFlags[0] = 1;
+				{
+					pulley->status = ITEM_DEACTIVATED;
+					pulley->itemFlags[2] = 1;
+					if (pulley->itemFlags[3] >= 0)
+					{
+						pulley->triggerFlags = abs(pulley->itemFlags[3]);
+					}
+					else
+					{
+						pulley->itemFlags[0] = 1;
+					}
+				}
 			}
 		}
 	}
 
-	if (item->animNumber == LA_PULLEY_RELEASE && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
+	if (item->animNumber == LA_PULLEY_RELEASE
+		&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 		Lara.gunStatus = LG_NO_ARMS;
 }
 /*end pulley*/

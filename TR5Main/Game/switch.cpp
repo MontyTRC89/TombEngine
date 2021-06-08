@@ -808,9 +808,13 @@ void PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (item->flags & 0x100
-		|| (!(TrInput & IN_ACTION) || Lara.gunStatus || l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || 
-			item->status || item->gravityStatus)
-		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+		|| (!(TrInput & IN_ACTION) 
+			|| Lara.gunStatus
+			|| l->currentAnimState != LS_STOP
+			|| l->animNumber != LA_STAND_IDLE 
+			|| item->gravityStatus)
+		&& (!Lara.isMoving 
+			|| Lara.generalPtr != (void*)itemNum))
 	{
 		if (l->currentAnimState != LS_PULLEY)
 			ObjectCollision(itemNum, l, coll);
@@ -821,7 +825,17 @@ void PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		item->pos.yRot = l->pos.yRot;
 		if (TestLaraPosition(&PulleyBounds, item, l))
 		{
-			if (MoveLaraPosition(&PulleyPos, item, l))
+			if (item->itemFlags[1])
+			{
+				if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
+				{
+					OldPickupPos.x = l->pos.xPos;
+					OldPickupPos.y = l->pos.yPos;
+					OldPickupPos.z = l->pos.zPos;
+					SayNo();
+				}
+			}
+			else if (MoveLaraPosition(&PulleyPos, item, l))
 			{
 				l->animNumber = LA_PULLEY_GRAB;
 				l->currentAnimState = LS_PULLEY;
@@ -1133,10 +1147,12 @@ void SwitchControl(short itemNumber)
 				item->goalAnimState = 0;
 				item->timer = 0;
 				AnimateItem(item);
-				return;
 			}
-			item->goalAnimState = 1;
-			item->timer = 0;
+			else
+			{
+				item->goalAnimState = 1;
+				item->timer = 0;
+			}
 		}
 	}
 	else
@@ -1297,8 +1313,11 @@ void InitialisePulleySwitch(short itemNumber)
 	item->itemFlags[3] = item->triggerFlags;
 	item->triggerFlags = abs(item->triggerFlags);
 
-	if (itemNumber == PulleyItemNumber)
+	if (item->status == ITEM_INVISIBLE)
+	{
 		item->itemFlags[1] = 1;
+		item->status = ITEM_NOT_ACTIVE;
+	}
 }
 
 void InitialiseCrowDoveSwitch(short itemNumber)
