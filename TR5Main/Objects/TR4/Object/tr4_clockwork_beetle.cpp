@@ -63,7 +63,7 @@ void ClockworkBeetleControl(short item_number)
 	beetle->pos.yPos += beetle->fallspeed;
 
 	short roomNum = beetle->roomNumber;
-	FLOOR_INFO* floor = GetFloor(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, &roomNum);
+	FLOOR_INFO* floor = GetFloor(beetle->pos.xPos, beetle->pos.yPos - 20, beetle->pos.zPos, &roomNum);
 	int height = GetFloorHeight(floor, beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
 
 	if (beetle->pos.yPos > height)
