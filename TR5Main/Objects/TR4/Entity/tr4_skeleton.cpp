@@ -118,7 +118,7 @@ void InitialiseSkeleton(short itemNumber)
 		item->currentAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
 		item->animNumber = obj->animIndex;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->status = ITEM_DEACTIVATED;
+		//item->status = ITEM_DEACTIVATED;
 		break;
 
 	}
