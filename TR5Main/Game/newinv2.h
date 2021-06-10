@@ -53,6 +53,14 @@ void combine_PuzzleItem5(int flag);
 void combine_PuzzleItem6(int flag);
 void combine_PuzzleItem7(int flag);
 void combine_PuzzleItem8(int flag);
+void combine_PuzzleItem9(int flag);
+void combine_PuzzleItem10(int flag);
+void combine_PuzzleItem11(int flag);
+void combine_PuzzleItem12(int flag);
+void combine_PuzzleItem13(int flag);
+void combine_PuzzleItem14(int flag);
+void combine_PuzzleItem15(int flag);
+void combine_PuzzleItem16(int flag);
 void combine_KeyItem1(int flag);
 void combine_KeyItem2(int flag);
 void combine_KeyItem3(int flag);
@@ -61,6 +69,14 @@ void combine_KeyItem5(int flag);
 void combine_KeyItem6(int flag);
 void combine_KeyItem7(int flag);
 void combine_KeyItem8(int flag);
+void combine_KeyItem9(int flag);
+void combine_KeyItem10(int flag);
+void combine_KeyItem11(int flag);
+void combine_KeyItem12(int flag);
+void combine_KeyItem13(int flag);
+void combine_KeyItem14(int flag);
+void combine_KeyItem15(int flag);
+void combine_KeyItem16(int flag);
 void combine_PickupItem1(int flag);
 void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
@@ -180,6 +196,14 @@ enum inv_objects
 	INV_OBJECT_PUZZLE6,
 	INV_OBJECT_PUZZLE7,
 	INV_OBJECT_PUZZLE8,
+	INV_OBJECT_PUZZLE9,
+	INV_OBJECT_PUZZLE10,
+	INV_OBJECT_PUZZLE11,
+	INV_OBJECT_PUZZLE12,
+	INV_OBJECT_PUZZLE13,
+	INV_OBJECT_PUZZLE14,
+	INV_OBJECT_PUZZLE15,
+	INV_OBJECT_PUZZLE16,
 
 	INV_OBJECT_PUZZLE1_COMBO1,
 	INV_OBJECT_PUZZLE1_COMBO2,
@@ -197,6 +221,22 @@ enum inv_objects
 	INV_OBJECT_PUZZLE7_COMBO2,
 	INV_OBJECT_PUZZLE8_COMBO1,
 	INV_OBJECT_PUZZLE8_COMBO2,
+	INV_OBJECT_PUZZLE9_COMBO1,
+	INV_OBJECT_PUZZLE9_COMBO2,
+	INV_OBJECT_PUZZLE10_COMBO1,
+	INV_OBJECT_PUZZLE10_COMBO2,
+	INV_OBJECT_PUZZLE11_COMBO1,
+	INV_OBJECT_PUZZLE11_COMBO2,
+	INV_OBJECT_PUZZLE12_COMBO1,
+	INV_OBJECT_PUZZLE12_COMBO2,
+	INV_OBJECT_PUZZLE13_COMBO1,
+	INV_OBJECT_PUZZLE13_COMBO2,
+	INV_OBJECT_PUZZLE14_COMBO1,
+	INV_OBJECT_PUZZLE14_COMBO2,
+	INV_OBJECT_PUZZLE15_COMBO1,
+	INV_OBJECT_PUZZLE15_COMBO2,
+	INV_OBJECT_PUZZLE16_COMBO1,
+	INV_OBJECT_PUZZLE16_COMBO2,
 
 	INV_OBJECT_KEY1,
 	INV_OBJECT_KEY2,
@@ -206,6 +246,14 @@ enum inv_objects
 	INV_OBJECT_KEY6,
 	INV_OBJECT_KEY7,
 	INV_OBJECT_KEY8,
+	INV_OBJECT_KEY9,
+	INV_OBJECT_KEY10,
+	INV_OBJECT_KEY11,
+	INV_OBJECT_KEY12,
+	INV_OBJECT_KEY13,
+	INV_OBJECT_KEY14,
+	INV_OBJECT_KEY15,
+	INV_OBJECT_KEY16,
 
 	INV_OBJECT_KEY1_COMBO1,
 	INV_OBJECT_KEY1_COMBO2,
@@ -223,6 +271,22 @@ enum inv_objects
 	INV_OBJECT_KEY7_COMBO2,
 	INV_OBJECT_KEY8_COMBO1,
 	INV_OBJECT_KEY8_COMBO2,
+	INV_OBJECT_KEY9_COMBO1,
+	INV_OBJECT_KEY9_COMBO2,
+	INV_OBJECT_KEY10_COMBO1,
+	INV_OBJECT_KEY10_COMBO2,
+	INV_OBJECT_KEY11_COMBO1,
+	INV_OBJECT_KEY11_COMBO2,
+	INV_OBJECT_KEY12_COMBO1,
+	INV_OBJECT_KEY12_COMBO2,
+	INV_OBJECT_KEY13_COMBO1,
+	INV_OBJECT_KEY13_COMBO2,
+	INV_OBJECT_KEY14_COMBO1,
+	INV_OBJECT_KEY14_COMBO2,
+	INV_OBJECT_KEY15_COMBO1,
+	INV_OBJECT_KEY15_COMBO2,
+	INV_OBJECT_KEY16_COMBO1,
+	INV_OBJECT_KEY16_COMBO2,
 
 	INV_OBJECT_PICKUP1,
 	INV_OBJECT_PICKUP2,
