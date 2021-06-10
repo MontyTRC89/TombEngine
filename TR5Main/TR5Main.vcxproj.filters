@@ -952,9 +952,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Entity\tr4_dog.h">
-		<Filter>File di intestazione</Filter>
+      <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Object\tr4_clockwork_beetle.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Object\tr4_obelisk.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1758,6 +1761,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Object\tr4_clockwork_beetle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Object\tr4_obelisk.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
