@@ -118,7 +118,7 @@ short optmessages[] =
 #define phd_winymax g_Configuration.Height
 #define phd_centerx 400
 #define phd_centery phd_winymax / 2
-#define max_combines	24//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
+#define max_combines	40//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
 
 COMBINELIST combine_table[max_combines] =
 {
@@ -133,6 +133,14 @@ COMBINELIST combine_table[max_combines] =
 	{combine_PuzzleItem6, INV_OBJECT_PUZZLE6_COMBO1, INV_OBJECT_PUZZLE6_COMBO2, INV_OBJECT_PUZZLE6},
 	{combine_PuzzleItem7, INV_OBJECT_PUZZLE7_COMBO1, INV_OBJECT_PUZZLE7_COMBO2, INV_OBJECT_PUZZLE7},
 	{combine_PuzzleItem8, INV_OBJECT_PUZZLE8_COMBO1, INV_OBJECT_PUZZLE8_COMBO2, INV_OBJECT_PUZZLE8},
+	{combine_PuzzleItem9, INV_OBJECT_PUZZLE9_COMBO1, INV_OBJECT_PUZZLE9_COMBO2, INV_OBJECT_PUZZLE9},
+	{combine_PuzzleItem10, INV_OBJECT_PUZZLE10_COMBO1, INV_OBJECT_PUZZLE10_COMBO2, INV_OBJECT_PUZZLE10},
+	{combine_PuzzleItem11, INV_OBJECT_PUZZLE11_COMBO1, INV_OBJECT_PUZZLE11_COMBO2, INV_OBJECT_PUZZLE11},
+	{combine_PuzzleItem12, INV_OBJECT_PUZZLE12_COMBO1, INV_OBJECT_PUZZLE12_COMBO2, INV_OBJECT_PUZZLE12},
+	{combine_PuzzleItem13, INV_OBJECT_PUZZLE13_COMBO1, INV_OBJECT_PUZZLE13_COMBO2, INV_OBJECT_PUZZLE13},
+	{combine_PuzzleItem14, INV_OBJECT_PUZZLE14_COMBO1, INV_OBJECT_PUZZLE14_COMBO2, INV_OBJECT_PUZZLE14},
+	{combine_PuzzleItem15, INV_OBJECT_PUZZLE15_COMBO1, INV_OBJECT_PUZZLE15_COMBO2, INV_OBJECT_PUZZLE15},
+	{combine_PuzzleItem16, INV_OBJECT_PUZZLE16_COMBO1, INV_OBJECT_PUZZLE16_COMBO2, INV_OBJECT_PUZZLE16},
 	{combine_KeyItem1, INV_OBJECT_KEY1_COMBO1, INV_OBJECT_KEY1_COMBO2, INV_OBJECT_KEY1},
 	{combine_KeyItem2, INV_OBJECT_KEY2_COMBO1, INV_OBJECT_KEY2_COMBO2, INV_OBJECT_KEY2},
 	{combine_KeyItem3, INV_OBJECT_KEY3_COMBO1, INV_OBJECT_KEY3_COMBO2, INV_OBJECT_KEY3},
@@ -141,6 +149,14 @@ COMBINELIST combine_table[max_combines] =
 	{combine_KeyItem6, INV_OBJECT_KEY6_COMBO1, INV_OBJECT_KEY6_COMBO2, INV_OBJECT_KEY6},
 	{combine_KeyItem7, INV_OBJECT_KEY7_COMBO1, INV_OBJECT_KEY7_COMBO2, INV_OBJECT_KEY7},
 	{combine_KeyItem8, INV_OBJECT_KEY8_COMBO1, INV_OBJECT_KEY8_COMBO2, INV_OBJECT_KEY8},
+	{combine_KeyItem9, INV_OBJECT_KEY9_COMBO1, INV_OBJECT_KEY9_COMBO2, INV_OBJECT_KEY9},
+	{combine_KeyItem10, INV_OBJECT_KEY10_COMBO1, INV_OBJECT_KEY10_COMBO2, INV_OBJECT_KEY10},
+	{combine_KeyItem11, INV_OBJECT_KEY11_COMBO1, INV_OBJECT_KEY11_COMBO2, INV_OBJECT_KEY11},
+	{combine_KeyItem12, INV_OBJECT_KEY12_COMBO1, INV_OBJECT_KEY12_COMBO2, INV_OBJECT_KEY12},
+	{combine_KeyItem13, INV_OBJECT_KEY13_COMBO1, INV_OBJECT_KEY13_COMBO2, INV_OBJECT_KEY13},
+	{combine_KeyItem14, INV_OBJECT_KEY14_COMBO1, INV_OBJECT_KEY14_COMBO2, INV_OBJECT_KEY14},
+	{combine_KeyItem15, INV_OBJECT_KEY15_COMBO1, INV_OBJECT_KEY15_COMBO2, INV_OBJECT_KEY15},
+	{combine_KeyItem16, INV_OBJECT_KEY16_COMBO1, INV_OBJECT_KEY16_COMBO2, INV_OBJECT_KEY16},
 	{combine_PickupItem1, INV_OBJECT_PICKUP1_COMBO1, INV_OBJECT_PICKUP1_COMBO2, INV_OBJECT_PICKUP1},
 	{combine_PickupItem2, INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2},
 	{combine_PickupItem3, INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3},
@@ -152,6 +168,7 @@ COMBINELIST combine_table[max_combines] =
 if you wanna add an object to the inventory, edit the inv_objects array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
 the #s MUST MATCH.
 i.e if uzi item is #2 in inv_objects (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
+and the same thing for the options table too please!
 
 note: don't forget to add your object to the proper list construction function, and EDIT THE OPTIONS TABLE ALSO!!!!
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file) 
@@ -220,13 +237,21 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	//puzzles
 
 {ID_PUZZLE_ITEM1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PUZZLE_ITEM2, 14, 0.5f, 0, 49152, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM3, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM4, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM5, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM6, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM7, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM8, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM9, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM10, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM11, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM12, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM13, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM14, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM15, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM16, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//puzzle combos
 
@@ -246,6 +271,22 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_PUZZLE_ITEM7_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM8_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PUZZLE_ITEM8_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM9_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM9_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM10_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM10_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM11_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM11_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM12_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM12_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM13_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM13_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM14_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM14_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM15_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM15_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM16_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PUZZLE_ITEM16_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//keys
 
@@ -257,6 +298,14 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_KEY_ITEM6, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_KEY_ITEM7, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_KEY_ITEM8, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM9, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM10, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM11, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM12, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM13, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM14, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM15, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM16, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//key combos
 
@@ -276,6 +325,22 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_KEY_ITEM7_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_KEY_ITEM8_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_KEY_ITEM8_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM9_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM9_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM10_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM10_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM11_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM11_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM12_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM12_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM13_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM13_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM14_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM14_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM15_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM15_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM16_COMBO1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_KEY_ITEM16_COMBO2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//pickups
 
@@ -298,7 +363,7 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	//examines
 
 {ID_EXAMINE1, 4, 0.5f, 0, ANGLE(90), 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE2, 14, 0.5f, 0, ANGLE(90), 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_EXAMINE3, 14, 0.5f, 0, ANGLE(90), 0, 2, STRING_LOAD_GAME, -1},
 
 	//examines combos
@@ -375,7 +440,15 @@ unsigned __int64 options_table[] =
 	OPT_USE,
 	OPT_USE,
 	OPT_USE,
-	OPT_USE,//8 puzzle items
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,//16 puzzle items
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
 	OPT_USE,
 	OPT_USE,
 	OPT_USE,
@@ -388,7 +461,23 @@ unsigned __int64 options_table[] =
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
-	OPT_USE | OPT_COMBINABLE,//8 puzzle items, each one has 2 parts, so 16
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,//16 puzzle items, each one has 2 parts, so 32
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
@@ -403,7 +492,15 @@ unsigned __int64 options_table[] =
 	OPT_USE,
 	OPT_USE,
 	OPT_USE,
-	OPT_USE,//8 key items
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,//16 key items
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
 	OPT_USE,
 	OPT_USE,
 	OPT_USE,
@@ -416,7 +513,23 @@ unsigned __int64 options_table[] =
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
-	OPT_USE | OPT_COMBINABLE,//8 key items, each one has 2 parts, so 16
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,//16 key items, each one has 2 parts, so 32
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
@@ -2161,19 +2274,19 @@ void construct_object_list()
 	if (Lara.big_waterskin)
 		insert_object_into_list((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_PUZZLES; i++)
 		if (Lara.Puzzles[i])
 			insert_object_into_list(INV_OBJECT_PUZZLE1 + i);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
 			insert_object_into_list(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_KEYS; i++)
 		if (Lara.Keys[i])
 			insert_object_into_list(INV_OBJECT_KEY1 + i);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_KEY_PIECES; i++)
 		if (Lara.KeysCombo[i])
 			insert_object_into_list(INV_OBJECT_KEY1_COMBO1 + i);
 
@@ -2262,11 +2375,11 @@ void construct_combine_object_list()
 	if (Lara.big_waterskin)
 		insert_object_into_list_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
 			insert_object_into_list_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_KEY_PIECES; i++)
 		if (Lara.KeysCombo[i])
 			insert_object_into_list_v2(INV_OBJECT_KEY1_COMBO1 + i);
 
@@ -2371,16 +2484,16 @@ void init_inventry()
 
 int have_i_got_object(short object_number)
 {
-	if (object_number >= ID_PUZZLE_ITEM1_COMBO1 && object_number <= ID_PUZZLE_ITEM8_COMBO2)
+	if (object_number >= ID_PUZZLE_ITEM1_COMBO1 && object_number <= ID_PUZZLE_ITEM16_COMBO2)
 		return Lara.PuzzlesCombo[object_number - ID_PUZZLE_ITEM1_COMBO1];
 
-	if (object_number >= ID_PUZZLE_ITEM1 && object_number <= ID_PUZZLE_ITEM8)
+	if (object_number >= ID_PUZZLE_ITEM1 && object_number <= ID_PUZZLE_ITEM16)
 		return Lara.Puzzles[object_number - ID_PUZZLE_ITEM1];
 
-	if (object_number >= ID_KEY_ITEM1_COMBO1 && object_number <= ID_KEY_ITEM8_COMBO2)
+	if (object_number >= ID_KEY_ITEM1_COMBO1 && object_number <= ID_KEY_ITEM16_COMBO2)
 		return Lara.KeysCombo[object_number - ID_KEY_ITEM1_COMBO1];
 
-	if (object_number >= ID_KEY_ITEM1 && object_number <= ID_KEY_ITEM8)
+	if (object_number >= ID_KEY_ITEM1 && object_number <= ID_KEY_ITEM16)
 		return Lara.Keys[object_number - ID_KEY_ITEM1];
 
 	if (object_number >= ID_PICKUP_ITEM1_COMBO1 && object_number <= ID_PICKUP_ITEM4_COMBO2)
@@ -3363,7 +3476,7 @@ void draw_current_object_list(int ringnum)
 
 				default:
 					if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-						inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM8)
+						inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
 					{
 						switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
 						{
@@ -3442,7 +3555,7 @@ void draw_current_object_list(int ringnum)
 				}
 
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-					inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM8)
+					inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
 				{
 					if (nummeup)
 					{
@@ -3461,7 +3574,6 @@ void draw_current_object_list(int ringnum)
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
 				g_Renderer.drawString(phd_centerx, ringnum == RING_INVENTORY ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
-			//	PrintString(phd_centerx, objmeup, 8, textbufme, 0x8000);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3830,6 +3942,62 @@ void combine_PuzzleItem8(int flag)
 	Lara.Puzzles[7] = 1;
 }
 
+void combine_PuzzleItem9(int flag)
+{
+	Lara.PuzzlesCombo[16] = 0;
+	Lara.PuzzlesCombo[17] = 0;
+	Lara.Puzzles[8] = 1;
+}
+
+void combine_PuzzleItem10(int flag)
+{
+	Lara.PuzzlesCombo[18] = 0;
+	Lara.PuzzlesCombo[19] = 0;
+	Lara.Puzzles[9] = 1;
+}
+
+void combine_PuzzleItem11(int flag)
+{
+	Lara.PuzzlesCombo[20] = 0;
+	Lara.PuzzlesCombo[21] = 0;
+	Lara.Puzzles[10] = 1;
+}
+
+void combine_PuzzleItem12(int flag)
+{
+	Lara.PuzzlesCombo[22] = 0;
+	Lara.PuzzlesCombo[23] = 0;
+	Lara.Puzzles[11] = 1;
+}
+
+void combine_PuzzleItem13(int flag)
+{
+	Lara.PuzzlesCombo[24] = 0;
+	Lara.PuzzlesCombo[25] = 0;
+	Lara.Puzzles[12] = 1;
+}
+
+void combine_PuzzleItem14(int flag)
+{
+	Lara.PuzzlesCombo[26] = 0;
+	Lara.PuzzlesCombo[27] = 0;
+	Lara.Puzzles[13] = 1;
+}
+
+void combine_PuzzleItem15(int flag)
+{
+	Lara.PuzzlesCombo[28] = 0;
+	Lara.PuzzlesCombo[29] = 0;
+	Lara.Puzzles[14] = 1;
+}
+
+void combine_PuzzleItem16(int flag)
+{
+	Lara.PuzzlesCombo[30] = 0;
+	Lara.PuzzlesCombo[31] = 0;
+	Lara.Puzzles[15] = 1;
+}
+
 void combine_KeyItem1(int flag)
 {
 	Lara.Keys[0] = 1;
@@ -3884,6 +4052,62 @@ void combine_KeyItem8(int flag)
 	Lara.Keys[7] = 1;
 	Lara.KeysCombo[14] = 0;
 	Lara.KeysCombo[15] = 0;
+}
+
+void combine_KeyItem9(int flag)
+{
+	Lara.Keys[8] = 1;
+	Lara.KeysCombo[16] = 0;
+	Lara.KeysCombo[17] = 0;
+}
+
+void combine_KeyItem10(int flag)
+{
+	Lara.Keys[9] = 1;
+	Lara.KeysCombo[18] = 0;
+	Lara.KeysCombo[19] = 0;
+}
+
+void combine_KeyItem11(int flag)
+{
+	Lara.Keys[10] = 1;
+	Lara.KeysCombo[20] = 0;
+	Lara.KeysCombo[21] = 0;
+}
+
+void combine_KeyItem12(int flag)
+{
+	Lara.Keys[11] = 1;
+	Lara.KeysCombo[22] = 0;
+	Lara.KeysCombo[23] = 0;
+}
+
+void combine_KeyItem13(int flag)
+{
+	Lara.Keys[12] = 1;
+	Lara.KeysCombo[24] = 0;
+	Lara.KeysCombo[25] = 0;
+}
+
+void combine_KeyItem14(int flag)
+{
+	Lara.Keys[13] = 1;
+	Lara.KeysCombo[26] = 0;
+	Lara.KeysCombo[27] = 0;
+}
+
+void combine_KeyItem15(int flag)
+{
+	Lara.Keys[14] = 1;
+	Lara.KeysCombo[28] = 0;
+	Lara.KeysCombo[29] = 0;
+}
+
+void combine_KeyItem16(int flag)
+{
+	Lara.Keys[15] = 1;
+	Lara.KeysCombo[30] = 0;
+	Lara.KeysCombo[31] = 0;
 }
 
 void combine_PickupItem1(int flag)
