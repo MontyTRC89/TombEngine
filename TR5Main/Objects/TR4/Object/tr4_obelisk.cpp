@@ -7,7 +7,7 @@
 #include "sound.h"
 #include "lara.h"
 #include "effect2.h"
-#include "items.cpp"
+#include "items.h"
 #include "tomb4fx.h"
 
 void InitialiseObelisk(short itemNumber)
