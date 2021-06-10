@@ -503,3 +503,18 @@ std::vector<int> FindItem(short objectNumber)
 
 	return itemList;
 }
+
+ITEM_INFO* find_a_fucking_item(int object_number)
+{
+	ITEM_INFO* item;
+
+	for (int i = 0; i < g_Level.NumItems; i++)
+	{
+		item = &g_Level.Items[i];
+
+		if (item->objectNumber == object_number)
+			return item;
+	}
+
+	return 0;
+}
