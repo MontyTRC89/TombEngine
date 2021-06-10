@@ -60,16 +60,15 @@ namespace T5M::Renderer
         x *= (ScreenWidth / 800.0f);
         y *= (ScreenHeight / 600.0f);
 
-        if (GLOBAL_invMode)//sorry
-        {
-            INVOBJ* objme;
+#ifdef NEW_INV
+        INVOBJ* objme;
 
-            objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
-            y += objme->yoff;
-            rotX += objme->xrot;
-            rotY += objme->yrot; 
-            rotZ += objme->zrot;
-        }
+        objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
+        y += objme->yoff;
+        rotX += objme->xrot;
+        rotY += objme->yrot;
+        rotZ += objme->zrot;
+#endif
 
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);

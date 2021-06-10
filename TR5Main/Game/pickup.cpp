@@ -350,21 +350,21 @@ void PickedUpObject(short objectNumber)
 			break;
 
 		default:
-			if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
+			if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM16)
 				Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]++;
-			else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
+			else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM16_COMBO2)
 				Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]++;
-			else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
+			else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM16)
 				Lara.Keys[objectNumber - ID_KEY_ITEM1]++;
-			else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
+			else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM16_COMBO2)
 				Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]++;
-			else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
+			else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM16)
 				Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]++;
-			else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
+			else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM16_COMBO2)
 				Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]++;
-			else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
+			else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE8)
 				Lara.Examines[objectNumber - ID_EXAMINE1] = 1;
-			else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
+			else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE8_COMBO2)
 				Lara.ExaminesCombo[objectNumber - ID_EXAMINE1_COMBO1] = 1;
 			break;
 	}
