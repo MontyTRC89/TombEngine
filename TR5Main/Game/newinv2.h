@@ -53,6 +53,14 @@ void combine_PuzzleItem5(int flag);
 void combine_PuzzleItem6(int flag);
 void combine_PuzzleItem7(int flag);
 void combine_PuzzleItem8(int flag);
+void combine_PuzzleItem9(int flag);
+void combine_PuzzleItem10(int flag);
+void combine_PuzzleItem11(int flag);
+void combine_PuzzleItem12(int flag);
+void combine_PuzzleItem13(int flag);
+void combine_PuzzleItem14(int flag);
+void combine_PuzzleItem15(int flag);
+void combine_PuzzleItem16(int flag);
 void combine_KeyItem1(int flag);
 void combine_KeyItem2(int flag);
 void combine_KeyItem3(int flag);
@@ -61,10 +69,38 @@ void combine_KeyItem5(int flag);
 void combine_KeyItem6(int flag);
 void combine_KeyItem7(int flag);
 void combine_KeyItem8(int flag);
+void combine_KeyItem9(int flag);
+void combine_KeyItem10(int flag);
+void combine_KeyItem11(int flag);
+void combine_KeyItem12(int flag);
+void combine_KeyItem13(int flag);
+void combine_KeyItem14(int flag);
+void combine_KeyItem15(int flag);
+void combine_KeyItem16(int flag);
 void combine_PickupItem1(int flag);
 void combine_PickupItem2(int flag);
 void combine_PickupItem3(int flag);
 void combine_PickupItem4(int flag);
+void combine_PickupItem5(int flag);
+void combine_PickupItem6(int flag);
+void combine_PickupItem7(int flag);
+void combine_PickupItem8(int flag);
+void combine_PickupItem9(int flag);
+void combine_PickupItem10(int flag);
+void combine_PickupItem11(int flag);
+void combine_PickupItem12(int flag);
+void combine_PickupItem13(int flag);
+void combine_PickupItem14(int flag);
+void combine_PickupItem15(int flag);
+void combine_PickupItem16(int flag);
+void combine_Examine1(int flag);
+void combine_Examine2(int flag);
+void combine_Examine3(int flag);
+void combine_Examine4(int flag);
+void combine_Examine5(int flag);
+void combine_Examine6(int flag);
+void combine_Examine7(int flag);
+void combine_Examine8(int flag);
 void combine_ClockWorkBeetle(int flag);
 int do_special_waterskin_combine_bullshit(int flag);
 
@@ -100,6 +136,13 @@ enum item_options
 	OPT_CHOOSEAMMO_ROCKET = 1 << 17
 };
 
+enum rotflags
+{
+	INV_ROT_X = 1,
+	INV_ROT_Y = 2,
+	INV_ROT_Z = 4
+};
+
 struct uhmG 
 {
 	int type;
@@ -110,7 +153,9 @@ struct AMMOLIST
 {
 	short	   		invitem;
 	short	 		amount;
+	unsigned short	xrot;
 	unsigned short	yrot;
+	unsigned short	zrot;
 };
 
 enum inv_objects
@@ -180,6 +225,14 @@ enum inv_objects
 	INV_OBJECT_PUZZLE6,
 	INV_OBJECT_PUZZLE7,
 	INV_OBJECT_PUZZLE8,
+	INV_OBJECT_PUZZLE9,
+	INV_OBJECT_PUZZLE10,
+	INV_OBJECT_PUZZLE11,
+	INV_OBJECT_PUZZLE12,
+	INV_OBJECT_PUZZLE13,
+	INV_OBJECT_PUZZLE14,
+	INV_OBJECT_PUZZLE15,
+	INV_OBJECT_PUZZLE16,
 
 	INV_OBJECT_PUZZLE1_COMBO1,
 	INV_OBJECT_PUZZLE1_COMBO2,
@@ -197,6 +250,22 @@ enum inv_objects
 	INV_OBJECT_PUZZLE7_COMBO2,
 	INV_OBJECT_PUZZLE8_COMBO1,
 	INV_OBJECT_PUZZLE8_COMBO2,
+	INV_OBJECT_PUZZLE9_COMBO1,
+	INV_OBJECT_PUZZLE9_COMBO2,
+	INV_OBJECT_PUZZLE10_COMBO1,
+	INV_OBJECT_PUZZLE10_COMBO2,
+	INV_OBJECT_PUZZLE11_COMBO1,
+	INV_OBJECT_PUZZLE11_COMBO2,
+	INV_OBJECT_PUZZLE12_COMBO1,
+	INV_OBJECT_PUZZLE12_COMBO2,
+	INV_OBJECT_PUZZLE13_COMBO1,
+	INV_OBJECT_PUZZLE13_COMBO2,
+	INV_OBJECT_PUZZLE14_COMBO1,
+	INV_OBJECT_PUZZLE14_COMBO2,
+	INV_OBJECT_PUZZLE15_COMBO1,
+	INV_OBJECT_PUZZLE15_COMBO2,
+	INV_OBJECT_PUZZLE16_COMBO1,
+	INV_OBJECT_PUZZLE16_COMBO2,
 
 	INV_OBJECT_KEY1,
 	INV_OBJECT_KEY2,
@@ -206,6 +275,14 @@ enum inv_objects
 	INV_OBJECT_KEY6,
 	INV_OBJECT_KEY7,
 	INV_OBJECT_KEY8,
+	INV_OBJECT_KEY9,
+	INV_OBJECT_KEY10,
+	INV_OBJECT_KEY11,
+	INV_OBJECT_KEY12,
+	INV_OBJECT_KEY13,
+	INV_OBJECT_KEY14,
+	INV_OBJECT_KEY15,
+	INV_OBJECT_KEY16,
 
 	INV_OBJECT_KEY1_COMBO1,
 	INV_OBJECT_KEY1_COMBO2,
@@ -223,11 +300,39 @@ enum inv_objects
 	INV_OBJECT_KEY7_COMBO2,
 	INV_OBJECT_KEY8_COMBO1,
 	INV_OBJECT_KEY8_COMBO2,
+	INV_OBJECT_KEY9_COMBO1,
+	INV_OBJECT_KEY9_COMBO2,
+	INV_OBJECT_KEY10_COMBO1,
+	INV_OBJECT_KEY10_COMBO2,
+	INV_OBJECT_KEY11_COMBO1,
+	INV_OBJECT_KEY11_COMBO2,
+	INV_OBJECT_KEY12_COMBO1,
+	INV_OBJECT_KEY12_COMBO2,
+	INV_OBJECT_KEY13_COMBO1,
+	INV_OBJECT_KEY13_COMBO2,
+	INV_OBJECT_KEY14_COMBO1,
+	INV_OBJECT_KEY14_COMBO2,
+	INV_OBJECT_KEY15_COMBO1,
+	INV_OBJECT_KEY15_COMBO2,
+	INV_OBJECT_KEY16_COMBO1,
+	INV_OBJECT_KEY16_COMBO2,
 
 	INV_OBJECT_PICKUP1,
 	INV_OBJECT_PICKUP2,
 	INV_OBJECT_PICKUP3,
 	INV_OBJECT_PICKUP4,
+	INV_OBJECT_PICKUP5,
+	INV_OBJECT_PICKUP6,
+	INV_OBJECT_PICKUP7,
+	INV_OBJECT_PICKUP8,
+	INV_OBJECT_PICKUP9,
+	INV_OBJECT_PICKUP10,
+	INV_OBJECT_PICKUP11,
+	INV_OBJECT_PICKUP12,
+	INV_OBJECT_PICKUP13,
+	INV_OBJECT_PICKUP14,
+	INV_OBJECT_PICKUP15,
+	INV_OBJECT_PICKUP16,
 
 	INV_OBJECT_PICKUP1_COMBO1,
 	INV_OBJECT_PICKUP1_COMBO2,
@@ -237,10 +342,40 @@ enum inv_objects
 	INV_OBJECT_PICKUP3_COMBO2,
 	INV_OBJECT_PICKUP4_COMBO1,
 	INV_OBJECT_PICKUP4_COMBO2,
+	INV_OBJECT_PICKUP5_COMBO1,
+	INV_OBJECT_PICKUP5_COMBO2,
+	INV_OBJECT_PICKUP6_COMBO1,
+	INV_OBJECT_PICKUP6_COMBO2,
+	INV_OBJECT_PICKUP7_COMBO1,
+	INV_OBJECT_PICKUP7_COMBO2,
+	INV_OBJECT_PICKUP8_COMBO1,
+	INV_OBJECT_PICKUP8_COMBO2,
+	INV_OBJECT_PICKUP9_COMBO1,
+	INV_OBJECT_PICKUP9_COMBO2,
+	INV_OBJECT_PICKUP10_COMBO1,
+	INV_OBJECT_PICKUP10_COMBO2,
+	INV_OBJECT_PICKUP11_COMBO1,
+	INV_OBJECT_PICKUP11_COMBO2,
+	INV_OBJECT_PICKUP12_COMBO1,
+	INV_OBJECT_PICKUP12_COMBO2,
+	INV_OBJECT_PICKUP13_COMBO1,
+	INV_OBJECT_PICKUP13_COMBO2,
+	INV_OBJECT_PICKUP14_COMBO1,
+	INV_OBJECT_PICKUP14_COMBO2,
+	INV_OBJECT_PICKUP15_COMBO1,
+	INV_OBJECT_PICKUP15_COMBO2,
+	INV_OBJECT_PICKUP16_COMBO1,
+	INV_OBJECT_PICKUP16_COMBO2,
 
 	INV_OBJECT_EXAMINE1,
 	INV_OBJECT_EXAMINE2,
 	INV_OBJECT_EXAMINE3,
+	INV_OBJECT_EXAMINE4,
+	INV_OBJECT_EXAMINE5,
+	INV_OBJECT_EXAMINE6,
+	INV_OBJECT_EXAMINE7,
+	INV_OBJECT_EXAMINE8,
+
 
 	INV_OBJECT_EXAMINE1_COMBO1,
 	INV_OBJECT_EXAMINE1_COMBO2,
@@ -248,6 +383,16 @@ enum inv_objects
 	INV_OBJECT_EXAMINE2_COMBO2,
 	INV_OBJECT_EXAMINE3_COMBO1,
 	INV_OBJECT_EXAMINE3_COMBO2,
+	INV_OBJECT_EXAMINE4_COMBO1,
+	INV_OBJECT_EXAMINE4_COMBO2,
+	INV_OBJECT_EXAMINE5_COMBO1,
+	INV_OBJECT_EXAMINE5_COMBO2,
+	INV_OBJECT_EXAMINE6_COMBO1,
+	INV_OBJECT_EXAMINE6_COMBO2,
+	INV_OBJECT_EXAMINE7_COMBO1,
+	INV_OBJECT_EXAMINE7_COMBO2,
+	INV_OBJECT_EXAMINE8_COMBO1,
+	INV_OBJECT_EXAMINE8_COMBO2,
 
 	INVENTORY_TABLE_SIZE
 };
@@ -300,7 +445,9 @@ enum pause_menus
 struct OBJLIST
 {
 	short invitem;
+	unsigned short xrot;
 	unsigned short yrot;
+	unsigned short zrot;
 	unsigned short bright;
 };
 
@@ -315,10 +462,10 @@ struct RINGME
 
 struct COMBINELIST
 {
-	void(*combine_routine)(int flag); // size=0, offset=0
-	short item1; // size=0, offset=4
-	short item2; // size=0, offset=6
-	short combined_item; // size=0, offset=8
+	void(*combine_routine)(int flag);
+	short item1;
+	short item2;
+	short combined_item;
 };
 
 struct INVOBJ
@@ -329,9 +476,10 @@ struct INVOBJ
 	short yrot;
 	short xrot;
 	short zrot;
-	short flags;
+	unsigned __int64 opts;
 	short objname;
 	unsigned long meshbits;
+	short rot_flags;
 };
 
 extern int GLOBAL_invMode;
@@ -342,7 +490,5 @@ extern int title_menu_to_display;
 extern int GLOBAL_inventoryitemchosen;
 extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
-extern RINGME pcring1;//items ring
-extern RINGME pcring2;//other ring
 extern RINGME* rings[2];
 extern INVOBJ inventry_objects_list[];
