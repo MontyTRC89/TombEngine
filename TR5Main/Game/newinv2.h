@@ -136,6 +136,13 @@ enum item_options
 	OPT_CHOOSEAMMO_ROCKET = 1 << 17
 };
 
+enum rotflags
+{
+	INV_ROT_X = 1,
+	INV_ROT_Y = 2,
+	INV_ROT_Z = 4
+};
+
 struct uhmG 
 {
 	int type;
@@ -146,7 +153,9 @@ struct AMMOLIST
 {
 	short	   		invitem;
 	short	 		amount;
+	unsigned short	xrot;
 	unsigned short	yrot;
+	unsigned short	zrot;
 };
 
 enum inv_objects
@@ -436,7 +445,9 @@ enum pause_menus
 struct OBJLIST
 {
 	short invitem;
+	unsigned short xrot;
 	unsigned short yrot;
+	unsigned short zrot;
 	unsigned short bright;
 };
 
@@ -451,10 +462,10 @@ struct RINGME
 
 struct COMBINELIST
 {
-	void(*combine_routine)(int flag); // size=0, offset=0
-	short item1; // size=0, offset=4
-	short item2; // size=0, offset=6
-	short combined_item; // size=0, offset=8
+	void(*combine_routine)(int flag);
+	short item1;
+	short item2;
+	short combined_item;
 };
 
 struct INVOBJ
@@ -465,9 +476,10 @@ struct INVOBJ
 	short yrot;
 	short xrot;
 	short zrot;
-	short flags;
+	unsigned __int64 opts;
 	short objname;
 	unsigned long meshbits;
+	short rot_flags;
 };
 
 extern int GLOBAL_invMode;
@@ -478,7 +490,5 @@ extern int title_menu_to_display;
 extern int GLOBAL_inventoryitemchosen;
 extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
-extern RINGME pcring1;//items ring
-extern RINGME pcring2;//other ring
 extern RINGME* rings[2];
 extern INVOBJ inventry_objects_list[];
