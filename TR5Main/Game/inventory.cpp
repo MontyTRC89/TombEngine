@@ -479,11 +479,12 @@ void Inventory::LoadObjects(bool isReload)
 	if (Lara.bottle)
 		InsertObject(INV_RING_PUZZLES, _INV_OBJECT_BOTTLE);
 
-	if (Lara.Waterskin1.Present)
-		InsertObject(INV_RING_PUZZLES, _INV_OBJECT_WATERSKIN1);
 
-	if (Lara.Waterskin2.Present)
-		InsertObject(INV_RING_PUZZLES, _INV_OBJECT_WATERSKIN2);
+	if (Lara.small_waterskin)
+		InsertObject(INV_RING_PUZZLES, (Lara.small_waterskin - 1) + _INV_OBJECT_WATERSKIN1);
+
+	if (Lara.big_waterskin)
+		InsertObject(INV_RING_PUZZLES, (Lara.big_waterskin - 1) + _INV_OBJECT_WATERSKIN2);
 
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 
