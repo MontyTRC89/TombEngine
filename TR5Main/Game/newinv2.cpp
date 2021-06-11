@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "newinv2.h"
-
 #include "draw.h"
 #include "control.h"
 #include "lara_fire.h"
@@ -118,7 +117,7 @@ short optmessages[] =
 #define phd_winymax g_Configuration.Height
 #define phd_centerx 400
 #define phd_centery phd_winymax / 2
-#define max_combines	40//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
+#define max_combines	60//update this if you add anything to the combine table otherwise it wont work since the relative functions use it!
 
 COMBINELIST combine_table[max_combines] =
 {
@@ -161,6 +160,26 @@ COMBINELIST combine_table[max_combines] =
 	{combine_PickupItem2, INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2},
 	{combine_PickupItem3, INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3},
 	{combine_PickupItem4, INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4},
+	{combine_PickupItem5, INV_OBJECT_PICKUP5_COMBO1, INV_OBJECT_PICKUP5_COMBO2, INV_OBJECT_PICKUP5},
+	{combine_PickupItem6, INV_OBJECT_PICKUP6_COMBO1, INV_OBJECT_PICKUP6_COMBO2, INV_OBJECT_PICKUP6},
+	{combine_PickupItem7, INV_OBJECT_PICKUP7_COMBO1, INV_OBJECT_PICKUP7_COMBO2, INV_OBJECT_PICKUP7},
+	{combine_PickupItem8, INV_OBJECT_PICKUP8_COMBO1, INV_OBJECT_PICKUP8_COMBO2, INV_OBJECT_PICKUP8},
+	{combine_PickupItem9, INV_OBJECT_PICKUP9_COMBO1, INV_OBJECT_PICKUP9_COMBO2, INV_OBJECT_PICKUP9},
+	{combine_PickupItem10, INV_OBJECT_PICKUP10_COMBO1, INV_OBJECT_PICKUP10_COMBO2, INV_OBJECT_PICKUP10},
+	{combine_PickupItem11, INV_OBJECT_PICKUP11_COMBO1, INV_OBJECT_PICKUP11_COMBO2, INV_OBJECT_PICKUP11},
+	{combine_PickupItem12, INV_OBJECT_PICKUP12_COMBO1, INV_OBJECT_PICKUP12_COMBO2, INV_OBJECT_PICKUP12},
+	{combine_PickupItem13, INV_OBJECT_PICKUP13_COMBO1, INV_OBJECT_PICKUP13_COMBO2, INV_OBJECT_PICKUP13},
+	{combine_PickupItem14, INV_OBJECT_PICKUP14_COMBO1, INV_OBJECT_PICKUP14_COMBO2, INV_OBJECT_PICKUP14},
+	{combine_PickupItem15, INV_OBJECT_PICKUP15_COMBO1, INV_OBJECT_PICKUP15_COMBO2, INV_OBJECT_PICKUP15},
+	{combine_PickupItem16, INV_OBJECT_PICKUP16_COMBO1, INV_OBJECT_PICKUP16_COMBO2, INV_OBJECT_PICKUP16},
+	{combine_Examine1, INV_OBJECT_EXAMINE1_COMBO1, INV_OBJECT_EXAMINE1_COMBO2, INV_OBJECT_EXAMINE1},
+	{combine_Examine2, INV_OBJECT_EXAMINE2_COMBO1, INV_OBJECT_EXAMINE2_COMBO2, INV_OBJECT_EXAMINE2},
+	{combine_Examine3, INV_OBJECT_EXAMINE3_COMBO1, INV_OBJECT_EXAMINE3_COMBO2, INV_OBJECT_EXAMINE3},
+	{combine_Examine4, INV_OBJECT_EXAMINE4_COMBO1, INV_OBJECT_EXAMINE4_COMBO2, INV_OBJECT_EXAMINE4},
+	{combine_Examine5, INV_OBJECT_EXAMINE5_COMBO1, INV_OBJECT_EXAMINE5_COMBO2, INV_OBJECT_EXAMINE5},
+	{combine_Examine6, INV_OBJECT_EXAMINE6_COMBO1, INV_OBJECT_EXAMINE6_COMBO2, INV_OBJECT_EXAMINE6},
+	{combine_Examine7, INV_OBJECT_EXAMINE7_COMBO1, INV_OBJECT_EXAMINE7_COMBO2, INV_OBJECT_EXAMINE7},
+	{combine_Examine8, INV_OBJECT_EXAMINE8_COMBO1, INV_OBJECT_EXAMINE8_COMBO2, INV_OBJECT_EXAMINE8},
 	{combine_ClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
@@ -344,10 +363,22 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 
 	//pickups
 
-{ID_PICKUP_ITEM1, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM1, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PICKUP_ITEM2, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_PICKUP_ITEM3, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_PICKUP_ITEM4, 2, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM4, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM5, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM6, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM7, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM8, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM9, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM10, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM11, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM12, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM13, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM14, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM15, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_PICKUP_ITEM16, 8, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//pickup combos
 
@@ -362,9 +393,14 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 
 	//examines
 
-{ID_EXAMINE1, 4, 0.5f, 0, ANGLE(90), 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE1, 4, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 {ID_EXAMINE2, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
-{ID_EXAMINE3, 14, 0.5f, 0, ANGLE(90), 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE3, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE4, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE5, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE6, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE7, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
+{ID_EXAMINE8, 14, 0.5f, 0, 0, 0, 2, STRING_LOAD_GAME, -1},
 
 	//examines combos
 
@@ -542,14 +578,50 @@ unsigned __int64 options_table[] =
 	//pickups
 	OPT_USE,
 	OPT_USE,
-	OPT_USE,//4 of them
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,//16 of them
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
+	OPT_USE,
 	OPT_USE,
 
 	//pickup combines
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
-	OPT_USE | OPT_COMBINABLE,//4 pickup items, each one has 2 parts, so 8
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,//16 pickup items, each one has 2 parts, so 32
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
@@ -559,11 +631,26 @@ unsigned __int64 options_table[] =
 	OPT_EXAMINABLE,
 	OPT_EXAMINABLE,
 	OPT_EXAMINABLE,
+	OPT_EXAMINABLE,//8 examines
+	OPT_EXAMINABLE,
+	OPT_EXAMINABLE,
+	OPT_EXAMINABLE,
+	OPT_EXAMINABLE,
 
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
-	OPT_USE | OPT_COMBINABLE,//3 examine items, each one has 2 parts, so 6
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,//8 examine items, each one has 2 parts, so 16
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
+	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 	OPT_USE | OPT_COMBINABLE,
 };
@@ -2290,19 +2377,19 @@ void construct_object_list()
 		if (Lara.KeysCombo[i])
 			insert_object_into_list(INV_OBJECT_KEY1_COMBO1 + i);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NUM_PICKUPS; i++)
 		if (Lara.Pickups[i])
 			insert_object_into_list(INV_OBJECT_PICKUP1 + i);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		if (Lara.PickupsCombo[i])
 			insert_object_into_list(INV_OBJECT_PICKUP1_COMBO1 + i);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < NUM_EXAMINES; i++)
 		if (Lara.Examines[i])
 			insert_object_into_list(INV_OBJECT_EXAMINE1 + i);
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		if (Lara.ExaminesCombo[i])
 			insert_object_into_list(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
@@ -2383,9 +2470,13 @@ void construct_combine_object_list()
 		if (Lara.KeysCombo[i])
 			insert_object_into_list_v2(INV_OBJECT_KEY1_COMBO1 + i);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		if (Lara.PickupsCombo[i])
 			insert_object_into_list_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
+
+	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
+		if (Lara.ExaminesCombo[i])
+			insert_object_into_list_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
 	rings[RING_AMMO]->objlistmovement = 0;
 	rings[RING_AMMO]->curobjinlist = 0;
@@ -2496,10 +2587,10 @@ int have_i_got_object(short object_number)
 	if (object_number >= ID_KEY_ITEM1 && object_number <= ID_KEY_ITEM16)
 		return Lara.Keys[object_number - ID_KEY_ITEM1];
 
-	if (object_number >= ID_PICKUP_ITEM1_COMBO1 && object_number <= ID_PICKUP_ITEM4_COMBO2)
+	if (object_number >= ID_PICKUP_ITEM1_COMBO1 && object_number <= ID_PICKUP_ITEM16_COMBO2)
 		return Lara.PickupsCombo[object_number - ID_PICKUP_ITEM1_COMBO1];
 
-	if (object_number >= ID_PICKUP_ITEM1 && object_number <= ID_PICKUP_ITEM4)
+	if (object_number >= ID_PICKUP_ITEM1 && object_number <= ID_PICKUP_ITEM16)
 		return Lara.Pickups[object_number - ID_PICKUP_ITEM1];
 
 	if (object_number == ID_CROWBAR_ITEM)
@@ -2522,8 +2613,6 @@ int convert_obj_to_invobj(short obj)
 		if (inventry_objects_list[i].object_number == obj)
 			return i;
 	}
-
-	return 27;
 }
 
 int convert_invobj_to_obj(int obj)
@@ -4136,6 +4225,146 @@ void combine_PickupItem4(int flag)
 	Lara.Pickups[3] = 1;
 	Lara.PickupsCombo[6] = 0;
 	Lara.PickupsCombo[7] = 0;
+}
+
+void combine_PickupItem5(int flag)
+{
+	Lara.Pickups[4] = 1;
+	Lara.PickupsCombo[8] = 0;
+	Lara.PickupsCombo[9] = 0;
+}
+
+void combine_PickupItem6(int flag)
+{
+	Lara.Pickups[5] = 1;
+	Lara.PickupsCombo[10] = 0;
+	Lara.PickupsCombo[11] = 0;
+}
+
+void combine_PickupItem7(int flag)
+{
+	Lara.Pickups[6] = 1;
+	Lara.PickupsCombo[12] = 0;
+	Lara.PickupsCombo[13] = 0;
+}
+
+void combine_PickupItem8(int flag)
+{
+	Lara.Pickups[7] = 1;
+	Lara.PickupsCombo[14] = 0;
+	Lara.PickupsCombo[15] = 0;
+}
+
+void combine_PickupItem9(int flag)
+{
+	Lara.Pickups[8] = 1;
+	Lara.PickupsCombo[16] = 0;
+	Lara.PickupsCombo[17] = 0;
+}
+
+void combine_PickupItem10(int flag)
+{
+	Lara.Pickups[9] = 1;
+	Lara.PickupsCombo[18] = 0;
+	Lara.PickupsCombo[19] = 0;
+}
+
+void combine_PickupItem11(int flag)
+{
+	Lara.Pickups[10] = 1;
+	Lara.PickupsCombo[20] = 0;
+	Lara.PickupsCombo[21] = 0;
+}
+
+void combine_PickupItem12(int flag)
+{
+	Lara.Pickups[11] = 1;
+	Lara.PickupsCombo[22] = 0;
+	Lara.PickupsCombo[23] = 0;
+}
+
+void combine_PickupItem13(int flag)
+{
+	Lara.Pickups[12] = 1;
+	Lara.PickupsCombo[24] = 0;
+	Lara.PickupsCombo[25] = 0;
+}
+
+void combine_PickupItem14(int flag)
+{
+	Lara.Pickups[13] = 1;
+	Lara.PickupsCombo[26] = 0;
+	Lara.PickupsCombo[27] = 0;
+}
+
+void combine_PickupItem15(int flag)
+{
+	Lara.Pickups[14] = 1;
+	Lara.PickupsCombo[28] = 0;
+	Lara.PickupsCombo[29] = 0;
+}
+
+void combine_PickupItem16(int flag)
+{
+	Lara.Pickups[15] = 1;
+	Lara.PickupsCombo[30] = 0;
+	Lara.PickupsCombo[31] = 0;
+}
+
+void combine_Examine1(int flag)
+{
+	Lara.Examines[0] = 1;
+	Lara.ExaminesCombo[0] = 0;
+	Lara.ExaminesCombo[1] = 0;
+}
+
+void combine_Examine2(int flag)
+{
+	Lara.Examines[1] = 1;
+	Lara.ExaminesCombo[2] = 0;
+	Lara.ExaminesCombo[3] = 0;
+}
+
+void combine_Examine3(int flag)
+{
+	Lara.Examines[2] = 1;
+	Lara.ExaminesCombo[4] = 0;
+	Lara.ExaminesCombo[5] = 0;
+}
+
+void combine_Examine4(int flag)
+{
+	Lara.Examines[3] = 1;
+	Lara.ExaminesCombo[6] = 0;
+	Lara.ExaminesCombo[7] = 0;
+}
+
+void combine_Examine5(int flag)
+{
+	Lara.Examines[4] = 1;
+	Lara.ExaminesCombo[8] = 0;
+	Lara.ExaminesCombo[9] = 0;
+}
+
+void combine_Examine6(int flag)
+{
+	Lara.Examines[5] = 1;
+	Lara.ExaminesCombo[10] = 0;
+	Lara.ExaminesCombo[11] = 0;
+}
+
+void combine_Examine7(int flag)
+{
+	Lara.Examines[6] = 1;
+	Lara.ExaminesCombo[12] = 0;
+	Lara.ExaminesCombo[13] = 0;
+}
+
+void combine_Examine8(int flag)
+{
+	Lara.Examines[7] = 1;
+	Lara.ExaminesCombo[14] = 0;
+	Lara.ExaminesCombo[15] = 0;
 }
 
 void combine_ClockWorkBeetle(int flag)
