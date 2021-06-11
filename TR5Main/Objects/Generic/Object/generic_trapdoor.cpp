@@ -13,7 +13,12 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	CloseTrapDoor(item);
+	auto obj = &Objects[item->objectNumber];
+	obj->floorBorder = TrapDoorFloorBorder;
+	obj->ceilingBorder = TrapDoorCeilingBorder;
+	obj->floor = TrapDoorFloor;
+	obj->ceiling = TrapDoorCeiling;
+	CloseTrapDoor(itemNumber, item);
 }
 
 void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
@@ -149,15 +154,15 @@ void TrapDoorControl(short itemNumber)
 
 	if (item->currentAnimState == 1 && (item->itemFlags[2] || JustLoaded))
 	{
-		OpenTrapDoor(item);
+		OpenTrapDoor(itemNumber, item);
 	}
 	else if (!item->currentAnimState && !item->itemFlags[2])
 	{
-		CloseTrapDoor(item);
+		CloseTrapDoor(itemNumber, item);
 	}
 }
 
-void CloseTrapDoor(ITEM_INFO* item)
+void CloseTrapDoor(short itemNumber, ITEM_INFO* item)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
@@ -188,9 +193,10 @@ void CloseTrapDoor(ITEM_INFO* item)
 
 	item->itemFlags[2] = 1;
 	item->itemFlags[3] = pitsky;
+	T5M::Floordata::AddBridge(itemNumber);
 }
 
-void OpenTrapDoor(ITEM_INFO* item)
+void OpenTrapDoor(short itemNumber, ITEM_INFO* item)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
@@ -216,4 +222,40 @@ void OpenTrapDoor(ITEM_INFO* item)
 	}
 
 	item->itemFlags[2] = 0;
+	T5M::Floordata::RemoveBridge(itemNumber);
+}
+
+int TrapDoorFloorBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int TrapDoorCeilingBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return (item->pos.yPos + 256);
+}
+
+std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits)
+		return std::nullopt;
+
+	int height = item->pos.yPos;
+	return std::optional{ height };
+}
+
+std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits)
+		return std::nullopt;
+
+	//+ 256 is more accurate, but prevents a tall block from entering underneath
+	int height = item->pos.yPos + 20;
+	return std::optional{ height };
 }
