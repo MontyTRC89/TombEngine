@@ -2764,6 +2764,11 @@ namespace T5M::Renderer
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
                 drawScaledSpikes(view,item, transparent, animated);
             }
+            else if (objectNumber == ID_EXPANDING_PLATFORM)
+            {
+                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
+                drawExpandingPlatform(view, item, transparent, animated);
+            }
             else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
             {
                 // We'll draw waterfalls later
@@ -2854,6 +2859,17 @@ namespace T5M::Renderer
 
             return drawAnimatingItem(view,item, transparent, animated);
         }
+    }
+
+    void Renderer11::drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated)
+    {
+        short objectNumber = item->Item->objectNumber;
+        float xTranslate = item->Item->pos.yRot == ANGLE(90) ? CLICK(2) : item->Item->pos.yRot == ANGLE(270) ? -CLICK(2) : 0.0f;
+        float zTranslate = item->Item->pos.yRot == 0 ? CLICK(2) : item->Item->pos.yRot == ANGLE(180) ? -CLICK(2) : 0.0f;
+        item->Translation *=  Matrix::CreateTranslation(xTranslate, 0.0f, zTranslate);
+        item->Scale = Matrix::CreateScale(1.0f, 1.0f, item->Item->itemFlags[1] / 4096.0f);
+        item->World = item->Scale * item->Rotation * item->Translation;
+        return drawAnimatingItem(view, item, transparent, animated);
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
