@@ -32,6 +32,7 @@
 #include "tr5_twoblockplatform.h"
 #include "tr5_raisingcog.h"
 #include "tr5_raisingblock.h"
+#include "tr5_expandingplatform.h"
 #include "tr5_light.h"
 #include "tr5_bodypart.h"
 #include "tr5_teleporter.h"
@@ -912,6 +913,20 @@ static void StartObject(OBJECT_INFO *obj)
 			obj->ceilingBorder = RaisingBlockCeilingBorder;
 			obj->saveFlags = true;
 		}
+	}
+
+	obj = &Objects[ID_EXPANDING_PLATFORM];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseExpandingPlatform;
+		obj->control = ControlExpandingPlatform;
+		obj->floor = ExpandingPlatformFloor;
+		obj->ceiling = ExpandingPlatformCeiling;
+		obj->floorBorder = ExpandingPlatformFloorBorder;
+		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
