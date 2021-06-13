@@ -37,26 +37,6 @@ void ControlExpandingPlatform(short itemNumber)
 	{
 		if (!item->itemFlags[2])
 		{
-			if (item->objectNumber == ID_RAISING_BLOCK1)
-			{
-				if (item->triggerFlags == -1)
-				{
-					//AlterFloorHeight(item, -255);
-				}
-				else if (item->triggerFlags == -3)
-				{
-					//AlterFloorHeight(item, -1023);
-				}
-				else
-				{
-					//AlterFloorHeight(item, -item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, -item->itemFlags[7]);
-			}
-
 			item->itemFlags[2] = 1;
 		}
 
@@ -94,22 +74,12 @@ void ControlExpandingPlatform(short itemNumber)
 			{
 				if (item->triggerFlags == -1)
 				{
-					//AlterFloorHeight(item, 255);
 					item->itemFlags[2] = 0;
 				}
 				else if (item->triggerFlags == -3)
 				{
-					//AlterFloorHeight(item, 1023);
 					item->itemFlags[2] = 0;
 				}
-				else
-				{
-					//AlterFloorHeight(item, item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
 			item->itemFlags[2] = 0;
@@ -139,7 +109,31 @@ void ControlExpandingPlatform(short itemNumber)
 std::optional<int> ExpandingPlatformFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	const auto height = item.pos.yPos + CLICK(2) - item.itemFlags[7] * (item.itemFlags[1] > 0 ? 1 : 0);
+	if (item.itemFlags[1] <= 0)
+		return std::nullopt;
+	if (item.pos.yRot == ANGLE(90))
+	{
+		auto xBorder = item.pos.xPos + CLICK(2) - SECTOR(1) * item.itemFlags[1] / 4096;
+		if(x < xBorder)
+			return std::nullopt;
+	} else if (item.pos.yRot == ANGLE(270))
+	{
+		auto xBorder = item.pos.xPos - CLICK(2) +  SECTOR(1) * item.itemFlags[1] / 4096;
+		if (x > xBorder)
+			return std::nullopt;
+	} else if (item.pos.yRot == 0)
+	{
+		auto zBorder = item.pos.zPos + CLICK(2) - SECTOR(1) * item.itemFlags[1] / 4096;
+		if (z < zBorder)
+			return std::nullopt;
+	}
+	else if (item.pos.yRot == ANGLE(180))
+	{
+		auto zBorder = item.pos.zPos - CLICK(2) + SECTOR(1) * item.itemFlags[1] / 4096;
+		if (z > zBorder)
+			return std::nullopt;
+	}
+	const auto height = item.pos.yPos - item.itemFlags[7] + CLICK(2);
 	return std::optional{ height };
 }
 
