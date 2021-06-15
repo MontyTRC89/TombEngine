@@ -1278,6 +1278,7 @@ static void StartPickup(OBJECT_INFO *obj)
 	InitPickup(obj, ID_WATERSKIN1_EMPTY);
 	InitPickup(obj, ID_WATERSKIN2_EMPTY);
 	InitPickup(obj, ID_GOLDROSE_ITEM);
+	InitPickup(obj, ID_DIARY_ITEM);
 }
 
 static OBJECT_INFO *objToInit;
