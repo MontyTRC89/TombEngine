@@ -527,6 +527,7 @@ namespace T5M::Renderer
 		void renderNewInventory();
 		void drawStatistics();
 		void drawExamines();
+		void drawDiary();
 		void drawDebris(RenderView& view,bool transparent);
 		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);

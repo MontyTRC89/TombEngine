@@ -1094,6 +1094,23 @@ namespace T5M::Renderer
         drawObjectOn2DPosition(400, 300, convert_invobj_to_obj(inv_item), xrot, yrot, zrot, obj->scale1);
         obj->scale1 = saved_scale;
     }
+
+    void Renderer11::drawDiary()
+    {
+        INVOBJ* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
+        short currentPage = Lara.Diary.currentPage;
+        drawObjectOn2DPosition(400, 300, convert_invobj_to_obj(INV_OBJECT_OPEN_DIARY), obj->xrot, obj->yrot, obj->zrot, obj->scale1);
+
+        for (int i = 0; i < MaxStringsPerPage; i++)
+        {
+            if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
+                break;
+
+            drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
+        }
+
+        drawAllStrings();
+    }
 #endif
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
@@ -1234,6 +1251,12 @@ namespace T5M::Renderer
             }
 
             renderPauseMenu();
+            return;
+        }
+
+        if (GLOBAL_invMode == IM_DIARY)
+        {
+            drawDiary();
             return;
         }
 
