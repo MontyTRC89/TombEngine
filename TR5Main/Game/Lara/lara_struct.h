@@ -927,9 +927,26 @@ typedef struct CarriedWeaponInfo
 	bool HasSilencer;
 };
 
+#define MaxDiaryPages	64
+#define MaxStringsPerPage	8
+
+typedef struct DiaryString
+{
+	int x, y;
+	short stringID;
+};
+
+typedef struct DiaryPage
+{
+	DiaryString	Strings[MaxStringsPerPage];
+};
+
 typedef struct DiaryInfo
 {
 	bool Present;
+	short numPages;
+	short currentPage;
+	DiaryPage	Pages[MaxDiaryPages];
 };
 
 typedef struct LARA_ARM
