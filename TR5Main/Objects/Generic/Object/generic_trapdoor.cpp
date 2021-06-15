@@ -199,6 +199,6 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + 128;
+	int height = item->pos.yPos + 32;
 	return std::optional{ height };
 }
