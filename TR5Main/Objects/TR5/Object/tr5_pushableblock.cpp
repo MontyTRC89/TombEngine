@@ -23,6 +23,8 @@ int DoPushPull = 0;
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	if (floor->box == NO_BOX)
+		return;
 	g_Level.Boxes[floor->box].flags &= (~BLOCKED);
 	short height = g_Level.Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
