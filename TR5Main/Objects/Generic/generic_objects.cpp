@@ -86,6 +86,10 @@ static void StartObject()
 		obj->initialise = InitialiseTrapDoor;
 		obj->collision = CeilingTrapDoorCollision;
 		obj->control = TrapDoorControl;
+		obj->floorBorder = TrapDoorFloorBorder;
+		obj->ceilingBorder = TrapDoorCeilingBorder;
+		obj->floor = TrapDoorFloor;
+		obj->ceiling = TrapDoorCeiling;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -96,6 +100,10 @@ static void StartObject()
 		obj->initialise = InitialiseTrapDoor;
 		obj->collision = CeilingTrapDoorCollision;
 		obj->control = TrapDoorControl;
+		obj->floorBorder = TrapDoorFloorBorder;
+		obj->ceilingBorder = TrapDoorCeilingBorder;
+		obj->floor = TrapDoorFloor;
+		obj->ceiling = TrapDoorCeiling;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
