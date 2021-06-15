@@ -1,3 +1,4 @@
+#ifdef NEW_INV
 #pragma once
 #include "configuration.h"
 #include <Scripting/LanguageScript.h>
@@ -42,6 +43,7 @@ int S_CallInventory2();
 void do_stats_mode();
 void do_examine_mode();
 void draw_compass();
+void do_diary();
 void combine_revolver_lasersight(int flag);
 void combine_crossbow_lasersight(int flag);
 void combine_HK_SILENCER(int flag);
@@ -114,6 +116,24 @@ int do_special_waterskin_combine_bullshit(int flag);
 #define INV_RESULT_EXIT_TO_TILE				6
 #define INV_RESULT_NEW_GAME_SELECTED_LEVEL	7
 
+enum menu_types
+{
+	nothing,
+	MENU_TYPE_USE,
+	MENU_TYPE_CHOOSEAMMO,
+	MENU_TYPE_COMBINE,
+	MENU_TYPE_SEPERATE,
+	MENU_TYPE_EQUIP,
+	MENU_TYPE_AMMO1,
+	MENU_TYPE_AMMO2,
+	MENU_TYPE_AMMO3,
+	MENU_TYPE_LOAD,
+	MENU_TYPE_SAVE,
+	MENU_TYPE_EXAMINE,
+	MENU_TYPE_STATS,
+	MENU_TYPE_DIARY
+};
+
 enum item_options
 {
 	OPT_ALWAYSCOMBINE = 1 << 0,
@@ -133,7 +153,8 @@ enum item_options
 	OPT_CHOOSEAMMO_HK = 1 << 14,
 	OPT_STATS = 1 << 15,
 	OPT_CHOOSEAMMO_HARPOON = 1 << 16,
-	OPT_CHOOSEAMMO_ROCKET = 1 << 17
+	OPT_CHOOSEAMMO_ROCKET = 1 << 17,
+	OPT_DIARY = 1 << 18
 };
 
 enum rotflags
@@ -215,6 +236,7 @@ enum inv_objects
 	INV_OBJECT_BIG_WATERSKIN3L,
 	INV_OBJECT_BIG_WATERSKIN4L,
 	INV_OBJECT_BIG_WATERSKIN5L,
+	INV_OBJECT_OPEN_DIARY,
 
 	// Puzzle, keys, pickups, examines
 	INV_OBJECT_PUZZLE1,
@@ -409,7 +431,8 @@ enum inv_modes
 	IM_INGAME,
 	IM_PAUSE,
 	IM_STATS,
-	IM_EXAMINE
+	IM_EXAMINE,
+	IM_DIARY
 };
 
 typedef struct titleSettings
@@ -492,3 +515,4 @@ extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
 extern RINGME* rings[2];
 extern INVOBJ inventry_objects_list[];
+#endif

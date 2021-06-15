@@ -1,4 +1,5 @@
 #include "framework.h"
+#ifdef NEW_INV
 #include "newinv2.h"
 #include "draw.h"
 #include "control.h"
@@ -107,10 +108,11 @@ short optmessages[] =
 //	STRING_COMBINE_WITH,
 	STRING_LOAD_GAME,
 	STRING_SAVE_GAME,
-	1,1,1//remove later
+	1,1,1,1//remove later
 //	STRING_EXAMINE,
 //	STRING_STATISTICS,
 //	STRING_CHOOSE_WEAPON,
+//	STRING_READ_DIARY
 };
 
 #define phd_winxmax g_Configuration.Width
@@ -236,7 +238,7 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_PC_LOAD_SAVE_ITEM, 52, 0.3f, ANGLE(180), 0, 0, OPT_SAVE, STRING_SAVE_GAME, -1, INV_ROT_Y},
 {ID_BURNING_TORCH_ITEM, 14, 0.5f, 0, ANGLE(90), 0, OPT_USE, STRING_LOAD_GAME, -1, INV_ROT_Y},
 {ID_CROWBAR_ITEM, 4, 0.5f, 0, ANGLE(90), 0, OPT_USE, STRING_CROWBAR, -1, INV_ROT_Y},
-{ID_DIARY_ITEM, 0, 0.5f, 0, 0, 0, OPT_USE, STRING_DIARY, -1, INV_ROT_Y},
+{ID_DIARY_ITEM, 0, 0.3f, ANGLE(180), 0, 0, OPT_DIARY, STRING_DIARY, -1, INV_ROT_Y},
 {ID_COMPASS_ITEM, 0x0FFF2, 0.5f, 0, 0, 0, 0, STRING_LOAD_GAME, -1, INV_ROT_Y},
 {ID_CLOCKWORK_BEETLE, 14, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, -1, INV_ROT_Y},
 {ID_CLOCKWORK_BEETLE_COMBO1, 18, 0.5f, 0, 0, 0, OPT_COMBINABLE, STRING_LOAD_GAME, -1, INV_ROT_Y},
@@ -251,6 +253,7 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_WATERSKIN2_3, 2, 0.5f, 0, ANGLE(285), 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, -1, INV_ROT_Y},
 {ID_WATERSKIN2_4, 2, 0.5f, 0, ANGLE(285), 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, -1, INV_ROT_Y},
 {ID_WATERSKIN2_5, 2, 0.5f, 0, ANGLE(285), 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, -1, INV_ROT_Y},
+{ID_OPEN_DIARY_ITEM, 0, 0.9f, ANGLE(90), 0, 0, 0, 0, 0, 0},
 
 	//puzzles
 
@@ -2802,49 +2805,49 @@ void handle_inventry_menu()
 
 			if ((opts & OPT_LOAD))
 			{
-				current_options[0].type = 9;
+				current_options[0].type = MENU_TYPE_LOAD;
 				current_options[0].text = g_GameFlow->GetString(optmessages[6]);
 				n = 1;
 			}
 
 			if ((opts & OPT_SAVE))
 			{
-				current_options[n].type = 10;
+				current_options[n].type = MENU_TYPE_SAVE;
 				current_options[n].text = g_GameFlow->GetString(optmessages[7]);
 				n++;
 			}
 
 			if ((opts & OPT_EXAMINABLE))
 			{
-				current_options[n].type = 11;
+				current_options[n].type = MENU_TYPE_EXAMINE;
 				current_options[n].text = g_GameFlow->GetString(optmessages[8]);
 				n++;
 			}
 
 			if ((opts & OPT_STATS))
 			{
-				current_options[n].type = 12;
+				current_options[n].type = MENU_TYPE_STATS;
 				current_options[n].text = g_GameFlow->GetString(optmessages[9]);
 				n++;
 			}
 
 			if ((opts & OPT_USE))
 			{
-				current_options[n].type = 1;
+				current_options[n].type = MENU_TYPE_USE;
 				current_options[n].text = g_GameFlow->GetString(optmessages[0]);
 				n++;
 			}
 
 			if ((opts & OPT_EQUIP))
 			{
-				current_options[n].type = 5;
+				current_options[n].type = MENU_TYPE_EQUIP;
 				current_options[n].text = g_GameFlow->GetString(optmessages[4]);
 				n++;
 			}
 
 			if ((opts & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN)))
 			{
-				current_options[n].type = 2;
+				current_options[n].type = MENU_TYPE_CHOOSEAMMO;
 				current_options[n].text = g_GameFlow->GetString(optmessages[1]);
 				n++;
 			}
@@ -2853,7 +2856,7 @@ void handle_inventry_menu()
 			{
 				if (is_item_currently_combinable(num))
 				{
-					current_options[n].type = 3;
+					current_options[n].type = MENU_TYPE_COMBINE;
 					current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 					n++;
 				}
@@ -2861,23 +2864,30 @@ void handle_inventry_menu()
 
 			if ((opts & OPT_ALWAYSCOMBINE))
 			{
-				current_options[n].type = 3;
+				current_options[n].type = MENU_TYPE_COMBINE;
 				current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 				n++;
 			}
 
 			if ((opts & OPT_SEPERATABLE))
 			{
-				current_options[n].type = 4;
+				current_options[n].type = MENU_TYPE_SEPERATE;
 				current_options[n].text = g_GameFlow->GetString(optmessages[3]);
+				n++;
+			}
+
+			if (opts & OPT_DIARY)
+			{
+				current_options[n].type = MENU_TYPE_DIARY;
+				current_options[n].text = g_GameFlow->GetString(optmessages[11]);
 				n++;
 			}
 		}
 		else
 		{
-			current_options[0].type = 6;
+			current_options[0].type = MENU_TYPE_AMMO1;
 			current_options[0].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[0].invitem].objname);
-			current_options[1].type = 7;
+			current_options[1].type = MENU_TYPE_AMMO2;
 			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
 			n = 2;
 
@@ -2886,7 +2896,7 @@ void handle_inventry_menu()
 			if (opts & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
-				current_options[2].type = 8;
+				current_options[2].type = MENU_TYPE_AMMO3;
 				current_options[2].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[2].invitem].objname);
 			}
 
@@ -2956,7 +2966,7 @@ void handle_inventry_menu()
 
 				switch (current_options[current_selected_option].type)
 				{
-				case 2:
+				case MENU_TYPE_CHOOSEAMMO:
 					rings[RING_INVENTORY]->ringactive = 0;
 					ammo_active = 1;
 					Stashedcurrent_selected_option = current_selected_option;
@@ -2971,31 +2981,31 @@ void handle_inventry_menu()
 					StashedCurrentRocketAmmoType = CurrentRocketAmmoType;
 					break;
 
-				case 9:
+				case MENU_TYPE_LOAD:
 					loading_or_saving = 1;
 					break;
 
-				case 10:
+				case MENU_TYPE_SAVE:
 					loading_or_saving = 2;
 					break;
 
-				case 11:
+				case MENU_TYPE_EXAMINE:
 					GLOBAL_invMode = IM_EXAMINE;
 					break;
 
-				case 12:
+				case MENU_TYPE_STATS:
 					GLOBAL_invMode = IM_STATS;
 					break;
 
-				case 6:
-				case 7:
-				case 8:
+				case MENU_TYPE_AMMO1:
+				case MENU_TYPE_AMMO2:
+				case MENU_TYPE_AMMO3:
 					ammo_active = 0;
 					rings[RING_INVENTORY]->ringactive = 1;
 					current_selected_option = 0;
 					break;
 
-				case 3:
+				case MENU_TYPE_COMBINE:
 					construct_combine_object_list();
 					rings[RING_INVENTORY]->ringactive = 0;
 					rings[RING_AMMO]->ringactive = 1;
@@ -3004,15 +3014,20 @@ void handle_inventry_menu()
 					combine_ring_fade_dir = 1;
 					break;
 
-				case 4:
+				case MENU_TYPE_SEPERATE:
 					seperate_type_flag = 1;
 					normal_ring_fade_dir = 2;
 					break;
 
-				case 5:
-				case 1:
+				case MENU_TYPE_EQUIP:
+				case MENU_TYPE_USE:
 					menu_active = 0;
 					useItem = 1;
+					break;
+
+				case MENU_TYPE_DIARY:
+					GLOBAL_invMode = IM_DIARY;
+					Lara.Diary.currentPage = 1;
 					break;
 				}
 			}
@@ -3657,8 +3672,11 @@ int S_CallInventory2()
 		if (GLOBAL_invMode == IM_EXAMINE)
 			do_examine_mode();
 
-			DrawInv();
-			draw_compass();
+		if (GLOBAL_invMode == IM_DIARY)
+			do_diary();
+
+		DrawInv();
+		draw_compass();
 
 		if (useItem & !TrInput)
 			val = 1;
@@ -3745,6 +3763,30 @@ void draw_compass()
 	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
 	short compass_angle = (LaraItem->pos.yRot + compass_speed) - ANGLE(180);
 	Matrix::CreateRotationY(compass_angle);
+}
+
+void do_diary()
+{
+	GLOBAL_invMode = IM_DIARY;
+
+	if (goRight && Lara.Diary.currentPage < Lara.Diary.numPages)
+	{
+		Lara.Diary.currentPage++;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goLeft && Lara.Diary.currentPage > 1)
+	{
+		Lara.Diary.currentPage--;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+	}
+
+	if (goDeselect)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		goDeselect = 0;
+		GLOBAL_invMode = IM_NONE;
+	}
 }
 
 void combine_revolver_lasersight(int flag)
@@ -4264,3 +4306,4 @@ int do_special_waterskin_combine_bullshit(int flag)
 
 	return 0;
 }
+#endif
