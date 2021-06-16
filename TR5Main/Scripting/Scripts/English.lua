@@ -87,7 +87,7 @@ GameFlow.strings[71] = "Special effects";
 -- Level names (from 100 to 199)
 GameFlow.strings[100] = "Title level";
 GameFlow.strings[101] = "Strets of Rome";
-GameFlow.strings[102] = "Trajan lolMarkets";
+GameFlow.strings[102] = "Trajan Markets";
 GameFlow.strings[103] = "The Colosseum";
 GameFlow.strings[104] = "The base";
 GameFlow.strings[105] = "The submarine";
