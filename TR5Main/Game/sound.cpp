@@ -305,7 +305,7 @@ void S_CDPlay(short index, unsigned int mode)
 	static char fullTrackName[1024];
 
 	char* mask = &TrackNamePrefix;
-	char* name = g_AudioTracks[index].Name;
+	char const* name = g_AudioTracks[index].Name;
 
 	snprintf(fullTrackName, sizeof(fullTrackName), &TrackNamePrefix, name);
 
