@@ -110,8 +110,7 @@ class LanguageScript
 {
 public:
 	std::string Name;
-	std::vector<std::string> Strings;
-
+	std::unordered_map<size_t, std::string> Strings;
 	LanguageScript(char* name);
 	~LanguageScript();
 };
