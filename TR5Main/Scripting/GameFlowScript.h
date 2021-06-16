@@ -1,14 +1,9 @@
 #pragma once
-#include "ChunkId.h"
-#include "ChunkReader.h"
-#include "LEB128.h"
 #include "LanguageScript.h"
+#include "LuaHandler.h"
 
 #define TITLE_FLYBY			0
 #define TITLE_BACKGROUND	1
-
-struct ChunkId;
-struct LEB128;
 
 typedef enum WEATHER_TYPES
 {
@@ -146,24 +141,16 @@ struct GameScriptLevel
 	}
 };
 
-extern ChunkReader* g_ScriptChunkIO;
-
-bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl readGameFlowLevel();
-bool __cdecl readGameFlowStrings();
-bool __cdecl readGameFlowTracks();
-bool __cdecl readGameFlowFlags();
-
 bool __cdecl LoadScript();
 
-class GameFlow
+class GameFlow : public LuaHandler
 {
 private:
-	sol::state*							m_lua;
 	GameScriptSettings					m_settings;
-	
-	std::string								loadScriptFromFile(char* luaFilename);
+
+	std::unordered_map < std::string, std::vector<std::string > > m_translationsMap;
+	std::vector<std::string> m_languageNames;
+
 	std::map<short, short>				m_itemsMap;
 
 public:
@@ -194,16 +181,20 @@ public:
 	GameFlow(sol::state* lua);
 	~GameFlow();
 
-	bool								LoadGameStrings(char* luaFilename);
-	bool								LoadGameSettings(char* luaFilename);
-	bool								ExecuteScript(char* luaFilename);
+	void								WriteDefaults();
+	void								AddLevel(GameScriptLevel const& level);
+	void								AddTracks();
+	bool								LoadGameFlowScript();
 	char*								GetString(int id);
+	auto								GetLang() -> decltype(std::ref(Strings[0]->Strings));
+	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
+	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(int id);
 	void								SetHorizon(bool horizon, bool colAddHorizon);
 	void								SetLayer1(byte r, byte g, byte b, short speed);
 	void								SetLayer2(byte r, byte g, byte b, short speed);
 	void								SetFog(byte r, byte g, byte b, short startDistance, short endDistance);
-	int								GetNumLevels();		
+	int									GetNumLevels();		
 	bool								DoGameflow();
 };
