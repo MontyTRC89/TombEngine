@@ -1,18 +1,20 @@
--- TR5Main Gameflow file
+-- TR5Main GameFlow file
 -- Created by MontyTRC
 -- Place in this LUA script all the levels of your game
 -- Title is mandatory and must be the first level
 
 -- Title level
+GameFlow:WriteDefaults();
+GameFlow:AddTracks();
 title = Level.new();
 
 title.script = "andrea2.lua";
 title.soundTrack = 110;
 title.fileName = "Data\\title.trc";
 title.loadScreen = "Screens\\rome.jpg";
-title.background = "Title.png";
+title.background = "Screens\\Title.png";
 
-Gameflow:AddLevel(title);
+GameFlow:AddLevel(title);
 
 -- Test
 test = Level.new();
@@ -26,7 +28,7 @@ test.horizon = true;
 test.colAddHorizon = true;
 test.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(test);
+GameFlow:AddLevel(test);
 
 -- Streets of rome --
 streets = Level.new();
@@ -40,7 +42,7 @@ streets.colAddHorizon = true;
 streets.layer1 = SkyLayer.new(16, 16, 96, 3);
 streets.resetHub = true;
 
-Gameflow:AddLevel(streets);
+GameFlow:AddLevel(streets);
 
 -- Trajan markets --
 trajan = Level.new();
@@ -55,7 +57,7 @@ trajan.colAddHorizon = true;
 trajan.layer1 = SkyLayer.new(128, 128, 128, 3);
 trajan.storm = false;
 
-Gameflow:AddLevel(trajan);
+GameFlow:AddLevel(trajan);
 
 -- Colosseum
 colosseum = Level.new();
@@ -69,7 +71,7 @@ colosseum.horizon = true;
 colosseum.colAddHorizon = true;
 colosseum.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(colosseum);
+GameFlow:AddLevel(colosseum);
 
 -- The base
 theBase = Level.new();
@@ -84,7 +86,7 @@ theBase.colAddHorizon = true;
 theBase.layer1 = SkyLayer.new(120, 80, 50, -4);
 theBase.resetHub = true;
 
-Gameflow:AddLevel(theBase);
+GameFlow:AddLevel(theBase);
 
 -- The submarine
 submarine = Level.new();
@@ -98,7 +100,7 @@ submarine.horizon = true;
 submarine.colAddHorizon = true;
 submarine.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(submarine);
+GameFlow:AddLevel(submarine);
 
 -- Deepsea dive
 deepsea = Level.new();
@@ -112,7 +114,7 @@ deepsea.horizon = true;
 deepsea.colAddHorizon = true;
 deepsea.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(deepsea);
+GameFlow:AddLevel(deepsea);
 
 -- Sinking submarine
 sinking = Level.new();
@@ -127,7 +129,7 @@ sinking.rumble = true;
 sinking.colAddHorizon = true;
 sinking.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(sinking);
+GameFlow:AddLevel(sinking);
 
 -- Gallows tree
 gallowstree = Level.new();
@@ -139,13 +141,13 @@ gallowstree.fileName = "Data\\andy1.trc";
 gallowstree.loadScreen = "Screens\\andy1.jpg";
 gallowstree.horizon = true;
 gallowstree.colAddHorizon = true;
-gallowstree.rain = true;
+gallowstree.weather = WeatherType.Rain;
 gallowstree.storm = true;
 gallowstree.laraType = LaraType.Young;
 gallowstree.layer1 = SkyLayer.new(80, 96, 160, -8);
 gallowstree.resetHub = true;
 
-Gameflow:AddLevel(gallowstree);
+GameFlow:AddLevel(gallowstree);
 
 -- Labyrinth
 labyrinth = Level.new();
@@ -157,12 +159,12 @@ labyrinth.fileName = "Data\\andy2.trc";
 labyrinth.loadScreen = "Screens\\andy2.jpg";
 labyrinth.horizon = true;
 labyrinth.colAddHorizon = true;
-labyrinth.rain = true;
+labyrinth.weather = WeatherType.Rain;
 labyrinth.storm = true;
 labyrinth.laraType = LaraType.Young;
 labyrinth.layer1 = SkyLayer.new(80, 96, 160, -8);
 
-Gameflow:AddLevel(labyrinth);
+GameFlow:AddLevel(labyrinth);
 
 -- Old mill
 oldMill = Level.new();
@@ -174,12 +176,12 @@ oldMill.fileName = "Data\\andy3.trc";
 oldMill.loadScreen = "Screens\\andy3.jpg";
 oldMill.horizon = true;
 oldMill.colAddHorizon = true;
-oldMill.rain = true;
+oldMill.weather = WeatherType.Rain;
 oldMill.storm = true;
 oldMill.laraType = LaraType.Young;
 oldMill.layer1 = SkyLayer.new(80, 96, 160, -8);
 
-Gameflow:AddLevel(oldMill);
+GameFlow:AddLevel(oldMill);
 
 -- 13th floor
 rich1 = Level.new();
@@ -194,7 +196,7 @@ rich1.colAddHorizon = true;
 rich1.layer1 = SkyLayer.new(120, 80, 50, -4);
 rich1.resetHub = true;
 
-Gameflow:AddLevel(rich1);
+GameFlow:AddLevel(rich1);
 
 -- Escape with the Iris
 iris = Level.new();
@@ -208,7 +210,7 @@ iris.horizon = true;
 iris.colAddHorizon = true;
 iris.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(iris);
+GameFlow:AddLevel(iris);
 
 -- Security breach
 sec = Level.new();
@@ -222,4 +224,4 @@ sec.horizon = true;
 sec.colAddHorizon = true;
 sec.layer1 = SkyLayer.new(120, 80, 50, -4);
 
-Gameflow:AddLevel(sec);
+GameFlow:AddLevel(sec);
