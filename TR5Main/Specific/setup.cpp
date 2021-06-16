@@ -492,8 +492,10 @@ void TrapObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		//obj->floor = FallingBlockFloor;
-		//obj->ceiling = FallingBlockCeiling;
+		obj->floor = FallingBlockFloor;
+		obj->ceiling = FallingBlockCeiling;
+		obj->floorBorder = FallingBlockFloorBorder;
+		obj->ceilingBorder = FallingBlockCeilingBorder;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
@@ -504,8 +506,10 @@ void TrapObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		//obj->floor = FallingBlockFloor;
-		//obj->ceiling = FallingBlockCeiling;
+		obj->floor = FallingBlockFloor;
+		obj->ceiling = FallingBlockCeiling;
+		obj->floorBorder = FallingBlockFloorBorder;
+		obj->ceilingBorder = FallingBlockCeilingBorder;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
