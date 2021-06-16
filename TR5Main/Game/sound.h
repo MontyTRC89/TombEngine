@@ -2132,7 +2132,7 @@ typedef struct SAMPLE_INFO
 
 typedef struct AudioTrack
 {
-	char* Name;
+	char const * Name;
 	byte Mask;
 };
 
