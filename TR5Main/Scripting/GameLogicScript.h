@@ -5,6 +5,7 @@
 #include "LEB128.h"
 #include "Streams.h"
 #include "items.h"
+#include "LuaHandler.h"
 
 #define ITEM_PARAM_currentAnimState		0
 #define ITEM_PARAM_goalAnimState			1
@@ -121,10 +122,9 @@ typedef struct LuaVariable
 	bool BoolValue;
 };
 
-class GameScript
+class GameScript : public LuaHandler
 {
 private:
-	sol::state*							m_lua;
 	LuaVariables						m_globals;
 	LuaVariables						m_locals;
 	std::map<int, short>						m_itemsMapId;
@@ -134,8 +134,6 @@ private:
 public:	
 	GameScript(sol::state* lua);
 
-	bool								ExecuteScript(const std::string& luaFilename, std::string& message);
-	bool								ExecuteString(const std::string& command, std::string& message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
