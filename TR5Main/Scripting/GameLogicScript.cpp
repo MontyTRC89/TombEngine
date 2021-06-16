@@ -13,12 +13,11 @@ extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 bool WarningsAsErrors = false;
 
-GameScript::GameScript(sol::state* lua)
+GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
-	m_lua = lua;
-
 	// Add constants
-	//ExecuteScript("Scripts\\Constants.lua");
+	std::string testingStuff{ "testing stuff" };
+	ExecuteScript("Scripts\\Constants.lua", testingStuff);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
@@ -111,30 +110,6 @@ void GameScript::FreeLevelScripts()
 	(*m_lua)["Lara"] = NULL;
 	//delete m_Lara;
 	*/
-}
-
-bool GameScript::ExecuteScript(const string& luaFilename, string& message)
-{ 
-	auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
-	if (!result.valid())
-	{
-		sol::error error = result;
-		message = error.what();
-		return false;
-	}
-	return true;
-}
-
-bool GameScript::ExecuteString(const string& command, string& message)
-{
-	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
-	if (!result.valid())
-	{
-		sol::error error = result;
-		message = error.what();
-		return false;
-	}
-	return true;
 }
 
 bool GameScript::ExecuteTrigger(short index)
