@@ -963,6 +963,12 @@
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\LuaHandler.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\AudioTracks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1770,6 +1776,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaHandler.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
