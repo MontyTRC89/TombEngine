@@ -225,6 +225,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	luaState.set_exception_handler(lua_exception_handler);
 
 	g_GameFlow = new GameFlow(&luaState);
+	g_GameFlow->LoadGameFlowScript();
+
 	LoadScript();
 
 	g_GameScript = new GameScript(&luaState);
