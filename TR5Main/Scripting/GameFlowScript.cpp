@@ -6,6 +6,8 @@
 #include "sound.h"
 #include "savegame.h"
 #include "draw.h"
+#include "AudioTracks.h"
+
 using std::string;
 using std::vector;
 std::unique_ptr<ChunkId> ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
@@ -26,14 +28,16 @@ std::unique_ptr<ChunkId> ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStri
 std::unique_ptr<ChunkId> ChunkGameFlowAudioTracks = ChunkId::FromString("Tr5MainAudioTracks");
 std::unique_ptr<ChunkId> ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5MainTitleBackground");
 
-ChunkReader* g_ScriptChunkIO;
-
 extern vector<AudioTrack> g_AudioTracks;
 
-GameFlow::GameFlow(sol::state* lua)
+GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
+	//Hardcode in English - old strings for now; will be removed shortly
+	LanguageScript* lang = new LanguageScript("English");
+	Strings.push_back(lang);
+
 	m_lua = lua;
-	
+
 	// Settings type
 	m_lua->new_usertype<GameScriptSettings>("GameScriptSettings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
@@ -74,10 +78,24 @@ GameFlow::GameFlow(sol::state* lua)
 		"b", &GameScriptFog::B
 		);
 
+	// Weather type
+	m_lua->new_enum("WeatherType",
+		"Normal", WEATHER_TYPES::WEATHER_NORMAL,
+		"Rain", WEATHER_TYPES::WEATHER_RAIN,
+		"Snow", WEATHER_TYPES::WEATHER_SNOW);
+
+	m_lua->new_enum("LaraType",
+		"Normal", LARA_DRAW_TYPE::LARA_NORMAL,
+		"Young", LARA_DRAW_TYPE::LARA_YOUNG,
+		"Bunhead", LARA_DRAW_TYPE::LARA_BUNHEAD,
+		"Catsuit", LARA_DRAW_TYPE::LARA_CATSUIT,
+		"Divesuit", LARA_DRAW_TYPE::LARA_DIVESUIT,
+		"Invisible", LARA_DRAW_TYPE::LARA_INVISIBLE);
+
 	// Level type
-	/*m_lua->new_usertype<GameScriptLevel>("Level",
+	m_lua->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
-		"name", &GameScriptLevel::Name,
+		"name", &GameScriptLevel::NameStringIndex,
 		"script", &GameScriptLevel::ScriptFileName,
 		"fileName", &GameScriptLevel::FileName,
 		"loadScreen", &GameScriptLevel::LoadScreenFileName,
@@ -89,279 +107,105 @@ GameFlow::GameFlow(sol::state* lua)
 		"colAddHorizon", &GameScriptLevel::ColAddHorizon,
 		"storm", &GameScriptLevel::Storm,
 		"background", &GameScriptLevel::Background,
-		"rain", &GameScriptLevel::Rain,
-		"snow", &GameScriptLevel::Snow,
+		"weather", &GameScriptLevel::Weather,
 		"laraType", &GameScriptLevel::LaraType,
 		"rumble", &GameScriptLevel::Rumble,
 		"resetHub", &GameScriptLevel::ResetHub,
 		"mirror", &GameScriptLevel::Mirror
-		);*/
+	);
 
-	(*m_lua)["Gameflow"] = this;
+	(*m_lua)["GameFlow"] = std::ref(*this);
+
+
+	m_lua->new_usertype<GameFlow>("_GameFlow",
+		sol::no_constructor,
+		"AddLevel", &GameFlow::AddLevel,
+		"WriteDefaults", &GameFlow::WriteDefaults,
+		"AddTracks", &GameFlow::AddTracks,
+		"strings", sol::property(&GameFlow::GetLang), // for compatibility with old strings
+		"SetStrings", &GameFlow::SetStrings,
+		"SetLanguageNames", &GameFlow::SetLanguageNames
+		);
 }
 
 GameFlow::~GameFlow()
 {
-
-}
-
-bool __cdecl readGameFlowFlags()
-{
-	g_GameFlow->EnableLoadSave = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-	g_GameFlow->PlayAnyLevel = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-	g_GameFlow->FlyCheat = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-	g_GameFlow->DebugMode = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-	g_GameFlow->LevelFarView = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
-	//g_GameFlow->TitleType = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
-
-	char* str;
-	g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-	g_GameFlow->Intro = str;
-
-	return true;
-}
-
-bool __cdecl readGameFlowStrings()
-{
-	char* name;
-	g_ScriptChunkIO->GetRawStream()->ReadString(&name);
-	LanguageScript* lang = new LanguageScript(name);
-	free(name);
-
-	int numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-	for (int i = 0; i < numStrings; i++)
+	for (auto& lev : Levels)
 	{
-		char* str;
-		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		lang->Strings.push_back(string(str));
-		free(str);
+		delete lev;
 	}
 
-	g_GameFlow->Strings.push_back(lang);
-
-	return true;
+	for (auto& lang : Strings)
+	{
+		delete lang;
+	}
 }
 
-bool __cdecl readGameFlowTracks()
+// This is for compatibility with the current English.strings and will be removed
+// once the new Lua strings system is in place
+auto GameFlow::GetLang() -> decltype(std::ref(Strings[0]->Strings))
 {
-	int numTracks = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-	for (int i = 0; i < numTracks; i++)
-	{
-		char* str;
-		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+	auto * eng = Strings[0];
+	return std::ref(eng->Strings);
+};
 
+
+void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
+{
+	m_languageNames = std::move(src);
+}
+
+void GameFlow::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src)
+{
+	m_translationsMap = std::move(src);
+}
+
+//hardcoded for now
+void GameFlow::WriteDefaults()
+{
+	Intro = "SCREENS\\MAIN.PNG";
+	EnableLoadSave = true;
+	PlayAnyLevel = true;
+	FlyCheat = true;
+	DebugMode = false;
+	LevelFarView = 0;
+}
+
+void GameFlow::AddLevel(GameScriptLevel const& level)
+{
+	Levels.push_back(new GameScriptLevel{ level });
+}
+
+void GameFlow::AddTracks() {
+	for (auto str : kAudioTracks) {
 		AudioTrack track;
 		track.Name = str;
 		track.Mask = 0;
 		g_AudioTracks.push_back(track);
 	}
-
-	return true;
-}
-
-bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	GameScriptLevel* level = g_GameFlow->Levels[arg];
-
-	if (chunkId->EqualsTo(ChunkGameFlowLevelInfo.get()))
-	{
-		char* str;
-
-		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		level->FileName = string(str);
-		free(str);
-
-		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		level->LoadScreenFileName = string(str);
-		free(str);
-
-		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
-		level->Background = str;
-		free(str);
-
-		level->NameStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		level->Soundtrack = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags.get()))
-	{
-		level->Horizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->Sky = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->ColAddHorizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->Storm = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->ResetHub = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->LaraType = (LARA_DRAW_TYPE)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		level->Rumble = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->Weather = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->UnlimitedAir = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzle.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelKey.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickup.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelExamine.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzleCombo.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelKeyCombo.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickupCombo.get()))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelLayer.get()))
-	{
-		int layerIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-
-		if (layerIndex == 1)
-		{
-			level->Layer1.Enabled = true;
-			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer1.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-		}
-		else
-		{
-			level->Layer2.Enabled = true;
-			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer2.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-bool __cdecl readGameFlowLevel()
-{
-	g_GameFlow->Levels.push_back(new GameScriptLevel());
-	return g_ScriptChunkIO->ReadChunks(readGameFlowLevelChunks, g_GameFlow->Levels.size() - 1);
-}
-
-bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(ChunkGameFlowFlags.get()))
-		return readGameFlowFlags();
-	else if (chunkId->EqualsTo(ChunkGameFlowStrings.get()))
-		return readGameFlowStrings();
-	else if (chunkId->EqualsTo(ChunkGameFlowAudioTracks.get()))
-		return readGameFlowTracks();
-	else if (chunkId->EqualsTo(ChunkGameFlowLevel.get()))
-		return readGameFlowLevel();
-	return false;
 }
 
 bool __cdecl LoadScript()
 {
-	// Load the new script file
-	FileStream stream("Script.dat", true, false);
-	g_ScriptChunkIO = new ChunkReader(0x4D355254, &stream);
-	if (!g_ScriptChunkIO->IsValid())
-		return false;
-
-	g_ScriptChunkIO->ReadChunks(readGameFlowChunks, 0);
-
 	g_GameFlow->CurrentStrings = g_GameFlow->Strings[0];
 
 	return true;
 }
 
-string GameFlow::loadScriptFromFile(char* luaFilename)
+bool GameFlow::LoadGameFlowScript()
 {
-	using std::ifstream;
-	using std::ios;
-	ifstream ifs(luaFilename, ios::in | ios::binary | ios::ate);
+	// Load the new script file
+	std::string err;
+	if (!ExecuteScript("Scripts/Gameflow.lua", err)) {
+		std::cout << err << "\n";
+	}
 
-	ifstream::pos_type fileSize = ifs.tellg();
-	ifs.seekg(0, ios::beg);
-
-	vector<char> bytes(fileSize);
-	ifs.read(bytes.data(), fileSize);
-
-	return string(bytes.data(), fileSize);
-}
-
-bool GameFlow::LoadGameStrings(char* luaFilename)
-{
-	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
-
-	return true;
-}
-
-bool GameFlow::LoadGameSettings(char* luaFilename)
-{
-	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
-
-	return true;
-}
-
-bool GameFlow::ExecuteScript(char* luaFilename)
-{
-	string script = loadScriptFromFile(luaFilename);
-	m_lua->script(script);
+	// Hardcode English for now - this will be changed
+	// to something like "Strings.lua" once that system
+	//  through
+	if (!ExecuteScript("Scripts/English.lua", err)) {
+		std::cout << err << "\n";
+	}
 
 	return true;
 }
