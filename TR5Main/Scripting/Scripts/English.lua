@@ -83,6 +83,26 @@ GameFlow.strings[68] = "Apply";
 GameFlow.strings[69] = "Cancel";
 GameFlow.strings[70] = "Enable sound";
 GameFlow.strings[71] = "Special effects";
+GameFlow.strings[75] = "Small Waterskin (Empty)"
+GameFlow.strings[76] = "Large Waterskin (Empty)"
+GameFlow.strings[78] = "Move forward"
+GameFlow.strings[79] = "Move backward"
+GameFlow.strings[80] = "Move left"
+GameFlow.strings[81] = "Move right"
+GameFlow.strings[82] = "Duck"
+GameFlow.strings[83] = "Dash"
+GameFlow.strings[84] = "Walk"
+GameFlow.strings[85] = "Jump"
+GameFlow.strings[86] = "Action"
+GameFlow.strings[87] = "Draw weapon"
+GameFlow.strings[88] = "Use flare"
+GameFlow.strings[89] = "Look"
+GameFlow.strings[90] = "Roll"
+GameFlow.strings[91] = "Inventory"
+GameFlow.strings[92] = "Step left"
+GameFlow.strings[93] = "Step right"
+GameFlow.strings[94] = "Items"
+GameFlow.strings[95] = "Puzzles"
 
 -- Level names (from 100 to 199)
 GameFlow.strings[100] = "Title level";
