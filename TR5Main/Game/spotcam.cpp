@@ -798,15 +798,15 @@ void CalculateSpotCameras()
 					CameraFOV[1] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[1] = SpotCam[CurrentSplineCamera - 1].speed;
 
-					CameraXposition[2] = SpotCam[CurrentSplineCamera].x;
-					CameraYposition[2] = SpotCam[CurrentSplineCamera].y;
-					CameraZposition[2] = SpotCam[CurrentSplineCamera].z;
-					CameraXtarget[2] = SpotCam[CurrentSplineCamera].tx;
-					CameraYtarget[2] = SpotCam[CurrentSplineCamera].ty;
-					CameraZtarget[2] = SpotCam[CurrentSplineCamera].tz;
-					CameraRoll[2] = SpotCam[CurrentSplineCamera].roll;
-					CameraFOV[2] = SpotCam[CurrentSplineCamera].fov;
-					CameraSpeed[2] = SpotCam[CurrentSplineCamera].speed;
+					CameraXposition[2] = SpotCam[CurrentSplineCamera - 1].x;
+					CameraYposition[2] = SpotCam[CurrentSplineCamera - 1].y;
+					CameraZposition[2] = SpotCam[CurrentSplineCamera - 1].z;
+					CameraXtarget[2] = SpotCam[CurrentSplineCamera - 1].tx;
+					CameraYtarget[2] = SpotCam[CurrentSplineCamera - 1].ty;
+					CameraZtarget[2] = SpotCam[CurrentSplineCamera - 1].tz;
+					CameraRoll[2] = SpotCam[CurrentSplineCamera - 1].roll;
+					CameraFOV[2] = SpotCam[CurrentSplineCamera - 1].fov;
+					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
 					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
 					Camera.oldType = FIXED_CAMERA;

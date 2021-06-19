@@ -352,6 +352,7 @@ void LavaBurn(ITEM_INFO* item)
 void InitialiseFallingBlock(short itemNumber)
 {
 	g_Level.Items[itemNumber].meshBits = 1;
+	T5M::Floordata::AddBridge(itemNumber);
 }
 
 void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
@@ -412,28 +413,61 @@ void FallingBlockControl(short itemNumber)
 	}
 }
 
-void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+//void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+//{
+//	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
+//	{
+//		if (y <= item->pos.yPos)
+//		{
+//			*height = item->pos.yPos;
+//			HeightType = WALL;
+//			OnFloor = 1;
+//		}
+//	}
+//}
+//
+//void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+//{
+//	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
+//	{
+//		if (y > item->pos.yPos)
+//		{
+//			*height = item->pos.yPos + 256;
+//		}
+//	}
+//}
+
+std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
-	{
-		if (y <= item->pos.yPos)
-		{
-			*height = item->pos.yPos;
-			HeightType = WALL;
-			OnFloor = 1;
-		}
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	if (!item->meshBits || item->itemFlags[0] >= 52)
+		return std::nullopt;
+
+	int height = item->pos.yPos;
+	return std::optional{ height };
 }
 
-void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
-	{
-		if (y > item->pos.yPos)
-		{
-			*height = item->pos.yPos + 256;
-		}
-	}
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits || item->itemFlags[0] >= 52)
+		return std::nullopt;
+
+	int height = item->pos.yPos + 256;
+	return std::optional{ height };
+}
+
+int FallingBlockFloorBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int FallingBlockCeilingBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return (item->pos.yPos + 256);
 }
 
 void InitialiseWreckingBall(short itemNumber)

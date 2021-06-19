@@ -183,6 +183,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_clockwork_beetle.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_element_puzzle.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_mapper.h" />
+    <ClInclude Include="Objects\TR4\Object\tr4_obelisk.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_hammer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_joby_spikes.h" />
@@ -449,6 +450,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
+    <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -494,6 +496,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_clockwork_beetle.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_element_puzzle.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_mapper.cpp" />
+    <ClCompile Include="Objects\TR4\Object\tr4_obelisk.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_hammer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_joby_spikes.cpp" />
@@ -725,6 +728,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
+    <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp" />

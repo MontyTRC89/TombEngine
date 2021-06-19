@@ -13,7 +13,8 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	CloseTrapDoor(item);
+	T5M::Floordata::AddBridge(itemNumber);
+	CloseTrapDoor(itemNumber);
 }
 
 void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
@@ -149,71 +150,55 @@ void TrapDoorControl(short itemNumber)
 
 	if (item->currentAnimState == 1 && (item->itemFlags[2] || JustLoaded))
 	{
-		OpenTrapDoor(item);
+		OpenTrapDoor(itemNumber);
 	}
 	else if (!item->currentAnimState && !item->itemFlags[2])
 	{
-		CloseTrapDoor(item);
+		CloseTrapDoor(itemNumber);
 	}
 }
 
-void CloseTrapDoor(ITEM_INFO* item)
+void CloseTrapDoor(short itemNumber)
 {
-	ROOM_INFO* r;
-	FLOOR_INFO* floor;
-	unsigned short pitsky;
-
-	r = &g_Level.Rooms[item->roomNumber];
-	floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	pitsky = 0;
-
-	if (item->pos.yPos == r->minfloor)
-	{
-		pitsky = floor->pitRoom;
-		floor->pitRoom = NO_ROOM;
-		r = &g_Level.Rooms[pitsky];
-		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky |= floor->skyRoom * 256;
-		floor->skyRoom = NO_ROOM;
-	}
-	else if (item->pos.yPos == r->maxceiling)
-	{
-		pitsky = floor->skyRoom;
-		floor->skyRoom = NO_ROOM;
-		r = &g_Level.Rooms[pitsky];
-		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		pitsky = ((pitsky * 256) | floor->pitRoom);
-		floor->pitRoom = NO_ROOM;
-	}
-
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	item->itemFlags[2] = 1;
-	item->itemFlags[3] = pitsky;
 }
 
-void OpenTrapDoor(ITEM_INFO* item)
+void OpenTrapDoor(short itemNumber)
 {
-	ROOM_INFO* r;
-	FLOOR_INFO* floor;
-	unsigned short pitsky;
-
-	r = &g_Level.Rooms[item->roomNumber];
-	floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	pitsky = item->itemFlags[3];
-
-	if (item->pos.yPos == r->minfloor)
-	{
-		floor->pitRoom = (unsigned char)pitsky;
-		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		floor->skyRoom = pitsky / 256;
-	}
-	else
-	{
-		floor->skyRoom = pitsky / 256;
-		r = &g_Level.Rooms[floor->skyRoom];
-		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-		floor->pitRoom = (unsigned char)pitsky;
-	}
-
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	item->itemFlags[2] = 0;
+}
+
+int TrapDoorFloorBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return item->pos.yPos;
+}
+
+int TrapDoorCeilingBorder(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	return (item->pos.yPos + 128);
+}
+
+std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	if (!item->meshBits || item->itemFlags[2] == 0)
+		return std::nullopt;
+
+	int height = item->pos.yPos;
+	return std::optional{ height };
+}
+
+std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits || item->itemFlags[2] == 0)
+		return std::nullopt;
+
+	int height = item->pos.yPos + 32;
+	return std::optional{ height };
 }
