@@ -40,6 +40,13 @@ enum TransTypeEnum
 	WEIRD
 };
 
+enum FireSizeEnum
+{
+	SP_TINYFIRE,
+	SP_SMALLFIRE,
+	SP_BIGFIRE
+};
+
 struct NODEOFFSET_INFO
 {
 	short x;

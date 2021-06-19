@@ -110,7 +110,7 @@ struct GameScriptMirror
 
 struct GameScriptLevel
 {
-	int NameStringIndex;
+	std::string NameStringKey;
 	std::string FileName;
 	std::string ScriptFileName;
 	std::string LoadScreenFileName;
@@ -197,7 +197,7 @@ public:
 	bool								LoadGameStrings(char* luaFilename);
 	bool								LoadGameSettings(char* luaFilename);
 	bool								ExecuteScript(char* luaFilename);
-	char*								GetString(int id);
+	char*								GetString(const char* id);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(int id);
 	void								SetHorizon(bool horizon, bool colAddHorizon);

@@ -179,7 +179,10 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 		level->Background = str;
 		free(str);
 
-		level->NameStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+		level->NameStringKey = string(str);
+		free(str);
+
 		level->Soundtrack = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -366,9 +369,10 @@ bool GameFlow::ExecuteScript(char* luaFilename)
 	return true;
 }
 
-char* GameFlow::GetString(int id)
+char* GameFlow::GetString(const char* id)
 {
-	return (char*)(CurrentStrings->Strings[id].c_str()); 
+	return (char*)id;
+	//return (char*)(CurrentStrings->Strings[id].c_str()); 
 }
 
 GameScriptSettings* GameFlow::GetSettings()
