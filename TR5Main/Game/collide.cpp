@@ -663,7 +663,8 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		coll->old.y = l->pos.yPos;
 		coll->old.z = l->pos.zPos;
 
-		UpdateLaraRoom(l, -10);
+	//	UpdateLaraRoom(l, -10);
+		/*Causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"*/
 	}
 	else
 	{

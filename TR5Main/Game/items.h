@@ -111,3 +111,4 @@ void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
 std::vector<int> FindItem(short objectNumber);
+ITEM_INFO* find_a_fucking_item(int object_number);
