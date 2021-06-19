@@ -419,7 +419,7 @@ bool SaveGame::Save(char* fileName)
 	printf("Timer: %d\n", Savegame.Game.Timer);
 
 	// The header must be here, so no chunks
-	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringIndex));
+	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
 	LEB128::Write(m_stream, (GameTimer / 30) / 86400);
 	LEB128::Write(m_stream, ((GameTimer / 30) % 86400) / 3600);
 	LEB128::Write(m_stream, ((GameTimer / 30) / 60) % 60);
