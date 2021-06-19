@@ -330,7 +330,7 @@ struct INVOBJ
 	short xrot;
 	short zrot;
 	short flags;
-	short objname;
+	const char* objname;
 	unsigned long meshbits;
 };
 
