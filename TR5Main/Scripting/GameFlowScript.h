@@ -105,7 +105,7 @@ struct GameScriptMirror
 
 struct GameScriptLevel
 {
-	int NameStringIndex;
+	std::string NameStringKey;
 	std::string FileName;
 	std::string ScriptFileName;
 	std::string LoadScreenFileName;
@@ -185,7 +185,7 @@ public:
 	void								AddLevel(GameScriptLevel const& level);
 	void								AddTracks();
 	bool								LoadGameFlowScript();
-	char*								GetString(int id);
+	char*								GetString(const char* id);
 	auto								GetLang() -> decltype(std::ref(Strings[0]->Strings));
 	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);

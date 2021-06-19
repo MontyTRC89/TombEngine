@@ -531,7 +531,7 @@ namespace T5M::Renderer
                 int i2 = i - 1;
                 GameScriptLevel* levelScript = g_GameFlow->GetLevel(i);
 
-                drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
+                drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringKey.c_str()), D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_selected_option & (1 << i2) ? PRINTSTRING_BLINK : 0));
 
                 lastY += 24;
@@ -549,7 +549,7 @@ namespace T5M::Renderer
                     int n2 = n - 1;
 
                     if (!g_NewSavegameInfos[n - 1].Present)
-                        drawString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
+                        drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_selected_option & (1 << (n2 + 1)) ? PRINTSTRING_BLINK : 0));
                     else
                     {
@@ -558,7 +558,7 @@ namespace T5M::Renderer
 
                         drawString(250, y, (char*)g_NewSavegameInfos[n-1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_selected_option & (1 << (n2 + 1)) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                        sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n-1].Days, g_NewSavegameInfos[n-1].Hours, g_NewSavegameInfos[n-1].Minutes, g_NewSavegameInfos[n-1].Seconds);
+                        sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n-1].Days, g_NewSavegameInfos[n-1].Hours, g_NewSavegameInfos[n-1].Minutes, g_NewSavegameInfos[n-1].Seconds);
                         drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_OUTLINE | (title_selected_option & (1 << (n2 + 1)) ? PRINTSTRING_BLINK : 0));
                     }
@@ -1029,13 +1029,13 @@ namespace T5M::Renderer
         GameScriptLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 
         ypos = 150;
-        drawString(400, ypos, "Statistics", PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
-        drawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringIndex), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
-        drawString(200, ypos + 3 * 25, "Time Taken", PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 4 * 25, "Distance travelled", PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 5 * 25, "Ammo used", PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 6 * 25, "HealthPacks used", PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 7 * 25, "Secrets found", PRINTSTRING_COLOR_WHITE, 0);
+        drawString(400, ypos, STRING_STATISTICS, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
+        drawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringKey.c_str()), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+        drawString(200, ypos + 3 * 25, STRING_TIME_TAKEN, PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 4 * 25, STRING_DISTANCE_TRAVELLED, PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 5 * 25, STRING_USED_AMMOS, PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 6 * 25, STRING_USED_MEDIPACKS, PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 7 * 25, STRING_SECRETS_FOUND, PRINTSTRING_COLOR_WHITE, 0);
 
         seconds = GameTimer / 30;
         Days = seconds / (24 * 60 * 60);
@@ -1106,7 +1106,7 @@ namespace T5M::Renderer
             if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
                 break;
 
-            drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
+            //drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
         }
 
         drawAllStrings();

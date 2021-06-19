@@ -97,18 +97,18 @@ int compassNeedleAngle;
 
 uhmG current_options[3];
 
-short optmessages[] =
+const char* optmessages[] =
 {
 	STRING_USE,
 	STRING_CHOOSE_AMMO,
 	STRING_COMBINE,
 	STRING_SEPARE,
-	1,1,//remove later
+	"","",//remove later
 //	STRING_EQUIP,
 //	STRING_COMBINE_WITH,
 	STRING_LOAD_GAME,
 	STRING_SAVE_GAME,
-	1,1,1,1//remove later
+	"","","",""//remove later
 //	STRING_EXAMINE,
 //	STRING_STATISTICS,
 //	STRING_CHOOSE_WEAPON,
