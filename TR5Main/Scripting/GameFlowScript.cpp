@@ -95,7 +95,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 	// Level type
 	m_lua->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
-		"name", &GameScriptLevel::NameStringIndex,
+		"name", &GameScriptLevel::NameStringKey,
 		"script", &GameScriptLevel::ScriptFileName,
 		"fileName", &GameScriptLevel::FileName,
 		"loadScreen", &GameScriptLevel::LoadScreenFileName,
@@ -148,7 +148,6 @@ auto GameFlow::GetLang() -> decltype(std::ref(Strings[0]->Strings))
 	auto * eng = Strings[0];
 	return std::ref(eng->Strings);
 };
-
 
 void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
 {
@@ -210,9 +209,10 @@ bool GameFlow::LoadGameFlowScript()
 	return true;
 }
 
-char* GameFlow::GetString(int id)
+char* GameFlow::GetString(const char* id)
 {
-	return (char*)(CurrentStrings->Strings[id].c_str()); 
+	return (char*)id;
+	//return (char*)(CurrentStrings->Strings[id].c_str()); 
 }
 
 GameScriptSettings* GameFlow::GetSettings()

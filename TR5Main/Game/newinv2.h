@@ -500,7 +500,7 @@ struct INVOBJ
 	short xrot;
 	short zrot;
 	unsigned __int64 opts;
-	short objname;
+	const char* objname;
 	unsigned long meshbits;
 	short rot_flags;
 };

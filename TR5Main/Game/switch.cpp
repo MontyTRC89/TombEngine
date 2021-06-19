@@ -1362,10 +1362,11 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (!(item->flags & 0x100)
 			&& (TrInput & IN_ACTION
 				&& !Lara.gunStatus
-				&& !(item->status && item->gravityStatus)
+				&& !item->gravityStatus
 				&& l->currentAnimState == LS_STOP
 				&& l->animNumber == LA_STAND_IDLE
-				|| Lara.isMoving && Lara.generalPtr == (void*)itemNum))
+				|| Lara.isMoving 
+				&& Lara.generalPtr == (void*)itemNum))
 		{
 			if (TestLaraPosition(&CogSwitchBounds, item, l))
 			{
