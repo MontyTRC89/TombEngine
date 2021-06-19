@@ -14,7 +14,8 @@ void InitialiseRaisingBlock(short itemNumber)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	g_Level.Boxes[floor->box].flags &= ~BLOCKED;
+	if(floor->box != NO_BOX)
+		g_Level.Boxes[floor->box].flags &= ~BLOCKED;
 
 	if (item->triggerFlags < 0)
 	{

@@ -32,6 +32,7 @@
 #include "tr5_twoblockplatform.h"
 #include "tr5_raisingcog.h"
 #include "tr5_raisingblock.h"
+#include "tr5_expandingplatform.h"
 #include "tr5_light.h"
 #include "tr5_bodypart.h"
 #include "tr5_teleporter.h"
@@ -914,6 +915,20 @@ static void StartObject(OBJECT_INFO *obj)
 		}
 	}
 
+	obj = &Objects[ID_EXPANDING_PLATFORM];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseExpandingPlatform;
+		obj->control = ControlExpandingPlatform;
+		obj->floor = ExpandingPlatformFloor;
+		obj->ceiling = ExpandingPlatformCeiling;
+		obj->floorBorder = ExpandingPlatformFloorBorder;
+		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
 	if (obj->loaded)
 	{
@@ -1263,6 +1278,7 @@ static void StartPickup(OBJECT_INFO *obj)
 	InitPickup(obj, ID_WATERSKIN1_EMPTY);
 	InitPickup(obj, ID_WATERSKIN2_EMPTY);
 	InitPickup(obj, ID_GOLDROSE_ITEM);
+	InitPickup(obj, ID_DIARY_ITEM);
 }
 
 static OBJECT_INFO *objToInit;

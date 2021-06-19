@@ -387,7 +387,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		&& (Lara.gunStatus == LG_NO_ARMS
 			|| Lara.gunType == WEAPON_NONE
 			|| Lara.gunType == WEAPON_PISTOLS
-			|| Lara.gunType == WEAPON_REVOLVER
+			|| (Lara.gunType == WEAPON_REVOLVER && !LaserSight)
 			|| Lara.gunType == WEAPON_UZI
 			|| Lara.gunType == WEAPON_FLARE))
 	{

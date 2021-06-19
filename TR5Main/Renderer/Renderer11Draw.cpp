@@ -60,16 +60,15 @@ namespace T5M::Renderer
         x *= (ScreenWidth / 800.0f);
         y *= (ScreenHeight / 600.0f);
 
-        if (GLOBAL_invMode)//sorry
-        {
-            INVOBJ* objme;
+#ifdef NEW_INV
+        INVOBJ* objme;
 
-            objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
-            y += objme->yoff;
-            rotX += objme->xrot;
-            rotY += objme->yrot; 
-            rotZ += objme->zrot;
-        }
+        objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
+        y += objme->yoff;
+        rotX += objme->xrot;
+        rotY += objme->yrot;
+        rotZ += objme->zrot;
+#endif
 
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
@@ -1095,6 +1094,23 @@ namespace T5M::Renderer
         drawObjectOn2DPosition(400, 300, convert_invobj_to_obj(inv_item), xrot, yrot, zrot, obj->scale1);
         obj->scale1 = saved_scale;
     }
+
+    void Renderer11::drawDiary()
+    {
+        INVOBJ* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
+        short currentPage = Lara.Diary.currentPage;
+        drawObjectOn2DPosition(400, 300, convert_invobj_to_obj(INV_OBJECT_OPEN_DIARY), obj->xrot, obj->yrot, obj->zrot, obj->scale1);
+
+        for (int i = 0; i < MaxStringsPerPage; i++)
+        {
+            if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
+                break;
+
+            //drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
+        }
+
+        drawAllStrings();
+    }
 #endif
     void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
@@ -1235,6 +1251,12 @@ namespace T5M::Renderer
             }
 
             renderPauseMenu();
+            return;
+        }
+
+        if (GLOBAL_invMode == IM_DIARY)
+        {
+            drawDiary();
             return;
         }
 
@@ -2765,6 +2787,11 @@ namespace T5M::Renderer
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
                 drawScaledSpikes(view,item, transparent, animated);
             }
+            else if (objectNumber == ID_EXPANDING_PLATFORM)
+            {
+                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
+                drawExpandingPlatform(view, item, transparent, animated);
+            }
             else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
             {
                 // We'll draw waterfalls later
@@ -2855,6 +2882,17 @@ namespace T5M::Renderer
 
             return drawAnimatingItem(view,item, transparent, animated);
         }
+    }
+
+    void Renderer11::drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated)
+    {
+        short objectNumber = item->Item->objectNumber;
+        float xTranslate = item->Item->pos.yRot == ANGLE(90) ? CLICK(2) : item->Item->pos.yRot == ANGLE(270) ? -CLICK(2) : 0.0f;
+        float zTranslate = item->Item->pos.yRot == 0 ? CLICK(2) : item->Item->pos.yRot == ANGLE(180) ? -CLICK(2) : 0.0f;
+        item->Translation *=  Matrix::CreateTranslation(xTranslate, 0.0f, zTranslate);
+        item->Scale = Matrix::CreateScale(1.0f, 1.0f, item->Item->itemFlags[1] / 4096.0f);
+        item->World = item->Scale * item->Rotation * item->Translation;
+        return drawAnimatingItem(view, item, transparent, animated);
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
