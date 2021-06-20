@@ -202,7 +202,7 @@ bool GameFlow::LoadGameFlowScript()
 	// Hardcode English for now - this will be changed
 	// to something like "Strings.lua" once that system
 	//  through
-	if (!ExecuteScript("Scripts/English.lua", err)) {
+	if (!ExecuteScript("Scripts/Strings.lua", err)) {
 		std::cout << err << "\n";
 	}
 
@@ -211,8 +211,10 @@ bool GameFlow::LoadGameFlowScript()
 
 char* GameFlow::GetString(const char* id)
 {
-	return (char*)id;
-	//return (char*)(CurrentStrings->Strings[id].c_str()); 
+	if (m_translationsMap.find(id) == m_translationsMap.end())
+		return "String not found";
+	else
+		return (char*)(m_translationsMap.at(string(id)).at(0).c_str());
 }
 
 GameScriptSettings* GameFlow::GetSettings()
