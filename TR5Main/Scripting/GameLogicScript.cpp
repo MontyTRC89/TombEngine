@@ -16,8 +16,7 @@ bool WarningsAsErrors = false;
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 	// Add constants
-	std::string testingStuff{ "testing stuff" };
-	ExecuteScript("Scripts\\Constants.lua", testingStuff);
+	//ExecuteScript("Scripts\\Constants.lua");
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
