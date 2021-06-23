@@ -21,8 +21,6 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 	LanguageScript* lang = new LanguageScript("English");
 	Strings.push_back(lang);
 
-	m_lua = lua;
-
 	// Settings type
 	m_lua->new_usertype<GameScriptSettings>("GameScriptSettings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
