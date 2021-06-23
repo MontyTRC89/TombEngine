@@ -98,6 +98,17 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 	return radiusVelocity + impactDirectionVelocity;
 }
 
+void DisableDebris()
+{
+	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	{
+		if (deb->active)
+		{
+			deb->active = false;
+		}
+	}
+}
+
 void UpdateDebris()
 {
 	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
