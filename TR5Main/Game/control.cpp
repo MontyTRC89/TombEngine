@@ -892,6 +892,7 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 			SOUND_Stop();
 			S_CDStop();
 			DisableBubbles();
+			DisableDebris();
 
 			return result;
 		}
