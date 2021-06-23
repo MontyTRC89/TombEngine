@@ -96,4 +96,5 @@ extern short SmashedMeshRoom[32];
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel);
 DebrisFragment* GetFreeDebrisFragment();
 Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation);
+void DisableDebris();
 void UpdateDebris();
