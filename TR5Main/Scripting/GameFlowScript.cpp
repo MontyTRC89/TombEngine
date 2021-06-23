@@ -7,26 +7,11 @@
 #include "savegame.h"
 #include "draw.h"
 #include "AudioTracks.h"
+#include <Objects/objectslist.h>
+#include <Game/newinv2.h>
 
 using std::string;
 using std::vector;
-std::unique_ptr<ChunkId> ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
-std::unique_ptr<ChunkId> ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelInfo = ChunkId::FromString("Tr5MainLevelInfo");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelPuzzle = ChunkId::FromString("Tr5MainLevelPuzzle");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelKey = ChunkId::FromString("Tr5MainLevelKey");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelPuzzleCombo = ChunkId::FromString("Tr5MainLevelPuzzleCombo");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelKeyCombo = ChunkId::FromString("Tr5MainLevelKeyCombo");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelPickup = ChunkId::FromString("Tr5MainLevelPickup");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelPickupCombo = ChunkId::FromString("Tr5MainLevelPickupCombo");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelExamine = ChunkId::FromString("Tr5MainLevelExamine");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelLayer = ChunkId::FromString("Tr5MainLevelLayer");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelLuaEvent = ChunkId::FromString("Tr5MainLevelLuaEvent");
-std::unique_ptr<ChunkId> ChunkGameFlowLevelLegend = ChunkId::FromString("Tr5MainLevelLegend");
-std::unique_ptr<ChunkId> ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStrings");
-std::unique_ptr<ChunkId> ChunkGameFlowAudioTracks = ChunkId::FromString("Tr5MainAudioTracks");
-std::unique_ptr<ChunkId> ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5MainTitleBackground");
 
 extern vector<AudioTrack> g_AudioTracks;
 
@@ -78,19 +63,19 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		"b", &GameScriptFog::B
 		);
 
-	// Weather type
-	m_lua->new_enum("WeatherType",
-		"Normal", WEATHER_TYPES::WEATHER_NORMAL,
-		"Rain", WEATHER_TYPES::WEATHER_RAIN,
-		"Snow", WEATHER_TYPES::WEATHER_SNOW);
-
-	m_lua->new_enum("LaraType",
-		"Normal", LARA_DRAW_TYPE::LARA_NORMAL,
-		"Young", LARA_DRAW_TYPE::LARA_YOUNG,
-		"Bunhead", LARA_DRAW_TYPE::LARA_BUNHEAD,
-		"Catsuit", LARA_DRAW_TYPE::LARA_CATSUIT,
-		"Divesuit", LARA_DRAW_TYPE::LARA_DIVESUIT,
-		"Invisible", LARA_DRAW_TYPE::LARA_INVISIBLE);
+	// Inventory object type
+	m_lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
+		sol::constructors<GameScriptInventoryObject(std::string, short, float, float, float, float, float, short, int, __int64)>(),
+		"name", &GameScriptInventoryObject::name,
+		"yOffset", &GameScriptInventoryObject::yOffset,
+		"scale", &GameScriptInventoryObject::scale,
+		"xRot", &GameScriptInventoryObject::xRot,
+		"yRot", &GameScriptInventoryObject::yRot,
+		"zRot", &GameScriptInventoryObject::zRot,
+		"rotationFlags", &GameScriptInventoryObject::rotationFlags,
+		"meshBits", &GameScriptInventoryObject::meshBits,
+		"operation", &GameScriptInventoryObject::operation
+		);
 
 	// Level type
 	m_lua->new_usertype<GameScriptLevel>("Level",
@@ -111,18 +96,17 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		"laraType", &GameScriptLevel::LaraType,
 		"rumble", &GameScriptLevel::Rumble,
 		"resetHub", &GameScriptLevel::ResetHub,
-		"mirror", &GameScriptLevel::Mirror
+		"mirror", &GameScriptLevel::Mirror,
+		"objects", &GameScriptLevel::InventoryObjects
 	);
 
 	(*m_lua)["GameFlow"] = std::ref(*this);
-
 
 	m_lua->new_usertype<GameFlow>("_GameFlow",
 		sol::no_constructor,
 		"AddLevel", &GameFlow::AddLevel,
 		"WriteDefaults", &GameFlow::WriteDefaults,
 		"AddTracks", &GameFlow::AddTracks,
-		"strings", sol::property(&GameFlow::GetLang), // for compatibility with old strings
 		"SetStrings", &GameFlow::SetStrings,
 		"SetLanguageNames", &GameFlow::SetLanguageNames
 		);
@@ -140,14 +124,6 @@ GameFlow::~GameFlow()
 		delete lang;
 	}
 }
-
-// This is for compatibility with the current English.strings and will be removed
-// once the new Lua strings system is in place
-auto GameFlow::GetLang() -> decltype(std::ref(Strings[0]->Strings))
-{
-	auto * eng = Strings[0];
-	return std::ref(eng->Strings);
-};
 
 void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
 {
@@ -193,8 +169,13 @@ bool __cdecl LoadScript()
 
 bool GameFlow::LoadGameFlowScript()
 {
-	// Load the new script file
+	// Load the enums file
 	std::string err;
+	if (!ExecuteScript("Scripts/Enums.lua", err)) {
+		std::cout << err << "\n";
+	}
+
+	// Load the new script file
 	if (!ExecuteScript("Scripts/Gameflow.lua", err)) {
 		std::cout << err << "\n";
 	}
@@ -284,13 +265,11 @@ bool GameFlow::DoGameflow()
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
 
-	//DoLevel(0, 120, false);
-
 	while (true)
 	{
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
-		//level->LaraType = LARA_YOUNG;
+
 		CurrentAtmosphere = level->Soundtrack;
 
 		if (level->Horizon)
@@ -325,6 +304,25 @@ bool GameFlow::DoGameflow()
 		}
 		else
 		{
+			// Prepare inventory objects table
+			for (int i = 0; i < level->InventoryObjects.size(); i++)
+			{
+				GameScriptInventoryObject* obj = &level->InventoryObjects[i];
+				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
+				{
+					INVOBJ* invObj = &inventry_objects_list[obj->slot];
+
+					invObj->objname = obj->name.c_str();
+					invObj->scale1 = obj->scale;
+					invObj->yoff = obj->yOffset;
+					invObj->xrot = obj->xRot;
+					invObj->zrot = obj->zRot;
+					invObj->meshbits = obj->meshBits;
+					invObj->opts = obj->operation;
+					invObj->rot_flags = obj->rotationFlags;
+				}
+			}
+
 			status = DoLevel(CurrentLevel, CurrentAtmosphere, loadFromSavegame);
 			loadFromSavegame = false;
 		}
