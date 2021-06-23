@@ -36,6 +36,34 @@ struct GameScriptSettings
 	bool ShowDebugInfo;
 };
 
+struct GameScriptInventoryObject
+{
+	std::string name;
+	short slot;
+	float yOffset;
+	float scale;
+	float xRot;
+	float yRot;
+	float zRot;
+	short rotationFlags;
+	int meshBits;
+	__int64 operation;
+
+	GameScriptInventoryObject(std::string name, short slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation)
+	{
+		this->name = name;
+		this->slot = slot;
+		this->yOffset = yOffset;
+		this->scale = scale;
+		this->xRot = xRot;
+		this->yRot = yRot;
+		this->zRot = zRot;
+		this->rotationFlags = rotationFlags;
+		this->meshBits = meshBits;
+		this->operation = operation;
+	}
+};
+
 struct GameScriptSkyLayer
 {
 	bool Enabled;
@@ -127,6 +155,7 @@ struct GameScriptLevel
 	byte UVRotate;
 	int LevelFarView;
 	bool UnlimitedAir;
+	std::vector<GameScriptInventoryObject> InventoryObjects;
 
 	GameScriptLevel()
 	{
@@ -186,7 +215,6 @@ public:
 	void								AddTracks();
 	bool								LoadGameFlowScript();
 	char*								GetString(const char* id);
-	auto								GetLang() -> decltype(std::ref(Strings[0]->Strings));
 	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	GameScriptSettings*					GetSettings();

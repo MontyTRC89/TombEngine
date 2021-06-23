@@ -7,7 +7,8 @@ LuaHandler::LuaHandler(sol::state* lua) {
 }
 
 bool	LuaHandler::ExecuteScript(std::string const& luaFilename, std::string & message) {
-	auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	auto result = m_lua->safe_script_file(luaFilename);
+	//auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
