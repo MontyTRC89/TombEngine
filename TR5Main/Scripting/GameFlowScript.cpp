@@ -17,10 +17,6 @@ extern vector<AudioTrack> g_AudioTracks;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
-	//Hardcode in English - old strings for now; will be removed shortly
-	LanguageScript* lang = new LanguageScript("English");
-	Strings.push_back(lang);
-
 	// Settings type
 	m_lua->new_usertype<GameScriptSettings>("GameScriptSettings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
@@ -116,11 +112,6 @@ GameFlow::~GameFlow()
 	{
 		delete lev;
 	}
-
-	for (auto& lang : Strings)
-	{
-		delete lang;
-	}
 }
 
 void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
@@ -156,13 +147,6 @@ void GameFlow::AddTracks() {
 		track.Mask = 0;
 		g_AudioTracks.push_back(track);
 	}
-}
-
-bool __cdecl LoadScript()
-{
-	g_GameFlow->CurrentStrings = g_GameFlow->Strings[0];
-
-	return true;
 }
 
 bool GameFlow::LoadGameFlowScript()
