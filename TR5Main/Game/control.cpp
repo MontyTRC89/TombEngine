@@ -53,6 +53,8 @@
 #include <Game/Lara/lara_one_gun.h>
 
 using std::vector;
+using std::unordered_map;
+using std::string;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
@@ -114,7 +116,7 @@ int nAnimUVRanges;
 int Wibble = 0;
 int SetDebounce = 0;
 
-int CurrentAtmosphere;
+std::string CurrentAtmosphere;
 short CurrentRoom;
 int GameTimer;
 short GlobalCounter;
@@ -177,7 +179,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-extern vector<AudioTrack> g_AudioTracks;
+extern unordered_map<string, AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
@@ -725,7 +727,7 @@ GAME_STATUS DoTitle(int index)
 		InitSpotCamSequences();
 
 		InitialiseSpotCam(2);
-		CurrentAtmosphere = 83;
+		CurrentAtmosphere = "083_horus";
 		UseSpotCam = true;
 
 		// Play background music
@@ -787,7 +789,7 @@ GAME_STATUS DoTitle(int index)
 	return GAME_STATUS_NEW_GAME;
 }
 
-GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
+GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
