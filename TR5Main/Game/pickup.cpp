@@ -323,7 +323,7 @@ void PickedUpObject(short objectNumber)
 		
 		case ID_GOLDROSE_ITEM:
 			IsAtmospherePlaying = 0;
-			S_CDPlay(6, FALSE);
+			S_CDPlay(TRACK_FOUND_SECRET, FALSE);
 			Lara.Secrets++;
 			Savegame.Level.Secrets++;
 			Savegame.Game.Secrets++;

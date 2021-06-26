@@ -2062,6 +2062,9 @@ typedef enum sound_effects
 #define SOUND_XFADETIME_HIJACKSOUND	50
 #define SOUND_BGM_DAMP_COEFFICIENT	0.6f
 
+#define TRACK_FOUND_SECRET			"073_Secret"
+#define TRACKS_PREFIX				"Audio\\%s.%s"
+
 typedef struct SoundEffectSlot
 {
 	short state;
@@ -2074,7 +2077,7 @@ typedef struct SoundEffectSlot
 typedef struct SoundTrackSlot
 {
 	HSTREAM channel;
-	short   trackID;
+	std::string track;
 };
 
 typedef enum sound_track_types
@@ -2132,11 +2135,12 @@ typedef struct SAMPLE_INFO
 
 typedef struct AudioTrack
 {
-	char const * Name;
+	std::string Name;
 	byte Mask;
+	bool looped;
 };
 
-extern std::vector<AudioTrack> g_AudioTracks;
+extern std::unordered_map<std::string, AudioTrack> g_AudioTracks;
 extern int GlobalMusicVolume;
 extern int GlobalFXVolume;
 
@@ -2145,8 +2149,10 @@ void StopSoundEffect(short effectID);
 bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void Sound_FreeSamples();
 void SOUND_Stop();
-void S_CDPlay(short index, unsigned int mode);
-void S_CDPlayEx(short index, DWORD mask, DWORD unknown);
+void S_CDPlay(std::string trackName, unsigned int mode);
+void S_CDPlayEx(std::string trackName, DWORD mask, DWORD unknown);
+void S_CDPlay(int index, unsigned int mode);
+void S_CDPlayEx(int index, DWORD mask, DWORD unknown);
 void S_CDStop();
 void SayNo();
 

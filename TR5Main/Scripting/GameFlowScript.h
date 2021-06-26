@@ -139,7 +139,7 @@ struct GameScriptLevel
 	std::string LoadScreenFileName;
 	std::string Background;
 	int Name;
-	int Soundtrack;
+	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
 	bool Horizon;
@@ -167,6 +167,18 @@ struct GameScriptLevel
 		Weather = WEATHER_NORMAL;
 		LaraType = LARA_NORMAL;
 		UnlimitedAir = false;
+	}
+};
+
+struct GameScriptAudioTrack
+{
+	std::string trackName;
+	bool looped;
+
+	GameScriptAudioTrack(std::string trackName, bool looped)
+	{
+		this->trackName = trackName;
+		this->looped = looped;
 	}
 };
 
@@ -212,7 +224,7 @@ public:
 
 	void								WriteDefaults();
 	void								AddLevel(GameScriptLevel const& level);
-	void								AddTracks();
+	void								SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
 	bool								LoadGameFlowScript();
 	char*								GetString(const char* id);
 	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
