@@ -18,12 +18,6 @@ extern unordered_map<string, AudioTrack> g_AudioTracks;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
-	//Hardcode in English - old strings for now; will be removed shortly
-	LanguageScript* lang = new LanguageScript("English");
-	Strings.push_back(lang);
-
-	m_lua = lua;
-
 	// Settings type
 	m_lua->new_usertype<GameScriptSettings>("GameScriptSettings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
@@ -126,11 +120,6 @@ GameFlow::~GameFlow()
 	{
 		delete lev;
 	}
-
-	for (auto& lang : Strings)
-	{
-		delete lang;
-	}
 }
 
 void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
@@ -169,13 +158,6 @@ void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>
 		track.looped = t.looped;
 		g_AudioTracks.insert_or_assign(track.Name, track);
 	}
-}
-
-bool __cdecl LoadScript()
-{
-	g_GameFlow->CurrentStrings = g_GameFlow->Strings[0];
-
-	return true;
 }
 
 bool GameFlow::LoadGameFlowScript()

@@ -227,8 +227,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_GameFlow = new GameFlow(&luaState);
 	g_GameFlow->LoadGameFlowScript();
 
-	LoadScript();
-
 	g_GameScript = new GameScript(&luaState);
 
 	luaState.set_function("GetItemByID", &GameScript::GetItemById, g_GameScript);

@@ -215,8 +215,6 @@ public:
 	char*								Intro;
 
 	// Selected language set
-	LanguageScript*						CurrentStrings;
-	std::vector<LanguageScript*>				Strings;
 	std::vector<GameScriptLevel*>			Levels;
 
 	GameFlow(sol::state* lua);
