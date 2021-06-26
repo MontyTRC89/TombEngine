@@ -147,14 +147,14 @@ bool GameScript::ExecuteTrigger(short index)
 
 void GameScript::PlayAudioTrack(short track)
 {
-	S_CDPlay(track, SOUND_TRACK_ONESHOT);
+	//S_CDPlay(track, SOUND_TRACK_ONESHOT);
 }
 
 void GameScript::ChangeAmbientSoundTrack(short track)
 {
 	CurrentAtmosphere = track;
 	S_CDStop();
-	S_CDPlay(track, SOUND_TRACK_BGM);
+	//S_CDPlay(track, SOUND_TRACK_BGM);
 }
 
 void GameScript::JumpToLevel(int levelNum)
@@ -181,7 +181,7 @@ void GameScript::AddOneSecret()
 	if (Savegame.Level.Secrets >= 255)
 		return;
 	Savegame.Level.Secrets++;
-	S_CDPlay(6, 0);
+	//S_CDPlay(6, 0);
 }
 /*
 void GameScript::MakeItemInvisible(short id)

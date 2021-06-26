@@ -12,8 +12,9 @@
 
 using std::string;
 using std::vector;
+using std::unordered_map;
 
-extern vector<AudioTrack> g_AudioTracks;
+extern unordered_map<string, AudioTrack> g_AudioTracks;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
@@ -77,6 +78,13 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		"operation", &GameScriptInventoryObject::operation
 		);
 
+	// Audio track type
+	m_lua->new_usertype<GameScriptAudioTrack>("AudioTrack",
+		sol::constructors<GameScriptAudioTrack(std::string, bool)>(),
+		"trackName", &GameScriptAudioTrack::trackName,
+		"looped", &GameScriptAudioTrack::looped
+		);
+
 	// Level type
 	m_lua->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
@@ -84,7 +92,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		"script", &GameScriptLevel::ScriptFileName,
 		"fileName", &GameScriptLevel::FileName,
 		"loadScreen", &GameScriptLevel::LoadScreenFileName,
-		"soundTrack", &GameScriptLevel::Soundtrack,
+		"ambientTrack", &GameScriptLevel::AmbientTrack,
 		"layer1", &GameScriptLevel::Layer1,
 		"layer2", &GameScriptLevel::Layer2,
 		"fog", &GameScriptLevel::Fog,
@@ -106,7 +114,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		sol::no_constructor,
 		"AddLevel", &GameFlow::AddLevel,
 		"WriteDefaults", &GameFlow::WriteDefaults,
-		"AddTracks", &GameFlow::AddTracks,
+		"SetAudioTracks", &GameFlow::SetAudioTracks,
 		"SetStrings", &GameFlow::SetStrings,
 		"SetLanguageNames", &GameFlow::SetLanguageNames
 		);
@@ -151,12 +159,15 @@ void GameFlow::AddLevel(GameScriptLevel const& level)
 	Levels.push_back(new GameScriptLevel{ level });
 }
 
-void GameFlow::AddTracks() {
-	for (auto str : kAudioTracks) {
+void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
+{
+	std::vector<GameScriptAudioTrack> tracks = std::move(src);
+	for (auto t : tracks) {
 		AudioTrack track;
-		track.Name = str;
+		track.Name = t.trackName;
 		track.Mask = 0;
-		g_AudioTracks.push_back(track);
+		track.looped = t.looped;
+		g_AudioTracks.insert_or_assign(track.Name, track);
 	}
 }
 
@@ -172,6 +183,11 @@ bool GameFlow::LoadGameFlowScript()
 	// Load the enums file
 	std::string err;
 	if (!ExecuteScript("Scripts/Enums.lua", err)) {
+		std::cout << err << "\n";
+	}
+
+	// Load the new audio tracks file
+	if (!ExecuteScript("Scripts/Tracks.lua", err)) {
 		std::cout << err << "\n";
 	}
 
@@ -270,7 +286,7 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentAtmosphere = level->Soundtrack;
+		CurrentAtmosphere = level->AmbientTrack;
 
 		if (level->Horizon)
 		{
