@@ -810,6 +810,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitialiseCamera();
 	SOUND_Stop();
 
+	// Run the level script
+	GameScriptLevel* level = g_GameFlow->Levels[index];
+	std::string err;
+	g_GameScript->ExecuteScript(level->ScriptFileName, err);
+
 	// Restore the game?
 	if (loadFromSavegame)
 	{
