@@ -8,6 +8,8 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
+#include "GameScriptItemInfo.h"
+
 using namespace std;
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -15,6 +17,7 @@ bool WarningsAsErrors = false;
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
+	GameScriptItemInfo::Register(m_lua);
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
