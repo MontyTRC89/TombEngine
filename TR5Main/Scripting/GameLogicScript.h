@@ -7,23 +7,10 @@
 #include "items.h"
 #include "LuaHandler.h"
 #include "trmath.h"
-
-#define ITEM_PARAM_currentAnimState		0
-#define ITEM_PARAM_goalAnimState			1
-#define ITEM_PARAM_REQUIRED_ANIM_STATE		2
-#define ITEM_PARAM_frameNumber				3
-#define ITEM_PARAM_animNumber				4
-#define ITEM_PARAM_hitPoints				5
-#define ITEM_PARAM_HIT_STATUS				6
-#define ITEM_PARAM_GRAVITY_STATUS			7
-#define ITEM_PARAM_COLLIDABLE				8
-#define ITEM_PARAM_POISONED					9
-#define ITEM_PARAM_roomNumber				10
-
-#define LUA_VARIABLE_TYPE_INT				0
-#define LUA_VARIABLE_TYPE_BOOL				1
-#define LUA_VARIABLE_TYPE_FLOAT				2
-#define LUA_VARIABLE_TYPE_STRING			3
+#include "GameScriptColor.h"
+#include "GameScriptPosition.h"
+#include "GameScriptRotation.h"
+#include "GameScriptItemInfo.h"
 
 typedef struct LuaFunction {
 	std::string Name;
@@ -35,59 +22,6 @@ struct GameScriptVector3 {
 	float x;
 	float y;
 	float z;
-};
-
-class GameScriptColor {
-public:
-	byte r;
-	byte g;
-	byte b;
-	byte a;
-
-	GameScriptColor(byte r, byte g, byte b);
-	GameScriptColor(byte r, byte g, byte b, byte a);
-
-	byte								GetR();
-	void								SetR(byte v);
-	byte								GetG();
-	void								SetG(byte v);
-	byte								GetB();
-	void								SetB(byte v);
-	byte								GetA();
-	void								SetA(byte v);
-};
-
-class GameScriptPosition {
-public:
-	int x;
-	int y;
-	int z;
-
-	GameScriptPosition(int x, int y, int z);
-
-	int								GetX();
-	void							SetX(int x);
-	int								GetY();
-	void							SetY(int y);
-	int								GetZ();
-	void							SetZ(int z);
-};
-
-class GameScriptRotation {
-private:
-	int								x;
-	int								y;
-	int								z;
-
-public:
-	GameScriptRotation(int x, int y, int z);
-
-	int								GetX();
-	void							SetX(int x);
-	int								GetY();
-	void							SetY(int y);
-	int								GetZ();
-	void							SetZ(int z);
 };
 
 class GameScriptItem {
