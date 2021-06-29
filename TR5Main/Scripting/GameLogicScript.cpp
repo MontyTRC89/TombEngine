@@ -11,6 +11,7 @@
 #include <Game/tomb4fx.h>
 #include <Game/effect2.h>
 #include <Game/pickup.h>
+#include "GameScriptItemInfo.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -18,6 +19,7 @@ bool WarningsAsErrors = false;
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
+	GameScriptItemInfo::Register(m_lua);
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
