@@ -3,7 +3,7 @@
 #include "collide.h"
 
 void InitialisePickup(short itemNumber);
-void PickedUpObject(short objectNumber);
+void PickedUpObject(short objectNumber, int count);
 void RemoveObjectFromInventory(short objectNumber, int count);
 void CollectCarriedItems(ITEM_INFO* item);
 int PickupTrigger(short itemNum);

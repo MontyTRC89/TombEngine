@@ -6,6 +6,7 @@
 #include "Streams.h"
 #include "items.h"
 #include "LuaHandler.h"
+#include "trmath.h"
 
 #define ITEM_PARAM_currentAnimState		0
 #define ITEM_PARAM_goalAnimState			1
@@ -30,52 +31,63 @@ typedef struct LuaFunction {
 	bool Executed;
 };
 
-class GameScriptPosition {
-private:
-	float								xPos;
-	float								yPos;
-	float								zPos;
-	std::function<float()>					readXPos;
-	std::function<void(float)>				writeXPos;
-	std::function<float()>					readYPos;
-	std::function<void(float)>				writeYPos;
-	std::function<float()>					readZPos;
-	std::function<void(float)>				writeZPos;
+struct GameScriptVector3 {
+	float x;
+	float y;
+	float z;
+};
 
+class GameScriptColor {
 public:
-	GameScriptPosition(float x, float y, float z);
-	GameScriptPosition(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
+	byte r;
+	byte g;
+	byte b;
+	byte a;
 
-	float								GetXPos();
-	void								SetXPos(float x);
-	float								GetYPos();
-	void								SetYPos(float y);
-	float								GetZPos();
-	void								SetZPos(float z);
+	GameScriptColor(byte r, byte g, byte b);
+	GameScriptColor(byte r, byte g, byte b, byte a);
+
+	byte								GetR();
+	void								SetR(byte v);
+	byte								GetG();
+	void								SetG(byte v);
+	byte								GetB();
+	void								SetB(byte v);
+	byte								GetA();
+	void								SetA(byte v);
+};
+
+class GameScriptPosition {
+public:
+	int x;
+	int y;
+	int z;
+
+	GameScriptPosition(int x, int y, int z);
+
+	int								GetX();
+	void							SetX(int x);
+	int								GetY();
+	void							SetY(int y);
+	int								GetZ();
+	void							SetZ(int z);
 };
 
 class GameScriptRotation {
 private:
-	float								xRot;
-	float								yRot;
-	float								zRot;
-	std::function<float()>					readXRot;
-	std::function<void(float)>				writeXRot;
-	std::function<float()>					readYRot;
-	std::function<void(float)>				writeYRot;
-	std::function<float()>					readZRot;
-	std::function<void(float)>				writeZRot;
+	int								x;
+	int								y;
+	int								z;
 
 public:
-	GameScriptRotation(float x, float y, float z);
-	GameScriptRotation(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
+	GameScriptRotation(int x, int y, int z);
 
-	float								GetXRot();
-	void								SetXRot(float x);
-	float								GetYRot();
-	void								SetYRot(float y);
-	float								GetZRot();
-	void								SetZRot(float z);
+	int								GetX();
+	void							SetX(int x);
+	int								GetY();
+	void							SetY(int y);
+	int								GetZ();
+	void							SetZ(int z);
 };
 
 class GameScriptItem {
@@ -86,8 +98,8 @@ private:
 public:
 	GameScriptItem(short itemNumber);
 
-	GameScriptPosition					GetPosition();
-	GameScriptRotation					GetRotation();
+	//GameScriptPosition					GetPosition();
+	//GameScriptRotation					GetRotation();
 	short								GetHP();
 	void								SetHP(short hp);
 	short								GetRoom();
@@ -139,27 +151,50 @@ public:
 	void								AddLuaId(int luaId, short itemNumber);
 	void								AddLuaName(std::string luaName, short itemNumber);
 	void								AssignItemsAndLara();
-	void								ResetVariables();
 
+
+	bool								ExecuteTrigger(short index);
+	void								MakeItemInvisible(short id);
+	std::unique_ptr<GameScriptItem>			GetItemById(int id);
+	std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
+
+	// Variables
 	template <typename T>
 	void								GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	template <typename T>
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
-	void								PlayAudioTrack(short track);
-	void								ChangeAmbientSoundTrack(short track);
-	bool								ExecuteTrigger(short index);
+	void								ResetVariables();
+
+	// Sound
+	void								PlayAudioTrack(std::string trackName, bool looped);
+	void								PlaySoundEffect(int id, GameScriptPosition pos, int flags);
+	void								PlaySoundEffect(int id, int flags);
+	void								SetAmbientTrack(std::string trackName);
+
+	// Special FX
+	void								AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags);
+	void								AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags);
+	void								AddSprite(GameScriptPosition pos, VectorInt3 vel, VectorInt2 falloff, GameScriptColor startColor, GameScriptColor endColor, int lifeTime, int fadeIn, int fadeOut, int spriteNum, int startSize, int endSize, float angle, int rotation);
+	void								AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime);
+	void								AddBlood(GameScriptPosition pos, int num);
+	void								AddFireFlame(GameScriptPosition pos, int size);
+	void								Earthquake(int strength);
+
+	// Inventory
+	void								InventoryAdd(int slot, int count);
+	void								InventoryRemove(int slot, int count);
+	void								InventoryGetCount(int slot);
+	void								InventorySetCount(int slot, int count);
+	void								InventoryCombine(int slot1, int slot2);
+	void								InventorySepare(int slot);
+
+	// Misc
+	void								PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags);
+	int									FindRoomNumber(GameScriptPosition pos);
 	void								JumpToLevel(int levelNum);
 	int									GetSecretsCount();
 	void								SetSecretsCount(int secretsNum);
 	void								AddOneSecret();
-	void								MakeItemInvisible(short id);
-	std::unique_ptr<GameScriptItem>			GetItemById(int id);
-	std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
-	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
-	void								PlaySoundEffect(short id, int flags);
-	GameScriptPosition					CreatePosition(float x, float y, float z);
-	GameScriptPosition					CreateSectorPosition(float x, float y, float z);
-	GameScriptRotation					CreateRotation(float x, float y, float z);
-	float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-	float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+	int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+	int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 };
