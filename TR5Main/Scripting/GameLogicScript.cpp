@@ -8,10 +8,9 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-#include <Game/tomb4fx.h>
-#include <Game/effect2.h>
-#include <Game/pickup.h>
-#include "GameScriptItemInfo.h"
+#include "tomb4fx.h"
+#include "effect2.h"
+#include "pickup.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -390,89 +389,6 @@ int GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptP
 	return sqrt(SQUARE(pos1.GetX() - pos2.GetX()) + SQUARE(pos1.GetZ() - pos2.GetZ()));
 }
 
-GameScriptPosition::GameScriptPosition(int x, int y, int z)
-{
-	SetX(x);
-	SetY(y);
-	SetZ(z);
-}
-
-int GameScriptPosition::GetX()
-{
-	return x;
-}
-
-void GameScriptPosition::SetX(int x)
-{
-	if (x < INT_MIN || x > INT_MAX)
-		return;
-	else
-		this->x = x;
-}
-
-int GameScriptPosition::GetY()
-{
-	return y;
-}
-
-void GameScriptPosition::SetY(int y)
-{
-	if (y < INT_MIN || y > INT_MAX)
-		return;
-	else
-		this->y = y;
-}
-
-int GameScriptPosition::GetZ()
-{
-	return z;
-}
-
-void GameScriptPosition::SetZ(int z)
-{
-	if (z < INT_MIN || z > INT_MAX)
-		return;
-	else
-		this->z = z;
-}
-
-GameScriptRotation::GameScriptRotation(int x, int y, int z)
-{
-	SetX(x);
-	SetY(y);
-	SetZ(z);
-}
-
-int GameScriptRotation::GetX()
-{
-	return x;
-}
-
-void GameScriptRotation::SetX(int x)
-{
-	this->x = std::clamp(x, -360, 360);
-}
-
-int GameScriptRotation::GetY()
-{
-	return y;
-}
-
-void GameScriptRotation::SetY(int y)
-{
-	this->y = std::clamp(y, -360, 360);
-}
-
-int GameScriptRotation::GetZ()
-{
-	return z;
-}
-
-void GameScriptRotation::SetZ(int z)
-{
-	this->z = std::clamp(z, -360, 360);
-}
-
 GameScriptItem::GameScriptItem(short itemNumber)
 	:
 	NativeItemNumber(itemNumber),
@@ -631,57 +547,4 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 	}
 }
 
-GameScriptColor::GameScriptColor(byte r, byte g, byte b)
-{
-	this->r = r;
-	this->g = g;
-	this->b = b;
-}
 
-GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a)
-{
-	this->r = r;
-	this->g = g;
-	this->b = b;
-	this->a = a;
-}
-
-byte GameScriptColor::GetR()
-{
-	return r;
-}
-
-void GameScriptColor::SetR(byte v)
-{
-	r = std::clamp<byte>(v, 0, 255);
-}
-
-byte GameScriptColor::GetG()
-{
-	return g;
-}
-
-void GameScriptColor::SetG(byte v)
-{
-	g = std::clamp<byte>(v, 0, 255);
-}
-
-byte GameScriptColor::GetB()
-{
-	return b;
-}
-
-void GameScriptColor::SetB(byte v)
-{
-	b = std::clamp<byte>(v, 0, 255);
-}
-
-byte GameScriptColor::GetA()
-{
-	return a;
-}
-
-void GameScriptColor::SetA(byte v)
-{
-	a = std::clamp<byte>(v, 0, 255);
-}

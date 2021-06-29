@@ -164,6 +164,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\prng.h" />
     <ClInclude Include="Game\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
+    <ClInclude Include="Scripting\GameScriptColor.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\smoke.h" />
     <ClInclude Include="Game\spark.h" />
@@ -379,6 +380,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
+    <ClInclude Include="Scripting\GameScriptPosition.h" />
+    <ClInclude Include="Scripting\GameScriptRotation.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -479,6 +482,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\particle\SimpleParticle.cpp" />
     <ClCompile Include="Game\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
+    <ClCompile Include="Scripting\GameScriptColor.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
@@ -663,6 +667,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
     <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
+    <ClCompile Include="Scripting\GameScriptPosition.cpp" />
+    <ClCompile Include="Scripting\GameScriptRotation.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />

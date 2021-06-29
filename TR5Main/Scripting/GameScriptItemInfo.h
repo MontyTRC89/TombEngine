@@ -5,7 +5,6 @@ namespace sol {
 	template <typename T> class as_table_t;
 }
 
-
 class GameScriptItemInfo
 {
 private:
