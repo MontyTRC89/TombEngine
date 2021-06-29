@@ -313,7 +313,7 @@ void floor_shake_effect(ITEM_INFO* item)
 
 	if (x < SECTOR(16) && y < SECTOR(16) && z < SECTOR(16))
 	{
-		Camera.bounce = 66 * ((x * x + y * y + z * z) / 256 - 0x100000) / 0x100000;
+		Camera.bounce = 66 * ((SQUARE(x) + SQUARE(y) + SQUARE(z)) / 256 - SQUARE(1024)) / SQUARE(1024);
 	}
 }
 

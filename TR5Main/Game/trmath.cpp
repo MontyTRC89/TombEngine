@@ -10,6 +10,11 @@ short ANGLE(float angle)
 	return angle * 65536.0f / 360.0f;
 }
 
+short FROM_DEGREES(float angle)
+{
+	return angle * 65536.0f / 360.0f;
+}
+
 short FROM_RAD(float angle)
 {
 	return angle / RADIAN * 65536.0f / 360.0f;
