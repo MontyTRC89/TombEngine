@@ -1573,6 +1573,8 @@ void FireCrossbow(PHD_3DPOS* pos)
 			ITEM_INFO* item = &g_Level.Items[itemNumber];
 			item->objectNumber = ID_CROSSBOW_BOLT;
 			item->shade = 0xC210;
+			if (!ammos.hasInfinite())
+				(ammos)--;
 			if (pos)
 			{
 				item->roomNumber = LaraItem->roomNumber;
@@ -1588,8 +1590,6 @@ void FireCrossbow(PHD_3DPOS* pos)
 			}
 			else
 			{
-				if (!ammos.hasInfinite())
-					(ammos)--;
 
 				PHD_VECTOR jointPos;
 				jointPos.x = 0;

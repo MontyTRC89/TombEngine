@@ -894,6 +894,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			SOUND_Stop();
 			S_CDStop();
 			DisableBubbles();
+			DisableDebris();
 
 			return result;
 		}
@@ -2293,10 +2294,11 @@ void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
 	short angles[2];
 	PHD_3DPOS pos;
 
+	/* this part makes arrows fire at bad angles
 	target->x &= ~1023;
 	target->z &= ~1023;
 	target->x |= 512;
-	target->z |= 512;
+	target->z |= 512;*/
 
 	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
 	
