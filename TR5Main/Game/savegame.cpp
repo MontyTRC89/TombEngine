@@ -350,14 +350,14 @@ void SaveGame::saveVariable(int arg1, int arg2)
 	LEB128::Write(m_stream, variable.Type);
 	m_stream->WriteString((char*)variable.Name.c_str());
 
-	if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
 		m_stream->WriteBool(variable.BoolValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
 		m_stream->WriteInt32(variable.IntValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
 		m_stream->WriteString((char*)variable.StringValue.c_str());
 	else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-		m_stream->WriteFloat(variable.FloatValue);
+		m_stream->WriteFloat(variable.FloatValue);*/
 }
 
 void SaveGame::Start()
@@ -575,7 +575,7 @@ bool SaveGame::readVariable()
 	variable.Name = string(variableName);
 	free(variableName);
 
-	if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
 		m_stream->ReadBool(&variable.BoolValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
 		m_stream->ReadInt32(&variable.IntValue);
@@ -587,7 +587,7 @@ bool SaveGame::readVariable()
 		m_stream->ReadString(&variableValue);
 		variable.StringValue = string(variableValue);
 		free(variableValue);
-	}
+	}*/
 
 	return true;
 }
