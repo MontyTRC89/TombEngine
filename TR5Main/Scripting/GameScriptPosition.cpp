@@ -8,7 +8,7 @@ GameScriptPosition::GameScriptPosition(int x, int y, int z)
 	SetZ(z);
 }
 
-int GameScriptPosition::GetX()
+int GameScriptPosition::GetX() const
 {
 	return x;
 }
@@ -21,7 +21,7 @@ void GameScriptPosition::SetX(int x)
 		this->x = x;
 }
 
-int GameScriptPosition::GetY()
+int GameScriptPosition::GetY() const
 {
 	return y;
 }
@@ -34,7 +34,7 @@ void GameScriptPosition::SetY(int y)
 		this->y = y;
 }
 
-int GameScriptPosition::GetZ()
+int GameScriptPosition::GetZ() const
 {
 	return z;
 }
