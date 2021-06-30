@@ -8,7 +8,7 @@ GameScriptRotation::GameScriptRotation(int x, int y, int z)
 	SetZ(z);
 }
 
-int GameScriptRotation::GetX()
+int GameScriptRotation::GetX() const
 {
 	return x;
 }
@@ -18,7 +18,7 @@ void GameScriptRotation::SetX(int x)
 	this->x = std::clamp(x, -360, 360);
 }
 
-int GameScriptRotation::GetY()
+int GameScriptRotation::GetY() const
 {
 	return y;
 }
@@ -28,7 +28,7 @@ void GameScriptRotation::SetY(int y)
 	this->y = std::clamp(y, -360, 360);
 }
 
-int GameScriptRotation::GetZ()
+int GameScriptRotation::GetZ() const
 {
 	return z;
 }

@@ -11,10 +11,10 @@ private:
 public:
 	GameScriptRotation(int x, int y, int z);
 
-	int								GetX();
+	int								GetX() const;
 	void							SetX(int x);
-	int								GetY();
+	int								GetY() const;
 	void							SetY(int y);
-	int								GetZ();
+	int								GetZ() const;
 	void							SetZ(int z);
 };
