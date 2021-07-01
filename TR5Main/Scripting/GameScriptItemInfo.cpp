@@ -3,8 +3,26 @@
 #include "items.h"
 #include "objectslist.h"
 #include "level.h"
+#include "setup.h"
+#include "lot.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
+
+extern bool const WarningsAsErrors;
+
+GameScriptItemInfo::GameScriptItemInfo(short num) : m_item{ &g_Level.Items[num]}, m_num { num }
+{};
+
+GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : m_item { std::exchange(other.m_item, nullptr) }, m_num{ std::exchange(other.m_num, -1) } {};
+
+// todo.. how to check if item is killed outside of script?
+GameScriptItemInfo::~GameScriptItemInfo() {
+	// todo.. see if there's a better default state than -1
+	if (m_num > -1)
+	{
+		KillItem(m_num);
+	}
+}
 
 void GameScriptItemInfo::Register(sol::state * state)
 {
@@ -15,6 +33,7 @@ void GameScriptItemInfo::Register(sol::state * state)
 		"GetRot", &GameScriptItemInfo::GetRot,
 		"GetCurrentAnim", &GameScriptItemInfo::GetCurrentAnim,
 		"GetRequiredAnim", &GameScriptItemInfo::GetRequiredAnim,
+		"GetGoalAnim", &GameScriptItemInfo::GetGoalAnim,
 		"GetHP", &GameScriptItemInfo::GetHP,
 		"GetOCB", &GameScriptItemInfo::GetOCB,
 		"GetItemFlags", &GameScriptItemInfo::GetItemFlags,
@@ -22,18 +41,23 @@ void GameScriptItemInfo::Register(sol::state * state)
 		"GetStatus", &GameScriptItemInfo::GetStatus,
 		"GetHitStatus", &GameScriptItemInfo::GetHitStatus,
 		"GetActive", &GameScriptItemInfo::GetActive,
+		"GetRoom", &GameScriptItemInfo::GetRoom,
 		"SetPos", &GameScriptItemInfo::SetPos,
 		"SetRot", &GameScriptItemInfo::SetRot,
 		"SetCurrentAnim", &GameScriptItemInfo::SetCurrentAnim,
 		"SetRequiredAnim", &GameScriptItemInfo::SetRequiredAnim,
+		"SetGoalAnim", &GameScriptItemInfo::SetGoalAnim,
 		"SetHP", &GameScriptItemInfo::SetHP,
 		"SetOCB", &GameScriptItemInfo::SetOCB,
 		"SetItemFlags", &GameScriptItemInfo::SetItemFlags,
 		"SetAIBits", &GameScriptItemInfo::SetAIBits,
 		"SetStatus", &GameScriptItemInfo::SetStatus,
 		"SetHitStatus", &GameScriptItemInfo::SetHitStatus,
-		"SetActive", &GameScriptItemInfo::SetActive);
-		}
+		"SetActive", &GameScriptItemInfo::SetActive,
+		"SetRoom", &GameScriptItemInfo::SetRoom,
+		"Enable", &GameScriptItemInfo::EnableItem,
+		"Disable", &GameScriptItemInfo::DisableItem);
+}
 
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
 {
@@ -46,8 +70,10 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	GameScriptPosition pos,
 	GameScriptRotation rot,
+	short room,
 	short currentAnim,
 	short requiredAnim,
+	short goalAnim,
 	short hp,
 	short ocb,
 	sol::as_table_t<std::array<short, 8>> itemFlags,
@@ -57,33 +83,29 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	bool hitStatus
 	)
 {
-	short num = CreateItem();	
+	short num = CreateItem();
+	auto ptr = std::make_unique<GameScriptItemInfo>(num);
+
 	ITEM_INFO * item = &g_Level.Items[num];
-
-	item->pos = PHD_3DPOS(
-		pos.GetX(),
-		pos.GetY(),
-		pos.GetZ(),
-		rot.GetX(),
-		rot.GetY(),
-		rot.GetZ()	
-	);
-
+	ptr->SetPos(pos);
+	ptr->SetRot(rot);
+	ptr->SetRoom(room);
 	//make it a big medipack by default for now	
 	item->objectNumber = ID_BIGMEDI_ITEM;
 	InitialiseItem(num);
-	
-	item->currentAnimState = currentAnim;
-	item->requiredAnimState = requiredAnim;
-	memcpy(item->itemFlags, itemFlags.value().data(), sizeof(item->itemFlags));
-	item->hitPoints = hp;
-	item->triggerFlags = ocb;
-	item->aiBits = aiBits;
-	item->status = status;
-	item->active = active;
-	item->hitStatus = hitStatus;
 
-	return std::make_unique<GameScriptItemInfo>(num);
+	ptr->SetCurrentAnim(currentAnim);
+	ptr->SetRequiredAnim(requiredAnim);
+	ptr->SetGoalAnim(requiredAnim);
+	ptr->SetHP(hp);
+	ptr->SetOCB(ocb);
+	ptr->SetItemFlags(itemFlags);
+	ptr->SetAIBits(aiBits);
+	ptr->SetStatus(status);
+	ptr->SetActive(active);
+	ptr->SetHitStatus(hitStatus);
+
+	return ptr;
 }
 
 void GameScriptItemInfo::Init()
@@ -93,150 +115,217 @@ void GameScriptItemInfo::Init()
 
 GameScriptPosition GameScriptItemInfo::GetPos() const
 {
-	ITEM_INFO * item = &g_Level.Items[m_num];
-	return GameScriptPosition(	item->pos.xPos,
-								item->pos.yPos,
-								item->pos.zPos);
+	return GameScriptPosition(	m_item->pos.xPos,
+								m_item->pos.yPos,
+								m_item->pos.zPos);
+}
+void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
+{
+	m_item->pos.xPos = pos.GetX();
+	m_item->pos.yPos = pos.GetY();
+	m_item->pos.zPos = pos.GetZ();
 }
 
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	ITEM_INFO * item = &g_Level.Items[m_num];
-	return GameScriptRotation(	item->pos.xRot,
-								item->pos.yRot,
-								item->pos.zRot);
-}
-
-short GameScriptItemInfo::GetHP() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return(item->hitPoints);
-}
-
-short GameScriptItemInfo::GetOCB() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->triggerFlags;
-}
-
-byte GameScriptItemInfo::GetAIBits() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->aiBits;
-}
-
-sol::as_table_t<std::array<short, 8>> GameScriptItemInfo::GetItemFlags() const
-{	
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	std::array<short, 8> ret;
-	memcpy(ret.data(), item->itemFlags, sizeof(item->itemFlags));
-	return ret;
-}
-
-short GameScriptItemInfo::GetCurrentAnim() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->currentAnimState;
-}
-
-short GameScriptItemInfo::GetRequiredAnim() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->requiredAnimState;
-}
-
-
-short GameScriptItemInfo::GetStatus() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->status;
-}
-
-bool GameScriptItemInfo::GetHitStatus() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->hitStatus;
-}
-
-bool GameScriptItemInfo::GetActive() const
-{
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	return item->active;
-}
-
-void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
-{
-	ITEM_INFO * item = &g_Level.Items[m_num];
-	item->pos.xPos = pos.x;
-	item->pos.yPos = pos.y;
-	item->pos.zPos = pos.z;
+	return GameScriptRotation(	m_item->pos.xRot,
+								m_item->pos.yRot,
+								m_item->pos.zRot);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	ITEM_INFO * item = &g_Level.Items[m_num];
-	item->pos.xRot = rot.GetX();
-	item->pos.yRot = rot.GetY();
-	item->pos.zRot = rot.GetZ();
+	m_item->pos.xRot = rot.GetX();
+	m_item->pos.yRot = rot.GetY();
+	m_item->pos.zRot = rot.GetZ();
+}
+
+short GameScriptItemInfo::GetGoalAnim() const
+{
+	return m_item->goalAnimState;
+}
+
+void GameScriptItemInfo::SetGoalAnim(short state)
+{
+	m_item->goalAnimState = state;
+}
+
+short GameScriptItemInfo::GetHP() const
+{
+	return(m_item->hitPoints);
 }
 
 void GameScriptItemInfo::SetHP(short hp)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->hitPoints = hp;
+	if (hp < 0 || hp > Objects[m_item->objectNumber].hitPoints)
+	{
+		if (WarningsAsErrors)
+			throw std::runtime_error("invalid HP");
+		if (hp < 0)
+		{
+			hp = 0;
+		}
+		else if (hp > Objects[m_item->objectNumber].hitPoints)
+		{
+			hp = Objects[m_item->objectNumber].hitPoints;
+		}
+	}
+
+	m_item->hitPoints = hp;
+}
+
+short GameScriptItemInfo::GetOCB() const
+{
+	return m_item->triggerFlags;
 }
 
 void GameScriptItemInfo::SetOCB(short ocb)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->triggerFlags = ocb;
+	m_item->triggerFlags = ocb;
+}
+
+byte GameScriptItemInfo::GetAIBits() const
+{
+	return m_item->aiBits;
 }
 
 void GameScriptItemInfo::SetAIBits(byte bits)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->aiBits = bits;
+	m_item->aiBits = bits;
 }
 
-void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>>  const& arr)
+sol::as_table_t<std::array<short, 8>> GameScriptItemInfo::GetItemFlags() const
 {	
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	memcpy(item->itemFlags, arr.value().data(), sizeof(item->itemFlags));
+	std::array<short, 8> ret{};
+	memcpy(ret.data(), m_item->itemFlags, sizeof(m_item->itemFlags));
+	return ret;
+}
+
+void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> const& arr)
+{	
+	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
+}
+
+short GameScriptItemInfo::GetCurrentAnim() const
+{
+	return m_item->currentAnimState;
 }
 
 void GameScriptItemInfo::SetCurrentAnim(short anim)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->currentAnimState = anim;
+	m_item->currentAnimState = anim;
+}
+
+short GameScriptItemInfo::GetRequiredAnim() const
+{
+	return m_item->requiredAnimState;
 }
 
 void GameScriptItemInfo::SetRequiredAnim(short anim)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->requiredAnimState = anim;
+	m_item->requiredAnimState = anim;
+}
+
+short GameScriptItemInfo::GetStatus() const
+{
+	return m_item->status;
 }
 
 void GameScriptItemInfo::SetStatus(short status)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->status = status;
+	m_item->status = status;
 }
 
-void GameScriptItemInfo::SetHitStatus(bool hitStatus)
+bool GameScriptItemInfo::GetActive() const
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->hitStatus = hitStatus;
+	return m_item->active;
 }
 
 void GameScriptItemInfo::SetActive(bool active)
 {
-	ITEM_INFO* item = &g_Level.Items[m_num];
-	item->active = active;
+	m_item->active = active;
 }
 
-GameScriptItemInfo::GameScriptItemInfo(short num) : m_num{ num } {};
-
-// todo.. how to check if item is killed outside of script?
-GameScriptItemInfo::~GameScriptItemInfo() {
-	KillItem(m_num);
+bool GameScriptItemInfo::GetHitStatus() const
+{
+	return m_item->hitStatus;
 }
+
+void GameScriptItemInfo::SetHitStatus(bool hitStatus)
+{
+	m_item->hitStatus = hitStatus;
+}
+
+short GameScriptItemInfo::GetRoom() const
+{
+	return m_item->roomNumber;
+}
+
+void GameScriptItemInfo::SetRoom(short room)
+{	
+	if (room < 0 || room >= g_Level.Rooms.size())
+	{
+		if (WarningsAsErrors)
+			throw std::runtime_error("invalid room number");
+		return;
+	}
+
+	m_item->roomNumber = room;
+}
+
+
+void GameScriptItemInfo::EnableItem()
+{
+	if (!m_item->active)
+	{
+		if (Objects[m_item->objectNumber].intelligent)
+		{
+			if (m_item->status == ITEM_DEACTIVATED)
+			{
+				m_item->touchBits = 0;
+				m_item->status = ITEM_ACTIVE;
+				AddActiveItem(m_num);
+				EnableBaddieAI(m_num, 1);
+			}
+			else if (m_item->status == ITEM_INVISIBLE)
+			{
+				m_item->touchBits = 0;
+				if (EnableBaddieAI(m_num, 0))
+					m_item->status = ITEM_ACTIVE;
+				else
+					m_item->status = ITEM_INVISIBLE;
+				AddActiveItem(m_num);
+			}
+		}
+		else
+		{
+			m_item->touchBits = 0;
+			AddActiveItem(m_num);
+			m_item->status = ITEM_ACTIVE;
+		}
+	}
+}
+
+void GameScriptItemInfo::DisableItem()
+{
+	if (m_item->active)
+	{
+		if (Objects[m_item->objectNumber].intelligent)
+		{
+			if (m_item->status == ITEM_ACTIVE)
+			{
+				m_item->touchBits = 0;
+				m_item->status = ITEM_DEACTIVATED;
+				RemoveActiveItem(m_num);
+				DisableBaddieAI(m_num);
+			}
+		}
+		else
+		{
+			m_item->touchBits = 0;
+			RemoveActiveItem(m_num);
+			m_item->status = ITEM_DEACTIVATED;
+		}
+	}
+}
+
