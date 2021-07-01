@@ -389,4 +389,47 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 	}
 }
 
+void GameScript::OnStart()
+{
+	m_onStart();
+}
 
+void GameScript::OnLoad()
+{
+	m_onLoad();
+}
+
+void GameScript::OnControlPhase()
+{
+	m_onControlPhase();
+}
+
+void GameScript::OnSave()
+{
+	m_onSave();
+
+}
+
+void GameScript::OnEnd()
+{
+	m_onEnd();
+}
+
+void GameScript::InitCallbacks()
+{
+	auto assignCB = [this](sol::protected_function& func, char const* luaFunc) {
+		func = (*m_lua)[luaFunc];
+		if (WarningsAsErrors && !func.valid())
+		{
+			std::string err{ "Level's script file requires callback \"" };
+			err += std::string{ luaFunc };
+			err += "\"";
+			throw std::runtime_error(err);
+		}
+	};
+	assignCB(m_onStart, "OnStart");
+	assignCB(m_onLoad, "OnLoad");
+	assignCB(m_onControlPhase, "OnControlPhase");
+	assignCB(m_onSave, "OnSave");
+	assignCB(m_onEnd, "OnEnd");
+}
