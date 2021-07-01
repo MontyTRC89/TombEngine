@@ -14,43 +14,17 @@
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
-bool WarningsAsErrors = false;
+extern bool const WarningsAsErrors = true;
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 	GameScriptItemInfo::Register(m_lua);
+	GameScriptPosition::Register(m_lua);
+	GameScriptRotation::Register(m_lua);
+
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
-
-	// Add the item type
-	m_lua->new_usertype<GameScriptPosition>("Position",
-		sol::constructors<GameScriptPosition(int, int, int)>(),
-		"X", sol::property(&GameScriptPosition::GetX, &GameScriptPosition::SetX),
-		"Y", sol::property(&GameScriptPosition::GetY, &GameScriptPosition::SetY),
-		"Z", sol::property(&GameScriptPosition::GetZ, &GameScriptPosition::SetZ)
-		);
-
-	m_lua->new_usertype<GameScriptRotation>("Rotation",
-		sol::constructors<GameScriptRotation(int, int, int)>(),
-		"X", sol::property(&GameScriptRotation::GetX, &GameScriptRotation::SetX),
-		"Y", sol::property(&GameScriptRotation::GetY, &GameScriptRotation::SetY),
-		"Z", sol::property(&GameScriptRotation::GetZ, &GameScriptRotation::SetZ)
-		);
-
-	m_lua->new_usertype<GameScriptItem>("Item",
-		//"Position", sol::property(&GameScriptItem::GetPosition),
-		//"Rotation", sol::property(&GameScriptItem::GetRotation),
-		"HP", sol::property(&GameScriptItem::GetHP, &GameScriptItem::SetHP),
-		"Room", sol::property(&GameScriptItem::GetRoom, &GameScriptItem::SetRoom),
-		"CurrentState", sol::property(&GameScriptItem::GetCurrentState, &GameScriptItem::SetCurrentState),
-		"GoalState", sol::property(&GameScriptItem::GetGoalState, &GameScriptItem::SetGoalState),
-		"RequiredState", sol::property(&GameScriptItem::GetRequiredState, &GameScriptItem::SetRequiredState),
-		"new", sol::no_constructor
-		);
-
-	m_lua->set_function("EnableItem", &GameScriptItem::EnableItem);
-	m_lua->set_function("DisableItem", &GameScriptItem::DisableItem);
 
 	m_lua->new_usertype<LuaVariables>("Variable",
 		sol::meta_function::index, &LuaVariables::GetVariable,
@@ -226,28 +200,28 @@ template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals
 template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
 template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
-std::unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
+std::unique_ptr<GameScriptItemInfo> GameScript::GetItemById(int id)
 {
 	if (m_itemsMapId.find(id) == m_itemsMapId.end())
 	{
 		if (WarningsAsErrors)
 			throw "item id not found";
-		return std::unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapId[id]);
 }
 
-std::unique_ptr<GameScriptItem> GameScript::GetItemByName(std::string name)
+std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string name)
 {
 	if (m_itemsMapName.find(name) == m_itemsMapName.end())
 	{
 		if (WarningsAsErrors)
 			throw "item name not found";
-		return std::unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return std::unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapName[name]);
 }
 
 void GameScript::PlayAudioTrack(std::string trackName, bool looped)
@@ -259,9 +233,9 @@ void GameScript::PlaySoundEffect(int id, GameScriptPosition p, int flags)
 {
 	PHD_3DPOS pos;
 
-	pos.xPos = p.x;
-	pos.yPos = p.y;
-	pos.zPos = p.z;
+	pos.xPos = p.GetX();
+	pos.yPos = p.GetY();
+	pos.zPos = p.GetZ();
 	pos.xRot = 0;
 	pos.yRot = 0;
 	pos.zRot = 0;
@@ -371,7 +345,7 @@ void GameScript::AssignItemsAndLara()
 {
 	m_lua->set("Level", m_locals);
 	m_lua->set("Game", m_globals);
-	m_lua->set("Lara", GameScriptItem(Lara.itemNumber));
+	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber));
 }
 
 void GameScript::ResetVariables()
@@ -387,138 +361,6 @@ int GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition po
 int GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
 	return sqrt(SQUARE(pos1.GetX() - pos2.GetX()) + SQUARE(pos1.GetZ() - pos2.GetZ()));
-}
-
-GameScriptItem::GameScriptItem(short itemNumber)
-	:
-	NativeItemNumber(itemNumber),
-	NativeItem(&g_Level.Items[itemNumber])
-{
-
-}
-
-short GameScriptItem::GetHP()
-{
-	return NativeItem->hitPoints;
-}
-
-void GameScriptItem::SetHP(short hp)
-{
-	if (hp < 0 || hp > Objects[NativeItem->objectNumber].hitPoints)
-	{
-		if (WarningsAsErrors)
-			throw std::runtime_error("invalid HP");
-		if (hp < 0)
-		{
-			hp = 0;
-		}
-		else if (hp > Objects[NativeItem->objectNumber].hitPoints)
-		{
-			hp = Objects[NativeItem->objectNumber].hitPoints;
-		}
-	}
-	NativeItem->hitPoints = hp;
-}
-
-short GameScriptItem::GetRoom()
-{
-	return NativeItem->roomNumber;
-}
-
-void GameScriptItem::SetRoom(short room)
-{
-	if (room < 0 || room >= g_Level.Rooms.size())
-	{
-		if (WarningsAsErrors)
-			throw std::runtime_error("invalid room number");
-		return;
-	}
-	NativeItem->roomNumber = room;
-}
-
-void GameScriptItem::EnableItem()
-{
-	if (!NativeItem->active)
-	{
-		if (Objects[NativeItem->objectNumber].intelligent)
-		{
-			if (NativeItem->status == ITEM_DEACTIVATED)
-			{
-				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_ACTIVE;
-				AddActiveItem(NativeItemNumber);
-				EnableBaddieAI(NativeItemNumber, 1);
-			}
-			else if (NativeItem->status == ITEM_INVISIBLE)
-			{
-				NativeItem->touchBits = 0;
-				if (EnableBaddieAI(NativeItemNumber, 0))
-					NativeItem->status = ITEM_ACTIVE;
-				else
-					NativeItem->status = ITEM_INVISIBLE;
-				AddActiveItem(NativeItemNumber);
-			}
-		}
-		else
-		{
-			NativeItem->touchBits = 0;
-			AddActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_ACTIVE;
-		}
-	}
-}
-
-void GameScriptItem::DisableItem()
-{
-	if (NativeItem->active)
-	{
-		if (Objects[NativeItem->objectNumber].intelligent)
-		{
-			if (NativeItem->status == ITEM_ACTIVE)
-			{
-				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_DEACTIVATED;
-				RemoveActiveItem(NativeItemNumber);
-				DisableBaddieAI(NativeItemNumber);
-			}
-		}
-		else
-		{
-			NativeItem->touchBits = 0;
-			RemoveActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_DEACTIVATED;
-		}
-	}
-}
-
-short GameScriptItem::GetCurrentState()
-{
-	return NativeItem->currentAnimState;
-}
-
-void GameScriptItem::SetCurrentState(short state)
-{
-	NativeItem->currentAnimState = state;
-}
-
-short GameScriptItem::GetGoalState()
-{
-	return NativeItem->goalAnimState;
-}
-
-void GameScriptItem::SetGoalState(short state)
-{
-	NativeItem->goalAnimState = state;
-}
-
-short GameScriptItem::GetRequiredState()
-{
-	return NativeItem->requiredAnimState;
-}
-
-void GameScriptItem::SetRequiredState(short state)
-{
-	NativeItem->requiredAnimState = state;
 }
 
 sol::object LuaVariables::GetVariable(std::string key)

@@ -24,29 +24,6 @@ struct GameScriptVector3 {
 	float z;
 };
 
-class GameScriptItem {
-private:
-	short								NativeItemNumber;
-	ITEM_INFO*							NativeItem;
-
-public:
-	GameScriptItem(short itemNumber);
-
-	//GameScriptPosition					GetPosition();
-	//GameScriptRotation					GetRotation();
-	short								GetHP();
-	void								SetHP(short hp);
-	short								GetRoom();
-	void								SetRoom(short room);
-	short								GetCurrentState();
-	void								SetCurrentState(short state);
-	short								GetGoalState();
-	void								SetGoalState(short state);
-	short								GetRequiredState();
-	void								SetRequiredState(short state);
-	void								EnableItem();
-	void								DisableItem();
-};
 
 class LuaVariables
 {
@@ -89,8 +66,8 @@ public:
 
 	bool								ExecuteTrigger(short index);
 	void								MakeItemInvisible(short id);
-	std::unique_ptr<GameScriptItem>			GetItemById(int id);
-	std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
+	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
+	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string name);
 
 	// Variables
 	template <typename T>
