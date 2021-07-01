@@ -1,5 +1,16 @@
 #include "framework.h"
 #include "GameScriptPosition.h"
+#include <sol.hpp>
+
+void GameScriptPosition::Register(sol::state* state)
+{
+	state->new_usertype<GameScriptPosition>("Position",
+		sol::constructors<GameScriptPosition(int, int, int)>(),
+		"X", sol::property(&GameScriptPosition::GetX, &GameScriptPosition::SetX),
+		"Y", sol::property(&GameScriptPosition::GetY, &GameScriptPosition::SetY),
+		"Z", sol::property(&GameScriptPosition::GetZ, &GameScriptPosition::SetZ)
+		);
+}
 
 GameScriptPosition::GameScriptPosition(int x, int y, int z)
 {
