@@ -6,23 +6,28 @@ namespace sol {
 }
 class GameScriptPosition;
 class GameScriptRotation;
+struct ITEM_INFO;
 
 class GameScriptItemInfo
 {
 private:
+	ITEM_INFO* m_item;
 	short m_num;
 public:
 	GameScriptItemInfo(short num);
 	~GameScriptItemInfo();
 	GameScriptItemInfo& operator=(GameScriptItemInfo const& other) = delete;
 	GameScriptItemInfo(GameScriptItemInfo const& other) = delete;
+	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
 	static void Register(sol::state *);
 	static std::unique_ptr<GameScriptItemInfo> CreateEmpty();
 	static std::unique_ptr<GameScriptItemInfo> Create(
 		GameScriptPosition pos,
 		GameScriptRotation aRot,
+		short room,
 		short aCurrentAnim,
 		short aRequiredAnim,
+		short goalAnim,
 		short aHp,
 		short aOcb,
 		sol::as_table_t<std::array<short, 8>> aFlags,
@@ -42,6 +47,10 @@ public:
 	short GetStatus() const;
 	bool GetHitStatus() const;
 	bool GetActive() const;
+	short GetRoom() const;
+	short GetGoalAnim() const;
+	void EnableItem();
+	void DisableItem();
 
 	void Init();
 
@@ -56,4 +65,6 @@ public:
 	void SetStatus(short status);
 	void SetHitStatus(bool hitStatus);
 	void SetActive(bool active);
+	void SetRoom(short Room);
+	void SetGoalAnim(short state);
 };
