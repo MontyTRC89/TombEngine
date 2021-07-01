@@ -50,10 +50,14 @@ class GameScript : public LuaHandler
 private:
 	LuaVariables						m_globals;
 	LuaVariables						m_locals;
-	std::map<int, short>						m_itemsMapId;
-	std::map<std::string, short>					m_itemsMapName;
-	std::vector<LuaFunction*>				m_triggers;
-
+	std::map<int, short>				m_itemsMapId;
+	std::map<std::string, short>		m_itemsMapName;
+	std::vector<LuaFunction*>			m_triggers;
+	sol::protected_function				m_onStart;
+	sol::protected_function				m_onLoad;
+	sol::protected_function				m_onControlPhase;
+	sol::protected_function				m_onSave;
+	sol::protected_function				m_onEnd;
 public:	
 	GameScript(sol::state* lua);
 
@@ -108,4 +112,11 @@ public:
 	void								AddOneSecret();
 	int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+
+	void InitCallbacks();
+	void OnStart();
+	void OnLoad();
+	void OnControlPhase();
+	void OnSave();
+	void OnEnd();
 };
