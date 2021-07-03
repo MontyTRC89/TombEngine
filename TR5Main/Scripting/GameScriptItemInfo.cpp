@@ -7,6 +7,7 @@
 #include "lot.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
+#include "trmath.h"
 
 extern bool const WarningsAsErrors;
 
@@ -29,32 +30,19 @@ void GameScriptItemInfo::Register(sol::state * state)
 	state->new_usertype<GameScriptItemInfo>("ItemInfo",
 		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
 		"Init", &GameScriptItemInfo::Init,
-		"GetPos", &GameScriptItemInfo::GetPos,
-		"GetRot", &GameScriptItemInfo::GetRot,
-		"GetCurrentAnim", &GameScriptItemInfo::GetCurrentAnim,
-		"GetRequiredAnim", &GameScriptItemInfo::GetRequiredAnim,
-		"GetGoalAnim", &GameScriptItemInfo::GetGoalAnim,
-		"GetHP", &GameScriptItemInfo::GetHP,
-		"GetOCB", &GameScriptItemInfo::GetOCB,
-		"GetItemFlags", &GameScriptItemInfo::GetItemFlags,
-		"GetAIBits", &GameScriptItemInfo::GetAIBits,
-		"GetStatus", &GameScriptItemInfo::GetStatus,
-		"GetHitStatus", &GameScriptItemInfo::GetHitStatus,
-		"GetActive", &GameScriptItemInfo::GetActive,
-		"GetRoom", &GameScriptItemInfo::GetRoom,
-		"SetPos", &GameScriptItemInfo::SetPos,
-		"SetRot", &GameScriptItemInfo::SetRot,
-		"SetCurrentAnim", &GameScriptItemInfo::SetCurrentAnim,
-		"SetRequiredAnim", &GameScriptItemInfo::SetRequiredAnim,
-		"SetGoalAnim", &GameScriptItemInfo::SetGoalAnim,
-		"SetHP", &GameScriptItemInfo::SetHP,
-		"SetOCB", &GameScriptItemInfo::SetOCB,
-		"SetItemFlags", &GameScriptItemInfo::SetItemFlags,
-		"SetAIBits", &GameScriptItemInfo::SetAIBits,
-		"SetStatus", &GameScriptItemInfo::SetStatus,
-		"SetHitStatus", &GameScriptItemInfo::SetHitStatus,
-		"SetActive", &GameScriptItemInfo::SetActive,
-		"SetRoom", &GameScriptItemInfo::SetRoom,
+		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::GetCurrentAnim),
+		"requiredAnim", sol::property(&GameScriptItemInfo::GetRequiredAnim, &GameScriptItemInfo::SetRequiredAnim),
+		"goalAnim", sol::property(&GameScriptItemInfo::GetGoalAnim, &GameScriptItemInfo::SetGoalAnim),
+		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
+		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
+		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
+		"AIBits", sol::property(&GameScriptItemInfo::GetAIBits, &GameScriptItemInfo::SetAIBits),
+		"status", sol::property(&GameScriptItemInfo::GetStatus, &GameScriptItemInfo::SetStatus),
+		"hitStatus", sol::property(&GameScriptItemInfo::GetHitStatus, &GameScriptItemInfo::SetHitStatus),
+		"active", sol::property(&GameScriptItemInfo::GetActive, &GameScriptItemInfo::SetActive),
+		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
+		"pos", sol::property(&GameScriptItemInfo::GetPos, &GameScriptItemInfo::SetPos),
+		"rot", sol::property(&GameScriptItemInfo::GetRot, &GameScriptItemInfo::SetRot),
 		"Enable", &GameScriptItemInfo::EnableItem,
 		"Disable", &GameScriptItemInfo::DisableItem);
 }
@@ -115,29 +103,30 @@ void GameScriptItemInfo::Init()
 
 GameScriptPosition GameScriptItemInfo::GetPos() const
 {
-	return GameScriptPosition(	m_item->pos.xPos,
-								m_item->pos.yPos,
-								m_item->pos.zPos);
-}
-void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
-{
-	m_item->pos.xPos = pos.GetX();
-	m_item->pos.yPos = pos.GetY();
-	m_item->pos.zPos = pos.GetZ();
+	return GameScriptPosition(	m_item->pos	);
 }
 
+void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
+{
+	pos.StoreInPHDPos(m_item->pos);
+}
+
+// This does not guarantee that the returned value will be identical
+// to a value written in via SetRot - only that the angle measures
+// will be mathematically equal
+// (e.g. 90 degrees = -270 degrees = 450 degrees)
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	return GameScriptRotation(	m_item->pos.xRot,
-								m_item->pos.yRot,
-								m_item->pos.zRot);
+	return GameScriptRotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
+								int(TO_DEGREES(m_item->pos.yRot)) % 360,
+								int(TO_DEGREES(m_item->pos.zRot)) % 360);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	m_item->pos.xRot = rot.GetX();
-	m_item->pos.yRot = rot.GetY();
-	m_item->pos.zRot = rot.GetZ();
+	m_item->pos.xRot = FROM_DEGREES(rot.x);
+	m_item->pos.yRot = FROM_DEGREES(rot.y);
+	m_item->pos.zRot = FROM_DEGREES(rot.z);
 }
 
 short GameScriptItemInfo::GetGoalAnim() const
