@@ -389,30 +389,39 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 	}
 }
 
+static void doCallback(sol::protected_function const & func) {
+	auto r = func();
+	if (WarningsAsErrors && !r.valid())
+	{
+		sol::error err = r;
+		std::cerr << "An error occurred: " << err.what() << "\n";
+		throw std::runtime_error(err.what());
+	}
+}
+
 void GameScript::OnStart()
 {
-	m_onStart();
+	doCallback(m_onStart);
 }
 
 void GameScript::OnLoad()
 {
-	m_onLoad();
+	doCallback(m_onLoad);
 }
 
 void GameScript::OnControlPhase()
 {
-	m_onControlPhase();
+	doCallback(m_onControlPhase);
 }
 
 void GameScript::OnSave()
 {
-	m_onSave();
-
+	doCallback(m_onSave);
 }
 
 void GameScript::OnEnd()
 {
-	m_onEnd();
+	doCallback(m_onEnd);
 }
 
 void GameScript::InitCallbacks()
