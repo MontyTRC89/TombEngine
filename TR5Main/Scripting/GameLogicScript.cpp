@@ -233,9 +233,9 @@ void GameScript::PlaySoundEffect(int id, GameScriptPosition p, int flags)
 {
 	PHD_3DPOS pos;
 
-	pos.xPos = p.GetX();
-	pos.yPos = p.GetY();
-	pos.zPos = p.GetZ();
+	pos.xPos = p.x;
+	pos.yPos = p.y;
+	pos.zPos = p.z;
 	pos.xRot = 0;
 	pos.yRot = 0;
 	pos.zRot = 0;
@@ -248,7 +248,7 @@ void GameScript::PlaySoundEffect(int id, int flags)
 	SoundEffect(id, NULL, flags);
 }
 
-void GameScript::SetAmbientTrack(std::string trackName)
+void GameScript::SetAmbientTrack(std::string const & trackName)
 {
 	CurrentAtmosphere = trackName;
 	S_CDPlay(CurrentAtmosphere, 1);
@@ -257,14 +257,14 @@ void GameScript::SetAmbientTrack(std::string trackName)
 void GameScript::AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 {
 	PHD_VECTOR p1;
-	p1.x = src.GetX();
-	p1.y = src.GetY();
-	p1.z = src.GetZ();
+	p1.x = src.x;
+	p1.y = src.y;
+	p1.z = src.z;
 
 	PHD_VECTOR p2;
-	p2.x = dest.GetX();
-	p2.y = dest.GetY();
-	p2.z = dest.GetZ();
+	p2.x = dest.x;
+	p2.y = dest.y;
+	p2.z = dest.z;
 
 	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 }
@@ -272,26 +272,26 @@ void GameScript::AddLightningArc(GameScriptPosition src, GameScriptPosition dest
 void GameScript::AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
 {
 	PHD_3DPOS p;
-	p.xPos = pos.GetX();
-	p.yPos = pos.GetY();
-	p.zPos = pos.GetZ();
+	p.xPos = pos.x;
+	p.yPos = pos.y;
+	p.zPos = pos.z;
 	
 	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 }
 
 void GameScript::AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
 {
-	TriggerDynamicLight(pos.GetX(), pos.GetY(), pos.GetZ(), radius, color.GetR(), color.GetG(), color.GetB());
+	TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 }
 
 void GameScript::AddBlood(GameScriptPosition pos, int num)
 {
-	TriggerBlood(pos.GetX(), pos.GetY(), pos.GetZ(), -1, num);
+	TriggerBlood(pos.x, pos.y, pos.z, -1, num);
 }
 
 void GameScript::AddFireFlame(GameScriptPosition pos, int size)
 {
-	AddFire(pos.GetX(), pos.GetY(), pos.GetZ(), size, FindRoomNumber(pos), true);
+	AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
 }
 
 void GameScript::Earthquake(int strength)
@@ -355,12 +355,12 @@ void GameScript::ResetVariables()
 
 int GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
-	return sqrt(SQUARE(pos1.GetX() - pos2.GetX()) + SQUARE(pos1.GetY() - pos2.GetY()) + SQUARE(pos1.GetZ() - pos2.GetZ()));
+	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 }
 
 int GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
-	return sqrt(SQUARE(pos1.GetX() - pos2.GetX()) + SQUARE(pos1.GetZ() - pos2.GetZ()));
+	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 }
 
 sol::object LuaVariables::GetVariable(std::string key)

@@ -84,7 +84,7 @@ public:
 	void								PlayAudioTrack(std::string trackName, bool looped);
 	void								PlaySoundEffect(int id, GameScriptPosition pos, int flags);
 	void								PlaySoundEffect(int id, int flags);
-	void								SetAmbientTrack(std::string trackName);
+	void								SetAmbientTrack(std::string const & trackName);
 
 	// Special FX
 	void								AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags);
