@@ -30,7 +30,7 @@ void GameScriptItemInfo::Register(sol::state * state)
 	state->new_usertype<GameScriptItemInfo>("ItemInfo",
 		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
 		"Init", &GameScriptItemInfo::Init,
-		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::GetCurrentAnim),
+		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::SetCurrentAnim),
 		"requiredAnim", sol::property(&GameScriptItemInfo::GetRequiredAnim, &GameScriptItemInfo::SetRequiredAnim),
 		"goalAnim", sol::property(&GameScriptItemInfo::GetGoalAnim, &GameScriptItemInfo::SetGoalAnim),
 		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
