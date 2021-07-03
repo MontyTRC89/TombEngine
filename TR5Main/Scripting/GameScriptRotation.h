@@ -13,9 +13,9 @@ public:
 	int								y;
 	int								z;
 
-public:
 	GameScriptRotation(int x, int y, int z);
-	static void Register(sol::state*);
-	void StoreInPHDPos(PHD_3DPOS& pos) const;
 	GameScriptRotation(PHD_3DPOS const& pos);
+	void StoreInPHDPos(PHD_3DPOS& pos) const;
+
+	static void Register(sol::state*);
 };
