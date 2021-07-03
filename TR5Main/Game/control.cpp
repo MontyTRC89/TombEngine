@@ -816,7 +816,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	std::string err;
 	g_GameScript->ExecuteScript(level->ScriptFileName, err);
 	g_GameScript->InitCallbacks();
-	g_GameScript->OnStart();
 	// Restore the game?
 	if (loadFromSavegame)
 	{
@@ -838,7 +837,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
-		g_GameScript->OnLoad();
 	}
 	else
 	{
@@ -877,6 +875,12 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	// Initialise ponytails
 	InitialiseHair();
+
+	g_GameScript->OnStart();
+	if (loadFromSavegame)
+	{
+		g_GameScript->OnLoad();
+	}
 
 	int nframes = 2;
 
