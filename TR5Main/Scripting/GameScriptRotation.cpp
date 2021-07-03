@@ -1,58 +1,35 @@
 #include "framework.h"
 #include "GameScriptRotation.h"
+#include "phd_global.h"
 
 void GameScriptRotation::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptRotation>("Rotation",
 		sol::constructors<GameScriptRotation(int, int, int)>(),
-		"X", sol::property(&GameScriptRotation::GetX, &GameScriptRotation::SetX),
-		"Y", sol::property(&GameScriptRotation::GetY, &GameScriptRotation::SetY),
-		"Z", sol::property(&GameScriptRotation::GetZ, &GameScriptRotation::SetZ)
-		);
+		"X", &GameScriptRotation::x,
+		"Y", &GameScriptRotation::y,
+		"Z", &GameScriptRotation::z
+	);
 }
 
 
-GameScriptRotation::GameScriptRotation(int x, int y, int z)
+GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
 {
-	SetX(x);
-	SetY(y);
-	SetZ(z);
+	x = aX;
+	y = aY;
+	z = aZ;
 }
 
-int GameScriptRotation::ConvertRotation(int a)
+void GameScriptRotation::StoreInPHDPos(PHD_3DPOS& pos) const
 {
-	short component = std::clamp(a, -359, 359);
-	component = static_cast<int>(lround((component/360.0f) * std::numeric_limits<unsigned short>::max()));
-	component = component - std::numeric_limits<short>::max();
-	return component;
+	pos.xRot = x;
+	pos.yRot = y;
+	pos.zRot = z;
 }
 
-int GameScriptRotation::GetX() const
+GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
 {
-	return x;
-}
-
-void GameScriptRotation::SetX(int x)
-{
-	this->x = ConvertRotation(x);
-}
-
-int GameScriptRotation::GetY() const
-{
-	return y;
-}
-
-void GameScriptRotation::SetY(int y)
-{
-	this->y = ConvertRotation(y);
-}
-
-int GameScriptRotation::GetZ() const
-{
-	return z;
-}
-
-void GameScriptRotation::SetZ(int z)
-{
-	this->z = ConvertRotation(z);
+	x = pos.xRot;
+	y = pos.yRot;
+	z = pos.zRot;
 }

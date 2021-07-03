@@ -1,59 +1,36 @@
 #include "framework.h"
 #include "GameScriptPosition.h"
 #include <sol.hpp>
+#include "phd_global.h"
 
 void GameScriptPosition::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptPosition>("Position",
 		sol::constructors<GameScriptPosition(int, int, int)>(),
-		"X", sol::property(&GameScriptPosition::GetX, &GameScriptPosition::SetX),
-		"Y", sol::property(&GameScriptPosition::GetY, &GameScriptPosition::SetY),
-		"Z", sol::property(&GameScriptPosition::GetZ, &GameScriptPosition::SetZ)
+		"X", &GameScriptPosition::x,
+		"Y", &GameScriptPosition::y,
+		"Z", &GameScriptPosition::z
 		);
 }
 
-GameScriptPosition::GameScriptPosition(int x, int y, int z)
+GameScriptPosition::GameScriptPosition(int aX, int aY, int aZ)
 {
-	SetX(x);
-	SetY(y);
-	SetZ(z);
+	x = aX;
+	y = aY;
+	z = aZ;
 }
 
-int GameScriptPosition::GetX() const
+GameScriptPosition::GameScriptPosition(PHD_3DPOS const& pos)
 {
-	return x;
+	x = pos.xPos;
+	y = pos.yPos;
+	z = pos.zPos;
 }
 
-void GameScriptPosition::SetX(int x)
+void GameScriptPosition::StoreInPHDPos(PHD_3DPOS& pos) const
 {
-	if (x < INT_MIN || x > INT_MAX)
-		return;
-	else
-		this->x = x;
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
 }
 
-int GameScriptPosition::GetY() const
-{
-	return y;
-}
-
-void GameScriptPosition::SetY(int y)
-{
-	if (y < INT_MIN || y > INT_MAX)
-		return;
-	else
-		this->y = y;
-}
-
-int GameScriptPosition::GetZ() const
-{
-	return z;
-}
-
-void GameScriptPosition::SetZ(int z)
-{
-	if (z < INT_MIN || z > INT_MAX)
-		return;
-	else
-		this->z = z;
-}

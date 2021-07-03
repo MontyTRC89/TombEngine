@@ -5,22 +5,17 @@
 namespace sol {
 	class state;
 }
+struct PHD_3DPOS;
 
 class GameScriptRotation {
-private:
+public:
 	int								x;
 	int								y;
 	int								z;
-	int								ConvertRotation(int a);
 
 public:
 	GameScriptRotation(int x, int y, int z);
 	static void Register(sol::state*);
-
-	int								GetX() const;
-	void							SetX(int x);
-	int								GetY() const;
-	void							SetY(int y);
-	int								GetZ() const;
-	void							SetZ(int z);
+	void StoreInPHDPos(PHD_3DPOS& pos) const;
+	GameScriptRotation(PHD_3DPOS const& pos);
 };
