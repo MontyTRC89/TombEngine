@@ -5,21 +5,17 @@
 namespace sol {
 	class state;
 }
+struct PHD_3DPOS;
 
 class GameScriptPosition {
-private:
+public:
 	int x;
 	int y;
 	int z;
 
 public:
 	GameScriptPosition(int x, int y, int z);
+	GameScriptPosition(PHD_3DPOS const& pos);
 	static void Register(sol::state*);
-
-	int								GetX() const;
-	void							SetX(int x);
-	int								GetY() const;
-	void							SetY(int y);
-	int								GetZ() const;
-	void							SetZ(int z);
+	void StoreInPHDPos(PHD_3DPOS& pos) const;
 };
