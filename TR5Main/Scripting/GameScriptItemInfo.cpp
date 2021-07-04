@@ -146,7 +146,8 @@ short GameScriptItemInfo::GetHP() const
 
 void GameScriptItemInfo::SetHP(short hp)
 {
-	if (hp < 0 || hp > Objects[m_item->objectNumber].hitPoints)
+	if(Objects[m_item->objectNumber].intelligent &&
+		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
 	{
 		if (WarningsAsErrors)
 			throw std::runtime_error("invalid HP");
