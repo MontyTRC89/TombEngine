@@ -11,6 +11,8 @@
 
 extern bool const WarningsAsErrors;
 
+constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
+
 GameScriptItemInfo::GameScriptItemInfo(short num) : m_item{ &g_Level.Items[num]}, m_num { num }
 {};
 
@@ -25,10 +27,20 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 	}
 }
 
-void GameScriptItemInfo::Register(sol::state * state)
+static void index_error(GameScriptItemInfo & item, sol::object key)
 {
-	state->new_usertype<GameScriptItemInfo>("ItemInfo",
+	std::string err = "Attempted to read non-existant var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME;
+	if (WarningsAsErrors)
+	{
+		throw std::runtime_error(err);
+	}
+}
+
+void GameScriptItemInfo::Register(sol::state* state)
+{
+	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
 		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
+		sol::meta_function::index, &index_error,
 		"Init", &GameScriptItemInfo::Init,
 		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::SetCurrentAnim),
 		"requiredAnim", sol::property(&GameScriptItemInfo::GetRequiredAnim, &GameScriptItemInfo::SetRequiredAnim),
