@@ -81,10 +81,10 @@ public:
 	void								ResetVariables();
 
 	// Sound
-	void								PlayAudioTrack(std::string trackName, bool looped);
+	static void							PlayAudioTrack(std::string const & trackName, bool looped);
 	void								PlaySoundEffect(int id, GameScriptPosition pos, int flags);
 	void								PlaySoundEffect(int id, int flags);
-	void								SetAmbientTrack(std::string const & trackName);
+	static void							SetAmbientTrack(std::string const & trackName);
 
 	// Special FX
 	void								AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags);
@@ -113,10 +113,10 @@ public:
 	int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 
-	void InitCallbacks();
-	void OnStart();
-	void OnLoad();
-	void OnControlPhase();
-	void OnSave();
-	void OnEnd();
+	void								InitCallbacks();
+	void								OnStart();
+	void								OnLoad();
+	void								OnControlPhase();
+	void								OnSave();
+	void								OnEnd();
 };
