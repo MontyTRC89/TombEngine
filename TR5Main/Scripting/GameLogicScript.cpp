@@ -18,6 +18,9 @@ extern bool const WarningsAsErrors = true;
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
+	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
+	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
+
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
@@ -224,9 +227,9 @@ std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string name)
 	return std::make_unique<GameScriptItemInfo>(m_itemsMapName[name]);
 }
 
-void GameScript::PlayAudioTrack(std::string trackName, bool looped)
+void GameScript::PlayAudioTrack(std::string const & trackName, bool looped)
 {
-	S_CDPlay(trackName, g_AudioTracks[trackName].looped);
+	S_CDPlay(trackName, looped);
 }
 
 void GameScript::PlaySoundEffect(int id, GameScriptPosition p, int flags)
