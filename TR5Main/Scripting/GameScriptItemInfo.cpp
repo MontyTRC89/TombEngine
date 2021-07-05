@@ -59,3 +59,4 @@ GameScriptItemInfo::GameScriptItemInfo(short num) : m_num{ num } {};
 GameScriptItemInfo::~GameScriptItemInfo() {
 	KillItem(m_num);
 }
+

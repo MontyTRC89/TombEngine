@@ -811,9 +811,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	SOUND_Stop();
 
 	// Run the level script
-	GameScriptLevel* level = g_GameFlow->Levels[index];
+	/*GameScriptLevel* level = g_GameFlow->Levels[index];
 	std::string err;
-	g_GameScript->ExecuteScript(level->ScriptFileName, err);
+	g_GameScript->ExecuteScript(level->ScriptFileName, err);*/
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -920,6 +920,43 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
+
+	// Test trigger volumes if any
+	if (heavy == 0)
+	{
+		ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
+		for (int i = 0; i < room->triggerVolumes.size(); i++)
+		{
+			TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
+			/*ANIM_FRAME* frame = GetBestFrame(LaraItem);
+
+			Vector3 boxMin = Vector3(frame->boundingBox.X1, frame->boundingBox.Y1, frame->boundingBox.Z1);
+			Vector3 boxMax = Vector3(frame->boundingBox.X2, frame->boundingBox.Y2, frame->boundingBox.Z2);
+			Vector3 centre = (boxMin + boxMax) / 2.0f;
+			Vector3 extens = boxMax - centre;
+			BoundingBox laraBox = BoundingBox((Vector3)(centre + Vector3(room->x, room->y, room->z)), extens);*/
+
+			/*BoundingOrientedBox volumeBox = BoundingOrientedBox(
+				(Vector3)(volume->position + Vector3(room->x, room->y, room->z)), 
+				(Vector3)(volume->scale / 2.0f),
+				volume->rotation);*/
+
+			if (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS)
+			{
+				// Execute trigger
+				//g_GameScript->ExecuteScript();
+				Lara.gunType = WEAPON_UZI;
+			}
+			else
+				Lara.gunType = WEAPON_NONE;
+
+			/*if (volumeBox.Intersects(laraBox))
+			{
+				// Execute trigger
+				g_GameScript->ExecuteScript();
+			}*/
+		}
+	}
 
 	HeavyTriggered = false;
 
