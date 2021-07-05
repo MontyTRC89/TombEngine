@@ -21,6 +21,9 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
 	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
 
+	m_lua->set_function("InventoryAdd", &GameScript::InventoryAdd);
+	m_lua->set_function("InventoryRemove", &GameScript::InventoryRemove);
+
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
@@ -328,7 +331,7 @@ void GameScript::InventoryCombine(int slot1, int slot2)
 	
 }
 
-void GameScript::InventorySepare(int slot)
+void GameScript::InventorySeparate(int slot)
 {
 
 }
