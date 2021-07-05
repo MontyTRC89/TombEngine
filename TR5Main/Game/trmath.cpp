@@ -22,7 +22,7 @@ short FROM_RAD(float angle)
 
 float TO_DEGREES(short angle)
 {
-	return (unsigned short) angle * 360.0f / 65536.0f;
+	return lround(angle * 360.0f / 65536.0f);
 }
 
 float TO_RAD(short angle)

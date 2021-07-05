@@ -2,19 +2,20 @@
 
 #include "framework.h"
 
+namespace sol {
+	class state;
+}
+struct PHD_3DPOS;
+
 class GameScriptRotation {
-private:
+public:
 	int								x;
 	int								y;
 	int								z;
 
-public:
 	GameScriptRotation(int x, int y, int z);
+	GameScriptRotation(PHD_3DPOS const& pos);
+	void StoreInPHDPos(PHD_3DPOS& pos) const;
 
-	int								GetX();
-	void							SetX(int x);
-	int								GetY();
-	void							SetY(int y);
-	int								GetZ();
-	void							SetZ(int z);
+	static void Register(sol::state*);
 };
