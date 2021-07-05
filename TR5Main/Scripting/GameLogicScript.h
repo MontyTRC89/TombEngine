@@ -96,12 +96,12 @@ public:
 	void								Earthquake(int strength);
 
 	// Inventory
-	void								InventoryAdd(int slot, int count);
-	void								InventoryRemove(int slot, int count);
+	static void							InventoryAdd(int slot, int count);
+	static void							InventoryRemove(int slot, int count);
 	void								InventoryGetCount(int slot);
 	void								InventorySetCount(int slot, int count);
 	void								InventoryCombine(int slot1, int slot2);
-	void								InventorySepare(int slot);
+	void								InventorySeparate(int slot);
 
 	// Misc
 	void								PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags);
