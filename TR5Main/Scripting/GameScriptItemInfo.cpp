@@ -330,4 +330,3 @@ void GameScriptItemInfo::DisableItem()
 		}
 	}
 }
-
