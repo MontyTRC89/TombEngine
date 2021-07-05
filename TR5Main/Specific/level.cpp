@@ -682,6 +682,43 @@ void ReadRooms()
 			room.mesh.push_back(mesh);
 		}
 
+		int numTriggerVolumes = ReadInt32();
+		for (int j = 0; j < numTriggerVolumes; j++)
+		{
+			TRIGGER_VOLUME volume;
+
+			volume.position = Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+			volume.rotation = Quaternion(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+			volume.scale = Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+			volume.activators = ReadInt32();
+
+			byte numBytes = ReadInt8();
+			char* buffer[255];
+			ZeroMemory(buffer, 256);
+			ReadBytes(buffer, numBytes);
+			volume.onEnter = std::string((const char*)buffer);
+
+			numBytes = ReadInt8();
+			ZeroMemory(buffer, 256);
+			ReadBytes(buffer, numBytes);
+			volume.onInside = std::string((const char*)buffer);
+
+			numBytes = ReadInt8();
+			ZeroMemory(buffer, 256);
+			ReadBytes(buffer, numBytes);
+			volume.onLeave = std::string((const char*)buffer);
+
+			volume.oneShot = ReadInt8();
+			volume.status = TS_OUTSIDE;
+
+			volume.box = BoundingOrientedBox(
+				(Vector3)(volume.position + Vector3(room.x, room.minfloor, room.z)),
+				(Vector3)(volume.scale / 2.0f),
+				volume.rotation);
+
+			room.triggerVolumes.push_back(volume);
+		}
+
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
 		room.meshEffect = ReadInt32();
