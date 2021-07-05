@@ -1,39 +1,35 @@
 #include "framework.h"
 #include "GameScriptRotation.h"
+#include "phd_global.h"
 
-GameScriptRotation::GameScriptRotation(int x, int y, int z)
+void GameScriptRotation::Register(sol::state* state)
 {
-	SetX(x);
-	SetY(y);
-	SetZ(z);
+	state->new_usertype<GameScriptRotation>("Rotation",
+		sol::constructors<GameScriptRotation(int, int, int)>(),
+		"X", &GameScriptRotation::x,
+		"Y", &GameScriptRotation::y,
+		"Z", &GameScriptRotation::z
+	);
 }
 
-int GameScriptRotation::GetX()
+
+GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
 {
-	return x;
+	x = aX;
+	y = aY;
+	z = aZ;
 }
 
-void GameScriptRotation::SetX(int x)
+void GameScriptRotation::StoreInPHDPos(PHD_3DPOS& pos) const
 {
-	this->x = std::clamp(x, -360, 360);
+	pos.xRot = x;
+	pos.yRot = y;
+	pos.zRot = z;
 }
 
-int GameScriptRotation::GetY()
+GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
 {
-	return y;
-}
-
-void GameScriptRotation::SetY(int y)
-{
-	this->y = std::clamp(y, -360, 360);
-}
-
-int GameScriptRotation::GetZ()
-{
-	return z;
-}
-
-void GameScriptRotation::SetZ(int z)
-{
-	this->z = std::clamp(z, -360, 360);
+	x = pos.xRot;
+	y = pos.yRot;
+	z = pos.zRot;
 }
