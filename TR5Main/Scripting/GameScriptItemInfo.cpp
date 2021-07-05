@@ -55,6 +55,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
 		"pos", sol::property(&GameScriptItemInfo::GetPos, &GameScriptItemInfo::SetPos),
 		"rot", sol::property(&GameScriptItemInfo::GetRot, &GameScriptItemInfo::SetRot),
+		"name", sol::property(&GameScriptItemInfo::GetName, &GameScriptItemInfo::SetName),
 		"Enable", &GameScriptItemInfo::EnableItem,
 		"Disable", &GameScriptItemInfo::DisableItem);
 }
@@ -68,6 +69,7 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
 }
 
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
+	std::string Name,
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
@@ -87,6 +89,7 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	auto ptr = std::make_unique<GameScriptItemInfo>(num);
 
 	ITEM_INFO * item = &g_Level.Items[num];
+	ptr->SetName(Name);
 	ptr->SetPos(pos);
 	ptr->SetRot(rot);
 	ptr->SetRoom(room);
@@ -111,6 +114,17 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 void GameScriptItemInfo::Init()
 {
 	InitialiseItem(m_num);
+}
+
+std::string GameScriptItemInfo::GetName() const
+{
+	return std::string{ "NOT YET IMPLEMENTED" };
+}
+
+void GameScriptItemInfo::SetName(std::string const & id) 
+{
+	//TODO: throw if the string Name isn't unique?
+	// do nothing. this is not yet implemented
 }
 
 GameScriptPosition GameScriptItemInfo::GetPos() const

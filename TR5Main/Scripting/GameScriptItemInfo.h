@@ -19,9 +19,11 @@ public:
 	GameScriptItemInfo& operator=(GameScriptItemInfo const& other) = delete;
 	GameScriptItemInfo(GameScriptItemInfo const& other) = delete;
 	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
+
 	static void Register(sol::state *);
 	static std::unique_ptr<GameScriptItemInfo> CreateEmpty();
 	static std::unique_ptr<GameScriptItemInfo> Create(
+		std::string Name,
 		GameScriptPosition pos,
 		GameScriptRotation aRot,
 		short room,
@@ -36,6 +38,8 @@ public:
 		bool aActive,
 		bool aHitStatus
 		);
+	std::string GetName() const;
+	void SetName(std::string const &);
 	GameScriptPosition GetPos() const;
 	GameScriptRotation GetRot() const;
 	short GetCurrentAnim() const;
