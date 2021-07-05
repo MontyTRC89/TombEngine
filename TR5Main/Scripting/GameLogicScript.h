@@ -24,29 +24,6 @@ struct GameScriptVector3 {
 	float z;
 };
 
-class GameScriptItem {
-private:
-	short								NativeItemNumber;
-	ITEM_INFO*							NativeItem;
-
-public:
-	GameScriptItem(short itemNumber);
-
-	//GameScriptPosition					GetPosition();
-	//GameScriptRotation					GetRotation();
-	short								GetHP();
-	void								SetHP(short hp);
-	short								GetRoom();
-	void								SetRoom(short room);
-	short								GetCurrentState();
-	void								SetCurrentState(short state);
-	short								GetGoalState();
-	void								SetGoalState(short state);
-	short								GetRequiredState();
-	void								SetRequiredState(short state);
-	void								EnableItem();
-	void								DisableItem();
-};
 
 class LuaVariables
 {
@@ -73,10 +50,14 @@ class GameScript : public LuaHandler
 private:
 	LuaVariables						m_globals;
 	LuaVariables						m_locals;
-	std::map<int, short>						m_itemsMapId;
-	std::map<std::string, short>					m_itemsMapName;
-	std::vector<LuaFunction*>				m_triggers;
-
+	std::map<int, short>				m_itemsMapId;
+	std::map<std::string, short>		m_itemsMapName;
+	std::vector<LuaFunction*>			m_triggers;
+	sol::protected_function				m_onStart;
+	sol::protected_function				m_onLoad;
+	sol::protected_function				m_onControlPhase;
+	sol::protected_function				m_onSave;
+	sol::protected_function				m_onEnd;
 public:	
 	GameScript(sol::state* lua);
 
@@ -89,8 +70,8 @@ public:
 
 	bool								ExecuteTrigger(short index);
 	void								MakeItemInvisible(short id);
-	std::unique_ptr<GameScriptItem>			GetItemById(int id);
-	std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
+	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
+	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string name);
 
 	// Variables
 	template <typename T>
@@ -103,7 +84,7 @@ public:
 	void								PlayAudioTrack(std::string trackName, bool looped);
 	void								PlaySoundEffect(int id, GameScriptPosition pos, int flags);
 	void								PlaySoundEffect(int id, int flags);
-	void								SetAmbientTrack(std::string trackName);
+	void								SetAmbientTrack(std::string const & trackName);
 
 	// Special FX
 	void								AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags);
@@ -131,4 +112,11 @@ public:
 	void								AddOneSecret();
 	int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+
+	void InitCallbacks();
+	void OnStart();
+	void OnLoad();
+	void OnControlPhase();
+	void OnSave();
+	void OnEnd();
 };

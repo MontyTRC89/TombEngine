@@ -195,6 +195,7 @@ extern bool newLockInputValue;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
+	g_GameScript->OnControlPhase();
 	short oldLaraFrame;
 	if (newSkipFramesValue)
 	{
@@ -811,9 +812,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	SOUND_Stop();
 
 	// Run the level script
-	/*GameScriptLevel* level = g_GameFlow->Levels[index];
+	GameScriptLevel* level = g_GameFlow->Levels[index];
 	std::string err;
-	g_GameScript->ExecuteScript(level->ScriptFileName, err);*/
+
+	g_GameScript->ExecuteScript(level->ScriptFileName, err);
+	g_GameScript->InitCallbacks();
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -875,6 +878,12 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Initialise ponytails
 	InitialiseHair();
 
+	g_GameScript->OnStart();
+	if (loadFromSavegame)
+	{
+		g_GameScript->OnLoad();
+	}
+
 	int nframes = 2;
 
 	// First control phase
@@ -895,6 +904,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)
 		{
+			g_GameScript->OnEnd();
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
 			S_CDStop();
