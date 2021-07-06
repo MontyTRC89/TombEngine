@@ -1031,11 +1031,11 @@ namespace T5M::Renderer
         ypos = 150;
         drawString(400, ypos, STRING_STATISTICS, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
         drawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringKey.c_str()), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
-        drawString(200, ypos + 3 * 25, STRING_TIME_TAKEN, PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 4 * 25, STRING_DISTANCE_TRAVELLED, PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 5 * 25, STRING_USED_AMMOS, PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 6 * 25, STRING_USED_MEDIPACKS, PRINTSTRING_COLOR_WHITE, 0);
-        drawString(200, ypos + 7 * 25, STRING_SECRETS_FOUND, PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 3 * 25, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 4 * 25, g_GameFlow->GetString(STRING_DISTANCE_TRAVELLED), PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 5 * 25, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 6 * 25, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, 0);
+        drawString(200, ypos + 7 * 25, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, 0);
 
         seconds = GameTimer / 30;
         Days = seconds / (24 * 60 * 60);

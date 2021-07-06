@@ -8,72 +8,35 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-using namespace std;
+#include "tomb4fx.h"
+#include "effect2.h"
+#include "pickup.h"
+
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
-bool WarningsAsErrors = false;
+extern bool const WarningsAsErrors = true;
 
-GameScript::GameScript(sol::state* lua)
+GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
-	m_lua = lua;
+	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
+	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
 
-	// Add constants
-	//ExecuteScript("Scripts\\Constants.lua");
+	m_lua->set_function("InventoryAdd", &GameScript::InventoryAdd);
+	m_lua->set_function("InventoryRemove", &GameScript::InventoryRemove);
+
+	GameScriptItemInfo::Register(m_lua);
+	GameScriptPosition::Register(m_lua);
+	GameScriptRotation::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
-
-	// Add the item type
-	m_lua->new_usertype<GameScriptPosition>("Position",
-		"X", sol::property(&GameScriptPosition::GetXPos, &GameScriptPosition::SetXPos),
-		"Y", sol::property(&GameScriptPosition::GetYPos, &GameScriptPosition::SetYPos),
-		"Z", sol::property(&GameScriptPosition::GetZPos, &GameScriptPosition::SetZPos),
-		"new", sol::no_constructor
-		);
-
-	m_lua->new_usertype<GameScriptRotation>("Rotation",
-		"X", sol::property(&GameScriptRotation::GetXRot, &GameScriptRotation::SetXRot),
-		"Y", sol::property(&GameScriptRotation::GetYRot, &GameScriptRotation::SetYRot),
-		"Z", sol::property(&GameScriptRotation::GetZRot, &GameScriptRotation::SetZRot),
-		"new", sol::no_constructor
-		);
-
-	m_lua->new_usertype<GameScriptItem>("Item",
-		"Position", sol::property(&GameScriptItem::GetPosition),
-		"Rotation", sol::property(&GameScriptItem::GetRotation),
-		"HP", sol::property(&GameScriptItem::GetHP, &GameScriptItem::SetHP),
-		"Room", sol::property(&GameScriptItem::GetRoom, &GameScriptItem::SetRoom),
-		"CurrentState", sol::property(&GameScriptItem::GetCurrentState, &GameScriptItem::SetCurrentState),
-		"GoalState", sol::property(&GameScriptItem::GetGoalState, &GameScriptItem::SetGoalState),
-		"RequiredState", sol::property(&GameScriptItem::GetRequiredState, &GameScriptItem::SetRequiredState),
-		"new", sol::no_constructor
-		);
-
-	m_lua->set_function("EnableItem", &GameScriptItem::EnableItem);
-	m_lua->set_function("DisableItem", &GameScriptItem::DisableItem);
 
 	m_lua->new_usertype<LuaVariables>("Variable",
 		sol::meta_function::index, &LuaVariables::GetVariable,
 		sol::meta_function::new_index, &LuaVariables::SetVariable,
 		"new", sol::no_constructor
 		);
-
-	// GameScript type
-	/*m_lua->new_usertype<GameScript>("GameScript",
-		"PlayAudioTrack", &GameScript::PlayAudioTrack,
-		"ChangeAmbientSoundTrack", &GameScript::ChangeAmbientSoundTrack,
-		"MakeItemInvisible", &GameScript::MakeItemInvisible,
-		"GetSecretsCount", &GameScript::GetSecretsCount,
-		"SetSecretsCount", &GameScript::SetSecretsCount,
-		"AddOneSecret", &GameScript::AddOneSecret,
-		"JumpToLevel", &GameScript::JumpToLevel,
-		"PlaySoundEffect", &GameScript::PlaySoundEffect,
-		"PlaySoundEffectAtPosition", &GameScript::PlaySoundEffectAtPosition
-		);*/
-
-	// Add global variables and namespaces
-	//(*m_lua)["TR"] = this;
 }
 
 void GameScript::AddTrigger(LuaFunction* function)
@@ -84,12 +47,12 @@ void GameScript::AddTrigger(LuaFunction* function)
 
 void GameScript::AddLuaId(int luaId, short itemNumber)
 {
-	m_itemsMapId.insert(pair<int, short>(luaId, itemNumber));
+	m_itemsMapId.insert(std::pair<int, short>(luaId, itemNumber));
 }
 
-void GameScript::AddLuaName(string luaName, short itemNumber)
+void GameScript::AddLuaName(std::string luaName, short itemNumber)
 {
-	m_itemsMapName.insert(pair<string, short>(luaName, itemNumber));
+	m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber));
 }
 
 void GameScript::FreeLevelScripts()
@@ -111,30 +74,6 @@ void GameScript::FreeLevelScripts()
 	(*m_lua)["Lara"] = NULL;
 	//delete m_Lara;
 	*/
-}
-
-bool GameScript::ExecuteScript(const string& luaFilename, string& message)
-{ 
-	auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
-	if (!result.valid())
-	{
-		sol::error error = result;
-		message = error.what();
-		return false;
-	}
-	return true;
-}
-
-bool GameScript::ExecuteString(const string& command, string& message)
-{
-	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
-	if (!result.valid())
-	{
-		sol::error error = result;
-		message = error.what();
-		return false;
-	}
-	return true;
 }
 
 bool GameScript::ExecuteTrigger(short index)
@@ -163,27 +102,15 @@ bool GameScript::ExecuteTrigger(short index)
 
 	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
 		if (value.is<bool>())
-			std::cout << key.as<string>() << " " << value.as<bool>() << std::endl;
-		else if (value.is<string>())
-			std::cout << key.as<string>() << " " << value.as<string>() << std::endl;
+			std::cout << key.as<std::string>() << " " << value.as<bool>() << std::endl;
+		else if (value.is<std::string>())
+			std::cout << key.as<std::string>() << " " << value.as<std::string>() << std::endl;
 		else
-			std::cout << key.as<string>() << " " << value.as<int>() << std::endl;		
+			std::cout << key.as<std::string>() << " " << value.as<int>() << std::endl;		
 	});
 
 	return result;
 	*/
-}
-
-void GameScript::PlayAudioTrack(short track)
-{
-	S_CDPlay(track, SOUND_TRACK_ONESHOT);
-}
-
-void GameScript::ChangeAmbientSoundTrack(short track)
-{
-	CurrentAtmosphere = track;
-	S_CDStop();
-	S_CDPlay(track, SOUND_TRACK_BGM);
 }
 
 void GameScript::JumpToLevel(int levelNum)
@@ -210,8 +137,9 @@ void GameScript::AddOneSecret()
 	if (Savegame.Level.Secrets >= 255)
 		return;
 	Savegame.Level.Secrets++;
-	S_CDPlay(6, 0);
+	S_CDPlay(TRACK_FOUND_SECRET, 0);
 }
+
 /*
 void GameScript::MakeItemInvisible(short id)
 {
@@ -242,73 +170,78 @@ void GameScript::MakeItemInvisible(short id)
 }
 */
 template <typename T>
-void GameScript::GetVariables(map<string, T>& locals, map<string, T>& globals)
+void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	for (const auto& it : m_locals.variables)
 	{
 		if (it.second.is<T>())
-			locals.insert(pair<string, T>(it.first, it.second.as<T>()));
+			locals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
 	}
 	for (const auto& it : m_globals.variables)
 	{
 		if (it.second.is<T>())
-			globals.insert(pair<string, T>(it.first, it.second.as<T>()));
+			globals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
 	}
 }
 
-template void GameScript::GetVariables<bool>(map<string, bool>& locals, map<string, bool>& globals);
-template void GameScript::GetVariables<float>(map<string, float>& locals, map<string, float>& globals);
-template void GameScript::GetVariables<string>(map<string, string>& locals, map<string, string>& globals);
+template void GameScript::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void GameScript::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void GameScript::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
 template <typename T>
-void GameScript::SetVariables(map<string, T>& locals, map<string, T>& globals)
+void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
-		m_locals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
 	}
 	for (const auto& it : globals)
 	{
-		m_globals.variables.insert(pair<string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
 	}
 }
 
-template void GameScript::SetVariables<bool>(map<string, bool>& locals, map<string, bool>& globals);
-template void GameScript::SetVariables<float>(map<string, float>& locals, map<string, float>& globals);
-template void GameScript::SetVariables<string>(map<string, string>& locals, map<string, string>& globals);
+template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
-unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
+std::unique_ptr<GameScriptItemInfo> GameScript::GetItemById(int id)
 {
 	if (m_itemsMapId.find(id) == m_itemsMapId.end())
 	{
 		if (WarningsAsErrors)
 			throw "item id not found";
-		return unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapId[id]);
 }
 
-unique_ptr<GameScriptItem> GameScript::GetItemByName(string name)
+std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string name)
 {
 	if (m_itemsMapName.find(name) == m_itemsMapName.end())
 	{
 		if (WarningsAsErrors)
 			throw "item name not found";
-		return unique_ptr<GameScriptItem>(nullptr);
+		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapName[name]);
 }
 
-void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags)
+void GameScript::PlayAudioTrack(std::string const & trackName, bool looped)
+{
+	S_CDPlay(trackName, looped);
+}
+
+void GameScript::PlaySoundEffect(int id, GameScriptPosition p, int flags)
 {
 	PHD_3DPOS pos;
 
-	pos.xPos = x;
-	pos.yPos = y;
-	pos.zPos = z;
+	pos.xPos = p.x;
+	pos.yPos = p.y;
+	pos.zPos = p.z;
 	pos.xRot = 0;
 	pos.yRot = 0;
 	pos.zRot = 0;
@@ -316,16 +249,109 @@ void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int fl
 	SoundEffect(id, &pos, flags);
 }
 
-void GameScript::PlaySoundEffect(short id, int flags)
+void GameScript::PlaySoundEffect(int id, int flags)
 {
 	SoundEffect(id, NULL, flags);
+}
+
+void GameScript::SetAmbientTrack(std::string const & trackName)
+{
+	CurrentAtmosphere = trackName;
+	S_CDPlay(CurrentAtmosphere, 1);
+}
+
+void GameScript::AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+{
+	PHD_VECTOR p1;
+	p1.x = src.x;
+	p1.y = src.y;
+	p1.z = src.z;
+
+	PHD_VECTOR p2;
+	p2.x = dest.x;
+	p2.y = dest.y;
+	p2.z = dest.z;
+
+	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
+}
+
+void GameScript::AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
+{
+	PHD_3DPOS p;
+	p.xPos = pos.x;
+	p.yPos = pos.y;
+	p.zPos = pos.z;
+	
+	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
+}
+
+void GameScript::AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
+{
+	TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
+}
+
+void GameScript::AddBlood(GameScriptPosition pos, int num)
+{
+	TriggerBlood(pos.x, pos.y, pos.z, -1, num);
+}
+
+void GameScript::AddFireFlame(GameScriptPosition pos, int size)
+{
+	AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
+}
+
+void GameScript::Earthquake(int strength)
+{
+	Camera.bounce = -strength;
+}
+
+// Inventory
+void GameScript::InventoryAdd(int slot, int count)
+{
+	PickedUpObject(slot, count);
+}
+
+void GameScript::InventoryRemove(int slot, int count)
+{
+	RemoveObjectFromInventory(slot, count);
+}
+
+void GameScript::InventoryGetCount(int slot)
+{
+
+}
+
+void GameScript::InventorySetCount(int slot, int count)
+{
+
+}
+
+void GameScript::InventoryCombine(int slot1, int slot2)
+{
+	
+}
+
+void GameScript::InventorySeparate(int slot)
+{
+
+}
+
+// Misc
+void GameScript::PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
+{
+
+}
+
+int GameScript::FindRoomNumber(GameScriptPosition pos)
+{
+	return 0;
 }
 
 void GameScript::AssignItemsAndLara()
 {
 	m_lua->set("Level", m_locals);
 	m_lua->set("Game", m_globals);
-	m_lua->set("Lara", GameScriptItem(Lara.itemNumber));
+	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber));
 }
 
 void GameScript::ResetVariables()
@@ -333,330 +359,24 @@ void GameScript::ResetVariables()
 	(*m_lua)["Lara"] = NULL;
 }
 
-GameScriptPosition GameScript::CreatePosition(float x, float y, float z)
+int GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
-	return GameScriptPosition(x, y, z);
+	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 }
 
-GameScriptPosition GameScript::CreateSectorPosition(float x, float y, float z)
+int GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
-	return GameScriptPosition(1024 * x + 512, 1024 * y + 512, 1024 * z + 512);
+	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 }
 
-GameScriptRotation GameScript::CreateRotation(float x, float y, float z)
-{
-	return GameScriptRotation(x, y, z);
-}
-
-float GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-{
-	return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetYPos() - pos2.GetYPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
-}
-
-float GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-{
-	return sqrt(SQUARE(pos1.GetXPos() - pos2.GetXPos()) + SQUARE(pos1.GetZPos() - pos2.GetZPos()));
-}
-
-GameScriptPosition::GameScriptPosition(float x, float y, float z)
-	:
-	xPos(x),
-	yPos(y),
-	zPos(z)
-{
-
-}
-
-GameScriptPosition::GameScriptPosition(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ)
-	:
-	readXPos(readX),
-	writeXPos(writeX),
-	readYPos(readY),
-	writeYPos(writeY),
-	readZPos(readZ),
-	writeZPos(writeZ)
-{
-
-}
-
-float GameScriptPosition::GetXPos()
-{
-	if (readXPos)
-		xPos = readXPos();
-	return xPos;
-}
-
-void GameScriptPosition::SetXPos(float x)
-{
-	xPos = x;
-	if (writeXPos)
-		writeXPos(xPos);
-}
-
-float GameScriptPosition::GetYPos()
-{
-	if (readYPos)
-		yPos = readYPos();
-	return yPos;
-}
-
-void GameScriptPosition::SetYPos(float y)
-{
-	yPos = y;
-	if (writeYPos)
-		writeYPos(yPos);
-}
-
-float GameScriptPosition::GetZPos()
-{
-	if (readZPos)
-		zPos = readZPos();
-	return zPos;
-}
-
-void GameScriptPosition::SetZPos(float z)
-{
-	zPos = z;
-	if (writeZPos)
-		writeZPos(zPos);
-}
-
-GameScriptRotation::GameScriptRotation(float x, float y, float z)
-	:
-	xRot(x),
-	yRot(y),
-	zRot(z)
-{
-
-}
-
-GameScriptRotation::GameScriptRotation(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ)
-	:
-	readXRot(readX),
-	writeXRot(writeX),
-	readYRot(readY),
-	writeYRot(writeY),
-	readZRot(readZ),
-	writeZRot(writeZ)
-{
-
-}
-
-float GameScriptRotation::GetXRot()
-{
-	if (readXRot)
-		xRot = readXRot();
-	return xRot;
-}
-
-void GameScriptRotation::SetXRot(float x)
-{
-	x = remainder(x, 360);
-	if (x < 0)
-		x += 360;
-	xRot = x;
-	if (writeXRot)
-		writeXRot(xRot);
-}
-
-float GameScriptRotation::GetYRot()
-{
-	if (readYRot)
-		yRot = readYRot();
-	return yRot;
-}
-
-void GameScriptRotation::SetYRot(float y)
-{
-	y = remainder(y, 360);
-	if (y < 0)
-		y += 360;
-	yRot = y;
-	if (writeYRot)
-		writeYRot(yRot);
-}
-
-float GameScriptRotation::GetZRot()
-{
-	if (readZRot)
-		zRot = readZRot();
-	return zRot;
-}
-
-void GameScriptRotation::SetZRot(float z)
-{
-	z = remainder(z, 360);
-	if (z < 0)
-		z += 360;
-	zRot = z;
-	if (writeZRot)
-		writeZRot(zRot);
-}
-
-GameScriptItem::GameScriptItem(short itemNumber)
-	:
-	NativeItemNumber(itemNumber),
-	NativeItem(&g_Level.Items[itemNumber])
-{
-
-}
-
-GameScriptPosition GameScriptItem::GetPosition()
-{
-	return GameScriptPosition(
-		[this]() -> float { return NativeItem->pos.xPos; },
-		[this](float x) -> void { NativeItem->pos.xPos = x; },
-		[this]() -> float { return NativeItem->pos.yPos; },
-		[this](float y) -> void { NativeItem->pos.yPos = y; },
-		[this]() -> float { return NativeItem->pos.zPos; },
-		[this](float z) -> void { NativeItem->pos.zPos = z; }
-	);
-}
-
-GameScriptRotation GameScriptItem::GetRotation()
-{
-	return GameScriptRotation(
-		[this]() -> float { return TO_DEGREES(NativeItem->pos.xRot); },
-		[this](float x) -> void { NativeItem->pos.xRot = ANGLE(x); },
-		[this]() -> float { return TO_DEGREES(NativeItem->pos.yRot); },
-		[this](float y) -> void { NativeItem->pos.yRot = ANGLE(y); },
-		[this]() -> float { return TO_DEGREES(NativeItem->pos.zRot); },
-		[this](float z) -> void { NativeItem->pos.zRot = ANGLE(z); }
-	);
-}
-
-short GameScriptItem::GetHP()
-{
-	return NativeItem->hitPoints;
-}
-
-void GameScriptItem::SetHP(short hp)
-{
-	if (hp < 0 || hp > Objects[NativeItem->objectNumber].hitPoints)
-	{
-		if (WarningsAsErrors)
-			throw runtime_error("invalid HP");
-		if (hp < 0)
-		{
-			hp = 0;
-		}
-		else if (hp > Objects[NativeItem->objectNumber].hitPoints)
-		{
-			hp = Objects[NativeItem->objectNumber].hitPoints;
-		}
-	}
-	NativeItem->hitPoints = hp;
-}
-
-short GameScriptItem::GetRoom()
-{
-	return NativeItem->roomNumber;
-}
-
-void GameScriptItem::SetRoom(short room)
-{
-	if (room < 0 || room >= g_Level.Rooms.size())
-	{
-		if (WarningsAsErrors)
-			throw runtime_error("invalid room number");
-		return;
-	}
-	NativeItem->roomNumber = room;
-}
-
-void GameScriptItem::EnableItem()
-{
-	if (!NativeItem->active)
-	{
-		if (Objects[NativeItem->objectNumber].intelligent)
-		{
-			if (NativeItem->status == ITEM_DEACTIVATED)
-			{
-				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_ACTIVE;
-				AddActiveItem(NativeItemNumber);
-				EnableBaddieAI(NativeItemNumber, 1);
-			}
-			else if (NativeItem->status == ITEM_INVISIBLE)
-			{
-				NativeItem->touchBits = 0;
-				if (EnableBaddieAI(NativeItemNumber, 0))
-					NativeItem->status = ITEM_ACTIVE;
-				else
-					NativeItem->status = ITEM_INVISIBLE;
-				AddActiveItem(NativeItemNumber);
-			}
-		}
-		else
-		{
-			NativeItem->touchBits = 0;
-			AddActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_ACTIVE;
-		}
-	}
-}
-
-void GameScriptItem::DisableItem()
-{
-	if (NativeItem->active)
-	{
-		if (Objects[NativeItem->objectNumber].intelligent)
-		{
-			if (NativeItem->status == ITEM_ACTIVE)
-			{
-				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_DEACTIVATED;
-				RemoveActiveItem(NativeItemNumber);
-				DisableBaddieAI(NativeItemNumber);
-			}
-		}
-		else
-		{
-			NativeItem->touchBits = 0;
-			RemoveActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_DEACTIVATED;
-		}
-	}
-}
-
-short GameScriptItem::GetCurrentState()
-{
-	return NativeItem->currentAnimState;
-}
-
-void GameScriptItem::SetCurrentState(short state)
-{
-	NativeItem->currentAnimState = state;
-}
-
-short GameScriptItem::GetGoalState()
-{
-	return NativeItem->goalAnimState;
-}
-
-void GameScriptItem::SetGoalState(short state)
-{
-	NativeItem->goalAnimState = state;
-}
-
-short GameScriptItem::GetRequiredState()
-{
-	return NativeItem->requiredAnimState;
-}
-
-void GameScriptItem::SetRequiredState(short state)
-{
-	NativeItem->requiredAnimState = state;
-}
-
-sol::object LuaVariables::GetVariable(string key)
+sol::object LuaVariables::GetVariable(std::string key)
 {
 	if (variables.find(key) == variables.end())
 		return sol::lua_nil;
 	return variables[key];
 }
 
-void LuaVariables::SetVariable(string key, sol::object value)
+void LuaVariables::SetVariable(std::string key, sol::object value)
 {
 	switch (value.get_type())
 	{
@@ -670,7 +390,61 @@ void LuaVariables::SetVariable(string key, sol::object value)
 		break;
 	default:
 		if (WarningsAsErrors)
-			throw runtime_error("unsupported variable type");
+			throw std::runtime_error("unsupported variable type");
 		break;
 	}
+}
+
+static void doCallback(sol::protected_function const & func) {
+	auto r = func();
+	if (WarningsAsErrors && !r.valid())
+	{
+		sol::error err = r;
+		std::cerr << "An error occurred: " << err.what() << "\n";
+		throw std::runtime_error(err.what());
+	}
+}
+
+void GameScript::OnStart()
+{
+	doCallback(m_onStart);
+}
+
+void GameScript::OnLoad()
+{
+	doCallback(m_onLoad);
+}
+
+void GameScript::OnControlPhase()
+{
+	doCallback(m_onControlPhase);
+}
+
+void GameScript::OnSave()
+{
+	doCallback(m_onSave);
+}
+
+void GameScript::OnEnd()
+{
+	doCallback(m_onEnd);
+}
+
+void GameScript::InitCallbacks()
+{
+	auto assignCB = [this](sol::protected_function& func, char const* luaFunc) {
+		func = (*m_lua)[luaFunc];
+		if (WarningsAsErrors && !func.valid())
+		{
+			std::string err{ "Level's script file requires callback \"" };
+			err += std::string{ luaFunc };
+			err += "\"";
+			throw std::runtime_error(err);
+		}
+	};
+	assignCB(m_onStart, "OnStart");
+	assignCB(m_onLoad, "OnLoad");
+	assignCB(m_onControlPhase, "OnControlPhase");
+	assignCB(m_onSave, "OnSave");
+	assignCB(m_onEnd, "OnEnd");
 }

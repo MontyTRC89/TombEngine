@@ -116,7 +116,7 @@ static bool LaserSightIsEquiped()
 		|| Lara.Weapons[WEAPON_HK].HasLasersight;
 }
 
-void PickedUpObject(short objectNumber)
+void PickedUpObject(short objectNumber, int count)
 {
 	switch (objectNumber)
 	{
@@ -128,7 +128,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += 30;
+				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += count ? count : 30;
 
 			break;
 
@@ -150,7 +150,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += 36;
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += count ? count : 36;
 			break;
 
 		case ID_REVOLVER_ITEM:
@@ -161,7 +161,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += 6;
+				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += count ? count : 6;
 			break;
 
 		case ID_CROSSBOW_ITEM:
@@ -172,7 +172,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_HK_ITEM:
@@ -183,7 +183,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += 30;
+				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += count ? count : 30;
 			break;
 
 		case ID_HARPOON_ITEM:
@@ -194,7 +194,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_GRENADE_GUN_ITEM:
@@ -205,7 +205,7 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_ROCKET_LAUNCHER_ITEM:
@@ -216,77 +216,77 @@ void PickedUpObject(short objectNumber)
 			}
 
 			if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_SHOTGUN_AMMO1_ITEM:
 			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += 36;
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += count ? count : 36;
 			break;
 
 		case ID_SHOTGUN_AMMO2_ITEM:
 			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2] != -1)
-				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2] += 36;
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2] += count ? count : 36;
 			break;
 
 		case ID_HK_AMMO_ITEM:
 			if (Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += 30;
+				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += count ? count : 30;
 			break;
 
 		case ID_CROSSBOW_AMMO1_ITEM:
 			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_CROSSBOW_AMMO2_ITEM:
 			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] != -1)
-				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] += 10;
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] += count ? count : 10;
 			break;
 
 		case ID_CROSSBOW_AMMO3_ITEM:
 			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] != -1)
-				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] += 10;
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] += count ? count : 10;
 			break;
 
 		case ID_GRENADE_AMMO1_ITEM:
 			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_GRENADE_AMMO2_ITEM:
 			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2] != -1)
-				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2] += 10;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2] += count ? count : 10;
 			break;
 
 		case ID_GRENADE_AMMO3_ITEM:
 			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3] != -1)
-				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3] += 10;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3] += count ? count : 10;
 			break;
 
 		case ID_REVOLVER_AMMO_ITEM:
 			if (Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += 6;
+				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += count ? count : 6;
 			break;
 
 		case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 			if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_HARPOON_AMMO_ITEM:
 			if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += 10;
+				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += count ? count : 10;
 			break;
 
 		case ID_UZI_AMMO_ITEM:
 			if (Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] != -1)
-				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += 30;
+				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += count ? count : 30;
 			break;
 
 		case ID_FLARE_INV_ITEM:
 			if (Lara.NumFlares != -1)
-				Lara.NumFlares += 12;
+				Lara.NumFlares += count ? count : 12;
 			break;
 
 		case ID_SILENCER_ITEM:
@@ -301,12 +301,12 @@ void PickedUpObject(short objectNumber)
 
 		case ID_BIGMEDI_ITEM:
 			if (Lara.NumLargeMedipacks != -1)
-				Lara.NumLargeMedipacks++;
+				Lara.NumLargeMedipacks += count ? count : 1;
 			break;
 
 		case ID_SMALLMEDI_ITEM:
 			if (Lara.NumSmallMedipacks != -1)
-				Lara.NumSmallMedipacks++;
+				Lara.NumSmallMedipacks += count ? count : 1;
 			break;
 
 		case ID_BINOCULARS_ITEM:
@@ -323,7 +323,7 @@ void PickedUpObject(short objectNumber)
 		
 		case ID_GOLDROSE_ITEM:
 			IsAtmospherePlaying = 0;
-			S_CDPlay(6, FALSE);
+			S_CDPlay(TRACK_FOUND_SECRET, FALSE);
 			Lara.Secrets++;
 			Savegame.Level.Secrets++;
 			Savegame.Game.Secrets++;
@@ -351,17 +351,17 @@ void PickedUpObject(short objectNumber)
 
 		default:
 			if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM16)
-				Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]++;
+				Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1] += count ? count : 1;
 			else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM16_COMBO2)
-				Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]++;
+				Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1] += count ? count : 1;
 			else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM16)
-				Lara.Keys[objectNumber - ID_KEY_ITEM1]++;
+				Lara.Keys[objectNumber - ID_KEY_ITEM1] += count ? count : 1;
 			else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM16_COMBO2)
-				Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]++;
+				Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1] += count ? count : 1;
 			else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM16)
-				Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]++;
+				Lara.Pickups[objectNumber - ID_PICKUP_ITEM1] += count ? count : 1;
 			else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM16_COMBO2)
-				Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]++;
+				Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1] += count ? count : 1;
 			else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE8)
 				Lara.Examines[objectNumber - ID_EXAMINE1] = 1;
 			else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE8_COMBO2)
