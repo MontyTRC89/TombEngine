@@ -79,7 +79,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (Objects[currentItem->objectNumber].isPickup)
 				{
-					PickedUpObject(currentItem->objectNumber);
+					PickedUpObject(currentItem->objectNumber, 0);
 					currentItem->status = ITEM_ACTIVE;
 					currentItem->itemFlags[3] = 1;
 					AddDisplayPickup(currentItem->objectNumber);

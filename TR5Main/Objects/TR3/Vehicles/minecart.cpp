@@ -825,7 +825,7 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
 
-		S_CDPlay(12, 0);
+		//S_CDPlay(12, 0);
 	}
 	else
 	{

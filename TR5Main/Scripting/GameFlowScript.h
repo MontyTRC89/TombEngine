@@ -1,14 +1,9 @@
 #pragma once
-#include "ChunkId.h"
-#include "ChunkReader.h"
-#include "LEB128.h"
 #include "LanguageScript.h"
+#include "LuaHandler.h"
 
 #define TITLE_FLYBY			0
 #define TITLE_BACKGROUND	1
-
-struct ChunkId;
-struct LEB128;
 
 typedef enum WEATHER_TYPES
 {
@@ -39,6 +34,34 @@ struct GameScriptSettings
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
+};
+
+struct GameScriptInventoryObject
+{
+	std::string name;
+	short slot;
+	float yOffset;
+	float scale;
+	float xRot;
+	float yRot;
+	float zRot;
+	short rotationFlags;
+	int meshBits;
+	__int64 operation;
+
+	GameScriptInventoryObject(std::string name, short slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation)
+	{
+		this->name = name;
+		this->slot = slot;
+		this->yOffset = yOffset;
+		this->scale = scale;
+		this->xRot = xRot;
+		this->yRot = yRot;
+		this->zRot = zRot;
+		this->rotationFlags = rotationFlags;
+		this->meshBits = meshBits;
+		this->operation = operation;
+	}
 };
 
 struct GameScriptSkyLayer
@@ -116,7 +139,7 @@ struct GameScriptLevel
 	std::string LoadScreenFileName;
 	std::string Background;
 	int Name;
-	int Soundtrack;
+	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
 	bool Horizon;
@@ -132,6 +155,7 @@ struct GameScriptLevel
 	byte UVRotate;
 	int LevelFarView;
 	bool UnlimitedAir;
+	std::vector<GameScriptInventoryObject> InventoryObjects;
 
 	GameScriptLevel()
 	{
@@ -146,24 +170,28 @@ struct GameScriptLevel
 	}
 };
 
-extern ChunkReader* g_ScriptChunkIO;
+struct GameScriptAudioTrack
+{
+	std::string trackName;
+	bool looped;
 
-bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl readGameFlowLevel();
-bool __cdecl readGameFlowStrings();
-bool __cdecl readGameFlowTracks();
-bool __cdecl readGameFlowFlags();
+	GameScriptAudioTrack(std::string trackName, bool looped)
+	{
+		this->trackName = trackName;
+		this->looped = looped;
+	}
+};
 
 bool __cdecl LoadScript();
 
-class GameFlow
+class GameFlow : public LuaHandler
 {
 private:
-	sol::state*							m_lua;
 	GameScriptSettings					m_settings;
-	
-	std::string								loadScriptFromFile(char* luaFilename);
+
+	std::unordered_map < std::string, std::vector<std::string > > m_translationsMap;
+	std::vector<std::string> m_languageNames;
+
 	std::map<short, short>				m_itemsMap;
 
 public:
@@ -187,23 +215,24 @@ public:
 	char*								Intro;
 
 	// Selected language set
-	LanguageScript*						CurrentStrings;
-	std::vector<LanguageScript*>				Strings;
 	std::vector<GameScriptLevel*>			Levels;
 
 	GameFlow(sol::state* lua);
 	~GameFlow();
 
-	bool								LoadGameStrings(char* luaFilename);
-	bool								LoadGameSettings(char* luaFilename);
-	bool								ExecuteScript(char* luaFilename);
+	void								WriteDefaults();
+	void								AddLevel(GameScriptLevel const& level);
+	void								SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
+	bool								LoadGameFlowScript();
 	char*								GetString(const char* id);
+	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
+	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(int id);
 	void								SetHorizon(bool horizon, bool colAddHorizon);
 	void								SetLayer1(byte r, byte g, byte b, short speed);
 	void								SetLayer2(byte r, byte g, byte b, short speed);
 	void								SetFog(byte r, byte g, byte b, short startDistance, short endDistance);
-	int								GetNumLevels();		
+	int									GetNumLevels();		
 	bool								DoGameflow();
 };

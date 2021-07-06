@@ -12,7 +12,7 @@
 #define STRING_EXIT_GAME				"exit_game"
 #define STRING_EXIT_TO_TITLE			"exit_to_title"	
 #define STRING_UZI						"uzi"
-#define STRING_PISTOLS					"uzi_ammo"
+#define STRING_PISTOLS					"pistols_ammo"
 #define STRING_SHOTGUN					"shotgun"
 #define STRING_REVOLVER					"revolver"
 #define STRING_REVOLVER_LASER			"reolver_laser"
@@ -107,13 +107,26 @@
 #define STRING_USED_MEDIPACKS			"used_medipacks"
 #define STRING_USED_AMMOS				"used_ammos"
 #define STRING_SECRETS_FOUND			"secrets_found"
+#define STRING_WATERSKIN_SMALL_EMPTY	"waterskin_small_empty"
+#define STRING_WATERSKIN_SMALL_1		"waterskin_small_1"
+#define STRING_WATERSKIN_SMALL_2		"waterskin_small_2"
+#define STRING_WATERSKIN_SMALL_3		"waterskin_small_3"
+#define STRING_WATERSKIN_LARGE_EMPTY	"waterskin_large_empty"
+#define STRING_WATERSKIN_LARGE_1		"waterskin_large_1"
+#define STRING_WATERSKIN_LARGE_2		"waterskin_large_2"
+#define STRING_WATERSKIN_LARGE_3		"waterskin_large_3"
+#define STRING_WATERSKIN_LARGE_4		"waterskin_large_4"
+#define STRING_WATERSKIN_LARGE_5		"waterskin_large_5"
+#define STRING_TORCH					"torch"
+#define STRING_CLOCKWORK_BEETLE			"clockwork_beetle"
+#define STRING_CLOCKWORK_BEETLE_COMBO1	"clockwork_beetle_combo1"
+#define STRING_CLOCKWORK_BEETLE_COMBO2	"clockwork_beetle_combo2"
 
 class LanguageScript
 {
 public:
 	std::string Name;
-	std::vector<std::string> Strings;
-
+	std::unordered_map<size_t, std::string> Strings;
 	LanguageScript(char* name);
 	~LanguageScript();
 };

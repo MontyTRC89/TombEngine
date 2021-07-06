@@ -82,6 +82,28 @@ enum RoomEnumFlag
 	ENV_FLAG_UNKNOWN3 = 0x0400
 };
 
+enum TriggerStatus 
+{
+	TS_OUTSIDE = 0,
+	TS_ENTERING = 1,
+	TS_INSIDE = 2,
+	TS_LEAVING = 3
+};
+
+struct TRIGGER_VOLUME
+{
+	Vector3 position;
+	Quaternion rotation;
+	Vector3 scale;
+	int activators;
+	std::string onEnter;
+	std::string onInside;
+	std::string onLeave;
+	bool oneShot;
+	TriggerStatus status;
+	BoundingOrientedBox box;
+};
+
 struct ROOM_INFO
 {
 	int x;
@@ -108,6 +130,7 @@ struct ROOM_INFO
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
+	std::vector<TRIGGER_VOLUME> triggerVolumes;
 };
 
 struct ANIM_STRUCT
