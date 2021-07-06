@@ -407,27 +407,32 @@ static void doCallback(sol::protected_function const & func) {
 
 void GameScript::OnStart()
 {
-	doCallback(m_onStart);
+	if (m_onStart.valid())
+		doCallback(m_onStart);
 }
 
 void GameScript::OnLoad()
 {
-	doCallback(m_onLoad);
+	if (m_onLoad.valid())
+		doCallback(m_onLoad);
 }
 
 void GameScript::OnControlPhase()
 {
-	doCallback(m_onControlPhase);
+	if (m_onControlPhase.valid())
+		doCallback(m_onControlPhase);
 }
 
 void GameScript::OnSave()
 {
-	doCallback(m_onSave);
+	if (m_onSave.valid())
+		doCallback(m_onSave);
 }
 
 void GameScript::OnEnd()
 {
-	doCallback(m_onEnd);
+	if (m_onEnd.valid())
+		doCallback(m_onEnd);
 }
 
 void GameScript::InitCallbacks()

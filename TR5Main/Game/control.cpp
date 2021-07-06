@@ -815,8 +815,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	GameScriptLevel* level = g_GameFlow->Levels[index];
 	std::string err;
 
-	g_GameScript->ExecuteScript(level->ScriptFileName, err);
-	g_GameScript->InitCallbacks();
+	if (!level->ScriptFileName.empty())
+	{
+		g_GameScript->ExecuteScript(level->ScriptFileName, err);
+		g_GameScript->InitCallbacks();
+	}
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -955,10 +958,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			{
 				// Execute trigger
 				//g_GameScript->ExecuteScript();
-				Lara.gunType = WEAPON_UZI;
 			}
-			else
-				Lara.gunType = WEAPON_NONE;
 
 			/*if (volumeBox.Intersects(laraBox))
 			{
