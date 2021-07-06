@@ -5,7 +5,10 @@
 #include "configuration.h"
 #include "level.h"
 #include "winmain.h"
+#include <filesystem>
 using std::vector;
+using std::unordered_map;
+using std::string;
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
 SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];
@@ -23,7 +26,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 }; 
 
-vector<AudioTrack> g_AudioTracks;
+unordered_map<string, AudioTrack> g_AudioTracks;
 int GlobalMusicVolume;
 int GlobalFXVolume;
 
@@ -271,19 +274,16 @@ void Sound_FreeSamples()
 		Sound_FreeSample(i);
 }
 
-void S_CDPlay(short index, unsigned int mode)
+void S_CDPlay(std::string track, unsigned int mode)
 {
 	bool crossfade = false;
 	DWORD crossfadeTime;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
-	if (index >= g_AudioTracks.size() || index < 0)
-		return;
-
 	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BGM : mode;
 
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[mode].channel);
-	if (channelActive && BASS_Soundtrack[mode].trackID == index)
+	if (channelActive && BASS_Soundtrack[mode].track.compare(track) == 0)
 		return;
 
 	switch (mode)
@@ -303,11 +303,21 @@ void S_CDPlay(short index, unsigned int mode)
 		BASS_ChannelSlideAttribute(BASS_Soundtrack[mode].channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 	
 	static char fullTrackName[1024];
+	char const* name = track.c_str();
 
-	char* mask = &TrackNamePrefix;
-	char* name = g_AudioTracks[index].Name;
-
-	snprintf(fullTrackName, sizeof(fullTrackName), &TrackNamePrefix, name);
+	snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "ogg");
+	if (!std::filesystem::exists(fullTrackName))
+	{
+		snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "mp3");
+		if (!std::filesystem::exists(fullTrackName))
+		{
+			snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "wav");
+			if (!std::filesystem::exists(fullTrackName))
+			{
+				return;
+			}
+		}
+	}
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName, 0, 0, flags);
 
@@ -347,41 +357,36 @@ void S_CDPlay(short index, unsigned int mode)
 		return;
 
 	BASS_Soundtrack[mode].channel = stream;
-	BASS_Soundtrack[mode].trackID = index;
+	BASS_Soundtrack[mode].track = track;
 }
 
-void S_CDPlayEx(short index, DWORD mask, DWORD unknown)
+void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
 {
-	static short loopedTracks[] = { 117, 118, 121, 123, 124, 125, 126, 127, 128, 129, 130 };
-	bool looped = false;
-
-	if (index >= g_AudioTracks.size() || index < 0)
-		return;
-
-	// Assign looping based on hardcoded track IDs.
-	// @TODO: Replace with scripted ones (or trigger property) later.
-	int size = sizeof(loopedTracks) / sizeof(short);
-	for (int i = 0; i < size; i++)
-	{
-		if (index == loopedTracks[i])
-		{
-			looped = true;
-			break;
-		}
-	}
-
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
-	if (!looped)
+	if (!g_AudioTracks[track].looped)
 	{
 		byte filteredMask = (mask / 256) & 0x3F;
-		if ((g_AudioTracks[index].Mask & filteredMask) == filteredMask)
+		if ((g_AudioTracks[track].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
-		g_AudioTracks[index].Mask |= filteredMask;
+		g_AudioTracks[track].Mask |= filteredMask;
 	}
 
-	S_CDPlay(index, looped);
+	S_CDPlay(track, g_AudioTracks[track].looped);
+}
+
+// Legacy!
+void S_CDPlay(int index, unsigned int mode)
+{
+	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
+	S_CDPlay(track.first, mode);
+}
+
+void S_CDPlayEx(int index, DWORD mask, DWORD unknown)
+{
+	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
+	S_CDPlayEx(track.first, mask, unknown);
 }
 
 void S_CDStop()
@@ -390,9 +395,9 @@ void S_CDStop()
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_ONESHOT].track = "";
 	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
-	BASS_Soundtrack[SOUND_TRACK_BGM].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_BGM].track = "";
 	BASS_Soundtrack[SOUND_TRACK_BGM].channel = NULL;
 }
 
@@ -401,7 +406,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
 		BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
 	
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_ONESHOT].track = "";
 	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
 }
 

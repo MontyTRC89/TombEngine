@@ -53,6 +53,8 @@
 #include <Game/Lara/lara_one_gun.h>
 
 using std::vector;
+using std::unordered_map;
+using std::string;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
@@ -114,7 +116,7 @@ int nAnimUVRanges;
 int Wibble = 0;
 int SetDebounce = 0;
 
-int CurrentAtmosphere;
+std::string CurrentAtmosphere;
 short CurrentRoom;
 int GameTimer;
 short GlobalCounter;
@@ -177,7 +179,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-extern vector<AudioTrack> g_AudioTracks;
+extern unordered_map<string, AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
@@ -193,6 +195,7 @@ extern bool newLockInputValue;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
+	g_GameScript->OnControlPhase();
 	short oldLaraFrame;
 	if (newSkipFramesValue)
 	{
@@ -725,7 +728,7 @@ GAME_STATUS DoTitle(int index)
 		InitSpotCamSequences();
 
 		InitialiseSpotCam(2);
-		CurrentAtmosphere = 83;
+		CurrentAtmosphere = "083_horus";
 		UseSpotCam = true;
 
 		// Play background music
@@ -787,7 +790,7 @@ GAME_STATUS DoTitle(int index)
 	return GAME_STATUS_NEW_GAME;
 }
 
-GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
+GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
@@ -807,6 +810,13 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	InitialisePickupDisplay();
 	InitialiseCamera();
 	SOUND_Stop();
+
+	// Run the level script
+	GameScriptLevel* level = g_GameFlow->Levels[index];
+	std::string err;
+
+	g_GameScript->ExecuteScript(level->ScriptFileName, err);
+	g_GameScript->InitCallbacks();
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -868,6 +878,12 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	// Initialise ponytails
 	InitialiseHair();
 
+	g_GameScript->OnStart();
+	if (loadFromSavegame)
+	{
+		g_GameScript->OnLoad();
+	}
+
 	int nframes = 2;
 
 	// First control phase
@@ -888,6 +904,7 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)
 		{
+			g_GameScript->OnEnd();
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
 			S_CDStop();
@@ -913,6 +930,43 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
+
+	// Test trigger volumes if any
+	if (heavy == 0)
+	{
+		ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
+		for (int i = 0; i < room->triggerVolumes.size(); i++)
+		{
+			TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
+			/*ANIM_FRAME* frame = GetBestFrame(LaraItem);
+
+			Vector3 boxMin = Vector3(frame->boundingBox.X1, frame->boundingBox.Y1, frame->boundingBox.Z1);
+			Vector3 boxMax = Vector3(frame->boundingBox.X2, frame->boundingBox.Y2, frame->boundingBox.Z2);
+			Vector3 centre = (boxMin + boxMax) / 2.0f;
+			Vector3 extens = boxMax - centre;
+			BoundingBox laraBox = BoundingBox((Vector3)(centre + Vector3(room->x, room->y, room->z)), extens);*/
+
+			/*BoundingOrientedBox volumeBox = BoundingOrientedBox(
+				(Vector3)(volume->position + Vector3(room->x, room->y, room->z)), 
+				(Vector3)(volume->scale / 2.0f),
+				volume->rotation);*/
+
+			if (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS)
+			{
+				// Execute trigger
+				//g_GameScript->ExecuteScript();
+				Lara.gunType = WEAPON_UZI;
+			}
+			else
+				Lara.gunType = WEAPON_NONE;
+
+			/*if (volumeBox.Intersects(laraBox))
+			{
+				// Execute trigger
+				g_GameScript->ExecuteScript();
+			}*/
+		}
+	}
 
 	HeavyTriggered = false;
 

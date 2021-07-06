@@ -67,7 +67,7 @@ std::unique_ptr<ChunkId> SaveGame::m_chunkExamineCombo;
 std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
 
 SAVEGAME_INFO Savegame;
-extern vector<AudioTrack> g_AudioTracks;
+//extern vector<AudioTrack> g_AudioTracks;
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
 extern byte Sequences[3];
@@ -177,13 +177,13 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 
 void SaveGame::saveGameStatus(int arg1, int arg2)
 {
-	LEB128::Write(m_stream, FlipStatus);
+	/*LEB128::Write(m_stream, FlipStatus);
 #ifndef NEW_INV
 	LEB128::Write(m_stream, LastInventoryItem);
 #endif
 	LEB128::Write(m_stream, FlipEffect);
 	LEB128::Write(m_stream, FlipTimer);
-	LEB128::Write(m_stream, CurrentAtmosphere);
+	//LEB128::Write(m_stream, CurrentAtmosphere);
 	LEB128::Write(m_stream, CurrentSequence);
 
 	// Now the sub-chunks
@@ -207,7 +207,7 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 		m_writer->WriteChunk(m_chunkFlipStats.get(), &saveFlipStats, i, FlipStats[i]);
 
 	for (int i = 0; i < 255; i++)
-		m_writer->WriteChunk(m_chunkFlipMap.get(), &saveFlipMap, i, FlipMap[i]);
+		m_writer->WriteChunk(m_chunkFlipMap.get(), &saveFlipMap, i, FlipMap[i]);*/
 }
 
 void SaveGame::saveLara(int arg1, int arg2)
@@ -350,14 +350,14 @@ void SaveGame::saveVariable(int arg1, int arg2)
 	LEB128::Write(m_stream, variable.Type);
 	m_stream->WriteString((char*)variable.Name.c_str());
 
-	if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
 		m_stream->WriteBool(variable.BoolValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
 		m_stream->WriteInt32(variable.IntValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
 		m_stream->WriteString((char*)variable.StringValue.c_str());
 	else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-		m_stream->WriteFloat(variable.FloatValue);
+		m_stream->WriteFloat(variable.FloatValue);*/
 }
 
 void SaveGame::Start()
@@ -575,7 +575,7 @@ bool SaveGame::readVariable()
 	variable.Name = string(variableName);
 	free(variableName);
 
-	if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
 		m_stream->ReadBool(&variable.BoolValue);
 	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
 		m_stream->ReadInt32(&variable.IntValue);
@@ -587,7 +587,7 @@ bool SaveGame::readVariable()
 		m_stream->ReadString(&variableValue);
 		variable.StringValue = string(variableValue);
 		free(variableValue);
-	}
+	}*/
 
 	return true;
 }
@@ -836,7 +836,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 			DoFlipMap(index);
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkCdFlags.get()))
+	/*else if (chunkId->EqualsTo(m_chunkCdFlags.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
@@ -844,7 +844,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 		if (index < g_AudioTracks.size())
 			g_AudioTracks[index].Mask = value;
 		return true;
-	}
+	}*/
 	else if (chunkId->EqualsTo(m_chunkCamera.get()))
 	{
 		short index = LEB128::ReadInt16(m_stream);
