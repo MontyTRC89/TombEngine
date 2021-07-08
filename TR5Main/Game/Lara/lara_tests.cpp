@@ -28,10 +28,10 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return 0;
 
-//	EnableCrawlFlex1click = true;
-//	EnableCrawlFlex2click = true;
-//	EnableCrawlFlex3click = true;
-//	EnableMonkeyVault = true;
+	Lara.NewAnims.CrawlVault1click = 1;
+	Lara.NewAnims.CrawlVault2click = 1;
+	Lara.NewAnims.CrawlVault3click = 1;
+	Lara.NewAnims.MonkeyVault = 1;
 
 	if (coll->collType == CT_FRONT)
 	{
@@ -56,7 +56,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->frontFloor < 0 && coll->frontFloor >= -256)
 		{
-			if (!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256))// && EnableCrawlFlex1click == true)
+			if (!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256) && Lara.NewAnims.CrawlVault1click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
@@ -85,7 +85,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->frontFloor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
-			else if ((!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256)))// && EnableCrawlFlex2click == true)
+			else if ((!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256)) && Lara.NewAnims.CrawlVault2click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -118,7 +118,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->frontFloor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
-			else if ((!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256)))// && EnableCrawlFlex3click == true))
+			else if ((!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256)) && Lara.NewAnims.CrawlVault3click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -197,36 +197,24 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		return 1;
 	}
-#if 0
-	else// if (EnableMonkeyVault == true)
+	else if (Lara.NewAnims.MonkeyVault)//gross
 	{
 		if (Lara.canMonkeySwing)
 		{
-			FLOOR_INFO* F;
-			int c, h;
 			short roomNum = item->roomNumber;
-			F = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
-			c = GetCeiling(F, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			h = (c)-(item->pos.yPos);
-			if (h > 1792 ||
-				h < -1792 ||
-				abs(h) == 768)
-			{
+			int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
+				item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
+
+			if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
 				return 0;
-			}
+
 			item->animNumber = LA_STAND_IDLE;
 			item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_TEST_1;
-			AnimateLara(item);
 			return 1;
 		}
 	}
-//	else
-		return 0;
-#else
-	else return 0;
-#endif
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)
