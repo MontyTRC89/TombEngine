@@ -61,7 +61,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-//		EnableMonkeyRoll = true;
+		Lara.NewAnims.Monkey180Roll = 1;
 
 
 		if (TrInput & IN_FORWARD && coll->collType != CT_FRONT && abs(coll->midCeiling - coll->frontCeiling) < 50)
@@ -84,7 +84,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if ((TrInput & IN_ROLL))// && EnableMonkeyRoll == true)
+		else if (TrInput & IN_ROLL && Lara.NewAnims.Monkey180Roll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}

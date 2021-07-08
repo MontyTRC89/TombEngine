@@ -789,8 +789,8 @@ void LaraControl(short itemNumber)
 			}
 			if (Lara.air < 0)
 			{
-				if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
-					Lara.anxiety += 4;
+			//	if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
+			//		Lara.anxiety += 4;
 				Lara.air = -1;
 				item->hitPoints -= 5;
 			}
@@ -1138,7 +1138,6 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		Lara.gunStatus = LG_NO_ARMS;
 		LaraInitialiseMeshes();
-		Lara.meshEffects = 0;
 		LaraItem->hitPoints = 1000;
 	}
 }
