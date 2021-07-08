@@ -590,15 +590,15 @@ void TorpedoControl(short itemNumber)
 			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->pos, 2);
 			SoundEffect(SFX_TR5_LARA_UNDERWATER_HIT, &LaraItem->pos, 2);
 			LaraItem->hitPoints -= 200;
-			if (Lara.anxiety >= 0x7F)
-				Lara.anxiety--;
-			else
-				Lara.anxiety -= 128;
+		//	if (Lara.anxiety >= 0x7F)
+		//		Lara.anxiety--;
+		//	else
+		//		Lara.anxiety -= 128;
 		}
 		else
 		{
-			if (ItemNearLara(&item->pos, 400) && Lara.anxiety < 0xE0)
-				Lara.anxiety += 32;
+		//	if (ItemNearLara(&item->pos, 400) && Lara.anxiety < 0xE0)
+		//		Lara.anxiety += 32;
 
 			if (roomNumber!= item->roomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
