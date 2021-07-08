@@ -676,9 +676,9 @@ namespace T5M::Renderer
 
             y += 25;
 
-            for (int k = 0; k < 18; k++)
+            for (int k = 0; k < 16; k++)
             {
-                drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+                drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
                     PRINTSTRING_COLOR_WHITE,
                     PRINTSTRING_OUTLINE | ((title_selected_option & (1 << k)) ? PRINTSTRING_BLINK : 0) |
                     (CurrentSettings.waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
@@ -702,13 +702,13 @@ namespace T5M::Renderer
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 18)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 16)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 19)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 17)) ? PRINTSTRING_BLINK : 0));
             break;
 
         case title_sounds_menu:
@@ -911,9 +911,9 @@ namespace T5M::Renderer
 
             y += 25;
 
-            for (int k = 0; k < 18; k++)
+            for (int k = 0; k < 16; k++)
             {
-                drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+                drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
                     PRINTSTRING_COLOR_WHITE,
                     PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << k)) ? PRINTSTRING_BLINK : 0) |
                     (CurrentSettings.waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
@@ -937,13 +937,13 @@ namespace T5M::Renderer
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 18)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 16)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 19)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 17)) ? PRINTSTRING_BLINK : 0));
 
             break;
 
