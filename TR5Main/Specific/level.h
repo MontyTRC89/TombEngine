@@ -60,7 +60,7 @@ struct ANIMATED_TEXTURES_SEQUENCE
 	std::vector<ANIMATED_TEXTURES_FRAME> frames;
 };
 
-struct AIOBJECT
+struct AI_OBJECT
 {
 	short objectNumber;
 	short roomNumber;
@@ -71,6 +71,7 @@ struct AIOBJECT
 	short flags;
 	short yRot;
 	short boxNumber;
+	std::string scriptId;
 };
 
 struct CHANGE_STRUCT
@@ -150,8 +151,11 @@ struct LEVEL
 	std::vector<ANIM_FRAME> Frames;
 	std::vector<OBJECT_TEXTURE> ObjectTextures;
 	std::vector<ITEM_INFO> Items;
-	std::vector<AIOBJECT> AIObjects;
+	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
+	std::vector<LEVEL_CAMERA_INFO> Cameras;
+	std::vector<SINK_INFO> Sinks;
+	std::vector<SOUND_SOURCE_INFO> SoundSources;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
 	std::vector<int> Zones[MAX_ZONES][2];

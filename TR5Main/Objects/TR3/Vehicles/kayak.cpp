@@ -356,16 +356,16 @@ void KayakDoCurrent(ITEM_INFO* item)
 		int sinkval = Lara.currentActive - 1;
 		
 		PHD_VECTOR target;
-		target.x = FixedCameras[sinkval].x;
-		target.y = FixedCameras[sinkval].y;
-		target.z = FixedCameras[sinkval].z;
+		target.x = g_Level.Sinks[sinkval].x;
+		target.y = g_Level.Sinks[sinkval].y;
+		target.z = g_Level.Sinks[sinkval].z;
 		
 		int angle = (((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90))) / 16) & 4095;
 
 		int dx = target.x - LaraItem->pos.xPos;
 		int dz = target.z - LaraItem->pos.zPos;
 
-		int speed = FixedCameras[sinkval].data;
+		int speed = g_Level.Sinks[sinkval].strength;
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 

@@ -69,7 +69,6 @@ extern int PhdPerspective;
 extern short CurrentFOV;
 extern int GetLaraOnLOS;
 extern int SniperOverlay;
-extern std::vector<OBJECT_VECTOR> FixedCameras;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);

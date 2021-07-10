@@ -117,6 +117,13 @@ int LoadItems()
 			item->shade = ReadInt16();
 			item->triggerFlags = ReadInt16();
 			item->flags = ReadInt16();
+
+			byte numBytes = ReadInt8();
+			char* buffer[255];
+			ZeroMemory(buffer, 256);
+			ReadBytes(buffer, numBytes);
+			item->scriptId = std::string((const char*)buffer);
+
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
 
@@ -365,14 +372,52 @@ void LoadObjects()
 void LoadCameras()
 {
 	int numCameras = ReadInt32();
-	FixedCameras.resize(numCameras);
-	ReadBytes(FixedCameras.data(), numCameras * sizeof(OBJECT_VECTOR));
+	g_Level.Cameras.resize(numCameras);
+	for (int i = 0; i < numCameras; i++)
+	{
+		LEVEL_CAMERA_INFO camera;
+
+		camera.x = ReadInt32();
+		camera.y = ReadInt32();
+		camera.z = ReadInt32();
+		camera.roomNumber = ReadInt32();
+		camera.flags = ReadInt32();
+
+		byte numBytes = ReadInt8();
+		char* buffer[255];
+		ZeroMemory(buffer, 256);
+		ReadBytes(buffer, numBytes);
+		camera.scriptId = std::string((const char*)buffer);
+
+		g_Level.Cameras.push_back(camera);
+	}
 
 	NumberSpotcams = ReadInt32();
 
 	if (NumberSpotcams != 0)
 	{
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
+	}
+
+	int numSinks = ReadInt32();
+	g_Level.Sinks.resize(numSinks);
+	for (int i = 0; i < numSinks; i++)
+	{
+		SINK_INFO sink;
+
+		sink.x = ReadInt32();
+		sink.y = ReadInt32();
+		sink.z = ReadInt32();
+		sink.strength = ReadInt32();
+		sink.boxIndex = ReadInt32();
+
+		byte numBytes = ReadInt8();
+		char* buffer[255];
+		ZeroMemory(buffer, 256);
+		ReadBytes(buffer, numBytes);
+		sink.scriptId = std::string((const char*)buffer);
+
+		g_Level.Sinks.push_back(sink);
 	}
 }
 
@@ -795,11 +840,25 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 
 void LoadSoundEffects()
 {
-	NumberSoundSources = ReadInt32();
-	if (NumberSoundSources)
+	int numSoundSources = ReadInt32();
+	g_Level.SoundSources.resize(numSoundSources);
+	for (int i = 0; i < numSoundSources; i++)
 	{
-		SoundSources = game_malloc<OBJECT_VECTOR>(NumberSoundSources);
-		ReadBytes(SoundSources, NumberSoundSources * sizeof(OBJECT_VECTOR));
+		SOUND_SOURCE_INFO source;
+
+		source.x = ReadInt32();
+		source.y = ReadInt32();
+		source.z = ReadInt32();
+		source.soundId = ReadInt32();
+		source.flags = ReadInt32();
+
+		byte numBytes = ReadInt8();
+		char* buffer[255];
+		ZeroMemory(buffer, 256);
+		ReadBytes(buffer, numBytes);
+		source.scriptId = std::string((const char*)buffer);
+
+		g_Level.SoundSources.push_back(source);
 	}
 }
 
@@ -854,7 +913,28 @@ void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
 	g_Level.AIObjects.resize(nAIObjects);
-	ReadBytes(g_Level.AIObjects.data(), nAIObjects * sizeof(AIOBJECT));
+	for (int i = 0; i < nAIObjects; i++)
+	{
+		AI_OBJECT obj;
+
+		obj.objectNumber = ReadInt16();
+		obj.roomNumber = ReadInt16();
+		obj.x = ReadInt32();
+		obj.y = ReadInt32();
+		obj.z = ReadInt32();
+		obj.triggerFlags = ReadInt16();
+		obj.flags = ReadInt16();
+		obj.yRot = ReadInt16();
+		obj.boxNumber = ReadInt16();
+
+		byte numBytes = ReadInt8();
+		char* buffer[255];
+		ZeroMemory(buffer, 256);
+		ReadBytes(buffer, numBytes);
+		obj.scriptId = std::string((const char*)buffer);
+
+		g_Level.AIObjects.push_back(obj);
+	}
 }
 
 FILE* FileOpen(const char* fileName)
@@ -1179,7 +1259,7 @@ void GetAIPickups()
 {
 	int i, num;
 	ITEM_INFO* item;
-	AIOBJECT* object;
+	AI_OBJECT* object;
 
 	for (i = 0; i < g_Level.NumItems; ++i)
 	{

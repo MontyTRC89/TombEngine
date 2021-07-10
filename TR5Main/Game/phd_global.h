@@ -116,57 +116,150 @@ typedef struct GAME_VECTOR
 	}
 };
 
-typedef struct OBJECT_VECTOR
+typedef struct LEVEL_CAMERA_INFO
 {
 	int x;
 	int y;
 	int z;
-	int data;
+	int roomNumber;
 	int flags;
+	std::string scriptId;
 
-	OBJECT_VECTOR()
+	LEVEL_CAMERA_INFO()
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
-		this->data = NULL;
+		this->roomNumber = NULL;
 		this->flags = NULL;
 	}
 
-	OBJECT_VECTOR(int xpos, int ypos, int zpos)
+	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos)
 	{
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->data = NULL;
+		this->roomNumber = NULL;
 		this->flags = NULL;
 	}
 
-	OBJECT_VECTOR(int xpos, int ypos, int zpos, short newdata)
+	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room)
 	{
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->data = newdata;
+		this->roomNumber = room;
 		this->flags = NULL;
 	}
 
-	OBJECT_VECTOR(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
+	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
 	{
 		UNREFERENCED_PARAMETER(isFlags);
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->data = NULL;
+		this->roomNumber = 0;
 		this->flags = flags;
 	}
 
-	OBJECT_VECTOR(int xpos, int ypos, int zpos, short newdata, short newflags)
+	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room, short newflags)
 	{
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->data = newdata;
+		this->roomNumber = room;
+		this->flags = newflags;
+	}
+};
+
+typedef struct SINK_INFO
+{
+	int x;
+	int y;
+	int z;
+	int strength;
+	int boxIndex;
+	std::string scriptId;
+
+	SINK_INFO()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+		this->strength = 0;
+		this->boxIndex = 0;
+	}
+
+	SINK_INFO(int xpos, int ypos, int zpos)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->strength = 0;
+		this->boxIndex = 0;
+	}
+
+	SINK_INFO(int xpos, int ypos, int zpos, short strength)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->strength = strength;
+		this->boxIndex = NULL;
+	}
+
+	SINK_INFO(int xpos, int ypos, int zpos, short strength, short boxIndex)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->strength = strength;
+		this->boxIndex = boxIndex;
+	}
+};
+
+typedef struct SOUND_SOURCE_INFO
+{
+	int x;
+	int y;
+	int z;
+	int soundId;
+	int flags;
+	std::string scriptId;
+
+	SOUND_SOURCE_INFO()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+		this->soundId = NULL;
+		this->flags = NULL;
+	}
+
+	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->soundId = NULL;
+		this->flags = NULL;
+	}
+
+	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->soundId = soundId;
+		this->flags = NULL;
+	}
+
+	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId, short newflags)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->soundId = soundId;
 		this->flags = newflags;
 	}
 };
