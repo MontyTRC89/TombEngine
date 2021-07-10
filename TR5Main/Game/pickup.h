@@ -2,9 +2,12 @@
 
 #include "collide.h"
 
+enum GAME_OBJECT_ID;
+
 void InitialisePickup(short itemNumber);
-void PickedUpObject(short objectNumber, int count);
-void RemoveObjectFromInventory(short objectNumber, int count);
+void PickedUpObject(GAME_OBJECT_ID objectNumber, int count);
+void RemoveObjectFromInventory(GAME_OBJECT_ID objectNumber, int count);
+int GetInventoryCount(GAME_OBJECT_ID objID);
 void CollectCarriedItems(ITEM_INFO* item);
 int PickupTrigger(short itemNum);
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
