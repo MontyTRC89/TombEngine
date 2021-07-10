@@ -96,10 +96,10 @@ public:
 	void								Earthquake(int strength);
 
 	// Inventory
-	static void							InventoryAdd(int slot, int count);
-	static void							InventoryRemove(int slot, int count);
-	void								InventoryGetCount(int slot);
-	void								InventorySetCount(int slot, int count);
+	static void							InventoryAdd(int slot, sol::optional<int> count);
+	static void							InventoryRemove(int slot, sol::optional<int> count);
+	static int							InventoryGetCount(int slot);
+	static void							InventorySetCount(int slot, int count);
 	void								InventoryCombine(int slot1, int slot2);
 	void								InventorySeparate(int slot);
 
