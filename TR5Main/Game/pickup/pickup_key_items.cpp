@@ -10,9 +10,10 @@ template <size_t N> struct KeyPickupInfo
 	int(LaraInfo::* arr)[N];
 	// The range of GAME_OBJECT_IDs that correspond to each type
 	// of key item
-	int min;
-	int max;
-	constexpr KeyPickupInfo<N>(int(LaraInfo::* a_arr)[N], int a_min, int a_max) : arr{ a_arr }, min{ a_min }, max{ a_max } {};
+	// ID of first and last objects of this type
+	GAME_OBJECT_ID min;
+	GAME_OBJECT_ID max;
+	constexpr KeyPickupInfo<N>(int(LaraInfo::* a_arr)[N], GAME_OBJECT_ID a_min, GAME_OBJECT_ID a_max) : arr{ a_arr }, min{ a_min }, max{ a_max } {};
 };
 
 static constexpr int kDefaultPickupAmt = 1;
