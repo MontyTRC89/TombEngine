@@ -189,14 +189,14 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
-	Lara.NewAnims.Crawl1clickdown = 1;
-	Lara.NewAnims.Crawl1clickup = 1;
-	Lara.NewAnims.CrawlExit1click = 1;
-	Lara.NewAnims.CrawlExit2click = 1;
-	Lara.NewAnims.CrawlExit3click = 1;
+//	Lara.NewAnims.Crawl1clickdown = 1;
+//	Lara.NewAnims.Crawl1clickup = 1;
+//	Lara.NewAnims.CrawlExit1click = 1;
+//	Lara.NewAnims.CrawlExit2click = 1;
+//	Lara.NewAnims.CrawlExit3click = 1;
+	Lara.NewAnims.CrawlExitJump = 1;
 
-
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP && Lara.NewAnims.CrawlExitJump)
 	{
 		GAME_VECTOR s, d;
 		MESH_INFO* StaticMesh;
@@ -512,7 +512,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*collision: lara_col_crawl*/
-	if (item->hitPoints <= 0 || TrInput & IN_JUMP)
+	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
@@ -853,14 +853,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else
 					{
-					/*	if (TestHangFeet(item, angle))
+						if (TestHangFeet(item, angle))
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG_FEET;
 						}
-						else*/
+						else
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
