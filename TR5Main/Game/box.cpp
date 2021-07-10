@@ -1372,11 +1372,11 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 	if (g_Level.AIObjects.size() > 0)
 	{
-		AIOBJECT* foundObject = NULL;
+		AI_OBJECT* foundObject = NULL;
 
 		for (int i = 0; i < g_Level.AIObjects.size(); i++)
 		{
-			AIOBJECT* aiObject = &g_Level.AIObjects[i];
+			AI_OBJECT* aiObject = &g_Level.AIObjects[i];
 
 			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != NO_ROOM)
 			{

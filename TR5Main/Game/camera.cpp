@@ -63,7 +63,6 @@ int PhdPerspective;
 short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
-std::vector<OBJECT_VECTOR> FixedCameras;
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
@@ -775,12 +774,12 @@ void FixedCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OBJECT_VECTOR* camera = &FixedCameras[Camera.number];
+		LEVEL_CAMERA_INFO* camera = &g_Level.Cameras[Camera.number];
 		
 		from.x = camera->x;
 		from.y = camera->y;
 		from.z = camera->z;
-		from.roomNumber = camera->data;
+		from.roomNumber = camera->roomNumber;
 
 		if (camera->flags & 2)
 		{
@@ -1675,7 +1674,7 @@ void CalculateCamera()
 
 		if (Camera.type
 			&& Camera.flags != CF_CHASE_OBJECT
-			&& (Camera.number != -1 &&(SniperCamActive = FixedCameras[Camera.number].flags & 3, FixedCameras[Camera.number].flags & 2)))
+			&& (Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;
@@ -1831,7 +1830,7 @@ void LookUpDown()
 	if (Lara.gunStatus != LG_HANDS_BUSY 
 		&& Lara.Vehicle == NO_ITEM 
 		&& !Lara.leftArm.lock 
-		& !Lara.rightArm.lock)
+		&& !Lara.rightArm.lock)
 		Lara.torsoXrot = Lara.headXrot;
 }
 
