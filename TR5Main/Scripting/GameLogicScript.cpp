@@ -11,6 +11,8 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "pickup.h"
+#include "newinv2.h"
+#include <iostream>
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -21,8 +23,11 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
 	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
 
-	m_lua->set_function("InventoryAdd", &GameScript::InventoryAdd);
-	m_lua->set_function("InventoryRemove", &GameScript::InventoryRemove);
+	m_lua->set_function("GiveInvItem", &GameScript::InventoryAdd);
+	m_lua->set_function("TakeInvItem", &GameScript::InventoryRemove);
+
+	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
+	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptPosition::Register(m_lua);
@@ -306,24 +311,27 @@ void GameScript::Earthquake(int strength)
 }
 
 // Inventory
-void GameScript::InventoryAdd(int slot, int count)
+void GameScript::InventoryAdd(int slot, sol::optional<int> count)
 {
-	PickedUpObject(slot, count);
+	PickedUpObject(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
 }
 
-void GameScript::InventoryRemove(int slot, int count)
+void GameScript::InventoryRemove(int slot, sol::optional<int> count)
 {
-	RemoveObjectFromInventory(slot, count);
+	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
 }
 
-void GameScript::InventoryGetCount(int slot)
+int GameScript::InventoryGetCount(int slot)
 {
-
+	return GetInventoryCount(static_cast<GAME_OBJECT_ID>( inventry_objects_list[slot].object_number));
 }
 
 void GameScript::InventorySetCount(int slot, int count)
 {
-
+	auto result = static_cast<GAME_OBJECT_ID>( inventry_objects_list[slot].object_number );
+	// add the amount we'd need to add to get to count
+	int currAmt = GetInventoryCount(result);
+	InventoryAdd(slot, count - currAmt);
 }
 
 void GameScript::InventoryCombine(int slot1, int slot2)
