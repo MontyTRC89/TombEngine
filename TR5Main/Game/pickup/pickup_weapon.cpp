@@ -9,6 +9,8 @@
 struct WeaponPickupInfo
 {
 	GAME_OBJECT_ID id;
+	// when the player picks up a weapon they
+	// get one clip's worth of the following ammo
 	GAME_OBJECT_ID ammoID;
 	LARA_WEAPON_TYPE laraWeaponType;
 };
