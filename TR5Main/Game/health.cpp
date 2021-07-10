@@ -254,7 +254,7 @@ void AddDisplayPickup(short objectNumber)
 	}
 
 	// No free slot found, so just pickup the object ithout displaying it
-	PickedUpObject(objectNumber, 0);
+	PickedUpObject(static_cast<GAME_OBJECT_ID>(objectNumber), 0);
 }
 
 void InitialisePickupDisplay()
