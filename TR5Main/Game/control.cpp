@@ -108,8 +108,6 @@ short *TriggerIndex;
 int DisableLaraControl = 0;
 int WeatherType;
 int LaraDrawType;
-int NumberSoundSources;
-OBJECT_VECTOR *SoundSources;
 int NumAnimatedTextures;
 short *AnimTextureRanges;
 int nAnimUVRanges;
@@ -590,36 +588,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			} while (SmashedMeshCount != 0);
 		}
 
-		/*PHD_VECTOR src = { 1024,-512,1024 };
-		PHD_VECTOR dest = { 4096,-1024,4096 };
-
-		byte b = (GetRandomControl() & 0x1F) + 224 - (GetRandomControl() & 0x3F);
-		byte g = b - (GetRandomControl() & 0x3F);
-
-		if (!(GlobalCounter & 3))
-		{
-			TriggerLightning(
-				&src,
-				&dest,
-				(GetRandomControl() & 0x1F) + 32,
-				0, g, b, 24,
-				1,
-				32,
-				5);
-		}
-
-		for (int i = 0; i < 3; i++)
-		{
-			TriggerLightning(
-				&src,
-				&dest,
-				(GetRandomControl() & 0x1F) + 32,
-				0, g, b, 24,
-				1,
-				32,
-				5);
-		}*/
-
+		// Update special FX
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -647,14 +616,36 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
+		// Rumble screen (like in submarine level of TRC)
 		if (level->Rumble)
 			RumbleScreen();
 
+		// Play sound sources
+		for (int i = 0; i < g_Level.SoundSources.size(); i++)
+		{
+			SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+
+			short t = sound->flags & 31;
+			short group = t & 1;
+			group += t & 2;
+			group += ((t >> 2) & 1) * 3;
+			group += ((t >> 3) & 1) * 4;
+			group += ((t >> 4) & 1) * 5;
+
+			if (!FlipStats[group] && (sound->flags & 128) == 0)
+				continue;
+			else if (FlipStats[group] && (sound->flags & 128) == 0)
+				continue;
+
+			SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
+		}
+
+		// Do flipeffects
 		if (FlipEffect != -1)
 			effect_routines[FlipEffect](NULL);
 
+		// Update timers
 		HealthBarTimer--;
-
 		GameTimer++;
 	}
 
@@ -1319,12 +1310,12 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (keyResult == 1)
 				break;
 
-			if (FixedCameras[value].flags & 0x100)
+			if (g_Level.Cameras[value].flags & 0x100)
 				break;
 
 			Camera.number = value;
 
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(FixedCameras[value].flags & 3))
+			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(g_Level.Cameras[value].flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -1338,7 +1329,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 				Camera.timer = (trigger & 0xFF) * 30;
 
 				if (trigger & 0x100)
-					FixedCameras[Camera.number].flags |= 0x100;
+					g_Level.Cameras[Camera.number].flags |= ONESHOT;
 
 				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
 				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;

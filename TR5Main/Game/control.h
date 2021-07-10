@@ -80,8 +80,6 @@ extern short* TriggerIndex;
 extern int DisableLaraControl;
 extern int WeatherType;
 extern int LaraDrawType;
-extern int NumberSoundSources;
-extern OBJECT_VECTOR* SoundSources;
 extern int NumAnimatedTextures;
 extern short* AnimTextureRanges;
 extern int nAnimUVRanges;

@@ -310,7 +310,7 @@ void EnemyJeepControl(short itemNumber)
 				item->itemFlags[3]++;
 
 				creature->enemy = NULL;
-				AIOBJECT* aiObject = NULL;
+				AI_OBJECT* aiObject = NULL;
 
 				for (int i = 0; i < g_Level.AIObjects.size(); i++)
 				{ 

@@ -402,15 +402,15 @@ static void DoCurrent(ITEM_INFO* item)
 		long angle, dx, dz, speed, sinkval;
 
 		sinkval = Lara.currentActive - 1;
-		target.x = FixedCameras[sinkval].x;
-		target.y = FixedCameras[sinkval].y;
-		target.z = FixedCameras[sinkval].z;
+		target.x = g_Level.Sinks[sinkval].x;
+		target.y = g_Level.Sinks[sinkval].y;
+		target.z = g_Level.Sinks[sinkval].z;
 		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - ANGLE(90)) / 16) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
-		speed = FixedCameras[sinkval].data;
+		speed = g_Level.Sinks[sinkval].strength;
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 

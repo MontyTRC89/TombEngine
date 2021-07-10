@@ -849,7 +849,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
-		FixedCameras[index].flags = value;
+		g_Level.Cameras[index].flags = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkSequenceSwitch.get()))
