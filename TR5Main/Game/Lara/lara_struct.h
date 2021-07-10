@@ -472,10 +472,10 @@ enum LARA_ANIM
 	LA_CRAWL_IDLE = 263,									// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,							// Crawl > crouch (2/2)
 	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,					// Crouch > crawl (3/3)
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.
+	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.//no dont remove thanks
 	LA_CRAWL_TO_IDLE_RIGHT = 267,							// Crawl forward > crawl idle, right leg first
 																// TODO: in WAD, link next to 263
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove. 
+	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove. //no dont remove thanks
 	LA_CRAWL_TURN_LEFT = 269,								// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,								// Crawl rotate right (looped)
 	LA_MONKEYSWING_TURN_LEFT = 271,							// Monkey swing rotate left
@@ -974,6 +974,10 @@ struct AnimsNew
 	bool CrawlVault2click;			//vault into crawlspace at 2 clicks
 	bool CrawlVault3click;			//vault into crawlspace at 3 clicks
 	bool MonkeyVault;				//vault up to monkeybars when pressing up + action underneath them. super annoying :)
+	bool CrawlExitJump;				//TR5 crawlspace exit with jump!
+	bool SwandiveRollRun;			//the transition from swandive roll to run
+	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
+	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
 
 typedef struct LaraInfo
