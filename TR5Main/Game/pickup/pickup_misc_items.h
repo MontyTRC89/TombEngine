@@ -1,5 +1,5 @@
 #pragma once
-enum GAME_OBJECT_ID;
+enum GAME_OBJECT_ID : short;
 struct LaraInfo;
 
 bool TryAddMiscItem(LaraInfo& lara, GAME_OBJECT_ID obj);

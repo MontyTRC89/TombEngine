@@ -1,5 +1,5 @@
 #pragma once
-enum GAME_OBJECT_ID;
+enum GAME_OBJECT_ID : short;
 struct LaraInfo;
 bool TryAddConsumable(LaraInfo&, GAME_OBJECT_ID id, int amt = 0);
 bool TryRemoveConsumable(LaraInfo&, GAME_OBJECT_ID id, int amt = 0);
