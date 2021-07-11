@@ -9,6 +9,7 @@
 struct ConsumablePickupInfo
 {
 	GAME_OBJECT_ID id;
+	// Pointer to array of consumable in question
 	int LaraInfo::* count;
 	// How many of the item to give the player if the caller
 	// does not specify; i.e. default amount per pickup
