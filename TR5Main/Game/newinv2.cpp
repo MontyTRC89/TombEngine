@@ -16,6 +16,7 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
+#include "pickup.h"
 
 using namespace T5M::Renderer;
 bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
@@ -2379,28 +2380,7 @@ void init_inventry()
 
 int have_i_got_object(short object_number)
 {
-	if (object_number >= ID_PUZZLE_ITEM1_COMBO1 && object_number <= ID_PUZZLE_ITEM16_COMBO2)
-		return Lara.PuzzlesCombo[object_number - ID_PUZZLE_ITEM1_COMBO1];
-
-	if (object_number >= ID_PUZZLE_ITEM1 && object_number <= ID_PUZZLE_ITEM16)
-		return Lara.Puzzles[object_number - ID_PUZZLE_ITEM1];
-
-	if (object_number >= ID_KEY_ITEM1_COMBO1 && object_number <= ID_KEY_ITEM16_COMBO2)
-		return Lara.KeysCombo[object_number - ID_KEY_ITEM1_COMBO1];
-
-	if (object_number >= ID_KEY_ITEM1 && object_number <= ID_KEY_ITEM16)
-		return Lara.Keys[object_number - ID_KEY_ITEM1];
-
-	if (object_number >= ID_PICKUP_ITEM1_COMBO1 && object_number <= ID_PICKUP_ITEM16_COMBO2)
-		return Lara.PickupsCombo[object_number - ID_PICKUP_ITEM1_COMBO1];
-
-	if (object_number >= ID_PICKUP_ITEM1 && object_number <= ID_PICKUP_ITEM16)
-		return Lara.Pickups[object_number - ID_PICKUP_ITEM1];
-
-	if (object_number == ID_CROWBAR_ITEM)
-		return Lara.Crowbar;
-
-	return 0;
+	return GetInventoryCount(from_underlying(object_number));
 }
 
 void setup_objectlist_startposition2(short newobj)
