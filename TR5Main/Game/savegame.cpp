@@ -510,7 +510,7 @@ bool SaveGame::readItem()
 		itemNumber = CreateItem();
 	
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->objectNumber = LEB128::ReadInt16(m_stream);
+	item->objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
@@ -542,7 +542,7 @@ bool SaveGame::readItem()
 
 	// Some post-processing things
 	if (obj->isPuzzleHole && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
-		item->objectNumber += NUM_PUZZLES;
+		item->objectNumber += GAME_OBJECT_ID{ NUM_PUZZLES };
 
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))
 		item->meshBits = 0x100;
@@ -784,7 +784,7 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		ITEM_INFO* weaponItem = &g_Level.Items[Lara.weaponItem];
 
-		weaponItem->objectNumber = LEB128::ReadInt16(m_stream);
+		weaponItem->objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
 		weaponItem->animNumber = LEB128::ReadInt16(m_stream);
 		weaponItem->frameNumber = LEB128::ReadInt16(m_stream);
 		weaponItem->currentAnimState = LEB128::ReadInt16(m_stream);
@@ -996,7 +996,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
 		creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
 
-		creature->aiTarget.objectNumber = LEB128::ReadInt16(m_stream);
+		creature->aiTarget.objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.boxNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.flags = LEB128::ReadInt16(m_stream);

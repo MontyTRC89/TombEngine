@@ -300,7 +300,7 @@ void set_flare_arm(int frame)
 	Lara.leftArm.frameBase = g_Level.Anims[anim].framePtr;
 }
 
-void CreateFlare(short objectNum, int thrown)
+void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 {
 	short itemNum = CreateItem();
 	if (itemNum != NO_ITEM)

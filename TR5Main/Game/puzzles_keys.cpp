@@ -209,7 +209,7 @@ void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void PuzzleDone(ITEM_INFO* item, short itemNum)
 {
-	item->objectNumber += (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+	item->objectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->requiredAnimState = 0;

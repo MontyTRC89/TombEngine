@@ -108,7 +108,7 @@ int LoadItems()
 		{
 			ITEM_INFO* item = &g_Level.Items[i];
 			
-			item->objectNumber = ReadInt16();
+			item->objectNumber = from_underlying(ReadInt16());
 			item->roomNumber = ReadInt16();
 			item->pos.xPos = ReadInt32();
 			item->pos.yPos = ReadInt32();
