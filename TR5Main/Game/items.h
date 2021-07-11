@@ -1,6 +1,8 @@
 #pragma once
 #include "phd_global.h"
 
+enum GAME_OBJECT_ID : short;
+
 typedef enum AIObjectType
 {
 	NO_AI = 0x0000,
@@ -41,7 +43,7 @@ typedef struct ITEM_INFO
 	int floor;
 	DWORD touchBits;
 	DWORD meshBits;
-	short objectNumber;
+	GAME_OBJECT_ID objectNumber;
 	short currentAnimState;
 	short goalAnimState;
 	short requiredAnimState;
