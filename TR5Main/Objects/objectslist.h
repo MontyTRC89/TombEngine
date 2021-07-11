@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum GAME_OBJECT_ID
+enum GAME_OBJECT_ID : short
 {
 	/* Lara Primary Slot */
 	ID_LARA,
