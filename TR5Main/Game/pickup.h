@@ -2,7 +2,7 @@
 
 #include "collide.h"
 
-enum GAME_OBJECT_ID;
+enum GAME_OBJECT_ID : short;
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(GAME_OBJECT_ID objectNumber, int count);

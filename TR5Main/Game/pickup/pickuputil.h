@@ -1,5 +1,5 @@
 #pragma once
-enum GAME_OBJECT_ID;
+enum GAME_OBJECT_ID : short;
 
 // Given an array and an id, iterate through the array until we find
 // an ID that matches the ID we've passed in.
