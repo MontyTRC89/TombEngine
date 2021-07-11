@@ -236,7 +236,7 @@ void DrawAllPickups()
 }
 
 
-void AddDisplayPickup(short objectNumber)
+void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 {
 	DISPLAY_PICKUP* pickup = Pickups;
 
@@ -254,7 +254,7 @@ void AddDisplayPickup(short objectNumber)
 	}
 
 	// No free slot found, so just pickup the object ithout displaying it
-	PickedUpObject(static_cast<GAME_OBJECT_ID>(objectNumber), 0);
+	PickedUpObject(objectNumber, 0);
 }
 
 void InitialisePickupDisplay()
