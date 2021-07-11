@@ -999,6 +999,24 @@ enum GAME_OBJECT_ID : short
 	ID_NUMBER_OBJECTS,		// NEED TO BE AT THE END !!!!
 };
 
+template <typename T, typename Enum> constexpr bool is_underlying = std::is_same_v<T, std::underlying_type_t<Enum>>;
+template <typename T, typename Enum> constexpr bool same_or_underlying = std::is_same_v<T, Enum> || is_underlying<T, Enum>;
+
+// += operator that only allows addition of shorts or GAME_OBJECT_IDs. This is to
+// allow us to see and manually review any places where we're adding something that
+// might be the wrong type.
+template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID> & operator+=(GAME_OBJECT_ID lhs, T rhs)
+{
+	lhs += GAME_OBJECT_ID{ rhs };
+	return lhs;
+}
+
+template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<GAME_OBJECT_ID>>, GAME_OBJECT_ID>
+	from_underlying (T rhs)
+{
+	return GAME_OBJECT_ID{ rhs };
+}
+
 typedef enum SPRITE_TYPES
 {
 	SPR_FIRE0,
