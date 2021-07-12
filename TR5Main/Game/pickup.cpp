@@ -113,16 +113,10 @@ void PickedUpObject(GAME_OBJECT_ID objID, int count)
 		&& !TryAddAmmo(Lara, objID, count)
 		&& !TryAddKeyItem(Lara, objID, count)
 		&& !TryAddConsumable(Lara, objID, count)
-		&& !TryAddMiscItem(Lara, objID)) {
-			if (objID == ID_GOLDROSE_ITEM)
-			{
-				IsAtmospherePlaying = 0;
-				S_CDPlay(TRACK_FOUND_SECRET, FALSE);
-				Lara.Secrets++;
-				Savegame.Level.Secrets++;
-				Savegame.Game.Secrets++;
-			}
-		}
+		&& !TryAddMiscItem(Lara, objID))
+	{
+		// item isn't any of the above; do nothing
+	}
 #ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
 #endif
@@ -169,11 +163,9 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objID, int count)
 		&& !TryRemoveAmmo(Lara, objID, count)
 		&& !TryRemoveKeyItem(Lara, objID, count)
 		&& !TryRemoveConsumable(Lara, objID, count)
-		&& !TryRemoveMiscItem(Lara, objID)) {
-			if (objID == ID_GOLDROSE_ITEM)
-			{
-				// TODO: do we really want to let a LD take secrets from the player?
-			}
+		&& !TryRemoveMiscItem(Lara, objID))
+		{
+			// item isn't any of the above; do nothing
 		}
 #ifndef NEW_INV
 	g_Inventory.LoadObjects(false);
