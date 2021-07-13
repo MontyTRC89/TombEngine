@@ -13,6 +13,7 @@
 #include "pickup.h"
 #include "newinv2.h"
 #include <iostream>
+#include "InventorySlots.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -28,6 +29,26 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 
 	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
 	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
+
+	// Put all the data in InvItem's metatable	
+	m_lua->set("InvItemMeta", sol::as_table(kInventorySlots));
+
+	// Make the metatable's __index refer to itself so that requests
+	// to InvItem will go through to the metatable (and thus the
+	// kInventorySlot members)
+	m_lua->safe_script("InvItemMeta.__index = InvItemMeta");
+
+	// Don't allow InvItem to have new elements put into it
+	m_lua->safe_script("InvItemMeta.__newindex = function() error('InvItem is read-only') end");
+
+	// Protect the metatable
+	m_lua->safe_script("InvItemMeta.__metatable = 'metatable is protected'");
+
+	auto tab = m_lua->create_named_table("InvItem");
+	m_lua->safe_script("setmetatable(InvItem, InvItemMeta)");
+
+	// point InvItemMeta array from the table
+	m_lua->safe_script("InvItemMeta = nil");
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptPosition::Register(m_lua);
@@ -311,26 +332,25 @@ void GameScript::Earthquake(int strength)
 }
 
 // Inventory
-void GameScript::InventoryAdd(int slot, sol::optional<int> count)
+void GameScript::InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
 {
-	PickedUpObject(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
+	PickedUpObject(slot, count.value_or(0));
 }
 
-void GameScript::InventoryRemove(int slot, sol::optional<int> count)
+void GameScript::InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
 {
 	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
 }
 
-int GameScript::InventoryGetCount(int slot)
+int GameScript::InventoryGetCount(GAME_OBJECT_ID slot)
 {
-	return GetInventoryCount(static_cast<GAME_OBJECT_ID>( inventry_objects_list[slot].object_number));
+	return GetInventoryCount(slot);
 }
 
-void GameScript::InventorySetCount(int slot, int count)
+void GameScript::InventorySetCount(GAME_OBJECT_ID slot, int count)
 {
-	auto result = static_cast<GAME_OBJECT_ID>( inventry_objects_list[slot].object_number );
 	// add the amount we'd need to add to get to count
-	int currAmt = GetInventoryCount(result);
+	int currAmt = GetInventoryCount(slot);
 	InventoryAdd(slot, count - currAmt);
 }
 
