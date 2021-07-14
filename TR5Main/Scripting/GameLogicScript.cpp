@@ -11,6 +11,9 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "pickup.h"
+#ifndef _DEBUG
+#include <iostream>
+#endif
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
