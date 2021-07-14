@@ -915,7 +915,7 @@ void LoadAIObjects()
 	{
 		AI_OBJECT obj;
 
-		obj.objectNumber = ReadInt16();
+		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
 		obj.x = ReadInt32();
 		obj.y = ReadInt32();

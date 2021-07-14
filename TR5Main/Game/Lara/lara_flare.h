@@ -3,6 +3,8 @@
 
 enum GAME_OBJECT_ID : short;
 
+#define FLARE_AGE	30*30	//30 seconds * 30 frames
+
 void FlareControl(short item_number);
 void ready_flare();
 void undraw_flare_meshes();

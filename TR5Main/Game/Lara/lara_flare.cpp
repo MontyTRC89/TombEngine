@@ -64,7 +64,7 @@ void FlareControl(short itemNumber)
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
 	short age = (short)(item->data) & 0x7FFF;
-	if (age >= 900)
+	if (age >= FLARE_AGE)
 	{
 		if (!item->fallspeed && !item->speed)
 		{
@@ -397,7 +397,7 @@ void DoFlareInHand(int flare_age)
 
 	/* Hardcoded code */
 
-	if (Lara.flareAge >= 900)
+	if (Lara.flareAge >= FLARE_AGE)
 	{
 		if (Lara.gunStatus == LG_NO_ARMS)
 			Lara.gunStatus = LG_UNDRAW_GUNS;
@@ -414,7 +414,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	int r, g, b;
 	float random;
 	int falloff;
-	if (age >= 900 || age == 0)
+	if (age >= FLARE_AGE || age == 0)
 		return 0;
 	random = generateFloat();
 
@@ -433,7 +433,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 		return (random < 0.9f);
 	}
-	else if (age < 810)
+	else if (age < (FLARE_AGE - 90))
 	{
 		float multiplier = FlareFlickerTable[age % FlareFlickerTable.size()];
 		falloff = 12*multiplier;
@@ -448,7 +448,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	{
 		float multiplier = FlareFlickerTableLow[age % FlareFlickerTableLow.size()];
 		
-		falloff = 12* (1.0f - ((age-810) / (900-810)));
+		falloff = 12 * (1.0f - ((age - (FLARE_AGE - 90)) / (FLARE_AGE - (FLARE_AGE - 90))));
 		r = FlareMainColor.x * 255 * multiplier;
 		g = FlareMainColor.y * 255 * multiplier;
 		b = FlareMainColor.z * 255 * multiplier;

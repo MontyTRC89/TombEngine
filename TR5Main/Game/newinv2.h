@@ -505,6 +505,7 @@ struct INVOBJ
 	short rot_flags;
 };
 
+extern const char* controlmsgs[];
 extern int GLOBAL_invMode;
 extern int pause_menu_to_display;
 extern __int64 pause_selected_option;
