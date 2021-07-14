@@ -236,7 +236,7 @@ void DrawAllPickups()
 }
 
 
-void AddDisplayPickup(short objectNumber)
+void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 {
 	DISPLAY_PICKUP* pickup = Pickups;
 
