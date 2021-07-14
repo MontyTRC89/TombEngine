@@ -122,7 +122,7 @@ int LoadItems()
 			char* buffer[255];
 			ZeroMemory(buffer, 256);
 			ReadBytes(buffer, numBytes);
-			item->scriptId = std::string((const char*)buffer);
+			item->luaName = std::string((const char*)buffer);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -325,14 +325,6 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
-	auto itemNumber = ReadInt16();
-	while (itemNumber != NO_ITEM)
-	{
-		auto scriptId = ReadInt32();
-		g_GameScript->AddLuaId(scriptId, itemNumber);
-		itemNumber = ReadInt16();
-	}
-
 	InitialiseObjects();
 	InitialiseClosedDoors();
 
@@ -387,7 +379,7 @@ void LoadCameras()
 		char* buffer[255];
 		ZeroMemory(buffer, 256);
 		ReadBytes(buffer, numBytes);
-		camera.scriptId = std::string((const char*)buffer);
+		camera.luaName = std::string((const char*)buffer);
 
 		g_Level.Cameras.push_back(camera);
 	}
@@ -415,7 +407,7 @@ void LoadCameras()
 		char* buffer[255];
 		ZeroMemory(buffer, 256);
 		ReadBytes(buffer, numBytes);
-		sink.scriptId = std::string((const char*)buffer);
+		sink.luaName = std::string((const char*)buffer);
 
 		g_Level.Sinks.push_back(sink);
 	}
@@ -724,6 +716,12 @@ void ReadRooms()
 			mesh.color = Vector4(rgb.x, rgb.y, rgb.z, a);
 			mesh.hitPoints = ReadInt16();
 
+			byte numBytes = ReadInt8();
+			char* buffer[255];
+			ZeroMemory(buffer, 256);
+			ReadBytes(buffer, numBytes);
+			mesh.luaName = std::string((const char*)buffer);
+
 			room.mesh.push_back(mesh);
 		}
 
@@ -856,7 +854,7 @@ void LoadSoundEffects()
 		char* buffer[255];
 		ZeroMemory(buffer, 256);
 		ReadBytes(buffer, numBytes);
-		source.scriptId = std::string((const char*)buffer);
+		source.luaName = std::string((const char*)buffer);
 
 		g_Level.SoundSources.push_back(source);
 	}
@@ -931,7 +929,7 @@ void LoadAIObjects()
 		char* buffer[255];
 		ZeroMemory(buffer, 256);
 		ReadBytes(buffer, numBytes);
-		obj.scriptId = std::string((const char*)buffer);
+		obj.luaName = std::string((const char*)buffer);
 
 		g_Level.AIObjects.push_back(obj);
 	}

@@ -123,7 +123,7 @@ typedef struct LEVEL_CAMERA_INFO
 	int z;
 	int roomNumber;
 	int flags;
-	std::string scriptId;
+	std::string luaName;
 
 	LEVEL_CAMERA_INFO()
 	{
@@ -179,7 +179,7 @@ typedef struct SINK_INFO
 	int z;
 	int strength;
 	int boxIndex;
-	std::string scriptId;
+	std::string luaName;
 
 	SINK_INFO()
 	{
@@ -225,7 +225,7 @@ typedef struct SOUND_SOURCE_INFO
 	int z;
 	int soundId;
 	int flags;
-	std::string scriptId;
+	std::string luaName;
 
 	SOUND_SOURCE_INFO()
 	{
