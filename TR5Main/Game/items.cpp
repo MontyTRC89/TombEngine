@@ -452,7 +452,7 @@ void InitialiseItemArray(int numitems)
 	item->nextItem = NO_ITEM;
 }
 
-short SpawnItem(ITEM_INFO* item, short objectNumber)
+short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
 {
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -472,7 +472,7 @@ short SpawnItem(ITEM_INFO* item, short objectNumber)
 	return itemNumber;
 }
 
-int GlobalItemReplace(short search, short replace)
+int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 {
 	int changed = 0;
 	for (int i = 0; i < g_Level.Rooms.size(); i++)

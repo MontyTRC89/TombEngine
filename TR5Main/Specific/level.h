@@ -62,7 +62,7 @@ struct ANIMATED_TEXTURES_SEQUENCE
 
 struct AI_OBJECT
 {
-	short objectNumber;
+	GAME_OBJECT_ID objectNumber;
 	short roomNumber;
 	int x;
 	int y;
