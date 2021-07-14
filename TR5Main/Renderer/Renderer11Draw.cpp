@@ -2481,7 +2481,7 @@ namespace T5M::Renderer
         dynamicLight->Out = falloff * 256.0f;
         dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
         dynamicLight->Dynamic = true;
-        dynamicLight->Intensity = falloff / 2;
+        dynamicLight->Intensity = falloff >> 2; //looks better..
 
         m_dynamicLights.push_back(dynamicLight);
         //NumDynamics++;
