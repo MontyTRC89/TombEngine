@@ -115,6 +115,26 @@ const char* optmessages[] =
 //	STRING_READ_DIARY
 };
 
+const char* controlmsgs[] =
+{
+	STRING_CONTROLS_MOVE_FORWARD,
+	STRING_CONTROLS_MOVE_BACKWARD,
+	STRING_CONTROLS_MOVE_LEFT,
+	STRING_CONTROLS_MOVE_RIGHT,
+	STRING_CONTROLS_DUCK,
+	STRING_CONTROLS_DASH,
+	STRING_CONTROLS_WALK,
+	STRING_CONTROLS_JUMP,
+	STRING_CONTROLS_ACTION,
+	STRING_CONTROLS_DRAW_WEAPON,
+	STRING_CONTROLS_USE_FLARE,
+	STRING_CONTROLS_LOOK,
+	STRING_CONTROLS_ROLL,
+	STRING_CONTROLS_INVENTORY,
+	STRING_CONTROLS_STEP_LEFT,
+	STRING_CONTROLS_STEP_RIGHT
+};
+
 #define phd_winxmax g_Configuration.Width
 #define phd_winymax g_Configuration.Height
 #define phd_centerx 400
@@ -586,7 +606,7 @@ int TitleOptions()
 		break;
 
 	case title_controls_menu:
-		settings_flag = 1 << 19;
+		settings_flag = 1 << 17;
 		handle_control_settings_input();
 		break;
 
@@ -929,7 +949,7 @@ void handle_control_settings_input()
 
 		if (goSelect)
 		{
-			if (title_selected_option & (1 << 18))//apply
+			if (title_selected_option & (1 << 16))//apply
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
@@ -939,7 +959,7 @@ void handle_control_settings_input()
 				return;
 			}
 
-			if (title_selected_option & (1 << 19))//cancel
+			if (title_selected_option & (1 << 17))//cancel
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				title_menu_to_display = title_options_menu;
@@ -949,7 +969,7 @@ void handle_control_settings_input()
 		}
 	}
 
-	if (KeyMap[DIK_RETURN] && !(title_selected_option & (1 << 18)) && !(title_selected_option & (1 << 19)))
+	if (KeyMap[DIK_RETURN] && !(title_selected_option & (1 << 16)) && !(title_selected_option & (1 << 17)))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
@@ -1222,7 +1242,7 @@ int DoPauseMenu()
 		break;
 
 	case pause_controls_menu:
-		pause_flag = 1 << 19;
+		pause_flag = 1 << 17;
 		handle_control_settings_input_pause();
 		break;
 
@@ -1484,7 +1504,7 @@ void handle_control_settings_input_pause()
 
 		if (goSelect)
 		{
-			if (pause_selected_option & (1 << 18))//apply
+			if (pause_selected_option & (1 << 16))//apply
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
@@ -1494,7 +1514,7 @@ void handle_control_settings_input_pause()
 				return;
 			}
 
-			if (pause_selected_option & (1 << 19))//cancel
+			if (pause_selected_option & (1 << 17))//cancel
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 				pause_menu_to_display = pause_options_menu;
@@ -1504,7 +1524,7 @@ void handle_control_settings_input_pause()
 		}
 	}
 
-	if (KeyMap[DIK_RETURN] && !(pause_selected_option & (1 << 18)) && !(pause_selected_option & (1 << 19)))
+	if (KeyMap[DIK_RETURN] && !(pause_selected_option & (1 << 16)) && !(pause_selected_option & (1 << 17)))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 		CurrentSettings.waitingForkey = 1;
@@ -2703,7 +2723,6 @@ void handle_inventry_menu()
 	if (rings[RING_AMMO]->ringactive)
 	{
 		g_Renderer.drawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
-	//	PrintString(phd_centerx, phd_centery, 1, &gfStringWad[gfStringOffset[optmessages[5]]], FF_CENTER);
 
 		if (rings[RING_INVENTORY]->objlistmovement)
 			return;
@@ -2896,13 +2915,11 @@ void handle_inventry_menu()
 				if (i == current_selected_option)
 				{
 					g_Renderer.drawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
-				//	PrintString(phd_centerx, ypos, 1, current_options[i].text, FF_CENTER);
 					ypos += font_height;
 				}
 				else
 				{
 					g_Renderer.drawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
-				//	PrintString(phd_centerx, ypos, 5, current_options[i].text, FF_CENTER);
 					ypos += font_height;
 				}
 			}
@@ -3077,10 +3094,10 @@ void spinback(unsigned short* angle)
 		{
 			val2 = val;
 
-			if (val2 < 1022)
-				val = 1022;
-			else if (val2 > 16384)
-				val2 = 16384;
+			if (val2 < ANGLE(5))
+				val = ANGLE(5);
+			else if (val2 > ANGLE(90))
+				val2 = ANGLE(90);
 
 			val -= (val2 >> 3);
 
@@ -3091,14 +3108,14 @@ void spinback(unsigned short* angle)
 		{
 			val2 = -val;
 
-			if (val2 < 1022)
-				val = 1022;
-			else if (val2 > 16384)
-				val2 = 16384;
+			if (val2 < ANGLE(5))
+				val = ANGLE(5);
+			else if (val2 > ANGLE(90))
+				val2 = ANGLE(90);
 
 			val += (val2 >> 3);
 
-			if (val < 32768)
+			if (val < ANGLE(180))
 				val = 0;
 		}
 
@@ -3134,13 +3151,13 @@ void draw_ammo_selector()
 			if (n == *current_ammo_type)
 			{
 				if (objme->rot_flags & INV_ROT_X)
-					ammo_object_list[n].xrot += 1022;
+					ammo_object_list[n].xrot += ANGLE(5);
 
 				if (objme->rot_flags & INV_ROT_Y)
-					ammo_object_list[n].yrot += 1022;
+					ammo_object_list[n].yrot += ANGLE(5);
 
 				if (objme->rot_flags & INV_ROT_Z)
-					ammo_object_list[n].zrot += 1022;
+					ammo_object_list[n].zrot += ANGLE(5);
 			}
 			else
 			{
@@ -3477,13 +3494,13 @@ void draw_current_object_list(int ringnum)
 			if (!i && !rings[ringnum]->objlistmovement)
 			{
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_X)
-					rings[ringnum]->current_object_list[n].xrot += 1022;
+					rings[ringnum]->current_object_list[n].xrot += ANGLE(5);
 
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Y)
-					rings[ringnum]->current_object_list[n].yrot += 1022;
+					rings[ringnum]->current_object_list[n].yrot += ANGLE(5);
 
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Z)
-					rings[ringnum]->current_object_list[n].zrot += 1022;
+					rings[ringnum]->current_object_list[n].zrot += ANGLE(5);
 			}
 			else
 			{

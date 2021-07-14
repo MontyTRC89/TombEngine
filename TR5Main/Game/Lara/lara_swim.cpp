@@ -649,7 +649,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (item->fallspeed > 100)
 	{
-		if (LaraDrawType == 5)
+	/*	if (LaraDrawType == 5)
 		{
 			SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) * 256) | 6);
 		}
@@ -657,7 +657,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.anxiety < 96)
 		{
 			Lara.anxiety += 16;
-		}
+		}*/
 	}
 
 	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)

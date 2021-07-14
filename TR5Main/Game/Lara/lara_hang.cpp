@@ -274,10 +274,10 @@ void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
 -corner anims(works well, tested with placeholder anims)
 -handstand(not tested)*/
 
-/*void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 139*/
-	/*collision: lara_col_hang_feet
+	//collision: lara_col_hang_feet
 	Lara.isClimbing = false;
 
 	if (item->hitPoints <= 0)
@@ -298,7 +298,7 @@ void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 139*/
-	/*state code: lara_as_hang_feet
+	//state code: lara_as_hang_feet
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
@@ -395,35 +395,35 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 		}
-		/*
-			if (Lara.climbStatus != 0 &&
-				coll->midCeiling <= -256 &&
-				abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
+
+		if (Lara.climbStatus != 0 &&
+			coll->midCeiling <= -256 &&
+			abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
+		{
+			if (LaraTestClimbStance(item, coll))
 			{
-				if (LaraTestClimbStance(item, coll))
-				{
-					item->goalAnimState = LS_LADDER_IDLE;
-				}
-				else
-				{
-					item->animNumber = LA_LADDER_UP_HANDS;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->goalAnimState = LS_HANG;
-					item->currentAnimState = LS_HANG;
-				}
+				item->goalAnimState = LS_LADDER_IDLE;
 			}
-			return;
-					}
+			else
+			{
+				item->animNumber = LA_LADDER_SHIMMY_UP;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->goalAnimState = LS_HANG;
+				item->currentAnimState = LS_HANG;
+			}
+		}
+
+		return;
+	}
 
 		Lara.moveAngle = item->pos.yRot;
 		LaraHangTest(item, coll);
-	}
 }
 
 void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 140*/
-	/*collision: lara_col_hang_feet_shimmyr
+	//collision: lara_col_hang_feet_shimmyr
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 	Camera.targetAngle = 0;
@@ -436,7 +436,7 @@ void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 140*/
-	/*state code: lara_as_hang_feet_shimmyr
+	//state code: lara_as_hang_feet_shimmyr
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
@@ -446,7 +446,7 @@ void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 141*/
-	/*collision: lara_col_hang_feet_shimmyl
+	//collision: lara_col_hang_feet_shimmyl
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 	Camera.targetAngle = 0;
@@ -458,55 +458,51 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 141*/
-	/*state code: lara_as_hang_feet_shimmyl
+	//state code: lara_as_hang_feet_shimmyl
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
 
-/*go around corners feet
+//go around corners feet
 
 void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 142*/
-	/*collision: lara_default_col
+	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
 	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_INNER].frameEnd) // I don't like this either but it's better than adding 4 new 1 frame anims?
-		SetCornerAnimFeet(item, coll, ANGLE(90.0f),
-			item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_INNER);
+		SetCornerAnimFeet(item, coll, ANGLE(90.0f), 1);
 }
 
 void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 143*/
-	/*collision: lara_default_col
+	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
 	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_INNER].frameEnd)
-		SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
-			item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_INNER);
+		SetCornerAnimFeet(item, coll, -ANGLE(90.0f), 1);
 }
 
 void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 144*/
-	/*collision: lara_default_col
+	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
 	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_OUTER].frameEnd)
-		SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
-			item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_OUTER);
+		SetCornerAnimFeet(item, coll, -ANGLE(90.0f), 1);
 }
 
 void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 145*/
-	/*collision: lara_default_col
+	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
 	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_OUTER].frameEnd)
-		SetCornerAnimFeet(item, coll, ANGLE(90.0f),
-			item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_OUTER);
-}*/
+		SetCornerAnimFeet(item, coll, ANGLE(90.0f), 1);
+}

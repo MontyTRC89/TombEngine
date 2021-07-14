@@ -472,10 +472,10 @@ enum LARA_ANIM
 	LA_CRAWL_IDLE = 263,									// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,							// Crawl > crouch (2/2)
 	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,					// Crouch > crawl (3/3)
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.
+	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.//no dont remove thanks
 	LA_CRAWL_TO_IDLE_RIGHT = 267,							// Crawl forward > crawl idle, right leg first
 																// TODO: in WAD, link next to 263
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove. 
+	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove. //no dont remove thanks
 	LA_CRAWL_TURN_LEFT = 269,								// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,								// Crawl rotate right (looped)
 	LA_MONKEYSWING_TURN_LEFT = 271,							// Monkey swing rotate left
@@ -961,6 +961,25 @@ typedef struct LARA_ARM
 	short flash_gun;
 };
 
+struct AnimsNew
+{
+	bool CrouchRoll;				//crouch roll
+	bool Monkey180Roll;				//the 180° roll on monkeybars
+	bool Crawl1clickup;				//going 1 click up in crawlspaces
+	bool Crawl1clickdown;			//going 1 click down in crawlspaces
+	bool CrawlExit1click;			//crawlspace exit at 1 click
+	bool CrawlExit2click;			//crawlspace exit at 2 clicks
+	bool CrawlExit3click;			//crawlspace exit at 3 clicks
+	bool CrawlVault1click;			//vault into crawlspace at 1 click
+	bool CrawlVault2click;			//vault into crawlspace at 2 clicks
+	bool CrawlVault3click;			//vault into crawlspace at 3 clicks
+	bool MonkeyVault;				//vault up to monkeybars when pressing up + action underneath them. super annoying :)
+	bool CrawlExitJump;				//TR5 crawlspace exit with jump!
+	bool SwandiveRollRun;			//the transition from swandive roll to run
+	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
+	bool FeetHanging;				//Daniel's super awesome feet hanging
+};
+
 typedef struct LaraInfo
 {
 	short itemNumber;
@@ -989,11 +1008,8 @@ typedef struct LaraInfo
 	short flareFrame;
 	short poisoned;
 	short dpoisoned;
-	short electric; // used for electric value in TR3
-	byte anxiety;
 	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft;
-	bool flareControlRight; // not used
 	bool look;
 	bool burn;
 	bool keepDucked;
@@ -1012,7 +1028,6 @@ typedef struct LaraInfo
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
-	int meshEffects;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
@@ -1047,7 +1062,6 @@ typedef struct LaraInfo
 	byte ropeFlag;
 	byte moveCount;
 	int ropeCount;
-	byte skelebob;
 	byte wetcloth;
 	byte bottle;
 	signed char location;
@@ -1056,12 +1070,12 @@ typedef struct LaraInfo
 	byte tightRopeOnCount;
 	byte tightRopeOff;
 	byte tightRopeFall;
-	byte chaffTimer;
 	/// =================================== NEW:
 	byte BeetleLife;
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
 	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
+	AnimsNew NewAnims;//troye's creative naming
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;

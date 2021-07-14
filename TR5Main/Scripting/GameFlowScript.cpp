@@ -10,6 +10,10 @@
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
 
+#ifndef _DEBUG
+#include <iostream>
+#endif
+
 using std::string;
 using std::vector;
 using std::unordered_map;
