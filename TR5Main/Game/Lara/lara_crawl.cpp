@@ -5,6 +5,7 @@
 #include "lara_slide.h"
 #include "lara_collide.h"
 #include "draw.h"
+#include <Game/Lara/lara_flare.h>
 
 /*this file has all the related functions to ducking and crawling*/
 
@@ -48,7 +49,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		if ((item->animNumber == LA_CROUCH_IDLE
 			|| item->animNumber == LA_STAND_TO_CROUCH_END)
 			&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)
-			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < FLARE_AGE && Lara.flareAge != 0))
 		{
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
@@ -69,7 +70,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 
 		if (!(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
-			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < FLARE_AGE && Lara.flareAge != 0))
 
 		{
 			Lara.torsoYrot = 0;
