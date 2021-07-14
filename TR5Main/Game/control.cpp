@@ -699,6 +699,14 @@ GAME_STATUS DoTitle(int index)
 		InitialiseCamera();
 		SOUND_Stop();
 
+		// Run the level script
+		GameScriptLevel* level = g_GameFlow->Levels[index];
+		std::string err;
+		if (!level->ScriptFileName.empty())
+		{
+			g_GameScript->ExecuteScript(level->ScriptFileName, err);
+			g_GameScript->InitCallbacks();
+		}
 		RequiredStartPos = false;
 		if (InitialiseGame)
 		{

@@ -11,6 +11,9 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "pickup.h"
+#include "newinv2.h"
+#include <iostream>
+#include "InventorySlots.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -21,8 +24,31 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
 	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
 
-	m_lua->set_function("InventoryAdd", &GameScript::InventoryAdd);
-	m_lua->set_function("InventoryRemove", &GameScript::InventoryRemove);
+	m_lua->set_function("GiveInvItem", &GameScript::InventoryAdd);
+	m_lua->set_function("TakeInvItem", &GameScript::InventoryRemove);
+
+	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
+	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
+
+	// Put all the data in InvItem's metatable	
+	m_lua->set("InvItemMeta", sol::as_table(kInventorySlots));
+
+	// Make the metatable's __index refer to itself so that requests
+	// to InvItem will go through to the metatable (and thus the
+	// kInventorySlot members)
+	m_lua->safe_script("InvItemMeta.__index = InvItemMeta");
+
+	// Don't allow InvItem to have new elements put into it
+	m_lua->safe_script("InvItemMeta.__newindex = function() error('InvItem is read-only') end");
+
+	// Protect the metatable
+	m_lua->safe_script("InvItemMeta.__metatable = 'metatable is protected'");
+
+	auto tab = m_lua->create_named_table("InvItem");
+	m_lua->safe_script("setmetatable(InvItem, InvItemMeta)");
+
+	// point InvItemMeta array from the table
+	m_lua->safe_script("InvItemMeta = nil");
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptPosition::Register(m_lua);
@@ -306,24 +332,26 @@ void GameScript::Earthquake(int strength)
 }
 
 // Inventory
-void GameScript::InventoryAdd(int slot, int count)
+void GameScript::InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
 {
-	PickedUpObject(slot, count);
+	PickedUpObject(slot, count.value_or(0));
 }
 
-void GameScript::InventoryRemove(int slot, int count)
+void GameScript::InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
 {
-	RemoveObjectFromInventory(slot, count);
+	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
 }
 
-void GameScript::InventoryGetCount(int slot)
+int GameScript::InventoryGetCount(GAME_OBJECT_ID slot)
 {
-
+	return GetInventoryCount(slot);
 }
 
-void GameScript::InventorySetCount(int slot, int count)
+void GameScript::InventorySetCount(GAME_OBJECT_ID slot, int count)
 {
-
+	// add the amount we'd need to add to get to count
+	int currAmt = GetInventoryCount(slot);
+	InventoryAdd(slot, count - currAmt);
 }
 
 void GameScript::InventoryCombine(int slot1, int slot2)

@@ -1,6 +1,8 @@
 #pragma once
 #define MAX_COLLECTED_PICKUPS 32
 
+enum GAME_OBJECT_ID : short;
+
 typedef struct DISPLAY_PICKUP
 {
 	short life;
@@ -13,7 +15,7 @@ void UpdateHealthBar(int flash);
 void DrawAirBar(float value);
 void UpdateAirBar(int flash);
 void DrawDashBar(int value);
-void AddDisplayPickup(short objectNumber);
+void AddDisplayPickup(GAME_OBJECT_ID objectNumber);
 void DrawAllPickups();
 void InitialisePickupDisplay();
 int FlashIt();
