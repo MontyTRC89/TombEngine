@@ -5,6 +5,7 @@
 #include "lara_slide.h"
 #include "lara_collide.h"
 #include "draw.h"
+#include <Game/Lara/lara_flare.h>
 
 /*this file has all the related functions to ducking and crawling*/
 
@@ -33,8 +34,8 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
 
-	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED-
-//	EnableCrouchRoll = true;
+	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
+	Lara.NewAnims.CrouchRoll = 1;
 
 
 	if ((TrInput & IN_FORWARD || TrInput & IN_BACK)
@@ -48,7 +49,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		if ((item->animNumber == LA_CROUCH_IDLE
 			|| item->animNumber == LA_STAND_TO_CROUCH_END)
 			&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)
-			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < FLARE_AGE && Lara.flareAge != 0))
 		{
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
@@ -61,15 +62,15 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		&& Lara.gunStatus == LG_NO_ARMS
 		&& Lara.waterStatus != LW_WADE
 		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256))
-		//		&& EnableCrouchRoll == true)
+		&& !(Lara.waterSurfaceDist > 256)
+		&& Lara.NewAnims.CrouchRoll)
 	{
 		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor
-			TestWall(item, 1024, 0, -256))			//4 clicks away from walls 
+			TestWall(item, WALL_SIZE / 2, 0, -256))			//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
 			return;
 
 		if (!(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
-			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < FLARE_AGE && Lara.flareAge != 0))
 
 		{
 			Lara.torsoYrot = 0;
@@ -130,7 +131,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 {
 	/*state 72*/
 	/*collision: lara_col_crouch_roll*/
@@ -138,25 +139,42 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
-void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 {
 	/*state 72*/
 	/*state code: lara_as_crouch_roll*/
-	Lara.isDucked = true;
-	item->gravityStatus = false;
+	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	Lara.moveAngle = item->pos.yRot;
+	coll->badPos = 384;
 	coll->facing = item->pos.yRot;
-	coll->badPos = STEPUP_HEIGHT;
-	coll->badNeg = -STEPUP_HEIGHT;
+	coll->badNeg = -384;
 	coll->badCeiling = 0;
-	coll->slopesAreWalls = true;
-	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
+	coll->slopesAreWalls = 1;
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
 
-	ShiftItem(item, coll);
-	if (coll->midFloor != NO_HEIGHT)
-		item->pos.yPos += coll->midFloor;
+	if (LaraFallen(item, coll))
+		Lara.gunStatus = LG_NO_ARMS;
+	else if (!TestLaraSlide(item, coll))
+	{
+		if (coll->midCeiling >= -362)
+			Lara.keepDucked = 1;
+		else
+			Lara.keepDucked = 0;
+
+		if (coll->midFloor < coll->badNeg)//hit a wall, stop
+		{
+			item->pos.xPos = coll->old.x;
+			item->pos.yPos = coll->old.y;
+			item->pos.zPos = coll->old.z;
+			return;
+		}
+
+		ShiftItem(item, coll);
+
+		if (!LaraHitCeiling(item, coll))
+			item->pos.yPos += coll->midFloor;
+	}
 }
 /*crouch/duck end*/
 /*-*/
@@ -172,17 +190,14 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
-//	EnableCrawlFlex1clickdown = true;
-//	EnableCrawlFlex1clickup = true;
-//	EnableCrawlFlex3clickE = true;
-//	EnableCrawlFlex2clickE = true;
-//	EnableCrawlFlex1clickE = true;
+//	Lara.NewAnims.Crawl1clickdown = 1;
+//	Lara.NewAnims.Crawl1clickup = 1;
+//	Lara.NewAnims.CrawlExit1click = 1;
+//	Lara.NewAnims.CrawlExit2click = 1;
+//	Lara.NewAnims.CrawlExit3click = 1;
+	Lara.NewAnims.CrawlExitJump = 1;
 
-
-
-
-
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP && Lara.NewAnims.CrawlExitJump)
 	{
 		GAME_VECTOR s, d;
 		MESH_INFO* StaticMesh;
@@ -228,7 +243,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			d.y = s.y + 160;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex3clickE == true)
+			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit3click)
 			{
 				item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -252,7 +267,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			d.y = s.y + 160;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex2clickE == true)
+			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit2click)
 			{
 				item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -275,7 +290,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			d.y = s.y + 160;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)// && EnableCrawlFlex1clickE == true)
+			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit1click)
 			{
 				item->animNumber = LA_CRAWL_JUMP_DOWN_1CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -292,8 +307,8 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
 			LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512)// &&
-//			EnableCrawlFlex1clickup == true)
+			LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512 &&
+			Lara.NewAnims.Crawl1clickup)
 		{
 			item->animNumber = LA_CRAWL_UP_STEP;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -303,8 +318,8 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
 				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-				LaraCeilingFront(item, item->pos.yRot, 256, -256) <= -512)// &&
-//				EnableCrawlFlex1clickdown == true)
+				LaraCeilingFront(item, item->pos.yRot, 256, -256) <= -512 &&
+				Lara.NewAnims.Crawl1clickdown)
 			{
 				item->animNumber = LA_CRAWL_DOWN_STEP;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -498,7 +513,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*collision: lara_col_crawl*/
-	if (item->hitPoints <= 0 || TrInput & IN_JUMP)
+	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
@@ -839,14 +854,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else
 					{
-					/*	if (TestHangFeet(item, angle))
+						if (TestHangFeet(item, angle))
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG_FEET;
 						}
-						else*/
+						else
 						{
 							item->animNumber = LA_REACH_TO_HANG;
 							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

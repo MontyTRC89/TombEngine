@@ -981,6 +981,24 @@
     <ClInclude Include="Scripting\GameScriptRotation.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\pickup\pickuputil.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup_ammo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup_consumable.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup_key_items.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup_misc_items.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup_weapon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1803,6 +1821,21 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptRotation.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup_consumable.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup_key_items.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup_misc_items.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup_weapon.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup_ammo.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

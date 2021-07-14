@@ -196,12 +196,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_null,//137
 	lara_as_null,//138
 	lara_as_null,//ara_as_hang_feet,//139
-	lara_as_null,//lara_as_hang_feet_shimmyr,//140
-	lara_as_null,//lara_as_hang_feet_shimmyl,//141
-	lara_as_null,//lara_as_hang_feet_inRcorner,//142
-	lara_as_null,//lara_as_hang_feet_inLcorner,//143
-	lara_as_null,//lara_as_hang_feet_outRcorner,//144
-	lara_as_null,//lara_as_hang_feet_outLcorner,//145
+	lara_as_hang_feet_shimmyr,//140
+	lara_as_hang_feet_shimmyl,//141
+	lara_as_hang_feet_inRcorner,//142
+	lara_as_hang_feet_inLcorner,//143
+	lara_as_hang_feet_outRcorner,//144
+	lara_as_hang_feet_outLcorner,//145
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -349,9 +349,9 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_void_func,//lara_col_hang_feet,
-	lara_void_func,//lara_col_hang_feet_shimmyr,
-	lara_void_func,//lara_col_hang_feet_shimmyl,
+	lara_col_hang_feet,
+	lara_col_hang_feet_shimmyr,
+	lara_col_hang_feet_shimmyl,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -789,8 +789,8 @@ void LaraControl(short itemNumber)
 			}
 			if (Lara.air < 0)
 			{
-				if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
-					Lara.anxiety += 4;
+			//	if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
+			//		Lara.anxiety += 4;
 				Lara.air = -1;
 				item->hitPoints -= 5;
 			}
@@ -1138,7 +1138,6 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		Lara.gunStatus = LG_NO_ARMS;
 		LaraInitialiseMeshes();
-		Lara.meshEffects = 0;
 		LaraItem->hitPoints = 1000;
 	}
 }

@@ -15,6 +15,10 @@
 #include <iostream>
 #include "InventorySlots.h"
 
+#ifndef _DEBUG
+#include <iostream>
+#endif
+
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 extern bool const WarningsAsErrors = true;

@@ -230,6 +230,12 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			if (item->pos.zRot < -LARA_LEAN_MAX)
 				item->pos.zRot = -LARA_LEAN_MAX;
 		}
+		else
+		{
+			item->pos.zRot -= LARA_LEAN_RATE;
+			if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)//gives best results
+				item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
+		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -242,6 +248,12 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += LARA_LEAN_RATE;
 			if (item->pos.zRot > LARA_LEAN_MAX)
 				item->pos.zRot = LARA_LEAN_MAX;
+		}
+		else
+		{
+			item->pos.zRot += LARA_LEAN_RATE;
+			if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)//gives best results
+				item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
 		}
 	}
 
@@ -1066,39 +1078,39 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestHangSwingIn(item, angle))
 		{
-			/*			if (TR12_OSCILLATE_HANG == true)
-						{
-							Lara.headYrot = 0;
-							Lara.headXrot = 0;
-							Lara.torsoYrot = 0;
-							Lara.torsoXrot = 0;
-							item->animNumber = LA_REACH_TO_HANG_OSCILLATE;
-							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-							item->currentAnimState = LS_HANG;
-							item->goalAnimState = LS_HANG;
-						}
-						else
-						{	*/
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
-			item->animNumber = LA_REACH_TO_MONKEYSWING;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
-			//			}
+			if (Lara.NewAnims.OscillateHanging)
+			{
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				item->animNumber = LA_REACH_TO_HANG_OSCILLATE;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->currentAnimState = LS_HANG;
+				item->goalAnimState = LS_HANG;
+			}
+			else
+			{
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				item->animNumber = LA_REACH_TO_MONKEYSWING;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->currentAnimState = LS_MONKEYSWING_IDLE;
+				item->goalAnimState = LS_MONKEYSWING_IDLE;
+			}
 		}
 		else
 		{
-		/*	if (TestHangFeet(item, angle))
+			if (TestHangFeet(item, angle))
 			{
 				item->animNumber = LA_REACH_TO_HANG;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = LS_HANG;
 				item->goalAnimState = LS_HANG_FEET;
 			}
-			else*/
+			else
 			{
 				item->animNumber = LA_REACH_TO_HANG;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -1683,14 +1695,14 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						}
 						else
 						{
-						/*	if (TestHangFeet(item, angle))
+							if (TestHangFeet(item, angle))
 							{
 								item->animNumber = LA_REACH_TO_HANG;
 								item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
 								item->currentAnimState = LS_HANG;
 								item->goalAnimState = LS_HANG_FEET;
 							}
-							else*/
+							else
 							{
 								item->animNumber = LA_REACH_TO_HANG;
 								item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
@@ -1840,7 +1852,10 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraFallen(item, coll))
 		return;
 
-	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL)
+	//##LUA debug etc.
+	Lara.NewAnims.SwandiveRollRun = 1;
+
+	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && Lara.NewAnims.SwandiveRollRun)
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
 	}
@@ -1957,8 +1972,14 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -(LARA_LEAN_MAX / 2))
-					item->pos.zRot = -(LARA_LEAN_MAX / 2);
+				if (item->pos.zRot < -LARA_LEAN_MAX / 2)
+					item->pos.zRot = -LARA_LEAN_MAX / 2;
+			}
+			else
+			{
+				item->pos.zRot -= LARA_LEAN_RATE;
+				if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)
+					item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
 			}
 		}
 		else if (TrInput & IN_RIGHT)
@@ -1970,8 +1991,14 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot += LARA_LEAN_RATE;
-				if (item->pos.zRot > (LARA_LEAN_MAX / 2))
-					item->pos.zRot = (LARA_LEAN_MAX / 2);
+				if (item->pos.zRot > LARA_LEAN_MAX / 2)
+					item->pos.zRot = LARA_LEAN_MAX / 2;
+			}
+			else
+			{
+				item->pos.zRot += LARA_LEAN_RATE;
+				if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)
+					item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
 			}
 		}
 
@@ -1994,6 +2021,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				if (item->pos.zRot < -LARA_LEAN_MAX)
 					item->pos.zRot = -LARA_LEAN_MAX;
 			}
+			else
+			{
+				item->pos.zRot -= LARA_LEAN_RATE;
+				if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)
+					item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
+			}
 		}
 		else if (TrInput & IN_RIGHT)
 		{
@@ -2006,6 +2039,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.zRot += LARA_LEAN_RATE;
 				if (item->pos.zRot > LARA_LEAN_MAX)
 					item->pos.zRot = LARA_LEAN_MAX;
+			}
+			else
+			{
+				item->pos.zRot += LARA_LEAN_RATE;
+				if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)
+					item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
 			}
 		}
 

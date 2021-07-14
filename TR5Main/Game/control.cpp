@@ -522,7 +522,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			// Control Lara
 			InItemControlLoop = true;
-			Lara.skelebob = NULL;
+		//	Lara.skelebob = NULL;
 			LaraControl(Lara.itemNumber);
 			InItemControlLoop = false;
 			KillMoveItems();
@@ -1164,9 +1164,9 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 				break;
 			return;
 
-		case TRIGGER_TYPES::SKELETON_T:
-			Lara.skelebob = 2;
-			break;
+	//	case TRIGGER_TYPES::SKELETON_T:	//NO.
+	//		Lara.skelebob = 2;
+	//		break;
 
 		case TRIGGER_TYPES::HEAVY:
 		case TRIGGER_TYPES::DUMMY:
