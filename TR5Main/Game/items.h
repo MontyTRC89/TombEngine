@@ -82,7 +82,7 @@ typedef struct ITEM_INFO
 	short TOSSPAD;
 	PHD_3DPOS startPos;
 	short locationAI;
-	std::string scriptId;
+	std::string luaName;
 };
 
 // used by fx->shade !

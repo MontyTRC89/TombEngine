@@ -71,7 +71,7 @@ struct AI_OBJECT
 	short flags;
 	short yRot;
 	short boxNumber;
-	std::string scriptId;
+	std::string luaName;
 };
 
 struct CHANGE_STRUCT
