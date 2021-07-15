@@ -730,9 +730,19 @@ void ReadRooms()
 		{
 			TRIGGER_VOLUME volume;
 
-			volume.position = Vector3(ReadFloat(), ReadFloat(), ReadFloat());
-			volume.rotation = Quaternion(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
-			volume.scale = Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+			volume.position.x = ReadFloat();
+			volume.position.y = ReadFloat();
+			volume.position.z = ReadFloat();
+
+			volume.rotation.x = ReadFloat();
+			volume.rotation.y = ReadFloat();
+			volume.rotation.z = ReadFloat();
+			volume.rotation.w = ReadFloat();
+
+			volume.scale.x = ReadFloat();
+			volume.scale.y = ReadFloat();
+			volume.scale.z = ReadFloat();
+
 			volume.activators = ReadInt32();
 
 			byte numBytes = ReadInt8();
@@ -755,8 +765,8 @@ void ReadRooms()
 			volume.status = TS_OUTSIDE;
 
 			volume.box = BoundingOrientedBox(
-				(Vector3)(volume.position + Vector3(room.x, room.minfloor, room.z)),
-				(Vector3)(volume.scale / 2.0f),
+				(Vector3)(volume.position + Vector3(room.x, room.y, room.z)),
+				(Vector3)(volume.scale),
 				volume.rotation);
 
 			room.triggerVolumes.push_back(volume);

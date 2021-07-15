@@ -170,6 +170,8 @@ int FramesCount;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
 
+bool g_CollidedVolume = false;
+
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
 #ifndef NEW_INV
@@ -933,37 +935,26 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
 
-	// Test trigger volumes if any
+	// Test trigger volumes if any, for now only for Lara
 	if (heavy == 0)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
 		for (int i = 0; i < room->triggerVolumes.size(); i++)
 		{
 			TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
-			/*ANIM_FRAME* frame = GetBestFrame(LaraItem);
-
-			Vector3 boxMin = Vector3(frame->boundingBox.X1, frame->boundingBox.Y1, frame->boundingBox.Z1);
-			Vector3 boxMax = Vector3(frame->boundingBox.X2, frame->boundingBox.Y2, frame->boundingBox.Z2);
-			Vector3 centre = (boxMin + boxMax) / 2.0f;
-			Vector3 extens = boxMax - centre;
-			BoundingBox laraBox = BoundingBox((Vector3)(centre + Vector3(room->x, room->y, room->z)), extens);*/
-
-			/*BoundingOrientedBox volumeBox = BoundingOrientedBox(
-				(Vector3)(volume->position + Vector3(room->x, room->y, room->z)), 
-				(Vector3)(volume->scale / 2.0f),
-				volume->rotation);*/
-
-			if (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS)
+			
+			ContainmentType type = volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos));
+			if (type == ContainmentType::CONTAINS)
 			{
+				g_CollidedVolume = true;
+
 				// Execute trigger
 				//g_GameScript->ExecuteScript();
 			}
-
-			/*if (volumeBox.Intersects(laraBox))
+			else
 			{
-				// Execute trigger
-				g_GameScript->ExecuteScript();
-			}*/
+				g_CollidedVolume = false;
+			}
 		}
 	}
 

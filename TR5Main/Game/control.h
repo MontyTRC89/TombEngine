@@ -136,6 +136,7 @@ extern int TiltXOffset;
 extern int TiltYOffset;
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
+extern bool g_CollidedVolume;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
