@@ -2696,6 +2696,7 @@ namespace T5M::Renderer
             printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 			printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
             printDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
+            printDebugMessage("CollidedVolume: %d", g_CollidedVolume ? 1 : 0);
 #endif
         }
 
