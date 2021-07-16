@@ -935,25 +935,39 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
 
-	// Test trigger volumes if any, for now only for Lara
-	if (heavy == 0)
+	// Test trigger volumes
+	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
+	for (int i = 0; i < room->triggerVolumes.size(); i++)
 	{
-		ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
-		for (int i = 0; i < room->triggerVolumes.size(); i++)
-		{
-			TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
-			
-			ContainmentType type = volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos));
-			if (type == ContainmentType::CONTAINS)
-			{
-				g_CollidedVolume = true;
+		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
 
-				// Execute trigger
+		if (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS)
+		{
+			g_CollidedVolume = true;
+
+			if (volume->status == TriggerStatus::TS_OUTSIDE)
+			{
+				volume->status = TriggerStatus::TS_ENTERING;
 				//g_GameScript->ExecuteScript();
 			}
 			else
 			{
-				g_CollidedVolume = false;
+				volume->status = TriggerStatus::TS_INSIDE;
+				//g_GameScript->ExecuteScript();
+			}
+		}
+		else
+		{
+			g_CollidedVolume = false;
+
+			if (volume->status == TriggerStatus::TS_INSIDE)
+			{
+				volume->status = TriggerStatus::TS_LEAVING;
+				//g_GameScript->ExecuteScript();
+			}
+			else
+			{
+				volume->status = TriggerStatus::TS_OUTSIDE;
 			}
 		}
 	}
