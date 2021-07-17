@@ -23,6 +23,7 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 	// todo.. see if there's a better default state than -1
 	if (m_num > -1)
 	{
+		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
 	}
 }
@@ -36,12 +37,38 @@ static void index_error(GameScriptItemInfo & item, sol::object key)
 	}
 }
 
+callbackSetName GameScriptItemInfo::s_callbackSetName = [] (std::string const & n, int num) {
+	std::string err = "\"Set Name\" callback is not set.";
+	if (WarningsAsErrors)
+	{
+		throw std::runtime_error(err);
+	}
+	return false;
+};
+
+callbackRemoveName GameScriptItemInfo::s_callbackRemoveName = [] (std::string const & n) {
+	std::string err = "\"Remove Name\" callback is not set.";
+	if (WarningsAsErrors)
+	{
+		throw std::runtime_error(err);
+	}
+	return false;
+};
+
+void GameScriptItemInfo::SetNameCallbacks(callbackSetName cbs, callbackRemoveName cbr)
+{
+	s_callbackSetName = cbs;
+	s_callbackRemoveName = cbr;
+}
+
+
 void GameScriptItemInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
 		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
 		sol::meta_function::index, &index_error,
 		"Init", &GameScriptItemInfo::Init,
+		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
 		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::SetCurrentAnim),
 		"requiredAnim", sol::property(&GameScriptItemInfo::GetRequiredAnim, &GameScriptItemInfo::SetRequiredAnim),
 		"goalAnim", sol::property(&GameScriptItemInfo::GetGoalAnim, &GameScriptItemInfo::SetGoalAnim),
@@ -64,11 +91,11 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
 {
 	short num = CreateItem();	
 	ITEM_INFO * item = &g_Level.Items[num];
-	item->objectNumber = ID_SMALLMEDI_ITEM;
 	return std::make_unique<GameScriptItemInfo>(num);
 }
 
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
+	GAME_OBJECT_ID objID,
 	std::string Name,
 	GameScriptPosition pos,
 	GameScriptRotation rot,
@@ -89,14 +116,13 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	auto ptr = std::make_unique<GameScriptItemInfo>(num);
 
 	ITEM_INFO * item = &g_Level.Items[num];
-	ptr->SetName(Name);
 	ptr->SetPos(pos);
 	ptr->SetRot(rot);
 	ptr->SetRoom(room);
-	//make it a big medipack by default for now	
-	item->objectNumber = ID_BIGMEDI_ITEM;
+	ptr->SetObjectID(objID);
 	InitialiseItem(num);
 
+	ptr->SetName(Name);
 	ptr->SetCurrentAnim(currentAnim);
 	ptr->SetRequiredAnim(requiredAnim);
 	ptr->SetGoalAnim(requiredAnim);
@@ -116,15 +142,37 @@ void GameScriptItemInfo::Init()
 	InitialiseItem(m_num);
 }
 
+GAME_OBJECT_ID GameScriptItemInfo::GetObjectID() const
+{
+	return m_item->objectNumber;
+}
+
+void GameScriptItemInfo::SetObjectID(GAME_OBJECT_ID item) 
+{
+	m_item->objectNumber = item;
+}
+
+
 std::string GameScriptItemInfo::GetName() const
 {
-	return std::string{ "NOT YET IMPLEMENTED" };
+	return m_item->luaName;
 }
 
 void GameScriptItemInfo::SetName(std::string const & id) 
 {
-	//TODO: throw if the string Name isn't unique?
-	// do nothing. this is not yet implemented
+	if (id.empty() && WarningsAsErrors)
+		throw std::runtime_error("Name cannot be blank");
+
+	// remove the old name if we have one
+	s_callbackRemoveName(m_item->luaName);
+
+	// un-register any other objects using this name.
+	// maybe we should throw an error if another object
+	// already uses the name...
+	s_callbackRemoveName(id);
+	m_item->luaName = id;
+	// todo add error checking
+	s_callbackSetName(id, m_num);
 }
 
 GameScriptPosition GameScriptItemInfo::GetPos() const
