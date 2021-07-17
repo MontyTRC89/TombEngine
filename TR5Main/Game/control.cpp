@@ -948,12 +948,12 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (volume->status == TriggerStatus::TS_OUTSIDE)
 			{
 				volume->status = TriggerStatus::TS_ENTERING;
-				//g_GameScript->ExecuteScript();
+				g_GameScript->ExecuteFunction(volume->onEnter);
 			}
 			else
 			{
 				volume->status = TriggerStatus::TS_INSIDE;
-				//g_GameScript->ExecuteScript();
+				g_GameScript->ExecuteFunction(volume->onInside);
 			}
 		}
 		else
@@ -963,7 +963,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (volume->status == TriggerStatus::TS_INSIDE)
 			{
 				volume->status = TriggerStatus::TS_LEAVING;
-				//g_GameScript->ExecuteScript();
+				g_GameScript->ExecuteFunction(volume->onLeave);
 			}
 			else
 			{
