@@ -427,6 +427,18 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 	}
 }
 
+void GameScript::ExecuteFunction(std::string name)
+{
+	/*sol::protected_function func = (*m_lua)[name.c_str()];
+	auto r = func();
+	if (WarningsAsErrors && !r.valid())
+	{
+		sol::error err = r;
+		std::cerr << "An error occurred: " << err.what() << "\n";
+		throw std::runtime_error(err.what());
+	}*/
+}
+
 static void doCallback(sol::protected_function const & func) {
 	auto r = func();
 	if (WarningsAsErrors && !r.valid())
