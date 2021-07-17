@@ -428,6 +428,7 @@ short CreateItem()
 
 	itemNum = NextItemFree;
 	g_Level.Items[NextItemFree].flags = 0;
+	g_Level.Items[NextItemFree].luaName = "";
 	NextItemFree = g_Level.Items[NextItemFree].nextItem;
 
 	return itemNum;
