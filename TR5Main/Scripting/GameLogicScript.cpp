@@ -55,6 +55,16 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->safe_script("InvItemMeta = nil");
 
 	GameScriptItemInfo::Register(m_lua);
+	auto addLuaName = [this](std::string const& str, short num)
+	{
+		return m_itemsMapName.insert(std::pair<std::string, short>(str, num)).second;
+	};
+	auto removeLuaName = [this](std::string const& str)
+	{
+		return m_itemsMapName.erase(str);
+	};
+	GameScriptItemInfo::SetNameCallbacks(addLuaName, removeLuaName);
+
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 
@@ -80,9 +90,14 @@ void GameScript::AddLuaId(int luaId, short itemNumber)
 	m_itemsMapId.insert(std::pair<int, short>(luaId, itemNumber));
 }
 
-void GameScript::AddLuaName(std::string luaName, short itemNumber)
+bool GameScript::RemoveLuaName(std::string const & luaName)
 {
-	m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber));
+	return m_itemsMapName.erase(luaName);
+}
+
+bool GameScript::AddLuaName(std::string const & luaName, short itemNumber)
+{
+	return m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber)).second;
 }
 
 void GameScript::FreeLevelScripts()
@@ -427,16 +442,16 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 	}
 }
 
-void GameScript::ExecuteFunction(std::string name)
+void GameScript::ExecuteFunction(std::string const & name)
 {
-	/*sol::protected_function func = (*m_lua)[name.c_str()];
+	sol::protected_function func = (*m_lua)[name.c_str()];
 	auto r = func();
 	if (WarningsAsErrors && !r.valid())
 	{
 		sol::error err = r;
 		std::cerr << "An error occurred: " << err.what() << "\n";
 		throw std::runtime_error(err.what());
-	}*/
+	}
 }
 
 static void doCallback(sol::protected_function const & func) {
