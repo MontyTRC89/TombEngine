@@ -69,6 +69,7 @@ public:
 
 
 	bool								ExecuteTrigger(short index);
+	void								ExecuteFunction(std::string name);
 	void								MakeItemInvisible(short id);
 	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
 	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string name);
