@@ -64,12 +64,13 @@ public:
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
-	void								AddLuaName(std::string luaName, short itemNumber);
+	bool								AddLuaName(std::string const & luaName, short itemNumber);
+	bool								RemoveLuaName(std::string const& luaName);
 	void								AssignItemsAndLara();
 
 
 	bool								ExecuteTrigger(short index);
-	void								ExecuteFunction(std::string name);
+	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
 	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string name);
