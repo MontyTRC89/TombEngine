@@ -40,8 +40,8 @@ public:
 	room, and object number, and then call InitialiseItem before it will work.
 	@function ItemInfo.new
 	*/
-
 	static std::unique_ptr<GameScriptItemInfo> CreateEmpty();
+
 	/*** For more information on each parameter, see the
 	associated getters and setters. If you do not know what to set for these,
 	most can just be set them to zero (see usage) or use the overload which
