@@ -69,9 +69,9 @@ void GameScriptItemInfo::Register(sol::state* state)
 		sol::meta_function::index, &index_error,
 		"Init", &GameScriptItemInfo::Init,
 		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
-		"currentAnim", sol::property(&GameScriptItemInfo::GetCurrentAnim, &GameScriptItemInfo::SetCurrentAnim),
-		"requiredAnim", sol::property(&GameScriptItemInfo::GetRequiredAnim, &GameScriptItemInfo::SetRequiredAnim),
-		"goalAnim", sol::property(&GameScriptItemInfo::GetGoalAnim, &GameScriptItemInfo::SetGoalAnim),
+		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
+		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
+		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
 		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
 		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
 		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
@@ -100,9 +100,9 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
-	short currentAnim,
-	short requiredAnim,
-	short goalAnim,
+	short currentAnimState,
+	short requiredAnimState,
+	short goalAnimState,
 	short hp,
 	short ocb,
 	sol::as_table_t<std::array<short, 8>> itemFlags,
@@ -123,9 +123,9 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	InitialiseItem(num);
 
 	ptr->SetName(Name);
-	ptr->SetCurrentAnim(currentAnim);
-	ptr->SetRequiredAnim(requiredAnim);
-	ptr->SetGoalAnim(requiredAnim);
+	ptr->SetCurrentAnimState(currentAnimState);
+	ptr->SetRequiredAnimState(requiredAnimState);
+	ptr->SetGoalAnimState(requiredAnimState);
 	ptr->SetHP(hp);
 	ptr->SetOCB(ocb);
 	ptr->SetItemFlags(itemFlags);
@@ -202,17 +202,6 @@ void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 	m_item->pos.yRot = FROM_DEGREES(rot.y);
 	m_item->pos.zRot = FROM_DEGREES(rot.z);
 }
-
-short GameScriptItemInfo::GetGoalAnim() const
-{
-	return m_item->goalAnimState;
-}
-
-void GameScriptItemInfo::SetGoalAnim(short state)
-{
-	m_item->goalAnimState = state;
-}
-
 short GameScriptItemInfo::GetHP() const
 {
 	return(m_item->hitPoints);
@@ -270,24 +259,34 @@ void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> cons
 	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
 }
 
-short GameScriptItemInfo::GetCurrentAnim() const
+short GameScriptItemInfo::GetCurrentAnimState() const
 {
 	return m_item->currentAnimState;
 }
 
-void GameScriptItemInfo::SetCurrentAnim(short anim)
+void GameScriptItemInfo::SetCurrentAnimState(short animState)
 {
-	m_item->currentAnimState = anim;
+	m_item->currentAnimState = animState;
 }
 
-short GameScriptItemInfo::GetRequiredAnim() const
+short GameScriptItemInfo::GetRequiredAnimState() const
 {
 	return m_item->requiredAnimState;
 }
 
-void GameScriptItemInfo::SetRequiredAnim(short anim)
+void GameScriptItemInfo::SetRequiredAnimState(short animState)
 {
-	m_item->requiredAnimState = anim;
+	m_item->requiredAnimState = animState;
+}
+
+short GameScriptItemInfo::GetGoalAnimState() const
+{
+	return m_item->goalAnimState;
+}
+
+void GameScriptItemInfo::SetGoalAnimState(short state)
+{
+	m_item->goalAnimState = state;
 }
 
 short GameScriptItemInfo::GetStatus() const
