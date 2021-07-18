@@ -1,7 +1,7 @@
 #pragma once
 #include "savegame.h"
 
-typedef struct SavegameInfo
+struct SavegameInfo
 {
 	bool present;
 	char levelName[75];

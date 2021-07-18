@@ -2,7 +2,7 @@
 #include "items.h"
 #include "collide.h"
 
-typedef struct QUAD_INFO
+struct QUAD_INFO
 {
 	int velocity;
 	short frontRot;

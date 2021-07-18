@@ -12,7 +12,7 @@
 #include "GameScriptRotation.h"
 #include "GameScriptItemInfo.h"
 
-typedef struct LuaFunction {
+struct LuaFunction {
 	std::string Name;
 	std::string Code;
 	bool Executed;
@@ -34,7 +34,7 @@ public:
 	void								SetVariable(std::string key, sol::object value);
 };
 
-typedef struct LuaVariable
+struct LuaVariable
 {
 	bool IsGlobal;
 	std::string Name;

@@ -2,7 +2,7 @@
 #include "items.h"
 #include "collide.h"
 
-typedef struct PUSHABLE_INFO
+struct PUSHABLE_INFO
 {
 	int height;				// height for collision, also in floor procedure
 	int weight;

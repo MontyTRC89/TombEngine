@@ -6,7 +6,7 @@
 #include "RendererVertex.h"
 #define MAX_DEBRIS 256
 
-typedef struct ILIGHT
+struct ILIGHT
 {
 	short x;
 	short y;
@@ -18,12 +18,12 @@ typedef struct ILIGHT
 	unsigned char pad;
 };
 
-typedef struct ITEM_LIGHT
+struct ITEM_LIGHT
 {
 	ILIGHT light[4];
 };
 
-typedef struct SHATTER_ITEM
+struct SHATTER_ITEM
 {
 	SPHERE sphere;
 	ITEM_LIGHT* il;
@@ -33,19 +33,19 @@ typedef struct SHATTER_ITEM
 	short flags;
 };
 
-typedef struct ShatterImpactInfo
+struct ShatterImpactInfo
 {
 	Vector3 impactDirection;
 	Vector3 impactLocation;
 };
 
-typedef struct DebrisMesh
+struct DebrisMesh
 {
 	BLEND_MODES blendMode;
 	std::array<T5M::Renderer::RendererVertex, 3> vertices;
 };
 
-typedef struct DebrisFragment
+struct DebrisFragment
 {
 	DebrisMesh mesh;
 	Quaternion rotation;
@@ -63,7 +63,7 @@ typedef struct DebrisFragment
 	bool active;
 };
 
-typedef struct DEBRIS_STRUCT
+struct DEBRIS_STRUCT
 {
 	void* textInfo;
 	int x;

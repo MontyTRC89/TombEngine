@@ -18,7 +18,7 @@
 #include "prng.h"
 using std::vector;
 using namespace T5M::Math::Random;
-typedef enum QUAD_EFFECTS_POSITIONS {
+enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
 	BACKLEFT_TYRE,
@@ -27,12 +27,12 @@ typedef enum QUAD_EFFECTS_POSITIONS {
 	FRONTLEFT_TYRE
 };
 
-typedef enum QUAD_FLAGS {
+enum QUAD_FLAGS {
 	QUAD_FLAGS_DEAD = 0x80,
 	QUAD_FLAGS_IS_FALLING = 0x40
 };
 
-typedef enum QUAD_ANIM_STATES {
+enum QUAD_ANIM_STATES {
 	QUAD_STATE_DRIVE = 1,
 	QUAD_STATE_TURNL = 2,
 	QUAD_STATE_SLOW = 5,

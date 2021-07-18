@@ -435,7 +435,7 @@ enum inv_modes
 	IM_DIARY
 };
 
-typedef struct titleSettings
+struct titleSettings
 {
 	bool waitingForkey;//waiting for a key to be pressed when configuring controls
 	int videoMode;

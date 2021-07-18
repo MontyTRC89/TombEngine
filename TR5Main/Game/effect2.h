@@ -56,7 +56,7 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
-typedef struct SPLASH_SETUP
+struct SPLASH_SETUP
 {
 	float x;
 	float y;
@@ -66,7 +66,7 @@ typedef struct SPLASH_SETUP
 	int room;
 };
 
-typedef struct RIPPLE_STRUCT
+struct RIPPLE_STRUCT
 {
 	Vector4 currentColor;
 	Vector4 initialColor;
@@ -82,7 +82,7 @@ typedef struct RIPPLE_STRUCT
 	bool isBillboard; //used for Blood
 };
 
-typedef struct SPARKS
+struct SPARKS
 {
 	int x;
 	int y;
@@ -123,7 +123,7 @@ typedef struct SPARKS
 	unsigned char nodeNumber;
 };
 
-typedef struct SPLASH_STRUCT
+struct SPLASH_STRUCT
 {
 	float x;
 	float y;
@@ -144,7 +144,7 @@ typedef struct SPLASH_STRUCT
 	bool isActive;
 };
 
-typedef struct DYNAMIC
+struct DYNAMIC
 {
 	int x;
 	int y;
@@ -159,7 +159,7 @@ typedef struct DYNAMIC
 	int FalloffScale;
 };
 
-typedef struct SP_DYNAMIC
+struct SP_DYNAMIC
 {
 	byte On;
 	byte Falloff;

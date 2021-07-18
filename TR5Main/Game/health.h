@@ -3,7 +3,7 @@
 
 enum GAME_OBJECT_ID : short;
 
-typedef struct DISPLAY_PICKUP
+struct DISPLAY_PICKUP
 {
 	short life;
 	short objectNumber;

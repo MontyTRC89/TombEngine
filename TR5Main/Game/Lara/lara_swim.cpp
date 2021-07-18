@@ -15,7 +15,7 @@
 #include "sound.h"
 #include "GameFlowScript.h"
 
-typedef struct SUBSUIT_INFO
+struct SUBSUIT_INFO
 {
 	short XRot;
 	short dXRot;

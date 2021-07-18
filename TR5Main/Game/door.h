@@ -3,14 +3,14 @@
 #include "collide.h"
 #include "room.h"
 
-typedef struct DOORPOS_DATA
+struct DOORPOS_DATA
 {
 	FLOOR_INFO* floor;
 	FLOOR_INFO data;
 	short block;
 };
 
-typedef struct DOOR_DATA
+struct DOOR_DATA
 {
 	DOORPOS_DATA d1;
 	DOORPOS_DATA d1flip;
