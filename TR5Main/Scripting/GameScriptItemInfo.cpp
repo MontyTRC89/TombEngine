@@ -72,6 +72,8 @@ void GameScriptItemInfo::Register(sol::state* state)
 		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
 		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
 		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
+		"animNumber", sol::property(&GameScriptItemInfo::GetAnimNumber, &GameScriptItemInfo::SetAnimNumber),
+		"frameNumber", sol::property(&GameScriptItemInfo::GetFrameNumber, &GameScriptItemInfo::SetFrameNumber),
 		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
 		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
 		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
@@ -96,13 +98,15 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
 
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	GAME_OBJECT_ID objID,
-	std::string Name,
+	std::string name,
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
 	short currentAnimState,
 	short requiredAnimState,
 	short goalAnimState,
+	short animNumber,
+	short frameNumber,
 	short hp,
 	short ocb,
 	sol::as_table_t<std::array<short, 8>> itemFlags,
@@ -122,10 +126,12 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	ptr->SetObjectID(objID);
 	InitialiseItem(num);
 
-	ptr->SetName(Name);
+	ptr->SetName(name);
 	ptr->SetCurrentAnimState(currentAnimState);
 	ptr->SetRequiredAnimState(requiredAnimState);
-	ptr->SetGoalAnimState(requiredAnimState);
+	ptr->SetGoalAnimState(goalAnimState);
+	ptr->SetAnimNumber(animNumber);
+	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
 	ptr->SetOCB(ocb);
 	ptr->SetItemFlags(itemFlags);
@@ -288,6 +294,27 @@ void GameScriptItemInfo::SetGoalAnimState(short state)
 {
 	m_item->goalAnimState = state;
 }
+
+short GameScriptItemInfo::GetAnimNumber() const
+{
+	return m_item->animNumber;
+}
+
+void GameScriptItemInfo::SetAnimNumber(short animNumber)
+{
+	m_item->animNumber = animNumber;
+}
+
+short GameScriptItemInfo::GetFrameNumber() const
+{
+	return m_item->frameNumber;
+}
+
+void GameScriptItemInfo::SetFrameNumber(short frameNumber)
+{
+	m_item->frameNumber = frameNumber;
+}
+
 
 short GameScriptItemInfo::GetStatus() const
 {
