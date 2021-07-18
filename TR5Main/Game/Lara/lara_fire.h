@@ -1,14 +1,14 @@
 #pragma once
 #include "lara.h"
 
-typedef enum FireWeaponType
+enum FireWeaponType
 {
 	FW_MISS = -1,
 	FW_NOAMMO = 0,
 	FW_MAYBEHIT = 1
 };
 
-typedef struct WEAPON_INFO
+struct WEAPON_INFO
 {
 	short lockAngles[4];
 	short leftAngles[4];

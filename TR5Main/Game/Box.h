@@ -3,7 +3,7 @@
 #include "items.h"
 #include "level.h"
 
-typedef enum MOOD_TYPE
+enum MOOD_TYPE
 {
 	BORED_MOOD,
 	ATTACK_MOOD,
@@ -11,14 +11,14 @@ typedef enum MOOD_TYPE
 	STALK_MOOD
 };
 
-typedef enum TARGET_TYPE
+enum TARGET_TYPE
 {
 	NO_TARGET,
 	PRIME_TARGET,
 	SECONDARY_TARGET
 };
 
-typedef enum ZoneType
+enum ZoneType
 {
 	ZONE_NULL = -1,  // default zone
 	ZONE_SKELLY = 0,
@@ -38,7 +38,7 @@ typedef enum ZoneType
 	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
-typedef struct OBJECT_Bones
+struct OBJECT_Bones
 {
 	short bone0;
 	short bone1;

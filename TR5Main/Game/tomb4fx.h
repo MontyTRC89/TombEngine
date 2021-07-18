@@ -2,7 +2,7 @@
 #include "phd_global.h"
 #include "items.h"
 
-typedef struct ENERGY_ARC
+struct ENERGY_ARC
 {
 	PHD_VECTOR pos1;
 	PHD_VECTOR pos2;
@@ -26,7 +26,7 @@ typedef struct ENERGY_ARC
 	int sLife;
 };
 
-typedef struct SMOKE_SPARKS
+struct SMOKE_SPARKS
 {
 	int x;
 	int y;
@@ -59,13 +59,13 @@ typedef struct SMOKE_SPARKS
 	byte mirror;
 };
 
-typedef struct GUNFLASH_STRUCT
+struct GUNFLASH_STRUCT
 {
 	MATRIX3D matrix;
 	short on;
 };
 
-typedef struct SHOCKWAVE_STRUCT
+struct SHOCKWAVE_STRUCT
 {
 	int x;
 	int y;
@@ -82,7 +82,7 @@ typedef struct SHOCKWAVE_STRUCT
 	short temp;
 };
 
-typedef struct GUNSHELL_STRUCT
+struct GUNSHELL_STRUCT
 {
 	PHD_3DPOS pos;
 	short fallspeed;
@@ -93,7 +93,7 @@ typedef struct GUNSHELL_STRUCT
 	short objectNumber;
 };
 
-typedef struct DRIP_STRUCT
+struct DRIP_STRUCT
 {
 	int x;
 	int y;
@@ -110,7 +110,7 @@ typedef struct DRIP_STRUCT
 	byte pad;
 };
 
-typedef struct FIRE_LIST
+struct FIRE_LIST
 {
 	int x;
 	int y;
@@ -120,7 +120,7 @@ typedef struct FIRE_LIST
 	short roomNumber;
 };
 
-typedef struct FIRE_SPARKS
+struct FIRE_SPARKS
 {
 	short x;
 	short y;
@@ -155,7 +155,7 @@ typedef struct FIRE_SPARKS
 	unsigned char life;
 };
 
-typedef struct BLOOD_STRUCT
+struct BLOOD_STRUCT
 {
 	int x;
 	int y;

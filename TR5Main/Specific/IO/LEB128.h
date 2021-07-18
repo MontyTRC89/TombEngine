@@ -7,7 +7,7 @@
 
 extern char* LevelDataPtr;
 
-typedef struct LEB128
+struct LEB128
 {
 	static const uint64_t MaximumSize1Byte = 63L;
 	static const uint64_t MaximumSize2Byte = 8191L;

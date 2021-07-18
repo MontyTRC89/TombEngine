@@ -9,7 +9,7 @@
 
 #define SAVEGAME_BUFFER_SIZE 1048576
 
-typedef struct STATS
+struct STATS
 {
 	unsigned int Timer;
 	unsigned int Distance;
@@ -20,7 +20,7 @@ typedef struct STATS
 	unsigned char HealthUsed;
 };
 
-typedef struct SAVEGAME_INFO
+struct SAVEGAME_INFO
 {
 	short Checksum;
 	unsigned short VolumeCD;
@@ -45,7 +45,7 @@ typedef struct SAVEGAME_INFO
 	unsigned char TLCount;
 };
 
-typedef struct SaveGameHeader
+struct SaveGameHeader
 {
 	std::string LevelName;
 	int Days;

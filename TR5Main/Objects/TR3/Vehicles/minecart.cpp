@@ -14,7 +14,7 @@
 #include "input.h"
 #include "sound.h"
 using std::vector;
-typedef enum MINECART_STATE {
+enum MINECART_STATE {
 	CART_GETIN,
 	CART_GETOUT,
 	CART_GETOUTL,
@@ -37,7 +37,7 @@ typedef enum MINECART_STATE {
 	CART_BRAKING
 };
 
-typedef enum MINECART_FLAGS
+enum MINECART_FLAGS
 {
 	CF_MESH = 1,
 	CF_TURNINGL = 2,

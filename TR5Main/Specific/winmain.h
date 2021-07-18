@@ -7,7 +7,7 @@
     "publicKeyToken='6595b64144ccf1df' " \
     "language='*'\"")
 
-typedef struct WINAPP
+struct WINAPP
 {
     HINSTANCE hInstance;
     int nFillMode;

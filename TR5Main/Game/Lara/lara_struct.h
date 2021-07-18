@@ -729,7 +729,7 @@ enum LARA_ANIM
 };
 #pragma endregion
 
-typedef enum LARA_WATER_STATUS
+enum LARA_WATER_STATUS
 {
 	LW_ABOVE_WATER,
 	LW_UNDERWATER,
@@ -738,7 +738,7 @@ typedef enum LARA_WATER_STATUS
 	LW_WADE
 };
 
-typedef enum LARA_GUN_STATUS
+enum LARA_GUN_STATUS
 {
 	LG_NO_ARMS,
 	LG_HANDS_BUSY,
@@ -748,7 +748,7 @@ typedef enum LARA_GUN_STATUS
 	LG_SPECIAL
 };
 
-typedef enum WeaponAmmoType
+enum WeaponAmmoType
 {
 	WEAPON_AMMO1,
 	WEAPON_AMMO2,
@@ -756,7 +756,7 @@ typedef enum WeaponAmmoType
 	MAX_AMMOTYPE
 };
 
-typedef enum LARA_MESHES
+enum LARA_MESHES
 {
 	LM_HIPS,
 	LM_LTHIGH,
@@ -794,7 +794,7 @@ enum LARA_WEAPON_TYPE
 	NUM_WEAPONS
 };
 
-typedef enum LARA_WEAPON_TYPE_CARRIED
+enum LARA_WEAPON_TYPE_CARRIED
 {
 	WTYPE_MISSING = 0x0,
 	WTYPE_PRESENT = 0x1,
@@ -807,12 +807,13 @@ typedef enum LARA_WEAPON_TYPE_CARRIED
 };
 
 
-typedef enum LARA_CLOTH_TYPES
+enum LARA_CLOTH_TYPES
 {
 	CLOTH_MISSING,
 	CLOTH_DRY,
 	CLOTH_WET
 };
+
 enum class HOLSTER_SLOT : int {
 	Empty = ID_LARA_HOLSTERS,
 	Pistols = ID_LARA_HOLSTERS_PISTOLS,
@@ -918,7 +919,7 @@ public:
 		isInfinite = infinite;
 	}
 };
-typedef struct CarriedWeaponInfo
+struct CarriedWeaponInfo
 {
 	bool Present;
 	Ammo Ammo[MAX_AMMOTYPE];
@@ -930,18 +931,18 @@ typedef struct CarriedWeaponInfo
 #define MaxDiaryPages	64
 #define MaxStringsPerPage	8
 
-typedef struct DiaryString
+struct DiaryString
 {
 	int x, y;
 	short stringID;
 };
 
-typedef struct DiaryPage
+struct DiaryPage
 {
 	DiaryString	Strings[MaxStringsPerPage];
 };
 
-typedef struct DiaryInfo
+struct DiaryInfo
 {
 	bool Present;
 	short numPages;
@@ -949,7 +950,7 @@ typedef struct DiaryInfo
 	DiaryPage	Pages[MaxDiaryPages];
 };
 
-typedef struct LARA_ARM
+struct LARA_ARM
 {
 	int frameBase;
 	short frameNumber;
@@ -980,7 +981,7 @@ struct AnimsNew
 	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
 
-typedef struct LaraInfo
+struct LaraInfo
 {
 	short itemNumber;
 	LARA_GUN_STATUS gunStatus; // LG_enum

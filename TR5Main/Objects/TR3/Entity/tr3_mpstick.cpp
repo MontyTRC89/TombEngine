@@ -13,7 +13,7 @@
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
 
-typedef enum MPSTICK_STATES {
+enum MPSTICK_STATES {
 	BATON_EMPTY,
 	BATON_STOP,
 	BATON_WALK, 

@@ -49,7 +49,7 @@
 #define REGKEY_SOUND_DEVICE		"SoundDevice"
 #define REGKEY_SHADOW_MAP       "ShadowMap"
 
-typedef struct GameConfiguration {
+struct GameConfiguration {
 	int Width;
 	int Height;
 	int RefreshRate;

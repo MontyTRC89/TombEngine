@@ -1017,7 +1017,7 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 	return GAME_OBJECT_ID{ rhs };
 }
 
-typedef enum SPRITE_TYPES
+enum SPRITE_TYPES
 {
 	SPR_FIRE0,
 	SPR_FIRE1,
@@ -1050,7 +1050,7 @@ typedef enum SPRITE_TYPES
 	SPR_LIGHTHING
 };
 
-typedef enum FLOOR_TYPES
+enum FLOOR_TYPES
 {
 	FLOOR_TYPE,
 	DOOR_TYPE,
@@ -1076,7 +1076,7 @@ typedef enum FLOOR_TYPES
 	MINER_TYPE
 };
 
-typedef enum TRIGGER_TYPES
+enum TRIGGER_TYPES
 {
 	TRIGGER,
 	PAD,
@@ -1097,7 +1097,7 @@ typedef enum TRIGGER_TYPES
 	CLIMB_T,
 };
 
-typedef enum TRIGOBJECTS_TYPES
+enum TRIGOBJECTS_TYPES
 {
 	TO_OBJECT,
 	TO_CAMERA,
@@ -1115,7 +1115,7 @@ typedef enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE
 };
 
-typedef enum FLOORDATA_MASKS
+enum FLOORDATA_MASKS
 {
 	FD_MASK_FUNCTION = 0x1F,
 	FD_MASK_SUBFUNCTION = 0x7F00,
