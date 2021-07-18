@@ -36,7 +36,7 @@ public:
 	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
 
 	static void Register(sol::state *);
-	/*** If you create items with this you need to give a position, rotation,
+	/*** If you create items with this you NEED to give a position, rotation,
 	room, and object number, and then call InitialiseItem before it will work.
 	@function ItemInfo.new
 	*/
@@ -52,9 +52,11 @@ public:
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
 	@tparam int room room ID item is in
-	@tparam int currentAnimState current animationState
-	@tparam int requiredAnimState required animationState
-	@tparam int goalAnimState goal animationState
+	@tparam int currentAnimState current animation state
+	@tparam int requiredAnimState required animation state
+	@tparam int goalAnimState goal animation state
+	@tparam int animNumber anim number
+	@tparam int frameNumber frame number
 	@tparam int hp HP of item
 	@tparam int OCB ocb of item
 	@tparam int itemFlags item flags 
@@ -73,6 +75,8 @@ public:
 		0, -- currentAnimState
 		0, -- requiredAnimState
 		0, -- goalAnimState
+		0, -- animNumber
+		0, -- frameNumber
 		0, -- HP
 		0, -- OCB
 		{0,0,0,0,0,0,0,0}, -- itemFlags
@@ -91,6 +95,8 @@ public:
 		short aCurrentAnimState,
 		short aRequiredAnimState,
 		short goalAnimState,
+		short animNumber,
+		short frameNumber,
 		short aHp,
 		short aOcb,
 		sol::as_table_t<std::array<short, 8>> aFlags,
@@ -127,6 +133,16 @@ public:
 //@todo what does this actually mean/should we expose it to the user?
 	short GetCurrentAnimState() const;
 	void SetCurrentAnimState(short animState);
+
+/// (int) animation number
+//@mem animNumber
+	short GetAnimNumber() const;
+	void SetAnimNumber(short animNumber);
+
+/// (int) frame number
+//@mem frameNumber
+	short GetFrameNumber() const;
+	void SetFrameNumber(short frameNumber);
 
 /// (int) State of required animation
 //@mem requiredAnimState
