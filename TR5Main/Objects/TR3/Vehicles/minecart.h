@@ -2,7 +2,7 @@
 #include "items.h"
 #include "collide.h"
 
-typedef struct CART_INFO
+struct CART_INFO
 {
 	int Speed;
 	int MidPos;

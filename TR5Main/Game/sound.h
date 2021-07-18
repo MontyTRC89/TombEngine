@@ -10,7 +10,7 @@ enum SFX_TYPES
 	SFX_WATERONLY = (2 << 14)
 };
 
-typedef enum audio_tracks
+enum audio_tracks
 {
 	CDA_XA1_TL_10B, // TO CLIMB OUT, SWIM TO THE EDGE AND PRESS 'ACTION'.
 	CDA_XA1_Z10,
@@ -151,7 +151,7 @@ typedef enum audio_tracks
 	CDA_XA18_TITLE_MENU
 };
 
-typedef enum sound_effects
+enum sound_effects
 {
 	SFX_TR4_LARA_FEET = 0,
 	SFX_TR4_LARA_CLIMB2 = 1,
@@ -2065,7 +2065,7 @@ typedef enum sound_effects
 #define TRACK_FOUND_SECRET			"073_Secret"
 #define TRACKS_PREFIX				"Audio\\%s.%s"
 
-typedef struct SoundEffectSlot
+struct SoundEffectSlot
 {
 	short state;
 	short effectID;
@@ -2074,13 +2074,13 @@ typedef struct SoundEffectSlot
 	Vector3 origin;
 };
 
-typedef struct SoundTrackSlot
+struct SoundTrackSlot
 {
 	HSTREAM channel;
 	std::string track;
 };
 
-typedef enum sound_track_types
+enum sound_track_types
 {
 	SOUND_TRACK_ONESHOT,
 	SOUND_TRACK_BGM,
@@ -2088,7 +2088,7 @@ typedef enum sound_track_types
 	NUM_SOUND_TRACK_TYPES
 };
 
-typedef enum sound_filters
+enum sound_filters
 {
 	SOUND_FILTER_REVERB,
 	SOUND_FILTER_COMPRESSOR,
@@ -2097,14 +2097,14 @@ typedef enum sound_filters
 	NUM_SOUND_FILTERS
 };
 
-typedef enum sound_states
+enum sound_states
 {
 	SOUND_STATE_IDLE,
 	SOUND_STATE_ENDING,
 	SOUND_STATE_ENDED
 };
 
-typedef enum sound_flags
+enum sound_flags
 { 
 	SOUND_NORMAL, 
 	SOUND_WAIT, 
@@ -2112,7 +2112,7 @@ typedef enum sound_flags
 	SOUND_LOOPED 
 };
 
-typedef enum reverb_type
+enum reverb_type
 {
 	RVB_OUTSIDE,	   // 0x00   no reverberation
 	RVB_SMALL_ROOM,	   // 0x01   little reverberation
@@ -2123,7 +2123,7 @@ typedef enum reverb_type
 	NUM_REVERB_TYPES
 };
 
-typedef struct SAMPLE_INFO
+struct SAMPLE_INFO
 {
 	short number;
 	byte volume;
@@ -2133,7 +2133,7 @@ typedef struct SAMPLE_INFO
 	short flags;
 };
 
-typedef struct AudioTrack
+struct AudioTrack
 {
 	std::string Name;
 	byte Mask;

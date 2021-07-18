@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct PHD_VECTOR
+struct PHD_VECTOR
 {
 	int x;
 	int y;
@@ -21,7 +21,7 @@ typedef struct PHD_VECTOR
 	}
 };
 
-typedef struct PHD_3DPOS
+struct PHD_3DPOS
 {
 	int xPos;
 	int yPos;
@@ -71,7 +71,7 @@ typedef struct PHD_3DPOS
 	}
 };
 
-typedef struct GAME_VECTOR
+struct GAME_VECTOR
 {
 	int x;
 	int y;
@@ -116,7 +116,7 @@ typedef struct GAME_VECTOR
 	}
 };
 
-typedef struct LEVEL_CAMERA_INFO
+struct LEVEL_CAMERA_INFO
 {
 	int x;
 	int y;
@@ -172,7 +172,7 @@ typedef struct LEVEL_CAMERA_INFO
 	}
 };
 
-typedef struct SINK_INFO
+struct SINK_INFO
 {
 	int x;
 	int y;
@@ -218,7 +218,7 @@ typedef struct SINK_INFO
 	}
 };
 
-typedef struct SOUND_SOURCE_INFO
+struct SOUND_SOURCE_INFO
 {
 	int x;
 	int y;
@@ -264,7 +264,7 @@ typedef struct SOUND_SOURCE_INFO
 	}
 };
 
-typedef struct VECTOR
+struct VECTOR
 {
 	int vx;
 	int vy;
@@ -272,7 +272,7 @@ typedef struct VECTOR
 	int pad;
 };
 
-typedef struct SVECTOR
+struct SVECTOR
 {
 	short vx;
 	short vy;
@@ -280,7 +280,7 @@ typedef struct SVECTOR
 	short pad;
 };
 
-typedef struct CVECTOR
+struct CVECTOR
 {
 	byte r;
 	byte g;
@@ -288,21 +288,21 @@ typedef struct CVECTOR
 	byte cd;
 };
 
-typedef struct TR_VERTEX
+struct TR_VERTEX
 {
 	int x;
 	int y;
 	int z;
 };
 
-typedef enum MATRIX_ARRAY_VALUE
+enum MATRIX_ARRAY_VALUE
 {
 	M00, M01, M02, M03,
 	M10, M11, M12, M13,
 	M20, M21, M22, M23
 };
 
-typedef struct MATRIX3D
+struct MATRIX3D
 {
 	short m00;
 	short m01;

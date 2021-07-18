@@ -18,13 +18,13 @@ struct SAMPLE_INFO;
 struct BOX_INFO;
 struct OVERLAP;
 
-typedef struct OBJECT_TEXTURE_VERT
+struct OBJECT_TEXTURE_VERT
 {
 	float x;
 	float y;
 };
 
-typedef struct OBJECT_TEXTURE
+struct OBJECT_TEXTURE
 {
 	int attribute;
 	int tileAndFlag;

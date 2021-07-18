@@ -7,7 +7,7 @@ struct QUAKE_CAMERA
 	GAME_VECTOR epos;
 };
 
-typedef struct SPOTCAM
+struct SPOTCAM
 {
 	int x;
 	int y;

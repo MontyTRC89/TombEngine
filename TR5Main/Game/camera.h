@@ -3,7 +3,7 @@
 #include "items.h"
 #include <Specific\setup.h>
 
-typedef enum CAMERA_TYPE
+enum CAMERA_TYPE
 {
 	CHASE_CAMERA,
 	FIXED_CAMERA,
@@ -13,7 +13,7 @@ typedef enum CAMERA_TYPE
 	HEAVY_CAMERA
 };
 
-typedef struct CAMERA_INFO
+struct CAMERA_INFO
 {
 	GAME_VECTOR pos; // size=16, offset=0
 	GAME_VECTOR target; // size=16, offset=16

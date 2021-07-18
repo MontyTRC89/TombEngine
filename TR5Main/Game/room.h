@@ -22,7 +22,7 @@ struct ROOM_DOOR
 	Vector3 vertices[4];
 };
 
-typedef struct ROOM_LIGHT
+struct ROOM_LIGHT
 {
 	int x, y, z;       // Position of light, in world coordinates
 	float r, g, b;       // Colour of the light
@@ -36,7 +36,7 @@ typedef struct ROOM_LIGHT
 	bool castShadows;
 };
 
-typedef struct MESH_INFO
+struct MESH_INFO
 {
 	int x;
 	int y;
@@ -49,7 +49,7 @@ typedef struct MESH_INFO
 	std::string luaName;
 };
 
-typedef struct LIGHTINFO
+struct LIGHTINFO
 {
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4

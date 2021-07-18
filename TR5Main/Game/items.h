@@ -3,7 +3,7 @@
 
 enum GAME_OBJECT_ID : short;
 
-typedef enum AIObjectType
+enum AIObjectType
 {
 	NO_AI = 0x0000,
 	GUARD = 0x0001,
@@ -15,7 +15,7 @@ typedef enum AIObjectType
 	ALL_AIOBJ = (GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2)
 };
 
-typedef enum ItemStatus
+enum ItemStatus
 {
 	ITEM_NOT_ACTIVE = 0,
 	ITEM_ACTIVE = 1,
@@ -23,7 +23,7 @@ typedef enum ItemStatus
 	ITEM_INVISIBLE = 3
 };
 
-typedef enum ItemFlags
+enum ItemFlags
 {
 	IFLAG_CLEAR_BODY = (1 << 7), // 0x0080
 	IFLAG_INVISIBLE = (1 << 8),  // 0x0100
@@ -38,7 +38,7 @@ struct ROOM_VECTOR
 	int yNumber;
 };
 
-typedef struct ITEM_INFO
+struct ITEM_INFO
 {
 	int floor;
 	DWORD touchBits;

@@ -3,7 +3,7 @@
 #include "LEB128.h"
 #include "ChunkId.h"
 
-typedef struct ChunkWritingState
+struct ChunkWritingState
 {
 private:
 	BaseStream* m_stream;
