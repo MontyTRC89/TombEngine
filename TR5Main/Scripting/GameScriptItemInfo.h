@@ -52,9 +52,9 @@ public:
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
 	@tparam int room room ID item is in
-	@tparam int currentAnim current animation
-	@tparam int requiredAnim required animation
-	@tparam int goalAnim goal animation
+	@tparam int currentAnimState current animationState
+	@tparam int requiredAnimState required animationState
+	@tparam int goalAnimState goal animationState
 	@tparam int hp HP of item
 	@tparam int OCB ocb of item
 	@tparam int itemFlags item flags 
@@ -70,9 +70,9 @@ public:
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
 		0, -- room
-		0, -- currentAnim
-		0, -- requiredAnim
-		0, -- goalAnim
+		0, -- currentAnimState
+		0, -- requiredAnimState
+		0, -- goalAnimState
 		0, -- HP
 		0, -- OCB
 		{0,0,0,0,0,0,0,0}, -- itemFlags
@@ -88,9 +88,9 @@ public:
 		GameScriptPosition pos,
 		GameScriptRotation aRot,
 		short room,
-		short aCurrentAnim,
-		short aRequiredAnim,
-		short goalAnim,
+		short aCurrentAnimState,
+		short aRequiredAnimState,
+		short goalAnimState,
 		short aHp,
 		short aOcb,
 		sol::as_table_t<std::array<short, 8>> aFlags,
@@ -122,23 +122,23 @@ public:
 	GameScriptRotation GetRot() const;
 	void SetRot(GameScriptRotation const& rot);
 
-/// (int) ID of current animation
-//@mem currentAnim
+/// (int) State of current animation
+//@mem currentAnimState
 //@todo what does this actually mean/should we expose it to the user?
-	short GetCurrentAnim() const;
-	void SetCurrentAnim(short anim);
+	short GetCurrentAnimState() const;
+	void SetCurrentAnimState(short animState);
 
-/// (int) ID of required animation
-//@mem requiredAnim
+/// (int) State of required animation
+//@mem requiredAnimState
 //@todo what does this actually mean/should we expose it to the user?
-	short GetRequiredAnim() const;
-	void SetRequiredAnim(short anim);
+	short GetRequiredAnimState() const;
+	void SetRequiredAnimState(short animState);
 
-/// (int) ID of goal animation
-//@mem goalAnim
+/// (int) State of goal animation
+//@mem goalAnimState
 //@todo what does this actually mean/should we expose it to the user?
-	short GetGoalAnim() const;
-	void SetGoalAnim(short state);
+	short GetGoalAnimState() const;
+	void SetGoalAnimState(short animState);
 
 /// (int) HP (hit points/health points) of object 
 //@raise an exception if the object is intelligent and an invalid
