@@ -21,7 +21,7 @@ GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : m_
 // todo.. how to check if item is killed outside of script?
 GameScriptItemInfo::~GameScriptItemInfo() {
 	// todo.. see if there's a better default state than -1
-	if (m_num > -1)
+	if (m_num > NO_ITEM)
 	{
 		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
@@ -208,6 +208,7 @@ void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 	m_item->pos.yRot = FROM_DEGREES(rot.y);
 	m_item->pos.zRot = FROM_DEGREES(rot.z);
 }
+
 short GameScriptItemInfo::GetHP() const
 {
 	return(m_item->hitPoints);
@@ -360,7 +361,7 @@ void GameScriptItemInfo::SetRoom(short room)
 		return;
 	}
 
-	m_item->roomNumber = room;
+	ItemNewRoom(m_num, room);
 }
 
 
