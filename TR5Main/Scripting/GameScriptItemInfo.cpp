@@ -8,6 +8,7 @@
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
 #include "trmath.h"
+#include "lara.h"
 
 extern bool const WarningsAsErrors;
 
@@ -16,7 +17,11 @@ constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
 GameScriptItemInfo::GameScriptItemInfo(short num) : m_item{ &g_Level.Items[num]}, m_num { num }
 {};
 
-GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : m_item { std::exchange(other.m_item, nullptr) }, m_num{ std::exchange(other.m_num, -1) } {};
+GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : 
+	m_item { std::exchange(other.m_item, nullptr) },
+	m_num{ std::exchange(other.m_num, NO_ITEM) },
+	m_initialised{ std::exchange(other.m_initialised, false) }
+{};
 
 // todo.. how to check if item is killed outside of script?
 GameScriptItemInfo::~GameScriptItemInfo() {
@@ -68,6 +73,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
 		sol::meta_function::index, &index_error,
 		"Init", &GameScriptItemInfo::Init,
+		"GetLara", &GameScriptItemInfo::GetLara,
 		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
 		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
 		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
@@ -87,6 +93,11 @@ void GameScriptItemInfo::Register(sol::state* state)
 		"name", sol::property(&GameScriptItemInfo::GetName, &GameScriptItemInfo::SetName),
 		"Enable", &GameScriptItemInfo::EnableItem,
 		"Disable", &GameScriptItemInfo::DisableItem);
+}
+
+std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::GetLara()
+{
+	return std::make_unique<GameScriptItemInfo>(Lara.itemNumber);
 }
 
 std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
@@ -146,6 +157,7 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 void GameScriptItemInfo::Init()
 {
 	InitialiseItem(m_num);
+	m_initialised = true;
 }
 
 GAME_OBJECT_ID GameScriptItemInfo::GetObjectID() const
@@ -354,14 +366,17 @@ short GameScriptItemInfo::GetRoom() const
 
 void GameScriptItemInfo::SetRoom(short room)
 {	
-	if (room < 0 || room >= g_Level.Rooms.size())
+	if (room < 0 || static_cast<size_t>(room) >= g_Level.Rooms.size())
 	{
 		if (WarningsAsErrors)
 			throw std::runtime_error("invalid room number");
 		return;
 	}
 
-	ItemNewRoom(m_num, room);
+	if (!m_initialised)
+		m_item->roomNumber = room;
+	else
+		ItemNewRoom(m_num, room);
 }
 
 
