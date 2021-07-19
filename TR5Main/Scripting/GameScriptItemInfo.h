@@ -26,6 +26,7 @@ class GameScriptItemInfo
 private:
 	ITEM_INFO* m_item;
 	short m_num;
+	bool m_initialised = false;
 	static callbackSetName s_callbackSetName;
 	static callbackRemoveName s_callbackRemoveName;
 public:
@@ -36,16 +37,21 @@ public:
 	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
 
 	static void Register(sol::state *);
-	/*** If you create items with this you NEED to give a position, rotation,
-	room, and object number, and then call InitialiseItem before it will work.
+
+/*** Create a GameScriptItemInfo representing the Lara object.
+	@function ItemInfo.GetLara
+*/
+	static std::unique_ptr<GameScriptItemInfo> GetLara();
+/*** If you create items with this you NEED to give a position, room, 
+and object number, and then call InitialiseItem before it will work.
 	@function ItemInfo.new
 	*/
 	static std::unique_ptr<GameScriptItemInfo> CreateEmpty();
 
 	/*** For more information on each parameter, see the
-	associated getters and setters. If you do not know what to set for these,
-	most can just be set them to zero (see usage) or use the overload which
-	takes no arguments.
+associated getters and setters. If you do not know what to set for these,
+most can just be set them to zero (see usage) or use the overload which
+takes no arguments.
 	@function ItemInfo.new
 	@tparam int object ID
 	@tparam string name Lua name of the item
