@@ -14,6 +14,7 @@
 #include "newinv2.h"
 #include <iostream>
 #include "InventorySlots.h"
+#include "ObjectIDs.h"
 
 #ifndef _DEBUG
 #include <iostream>
@@ -34,25 +35,32 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
 	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
 
-	// Put all the data in InvItem's metatable	
-	m_lua->set("InvItemMeta", sol::as_table(kInventorySlots));
+	auto makeReadOnlyTable = [this](std::string const & tableName, auto const& container)
+	{
+		auto mt = tableName + "Meta";
+		// Put all the data in the metatable	
+		m_lua->set(mt, sol::as_table(container));
 
-	// Make the metatable's __index refer to itself so that requests
-	// to InvItem will go through to the metatable (and thus the
-	// kInventorySlot members)
-	m_lua->safe_script("InvItemMeta.__index = InvItemMeta");
+		// Make the metatable's __index refer to itself so that requests
+		// to the main table will go through to the metatable (and thus the
+		// container's members)
+		m_lua->safe_script(mt + ".__index = " + mt);
 
-	// Don't allow InvItem to have new elements put into it
-	m_lua->safe_script("InvItemMeta.__newindex = function() error('InvItem is read-only') end");
+		// Don't allow the table to have new elements put into it
+		m_lua->safe_script(mt + ".__newindex = function() error('" + tableName + " is read-only') end");
 
-	// Protect the metatable
-	m_lua->safe_script("InvItemMeta.__metatable = 'metatable is protected'");
+		// Protect the metatable
+		m_lua->safe_script(mt + ".__metatable = 'metatable is protected'");
 
-	auto tab = m_lua->create_named_table("InvItem");
-	m_lua->safe_script("setmetatable(InvItem, InvItemMeta)");
+		auto tab = m_lua->create_named_table(tableName);
+		m_lua->safe_script("setmetatable(" + tableName + ", " + mt + ")");
 
-	// point InvItemMeta array from the table
-	m_lua->safe_script("InvItemMeta = nil");
+		// point the initial metatable variable away from its contents. this is just for cleanliness
+		m_lua->safe_script(mt + "= nil");
+	};
+
+	makeReadOnlyTable("InvItem", kInventorySlots);
+	makeReadOnlyTable("ObjID", kObjIDs);
 
 	GameScriptItemInfo::Register(m_lua);
 	auto addLuaName = [this](std::string const& str, short num)
