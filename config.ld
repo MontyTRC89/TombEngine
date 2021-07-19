@@ -3,3 +3,4 @@ new_type("mem", "Members", false)
 project = "TombEngine"
 style = true
 wrap = true
+format = 'markdown'
