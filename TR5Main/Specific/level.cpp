@@ -124,6 +124,8 @@ int LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string((const char*)buffer);
 
+			g_GameScript->AddLuaName(item->luaName, i);
+
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
 
