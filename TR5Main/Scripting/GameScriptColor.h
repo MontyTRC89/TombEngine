@@ -2,6 +2,11 @@
 
 #include "framework.h"
 
+namespace sol {
+	class state;
+	template <typename T> struct as_table_t;
+}
+
 class GameScriptColor {
 public:
 	byte r;
@@ -20,4 +25,6 @@ public:
 	void								SetB(byte v);
 	byte								GetA();
 	void								SetA(byte v);
+
+	void Register(sol::state* state);
 };
