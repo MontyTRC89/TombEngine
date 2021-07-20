@@ -35,6 +35,8 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
 	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
 
+	m_lua->set_function("GetItemByName", &GameScript::GetItemByName, this);
+	m_lua->set_function("GetItemByID", &GameScript::GetItemById, this);
 	auto makeReadOnlyTable = [this](std::string const & tableName, auto const& container)
 	{
 		auto mt = tableName + "Meta";
@@ -65,16 +67,17 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	GameScriptItemInfo::Register(m_lua);
 	auto addLuaName = [this](std::string const& str, short num)
 	{
-		return m_itemsMapName.insert(std::pair<std::string, short>(str, num)).second;
+		return AddLuaName(str, num);
 	};
 	auto removeLuaName = [this](std::string const& str)
 	{
-		return m_itemsMapName.erase(str);
+		return RemoveLuaName(str);
 	};
 	GameScriptItemInfo::SetNameCallbacks(addLuaName, removeLuaName);
 
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
+	GameScriptColor::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
@@ -268,19 +271,23 @@ std::unique_ptr<GameScriptItemInfo> GameScript::GetItemById(int id)
 		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return std::make_unique<GameScriptItemInfo>(m_itemsMapId[id]);
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapId[id], false);
 }
 
-std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string name)
+std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string const & name)
 {
 	if (m_itemsMapName.find(name) == m_itemsMapName.end())
 	{
 		if (WarningsAsErrors)
-			throw "item name not found";
+		{
+			std::string error{ "Item name not found: " };
+			error += name;
+			throw std::runtime_error{error};
+		}
 		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
-	return std::make_unique<GameScriptItemInfo>(m_itemsMapName[name]);
+	return std::make_unique<GameScriptItemInfo>(m_itemsMapName[name], false);
 }
 
 void GameScript::PlayAudioTrack(std::string const & trackName, bool looped)
