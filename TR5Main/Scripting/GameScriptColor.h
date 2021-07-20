@@ -26,5 +26,5 @@ public:
 	byte								GetA();
 	void								SetA(byte v);
 
-	void Register(sol::state* state);
+	static void Register(sol::state* state);
 };
