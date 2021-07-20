@@ -10,11 +10,20 @@
 #include "trmath.h"
 #include "lara.h"
 
+/***
+Represents any object inside the game world.
+Examples include statics, enemies, doors,
+pickups, and Lara herself.
+
+@classmod ItemInfo
+@pragma nostrip
+*/
+
 extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
 
-GameScriptItemInfo::GameScriptItemInfo(short num) : m_item{ &g_Level.Items[num]}, m_num { num }
+GameScriptItemInfo::GameScriptItemInfo(short num, bool temp) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ false }, m_temporary{ temp }
 {};
 
 GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : 
@@ -26,7 +35,7 @@ GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept :
 // todo.. how to check if item is killed outside of script?
 GameScriptItemInfo::~GameScriptItemInfo() {
 	// todo.. see if there's a better default state than -1
-	if (m_num > NO_ITEM)
+	if (m_temporary && (m_num > NO_ITEM))
 	{
 		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
@@ -66,48 +75,79 @@ void GameScriptItemInfo::SetNameCallbacks(callbackSetName cbs, callbackRemoveNam
 	s_callbackRemoveName = cbr;
 }
 
+/*** If you create items with this you NEED to give a position, room, 
+and object number, and then call InitialiseItem before it will work.
+	@function ItemInfo.newItem
+*/
 
-void GameScriptItemInfo::Register(sol::state* state)
-{
-	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
-		"new", sol::overload(&GameScriptItemInfo::Create, &GameScriptItemInfo::CreateEmpty),
-		sol::meta_function::index, &index_error,
-		"Init", &GameScriptItemInfo::Init,
-		"GetLara", &GameScriptItemInfo::GetLara,
-		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
-		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
-		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
-		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
-		"animNumber", sol::property(&GameScriptItemInfo::GetAnimNumber, &GameScriptItemInfo::SetAnimNumber),
-		"frameNumber", sol::property(&GameScriptItemInfo::GetFrameNumber, &GameScriptItemInfo::SetFrameNumber),
-		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
-		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
-		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
-		"AIBits", sol::property(&GameScriptItemInfo::GetAIBits, &GameScriptItemInfo::SetAIBits),
-		"status", sol::property(&GameScriptItemInfo::GetStatus, &GameScriptItemInfo::SetStatus),
-		"hitStatus", sol::property(&GameScriptItemInfo::GetHitStatus, &GameScriptItemInfo::SetHitStatus),
-		"active", sol::property(&GameScriptItemInfo::GetActive, &GameScriptItemInfo::SetActive),
-		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
-		"pos", sol::property(&GameScriptItemInfo::GetPos, &GameScriptItemInfo::SetPos),
-		"rot", sol::property(&GameScriptItemInfo::GetRot, &GameScriptItemInfo::SetRot),
-		"name", sol::property(&GameScriptItemInfo::GetName, &GameScriptItemInfo::SetName),
-		"Enable", &GameScriptItemInfo::EnableItem,
-		"Disable", &GameScriptItemInfo::DisableItem);
-}
-
-std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::GetLara()
-{
-	return std::make_unique<GameScriptItemInfo>(Lara.itemNumber);
-}
-
-std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::CreateEmpty()
+/*** Like above, but the returned variable controls the 
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).
+	@function ItemInfo.newItemTemporary
+*/
+template <bool temp> std::unique_ptr<GameScriptItemInfo> CreateEmpty()
 {
 	short num = CreateItem();	
 	ITEM_INFO * item = &g_Level.Items[num];
-	return std::make_unique<GameScriptItemInfo>(num);
+	return std::make_unique<GameScriptItemInfo>(num, temp);
 }
 
-std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
+
+
+
+/*** For more information on each parameter, see the
+associated getters and setters. If you do not know what to set for these,
+most can just be set them to zero (see usage) or use the overload which
+takes no arguments.
+	@function ItemInfo.newItem
+	@tparam int object ID
+	@tparam string name Lua name of the item
+	@tparam Position position position in level
+	@tparam Rotation rotation rotation about x, y, and z axes
+	@tparam int room room ID item is in
+	@tparam int currentAnimState current animation state
+	@tparam int requiredAnimState required animation state
+	@tparam int goalAnimState goal animation state
+	@tparam int animNumber anim number
+	@tparam int frameNumber frame number
+	@tparam int hp HP of item
+	@tparam int OCB ocb of item
+	@tparam int itemFlags item flags 
+	@tparam int AIBits byte with AI bits
+	@tparam int status status of object
+	@tparam bool active is item active or not?
+	@tparam bool hitStatus hit status of object
+	@return reference to new ItemInfo object
+	@usage 
+	local item = ItemInfo.new(
+		950, -- object id. 950 is pistols
+		"test", -- name
+		Position.new(18907, 0, 21201),
+		Rotation.new(0,0,0),
+		0, -- room
+		0, -- currentAnimState
+		0, -- requiredAnimState
+		0, -- goalAnimState
+		0, -- animNumber
+		0, -- frameNumber
+		0, -- HP
+		0, -- OCB
+		{0,0,0,0,0,0,0,0}, -- itemFlags
+		0, -- AIBits
+		0, -- status
+		false, -- active
+		false, -- hitStatus
+		)
+	*/
+
+/*** Like the above, but the returned variable controls the 
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).
+	@function ItemInfo.newItemTemporary
+	@param see_above same as above function
+*/
+
+template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	GAME_OBJECT_ID objID,
 	std::string name,
 	GameScriptPosition pos,
@@ -120,17 +160,17 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	short frameNumber,
 	short hp,
 	short ocb,
-	sol::as_table_t<std::array<short, 8>> itemFlags,
+	sol::as_table_t<std::array<short, 8>> flags,
 	byte aiBits,
 	short status,
 	bool active,
 	bool hitStatus
-	)
+)
 {
 	short num = CreateItem();
-	auto ptr = std::make_unique<GameScriptItemInfo>(num);
+	auto ptr = std::make_unique<GameScriptItemInfo>(num, temp);
 
-	ITEM_INFO * item = &g_Level.Items[num];
+	ITEM_INFO* item = &g_Level.Items[num];
 	ptr->SetPos(pos);
 	ptr->SetRot(rot);
 	ptr->SetRoom(room);
@@ -145,7 +185,7 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
 	ptr->SetOCB(ocb);
-	ptr->SetItemFlags(itemFlags);
+	ptr->SetItemFlags(flags);
 	ptr->SetAIBits(aiBits);
 	ptr->SetStatus(status);
 	ptr->SetActive(active);
@@ -153,6 +193,115 @@ std::unique_ptr<GameScriptItemInfo> GameScriptItemInfo::Create(
 
 	return ptr;
 }
+
+std::unique_ptr<GameScriptItemInfo> static GetLara()
+{
+	return std::make_unique<GameScriptItemInfo>(Lara.itemNumber, false);
+}
+
+void GameScriptItemInfo::Register(sol::state* state)
+{
+	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
+		"newItem", sol::overload(Create<false>, CreateEmpty<false>),
+		"newItemTemporary", sol::overload(Create<true>, CreateEmpty<true>),
+		sol::meta_function::index, &index_error,
+
+		/// Initialise an item.
+		//Use this if you called new with no arguments
+		// @function ItemInfo.Init
+		"Init", &GameScriptItemInfo::Init,
+
+		/// Enable the item
+		// @function ItemInfo:EnableItem
+		"Enable", &GameScriptItemInfo::EnableItem,
+
+		/// Disable the item
+		// @function ItemInfo:DisableItem
+		"Disable", &GameScriptItemInfo::DisableItem,
+
+		/// Create a GameScriptItemInfo representing the Lara object.
+		// @function ItemInfo.GetLara
+		"GetLara", GetLara,
+
+		/// (int) object ID 
+		// @mem objectID
+		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
+
+		/// (int) State of current animation
+		// @mem currentAnimState
+		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
+
+		/// (int) State of required animation
+		// @mem requiredAnimState
+		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
+
+
+		/// (int) State of goal animation
+		// @mem goalAnimState
+		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
+
+		/// (int) animation number
+		// @mem animNumber
+		"animNumber", sol::property(&GameScriptItemInfo::GetAnimNumber, &GameScriptItemInfo::SetAnimNumber),
+
+		/// (int) frame number
+		// @mem frameNumber
+		"frameNumber", sol::property(&GameScriptItemInfo::GetFrameNumber, &GameScriptItemInfo::SetFrameNumber),
+
+		/// (int) HP (hit points/health points) of object 
+		//@raise an exception if the object is intelligent and an invalid
+		//hp value is given
+		// @mem HP
+		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
+
+		/// (int) OCB (object code bit) of object
+		// @mem OCB
+		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
+
+		/// (table) item flags of object (table of 8 ints)
+		// @mem itemFlags 
+		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
+
+		/// (int) AIBits of object. Will be clamped to [0, 255]
+		// @mem AIBits
+		"AIBits", sol::property(&GameScriptItemInfo::GetAIBits, &GameScriptItemInfo::SetAIBits),
+
+		/// (int) status of object.
+		// possible values:
+		// 0 - not active
+		// 1 - active
+		// 2 - deactivated
+		// 3 - invisible
+		// @mem status
+		"status", sol::property(&GameScriptItemInfo::GetStatus, &GameScriptItemInfo::SetStatus),
+
+		/// (bool) hit status of object
+		// @mem hitStatus
+		"hitStatus", sol::property(&GameScriptItemInfo::GetHitStatus, &GameScriptItemInfo::SetHitStatus),
+
+		/// (bool) whether or not the object is active 
+		// @mem active
+		"active", sol::property(&GameScriptItemInfo::GetActive, &GameScriptItemInfo::SetActive),
+
+		/// (short) room the item is in 
+		// @mem room
+		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
+
+		/// (@{Position}) position in level
+		// @mem pos
+		"pos", sol::property(&GameScriptItemInfo::GetPos, &GameScriptItemInfo::SetPos),
+
+		/// (@{Rotation}) rotation represented as degree angles about X, Y, and Z axes
+		// @mem rot
+		"rot", sol::property(&GameScriptItemInfo::GetRot, &GameScriptItemInfo::SetRot),
+
+		/// (string) unique string identifier.
+		// e.g. "door_back_room" or "cracked_greek_statue"
+		// @mem name
+		"name", sol::property(&GameScriptItemInfo::GetName, &GameScriptItemInfo::SetName)
+		);
+}
+
 
 void GameScriptItemInfo::Init()
 {
