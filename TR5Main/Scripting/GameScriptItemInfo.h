@@ -1,5 +1,7 @@
 #pragma once
-#include <functional>
+
+#include "GameScriptNamedBase.h"
+
 namespace sol {
 	class state;
 	template <typename T> struct as_table_t;
@@ -9,10 +11,8 @@ class GameScriptRotation;
 struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
-using callbackSetName = std::function<bool(std::string const&, short itemID)>;
-using callbackRemoveName = std::function<bool(std::string const&)>;
 
-class GameScriptItemInfo
+class GameScriptItemInfo : public GameScriptNamedBase<GameScriptItemInfo, short>
 {
 public:
 	GameScriptItemInfo(short num, bool temporary);
@@ -22,8 +22,6 @@ public:
 	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
 
 	static void Register(sol::state *);
-
-	static void SetNameCallbacks(callbackSetName, callbackRemoveName);
 
 	GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
@@ -87,7 +85,5 @@ private:
 	short m_num;
 	bool m_initialised;
 	bool m_temporary;
-	static callbackSetName s_callbackSetName;
-	static callbackRemoveName s_callbackRemoveName;
 
 };
