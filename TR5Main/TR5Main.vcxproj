@@ -386,6 +386,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
+    <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
+    <ClInclude Include="Scripting\GameScriptNamedBase.h" />
     <ClInclude Include="Scripting\GameScriptPosition.h" />
     <ClInclude Include="Scripting\GameScriptRotation.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
@@ -679,6 +681,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
     <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
+    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptPosition.cpp" />
     <ClCompile Include="Scripting\GameScriptRotation.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
