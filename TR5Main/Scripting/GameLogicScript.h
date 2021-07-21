@@ -1,16 +1,13 @@
 #pragma once
-#include "ChunkId.h"
-#include "ChunkReader.h"
-#include "ChunkWriter.h"
-#include "LEB128.h"
-#include "Streams.h"
 #include "items.h"
+#include "room.h"
 #include "LuaHandler.h"
 #include "trmath.h"
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
 #include "GameScriptItemInfo.h"
+#include "GameScriptMeshInfo.h"
 
 struct LuaFunction {
 	std::string Name;
@@ -52,6 +49,7 @@ private:
 	LuaVariables						m_locals;
 	std::map<int, short>				m_itemsMapId;
 	std::map<std::string, short>		m_itemsMapName;
+	std::map<std::string, MESH_INFO&>	m_meshesMapName;
 	std::vector<LuaFunction*>			m_triggers;
 	sol::protected_function				m_onStart;
 	sol::protected_function				m_onLoad;
@@ -66,6 +64,8 @@ public:
 	void								AddLuaId(int luaId, short itemNumber);
 	bool								AddLuaName(std::string const & luaName, short itemNumber);
 	bool								RemoveLuaName(std::string const& luaName);
+	bool								AddLuaNameMesh(std::string const & luaName, MESH_INFO &);
+	bool								RemoveLuaNameMesh(std::string const& luaName);
 	void								AssignItemsAndLara();
 
 
@@ -73,7 +73,8 @@ public:
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
-	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string name);
+	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string const & name);
+	std::unique_ptr<GameScriptMeshInfo>	GetMeshByName(std::string const & name);
 
 	// Variables
 	template <typename T>
