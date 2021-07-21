@@ -63,6 +63,20 @@ GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a)
 	SetA(a);
 }
 
+GameScriptColor::GameScriptColor(Vector3 const& col) : GameScriptColor{ col.x, col.y, col.z } {}
+
+GameScriptColor::GameScriptColor(Vector4 const& col) : GameScriptColor{ col.x, col.y, col.z, col.w } {}
+
+GameScriptColor::operator Vector3() const
+{
+	return Vector3{ float(r), float(g), float(b) };
+}
+
+GameScriptColor::operator Vector4() const
+{
+	return Vector4{ float(r), float(g), float(b), float(a) };
+}
+
 byte GameScriptColor::GetR()
 {
 	return r;

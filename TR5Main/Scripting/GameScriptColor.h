@@ -16,6 +16,11 @@ public:
 
 	GameScriptColor(byte r, byte g, byte b);
 	GameScriptColor(byte r, byte g, byte b, byte a);
+	GameScriptColor(Vector3 const &);
+	GameScriptColor(Vector4 const &);
+
+	operator Vector3() const;
+	operator Vector4() const;
 
 	byte								GetR();
 	void								SetR(byte v);
