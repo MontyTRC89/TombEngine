@@ -725,6 +725,7 @@ void ReadRooms()
 			mesh.luaName = std::string((const char*)buffer);
 
 			room.mesh.push_back(mesh);
+			g_GameScript->AddLuaNameMesh(mesh.luaName, room.mesh.back());
 		}
 
 		int numTriggerVolumes = ReadInt32();
