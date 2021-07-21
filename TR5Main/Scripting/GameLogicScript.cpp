@@ -413,7 +413,7 @@ void GameScript::AssignItemsAndLara()
 {
 	m_lua->set("Level", m_locals);
 	m_lua->set("Game", m_globals);
-	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber));
+	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false)); // do we need GetLara if we have this?
 }
 
 void GameScript::ResetVariables()
