@@ -65,15 +65,16 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 	makeReadOnlyTable("ObjID", kObjIDs);
 
 	GameScriptItemInfo::Register(m_lua);
-	auto addLuaName = [this](std::string const& str, short num)
-	{
-		return AddLuaName(str, num);
-	};
-	auto removeLuaName = [this](std::string const& str)
-	{
-		return RemoveLuaName(str);
-	};
-	GameScriptItemInfo::SetNameCallbacks(addLuaName, removeLuaName);
+	GameScriptItemInfo::SetNameCallbacks(
+		[this](std::string const& str, short num) {	return AddLuaName(str, num); },
+		[this](std::string const& str) { return RemoveLuaName(str); }
+	);
+
+	GameScriptMeshInfo::Register(m_lua);
+	GameScriptMeshInfo::SetNameCallbacks(
+		[this](std::string const& str, MESH_INFO & info) {	return AddLuaNameMesh(str, info); },
+		[this](std::string const& str) { return RemoveLuaNameMesh(str); }
+	);
 
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
@@ -109,6 +110,16 @@ bool GameScript::RemoveLuaName(std::string const & luaName)
 bool GameScript::AddLuaName(std::string const & luaName, short itemNumber)
 {
 	return m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber)).second;
+}
+
+bool GameScript::RemoveLuaNameMesh(std::string const & luaName)
+{
+	return m_meshesMapName.erase(luaName);
+}
+
+bool GameScript::AddLuaNameMesh(std::string const& luaName, MESH_INFO& infoRef)
+{
+	return m_meshesMapName.insert(std::pair<std::string, MESH_INFO&>(luaName, infoRef)).second;
 }
 
 void GameScript::FreeLevelScripts()
