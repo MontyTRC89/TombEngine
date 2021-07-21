@@ -42,38 +42,8 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 	}
 }
 
-static void index_error(GameScriptItemInfo & item, sol::object key)
-{
-	std::string err = "Attempted to read non-existant var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME;
-	if (WarningsAsErrors)
-	{
-		throw std::runtime_error(err);
-	}
-}
+static auto index_error = index_error_maker(GameScriptItemInfo, LUA_CLASS_NAME);
 
-callbackSetName GameScriptItemInfo::s_callbackSetName = [] (std::string const & n, int num) {
-	std::string err = "\"Set Name\" callback is not set.";
-	if (WarningsAsErrors)
-	{
-		throw std::runtime_error(err);
-	}
-	return false;
-};
-
-callbackRemoveName GameScriptItemInfo::s_callbackRemoveName = [] (std::string const & n) {
-	std::string err = "\"Remove Name\" callback is not set.";
-	if (WarningsAsErrors)
-	{
-		throw std::runtime_error(err);
-	}
-	return false;
-};
-
-void GameScriptItemInfo::SetNameCallbacks(callbackSetName cbs, callbackRemoveName cbr)
-{
-	s_callbackSetName = cbs;
-	s_callbackRemoveName = cbr;
-}
 
 /*** If you create items with this you NEED to give a position, room, 
 and object number, and then call InitialiseItem before it will work.
@@ -91,9 +61,6 @@ template <bool temp> std::unique_ptr<GameScriptItemInfo> CreateEmpty()
 	ITEM_INFO * item = &g_Level.Items[num];
 	return std::make_unique<GameScriptItemInfo>(num, temp);
 }
-
-
-
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
@@ -204,7 +171,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
 		"newItem", sol::overload(Create<false>, CreateEmpty<false>),
 		"newItemTemporary", sol::overload(Create<true>, CreateEmpty<true>),
-		sol::meta_function::index, &index_error,
+		sol::meta_function::index, index_error,
 
 		/// Initialise an item.
 		//Use this if you called new with no arguments
@@ -234,7 +201,6 @@ void GameScriptItemInfo::Register(sol::state* state)
 		/// (int) State of required animation
 		// @mem requiredAnimState
 		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
-
 
 		/// (int) State of goal animation
 		// @mem goalAnimState
