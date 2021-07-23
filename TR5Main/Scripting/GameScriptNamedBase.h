@@ -2,6 +2,8 @@
 #include <functional>
 #include <string>
 
+extern bool const WarningsAsErrors;
+
 #define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE & item, sol::object key) \
 { \
 	if (WarningsAsErrors) \
