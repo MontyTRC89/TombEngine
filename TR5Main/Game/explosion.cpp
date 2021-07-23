@@ -14,7 +14,7 @@ namespace T5M {
 			using namespace T5M::Effects::Spark;
 			std::array<ExplosionParticle, 64> explosionParticles;
 			constexpr float PARTICLE_DISTANCE = 512;
-			void TriggerExplosion(Vector3& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room)
+			void TriggerExplosion(Vector3 const& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room)
 			{
 				SpawnExplosionParticle(pos);
 				for (int i = 0; i < 3; i++) {
@@ -67,7 +67,7 @@ namespace T5M {
 				}
 				return explosionParticles[0];
 			}
-			void SpawnExplosionParticle(Vector3& pos)
+			void SpawnExplosionParticle(Vector3 const & pos)
 			{
 				ExplosionParticle& e = getFreeExplosionParticle();
 				e = {};
