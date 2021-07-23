@@ -19,10 +19,10 @@ namespace T5M {
 				bool active;
 			};
 			extern std::array<ExplosionParticle, 64> explosionParticles;
-			void TriggerExplosion(DirectX::SimpleMath::Vector3& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room);
+			void TriggerExplosion(DirectX::SimpleMath::Vector3 const & pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room);
 			void UpdateExplosionParticles();
 			ExplosionParticle& getFreeExplosionParticle();
-			void SpawnExplosionParticle(DirectX::SimpleMath::Vector3& pos);
+			void SpawnExplosionParticle(DirectX::SimpleMath::Vector3 const & pos);
 		}
 	}
 }
