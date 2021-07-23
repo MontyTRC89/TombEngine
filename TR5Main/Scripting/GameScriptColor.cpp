@@ -2,8 +2,8 @@
 #include "GameScriptColor.h"
 
 /***
-An RGBA or RGB color. Components are set in bytes, with 0 being
-the minimum amount of that component, and 255 being the maximum.
+An RGBA or RGB color.
+Components are specified in bytes; all values are clamped to [0, 255].
 
 @classmod Color
 @pragma nostrip
@@ -15,20 +15,20 @@ void GameScriptColor::Register(sol::state* state)
 		sol::constructors<GameScriptColor(int, int, int)>(),
 
 /// (int) red component
-//@mem R
-		"R", sol::property(&GameScriptColor::GetR, &GameScriptColor::SetR),
+//@mem r
+		"r", sol::property(&GameScriptColor::GetR, &GameScriptColor::SetR),
 
 /// (int) green component
-//@mem G
-		"G", sol::property(&GameScriptColor::GetG, &GameScriptColor::SetG),
+//@mem g
+		"g", sol::property(&GameScriptColor::GetG, &GameScriptColor::SetG),
 
 /// (int) blue component
-//@mem B
-		"B", sol::property(&GameScriptColor::GetB, &GameScriptColor::SetB),
+//@mem b
+		"b", sol::property(&GameScriptColor::GetB, &GameScriptColor::SetB),
 
 /// (int) alpha component (255 is opaque, 0 is invisible)
-//@mem A
-		"A", sol::property(&GameScriptColor::GetA, &GameScriptColor::SetA)
+//@mem a
+		"a", sol::property(&GameScriptColor::GetA, &GameScriptColor::SetA)
 	);
 }
 
@@ -115,4 +115,14 @@ byte GameScriptColor::GetA()
 void GameScriptColor::SetA(byte v)
 {
 	a = std::clamp<byte>(v, 0, 255);
+}
+
+/***
+@tparam Color color this color
+@treturn string A string showing the r, g, b, and a values of the color
+@function __tostring
+*/
+std::string GameScriptColor::ToString() const
+{
+	return "{" + std::to_string(r) + ", " + std::to_string(g) + ", " + std::to_string(b) +  ", " + std::to_string(a) + "}";
 }
