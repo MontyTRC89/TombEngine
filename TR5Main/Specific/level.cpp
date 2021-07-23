@@ -545,11 +545,11 @@ void ReadRooms()
 {
 	int numRooms = ReadInt32();
 	printf("NumRooms: %d\n", numRooms);
-	
+
 	for (int i = 0; i < numRooms; i++)
 	{
-		ROOM_INFO room;
-
+		g_Level.Rooms.push_back(ROOM_INFO{});
+		auto& room = g_Level.Rooms.back();
 		room.x = ReadInt32();
 		room.y = 0;
 		room.z = ReadInt32();
@@ -784,8 +784,6 @@ void ReadRooms()
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
-
-		g_Level.Rooms.push_back(room);
 	}
 }
 
