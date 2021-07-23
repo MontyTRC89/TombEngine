@@ -192,7 +192,7 @@ bool GameFlow::LoadGameFlowScript()
 	return true;
 }
 
-char* GameFlow::GetString(const char* id)
+char const * GameFlow::GetString(const char* id)
 {
 	if (m_translationsMap.find(id) == m_translationsMap.end())
 		return "String not found";
