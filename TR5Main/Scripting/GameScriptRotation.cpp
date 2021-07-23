@@ -16,16 +16,16 @@ void GameScriptRotation::Register(sol::state* state)
 		sol::constructors<GameScriptRotation(int, int, int)>(),
 
 /// (int) rotation about x axis
-//@mem X
-		"X", &GameScriptRotation::x,
+//@mem x
+		"x", &GameScriptRotation::x,
 
 /// (int) rotation about x axis
-//@mem Y
-		"Y", &GameScriptRotation::y,
+//@mem y
+		"y", &GameScriptRotation::y,
 
 /// (int) rotation about x axis
-//@mem Z
-		"Z", &GameScriptRotation::z
+//@mem z
+		"z", &GameScriptRotation::z
 	);
 }
 
@@ -56,3 +56,14 @@ GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
 	y = pos.yRot;
 	z = pos.zRot;
 }
+
+/***
+@tparam Rotation rotation this rotation
+@treturn string A string showing the x, y, and z values of the rotation
+@function __tostring
+*/
+std::string GameScriptRotation::ToString() const
+{
+	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+}
+

@@ -15,6 +15,9 @@ public:
 
 	GameScriptRotation(int x, int y, int z);
 	GameScriptRotation(PHD_3DPOS const& pos);
+
+	std::string ToString() const;
+
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
 
 	static void Register(sol::state*);

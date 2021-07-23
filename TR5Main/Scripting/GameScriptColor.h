@@ -31,5 +31,7 @@ public:
 	byte								GetA();
 	void								SetA(byte v);
 
+	std::string ToString() const;
+
 	static void Register(sol::state* state);
 };
