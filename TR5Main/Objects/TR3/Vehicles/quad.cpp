@@ -152,7 +152,8 @@ static void QuadbikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
-	TriggerShockwave(&PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0), 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
+	auto pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0);
+	TriggerShockwave(&pos, 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
 	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
