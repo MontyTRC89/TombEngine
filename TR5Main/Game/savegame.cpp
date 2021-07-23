@@ -476,7 +476,7 @@ bool SaveGame::readLara()
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
-	Lara.generalPtr = (void*)AddPtr(Lara.generalPtr, char, malloc_buffer);
+	Lara.generalPtr = AddPtr(Lara.generalPtr, char, malloc_buffer);
 	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
