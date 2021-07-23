@@ -24,8 +24,8 @@ namespace T5M {
 			void UpdateDrips();
 			DripParticle& getFreeDrip();
 			void SpawnWetnessDrip(DirectX::SimpleMath::Vector3 pos, int room);
-			void SpawnSplashDrips(Vector3& pos, int num, int room);
-			void SpawnGunshellDrips(Vector3& pos, int room);
+			void SpawnSplashDrips(Vector3 const & pos, int num, int room);
+			void SpawnGunshellDrips(Vector3 const & pos, int room);
 		}
 	}
 }
