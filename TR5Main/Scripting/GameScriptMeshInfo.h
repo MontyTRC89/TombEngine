@@ -13,6 +13,8 @@ class GameScriptColor;
 class GameScriptMeshInfo : public GameScriptNamedBase<GameScriptMeshInfo, MESH_INFO &>
 {
 public:
+	GameScriptMeshInfo(MESH_INFO & id, bool temporary);
+	~GameScriptMeshInfo();
 	GameScriptMeshInfo& operator=(GameScriptMeshInfo const& other) = delete;
 	GameScriptMeshInfo(GameScriptMeshInfo const& other) = delete;
 
@@ -32,4 +34,5 @@ public:
 	void SetHP(int hp);
 private:
 	MESH_INFO & m_mesh;
+	bool m_temporary;
 };
