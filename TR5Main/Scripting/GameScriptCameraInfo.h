@@ -1,0 +1,29 @@
+#pragma once
+
+#include "GameScriptNamedBase.h"
+#include "phd_global.h"
+
+namespace sol {
+	class state;
+}
+class GameScriptPosition;
+
+class GameScriptCameraInfo : public GameScriptNamedBase<GameScriptCameraInfo, LEVEL_CAMERA_INFO &>
+{
+public:
+	GameScriptCameraInfo(LEVEL_CAMERA_INFO& ref, bool temp);
+	~GameScriptCameraInfo();
+	static void Register(sol::state *);
+	GameScriptPosition GetPos() const;
+	void SetPos(GameScriptPosition const& pos);
+
+	short GetRoom() const;
+	void SetRoom(short Room);
+
+	std::string GetName() const;
+	void SetName(std::string const &);
+
+private:
+	LEVEL_CAMERA_INFO & m_camera;
+	bool m_temporary;
+};
