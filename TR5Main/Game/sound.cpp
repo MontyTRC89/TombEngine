@@ -540,8 +540,9 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 						SoundSlot[index].origin.y == position->yPos &&
 						SoundSlot[index].origin.z == position->zPos))
 		{
-			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &BASS_3DVECTOR(position->xPos, position->yPos, position->zPos),
-				&BASS_3DVECTOR(position->xRot, position->yRot, position->zRot), NULL);
+			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
+			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
+			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &pos, &rot, NULL);
 			BASS_Apply3D();
 		}
 	}
@@ -610,15 +611,18 @@ void Sound_UpdateScene()
 	Vector3 at = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) -
 		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
 	at.Normalize();
-
-	BASS_Set3DPosition(&BASS_3DVECTOR(Camera.mikePos.x,		// Pos
-									  Camera.mikePos.y,
-									  Camera.mikePos.z),
-					   &BASS_3DVECTOR(Lara.currentXvel,		// Vel
-									  Lara.currentYvel,
-									  Lara.currentZvel),
-					   &BASS_3DVECTOR(at.x, at.y, at.z),	// At
-					   &BASS_3DVECTOR(0.0f, 1.0f, 0.0f));	// Up
+	auto mikePos = BASS_3DVECTOR( Camera.mikePos.x,		// Pos
+		Camera.mikePos.y,
+		Camera.mikePos.z);
+	auto laraVel = BASS_3DVECTOR(Lara.currentXvel,		// Vel
+		Lara.currentYvel,
+		Lara.currentZvel);
+	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);			// At
+	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);		// Up
+	BASS_Set3DPosition(&mikePos,
+					   &laraVel,
+					   &atVec,
+					   &upVec);
 	BASS_Apply3D();
 }
 
