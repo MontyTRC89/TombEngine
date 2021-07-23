@@ -23,13 +23,16 @@ extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
 
+static auto index_error = index_error_maker(GameScriptItemInfo, LUA_CLASS_NAME);
+
 GameScriptItemInfo::GameScriptItemInfo(short num, bool temp) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ false }, m_temporary{ temp }
 {};
 
 GameScriptItemInfo::GameScriptItemInfo(GameScriptItemInfo&& other) noexcept : 
 	m_item { std::exchange(other.m_item, nullptr) },
 	m_num{ std::exchange(other.m_num, NO_ITEM) },
-	m_initialised{ std::exchange(other.m_initialised, false) }
+	m_initialised{ std::exchange(other.m_initialised, false) },
+	m_temporary{ std::exchange(other.m_temporary, false) }
 {};
 
 // todo.. how to check if item is killed outside of script?
@@ -41,8 +44,6 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 		KillItem(m_num);
 	}
 }
-
-static auto index_error = index_error_maker(GameScriptItemInfo, LUA_CLASS_NAME);
 
 
 /*** If you create items with this you NEED to give a position, room, 
@@ -67,7 +68,7 @@ associated getters and setters. If you do not know what to set for these,
 most can just be set them to zero (see usage) or use the overload which
 takes no arguments.
 	@function ItemInfo.newItem
-	@tparam int object ID
+	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
@@ -87,7 +88,7 @@ takes no arguments.
 	@return reference to new ItemInfo object
 	@usage 
 	local item = ItemInfo.new(
-		950, -- object id. 950 is pistols
+		PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
@@ -190,7 +191,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 		// @function ItemInfo.GetLara
 		"GetLara", GetLara,
 
-		/// (int) object ID 
+		/// (@{ObjID}) object ID 
 		// @mem objectID
 		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
 
@@ -249,7 +250,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 		// @mem active
 		"active", sol::property(&GameScriptItemInfo::GetActive, &GameScriptItemInfo::SetActive),
 
-		/// (short) room the item is in 
+		/// (int) room the item is in 
 		// @mem room
 		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
 
@@ -493,7 +494,6 @@ void GameScriptItemInfo::SetRoom(short room)
 	else
 		ItemNewRoom(m_num, room);
 }
-
 
 void GameScriptItemInfo::EnableItem()
 {

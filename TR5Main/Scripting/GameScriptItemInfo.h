@@ -75,7 +75,6 @@ public:
 	void SetRoom(short Room);
 
 	void EnableItem();
-
 	void DisableItem();
 
 	void Init();
