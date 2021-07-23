@@ -133,7 +133,7 @@ bool BaseStream::WriteFloat(float value) {
 	return Write(reinterpret_cast<char*>(&value), 4);
 }
 
-bool BaseStream::WriteString(char* str) {
+bool BaseStream::WriteString(char const* str) {
 	int length = (int)strlen(str);
 	WriteInt32(length);
 	Write(str, length);
@@ -209,7 +209,7 @@ bool FileStream::Read(char* buffer, int length) {
 	return true;
 }
 
-bool FileStream::Write(char* buffer, int length) {
+bool FileStream::Write(char const* buffer, int length) {
 	m_stream.write(buffer, length);
 	return true;
 }
