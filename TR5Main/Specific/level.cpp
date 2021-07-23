@@ -384,6 +384,7 @@ void LoadCameras()
 		camera.luaName = std::string((const char*)buffer);
 
 		g_Level.Cameras.push_back(camera);
+		g_GameScript->AddLuaNameCamera(camera.luaName, g_Level.Cameras.back());
 	}
 
 	NumberSpotcams = ReadInt32();
