@@ -195,24 +195,24 @@ private:
 	std::map<short, short>				m_itemsMap;
 
 public:
-	Vector3								SkyColorLayer1;
+	Vector3							SkyColorLayer1;
 	int								SkySpeedLayer1;
-	Vector3								SkyColorLayer2;
+	Vector3							SkyColorLayer2;
 	int								SkySpeedLayer2;
-	Vector3								FogColor;
+	Vector3							FogColor;
 	int								FogInDistance;
 	int								FogOutDistance;
-	bool								DrawHorizon;
-	bool								ColAddHorizon;
+	bool							DrawHorizon;
+	bool							ColAddHorizon;
 	int								SelectedLevelForNewGame;
 	int								SelectedSaveGame;
-	bool								EnableLoadSave;
-	bool								PlayAnyLevel;
-	bool								FlyCheat;
-	bool								DebugMode;
+	bool							EnableLoadSave;
+	bool							PlayAnyLevel;
+	bool							FlyCheat;
+	bool							DebugMode;
 	int								LevelFarView;
 	int								TitleType;
-	char*								Intro;
+	char const *					Intro;
 
 	// Selected language set
 	std::vector<GameScriptLevel*>			Levels;
@@ -224,7 +224,7 @@ public:
 	void								AddLevel(GameScriptLevel const& level);
 	void								SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
 	bool								LoadGameFlowScript();
-	char*								GetString(const char* id);
+	char const *						GetString(const char* id);
 	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	GameScriptSettings*					GetSettings();
