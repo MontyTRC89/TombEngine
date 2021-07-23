@@ -261,7 +261,8 @@ void ControlHarpoonBolt(short itemNumber)
 				if (currentMesh->hitPoints <= 0)
 				{
 					TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-					TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
+					auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 					ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
 					SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 					SmashedMesh[SmashedMeshCount] = currentMesh;
@@ -293,7 +294,7 @@ void FireGrenade()
 	int z = 0;
 	
 	Ammo& ammo = GetAmmo(WEAPON_GRENADE_LAUNCHER);
-	if (ammo != 0)
+	if (ammo != size_t{ 0 })
 	{
 		Lara.hasFired = true;
 
@@ -683,7 +684,8 @@ void ControlGrenade(short itemNumber)
 					{
 						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 						TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-						TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
+						auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
+						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 						ExplodeItemNode(currentItem, 0, 0, 128);
 						short currentItemNumber = (currentItem - CollidedItems[0]);
 						SmashObject(currentItemNumber);
@@ -705,7 +707,8 @@ void ControlGrenade(short itemNumber)
 							if (currentMesh->hitPoints <= 0)
 							{
 								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-								TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
+								auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
@@ -911,7 +914,8 @@ void ControlRocket(short itemNumber)
 				{
 					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 					TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-					TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
+					auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
+					TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 					ExplodeItemNode(currentItem, 0, 0, 128);
 					short currentItemNumber = (currentItem - CollidedItems[0]);
 					SmashObject(currentItemNumber);
@@ -946,7 +950,8 @@ void ControlRocket(short itemNumber)
 					if (currentMesh->hitPoints <= 0)
 					{
 						TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-						TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
+						auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+						TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
@@ -1416,7 +1421,8 @@ void ControlCrossbowBolt(short itemNumber)
 					{
 						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 						TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-						TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
+						auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
+						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 						ExplodeItemNode(currentItem, 0, 0, 128);
 						short currentItemNumber = (currentItem - CollidedItems[0]);
 						SmashObject(currentItemNumber);
@@ -1451,7 +1457,8 @@ void ControlCrossbowBolt(short itemNumber)
 						if (currentMesh->hitPoints <= 0)
 						{
 							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-							TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
+							auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+							TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 							ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
 							SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 							SmashedMesh[SmashedMeshCount] = currentMesh;
