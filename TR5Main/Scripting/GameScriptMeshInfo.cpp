@@ -17,6 +17,16 @@ constexpr auto LUA_CLASS_NAME{ "MeshInfo" };
 
 static auto index_error = index_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
 
+GameScriptMeshInfo::GameScriptMeshInfo(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
+{};
+
+GameScriptMeshInfo::~GameScriptMeshInfo() {
+	if (m_temporary)
+	{
+		s_callbackRemoveName(m_mesh.luaName);
+	}
+}
+
 void GameScriptMeshInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptMeshInfo>(LUA_CLASS_NAME,
@@ -39,17 +49,13 @@ void GameScriptMeshInfo::Register(sol::state* state)
 		// @mem staticNumber
 		"staticNumber", sol::property(&GameScriptMeshInfo::GetStaticNumber, &GameScriptMeshInfo::SetStaticNumber),
 
-		/// (@{Color}) position in level
+		/// (@{Color}) color of mesh
 		// @mem color
 		"color", sol::property(&GameScriptMeshInfo::GetColor, &GameScriptMeshInfo::SetColor),
 
 		/// (int) hp
 		// @mem HP
-		"HP", sol::property(&GameScriptMeshInfo::GetHP, &GameScriptMeshInfo::SetHP),
-
-		/// (string) name
-		// @mem name
-		"pos", sol::property(&GameScriptMeshInfo::GetName, &GameScriptMeshInfo::SetName)
+		"HP", sol::property(&GameScriptMeshInfo::GetHP, &GameScriptMeshInfo::SetHP)
 		);
 }
 
