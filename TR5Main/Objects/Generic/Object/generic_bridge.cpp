@@ -1,7 +1,7 @@
 #include "framework.h"
+#include "level.h"
 #include "generic_bridge.h"
 #include "floordata.h"
-#include "level.h"
 
 using namespace T5M::Floordata;
 
