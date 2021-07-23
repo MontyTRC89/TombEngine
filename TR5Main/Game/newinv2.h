@@ -167,7 +167,7 @@ enum rotflags
 struct uhmG 
 {
 	int type;
-	char* text;
+	char const* text;
 };
 
 struct AMMOLIST 
