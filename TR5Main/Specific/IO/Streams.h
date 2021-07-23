@@ -19,7 +19,7 @@ enum SeekOrigin {
 class BaseStream {
 public:
 	virtual bool Read(char* buffer, int length) = 0;
-	virtual bool Write(char* buffer, int length) = 0;
+	virtual bool Write(char const * buffer, int length) = 0;
 	virtual int GetCurrentPosition() = 0;
 	virtual bool Seek(int seek, SeekOrigin origin) = 0;
 	virtual bool IsEOF() = 0;
@@ -65,7 +65,7 @@ public:
 
 	bool WriteFloat(float value);
 
-	bool WriteString(char* str);
+	bool WriteString(char const * str);
 };
 
 class MemoryStream : public BaseStream {
@@ -105,7 +105,7 @@ public:
 
 	bool Read(char* buffer, int length);
 
-	bool Write(char* buffer, int length);
+	bool Write(char const * buffer, int length);
 
 	int GetCurrentPosition();
 
