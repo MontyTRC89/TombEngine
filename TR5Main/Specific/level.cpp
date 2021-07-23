@@ -124,7 +124,7 @@ int LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string((const char*)buffer);
 
-			g_GameScript->AddLuaName(item->luaName, i);
+			g_GameScript->AddLuaNameItem(item->luaName, i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -413,6 +413,7 @@ void LoadCameras()
 		sink.luaName = std::string((const char*)buffer);
 
 		g_Level.Sinks.push_back(sink);
+		g_GameScript->AddLuaNameSink(sink.luaName, g_Level.Sinks.back());
 	}
 }
 

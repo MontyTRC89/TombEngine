@@ -8,6 +8,7 @@
 #include "GameScriptRotation.h"
 #include "GameScriptItemInfo.h"
 #include "GameScriptMeshInfo.h"
+#include "GameScriptSinkInfo.h"
 #include "GameScriptCameraInfo.h"
 
 struct LuaFunction {
@@ -52,6 +53,7 @@ private:
 	std::map<std::string, short>				m_itemsMapName;
 	std::map<std::string, MESH_INFO&>			m_meshesMapName;
 	std::map<std::string, LEVEL_CAMERA_INFO&>	m_camerasMapName;
+	std::map<std::string, SINK_INFO&>			m_sinksMapName;
 	std::vector<LuaFunction*>					m_triggers;
 	sol::protected_function						m_onStart;
 	sol::protected_function						m_onLoad;
@@ -64,12 +66,14 @@ public:
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
-	bool								AddLuaName(std::string const & luaName, short itemNumber);
-	bool								RemoveLuaName(std::string const& luaName);
+	bool								AddLuaNameItem(std::string const & luaName, short itemNumber);
+	bool								RemoveLuaNameItem(std::string const& luaName);
 	bool								AddLuaNameMesh(std::string const & luaName, MESH_INFO &);
 	bool								RemoveLuaNameMesh(std::string const& luaName);
 	bool								AddLuaNameCamera(std::string const & luaName, LEVEL_CAMERA_INFO &);
 	bool								RemoveLuaNameCamera(std::string const& luaName);
+	bool								AddLuaNameSink(std::string const & luaName, SINK_INFO &);
+	bool								RemoveLuaNameSink(std::string const& luaName);
 	void								AssignItemsAndLara();
 
 
@@ -81,6 +85,7 @@ public:
 	std::unique_ptr<GameScriptItemInfo>		GetItemByName(std::string const & name);
 	std::unique_ptr<GameScriptMeshInfo>		GetMeshByName(std::string const & name);
 	std::unique_ptr<GameScriptCameraInfo>	GetCameraByName(std::string const & name);
+	std::unique_ptr<GameScriptSinkInfo>		GetSinkByName(std::string const & name);
 
 	// Variables
 	template <typename T>
