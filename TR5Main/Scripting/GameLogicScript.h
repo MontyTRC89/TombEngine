@@ -8,6 +8,7 @@
 #include "GameScriptRotation.h"
 #include "GameScriptItemInfo.h"
 #include "GameScriptMeshInfo.h"
+#include "GameScriptCameraInfo.h"
 
 struct LuaFunction {
 	std::string Name;
@@ -45,17 +46,18 @@ struct LuaVariable
 class GameScript : public LuaHandler
 {
 private:
-	LuaVariables						m_globals;
-	LuaVariables						m_locals;
-	std::map<int, short>				m_itemsMapId;
-	std::map<std::string, short>		m_itemsMapName;
-	std::map<std::string, MESH_INFO&>	m_meshesMapName;
-	std::vector<LuaFunction*>			m_triggers;
-	sol::protected_function				m_onStart;
-	sol::protected_function				m_onLoad;
-	sol::protected_function				m_onControlPhase;
-	sol::protected_function				m_onSave;
-	sol::protected_function				m_onEnd;
+	LuaVariables								m_globals;
+	LuaVariables								m_locals;
+	std::map<int, short>						m_itemsMapId;
+	std::map<std::string, short>				m_itemsMapName;
+	std::map<std::string, MESH_INFO&>			m_meshesMapName;
+	std::map<std::string, LEVEL_CAMERA_INFO&>	m_camerasMapName;
+	std::vector<LuaFunction*>					m_triggers;
+	sol::protected_function						m_onStart;
+	sol::protected_function						m_onLoad;
+	sol::protected_function						m_onControlPhase;
+	sol::protected_function						m_onSave;
+	sol::protected_function						m_onEnd;
 public:	
 	GameScript(sol::state* lua);
 
@@ -66,15 +68,19 @@ public:
 	bool								RemoveLuaName(std::string const& luaName);
 	bool								AddLuaNameMesh(std::string const & luaName, MESH_INFO &);
 	bool								RemoveLuaNameMesh(std::string const& luaName);
+	bool								AddLuaNameCamera(std::string const & luaName, LEVEL_CAMERA_INFO &);
+	bool								RemoveLuaNameCamera(std::string const& luaName);
 	void								AssignItemsAndLara();
 
 
 	bool								ExecuteTrigger(short index);
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
-	std::unique_ptr<GameScriptItemInfo>	GetItemById(int id);
-	std::unique_ptr<GameScriptItemInfo>	GetItemByName(std::string const & name);
-	std::unique_ptr<GameScriptMeshInfo>	GetMeshByName(std::string const & name);
+
+	std::unique_ptr<GameScriptItemInfo>		GetItemById(int id);
+	std::unique_ptr<GameScriptItemInfo>		GetItemByName(std::string const & name);
+	std::unique_ptr<GameScriptMeshInfo>		GetMeshByName(std::string const & name);
+	std::unique_ptr<GameScriptCameraInfo>	GetCameraByName(std::string const & name);
 
 	// Variables
 	template <typename T>
