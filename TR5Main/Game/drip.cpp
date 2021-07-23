@@ -59,7 +59,7 @@ namespace T5M {
 				return dripParticles[0];
 			}
 
-			void SpawnWetnessDrip(Vector3 pos, int room)
+			void SpawnWetnessDrip(Vector3 const & pos, int room)
 			{
 				DripParticle& d = getFreeDrip();
 				d = {};
@@ -70,7 +70,7 @@ namespace T5M {
 				d.gravity = generateFloat(3, 6);
 			}
 
-			void SpawnSplashDrips(Vector3& pos, int num,int room)
+			void SpawnSplashDrips(Vector3 const& pos, int num,int room)
 			{
 				for (int i = 0; i < num; i++) {
 					Vector3 dripPos = pos + Vector3(generateFloat(-128, 128), generateFloat(-128, 128), generateFloat(-128, 128));
@@ -88,7 +88,7 @@ namespace T5M {
 				}
 			}
 
-			void SpawnGunshellDrips(Vector3& pos, int room)
+			void SpawnGunshellDrips(Vector3 const & pos, int room)
 			{
 				for (int i = 0; i < 4; i++) {
 					Vector3 dripPos = pos + Vector3(generateFloat(-16, 16), generateFloat(-16, 16), generateFloat(-16, 16));
