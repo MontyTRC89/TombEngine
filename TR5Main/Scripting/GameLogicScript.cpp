@@ -436,22 +436,32 @@ std::unique_ptr<T> GetTByName(std::string const & type, std::string const& name,
 
 std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string const & name)
 {
-	return GetTByName<GameScriptItemInfo, short>("Item", name, m_itemsMapName);
+	return GetTByName<GameScriptItemInfo, short>("ItemInfo", name, m_itemsMapName);
 }
 
 std::unique_ptr<GameScriptMeshInfo> GameScript::GetMeshByName(std::string const & name)
 {
-	return GetTByName<GameScriptMeshInfo, MESH_INFO &>("Mesh", name, m_meshesMapName);
+	return GetTByName<GameScriptMeshInfo, MESH_INFO &>("MeshInfo", name, m_meshesMapName);
 }
 
 std::unique_ptr<GameScriptCameraInfo> GameScript::GetCameraByName(std::string const & name)
 {
-	return GetTByName<GameScriptCameraInfo, LEVEL_CAMERA_INFO &>("Camera", name, m_camerasMapName);
+	return GetTByName<GameScriptCameraInfo, LEVEL_CAMERA_INFO &>("CameraInfo", name, m_camerasMapName);
 }
 
 std::unique_ptr<GameScriptSinkInfo> GameScript::GetSinkByName(std::string const & name)
 {
-	return GetTByName<GameScriptSinkInfo, SINK_INFO &>("Sink", name, m_sinksMapName);
+	return GetTByName<GameScriptSinkInfo, SINK_INFO &>("SinkInfo", name, m_sinksMapName);
+}
+
+std::unique_ptr<GameScriptAIObject> GameScript::GetAIObjectByName(std::string const & name)
+{
+	return GetTByName<GameScriptAIObject, AI_OBJECT &>("AIObject", name, m_aiObjectsMapName);
+}
+
+std::unique_ptr<GameScriptSoundSourceInfo> GameScript::GetSoundSourceByName(std::string const & name)
+{
+	return GetTByName<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>("SoundSourceInfo", name, m_soundSourcesMapName);
 }
 
 void GameScript::PlayAudioTrack(std::string const & trackName, bool looped)
