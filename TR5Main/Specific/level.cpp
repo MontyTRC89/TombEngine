@@ -119,10 +119,9 @@ int LoadItems()
 			item->flags = ReadInt16();
 
 			byte numBytes = ReadInt8();
-			char* buffer[255];
-			ZeroMemory(buffer, 256);
+			char buffer[255];
 			ReadBytes(buffer, numBytes);
-			item->luaName = std::string((const char*)buffer);
+			item->luaName = std::string(buffer, buffer + numBytes);
 
 			g_GameScript->AddLuaNameItem(item->luaName, i);
 
@@ -247,7 +246,7 @@ void LoadObjects()
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
 	{
-		ANIM_STRUCT* anim = &g_Level.Anims[i];;
+		ANIM_STRUCT* anim = &g_Level.Anims[i];
 
 		anim->framePtr = ReadInt32();
 		anim->interpolation = ReadInt16();
@@ -369,8 +368,7 @@ void LoadCameras()
 	g_Level.Cameras.resize(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
-		LEVEL_CAMERA_INFO camera;
-
+		auto & camera = g_Level.Cameras.emplace_back();
 		camera.x = ReadInt32();
 		camera.y = ReadInt32();
 		camera.z = ReadInt32();
@@ -378,12 +376,10 @@ void LoadCameras()
 		camera.flags = ReadInt32();
 
 		byte numBytes = ReadInt8();
-		char* buffer[255];
-		ZeroMemory(buffer, 256);
+		char buffer[255];
 		ReadBytes(buffer, numBytes);
-		camera.luaName = std::string((const char*)buffer);
+		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_Level.Cameras.push_back(camera);
 		g_GameScript->AddLuaNameCamera(camera.luaName, g_Level.Cameras.back());
 	}
 
@@ -398,8 +394,7 @@ void LoadCameras()
 	g_Level.Sinks.resize(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
-		SINK_INFO sink;
-
+		auto & sink = g_Level.Sinks.emplace_back();
 		sink.x = ReadInt32();
 		sink.y = ReadInt32();
 		sink.z = ReadInt32();
@@ -407,12 +402,10 @@ void LoadCameras()
 		sink.boxIndex = ReadInt32();
 
 		byte numBytes = ReadInt8();
-		char* buffer[255];
-		ZeroMemory(buffer, 256);
+		char buffer[255];
 		ReadBytes(buffer, numBytes);
-		sink.luaName = std::string((const char*)buffer);
+		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_Level.Sinks.push_back(sink);
 		g_GameScript->AddLuaNameSink(sink.luaName, g_Level.Sinks.back());
 	}
 }
@@ -549,8 +542,7 @@ void ReadRooms()
 
 	for (int i = 0; i < numRooms; i++)
 	{
-		g_Level.Rooms.push_back(ROOM_INFO{});
-		auto& room = g_Level.Rooms.back();
+		auto & room = g_Level.Rooms.emplace_back();
 		room.x = ReadInt32();
 		room.y = 0;
 		room.z = ReadInt32();
@@ -721,10 +713,9 @@ void ReadRooms()
 			mesh.hitPoints = ReadInt16();
 
 			byte numBytes = ReadInt8();
-			char* buffer[255];
-			ZeroMemory(buffer, 256);
+			char buffer[255];
 			ReadBytes(buffer, numBytes);
-			mesh.luaName = std::string((const char*)buffer);
+			mesh.luaName = std::string(buffer, buffer + numBytes);
 
 			room.mesh.push_back(mesh);
 			g_GameScript->AddLuaNameMesh(mesh.luaName, room.mesh.back());
@@ -751,20 +742,17 @@ void ReadRooms()
 			volume.activators = ReadInt32();
 
 			byte numBytes = ReadInt8();
-			char* buffer[255];
-			ZeroMemory(buffer, 256);
+			char buffer[255];
 			ReadBytes(buffer, numBytes);
-			volume.onEnter = std::string((const char*)buffer);
+			volume.onEnter = std::string(buffer, buffer+numBytes);
 
 			numBytes = ReadInt8();
-			ZeroMemory(buffer, 256);
 			ReadBytes(buffer, numBytes);
-			volume.onInside = std::string((const char*)buffer);
+			volume.onInside = std::string(buffer, buffer+numBytes);
 
 			numBytes = ReadInt8();
-			ZeroMemory(buffer, 256);
 			ReadBytes(buffer, numBytes);
-			volume.onLeave = std::string((const char*)buffer);
+			volume.onLeave = std::string(buffer, buffer+numBytes);
 
 			volume.oneShot = ReadInt8();
 			volume.status = TS_OUTSIDE;
@@ -855,8 +843,7 @@ void LoadSoundEffects()
 	g_Level.SoundSources.resize(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
-		g_Level.SoundSources.push_back(SOUND_SOURCE_INFO{});
-		auto & source = g_Level.SoundSources.back();
+		auto & source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
 
 		source.x = ReadInt32();
 		source.y = ReadInt32();
@@ -865,12 +852,10 @@ void LoadSoundEffects()
 		source.flags = ReadInt32();
 
 		byte numBytes = ReadInt8();
-		char* buffer[255];
-		ZeroMemory(buffer, 256);
+		char buffer[255];
 		ReadBytes(buffer, numBytes);
-		source.luaName = std::string((const char*)buffer);
+		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_Level.SoundSources.push_back(source);
 		g_GameScript->AddLuaNameSoundSource(source.luaName, source);
 	}
 }
@@ -928,8 +913,7 @@ void LoadAIObjects()
 	g_Level.AIObjects.resize(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
-		g_Level.AIObjects.push_back(AI_OBJECT{});
-		auto & obj  = g_Level.AIObjects.back();
+		auto & obj = g_Level.AIObjects.emplace_back();
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
@@ -942,11 +926,10 @@ void LoadAIObjects()
 		obj.boxNumber = ReadInt16();
 
 		byte numBytes = ReadInt8();
-		char* buffer[255];
-		ZeroMemory(buffer, 256);
+		char buffer[255];
 		ReadBytes(buffer, numBytes);
-		obj.luaName = std::string((const char*)buffer);
-		
+		obj.luaName = std::string(buffer, buffer+numBytes);
+
 		g_GameScript->AddLuaNameAIObject(obj.luaName, obj);
 	}
 }
