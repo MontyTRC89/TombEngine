@@ -1005,7 +1005,7 @@ template <typename T, typename Enum> constexpr bool same_or_underlying = std::is
 // += operator that only allows addition of shorts or GAME_OBJECT_IDs. This is to
 // allow us to see and manually review any places where we're adding something that
 // might be the wrong type.
-template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID> & operator+=(GAME_OBJECT_ID lhs, T rhs)
+template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID> & operator+=(GAME_OBJECT_ID & lhs, T const & rhs)
 {
 	lhs += GAME_OBJECT_ID{ rhs };
 	return lhs;
