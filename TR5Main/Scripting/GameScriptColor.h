@@ -22,13 +22,13 @@ public:
 	operator Vector3() const;
 	operator Vector4() const;
 
-	byte								GetR();
+	byte								GetR() const;
 	void								SetR(byte v);
-	byte								GetG();
+	byte								GetG() const;
 	void								SetG(byte v);
-	byte								GetB();
+	byte								GetB() const;
 	void								SetB(byte v);
-	byte								GetA();
+	byte								GetA() const;
 	void								SetA(byte v);
 
 	std::string ToString() const;
