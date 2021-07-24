@@ -9,6 +9,8 @@
 #include "GameScriptItemInfo.h"
 #include "GameScriptMeshInfo.h"
 #include "GameScriptSinkInfo.h"
+#include "GameScriptAIObject.h"
+#include "GameScriptSoundSourceInfo.h"
 #include "GameScriptCameraInfo.h"
 
 struct LuaFunction {
@@ -54,6 +56,8 @@ private:
 	std::map<std::string, MESH_INFO&>			m_meshesMapName;
 	std::map<std::string, LEVEL_CAMERA_INFO&>	m_camerasMapName;
 	std::map<std::string, SINK_INFO&>			m_sinksMapName;
+	std::map<std::string, SOUND_SOURCE_INFO&>	m_soundSourcesMapName;
+	std::map<std::string, AI_OBJECT &>			m_aiObjectsMapName;
 	std::vector<LuaFunction*>					m_triggers;
 	sol::protected_function						m_onStart;
 	sol::protected_function						m_onLoad;
@@ -65,15 +69,26 @@ public:
 
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
+
 	void								AddLuaId(int luaId, short itemNumber);
 	bool								AddLuaNameItem(std::string const & luaName, short itemNumber);
 	bool								RemoveLuaNameItem(std::string const& luaName);
+
 	bool								AddLuaNameMesh(std::string const & luaName, MESH_INFO &);
 	bool								RemoveLuaNameMesh(std::string const& luaName);
+
 	bool								AddLuaNameCamera(std::string const & luaName, LEVEL_CAMERA_INFO &);
 	bool								RemoveLuaNameCamera(std::string const& luaName);
+
 	bool								AddLuaNameSink(std::string const & luaName, SINK_INFO &);
 	bool								RemoveLuaNameSink(std::string const& luaName);
+
+	bool								AddLuaNameSoundSource(std::string const& luaName, SOUND_SOURCE_INFO&);
+	bool								RemoveLuaNameSoundSource(std::string const& luaName);
+
+	bool								AddLuaNameAIObject(std::string const & luaName, AI_OBJECT &);
+	bool								RemoveLuaNameAIObject(std::string const& luaName);
+
 	void								AssignItemsAndLara();
 
 
@@ -81,11 +96,13 @@ public:
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 
-	std::unique_ptr<GameScriptItemInfo>		GetItemById(int id);
-	std::unique_ptr<GameScriptItemInfo>		GetItemByName(std::string const & name);
-	std::unique_ptr<GameScriptMeshInfo>		GetMeshByName(std::string const & name);
-	std::unique_ptr<GameScriptCameraInfo>	GetCameraByName(std::string const & name);
-	std::unique_ptr<GameScriptSinkInfo>		GetSinkByName(std::string const & name);
+	std::unique_ptr<GameScriptItemInfo>			GetItemById(int id);
+	std::unique_ptr<GameScriptItemInfo>			GetItemByName(std::string const & name);
+	std::unique_ptr<GameScriptMeshInfo>			GetMeshByName(std::string const & name);
+	std::unique_ptr<GameScriptCameraInfo>		GetCameraByName(std::string const & name);
+	std::unique_ptr<GameScriptSinkInfo>			GetSinkByName(std::string const & name);
+	std::unique_ptr<GameScriptSoundSourceInfo>	GetSoundSourceByName(std::string const & name);
+	std::unique_ptr<GameScriptAIObject>			GetAIObjectByName(std::string const & name);
 
 	// Variables
 	template <typename T>
