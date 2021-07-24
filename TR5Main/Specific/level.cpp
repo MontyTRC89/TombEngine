@@ -380,7 +380,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddLuaNameCamera(camera.luaName, g_Level.Cameras.back());
+		g_GameScript->AddLuaNameCamera(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -406,7 +406,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSink(sink.luaName, g_Level.Sinks.back());
+		g_GameScript->AddLuaNameSink(sink.luaName, sink);
 	}
 }
 
@@ -699,8 +699,7 @@ void ReadRooms()
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			MESH_INFO mesh;
-
+			auto & mesh = room.mesh.emplace_back();
 			mesh.x = ReadInt32();
 			mesh.y = ReadInt32();
 			mesh.z = ReadInt32();
@@ -717,8 +716,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			room.mesh.push_back(mesh);
-			g_GameScript->AddLuaNameMesh(mesh.luaName, room.mesh.back());
+			g_GameScript->AddLuaNameMesh(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
