@@ -188,6 +188,18 @@ auto makeReadOnlyTable = [this](std::string const & tableName, auto const& conta
 		[this](std::string const& str) { return RemoveLuaNameSink(str); }
 	);
 
+	GameScriptAIObject::Register(m_lua);
+	GameScriptAIObject::SetNameCallbacks(
+		[this](std::string const& str, AI_OBJECT & info) {	return AddLuaNameAIObject(str, info); },
+		[this](std::string const& str) { return RemoveLuaNameAIObject(str); }
+	);
+
+	GameScriptSoundSourceInfo::Register(m_lua);
+	GameScriptSoundSourceInfo::SetNameCallbacks(
+		[this](std::string const& str, SOUND_SOURCE_INFO & info) {	return AddLuaNameSoundSource(str, info); },
+		[this](std::string const& str) { return RemoveLuaNameSoundSource(str); }
+	);
+
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 	GameScriptColor::Register(m_lua);
@@ -253,6 +265,25 @@ bool GameScript::RemoveLuaNameSink(std::string const & luaName)
 bool GameScript::AddLuaNameSink(std::string const& luaName, SINK_INFO& infoRef)
 {
 	return m_sinksMapName.insert(std::pair<std::string, SINK_INFO&>(luaName, infoRef)).second;
+}
+bool GameScript::RemoveLuaNameSoundSource(std::string const & luaName)
+{
+	return m_soundSourcesMapName.erase(luaName);
+}
+
+bool GameScript::AddLuaNameSoundSource(std::string const& luaName, SOUND_SOURCE_INFO& infoRef)
+{
+	return m_soundSourcesMapName.insert(std::pair<std::string, SOUND_SOURCE_INFO&>(luaName, infoRef)).second;
+}
+
+bool GameScript::RemoveLuaNameAIObject(std::string const & luaName)
+{
+	return m_aiObjectsMapName.erase(luaName);
+}
+
+bool GameScript::AddLuaNameAIObject(std::string const& luaName, AI_OBJECT & ref)
+{
+	return m_aiObjectsMapName.insert(std::pair<std::string, AI_OBJECT&>(luaName, ref)).second;
 }
 
 void GameScript::FreeLevelScripts()
