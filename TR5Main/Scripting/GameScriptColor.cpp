@@ -77,7 +77,7 @@ GameScriptColor::operator Vector4() const
 	return Vector4{ float(r), float(g), float(b), float(a) };
 }
 
-byte GameScriptColor::GetR()
+byte GameScriptColor::GetR() const
 {
 	return r;
 }
@@ -87,7 +87,7 @@ void GameScriptColor::SetR(byte v)
 	r = std::clamp<byte>(v, 0, 255);
 }
 
-byte GameScriptColor::GetG()
+byte GameScriptColor::GetG() const
 {
 	return g;
 }
@@ -97,7 +97,7 @@ void GameScriptColor::SetG(byte v)
 	g = std::clamp<byte>(v, 0, 255);
 }
 
-byte GameScriptColor::GetB()
+byte GameScriptColor::GetB() const
 {
 	return b;
 }
@@ -107,7 +107,7 @@ void GameScriptColor::SetB(byte v)
 	b = std::clamp<byte>(v, 0, 255);
 }
 
-byte GameScriptColor::GetA()
+byte GameScriptColor::GetA() const
 {
 	return a;
 }
