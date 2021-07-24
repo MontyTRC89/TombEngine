@@ -855,7 +855,8 @@ void LoadSoundEffects()
 	g_Level.SoundSources.resize(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
-		SOUND_SOURCE_INFO source;
+		g_Level.SoundSources.push_back(SOUND_SOURCE_INFO{});
+		auto & source = g_Level.SoundSources.back();
 
 		source.x = ReadInt32();
 		source.y = ReadInt32();
@@ -870,6 +871,7 @@ void LoadSoundEffects()
 		source.luaName = std::string((const char*)buffer);
 
 		g_Level.SoundSources.push_back(source);
+		g_GameScript->AddLuaNameSoundSource(source.luaName, source);
 	}
 }
 
@@ -926,7 +928,8 @@ void LoadAIObjects()
 	g_Level.AIObjects.resize(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
-		AI_OBJECT obj;
+		g_Level.AIObjects.push_back(AI_OBJECT{});
+		auto & obj  = g_Level.AIObjects.back();
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
@@ -943,8 +946,8 @@ void LoadAIObjects()
 		ZeroMemory(buffer, 256);
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string((const char*)buffer);
-
-		g_Level.AIObjects.push_back(obj);
+		
+		g_GameScript->AddLuaNameAIObject(obj.luaName, obj);
 	}
 }
 
