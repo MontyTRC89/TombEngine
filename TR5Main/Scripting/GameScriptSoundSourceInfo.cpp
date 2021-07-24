@@ -2,7 +2,7 @@
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptPosition.h"
 /***
-Camera info
+Sound source info
 
 @classmod SoundSourceInfo
 @pragma nostrip
