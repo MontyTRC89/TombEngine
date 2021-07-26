@@ -54,14 +54,6 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 		"endZ", &GameScriptMirror::EndZ
 		);
 
-	// Fog type
-	m_lua->new_usertype<GameScriptFog>("Fog",
-		sol::constructors<GameScriptFog(byte, byte, byte)>(),
-		"r", &GameScriptFog::R,
-		"g", &GameScriptFog::G,
-		"b", &GameScriptFog::B
-		);
-
 	// Inventory object type
 	m_lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
 		sol::constructors<GameScriptInventoryObject(std::string, short, float, float, float, float, float, short, int, __int64)>(),
@@ -140,11 +132,6 @@ void GameFlow::SetStrings(sol::nested<std::unordered_map<std::string, std::vecto
 void GameFlow::WriteDefaults()
 {
 	Intro = "SCREENS\\MAIN.PNG";
-	EnableLoadSave = true;
-	PlayAnyLevel = true;
-	FlyCheat = true;
-	DebugMode = false;
-	LevelFarView = 0;
 }
 
 void GameFlow::AddLevel(GameScriptLevel const& level)
