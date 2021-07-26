@@ -13,6 +13,10 @@ class GameScriptCameraInfo : public GameScriptNamedBase<GameScriptCameraInfo, LE
 public:
 	GameScriptCameraInfo(LEVEL_CAMERA_INFO& ref, bool temp);
 	~GameScriptCameraInfo();
+
+	GameScriptCameraInfo& operator=(GameScriptCameraInfo const& other) = delete;
+	GameScriptCameraInfo(GameScriptCameraInfo const& other) = delete;
+
 	static void Register(sol::state *);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
