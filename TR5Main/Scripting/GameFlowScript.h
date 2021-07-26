@@ -2,10 +2,13 @@
 #include "LanguageScript.h"
 #include "LuaHandler.h"
 
-#define TITLE_FLYBY			0
-#define TITLE_BACKGROUND	1
+enum TITLE_TYPE
+{
+	TITLE_FLYBY,
+	TITLE_BACKGROUND
+};
 
-enum WEATHER_TYPES
+enum WEATHER_TYPE
 {
 	WEATHER_NORMAL,
 	WEATHER_RAIN,
@@ -88,25 +91,6 @@ struct GameScriptSkyLayer
 	}
 };
 
-struct GameScriptFog
-{
-	byte R;
-	byte G;
-	byte B;
-
-	GameScriptFog()
-	{
-
-	}
-
-	GameScriptFog(byte r, byte g, byte b)
-	{
-		R = r;
-		G = g;
-		B = b;
-	}
-};
-
 struct GameScriptMirror
 {
 	short Room;
@@ -142,32 +126,20 @@ struct GameScriptLevel
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
-	bool Horizon;
+	bool Horizon{ false };
 	bool Sky;
-	bool ColAddHorizon;
-	GameScriptFog Fog;
-	bool Storm;
-	WEATHER_TYPES Weather;
-	bool ResetHub;
-	bool Rumble;
-	LARA_DRAW_TYPE LaraType;
+	bool ColAddHorizon{ false };
+	GameScriptColor Fog{ 0,0,0 };
+	bool Storm{ false };
+	WEATHER_TYPE Weather{ WEATHER_NORMAL };
+	bool ResetHub{ false };
+	bool Rumble{ false };
+	LARA_DRAW_TYPE LaraType{ LARA_NORMAL };
 	GameScriptMirror Mirror;
 	byte UVRotate;
 	int LevelFarView;
-	bool UnlimitedAir;
+	bool UnlimitedAir{ false };
 	std::vector<GameScriptInventoryObject> InventoryObjects;
-
-	GameScriptLevel()
-	{
-		Storm = false;
-		Horizon = false;
-		ColAddHorizon = false;
-		ResetHub = false;
-		Rumble = false;
-		Weather = WEATHER_NORMAL;
-		LaraType = LARA_NORMAL;
-		UnlimitedAir = false;
-	}
 };
 
 struct GameScriptAudioTrack
@@ -195,24 +167,24 @@ private:
 	std::map<short, short>				m_itemsMap;
 
 public:
-	Vector3							SkyColorLayer1;
-	int								SkySpeedLayer1;
-	Vector3							SkyColorLayer2;
-	int								SkySpeedLayer2;
-	Vector3							FogColor;
-	int								FogInDistance;
-	int								FogOutDistance;
-	bool							DrawHorizon;
-	bool							ColAddHorizon;
-	int								SelectedLevelForNewGame;
-	int								SelectedSaveGame;
-	bool							EnableLoadSave;
-	bool							PlayAnyLevel;
-	bool							FlyCheat;
-	bool							DebugMode;
-	int								LevelFarView;
-	int								TitleType;
-	char const *					Intro;
+	Vector3							SkyColorLayer1{};
+	Vector3							SkyColorLayer2{};
+	Vector3							FogColor{};
+	int								SkySpeedLayer1{ 0 };
+	int								SkySpeedLayer2{ 0 };
+	int								FogInDistance{ 0 };
+	int								FogOutDistance{ 0 };
+	bool							DrawHorizon{ false };
+	bool							ColAddHorizon{ false };
+	int								SelectedLevelForNewGame{ 0 };
+	int								SelectedSaveGame{ 0 };
+	bool							EnableLoadSave{ true };
+	bool							PlayAnyLevel{ true };
+	bool							FlyCheat{ true };
+	bool							DebugMode{ false };
+	int								LevelFarView{ 0 };
+	TITLE_TYPE						TitleType{ TITLE_BACKGROUND };
+	char const*						Intro{ nullptr };
 
 	// Selected language set
 	std::vector<GameScriptLevel*>			Levels;
