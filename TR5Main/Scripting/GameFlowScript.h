@@ -1,6 +1,7 @@
 #pragma once
 #include "LanguageScript.h"
 #include "LuaHandler.h"
+#include "GameScriptColor.h"
 
 enum TITLE_TYPE
 {
