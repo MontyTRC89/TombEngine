@@ -14,6 +14,9 @@ public:
 	GameScriptAIObject(AI_OBJECT& ref, bool temp);
 	~GameScriptAIObject();
 
+	GameScriptAIObject& operator=(GameScriptAIObject const& other) = delete;
+	GameScriptAIObject(GameScriptAIObject const& other) = delete;
+
 	static void Register(sol::state *);
 
 	GameScriptPosition GetPos() const;

@@ -13,6 +13,9 @@ class GameScriptSinkInfo : public GameScriptNamedBase<GameScriptSinkInfo, SINK_I
 public:
 	GameScriptSinkInfo(SINK_INFO& ref, bool temp);
 	~GameScriptSinkInfo();
+	GameScriptSinkInfo& operator=(GameScriptSinkInfo const& other) = delete;
+	GameScriptSinkInfo(GameScriptSinkInfo const& other) = delete;
+
 	static void Register(sol::state *);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
