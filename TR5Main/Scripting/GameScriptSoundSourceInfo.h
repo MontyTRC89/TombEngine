@@ -13,6 +13,10 @@ class GameScriptSoundSourceInfo : public GameScriptNamedBase<GameScriptSoundSour
 public:
 	GameScriptSoundSourceInfo(SOUND_SOURCE_INFO& ref, bool temp);
 	~GameScriptSoundSourceInfo();
+
+	GameScriptSoundSourceInfo& operator=(GameScriptSoundSourceInfo const& other) = delete;
+	GameScriptSoundSourceInfo(GameScriptSoundSourceInfo const& other) = delete;
+
 	static void Register(sol::state *);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
