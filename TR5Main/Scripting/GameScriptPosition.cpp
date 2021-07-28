@@ -18,6 +18,7 @@ void GameScriptPosition::Register(sol::state* state)
 		/// (int) x coordinate
 		//@mem x
 		"x", &GameScriptPosition::x,
+
 		/// (int) y coordinate
 		//@mem y
 
