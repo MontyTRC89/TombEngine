@@ -21,8 +21,8 @@
 #endif
 
 /***
-Global functions and callbacks (not actually a module but a set of global functions)
-@module global 
+functions and callbacks for game specific scripts
+@module gamelogic
 @pragma nostrip
 */
 
@@ -137,7 +137,7 @@ Get a SinkInfo by its name.
 */
 	m_lua->set_function("GetSinkByName", &GameScript::GetSinkByName, this);
 
-auto makeReadOnlyTable = [this](std::string const & tableName, auto const& container)
+	auto makeReadOnlyTable = [this](std::string const & tableName, auto const& container)
 	{
 		auto mt = tableName + "Meta";
 		// Put all the data in the metatable	
