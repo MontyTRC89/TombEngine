@@ -115,6 +115,7 @@ struct ROOM_INFO
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
+	std::vector<int> effects;
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 	int xSize;

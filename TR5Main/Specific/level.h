@@ -119,6 +119,7 @@ struct MESH
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
+	std::vector<int> effects;
 	std::vector<int> bones;
 	std::vector<BUCKET> buckets;
 };

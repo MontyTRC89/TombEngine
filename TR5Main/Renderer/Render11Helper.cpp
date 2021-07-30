@@ -461,6 +461,9 @@ namespace T5M::Renderer
 					/*if (isHairs)
 						vertex.Bone = v;*/
 
+					vertex.Effects = meshPtr->effects[v];
+					vertex.hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
+
 					bucket.Vertices[lastVertex++] = vertex;
 				}
 
