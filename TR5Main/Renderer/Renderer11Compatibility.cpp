@@ -251,6 +251,7 @@ namespace T5M::Renderer
 						vertex->BiTangent = poly->bitangents[k];
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = v;
+						vertex->Effects = room->effects[v];
 						vertex->hash = std::hash<float>{}(vertex->Position.x) ^ std::hash<float>{}(vertex->Position.y) ^ std::hash<float>{}(vertex->Position.z);
 						vertex->Bone = 0;
 

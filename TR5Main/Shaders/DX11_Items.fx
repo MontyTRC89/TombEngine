@@ -61,9 +61,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
 	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
 	float3 ReflectionVector = reflect(normalize(-CamDirectionWS.xyz), normalize(Normal));
-	output.Position = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
+	float4 ScreenPos = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
 	output.Normal = Normal;
-	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = WorldPosition;
 	output.ReflectionVector = ReflectionVector;
@@ -71,6 +70,35 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3 Bitangent = mul(float4(input.Bitangent, 0), world).xyz;
 	float3x3 TBN = float3x3(Tangent, Bitangent, Normal);
 	output.TBN = transpose(TBN);
+	
+	float2 clipPos = ScreenPos.xy / ScreenPos.w;
+	
+	float glow = float(input.Effects & 0x3F) / 60.0f;	
+	float move = float((input.Effects >> 6) & 63) / 15.0f;
+	
+	if (move > 0) 
+	{
+		static const float PI = 3.14159265f;
+		float factor = (Frame + clipPos.x*320);
+		float xOffset = (sin(factor * PI/20.0f)) * (ScreenPos.z/1024)*5;
+		float yOffset = (cos(factor*PI/20.0f))*(ScreenPos.z/1024)*5;
+		ScreenPos.x += xOffset * move;
+		ScreenPos.y += yOffset * move;
+	}
+	
+	output.Position = ScreenPos;
+	output.Color = input.Color;
+	
+	if (glow > 0)
+	{
+		static const float PI = 3.14159265f;
+		int offset = input.Hash;
+		float wibble = sin((((Frame + offset) % 64) / 64.0) * PI) * 0.5f + 0.5f;
+		wibble *= glow;
+		wibble = lerp(0.1f, 1.0f, wibble);
+		output.Color *= wibble;
+	}
+	
 	return output;
 }
 

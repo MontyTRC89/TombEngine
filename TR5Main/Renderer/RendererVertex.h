@@ -11,6 +11,7 @@ namespace T5M::Renderer {
 		float Bone;
 		int IndexInPoly;
 		int OriginalIndex;
+		int Effects;
 		int hash;
 	};
 }
