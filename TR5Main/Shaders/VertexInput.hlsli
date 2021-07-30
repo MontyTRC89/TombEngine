@@ -8,5 +8,6 @@ struct VertexShaderInput {
 	float Bone: BLENDINDICES;
 	uint PolyIndex : POLYINDEX;
 	uint Index: DRAWINDEX;
+	uint Effects: EFFECTS;
 	int Hash : HASH;
 };

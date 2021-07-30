@@ -34,7 +34,7 @@ cbuffer CShadowLightBuffer : register(b4)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
-	int water;
+	int water; // DEPRECATED
 };
 struct AnimatedFrameUV
 {
@@ -82,25 +82,38 @@ PixelShaderInput VS(VertexShaderInput input)
 	PixelShaderInput output;
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
-	if (CameraUnderwater != water) {
+	
+	float glow = float(input.Effects & 0x3F) / 60.0f;	
+	float move = float((input.Effects >> 6) & 63) / 15.0f;
+
+	if (CameraUnderwater)
+		move = 2.0f;
+	
+	if (move > 0) 
+	{
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x*320);
 		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;
 		float yOffset = (cos(factor*PI/20.0f))*(screenPos.z/1024)*5;
-		screenPos.x += xOffset;
-		screenPos.y += yOffset;
+		screenPos.x += xOffset * move;
+		screenPos.y += yOffset * move;
 	}
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
-	if (water) {
+	
+	if (glow > 0.0f)
+	{
 		static const float PI = 3.14159265f;
 		int offset = input.Hash;
-		float wibble = sin((((Frame + offset) % 64) / 64.0)* PI)*0.5f+0.5f;
+		float wibble = sin((((Frame + offset) % 64) / 64.0) * PI) * 0.5f + 0.5f;
+		wibble *= glow;
 		wibble = lerp(0.1f, 1.0f, wibble);
 		output.Color *= wibble;
 	}
+	
+	
 #ifdef ANIMATED
 	int frame = (Frame / 2) % numAnimFrames;
 	switch (input.PolyIndex) {
@@ -121,6 +134,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 
 #endif
+
 	output.WorldPosition = input.Position.xyz;
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
