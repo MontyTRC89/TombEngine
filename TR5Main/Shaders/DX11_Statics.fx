@@ -26,7 +26,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection); 
 	output.Normal = input.Normal;
-	output.Color = input.Color*Color;
+	output.Color = input.Color * Color;
 	output.UV = input.UV;
 
 	return output;
