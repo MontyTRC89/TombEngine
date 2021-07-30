@@ -401,7 +401,7 @@ namespace T5M::Renderer
 {
         wchar_t introFileChars[255];
 
-        std::mbstowcs(introFileChars, g_GameFlow->Intro, 255);
+        std::mbstowcs(introFileChars, g_GameFlow->IntroImagePath.c_str(), 255);
         std::wstring titleStringFileName(introFileChars);
         Texture2D texture = Texture2D(m_device.Get(), titleStringFileName);
 
