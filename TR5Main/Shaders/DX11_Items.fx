@@ -80,6 +80,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	Normal = Normal * 2 - 1;
 	Normal = normalize( mul(input.TBN,Normal));
 	float4 output = Texture.Sample(Sampler, input.UV);
+	float3 colorMul = min(input.Color.xyz, 1.0f);
 	if (AlphaTest)
 		clip(output.w - 0.5f);
 
@@ -174,5 +175,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 
 	output.xyz *= lighting.xyz;
+	output.xyz *= colorMul.xyz;
 	return output;
 }

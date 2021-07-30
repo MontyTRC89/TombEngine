@@ -2617,7 +2617,7 @@ namespace T5M::Renderer
         drawRooms(true, false, view);
         drawRooms(true, true, view);
         drawStatics(true, view);
-        drawLara(view,true, false);
+        drawLara(view, true, false);
         drawItems(true, false, view);
         drawItems(true, true, view);
         drawEffects(view,true);
