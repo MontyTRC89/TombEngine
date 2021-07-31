@@ -10,6 +10,7 @@
 using namespace T5M::Renderer;
 int LastSequence;
 int SpotcamTimer;
+int SpotcamPaused;
 int SpotcamLoopCnt;
 int CameraFade;
 PHD_VECTOR LaraFixedPosition;
@@ -45,7 +46,6 @@ SPOTCAM SpotCam[64];
 int NumberSpotcams;
 int CheckTrigger = 0;
 int UseSpotCam = 0;
-int SlowMotion;
 int SpotcamDontDrawLara;
 int SpotcamOverlay;
 
@@ -123,6 +123,7 @@ void InitialiseSpotCam(short Sequence)
 	LastSequence = Sequence;
 	TrackCameraInit = 0;
 	SpotcamTimer = 0;
+	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
 	DisableLaraControl = 0;
 
@@ -262,11 +263,6 @@ void InitialiseSpotCam(short Sequence)
 			if (s->flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
 			{
 				CheckTrigger = true;
-			}
-
-			if (s->flags & SCF_VIGNETTE)
-			{
-				/*Hardcoded code*/
 			}
 
 			if (s->flags & SCF_HIDE_LARA)
@@ -574,17 +570,14 @@ void CalculateSpotCameras()
 		}
 		else if (CurrentSplinePosition > 0x10000 - cspeed)
 		{
-			if (SpotCam[CurrentSplineCamera].flags & SCF_VIGNETTE)
+			if (SpotCam[CurrentSplineCamera].timer >= 0)
 			{
-				if (SpotCam[CurrentSplineCamera].timer >= 0)
-				{
-					if (!SlowMotion)
-						SlowMotion = SpotCam[CurrentSplineCamera].timer;
-				}
-				else
-				{
-					SpotcamOverlay = 1;
-				}
+				if (!SpotcamTimer && !SpotcamPaused)
+					SpotcamTimer = SpotCam[CurrentSplineCamera].timer * 30;
+			}
+			else
+			{
+				SpotcamOverlay = 1; // Negative timer = sniper mode?
 			}
 
 			if (SpotCam[CurrentSplineCamera].flags & SCF_HIDE_LARA)
@@ -731,6 +724,7 @@ void CalculateSpotCameras()
 				}
 
 				CurrentSplineCamera++;
+				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
 				{
@@ -857,6 +851,12 @@ void CalculateSpotCameras()
 
 					SplineToCamera = 1;
 				}
+			}
+			else
+			{
+				SpotcamTimer--;
+				if (!SpotcamTimer)
+					SpotcamPaused = 1;
 			}
 		}
 	}
