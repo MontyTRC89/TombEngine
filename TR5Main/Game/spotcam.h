@@ -29,7 +29,7 @@ struct SPOTCAM
 enum spotcam_flags
 {
 	SCF_CUT_PAN = (1 << 0),					 // 0x0001   cut without panning smoothly
-	SCF_VIGNETTE = (1 << 1),				 // 0x0002
+	SCF_UNUSED = (1 << 1),				     // 0x0002
 	SCF_LOOP_SEQUENCE = (1 << 2),			 // 0x0004
 	SCF_TRACKING_CAM = (1 << 3),			 // 0x0008
 	SCF_HIDE_LARA = (1 << 4),				 // 0x0010
