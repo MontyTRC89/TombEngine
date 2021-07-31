@@ -8,10 +8,10 @@ namespace T5M::Renderer {
 		DirectX::SimpleMath::Vector4 Color;
 		DirectX::SimpleMath::Vector3 Tangent;
 		DirectX::SimpleMath::Vector3 BiTangent;
+		DirectX::SimpleMath::Vector3 Effects;
 		float Bone;
 		int IndexInPoly;
 		int OriginalIndex;
-		int Effects;
 		int hash;
 	};
 }

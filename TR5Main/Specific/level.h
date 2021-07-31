@@ -102,24 +102,13 @@ struct SPRITE
 	float y4;
 };
 
-struct MESH_VERTEX
-{
-	Vector3 position;
-	Vector3 normal;
-	Vector2 textureCoordinates;
-	Vector3 color;
-	int bone;
-	int indexInPoly;
-	int originalIndex;
-};
-
 struct MESH
 {
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
-	std::vector<int> effects;
+	std::vector<Vector3> effects; // X = glow, Y = move, Z = refract
 	std::vector<int> bones;
 	std::vector<BUCKET> buckets;
 };
