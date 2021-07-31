@@ -83,25 +83,29 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
 	
-	float glow = float(input.Effects & 0x3F) / 60.0f;	
-	float move = float((input.Effects >> 6) & 63) / 15.0f;
-
-	if (CameraUnderwater)
-		move = 2.0f;
+	float refract = input.Effects.z;
+	if (CameraUnderwater) // Always refract if underwater
+		refract = 1.0f;
 	
-	if (move > 0) 
+	if (refract > 0.0f) 
 	{
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x*320);
 		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;
 		float yOffset = (cos(factor*PI/20.0f))*(screenPos.z/1024)*5;
-		screenPos.x += xOffset * move;
-		screenPos.y += yOffset * move;
+		screenPos.x += xOffset * refract;
+		screenPos.y += yOffset * refract;
 	}
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
+	
+	float glow = input.Effects.x;
+	if (refract > 0.0f)
+	{
+		glow = refract; // Override glow value with refraction if exists
+	}
 	
 	if (glow > 0.0f)
 	{
@@ -112,7 +116,6 @@ PixelShaderInput VS(VertexShaderInput input)
 		wibble = lerp(0.1f, 1.0f, wibble);
 		output.Color *= wibble;
 	}
-	
 	
 #ifdef ANIMATED
 	int frame = (Frame / 2) % numAnimFrames;

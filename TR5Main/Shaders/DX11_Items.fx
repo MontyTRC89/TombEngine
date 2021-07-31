@@ -73,28 +73,25 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	float2 clipPos = ScreenPos.xy / ScreenPos.w;
 	
-	float glow = float(input.Effects & 0x3F) / 60.0f;	
-	float move = float((input.Effects >> 6) & 63) / 15.0f;
-	
-	if (move > 0) 
+	if (input.Effects.z > 0.0f)  // Refraction
 	{
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x*320);
 		float xOffset = (sin(factor * PI/20.0f)) * (ScreenPos.z/1024)*5;
 		float yOffset = (cos(factor*PI/20.0f))*(ScreenPos.z/1024)*5;
-		ScreenPos.x += xOffset * move;
-		ScreenPos.y += yOffset * move;
+		ScreenPos.x += xOffset * input.Effects.z;
+		ScreenPos.y += yOffset * input.Effects.z;
 	}
 	
 	output.Position = ScreenPos;
 	output.Color = input.Color;
 	
-	if (glow > 0)
+	if (input.Effects.x > 0.0f) // Glow
 	{
 		static const float PI = 3.14159265f;
 		int offset = input.Hash;
 		float wibble = sin((((Frame + offset) % 64) / 64.0) * PI) * 0.5f + 0.5f;
-		wibble *= glow;
+		wibble *= input.Effects.x;
 		wibble = lerp(0.1f, 1.0f, wibble);
 		output.Color *= wibble;
 	}
