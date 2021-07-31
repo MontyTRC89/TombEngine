@@ -90,9 +90,9 @@ PixelShaderInput VS(VertexShaderInput input)
 	if (refract > 0.0f) 
 	{
 		static const float PI = 3.14159265f;
-		float factor = (Frame + clipPos.x*320);
-		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;
-		float yOffset = (cos(factor*PI/20.0f))*(screenPos.z/1024)*5;
+		float factor = (Frame + clipPos.x * 320);
+		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024) * 8;
+		float yOffset = (cos(factor * PI/20.0f)) * (screenPos.z/1024) * 8;
 		screenPos.x += xOffset * refract;
 		screenPos.y += yOffset * refract;
 	}
