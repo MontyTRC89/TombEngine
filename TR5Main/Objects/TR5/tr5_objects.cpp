@@ -1014,6 +1014,12 @@ static void StartObject(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_LARA_START_POS];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+	}
+
 	obj = &Objects[ID_HIGH_OBJECT1];
 	if (obj->loaded)
 	{
