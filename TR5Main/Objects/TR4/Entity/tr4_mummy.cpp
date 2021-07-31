@@ -148,8 +148,8 @@ void MummyControl(short itemNumber)
 		if (info.ahead)
 		{
 			joint0 = info.angle / 2;
-			joint2 = info.angle / 2;
-			joint1 = info.xAngle;
+			joint1 = info.angle / 2;
+			joint2 = info.xAngle;
 		}
 
 		switch (item->currentAnimState)
@@ -262,7 +262,7 @@ void MummyControl(short itemNumber)
 
 				if (item->touchBits & 0x4800)
 				{
-					if (item->frameNumber > g_Level.Anims[item->animNumber].frameEnd + 13 && item->frameNumber < g_Level.Anims[item->animNumber].frameEnd + 22)
+					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase && item->frameNumber < g_Level.Anims[item->animNumber].frameEnd)
 					{
 						LaraItem->hitPoints -= 100;
 						LaraItem->hitStatus = true;
