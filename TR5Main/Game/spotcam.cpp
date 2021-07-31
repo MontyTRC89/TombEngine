@@ -570,12 +570,13 @@ void CalculateSpotCameras()
 		}
 		else if (CurrentSplinePosition > 0x10000 - cspeed)
 		{
-			if (SpotCam[CurrentSplineCamera].timer >= 0)
+			if (SpotCam[CurrentSplineCamera].timer > 0 &&
+				SpotCam[CurrentSplineCamera].flags & SCF_STOP_MOVEMENT)
 			{
 				if (!SpotcamTimer && !SpotcamPaused)
-					SpotcamTimer = SpotCam[CurrentSplineCamera].timer * 30;
+					SpotcamTimer = SpotCam[CurrentSplineCamera].timer >> 3;
 			}
-			else
+			else if (SpotCam[CurrentSplineCamera].timer < 0)
 			{
 				SpotcamOverlay = 1; // Negative timer = sniper mode?
 			}
@@ -585,6 +586,7 @@ void CalculateSpotCameras()
 			if (SpotCam[CurrentSplineCamera].flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
 				CheckTrigger = true;
 
+			/* // Weird code which possibly did some shaking over the course of camera
 			if (SpotCam[CurrentSplineCamera].flags & SCF_STOP_MOVEMENT)
 			{
 				if (QuakeCam.spos.boxNumber == 0 || SpotCam[CurrentSplineCamera].timer != -1)
@@ -622,6 +624,7 @@ void CalculateSpotCameras()
 					QuakeCam.spos.boxNumber = 0;
 				}
 			}
+			*/
 
 			if (!SpotcamTimer)
 			{
