@@ -39,7 +39,7 @@ public:
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
 	int								LevelFarView{ 0 };
-	TITLE_TYPE						TitleType{ TITLE_BACKGROUND };
+	TITLE_TYPE						TitleType{ TITLE_FLYBY };
 	std::string						IntroImagePath{};
 
 	// Selected language set
