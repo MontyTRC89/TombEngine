@@ -187,7 +187,7 @@ void LoadObjects()
 		ReadBytes(mesh.colors.data(), 12 * numVertices);
 
 		mesh.effects.resize(numVertices);
-		ReadBytes(mesh.effects.data(), 4 * numVertices);
+		ReadBytes(mesh.effects.data(), 12 * numVertices);
 
 		mesh.bones.resize(numVertices);
 		ReadBytes(mesh.bones.data(), 4 * numVertices);
@@ -564,7 +564,7 @@ void ReadRooms()
 
 		room.effects.reserve(numVertices);
 		for (int j = 0; j < numVertices; j++)
-			room.effects.push_back(ReadInt32());
+			room.effects.push_back(ReadVector3());
 
 		int numBuckets = ReadInt32();
 		room.buckets.reserve(numBuckets);
