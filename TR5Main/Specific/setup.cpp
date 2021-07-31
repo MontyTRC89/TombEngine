@@ -219,7 +219,7 @@ void ObjectObjects()
 		if (obj->loaded)
 		{
 			obj->control = SwitchControl;
-			obj->collision = UnderwaterSwitchCollision;
+			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? SwitchCollision2 : UnderwaterSwitchCollision;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 		}
