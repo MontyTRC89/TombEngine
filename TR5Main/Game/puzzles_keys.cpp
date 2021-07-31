@@ -209,7 +209,9 @@ void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void PuzzleDone(ITEM_INFO* item, short itemNum)
 {
-	item->objectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+	// FIXME: This line causes stack overflow.
+	// item->objectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+	item->objectNumber = GAME_OBJECT_ID { item->objectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->requiredAnimState = 0;
@@ -276,9 +278,9 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if ((!(TrInput & IN_ACTION) && 
 #ifdef NEW_INV
-		GLOBAL_inventoryitemchosen == NO_ITEM
+		GLOBAL_inventoryitemchosen != NO_ITEM
 #else
-		g_Inventory.GetSelectedObject() == NO_ITEM
+		g_Inventory.GetSelectedObject() != NO_ITEM
 #endif
 		|| BinocularRange
 		|| Lara.gunStatus
