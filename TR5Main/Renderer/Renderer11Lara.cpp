@@ -200,11 +200,11 @@ void Renderer11::updateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool shadowMap)
+void T5M::Renderer::Renderer11::drawLara(RenderView& view, bool transparent, bool shadowMap)
 {
-	if (transparent)
-		if (shadowMap)
-			return;
+	if (transparent && shadowMap)
+		return;
+
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
 		return;
@@ -269,20 +269,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
 		RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
-
-		for (auto& bucket : mesh->buckets)
-		{
-
-			if (bucket.Vertices.size() == 0)
-				continue;
-			
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-			m_numDrawCalls++;
-		}
+		drawLaraMesh(mesh, transparent);
 	}
 	drawLaraHolsters(transparent);
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
@@ -293,20 +280,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 		for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 		{
 			RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
-			{
-
-				if (bucket.Vertices.size() == 0)
-					continue;
-
-				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-				m_numDrawCalls++;
-			}
+			drawLaraMesh(mesh, transparent);
 		}
 	}
 
@@ -332,20 +306,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
-			{
-
-				if (bucket.Vertices.size() == 0)
-					continue;
-
-				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-				m_numDrawCalls++;
-			}
+			drawLaraMesh(mesh, transparent);
 		}	
 	}
 }
@@ -362,53 +323,35 @@ void Renderer11::drawLaraHolsters(bool transparent)
 	if(m_moveableObjects[static_cast<int>(leftHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
-		for (auto& bucket : mesh->buckets)
-		{
-
-			if (bucket.Vertices.size() == 0)
-				continue;
-
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-			m_numDrawCalls++;
-		}
+		drawLaraMesh(mesh, transparent);
 	}
 	if(m_moveableObjects[static_cast<int>(rightHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
-		for (auto& bucket : mesh->buckets)
-		{
-
-			if (bucket.Vertices.size() == 0)
-				continue;
-
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-			m_numDrawCalls++;
-		}
+		drawLaraMesh(mesh, transparent);
 	}
 	if(backHolsterID != HOLSTER_SLOT::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
-		for (auto& bucket : mesh->buckets)
-		{
+		drawLaraMesh(mesh, transparent);
+	}
+}
 
-			if (bucket.Vertices.size() == 0)
-				continue;
+void Renderer11::drawLaraMesh(RendererMesh* mesh, bool transparent)
+{
+	for (auto& bucket : mesh->buckets)
+	{
+		if (bucket.Vertices.size() == 0)
+			continue;
 
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-				continue;
+		if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
+			continue;
 
-			// Draw vertices
-			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-			m_numDrawCalls++;
-		}
+		setBlendMode(bucket.blendMode);
+
+		// Draw vertices
+		m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+		m_numDrawCalls++;
 	}
 }
 
