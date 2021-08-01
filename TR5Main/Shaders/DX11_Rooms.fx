@@ -80,39 +80,49 @@ float hash(float3 n)
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
-	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
-	float2 clipPos = screenPos.xy / screenPos.w;
+	float3 pos = input.Position;
+	float4 col = input.Color;
 	
 	// Setting effect weight on TE side prevents portal vertices from moving.
 	// Here we just read weight and decide if we should apply refraction or movement effect.
 	
 	float weight = input.Effects.z;
 	
+	// Wibble effect returns different value depending on vertex hash and frame number.
+	// In theory, hash could be affected by WaterScheme value from room.
+	
+	static const float PI = 3.14159265f;
+	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI*2)); // sin from -1 to 1 with a period of 64 frames
+	
+	// Glow
+	
+	if (input.Effects.x > 0.0f)
+	{
+		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
+		col = saturate(col + float4(intensity, intensity, intensity, 0));
+	}
+	
+	// Movement
+	
+	if (input.Effects.y > 0.0f)
+        pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
+
+	// Refraction
+	
+	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
+	float2 clipPos = screenPos.xy / screenPos.w;
 	if (CameraUnderwater != Water)
 	{
-		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x * 320);
-		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024) * 4;
-		float yOffset = (cos(factor * PI/20.0f)) * (screenPos.z/1024) * 4;
+		float xOffset = (sin(factor * PI / 20.0f)) * (screenPos.z/1024) * 4;
+		float yOffset = (cos(factor * PI / 20.0f)) * (screenPos.z/1024) * 4;
 		screenPos.x += xOffset * weight;
 		screenPos.y += yOffset * weight;
 	}
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
-	output.Color = input.Color;
-	
-	float glow = input.Effects.x;
-	
-	if (glow > 0.0f)
-	{
-		static const float PI = 3.14159265f;
-		int offset = input.Hash;
-		float wibble = sin((((Frame + offset) % 64) / 64.0) * PI) * 0.5f + 0.5f;
-		wibble *= glow;
-		wibble = lerp(0.1f, 1.0f, wibble);
-		output.Color *= wibble;
-	}
+	output.Color = col;
 	
 #ifdef ANIMATED
 	int frame = (Frame / 2) % numAnimFrames;
@@ -134,8 +144,9 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 
 #endif
-
+	
 	output.WorldPosition = input.Position.xyz;
+
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
 	output.TBN = TBN;
