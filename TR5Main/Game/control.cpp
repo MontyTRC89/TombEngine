@@ -497,15 +497,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			// Is Lara poisoned?
 			if (Lara.poisoned)
 			{
-				if (Lara.poisoned <= 4096)
-				{
-					if (Lara.dpoisoned)
-						++Lara.dpoisoned;
-				}
-				else
-				{
+				if (Lara.poisoned > 4096)
 					Lara.poisoned = 4096;
-				}
+				else if (Lara.dpoisoned)
+					Lara.dpoisoned++;
+
+
 				if (!Lara.gassed)
 				{
 					if (Lara.dpoisoned)
@@ -515,7 +512,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 							Lara.dpoisoned = 0;
 					}
 				}
-				if (Lara.dpoisoned >= 256 && !(Wibble & 0xFF))
+				if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
 				{
 					LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
 					PoisonFlags = 16;
