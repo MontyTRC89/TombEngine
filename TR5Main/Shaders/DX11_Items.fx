@@ -73,14 +73,19 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	float2 clipPos = ScreenPos.xy / ScreenPos.w;
 	
-	if (input.Effects.z > 0.0f)  // Refraction
+	// Setting effect weight on TE side prevents portal vertices from moving.
+	// Here we just read weight and decide if we should apply refraction or movement effect.
+	
+	float weight = input.Effects.z;
+	
+	if (input.Effects.y > 0.0f)  // Movement FIXME: rewrite this proc to differentiate from refraction!
 	{
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x*320);
 		float xOffset = (sin(factor * PI/20.0f)) * (ScreenPos.z/1024)*5;
 		float yOffset = (cos(factor*PI/20.0f))*(ScreenPos.z/1024)*5;
-		ScreenPos.x += xOffset * input.Effects.z;
-		ScreenPos.y += yOffset * input.Effects.z;
+		ScreenPos.x += xOffset * input.Effects.y * weight;
+		ScreenPos.y += yOffset * input.Effects.y * weight;
 	}
 	
 	output.Position = ScreenPos;

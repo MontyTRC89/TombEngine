@@ -34,7 +34,7 @@ cbuffer CShadowLightBuffer : register(b4)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
-	int water; // DEPRECATED
+	int Water;
 };
 struct AnimatedFrameUV
 {
@@ -83,18 +83,19 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
 	
-	float refract = input.Effects.z;
-	if (CameraUnderwater) // Always refract if underwater
-		refract = 1.0f;
+	// Setting effect weight on TE side prevents portal vertices from moving.
+	// Here we just read weight and decide if we should apply refraction or movement effect.
 	
-	if (refract > 0.0f) 
+	float weight = input.Effects.z;
+	
+	if (CameraUnderwater != Water)
 	{
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x * 320);
-		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024) * 8;
-		float yOffset = (cos(factor * PI/20.0f)) * (screenPos.z/1024) * 8;
-		screenPos.x += xOffset * refract;
-		screenPos.y += yOffset * refract;
+		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024) * 4;
+		float yOffset = (cos(factor * PI/20.0f)) * (screenPos.z/1024) * 4;
+		screenPos.x += xOffset * weight;
+		screenPos.y += yOffset * weight;
 	}
 	
 	output.Position = screenPos;
@@ -102,10 +103,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	
 	float glow = input.Effects.x;
-	if (refract > 0.0f)
-	{
-		glow = refract; // Override glow value with refraction if exists
-	}
 	
 	if (glow > 0.0f)
 	{
