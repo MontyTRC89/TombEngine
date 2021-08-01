@@ -148,12 +148,9 @@ namespace T5M::Renderer
                 if (bucket.Vertices.size() == 0)
                     continue;
 
-                if (bucket.blendMode == 0)
-                    m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-                else
-                    m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				setBlendMode(bucket.blendMode);
 
-                m_stMisc.AlphaTest = (bucket.blendMode == 0);
+                m_stMisc.AlphaTest = (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE);
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
@@ -470,7 +467,7 @@ namespace T5M::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.Vertices.size() == 0 && bucket.blendMode == 0)
+					if (bucket.Vertices.size() == 0 && bucket.blendMode == BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
@@ -1388,12 +1385,9 @@ namespace T5M::Renderer
 						if (bucket.Vertices.size() == 0)
 							continue;
 
-						if (bucket.blendMode == 0)
-							m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-						else
-							m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+						setBlendMode(bucket.blendMode);
 
-						m_stMisc.AlphaTest = (bucket.blendMode == 0);
+						m_stMisc.AlphaTest = (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE);
 						m_cbMisc.updateData(m_stMisc, m_context.Get());
 						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
@@ -2864,9 +2858,10 @@ namespace T5M::Renderer
 				}
 				if (bucket.Vertices.size() == 0)
 					continue;
-				if (transparent && bucket.blendMode == 0)
+				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 					continue;
 
+				setBlendMode(bucket.blendMode);
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			}
         }
@@ -3000,9 +2995,10 @@ namespace T5M::Renderer
 				{
 					if (bucket.Vertices.size() == 0)
 						continue;
-					if (transparent && bucket.blendMode == 0)
+					if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 						continue;
 
+					setBlendMode(bucket.blendMode);
 					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 				}
             }
@@ -3027,7 +3023,6 @@ namespace T5M::Renderer
 			m_context->VSSetConstantBuffers(6, 1, m_cbAnimated.get());
 			m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
 		}
-
 
         m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
 
@@ -3081,11 +3076,11 @@ namespace T5M::Renderer
             for (auto& bucket : room->buckets)
             {
 				if (transparent) {
-					if (bucket.blendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+					if (bucket.blendMode == BLEND_MODES::BLENDMODE_OPAQUE || bucket.blendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
 						continue;
 				}
 				else {
-					if (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE)
+					if (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE && bucket.blendMode != BLEND_MODES::BLENDMODE_ALPHATEST)
 						continue;
 				}
 					
@@ -3114,6 +3109,7 @@ namespace T5M::Renderer
                 if (bucket.Vertices.size() == 0)
                     continue;
 
+				setBlendMode(bucket.blendMode);
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 				m_numDrawCalls++;
             }
@@ -3266,10 +3262,7 @@ namespace T5M::Renderer
                     if (bucket.Vertices.size() == 0)
                         continue;
 
-                    if (bucket.blendMode != 0)
-                        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-                    else
-                        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+					setBlendMode(bucket.blendMode);
 
                     // Draw vertices
                     m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);

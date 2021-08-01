@@ -456,7 +456,7 @@ namespace T5M::Renderer {
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 			for (auto& flashBucket : flashMesh->buckets) {
-				if (flashBucket.blendMode == 0)
+				if (flashBucket.blendMode == BLENDMODE_OPAQUE)
 					continue;
 				if (flashBucket.Vertices.size() != 0) {
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
@@ -544,7 +544,7 @@ namespace T5M::Renderer {
 				RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 				for (auto& flashBucket : flashMesh->buckets) {
-					if (flashBucket.blendMode == 0)
+					if (flashBucket.blendMode == BLENDMODE_OPAQUE)
 						continue;
 					if (flashBucket.Vertices.size() != 0) {
 						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
@@ -647,7 +647,7 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::drawSprites(RenderView& view)
-{
+	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 		m_context->RSSetState(m_states->CullNone());
@@ -668,27 +668,10 @@ namespace T5M::Renderer {
 		for (int i = 0; i < numSpritesToDraw; i++) {
 			Matrix billboardMatrix;
 			RendererSpriteToDraw& spr = view.spritesToDraw[i];
-			if(spr.BlendMode != currentBlendMode){
+			if(spr.BlendMode != currentBlendMode)
+			{
 				currentBlendMode = spr.BlendMode;
-				switch(currentBlendMode){
-					case BLENDMODE_ALPHABLEND:
-						m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-
-						break;
-					case BLENDMODE_ALPHATEST:
-						m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-
-						break;
-					case BLENDMODE_OPAQUE:
-						m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-						break;
-					case BLENDMODE_SUBTRACTIVE:
-						m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
-						break;
-					case BLENDMODE_ADDITIVE:
-						m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-						break;
-				}
+				setBlendMode(spr.BlendMode);
 			}
 			m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
 			ID3D11SamplerState* sampler = m_states->LinearClamp();
@@ -819,7 +802,7 @@ namespace T5M::Renderer {
 
 			if (bucket.Vertices.size() == 0)
 				continue;
-			if (transparent && bucket.blendMode == 0)
+			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
@@ -1044,12 +1027,37 @@ namespace T5M::Renderer {
 			addSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE,view);
 		}
 	}
+
 	void Renderer11::drawSimpleParticles(RenderView& view)
 	{
 		using namespace T5M::Effects;
 		for(SimpleParticle& s : simpleParticles){
 			if(!s.active) continue;
 			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
+		}
+	}
+
+	void Renderer11::setBlendMode(BLEND_MODES blendMode)
+	{
+		switch (blendMode)
+		{
+		case BLENDMODE_ALPHABLEND:
+			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_ALPHATEST:
+			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_OPAQUE:
+			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			break;
+		case BLENDMODE_SUBTRACTIVE:
+			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+			break;
+		case BLENDMODE_ADDITIVE:
+			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			break;
 		}
 	}
 }

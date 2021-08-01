@@ -276,7 +276,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 			if (bucket.Vertices.size() == 0)
 				continue;
 			
-			if (transparent && bucket.blendMode == 0)
+			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
@@ -300,7 +300,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 				if (bucket.Vertices.size() == 0)
 					continue;
 
-				if (transparent && bucket.blendMode == 0)
+				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 					continue;
 
 				// Draw vertices
@@ -339,7 +339,7 @@ void T5M::Renderer::Renderer11::drawLara(RenderView& view,bool transparent, bool
 				if (bucket.Vertices.size() == 0)
 					continue;
 
-				if (transparent && bucket.blendMode == 0)
+				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 					continue;
 
 				// Draw vertices
@@ -368,7 +368,7 @@ void Renderer11::drawLaraHolsters(bool transparent)
 			if (bucket.Vertices.size() == 0)
 				continue;
 
-			if (transparent && bucket.blendMode == 0)
+			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
@@ -385,7 +385,7 @@ void Renderer11::drawLaraHolsters(bool transparent)
 			if (bucket.Vertices.size() == 0)
 				continue;
 
-			if (transparent && bucket.blendMode == 0)
+			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
@@ -402,7 +402,7 @@ void Renderer11::drawLaraHolsters(bool transparent)
 			if (bucket.Vertices.size() == 0)
 				continue;
 
-			if (transparent && bucket.blendMode == 0)
+			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
