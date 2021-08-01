@@ -61,7 +61,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
 	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
 	float3 ReflectionVector = reflect(normalize(-CamDirectionWS.xyz), normalize(Normal));
-	float4 ScreenPos = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
 	output.Normal = Normal;
 	output.UV = input.UV;
 	output.WorldPosition = WorldPosition;
@@ -71,35 +70,35 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3x3 TBN = float3x3(Tangent, Bitangent, Normal);
 	output.TBN = transpose(TBN);
 	
-	float2 clipPos = ScreenPos.xy / ScreenPos.w;
+	float3 pos = input.Position;
+	float4 col = input.Color;
 	
 	// Setting effect weight on TE side prevents portal vertices from moving.
 	// Here we just read weight and decide if we should apply refraction or movement effect.
 	
 	float weight = input.Effects.z;
 	
-	if (input.Effects.y > 0.0f)  // Movement FIXME: rewrite this proc to differentiate from refraction!
+	// Wibble effect returns different value depending on vertex hash and frame number.
+	// In theory, hash could be affected by WaterScheme value from room.
+	
+	static const float PI = 3.14159265f;
+	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI*2)); // sin from -1 to 1 with a period of 64 frames
+	
+	// Glow
+	
+	if (input.Effects.x > 0.0f)
 	{
-		static const float PI = 3.14159265f;
-		float factor = (Frame + clipPos.x*320);
-		float xOffset = (sin(factor * PI/20.0f)) * (ScreenPos.z/1024)*5;
-		float yOffset = (cos(factor*PI/20.0f))*(ScreenPos.z/1024)*5;
-		ScreenPos.x += xOffset * input.Effects.y * weight;
-		ScreenPos.y += yOffset * input.Effects.y * weight;
+		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
+		col = saturate(col + float4(intensity, intensity, intensity, 0));
 	}
 	
-	output.Position = ScreenPos;
-	output.Color = input.Color;
+	// Movement
 	
-	if (input.Effects.x > 0.0f) // Glow
-	{
-		static const float PI = 3.14159265f;
-		int offset = input.Hash;
-		float wibble = sin((((Frame + offset) % 64) / 64.0) * PI) * 0.5f + 0.5f;
-		wibble *= input.Effects.x;
-		wibble = lerp(0.1f, 1.0f, wibble);
-		output.Color *= wibble;
-	}
+	if (input.Effects.y > 0.0f)
+        pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
+	
+	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
+	output.Color = col;
 	
 	return output;
 }
