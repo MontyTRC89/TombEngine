@@ -546,6 +546,7 @@ namespace T5M::Renderer
 		void drawExplosionParticles(RenderView& view);
 		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumber);
 		void drawLaraHolsters(bool transparent);
+		void drawLaraMesh(RendererMesh* mesh, bool transparent);
 		void drawSimpleParticles(RenderView& view); 
 		void setBlendMode(BLEND_MODES blendMode);
 	public:
