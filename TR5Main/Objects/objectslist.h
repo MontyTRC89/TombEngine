@@ -1007,7 +1007,7 @@ template <typename T, typename Enum> constexpr bool same_or_underlying = std::is
 // might be the wrong type.
 template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID> & operator+=(GAME_OBJECT_ID & lhs, T const & rhs)
 {
-	lhs += GAME_OBJECT_ID{ rhs };
+	lhs = GAME_OBJECT_ID{ lhs + GAME_OBJECT_ID{ rhs } };
 	return lhs;
 }
 
