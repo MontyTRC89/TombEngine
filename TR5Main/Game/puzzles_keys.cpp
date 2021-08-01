@@ -276,16 +276,17 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 
-	if ((!(TrInput & IN_ACTION) && 
+	if (!((TrInput & IN_ACTION ||
 #ifdef NEW_INV
 		GLOBAL_inventoryitemchosen != NO_ITEM
 #else
 		g_Inventory.GetSelectedObject() != NO_ITEM
 #endif
-		|| BinocularRange
-		|| Lara.gunStatus
-		|| l->currentAnimState != LS_STOP
-		|| l->animNumber != LA_STAND_IDLE)
+		)
+		&& !BinocularRange
+		&& !Lara.gunStatus
+		&& l->currentAnimState == LS_STOP
+		&& l->animNumber == LA_STAND_IDLE)
 		&& (!Lara.isMoving || (short)Lara.generalPtr != itemNum))
 	{
 		if (item->objectNumber < ID_KEY_HOLE6)
