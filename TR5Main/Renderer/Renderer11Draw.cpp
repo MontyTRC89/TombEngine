@@ -3074,7 +3074,7 @@ namespace T5M::Renderer
             m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
             m_stRoom.AmbientColor = room->AmbientLight;
-            m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+            m_stRoom.Water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
             m_cbRoom.updateData(m_stRoom, m_context.Get());
             m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
             m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
