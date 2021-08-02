@@ -453,6 +453,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->initialise = InitialiseJeanYves;
 		obj->control = JeanYvesControl;
 		obj->collision = ObjectCollision;
+		obj->hitEffect = HIT_BLOOD;
 		obj->nonLot = true;
 		obj->savePosition = true;
 		obj->zoneType = ZONE_BASIC;
@@ -722,6 +723,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->initialise = InitialiseSasDying;
 		obj->control = SasDyingControl;
 		obj->collision = ObjectCollision;
+		obj->hitEffect = HIT_BLOOD;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
@@ -733,6 +735,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->control = AnimatingControl;
 		obj->collision = SasDragBlokeCollision;
+		obj->hitEffect = HIT_BLOOD;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
@@ -794,6 +797,7 @@ static void StartObject(OBJECT_INFO* obj)
 	{
 		obj->control = AnimatingControl;
 		obj->collision = SarcophagusCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
@@ -837,6 +841,7 @@ static void StartObject(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->collision = ObjectCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = 1;
 	}
 
@@ -858,6 +863,7 @@ static void StartObject(OBJECT_INFO* obj)
 			obj->initialise = InitialiseGamePiece;
 			obj->control = SenetControl;
 			obj->collision = ObjectCollision;
+			obj->hitEffect = HIT_RICOCHET;
 			obj->savePosition = 1;
 			obj->saveHitpoints = 1;
 			obj->saveFlags = 1;
@@ -892,6 +898,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = ChainControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -901,6 +908,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = PloughControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -910,6 +918,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -919,6 +928,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -928,6 +938,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = CatwalkBladeControl;
 		obj->collision = BladeCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -938,6 +949,7 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->initialise = InitialiseSethBlade;
 		obj->control = SethBladeControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -947,6 +959,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = PlinthBladeControl;
 		obj->collision = BladeCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -956,6 +969,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = BirdBladeControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -966,6 +980,7 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->initialise = InitialiseJobySpikes;
 		obj->control = JobySpikesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 	}
 
@@ -974,6 +989,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = MovingBladeControl;
 		obj->collision = BladeCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
@@ -992,6 +1008,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = ChainControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1001,6 +1018,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = PloughControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1028,6 +1046,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = StargateControl;
 		obj->collision = StargateCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1038,6 +1057,7 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->initialise = InitialiseSlicerDicer;
 		obj->control = SlicerDicerControl;
 		obj->collision = BladeCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 	}
 
@@ -1057,6 +1077,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = ControlSpikyWall;
 		obj->collision = ObjectCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -1066,6 +1087,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = ControlSpikyCeiling;
 		obj->collision = TrapCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -1075,6 +1097,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = CogControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1085,6 +1108,7 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->initialise = InitialiseLaraDouble;
 		obj->control = LaraDoubleControl;
 		obj->collision = CreatureCollision;
+		obj->hitEffect = HIT_SMOKE;
 		obj->shadowSize = 128;
 		obj->hitPoints = 1000;
 		obj->pivotLength = 50;
@@ -1105,6 +1129,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseJeep;
 		obj->collision = JeepCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -1116,6 +1141,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->initialise = InitialiseMotorbike;
 		obj->collision = MotorbikeCollision;
 		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
+		obj->hitEffect = HIT_RICOCHET;
 		obj->drawRoutineExtra = DrawMotorbikeEffect;
 		obj->savePosition = true;
 		obj->saveAnim = true;
