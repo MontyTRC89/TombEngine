@@ -2846,7 +2846,7 @@ namespace T5M::Renderer
             if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) 
 			{
                 RendererObject &swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
-				if (swapMeshObj.ObjectMeshes.capacity() > k)
+				if (swapMeshObj.ObjectMeshes.size() > k)
 					mesh = swapMeshObj.ObjectMeshes[k];
             }
 
