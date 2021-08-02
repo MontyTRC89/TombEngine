@@ -5,7 +5,7 @@
     <RESOURCE_FILE>Resources.rc</RESOURCE_FILE>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>Tr5Main.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>TombEngine.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\Build\</LocalDebuggerWorkingDirectory>
     <LocalDebuggerCommandArguments>/debug</LocalDebuggerCommandArguments>

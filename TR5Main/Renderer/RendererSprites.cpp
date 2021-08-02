@@ -4,7 +4,8 @@
 namespace T5M::Renderer {
 	void addSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
 	{
-		scale = 1.0f;
+		if (scale <= 0.0f)
+			scale = 1.0f;
 
 		size.x *= scale;
 		size.y *= scale;
@@ -25,7 +26,8 @@ namespace T5M::Renderer {
 	}
 	void addSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis, RenderView& view)
 	{
-		scale = 1.0f;
+		if (scale <= 0.0f)
+			scale = 1.0f;
 
 		size.x *= scale;
 		size.y *= scale;
@@ -46,6 +48,9 @@ namespace T5M::Renderer {
 	}
 	void addSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis, RenderView& view)
 	{
+		if (scale <= 0.0f)
+			scale = 1.0f;
+
 		size.x *= scale;
 		size.y *= scale;
 		RendererSpriteToDraw spr = {};
@@ -64,7 +69,8 @@ namespace T5M::Renderer {
 	}
 	void addSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
 	{
-		scale = 1.0f;
+		if (scale <= 0.0f)
+			scale = 1.0f;
 
 		size.x *= scale;
 		size.y *= scale;

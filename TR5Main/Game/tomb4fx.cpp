@@ -239,8 +239,20 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	fptr->x = x;
 	fptr->y = y;
 	fptr->z = z;
-	fptr->size = size;
 	fptr->roomNumber = roomNum;
+
+	switch (size)
+	{
+	case SP_NORMALFIRE:
+		fptr->size = 1;
+		break;
+	case SP_SMALLFIRE:
+		fptr->size = 2;
+		break;
+	case SP_BIGFIRE:
+		fptr->size = 3;
+		break;
+	}
 }
 
 void ClearFires()
@@ -317,9 +329,9 @@ void UpdateFireSparks()
 				spark->zVel -= spark->zVel >> spark->friction;
 			}
 
-			spark->x += spark->xVel / 32;
-			spark->y += spark->yVel / 32;
-			spark->z += spark->zVel / 32;
+			spark->x += spark->xVel / 48;
+			spark->y += spark->yVel / 48;
+			spark->z += spark->zVel / 48;
 
 			spark->size = spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536);
 		}

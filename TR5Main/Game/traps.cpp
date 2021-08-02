@@ -110,7 +110,7 @@ void FlameEmitterControl(short itemNumber)
 				}
 
 				if (item->itemFlags[2])
-					AddFire(item->pos.xPos, item->pos.yPos, item->pos.zPos, SP_TINYFIRE, item->roomNumber, item->itemFlags[2]);
+					AddFire(item->pos.xPos, item->pos.yPos, item->pos.zPos, SP_NORMALFIRE, item->roomNumber, item->itemFlags[2]);
 
 				if (item->itemFlags[1])
 				{
