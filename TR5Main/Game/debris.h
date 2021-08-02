@@ -43,6 +43,7 @@ struct DebrisMesh
 {
 	BLEND_MODES blendMode;
 	std::array<T5M::Renderer::RendererVertex, 3> vertices;
+	int tex;
 };
 
 struct DebrisFragment
@@ -61,6 +62,7 @@ struct DebrisFragment
 	uint32_t roomNumber;
 	uint32_t numBounces;
 	bool active;
+	bool isStatic;
 };
 
 struct DEBRIS_STRUCT

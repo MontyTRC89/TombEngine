@@ -740,7 +740,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar);
+            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,0,false);
 
             y += 25;
 
@@ -748,7 +748,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar);
+            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar,0,false);
             y += 25;
 
             // Apply and cancel
@@ -976,7 +976,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar);
+            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,0,0);
 
             y += 25;
 
@@ -984,7 +984,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar);
+            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar,0,0);
             y += 25;
 
             // Apply and cancel
@@ -2650,7 +2650,7 @@ namespace T5M::Renderer
         // Bars
         int flash = FlashIt();
         if (DashTimer < 120)
-            drawBar(DashTimer / 120.0f, g_DashBar);
+            drawBar(DashTimer / 120.0f, g_DashBar,0,0);
         UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();

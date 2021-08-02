@@ -2,6 +2,7 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "spotcam.h"
+#include "lara.h"
 T5M::Renderer::RendererHUDBar* g_HealthBar;
 T5M::Renderer::RendererHUDBar* g_AirBar;
 T5M::Renderer::RendererHUDBar* g_DashBar;
@@ -11,61 +12,45 @@ namespace T5M::Renderer {
 
 	void Renderer11::initialiseBars()
 {
-		std::array<Vector4, 9> healthColors = {
+		std::array<Vector4, 5> healthColors = {
 			//top
 			Vector4(82 / 255.0f,0,0,1),
-			Vector4(36 / 255.0f,46 / 255.0f,0,1),
 			Vector4(0,82 / 255.0f,0,1),
 			//center
-			Vector4(159 / 255.0f,0,0,1),
 			Vector4(78 / 255.0f,81 / 255.0f,0,1),
-			Vector4(0,158 / 255.0f,0,1),
 			//bottom
 			Vector4(82 / 255.0f,0,0,1),
-			Vector4(36 / 255.0f,46 / 255.0f,0,1),
 			Vector4(0,82 / 255.0f,0,1),
 		};
 
-		std::array<Vector4, 9> airColors = {
+		std::array<Vector4, 5> airColors = {
 			//top
 			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 / 255.0f,28 / 255.0f,84 / 255.0f,1),
 			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
 			//center
-			Vector4(0,3 / 255,153 / 255.0f,1),
 			Vector4(0,39 / 255,155 / 255.0f,1),
-			Vector4(0,78 / 255.0f,159 / 255.0f,1),
 			//bottom
 			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 / 255.0f,28 / 255.0f,84 / 255.0f,1),
 			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
 		};
 
-		std::array<Vector4, 9> dashColors = {
+		std::array<Vector4, 5> dashColors = {
 			//top
 			Vector4(78 / 255.0f,4 / 255.0f,0,1),
-			Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
 			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 			//center
-			Vector4(211 / 255.0f,29 / 255.0f,23 / 255.0f,1),
 			Vector4(245 / 255.0f,119 / 255,24 / 255.0f,1),
-			Vector4(207 / 255.0f,183 / 255.0f,27 / 255.0f,1),
 			//bottom
 			Vector4(78 / 255.0f,4 / 255.0f,0,1),
-			Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
 			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 		};
-		std::array<Vector4, 9> soundSettingColors = {
+		std::array<Vector4, 5> soundSettingColors = {
 			//top
-			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 			//center
 			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
 			//bottom
-			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 		};
@@ -75,7 +60,7 @@ namespace T5M::Renderer {
 		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
 		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 230, 150, 8, 1, soundSettingColors);
 	}
-	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar) {
+	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar,int frame, bool poison) {
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
@@ -102,6 +87,8 @@ namespace T5M::Renderer {
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
+		m_stHUDBar.Poisoned = poison;
+		m_stHUDBar.Frame = frame;
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
 		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
@@ -110,7 +97,7 @@ namespace T5M::Renderer {
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 		m_context->RSSetState(m_states->CullNone());
-		m_context->DrawIndexed(24, 0, 0);
+		m_context->DrawIndexed(12, 0, 0);
 	}
 
 	void Renderer11::addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
