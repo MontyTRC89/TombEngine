@@ -2558,7 +2558,7 @@ void use_current_item()
 				if (Lara.NumSmallMedipacks != -1)
 					Lara.NumSmallMedipacks--;
 
-				Lara.dpoisoned = 0;
+				Lara.poisoned = 0;
 				LaraItem->hitPoints += 500;
 
 				if (LaraItem->hitPoints > 1000)
@@ -2585,7 +2585,7 @@ void use_current_item()
 				if (Lara.NumLargeMedipacks != -1)
 					Lara.NumLargeMedipacks--;
 
-				Lara.dpoisoned = 0;
+				Lara.poisoned = 0;
 				LaraItem->hitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
