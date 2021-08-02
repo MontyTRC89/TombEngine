@@ -285,22 +285,25 @@ void FlameControl(short fxNumber)
 
 	if (!Lara.burnSmoke)
 	{
+		PHD_VECTOR pos{ 0,0,0 };
+		GetLaraJointPosition(&pos, LM_HIPS);
 		if (!Lara.burnBlue)
 		{
-			TriggerDynamicLight(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 13, r, g, 0);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 13, r, g, 0);
 		}
 		else
 		{
 			if (Lara.burnBlue == 128)
 			{
 				b = r;
-				TriggerDynamicLight(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 13, 0, g, b);
+				
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 13, 0, g, b);
 			}
 			else if (Lara.burnBlue == 256)
 			{
 				b = g;
 				g = r;
-				TriggerDynamicLight(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 13, 0, g, b);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 13, 0, g, b);
 			}
 		}
 	}
