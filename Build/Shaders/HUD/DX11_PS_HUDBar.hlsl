@@ -1,7 +1,10 @@
 #include "./../VertexInput.hlsli"
+#include "./../Math.hlsli"
 cbuffer HUDBarBuffer : register(b0)
 {
 	float Percent;
+	int Poisoned;
+	int Frame;
 };
 
 struct PixelShaderInput
@@ -29,7 +32,12 @@ half4 PSColored(PixelShaderInput input) : SV_TARGET
 	if (input.UV.x > Percent) {
 		discard;
 	}
-	return glassOverlay(input.UV,input.Color);
+    half4 col = input.Color;
+	if (Poisoned) {
+		float factor = sin(((Frame % 30) / 30.0) * PI2)*0.5 + 0.5;
+		col = lerp(col,half4(214 / 512.0, 241 / 512.0, 18 / 512.0, 1),factor);
+	}
+	return glassOverlay(input.UV,col);
 }
 
 half4 PSTextured(PixelShaderInput input) : SV_TARGET
