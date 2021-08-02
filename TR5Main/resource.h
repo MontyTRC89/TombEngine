@@ -1,10 +1,11 @@
 //{{NO_DEPENDENCIES}}
-// File di inclusione generato con Microsoft Visual C++.
-// Utilizzato da Resources.rc
+// Microsoft Visual C++ generated include file.
+// Used by Resources.rc
 //
 #define IDD_SETUP                       103
 #define IDB_BITMAP1                     107
 #define IDB_BMP_BANNER                  107
+#define IDI_ICON1                       108
 #define IDC_CHK_ENABLE_SOUND2           1012
 #define IDC_GFXADAPTER                  1020
 #define IDC_GFXADAPTERTXT               1021
@@ -42,7 +43,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        108
+#define _APS_NEXT_RESOURCE_VALUE        109
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101
