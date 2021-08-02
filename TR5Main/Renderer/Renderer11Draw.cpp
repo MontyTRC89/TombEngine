@@ -2841,13 +2841,13 @@ namespace T5M::Renderer
             if (!(item->Item->meshBits & (1 << k)))
                 continue;
 
-            RendererMesh *mesh;
-            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) {
+            RendererMesh *mesh = moveableObj.ObjectMeshes[k];
+
+            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) 
+			{
                 RendererObject &swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
-                mesh = swapMeshObj.ObjectMeshes[k];
-            }
-            else {
-                mesh = moveableObj.ObjectMeshes[k];
+				if (swapMeshObj.ObjectMeshes.capacity() > k)
+					mesh = swapMeshObj.ObjectMeshes[k];
             }
 
 			for (auto& bucket : mesh->buckets) {
