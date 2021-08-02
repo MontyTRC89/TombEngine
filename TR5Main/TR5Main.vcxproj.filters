@@ -1917,7 +1917,6 @@
     <None Include="Shaders\DX11_Test.fx" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
-    <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli" />
     <None Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
     <None Include="Shaders\Fxaa3_11.fxh" />
@@ -1952,6 +1951,7 @@
     <None Include="Shaders\Transparent.fx" />
     <None Include="Resources.aps" />
     <None Include="Shaders\VertexInput.hlsli" />
+    <None Include="Shaders\Math.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
@@ -1962,5 +1962,8 @@
     <Image Include="Banner.bmp">
       <Filter>File di risorse</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
   </ItemGroup>
 </Project>

@@ -88,16 +88,12 @@ namespace T5M::Renderer {
 		}
 	}
 
-	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 9> colors) {
+	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 5> colors) {
 		array<Vector3, 9> barVertices = {
 			Vector3(x, HUD_ZERO_Y + y, 0.5),
-			Vector3(x + (w / 2.0f), HUD_ZERO_Y + y, 0.5),
 			Vector3(x + w, HUD_ZERO_Y + y, 0.5),
-			Vector3(x, HUD_ZERO_Y + (y + h / 2.0f), 0.5),
 			Vector3(x + (w / 2.0f), HUD_ZERO_Y + (y + h / 2.0f), 0.5),
-			Vector3(x + w, HUD_ZERO_Y + (y + h / 2.0f), 0.5),
 			Vector3(x, HUD_ZERO_Y + y + h, 0.5),
-			Vector3(x + (w / 2.0f), HUD_ZERO_Y + y + h, 0.5),
 			Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
 
 		};
@@ -126,15 +122,11 @@ namespace T5M::Renderer {
 			Vector3(x - HUD_BORDER_WIDTH	,HUD_ZERO_Y + y + h + HUD_BORDER_HEIGT,0)
 		};
 
-		array<Vector2, 9> barUVs = {
+		array<Vector2, 5> barUVs = {
 			Vector2(0,0),
-			Vector2(0.5,0),
 			Vector2(1,0),
-			Vector2(0,0.5),
 			Vector2(0.5,0.5),
-			Vector2(1,0.5),
 			Vector2(0,1),
-			Vector2(0.5,1),
 			Vector2(1,1),
 		};
 		array<Vector2, 16> barBorderUVs = {
@@ -160,14 +152,11 @@ namespace T5M::Renderer {
 			Vector2(0,1),
 		};
 
-		array<int, 24> barIndices = {
-			0,1,3,1,4,3,
-			//
-			1,2,4,2,5,4,
-			//
-			3,4,6,4,7,6,
-			//
-			4,5,7,5,8,7
+		array<int, 12> barIndices = {
+			2,1,0,
+			2,0,3,
+			2,3,4,
+			2,4,1
 		};
 		array<int, 56> barBorderIndices = {
 			//top left
@@ -189,8 +178,8 @@ namespace T5M::Renderer {
 			//center
 			2,7,13,7,8,13
 		};
-		array<RendererVertex, 9> vertices;
-		for (int i = 0; i < 9; i++) {
+		array<RendererVertex, 5> vertices;
+		for (int i = 0; i < 5; i++) {
 
 			vertices[i].Position = barVertices[i];
 			vertices[i].Color = colors[i];

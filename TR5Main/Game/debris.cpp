@@ -30,17 +30,20 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	RendererMesh* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
+	bool isStatic;
 	if (mesh) {
+		isStatic = false;
 		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
 		yRot = mesh->yRot;
 		pos = Vector3(mesh->x, mesh->y, mesh->z);
 	}
 	else {
+		isStatic = true;
 		meshPtr = item->meshp;
 		yRot = item->yRot;
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
-	fragmentsMesh = g_Renderer.getMesh(0);
+	fragmentsMesh = g_Renderer.getRendererMeshFromTrMesh(nullptr, meshPtr, num, 0, 0);
 	for (auto& renderBucket : fragmentsMesh->buckets) {
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
@@ -65,6 +68,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->mesh.vertices[1] = vtx1;
 				fragment->mesh.vertices[2] = vtx2;
 				fragment->mesh.blendMode = renderBucket.blendMode;
+				fragment->mesh.tex = renderBucket.texture;
+				fragment->isStatic = isStatic;
 				fragment->active = true;
 				fragment->terminalVelocity = 1024;
 				fragment->gravity = Vector3(0, 7, 0);
@@ -81,6 +86,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 			}
 		}
 	}
+	delete fragmentsMesh;
 
 }
 
