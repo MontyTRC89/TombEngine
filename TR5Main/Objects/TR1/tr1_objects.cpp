@@ -30,6 +30,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 6;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 375;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -49,6 +50,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 20;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 500;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -66,6 +68,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = ApeControl;
 		obj->collision = CreatureCollision;
 		obj->hitPoints = 22;
+		obj->hitEffect = HIT_BLOOD;
 		obj->shadowSize = 128;
 		obj->pivotLength = 250;
 		obj->radius = 340;
@@ -85,6 +88,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 5;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 204;
 		obj->intelligent = true;
@@ -102,6 +106,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->hitEffect = HIT_BLOOD;
 		obj->control = NatlaControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 400;
@@ -122,6 +127,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = AbortionControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 500;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->intelligent = true;
 		obj->saveAnim = true;
@@ -143,6 +149,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		//obj->drawRoutine = DrawEvilLara;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 1000;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		//obj->intelligent = true;
 		obj->saveFlags = true;
@@ -158,6 +165,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 3;
 		obj->hitPoints = 120;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
 		obj->radius = WALL_SIZE / 3;
 		obj->intelligent = 1;

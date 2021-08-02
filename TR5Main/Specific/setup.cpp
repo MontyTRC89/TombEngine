@@ -270,6 +270,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseCrowDoveSwitch;
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
@@ -283,6 +284,7 @@ void ObjectObjects()
 			obj->initialise = InitialiseDoor;
 			obj->control = DoorControl;
 			obj->collision = DoorCollision;
+			obj->hitEffect = HIT_RICOCHET;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->saveMesh = true;
@@ -294,6 +296,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 	}
 
@@ -302,6 +305,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 	}
 
@@ -311,6 +315,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseDoor;
 		obj->collision = DoorCollision;
 		obj->control = SequenceDoorControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -323,6 +328,7 @@ void ObjectObjects()
 			obj->initialise = InitialiseDoor;
 			obj->collision = DoubleDoorCollision;
 			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 		}
@@ -336,6 +342,7 @@ void ObjectObjects()
 			obj->initialise = InitialiseDoor;
 			obj->collision = UnderwaterDoorCollision;
 			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 		}
@@ -349,6 +356,7 @@ void ObjectObjects()
 			obj->initialise = InitialiseDoor;
 			obj->collision = PushPullKickDoorCollision;
 			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 		}
