@@ -71,7 +71,6 @@ namespace T5M::Renderer {
 			} while (i);
 		}
 
-		GnFrameCounter++;
 		return nf;
 	}
 

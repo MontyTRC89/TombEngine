@@ -8,7 +8,6 @@ extern int StormTimer;
 extern int dLightningRand;
 extern byte SkyStormColor[3];
 extern byte SkyStormColor2[3];
-extern int GnFrameCounter;
 
 int DrawPhaseGame();
 int GetFrame_D2(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);

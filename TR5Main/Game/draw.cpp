@@ -28,7 +28,6 @@ BOUNDING_BOX InterpolatedBounds;
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
 double LdSync;
-int GnFrameCounter;
 
 int DrawPhaseGame()
 {

@@ -2581,7 +2581,7 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
-        cameraConstantBuffer.Frame = GnFrameCounter;
+        cameraConstantBuffer.Frame = GlobalCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
@@ -2722,7 +2722,6 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
-        cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
