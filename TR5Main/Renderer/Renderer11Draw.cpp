@@ -3121,7 +3121,7 @@ namespace T5M::Renderer
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
         Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
-        if (!level->Horizon)
+		if (!level->Horizon || !(m_rooms[Camera.pos.roomNumber].Room->flags & ENV_FLAG_OUTSIDE))
             return ;
 
         if (BinocularRange)
