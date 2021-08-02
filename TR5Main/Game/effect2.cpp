@@ -84,7 +84,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)
 			switch (type)
 			{
 				case SP_FX:
-					if (sptr->flags & SP_USEFXOBJPOS)
+					if (sptr->flags & SP_DAMAGE)
 					{
 						sptr->on = false;
 					}
@@ -98,7 +98,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)
 					}
 					break;
 				case SP_ITEM:
-					if (sptr->flags & SP_USEFXOBJPOS)
+					if (sptr->flags & SP_DAMAGE)
 					{
 						sptr->on = false;
 					}
@@ -222,21 +222,21 @@ void UpdateSparks()
 
 			if (spark->life == spark->colFadeSpeed)
 			{
-				if (spark->flags & 0x800)
+				if (spark->flags & SP_UNDERWEXP)
 					spark->dSize /= 4;
 			}
 
-			if (spark->flags & 0x10)
+			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
 
 			if (spark->sLife - spark->life == spark->extras / 8
 				&& spark->extras & 7)
 			{
 				int unk;
-				if (spark->flags & 0x800)
+				if (spark->flags & SP_UNDERWEXP)
 					unk = 1;
 				else
-					unk = (spark->flags & 0x2000) / 4096;
+					unk = (spark->flags & SP_PLASMAEXP) / 4096;
 
 				for (int j = 0; j < (spark->extras & 7); j++)
 				{
@@ -281,7 +281,7 @@ void UpdateSparks()
 			spark->y += (spark->yVel / 32);
 			spark->z += (spark->zVel / 32);
 
-			if (spark->flags & 0x100)
+			if (spark->flags & SP_WIND)
 			{
 				spark->x += (SmokeWindX / 2);
 				spark->z += (SmokeWindZ / 2);
@@ -293,9 +293,7 @@ void UpdateSparks()
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
 			spark->size = lerp(spark->sSize, spark->dSize,alpha );
 
-			if (spark->flags & 1
-				&& !Lara.burn
-				|| spark->flags & 0x400)
+			if (spark->flags & SP_FIRE && !Lara.burn || spark->flags & SP_DAMAGE)
 			{
 				ds = spark->size * (spark->scalar / 2.0);
 
@@ -305,7 +303,7 @@ void UpdateSparks()
 					{
 						if (spark->z + ds > DeadlyBounds[4] && spark->z - ds < DeadlyBounds[5])
 						{
-							if (spark->flags & 1)
+							if (spark->flags & SP_FIRE)
 								LaraBurn();
 							else
 								LaraItem->hitPoints -= 2;
@@ -819,7 +817,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->maxYvel = 0;
 		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		if (deadly)
-			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FLAT;
+			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FIRE;
 		sptr->scalar = 2;
 		sptr->dSize = (GetRandomControl() & 0xF) + (size / 64) + 16;
 		sptr->sSize = sptr->size = sptr->dSize / 2;
@@ -1517,7 +1515,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
+void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -1528,14 +1526,14 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 
 		spark->on = true;
 
-		if (flag2 == 2)
+		if (type == 2)
 		{
 			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
 			spark->sB = (GetRandomControl() & 0x3F) - 64;
 		}
 		else
 		{
-			if (flag2 == -2)
+			if (type == -2)
 			{
 				spark->sR = 48;
 				spark->sG = 255;
@@ -1553,20 +1551,20 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 			}
 		}
 
-		if (flag2 != -2)
+		if (type != -2)
 		{
 			spark->dR = (GetRandomControl() & 0x3F) - 64;
 			spark->dG = (GetRandomControl() & 0x3F) + -128;
 			spark->dB = 32;
 		}
 
-		if (flag1 == -1)
+		if (fxObj == -1)
 		{
-			if (flag2 == 2 || flag2 == -2 || flag2 == -1)
+			if (type == 2 || type == -2 || type == -1)
 			{
 				spark->fadeToBlack = 6;
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
-				spark->life = spark->sLife = (flag2 < -2 ? 0 : 8) + (GetRandomControl() & 3) + 16;
+				spark->life = spark->sLife = (type < -2 ? 0 : 8) + (GetRandomControl() & 3) + 16;
 			}
 			else
 			{
@@ -1579,12 +1577,12 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 		{
 			spark->fadeToBlack = 16;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 28;
+			spark->life = spark->sLife = (GetRandomControl() & 3) + 18;
 		}
 
 		spark->transType = COLADD;
 
-		if (flag1 != -1)
+		if (fxObj != -1)
 		{
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0x1F) - 16;
@@ -1592,9 +1590,9 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 
 		//LABEL_POS_1:
 
-			if (flag2 && flag2 != 1)
+			if (type && type != 1)
 			{
-				if (flag2 < -2)
+				if (type < -2)
 				{
 					spark->y = y;
 					spark->x = (GetRandomControl() & 0xF) + x - 8;
@@ -1614,7 +1612,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 				spark->z = (GetRandomControl() & 0x1F) + z - 16;
 			}
 
-			if (flag2 == 2)
+			if (type == 2)
 			{
 				spark->xVel = (GetRandomControl() & 0x1F) - 16;
 				spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
@@ -1623,10 +1621,10 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 			}
 			else
 			{
-				spark->xVel = GetRandomControl() - 128;
+				spark->xVel = (GetRandomControl() & 255) - 128;
 				spark->yVel = -16 - (GetRandomControl() & 0xF);
-				spark->zVel = GetRandomControl() - 128;
-				if (flag2 == 1)
+				spark->zVel = (GetRandomControl() & 255) - 128;
+				if (type == 1)
 				{
 					spark->friction = 51;
 				}
@@ -1638,7 +1636,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 
 			if (GetRandomControl() & 1)
 			{
-				if (flag1 == -1)
+				if (fxObj == -1)
 				{
 					spark->gravity = -16 - (GetRandomControl() & 0x1F);
 					spark->maxYvel = -16 - (GetRandomControl() & 7);
@@ -1647,7 +1645,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 				else
 				{
 					spark->flags = 602;
-					spark->fxObj = flag1;
+					spark->fxObj = fxObj;
 					spark->gravity = -32 - (GetRandomControl() & 0x3F);
 					spark->maxYvel = -24 - (GetRandomControl() & 7);
 				}
@@ -1665,7 +1663,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 			}
 			else
 			{
-				if (flag1 == -1)
+				if (fxObj == -1)
 				{
 					spark->flags = 522;
 					spark->gravity = -16 - (GetRandomControl() & 0x1F);
@@ -1674,7 +1672,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 				else
 				{
 					spark->flags = 586;
-					spark->fxObj = flag1;
+					spark->fxObj = fxObj;
 					spark->gravity = -32 - (GetRandomControl() & 0x3F);
 					spark->maxYvel = -24 - (GetRandomControl() & 7);
 				}
@@ -1682,13 +1680,13 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 
 			spark->scalar = 2;
 
-			if (flag2)
+			if (type)
 			{
-				if (flag2 == 1)
+				if (type == 1)
 				{
 					spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
 				}
-				else if (flag2 < 254)
+				else if (type < 254)
 				{
 					spark->maxYvel = 0;
 					spark->gravity = 0;
@@ -1696,7 +1694,7 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 				}
 				else
 				{
-					spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+					spark->sSize = spark->size = (GetRandomControl() & 0xF) + 128;
 				}
 			}
 			else
@@ -1704,14 +1702,14 @@ void TriggerFireFlame(int x, int y, int z, int flag1, int flag2)
 				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
 			}
 
-			if (flag2 == 2)
+			if (type == 2)
 			{
 				spark->dSize = spark->size / 4;
 			}
 			else
 			{
 				spark->dSize = spark->size / 16;
-				if (flag2 == 7)
+				if (type == 7)
 				{
 					spark->colFadeSpeed /= 4;
 					spark->fadeToBlack = spark->fadeToBlack / 4;
