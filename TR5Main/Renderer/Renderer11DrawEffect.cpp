@@ -138,7 +138,11 @@ namespace T5M::Renderer {
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) {
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f }, BLENDMODE_ADDITIVE,view);
+						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
+																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
+																   TO_RAD(spark->rotAng), 
+																   spark->scalar,
+																   { spark->size * (float)fire->size, spark->size * (float)fire->size }, BLENDMODE_ADDITIVE, view);
 				}
 			}
 		}

@@ -42,7 +42,7 @@ enum TransTypeEnum
 
 enum FireSizeEnum
 {
-	SP_TINYFIRE,
+	SP_NORMALFIRE,
 	SP_SMALLFIRE,
 	SP_BIGFIRE
 };
