@@ -28,6 +28,7 @@ void InitKeyHole(OBJECT_INFO* obj, int objectNumber)
 	if (obj->loaded)
 	{
 		obj->collision = KeyHoleCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 	}
 }
@@ -39,6 +40,7 @@ void InitPuzzleHole(OBJECT_INFO* obj, int objectNumber)
 	{
 		obj->collision = PuzzleHoleCollision;
 		obj->control = AnimatingControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->isPuzzleHole = true;
@@ -52,6 +54,7 @@ void InitPuzzleDone(OBJECT_INFO* obj, int objectNumber)
 	{
 		obj->collision = PuzzleDoneCollision;
 		obj->control = AnimatingControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
@@ -65,6 +68,7 @@ void InitAnimating(OBJECT_INFO* obj, int objectNumber)
 		obj->initialise = InitialiseAnimating;
 		obj->control = AnimatingControl;
 		obj->collision = ObjectCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
@@ -148,6 +152,7 @@ void InitPushableObject(OBJECT_INFO* obj, int objectNumber)
 		obj->ceiling = PushableBlockCeiling;
 		obj->floorBorder = PushableBlockFloorBorder;
 		obj->ceilingBorder = PushableBlockCeilingBorder;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;

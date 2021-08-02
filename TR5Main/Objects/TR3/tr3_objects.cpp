@@ -45,6 +45,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -64,6 +65,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -82,6 +84,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 8;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->nonLot = true;
@@ -101,6 +104,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->pivotLength = 600;
 		obj->intelligent = true;
@@ -122,6 +126,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 28;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -141,6 +146,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 28;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -159,6 +165,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = TyrannosaurControl;
 		obj->collision = CreatureCollision;
 		obj->hitPoints = 800;
+		obj->hitEffect = HIT_BLOOD;
 		obj->shadowSize = 64;
 		obj->pivotLength = 1800;
 		obj->radius = 512;
@@ -179,6 +186,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 20;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
@@ -208,6 +216,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 36;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -229,6 +238,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 8;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -249,6 +259,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 28;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -271,6 +282,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 28;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -294,6 +306,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		//obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
@@ -315,6 +328,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->shadowSize = 0;
 		obj->pivotLength = 50;
 		obj->hitPoints = 300;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->saveAnim = true;
@@ -334,6 +348,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 15;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
@@ -359,6 +374,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -372,6 +388,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseQuadBike;
 		obj->collision = QuadBikeCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -384,6 +401,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->control = RubberBoatControl;
 		obj->collision = RubberBoatCollision;
 		obj->drawRoutine = DrawRubberBoat;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
@@ -395,6 +413,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->initialise = InitialiseKayak;
 		obj->collision = KayakCollision;
 		//obj->drawRoutine = KayakDraw;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -405,6 +424,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseMineCart;
 		obj->collision = MineCartCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -416,6 +436,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->initialise = BigGunInitialise;
 		obj->collision = BigGunCollision;
 //		obj->draw_routine = BigGunDraw;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
@@ -428,6 +449,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 		obj->control = SubEffects;
 		obj->collision = SubCollision;
 	//	obj->drawRoutine = SubDraw;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;

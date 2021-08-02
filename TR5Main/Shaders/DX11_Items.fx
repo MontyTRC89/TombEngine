@@ -1,3 +1,4 @@
+#include "./Math.hlsli"
 #define LT_SUN		0
 #define LT_POINT	1
 #define LT_SPOT		2
@@ -81,8 +82,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	// Wibble effect returns different value depending on vertex hash and frame number.
 	// In theory, hash could be affected by WaterScheme value from room.
 	
-	static const float PI = 3.14159265f;
-	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI*2)); // sin from -1 to 1 with a period of 64 frames
+	float wibble = sin((((Frame + input.Hash) % 256) / 256.0) * (PI2)); // sin from -1 to 1 with a period of 64 frames
 	
 	// Glow
 	

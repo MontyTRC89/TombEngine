@@ -91,6 +91,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 40;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -98,7 +99,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -115,6 +115,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = GuardControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -123,7 +124,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -143,6 +143,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->pivotLength = 50;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
@@ -150,7 +151,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -173,6 +173,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = GuardControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -180,7 +181,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -203,6 +203,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = GuardControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -211,7 +212,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -233,6 +233,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -240,7 +241,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
@@ -263,6 +263,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -271,7 +272,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -294,6 +294,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -302,7 +303,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -318,6 +318,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = SubmarineControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 200;
 		obj->radius = 512;
 		obj->intelligent = true;
@@ -326,7 +327,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->zoneType = ZONE_FLYER;
 		obj->undead = true;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
@@ -341,6 +341,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 35;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->biteOffset = 0;
@@ -349,7 +350,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
@@ -366,6 +366,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = LionControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 40;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 341;
 		obj->intelligent = true;
@@ -373,7 +374,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
@@ -387,6 +387,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = DobermanControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 18;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
@@ -394,7 +395,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -407,6 +407,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = Tr5DogControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
@@ -414,7 +415,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -427,6 +427,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = ReaperControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 10;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -434,7 +435,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->waterCreature = true;
 		obj->zoneType = ZONE_FLYER;
 	}
@@ -448,6 +448,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = Mafia2Control;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 26;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -456,7 +457,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 
@@ -475,6 +475,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = LarsonControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 60;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -482,7 +483,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -499,6 +499,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = LarsonControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 60;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -506,7 +507,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -523,6 +523,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = HitmanControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 50;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -530,7 +531,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
@@ -550,6 +550,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = SniperControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 35;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
@@ -558,7 +559,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -574,6 +574,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		//obj->control = GuardControlLaser;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 128;
 		obj->explodableMeshbits = 4;
@@ -582,7 +583,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
@@ -599,6 +599,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = HydraControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 30;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->biteOffset = 1024;
@@ -607,7 +608,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
@@ -625,6 +625,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = ImpControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 12;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -632,7 +633,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
 		obj->zoneType = ZONE_BASIC;
 
@@ -674,6 +674,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = ControlBrowsBeast;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
 		obj->radius = 341;
 		obj->intelligent = true;
@@ -681,7 +682,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
@@ -698,6 +698,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = LagoonWitchControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
@@ -723,6 +724,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = InvisibleGhostControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
+		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
@@ -730,7 +732,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -774,6 +775,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 20;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -781,7 +783,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -800,6 +801,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 			obj->control = RomanStatueControl;
 			obj->shadowSize = UNIT_SHADOW / 2;
 			obj->hitPoints = 300;
+			obj->hitEffect = HIT_SMOKE;
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
@@ -807,7 +809,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 			obj->saveHitpoints = true;
-			obj->hitEffect = HIT_SMOKE;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->zoneType = ZONE_HUMAN_CLASSIC;
 			obj->castShadows = true;
@@ -845,7 +846,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = HIT_BLOOD;
+		obj->hitEffect = HIT_RICOCHET;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -857,6 +858,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = ControlGunShip;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->hitEffect = HIT_RICOCHET;
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
@@ -869,7 +871,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = SubmarineControl;
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
-		obj->hitEffect = HIT_BLOOD;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->castShadows = true;
 		obj->hitPoints = 100;
 	}
@@ -1099,6 +1101,7 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->initialise = InitialiseRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1118,6 +1121,7 @@ static void StartTrap(OBJECT_INFO *obj)
 	{
 		obj->collision = RollingBallCollision;
 		obj->control = RollingBallControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -1128,6 +1132,7 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->initialise = InitialiseClassicRollingBall;
 		obj->control = ClassicRollingBallControl;
 		obj->collision = ClassicRollingBallCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
@@ -1139,6 +1144,7 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->collision = ClassicRollingBallCollision;
 		obj->control = ClassicRollingBallControl;
 		obj->initialise = InitialiseClassicRollingBall;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
@@ -1210,6 +1216,7 @@ static void StartSwitch(OBJECT_INFO *obj)
 	{
 		obj->collision = CogSwitchCollision;
 		obj->control = CogSwitchControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
@@ -1219,6 +1226,7 @@ static void StartSwitch(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseRaisingCog;
 		obj->control = RaisingCogControl;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
