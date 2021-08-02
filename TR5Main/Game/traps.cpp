@@ -260,7 +260,7 @@ void FlameControl(short fxNumber)
 
 	for (int i = 0; i < 14; i++)
 	{
-		if (!(Wibble & 0xC))
+		if (!(Wibble & 0x2))
 		{
 			fx->pos.xPos = 0;
 			fx->pos.yPos = 0;
@@ -275,7 +275,7 @@ void FlameControl(short fxNumber)
 					Lara.burnSmoke = true;
 			}
 
-			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - Lara.burnSmoke);
+			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, i, 255 - Lara.burnSmoke);
 		}
 	}
 
