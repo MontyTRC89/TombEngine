@@ -68,7 +68,7 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 		spark->friction = 85;
 		spark->gravity = -16 - (GetRandomControl() & 0x1F);
 		spark->maxYvel = 0;
-		spark->flags = SP_FLAT | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		spark->scalar = 3;
 		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 64;
