@@ -186,32 +186,11 @@ extern bool BlockAllInput;
 extern int skipLoop;
 extern int skipFrames;
 extern int lockInput;
-extern int newSkipLoop;
-extern int newSkipFrames;
-extern int newLockInput;
-extern bool newSkipFramesValue;
-extern bool newSkipLoopValue;
-extern bool newLockInputValue;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	g_GameScript->OnControlPhase();
 	short oldLaraFrame;
-	if (newSkipFramesValue)
-	{
-		skipFrames = newSkipFrames;
-		newSkipFramesValue = false;
-	}
-	if (newSkipLoopValue)
-	{
-		skipLoop = newSkipLoop;
-		newSkipLoopValue = false;
-	}
-	if (newLockInputValue)
-	{
-		lockInput = newLockInput;
-		newLockInputValue = false;
-	}
 
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
