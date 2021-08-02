@@ -36,7 +36,7 @@ void DrawHealthBarOverlay(int value)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
-		g_Renderer.drawBar(value, ::g_HealthBar);
+		g_Renderer.drawBar(value, ::g_HealthBar, GlobalCounter,Lara.poisoned || Lara.gassed);
 	}
 }
 
@@ -44,7 +44,7 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_HealthBar);
+		g_Renderer.drawBar(value, ::g_HealthBar,GlobalCounter,Lara.poisoned || Lara.gassed);
 	}
 }
 
@@ -97,7 +97,7 @@ void UpdateHealthBar(int flash)
 		HealthBarTimer = 0;
 
 	// Flash when at 1/4 capacity AND HP bar is not transitioning.
-	if (HealthBar <= 1000 / 4 && MutateAmount == 0)
+	if (HealthBar <= 1000 / 4)
 	{
 		if (!BinocularRange)
 		{
@@ -137,7 +137,7 @@ void DrawAirBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_AirBar);
+		g_Renderer.drawBar(value, ::g_AirBar,0,0);
 	}
 }
 
@@ -183,7 +183,7 @@ void DrawDashBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_DashBar);
+		g_Renderer.drawBar(value, ::g_DashBar,0,0);
 	}
 }
 

@@ -68,14 +68,14 @@ namespace T5M::Renderer
 		IndexBuffer indexBuffer;
 		/*
 			Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
-			The colors are setup like this
-			0-----------1-----------2
-			|           |           |
-			3-----------4-----------5
-			|           |           |
-			6-----------7-----------8
+			The colors are setup like this (4 triangles)
+			0-------1
+			| \   / |
+			|  >2<  |
+			| /   \ |
+			3-------4
 		*/
-		RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, std::array<DirectX::SimpleMath::Vector4, 9> colors);
+		RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, std::array<DirectX::SimpleMath::Vector4, 5> colors);
 	};
 	
 	struct RendererStringToDraw
@@ -466,7 +466,6 @@ namespace T5M::Renderer
 		// Private functions
 		int getAnimatedTextureInfo(short textureId);
 		void drawAllStrings();
-		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
 		void fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void buildHierarchy(RendererObject* obj);
 		void buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
@@ -550,6 +549,8 @@ namespace T5M::Renderer
 		void drawSimpleParticles(RenderView& view); 
 		void setBlendMode(BLEND_MODES blendMode);
 	public:
+		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
+
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;
 		DirectX::SimpleMath::Matrix ViewProjection;
@@ -592,7 +593,6 @@ namespace T5M::Renderer
 		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		void changeScreenResolution(int width, int height, int frequency, bool windowed);
-		void drawBar(float percent, const RendererHUDBar* const bar);
 		void flipRooms(short roomNumber1, short roomNumber2);
 		void resetAnimations();
 		void updateLaraAnimations(bool force);
@@ -602,7 +602,8 @@ namespace T5M::Renderer
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
 		void getBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
 		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ, float scale1);
-	
+		void drawBar(float percent, const RendererHUDBar * const bar, int frame, bool poison);
+
 		RendererMesh* getMesh(int meshIndex);
 	private:
 		Texture2D createDefaultNormalTexture();

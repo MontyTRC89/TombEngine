@@ -950,8 +950,14 @@ namespace T5M::Renderer {
 				m_primitiveBatch->Begin();
 				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
-				m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
-				ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+				if (!deb->isStatic) {
+					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
+
+				} else {
+					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
+
+				}
+				ID3D11SamplerState* sampler = m_states->LinearClamp();
 				m_context->PSSetSamplers(0, 1, &sampler);
 				//m_stCameraMatrices.View = View.Transpose();
 				//m_stCameraMatrices.Projection = Projection.Transpose();
