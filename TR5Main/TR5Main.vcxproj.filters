@@ -1962,6 +1962,9 @@
     <Image Include="Banner.bmp">
       <Filter>File di risorse</Filter>
     </Image>
+    <Image Include="ten.ico">
+      <Filter>File di risorse</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
