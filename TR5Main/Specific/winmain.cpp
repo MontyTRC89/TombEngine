@@ -39,12 +39,6 @@ bool BlockAllInput = true;
 int skipLoop = -1;
 int skipFrames = 2;
 int lockInput = 0;
-int newSkipLoop = -1;
-int newSkipFrames = 2;
-int newLockInput = 0;
-bool newSkipFramesValue = false;
-bool newSkipLoopValue = false;
-bool newLockInputValue = false;
 
 #if _DEBUG
 string commit;
@@ -93,45 +87,6 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 			}
 		}
 	}
-}
-
-void HandleScriptMessage(WPARAM wParam)
-{
-	string ErrorMessage;
-	string message = *(string*)(wParam);
-	bool status = false;
-
-	//check whether line starts with "lua "
-	if (message.find("lua ") == 0) {
-		string scriptSubstring = message.substr(4);
-		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
-	}
-	else {
-		if (message.find("SL=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newSkipLoop = stoi(scriptSubstring);
-			newSkipLoopValue = true;
-		}
-		else if (message.find("SF=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newSkipFrames = stoi(scriptSubstring);
-			newSkipFramesValue = true;
-		}
-		else if (message.find("LI=") == 0)
-		{
-			string scriptSubstring = message.substr(3);
-			newLockInput = stoi(scriptSubstring);
-			newLockInputValue = true;
-		}
-		else
-		{
-			status = g_GameScript->ExecuteString(message, ErrorMessage);
-		}
-	}
-	if (!status)
-		cout << ErrorMessage << endl;
 }
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
