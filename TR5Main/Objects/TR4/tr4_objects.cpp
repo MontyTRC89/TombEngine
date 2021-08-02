@@ -467,6 +467,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 40;
+		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -486,7 +487,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = SentryGunControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
+		obj->undead = true;
 		obj->hitPoints = 30;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 204;
 		obj->intelligent = true;
@@ -510,6 +513,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 60;
+		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 50;
 		obj->radius = 409;
 		obj->intelligent = true;

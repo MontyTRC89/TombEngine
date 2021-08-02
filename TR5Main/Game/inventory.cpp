@@ -1456,7 +1456,7 @@ void Inventory::UseCurrentItem()
 		if (Lara.NumSmallMedipacks != -1)
 			Lara.NumSmallMedipacks--;
 
-		Lara.dpoisoned = 0;
+		Lara.poisoned = 0;
 		LaraItem->hitPoints += 500;
 		if (LaraItem->hitPoints > 1000)
 			LaraItem->hitPoints = 1000;
@@ -1488,7 +1488,7 @@ void Inventory::UseCurrentItem()
 		if (Lara.NumLargeMedipacks != -1)
 			Lara.NumLargeMedipacks--;
 
-		Lara.dpoisoned = 0;
+		Lara.poisoned = 0;
 		LaraItem->hitPoints += 1000;
 		if (LaraItem->hitPoints > 1000)
 			LaraItem->hitPoints = 1000;
