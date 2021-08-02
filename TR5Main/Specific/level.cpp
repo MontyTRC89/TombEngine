@@ -368,7 +368,7 @@ void LoadObjects()
 void LoadCameras()
 {
 	int numCameras = ReadInt32();
-	g_Level.Cameras.resize(numCameras);
+	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
 		auto & camera = g_Level.Cameras.emplace_back();
@@ -394,7 +394,7 @@ void LoadCameras()
 	}
 
 	int numSinks = ReadInt32();
-	g_Level.Sinks.resize(numSinks);
+	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
 		auto & sink = g_Level.Sinks.emplace_back();
@@ -847,7 +847,7 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 void LoadSoundEffects()
 {
 	int numSoundSources = ReadInt32();
-	g_Level.SoundSources.resize(numSoundSources);
+	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
 		auto & source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
@@ -917,7 +917,7 @@ void LoadTextureInfos()
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
-	g_Level.AIObjects.resize(nAIObjects);
+	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
 		auto & obj = g_Level.AIObjects.emplace_back();
