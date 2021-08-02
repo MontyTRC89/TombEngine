@@ -117,7 +117,7 @@ void DisableDebris()
 
 void UpdateDebris()
 {
-	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	for (auto& deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 	{
 		if (deb->active)
 		{
@@ -134,13 +134,13 @@ void UpdateDebris()
 			roomNumber = deb->roomNumber;
 			floor = GetFloor(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z,&roomNumber);
 
-			if (deb->worldPosition.y < floor->ceiling)
+			if (deb->worldPosition.y < floor->ceiling*256)
 			{
 				if (floor->skyRoom != NO_ROOM)
 					deb->roomNumber = floor->skyRoom;
 			}
 
-			if (deb->worldPosition.y > floor->floor)
+			if (deb->worldPosition.y > floor->floor*256)
 			{
 				if (floor->pitRoom != NO_ROOM)
 					deb->roomNumber = floor->pitRoom;
