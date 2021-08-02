@@ -233,13 +233,13 @@ void BubblesControl(short fxNum)
 		}
 		
 		int dy = angles[0] - fx->pos.yRot;
-		if (abs(dy) > ANGLE(180.0f))
+		if (abs(dy) <= ANGLE(180.0f))
 		{
 			dy = -dy;
 		}
 
 		int dx = angles[1] - fx->pos.xRot;
-		if (abs(dx) > ANGLE(180.0f))
+		if (abs(dx) <= ANGLE(180.0f))
 			dx = -dx;
 
 		dy /= 8;
@@ -270,10 +270,10 @@ void BubblesControl(short fxNum)
 	int oldY = fx->pos.yPos;
 	int oldZ = fx->pos.zPos;
 
-	int c = fx->speed * phd_cos(fx->pos.xRot);
-	fx->pos.xPos += c * phd_sin(fx->pos.yRot);
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
+	int speed = (fx->speed * phd_cos(fx->pos.xRot));
+	fx->pos.zPos += (speed * phd_cos(fx->pos.yRot));
+	fx->pos.xPos += (speed * phd_sin(fx->pos.yRot));
+	fx->pos.yPos += -((fx->speed * phd_sin(fx->pos.xRot))) + fx->fallspeed;
 	
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
