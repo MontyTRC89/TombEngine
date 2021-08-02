@@ -38,7 +38,6 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 		spark->colFadeSpeed = 12;
 		spark->fadeToBlack = 8;
 		spark->transType = COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 16;
 
 		PHD_VECTOR pos1;
 		pos1.x = -140;
@@ -60,6 +59,8 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 
 		int v = (GetRandomControl() & 0x3F) + 192;
 
+		spark->life = spark->sLife = v / 6;
+
 		spark->xVel = v * (pos2.x - pos1.x) / 10;
 		spark->yVel = v * (pos2.y - pos1.y) / 10;
 		spark->zVel = v * (pos2.z - pos1.z) / 10;
@@ -67,18 +68,12 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 		spark->friction = 85;
 		spark->gravity = -16 - (GetRandomControl() & 0x1F);
 		spark->maxYvel = 0;
-		spark->flags = 538;
-
-		if ((GlobalCounter & 1) != 0)
-		{
-			v = 255;
-			spark->flags = 539;
-		}
+		spark->flags = SP_FLAT | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		spark->scalar = 3;
-		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
-		spark->sSize = spark->dSize / 8;
-		spark->size = spark->dSize / 8;
+		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 64;
+		spark->sSize = spark->dSize / 4;
+		spark->size = spark->dSize / 2;
 	}
 }
 
