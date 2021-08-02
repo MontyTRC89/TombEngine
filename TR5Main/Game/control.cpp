@@ -260,15 +260,16 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
-			TrInput &= 0x200;
+			TrInput &= IN_LOOK;
 		}
 
 		// If cutscene has been triggered then clear input
 		if (CutSeqTriggered)
-			TrInput = 0;
+			TrInput = IN_NONE;
 
 		// Does the player want to enter inventory?
 		SetDebounce = false;
+
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
@@ -366,6 +367,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				}
 				else
 				{
+					// If any input but optic controls (directions + action), immediately exit binoculars mode.
+					if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
+						BinocularRange = 0;
+
 					if (LaserSight)
 					{
 						BinocularRange = 0;
@@ -389,6 +394,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					else
 					{
 						TrInput |= IN_LOOK;
+						DbInput = 0;
 					}
 				}
 
