@@ -2526,9 +2526,8 @@ void use_current_item()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if ((LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE
-				|| Lara.isDucked && !(TrInput & IN_DUCK))
-			//	&& !SniperCamActive
+			if (((LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE)
+				|| (Lara.isDucked && !(TrInput & IN_DUCK)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
