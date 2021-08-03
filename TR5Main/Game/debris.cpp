@@ -117,7 +117,7 @@ void DisableDebris()
 
 void UpdateDebris()
 {
-	for (auto& deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 	{
 		if (deb->active)
 		{
