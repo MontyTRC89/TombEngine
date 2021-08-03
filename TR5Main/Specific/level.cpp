@@ -825,6 +825,11 @@ void FreeLevel()
 	g_Level.SoundDetails.clear();
 	g_Level.SoundMap.clear();
 	g_Level.FloorData.clear();
+	g_Level.Cameras.clear();
+	g_Level.Sinks.clear();
+	g_Level.SoundSources.clear();
+	g_Level.AIObjects.clear();
+
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 4; j++)
