@@ -54,7 +54,6 @@ Add a level to the gameflow.
 */
 	m_lua->set_function("SetAudioTracks", &GameFlow::SetAudioTracks, this);
 
-
 /***
 @function SetStrings
 @tparam table table array-style table with strings
@@ -66,6 +65,12 @@ Add a level to the gameflow.
 @tparam table table array-style table with TODO EXTRA INFO HERE
 */
 	m_lua->set_function("SetLanguageNames", &GameFlow::SetLanguageNames, this);
+
+/***
+@function SetSettings
+@tparam table table array-style table with TODO EXTRA INFO HERE
+*/
+	m_lua->set_function("SetSettings", &GameFlow::SetSettings, this);
 }
 
 GameFlow::~GameFlow()
@@ -84,6 +89,11 @@ void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src
 void GameFlow::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src)
 {
 	m_translationsMap = std::move(src);
+}
+
+void GameFlow::SetSettings(GameScriptSettings const & src)
+{
+	m_settings = src;
 }
 
 void GameFlow::AddLevel(GameScriptLevel const& level)
@@ -108,30 +118,13 @@ void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>
 	}
 }
 
-bool GameFlow::LoadGameFlowScript()
+void GameFlow::LoadGameFlowScript()
 {
-	// Load the enums file
-	std::string err;
-	if (!ExecuteScript("Scripts/Enums.lua", err)) {
-		std::cout << err << "\n";
-	}
-
-	// Load the new audio tracks file
-	if (!ExecuteScript("Scripts/Tracks.lua", err)) {
-		std::cout << err << "\n";
-	}
-
-	// Load the new script file
-	if (!ExecuteScript("Scripts/Gameflow.lua", err)) {
-		std::cout << err << "\n";
-	}
-
-	// Populate strings
-	if (!ExecuteScript("Scripts/Strings.lua", err)) {
-		std::cout << err << "\n";
-	}
-
-	return true;
+	ExecuteScript("Scripts/Enums.lua");
+	ExecuteScript("Scripts/Tracks.lua");
+	ExecuteScript("Scripts/Gameflow.lua");
+	ExecuteScript("Scripts/Strings.lua");
+	ExecuteScript("Scripts/Settings.lua");
 }
 
 char const * GameFlow::GetString(const char* id)

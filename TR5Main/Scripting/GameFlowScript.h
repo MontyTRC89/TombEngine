@@ -50,10 +50,11 @@ public:
 
 	void								AddLevel(GameScriptLevel const& level);
 	void								SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
-	bool								LoadGameFlowScript();
+	void								LoadGameFlowScript();
 	char const *						GetString(const char* id);
 	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
+	void								SetSettings(GameScriptSettings const & src);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(int id);
 	void								SetHorizon(bool horizon, bool colAddHorizon);
