@@ -106,7 +106,7 @@ std::string GameScriptAIObject::GetName() const
 void GameScriptAIObject::SetName(std::string const & id) 
 {
 	if (id.empty() && WarningsAsErrors)
-		throw std::runtime_error("Name cannot be blank");
+		throw TENScriptException("Name cannot be blank");
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_aiObject.luaName);

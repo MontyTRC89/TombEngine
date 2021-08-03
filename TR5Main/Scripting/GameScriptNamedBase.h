@@ -39,7 +39,7 @@ template <typename T, typename S> callbackSetName<S> GameScriptNamedBase<T, S>::
 		std::string err = "\"Set Name\" callback is not set.";
 		if (WarningsAsErrors)
 		{
-			throw std::runtime_error(err);
+			throw TENScriptException(err);
 		}
 		return false;
 	};
@@ -48,7 +48,7 @@ template <typename T, typename S> callbackRemoveName GameScriptNamedBase<T, S>::
 		std::string err = "\"Remove Name\" callback is not set.";
 		if (WarningsAsErrors)
 		{
-			throw std::runtime_error(err);
+			throw TENScriptException(err);
 		}
 		return false;
 
