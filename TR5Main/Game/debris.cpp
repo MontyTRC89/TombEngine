@@ -16,9 +16,9 @@ using namespace T5M::Renderer;
 using namespace T5M::Math::Random;
 DebrisFragment* GetFreeDebrisFragment()
 {
-	for (auto frag = DebrisFragments.begin(); frag != DebrisFragments.end(); frag++) {
-		if (!frag->active) {
-			return &*frag;
+	for (auto& frag : DebrisFragments) {
+		if (!frag.active) {
+			return &frag;
 		}
 	}
 	return nullptr;
@@ -45,7 +45,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	}
 	fragmentsMesh = g_Renderer.getRendererMeshFromTrMesh(nullptr, meshPtr, num, 0, 0);
 	for (auto& renderBucket : fragmentsMesh->buckets) {
-		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;
+		vector<RendererVertex>& meshVertices = renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
 		{
 			DebrisFragment* fragment = GetFreeDebrisFragment();
@@ -54,9 +54,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 			}
 			if (!fragment->active) {
 				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
-				RendererVertex vtx0 = meshVertices->at(renderBucket.Indices[i]);
-				RendererVertex vtx1 = meshVertices->at(renderBucket.Indices[i + 1]);
-				RendererVertex vtx2 = meshVertices->at(renderBucket.Indices[i + 2]);
+				RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
+				RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
+				RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
 				//Take the average of all 3 local positions
 				Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
 				vtx0.Position -= localPos;
@@ -81,8 +81,6 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
-				
-
 			}
 		}
 	}
@@ -106,12 +104,9 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 
 void DisableDebris()
 {
-	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	for (auto& deb : DebrisFragments)
 	{
-		if (deb->active)
-		{
-			deb->active = false;
-		}
+		deb.active = false;
 	}
 }
 
