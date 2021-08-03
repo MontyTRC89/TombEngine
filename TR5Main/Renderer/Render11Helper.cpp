@@ -873,7 +873,7 @@ namespace T5M::Renderer
 			else
 				pos = mesh->Sphere.Center;
 
-			spheres[i].Center = Vector3(x, y, z) + Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
+			spheres[i].Center = Vector3::Transform(Vector3(x, y, z) + pos, (rendererItem->AnimationTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
 		}
 
