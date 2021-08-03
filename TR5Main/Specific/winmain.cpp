@@ -199,9 +199,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Initialise main window
 	App.hInstance = hInstance;
-	App.WindowClass.hIcon = NULL;
+	App.WindowClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	App.WindowClass.lpszMenuName = NULL;
-	App.WindowClass.lpszClassName = "TR5Main";
+	App.WindowClass.lpszClassName = "TombEngine";
 	App.WindowClass.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 	App.WindowClass.hInstance = hInstance;
 	App.WindowClass.style = CS_VREDRAW | CS_HREDRAW;
@@ -242,9 +242,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	App.WindowHandle = CreateWindowEx(
 		0,
-		"TR5Main",
+		"TombEngine",
 		g_GameFlow->GetSettings()->WindowTitle.c_str(),
-		WS_POPUP,
+		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, // TODO: change this to center of screen !!!
 		CW_USEDEFAULT,
 		Rect.right - Rect.left,
