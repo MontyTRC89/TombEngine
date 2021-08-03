@@ -839,23 +839,12 @@ namespace T5M::Renderer
 				updateItemAnimations(itemNumber, false);
 		}
 
-		int x, y, z;
 		Matrix world;
 
 		if (worldSpace & SPHERES_SPACE_WORLD)
-		{
-			x = item->pos.xPos;
-			y = item->pos.yPos;
-			z = item->pos.zPos;
-			world = Matrix::Identity;
-		}
-		else
-		{
-			x = 0;
-			y = 0;
-			z = 0;
 			world = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos) * local;
-		}
+		else
+			world = Matrix::Identity * local;
 
 		world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
 
@@ -869,11 +858,11 @@ namespace T5M::Renderer
 
 			Vector3 pos;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos = Vector3::Zero;
-			else
 				pos = mesh->Sphere.Center;
+			else
+				pos = Vector3::Zero;
 
-			spheres[i].Center = Vector3::Transform(Vector3(x, y, z) + pos, (rendererItem->AnimationTransforms[i] * world));
+			spheres[i].Center = Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
 		}
 
