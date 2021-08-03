@@ -1910,6 +1910,9 @@
     <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Game\debug\debug.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
