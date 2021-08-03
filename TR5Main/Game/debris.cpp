@@ -117,44 +117,44 @@ void DisableDebris()
 
 void UpdateDebris()
 {
-	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	for (auto& deb : DebrisFragments)
 	{
-		if (deb->active)
+		if (deb.active)
 		{
 			FLOOR_INFO* floor;
 			short roomNumber;
 
-			deb->velocity *= deb->linearDrag;
-			deb->velocity += deb->gravity;
-			deb->velocity = XMVector3ClampLength(deb->velocity, 0, deb->terminalVelocity);
-			deb->rotation *= Quaternion::CreateFromYawPitchRoll(deb->angularVelocity.x,deb->angularVelocity.y,deb->angularVelocity.z);
-			deb->worldPosition += deb->velocity;
-			deb->angularVelocity *= deb->angularDrag;
+			deb.velocity *= deb.linearDrag;
+			deb.velocity += deb.gravity;
+			deb.velocity = XMVector3ClampLength(deb.velocity, 0, deb.terminalVelocity);
+			deb.rotation *= Quaternion::CreateFromYawPitchRoll(deb.angularVelocity.x,deb.angularVelocity.y,deb.angularVelocity.z);
+			deb.worldPosition += deb.velocity;
+			deb.angularVelocity *= deb.angularDrag;
 
-			roomNumber = deb->roomNumber;
-			floor = GetFloor(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z,&roomNumber);
+			roomNumber = deb.roomNumber;
+			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z,&roomNumber);
 
-			if (deb->worldPosition.y < floor->ceiling*256)
+			if (deb.worldPosition.y < floor->ceiling*256)
 			{
 				if (floor->skyRoom != NO_ROOM)
-					deb->roomNumber = floor->skyRoom;
+					deb.roomNumber = floor->skyRoom;
 			}
 
-			if (deb->worldPosition.y > floor->floor*256)
+			if (deb.worldPosition.y > floor->floor*256)
 			{
 				if (floor->pitRoom != NO_ROOM)
-					deb->roomNumber = floor->pitRoom;
+					deb.roomNumber = floor->pitRoom;
 
-				if (deb->numBounces > 3)
+				if (deb.numBounces > 3)
 				{
-					deb->active = false;
+					deb.active = false;
 					continue;
 				}
 				
-				deb->velocity.y *= -deb->restitution;
-				deb->velocity.x *= deb->friction;
-				deb->velocity.z *= deb->friction;
-				deb->numBounces++;
+				deb.velocity.y *= -deb.restitution;
+				deb.velocity.x *= deb.friction;
+				deb.velocity.z *= deb.friction;
+				deb.numBounces++;
 			}
 		}
 	}
