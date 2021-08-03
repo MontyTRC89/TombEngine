@@ -348,7 +348,7 @@ void GameScriptItemInfo::SetHP(short hp)
 		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
 	{
 		if (WarningsAsErrors)
-			throw std::runtime_error("invalid HP");
+			throw TENScriptException("invalid HP");
 		if (hp < 0)
 		{
 			hp = 0;
@@ -485,7 +485,7 @@ void GameScriptItemInfo::SetRoom(short room)
 	if (room < 0 || static_cast<size_t>(room) >= g_Level.Rooms.size())
 	{
 		if (WarningsAsErrors)
-			throw std::runtime_error("invalid room number");
+			throw TENScriptException("invalid room number");
 		return;
 	}
 

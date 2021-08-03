@@ -441,7 +441,9 @@ std::unique_ptr<GameScriptItemInfo> GameScript::GetItemById(int id)
 	if (m_itemsMapId.find(id) == m_itemsMapId.end())
 	{
 		if (WarningsAsErrors)
-			throw "item id not found";
+		{
+			throw TENScriptException{ "item id not found" };
+		}
 		return std::unique_ptr<GameScriptItemInfo>(nullptr);
 	}
 
@@ -457,7 +459,7 @@ std::unique_ptr<T> GetTByName(std::string const & type, std::string const& name,
 		{
 			std::string error = type + " name not found: ";
 			error += name;
-			throw std::runtime_error{error};
+			throw TENScriptException{error};
 		}
 		return std::unique_ptr<T>(nullptr);
 	}
@@ -669,8 +671,7 @@ void GameScript::ExecuteFunction(std::string const & name)
 	if (WarningsAsErrors && !r.valid())
 	{
 		sol::error err = r;
-		std::cerr << "An error occurred: " << err.what() << "\n";
-		throw std::runtime_error(err.what());
+		throw TENScriptException(err.what());
 	}
 }
 
@@ -679,8 +680,7 @@ static void doCallback(sol::protected_function const & func) {
 	if (WarningsAsErrors && !r.valid())
 	{
 		sol::error err = r;
-		std::cerr << "An error occurred: " << err.what() << "\n";
-		throw std::runtime_error(err.what());
+		throw TENScriptException(err.what());
 	}
 }
 
@@ -723,7 +723,7 @@ void GameScript::InitCallbacks()
 			std::string err{ "Level's script file requires callback \"" };
 			err += std::string{ luaFunc };
 			err += "\"";
-			throw std::runtime_error(err);
+			throw TENScriptException(err);
 		}
 	};
 	assignCB(m_onStart, "OnStart");
