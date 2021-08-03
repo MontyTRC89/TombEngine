@@ -856,11 +856,9 @@ namespace T5M::Renderer
 		{
 			RendererMesh *mesh = moveable.ObjectMeshes[i];
 
-			Vector3 pos;
+			Vector3 pos = Vector3::Zero;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos = mesh->Sphere.Center;
-			else
-				pos = Vector3::Zero;
+				pos = moveable.LinearizedBones[i]->Translation;
 
 			spheres[i].Center = Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
