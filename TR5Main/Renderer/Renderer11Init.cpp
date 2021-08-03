@@ -6,6 +6,8 @@
 #include "Quad/RenderQuad.h"
 #include <string>
 #include <memory>
+#include <filesystem>
+
 using namespace T5M::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
@@ -30,22 +32,22 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	// Load caustics
 	const char* causticsNames[NUM_CAUSTICS_TEXTURES] = {
-		"CausticsRender_001.bmp",
-		"CausticsRender_002.bmp",
-		"CausticsRender_003.bmp",
-		"CausticsRender_004.bmp",
-		"CausticsRender_005.bmp",
-		"CausticsRender_006.bmp",
-		"CausticsRender_007.bmp",
-		"CausticsRender_008.bmp",
-		"CausticsRender_009.bmp",
-		"CausticsRender_010.bmp",
-		"CausticsRender_011.bmp",
-		"CausticsRender_012.bmp",
-		"CausticsRender_013.bmp",
-		"CausticsRender_014.bmp",
-		"CausticsRender_015.bmp",
-		"CausticsRender_016.bmp"
+		"Textures/CausticsRender_001.bmp",
+		"Textures/CausticsRender_002.bmp",
+		"Textures/CausticsRender_003.bmp",
+		"Textures/CausticsRender_004.bmp",
+		"Textures/CausticsRender_005.bmp",
+		"Textures/CausticsRender_006.bmp",
+		"Textures/CausticsRender_007.bmp",
+		"Textures/CausticsRender_008.bmp",
+		"Textures/CausticsRender_009.bmp",
+		"Textures/CausticsRender_010.bmp",
+		"Textures/CausticsRender_011.bmp",
+		"Textures/CausticsRender_012.bmp",
+		"Textures/CausticsRender_013.bmp",
+		"Textures/CausticsRender_014.bmp",
+		"Textures/CausticsRender_015.bmp",
+		"Textures/CausticsRender_016.bmp"
 	};
 
 	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
@@ -53,7 +55,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 		wchar_t causticsFile[255];
 		std::mbstowcs(causticsFile, causticsNames[i], 255);
 		std::wstring causticsFilename = std::wstring(causticsFile);
-		m_caustics[i] = Texture2D(m_device.Get(), causticsFilename);
+		m_caustics[i] = std::filesystem::exists(causticsFilename) ? Texture2D(m_device.Get(), causticsFilename) : Texture2D();
 	}
 	m_HUDBarBorderTexture = Texture2D(m_device.Get(), L"bar_border.png");
 	wchar_t titleScreenFile[255];
