@@ -2,18 +2,19 @@
 #include "GameScriptInventoryObject.h"
 
 GameScriptInventoryObject::GameScriptInventoryObject(std::string name, short slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation)
-	{
-		this->name = name;
-		this->slot = slot;
-		this->yOffset = yOffset;
-		this->scale = scale;
-		this->xRot = xRot;
-		this->yRot = yRot;
-		this->zRot = zRot;
-		this->rotationFlags = rotationFlags;
-		this->meshBits = meshBits;
-		this->operation = operation;
-	}
+{
+	this->name = name;
+	this->slot = slot;
+	this->yOffset = yOffset;
+	this->scale = scale;
+	this->xRot = xRot;
+	this->yRot = yRot;
+	this->zRot = zRot;
+	this->rotationFlags = rotationFlags;
+	this->meshBits = meshBits;
+	this->operation = operation;
+}
+
 void GameScriptInventoryObject::Register(sol::state * lua)
 {
 	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
