@@ -644,23 +644,34 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 unsigned CALLBACK GameMain(void *)
 {
-	printf("GameMain\n");
+	try {
+		printf("GameMain\n");
 
-	// Initialise legacy memory buffer and game timer
-	init_game_malloc();
-	TIME_Init();
+		// Initialise legacy memory buffer and game timer
+		init_game_malloc();
+		TIME_Init();
+		if (g_GameFlow->IntroImagePath.empty() && WarningsAsErrors)
+		{
+			throw TENScriptException("Intro image path is not set.");
+		}
 
-	// Do a fixed time title image
-	g_Renderer.renderTitleImage();
+		// Do a fixed time title image
+		g_Renderer.renderTitleImage();
 
-	// Execute the LUA gameflow and play the game
-	g_GameFlow->DoGameflow();
+		// Execute the LUA gameflow and play the game
+		g_GameFlow->DoGameflow();
 
-	DoTheGame = false;
+		DoTheGame = false;
 
-	// Finish the thread
-	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
-	EndThread();
+		// Finish the thread
+		PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
+		EndThread();
+	}
+	catch (TENScriptException const& e) {
+		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+		TENLog(msg, LogLevel::Error, LogConfig::All);
+		throw;
+	}
 
 	return true;
 }
@@ -688,7 +699,7 @@ GAME_STATUS DoTitle(int index)
 		std::string err;
 		if (!level->ScriptFileName.empty())
 		{
-			g_GameScript->ExecuteScript(level->ScriptFileName, err);
+			g_GameScript->ExecuteScript(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
 		}
 		RequiredStartPos = false;
@@ -796,11 +807,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	// Run the level script
 	GameScriptLevel* level = g_GameFlow->Levels[index];
-	std::string err;
-
+  
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScript(level->ScriptFileName, err);
+		g_GameScript->ExecuteScript(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
 	}
 
