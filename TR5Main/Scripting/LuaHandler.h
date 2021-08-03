@@ -10,6 +10,6 @@ public:
 	LuaHandler(LuaHandler const &) = delete;
 	LuaHandler& operator=(LuaHandler const &) = delete;
 
-	bool		ExecuteScript(const std::string & luaFilename, std::string & message);
-	bool		ExecuteString(const std::string& command, std::string& message);
+	void ExecuteScript(const std::string & luaFilename);
+	void ExecuteString(const std::string & command);
 };

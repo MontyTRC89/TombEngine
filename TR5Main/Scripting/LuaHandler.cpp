@@ -6,27 +6,20 @@ LuaHandler::LuaHandler(sol::state* lua) {
 	m_lua = lua;
 }
 
-bool	LuaHandler::ExecuteScript(std::string const& luaFilename, std::string & message) {
-	auto result = m_lua->safe_script_file(luaFilename);
-	//auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+void LuaHandler::ExecuteScript(std::string const& luaFilename) {
+	auto result = m_lua->safe_script_file(luaFilename, sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
-		message = error.what();
-		return false;
+		throw TENScriptException{ error.what() };
 	}
-	return true;
-
 }
 
-bool	LuaHandler::ExecuteString(std::string const & command, std::string& message) {
+void LuaHandler::ExecuteString(std::string const & command) {
 	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
-		message = error.what();
-		return false;
+		throw TENScriptException{ error.what() };
 	}
-	return true;
-
 }
