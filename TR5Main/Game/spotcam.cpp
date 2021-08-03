@@ -885,8 +885,8 @@ void CalculateSpotCameras()
 	}
 }
 
-// It just works (tm)!
-int Spline(int x, int* knots, int nk)
+#if 0
+int Spline(int x, int* knots, int nk)//Monty's version?
 {
 	/*int num = nk - 1;
 
@@ -974,30 +974,22 @@ int Spline(int x, int* knots, int nk)
 
 	return ((((d * x) + c) * x + b) * x + a);
 	*/
-
-	int64_t v3 = (x * (int64_t)(nk - 3)) * 65536 / 65536; // lmao?
-	int32_t v4 = (int32_t)v3 / 65536;
-	if (((int32_t)v3 / 65536) >= nk - 3)
-		v4 = nk - 4;
-	int32_t v5 = knots[v4];
-	int32_t v6 = knots[v4 + 2];
-	int32_t nka = knots[v4 + 3] / 2;
-	int32_t v7 = knots[v4 + 1];
-	return (int32_t)(v7
-		+ (int64_t)(uint64_t)(((int32_t)((~v5 / 2)
-			+ (v6 / 2)
-			+ (int64_t)(uint64_t)(((int32_t)(v5
-				+ (int64_t)(uint64_t)((((~v5 / 2)
-					+ nka
-					+ v7
-					+ (v7 / 2)
-					- (v6 / 2)
-					- v6)
-					* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536)
-				- 2 * v7
-				+ 2 * v6
-				- (v7 / 2)
-				- nka)
-				* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536))
-			* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536));
 }
+#else
+int Spline(int x, int* knots, int nk)//Core's version, *proper* decompilation by ChocolateFan
+{
+	int* k;
+	int span, c1, c2;
+
+	span = x * (nk - 3) >> 16;
+
+	if (span >= nk - 3)
+		span = nk - 4;
+
+	k = &knots[span];
+	x = x * (nk - 3) - span * 65536;
+	c1 = (k[1] >> 1) - (k[2] >> 1) - k[2] + k[1] + (k[3] >> 1) + ((-k[0] - 1) >> 1);
+	c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
+	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
+}
+#endif
