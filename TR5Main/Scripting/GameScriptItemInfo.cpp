@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "ScriptAssert.h"
 #include "GameScriptItemInfo.h"
 #include "items.h"
 #include "objectslist.h"
@@ -18,8 +19,6 @@ pickups, and Lara herself.
 @classmod ItemInfo
 @pragma nostrip
 */
-
-extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
 
@@ -294,8 +293,7 @@ std::string GameScriptItemInfo::GetName() const
 
 void GameScriptItemInfo::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw std::runtime_error("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_item->luaName);
@@ -347,8 +345,7 @@ void GameScriptItemInfo::SetHP(short hp)
 	if(Objects[m_item->objectNumber].intelligent &&
 		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
 	{
-		if (WarningsAsErrors)
-			throw TENScriptException("invalid HP");
+		ScriptAssert(false, "Invalid value: " + hp);
 		if (hp < 0)
 		{
 			hp = 0;
@@ -484,8 +481,8 @@ void GameScriptItemInfo::SetRoom(short room)
 {	
 	if (room < 0 || static_cast<size_t>(room) >= g_Level.Rooms.size())
 	{
-		if (WarningsAsErrors)
-			throw TENScriptException("invalid room number");
+		ScriptAssert(false, "Invalid room number: " + room);
+		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
 		return;
 	}
 

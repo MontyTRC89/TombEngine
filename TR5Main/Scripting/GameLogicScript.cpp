@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "GameLogicScript.h"
+#include "ScriptAssert.h"
 #include "items.h"
 #include "box.h"
 #include "lara.h"
@@ -28,7 +29,6 @@ functions and callbacks for game specific scripts
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
-extern bool const WarningsAsErrors = true;
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }, m_itemsMapId{}, m_itemsMapName{}, m_meshesMapName{}
 {
@@ -621,8 +621,7 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 		variables[key] = value;
 		break;
 	default:
-		if (WarningsAsErrors)
-			throw std::runtime_error("unsupported variable type");
+		ScriptAssert(false, "Variable " + key + " has an unsupported type.", ERROR_MODE::TERMINATE);
 		break;
 	}
 }
@@ -631,19 +630,19 @@ void GameScript::ExecuteFunction(std::string const & name)
 {
 	sol::protected_function func = (*m_lua)[name.c_str()];
 	auto r = func();
-	if (WarningsAsErrors && !r.valid())
+	if (!r.valid())
 	{
 		sol::error err = r;
-		throw TENScriptException(err.what());
+		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
 	}
 }
 
 static void doCallback(sol::protected_function const & func) {
 	auto r = func();
-	if (WarningsAsErrors && !r.valid())
+	if (!r.valid())
 	{
 		sol::error err = r;
-		throw TENScriptException(err.what());
+		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
 	}
 }
 
@@ -655,40 +654,38 @@ void GameScript::OnStart()
 
 void GameScript::OnLoad()
 {
-	if (m_onLoad.valid())
+	if(m_onLoad.valid())
 		doCallback(m_onLoad);
 }
 
 void GameScript::OnControlPhase()
 {
-	if (m_onControlPhase.valid())
+	if(m_onControlPhase.valid())
 		doCallback(m_onControlPhase);
 }
 
 void GameScript::OnSave()
 {
-	if (m_onSave.valid())
+	if(m_onSave.valid())
 		doCallback(m_onSave);
 }
 
 void GameScript::OnEnd()
 {
-	if (m_onEnd.valid())
+	if(m_onEnd.valid())
 		doCallback(m_onEnd);
 }
 
 void GameScript::InitCallbacks()
 {
-	auto assignCB = [this](sol::protected_function& func, char const* luaFunc) {
+	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
 		func = (*m_lua)[luaFunc];
-		if (WarningsAsErrors && !func.valid())
-		{
-			std::string err{ "Level's script file requires callback \"" };
-			err += std::string{ luaFunc };
-			err += "\"";
-			throw TENScriptException(err);
+		std::string err{ "Level's script does not define callback " + luaFunc};
+		if (!ScriptAssert(func.valid(), err)) {
+			TENLog("Defaulting to no " + luaFunc + " behaviour.", LogLevel::Warning, LogConfig::All);
 		}
 	};
+
 	assignCB(m_onStart, "OnStart");
 	assignCB(m_onLoad, "OnLoad");
 	assignCB(m_onControlPhase, "OnControlPhase");
