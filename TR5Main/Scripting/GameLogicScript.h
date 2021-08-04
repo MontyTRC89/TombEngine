@@ -70,7 +70,6 @@ public:
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 
-	void								AddLuaId(int luaId, short itemNumber);
 	bool								AddLuaNameItem(std::string const & luaName, short itemNumber);
 	bool								RemoveLuaNameItem(std::string const& luaName);
 
@@ -96,7 +95,6 @@ public:
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 
-	std::unique_ptr<GameScriptItemInfo>			GetItemById(int id);
 	std::unique_ptr<GameScriptItemInfo>			GetItemByName(std::string const & name);
 	std::unique_ptr<GameScriptMeshInfo>			GetMeshByName(std::string const & name);
 	std::unique_ptr<GameScriptCameraInfo>		GetCameraByName(std::string const & name);
