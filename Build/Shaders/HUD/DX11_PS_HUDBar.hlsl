@@ -45,6 +45,10 @@ half4 PSTextured(PixelShaderInput input) : SV_TARGET
 	if (input.UV.x > Percent) {
 		discard;
 	}
-	float4 color = Texture.Sample(Sampler, input.UV);
-	return glassOverlay(input.UV, color);
+	half4 col = Texture.Sample(Sampler, input.UV);
+	if (Poisoned) {
+		float factor = sin(((Frame % 30) / 30.0) * PI2)*0.5 + 0.5;
+		col = lerp(col, half4(214 / 512.0, 241 / 512.0, 18 / 512.0, 1), factor);
+	}
+	return glassOverlay(input.UV, col);
 }

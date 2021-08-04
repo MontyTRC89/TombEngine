@@ -30,40 +30,10 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
 
-	// Load caustics
-	const wchar_t* causticsNames[NUM_CAUSTICS_TEXTURES] = 
-	{
-		L"Textures/CausticsRender_001.bmp",
-		L"Textures/CausticsRender_002.bmp",
-		L"Textures/CausticsRender_003.bmp",
-		L"Textures/CausticsRender_004.bmp",
-		L"Textures/CausticsRender_005.bmp",
-		L"Textures/CausticsRender_006.bmp",
-		L"Textures/CausticsRender_007.bmp",
-		L"Textures/CausticsRender_008.bmp",
-		L"Textures/CausticsRender_009.bmp",
-		L"Textures/CausticsRender_010.bmp",
-		L"Textures/CausticsRender_011.bmp",
-		L"Textures/CausticsRender_012.bmp",
-		L"Textures/CausticsRender_013.bmp",
-		L"Textures/CausticsRender_014.bmp",
-		L"Textures/CausticsRender_015.bmp",
-		L"Textures/CausticsRender_016.bmp"
-	};
-
 	wchar_t titleScreenFile[255];
 	std::wstring titleFile = std::wstring(titleScreenFile);
 	std::mbstowcs(titleScreenFile, g_GameFlow->GetLevel(0)->Background.c_str(), 255);
 	m_titleScreen = Texture2D(m_device.Get(), titleScreenFile);
-
-	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
-		m_caustics[i] = std::filesystem::exists(causticsNames[i]) ? Texture2D(m_device.Get(), causticsNames[i]) : Texture2D();
-
-	auto borderName = L"Textures/bar_border.png";
-	m_HUDBarBorderTexture = std::filesystem::exists(borderName) ? Texture2D(m_device.Get(), L"Textures/bar_border.png") : Texture2D();
-
-	auto binocularsName = L"Textures/Binoculars.png";
-	m_binocularsTexture = std::filesystem::exists(binocularsName) ? Texture2D(m_device.Get(), L"Textures/Binoculars.png") : Texture2D();
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	m_whiteTexture = std::filesystem::exists(whiteSpriteName) ? Texture2D(m_device.Get(), L"Textures/WhiteSprite.png") : Texture2D();
@@ -121,7 +91,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_vsHUD = Utils::compileVertexShader(m_device.Get(), L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", nullptr, blob);
 	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, blob);
 	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers

@@ -381,8 +381,10 @@ namespace T5M::Renderer
 	
 		// System resources
 		T5M::Renderer::Texture2D m_HUDBarBorderTexture;
-		T5M::Renderer::Texture2D m_caustics[NUM_CAUSTICS_TEXTURES];
+		T5M::Renderer::Texture2D m_HUDBarTextures[4];
+		std::vector<T5M::Renderer::Texture2D> m_caustics;
 		T5M::Renderer::Texture2D m_binocularsTexture;
+		T5M::Renderer::Texture2D m_LasersightTexture;
 		T5M::Renderer::Texture2D m_whiteTexture;
 		T5M::Renderer::RenderTargetCubeArray m_shadowMaps;
 	
@@ -550,6 +552,7 @@ namespace T5M::Renderer
 		void setBlendMode(BLEND_MODES blendMode);
 	public:
 		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
+		void drawBar(float percent, const RendererHUDBar * const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;
@@ -602,7 +605,6 @@ namespace T5M::Renderer
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
 		void getBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
 		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ, float scale1);
-		void drawBar(float percent, const RendererHUDBar * const bar, int frame, bool poison);
 
 		RendererMesh* getMesh(int meshIndex);
 	private:

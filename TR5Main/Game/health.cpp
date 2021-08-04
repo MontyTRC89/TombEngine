@@ -36,7 +36,7 @@ void DrawHealthBarOverlay(int value)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
-		g_Renderer.drawBar(value, ::g_HealthBar, GlobalCounter,Lara.poisoned || Lara.gassed);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter,Lara.poisoned || Lara.gassed);
 	}
 }
 
@@ -44,7 +44,7 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_HealthBar,GlobalCounter,Lara.poisoned || Lara.gassed);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE,GlobalCounter,Lara.poisoned || Lara.gassed);
 	}
 }
 
@@ -137,7 +137,7 @@ void DrawAirBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_AirBar,0,0);
+		g_Renderer.drawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
 	}
 }
 
@@ -183,7 +183,7 @@ void DrawDashBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_DashBar,0,0);
+		g_Renderer.drawBar(value, ::g_DashBar,ID_DASH_BAR_TEXTURE,0,0);
 	}
 }
 

@@ -60,7 +60,7 @@ namespace T5M::Renderer {
 		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
 		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 230, 150, 8, 1, soundSettingColors);
 	}
-	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar,int frame, bool poison) {
+	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison) {
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
@@ -71,7 +71,7 @@ namespace T5M::Renderer {
 		m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShaderResources(0, 1, m_HUDBarBorderTexture.ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture->ShaderResourceView.GetAddressOf());
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
@@ -79,6 +79,7 @@ namespace T5M::Renderer {
 		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 		m_context->RSSetState(m_states->CullNone());
 		m_context->DrawIndexed(56, 0, 0);
+		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[textureSlot].meshIndex].Texture->ShaderResourceView.GetAddressOf());
 
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
@@ -116,7 +117,7 @@ namespace T5M::Renderer {
 			return;
 
 		m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
-		drawFullScreenQuad(m_binocularsTexture.ShaderResourceView.Get(), Vector3::One, false);
+		drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 		if (LaserSight) {
