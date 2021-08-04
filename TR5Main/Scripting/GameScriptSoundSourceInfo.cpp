@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "ScriptAssert.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptPosition.h"
 /***
@@ -7,8 +8,6 @@ Sound source info
 @classmod SoundSourceInfo
 @pragma nostrip
 */
-
-extern bool const WarningsAsErrors;
 
 static constexpr auto LUA_CLASS_NAME{ "SoundSourceInfo" };
 
@@ -67,8 +66,7 @@ std::string GameScriptSoundSourceInfo::GetName() const
 
 void GameScriptSoundSourceInfo::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw TENScriptException("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_soundSource.luaName);

@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "GameScriptAIObject.h"
+#include "ScriptAssert.h"
 #include "GameScriptPosition.h"
 #include <sol.hpp>
 /***
@@ -10,7 +11,6 @@ AI object
 @pragma nostrip
 */
 
-extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "AIObject" };
 
@@ -105,8 +105,7 @@ std::string GameScriptAIObject::GetName() const
 
 void GameScriptAIObject::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw TENScriptException("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_aiObject.luaName);

@@ -650,7 +650,7 @@ unsigned CALLBACK GameMain(void *)
 		// Initialise legacy memory buffer and game timer
 		init_game_malloc();
 		TIME_Init();
-		if (g_GameFlow->IntroImagePath.empty() && WarningsAsErrors)
+		if (g_GameFlow->IntroImagePath.empty())
 		{
 			throw TENScriptException("Intro image path is not set.");
 		}

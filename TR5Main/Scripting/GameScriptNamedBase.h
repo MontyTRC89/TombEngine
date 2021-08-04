@@ -1,16 +1,13 @@
 #pragma once
+#include "ScriptAssert.h"
 #include <functional>
 #include <string>
 
-extern bool const WarningsAsErrors;
 
 #define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE & item, sol::object key) \
 { \
-	if (WarningsAsErrors) \
-	{ \
-		std::string err = "Attempted to read non-existant var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \
-		throw std::runtime_error(err); \
-	} \
+	std::string err = "Attempted to read non-existant var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \
+	throw TENScriptException(err); \
 }
 
 template <typename S> using callbackSetName = std::function<bool(std::string const&, S identifier)>;
@@ -37,20 +34,13 @@ protected:
 // default callbacks
 template <typename T, typename S> callbackSetName<S> GameScriptNamedBase<T, S>::s_callbackSetName = [](std::string const& n, S identifier) {
 		std::string err = "\"Set Name\" callback is not set.";
-		if (WarningsAsErrors)
-		{
-			throw TENScriptException(err);
-		}
+		throw TENScriptException(err);
 		return false;
 	};
 
 template <typename T, typename S> callbackRemoveName GameScriptNamedBase<T, S>::s_callbackRemoveName = [](std::string const& n) {
 		std::string err = "\"Remove Name\" callback is not set.";
-		if (WarningsAsErrors)
-		{
-			throw TENScriptException(err);
-		}
+		throw TENScriptException(err);
 		return false;
-
 	};
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "framework.h"
+#include "ScriptAssert.h"
 #include "GameScriptSinkInfo.h"
 #include "GameScriptPosition.h"
 #include <sol.hpp>
@@ -9,8 +10,6 @@ Sink info
 @classmod SinkInfo
 @pragma nostrip
 */
-
-extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "SinkInfo" };
 
@@ -71,8 +70,7 @@ std::string GameScriptSinkInfo::GetName() const
 
 void GameScriptSinkInfo::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw TENScriptException("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_sink.luaName);
