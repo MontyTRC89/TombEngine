@@ -22,11 +22,6 @@ using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Math::Random;
 
-unsigned char TES_extra_tab[] =
-{
-	0x00, 0x04, 0x07, 0x0A, 0x00, 0x00
-};
-
 int NextSpark;
 int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
@@ -42,7 +37,7 @@ int SplashCount = 0;
 
 PHD_VECTOR NodeVectors[MAX_NODE];
 NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
-	{ -16, 40, 160, -14, false }, // TR5 offset 0
+	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0
 	{ -16, -8, 160, 0, false }, // TR5 offset 1
 	{ 0, 0, 256, 8, false }, // TR5 offset 2
 	{ 0, 0, 256, 17, false }, // TR5 offset 3

@@ -156,8 +156,7 @@ void undraw_flare()
 			Lara.flareFrame++;
 		}
 	}
-	else if (LaraItem->currentAnimState == LS_STOP 
-		&& Lara.Vehicle == NO_ITEM)
+	else if (LaraItem->animNumber == LA_DISCARD_FLARE)
 	{
 		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;

@@ -365,7 +365,7 @@ void LaraGun()
 
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (!Lara.leftArm.frameNumber)
+			//	if (!Lara.leftArm.frameNumber)	//NO
 				{
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 				}
