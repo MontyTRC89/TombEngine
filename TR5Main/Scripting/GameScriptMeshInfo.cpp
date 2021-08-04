@@ -1,5 +1,6 @@
 #pragma once
 #include "framework.h"
+#include "ScriptAssert.h"
 #include "GameScriptMeshInfo.h"
 #include "GameScriptPosition.h"
 #include "GameScriptColor.h"
@@ -10,8 +11,6 @@ Mesh info
 @classmod MeshInfo
 @pragma nostrip
 */
-
-extern bool const WarningsAsErrors;
 
 constexpr auto LUA_CLASS_NAME{ "MeshInfo" };
 
@@ -88,8 +87,7 @@ std::string GameScriptMeshInfo::GetName() const
 
 void GameScriptMeshInfo::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw TENScriptException("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_mesh.luaName);

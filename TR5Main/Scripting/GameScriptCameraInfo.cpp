@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "ScriptAssert.h"
 #include "GameScriptCameraInfo.h"
 #include "GameScriptPosition.h"
 /***
@@ -7,8 +8,6 @@ Camera info
 @classmod CameraInfo
 @pragma nostrip
 */
-
-extern bool const WarningsAsErrors;
 
 static constexpr auto LUA_CLASS_NAME{ "CameraInfo" };
 
@@ -63,8 +62,7 @@ std::string GameScriptCameraInfo::GetName() const
 
 void GameScriptCameraInfo::SetName(std::string const & id) 
 {
-	if (id.empty() && WarningsAsErrors)
-		throw TENScriptException("Name cannot be blank");
+	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
 	s_callbackRemoveName(m_camera.luaName);
