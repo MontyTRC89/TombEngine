@@ -740,7 +740,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,0,false);
+            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,ID_SFX_BAR_TEXTURE,0,false);
 
             y += 25;
 
@@ -748,7 +748,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar,0,false);
+            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,false);
             y += 25;
 
             // Apply and cancel
@@ -976,7 +976,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,0,0);
+            drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
 
             y += 25;
 
@@ -984,7 +984,7 @@ namespace T5M::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
-            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar,0,0);
+            drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
             y += 25;
 
             // Apply and cancel
@@ -2650,7 +2650,7 @@ namespace T5M::Renderer
         // Bars
         int flash = FlashIt();
         if (DashTimer < 120)
-            drawBar(DashTimer / 120.0f, g_DashBar,0,0);
+            drawBar(DashTimer / 120.0f, g_DashBar,ID_DASH_BAR_TEXTURE,0,0);
         UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();
@@ -3029,7 +3029,10 @@ namespace T5M::Renderer
 
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
         m_context->PSSetSamplers(0, 1, &sampler);
-        m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
+		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
+		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
+		int causticsFrame = meshIndex + ((GlobalCounter) % nmeshes);
+        m_context->PSSetShaderResources(1, 1, m_sprites[causticsFrame].Texture->ShaderResourceView.GetAddressOf());
         m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
