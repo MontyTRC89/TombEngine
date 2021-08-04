@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "ScriptAssert.h"
 
-ERROR_MODE ScriptErrorMode = ERROR_MODE::WARN;
+static ERROR_MODE ScriptErrorMode = ERROR_MODE::WARN;
 
 bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> forceMode)
 {
