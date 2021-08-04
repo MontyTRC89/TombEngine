@@ -1038,6 +1038,9 @@
     <ClInclude Include="Scripting\GameScriptAudioTrack.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\ScriptAssert.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1911,6 +1914,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\debug\debug.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\ScriptAssert.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
