@@ -764,10 +764,7 @@ void ReadRooms()
 			volume.oneShot = ReadInt8();
 			volume.status = TS_OUTSIDE;
 
-			volume.box = BoundingOrientedBox(
-				(Vector3)(volume.position + Vector3(room.x, room.y, room.z)),
-				(Vector3)(volume.scale),
-				volume.rotation);
+			volume.box = BoundingOrientedBox(volume.position, volume.scale, volume.rotation);
 
 			room.triggerVolumes.push_back(volume);
 		}
