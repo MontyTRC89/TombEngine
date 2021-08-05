@@ -666,6 +666,9 @@ void CustomObjects()
 
 void InitialiseObjects()
 {
+	AllocTR4Objects();
+	AllocTR5Objects();
+
 	OBJECT_INFO* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
@@ -732,7 +735,4 @@ void InitialiseObjects()
 	SequenceUsed[3] = 0;
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
-
-	AllocTR4Objects();
-	AllocTR5Objects();
 }
