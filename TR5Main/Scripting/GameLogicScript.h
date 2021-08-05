@@ -3,6 +3,7 @@
 #include "room.h"
 #include "LuaHandler.h"
 #include "trmath.h"
+#include <unordered_map>
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
@@ -31,8 +32,8 @@ class LuaVariables
 public:
 	std::map<std::string, sol::object>			variables;
 
-	sol::object							GetVariable(std::string key);
-	void								SetVariable(std::string key, sol::object value);
+	sol::object							GetVariable(sol::table tab, std::string key);
+	void								SetVariable(sol::table tab, std::string key, sol::object value);
 };
 
 struct LuaVariable
@@ -58,6 +59,7 @@ private:
 	std::map<std::string, SINK_INFO&>			m_sinksMapName;
 	std::map<std::string, SOUND_SOURCE_INFO&>	m_soundSourcesMapName;
 	std::map<std::string, AI_OBJECT &>			m_aiObjectsMapName;
+	std::unordered_map<std::string, bool>		m_levelFuncs;
 	std::vector<LuaFunction*>					m_triggers;
 	sol::protected_function						m_onStart;
 	sol::protected_function						m_onLoad;
@@ -88,6 +90,8 @@ public:
 	bool								AddLuaNameAIObject(std::string const & luaName, AI_OBJECT &);
 	bool								RemoveLuaNameAIObject(std::string const& luaName);
 
+	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
+
 	void								AssignItemsAndLara();
 
 
@@ -109,38 +113,6 @@ public:
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								ResetVariables();
 
-	// Sound
-	static void							PlayAudioTrack(std::string const & trackName, bool looped);
-	void								PlaySoundEffect(int id, GameScriptPosition pos, int flags);
-	void								PlaySoundEffect(int id, int flags);
-	static void							SetAmbientTrack(std::string const & trackName);
-
-	// Special FX
-	void								AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags);
-	void								AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags);
-	void								AddSprite(GameScriptPosition pos, VectorInt3 vel, VectorInt2 falloff, GameScriptColor startColor, GameScriptColor endColor, int lifeTime, int fadeIn, int fadeOut, int spriteNum, int startSize, int endSize, float angle, int rotation);
-	void								AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime);
-	void								AddBlood(GameScriptPosition pos, int num);
-	void								AddFireFlame(GameScriptPosition pos, int size);
-	void								Earthquake(int strength);
-
-	// Inventory
-	static void							InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count);
-	static void							InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count);
-	static int							InventoryGetCount(GAME_OBJECT_ID slot);
-	static void							InventorySetCount(GAME_OBJECT_ID slot, int count);
-	void								InventoryCombine(int slot1, int slot2);
-	void								InventorySeparate(int slot);
-
-	// Misc
-	void								PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags);
-	int									FindRoomNumber(GameScriptPosition pos);
-	void								JumpToLevel(int levelNum);
-	int									GetSecretsCount();
-	void								SetSecretsCount(int secretsNum);
-	void								AddOneSecret();
-	int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-	int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 
 	void								InitCallbacks();
 	void								OnStart();
@@ -149,3 +121,7 @@ public:
 	void								OnSave();
 	void								OnEnd();
 };
+
+int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+

@@ -32,7 +32,7 @@ HWND WindowsHandle;
 int App_Unk00D9ABFD;
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
+GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
 bool BlockAllInput = true;
@@ -184,10 +184,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	g_GameScript = new GameScript(&luaState);
 
-	//luaState.set_function("CreatePosition", &GameScript::CreatePosition, g_GameScript);
-	//luaState.set_function("CreateRotation", &GameScript::CreateRotation, g_GameScript);
-	luaState.set_function("CalculateDistance", &GameScript::CalculateDistance, g_GameScript);
-	luaState.set_function("CalculateHorizontalDistance", &GameScript::CalculateHorizontalDistance, g_GameScript);
+	luaState.set_function("CalculateDistance", &CalculateDistance);
+	luaState.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
 	// Initialise chunks for savegames
 	SaveGame::Start();

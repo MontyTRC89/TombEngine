@@ -13,7 +13,6 @@
 #include "effect2.h"
 #include "pickup.h"
 #include "newinv2.h"
-#include <iostream>
 #include "InventorySlots.h"
 #include "ObjectIDs.h"
 
@@ -28,7 +27,125 @@ functions and callbacks for game specific scripts
 */
 
 extern GameFlow* g_GameFlow;
-GameScript* g_GameScript;
+
+static void PlayAudioTrack(std::string const & trackName, bool looped)
+{
+	S_CDPlay(trackName, looped);
+}
+
+static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
+{
+	PHD_3DPOS pos;
+
+	pos.xPos = p.x;
+	pos.yPos = p.y;
+	pos.zPos = p.z;
+	pos.xRot = 0;
+	pos.yRot = 0;
+	pos.zRot = 0;
+
+	SoundEffect(id, &pos, flags);
+}
+
+static void PlaySoundEffect(int id, int flags)
+{
+	SoundEffect(id, NULL, flags);
+}
+
+static void SetAmbientTrack(std::string const & trackName)
+{
+	CurrentAtmosphere = trackName;
+	S_CDPlay(CurrentAtmosphere, 1);
+}
+
+static int FindRoomNumber(GameScriptPosition pos)
+{
+	return 0;
+}
+
+static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+{
+	PHD_VECTOR p1;
+	p1.x = src.x;
+	p1.y = src.y;
+	p1.z = src.z;
+
+	PHD_VECTOR p2;
+	p2.x = dest.x;
+	p2.y = dest.y;
+	p2.z = dest.z;
+
+	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
+}
+
+static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
+{
+	PHD_3DPOS p;
+	p.xPos = pos.x;
+	p.yPos = pos.y;
+	p.zPos = pos.z;
+	
+	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
+}
+
+static void AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
+{
+	TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
+}
+
+static void AddBlood(GameScriptPosition pos, int num)
+{
+	TriggerBlood(pos.x, pos.y, pos.z, -1, num);
+}
+
+static void AddFireFlame(GameScriptPosition pos, int size)
+{
+	AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
+}
+
+static void Earthquake(int strength)
+{
+	Camera.bounce = -strength;
+}
+
+// Inventory
+static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
+{
+	PickedUpObject(slot, count.value_or(0));
+}
+
+static void InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
+{
+	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
+}
+
+static int InventoryGetCount(GAME_OBJECT_ID slot)
+{
+	return GetInventoryCount(slot);
+}
+
+static void InventorySetCount(GAME_OBJECT_ID slot, int count)
+{
+	// add the amount we'd need to add to get to count
+	int currAmt = GetInventoryCount(slot);
+	InventoryAdd(slot, count - currAmt);
+}
+
+static void InventoryCombine(int slot1, int slot2)
+{
+	
+}
+
+static void InventorySeparate(int slot)
+{
+
+}
+
+// Misc
+static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
+{
+
+}
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }, m_itemsMapId{}, m_itemsMapName{}, m_meshesMapName{}
 {
@@ -41,7 +158,7 @@ Set the named track as the ambient track, and start playing it
 @function SetAmbientTrack
 @tparam string name of track (without file extension) to play
 */
-	m_lua->set_function("SetAmbientTrack", &GameScript::SetAmbientTrack);
+	m_lua->set_function("SetAmbientTrack", &SetAmbientTrack);
 
 /***
 Start playing the named track.
@@ -49,7 +166,7 @@ Start playing the named track.
 @tparam string name of track (without file extension) to play
 @tparam bool loop if true, the track will loop; if false, it won't
 */
-	m_lua->set_function("PlayAudioTrack", &GameScript::PlayAudioTrack);
+	m_lua->set_function("PlayAudioTrack", &PlayAudioTrack);
 
 /*** Player inventory management
 @section Inventory
@@ -61,7 +178,7 @@ Add x of a certain item to the inventory.
 @tparam @{InvItem} item the item to be added
 @tparam int count the number of items to add
 */
-	m_lua->set_function("GiveInvItem", &GameScript::InventoryAdd);
+	m_lua->set_function("GiveInvItem", &InventoryAdd);
 
 /***
 Remove x of a certain item from the inventory.
@@ -69,7 +186,7 @@ Remove x of a certain item from the inventory.
 @tparam @{InvItem} item the item to be removed
 @tparam int count the number of items to remove
 */
-	m_lua->set_function("TakeInvItem", &GameScript::InventoryRemove);
+	m_lua->set_function("TakeInvItem", &InventoryRemove);
 
 /***
 Get the amount the player holds of an item.
@@ -77,7 +194,7 @@ Get the amount the player holds of an item.
 @tparam @{InvItem} item the item to check
 @return the amount of the item the player has in the inventory
 */
-	m_lua->set_function("GetInvItemCount", &GameScript::InventoryGetCount);
+	m_lua->set_function("GetInvItemCount", &InventoryGetCount);
 
 /***
 Set the amount of a certain item the player has in the inventory.
@@ -86,7 +203,7 @@ Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
 @tparam @{InvItem} item the item to be set
 @tparam int count the number of items the player will have 
 */
-	m_lua->set_function("SetInvItemCount", &GameScript::InventorySetCount);
+	m_lua->set_function("SetInvItemCount", &InventorySetCount);
 
 /*** Game entity getters.
 All Lua variables created with these functions will be non-owning.
@@ -155,6 +272,41 @@ Get a SinkInfo by its name.
 	makeReadOnlyTable("InvItem", kInventorySlots);
 	makeReadOnlyTable("ObjID", kObjIDs);
 
+	// LevelFuncs
+	std::string LevelFuncsName{ "LevelFuncs" };
+	std::string LevelFuncsNameMeta{ LevelFuncsName + "Meta" };
+	auto meta = sol::table{ *m_lua, sol::create };
+	m_lua->set(LevelFuncsNameMeta, meta);
+	meta.set_function("__newindex", &GameScript::SetLevelFunc, this);
+	meta.set("__metatable", "\"metatable is protected\"");
+	auto tab = m_lua->create_named_table(LevelFuncsName);
+	tab[sol::metatable_key] = meta;
+	m_lua->set(LevelFuncsNameMeta, sol::nil);
+
+	// Level
+	std::string LevelName{ "Level" };
+	std::string LevelNameMeta{ LevelName + "Meta" };
+	meta = sol::table{ *m_lua, sol::create };
+	m_lua->set(LevelNameMeta, meta);
+	meta.set_function("__index", &LuaVariables::GetVariable, &m_locals);
+	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_locals);
+	meta.set("__metatable", "\"metatable is protected\"");
+	tab = m_lua->create_named_table(LevelName);
+	tab[sol::metatable_key] = meta;
+	m_lua->set(LevelNameMeta, sol::nil);
+
+	// Game
+	std::string GameName{ "Game" };
+	std::string GameNameMeta{ GameName + "Meta" };
+	meta = sol::table{ *m_lua, sol::create };
+	m_lua->set(GameName, meta);
+	meta.set_function("__index", &LuaVariables::GetVariable, &m_globals);
+	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_globals);
+	meta.set("__metatable", "\"metatable is protected\"");
+	tab = m_lua->create_named_table(GameName);
+	tab[sol::metatable_key] = meta;
+	m_lua->set(GameNameMeta, sol::nil);
+
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptItemInfo::SetNameCallbacks(
 		[this](std::string const& str, short num) {	return AddLuaNameItem(str, num); },
@@ -198,19 +350,32 @@ Get a SinkInfo by its name.
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
-
-	// todo document this when I get round to looking into it
-	m_lua->new_usertype<LuaVariables>("Variable",
-		sol::meta_function::index, &LuaVariables::GetVariable,
-		sol::meta_function::new_index, &LuaVariables::SetVariable,
-		"new", sol::no_constructor
-		);
 }
 
 void GameScript::AddTrigger(LuaFunction* function)
 {
 	m_triggers.push_back(function);
 	(*m_lua).script(function->Code);
+}
+
+bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
+{
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+		m_levelFuncs.erase(luaName);
+		tab.raw_set(luaName, value);
+		break;
+	case sol::type::function:
+		m_levelFuncs[luaName];
+		tab.raw_set(luaName, value);
+		break;
+	default:
+		std::string error{ "Could not assign LevelFuncs." };
+		error += luaName + "; it must be a function (or nil).";
+		return ScriptAssert(false, error);
+	}
+	return true;
 }
 
 bool GameScript::RemoveLuaNameItem(std::string const & luaName)
@@ -330,26 +495,26 @@ bool GameScript::ExecuteTrigger(short index)
 	*/
 }
 
-void GameScript::JumpToLevel(int levelNum)
+void JumpToLevel(int levelNum)
 {
 	if (levelNum >= g_GameFlow->GetNumLevels())
 		return;
 	LevelComplete = levelNum;
 }
 
-int GameScript::GetSecretsCount()
+int GetSecretsCount()
 {
 	return Savegame.Level.Secrets;
 }
 
-void GameScript::SetSecretsCount(int secretsNum)
+void SetSecretsCount(int secretsNum)
 {
 	if (secretsNum > 255)
 		return;
 	Savegame.Level.Secrets = secretsNum;
 }
 
-void GameScript::AddOneSecret()
+void AddOneSecret()
 {
 	if (Savegame.Level.Secrets >= 255)
 		return;
@@ -460,129 +625,9 @@ std::unique_ptr<GameScriptSoundSourceInfo> GameScript::GetSoundSourceByName(std:
 	return GetTByName<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>("SoundSourceInfo", name, m_soundSourcesMapName);
 }
 
-void GameScript::PlayAudioTrack(std::string const & trackName, bool looped)
-{
-	S_CDPlay(trackName, looped);
-}
-
-void GameScript::PlaySoundEffect(int id, GameScriptPosition p, int flags)
-{
-	PHD_3DPOS pos;
-
-	pos.xPos = p.x;
-	pos.yPos = p.y;
-	pos.zPos = p.z;
-	pos.xRot = 0;
-	pos.yRot = 0;
-	pos.zRot = 0;
-
-	SoundEffect(id, &pos, flags);
-}
-
-void GameScript::PlaySoundEffect(int id, int flags)
-{
-	SoundEffect(id, NULL, flags);
-}
-
-void GameScript::SetAmbientTrack(std::string const & trackName)
-{
-	CurrentAtmosphere = trackName;
-	S_CDPlay(CurrentAtmosphere, 1);
-}
-
-void GameScript::AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
-{
-	PHD_VECTOR p1;
-	p1.x = src.x;
-	p1.y = src.y;
-	p1.z = src.z;
-
-	PHD_VECTOR p2;
-	p2.x = dest.x;
-	p2.y = dest.y;
-	p2.z = dest.z;
-
-	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
-}
-
-void GameScript::AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
-{
-	PHD_3DPOS p;
-	p.xPos = pos.x;
-	p.yPos = pos.y;
-	p.zPos = pos.z;
-	
-	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
-}
-
-void GameScript::AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
-{
-	TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
-}
-
-void GameScript::AddBlood(GameScriptPosition pos, int num)
-{
-	TriggerBlood(pos.x, pos.y, pos.z, -1, num);
-}
-
-void GameScript::AddFireFlame(GameScriptPosition pos, int size)
-{
-	AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
-}
-
-void GameScript::Earthquake(int strength)
-{
-	Camera.bounce = -strength;
-}
-
-// Inventory
-void GameScript::InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
-{
-	PickedUpObject(slot, count.value_or(0));
-}
-
-void GameScript::InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
-{
-	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
-}
-
-int GameScript::InventoryGetCount(GAME_OBJECT_ID slot)
-{
-	return GetInventoryCount(slot);
-}
-
-void GameScript::InventorySetCount(GAME_OBJECT_ID slot, int count)
-{
-	// add the amount we'd need to add to get to count
-	int currAmt = GetInventoryCount(slot);
-	InventoryAdd(slot, count - currAmt);
-}
-
-void GameScript::InventoryCombine(int slot1, int slot2)
-{
-	
-}
-
-void GameScript::InventorySeparate(int slot)
-{
-
-}
-
-// Misc
-void GameScript::PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
-{
-
-}
-
-int GameScript::FindRoomNumber(GameScriptPosition pos)
-{
-	return 0;
-}
 
 void GameScript::AssignItemsAndLara()
 {
-	m_lua->set("Level", m_locals);
-	m_lua->set("Game", m_globals);
 	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false)); // do we need GetLara if we have this?
 }
 
@@ -591,24 +636,24 @@ void GameScript::ResetVariables()
 	(*m_lua)["Lara"] = NULL;
 }
 
-int GameScript::CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
+int CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
 	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 }
 
-int GameScript::CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
+int CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
 {
 	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 }
 
-sol::object LuaVariables::GetVariable(std::string key)
+sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
 {
 	if (variables.find(key) == variables.end())
 		return sol::lua_nil;
 	return variables[key];
 }
 
-void LuaVariables::SetVariable(std::string key, sol::object value)
+void LuaVariables::SetVariable(sol::table tab, std::string key, sol::object value)
 {
 	switch (value.get_type())
 	{
@@ -628,7 +673,7 @@ void LuaVariables::SetVariable(std::string key, sol::object value)
 
 void GameScript::ExecuteFunction(std::string const & name)
 {
-	sol::protected_function func = (*m_lua)[name.c_str()];
+	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];
 	auto r = func();
 	if (!r.valid())
 	{
@@ -676,13 +721,83 @@ void GameScript::OnEnd()
 		doCallback(m_onEnd);
 }
 
+/*** Special tables
+
+TombEngine uses the following tables for specific things.
+
+@section levelandgametables
+*/
+
+/*** A table with level-specific data which will be saved and loaded.
+This is for level-specific information that you want to store in saved games.
+
+For example, you may have a level with a custom puzzle where Lara has
+to kill exactly seven enemies to open a door to a secret. You could use
+the following line each time an enemy is killed:
+
+	Level.enemiesKilled = Level.enemiesKilled + 1
+
+If the player saves the level after killing three, saves, and then reloads the save
+some time later, the values `3` will be put back into `Level.enemiesKilled.`
+
+__This table is emptied when a level is finished.__ If the player needs to be able
+to return to the level (e.g. like the Karnak level in *The Last Revelation*,
+you will need to use the @{Game} table, below.
+@table Level
+*/
+
+/*** A table with game data which will be saved and loaded.
+This is for information not specific to any level, but which concerns your whole
+levelset or game, that you want to store in saved games.
+
+For example, you may wish to have a final boss say a specific voice line based on
+a choice the player made in a previous level. In the level with the choice, you could
+write:
+
+	Game.playerSnoopedInDraws = true
+
+And in the script file for the level with the boss, you could write:
+
+	if Game.playerSnoopedInDraws then
+		PlayAudioTrack("how_dare_you.wav")
+	end
+
+Unlike @{Level}, this table will remain intact for the entirety of the game.
+@table Game
+*/
+
+/*** A table with level-specific functions.
+
+This serves two purposes: it holds the level callbacks (listed below) as well as
+any trigger functions you might have specified. For example, if you give a trigger
+a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
+of this table:
+
+	LevelFuncs.my_trigger = function() 
+		-- implementation goes here
+	end
+
+The following are the level callbacks. They are optional; if your level has no special
+behaviour for a particular scenario, you do not need to implement the function. For
+example, if your level does not need any special initialisation when it is loaded,
+you can just leave out `LevelFuncs.OnStart`.
+
+@tfield function OnStart Will be called when a level is loaded
+@tfield function OnLoad Will be called when a saved game is loaded
+@tfield function OnControlPhase Will be called once per frame
+@tfield function OnSave Will be called when the player saves the game
+@tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
+@table LevelFuncs
+*/
+
 void GameScript::InitCallbacks()
 {
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
-		func = (*m_lua)[luaFunc];
-		std::string err{ "Level's script does not define callback " + luaFunc};
+		std::string fullName = "LevelFuncs." + luaFunc;
+		func = (*m_lua)["LevelFuncs"][luaFunc];
+		std::string err{ "Level's script does not define callback " + fullName};
 		if (!ScriptAssert(func.valid(), err)) {
-			TENLog("Defaulting to no " + luaFunc + " behaviour.", LogLevel::Warning, LogConfig::All);
+			TENLog("Defaulting to no " + fullName + " behaviour.", LogLevel::Warning, LogConfig::All);
 		}
 	};
 
