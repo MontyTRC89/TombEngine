@@ -1689,7 +1689,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 				}
 				else
 				{
-					spark->sSize = spark->size = (GetRandomControl() & 0xF) + 128;
+					spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
 				}
 			}
 			else
