@@ -799,6 +799,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Load the level
 	S_LoadLevelFile(index);
 
+	// Reset all the globals for the game which needs this
+	ResetGlobals();
+
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
@@ -3604,5 +3607,13 @@ void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int fla
 {
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 	TestTriggers(TriggerIndex, heavy, flags);
+}
+
+void ResetGlobals()
+{
+	// It's kinda lonely here for now, but I recommend gradually putting here all the globals which need reset
+	// on level change, unless we refactor all the code better way -- Lwmte
+
+	DisableLaraControl = false;
 }
 
