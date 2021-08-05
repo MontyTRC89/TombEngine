@@ -733,6 +733,8 @@ void ReadRooms()
 		{
 			TRIGGER_VOLUME volume;
 
+			volume.type = (TriggerVolumeType)ReadInt32();
+
 			volume.position.x = ReadFloat();
 			volume.position.y = ReadFloat();
 			volume.position.z = ReadFloat();
@@ -764,7 +766,8 @@ void ReadRooms()
 			volume.oneShot = ReadInt8();
 			volume.status = TS_OUTSIDE;
 
-			volume.box = BoundingOrientedBox(volume.position, volume.scale, volume.rotation);
+			volume.box    = BoundingOrientedBox(volume.position, volume.scale, volume.rotation);
+			volume.sphere = BoundingSphere(volume.position, volume.scale.x);
 
 			room.triggerVolumes.push_back(volume);
 		}

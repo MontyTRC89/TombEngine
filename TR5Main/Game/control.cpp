@@ -931,12 +931,26 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	int spotCamIndex = 0;
 
 	// Test trigger volumes
+	g_CollidedVolume = false;
+
 	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
 	for (int i = 0; i < room->triggerVolumes.size(); i++)
 	{
 		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
 
-		if (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS)
+		bool contains = false;
+		switch (volume->type)
+		{
+		case VOLUME_BOX:
+			contains = (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
+			break;
+
+		case VOLUME_SPHERE:
+			contains = (volume->sphere.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
+			break;
+		}
+
+		if (contains)
 		{
 			g_CollidedVolume = true;
 
@@ -955,8 +969,6 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		}
 		else
 		{
-			g_CollidedVolume = false;
-
 			if (volume->status == TriggerStatus::TS_INSIDE)
 			{
 				volume->status = TriggerStatus::TS_LEAVING;
