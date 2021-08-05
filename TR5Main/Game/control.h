@@ -180,5 +180,6 @@ int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
 void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags);
+void ResetGlobals();
 
 unsigned CALLBACK GameMain(void*);
