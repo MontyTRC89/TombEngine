@@ -54,7 +54,10 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::clearSceneItems() {
+
+		//if ((GlobalCounter & 2) != 2) // For drawing debug lines generated in arbitrary place of game loop
 		m_lines3DToDraw.clear();
+		
 		m_lines2DToDraw.clear();
 		gameCamera.clear();
 	}
