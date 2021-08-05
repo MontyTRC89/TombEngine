@@ -856,12 +856,17 @@ namespace T5M::Renderer
 		{
 			RendererMesh *mesh = moveable.ObjectMeshes[i];
 
-			Vector3 pos = Vector3::Zero;
+			Vector3 pos = mesh->Sphere.Center;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos = moveable.LinearizedBones[i]->Translation;
+				pos += moveable.LinearizedBones[i]->Translation;
 
 			spheres[i].Center = Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
+
+			// Spheres debug
+			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
+			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
+			// addLine3D(v1, v2, Vector4::One);
 		}
 
 		return moveable.ObjectMeshes.size();
