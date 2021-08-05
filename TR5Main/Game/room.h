@@ -91,18 +91,31 @@ enum TriggerStatus
 	TS_LEAVING = 3
 };
 
+enum TriggerVolumeType
+{
+	VOLUME_BOX = 0,
+	VOLUME_SPHERE = 1,
+	VOLUME_PRISM = 2 // Unsupported as of now
+};
+
 struct TRIGGER_VOLUME
 {
+	TriggerVolumeType type;
+
 	Vector3 position;
 	Quaternion rotation;
-	Vector3 scale;
-	int activators;
+	Vector3 scale; // X used as radius if type is VOLUME_SPHERE
+
 	std::string onEnter;
 	std::string onInside;
 	std::string onLeave;
+
+	int activators;
 	bool oneShot;
+
 	TriggerStatus status;
 	BoundingOrientedBox box;
+	BoundingSphere sphere;
 };
 
 struct ROOM_INFO
