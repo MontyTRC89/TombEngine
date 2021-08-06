@@ -6,6 +6,8 @@
 #include "sound.h"
 #include "savegame.h"
 
+using T5M::Renderer::g_Renderer;
+
 const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",
 		"7",		"8",		"9",		"0",		"-",		"+",		"BKSP",	"TAB",
@@ -264,6 +266,20 @@ int S_UpdateInput()
 	// CHECK
 	if (KeyMap[1])
 		linput |= IN_OPTION | IN_DESELECT;
+	
+	// Switch debug pages
+
+	static int debug_timeout = 0;
+	if (KeyMap[DIK_F10] || KeyMap[DIK_F11])
+	{
+		if (debug_timeout == 0)
+		{
+			debug_timeout = 1;
+			g_Renderer.switchDebugPage(KeyMap[DIK_F10]);
+		}
+	}
+	else
+		debug_timeout = 0;
 
 	static int look_timeout = 0;
 

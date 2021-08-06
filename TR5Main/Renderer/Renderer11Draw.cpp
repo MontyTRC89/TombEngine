@@ -2410,6 +2410,79 @@ namespace T5M::Renderer
         m_lines3DToDraw.push_back(line);
     }
 
+	void Renderer11::addSphere(Vector3 center, float radius, Vector4 color)
+	{
+		if (m_nextLine3D >= MAX_LINES_3D)
+			return;
+
+		auto line1 = &m_lines3DBuffer[m_nextLine3D++];
+		line1->start = Vector3(center.x - radius, center.y, center.z); 
+		line1->end   = Vector3(center.x + radius, center.y, center.z);
+		line1->color = color;
+
+		m_lines3DToDraw.push_back(line1);
+
+		auto line2 = &m_lines3DBuffer[m_nextLine3D++];
+		line2->start = Vector3(center.x, center.y - radius, center.z);
+		line2->end   = Vector3(center.x, center.y + radius, center.z);
+		line2->color = color;
+		m_lines3DToDraw.push_back(line2);
+
+		auto line3 = &m_lines3DBuffer[m_nextLine3D++];
+		line3->start = Vector3(center.x, center.y, center.z - radius);
+		line3->end   = Vector3(center.x, center.y, center.z + radius);
+		line3->color = color;
+		m_lines3DToDraw.push_back(line3);
+	}
+
+	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
+	{
+		if (m_numDebugPage != page)
+			return;
+
+		addSphere(center, radius, color);
+	}
+
+	void Renderer11::addBox(Vector3 min, Vector3 max, Vector4 color)
+	{
+		if (m_nextLine3D >= MAX_LINES_3D)
+			return;
+
+		for (int i = 0; i < 12; i++)
+		{
+			auto line = &m_lines3DBuffer[m_nextLine3D++];
+
+			switch (i)
+			{
+			case  0: line->start = Vector3(min.x, min.y, min.z); line->end = Vector3(min.x, min.y, max.z); break;
+			case  1: line->start = Vector3(min.x, min.y, max.z); line->end = Vector3(max.x, min.y, max.z); break;
+			case  2: line->start = Vector3(max.x, min.y, max.z); line->end = Vector3(max.x, min.y, min.z); break;
+			case  3: line->start = Vector3(max.x, min.y, min.z); line->end = Vector3(min.x, min.y, min.z); break;
+
+			case  4: line->start = Vector3(min.x, max.y, min.z); line->end = Vector3(min.x, max.y, max.z); break;
+			case  5: line->start = Vector3(min.x, max.y, max.z); line->end = Vector3(max.x, max.y, max.z); break;
+			case  6: line->start = Vector3(max.x, max.y, max.z); line->end = Vector3(max.x, max.y, min.z); break;
+			case  7: line->start = Vector3(max.x, max.y, min.z); line->end = Vector3(min.x, max.y, min.z); break;
+
+			case  8: line->start = Vector3(min.x, min.y, min.z); line->end = Vector3(min.x, max.y, min.z); break;
+			case  9: line->start = Vector3(min.x, min.y, max.z); line->end = Vector3(min.x, max.y, max.z); break;
+			case 10: line->start = Vector3(max.x, min.y, max.z); line->end = Vector3(max.x, max.y, max.z); break;
+			case 11: line->start = Vector3(max.x, min.y, min.z); line->end = Vector3(max.x, max.y, min.z); break;
+			}
+
+			line->color = color;
+			m_lines3DToDraw.push_back(line);
+		}
+	}
+
+	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	{
+		if (m_numDebugPage != page)
+			return;
+
+		addBox(min, max, color);
+	}
+
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
     {
         return;
@@ -2523,23 +2596,106 @@ namespace T5M::Renderer
         m_swapChain->Present(0, 0);
     }
 
+	void Renderer11::clearScene()
+	{
+		resetAnimations();
+
+		// Clear dynamic lights
+		ClearFires();
+
+		clearDynamicLights();
+		clearSceneItems();
+
+		m_strings.clear();
+
+		m_currentCausticsFrame++;
+		m_currentCausticsFrame %= 32;
+	}
+
+	void Renderer11::drawDebugInfo()
+	{
+		if (CurrentLevel != 0)
+		{
+			m_currentY = 60;
+#ifdef _DEBUG
+			ROOM_INFO* r = &g_Level.Rooms[LaraItem->roomNumber];
+
+			switch (m_numDebugPage)
+			{
+			case RENDERER_DEBUG_PAGE::NO_PAGE:
+				break;
+
+			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
+				printDebugMessage("Update time: %d", m_timeUpdate);
+				printDebugMessage("Frame time: %d", m_timeFrame);
+				printDebugMessage("Draw calls: %d", m_numDrawCalls);
+				break;
+
+			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
+				printDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
+				printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+				printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
+				printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+				printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
+				printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+				printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
+				printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
+				printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
+				break;
+
+			case RENDERER_DEBUG_PAGE::LARA_STATS:
+				printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
+				printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
+				printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
+				printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
+				printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
+				printDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
+				printDebugMessage("Lara.gunType: %d", Lara.gunType);
+				printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
+				printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
+				printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
+				printDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
+				break;
+
+			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
+				printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
+				printDebugMessage("CollidedVolume: %d", g_CollidedVolume ? 1 : 0);
+				break;
+			}
+#endif
+		}
+	}
+
+	void Renderer11::switchDebugPage(bool back)
+	{
+		auto index = (int)m_numDebugPage;
+
+		if (back)
+			--index;
+		else
+			++index;
+		
+		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
+			index = 4;
+		else if (index > RENDERER_DEBUG_PAGE::LOGIC_STATS)
+			index = 0;
+
+		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;
+	}
+
     void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
+		m_timeUpdate = 0;
+		m_timeDraw = 0;
+		m_timeFrame = 0;
+		m_numDrawCalls = 0;
+		m_nextLight = 0;
+		m_nextSprite = 0;
+		m_nextLine3D = 0;
+		m_nextLine2D = 0;
+
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
-        m_timeUpdate = 0;
-        m_timeDraw = 0;
-        m_timeFrame = 0;
-        m_numDrawCalls = 0;
-        m_nextLight = 0;
-        m_nextSprite = 0;
-        m_nextLine3D = 0;
-        m_nextLine2D = 0;
-
-        m_currentCausticsFrame++;
-        m_currentCausticsFrame %= 32;
-
-        m_strings.clear();
 
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -2547,8 +2703,6 @@ namespace T5M::Renderer
 
         // Prepare the scene to draw
         auto time1 = std::chrono::high_resolution_clock::now();
-        //prepareCameraForFrame();
-        clearSceneItems();
         collectRooms(view);
         updateLaraAnimations(false);
         updateItemsAnimations(view);
@@ -2642,10 +2796,7 @@ namespace T5M::Renderer
         drawRopes(view);
         drawSprites(view);
         drawLines3D(view);
-
-        time2 = std::chrono::high_resolution_clock::now();
-        m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
-        time1 = time2;
+		drawLines2D(view);
 
         // Bars
         int flash = FlashIt();
@@ -2655,47 +2806,15 @@ namespace T5M::Renderer
         UpdateAirBar(flash);
         DrawAllPickups();
 
-        drawLines2D(view);
+		drawOverlays(view); // Draw binoculars or lasersight
 
-        if (CurrentLevel != 0)
-        {
-            // Draw binoculars or lasersight
-            drawOverlays(view);
+		time2 = std::chrono::high_resolution_clock::now();
+		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+		time1 = time2;
 
-            m_currentY = 60;
-#ifdef _DEBUG
-            ROOM_INFO *r = &g_Level.Rooms[LaraItem->roomNumber];
-
-            printDebugMessage("Update time: %d", m_timeUpdate);
-            printDebugMessage("Frame time: %d", m_timeFrame);
-            printDebugMessage("Draw calls: %d", m_numDrawCalls);
-            printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-			printDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
-			printDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->boxNumber);
-            printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-            printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
-            printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
-            printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
-            printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
-            printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
-            printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
-            printDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
-            printDebugMessage("Lara.gunType: %d", Lara.gunType);
-            printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
-            printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
-            printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
-            printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
-            printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
-            printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-            printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-			printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
-            printDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
-            printDebugMessage("CollidedVolume: %d", g_CollidedVolume ? 1 : 0);
-#endif
-        }
-
-        drawAllStrings();
-
+		drawDebugInfo();
+		drawAllStrings();
+		clearScene();
     }
 
     void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)

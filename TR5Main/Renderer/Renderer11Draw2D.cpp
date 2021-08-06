@@ -112,7 +112,10 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::drawOverlays(RenderView& view)
-{
+	{
+		if (CurrentLevel == 0)
+			return;
+
 		if (!BinocularRange && !SpotcamOverlay)
 			return;
 
