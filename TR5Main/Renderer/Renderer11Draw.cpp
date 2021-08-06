@@ -2518,6 +2518,13 @@ namespace T5M::Renderer
 		box.GetCorners(corners);
 		addBox(corners, color);
 	}
+	
+	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	{
+		if (m_numDebugPage != page)
+			return;
+		addBox(min, max, color);
+	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
     {

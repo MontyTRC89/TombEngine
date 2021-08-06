@@ -936,7 +936,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		switch (volume->type)
 		{
 		case VOLUME_BOX:
-			g_Renderer.addDebugBox(volume->box.Center - volume->box.Extents, volume->box.Center + volume->box.Extents, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+			g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 			contains = (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
 			break;
 
