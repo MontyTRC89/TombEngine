@@ -19,6 +19,7 @@ struct GameScriptSettings
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
+	std::string ErrorMode;
 
 	static void Register(sol::state* lua);
 };
