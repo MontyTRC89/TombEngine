@@ -406,11 +406,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 		}
 
-		// Clear dynamic lights
-		ClearDynamicLights();
-		ClearFires();
-		g_Renderer.clearDynamicLights();
-
 		GotLaraSpheres = false;
 
 		// Update all items
@@ -895,10 +890,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// The game loop, finally!
 	while (true)
 	{
-		nframes = DrawPhaseGame();
-
-		g_Renderer.resetAnimations();
 		result = ControlPhase(nframes, 0);
+		nframes = DrawPhaseGame();
+		Sound_UpdateScene();
+
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)
@@ -912,8 +907,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 			return result;
 		}
-
-		Sound_UpdateScene();
 	}
 }
 
@@ -936,16 +929,19 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
 	for (int i = 0; i < room->triggerVolumes.size(); i++)
 	{
+
 		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
 
 		bool contains = false;
 		switch (volume->type)
 		{
 		case VOLUME_BOX:
+			g_Renderer.addDebugBox(volume->box.Center - volume->box.Extents, volume->box.Center + volume->box.Extents, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 			contains = (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
 			break;
 
 		case VOLUME_SPHERE:
+			g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 			contains = (volume->sphere.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
 			break;
 		}

@@ -144,21 +144,6 @@ struct SPLASH_STRUCT
 	bool isActive;
 };
 
-struct DYNAMIC
-{
-	int x;
-	int y;
-	int z;
-	byte on;
-	byte r;
-	byte g;
-	byte b;
-	short falloff;
-	byte used;
-	byte pad1[1];
-	int FalloffScale;
-};
-
 struct SP_DYNAMIC
 {
 	byte On;
@@ -185,7 +170,6 @@ extern int DeadlyBounds[6];
 extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-extern DYNAMIC Dynamics[MAX_DYNAMICS];
 extern SPARKS Sparks[MAX_SPARKS];
 extern SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
 extern int SmokeWeapon;

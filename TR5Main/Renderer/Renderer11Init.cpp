@@ -4,6 +4,7 @@
 #include "winmain.h"
 #include "GameFlowScript.h"
 #include "Quad/RenderQuad.h"
+#include "memory/Vector.h"
 #include <string>
 #include <memory>
 #include <filesystem>
@@ -103,6 +104,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
 	m_cbRoom = createConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = createConstantBuffer<CAnimatedBuffer>();
+
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();
 	m_cbHUD = createConstantBuffer<CHUDBuffer>();
@@ -114,17 +116,17 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_dynamicLights = vector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
-	m_lines3DToDraw = vector<RendererLine3D*>(MAX_LINES_3D);
-	m_lines2DToDraw = vector<RendererLine2D*>(MAX_LINES_2D);
+	m_dynamicLights = createVector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
+	m_lines3DToDraw = createVector<RendererLine3D*>(MAX_LINES_3D);
+	m_lines2DToDraw = createVector<RendererLine2D*>(MAX_LINES_2D);
+
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
-	m_pickupRotation = 0;
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
-		m_items[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_items[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
 	D3D11_BLEND_DESC blendStateDesc{};

@@ -24,12 +24,15 @@
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
 using std::vector;
-namespace T5M::Renderer {
+
+namespace T5M::Renderer 
+{
 	using namespace T5M::Renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;
-	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) {
 
+	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) 
+	{
 		m_blinkColorDirection = 1;
 	}
 
@@ -38,7 +41,9 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::freeRendererData()
-{
+	{
+		clearSceneItems();
+
 		m_meshPointersToMesh.clear();
 		m_moveableObjects.clear();
 		m_staticObjects.clear();
@@ -50,14 +55,10 @@ namespace T5M::Renderer {
 		m_spritesTextures.clear();
 		m_animatedTextures.clear();
 		m_animatedTextureSets.clear();
-		gameCamera.clear();
 	}
 
 	void Renderer11::clearSceneItems() {
-
-		//if ((GlobalCounter & 2) != 2) // For drawing debug lines generated in arbitrary place of game loop
 		m_lines3DToDraw.clear();
-		
 		m_lines2DToDraw.clear();
 		gameCamera.clear();
 	}
