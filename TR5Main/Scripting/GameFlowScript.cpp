@@ -7,6 +7,7 @@
 #include "savegame.h"
 #include "draw.h"
 #include "AudioTracks.h"
+#include "ScriptAssert.h"
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
 
@@ -125,6 +126,8 @@ void GameFlow::LoadGameFlowScript()
 	ExecuteScript("Scripts/Gameflow.lua");
 	ExecuteScript("Scripts/Strings.lua");
 	ExecuteScript("Scripts/Settings.lua");
+
+	SetErrorMode(GetSettings()->ErrorMode);
 }
 
 char const * GameFlow::GetString(const char* id)
