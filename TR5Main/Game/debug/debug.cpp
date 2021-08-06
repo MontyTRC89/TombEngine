@@ -3,7 +3,7 @@
 
 void TENLog(std::string_view str, LogLevel level, LogConfig config)
 {
-	if constexpr (DebugBuild)
+	if constexpr (!DebugBuild)
 	{
 		if (LogConfig::Debug == config)
 		{
