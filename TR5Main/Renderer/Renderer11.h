@@ -438,9 +438,6 @@ namespace T5M::Renderer
 		std::vector<TexturePair> m_staticsTextures;
 		std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
 	
-		// Debug variables
-		int m_numDrawCalls = 0;
-	
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
@@ -449,6 +446,10 @@ namespace T5M::Renderer
 		RendererLight m_lights[MAX_LIGHTS];
 		int m_nextLight;
 		int m_currentY;
+
+		// Debug variables
+		int m_numDrawCalls = 0;
+		RENDERER_DEBUG_PAGE m_numDebugPage = RENDERER_DEBUG_PAGE::NO_PAGE;
 	
 		// Times for debug
 		int m_timeUpdate;
@@ -463,7 +464,7 @@ namespace T5M::Renderer
 		float m_fadeFactor;
 		int m_progress;
 		bool m_enableCinematicBars = false;
-		int m_pickupRotation;
+		int m_pickupRotation = 0;
 	
 		// Private functions
 		int getAnimatedTextureInfo(short textureId);
@@ -576,6 +577,9 @@ namespace T5M::Renderer
 		void renderInventory();
 		void renderTitle();
 		void renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void clearScene();
+		void drawDebugInfo();
+		void switchDebugPage(bool back);
 		void drawPickup(short objectNum);
 		int SyncRenderer();
 		void drawString(int x, int y, const char* string, D3DCOLOR color, int flags);
@@ -595,6 +599,10 @@ namespace T5M::Renderer
 		void renderTitleImage();
 		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
+		void addBox(Vector3 min, Vector3 max, Vector4 color);
+		void addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
+		void addSphere(Vector3 center, float radius , Vector4 color);
+		void addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void changeScreenResolution(int width, int height, int frequency, bool windowed);
 		void flipRooms(short roomNumber1, short roomNumber2);
 		void resetAnimations();

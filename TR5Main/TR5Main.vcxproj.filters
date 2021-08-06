@@ -1044,6 +1044,9 @@
     <ClInclude Include="Scripting\InventorySlots.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\memory\Vector.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">

@@ -27,7 +27,6 @@ int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-DYNAMIC Dynamics[MAX_DYNAMICS];
 SPARKS Sparks[MAX_SPARKS];
 SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
 int SmokeWeapon;
@@ -1211,15 +1210,6 @@ void KillAllCurrentItems(short itemNumber)
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer.addDynamicLight(x, y, z, falloff, r, g, b);
-}
-
-// Really needed?
-void ClearDynamicLights()
-{
-	for (int i = 0; i < 32; i++)
-	{
-		Dynamics[i].on = false;
-	}
 }
 
 void WadeSplash(ITEM_INFO* item, int wh, int wd)
