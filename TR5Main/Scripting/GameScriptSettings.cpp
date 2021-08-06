@@ -12,6 +12,7 @@ void GameScriptSettings::Register(sol::state* lua)
 		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
 		"drawingDistance", &GameScriptSettings::DrawingDistance,
 		"showRendererSteps", &GameScriptSettings::ShowRendererSteps,
-		"showDebugInfo", &GameScriptSettings::ShowDebugInfo
+		"showDebugInfo", &GameScriptSettings::ShowDebugInfo,
+		"errorMode", &GameScriptSettings::ErrorMode
 		);
 }
