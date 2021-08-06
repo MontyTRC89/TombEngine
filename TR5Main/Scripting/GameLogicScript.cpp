@@ -797,7 +797,7 @@ void GameScript::InitCallbacks()
 		func = (*m_lua)["LevelFuncs"][luaFunc];
 		std::string err{ "Level's script does not define callback " + fullName};
 		if (!ScriptAssert(func.valid(), err)) {
-			TENLog("Defaulting to no " + fullName + " behaviour.", LogLevel::Warning, LogConfig::All);
+			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
 		}
 	};
 
