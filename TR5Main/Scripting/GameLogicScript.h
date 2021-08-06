@@ -3,7 +3,7 @@
 #include "room.h"
 #include "LuaHandler.h"
 #include "trmath.h"
-#include <unordered_map>
+#include <unordered_set>
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
@@ -50,22 +50,21 @@ struct LuaVariable
 class GameScript : public LuaHandler
 {
 private:
-	LuaVariables								m_globals;
-	LuaVariables								m_locals;
-	std::map<int, short>						m_itemsMapId;
-	std::map<std::string, short>				m_itemsMapName;
-	std::map<std::string, MESH_INFO&>			m_meshesMapName;
-	std::map<std::string, LEVEL_CAMERA_INFO&>	m_camerasMapName;
-	std::map<std::string, SINK_INFO&>			m_sinksMapName;
-	std::map<std::string, SOUND_SOURCE_INFO&>	m_soundSourcesMapName;
-	std::map<std::string, AI_OBJECT &>			m_aiObjectsMapName;
-	std::unordered_map<std::string, bool>		m_levelFuncs;
-	std::vector<LuaFunction*>					m_triggers;
-	sol::protected_function						m_onStart;
-	sol::protected_function						m_onLoad;
-	sol::protected_function						m_onControlPhase;
-	sol::protected_function						m_onSave;
-	sol::protected_function						m_onEnd;
+	LuaVariables										m_globals{};
+	LuaVariables										m_locals{};
+	std::unordered_map<std::string, short>				m_itemsMapName{};
+	std::unordered_map<std::string, MESH_INFO&>			m_meshesMapName{};
+	std::unordered_map<std::string, LEVEL_CAMERA_INFO&>	m_camerasMapName{};
+	std::unordered_map<std::string, SINK_INFO&>			m_sinksMapName{};
+	std::unordered_map<std::string, SOUND_SOURCE_INFO&>	m_soundSourcesMapName{};
+	std::unordered_map<std::string, AI_OBJECT&>			m_aiObjectsMapName{};
+	std::unordered_set<std::string>						m_levelFuncs{};
+	std::vector<LuaFunction*	>						m_triggers{};
+	sol::protected_function								m_onStart{};
+	sol::protected_function								m_onLoad{};
+	sol::protected_function								m_onControlPhase{};
+	sol::protected_function								m_onSave{};
+	sol::protected_function								m_onEnd{};
 public:	
 	GameScript(sol::state* lua);
 
