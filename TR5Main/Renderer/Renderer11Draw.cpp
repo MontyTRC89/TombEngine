@@ -2443,6 +2443,40 @@ namespace T5M::Renderer
 		addSphere(center, radius, color);
 	}
 
+	void Renderer11::addBox(Vector3* corners, Vector4 color)
+	{
+		if (m_nextLine3D >= MAX_LINES_3D)
+			return;
+
+		for (int i = 0; i < 12; i++)
+		{
+			auto line = &m_lines3DBuffer[m_nextLine3D++];
+
+			switch (i)
+			{
+			case  0:  line->start = corners[0]; line->end = corners[1]; break;
+			case  1:  line->start = corners[1]; line->end = corners[2]; break;
+			case  2:  line->start = corners[2]; line->end = corners[3]; break;
+			case  3:  line->start = corners[3]; line->end = corners[0]; break;
+					  							
+					  							
+			case  4:  line->start = corners[4]; line->end = corners[5]; break;
+			case  5:  line->start = corners[5]; line->end = corners[6]; break;
+			case  6:  line->start = corners[6]; line->end = corners[7]; break;
+			case  7:  line->start = corners[7]; line->end = corners[4]; break;
+					  							
+					  							
+			case  8:  line->start = corners[0]; line->end = corners[4]; break;
+			case  9:  line->start = corners[1]; line->end = corners[5]; break;
+			case  10: line->start = corners[2]; line->end = corners[6]; break;
+			case  11: line->start = corners[3]; line->end = corners[7]; break;
+			}
+
+			line->color = color;
+			m_lines3DToDraw.push_back(line);
+		}
+	}
+
 	void Renderer11::addBox(Vector3 min, Vector3 max, Vector4 color)
 	{
 		if (m_nextLine3D >= MAX_LINES_3D)
@@ -2475,12 +2509,14 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
 		if (m_numDebugPage != page)
 			return;
 
-		addBox(min, max, color);
+		Vector3 corners[8];
+		box.GetCorners(corners);
+		addBox(corners, color);
 	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
