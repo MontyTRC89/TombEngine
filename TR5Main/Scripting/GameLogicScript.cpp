@@ -147,7 +147,7 @@ static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor
 
 }
 
-GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }, m_itemsMapId{}, m_itemsMapName{}, m_meshesMapName{}
+GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 /*** Ambience and music
 @section Music
@@ -367,7 +367,7 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 		tab.raw_set(luaName, value);
 		break;
 	case sol::type::function:
-		m_levelFuncs[luaName];
+		m_levelFuncs.insert(luaName);
 		tab.raw_set(luaName, value);
 		break;
 	default:
@@ -589,7 +589,7 @@ template void GameScript::SetVariables<float>(std::map<std::string, float>& loca
 template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
 template <typename T, typename Stored>
-std::unique_ptr<T> GetTByName(std::string const & type, std::string const& name, std::map<std::string, Stored> const & map)
+std::unique_ptr<T> GetTByName(std::string const & type, std::string const& name, std::unordered_map<std::string, Stored> const & map)
 {
 	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ERROR_MODE::TERMINATE);
 	return std::make_unique<T>(map.at(name), false);
