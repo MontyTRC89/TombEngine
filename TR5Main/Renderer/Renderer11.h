@@ -601,6 +601,7 @@ namespace T5M::Renderer
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		void addBox(Vector3 min, Vector3 max, Vector4 color); 
 		void addBox(Vector3* corners, Vector4 color);
+		void addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void addSphere(Vector3 center, float radius , Vector4 color);
 		void addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
