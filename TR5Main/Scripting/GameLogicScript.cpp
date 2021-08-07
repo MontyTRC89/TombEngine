@@ -322,7 +322,6 @@ Get a SinkInfo by its name.
 
 	GameScriptPosition::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
-	GameScriptColor::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
