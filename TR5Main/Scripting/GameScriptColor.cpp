@@ -12,7 +12,7 @@ Components are specified in bytes; all values are clamped to [0, 255].
 void GameScriptColor::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptColor>("Color",
-		sol::constructors<GameScriptColor(int, int, int)>(),
+		sol::constructors<GameScriptColor(byte, byte, byte), GameScriptColor(byte, byte, byte, byte)>(),
 
 /// (int) red component
 //@mem r
@@ -44,7 +44,6 @@ GameScriptColor::GameScriptColor(byte r, byte g, byte b)
 	SetR(r);
 	SetG(g);
 	SetB(b);
-	SetA(255);
 }
 
 /*** 
@@ -55,11 +54,8 @@ GameScriptColor::GameScriptColor(byte r, byte g, byte b)
 @return A Color object.
 @function Color.new
 */
-GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a)
+GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a) : GameScriptColor(r, g, b)
 {
-	SetR(r);
-	SetG(g);
-	SetB(b);
 	SetA(a);
 }
 
