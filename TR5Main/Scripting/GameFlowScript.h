@@ -6,10 +6,10 @@
 #include "GameScriptSettings.h"
 #include "GameScriptAudioTrack.h"
 
-enum TITLE_TYPE
+enum class TITLE_TYPE
 {
-	TITLE_FLYBY,
-	TITLE_BACKGROUND
+	FLYBY,
+	BACKGROUND
 };
 
 class GameFlow : public LuaHandler
@@ -23,15 +23,8 @@ private:
 	std::map<short, short>			m_itemsMap;
 
 public:
-	Vector3							SkyColorLayer1{};
-	Vector3							SkyColorLayer2{};
-	Vector3							FogColor{};
-	int								SkySpeedLayer1{ 0 };
-	int								SkySpeedLayer2{ 0 };
 	int								FogInDistance{ 0 };
 	int								FogOutDistance{ 0 };
-	bool							DrawHorizon{ false };
-	bool							ColAddHorizon{ false };
 	int								SelectedLevelForNewGame{ 0 };
 	int								SelectedSaveGame{ 0 };
 	bool							EnableLoadSave{ true };
@@ -39,8 +32,9 @@ public:
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
 	int								LevelFarView{ 0 };
-	TITLE_TYPE						TitleType{ TITLE_FLYBY };
+	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
 	std::string						IntroImagePath{};
+	std::string						TitleScreenImagePath{};
 
 	// Selected language set
 	std::vector<GameScriptLevel*>			Levels;
@@ -57,11 +51,8 @@ public:
 	void								SetSettings(GameScriptSettings const & src);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(int id);
-	void								SetHorizon(bool horizon, bool colAddHorizon);
-	void								SetLayer1(byte r, byte g, byte b, short speed);
-	void								SetLayer2(byte r, byte g, byte b, short speed);
-	void								SetFog(byte r, byte g, byte b, short startDistance, short endDistance);
 	int									GetNumLevels();		
 	bool								DoGameflow();
 	void								SetIntroImagePath(std::string const& path);
+	void								SetTitleScreenImagePath(std::string const& path);
 };
