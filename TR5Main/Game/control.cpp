@@ -681,7 +681,7 @@ GAME_STATUS DoTitle(int index)
 
 	int inventoryResult;
 
-	if (g_GameFlow->TitleType == TITLE_FLYBY)
+	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
 		// Initialise items, effects, lots, camera
 		InitialiseFXArray(true);
