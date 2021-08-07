@@ -48,7 +48,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	OBJECT_INFO* object = &Objects[ID_LARA];
 	ANIM_FRAME* frame;
 	int spaz;
-	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_TYPE::YOUNG;
 
 	if (framePtr == NULL)
 	{
