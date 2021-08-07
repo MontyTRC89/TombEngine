@@ -245,33 +245,10 @@ Get a SinkInfo by its name.
 */
 	m_lua->set_function("GetSinkByName", &GameScript::GetSinkByName, this);
 
-	auto makeReadOnlyTable = [this](std::string const & tableName, auto const& container)
-	{
-		auto mt = tableName + "Meta";
-		// Put all the data in the metatable	
-		m_lua->set(mt, sol::as_table(container));
+	MakeReadOnlyTable("InvItem", kInventorySlots);
+	MakeReadOnlyTable("ObjID", kObjIDs);
 
-		// Make the metatable's __index refer to itself so that requests
-		// to the main table will go through to the metatable (and thus the
-		// container's members)
-		m_lua->safe_script(mt + ".__index = " + mt);
-
-		// Don't allow the table to have new elements put into it
-		m_lua->safe_script(mt + ".__newindex = function() error('" + tableName + " is read-only') end");
-
-		// Protect the metatable
-		m_lua->safe_script(mt + ".__metatable = 'metatable is protected'");
-
-		auto tab = m_lua->create_named_table(tableName);
-		m_lua->safe_script("setmetatable(" + tableName + ", " + mt + ")");
-
-		// point the initial metatable variable away from its contents. this is just for cleanliness
-		m_lua->safe_script(mt + "= nil");
-	};
-
-	makeReadOnlyTable("InvItem", kInventorySlots);
-	makeReadOnlyTable("ObjID", kObjIDs);
-
+	//TODO ABSTRACT THESE OUT TOO
 	// LevelFuncs
 	std::string LevelFuncsName{ "LevelFuncs" };
 	std::string LevelFuncsNameMeta{ LevelFuncsName + "Meta" };
