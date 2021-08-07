@@ -7,6 +7,7 @@
 #include "savegame.h"
 #include "draw.h"
 #include "AudioTracks.h"
+#include "GameScriptColor.h"
 #include "ScriptAssert.h"
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
@@ -35,6 +36,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 	GameScriptInventoryObject::Register(m_lua);
 	GameScriptSettings::Register(m_lua);
 	GameScriptAudioTrack::Register(m_lua);
+	GameScriptColor::Register(m_lua);
 
 /***
 Add a level to the gameflow.
@@ -43,11 +45,18 @@ Add a level to the gameflow.
 */
 	m_lua->set_function("AddLevel", &GameFlow::AddLevel, this);
 
-/***
+/*** The path of the .jpg or .png image to show when loading the game.
 @function SetIntroImagePath
 @tparam string path the path to the image, relative to the TombEngine exe
 */
 	m_lua->set_function("SetIntroImagePath", &GameFlow::SetIntroImagePath, this);
+
+/*** The path of the .jpg or .png image to show in the background of the title screen.
+__(not yet implemented)__
+@function SetTitleScreenImagePath
+@tparam string path the path to the image, relative to the TombEngine exe
+*/
+	m_lua->set_function("SetTitleScreenImagePath", &GameFlow::SetTitleScreenImagePath, this);
 
 /***
 @function SetAudioTracks
@@ -107,6 +116,11 @@ void GameFlow::SetIntroImagePath(std::string const& path)
 	IntroImagePath = path;
 }
 
+void GameFlow::SetTitleScreenImagePath(std::string const& path)
+{
+	TitleScreenImagePath = path;
+}
+
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
 {
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
@@ -146,47 +160,6 @@ GameScriptSettings* GameFlow::GetSettings()
 GameScriptLevel* GameFlow::GetLevel(int id)
 {
 	return Levels[id];
-}
-
-void GameFlow::SetHorizon(bool horizon, bool colAddHorizon)
-{
-	DrawHorizon = horizon;
-	ColAddHorizon = colAddHorizon;
-}
-
-void GameFlow::SetLayer1(byte r, byte g, byte b, short speed)
-{
-	SkyColor1.r = r;
-	SkyColor1.g = g;
-	SkyColor1.b = b;
-	SkyVelocity1 = speed;
-
-	SkyColorLayer1.x = r / 255.0f;
-	SkyColorLayer1.y = g / 255.0f;
-	SkyColorLayer1.z = b / 255.0f;
-	SkySpeedLayer1 = speed;
-}
-
-void GameFlow::SetLayer2(byte r, byte g, byte b, short speed)
-{
-	SkyColor2.r = r;
-	SkyColor2.g = g;
-	SkyColor2.b = b;
-	SkyVelocity2 = speed;
-
-	SkyColorLayer2.x = r / 255.0f;
-	SkyColorLayer2.y = g / 255.0f;
-	SkyColorLayer2.z = b / 255.0f;
-	SkySpeedLayer2 = speed;
-}
-
-void GameFlow::SetFog(byte r, byte g, byte b, short startDistance, short endDistance)
-{
-	FogColor.x = r / 255.0f;
-	FogColor.y = g / 255.0f;
-	FogColor.z = b / 255.0f;
-	FogInDistance = startDistance;
-	FogOutDistance = endDistance;
 }
 
 int	GameFlow::GetNumLevels()
