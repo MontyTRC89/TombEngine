@@ -81,6 +81,9 @@ __(not yet implemented)__
 @tparam table table array-style table with TODO EXTRA INFO HERE
 */
 	m_lua->set_function("SetSettings", &GameFlow::SetSettings, this);
+
+	MakeReadOnlyTable("WeatherType", kWeatherTypes);
+	MakeReadOnlyTable("LaraType", kLaraTypes);
 }
 
 GameFlow::~GameFlow()
