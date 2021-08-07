@@ -5,21 +5,36 @@
 #include "GameScriptColor.h"
 #include "GameScriptInventoryObject.h"
 
-enum WEATHER_TYPE
+enum class WEATHER_TYPE
 {
-	WEATHER_NORMAL,
-	WEATHER_RAIN,
-	WEATHER_SNOW
+	NORMAL,
+	RAIN,
+	SNOW
 };
 
-enum LARA_DRAW_TYPE
+static const std::unordered_map<std::string, WEATHER_TYPE> kWeatherTypes{
+	{"NORMAL", WEATHER_TYPE::NORMAL},
+	{"RAIN", WEATHER_TYPE::RAIN},
+	{"SNOW", WEATHER_TYPE::SNOW}
+};
+
+enum LARA_TYPE
 {
-	LARA_NORMAL = 1,
-	LARA_YOUNG = 2,
-	LARA_BUNHEAD = 3,
-	LARA_CATSUIT = 4,
-	LARA_DIVESUIT = 5,
-	LARA_INVISIBLE = 7
+	NORMAL = 1,
+	YOUNG = 2,
+	BUNHEAD = 3,
+	CATSUIT = 4,
+	DIVESUIT = 5,
+	INVISIBLE = 7
+};
+
+static const std::unordered_map<std::string, LARA_TYPE> kLaraTypes{
+	{"NORMAL", LARA_TYPE::NORMAL},
+	{"YOUNG", LARA_TYPE::YOUNG},
+	{"BUNHEAD", LARA_TYPE::BUNHEAD},
+	{"CATSUIT", LARA_TYPE::CATSUIT},
+	{"DIVESUIT", LARA_TYPE::DIVESUIT},
+	{"INVISIBLE", LARA_TYPE::INVISIBLE}
 };
 
 struct GameScriptLevel
@@ -28,7 +43,6 @@ struct GameScriptLevel
 	std::string FileName;
 	std::string ScriptFileName;
 	std::string LoadScreenFileName;
-	std::string Background;
 	int Name;
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
@@ -36,17 +50,17 @@ struct GameScriptLevel
 	bool Horizon{ false };
 	bool Sky;
 	bool ColAddHorizon{ false };
-	GameScriptColor Fog{ 0,0,0 };
+	GameScriptColor Fog{ 0, 0, 0 };
 	bool Storm{ false };
-	WEATHER_TYPE Weather{ WEATHER_NORMAL };
+	WEATHER_TYPE Weather{ WEATHER_TYPE::NORMAL };
 	bool ResetHub{ false };
 	bool Rumble{ false };
-	LARA_DRAW_TYPE LaraType{ LARA_NORMAL };
+	LARA_TYPE LaraType{ LARA_TYPE::NORMAL };
 	GameScriptMirror Mirror;
 	byte UVRotate;
 	int LevelFarView;
 	bool UnlimitedAir{ false };
 	std::vector<GameScriptInventoryObject> InventoryObjects;
-
+	
 	static void Register(sol::state* state);
 };
