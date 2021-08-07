@@ -9,10 +9,10 @@ namespace sol {
 
 class GameScriptColor {
 public:
-	byte r;
-	byte g;
-	byte b;
-	byte a;
+	byte r{ 0 };
+	byte g{ 0 };
+	byte b{ 0 };
+	byte a{ 255 };
 
 	GameScriptColor(byte r, byte g, byte b);
 	GameScriptColor(byte r, byte g, byte b, byte a);
