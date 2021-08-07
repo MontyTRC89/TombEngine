@@ -179,14 +179,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	luaState.open_libraries(sol::lib::base);
 	luaState.set_exception_handler(lua_exception_handler);
 
-	g_GameFlow = new GameFlow(&luaState);
-	g_GameFlow->LoadGameFlowScript();
+	try {
+		g_GameFlow = new GameFlow(&luaState);
+		g_GameFlow->LoadGameFlowScript();
 
-	g_GameScript = new GameScript(&luaState);
+		g_GameScript = new GameScript(&luaState);
+	}
+	catch (TENScriptException const& e)
+	{
+		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+		TENLog(msg, LogLevel::Error, LogConfig::All);
+		throw;
+	}
 
 	luaState.set_function("CalculateDistance", &CalculateDistance);
 	luaState.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
-
 	// Initialise chunks for savegames
 	SaveGame::Start();
 
