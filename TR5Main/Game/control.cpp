@@ -1498,7 +1498,7 @@ void UpdateSky()
 		}
 	}
 
-	if (level->Layer1.Enabled)
+	if (level->Layer2.Enabled)
 	{
 		SkyPos2 += level->Layer2.CloudSpeed;
 		if (SkyPos2 <= 9728)
