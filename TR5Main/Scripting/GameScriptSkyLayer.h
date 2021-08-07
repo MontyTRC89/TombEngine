@@ -1,7 +1,6 @@
 #pragma once
 
-#include "framework.h"
-#include "GameScriptSkyLayer.h"
+#include "GameScriptColor.h"
 
 namespace sol {
 	class state;
@@ -16,7 +15,8 @@ struct GameScriptSkyLayer
 	short CloudSpeed{ 0 };
 
 	GameScriptSkyLayer() = default;
-	GameScriptSkyLayer(byte r, byte g, byte b, short speed);
+	GameScriptSkyLayer(GameScriptColor const & col, short speed);
+	void SetColor(GameScriptColor const & col);
 
 	static void Register(sol::state *);
 };
