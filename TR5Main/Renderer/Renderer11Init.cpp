@@ -33,7 +33,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	wchar_t titleScreenFile[255];
 	std::wstring titleFile = std::wstring(titleScreenFile);
-	std::mbstowcs(titleScreenFile, g_GameFlow->GetLevel(0)->Background.c_str(), 255);
+	std::mbstowcs(titleScreenFile, g_GameFlow->TitleScreenImagePath.c_str(), 255);
 	m_titleScreen = Texture2D(m_device.Get(), titleScreenFile);
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
