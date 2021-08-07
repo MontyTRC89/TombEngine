@@ -517,7 +517,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #endif
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
-			if (level->LaraType == LARA_YOUNG)
+			if (level->LaraType == LARA_TYPE::YOUNG)
 				HairControl(0, 1, 0);
 		}
 

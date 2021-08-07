@@ -1062,7 +1062,7 @@ void LaraBubbles(ITEM_INFO* item)
 
 	pos.x = 0;
 
-	if (LaraDrawType == LARA_DIVESUIT)
+	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 	{
 		pos.y = -192;
 		pos.z = -160;

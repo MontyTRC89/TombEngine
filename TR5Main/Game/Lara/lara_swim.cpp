@@ -262,7 +262,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_DIVESUIT)
+	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		item->currentAnimState = LS_UNDERWATER_ROLL;
 		item->animNumber = LA_UNDERWATER_ROLL_180_START;
@@ -273,7 +273,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LOOK)
 			LookUpDown();
 
-		if (LaraDrawType == LARA_DIVESUIT)
+		if (LaraDrawType == LARA_TYPE::DIVESUIT)
 			SwimTurnSubsuit(item);
 		else
 			SwimTurn(item);
@@ -301,7 +301,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		if (LaraDrawType != LARA_DIVESUIT)
+		if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		{
 			item->currentAnimState = LS_UNDERWATER_ROLL;
 			item->animNumber = LA_UNDERWATER_ROLL_180_START;
@@ -309,7 +309,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 	}
-	else if (LaraDrawType != LARA_DIVESUIT)
+	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		SwimTurn(item);
 	}
@@ -339,7 +339,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		if (LaraDrawType != LARA_DIVESUIT)
+		if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		{
 			item->currentAnimState = LS_UNDERWATER_ROLL;
 			item->animNumber = LA_UNDERWATER_ROLL_180_START;
@@ -347,7 +347,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 	}
-	else if (LaraDrawType != LARA_DIVESUIT)
+	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		SwimTurn(item);
 	}
@@ -525,8 +525,8 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	short height = 762 * phd_sin(item->pos.xRot);
 	height = abs(height);
 
-	if (height < ((LaraDrawType == LARA_DIVESUIT) * 64) + 200)
-		height = ((LaraDrawType == LARA_DIVESUIT) * 64) + 200;
+	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) * 64) + 200)
+		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) * 64) + 200;
 	
 	coll->badNeg = -64;
 	
