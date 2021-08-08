@@ -11,6 +11,7 @@ void GameScriptSkyLayer::Register(sol::state* lua)
 {
 	lua->new_usertype<GameScriptSkyLayer>("SkyLayer",
 		sol::constructors<GameScriptSkyLayer(GameScriptColor const &, short)>(),
+
 /// (@{Color}) RGB sky color
 //@mem color
 		"color", sol::property(&GameScriptSkyLayer::SetColor),
@@ -37,9 +38,7 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 */
 GameScriptSkyLayer::GameScriptSkyLayer(GameScriptColor const& col, short speed)
 {
-	R = col.GetR();
-	G = col.GetG();
-	B = col.GetB();
+	SetColor(col);
 	CloudSpeed = speed;
 	Enabled = true;
 }

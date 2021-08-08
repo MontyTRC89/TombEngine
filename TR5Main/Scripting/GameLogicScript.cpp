@@ -246,41 +246,28 @@ Get a SinkInfo by its name.
 
 	MakeReadOnlyTable("ObjID", kObjIDs);
 
-	//TODO ABSTRACT THESE OUT TOO
-	// LevelFuncs
-	std::string LevelFuncsName{ "LevelFuncs" };
-	std::string LevelFuncsNameMeta{ LevelFuncsName + "Meta" };
-	auto meta = sol::table{ *m_lua, sol::create };
-	m_lua->set(LevelFuncsNameMeta, meta);
-	meta.set_function("__newindex", &GameScript::SetLevelFunc, this);
-	meta.set("__metatable", "\"metatable is protected\"");
-	auto tab = m_lua->create_named_table(LevelFuncsName);
-	tab[sol::metatable_key] = meta;
-	m_lua->set(LevelFuncsNameMeta, sol::nil);
+	auto MakeSpecialTable = [&](std::string const& name)
+	{
+		std::string metaName{ name + "Meta" };
+		auto meta = sol::table{ *m_lua, sol::create };
+		m_lua->set(metaName, meta);
+		meta.set("__metatable", "\"metatable is protected\"");
+		auto tab = m_lua->create_named_table(name);
+		tab[sol::metatable_key] = meta;
+		m_lua->set(metaName, sol::nil);
+		return meta;
+	};
 
-	// Level
-	std::string LevelName{ "Level" };
-	std::string LevelNameMeta{ LevelName + "Meta" };
-	meta = sol::table{ *m_lua, sol::create };
-	m_lua->set(LevelNameMeta, meta);
+	auto meta = MakeSpecialTable("LevelFuncs");
+	meta.set_function("__newindex", &GameScript::SetLevelFunc, this);
+
+	meta = MakeSpecialTable("Level");
 	meta.set_function("__index", &LuaVariables::GetVariable, &m_locals);
 	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_locals);
-	meta.set("__metatable", "\"metatable is protected\"");
-	tab = m_lua->create_named_table(LevelName);
-	tab[sol::metatable_key] = meta;
-	m_lua->set(LevelNameMeta, sol::nil);
 
-	// Game
-	std::string GameName{ "Game" };
-	std::string GameNameMeta{ GameName + "Meta" };
-	meta = sol::table{ *m_lua, sol::create };
-	m_lua->set(GameName, meta);
+	meta = MakeSpecialTable("Game");
 	meta.set_function("__index", &LuaVariables::GetVariable, &m_globals);
 	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_globals);
-	meta.set("__metatable", "\"metatable is protected\"");
-	tab = m_lua->create_named_table(GameName);
-	tab[sol::metatable_key] = meta;
-	m_lua->set(GameNameMeta, sol::nil);
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptItemInfo::SetNameCallbacks(
