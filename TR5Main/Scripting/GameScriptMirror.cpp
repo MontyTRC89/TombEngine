@@ -1,6 +1,15 @@
 #include "framework.h"
 #include "GameScriptMirror.h"
 
+/***
+A mirror effect, as seen in TR4's Coastal Ruins and Sacred Lake levels.
+
+__Not currently implemented.__ 
+
+@classmod Mirror
+@pragma nostrip
+*/
+
 void GameScriptMirror::Register(sol::state* lua)
 {
 	lua->new_usertype<GameScriptMirror>("Mirror",
