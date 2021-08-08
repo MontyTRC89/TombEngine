@@ -245,7 +245,6 @@ Get a SinkInfo by its name.
 */
 	m_lua->set_function("GetSinkByName", &GameScript::GetSinkByName, this);
 
-	MakeReadOnlyTable("InvItem", kInventorySlots);
 	MakeReadOnlyTable("ObjID", kObjIDs);
 
 	//TODO ABSTRACT THESE OUT TOO

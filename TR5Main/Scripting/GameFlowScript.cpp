@@ -9,6 +9,7 @@
 #include "AudioTracks.h"
 #include "GameScriptColor.h"
 #include "ScriptAssert.h"
+#include "InventorySlots.h"
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
 
@@ -84,6 +85,7 @@ __(not yet implemented)__
 
 	MakeReadOnlyTable("WeatherType", kWeatherTypes);
 	MakeReadOnlyTable("LaraType", kLaraTypes);
+	MakeReadOnlyTable("InvItem", kInventorySlots);
 }
 
 GameFlow::~GameFlow()
