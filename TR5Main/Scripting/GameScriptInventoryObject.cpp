@@ -1,7 +1,17 @@
 #include "framework.h"
 #include "GameScriptInventoryObject.h"
 
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& name, ItemEnumPair slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation) : name{ name }, slot{ slot.m_pair.second }, yOffset{ yOffset }, scale{ scale }, xRot{ xRot }, yRot{ yRot }, zRot{ zRot }, rotationFlags{ rotationFlags }, meshBits{ meshBits }, operation{ operation }
+GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, float a_xRot, float a_yRot, float a_zRot, short a_rotationFlags, int a_meshBits, __int64 a_operation) :
+	name{ a_name },
+	slot{ a_slot.m_pair.second },
+	yOffset{ a_yOffset },
+	scale{ a_scale },
+	xRot{ a_xRot },
+	yRot{ a_yRot },
+	zRot{ a_zRot },
+	rotationFlags{ a_rotationFlags },
+	meshBits{ a_meshBits },
+	operation{ a_operation }
 {}
 
 void GameScriptInventoryObject::Register(sol::state * lua)
