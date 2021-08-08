@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "ItemEnumPair.h"
 
 namespace sol {
 	class state;
@@ -8,7 +9,7 @@ namespace sol {
 struct GameScriptInventoryObject
 {
 	std::string name;
-	short slot;
+	inv_objects slot;
 	float yOffset;
 	float scale;
 	float xRot;
@@ -18,7 +19,7 @@ struct GameScriptInventoryObject
 	int meshBits;
 	__int64 operation;
 
-	GameScriptInventoryObject(std::string name, short slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation);
+	GameScriptInventoryObject(std::string const & name, ItemEnumPair slot, float yOffset, float scale, float xRot, float yRot, float zRot, short rotationFlags, int meshBits, __int64 operation);
 
 	static void Register(sol::state* lua);
 };

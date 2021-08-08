@@ -13,7 +13,6 @@
 #include "effect2.h"
 #include "pickup.h"
 #include "newinv2.h"
-#include "InventorySlots.h"
 #include "ObjectIDs.h"
 
 #ifndef _DEBUG
@@ -109,25 +108,25 @@ static void Earthquake(int strength)
 }
 
 // Inventory
-static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
+static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
 {
-	PickedUpObject(slot, count.value_or(0));
+	PickedUpObject(slot.m_pair.first, count.value_or(0));
 }
 
-static void InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
+static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
 {
-	RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(inventry_objects_list[slot].object_number), count.value_or(0));
+	RemoveObjectFromInventory(slot.m_pair.first, count.value_or(0));
 }
 
-static int InventoryGetCount(GAME_OBJECT_ID slot)
+static int InventoryGetCount(ItemEnumPair slot)
 {
-	return GetInventoryCount(slot);
+	return GetInventoryCount(slot.m_pair.first);
 }
 
-static void InventorySetCount(GAME_OBJECT_ID slot, int count)
+static void InventorySetCount(ItemEnumPair slot, int count)
 {
 	// add the amount we'd need to add to get to count
-	int currAmt = GetInventoryCount(slot);
+	int currAmt = GetInventoryCount(slot.m_pair.first);
 	InventoryAdd(slot, count - currAmt);
 }
 
