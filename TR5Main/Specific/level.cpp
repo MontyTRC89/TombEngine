@@ -1073,7 +1073,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	Wibble = 0;
 	TorchRoom = -1;
 	InitialiseGameFlags();
-	InitialiseLara(!(InitialiseGame || CurrentLevel == 1 || level->ResetHub));
+	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();
 	GetAIPickups();
 	Lara.Vehicle = -1;
