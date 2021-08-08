@@ -24,6 +24,24 @@ auto LaserSightIsEquipped(LaraInfo& lara)
 
 static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
 {
+	// If adding, replace the small/large waterskin with one of the requested
+	// capacity. If removing, only remove the waterskin if it contains the given
+	// capacity.
+	auto modifyWaterSkinAmount = [&](byte& currentFlag, byte newFlag)
+	{
+		if (add)
+		{
+			currentFlag = newFlag;
+		}
+		else
+		{
+			if (currentFlag == newFlag)
+			{
+				currentFlag = 0;
+			}
+		}
+	};
+
 	auto modifyBeetleCount = [&](int bit)
 	{
 		if (add)
@@ -52,12 +70,35 @@ static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
 	case ID_DIARY_ITEM:
 		lara.Diary.Present = add;
 		break;
-	//todo.. what if the waterskin is already full?
 	case ID_WATERSKIN1_EMPTY:
-		lara.small_waterskin = int{ add };
+		modifyWaterSkinAmount(lara.small_waterskin, 1);
+		break;
+	case ID_WATERSKIN1_1:
+		modifyWaterSkinAmount(lara.small_waterskin, 2);
+		break;
+	case ID_WATERSKIN1_2:
+		modifyWaterSkinAmount(lara.small_waterskin, 3);
+		break;
+	case ID_WATERSKIN1_3:
+		modifyWaterSkinAmount(lara.small_waterskin, 4);
 		break;
 	case ID_WATERSKIN2_EMPTY:
-		lara.big_waterskin = int{ add };
+		modifyWaterSkinAmount(lara.big_waterskin, 1);
+		break;
+	case ID_WATERSKIN2_1:
+		modifyWaterSkinAmount(lara.big_waterskin, 2);
+		break;
+	case ID_WATERSKIN2_2:
+		modifyWaterSkinAmount(lara.big_waterskin, 3);
+		break;
+	case ID_WATERSKIN2_3:
+		modifyWaterSkinAmount(lara.big_waterskin, 4);
+		break;
+	case ID_WATERSKIN2_4:
+		modifyWaterSkinAmount(lara.big_waterskin, 5);
+		break;
+	case ID_WATERSKIN2_5:
+		modifyWaterSkinAmount(lara.big_waterskin, 6);
 		break;
 	case ID_CLOCKWORK_BEETLE:
 		modifyBeetleCount(0);
@@ -103,11 +144,26 @@ std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID obj)
 		return lara.Crowbar;
 	case ID_DIARY_ITEM:
 		return lara.Diary.Present;
-		//TODO what about other waterskins?
 	case ID_WATERSKIN1_EMPTY:
-		return lara.small_waterskin;
+		return lara.small_waterskin == 1;
+	case ID_WATERSKIN1_1:
+		return lara.small_waterskin == 2;
+	case ID_WATERSKIN1_2:
+		return lara.small_waterskin == 3;
+	case ID_WATERSKIN1_3:
+		return lara.small_waterskin == 4;
 	case ID_WATERSKIN2_EMPTY:
-		return lara.big_waterskin;
+		return lara.big_waterskin == 1;
+	case ID_WATERSKIN2_1:
+		return lara.big_waterskin == 2;
+	case ID_WATERSKIN2_2:
+		return lara.big_waterskin == 3;
+	case ID_WATERSKIN2_3:
+		return lara.big_waterskin == 4;
+	case ID_WATERSKIN2_4:
+		return lara.big_waterskin == 5;
+	case ID_WATERSKIN2_5:
+		return lara.big_waterskin == 6;
 	case ID_CLOCKWORK_BEETLE:
 		return HasBeetle(0);
 	case ID_CLOCKWORK_BEETLE_COMBO1:
