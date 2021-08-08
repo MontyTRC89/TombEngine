@@ -53,7 +53,6 @@ struct GameScriptLevel
 	GameScriptColor Fog{ 0, 0, 0 };
 	bool Storm{ false };
 	WEATHER_TYPE Weather{ WEATHER_TYPE::NORMAL };
-	bool ResetHub{ false };
 	bool Rumble{ false };
 	LARA_TYPE LaraType{ LARA_TYPE::NORMAL };
 	GameScriptMirror Mirror;

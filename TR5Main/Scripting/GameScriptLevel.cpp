@@ -86,15 +86,13 @@ e.g. `myLevel.laraType = LaraType.DIVESUIT`
  @mem laraType*/
 		"laraType", &GameScriptLevel::LaraType,
 
-/// (bool) todo 
+/// (bool) If true, an occasional screen shake effect (as seen in TRC's Sinking Submarine) will
+// happen throughout the level.
 //@mem rumble
 		"rumble", &GameScriptLevel::Rumble,
 
-/// (bool) todo 
-//@mem resetHub
-		"resetHub", &GameScriptLevel::ResetHub,
-
-/// (Mirror) todo 
+/// (Mirror) object holding the location and size of the room's mirror, if present.
+// __(not yet implemented)__
 //@mem mirror
 		"mirror", &GameScriptLevel::Mirror,
 
