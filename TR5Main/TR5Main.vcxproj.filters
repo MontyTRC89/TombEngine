@@ -1047,6 +1047,9 @@
     <ClInclude Include="Game\memory\Vector.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\ItemEnumPair.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
