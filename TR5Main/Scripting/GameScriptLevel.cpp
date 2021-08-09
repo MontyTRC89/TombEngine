@@ -15,23 +15,23 @@ void GameScriptLevel::Register(sol::state* state)
 	state->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
 
-/// (string) todo 
-//@mem name
-		"name", &GameScriptLevel::NameStringKey,
+/// (string) string key for the level's (localised) name. Corresponds to an entry in strings.lua.
+//@mem nameKey
+		"nameKey", &GameScriptLevel::NameStringKey,
 
-/// (string) todo 
-//@mem script
-		"script", &GameScriptLevel::ScriptFileName,
+/// (string) path of the Lua file holding the level's logic script, relative to the location of the tombengine executable
+//@mem scriptFile
+		"scriptFile", &GameScriptLevel::ScriptFileName,
 
-/// (string) todo 
-//@mem fileName
-		"fileName", &GameScriptLevel::FileName,
+/// (string) path of the compiled level file, relative to the location of the tombengine executable
+//@mem levelFile
+		"levelFile", &GameScriptLevel::FileName,
 
-/// (string) todo 
-//@mem loadScreen
-		"loadScreen", &GameScriptLevel::LoadScreenFileName,
+/// (string) path of the level's load screen file (.png or .jpg), relative to the location of the tombengine executable
+//@mem loadScreenFile
+		"loadScreenFile", &GameScriptLevel::LoadScreenFileName,
 		
-/// (string) todo 
+/// (string) initial ambient sound track to play - this is the filename of the track __without__ the .wav extension
 //@mem ambientTrack
 		"ambientTrack", &GameScriptLevel::AmbientTrack,
 
@@ -96,8 +96,8 @@ e.g. `myLevel.laraType = LaraType.DIVESUIT`
 //@mem mirror
 		"mirror", &GameScriptLevel::Mirror,
 
-/// (table of InventoryObjects) todo 
-//@mem mirror
+/// (table of InventoryObjects) table of inventory object overrides
+//@mem objects
 		"objects", &GameScriptLevel::InventoryObjects
 		);
 }
