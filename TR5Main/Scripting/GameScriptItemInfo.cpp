@@ -64,7 +64,7 @@ template <bool temp> std::unique_ptr<GameScriptItemInfo> CreateEmpty()
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
-most can just be set them to zero (see usage) or use the overload which
+most can just be set to zero (see usage). See also the overload which
 takes no arguments.
 	@function ItemInfo.newItem
 	@tparam ObjID object ID
