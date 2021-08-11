@@ -86,7 +86,7 @@ takes no arguments.
 	@tparam bool hitStatus hit status of object
 	@return reference to new ItemInfo object
 	@usage 
-	local item = ItemInfo.new(
+	local item = ItemInfo.newItem(
 		PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
