@@ -10,6 +10,10 @@ level file itself.
 @pragma nostrip
 */
 
+/*** Make a new Level object.
+	@function Level.new
+	@return a Level object
+	*/
 void GameScriptLevel::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptLevel>("Level",
@@ -91,12 +95,12 @@ e.g. `myLevel.laraType = LaraType.DIVESUIT`
 //@mem rumble
 		"rumble", &GameScriptLevel::Rumble,
 
-/// (Mirror) object holding the location and size of the room's mirror, if present.
+/// (@{Mirror}) object holding the location and size of the room's mirror, if present.
 // __(not yet implemented)__
 //@mem mirror
 		"mirror", &GameScriptLevel::Mirror,
 
-/// (table of InventoryObjects) table of inventory object overrides
+/// (table of @{InventoryObject}s) table of inventory object overrides
 //@mem objects
 		"objects", &GameScriptLevel::InventoryObjects
 		);
