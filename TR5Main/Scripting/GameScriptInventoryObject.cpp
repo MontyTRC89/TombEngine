@@ -1,5 +1,7 @@
 #include "framework.h"
 #include "GameScriptInventoryObject.h"
+#include "ScriptAssert.h"
+#include <string>
 
 /***
 Represents the properties of an object as it appears in the inventory.
@@ -8,44 +10,109 @@ Represents the properties of an object as it appears in the inventory.
 @pragma nostrip
 */
 
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, float a_xRot, float a_yRot, float a_zRot, short a_rotationFlags, int a_meshBits, __int64 a_operation) :
+/*** For more information on each parameter, see the
+associated getters and setters.
+takes no arguments.
+	@function InventoryObject.new
+	@tparam string nameKey name key
+	@tparam InvItem slot slot of inventory object to change
+	@tparam int yOffset y-axis offset
+	@tparam float scale item size (1 being standard size) 
+	@tparam Rotation rot rotation about x, y, and z axes
+	@tparam RotationAxis rotAxisWhenCurrent axis to rotate around in inventory
+	@tparam int meshBits not currently implemented
+	@tparam ItemAction action is this usable, equippable, or examinable?
+	@return an InventoryObject
+	*/
+
+GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
 	scale{ a_scale },
-	xRot{ a_xRot },
-	yRot{ a_yRot },
-	zRot{ a_zRot },
+	rot{ a_rot },
 	rotationFlags{ a_rotationFlags },
-	meshBits{ a_meshBits },
-	operation{ a_operation }
-{}
+	meshBits{ a_meshBits }
+{
+	SetAction(a_action);
+}
 
 void GameScriptInventoryObject::Register(sol::state * lua)
 {
 	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
-		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, float, float, float, float, float, short, int, __int64)>(),
+		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, float, float, GameScriptRotation const &, rotflags, int, item_options)>(),
 
-		/// (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
-		//@mem nameKey
+/*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
+@mem nameKey
+*/
 		"nameKey", &GameScriptInventoryObject::name,
 
-		/// (float) y-axis offset.
-		// A value of about 100 will cause the item to display directly below its usual position.
-		//@mem nameKey
+/*** (@{InvItem}) slot of item whose inventory display properties you wish to change
+@mem slot
+*/
+		"slot", &GameScriptInventoryObject::slot,
+
+/*** (float) y-axis offset.
+ A value of about 100 will cause the item to display directly below its usual position.
+@mem yOffset
+*/
 		"yOffset", &GameScriptInventoryObject::yOffset,
 
-		/// (float) Item's size when displayed in the inventory as a multiple of its "regular" size.
-		// A value of 0.5 will cause the item to render at half the size,
-		// and a value of 2 will cause the item to render at twice the size.
-		//@mem scale
+/*** (float) Item's size when displayed in the inventory as a multiple of its "regular" size.
+A value of 0.5 will cause the item to render at half the size,
+and a value of 2 will cause the item to render at twice the size.
+@mem scale
+*/
 		"scale", &GameScriptInventoryObject::scale,
 
-		"xRot", &GameScriptInventoryObject::xRot,
-		"yRot", &GameScriptInventoryObject::yRot,
-		"zRot", &GameScriptInventoryObject::zRot,
-		"rotationFlags", &GameScriptInventoryObject::rotationFlags,
+/*** (@{Rotation}) Item's rotation about its origin when displayed in the inventory.
+@mem rot
+*/
+		"rot", &GameScriptInventoryObject::rot,
+
+/*** (@RotationAxis) Axis to rotate about when the item is being looked at in the inventory.
+Note that this is entirely separate from the `rot` field described above.
+Must be one of:
+	X
+	Y
+	Z
+e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`
+@mem rotAxisWhenCurrent
+*/
+		"rotAxisWhenCurrent", &GameScriptInventoryObject::rotationFlags,
+
+/*** (@int) __Not currently implemented__ (will have no effect regardless of what you set it to)
+@mem meshBits
+*/
 		"meshBits", &GameScriptInventoryObject::meshBits,
-		"operation", &GameScriptInventoryObject::operation
+
+/*** (@ItemAction) What can the player do with the item?
+Must be one of:
+	EQUIP
+	USE
+	EXAMINE
+e.g. `myItem.action = ItemAction.EXAMINE`
+@mem action
+*/
+		"action", sol::property(&GameScriptInventoryObject::SetAction)
 		);
+}
+
+// Add validation so the user can't choose something unimplemented
+void GameScriptInventoryObject::SetAction(item_options a_action)
+{
+	bool isSupported = (a_action == item_options::OPT_EQUIP) ||
+		(a_action == item_options::OPT_USE) ||
+		(a_action == item_options::OPT_EXAMINABLE);
+
+	if (!ScriptAssert(isSupported, "Unsupported item action: " + std::to_string(a_action)))
+	{
+		item_options def = item_options::OPT_USE;
+		ScriptWarn("Defaulting to " + std::to_string(def));
+		action = def;
+	}
+	else
+	{
+		action = a_action;
+	}
 }
