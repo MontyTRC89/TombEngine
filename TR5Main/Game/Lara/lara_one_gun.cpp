@@ -1517,6 +1517,9 @@ void ControlCrossbowBolt(short itemNumber)
 
 void RifleHandler(int weaponType)
 {
+	if (BinocularRange)
+		return; // Never handle weapons when in binocular mode!
+
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
 	LaraGetNewTarget(weapon);

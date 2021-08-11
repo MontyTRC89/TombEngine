@@ -747,7 +747,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 	}
 }
 
-FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 {
 	Ammo& ammo = GetAmmo(weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
