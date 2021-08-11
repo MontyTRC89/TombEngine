@@ -1049,10 +1049,6 @@ void fillSound()
 
 void handle_sound_settings_input()
 {
-	int oldVolume = CurrentSettings.conf.MusicVolume;
-	int oldSfxVolume = CurrentSettings.conf.SfxVolume;
-	bool wasSoundEnabled = CurrentSettings.conf.EnableSound;
-
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
@@ -1061,8 +1057,8 @@ void handle_sound_settings_input()
 
 	if (goDeselect)
 	{
-		GlobalMusicVolume = oldVolume;
-		GlobalFXVolume = oldSfxVolume;
+		SetVolumeMusic(g_Configuration.MusicVolume);
+		SetVolumeFX(g_Configuration.SfxVolume);
 		title_menu_to_display = title_options_menu;
 		title_selected_option = 4;
 		return;
@@ -1074,21 +1070,15 @@ void handle_sound_settings_input()
 		{
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
-
-			break;
-
-		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
-		case 4:
+		case 2:
 			if (CurrentSettings.conf.MusicVolume > 0)
 			{
 				static int db = 0;
 				CurrentSettings.conf.MusicVolume--;
-				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1100,12 +1090,12 @@ void handle_sound_settings_input()
 
 			break;
 
-		case 8:
+		case 4:
 			if (CurrentSettings.conf.SfxVolume > 0)
 			{
 				static int db = 0;
 				CurrentSettings.conf.SfxVolume--;
-				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1125,20 +1115,15 @@ void handle_sound_settings_input()
 		{
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
-			break;
-
-		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
-		case 4:
+		case 2:
 			if (CurrentSettings.conf.MusicVolume < 100)
 			{
 				static int db = 0;
 				CurrentSettings.conf.MusicVolume++;
-				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1150,12 +1135,12 @@ void handle_sound_settings_input()
 
 			break;
 
-		case 8:
+		case 4:
 			if (CurrentSettings.conf.SfxVolume < 100)
 			{
 				static int db = 0;
 				CurrentSettings.conf.SfxVolume++;
-				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1189,28 +1174,21 @@ void handle_sound_settings_input()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
-		if (title_selected_option & (1 << 4))
+		if (title_selected_option & (1 << 3))
 		{
 			// Save the configuration
-			GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
-			GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-			SaveAudioConfig();
 
-			// Init or deinit the sound system
-			if (wasSoundEnabled && !g_Configuration.EnableSound)
-				Sound_DeInit();
-			else if (!wasSoundEnabled && g_Configuration.EnableSound)
-				Sound_Init();
-
+			title_menu_to_display = title_options_menu;
+			title_selected_option = 4;
 			return;
 		}
 
-		if (title_selected_option & (1 << 5))
+		if (title_selected_option & (1 << 4))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			GlobalMusicVolume = oldVolume;
-			GlobalFXVolume = oldSfxVolume;
+			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeFX(g_Configuration.SfxVolume);
 			title_menu_to_display = title_options_menu;
 			title_selected_option = 4;
 			return;
@@ -1597,14 +1575,10 @@ void handle_control_settings_input_pause()
 
 void handle_sound_settings_input_pause()
 {
-	int oldVolume = CurrentSettings.conf.MusicVolume;
-	int oldSfxVolume = CurrentSettings.conf.SfxVolume;
-	bool wasSoundEnabled = CurrentSettings.conf.EnableSound;
-
 	if (goDeselect)
 	{
-		GlobalMusicVolume = oldVolume;
-		GlobalFXVolume = oldSfxVolume;
+		SetVolumeMusic(g_Configuration.MusicVolume);
+		SetVolumeFX(g_Configuration.SfxVolume);
 		pause_menu_to_display = pause_options_menu;
 		pause_selected_option = 4;
 		return;
@@ -1616,21 +1590,15 @@ void handle_sound_settings_input_pause()
 		{
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
-
-			break;
-
-		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
-		case 4:
+		case 2:
 			if (CurrentSettings.conf.MusicVolume > 0)
 			{
 				static int db = 0;
 				CurrentSettings.conf.MusicVolume--;
-				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1642,12 +1610,12 @@ void handle_sound_settings_input_pause()
 
 			break;
 
-		case 8:
+		case 4:
 			if (CurrentSettings.conf.SfxVolume > 0)
 			{
 				static int db = 0;
 				CurrentSettings.conf.SfxVolume--;
-				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1667,20 +1635,15 @@ void handle_sound_settings_input_pause()
 		{
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			CurrentSettings.conf.EnableSound = !CurrentSettings.conf.EnableSound;
-			break;
-
-		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
-		case 4:
+		case 2:
 			if (CurrentSettings.conf.MusicVolume < 100)
 			{
 				static int db = 0;
 				CurrentSettings.conf.MusicVolume++;
-				GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1692,12 +1655,12 @@ void handle_sound_settings_input_pause()
 
 			break;
 
-		case 8:
+		case 4:
 			if (CurrentSettings.conf.SfxVolume < 100)
 			{
 				static int db = 0;
 				CurrentSettings.conf.SfxVolume++;
-				GlobalFXVolume = CurrentSettings.conf.SfxVolume;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
@@ -1731,28 +1694,22 @@ void handle_sound_settings_input_pause()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
-		if (pause_selected_option & (1 << 4))
+		if (pause_selected_option & (1 << 3))
 		{
 			// Save the configuration
-			GlobalMusicVolume = CurrentSettings.conf.MusicVolume;
-			GlobalFXVolume = CurrentSettings.conf.SfxVolume;
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-			SaveAudioConfig();
 
-			// Init or deinit the sound system
-			if (wasSoundEnabled && !g_Configuration.EnableSound)
-				Sound_DeInit();
-			else if (!wasSoundEnabled && g_Configuration.EnableSound)
-				Sound_Init();
+			pause_menu_to_display = pause_options_menu;
+			pause_selected_option = 4;
 
 			return;
 		}
 
-		if (pause_selected_option & (1 << 5))
+		if (pause_selected_option & (1 << 4))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			GlobalMusicVolume = oldVolume;
-			GlobalFXVolume = oldSfxVolume;
+			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeFX(g_Configuration.SfxVolume);
 			pause_menu_to_display = pause_options_menu;
 			pause_selected_option = 4;
 			return;

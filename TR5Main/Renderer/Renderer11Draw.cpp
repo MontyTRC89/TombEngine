@@ -716,30 +716,20 @@ namespace T5M::Renderer
 
             y += 25;
 
-            // Enable sound
-            drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
-                PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableSound ? STRING_ENABLED : STRING_DISABLED),
-                PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
-
-            y += 25;
-
             // Enable sound special effects
             drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Music volume
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar,ID_SFX_BAR_TEXTURE,0,false);
 
             y += 25;
@@ -747,20 +737,20 @@ namespace T5M::Renderer
             // Sound FX volume
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,false);
             y += 25;
 
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((title_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
             break;
         }
     }
@@ -952,30 +942,20 @@ namespace T5M::Renderer
 
             y += 25;
 
-            // Enable sound
-            drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
-                PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableSound ? STRING_ENABLED : STRING_DISABLED),
-                PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
-
-            y += 25;
-
             // Enable sound special effects
             drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
             drawString(400, y, g_GameFlow->GetString(CurrentSettings.conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 0)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             // Music volume
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 1)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
 
             y += 25;
@@ -983,20 +963,20 @@ namespace T5M::Renderer
             // Sound FX volume
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 2)) ? PRINTSTRING_BLINK : 0));
             drawBar(CurrentSettings.conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
             y += 25;
 
             // Apply and cancel
             drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 3)) ? PRINTSTRING_BLINK : 0));
 
             y += 25;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                 PRINTSTRING_COLOR_ORANGE,
-                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 5)) ? PRINTSTRING_BLINK : 0));
+                PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
             break;
         }
         drawAllStrings();
