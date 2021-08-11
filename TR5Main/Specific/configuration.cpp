@@ -313,8 +313,8 @@ bool SaveConfiguration()
 
 void SaveAudioConfig()
 {
-	GlobalMusicVolume = g_Configuration.MusicVolume;
-	GlobalFXVolume = g_Configuration.SfxVolume;
+	SetVolumeMusic(g_Configuration.MusicVolume);
+	SetVolumeFX(g_Configuration.SfxVolume);
 }
 
 void InitDefaultConfiguration()
@@ -473,8 +473,8 @@ bool LoadConfiguration()
 	g_Configuration.shadowMapSize = 512;
 	// Set legacy variables
 	//OptionAutoTarget = autoTarget;
-	GlobalMusicVolume = musicVolume;
-	GlobalFXVolume = sfxVolume;
+	SetVolumeMusic(musicVolume);
+	SetVolumeFX(sfxVolume);
 
 	RegCloseKey(rootKey);
 
