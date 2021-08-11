@@ -9,10 +9,11 @@ struct PHD_3DPOS;
 
 class GameScriptRotation {
 public:
-	short								x;
-	short								y;
-	short								z;
+	short								x{ 0 };
+	short								y{ 0 };
+	short								z{ 0 };
 
+	GameScriptRotation() = default;
 	GameScriptRotation(int x, int y, int z);
 	GameScriptRotation(PHD_3DPOS const& pos);
 
