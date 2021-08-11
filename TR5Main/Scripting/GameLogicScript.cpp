@@ -261,11 +261,11 @@ Get a SinkInfo by its name.
 	auto meta = MakeSpecialTable("LevelFuncs");
 	meta.set_function("__newindex", &GameScript::SetLevelFunc, this);
 
-	meta = MakeSpecialTable("Level");
+	meta = MakeSpecialTable("LevelVars");
 	meta.set_function("__index", &LuaVariables::GetVariable, &m_locals);
 	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_locals);
 
-	meta = MakeSpecialTable("Game");
+	meta = MakeSpecialTable("GameVars");
 	meta.set_function("__index", &LuaVariables::GetVariable, &m_globals);
 	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_globals);
 
@@ -695,15 +695,15 @@ For example, you may have a level with a custom puzzle where Lara has
 to kill exactly seven enemies to open a door to a secret. You could use
 the following line each time an enemy is killed:
 
-	Level.enemiesKilled = Level.enemiesKilled + 1
+	LevelVars.enemiesKilled = LevelVars.enemiesKilled + 1
 
 If the player saves the level after killing three, saves, and then reloads the save
 some time later, the values `3` will be put back into `Level.enemiesKilled.`
 
 __This table is emptied when a level is finished.__ If the player needs to be able
 to return to the level (e.g. like the Karnak level in *The Last Revelation*,
-you will need to use the @{Game} table, below.
-@table Level
+you will need to use the @{GameVars} table, below.
+@table LevelVars
 */
 
 /*** A table with game data which will be saved and loaded.
@@ -714,16 +714,16 @@ For example, you may wish to have a final boss say a specific voice line based o
 a choice the player made in a previous level. In the level with the choice, you could
 write:
 
-	Game.playerSnoopedInDraws = true
+	GameVars.playerSnoopedInDraws = true
 
 And in the script file for the level with the boss, you could write:
 
-	if Game.playerSnoopedInDraws then
+	if GameVars.playerSnoopedInDraws then
 		PlayAudioTrack("how_dare_you.wav")
 	end
 
-Unlike @{Level}, this table will remain intact for the entirety of the game.
-@table Game
+Unlike @{LevelVars}, this table will remain intact for the entirety of the game.
+@table GameVars
 */
 
 /*** A table with level-specific functions.
