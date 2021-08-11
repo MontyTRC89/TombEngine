@@ -381,7 +381,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (BinocularRange == 0)
 			{
-				if (Lara.gunStatus == LG_READY && ((Lara.gunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || (Lara.gunType == WEAPON_HK) || (Lara.gunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+				if (Lara.gunStatus == LG_READY && ((Lara.gunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || 
+												   (Lara.gunType == WEAPON_HK) || 
+												   (Lara.gunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
@@ -2906,7 +2908,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 	MESH* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
-	float minDistance = SECTOR(1024);
+	float minDistance = std::numeric_limits<float>::max();
 
 	int action = TrInput & IN_ACTION;
 
