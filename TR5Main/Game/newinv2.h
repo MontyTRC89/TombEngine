@@ -134,7 +134,7 @@ enum menu_types
 	MENU_TYPE_DIARY
 };
 
-enum item_options
+enum item_options : int64_t
 {
 	OPT_ALWAYSCOMBINE = 1 << 0,
 	OPT_EQUIP = 1 << 1,
