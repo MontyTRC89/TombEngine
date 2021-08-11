@@ -7,8 +7,7 @@
 #include "savegame.h"
 #include "draw.h"
 #include "AudioTracks.h"
-#include "GameScriptColor.h"
-#include "ScriptAssert.h"
+#include "GameScriptInventoryObject.h"
 #include "InventorySlots.h"
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
@@ -87,6 +86,8 @@ __(not yet implemented)__
 	MakeReadOnlyTable("WeatherType", kWeatherTypes);
 	MakeReadOnlyTable("LaraType", kLaraTypes);
 	MakeReadOnlyTable("InvItem", kInventorySlots);
+	MakeReadOnlyTable("RotationAxis", kRotAxes);
+	MakeReadOnlyTable("ItemAction", kItemActions);
 }
 
 GameFlow::~GameFlow()
@@ -234,10 +235,11 @@ bool GameFlow::DoGameflow()
 					invObj->objname = obj->name.c_str();
 					invObj->scale1 = obj->scale;
 					invObj->yoff = obj->yOffset;
-					invObj->xrot = obj->xRot;
-					invObj->zrot = obj->zRot;
+					invObj->xrot = FROM_DEGREES(obj->rot.x);
+					invObj->yrot = FROM_DEGREES(obj->rot.y);
+					invObj->zrot = FROM_DEGREES(obj->rot.z);
 					invObj->meshbits = obj->meshBits;
-					invObj->opts = obj->operation;
+					invObj->opts = obj->action;
 					invObj->rot_flags = obj->rotationFlags;
 				}
 			}
