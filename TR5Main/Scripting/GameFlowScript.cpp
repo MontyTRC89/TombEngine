@@ -38,6 +38,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 	GameScriptSettings::Register(m_lua);
 	GameScriptAudioTrack::Register(m_lua);
 	GameScriptColor::Register(m_lua);
+	GameScriptRotation::Register(m_lua);
 
 /***
 Add a level to the gameflow.
