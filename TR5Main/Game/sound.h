@@ -2141,8 +2141,6 @@ struct AudioTrack
 };
 
 extern std::unordered_map<std::string, AudioTrack> g_AudioTracks;
-extern int GlobalMusicVolume;
-extern int GlobalFXVolume;
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
 void StopSoundEffect(short effectID);
@@ -2157,6 +2155,9 @@ void S_CDStop();
 void SayNo();
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
+
+void  SetVolumeMusic(int vol);
+void  SetVolumeFX(int vol);
 
 void  Sound_Init();
 void  Sound_DeInit();

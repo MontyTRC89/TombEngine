@@ -27,8 +27,32 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
 }; 
 
 unordered_map<string, AudioTrack> g_AudioTracks;
-int GlobalMusicVolume;
-int GlobalFXVolume;
+static int GlobalMusicVolume;
+static int GlobalFXVolume;
+static bool s_initialised{ false };
+
+void SetVolumeMusic(int vol) 
+{
+	GlobalMusicVolume = vol;
+
+	if (s_initialised)
+	{
+		float fVol = static_cast<float>(vol) / 100.0f;
+		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
+		{
+			BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, fVol);
+		}
+		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel))
+		{
+			BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL, fVol);
+		}
+	}
+}
+
+void SetVolumeFX(int vol)
+{
+	GlobalFXVolume = vol;
+}
 
 bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
 {
@@ -635,6 +659,8 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
+	s_initialised = true;
+
 	// Initialize BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
@@ -689,6 +715,7 @@ void Sound_Init()
 
 void Sound_DeInit()
 {
+	s_initialised = false;
 	BASS_Free();
 }
 
@@ -703,8 +730,8 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 		va_start(argptr, verbose);
 		int32_t written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
 		va_end(argptr);
-		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d \n" : ": success \n", bassError);
-		printf(data);
+		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d" : ": success", bassError);
+		TENLog(data, bassError ? LogLevel::Error : LogLevel::Info);
 	}
 	return bassError != 0;
 }
