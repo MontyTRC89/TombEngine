@@ -814,7 +814,7 @@ int GetFreeGunshell()
 	return gsNum;
 }
 
-void TriggerGunShell(short hand, short objNum, int weaponType)
+void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 {
 	PHD_VECTOR pos;
 
