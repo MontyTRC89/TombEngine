@@ -1335,6 +1335,8 @@ void BinocularCamera(ITEM_INFO* item)
 				Savegame.Game.AmmoUsed++;
 				if (!ammo.hasInfinite())
 					(ammo)--;
+
+				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
 			else if (Lara.gunType == WEAPON_CROSSBOW)
 			{
