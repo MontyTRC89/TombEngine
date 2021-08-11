@@ -43,12 +43,10 @@ struct GameScriptLevel
 	std::string FileName;
 	std::string ScriptFileName;
 	std::string LoadScreenFileName;
-	int Name;
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
 	bool Horizon{ false };
-	bool Sky;
 	bool ColAddHorizon{ false };
 	GameScriptColor Fog{ 0, 0, 0 };
 	bool Storm{ false };
@@ -56,9 +54,9 @@ struct GameScriptLevel
 	bool Rumble{ false };
 	LARA_TYPE LaraType{ LARA_TYPE::NORMAL };
 	GameScriptMirror Mirror;
-	byte UVRotate;
-	int LevelFarView;
-	bool UnlimitedAir{ false };
+	byte UVRotate{ 0 }; // unused
+	int LevelFarView{ 0 }; // unused
+	bool UnlimitedAir{ false }; //unused
 	std::vector<GameScriptInventoryObject> InventoryObjects;
 	
 	static void Register(sol::state* state);
