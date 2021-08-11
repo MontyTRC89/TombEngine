@@ -2906,7 +2906,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 	MESH* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
-	float minDistance = SECTOR(1024);
+	float minDistance = std::numeric_limits<float>::max();
 
 	int action = TrInput & IN_ACTION;
 
