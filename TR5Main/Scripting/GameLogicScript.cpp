@@ -706,10 +706,10 @@ the following line each time an enemy is killed:
 	LevelVars.enemiesKilled = LevelVars.enemiesKilled + 1
 
 If the player saves the level after killing three, saves, and then reloads the save
-some time later, the values `3` will be put back into `Level.enemiesKilled.`
+some time later, the values `3` will be put back into `LevelVars.enemiesKilled.`
 
 __This table is emptied when a level is finished.__ If the player needs to be able
-to return to the level (e.g. like the Karnak level in *The Last Revelation*,
+to return to the level (like in the Karnak and Alexandria levels in *The Last Revelation*),
 you will need to use the @{GameVars} table, below.
 @table LevelVars
 */
