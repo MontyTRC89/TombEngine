@@ -411,7 +411,7 @@ namespace T5M::Renderer {
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 		OBJECT_INFO* obj = &Objects[0];
-		RendererRoom& const room = m_rooms[LaraItem->roomNumber];
+		RendererRoom const & room = m_rooms[LaraItem->roomNumber];
 		RendererItem* item = &m_items[Lara.itemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
@@ -520,7 +520,7 @@ namespace T5M::Renderer {
 			if (obj->biteOffset == -1 || !item->Item->firedWeapon)
 				continue;
 
-			RendererRoom& const room = m_rooms[item->Item->roomNumber];
+			RendererRoom const & room = m_rooms[item->Item->roomNumber];
 			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 			m_stItem.AmbientLight = room.AmbientLight;
@@ -783,7 +783,7 @@ namespace T5M::Renderer {
 		int firstBucket = (transparent ? 2 : 0);
 		int lastBucket = (transparent ? 4 : 2);
 
-		RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
+		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
 		//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 		m_stItem.World = effect->World;
@@ -834,7 +834,7 @@ namespace T5M::Renderer {
 
 		for (int i = 0; i < view.effectsToDraw.size(); i++) {
 			RendererEffect* effect = view.effectsToDraw[i];
-			RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
+			RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
 			OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
 			if (obj->drawRoutine && obj->loaded)
