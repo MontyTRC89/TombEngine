@@ -27,9 +27,9 @@ functions and callbacks for game specific scripts
 
 extern GameFlow* g_GameFlow;
 
-static void PlayAudioTrack(std::string const & trackName, bool looped)
+static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> looped)
 {
-	S_CDPlay(trackName, looped);
+	S_CDPlay(trackName, looped.value_or(false));
 }
 
 static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
@@ -166,7 +166,7 @@ Set the named track as the ambient track, and start playing it
 Start playing the named track.
 @function PlayAudioTrack
 @tparam string name of track (without file extension) to play
-@tparam bool loop if true, the track will loop; if false, it won't
+@tparam bool loop if true, the track will loop; if false, it won't (default: false)
 */
 	m_lua->set_function("PlayAudioTrack", &PlayAudioTrack);
 
