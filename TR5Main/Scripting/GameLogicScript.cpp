@@ -143,13 +143,13 @@ static void InventorySeparate(int slot)
 
 }
 
-int CalculateDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
+static int CalculateDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
 {
 	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 	return static_cast<int>(round(result));
 }
 
-int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
+static int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
 {
 	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 	return static_cast<int>(round(result));

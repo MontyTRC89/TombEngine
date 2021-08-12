@@ -120,7 +120,3 @@ public:
 	void								OnSave();
 	void								OnEnd();
 };
-
-int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-
