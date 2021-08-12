@@ -20,7 +20,7 @@
 #endif
 
 /***
-functions and callbacks for game specific scripts
+Functions and callbacks for level-specific logic scripts.
 @module gamelogic
 @pragma nostrip
 */
@@ -193,7 +193,7 @@ A count of 0 will add the "default" amount of that item
 For example, giving "zero" crossbow ammo would give the player
 10 instead, whereas giving "zero" medkits would give the player 1 medkit.
 @function GiveInvItem
-@tparam @{InvItem} item the item to be added
+@tparam InvItem item the item to be added
 @tparam int count the number of items to add (default: 0)
 */
 	m_lua->set_function("GiveInvItem", &InventoryAdd);
@@ -202,7 +202,7 @@ For example, giving "zero" crossbow ammo would give the player
 Remove x of a certain item from the inventory.
 As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item.
 @function TakeInvItem
-@tparam @{InvItem} item the item to be removed
+@tparam InvItem item the item to be removed
 @tparam int count the number of items to remove (default: 0)
 */
 	m_lua->set_function("TakeInvItem", &InventoryRemove);
@@ -210,8 +210,8 @@ As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item
 /***
 Get the amount the player holds of an item.
 @function GetInvItemCount
-@tparam @{InvItem} item the item to check
-@return the amount of the item the player has in the inventory
+@tparam InvItem item the item to check
+@treturn int the amount of the item the player has in the inventory
 */
 	m_lua->set_function("GetInvItemCount", &InventoryGetCount);
 
@@ -280,6 +280,7 @@ Calculate the distance between two positions.
 @treturn int the direct distance from one position to the other
 */
 	m_lua->set_function("CalculateDistance", &CalculateDistance);
+
 /***
 Calculate the horizontal distance between two positions.
 @function CalculateHorizontalDistance
