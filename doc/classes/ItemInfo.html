@@ -1,0 +1,660 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Members">Members</a></li>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AIObject.html">AIObject</a></li>
+  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="../classes/Color.html">Color</a></li>
+  <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
+  <li><strong>ItemInfo</strong></li>
+  <li><a href="../classes/Level.html">Level</a></li>
+  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../classes/Mirror.html">Mirror</a></li>
+  <li><a href="../classes/Position.html">Position</a></li>
+  <li><a href="../classes/Rotation.html">Rotation</a></li>
+  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
+  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+  <li><a href="../classes/InvItem.html">InvItem</a></li>
+  <li><a href="../classes/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/gameflow.html">gameflow</a></li>
+  <li><a href="../modules/gamelogic.html">gamelogic</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>ItemInfo</code></h1>
+<p>Represents any object inside the game world.</p>
+<p>Examples include statics, enemies, doors,
+pickups, and Lara herself.</p>
+
+
+<h2><a href="#Members">Members</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#ItemInfo.objectID">ItemInfo.objectID</a></td>
+	<td class="summary">(<a href="../classes/ObjID.html#">ObjID</a>) object ID</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.currentAnimState">ItemInfo.currentAnimState</a></td>
+	<td class="summary">(int) State of current animation</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.requiredAnimState">ItemInfo.requiredAnimState</a></td>
+	<td class="summary">(int) State of required animation</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.goalAnimState">ItemInfo.goalAnimState</a></td>
+	<td class="summary">(int) State of goal animation</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.animNumber">ItemInfo.animNumber</a></td>
+	<td class="summary">(int) animation number</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.frameNumber">ItemInfo.frameNumber</a></td>
+	<td class="summary">(int) frame number</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.HP">ItemInfo.HP</a></td>
+	<td class="summary">(int) HP (hit points/health points) of object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.OCB">ItemInfo.OCB</a></td>
+	<td class="summary">(int) OCB (object code bit) of object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.itemFlags">ItemInfo.itemFlags</a></td>
+	<td class="summary">(table) item flags of object (table of 8 ints)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.AIBits">ItemInfo.AIBits</a></td>
+	<td class="summary">(int) AIBits of object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.status">ItemInfo.status</a></td>
+	<td class="summary">(int) status of object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.hitStatus">ItemInfo.hitStatus</a></td>
+	<td class="summary">(bool) hit status of object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.active">ItemInfo.active</a></td>
+	<td class="summary">(bool) whether or not the object is active</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.room">ItemInfo.room</a></td>
+	<td class="summary">(int) room the item is in</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.pos">ItemInfo.pos</a></td>
+	<td class="summary">(<a href="../classes/Position.html#">Position</a>) position in level</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.rot">ItemInfo.rot</a></td>
+	<td class="summary">(<a href="../classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.name">ItemInfo.name</a></td>
+	<td class="summary">(string) unique string identifier.</td>
+	</tr>
+</table>
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#ItemInfo.newItem">ItemInfo.newItem ()</a></td>
+	<td class="summary">If you create items with this you NEED to give a position, room,
+and object number, and then call InitialiseItem before it will work.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.newItemTemporary">ItemInfo.newItemTemporary ()</a></td>
+	<td class="summary">Like above, but the returned variable controls the
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.newItem">ItemInfo.newItem (object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</a></td>
+	<td class="summary">For more information on each parameter, see the
+associated getters and setters.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.newItemTemporary">ItemInfo.newItemTemporary (see_above)</a></td>
+	<td class="summary">Like the above, but the returned variable controls the
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo.Init">ItemInfo.Init ()</a></td>
+	<td class="summary">Initialise an item.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo:EnableItem">ItemInfo:EnableItem ()</a></td>
+	<td class="summary">Enable the item</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ItemInfo:DisableItem">ItemInfo:DisableItem ()</a></td>
+	<td class="summary">Disable the item</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Members"></a>Members</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "ItemInfo.objectID"></a>
+    <strong>ItemInfo.objectID</strong>
+    </dt>
+    <dd>
+    (<a href="../classes/ObjID.html#">ObjID</a>) object ID
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.currentAnimState"></a>
+    <strong>ItemInfo.currentAnimState</strong>
+    </dt>
+    <dd>
+    (int) State of current animation
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.requiredAnimState"></a>
+    <strong>ItemInfo.requiredAnimState</strong>
+    </dt>
+    <dd>
+    (int) State of required animation
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.goalAnimState"></a>
+    <strong>ItemInfo.goalAnimState</strong>
+    </dt>
+    <dd>
+    (int) State of goal animation
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.animNumber"></a>
+    <strong>ItemInfo.animNumber</strong>
+    </dt>
+    <dd>
+    (int) animation number
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.frameNumber"></a>
+    <strong>ItemInfo.frameNumber</strong>
+    </dt>
+    <dd>
+    (int) frame number
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.HP"></a>
+    <strong>ItemInfo.HP</strong>
+    </dt>
+    <dd>
+    (int) HP (hit points/health points) of object
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.OCB"></a>
+    <strong>ItemInfo.OCB</strong>
+    </dt>
+    <dd>
+    (int) OCB (object code bit) of object
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.itemFlags"></a>
+    <strong>ItemInfo.itemFlags</strong>
+    </dt>
+    <dd>
+    (table) item flags of object (table of 8 ints)
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.AIBits"></a>
+    <strong>ItemInfo.AIBits</strong>
+    </dt>
+    <dd>
+    (int) AIBits of object.  Will be clamped to [0, 255]
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.status"></a>
+    <strong>ItemInfo.status</strong>
+    </dt>
+    <dd>
+    (int) status of object.
+ possible values:
+ 0 - not active
+ 1 - active
+ 2 - deactivated
+ 3 - invisible
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.hitStatus"></a>
+    <strong>ItemInfo.hitStatus</strong>
+    </dt>
+    <dd>
+    (bool) hit status of object
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.active"></a>
+    <strong>ItemInfo.active</strong>
+    </dt>
+    <dd>
+    (bool) whether or not the object is active
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.room"></a>
+    <strong>ItemInfo.room</strong>
+    </dt>
+    <dd>
+    (int) room the item is in
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.pos"></a>
+    <strong>ItemInfo.pos</strong>
+    </dt>
+    <dd>
+    (<a href="../classes/Position.html#">Position</a>) position in level
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.rot"></a>
+    <strong>ItemInfo.rot</strong>
+    </dt>
+    <dd>
+    (<a href="../classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.name"></a>
+    <strong>ItemInfo.name</strong>
+    </dt>
+    <dd>
+    (string) unique string identifier.
+ e.g. "door<em>back</em>room" or "cracked<em>greek</em>statue"
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    Methods
+    <dl class="function">
+    <dt>
+    <a name = "ItemInfo.newItem"></a>
+    <strong>ItemInfo.newItem ()</strong>
+    </dt>
+    <dd>
+    If you create items with this you NEED to give a position, room,
+and object number, and then call InitialiseItem before it will work.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.newItemTemporary"></a>
+    <strong>ItemInfo.newItemTemporary ()</strong>
+    </dt>
+    <dd>
+    Like above, but the returned variable controls the
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.newItem"></a>
+    <strong>ItemInfo.newItem (object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</strong>
+    </dt>
+    <dd>
+    For more information on each parameter, see the
+associated getters and setters.  If you do not know what to set for these,
+most can just be set to zero (see usage). See also the overload which
+takes no arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><a class="type" href="../classes/ObjID.html#">ObjID</a></span>
+         ID
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Lua name of the item
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+         position in level
+        </li>
+        <li><span class="parameter">rotation</span>
+            <span class="types"><a class="type" href="../classes/Rotation.html#">Rotation</a></span>
+         rotation about x, y, and z axes
+        </li>
+        <li><span class="parameter">room</span>
+            <span class="types"><span class="type">int</span></span>
+         room ID item is in
+        </li>
+        <li><span class="parameter">currentAnimState</span>
+            <span class="types"><span class="type">int</span></span>
+         current animation state
+        </li>
+        <li><span class="parameter">requiredAnimState</span>
+            <span class="types"><span class="type">int</span></span>
+         required animation state
+        </li>
+        <li><span class="parameter">goalAnimState</span>
+            <span class="types"><span class="type">int</span></span>
+         goal animation state
+        </li>
+        <li><span class="parameter">animNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         anim number
+        </li>
+        <li><span class="parameter">frameNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         frame number
+        </li>
+        <li><span class="parameter">hp</span>
+            <span class="types"><span class="type">int</span></span>
+         HP of item
+        </li>
+        <li><span class="parameter">OCB</span>
+            <span class="types"><span class="type">int</span></span>
+         ocb of item
+        </li>
+        <li><span class="parameter">itemFlags</span>
+            <span class="types"><span class="type">int</span></span>
+         item flags
+        </li>
+        <li><span class="parameter">AIBits</span>
+            <span class="types"><span class="type">int</span></span>
+         byte with AI bits
+        </li>
+        <li><span class="parameter">status</span>
+            <span class="types"><span class="type">int</span></span>
+         status of object
+        </li>
+        <li><span class="parameter">active</span>
+            <span class="types"><span class="type">bool</span></span>
+         is item active or not?
+        </li>
+        <li><span class="parameter">hitStatus</span>
+            <span class="types"><span class="type">bool</span></span>
+         hit status of object
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        reference to new ItemInfo object
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> item = ItemInfo.newItem(
+	PISTOLS_ITEM, <span class="comment">-- object id
+</span>	<span class="string">"test"</span>, <span class="comment">-- name
+</span>	Position.new(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
+	Rotation.new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
+	<span class="number">0</span>, <span class="comment">-- room
+</span>	<span class="number">0</span>, <span class="comment">-- currentAnimState
+</span>	<span class="number">0</span>, <span class="comment">-- requiredAnimState
+</span>	<span class="number">0</span>, <span class="comment">-- goalAnimState
+</span>	<span class="number">0</span>, <span class="comment">-- animNumber
+</span>	<span class="number">0</span>, <span class="comment">-- frameNumber
+</span>	<span class="number">0</span>, <span class="comment">-- HP
+</span>	<span class="number">0</span>, <span class="comment">-- OCB
+</span>	{<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>}, <span class="comment">-- itemFlags
+</span>	<span class="number">0</span>, <span class="comment">-- AIBits
+</span>	<span class="number">0</span>, <span class="comment">-- status
+</span>	<span class="keyword">false</span>, <span class="comment">-- active
+</span>	<span class="keyword">false</span>, <span class="comment">-- hitStatus
+</span>	)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.newItemTemporary"></a>
+    <strong>ItemInfo.newItemTemporary (see_above)</strong>
+    </dt>
+    <dd>
+    Like the above, but the returned variable controls the
+lifetime of the object (it will be destroyed when the variable goes
+out of scope).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">see_above</span>
+         same as above function
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo.Init"></a>
+    <strong>ItemInfo.Init ()</strong>
+    </dt>
+    <dd>
+    Initialise an item.
+Use this if you called new with no arguments
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo:EnableItem"></a>
+    <strong>ItemInfo:EnableItem ()</strong>
+    </dt>
+    <dd>
+    Enable the item
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ItemInfo:DisableItem"></a>
+    <strong>ItemInfo:DisableItem ()</strong>
+    </dt>
+    <dd>
+    Disable the item
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-08-12 20:14:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
