@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>gameflow</strong></li>
+  <li><a href="../modules/gamelogic.html">gamelogic</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AIObject.html">AIObject</a></li>
+  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="../classes/Color.html">Color</a></li>
+  <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="../classes/ItemInfo.html">ItemInfo</a></li>
+  <li><a href="../classes/Level.html">Level</a></li>
+  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../classes/Mirror.html">Mirror</a></li>
+  <li><a href="../classes/Position.html">Position</a></li>
+  <li><a href="../classes/Rotation.html">Rotation</a></li>
+  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
+  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+  <li><a href="../classes/InvItem.html">InvItem</a></li>
+  <li><a href="../classes/ObjID.html">ObjID</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>gameflow</code></h1>
+<p>Functions to be used in GameFlow.lua</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#AddLevel">AddLevel (level)</a></td>
+	<td class="summary">Add a level to the gameflow.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetIntroImagePath">SetIntroImagePath (path)</a></td>
+	<td class="summary">The path of the .jpg or .png image to show when loading the game.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetTitleScreenImagePath">SetTitleScreenImagePath (path)</a></td>
+	<td class="summary">The path of the .jpg or .png image to show in the background of the title screen.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetAudioTracks">SetAudioTracks (table)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetStrings">SetStrings (table)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames (table)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetSettings">SetSettings (table)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    Methods
+    <dl class="function">
+    <dt>
+    <a name = "AddLevel"></a>
+    <strong>AddLevel (level)</strong>
+    </dt>
+    <dd>
+    Add a level to the gameflow.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">level</span>
+         a level object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetIntroImagePath"></a>
+    <strong>SetIntroImagePath (path)</strong>
+    </dt>
+    <dd>
+    The path of the .jpg or .png image to show when loading the game.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         the path to the image, relative to the TombEngine exe
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetTitleScreenImagePath"></a>
+    <strong>SetTitleScreenImagePath (path)</strong>
+    </dt>
+    <dd>
+    The path of the .jpg or .png image to show in the background of the title screen.
+<strong>(not yet implemented)</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         the path to the image, relative to the TombEngine exe
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetAudioTracks"></a>
+    <strong>SetAudioTracks (table)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         array-style table with ??? objects
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetStrings"></a>
+    <strong>SetStrings (table)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         array-style table with strings
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetLanguageNames"></a>
+    <strong>SetLanguageNames (table)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         array-style table with TODO EXTRA INFO HERE
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetSettings"></a>
+    <strong>SetSettings (table)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         array-style table with TODO EXTRA INFO HERE
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-08-12 20:14:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
