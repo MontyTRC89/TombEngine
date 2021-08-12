@@ -116,7 +116,7 @@ public:
 	void								InitCallbacks();
 	void								OnStart();
 	void								OnLoad();
-	void								OnControlPhase();
+	void								OnControlPhase(float dt);
 	void								OnSave();
 	void								OnEnd();
 };

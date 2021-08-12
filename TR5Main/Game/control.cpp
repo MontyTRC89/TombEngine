@@ -189,9 +189,7 @@ extern int lockInput;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
-	g_GameScript->OnControlPhase();
 	short oldLaraFrame;
-
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
@@ -216,6 +214,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 	{
 		GlobalCounter++;
 
+		// This might not be the exact amount of time that has passed, but giving it a
+		// value of 1/30 keeps it in lock-step with the rest of the game logic,
+		// which assumes 30 iterations per second.
+		g_GameScript->OnControlPhase(1.0f/30.0f);
 		UpdateSky();
 
 		// Poll the keyboard and update input variables

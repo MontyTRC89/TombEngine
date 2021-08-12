@@ -650,8 +650,9 @@ void GameScript::ExecuteFunction(std::string const & name)
 	}
 }
 
-static void doCallback(sol::protected_function const & func) {
-	auto r = func();
+static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)  {
+	auto r = dt.has_value() ? func(dt) : func();
+
 	if (!r.valid())
 	{
 		sol::error err = r;
@@ -671,10 +672,10 @@ void GameScript::OnLoad()
 		doCallback(m_onLoad);
 }
 
-void GameScript::OnControlPhase()
+void GameScript::OnControlPhase(float dt)
 {
 	if(m_onControlPhase.valid())
-		doCallback(m_onControlPhase);
+		doCallback(m_onControlPhase, dt);
 }
 
 void GameScript::OnSave()
