@@ -604,7 +604,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			RumbleScreen();
 
 		// Play sound sources
-		for (int i = 0; i < g_Level.SoundSources.size(); i++)
+		for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
 		{
 			SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
 
@@ -931,7 +931,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	g_CollidedVolume = false;
 
 	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
-	for (int i = 0; i < room->triggerVolumes.size(); i++)
+	for (size_t i = 0; i < room->triggerVolumes.size(); i++)
 	{
 
 		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
@@ -3244,7 +3244,7 @@ void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
 
-	for (int i = 0; i < g_Level.Rooms.size(); i++)
+	for (size_t i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		ROOM_INFO *r = &g_Level.Rooms[i];
 
@@ -3266,7 +3266,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(r);
 
-			g_Renderer.flipRooms(i, r->flippedRoom);
+			g_Renderer.flipRooms(static_cast<short>(i), r->flippedRoom);
 
 			for (auto& fd : r->floor)
 				fd.Room = i;
@@ -3568,7 +3568,7 @@ int is_object_in_room(short roomNumber, short objectNumber)
 
 void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 {
-	short deltaAngle = angle - *rotation;
+	int deltaAngle = angle - *rotation;
 
 	if (deltaAngle < -32768)
 		deltaAngle += 65536;
@@ -3578,7 +3578,7 @@ void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 	if (outAngle)
 		*outAngle = deltaAngle;
 
-	*rotation += deltaAngle >> shift;
+	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
 int IsRoomOutside(int x, int y, int z)
@@ -3592,7 +3592,7 @@ int IsRoomOutside(int x, int y, int z)
 	if (OutsideRoomTable[xTable][zTable].size() == 0)
 		return -2;
 
-	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
+	for (size_t i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
