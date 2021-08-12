@@ -3576,7 +3576,7 @@ void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 		deltaAngle -= 65536;
 
 	if (outAngle)
-		*outAngle = deltaAngle;
+		*outAngle = static_cast<short>(deltaAngle);
 
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
