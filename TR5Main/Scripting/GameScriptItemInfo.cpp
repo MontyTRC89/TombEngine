@@ -87,7 +87,7 @@ takes no arguments.
 	@return reference to new ItemInfo object
 	@usage 
 	local item = ItemInfo.newItem(
-		PISTOLS_ITEM, -- object id
+		ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
