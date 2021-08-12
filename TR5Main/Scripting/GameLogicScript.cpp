@@ -633,9 +633,16 @@ std::unique_ptr<GameScriptSoundSourceInfo> GameScript::GetSoundSourceByName(std:
 
 void GameScript::AssignItemsAndLara()
 {
-	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false)); // do we need GetLara if we have this?
+	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false));
 }
 
+/*** Special objects
+@section specialobjects
+*/
+
+/*** An @{ItemInfo} representing Lara herself.
+@table Lara
+*/
 void GameScript::ResetVariables()
 {
 	(*m_lua)["Lara"] = NULL;

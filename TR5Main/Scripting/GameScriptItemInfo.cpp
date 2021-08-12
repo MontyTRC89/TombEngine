@@ -161,11 +161,6 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	return ptr;
 }
 
-std::unique_ptr<GameScriptItemInfo> static GetLara()
-{
-	return std::make_unique<GameScriptItemInfo>(Lara.itemNumber, false);
-}
-
 void GameScriptItemInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
@@ -185,10 +180,6 @@ void GameScriptItemInfo::Register(sol::state* state)
 		/// Disable the item
 		// @function ItemInfo:DisableItem
 		"Disable", &GameScriptItemInfo::DisableItem,
-
-		/// Create a GameScriptItemInfo representing the Lara object.
-		// @function ItemInfo.GetLara
-		"GetLara", GetLara,
 
 		/// (@{ObjID}) object ID 
 		// @mem objectID
