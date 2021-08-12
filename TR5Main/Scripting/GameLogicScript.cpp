@@ -107,14 +107,17 @@ static void Earthquake(int strength)
 	Camera.bounce = -strength;
 }
 
-// Inventory
 static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
 {
+	// If 0 is passed in, then the amount added will be the default amount
+	// for that pickup - i.e. the amount you would get from picking up the
+	// item in-game (e.g. 1 for medipacks, 12 for flares).
 	PickedUpObject(slot.m_pair.first, count.value_or(0));
 }
 
 static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
 {
+	// 0 is default for the same reason as in InventoryAdd.
 	RemoveObjectFromInventory(slot.m_pair.first, count.value_or(0));
 }
 
@@ -173,17 +176,22 @@ Start playing the named track.
 
 /***
 Add x of a certain item to the inventory.
+A count of 0 will add the "default" amount of that item
+(i.e. the amount the player would get from a pickup of that type).
+For example, giving "zero" crossbow ammo would give the player
+10 instead, whereas giving "zero" medkits would give the player 1 medkit.
 @function GiveInvItem
 @tparam @{InvItem} item the item to be added
-@tparam int count the number of items to add
+@tparam int count the number of items to add (default: 0)
 */
 	m_lua->set_function("GiveInvItem", &InventoryAdd);
 
 /***
 Remove x of a certain item from the inventory.
+As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item.
 @function TakeInvItem
 @tparam @{InvItem} item the item to be removed
-@tparam int count the number of items to remove
+@tparam int count the number of items to remove (default: 0)
 */
 	m_lua->set_function("TakeInvItem", &InventoryRemove);
 
