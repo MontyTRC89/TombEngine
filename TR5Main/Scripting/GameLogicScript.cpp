@@ -143,6 +143,18 @@ static void InventorySeparate(int slot)
 
 }
 
+int CalculateDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
+{
+	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
+	return static_cast<int>(round(result));
+}
+
+int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
+{
+	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
+	return static_cast<int>(round(result));
+}
+
 // Misc
 static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
 {
@@ -251,6 +263,9 @@ Get a SinkInfo by its name.
 @return a non-owning CameraInfo referencing the sink.
 */
 	m_lua->set_function("GetSinkByName", &GameScript::GetSinkByName, this);
+
+	m_lua->set_function("CalculateDistance", &CalculateDistance);
+	m_lua->set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
 	MakeReadOnlyTable("ObjID", kObjIDs);
 
@@ -603,17 +618,6 @@ void GameScript::ResetVariables()
 {
 	(*m_lua)["Lara"] = NULL;
 }
-
-int CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-{
-	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
-}
-
-int CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2)
-{
-	return sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
-}
-
 sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
 {
 	if (variables.find(key) == variables.end())
