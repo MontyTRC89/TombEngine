@@ -1967,7 +1967,7 @@ void insert_object_into_list(int num)
 
 void insert_object_into_list_v2(int num)
 {
-	unsigned __int64 opts = inventry_objects_list[convert_obj_to_invobj(num)].opts;
+	unsigned __int64 opts = inventry_objects_list[num].opts;
 
 	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
