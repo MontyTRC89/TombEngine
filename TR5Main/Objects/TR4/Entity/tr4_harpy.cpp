@@ -18,7 +18,14 @@ BITE_INFO harpyBite3 = { 0, 0, 0, 21 };
 BITE_INFO harpyAttack1 = { 0, 128, 0, 2 };
 BITE_INFO harpyAttack2 = { 0, 128, 0, 4 };
 
-static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
+#define STATE_HARPY_STOP				1
+#define STATE_HARPY_ATTACK				5
+#define STATE_HARPY_POISON_ATTACK		6
+#define STATE_HARPY_FLAME_ATTACK		8
+#define STATE_HARPY_FALLING				10
+#define STATE_HARPY_DEATH				11
+
+static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
@@ -36,11 +43,11 @@ static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->objectNumber = ID_ENERGY_BUBBLES;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
 		fx->flag1 = count;
-		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * count;
+		fx->frameNumber = Objects[fx->objectNumber].meshIndex + 2 * count;
 	}
 }
 
-static void HarpySparks1(short itemNumber, byte num, int size)
+static void TriggerHarpyFlame(short itemNumber, byte num, int size)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -59,16 +66,16 @@ static void HarpySparks1(short itemNumber, byte num, int size)
 		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
-		spark->y = 0;
 		spark->x = (GetRandomControl() & 0xF) - 8;
+		spark->y = 0;
 		spark->z = (GetRandomControl() & 0xF) - 8;
+		spark->xVel = (byte)GetRandomControl() - 128;
 		spark->yVel = 0;
-		spark->xVel = GetRandomControl() - 128;
+		spark->zVel = (byte)GetRandomControl() - 128;
 		spark->friction = 5;
 		spark->flags = 4762;
-		spark->zVel = GetRandomControl() - 128;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 		if (GetRandomControl() & 1)
 		{
@@ -88,7 +95,7 @@ static void HarpySparks1(short itemNumber, byte num, int size)
 	}
 }
 
-static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
+static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -124,7 +131,7 @@ static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 	}
 }
 
-static void HarpyAttack(ITEM_INFO* item, short itemNumber)
+static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 {
 	item->itemFlags[0]++;
 
@@ -144,7 +151,9 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 
 	GetJointAbsPosition(item, &pos2, harpyAttack2.meshNum);
 
-	if (item->itemFlags[0] >= 24 && item->itemFlags[0] <= 47 && (GetRandomControl() & 0x1F) < item->itemFlags[0])
+	if (item->itemFlags[0] >= 24 
+		&& item->itemFlags[0] <= 47 
+		&& (GetRandomControl() & 0x1F) < item->itemFlags[0])
 	{
 		for (int i = 0; i < 2; i++)
 		{
@@ -152,13 +161,13 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 			int dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
 			int dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
 
-			HarpySparks2(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
+			TriggerHarpySparks(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
 
 			dx = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
 			dy = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
 			dz = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
 
-			HarpySparks2(dx, dy, dz, 8 * (pos2.x - dx), 8 * (pos2.y - dy), 8 * (pos2.z - dz));
+			TriggerHarpySparks(dx, dy, dz, 8 * (pos2.x - dx), 8 * (pos2.y - dy), 8 * (pos2.z - dz));
 		}
 	}
 
@@ -171,11 +180,11 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 	{
 		if ((Wibble & 0xF) == 8)
 		{
-			HarpySparks1(itemNumber, 4, something);
+			TriggerHarpyFlame(itemNumber, 4, something);
 		}
 		else if (!(Wibble & 0xF))
 		{
-			HarpySparks1(itemNumber, 5, something);
+			TriggerHarpyFlame(itemNumber, 5, something);
 		}
 	}
 
@@ -207,7 +216,7 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 			pos.yRot = angles[0];
 			pos.zRot = 0;
 
-			HarpyBubbles(&pos, item->roomNumber, 2);
+			TriggerHarpyMissile(&pos, item->roomNumber, 2);
 		}
 		if (item->itemFlags[0] >= 61 && item->itemFlags[0] <= 65 && !(GlobalCounter & 1))
 		{
@@ -235,7 +244,7 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 			pos.yRot = angles[0];
 			pos.zRot = 0;
 
-			HarpyBubbles(&pos, item->roomNumber, 2);
+			TriggerHarpyMissile(&pos, item->roomNumber, 2);
 		}
 	}
 }
@@ -246,10 +255,10 @@ void InitialiseHarpy(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[ID_HARPY].animIndex + 4;
+	item->animNumber = Objects[item->objectNumber].animIndex + 4;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = STATE_HARPY_STOP;
+	item->currentAnimState = STATE_HARPY_STOP;
 }
 
 void HarpyControl(short itemNumber)
@@ -305,14 +314,14 @@ void HarpyControl(short itemNumber)
 		}
 		else
 		{
-			item->goalAnimState = 10;
+			item->goalAnimState = STATE_HARPY_FALLING;
 		}
 
 		if (item->pos.yPos >= item->floor)
 		{
 			item->pos.yPos = item->floor;
 			item->fallspeed = 0;
-			item->goalAnimState = 11;
+			item->goalAnimState = STATE_HARPY_DEATH;
 			item->gravityStatus = false;
 		}
 
@@ -320,7 +329,10 @@ void HarpyControl(short itemNumber)
 	}
 	else
 	{
-		creature->enemy = LaraItem;
+		if (item->aiBits)
+		{
+			GetAITarget(creature);
+		}
 
 		CREATURE_INFO* baddie = &BaddieSlots[0];
 		int minDistance = 0x7FFFFFFF;
@@ -354,7 +366,7 @@ void HarpyControl(short itemNumber)
 
 		if (creature->enemy != LaraItem)
 		{
-			//phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
+			phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
 		}
 
 		GetCreatureMood(item, &info, VIOLENT);
@@ -365,8 +377,8 @@ void HarpyControl(short itemNumber)
 		if (info.ahead)
 		{
 			joint0 = info.angle / 2;
-			joint1 = info.angle / 2;
-			joint0 = info.xAngle;
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle;
 		}
 
 		int height = 0;
@@ -374,7 +386,7 @@ void HarpyControl(short itemNumber)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case STATE_HARPY_STOP:
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(7);
 
@@ -394,7 +406,7 @@ void HarpyControl(short itemNumber)
 				{
 					if (info.distance < SQUARE(341))
 					{
-						item->goalAnimState = 6;
+						item->goalAnimState = STATE_HARPY_POISON_ATTACK;
 						break;
 					}
 					if (dy <= 1024 && info.distance < SQUARE(2048))
@@ -405,13 +417,16 @@ void HarpyControl(short itemNumber)
 				}
 			}
 
-			if (creature->enemy != LaraItem || !Targetable(item, &info) || info.distance <= SQUARE(3584) || !(GetRandomControl() & 1))
+			if (creature->enemy != LaraItem 
+				|| !Targetable(item, &info)
+				|| info.distance <= SQUARE(3584)
+				|| !(GetRandomControl() & 1))
 			{
 				item->goalAnimState = 2;
 				break;
 			}
 
-			item->goalAnimState = 8;
+			item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
 			item->itemFlags[0] = 0;
 			break;
 
@@ -437,9 +452,12 @@ void HarpyControl(short itemNumber)
 			{
 				if (info.distance >= SQUARE(341))
 				{
-					if (info.ahead && info.distance >= SQUARE(2048) && info.distance > SQUARE(3584) && GetRandomControl() & 1)
+					if (info.ahead 
+						&& info.distance >= SQUARE(2048) 
+						&& info.distance > SQUARE(3584) 
+						&& GetRandomControl() & 1)
 					{
-						item->goalAnimState = 8;
+						item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
 						item->itemFlags[0] = 0;
 					}
 					else
@@ -449,7 +467,7 @@ void HarpyControl(short itemNumber)
 				}
 				else
 				{
-					item->goalAnimState = 6;
+					item->goalAnimState = STATE_HARPY_POISON_ATTACK;
 				}
 
 				break;
@@ -469,7 +487,7 @@ void HarpyControl(short itemNumber)
 				if (info.ahead && info.distance >= SQUARE(2048) &&
 					info.distance > SQUARE(3584) && GetRandomControl() & 1)
 				{
-					item->goalAnimState = 8;
+					item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
 					item->itemFlags[0] = 0;
 				}
 				else
@@ -479,15 +497,16 @@ void HarpyControl(short itemNumber)
 			}
 			else
 			{
-				item->goalAnimState = 6;
+				item->goalAnimState = STATE_HARPY_POISON_ATTACK;
 			}
 
 			break;
 
 		case 3:
-			if (!creature->enemy || creature->enemy->pos.yPos < item->pos.yPos + 2048)
+			if (!creature->enemy 
+				|| creature->enemy->pos.yPos < item->pos.yPos + 2048)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_HARPY_STOP;
 			}
 
 			break;
@@ -497,7 +516,7 @@ void HarpyControl(short itemNumber)
 
 			if (info.ahead && info.distance < SQUARE(2048))
 			{
-				item->goalAnimState = 5;
+				item->goalAnimState = STATE_HARPY_ATTACK;
 			}
 			else
 			{
@@ -506,7 +525,7 @@ void HarpyControl(short itemNumber)
 
 			break;
 
-		case 5:
+		case STATE_HARPY_ATTACK:
 			creature->maximumTurn = ANGLE(2);
 			item->goalAnimState = 2;
 
@@ -540,7 +559,7 @@ void HarpyControl(short itemNumber)
 
 			break;
 
-		case 6:
+		case STATE_HARPY_POISON_ATTACK:
 			creature->maximumTurn = ANGLE(2);
 
 			if (creature->flags == 0
@@ -569,20 +588,19 @@ void HarpyControl(short itemNumber)
 
 			break;
 
-		case 8:
-			// Flame attack
-			HarpyAttack(item, itemNumber);
+		case STATE_HARPY_FLAME_ATTACK:
+			DoHarpyEffects(item, itemNumber);
 			break;
 
 		case 12:
 			if (info.ahead && info.distance > SQUARE(3584))
 			{
 				item->goalAnimState = 2;
-				item->requiredAnimState = 8;
+				item->requiredAnimState = STATE_HARPY_FLAME_ATTACK;
 			}
 			else if (GetRandomControl() & 1)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_HARPY_STOP;
 			}
 
 			break;
