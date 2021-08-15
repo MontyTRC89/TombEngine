@@ -6,7 +6,6 @@ void GameScriptSettings::Register(sol::state* lua)
 	lua->new_usertype<GameScriptSettings>("Settings",
 		"screenWidth", &GameScriptSettings::ScreenWidth,
 		"screenHeight", &GameScriptSettings::ScreenHeight,
-		"windowTitle", &GameScriptSettings::WindowTitle,
 		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
 		"windowed", &GameScriptSettings::Windowed,
 		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,

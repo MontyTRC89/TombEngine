@@ -35,6 +35,7 @@ public:
 	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
 	std::string						IntroImagePath{};
 	std::string						TitleScreenImagePath{};
+	std::string						WindowTitleKey{};
 
 	// Selected language set
 	std::vector<GameScriptLevel*>			Levels;
@@ -42,17 +43,18 @@ public:
 	GameFlow(sol::state* lua);
 	~GameFlow();
 
-	void								AddLevel(GameScriptLevel const& level);
-	void								SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
-	void								LoadGameFlowScript();
-	char const *						GetString(const char* id);
-	void								SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
-	void								SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
-	void								SetSettings(GameScriptSettings const & src);
-	GameScriptSettings*					GetSettings();
-	GameScriptLevel*					GetLevel(int id);
-	int									GetNumLevels();		
-	bool								DoGameflow();
-	void								SetIntroImagePath(std::string const& path);
-	void								SetTitleScreenImagePath(std::string const& path);
+	void							AddLevel(GameScriptLevel const& level);
+	void							SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
+	void							LoadGameFlowScript();
+	char const *					GetString(const char* id);
+	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
+	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
+	void							SetSettings(GameScriptSettings const & src);
+	GameScriptSettings*				GetSettings();
+	GameScriptLevel*				GetLevel(int id);
+	int								GetNumLevels();		
+	bool							DoGameflow();
+	void							SetIntroImagePath(std::string const& path);
+	void							SetTitleScreenImagePath(std::string const& path);
+	void							SetWindowTitleKey(std::string const& key);
 };
