@@ -35,7 +35,6 @@ public:
 	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
 	std::string						IntroImagePath{};
 	std::string						TitleScreenImagePath{};
-	std::string						WindowTitleKey{};
 
 	// Selected language set
 	std::vector<GameScriptLevel*>			Levels;
@@ -56,5 +55,4 @@ public:
 	bool							DoGameflow();
 	void							SetIntroImagePath(std::string const& path);
 	void							SetTitleScreenImagePath(std::string const& path);
-	void							SetWindowTitleKey(std::string const& key);
 };
