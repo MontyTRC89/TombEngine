@@ -65,13 +65,6 @@ __(not yet implemented)__
 */
 	m_lua->set_function("SetTitleScreenImagePath", &GameFlow::SetTitleScreenImagePath, this);
 
-/*** The string ID of the title of the game
-__(not yet implemented)__
-@function SetWindowTitleKey
-@tparam string string ID of the title as set in TombIDE.
-*/
-	m_lua->set_function("SetWindowTitleKey", &GameFlow::SetWindowTitleKey, this);
-
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -155,12 +148,6 @@ void GameFlow::SetIntroImagePath(std::string const& path)
 void GameFlow::SetTitleScreenImagePath(std::string const& path)
 {
 	TitleScreenImagePath = path;
-}
-
-void GameFlow::SetWindowTitleKey(std::string const& key)
-{
-	// TODO FIXME: I need to actually implement this
-	WindowTitleKey = key;
 }
 
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
