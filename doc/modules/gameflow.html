@@ -32,7 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#gameflow_lua">gameflow.lua </a></li>
+<li><a href="#settings_lua">settings.lua </a></li>
+<li><a href="#tracks_lua">tracks.lua </a></li>
+<li><a href="#strings_lua">strings.lua </a></li>
 </ul>
 
 
@@ -44,6 +47,7 @@
 <h2>Classes</h2>
 <ul class="nowrap">
   <li><a href="../classes/AIObject.html">AIObject</a></li>
+  <li><a href="../classes/AudioTrack.html">AudioTrack</a></li>
   <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
   <li><a href="../classes/Color.html">Color</a></li>
   <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
@@ -65,13 +69,13 @@
 <div id="content">
 
 <h1>Module <code>gameflow</code></h1>
-<p>Functions to be used in GameFlow.lua</p>
+<p>Files that will be run on game startup.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#gameflow_lua">gameflow.lua </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#AddLevel">AddLevel (level)</a></td>
@@ -86,28 +90,38 @@
 	<td class="summary">The path of the .jpg or .png image to show in the background of the title screen.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#SetWindowTitleKey">SetWindowTitleKey (string)</a></td>
+	<td class="summary">The string ID of the title of the game
+<strong>(not yet implemented)</strong></td>
+	</tr>
+</table>
+<h2><a href="#settings_lua">settings.lua </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#SetSettings">SetSettings (settings)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#tracks_lua">tracks.lua </a></h2>
+<table class="function_list">
+	<tr>
 	<td class="name" ><a href="#SetAudioTracks">SetAudioTracks (table)</a></td>
 	<td class="summary">
 
 </td>
 	</tr>
+</table>
+<h2><a href="#strings_lua">strings.lua </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" ><a href="#SetStrings">SetStrings (table)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="summary">Set string variable keys and their translations.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames (table)</a></td>
-	<td class="summary">
-
-</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetSettings">SetSettings (table)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="summary">Specify which translations in the strings table correspond to which languages.</td>
 	</tr>
 </table>
 
@@ -115,8 +129,13 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-    Methods
+    <h2 class="section-header has-description"><a name="gameflow_lua"></a>gameflow.lua </h2>
+
+          <div class="section-description">
+          These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
+They handle a game's 'metadata'; i.e., things such as level titles, loading screen paths, and default
+ambient tracks.
+          </div>
     <dl class="function">
     <dt>
     <a name = "AddLevel"></a>
@@ -129,6 +148,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">level</span>
+            <span class="types"><a class="type" href="../classes/Level.html#">Level</a></span>
          a level object
         </li>
     </ul>
@@ -182,6 +202,66 @@
 
 </dd>
     <dt>
+    <a name = "SetWindowTitleKey"></a>
+    <strong>SetWindowTitleKey (string)</strong>
+    </dt>
+    <dd>
+    The string ID of the title of the game
+<strong>(not yet implemented)</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         ID of the title as set in TombIDE.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="settings_lua"></a>settings.lua </h2>
+
+          <div class="section-description">
+          These functions are called in settings.lua, a file which holds your local settings.
+settings.lua shouldn't be bundled with any finished levels/games.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "SetSettings"></a>
+    <strong>SetSettings (settings)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">settings</span>
+            <span class="types"><span class="type">Settings</span></span>
+         a settings object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="tracks_lua"></a>tracks.lua </h2>
+
+          <div class="section-description">
+          <strong>TODO CONFIRM PROPER BEHAVIOUR</strong>
+          </div>
+    <dl class="function">
+    <dt>
     <a name = "SetAudioTracks"></a>
     <strong>SetAudioTracks (table)</strong>
     </dt>
@@ -195,7 +275,7 @@
     <ul>
         <li><span class="parameter">table</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         array-style table with ??? objects
+         array-style table with <a href="../classes/AudioTrack.html#">AudioTrack</a> objects
         </li>
     </ul>
 
@@ -204,14 +284,21 @@
 
 
 </dd>
+</dl>
+    <h2 class="section-header has-description"><a name="strings_lua"></a>strings.lua </h2>
+
+          <div class="section-description">
+
+These functions used in strings.lua, which is generated by TombIDE.
+You will not need to call them manually.
+          </div>
+    <dl class="function">
     <dt>
     <a name = "SetStrings"></a>
     <strong>SetStrings (table)</strong>
     </dt>
     <dd>
-
-
-
+    Set string variable keys and their translations.
 
 
     <h3>Parameters:</h3>
@@ -232,39 +319,14 @@
     <strong>SetLanguageNames (table)</strong>
     </dt>
     <dd>
-
-
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">table</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         array-style table with TODO EXTRA INFO HERE
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetSettings"></a>
-    <strong>SetSettings (table)</strong>
-    </dt>
-    <dd>
-
-
-
+    Specify which translations in the strings table correspond to which languages.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">table</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         array-style table with TODO EXTRA INFO HERE
+         array-style table with language names
         </li>
     </ul>
 
@@ -280,7 +342,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-12 20:14:56 </i>
+<i style="float:right;">Last updated 2021-08-15 23:07:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
