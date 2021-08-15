@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Members">Members</a></li>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AIObject.html">AIObject</a></li>
+  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="../classes/Color.html">Color</a></li>
+  <li><strong>InventoryObject</strong></li>
+  <li><a href="../classes/ItemInfo.html">ItemInfo</a></li>
+  <li><a href="../classes/Level.html">Level</a></li>
+  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../classes/Mirror.html">Mirror</a></li>
+  <li><a href="../classes/Position.html">Position</a></li>
+  <li><a href="../classes/Rotation.html">Rotation</a></li>
+  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
+  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+  <li><a href="../classes/InvItem.html">InvItem</a></li>
+  <li><a href="../classes/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/gameflow.html">gameflow</a></li>
+  <li><a href="../modules/gamelogic.html">gamelogic</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>InventoryObject</code></h1>
+<p>Represents the properties of an object as it appears in the inventory.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Members">Members</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#InventoryObject.nameKey">InventoryObject.nameKey</a></td>
+	<td class="summary">(string) string key for the item's (localised) name.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.slot">InventoryObject.slot</a></td>
+	<td class="summary">(<a href="../classes/InvItem.html#">InvItem</a>) slot of item whose inventory display properties you wish to change</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.yOffset">InventoryObject.yOffset</a></td>
+	<td class="summary">(float) y-axis offset (positive values will move the item lower).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.scale">InventoryObject.scale</a></td>
+	<td class="summary">(float) Item's size when displayed in the inventory as a multiple of its "regular" size.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.rot">InventoryObject.rot</a></td>
+	<td class="summary">(<a href="../classes/Rotation.html#">Rotation</a>) Item's rotation about its origin when displayed in the inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.rotAxisWhenCurrent">InventoryObject.rotAxisWhenCurrent</a></td>
+	<td class="summary">(RotationAxis) Axis to rotate about when the item is being looked at in the inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.meshBits">InventoryObject.meshBits</a></td>
+	<td class="summary">(int) <strong>Not currently implemented</strong> (will have no effect regardless of what you set it to)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.action">InventoryObject.action</a></td>
+	<td class="summary">(ItemAction) What can the player do with the item?</td>
+	</tr>
+</table>
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#InventoryObject.new">InventoryObject.new ()</a></td>
+	<td class="summary">Create an inventoryObject item.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#InventoryObject.new">InventoryObject.new (nameKey, slot, yOffset, scale, rot, rotAxisWhenCurrent, meshBits, action)</a></td>
+	<td class="summary">For more information on each parameter, see the
+associated getters and setters.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Members"></a>Members</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "InventoryObject.nameKey"></a>
+    <strong>InventoryObject.nameKey</strong>
+    </dt>
+    <dd>
+    (string) string key for the item's (localised) name.  Corresponds to an entry in strings.lua.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.slot"></a>
+    <strong>InventoryObject.slot</strong>
+    </dt>
+    <dd>
+    (<a href="../classes/InvItem.html#">InvItem</a>) slot of item whose inventory display properties you wish to change
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.yOffset"></a>
+    <strong>InventoryObject.yOffset</strong>
+    </dt>
+    <dd>
+    (float) y-axis offset (positive values will move the item lower).
+A value of about 100 will cause the item to display directly below its usual position.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.scale"></a>
+    <strong>InventoryObject.scale</strong>
+    </dt>
+    <dd>
+    (float) Item's size when displayed in the inventory as a multiple of its "regular" size.
+A value of 0.5 will cause the item to render at half the size,
+and a value of 2 will cause the item to render at twice the size.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.rot"></a>
+    <strong>InventoryObject.rot</strong>
+    </dt>
+    <dd>
+    (<a href="../classes/Rotation.html#">Rotation</a>) Item's rotation about its origin when displayed in the inventory.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.rotAxisWhenCurrent"></a>
+    <strong>InventoryObject.rotAxisWhenCurrent</strong>
+    </dt>
+    <dd>
+    (RotationAxis) Axis to rotate about when the item is being looked at in the inventory.
+Note that this is entirely separate from the <a href="../classes/InventoryObject.html#InventoryObject.rot">rot</a> field described above.
+Must be RotationAxis.X, RotationAxis.Y or RotationAxis.Z.
+e.g. <code>myItem.rotAxisWhenCurrent = RotationAxis.X</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.meshBits"></a>
+    <strong>InventoryObject.meshBits</strong>
+    </dt>
+    <dd>
+    (int) <strong>Not currently implemented</strong> (will have no effect regardless of what you set it to)
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.action"></a>
+    <strong>InventoryObject.action</strong>
+    </dt>
+    <dd>
+    (ItemAction) What can the player do with the item?
+Must be one of:</p>
+<pre><code>EQUIP
+USE
+EXAMINE
+</code></pre>
+<p>e.g. <code>myItem.action = ItemAction.EXAMINE</code>
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    Methods
+    <dl class="function">
+    <dt>
+    <a name = "InventoryObject.new"></a>
+    <strong>InventoryObject.new ()</strong>
+    </dt>
+    <dd>
+    Create an inventoryObject item.  Use this if you want to specify property values later later.
+The default property values are not disclosed here, since at the time of writing, they are subject to change.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        an InventoryObject
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "InventoryObject.new"></a>
+    <strong>InventoryObject.new (nameKey, slot, yOffset, scale, rot, rotAxisWhenCurrent, meshBits, action)</strong>
+    </dt>
+    <dd>
+    For more information on each parameter, see the
+associated getters and setters.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">nameKey</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         name key
+        </li>
+        <li><span class="parameter">slot</span>
+            <span class="types"><a class="type" href="../classes/InvItem.html#">InvItem</a></span>
+         slot of inventory object to change
+        </li>
+        <li><span class="parameter">yOffset</span>
+            <span class="types"><span class="type">int</span></span>
+         y-axis offset (positive values move the item down)
+        </li>
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">float</span></span>
+         item size (1 being standard size)
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../classes/Rotation.html#">Rotation</a></span>
+         rotation about x, y, and z axes
+        </li>
+        <li><span class="parameter">rotAxisWhenCurrent</span>
+            <span class="types"><span class="type">RotationAxis</span></span>
+         axis to rotate around in inventory
+        </li>
+        <li><span class="parameter">meshBits</span>
+            <span class="types"><span class="type">int</span></span>
+         not currently implemented
+        </li>
+        <li><span class="parameter">action</span>
+            <span class="types"><span class="type">ItemAction</span></span>
+         is this usable, equippable, or examinable?
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        an InventoryObject
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-08-12 20:14:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
