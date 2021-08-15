@@ -192,8 +192,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		throw;
 	}
 
-	luaState.set_function("CalculateDistance", &CalculateDistance);
-	luaState.set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 	// Initialise chunks for savegames
 	SaveGame::Start();
 

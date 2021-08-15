@@ -57,7 +57,7 @@ namespace T5M {
 
 			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room) {
 				using namespace DirectX::SimpleMath;
-				SmokeParticle& const s = getFreeSmokeParticle();
+				SmokeParticle & s = getFreeSmokeParticle();
 				s = {};
 				s.position = pos;
 				s.age = 0;
