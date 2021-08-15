@@ -116,11 +116,7 @@ public:
 	void								InitCallbacks();
 	void								OnStart();
 	void								OnLoad();
-	void								OnControlPhase();
+	void								OnControlPhase(float dt);
 	void								OnSave();
 	void								OnEnd();
 };
-
-int									CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-int									CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
-

@@ -17,7 +17,7 @@
 #endif
 
 /***
-functions for gameflow
+Functions to be used in GameFlow.lua
 @module gameflow
 @pragma nostrip
 */

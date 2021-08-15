@@ -33,7 +33,7 @@ namespace T5M::Renderer
 
 	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
 	{
-		RendererRoom &const room = m_rooms[roomNumber];
+		RendererRoom const & room = m_rooms[roomNumber];
 		ROOM_INFO *r = room.Room;
 
 		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
