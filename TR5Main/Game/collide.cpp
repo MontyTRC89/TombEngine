@@ -1352,10 +1352,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		tfLocation = LaraItem->location;
 		tcLocation = LaraItem->location;
+		tRoomNumber = roomNumber;
 	}
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
 	DoFloorThings(floor, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1437,6 +1439,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
+	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
 	DoFloorThings(floor, x, yTop, z);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
