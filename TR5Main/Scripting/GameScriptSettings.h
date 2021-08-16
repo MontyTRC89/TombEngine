@@ -15,7 +15,6 @@ struct GameScriptSettings
 	bool EnableDynamicShadows;
 	bool EnableWaterCaustics;
 	bool Windowed;
-	std::string WindowTitle;
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;

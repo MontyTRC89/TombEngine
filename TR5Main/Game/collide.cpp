@@ -1352,10 +1352,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		tfLocation = LaraItem->location;
 		tcLocation = LaraItem->location;
+		tRoomNumber = roomNumber;
 	}
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
 	DoFloorThings(floor, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1437,6 +1439,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
+	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
 	DoFloorThings(floor, x, yTop, z);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
@@ -2416,7 +2419,7 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 {
 	Vector2 vect;
 
-	int xGrid = xPos - ((xPos) % WALL_SIZE);
+	int xGrid = xPos - (xPos % WALL_SIZE);
 	int zGrid = zPos - (zPos % WALL_SIZE);
 
 	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
@@ -2432,7 +2435,7 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 		zPos = zGrid + radius;
 		break;
 	case WEST:
-		xPos = xGrid - (WALL_SIZE - 1) + radius;
+		xPos = xGrid + radius;
 		break;
 	}
 
