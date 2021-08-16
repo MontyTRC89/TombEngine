@@ -35,10 +35,6 @@ extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
-bool BlockAllInput = true;
-int skipLoop = -1;
-int skipFrames = 2;
-int lockInput = 0;
 
 #if _DEBUG
 string commit;
@@ -125,7 +121,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			//DB_Log(6, "WM_ACTIVE");
-			BlockAllInput = false;
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
@@ -137,7 +132,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		BlockAllInput = true;
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
