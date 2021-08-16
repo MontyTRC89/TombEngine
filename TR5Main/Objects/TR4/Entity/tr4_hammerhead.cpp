@@ -15,6 +15,7 @@
 #define STATE_HAMMERHEAD_SWIM_FAST  2
 #define STATE_HAMMERHEAD_ATTACK     3
 #define STATE_HAMMERHEAD_DEATH      5
+#define STATE_HAMMERHEAD_KILL       6
 
 BITE_INFO HammerheadAttack = { 0, 0, 0, 12 };
 
@@ -60,7 +61,7 @@ void HammerheadControl(short itemNumber)
             switch (item->currentAnimState)
             {
             case STATE_HAMMERHEAD_STOP:
-                item->goalAnimState = 1;
+                item->goalAnimState = STATE_HAMMERHEAD_SWIM_SLOW;
                 creature->flags = 0;
                 break;
 
@@ -110,7 +111,9 @@ void HammerheadControl(short itemNumber)
             CreatureJoint(item, 2, -2 * angle);
             CreatureJoint(item, 3, 2 * angle);
 
-            if (item->currentAnimState == 6)
+            // NOTE: in TR2 shark there was a call to CreatureKill with special kill anim
+            // Hammerhead seems to not have it in original code but this check is still there as a leftover
+            if (item->currentAnimState == STATE_HAMMERHEAD_KILL)
             {
                 AnimateItem(item);
             }

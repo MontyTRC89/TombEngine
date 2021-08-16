@@ -126,6 +126,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->waterCreature = true;
 		obj->zoneType = ZONE_WATER;
 	}
 
