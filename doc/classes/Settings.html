@@ -45,11 +45,11 @@
   <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
   <li><a href="../classes/ItemInfo.html">ItemInfo</a></li>
   <li><a href="../classes/Level.html">Level</a></li>
-  <li><strong>MeshInfo</strong></li>
+  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
   <li><a href="../classes/Mirror.html">Mirror</a></li>
   <li><a href="../classes/Position.html">Position</a></li>
   <li><a href="../classes/Rotation.html">Rotation</a></li>
-  <li><a href="../classes/Settings.html">Settings</a></li>
+  <li><strong>Settings</strong></li>
   <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
   <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
   <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
@@ -66,8 +66,8 @@
 
 <div id="content">
 
-<h1>Class <code>MeshInfo</code></h1>
-<p>Mesh info</p>
+<h1>Class <code>Settings</code></h1>
+<p>Settings that will be run on game startup.</p>
 <p>
 
 </p>
@@ -76,28 +76,8 @@
 <h2><a href="#Members">Members</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#MeshInfo.pos">MeshInfo.pos</a></td>
-	<td class="summary">(<a href="../classes/Position.html#">Position</a>) position in level</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#MeshInfo.yRot">MeshInfo.yRot</a></td>
-	<td class="summary">(int) y-axis rotation</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#MeshInfo.name">MeshInfo.name</a></td>
-	<td class="summary">(string) unique string identifier.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#MeshInfo.staticNumber">MeshInfo.staticNumber</a></td>
-	<td class="summary">(int) static number</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#MeshInfo.color">MeshInfo.color</a></td>
-	<td class="summary">(<a href="../classes/Color.html#">Color</a>) color of mesh</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#MeshInfo.HP">MeshInfo.HP</a></td>
-	<td class="summary">(int) hp</td>
+	<td class="name" ><a href="#Settings.errorMode">Settings.errorMode</a></td>
+	<td class="summary">How should the application respond to script errors?</td>
 	</tr>
 </table>
 
@@ -109,82 +89,25 @@
 
     <dl class="function">
     <dt>
-    <a name = "MeshInfo.pos"></a>
-    <strong>MeshInfo.pos</strong>
+    <a name = "Settings.errorMode"></a>
+    <strong>Settings.errorMode</strong>
     </dt>
     <dd>
-    (<a href="../classes/Position.html#">Position</a>) position in level
+    How should the application respond to script errors?
+Must be one of the following:
+<code>ErrorMode.TERMINATE</code> - print to the log file and terminate the application when any script error is hit.
+This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
 
+<p><code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
+Choose this one if terminating the application is too much for you. Note that unrecoverable errors will still terminate
+the application.</p>
 
+<p><code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
+Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
+working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
+an invalid argument.</p>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "MeshInfo.yRot"></a>
-    <strong>MeshInfo.yRot</strong>
-    </dt>
-    <dd>
-    (int) y-axis rotation
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "MeshInfo.name"></a>
-    <strong>MeshInfo.name</strong>
-    </dt>
-    <dd>
-    (string) unique string identifier.
- e.g. "door<em>back</em>room" or "cracked<em>greek</em>statue"
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "MeshInfo.staticNumber"></a>
-    <strong>MeshInfo.staticNumber</strong>
-    </dt>
-    <dd>
-    (int) static number
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "MeshInfo.color"></a>
-    <strong>MeshInfo.color</strong>
-    </dt>
-    <dd>
-    (<a href="../classes/Color.html#">Color</a>) color of mesh
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "MeshInfo.HP"></a>
-    <strong>MeshInfo.HP</strong>
-    </dt>
-    <dd>
-    (int) hp
+<p>As with <code>ErrorMode.WARN</code>, unrecoverable errors will still terminate the application.
 
 
 
