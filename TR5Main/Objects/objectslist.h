@@ -92,7 +92,7 @@ enum GAME_OBJECT_ID : short
 	ID_BAT,					// TR4 - OK
 	ID_SPHINX,				// TR4 - OK
 	ID_WILD_BOAR,			// TR4 - OK
-	ID_HARPY,
+	ID_HARPY,				// TR4 - OK
 	ID_BIG_SCORPION,		// TR4 - OK
 	ID_SMALL_SCORPION,		// TR4 - OK
 	ID_BABOON_NORMAL,
@@ -108,8 +108,8 @@ enum GAME_OBJECT_ID : short
 	ID_SPIDERS_EMITTER,
 	ID_LION,
 	ID_DOBERMAN,
-	ID_HAMMERHEAD,
-	ID_CROCODILE_GOD, // TR4 Citadel Gate Mutant
+	ID_HAMMERHEAD,			// TR4 - OK
+	ID_CROCODILE_GOD,		// TR4 Citadel Gate Mutant
 	ID_LOCUSTS_EMITTER,
 
 	/* Humans */

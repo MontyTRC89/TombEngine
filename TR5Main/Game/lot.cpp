@@ -196,6 +196,7 @@ void InitialiseSlot(short itemNum, short slot)
 			// Can swim
 			creature->LOT.step = SECTOR(20);
 			creature->LOT.drop = -SECTOR(20);
+			creature->LOT.zone = ZONE_WATER;
 
 			if (item->objectNumber == ID_CROCODILE)
 			{
@@ -213,7 +214,6 @@ void InitialiseSlot(short itemNum, short slot)
 				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
 
-			creature->LOT.zone = ZONE_WATER;
 			break;
 
 		case ZONE_HUMAN_CLASSIC:
