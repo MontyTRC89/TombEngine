@@ -463,12 +463,16 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
+		const short pushableBoundsExtents = 200;
+
 		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-		PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
-		PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
-		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
-		PushableBlockBounds.boundingBox.Z2 = 0;
+		PushableBlockBounds.boundingBox.X1 = bounds->X1 - pushableBoundsExtents;
+		PushableBlockBounds.boundingBox.X2 = bounds->X2 + pushableBoundsExtents;
+		PushableBlockBounds.boundingBox.Y1 = bounds->Y1;
+		PushableBlockBounds.boundingBox.Y2 = bounds->Y2;
+		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - pushableBoundsExtents;
+		PushableBlockBounds.boundingBox.Z2 = bounds->Z2 + pushableBoundsExtents;
 
 		short rot = item->pos.yRot;
 		item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
