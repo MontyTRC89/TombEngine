@@ -135,8 +135,9 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.targetAngle = ANGLE(90.0f);
+	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.laraNode = LM_TORSO;
 }
 
 void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
@@ -149,6 +150,7 @@ void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.laraNode = LM_TORSO;
 }
 
 void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
