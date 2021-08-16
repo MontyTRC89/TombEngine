@@ -110,6 +110,7 @@ You will not need to call them manually.
 	MakeReadOnlyTable("InvItem", kInventorySlots);
 	MakeReadOnlyTable("RotationAxis", kRotAxes);
 	MakeReadOnlyTable("ItemAction", kItemActions);
+	MakeReadOnlyTable("ErrorMode", kErrorModes);
 }
 
 GameFlow::~GameFlow()
