@@ -507,5 +507,6 @@ void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.laraNode = LM_HIPS;	//forces the camera to follow Lara instead of snapping
 }
 
