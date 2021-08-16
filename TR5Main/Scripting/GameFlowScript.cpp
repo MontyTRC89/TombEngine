@@ -176,8 +176,10 @@ void GameFlow::LoadGameFlowScript()
 
 char const * GameFlow::GetString(const char* id)
 {
-	if (m_translationsMap.find(id) == m_translationsMap.end())
+	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	{
 		return "String not found";
+	}
 	else
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
