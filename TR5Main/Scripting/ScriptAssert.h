@@ -13,4 +13,4 @@ void ScriptWarn(std::string const& msg);
 
 bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> forceMode = std::nullopt);
 
-void SetErrorMode(std::string const& mode);
+void SetErrorMode(ERROR_MODE mode);
