@@ -55,7 +55,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\boost\libs</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
