@@ -11,7 +11,7 @@
     <LocalDebuggerCommandArguments>/debug</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>TR5Main.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>TombEngine.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\Build\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
