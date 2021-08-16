@@ -472,7 +472,7 @@ void GameScriptItemInfo::SetRoom(short room)
 {	
 	if (room < 0 || static_cast<size_t>(room) >= g_Level.Rooms.size())
 	{
-		ScriptAssert(false, "Invalid room number: " + room);
+		ScriptAssert(false, std::string{ "Invalid room number: " } + std::to_string(room));
 		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
 		return;
 	}
