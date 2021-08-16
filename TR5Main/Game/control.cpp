@@ -182,10 +182,6 @@ extern short FXType;
 extern unordered_map<string, AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-extern bool BlockAllInput;
-extern int skipLoop;
-extern int skipFrames;
-extern int lockInput;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -202,15 +198,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	if (skipLoop != -1)
-	{
-		if (skipLoop == 0)
-			return GAME_STATUS_NONE;
-		else
-			oldLaraFrame = LaraItem->frameNumber;
-	}
-
-	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= skipFrames)
+	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
 
@@ -226,15 +214,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if (S_UpdateInput() == -1)
 				return GAME_STATUS_NONE;
 		}
-
-		if (BlockAllInput)
-		{
-			DbInput = 0;
-			TrInput = 0;
-		}
-
-		if (lockInput)
-			TrInput = lockInput;
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)
@@ -630,12 +609,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Update timers
 		HealthBarTimer--;
 		GameTimer++;
-	}
-
-	if (skipLoop != -1)
-	{
-		if (oldLaraFrame != LaraItem->frameNumber)
-			--skipLoop;
 	}
 
 	return GAME_STATUS_NONE;
