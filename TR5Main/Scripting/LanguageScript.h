@@ -1,6 +1,7 @@
 #pragma once
 
 // Define std::string ids
+#define STRING_WINDOW_TITLE				"window_title"
 #define STRING_PASSPORT					"passport"
 #define STRING_LARA_HOME				"lara_home"
 #define STRING_CONTROLS					"controls"

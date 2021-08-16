@@ -1,6 +1,16 @@
 #include "framework.h"
 #include "GameScriptAudioTrack.h"
 
+/***
+Metadata about audio tracks (music and ambience).
+
+__In progress__ 
+
+@classmod AudioTrack
+@pragma nostrip
+*/
+// TODO FIXME find out what is meant to happen and whether we need this or not
+
 GameScriptAudioTrack::GameScriptAudioTrack(std::string const & trackName, bool looped)
 {
 	this->trackName = trackName;

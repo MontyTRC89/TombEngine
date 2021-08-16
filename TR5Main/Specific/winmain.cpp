@@ -246,7 +246,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
-		g_GameFlow->GetSettings()->WindowTitle.c_str(),
+		g_GameFlow->GetString(STRING_WINDOW_TITLE),
 		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, // TODO: change this to center of screen !!!
 		CW_USEDEFAULT,
