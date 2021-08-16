@@ -14,7 +14,7 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config)
 	switch (level)
 	{
 	case LogLevel::Error:
-		std::cerr << "Error: " << str << "\n";
+		std::cout << "Error: " << str << "\n";
 		// Monty code goes here
 		break;
 	case LogLevel::Warning:
