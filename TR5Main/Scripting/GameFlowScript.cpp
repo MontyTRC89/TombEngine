@@ -197,7 +197,7 @@ void GameFlow::LoadGameFlowScript()
 	SetErrorMode(GetSettings()->ErrorMode);
 }
 
-char const * GameFlow::GetString(const char* id)
+char const * GameFlow::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{
@@ -217,7 +217,7 @@ GameScriptLevel* GameFlow::GetLevel(int id)
 	return Levels[id];
 }
 
-int	GameFlow::GetNumLevels()
+int	GameFlow::GetNumLevels() const
 {
 	return Levels.size();
 }
