@@ -141,6 +141,10 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+int main() {
+	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLine(), SW_SHOW);
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	int RetVal;
@@ -149,9 +153,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Process the command line
 	bool setup = false;
 
-	//TrLevel* level = new TrLevel(string("Data\\andrea1.t5m"));
-	//level->Load();
-	
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);

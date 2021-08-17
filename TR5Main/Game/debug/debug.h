@@ -6,6 +6,7 @@ constexpr bool DebugBuild = false;
 #endif
 #include <stdexcept>
 #include <string_view>
+#include <iostream>
 
 inline void assertion(const bool& expr,const char* msg) noexcept {
 	if constexpr (DebugBuild) {
