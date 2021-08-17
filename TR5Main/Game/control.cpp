@@ -179,7 +179,6 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-extern unordered_map<string, AudioTrack> g_AudioTracks;
 using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
