@@ -27,8 +27,8 @@ struct LASER_HEAD_STRUCT
 {
 	PHD_VECTOR target;
 	ENERGY_ARC* fireArcs[2];
-	ENERGY_ARC* chargeArcs[8];
-	bool LOS;
+	ENERGY_ARC* chargeArcs[4];
+	bool LOS[2];
 	byte byte1;
 	byte byte2;
 	short xRot;
@@ -38,8 +38,8 @@ struct LASER_HEAD_STRUCT
 LASER_HEAD_STRUCT LaserHeadData;
 
 PHD_VECTOR LaserHeadBasePosition = { 0, -640, 0 };
-PHD_VECTOR GuardianChargePositions[8];
-int GuardianMeshes[5] = { 1,0,0,0,2 };
+PHD_VECTOR GuardianChargePositions[4] = { {-188, -832, 440}, {188, -832, -440}, {440, -832, 188}, {-440, -832, -188} };
+int GuardianMeshes[5] = { 1, 2 };
 
 static void TriggerLaserHeadSparks(PHD_VECTOR* pos, int count, byte r, byte g, byte b, int unk)
 {
@@ -105,10 +105,10 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 		if (item->itemFlags[3] & 0x0F && arc != NULL)
 		{
-			arc->r = 0;
+			arc->r = b;
 			arc->g = g;
-			arc->b = b;
-			//arc->segmentSize = 50;
+			arc->b = 0;
+			arc->life = 50;
 		}
 		else
 		{
@@ -116,15 +116,15 @@ static void LaserHeadCharge(ITEM_INFO* item)
 			src.y = GuardianChargePositions[i].y;
 			src.z = GuardianChargePositions[i].z;
 			GetJointAbsPosition(&g_Level.Items[creature->baseItem], &src, 0);
-			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 255, 255, 255, 256, 90, 64, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
+			LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 		}
 	}
 
 	if (GlobalCounter & 1)
 	{
-		for (int i = 0; i < 5; i += 4)
+		for (int i = 0; i < 2; i++)
 		{
-			if (2 * GuardianMeshes[i] & item->meshBits)
+			if (1 << GuardianMeshes[i] & item->meshBits)
 			{
 				src.x = 0;
 				src.y = 0;
@@ -166,15 +166,17 @@ void InitialiseLaserHead(short itemNumber)
 	}
 
 	short rotation = 0;
-	int j = 0;
-	for (int i = 0; i < g_Level.NumItems; i++)
+	for (int j = 0; j < 8; j++)
 	{
-		if (g_Level.Items[i].objectNumber == ID_LASERHEAD_TENTACLE && j < 8)
+		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			info->tentacles[j] = i;
-			rotation += ANGLE(45);
-			j++;
+			if (g_Level.Items[i].objectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].pos.yRot == rotation)
+			{
+				info->tentacles[j] = i;
+				break;
+			}
 		}
+		rotation += ANGLE(45);
 	}
 
 	for (int i = 0; i < g_Level.NumItems; i++)
@@ -259,7 +261,8 @@ void LaserHeadControl(short itemNumber)
 
 				ExplodeItemNode(item, 0, 0, 128);
 
-				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, 3, -2, 2, item->roomNumber);
+				item->pos.yPos -= 256;
+				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 2, item->roomNumber);
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, 0, 2, item->roomNumber);
 				
 				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0, 0);
@@ -297,7 +300,7 @@ void LaserHeadControl(short itemNumber)
 				dest.x = 0;
 				dest.y = 0;
 				dest.z = 0;
-				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LM_LHAND);
+				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LM_HEAD);
 
 				// Calculate distance between guardian and Lara
 				int distance = sqrt(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
@@ -326,9 +329,8 @@ void LaserHeadControl(short itemNumber)
 				{
 					// Randomly turn head try to finding Lara
 					bool condition = !(GetRandomControl() & 0x7F) && item->triggerFlags > 150;
-					item->itemFlags[3]--;
 
-					if (item->itemFlags[3] <= 0 || condition)
+					if (item->itemFlags[3]-- <= 0 || condition)
 					{
 						short xRot = (GetRandomControl() / 4) - 4096;
 						short yRot;
@@ -417,19 +419,18 @@ void LaserHeadControl(short itemNumber)
 			}
 			else
 			{
-				bool condition = false;
 				if (item->itemFlags[3] <= 90)
 				{
 					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->pos, 0);
 					LaserHeadCharge(item);
 					item->itemFlags[3]++;
-					condition = item->itemFlags[3] >= 90;
 				}
 
-				if (item->itemFlags[3] > 90 || condition)
+				if (item->itemFlags[3] >= 90)
 				{
 					byte r, g, b;
 
+					r = 0;
 					g = (GetRandomControl() & 0x1F) + 128;
 					b = (GetRandomControl() & 0x1F) + 64;
 
@@ -457,10 +458,11 @@ void LaserHeadControl(short itemNumber)
 							&& arc
 							&& arc->life < 16)
 						{
-							g = b = (arc->life * g) / 16;
+							g = (arc->life * g) / 16;
+							b = (arc->life * b) / 16;
 						}
 
-						for (int i = 0, j = 0; i < 5; i += 4, j++)
+						for (int i = 0; i < 2; i++)
 						{ 
 							// If eye was not destroyed then fire from it
 							if ((1 << GuardianMeshes[i]) & item->meshBits)
@@ -476,38 +478,38 @@ void LaserHeadControl(short itemNumber)
 								dest.z = src.z + c * phd_cos(item->pos.yRot);
 
 								if (item->itemFlags[3] != 90 
-									&& LaserHeadData.fireArcs[j] != NULL)
+									&& LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->pos, 0);
 
-									LaserHeadData.fireArcs[j]->pos1.x = src.x;
-									LaserHeadData.fireArcs[j]->pos1.y = src.y;
-									LaserHeadData.fireArcs[j]->pos1.z = src.z;
+									LaserHeadData.fireArcs[i]->pos1.x = src.x;
+									LaserHeadData.fireArcs[i]->pos1.y = src.y;
+									LaserHeadData.fireArcs[i]->pos1.z = src.z;
 								}
 								else
 								{
 									// Start firing from eye
 									src.roomNumber = item->roomNumber;
-									LaserHeadData.LOS = LOS(&src, &dest);
-									LaserHeadData.fireArcs[j] = TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& dest, 128, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
+									LaserHeadData.LOS[i] = LOS(&src, &dest);
+									LaserHeadData.fireArcs[i] = TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->pos, 0);
 								}
 
-								ENERGY_ARC* currentArc = LaserHeadData.fireArcs[j];
+								ENERGY_ARC* currentArc = LaserHeadData.fireArcs[i];
 
 								if (GlobalCounter & 1) 
 								{
-									TriggerLaserHeadSparks((PHD_VECTOR*)& src, 3, 0, g, b, 0);
-									TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, 0, g, b);
-									TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, 0, g, b);
+									TriggerLaserHeadSparks((PHD_VECTOR*)& src, 3, r, g, b, 0);
+									TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, r, g, b);
+									TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, r, g, b);
 
-									if (!LaserHeadData.LOS)
+									if (!LaserHeadData.LOS[i])
 									{
-										TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, 0, g, b);
-										TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, 0, g, b);
-										TriggerLaserHeadSparks((PHD_VECTOR*)& currentArc->pos4, 3, 0, g, b, 0);
+										TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
+										TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
+										TriggerLaserHeadSparks((PHD_VECTOR*)& currentArc->pos4, 3, r, g, b, 0);
 									}
 								}
 
@@ -591,10 +593,10 @@ void LaserHeadControl(short itemNumber)
 							}
 							else if (item->itemFlags[3] > 90)
 							{
-								if (LaserHeadData.fireArcs[j])
+								if (LaserHeadData.fireArcs[i])
 								{
-									LaserHeadData.fireArcs[j]->life = 0;
-									LaserHeadData.fireArcs[j] = NULL;
+									LaserHeadData.fireArcs[i]->life = 0;
+									LaserHeadData.fireArcs[i] = NULL;
 								}
 							}
 						}
@@ -618,7 +620,7 @@ void LaserHeadControl(short itemNumber)
 				dest.x = 0;
 				dest.y = 0;
 				dest.z = 0;
-				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)& dest, LM_LHAND);
+				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)& dest, LM_HEAD);
 
 				if (LOS(&src, &src))
 				{
@@ -650,19 +652,19 @@ void LaserHeadControl(short itemNumber)
 	{
 		int i = 0;
 
-		/*for (i = 0; i < 8; i++)
+		for (i = 0; i < 8; i++)
 		{
-			short tentacleItemNumber = creature->tentacles[item->itemFlags[2]];
+			short tentacleItemNumber = creature->tentacles[i];
 			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
 			if (tentacleItem->animNumber == Objects[tentacleItem->objectNumber].animIndex
 				&& tentacleItem->frameNumber != g_Level.Anims[tentacleItem->animNumber].frameEnd)
 			{
 				break;
 			}
-		}*/
+		}
 
 		// If all tentacles animations are done and both eyes are destroyed it's time to die
-		if (/*i == 8*/   !(item->meshBits & 6))
+		if (i == 8 && !(item->meshBits & 6))
 		{
 			if (LaserHeadData.fireArcs[0])
 				LaserHeadData.fireArcs[0]->life = 2;
