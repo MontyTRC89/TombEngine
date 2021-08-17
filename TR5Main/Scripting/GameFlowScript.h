@@ -31,7 +31,7 @@ public:
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
-	int								LevelFarView{ 0 };
+	byte							GameFarView{ 0 };
 	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
 	std::string						IntroImagePath{};
 	std::string						TitleScreenImagePath{};
@@ -55,4 +55,5 @@ public:
 	bool							DoGameflow();
 	void							SetIntroImagePath(std::string const& path);
 	void							SetTitleScreenImagePath(std::string const& path);
+	void							SetGameFarView(byte val);
 };
