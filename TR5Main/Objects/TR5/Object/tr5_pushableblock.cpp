@@ -473,6 +473,8 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		PushableBlockBounds.boundingBox.Y2 = bounds->Y2;
 		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - pushableBoundsExtents;
 		PushableBlockBounds.boundingBox.Z2 = bounds->Z2 + pushableBoundsExtents;
+		// TODO: replace block rotation code with simple Lara vs. block atan check 
+		// and decide on grabbing based on that
 
 		short rot = item->pos.yRot;
 		item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
