@@ -12,10 +12,6 @@
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
 
-#ifndef _DEBUG
-#include <iostream>
-#endif
-
 /***
 Files that will be run on game startup.
 @module gameflow

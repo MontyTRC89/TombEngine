@@ -15,10 +15,6 @@
 #include "newinv2.h"
 #include "ObjectIDs.h"
 
-#ifndef _DEBUG
-#include <iostream>
-#endif
-
 /***
 Functions and callbacks for level-specific logic scripts.
 @module gamelogic
