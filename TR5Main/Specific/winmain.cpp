@@ -168,6 +168,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
+	InitTENLog();
+
 	// Initialise the new scripting system
 	sol::state luaState;
 	luaState.open_libraries(sol::lib::base);
@@ -183,6 +185,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
+		ShutdownTENLog();
 		throw;
 	}
 
@@ -304,6 +307,8 @@ void WinClose()
 	
 	delete g_GameScript;
 	delete g_GameFlow;
+
+	ShutdownTENLog();
 
 	SaveGame::End();
 }
