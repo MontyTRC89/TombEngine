@@ -395,8 +395,6 @@ void CalculateSpotCameras()
 		spline_cnt = CurrentCameraCnt + 2;
 	}
 
-	printf("%d %d\n", spline_cnt, spline_cnt);
-
 	//loc_37F64
 	cpx = Spline(CurrentSplinePosition, &CameraXposition[1], spline_cnt);
 	cpy = Spline(CurrentSplinePosition, &CameraYposition[1], spline_cnt);

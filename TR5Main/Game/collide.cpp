@@ -573,12 +573,17 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	BOUNDING_BOX* bounds;
 	short facing;
 
-	dx = l->pos.xPos - item->pos.xPos;		// Get Vector from Baddie to Lara
-	dz = l->pos.zPos - item->pos.zPos;
-	c = phd_cos(item->pos.yRot);					// Get Baddies Rotation
+	// Get item's rotation
+	c = phd_cos(item->pos.yRot); 
 	s = phd_sin(item->pos.yRot);
-	rx = (c * dx - s * dz);            	// Rotate Lara Vector into Baddie Frame
-	rz = (c * dz + s * dx);
+
+	// Get vector from item to Lara
+	dx = LaraItem->pos.xPos - item->pos.xPos; 
+	dz = LaraItem->pos.zPos - item->pos.zPos;
+
+	// Rotate Lara vector into item frame
+	rx = c * dx - s * dz; 
+	rz = c * dz + s * dx;
 
 	if (bigpush & 2)
 		bounds = &GlobalCollisionBounds;
@@ -654,7 +659,16 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 	facing = coll->facing;
 	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
-	GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HITE);
+
+	if (l == LaraItem)
+	{
+		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HITE);
+	}
+	else
+	{
+		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HITE);
+	}
+
 	coll->facing = facing;
 
 	if (coll->collType == CT_NONE)
@@ -663,8 +677,8 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		coll->old.y = l->pos.yPos;
 		coll->old.z = l->pos.zPos;
 
-	//	UpdateLaraRoom(l, -10);
-		/*Causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"*/
+		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
+		// UpdateLaraRoom(l, -10);
 	}
 	else
 	{
@@ -773,10 +787,12 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 
 	Vector3 pos = Vector3(x, y, z);
 
-	// HACK (REMOVED FOR NOW): it seems that a minus sign is required here. I don't know why, but it just works (tm) but we must 
-	// do more tests
+	// HACK (REMOVED FOR NOW): it seems that a minus sign may be required here. 
+	// I don't know why, but it just works (tm) but we must do more tests -- Monty
+	// 16.08.21: Changed back to non-minus sign by request of Krys and ChocolateFan -- Lwmte
+
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(-item->pos.yRot),
+		TO_RAD(item->pos.yRot),
 		TO_RAD(item->pos.xRot),
 		TO_RAD(item->pos.zRot)
 	);
@@ -824,47 +840,49 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		if (Lara.waterStatus != LW_UNDERWATER)
 		{
 			angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
-			//direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
+			direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
 			
-			angle = (angle + 0x2000) / 0x4000;
-			angle = (angle - ((unsigned short)(dest->yRot + 0x2000) / 0x4000));
-			angle &= 3;
+			// 16.08.21: code below was deliberately reintroduced by Monty for whatever reasons.
+			// Identified as regression by ChocolateFan and commented.
+
+			// angle = (angle + 0x2000) / 0x4000;
+			// angle = (angle - ((unsigned short)(dest->yRot + 0x2000) / 0x4000));
+			// angle &= 3;
 			
-			switch (angle)
+			switch (direction)
 			{
-			case 0:
-				LaraItem->animNumber = LA_SIDESTEP_LEFT;
-				LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
-				LaraItem->goalAnimState = LS_STEP_LEFT;
-				LaraItem->currentAnimState = LS_STEP_LEFT;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				break;
+				case 0:
+					LaraItem->animNumber = LA_SIDESTEP_LEFT;
+					LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
+					LaraItem->goalAnimState = LS_STEP_LEFT;
+					LaraItem->currentAnimState = LS_STEP_LEFT;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					break;
 
-			case 1:
-				LaraItem->animNumber = LA_WALK;
-				LaraItem->frameNumber = GF(LA_WALK, 0);
-				LaraItem->goalAnimState = LS_WALK_FORWARD;
-				LaraItem->currentAnimState = LS_WALK_FORWARD;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				break;
+				case 1:
+					LaraItem->animNumber = LA_WALK;
+					LaraItem->frameNumber = GF(LA_WALK, 0);
+					LaraItem->goalAnimState = LS_WALK_FORWARD;
+					LaraItem->currentAnimState = LS_WALK_FORWARD;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					break;
 
-			case 2:
-				LaraItem->animNumber = LA_WALK;
-				LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
-				LaraItem->goalAnimState = LS_STEP_RIGHT;
-				LaraItem->currentAnimState = LS_STEP_RIGHT;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				break;
+				case 2:
+					LaraItem->animNumber = LA_WALK;
+					LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
+					LaraItem->goalAnimState = LS_STEP_RIGHT;
+					LaraItem->currentAnimState = LS_STEP_RIGHT;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					break;
 
-			case 3:
-			default:
-				LaraItem->animNumber = LA_WALK_BACK;
-				LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
-				LaraItem->goalAnimState = LS_WALK_BACK;
-				LaraItem->currentAnimState = LS_WALK_BACK;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				break;
-
+				case 3:
+				default:
+					LaraItem->animNumber = LA_WALK_BACK;
+					LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
+					LaraItem->goalAnimState = LS_WALK_BACK;
+					LaraItem->currentAnimState = LS_WALK_BACK;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					break;
 			}
 		}
 

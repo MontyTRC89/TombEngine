@@ -580,7 +580,7 @@ void HarpyControl(short itemNumber)
 
 				if (creature->enemy == LaraItem)
 				{
-					Lara.dpoisoned += 2048;
+					Lara.poisoned += 2048;
 				}
 
 				creature->flags = 1;

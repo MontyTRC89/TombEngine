@@ -1,5 +1,30 @@
 #include "framework.h"
-#include <iostream>
+#include <spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
+void InitTENLog()
+{
+	// "true" means that we create a new log file each time we run the game
+	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/TENLog.txt", true);
+
+	std::shared_ptr<spdlog::logger> logger;
+	if constexpr (DebugBuild)
+	{
+		// Set the file and console log targets
+		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{file_sink, console_sink });
+	}
+	else
+	{
+		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, file_sink);
+	}
+	
+	spdlog::initialize_logger(logger);
+    logger->set_level(spdlog::level::info);
+	logger->flush_on(spdlog::level::info);   
+	logger->set_pattern("[%Y-%b-%d %T] [%^%l%$] %v");
+}
 
 void TENLog(std::string_view str, LogLevel level, LogConfig config)
 {
@@ -11,19 +36,24 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config)
 		}
 	}
 
+	auto logger = spdlog::get("multi_sink");
 	switch (level)
 	{
 	case LogLevel::Error:
-		std::cerr << "Error: " << str << "\n";
-		// Monty code goes here
-		break;
+		logger->error(str);
+	break;
 	case LogLevel::Warning:
-		std::cout << "Warning: " << str << "\n";
-		// Monty code goes here
+		logger->warn(str);
 		break;
 	case LogLevel::Info:
-		std::cout << "Info: " << str << "\n";
-		// Monty code goes here
+		logger->info(str);
 		break;
 	}
+	logger->flush();
 }
+
+void ShutdownTENLog()
+{
+	spdlog::shutdown();
+}
+
