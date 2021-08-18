@@ -31,7 +31,7 @@ public:
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
-	int								LevelFarView{ 0 };
+	byte							GameFarView{ 0 };
 	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
 	std::string						IntroImagePath{};
 	std::string						TitleScreenImagePath{};
@@ -45,14 +45,15 @@ public:
 	void							AddLevel(GameScriptLevel const& level);
 	void							SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
 	void							LoadGameFlowScript();
-	char const *					GetString(const char* id);
+	char const *					GetString(const char* id) const;
 	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	void							SetSettings(GameScriptSettings const & src);
 	GameScriptSettings*				GetSettings();
 	GameScriptLevel*				GetLevel(int id);
-	int								GetNumLevels();		
+	int								GetNumLevels() const;
 	bool							DoGameflow();
 	void							SetIntroImagePath(std::string const& path);
 	void							SetTitleScreenImagePath(std::string const& path);
+	void							SetGameFarView(byte val);
 };

@@ -6,6 +6,7 @@ constexpr bool DebugBuild = false;
 #endif
 #include <stdexcept>
 #include <string_view>
+#include <iostream>
 
 inline void assertion(const bool& expr,const char* msg) noexcept {
 	if constexpr (DebugBuild) {
@@ -40,6 +41,8 @@ enum class LogConfig
 };
 
 void TENLog(std::string_view str, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::Debug);
+void ShutdownTENLog();
+void InitTENLog();
 
 class TENScriptException : public std::runtime_error
 {
