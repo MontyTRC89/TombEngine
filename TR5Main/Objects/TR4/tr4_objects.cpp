@@ -683,7 +683,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
 	}
 
-	obj = &Objects[ID_LOCUSTS_EMITTER];
+	obj = &Objects[ID_LOCUST_EMITTER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLocust;

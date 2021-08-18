@@ -51,7 +51,7 @@ void SpawnLocust(ITEM_INFO* item)
     {
         locust = &Locusts[locustNumber];
         // emitter
-        if (item->objectNumber == ID_LOCUSTS_EMITTER)
+        if (item->objectNumber == ID_LOCUST_EMITTER)
         {
             end.x = item->pos.xPos;
             end.y = item->pos.yPos;
@@ -73,10 +73,11 @@ void SpawnLocust(ITEM_INFO* item)
             phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
         }
 
-        target = GetCreatureInfo(item)->enemy;
+        // NOTE: this is not present in original TR4 code
+        //target = GetCreatureInfo(item)->enemy;
 
         locust->on = true;
-        locust->target = target != nullptr ? target : nullptr;
+        //locust->target = target != nullptr ? target : nullptr;
         locust->pos.xPos = end.x;
         locust->pos.yPos = end.y;
         locust->pos.zPos = end.z;
@@ -96,14 +97,14 @@ void InitialiseLocust(short itemNumber)
 
     if (item->pos.yRot > 0)
     {
-        if (item->pos.yRot == 0x4000)
+        if (item->pos.yRot == ANGLE(90))
             item->pos.xPos += CLICK(2);
     }
     else if (item->pos.yRot < 0)
     {
-        if (item->pos.yRot == -0x8000)
+        if (item->pos.yRot == -ANGLE(180))
             item->pos.zPos -= CLICK(2);
-        else if (item->pos.yRot == -0x4000)
+        else if (item->pos.yRot == -ANGLE(90))
             item->pos.xPos -= CLICK(2);
     }
     else
@@ -144,9 +145,13 @@ void UpdateLocusts(void)
         locust = &Locusts[i];
         if (locust->on)
         {
-            if (locust->target == nullptr)
-                locust->target = LaraItem;
-            if (locust->target->hitPoints <= 0 && locust->counter >= 90 && !(GetRandomControl() & 7))
+            // NOTE: not present in original TR4 code
+            //if (LaraItem == nullptr)
+            //    LaraItem = LaraItem;
+
+            if ((Lara.keepDucked || LaraItem->hitPoints <= 0) 
+                && locust->counter >= 90 
+                && !(GetRandomControl() & 7))
                 locust->counter = 90;
 
             locust->counter--;
@@ -164,12 +169,12 @@ void UpdateLocusts(void)
             }
 
             phd_GetVectorAngles(
-                locust->target->pos.xPos + 8 * locust->escapeXrot - locust->pos.xPos,
-                locust->target->pos.yPos - locust->escapeYrot - locust->pos.yPos,
-                locust->target->pos.zPos + 8 * locust->escapeZrot - locust->pos.zPos,
+                LaraItem->pos.xPos + 8 * locust->escapeXrot - locust->pos.xPos,
+                LaraItem->pos.yPos - locust->escapeYrot - locust->pos.yPos,
+                LaraItem->pos.zPos + 8 * locust->escapeZrot - locust->pos.zPos,
                 angles);
 
-            distance = SQUARE(locust->target->pos.zPos - locust->pos.zPos) + SQUARE(locust->target->pos.xPos - locust->pos.xPos);
+            distance = SQUARE(LaraItem->pos.zPos - locust->pos.zPos) + SQUARE(LaraItem->pos.xPos - locust->pos.xPos);
             square = int(sqrt(distance)) / 8;
             if (square <= 128)
             {
@@ -210,13 +215,14 @@ void UpdateLocusts(void)
             locust->pos.xPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_sin(locust->pos.yRot);
             locust->pos.yPos += locust->randomRotation * phd_sin(-locust->pos.xRot);
             locust->pos.zPos += locust->randomRotation * phd_cos(locust->pos.xRot) * phd_cos(locust->pos.yRot);
-            if (ItemNearTarget(&locust->pos, locust->target, CLICK(1) / 2))
+            if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
             {
                 TriggerBlood(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 2 * GetRandomControl(), 2);
-                if (locust->target == LaraItem)
-                    locust->target->hitPoints -= LOCUST_LARA_DAMAGE;
-                else
-                    locust->target->hitPoints -= LOCUST_ENTITY_DAMAGE;
+                if (LaraItem->hitPoints > 0)
+                    LaraItem->hitPoints -= LOCUST_LARA_DAMAGE;
+                // NOTE: not present in original TR4 code
+                //else
+                //    LaraItem->hitPoints -= LOCUST_ENTITY_DAMAGE;
             }
 
             if (locust->counter > 0)
