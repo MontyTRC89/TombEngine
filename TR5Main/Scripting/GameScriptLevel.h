@@ -59,5 +59,7 @@ struct GameScriptLevel
 	bool UnlimitedAir{ false }; //unused
 	std::vector<GameScriptInventoryObject> InventoryObjects;
 	
+	void SetUVRotate(byte val);
+	void SetLevelFarView(byte val);
 	static void Register(sol::state* state);
 };

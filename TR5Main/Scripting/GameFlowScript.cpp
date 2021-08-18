@@ -12,10 +12,6 @@
 #include <Objects/objectslist.h>
 #include <Game/newinv2.h>
 
-#ifndef _DEBUG
-#include <iostream>
-#endif
-
 /***
 Files that will be run on game startup.
 @module gameflow
@@ -65,6 +61,14 @@ __(not yet implemented)__
 */
 	m_lua->set_function("SetTitleScreenImagePath", &GameFlow::SetTitleScreenImagePath, this);
 
+/*** The maximum draw distance, in sectors (blocks), of any level in the game.
+This is equivalent to TRNG's WorldFarView variable.
+__(not yet implemented)__
+@function SetGameFarView
+@tparam byte farview Number of sectors. Must be in the range [1, 127].
+*/
+	m_lua->set_function("SetGameFarView", &GameFlow::SetGameFarView, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -110,6 +114,7 @@ You will not need to call them manually.
 	MakeReadOnlyTable("InvItem", kInventorySlots);
 	MakeReadOnlyTable("RotationAxis", kRotAxes);
 	MakeReadOnlyTable("ItemAction", kItemActions);
+	MakeReadOnlyTable("ErrorMode", kErrorModes);
 }
 
 GameFlow::~GameFlow()
@@ -150,6 +155,21 @@ void GameFlow::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
+void GameFlow::SetGameFarView(byte val)
+{
+	bool cond = val <= 127 && val >= 1;
+	std::string msg{ "Game far view value must be in the range [1, 127]." };
+	if (!ScriptAssert(cond, msg))
+	{
+		ScriptWarn("Setting game far view to 32.");
+		GameFarView = 32;
+	}
+	else
+	{
+		GameFarView = val;
+	}
+}
+
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
 {
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
@@ -173,10 +193,12 @@ void GameFlow::LoadGameFlowScript()
 	SetErrorMode(GetSettings()->ErrorMode);
 }
 
-char const * GameFlow::GetString(const char* id)
+char const * GameFlow::GetString(const char* id) const
 {
-	if (m_translationsMap.find(id) == m_translationsMap.end())
+	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	{
 		return "String not found";
+	}
 	else
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
@@ -191,7 +213,7 @@ GameScriptLevel* GameFlow::GetLevel(int id)
 	return Levels[id];
 }
 
-int	GameFlow::GetNumLevels()
+int	GameFlow::GetNumLevels() const
 {
 	return Levels.size();
 }

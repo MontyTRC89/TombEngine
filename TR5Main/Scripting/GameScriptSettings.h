@@ -1,7 +1,13 @@
 #pragma once
 
-#include "GameScriptSettings.h"
+#include "ScriptAssert.h"
 #include <string>
+
+static const std::unordered_map<std::string, ERROR_MODE> kErrorModes {
+	{"SILENT", ERROR_MODE::SILENT},
+	{"WARN", ERROR_MODE::WARN},
+	{"TERMINATE", ERROR_MODE::TERMINATE}
+};
 
 namespace sol {
 	class state;
@@ -18,7 +24,7 @@ struct GameScriptSettings
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
-	std::string ErrorMode;
+	ERROR_MODE ErrorMode;
 
 	static void Register(sol::state* lua);
 };

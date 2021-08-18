@@ -35,10 +35,6 @@ extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
-bool BlockAllInput = true;
-int skipLoop = -1;
-int skipFrames = 2;
-int lockInput = 0;
 
 #if _DEBUG
 string commit;
@@ -125,7 +121,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			//DB_Log(6, "WM_ACTIVE");
-			BlockAllInput = false;
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
@@ -137,7 +132,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		BlockAllInput = true;
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
@@ -145,6 +139,10 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+int main() {
+	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLine(), SW_SHOW);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -155,9 +153,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Process the command line
 	bool setup = false;
 
-	//TrLevel* level = new TrLevel(string("Data\\andrea1.t5m"));
-	//level->Load();
-	
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -174,6 +169,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
+	InitTENLog();
+
 	// Initialise the new scripting system
 	sol::state luaState;
 	luaState.open_libraries(sol::lib::base);
@@ -189,6 +186,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
+		ShutdownTENLog();
 		throw;
 	}
 
@@ -310,6 +308,8 @@ void WinClose()
 	
 	delete g_GameScript;
 	delete g_GameFlow;
+
+	ShutdownTENLog();
 
 	SaveGame::End();
 }
