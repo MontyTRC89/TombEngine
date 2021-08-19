@@ -91,8 +91,8 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", nullptr, blob);
 	m_vsHUD = Utils::compileVertexShader(m_device.Get(), L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", nullptr, blob);
 	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, blob);
-	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
