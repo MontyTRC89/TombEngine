@@ -683,11 +683,11 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
 	}
 
-	obj = &Objects[ID_LOCUST_EMITTER];
+	obj = &Objects[ID_LOCUSTS_EMITTER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLocust;
-		obj->control = LocustControl;
+		obj->initialise = GameObjects::TR4::Locusts::InitialiseLocust;
+		obj->control = GameObjects::TR4::Locusts::LocustControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;

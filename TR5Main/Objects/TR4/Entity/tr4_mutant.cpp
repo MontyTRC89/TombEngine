@@ -324,7 +324,7 @@ void MutantControl(short itemNumber)
     case MUTANT_LOCUST1:
         frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
         if (frameNumber >= 60 && frameNumber <= 120)
-            SpawnLocust(item);
+            GameObjects::TR4::Locusts::SpawnLocust(item);
         break;
     case MUTANT_LOCUST2:
         if (ShootFrame(item))
