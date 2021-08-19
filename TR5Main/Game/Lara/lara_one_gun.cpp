@@ -646,13 +646,10 @@ void ControlGrenade(short itemNumber)
 						}
 						else
 						{
-							if ((currentItem->flags & 0x3E00) &&
-								(currentItem->flags & 0x3E00) != 0x3E00)
+							if ((currentItem->flags & IFLAG_ACTIVATION_MASK) &&
+								(currentItem->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 							{
-								roomNumber = currentItem->roomNumber;
-								FLOOR_INFO* floor = GetFloor(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, &roomNumber);
-								GetFloorHeight(floor, currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos);
-								TestTriggers(TriggerIndex, 1, currentItem->flags & 0x3E00);
+								TestTriggersAtXYZ(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
 							}
 							else
 							{

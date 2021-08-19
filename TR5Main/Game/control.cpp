@@ -51,6 +51,7 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
+#include <Game\Lara\lara_climb.h>
 
 using std::vector;
 using std::unordered_map;
@@ -536,13 +537,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					SmashedMesh[SmashedMeshCount]->z,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				int height = GetFloorHeight(
-					floor,
-					SmashedMesh[SmashedMeshCount]->x,
+				TestTriggersAtXYZ(SmashedMesh[SmashedMeshCount]->x,
 					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z);
-
-				TestTriggers(TriggerIndex, 1, 0);
+					SmashedMesh[SmashedMeshCount]->z,
+					SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
@@ -956,76 +954,8 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 
 	HeavyTriggered = false;
 
-	if (!heavy)
-	{
-		Lara.canMonkeySwing = false;
-		Lara.climbStatus = false;
-		Lara.ClockworkBeetleFlag = false;
-	}
-
 	if (!data)
 		return;
-
-	// Burn Lara
-	if ((*data & 0x1F) == LAVA_TYPE)
-	{
-		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
-			LavaBurn(LaraItem);
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can climb
-	if ((*data & 0x1F) == CLIMB_TYPE)
-	{
-		if (!heavy)
-		{
-			short quad = GetQuadrant(LaraItem->pos.yRot);
-			if ((1 << (quad + 8)) & *data)
-				Lara.climbStatus = true;
-		}
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can monkey
-	if ((*data & 0x1F) == MONKEY_TYPE)
-	{
-		if (!heavy)
-			Lara.canMonkeySwing = true;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	//for the stupid beetle
-	if ((*data & 0x1F) == MINER_TYPE)
-	{
-		if (!heavy)
-			Lara.ClockworkBeetleFlag = 1;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Trigger triggerer
-	if ((*data & 0x1F) == TRIGTRIGGER_TYPE)
-	{
-		if (!(*data & 0x20) || *data & 0x8000)
-			return;
-
-		data++;
-	}
 
 	short triggerType = (*(data++) >> 8) & 0x3F;
 	short flags = *(data++);
@@ -1040,11 +970,11 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		switch (triggerType)
 		{
-		case HEAVY:
-		case HEAVYANTITRIGGER:
+		case TRIGGER_TYPES::HEAVY:
+		case TRIGGER_TYPES::HEAVYANTITRIGGER:
 			break;
 
-		case HEAVYSWITCH:
+		case TRIGGER_TYPES::HEAVYSWITCH:
 			if (!HeavyFlags)
 				return;
 
@@ -2357,7 +2287,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	MESH_INFO *mesh;
 	PHD_VECTOR vector;
 	ITEM_INFO *item;
-	short angle, room, triggerItems[8];
+	short angle, triggerItems[8];
 	VECTOR dir;
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();
@@ -2518,9 +2448,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										room = item->roomNumber;
-										GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-										TestTriggers(TriggerIndex, 1, item->flags & IFLAG_ACTIVATION_MASK);
+										TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags& IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
@@ -3592,8 +3520,37 @@ int IsRoomOutside(int x, int y, int z)
 
 void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags)
 {
-	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
+	auto floor = GetFloor(x, y, z, &roomNumber);
+	GetFloorHeight(floor, x, y, z);
+
+	// Don't process legacy triggers if trigger triggerer wasn't used
+
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
+		return;
+
 	TestTriggers(TriggerIndex, heavy, flags);
+}
+
+void ProcessSectorFlags(int x, int y, int z, short roomNumber)
+{
+	ProcessSectorFlags(GetFloor(x, y, z, &roomNumber));
+}
+
+void ProcessSectorFlags(FLOOR_INFO* floor)
+{
+	// Monkeyswing
+	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
+
+	// Beetle flag
+	Lara.ClockworkBeetleFlag = floor->Flags.MarkBeetle;
+		
+	// Burn Lara
+	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
+		LavaBurn(LaraItem);
+
+	// Set climb status
+	if ((1 << (GetQuadrant(LaraItem->pos.yRot) + 8)) & GetClimbFlags(floor))
+		Lara.climbStatus = true;
 }
 
 void ResetGlobals()
