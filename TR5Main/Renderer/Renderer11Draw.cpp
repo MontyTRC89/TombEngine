@@ -29,6 +29,7 @@
 #include "hair.h"
 #include "winmain.h"
 #include <chrono>
+#include <Objects/Effects/tr4_locusts.h>
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -2339,6 +2340,53 @@ namespace T5M::Renderer
 		*/
 	}
 
+    void Renderer11::drawLocusts(RenderView& view) {
+        UINT stride = sizeof(RendererVertex);
+        UINT offset = 0;
+
+        m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_context->IASetInputLayout(m_inputLayout.Get());
+        m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+        if (Objects[ID_LOCUSTS].loaded)
+        {
+            OBJECT_INFO* obj = &Objects[ID_LOCUSTS];
+            RendererObject& moveableObj = *m_moveableObjects[ID_LOCUSTS];
+
+            for (int m = 0; m < 32; m++)
+                memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+
+            for (int i = 0; i < GameObjects::TR4::Locusts::MAX_LOCUSTS; i++)
+            {
+                LOCUST_INFO* locust = &GameObjects::TR4::Locusts::Locusts[i];
+
+                if (locust->on)
+                {
+                    RendererMesh* mesh = getMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
+                    Matrix translation = Matrix::CreateTranslation(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos);
+                    Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.yRot, locust->pos.xRot, locust->pos.zRot);
+                    Matrix world = rotation * translation;
+
+                    m_stItem.World = world;
+                    m_stItem.Position = Vector4(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 1.0f);
+                    m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
+                    m_cbItem.updateData(m_stItem,m_context.Get());
+
+                    for (int b = 0; b < mesh->buckets.size(); b++)
+                    {
+                        RendererBucket* bucket = &mesh->buckets[b];
+
+                        if (bucket->Vertices.size() == 0)
+                            continue;
+
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                        m_numDrawCalls++;
+                    }
+                }
+            }
+        }
+    }
 
     void Renderer11::drawLines3D(RenderView& view) {
 
@@ -2780,6 +2828,7 @@ namespace T5M::Renderer
         drawRats(view);
         drawSpiders(view);
 		drawLittleBeetles(view);
+        drawLocusts(view);
 
         // Transparent geometry
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);

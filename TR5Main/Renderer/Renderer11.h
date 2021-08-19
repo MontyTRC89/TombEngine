@@ -523,6 +523,7 @@ namespace T5M::Renderer
 		void drawSpiders(RenderView& view);
 		bool drawGunFlashes(RenderView& view);
 		void drawGunShells(RenderView& view);
+		void drawLocusts(RenderView& view);
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
 		void renderTitleMenu();
 		void renderPauseMenu();

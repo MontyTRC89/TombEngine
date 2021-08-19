@@ -572,7 +572,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		T5M::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		UpdateLocusts();
+		GameObjects::TR4::Locusts::UpdateLocusts();
 		UpdateLittleBeetles();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
