@@ -387,7 +387,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 				break;
 			}
 			Lara.moveAngle = angle;
-			if (256 << dir & GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber))
+			if (256 << dir & GetClimbFlags(x, item->pos.yPos, z, item->roomNumber))
 			{
 				if (!LaraTestHangOnClimbWall(item, coll))
 					dfront = 0;
@@ -493,7 +493,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (Lara.climbStatus)
 		{
-			if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
+			if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
 			{
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
@@ -596,7 +596,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		return 0;
 	}
 
-	if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
+	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
 		return result;
 
 	short front = LaraFloorFront(item, item->pos.yRot, 116);
@@ -648,7 +648,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (Lara.climbStatus)
 		{
-			if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
+			if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
 			{
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
@@ -751,7 +751,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		return 0;
 	}
 
-	if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
+	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
 		return result;
 
 	short front = LaraFloorFront(item, item->pos.yRot, 116);
