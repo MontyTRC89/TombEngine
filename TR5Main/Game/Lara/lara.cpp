@@ -937,8 +937,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Handle weapons
 	LaraGun();
 
+	// Test for flags
+	ProcessSectorFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+
 	// Test if there's a trigger
-	TestTriggers(coll->trigger, FALSE, 0);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, 0);
 }
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
@@ -1048,7 +1051,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraGun();
 
-	TestTriggers(coll->trigger, 0, 0);
+	ProcessSectorFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, 0);
 }
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
@@ -1105,7 +1109,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraGun();
 
-	TestTriggers(coll->trigger, 0, 0);
+	ProcessSectorFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, 0);
 }
 
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)

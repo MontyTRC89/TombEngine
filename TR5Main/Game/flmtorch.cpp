@@ -331,7 +331,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
 				item->flags |= 0x3E00;
 				item->itemFlags[3] = 0;
 				item->status = ITEM_ACTIVE;
