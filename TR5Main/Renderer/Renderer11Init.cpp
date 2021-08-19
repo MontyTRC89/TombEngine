@@ -229,7 +229,7 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 
 	// Initialise sprites and font
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_context.Get());
-	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Font.spritefont");
+	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
 
 	// Initialise buffers
