@@ -1258,6 +1258,13 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 	}
 }
 
+void RefreshFloorGlobals(ITEM_INFO* item)
+{
+	auto room = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
+	DoFloorThings(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+}
+
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
 {
 	int resetRoom;
