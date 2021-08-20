@@ -55,13 +55,13 @@
 using std::vector;
 using std::unordered_map;
 using std::string;
-using namespace T5M::Effects::Explosion;
-using namespace T5M::Effects::Spark;
-using namespace T5M::Effects::Smoke;
-using namespace T5M::Effects;
-using T5M::Renderer::g_Renderer;
-using namespace T5M::Math::Random;
-using namespace T5M::Floordata;
+using namespace ten::Effects::Explosion;
+using namespace ten::Effects::Spark;
+using namespace ten::Effects::Smoke;
+using namespace ten::Effects;
+using ten::renderer::g_Renderer;
+using namespace ten::Math::Random;
+using namespace ten::Floordata;
 
 short ShatterSounds[18][10] =
 	{
@@ -179,7 +179,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace T5M::Effects::Footprints;
+using namespace ten::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
@@ -569,10 +569,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		T5M::Effects::Drip::UpdateDrips();
+		ten::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		GameObjects::TR4::Locusts::UpdateLocusts();
+		ten::entities::tr4::UpdateLocusts();
 		UpdateLittleBeetles();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();

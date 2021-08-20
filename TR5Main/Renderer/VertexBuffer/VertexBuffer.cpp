@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "VertexBuffer.h"
 #include "Renderer11.h"
-namespace T5M::Renderer {
-	using namespace T5M::Renderer::Utils;
+namespace ten::renderer {
+	using namespace ten::renderer::Utils;
 	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices) {
 		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};

@@ -686,8 +686,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LOCUSTS_EMITTER];
 	if (obj->loaded)
 	{
-		obj->initialise = GameObjects::TR4::Locusts::InitialiseLocust;
-		obj->control = GameObjects::TR4::Locusts::LocustControl;
+		obj->initialise = ten::entities::tr4::InitialiseLocust;
+		obj->control = ten::entities::tr4::LocustControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;

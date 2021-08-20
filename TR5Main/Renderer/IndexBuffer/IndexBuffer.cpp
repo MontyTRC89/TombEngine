@@ -1,7 +1,7 @@
 #include "IndexBuffer.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	using Microsoft::WRL::ComPtr;
-	using T5M::Renderer::Utils::throwIfFailed;
+	using ten::renderer::Utils::throwIfFailed;
 
 	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices, int* indices) {
 		HRESULT res;

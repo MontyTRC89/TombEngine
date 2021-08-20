@@ -6,7 +6,7 @@
 #include "sound.h"
 #include "savegame.h"
 
-using T5M::Renderer::g_Renderer;
+using ten::renderer::g_Renderer;
 
 const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",

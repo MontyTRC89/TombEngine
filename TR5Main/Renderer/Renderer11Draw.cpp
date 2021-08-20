@@ -30,14 +30,14 @@
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
-extern T5M::Renderer::RendererHUDBar *g_DashBar;
-extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
-extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
+extern ten::renderer::RendererHUDBar *g_DashBar;
+extern ten::renderer::RendererHUDBar *g_SFXVolumeBar;
+extern ten::renderer::RendererHUDBar *g_MusicVolumeBar;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
-namespace T5M::Renderer
+namespace ten::renderer
 {
-    using namespace T5M::Renderer;
+    using namespace ten::renderer;
     using namespace std::chrono;
 
     void Renderer11::drawPickup(short objectNum)
@@ -2357,9 +2357,9 @@ namespace T5M::Renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < GameObjects::TR4::Locusts::MAX_LOCUSTS; i++)
+            for (int i = 0; i < ten::entities::tr4::MAX_LOCUSTS; i++)
             {
-                LOCUST_INFO* locust = &GameObjects::TR4::Locusts::Locusts[i];
+                LOCUST_INFO* locust = &ten::entities::tr4::Locusts[i];
 
                 if (locust->on)
                 {
@@ -3478,4 +3478,4 @@ namespace T5M::Renderer
         //drawFinalPass();
         m_swapChain->Present(0, 0);
     }
-} // namespace T5M::Renderer
+} // namespace ten::renderer

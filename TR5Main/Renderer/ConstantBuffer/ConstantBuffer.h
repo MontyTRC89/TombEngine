@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include "Utils.h"
 #include "debug/debug.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	template <typename CBuff>
 	class ConstantBuffer {
 		ComPtr<ID3D11Buffer> buffer;

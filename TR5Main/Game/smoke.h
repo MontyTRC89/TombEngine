@@ -3,7 +3,7 @@
 #include <SimpleMath.h>
 #include <array>
 struct ITEM_INFO;
-namespace T5M{
+namespace ten{
 	namespace Effects {
 		namespace Smoke {
 			struct SmokeParticle {

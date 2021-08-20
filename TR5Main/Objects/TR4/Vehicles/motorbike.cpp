@@ -21,7 +21,7 @@
 #include "camera.h"
 #include "prng.h"
 
-using namespace T5M::Math::Random;
+using namespace ten::Math::Random;
 
 /*collision stuff*/
 #define BIKE_FRONT 500

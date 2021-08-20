@@ -24,7 +24,7 @@
 
 using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
-using namespace T5M::Effects::Footprints;
+using namespace ten::Effects::Footprints;
 
 short FXType;
 FX_INFO* EffectList;

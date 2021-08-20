@@ -7,7 +7,7 @@
 #include "level.h"
 #include "control.h"
 
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 short PickupX;
 short PickupY;
 short CurrentPickup;

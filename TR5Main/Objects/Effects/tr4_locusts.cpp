@@ -7,7 +7,7 @@
 #include "lara.h"
 #include "tomb4fx.h"
 
-namespace GameObjects::TR4::Locusts {
+namespace ten::entities::tr4 {
     LOCUST_INFO Locusts[MAX_LOCUSTS];
 
     int CreateLocust(void)

@@ -3,12 +3,12 @@
 #include "camera.h"
 #include "spotcam.h"
 #include "lara.h"
-T5M::Renderer::RendererHUDBar* g_HealthBar;
-T5M::Renderer::RendererHUDBar* g_AirBar;
-T5M::Renderer::RendererHUDBar* g_DashBar;
-T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
-T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
-namespace T5M::Renderer {
+ten::renderer::RendererHUDBar* g_HealthBar;
+ten::renderer::RendererHUDBar* g_AirBar;
+ten::renderer::RendererHUDBar* g_DashBar;
+ten::renderer::RendererHUDBar* g_MusicVolumeBar;
+ten::renderer::RendererHUDBar* g_SFXVolumeBar;
+namespace ten::renderer {
 
 	void Renderer11::initialiseBars()
 {

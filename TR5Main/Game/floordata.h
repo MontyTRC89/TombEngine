@@ -52,7 +52,7 @@ public:
 	void RemoveItem(short itemNumber);
 };
 
-namespace T5M::Floordata
+namespace ten::Floordata
 {
 	VectorInt2 GetSectorPoint(int x, int z);
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
