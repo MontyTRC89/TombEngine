@@ -30,7 +30,7 @@ namespace ten::entities::tr4
             fx->roomNumber = roomNumber;
             fx->counter = 16 * counter + 15;
             fx->objectNumber = ID_ENERGY_BUBBLES;
-            fx->frameNumber = Objects[fx->objectNumber].meshIndex + 5 * 2;
+            fx->frameNumber = Objects[fx->objectNumber].meshIndex + 5;
             fx->speed = (GetRandomControl() & 0x1F) + 96;
             fx->flag1 = 6;
         }
@@ -107,7 +107,7 @@ namespace ten::entities::tr4
 
     static bool ShootFrame(ITEM_INFO* item)
     {
-        short frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
+        short frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
         if (frameNumber == 45
             //||  frameNumber == 50
             //||  frameNumber == 55
@@ -281,7 +281,7 @@ namespace ten::entities::tr4
             break;
 
         case STATE_MUTANT_SHOOT:
-            frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
+            frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
             if (frameNumber >= 94 && frameNumber <= 96)
             {
                 PHD_3DPOS src;
@@ -304,7 +304,7 @@ namespace ten::entities::tr4
             break;
 
         case STATE_MUTANT_LOCUST1:
-            frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
+            frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
             if (frameNumber >= 60 && frameNumber <= 120)
                 ten::entities::tr4::SpawnLocust(item);
             break;

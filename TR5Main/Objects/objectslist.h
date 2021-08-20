@@ -109,7 +109,7 @@ enum GAME_OBJECT_ID : short
 	ID_LION,
 	ID_DOBERMAN,
 	ID_HAMMERHEAD,			// TR4 - OK
-	ID_CROCODILE_GOD,		// TR4 Citadel Gate Mutant
+	ID_CROCODILE_GOD,		// TR4 - OK (needs accurate testing)
 	ID_LOCUSTS_EMITTER,		// TR4 - OK
 
 	/* Humans */
