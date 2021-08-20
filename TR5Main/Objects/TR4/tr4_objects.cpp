@@ -664,8 +664,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_CROCODILE_GOD];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseMutant;
-		obj->control = MutantControl;
+		obj->initialise = ten::entities::tr4::InitialiseCrocgod;
+		obj->control = ten::entities::tr4::CrocgodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = NOT_TARGETABLE;
