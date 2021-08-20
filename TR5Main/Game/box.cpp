@@ -1291,7 +1291,6 @@ void GetAITarget(CREATURE_INFO* creature)
 			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggersAtXYZ(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, enemy->roomNumber, true, 0);
-			TestTriggers(TriggerIndex, TRUE, 0);
 
 			creature->reachedGoal = true;
 			creature->enemy = LaraItem;

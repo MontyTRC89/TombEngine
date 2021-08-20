@@ -621,8 +621,8 @@ void RomanStatueControl(short itemNumber)
 
 								mesh->flags &= ~1;
 								floor->stopper = false;
-								GetFloorHeight(floor, pos.x, pos.y, pos.z);
-								TestTriggers(TriggerIndex, 1, 0);
+
+								TestTriggersAtXYZ(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 							}
 						}
 					}
@@ -913,9 +913,7 @@ void RomanStatueControl(short itemNumber)
 				int y = r->minfloor + floorHeight;
 				int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
-				FLOOR_INFO * floor = GetFloor(x, y, z, &roomNumber);
-				GetFloorHeight(floor, x, y, z);
-				TestTriggers(TriggerIndex, 1, 0);
+				TestTriggersAtXYZ(x, y, z, roomNumber, true, NULL);
 			}
 		}
 		else

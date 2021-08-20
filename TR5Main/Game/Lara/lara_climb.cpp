@@ -995,11 +995,6 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	coll->trigger = TriggerIndex;
-
 	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER)//can't let go on this anim
 		return 0;
 

@@ -1410,7 +1410,6 @@ int MotorbikeControl(void)
     FLOOR_INFO* floor;
     PHD_VECTOR oldpos, fl, fr, fm;
     int drive, collide, pitch = 0, dead, ceiling;
-    short room_number;
 
     item = &g_Level.Items[Lara.Vehicle];
     motorbike = GetMotorbikeInfo(item);
@@ -1425,12 +1424,12 @@ int MotorbikeControl(void)
     int hfr = TestMotorbikeHeight(item, BIKE_FRONT, STEP_SIZE / 2, &fr);
     int hfm = TestMotorbikeHeight(item, -BIKE_FRONT, 0, &fm);
 
-    room_number = item->roomNumber;
+	auto room_number = item->roomNumber;
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-    TestTriggers(TriggerIndex, FALSE, FALSE);
-    TestTriggers(TriggerIndex, TRUE, FALSE);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true,  NULL);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
 
     if (LaraItem->hitPoints <= 0)
     {

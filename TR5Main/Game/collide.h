@@ -76,7 +76,6 @@ struct COLL_INFO
 	short facing;
 	short quadrant;
 	short collType; // CT_enum
-	short* trigger;
 	signed char tiltX;
 	signed char tiltZ;
 	bool hitByBaddie;

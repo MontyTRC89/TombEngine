@@ -1310,7 +1310,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->midType = HeightType;
 	coll->midSplitFloor = SplitFloor;
 	coll->midSplitCeil = SplitCeiling;
-	coll->trigger = TriggerIndex;
 
 	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
 	coll->tiltX = tilt;
@@ -1424,8 +1423,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	}
 	else if ((coll->lavaIsPit)
 		&& (coll->frontFloor > 0)
-		&& (TriggerIndex)
-		&& ((*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE))
+		&& floor->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
@@ -1459,7 +1457,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && floor->Flags.Death)
 		coll->leftFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
@@ -1487,7 +1485,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && floor->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
@@ -1519,7 +1517,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && floor->Flags.Death)
 		coll->rightFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
@@ -1547,7 +1545,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && floor->Flags.Death)
 		coll->rightFloor2 = 512;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, tRoomNumber, objectHeight);
@@ -1768,7 +1766,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->midType = HeightType;
 	coll->midSplitFloor = SplitFloor;
 	coll->midSplitCeil = SplitCeiling;
-	coll->trigger = TriggerIndex;
 
 	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
 	coll->tiltX = tilt;
@@ -1871,8 +1868,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 	else if ((coll->lavaIsPit)
 		&& (coll->frontFloor > 0)
-		&& (TriggerIndex)
-		&& ((*(TriggerIndex) & DATA_TYPE) == LAVA_TYPE))
+		&& floor->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
@@ -1900,7 +1896,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && floor->Flags.Death)
 		coll->leftFloor = 512;
 
 	floor = GetFloor(x, yTop, z, &tRoomNumber);
@@ -1923,7 +1919,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && floor->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
@@ -1949,7 +1945,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && floor->Flags.Death)
 		coll->rightFloor = 512;
 
 	floor = GetFloor(x, yTop, z, &tRoomNumber);
@@ -1972,7 +1968,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && floor->Flags.Death)
 		coll->rightFloor2 = 512;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, tRoomNumber, objectHeight);

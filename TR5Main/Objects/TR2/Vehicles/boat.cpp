@@ -920,8 +920,8 @@ void SpeedBoatControl(short itemNumber)
 
 	if (Lara.Vehicle == itemNumber)
 	{
-		TestTriggers(TriggerIndex, 0, 0);
-		TestTriggers(TriggerIndex, 1, 0);
+		TestTriggersAtXYZ(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, boat->roomNumber, true, NULL);
+		TestTriggersAtXYZ(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, boat->roomNumber, false, NULL);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);

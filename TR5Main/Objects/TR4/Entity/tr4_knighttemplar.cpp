@@ -183,8 +183,8 @@ void KnightTemplarControl(short itemNumber)
 
 						mesh->flags &= ~1;
 						currentFloor->stopper = false;
-						int height = GetFloorHeight(currentFloor, pos.x, pos.y, pos.z);
-						TestTriggers(TriggerIndex, 1, 0);
+
+						TestTriggersAtXYZ(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 					}
 
 					mesh++;

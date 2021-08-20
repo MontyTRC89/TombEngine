@@ -435,7 +435,6 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->old.y = v->pos.yPos;
 	coll->old.z = v->pos.zPos;
 	coll->radius = SUB_RADIUS;
-	coll->trigger = NULL;
 	coll->slopesAreWalls = false;
 	coll->slopesArePits = false;
 	coll->lavaIsPit = false;
@@ -1006,7 +1005,7 @@ int SubControl(void)
 		}
 	}
 
-	TestTriggers(TriggerIndex, false, 0);
+	TestTriggersAtXYZ(v->pos.xPos, v->pos.yPos, v->pos.zPos, v->roomNumber, false, NULL);
 	SubEffects(Lara.Vehicle);
 
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))
