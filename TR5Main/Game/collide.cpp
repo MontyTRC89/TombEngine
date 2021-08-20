@@ -12,8 +12,8 @@
 #include "trmath.h"
 #include "prng.h"
 using std::vector;
-using namespace T5M::Math::Random;
-using namespace T5M::Floordata;
+using namespace ten::Math::Random;
+using namespace ten::Floordata;
 char LM[] =
 {
 	LM_HIPS,

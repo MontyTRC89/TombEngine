@@ -15,7 +15,7 @@ struct LOCUST_INFO
     BYTE counter;
 };
 
-namespace GameObjects::TR4::Locusts {
+namespace ten::entities::tr4 {
     constexpr auto MAX_LOCUSTS = 64;
     constexpr auto LOCUST_LARA_DAMAGE = 3;
     constexpr auto LOCUST_ENTITY_DAMAGE = 1;

@@ -12,8 +12,8 @@ short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
 vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
-using namespace T5M::Renderer;
-using namespace T5M::Math::Random;
+using namespace ten::renderer;
+using namespace ten::Math::Random;
 DebrisFragment* GetFreeDebrisFragment()
 {
 	for (auto& frag : DebrisFragments) {

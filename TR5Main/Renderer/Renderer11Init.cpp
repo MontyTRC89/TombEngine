@@ -9,12 +9,12 @@
 #include <memory>
 #include <filesystem>
 
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
-void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
+void ten::renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -91,8 +91,8 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", nullptr, blob);
 	m_vsHUD = Utils::compileVertexShader(m_device.Get(), L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", nullptr, blob);
 	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, blob);
-	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(),L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
@@ -153,7 +153,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	initQuad(m_device.Get());
 }
 
-void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
+void ten::renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
@@ -229,7 +229,7 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 
 	// Initialise sprites and font
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_context.Get());
-	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Font.spritefont");
+	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
 
 	// Initialise buffers
@@ -311,7 +311,7 @@ void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 
 }
 
-void T5M::Renderer::Renderer11::Create()
+void ten::renderer::Renderer11::Create()
 {
 
 	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; // {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_11_1};

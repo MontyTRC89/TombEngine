@@ -30,7 +30,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 struct CAMERA_INFO;
-namespace T5M::Renderer
+namespace ten::renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
@@ -217,7 +217,7 @@ namespace T5M::Renderer
 		int Width;
 		int Height;
 		Vector2 UV[4];
-		T5M::Renderer::Texture2D* Texture;
+		ten::renderer::Texture2D* Texture;
 	};
 	
 	struct RendererSpriteSequence
@@ -314,11 +314,11 @@ namespace T5M::Renderer
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11Texture2D* m_depthStencilTexture;
 	
-		T5M::Renderer::RenderTarget2D m_dumpScreenRenderTarget;
-		T5M::Renderer::RenderTarget2D m_renderTarget;
-		T5M::Renderer::RenderTarget2D m_currentRenderTarget;
-		T5M::Renderer::RenderTarget2D m_shadowMap;
-		T5M::Renderer::RenderTargetCube m_reflectionCubemap;
+		ten::renderer::RenderTarget2D m_dumpScreenRenderTarget;
+		ten::renderer::RenderTarget2D m_renderTarget;
+		ten::renderer::RenderTarget2D m_currentRenderTarget;
+		ten::renderer::RenderTarget2D m_shadowMap;
+		ten::renderer::RenderTargetCube m_reflectionCubemap;
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
@@ -380,20 +380,20 @@ namespace T5M::Renderer
 		std::unique_ptr<PrimitiveBatch<RendererVertex>> m_primitiveBatch;
 	
 		// System resources
-		T5M::Renderer::Texture2D m_HUDBarBorderTexture;
-		T5M::Renderer::Texture2D m_HUDBarTextures[4];
-		std::vector<T5M::Renderer::Texture2D> m_caustics;
-		T5M::Renderer::Texture2D m_binocularsTexture;
-		T5M::Renderer::Texture2D m_LasersightTexture;
-		T5M::Renderer::Texture2D m_whiteTexture;
-		T5M::Renderer::RenderTargetCubeArray m_shadowMaps;
+		ten::renderer::Texture2D m_HUDBarBorderTexture;
+		ten::renderer::Texture2D m_HUDBarTextures[4];
+		std::vector<ten::renderer::Texture2D> m_caustics;
+		ten::renderer::Texture2D m_binocularsTexture;
+		ten::renderer::Texture2D m_LasersightTexture;
+		ten::renderer::Texture2D m_whiteTexture;
+		ten::renderer::RenderTargetCubeArray m_shadowMaps;
 	
 		// Level data
-		T5M::Renderer::Texture2D m_titleScreen;
-		T5M::Renderer::Texture2D m_loadScreen;
-		T5M::Renderer::Texture2D m_textureAtlas;
-		T5M::Renderer::Texture2D m_skyTexture;
-		T5M::Renderer::Texture2D m_logo;
+		ten::renderer::Texture2D m_titleScreen;
+		ten::renderer::Texture2D m_loadScreen;
+		ten::renderer::Texture2D m_textureAtlas;
+		ten::renderer::Texture2D m_skyTexture;
+		ten::renderer::Texture2D m_logo;
 		VertexBuffer m_roomsVertexBuffer;
 		IndexBuffer m_roomsIndexBuffer;
 		VertexBuffer m_moveablesVertexBuffer;
@@ -436,7 +436,7 @@ namespace T5M::Renderer
 		std::vector<TexturePair> m_animatedTextures;
 		std::vector<TexturePair> m_moveablesTextures;
 		std::vector<TexturePair> m_staticsTextures;
-		std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
+		std::vector<ten::renderer::Texture2D> m_spritesTextures;
 	
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 

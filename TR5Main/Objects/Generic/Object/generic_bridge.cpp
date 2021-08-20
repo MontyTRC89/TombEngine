@@ -3,7 +3,7 @@
 #include "generic_bridge.h"
 #include "floordata.h"
 
-using namespace T5M::Floordata;
+using namespace ten::Floordata;
 
 void InitialiseBridge(short itemNumber)
 {

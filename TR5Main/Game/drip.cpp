@@ -9,8 +9,8 @@
 #include "effect2.h"
 #include "setup.h"
 #include "prng.h"
-using namespace T5M::Math::Random;
-namespace T5M {
+using namespace ten::Math::Random;
+namespace ten {
 	namespace Effects {
 		namespace Drip {
 			using namespace DirectX::SimpleMath;

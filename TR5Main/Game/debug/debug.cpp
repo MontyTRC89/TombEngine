@@ -6,7 +6,7 @@
 void InitTENLog()
 {
 	// "true" means that we create a new log file each time we run the game
-	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/TENLog.txt", true);
+	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Logs/TENLog.txt", true);
 
 	std::shared_ptr<spdlog::logger> logger;
 	if constexpr (DebugBuild)

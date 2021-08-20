@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include "phd_global.h"
-namespace T5M {
+namespace ten {
 	namespace Effects {
 		namespace Spark {
 			struct SparkParticle {

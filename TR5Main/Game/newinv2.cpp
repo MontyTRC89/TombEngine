@@ -18,7 +18,7 @@
 #include "input.h"
 #include "pickup.h"
 
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 long rptRight, rptLeft;
