@@ -29,7 +29,7 @@ associated getters and setters.
 	@tparam ItemAction action is this usable, equippable, or examinable?
 	@return an InventoryObject
 */
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
+GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },

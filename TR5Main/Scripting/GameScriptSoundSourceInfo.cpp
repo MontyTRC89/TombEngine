@@ -2,6 +2,7 @@
 #include "ScriptAssert.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptPosition.h"
+#include "ScriptUtil.h"
 /***
 Sound source info
 
@@ -12,6 +13,7 @@ Sound source info
 static constexpr auto LUA_CLASS_NAME{ "SoundSourceInfo" };
 
 static auto index_error = index_error_maker(GameScriptSoundSourceInfo, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(GameScriptSoundSourceInfo, LUA_CLASS_NAME);
 
 GameScriptSoundSourceInfo::GameScriptSoundSourceInfo(SOUND_SOURCE_INFO & ref, bool temp) : m_soundSource{ref}, m_temporary{ temp }
 {};
@@ -27,13 +29,14 @@ void GameScriptSoundSourceInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptSoundSourceInfo>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
+		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos
 		"pos", sol::property(&GameScriptSoundSourceInfo::GetPos, &GameScriptSoundSourceInfo::SetPos),
 
 		/// (string) unique string identifier.
-		// e.g. "machine_sound_1" or "discordant_humming"
+		// e.g. "machine\_sound\_1" or "discordant\_humming"
 		// @mem name
 		"name", sol::property(&GameScriptSoundSourceInfo::GetName, &GameScriptSoundSourceInfo::SetName),
 

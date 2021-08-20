@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "ScriptAssert.h"
 #include "GameScriptItemInfo.h"
+#include "ScriptUtil.h"
 #include "items.h"
 #include "objectslist.h"
 #include "level.h"
@@ -23,6 +24,7 @@ pickups, and Lara herself.
 constexpr auto LUA_CLASS_NAME{ "ItemInfo" };
 
 static auto index_error = index_error_maker(GameScriptItemInfo, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(GameScriptItemInfo, LUA_CLASS_NAME);
 
 GameScriptItemInfo::GameScriptItemInfo(short num, bool temp) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ false }, m_temporary{ temp }
 {};
@@ -167,6 +169,7 @@ void GameScriptItemInfo::Register(sol::state* state)
 		"newItem", sol::overload(Create<false>, CreateEmpty<false>),
 		"newItemTemporary", sol::overload(Create<true>, CreateEmpty<true>),
 		sol::meta_function::index, index_error,
+		sol::meta_function::new_index, newindex_error,
 
 		/// Initialise an item.
 		//Use this if you called new with no arguments
