@@ -190,7 +190,7 @@ void GameFlow::LoadGameFlowScript()
 	ExecuteScript("Scripts/Strings.lua");
 	ExecuteScript("Scripts/Settings.lua");
 
-	SetErrorMode(GetSettings()->ErrorMode);
+	SetScriptErrorMode(GetSettings()->ErrorMode);
 }
 
 char const * GameFlow::GetString(const char* id) const
