@@ -1,6 +1,6 @@
 #pragma once
 #include <wrl/client.h>
-namespace T5M::Renderer {
+namespace ten::renderer {
 	using Microsoft::WRL::ComPtr;
 	class RenderTarget2D {
 	public:

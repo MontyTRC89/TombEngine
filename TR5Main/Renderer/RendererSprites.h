@@ -2,7 +2,7 @@
 #include <SimpleMath.h>
 #include "RenderEnums.h"
 
-namespace T5M::Renderer {
+namespace ten::renderer {
 	struct RenderView;
 	struct RendererSprite;
 	struct RendererSpriteToDraw

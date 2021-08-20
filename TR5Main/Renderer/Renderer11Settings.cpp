@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 #include "winmain.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	void Renderer11::toggleFullScreen()
 {
 		
@@ -124,7 +124,7 @@ namespace T5M::Renderer {
 		DX11_DELETE(m_primitiveBatch);
 
 		m_spriteBatch = new SpriteBatch(m_context);
-		m_gameFont = new SpriteFont(m_device, L"Font.spritefont");
+		m_gameFont = new SpriteFont(m_device, L"Textures/Font.spritefont");
 		m_primitiveBatch = new PrimitiveBatch<RendererVertex>(m_context);
 
 		ScreenWidth = width;

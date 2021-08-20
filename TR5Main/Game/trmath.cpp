@@ -3,7 +3,7 @@
 #include <cmath>
 #include "prng.h"
 
-using namespace T5M::Math::Random;
+using namespace ten::Math::Random;
 
 short ANGLE(float angle)
 {

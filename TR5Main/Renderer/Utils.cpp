@@ -4,7 +4,7 @@
 #include <iostream>
 #include <wrl/client.h>
 #include <d3dcompiler.h>
-namespace T5M::Renderer::Utils {
+namespace ten::renderer::Utils {
 	using std::wstring;
 	using std::string;
 	using Microsoft::WRL::ComPtr;

@@ -19,7 +19,7 @@
 #include "prng.h"
 
 using std::vector;
-using namespace T5M::Math::Random;
+using namespace ten::Math::Random;
 
 enum SKIDOO_STATE 
 { 
@@ -315,7 +315,7 @@ bool SkidooCheckGetOff()
 
 void DoSnowEffect(ITEM_INFO* skidoo)
 {
-	T5M::Effects::TriggerSnowmobileSnow(skidoo);
+	ten::Effects::TriggerSnowmobileSnow(skidoo);
 	// OLD SPARK EFFECT
 	/*SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;

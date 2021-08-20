@@ -19,28 +19,28 @@ void AddTwoBlocksPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	T5M::Floordata::AddBridge(itemNumber);
+	ten::Floordata::AddBridge(itemNumber);
 	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
-		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
-		T5M::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
-		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
+		ten::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, -SECTOR(1), SECTOR(1));
 		break;
 	case EAST:
-		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
-		T5M::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
-		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
+		ten::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, SECTOR(1), SECTOR(1));
 		break;
 	case SOUTH:
-		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
-		T5M::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
-		T5M::Floordata::AddBridge(itemNumber, SECTOR(1), -SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
+		ten::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, SECTOR(1), -SECTOR(1));
 		break;
 	case WEST:
-		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
-		T5M::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
-		T5M::Floordata::AddBridge(itemNumber, -SECTOR(1), -SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
+		ten::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
+		ten::Floordata::AddBridge(itemNumber, -SECTOR(1), -SECTOR(1));
 		break;
 	}
 }
@@ -49,28 +49,28 @@ void RemoveTwoBlocksPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	T5M::Floordata::RemoveBridge(itemNumber);
+	ten::Floordata::RemoveBridge(itemNumber);
 	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
-		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
-		T5M::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
-		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
+		ten::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, -SECTOR(1), SECTOR(1));
 		break;
 	case EAST:
-		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
-		T5M::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
-		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
+		ten::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, SECTOR(1), SECTOR(1));
 		break;
 	case SOUTH:
-		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
-		T5M::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
-		T5M::Floordata::RemoveBridge(itemNumber, SECTOR(1), -SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
+		ten::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, SECTOR(1), -SECTOR(1));
 		break;
 	case WEST:
-		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
-		T5M::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
-		T5M::Floordata::RemoveBridge(itemNumber, -SECTOR(1), -SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
+		ten::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
+		ten::Floordata::RemoveBridge(itemNumber, -SECTOR(1), -SECTOR(1));
 		break;
 	}
 }

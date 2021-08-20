@@ -2,7 +2,7 @@
 #include "prng.h"
 #include <random>
 
-namespace T5M::Math::Random
+namespace ten::Math::Random
 {
 	static std::mt19937 Engine;
 
