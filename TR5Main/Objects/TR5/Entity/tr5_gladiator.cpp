@@ -330,8 +330,8 @@ void ControlGladiator(short itemNumber)
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
 										mesh->flags &= 0xFEu;
-										GetFloorHeight(floor, pos.x, pos.y, pos.z);
-										TestTriggers(TriggerIndex, 1, 0);
+
+										TestTriggersAtXYZ(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 									}
 								}
 							}

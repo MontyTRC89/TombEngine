@@ -1645,8 +1645,8 @@ int JeepControl(void)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	TestTriggers(TriggerIndex, 1, 0);
-	TestTriggers(TriggerIndex, 0, 0);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true,  NULL);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
 
 	if (LaraItem->hitPoints <= 0)
 	{

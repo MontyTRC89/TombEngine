@@ -219,11 +219,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 									if ((frame >= 12) && (frame <= 22))
 									{
 										SoundEffect(220, &item->pos, 2);
-
-										roomNumber = item->roomNumber;
-										floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-
-										TestTriggers(TriggerIndex, TRUE, 0);
+										TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
 										item->frameNumber++;
 									}
 								}
@@ -868,7 +864,7 @@ int MineCartControl(void)
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
-	TestTriggers(TriggerIndex, FALSE, 0);
+	TestTriggersAtXYZ(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber, false, NULL);
 
 	if (!(cart->Flags & CF_DEAD))
 	{

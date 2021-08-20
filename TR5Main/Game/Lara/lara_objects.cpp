@@ -811,11 +811,6 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetAngle = ANGLE(70.0f);
 
-	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	coll->trigger = TriggerIndex;
-
 	if (!(TrInput & IN_ACTION))
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;

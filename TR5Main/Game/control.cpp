@@ -166,7 +166,6 @@ int SplitFloor;
 int SplitCeiling;
 int TiltXOffset;
 int TiltYOffset;
-int FramesCount;
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
@@ -198,6 +197,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
@@ -3520,11 +3520,11 @@ int IsRoomOutside(int x, int y, int z)
 
 void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags)
 {
-	auto floor = GetFloor(x, y, z, &roomNumber);
+	auto roomNum = roomNumber;
+	auto floor = GetFloor(x, y, z, &roomNum);
 	GetFloorHeight(floor, x, y, z);
 
 	// Don't process legacy triggers if trigger triggerer wasn't used
-
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
