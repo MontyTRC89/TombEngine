@@ -171,93 +171,106 @@ void GameScriptItemInfo::Register(sol::state* state)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// Initialise an item.
-		//Use this if you called new with no arguments
-		// @function ItemInfo.Init
+/// Initialise an item.
+//Use this if you called new with no arguments
+// @function ItemInfo.Init
 		"Init", &GameScriptItemInfo::Init,
 
-		/// Enable the item
-		// @function ItemInfo:EnableItem
+/// Enable the item
+// @function ItemInfo:EnableItem
 		"Enable", &GameScriptItemInfo::EnableItem,
 
-		/// Disable the item
-		// @function ItemInfo:DisableItem
+/// Disable the item
+// @function ItemInfo:DisableItem
 		"Disable", &GameScriptItemInfo::DisableItem,
 
-		/// (@{ObjID}) object ID 
-		// @mem objectID
+/// (@{ObjID}) object ID 
+// @mem objectID
 		"objectID", sol::property(&GameScriptItemInfo::GetObjectID, &GameScriptItemInfo::SetObjectID),
 
-		/// (int) State of current animation
-		// @mem currentAnimState
+/*** (int) current animation state
+
+The state number of the animation the object is currently doing.
+This corresponds to "state" number shown in the animation editor of WadTool.
+@mem currentAnimState
+*/
 		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
 
-		/// (int) State of required animation
-		// @mem requiredAnimState
+/// (int) State of required animation
+// @mem requiredAnimState
 		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
 
-		/// (int) State of goal animation
-		// @mem goalAnimState
+/// (int) State of goal animation
+// @mem goalAnimState
 		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
 
-		/// (int) animation number
-		// @mem animNumber
+/*** (int) animation number
+
+The index of the animation the object is currently doing.
+This corresponds to the number shown in the item's animation list in WadTool.
+@mem animNumber
+*/
 		"animNumber", sol::property(&GameScriptItemInfo::GetAnimNumber, &GameScriptItemInfo::SetAnimNumber),
 
-		/// (int) frame number
-		// @mem frameNumber
+/*** (int) frame number
+
+Current fame of the animation the object is currently doing.
+The number of frames in an animation can be seen under the heading "End frame" in
+the WadTool animation editor.
+@mem frameNumber
+*/
 		"frameNumber", sol::property(&GameScriptItemInfo::GetFrameNumber, &GameScriptItemInfo::SetFrameNumber),
 
-		/// (int) HP (hit points/health points) of object 
-		//@raise an exception if the object is intelligent and an invalid
-		//hp value is given
-		// @mem HP
+/// (int) HP (hit points/health points) of object 
+//@raise an exception if the object is intelligent and an invalid
+//hp value is given
+// @mem HP
 		"HP", sol::property(&GameScriptItemInfo::GetHP, &GameScriptItemInfo::SetHP),
 
-		/// (int) OCB (object code bit) of object
-		// @mem OCB
+/// (int) OCB (object code bit) of object
+// @mem OCB
 		"OCB", sol::property(&GameScriptItemInfo::GetOCB, &GameScriptItemInfo::SetOCB),
 
-		/// (table) item flags of object (table of 8 ints)
-		// @mem itemFlags 
+/// (table) item flags of object (table of 8 ints)
+// @mem itemFlags 
 		"itemFlags", sol::property(&GameScriptItemInfo::GetItemFlags, &GameScriptItemInfo::SetItemFlags),
 
-		/// (int) AIBits of object. Will be clamped to [0, 255]
-		// @mem AIBits
+/// (int) AIBits of object. Will be clamped to [0, 255]
+// @mem AIBits
 		"AIBits", sol::property(&GameScriptItemInfo::GetAIBits, &GameScriptItemInfo::SetAIBits),
 
-		/// (int) status of object.
-		// possible values:
-		// 0 - not active
-		// 1 - active
-		// 2 - deactivated
-		// 3 - invisible
-		// @mem status
+/// (int) status of object.
+// possible values:
+// 0 - not active
+// 1 - active
+// 2 - deactivated
+// 3 - invisible
+// @mem status
 		"status", sol::property(&GameScriptItemInfo::GetStatus, &GameScriptItemInfo::SetStatus),
 
-		/// (bool) hit status of object
-		// @mem hitStatus
+/// (bool) hit status of object
+// @mem hitStatus
 		"hitStatus", sol::property(&GameScriptItemInfo::GetHitStatus, &GameScriptItemInfo::SetHitStatus),
 
-		/// (bool) whether or not the object is active 
-		// @mem active
+/// (bool) whether or not the object is active 
+// @mem active
 		"active", sol::property(&GameScriptItemInfo::GetActive, &GameScriptItemInfo::SetActive),
 
-		/// (int) room the item is in 
-		// @mem room
+/// (int) room the item is in 
+// @mem room
 		"room", sol::property(&GameScriptItemInfo::GetRoom, &GameScriptItemInfo::SetRoom),
 
-		/// (@{Position}) position in level
-		// @mem pos
+/// (@{Position}) position in level
+// @mem pos
 		"pos", sol::property(&GameScriptItemInfo::GetPos, &GameScriptItemInfo::SetPos),
 
-		/// (@{Rotation}) rotation represented as degree angles about X, Y, and Z axes
-		// @mem rot
+/// (@{Rotation}) rotation represented as degree angles about X, Y, and Z axes
+// @mem rot
 		"rot", sol::property(&GameScriptItemInfo::GetRot, &GameScriptItemInfo::SetRot),
 
-		/// (string) unique string identifier.
-		// e.g. "door_back_room" or "cracked_greek_statue"
-		// @mem name
+/// (string) unique string identifier.
+// e.g. "door\_back\_room" or "cracked\_greek\_statue"
+// @mem name
 		"name", sol::property(&GameScriptItemInfo::GetName, &GameScriptItemInfo::SetName)
 		);
 }
