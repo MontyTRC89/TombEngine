@@ -24,7 +24,7 @@ struct GameScriptInventoryObject
 {
 	std::string name{};
 	inv_objects slot{ INV_OBJECT_PISTOLS };
-	float yOffset{ 0.0f };
+	short yOffset{ 0 };
 	float scale{ 1.0f };
 	GameScriptRotation rot{};
 	rotflags rotationFlags{ rotflags::INV_ROT_X };
@@ -32,7 +32,7 @@ struct GameScriptInventoryObject
 	item_options action{ item_options::OPT_USE };
 
 	GameScriptInventoryObject() = default;
-	GameScriptInventoryObject(std::string const & a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_actions);
+	GameScriptInventoryObject(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_actions);
 
 	static void Register(sol::state* lua);
 

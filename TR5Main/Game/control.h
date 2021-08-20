@@ -105,8 +105,6 @@ extern HEIGHT_TYPES HeightType;
 extern int HeavyTriggered;
 extern short SkyPos1;
 extern short SkyPos2;
-extern signed char SkyVelocity1;
-extern signed char SkyVelocity2;
 extern CVECTOR SkyColor1;
 extern CVECTOR SkyColor2;
 extern int CutSeqNum;

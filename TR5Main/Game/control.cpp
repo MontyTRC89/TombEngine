@@ -133,8 +133,6 @@ HEIGHT_TYPES HeightType;
 int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
-signed char SkyVelocity1;
-signed char SkyVelocity2;
 CVECTOR SkyColor1;
 CVECTOR SkyColor2;
 int CutSeqNum;
