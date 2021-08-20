@@ -126,7 +126,6 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void RefreshFloorGlobals(ITEM_INFO* item);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
