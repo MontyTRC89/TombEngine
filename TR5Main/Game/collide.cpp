@@ -1080,8 +1080,6 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 	int height = floor->floor * 256;
 	if (height != NO_HEIGHT)
 	{
-		TriggerIndex = NULL;
-
 		if (floor->index != 0)
 		{
 			short* data = &g_Level.FloorData[floor->index];
@@ -1131,11 +1129,7 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 					break;
 
 				case TRIGGER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-
 					data++;
-
 					do
 					{
 						trigger = *(data++);
@@ -1150,18 +1144,6 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 						}
 
 					} while (!(trigger & END_BIT));
-					break;
-
-				case LAVA_TYPE:
-					TriggerIndex = data - 1;
-					break;
-
-				case CLIMB_TYPE:
-				case MONKEY_TYPE:
-				case TRIGTRIGGER_TYPE:
-				case MINER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
 					break;
 
 				case SPLIT1:
@@ -1256,13 +1238,6 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 			} while (!(type & END_BIT));
 		}
 	}
-}
-
-void RefreshFloorGlobals(ITEM_INFO* item)
-{
-	auto room = item->roomNumber;
-	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
-	DoFloorThings(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)

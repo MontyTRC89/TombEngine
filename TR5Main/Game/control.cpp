@@ -104,7 +104,6 @@ short NextFxActive;
 short NextFxFree;
 short NextItemActive;
 short NextItemFree;
-short *TriggerIndex;
 
 int DisableLaraControl = 0;
 int WeatherType;
@@ -130,7 +129,6 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-HEIGHT_TYPES HeightType;
 int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
@@ -162,6 +160,7 @@ short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
 
+HEIGHT_TYPES HeightType;
 int SplitFloor;
 int SplitCeiling;
 int TiltXOffset;
@@ -1756,9 +1755,86 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 	return 0;
 }
 
+short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+{
+	ROOM_INFO* r;
+	while (floor->pitRoom != NO_ROOM)
+	{
+		if (CheckNoColFloorTriangle(floor, x, z) == 1)
+			break;
+		r = &g_Level.Rooms[floor->pitRoom];
+		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	}
+
+	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
+		return NULL;
+
+	short* triggerIndex = NULL;
+
+	short* data = &g_Level.FloorData[floor->index];
+	short type;
+	int trigger;
+	do
+	{
+		type = *(data++);
+
+		switch (type & DATA_TYPE)
+		{
+			case DOOR_TYPE:
+			case TILT_TYPE:
+			case ROOF_TYPE:
+			case SPLIT1:
+			case SPLIT2:
+			case SPLIT3:
+			case SPLIT4:
+			case NOCOLF1T:
+			case NOCOLF1B:
+			case NOCOLF2T:
+			case NOCOLF2B:
+			case NOCOLC1T:
+			case NOCOLC1B:
+			case NOCOLC2T:
+			case NOCOLC2B:
+				data++;
+				break;
+
+			case LAVA_TYPE:
+			case CLIMB_TYPE:
+			case MONKEY_TYPE:
+			case TRIGTRIGGER_TYPE:
+			case MINER_TYPE:
+				break;
+
+			case TRIGGER_TYPE:
+				triggerIndex = data - 1;
+				data++;
+
+				do
+				{
+					trigger = *(data++);
+
+					if (TRIG_BITS(trigger) != TO_OBJECT)
+					{
+						if (TRIG_BITS(trigger) == TO_CAMERA ||
+							TRIG_BITS(trigger) == TO_FLYBY)
+						{
+							trigger = *(data++);
+						}
+					}
+
+				} while (!(trigger & END_BIT));
+				break;
+
+			default:
+				break;
+		}
+	} while (!(type & END_BIT));
+
+	return triggerIndex;
+}
+
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
-
 	TiltYOffset = 0;
 	TiltXOffset = 0;
 	OnObject = 0;
@@ -1777,15 +1853,8 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 	int height = floor->floor * 256;
 	if (height != NO_HEIGHT)
 	{
-		//		return height;
-
-
-		TriggerIndex = NULL;
-
 		if (floor->index != 0)
 		{
-			//		return height;
-
 			short* data = &g_Level.FloorData[floor->index];
 			short type, hadj;
 
@@ -1799,6 +1868,14 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 
 				switch (type & DATA_TYPE)
 				{
+
+				case LAVA_TYPE:
+				case CLIMB_TYPE:
+				case MONKEY_TYPE:
+				case TRIGTRIGGER_TYPE:
+				case MINER_TYPE:
+					break;
+
 				case DOOR_TYPE:
 				case ROOF_TYPE:
 				case SPLIT3:
@@ -1833,11 +1910,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 					break;
 
 				case TRIGGER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-
 					data++;
-
 					do
 					{
 						trigger = *(data++);
@@ -1850,30 +1923,8 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 								trigger = *(data++);
 							}
 						}
-						else
-						{
-							/*item = &g_Level.Items[trigger & VALUE_BITS];
-							obj = &Objects[item->objectNumber];
-
-							if (obj->floor && !(item->flags & 0x8000))
-							{
-								(obj->floor)(item, x, y, z, &height);
-							}*/
-						}
 
 					} while (!(trigger & END_BIT));
-					break;
-
-				case LAVA_TYPE:
-					TriggerIndex = data - 1;
-					break;
-
-				case CLIMB_TYPE:
-				case MONKEY_TYPE:
-				case TRIGTRIGGER_TYPE:
-				case MINER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
 					break;
 
 				case SPLIT1:
@@ -3522,13 +3573,12 @@ void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int fla
 {
 	auto roomNum = roomNumber;
 	auto floor = GetFloor(x, y, z, &roomNum);
-	GetFloorHeight(floor, x, y, z);
 
 	// Don't process legacy triggers if trigger triggerer wasn't used
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(TriggerIndex, heavy, flags);
+	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, flags);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)
