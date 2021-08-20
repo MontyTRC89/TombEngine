@@ -1182,12 +1182,12 @@ void SwitchControl(short itemNumber)
 int GetKeyTrigger(ITEM_INFO* item) 
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	auto triggerIndex = GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	if (TriggerIndex)
+	if (triggerIndex)
 	{
-		short* trigger = TriggerIndex;
-		for (short i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+		short* trigger = triggerIndex;
+		for (short i = *triggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;
@@ -1210,12 +1210,12 @@ int GetKeyTrigger(ITEM_INFO* item)
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	auto triggerIndex = GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	if (TriggerIndex)
+	if (triggerIndex)
 	{
 		short* trigger;
-		for (trigger = TriggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
+		for (trigger = triggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
 		{
 			if (*trigger & END_BIT)
 				break;
@@ -1338,16 +1338,16 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	auto triggerIndex = GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	if (!TriggerIndex)
+	if (!triggerIndex)
 	{
 		ObjectCollision(itemNum, l, coll);
 		return;
 	}
 
-	short* trigger = TriggerIndex;
-	for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+	short* trigger = triggerIndex;
+	for (int i = *triggerIndex; (i & 0x1F) != 4; trigger++)
 	{
 		if (i < 0)
 			break;
