@@ -43,7 +43,7 @@ void GameScriptMeshInfo::Register(sol::state* state)
 		"yRot", sol::property(&GameScriptMeshInfo::GetRot, &GameScriptMeshInfo::SetRot),
 
 		/// (string) unique string identifier.
-		// e.g. "door_back_room" or "cracked_greek_statue"
+		// e.g. "my\_vase" or "oldrubble"
 		// @mem name
 		"name", sol::property(&GameScriptMeshInfo::GetName, &GameScriptMeshInfo::SetName),
 

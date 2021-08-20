@@ -38,7 +38,7 @@ void GameScriptSinkInfo::Register(sol::state* state)
 		"pos", sol::property(&GameScriptSinkInfo::GetPos, &GameScriptSinkInfo::SetPos),
 
 		/// (string) unique string identifier.
-		// e.g. "door\_back\_room" or "cracked\_greek\_statue"
+		// e.g. "strong\_river\_current" or "propeller\_death\_sink"
 		// @mem name
 		"name", sol::property(&GameScriptSinkInfo::GetName, &GameScriptSinkInfo::SetName),
 
