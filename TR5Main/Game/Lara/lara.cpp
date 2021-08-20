@@ -833,7 +833,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	coll->oldAnimNumber = item->animNumber;
 	coll->oldFrameNumber = item->frameNumber;
 	coll->radius = LARA_RAD;
-	coll->trigger = NULL;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -962,7 +961,6 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->enableSpaz = false;
 
 	coll->radius = 300;
-	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1074,7 +1072,6 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->enableSpaz = false;
 
 	coll->radius = 100;
-	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();

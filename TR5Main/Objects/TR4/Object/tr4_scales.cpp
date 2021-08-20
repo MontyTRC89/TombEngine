@@ -74,11 +74,7 @@ void ScalesControl(short itemNum)
 		item->itemFlags[1] = 1;
 	}
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	TestTriggers(TriggerIndex, TRUE, flags);
+	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, flags);
 	AnimateItem(item);
 }
 
