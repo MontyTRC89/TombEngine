@@ -241,12 +241,10 @@ bool GameFlow::DoGameflow()
 			SkyColor1.r = level->Layer1.R;
 			SkyColor1.g = level->Layer1.G;
 			SkyColor1.b = level->Layer1.B;
-			SkyVelocity1 = level->Layer1.CloudSpeed;
 
 			SkyColor2.r = level->Layer2.R;
 			SkyColor2.g = level->Layer2.G;
 			SkyColor2.b = level->Layer2.B;
-			SkyVelocity2 = level->Layer2.CloudSpeed;
 		}
 
 		if (level->Storm)
@@ -269,7 +267,7 @@ bool GameFlow::DoGameflow()
 		else
 		{
 			// Prepare inventory objects table
-			for (int i = 0; i < level->InventoryObjects.size(); i++)
+			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
 				GameScriptInventoryObject* obj = &level->InventoryObjects[i];
 				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
