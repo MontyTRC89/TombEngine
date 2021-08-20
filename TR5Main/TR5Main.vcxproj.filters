@@ -1154,9 +1154,6 @@
     <ClCompile Include="Renderer\Renderer11.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\LanguageScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Specific\configuration.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
