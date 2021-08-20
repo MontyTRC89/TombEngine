@@ -417,22 +417,36 @@ void GameScriptItemInfo::SetGoalAnimState(short state)
 
 short GameScriptItemInfo::GetAnimNumber() const
 {
-	return m_item->animNumber;
+	return m_item->animNumber - Objects[m_item->objectNumber].animIndex;
 }
 
 void GameScriptItemInfo::SetAnimNumber(short animNumber)
 {
-	m_item->animNumber = animNumber;
+	//TODO fixme: we need bounds checking with an error message once it's in the level file format
+	m_item->animNumber = animNumber +  Objects[m_item->objectNumber].animIndex;
 }
 
 short GameScriptItemInfo::GetFrameNumber() const
 {
-	return m_item->frameNumber;
+	return m_item->frameNumber - g_Level.Anims[m_item->animNumber].frameBase;
 }
+
 
 void GameScriptItemInfo::SetFrameNumber(short frameNumber)
 {
-	m_item->frameNumber = frameNumber;
+	auto const fBase = g_Level.Anims[m_item->animNumber].frameBase;
+	auto const fEnd = g_Level.Anims[m_item->animNumber].frameEnd;
+	auto frameCount = fEnd - fBase;
+	bool cond = (frameNumber < frameCount);
+	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";
+	if (ScriptAssertF(cond, err, frameNumber, m_item->animNumber, frameCount))
+	{
+		m_item->frameNumber = frameNumber + fBase;
+	}
+	else
+	{
+		ScriptWarn("Not setting frame number.");
+	}
 }
 
 
