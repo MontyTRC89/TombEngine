@@ -4,6 +4,7 @@
 #include "GameScriptMeshInfo.h"
 #include "GameScriptPosition.h"
 #include "GameScriptColor.h"
+#include "ScriptUtil.h"
 #include <sol.hpp>
 /***
 Mesh info
@@ -15,6 +16,7 @@ Mesh info
 constexpr auto LUA_CLASS_NAME{ "MeshInfo" };
 
 static auto index_error = index_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
 
 GameScriptMeshInfo::GameScriptMeshInfo(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
 {};
@@ -30,6 +32,7 @@ void GameScriptMeshInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptMeshInfo>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
+		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos
