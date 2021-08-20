@@ -711,7 +711,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptSkyLayer.cpp" />
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
-    <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />

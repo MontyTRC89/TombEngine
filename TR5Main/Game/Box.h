@@ -38,14 +38,14 @@ enum ZoneType
 	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
-struct OBJECT_Bones
+struct OBJECT_BONES
 {
 	short bone0;
 	short bone1;
 	short bone2;
 	short bone3;
 
-	OBJECT_Bones()
+	OBJECT_BONES()
 	{
 		this->bone0 = 0;
 		this->bone1 = 0;
@@ -53,7 +53,7 @@ struct OBJECT_Bones
 		this->bone3 = 0;
 	}
 
-	OBJECT_Bones(short all)
+	OBJECT_BONES(short all)
 	{
 		this->bone0 = all;
 		this->bone1 = all;
@@ -61,7 +61,7 @@ struct OBJECT_Bones
 		this->bone3 = all;
 	}
 
-	OBJECT_Bones(short angleY, short angleX)
+	OBJECT_BONES(short angleY, short angleX)
 	{
 		this->bone0 = angleY;
 		this->bone1 = angleX;
@@ -69,7 +69,7 @@ struct OBJECT_Bones
 		this->bone3 = angleX;
 	}
 
-	OBJECT_Bones(short angleY, short angleX, bool total)
+	OBJECT_BONES(short angleY, short angleX, bool total)
 	{
 		this->bone0 = angleY;
 		this->bone1 = angleX;

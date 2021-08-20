@@ -104,7 +104,7 @@ void CrocodileControl(short itemNumber)
     OBJECT_INFO* obj;
     CREATURE_INFO* crocodile;
     AI_INFO info;
-    OBJECT_Bones boneRot;
+    OBJECT_BONES boneRot;
     short angle;
     short boneAngle;
 
