@@ -298,26 +298,15 @@ namespace ten::entities::all
 			}
 			else
 			{
-				int shockwaveValue = 0;
-				byte r, g, b, life;
-
 				if (fx->flag1)
 				{
 					if (fx->flag1 == 3 || fx->flag1 == 4)
 					{
-						shockwaveValue = 268451968;
-						r = 128;
-						g = 64;
-						b = 0;
-						life = 16;
+						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					}
 					else if (fx->flag1 == 5)
 					{
-						shockwaveValue = 276848640;
-						r = 0;
-						g = 96;
-						b = 128;
-						life = 16;
+						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
 					}
 					else
 					{
@@ -332,27 +321,18 @@ namespace ten::entities::all
 								fx->pos.yPos += 256;
 								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 							}
+
 						}
 						else
 						{
-							shockwaveValue = 276856832;
-							r = 0;
-							g = 128;
-							b = 128;
-							life = 16;
+							TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 0);
 						}
 					}
 				}
 				else
 				{
-					shockwaveValue = 268468288;
-					r = 64;
-					g = 128;
-					b = 0;
-					life = 16;
+					TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 0, 16, 0, 0);
 				}
-
-				TriggerShockwave(&fx->pos, 32, 160, 64, r, g, b, life, 0, 0);
 			}
 
 			KillEffect(fxNum);
