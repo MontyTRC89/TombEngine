@@ -122,13 +122,3 @@
 #define STRING_CLOCKWORK_BEETLE			"clockwork_beetle"
 #define STRING_CLOCKWORK_BEETLE_COMBO1	"clockwork_beetle_combo1"
 #define STRING_CLOCKWORK_BEETLE_COMBO2	"clockwork_beetle_combo2"
-
-class LanguageScript
-{
-public:
-	std::string Name;
-	std::unordered_map<size_t, std::string> Strings;
-	LanguageScript(char* name);
-	~LanguageScript();
-};
-
