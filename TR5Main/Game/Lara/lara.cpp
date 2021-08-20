@@ -920,6 +920,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
 
+		// FIXME: refresh floor globals because sometimes they are messed by calling GetFloorHeight
+		// all over the place. Needed for monkeyswing. Remove when block flags decoupled from floordata. -- Lwmte 19.08.21
+		RefreshFloorGlobals(item);
+
 		// Handle Lara collision
 		if (Lara.Vehicle == NO_ITEM)
 			lara_collision_routines[item->currentAnimState](item, coll);

@@ -128,8 +128,15 @@ This is equivalent to TRNG's LevelFarView variable.
 __(not yet implemented)__
 @mem farView
 */
-
 		"farView", sol::property(&GameScriptLevel::SetLevelFarView),
+
+/*** (bool) If true, the player will have an unlimited oxygen supply when in water.
+
+ __(not yet implemented)__
+@mem unlimitedAir
+*/
+		"unlimitedAir", &GameScriptLevel::UnlimitedAir,
+
 /// (table of @{InventoryObject}s) table of inventory object overrides
 //@mem objects
 		"objects", &GameScriptLevel::InventoryObjects
