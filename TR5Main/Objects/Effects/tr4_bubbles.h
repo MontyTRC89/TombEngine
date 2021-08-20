@@ -1,3 +1,6 @@
 #pragma once
 
-void BubblesControl(short fxNum);
+namespace ten::entities::all
+{
+	void ControlEnemyMissile(short fxNum);
+}
