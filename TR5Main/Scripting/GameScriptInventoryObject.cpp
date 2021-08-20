@@ -44,7 +44,7 @@ GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, 
 void GameScriptInventoryObject::Register(sol::state * lua)
 {
 	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
-		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, float, float, GameScriptRotation const &, rotflags, int, item_options), GameScriptInventoryObject()>(),
+		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, rotflags, int, item_options), GameScriptInventoryObject()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
 */
