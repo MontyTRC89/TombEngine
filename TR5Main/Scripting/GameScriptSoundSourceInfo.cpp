@@ -33,7 +33,7 @@ void GameScriptSoundSourceInfo::Register(sol::state* state)
 		"pos", sol::property(&GameScriptSoundSourceInfo::GetPos, &GameScriptSoundSourceInfo::SetPos),
 
 		/// (string) unique string identifier.
-		// e.g. "machine_sound_1" or "discordant_humming"
+		// e.g. "machine\_sound\_1" or "discordant\_humming"
 		// @mem name
 		"name", sol::property(&GameScriptSoundSourceInfo::GetName, &GameScriptSoundSourceInfo::SetName),
 
