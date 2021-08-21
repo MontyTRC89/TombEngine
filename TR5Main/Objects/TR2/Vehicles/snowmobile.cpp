@@ -234,16 +234,16 @@ bool SkidooCheckGetOffOK(int direction)
 
 	short roomNumber = skidoo->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	auto collResult = GetCollisionResult(floor, x, y, z);
 
-	if (HeightType == BIG_SLOPE || height == NO_HEIGHT || HeightType == DIAGONAL)
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
 
-	if (abs(height - skidoo->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
 	int ceiling = GetCeiling(floor, x, y, z);
-	if (ceiling - skidoo->pos.yPos > -LARA_HITE || height - ceiling < LARA_HITE)
+	if (ceiling - skidoo->pos.yPos > -LARA_HITE || collResult.FloorHeight - ceiling < LARA_HITE)
 		return false;
 
 	return true;
