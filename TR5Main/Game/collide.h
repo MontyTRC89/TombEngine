@@ -9,6 +9,21 @@
 
 #define MAX_COLLIDED_OBJECTS 1024
 
+struct COLL_RESULT
+{
+	FLOOR_INFO* Block;
+
+	int FloorHeight;
+	int HeightType;
+
+	int TiltX;
+	int TiltZ;
+	int SplitFloor;
+
+	int CeilingHeight;
+	int SplitCeiling;
+};
+
 struct COLL_FLOOR
 {
 	int floor;
@@ -113,6 +128,9 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateLaraRoom(ITEM_INFO* item, int height);
 short GetTiltType(FLOOR_INFO* floor, int x, int y, int z);
+COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
+COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
+COLL_RESULT GetCollisionResult(ITEM_INFO* item);
 int FindGridShift(int x, int z);
 int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
 int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll);

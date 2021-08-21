@@ -33,7 +33,6 @@ char LM[] =
 	LM_HEAD,
 };
 
-extern int SplitFloor, SplitCeiling;
 int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
@@ -1060,13 +1059,25 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
+COLL_RESULT GetCollisionResult(ITEM_INFO* item)
 {
-	TiltYOffset = 0;
-	TiltXOffset = 0;
-	OnObject = 0;
-	HeightType = WALL;
-	SplitFloor = 0;
+	auto roomNumber = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	return GetCollisionResult(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+}
+
+COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber)
+{
+	auto room = roomNumber;
+	auto floor = GetFloor(x, y, z, &room);
+	return GetCollisionResult(floor, x, y, z);
+}
+
+COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
+{
+	COLL_RESULT result = {};
+
+	result.Block = floor;
 
 	ROOM_INFO* r;
 	while (floor->pitRoom != NO_ROOM)
@@ -1077,167 +1088,172 @@ void DoFloorThings(FLOOR_INFO* floor, int x, int y, int z)
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	int height = floor->floor * 256;
-	if (height != NO_HEIGHT)
-	{
-		if (floor->index != 0)
-		{
-			short* data = &g_Level.FloorData[floor->index];
-			short type, hadj;
+	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
-			int xOff, yOff, trigger;
-			ITEM_INFO* item;
-			OBJECT_INFO* obj;
-			int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+	if (floor->floor * 256 == NO_HEIGHT || floor->index == 0)
+		return result; // No floordata, block is flat.
+
+	int height = floor->floor * 256;
+
+	short* data = &g_Level.FloorData[floor->index];
+	short type, hadj;
+
+	int xOff, yOff, trigger;
+	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+
+	do
+	{
+		type = *(data++);
+
+		switch (type & DATA_TYPE)
+		{
+		case DOOR_TYPE:
+		case ROOF_TYPE:
+			data++;
+			break;
+
+		case SPLIT3:
+		case SPLIT4:
+		case NOCOLC1T:
+		case NOCOLC1B:
+		case NOCOLC2T:
+		case NOCOLC2B:
+			result.SplitCeiling = type & DATA_TYPE;
+			data++;
+			break;
+
+		case TILT_TYPE:
+			result.TiltX = xOff = (*data >> 8);
+			result.TiltZ = yOff = *(char*)data;
+
+			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				result.HeightType = BIG_SLOPE;
+			else
+				result.HeightType = SMALL_SLOPE;
+
+			if (xOff >= 0)
+				height += (xOff * ((-1 - z) & 1023) >> 2);
+			else
+				height -= (xOff * (z & 1023) >> 2);
+
+			if (yOff >= 0)
+				height += yOff * ((-1 - x) & 1023) >> 2;
+			else
+				height -= yOff * (x & 1023) >> 2;
+
+			data++;
+			break;
+
+		case TRIGGER_TYPE:
+			data++;
 			do
 			{
-				type = *(data++);
+				trigger = *(data++);
 
-				switch (type & DATA_TYPE)
+				if (TRIG_BITS(trigger) != TO_OBJECT)
 				{
-				case DOOR_TYPE:
-				case ROOF_TYPE:
-				case SPLIT3:
-				case SPLIT4:
-				case NOCOLC1T:
-				case NOCOLC1B:
-				case NOCOLC2T:
-				case NOCOLC2B:
-					data++;
-					break;
-
-				case TILT_TYPE:
-					TiltXOffset = xOff = (*data >> 8);
-					TiltYOffset = yOff = *(char*)data;
-
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = BIG_SLOPE;
-					else
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += (xOff * ((-1 - z) & 1023) >> 2);
-					else
-						height -= (xOff * (z & 1023) >> 2);
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				case TRIGGER_TYPE:
-					data++;
-					do
+					if (TRIG_BITS(trigger) == TO_CAMERA ||
+						TRIG_BITS(trigger) == TO_FLYBY)
 					{
 						trigger = *(data++);
-
-						if (TRIG_BITS(trigger) != TO_OBJECT)
-						{
-							if (TRIG_BITS(trigger) == TO_CAMERA ||
-								TRIG_BITS(trigger) == TO_FLYBY)
-							{
-								trigger = *(data++);
-							}
-						}
-
-					} while (!(trigger & END_BIT));
-					break;
-
-				case SPLIT1:
-				case SPLIT2:
-				case NOCOLF1T:
-				case NOCOLF1B:
-				case NOCOLF2T:
-				case NOCOLF2B:
-					tilts = *data;
-					t0 = tilts & 15;
-					t1 = (tilts >> 4) & 15;
-					t2 = (tilts >> 8) & 15;
-					t3 = (tilts >> 12) & 15;
-
-					dx = x & 1023;
-					dz = z & 1023;
-
-					xOff = yOff = 0;
-
-					HeightType = SPLIT_TRI;
-					SplitFloor = (type & DATA_TYPE);
-
-					if ((type & DATA_TYPE) == SPLIT1 ||
-						(type & DATA_TYPE) == NOCOLF1T ||
-						(type & DATA_TYPE) == NOCOLF1B)
-					{
-						if (dx <= (1024 - dz))
-						{
-							hadj = (type >> 10) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t0 - t1;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xFFF0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t3 - t2;
-						}
 					}
-					else
-					{
-						if (dx <= dz)
-						{
-							hadj = (type >> 10) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t3 - t2;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t0 - t1;
-						}
-					}
-
-					TiltXOffset = xOff;
-					TiltYOffset = yOff;
-
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = DIAGONAL;
-					else if (HeightType != SPLIT_TRI)
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += xOff * ((-1 - z) & 1023) >> 2;
-					else
-						height -= xOff * (z & 1023) >> 2;
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				default:
-					break;
 				}
-			} while (!(type & END_BIT));
+
+			} while (!(trigger & END_BIT));
+			break;
+
+		case SPLIT1:
+		case SPLIT2:
+		case NOCOLF1T:
+		case NOCOLF1B:
+		case NOCOLF2T:
+		case NOCOLF2B:
+			tilts = *data;
+			t0 = tilts & 15;
+			t1 = (tilts >> 4) & 15;
+			t2 = (tilts >> 8) & 15;
+			t3 = (tilts >> 12) & 15;
+
+			dx = x & 1023;
+			dz = z & 1023;
+
+			xOff = yOff = 0;
+
+			result.HeightType = SPLIT_TRI;
+			result.SplitFloor = (type & DATA_TYPE);
+
+			if ((type & DATA_TYPE) == SPLIT1 ||
+				(type & DATA_TYPE) == NOCOLF1T ||
+				(type & DATA_TYPE) == NOCOLF1B)
+			{
+				if (dx <= (1024 - dz))
+				{
+					hadj = (type >> 10) & 0x1F;
+					if (hadj & 0x10)
+						hadj |= 0xfff0;
+					height += 256 * hadj;
+					xOff = t2 - t1;
+					yOff = t0 - t1;
+				}
+				else
+				{
+					hadj = (type >> 5) & 0x1F;
+					if (hadj & 0x10)
+						hadj |= 0xFFF0;
+					height += 256 * hadj;
+					xOff = t3 - t0;
+					yOff = t3 - t2;
+				}
+			}
+			else
+			{
+				if (dx <= dz)
+				{
+					hadj = (type >> 10) & 0x1f;
+					if (hadj & 0x10)
+						hadj |= 0xfff0;
+					height += 256 * hadj;
+					xOff = t2 - t1;
+					yOff = t3 - t2;
+				}
+				else
+				{
+					hadj = (type >> 5) & 0x1f;
+					if (hadj & 0x10)
+						hadj |= 0xfff0;
+					height += 256 * hadj;
+					xOff = t3 - t0;
+					yOff = t0 - t1;
+				}
+			}
+
+			result.TiltX = xOff;
+			result.TiltZ = yOff;
+
+			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				result.HeightType = DIAGONAL;
+			else if (result.HeightType != SPLIT_TRI)
+				result.HeightType = SMALL_SLOPE;
+
+			if (xOff >= 0)
+				height += xOff * ((-1 - z) & 1023) >> 2;
+			else
+				height -= xOff * (z & 1023) >> 2;
+
+			if (yOff >= 0)
+				height += yOff * ((-1 - x) & 1023) >> 2;
+			else
+				height -= yOff * (x & 1023) >> 2;
+
+			data++;
+			break;
+
+		default:
+			break;
 		}
-	}
+	} while (!(type & END_BIT));
+
+	return result;
 }
 
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
@@ -1264,12 +1280,11 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	int yTop = y - 160;
 	int z = zPos;
 
-	short tRoomNumber = roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
-
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
-	DoFloorThings(floor, x, yTop, z);
+	// DoFloorThings(floor, x, yTop, z);
+	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+
 	int height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1282,13 +1297,27 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->midCeiling = ceiling;
 	coll->midFloor = height;
-	coll->midType = HeightType;
-	coll->midSplitFloor = SplitFloor;
-	coll->midSplitCeil = SplitCeiling;
+	coll->midType = collResult.HeightType;
+	coll->midSplitFloor = collResult.SplitFloor;
+	coll->midSplitCeil = collResult.SplitCeiling;
 
-	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
+	short tRoomNumber = roomNumber;
+	int tilt = GetTiltType(GetFloor(x, yTop, z, &tRoomNumber), x, LaraItem->pos.yPos, z);
+	// ||| remove upper thingy if equal 
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
+
+	// FIXME REPLACE WITH GetCollisionResult
 	coll->tiltX = tilt;
 	coll->tiltZ = tilt / 256;
+	// FIXME REPLACE WITH GetCollisionResult
+
+	// FIXME REPLACE WITH GetCollisionResult
+	if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+	{
+		auto shit = 1;
+	}
+	// FIXME REPLACE WITH GetCollisionResult
+
 
 	int xright, xleft, zright, zleft;
 
@@ -1356,8 +1385,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
-	floor = GetFloor(x, yTop, z, &tRoomNumber);
-	DoFloorThings(floor, x, yTop, z);
+	//floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//DoFloorThings(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1370,12 +1401,13 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->frontCeiling = ceiling;
 	coll->frontFloor = height;
-	coll->frontType = HeightType;
-	coll->frontSplitFloor = SplitFloor;
-	coll->frontSplitCeil = SplitCeiling;
+	coll->frontType = collResult.HeightType;
+	coll->frontSplitFloor = collResult.SplitFloor;
+	coll->frontSplitCeil = collResult.SplitCeiling;
 
-	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	DoFloorThings(floor, x + XFront, yTop, z + ZFront);
+	//DoFloorThings(floor, x + XFront, yTop, z + ZFront);
+	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
+	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
 
 	tfLocation = GetRoom(tfLocation, x + XFront, yTop, z + ZFront);
 	height = GetFloorHeight(tfLocation, x + XFront, z + ZFront).value_or(NO_HEIGHT);
@@ -1397,8 +1429,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->frontFloor = 512;
 	}
 	else if ((coll->lavaIsPit)
-		&& (coll->frontFloor > 0)
-		&& floor->Flags.Death)
+		     && (coll->frontFloor > 0)
+		     && collResult.Block->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
@@ -1408,9 +1440,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
-	short lrRoomNumber = roomNumber;
-	floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	DoFloorThings(floor, x, yTop, z);
+	//short lrRoomNumber = roomNumber;
+	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	//DoFloorThings(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1424,21 +1457,22 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->leftFloor = height;
 	coll->leftCeiling = ceiling;
-	coll->leftType = HeightType;
-	coll->leftSplitFloor = SplitFloor;
-	coll->leftSplitCeil = SplitCeiling;
+	coll->leftType = collResult.HeightType;
+	coll->leftSplitFloor = collResult.SplitFloor;
+	coll->leftSplitCeil = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor < 0)
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.Block->Flags.Death)
 		coll->leftFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
-	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	DoFloorThings(floor, x, yTop, z);
+	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber); // WRONG COPYPASTE BY CHOCO
+	//DoFloorThings(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber); // We use plain x/z values here, proposed by Choco
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1452,15 +1486,15 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->leftFloor2 = height;
 	coll->leftCeiling2 = ceiling;
-	coll->leftType2 = HeightType;
-	coll->leftSplitFloor2 = SplitFloor;
-	coll->leftSplitCeil2 = SplitCeiling;
+	coll->leftType2 = collResult.HeightType;
+	coll->leftSplitFloor2 = collResult.SplitFloor;
+	coll->leftSplitCeil2 = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 < 0)
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
@@ -1468,9 +1502,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
-	lrRoomNumber = roomNumber;
-	floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	DoFloorThings(floor, x, yTop, z);
+	//lrRoomNumber = roomNumber;
+	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	//DoFloorThings(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1484,21 +1519,22 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->rightFloor = height;
 	coll->rightCeiling = ceiling;
-	coll->rightType = HeightType;
-	coll->rightSplitFloor = SplitFloor;
-	coll->rightSplitCeil = SplitCeiling;
+	coll->rightType = collResult.HeightType;
+	coll->rightSplitFloor = collResult.SplitFloor;
+	coll->rightSplitCeil = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor < 0)
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
-	floor = GetFloor(x, yTop, z, &tRoomNumber);
-	DoFloorThings(floor, x, yTop, z);
+	//floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//DoFloorThings(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1512,18 +1548,18 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->rightFloor2 = height;
 	coll->rightCeiling2 = ceiling;
-	coll->rightType2 = HeightType;
-	coll->rightSplitFloor2 = SplitFloor;
-	coll->rightSplitCeil2 = SplitCeiling;
+	coll->rightType2 = collResult.HeightType;
+	coll->rightSplitFloor2 = collResult.SplitFloor;
+	coll->rightSplitCeil2 = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 < 0)
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor2 = 512;
 
-	CollideStaticObjects(coll, xPos, yPos, zPos, tRoomNumber, objectHeight);
+	CollideStaticObjects(coll, xPos, yPos, zPos, roomNumber, objectHeight); // check if bugged with roomNumber insted of tRoomNumber
 
 	if (coll->midFloor == NO_HEIGHT)
 	{
@@ -1725,26 +1761,37 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	int yTop = y - 160;
 	int z = zPos;
 
-	short tRoomNumber = roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
-	
-	int height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	//short tRoomNumber = roomNumber;
+	//FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//int height = GetFloorHeight(floor, x, yTop, z);
+	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
-	int ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
+
+	int ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
 	coll->midCeiling = ceiling;
-	coll->midFloor = height;
-	coll->midType = HeightType;
-	coll->midSplitFloor = SplitFloor;
-	coll->midSplitCeil = SplitCeiling;
+	coll->midFloor = collResult.FloorHeight;
+	coll->midType = collResult.HeightType;
+	coll->midSplitFloor = collResult.SplitFloor;
+	coll->midSplitCeil = collResult.SplitCeiling;
 
-	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
+	// FIXME REPLACE WITH GetCollisionResult
+	// collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber); // uncomment this line if yes
+	int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z); // CHECK IF SAME
 	coll->tiltX = tilt;
 	coll->tiltZ = tilt / 256;
+	// FIXME REPLACE WITH GetCollisionResult
+
+	// FIXME REPLACE WITH GetCollisionResult
+	if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+	{
+		auto shit = 1;
+	}
+	// FIXME REPLACE WITH GetCollisionResult
 	
 	int xright, xleft, zright, zleft;
 
@@ -1803,34 +1850,38 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	x = XFront + xPos;
 	z = ZFront + zPos;
 
-	if (resetRoom)
-		tRoomNumber = roomNumber;
-	
-	floor = GetFloor(x, yTop, z, &tRoomNumber);
-	
-	height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	//if (resetRoom)
+	//	tRoomNumber = roomNumber;
+	//
+	//floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//
+	//height = GetFloorHeight(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
-	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
+
+	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
 	coll->frontCeiling = ceiling;
-	coll->frontFloor = height;
-	coll->frontType = HeightType;
-	coll->frontSplitFloor = SplitFloor;
-	coll->frontSplitCeil = SplitCeiling;
+	coll->frontFloor = collResult.FloorHeight;
+	coll->frontType = collResult.HeightType;
+	coll->frontSplitFloor = collResult.SplitFloor;
+	coll->frontSplitCeil = collResult.SplitCeiling;
 
-	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
+	//height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
+	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
+
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
 
 	if ((coll->slopesAreWalls)
 		&& ((coll->frontType == BIG_SLOPE) || (coll->frontType == DIAGONAL))
 		&& (coll->frontFloor < coll->midFloor)
-		&& (height < coll->frontFloor)
+		&& (collResult.FloorHeight < coll->frontFloor)
 		&& (coll->frontFloor < 0))
 	{
 		coll->frontFloor = -32767;
@@ -1843,110 +1894,119 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 	else if ((coll->lavaIsPit)
 		&& (coll->frontFloor > 0)
-		&& floor->Flags.Death)
+		&& collResult.Block->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
 
 	x = xPos + xleft;
 	z = zPos + zleft;
-	short lrRoomNumber = roomNumber;
-	floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	//short lrRoomNumber = roomNumber;
+	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	//
+	//height = GetFloorHeight(floor, x, yTop, z);
+	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
 
-	height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->leftFloor = height;
+	coll->leftFloor = collResult.FloorHeight;
 	coll->leftCeiling = ceiling;
-	coll->leftType = HeightType;
-	coll->leftSplitFloor = SplitFloor;
-	coll->leftSplitCeil = SplitCeiling;
+	coll->leftType = collResult.HeightType;
+	coll->leftSplitFloor = collResult.SplitFloor;
+	coll->leftSplitCeil = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor < 0)
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.Block->Flags.Death)
 		coll->leftFloor = 512;
 
-	floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//
+	//height = GetFloorHeight(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
-	height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->leftFloor2 = height;
+	coll->leftFloor2 = collResult.FloorHeight;
 	coll->leftCeiling2 = ceiling;
-	coll->leftType2 = HeightType;
-	coll->leftSplitFloor2 = SplitFloor;
-	coll->leftSplitCeil2 = SplitCeiling;
+	coll->leftType2 = collResult.HeightType;
+	coll->leftSplitFloor2 = collResult.SplitFloor;
+	coll->leftSplitCeil2 = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 < 0)
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
 	z = zPos + zright;
-	lrRoomNumber = roomNumber;
-	floor = GetFloor(x, yTop, z, &lrRoomNumber);
 
-	height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	//lrRoomNumber = roomNumber;
+	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
+	//
+	//height = GetFloorHeight(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->rightFloor = height;
+	coll->rightFloor = collResult.FloorHeight;
 	coll->rightCeiling = ceiling;
-	coll->rightType = HeightType;
-	coll->rightSplitFloor = SplitFloor;
-	coll->rightSplitCeil = SplitCeiling;
+	coll->rightType = collResult.HeightType;
+	coll->rightSplitFloor = collResult.SplitFloor;
+	coll->rightSplitCeil = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor < 0)
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor = 512;
 
-	floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//floor = GetFloor(x, yTop, z, &tRoomNumber);
+	//
+	//height = GetFloorHeight(floor, x, yTop, z);
+	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
-	height = GetFloorHeight(floor, x, yTop, z);
-	if (height != NO_HEIGHT)
-		height -= yPos;
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->rightFloor2 = height;
+	coll->rightFloor2 = collResult.FloorHeight;
 	coll->rightCeiling2 = ceiling;
-	coll->rightType2 = HeightType;
-	coll->rightSplitFloor2 = SplitFloor;
-	coll->rightSplitCeil2 = SplitCeiling;
+	coll->rightType2 = collResult.HeightType;
+	coll->rightSplitFloor2 = collResult.SplitFloor;
+	coll->rightSplitCeil2 = collResult.SplitCeiling;
 
 	if (coll->slopesAreWalls == 1 && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 < 0)
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && floor->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor2 = 512;
 
-	CollideStaticObjects(coll, xPos, yPos, zPos, tRoomNumber, objectHeight);
+	CollideStaticObjects(coll, xPos, yPos, zPos, roomNumber, objectHeight); // check if bugged with roomNumber insted of tRoomNumber
 	
 	if (coll->midFloor == NO_HEIGHT)	 
 	{

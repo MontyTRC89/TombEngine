@@ -399,7 +399,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (TrInput & IN_FORWARD)
 					{
-						if (abs(LaraFloorFront(item, item->pos.yRot, 256)) < 127 && HeightType != BIG_SLOPE)
+						if (abs(LaraFloorFront(item, item->pos.yRot, 256)) < 127 && HeightType != BIG_SLOPE) // FIXME: UNDEFINED HEIGHT TYPE!!!!!!!!!!!!!!!!!!!!!!!!!!
 							item->goalAnimState = LS_CRAWL_FORWARD;
 					}
 					else if (TrInput & IN_BACK)
