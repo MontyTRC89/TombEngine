@@ -729,8 +729,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LITTLE_BEETLE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLittleBeetle;
-		obj->control = LittleBeetleControl;
+		obj->initialise = ten::entities::tr4::InitialiseScarabs;
+		obj->control = ten::entities::tr4::ScarabsControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
@@ -1185,6 +1185,6 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	LittleBeetles = game_malloc<BEETLE_INFO>(NUM_LITTLE_BETTLES);
-	ZeroMemory(LittleBeetles, NUM_LITTLE_BETTLES * sizeof(BEETLE_INFO));
+	ten::entities::tr4::Scarabs = game_malloc<SCARAB_INFO>(ten::entities::tr4::NUM_LITTLE_BETTLES);
+	ZeroMemory(ten::entities::tr4::Scarabs, ten::entities::tr4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
 }
