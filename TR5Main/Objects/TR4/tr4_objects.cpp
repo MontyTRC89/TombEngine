@@ -314,8 +314,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_SKELETON];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSkeleton;
-		obj->control = SkeletonControl;
+		obj->initialise = ten::entities::tr4::InitialiseSkeleton;
+		obj->control = ten::entities::tr4::SkeletonControl;
 		obj->collision = CreatureCollision;
 		obj->hitPoints = 15;
 		obj->hitEffect = HIT_SMOKE;
