@@ -2290,8 +2290,7 @@ namespace ten::renderer
 		*/
     }
 
-	void Renderer11::drawLittleBeetles(RenderView& view) {
-		/*
+	void Renderer11::drawScarabs(RenderView& view) {
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -2308,9 +2307,9 @@ namespace ten::renderer
 			for (int m = 0; m < 32; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int i = 0; i < NUM_LITTLE_BETTLES; i++)
+			for (int i = 0; i < ten::entities::tr4::NUM_LITTLE_BETTLES; i++)
 			{
-				BEETLE_INFO* beetle = &LittleBeetles[i];
+				SCARAB_INFO* beetle = &ten::entities::tr4::Scarabs[i];
 
 				if (beetle->on)
 				{
@@ -2324,9 +2323,9 @@ namespace ten::renderer
 					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem,m_context.Get());
 
-					for (int b = 0; b < 2; b++)
+                    for (int b = 0; b < mesh->buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->Buckets[b];
+						RendererBucket* bucket = &mesh->buckets[b];
 
 						if (bucket->Vertices.size() == 0)
 							continue;
@@ -2337,7 +2336,6 @@ namespace ten::renderer
 				}
 			}
 		}
-		*/
 	}
 
     void Renderer11::drawLocusts(RenderView& view) {
@@ -2827,7 +2825,7 @@ namespace ten::renderer
         drawBats(view);
         drawRats(view);
         drawSpiders(view);
-		drawLittleBeetles(view);
+		drawScarabs(view);
         drawLocusts(view);
 
         // Transparent geometry
