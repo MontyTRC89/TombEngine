@@ -623,7 +623,7 @@ void GameScript::ExecuteFunction(std::string const & name)
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 }
 
