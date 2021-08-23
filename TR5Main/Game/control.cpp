@@ -563,15 +563,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
-		UpdateLittleBeetles();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
 		ten::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
+		ten::entities::tr4::UpdateScarabs();
 		ten::entities::tr4::UpdateLocusts();
-		UpdateLittleBeetles();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
