@@ -74,7 +74,7 @@ void GameScriptLevel::Register(sol::state* state)
 
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
-j//
+//
 // __(thunder sounds not yet implemented)__
 //@mem storm
 		"storm", &GameScriptLevel::Storm,
