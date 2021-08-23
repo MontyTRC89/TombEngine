@@ -37,30 +37,39 @@
 </ul>
 
 
-<h2>Classes</h2>
+<h2>Entity classes</h2>
 <ul class="nowrap">
-  <li><a href="../classes/AIObject.html">AIObject</a></li>
-  <li><a href="../classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="../classes/Color.html">Color</a></li>
-  <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="../entity classes/AIObject.html">AIObject</a></li>
+  <li><a href="../entity classes/CameraInfo.html">CameraInfo</a></li>
   <li><strong>ItemInfo</strong></li>
-  <li><a href="../classes/Level.html">Level</a></li>
-  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="../classes/Mirror.html">Mirror</a></li>
-  <li><a href="../classes/Position.html">Position</a></li>
-  <li><a href="../classes/Rotation.html">Rotation</a></li>
-  <li><a href="../classes/Settings.html">Settings</a></li>
-  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
-  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-  <li><a href="../classes/InvItem.html">InvItem</a></li>
-  <li><a href="../classes/ObjID.html">ObjID</a></li>
+  <li><a href="../entity classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../entity classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
 </ul>
-<h2>Modules</h2>
+<h2>Script Files</h2>
 <ul class="nowrap">
-  <li><a href="../modules/gameflow.html">gameflow</a></li>
-  <li><a href="../modules/gamelogic.html">gamelogic</a></li>
+  <li><a href="../script files/Pre-game.html">Pre-game scripts</a></li>
+  <li><a href="../script files/Level-specific.html">Level-specific scripts</a></li>
+</ul>
+<h2>Enums</h2>
+<ul class="nowrap">
+  <li><a href="../enums/InvItem.html">InvItem</a></li>
+  <li><a href="../enums/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Pre-game script classes</h2>
+<ul class="nowrap">
+  <li><a href="../pre-game script classes/AudioTrack.html">AudioTrack</a></li>
+  <li><a href="../pre-game script classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="../pre-game script classes/Level.html">Level</a></li>
+  <li><a href="../pre-game script classes/Mirror.html">Mirror</a></li>
+  <li><a href="../pre-game script classes/Settings.html">Settings</a></li>
+  <li><a href="../pre-game script classes/SkyLayer.html">SkyLayer</a></li>
+</ul>
+<h2>Misc classes</h2>
+<ul class="nowrap">
+  <li><a href="../misc classes/Color.html">Color</a></li>
+  <li><a href="../misc classes/Position.html">Position</a></li>
+  <li><a href="../misc classes/Rotation.html">Rotation</a></li>
 </ul>
 
 </div>
@@ -76,114 +85,114 @@ pickups, and Lara herself.</p>
 <h2><a href="#Members">Members</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#ItemInfo.objectID">ItemInfo.objectID</a></td>
-	<td class="summary">(<a href="../classes/ObjID.html#">ObjID</a>) object ID</td>
+	<td class="name" ><a href="#objectID">objectID</a></td>
+	<td class="summary">(<a href="../enums/ObjID.html#">ObjID</a>) object ID</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.currentAnimState">ItemInfo.currentAnimState</a></td>
+	<td class="name" ><a href="#currentAnimState">currentAnimState</a></td>
 	<td class="summary">(int) current animation state</p>
 
 <p>The state number of the animation the object is currently doing.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.requiredAnimState">ItemInfo.requiredAnimState</a></td>
+	<td class="name" ><a href="#requiredAnimState">requiredAnimState</a></td>
 	<td class="summary">(int) State of required animation</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.goalAnimState">ItemInfo.goalAnimState</a></td>
+	<td class="name" ><a href="#goalAnimState">goalAnimState</a></td>
 	<td class="summary">(int) State of goal animation</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.animNumber">ItemInfo.animNumber</a></td>
+	<td class="name" ><a href="#animNumber">animNumber</a></td>
 	<td class="summary">(int) animation number</p>
 
 <p>The index of the animation the object is currently doing.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.frameNumber">ItemInfo.frameNumber</a></td>
+	<td class="name" ><a href="#frameNumber">frameNumber</a></td>
 	<td class="summary">(int) frame number</p>
 
 <p>Current fame of the animation the object is currently doing.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.HP">ItemInfo.HP</a></td>
+	<td class="name" ><a href="#HP">HP</a></td>
 	<td class="summary">(int) HP (hit points/health points) of object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.OCB">ItemInfo.OCB</a></td>
+	<td class="name" ><a href="#OCB">OCB</a></td>
 	<td class="summary">(int) OCB (object code bit) of object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.itemFlags">ItemInfo.itemFlags</a></td>
+	<td class="name" ><a href="#itemFlags">itemFlags</a></td>
 	<td class="summary">(table) item flags of object (table of 8 ints)</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.AIBits">ItemInfo.AIBits</a></td>
+	<td class="name" ><a href="#AIBits">AIBits</a></td>
 	<td class="summary">(int) AIBits of object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.status">ItemInfo.status</a></td>
+	<td class="name" ><a href="#status">status</a></td>
 	<td class="summary">(int) status of object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.hitStatus">ItemInfo.hitStatus</a></td>
+	<td class="name" ><a href="#hitStatus">hitStatus</a></td>
 	<td class="summary">(bool) hit status of object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.active">ItemInfo.active</a></td>
+	<td class="name" ><a href="#active">active</a></td>
 	<td class="summary">(bool) whether or not the object is active</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.room">ItemInfo.room</a></td>
+	<td class="name" ><a href="#room">room</a></td>
 	<td class="summary">(int) room the item is in</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.pos">ItemInfo.pos</a></td>
-	<td class="summary">(<a href="../classes/Position.html#">Position</a>) position in level</td>
+	<td class="name" ><a href="#pos">pos</a></td>
+	<td class="summary">(<a href="../misc classes/Position.html#">Position</a>) position in level</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.rot">ItemInfo.rot</a></td>
-	<td class="summary">(<a href="../classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes</td>
+	<td class="name" ><a href="#rot">rot</a></td>
+	<td class="summary">(<a href="../misc classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.name">ItemInfo.name</a></td>
+	<td class="name" ><a href="#name">name</a></td>
 	<td class="summary">(string) unique string identifier.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#ItemInfo.new">ItemInfo.new ()</a></td>
+	<td class="name" ><a href="#ItemInfo.new">ItemInfo.new()</a></td>
 	<td class="summary">If you create items with this you NEED to give a position, room,
 and object number, and then call InitialiseItem before it will work.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.newTemporary">ItemInfo.newTemporary ()</a></td>
+	<td class="name" ><a href="#ItemInfo.newTemporary">ItemInfo.newTemporary()</a></td>
 	<td class="summary">Like above, but the returned variable controls the
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.new">ItemInfo.new (object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</a></td>
+	<td class="name" ><a href="#ItemInfo.new">ItemInfo.new(object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</a></td>
 	<td class="summary">For more information on each parameter, see the
 associated getters and setters.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.newTemporary">ItemInfo.newTemporary (see_above)</a></td>
+	<td class="name" ><a href="#ItemInfo.newTemporary">ItemInfo.newTemporary(see_above)</a></td>
 	<td class="summary">Like the above, but the returned variable controls the
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo.Init">ItemInfo.Init ()</a></td>
+	<td class="name" ><a href="#ItemInfo.Init">ItemInfo.Init()</a></td>
 	<td class="summary">Initialise an item.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo:EnableItem">ItemInfo:EnableItem ()</a></td>
+	<td class="name" ><a href="#ItemInfo:EnableItem">ItemInfo:EnableItem()</a></td>
 	<td class="summary">Enable the item</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ItemInfo:DisableItem">ItemInfo:DisableItem ()</a></td>
+	<td class="name" ><a href="#ItemInfo:DisableItem">ItemInfo:DisableItem()</a></td>
 	<td class="summary">Disable the item</td>
 	</tr>
 </table>
@@ -196,11 +205,11 @@ out of scope).</td>
 
     <dl class="function">
     <dt>
-    <a name = "ItemInfo.objectID"></a>
-    <strong>ItemInfo.objectID</strong>
+    <a name = "objectID"></a>
+    <strong>objectID</strong>
     </dt>
     <dd>
-    (<a href="../classes/ObjID.html#">ObjID</a>) object ID
+    (<a href="../enums/ObjID.html#">ObjID</a>) object ID
 
 
 
@@ -210,8 +219,8 @@ out of scope).</td>
 
 </dd>
     <dt>
-    <a name = "ItemInfo.currentAnimState"></a>
-    <strong>ItemInfo.currentAnimState</strong>
+    <a name = "currentAnimState"></a>
+    <strong>currentAnimState</strong>
     </dt>
     <dd>
     (int) current animation state</p>
@@ -227,8 +236,8 @@ This corresponds to "state" number shown in the animation editor of WadTool.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.requiredAnimState"></a>
-    <strong>ItemInfo.requiredAnimState</strong>
+    <a name = "requiredAnimState"></a>
+    <strong>requiredAnimState</strong>
     </dt>
     <dd>
     (int) State of required animation
@@ -241,8 +250,8 @@ This corresponds to "state" number shown in the animation editor of WadTool.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.goalAnimState"></a>
-    <strong>ItemInfo.goalAnimState</strong>
+    <a name = "goalAnimState"></a>
+    <strong>goalAnimState</strong>
     </dt>
     <dd>
     (int) State of goal animation
@@ -255,8 +264,8 @@ This corresponds to "state" number shown in the animation editor of WadTool.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.animNumber"></a>
-    <strong>ItemInfo.animNumber</strong>
+    <a name = "animNumber"></a>
+    <strong>animNumber</strong>
     </dt>
     <dd>
     (int) animation number</p>
@@ -272,8 +281,8 @@ This corresponds to the number shown in the item's animation list in WadTool.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.frameNumber"></a>
-    <strong>ItemInfo.frameNumber</strong>
+    <a name = "frameNumber"></a>
+    <strong>frameNumber</strong>
     </dt>
     <dd>
     (int) frame number</p>
@@ -290,8 +299,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.HP"></a>
-    <strong>ItemInfo.HP</strong>
+    <a name = "HP"></a>
+    <strong>HP</strong>
     </dt>
     <dd>
     (int) HP (hit points/health points) of object
@@ -304,8 +313,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.OCB"></a>
-    <strong>ItemInfo.OCB</strong>
+    <a name = "OCB"></a>
+    <strong>OCB</strong>
     </dt>
     <dd>
     (int) OCB (object code bit) of object
@@ -318,8 +327,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.itemFlags"></a>
-    <strong>ItemInfo.itemFlags</strong>
+    <a name = "itemFlags"></a>
+    <strong>itemFlags</strong>
     </dt>
     <dd>
     (table) item flags of object (table of 8 ints)
@@ -332,8 +341,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.AIBits"></a>
-    <strong>ItemInfo.AIBits</strong>
+    <a name = "AIBits"></a>
+    <strong>AIBits</strong>
     </dt>
     <dd>
     (int) AIBits of object.  Will be clamped to [0, 255]
@@ -346,8 +355,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.status"></a>
-    <strong>ItemInfo.status</strong>
+    <a name = "status"></a>
+    <strong>status</strong>
     </dt>
     <dd>
     (int) status of object.
@@ -365,8 +374,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.hitStatus"></a>
-    <strong>ItemInfo.hitStatus</strong>
+    <a name = "hitStatus"></a>
+    <strong>hitStatus</strong>
     </dt>
     <dd>
     (bool) hit status of object
@@ -379,8 +388,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.active"></a>
-    <strong>ItemInfo.active</strong>
+    <a name = "active"></a>
+    <strong>active</strong>
     </dt>
     <dd>
     (bool) whether or not the object is active
@@ -393,8 +402,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.room"></a>
-    <strong>ItemInfo.room</strong>
+    <a name = "room"></a>
+    <strong>room</strong>
     </dt>
     <dd>
     (int) room the item is in
@@ -407,11 +416,11 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.pos"></a>
-    <strong>ItemInfo.pos</strong>
+    <a name = "pos"></a>
+    <strong>pos</strong>
     </dt>
     <dd>
-    (<a href="../classes/Position.html#">Position</a>) position in level
+    (<a href="../misc classes/Position.html#">Position</a>) position in level
 
 
 
@@ -421,11 +430,11 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.rot"></a>
-    <strong>ItemInfo.rot</strong>
+    <a name = "rot"></a>
+    <strong>rot</strong>
     </dt>
     <dd>
-    (<a href="../classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes
+    (<a href="../misc classes/Rotation.html#">Rotation</a>) rotation represented as degree angles about X, Y, and Z axes
 
 
 
@@ -435,8 +444,8 @@ the WadTool animation editor.
 
 </dd>
     <dt>
-    <a name = "ItemInfo.name"></a>
-    <strong>ItemInfo.name</strong>
+    <a name = "name"></a>
+    <strong>name</strong>
     </dt>
     <dd>
     (string) unique string identifier.
@@ -451,11 +460,11 @@ the WadTool animation editor.
 </dd>
 </dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-    Methods
+
     <dl class="function">
     <dt>
     <a name = "ItemInfo.new"></a>
-    <strong>ItemInfo.new ()</strong>
+    <strong>ItemInfo.new()</strong>
     </dt>
     <dd>
     If you create items with this you NEED to give a position, room,
@@ -470,7 +479,7 @@ and object number, and then call InitialiseItem before it will work.
 </dd>
     <dt>
     <a name = "ItemInfo.newTemporary"></a>
-    <strong>ItemInfo.newTemporary ()</strong>
+    <strong>ItemInfo.newTemporary()</strong>
     </dt>
     <dd>
     Like above, but the returned variable controls the
@@ -486,7 +495,7 @@ out of scope).
 </dd>
     <dt>
     <a name = "ItemInfo.new"></a>
-    <strong>ItemInfo.new (object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</strong>
+    <strong>ItemInfo.new(object, name, position, rotation, room, currentAnimState, requiredAnimState, goalAnimState, animNumber, frameNumber, hp, OCB, itemFlags, AIBits, status, active, hitStatus)</strong>
     </dt>
     <dd>
     For more information on each parameter, see the
@@ -498,7 +507,7 @@ takes no arguments.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">object</span>
-            <span class="types"><a class="type" href="../classes/ObjID.html#">ObjID</a></span>
+            <span class="types"><span class="type">ObjID</span></span>
          ID
         </li>
         <li><span class="parameter">name</span>
@@ -506,11 +515,11 @@ takes no arguments.
          Lua name of the item
         </li>
         <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+            <span class="types"><span class="type">Position</span></span>
          position in level
         </li>
         <li><span class="parameter">rotation</span>
-            <span class="types"><a class="type" href="../classes/Rotation.html#">Rotation</a></span>
+            <span class="types"><span class="type">Rotation</span></span>
          rotation about x, y, and z axes
         </li>
         <li><span class="parameter">room</span>
@@ -601,7 +610,7 @@ takes no arguments.
 </dd>
     <dt>
     <a name = "ItemInfo.newTemporary"></a>
-    <strong>ItemInfo.newTemporary (see_above)</strong>
+    <strong>ItemInfo.newTemporary(see_above)</strong>
     </dt>
     <dd>
     Like the above, but the returned variable controls the
@@ -623,7 +632,7 @@ out of scope).
 </dd>
     <dt>
     <a name = "ItemInfo.Init"></a>
-    <strong>ItemInfo.Init ()</strong>
+    <strong>ItemInfo.Init()</strong>
     </dt>
     <dd>
     Initialise an item.
@@ -638,7 +647,7 @@ Use this if you called new with no arguments
 </dd>
     <dt>
     <a name = "ItemInfo:EnableItem"></a>
-    <strong>ItemInfo:EnableItem ()</strong>
+    <strong>ItemInfo:EnableItem()</strong>
     </dt>
     <dd>
     Enable the item
@@ -652,7 +661,7 @@ Use this if you called new with no arguments
 </dd>
     <dt>
     <a name = "ItemInfo:DisableItem"></a>
-    <strong>ItemInfo:DisableItem ()</strong>
+    <strong>ItemInfo:DisableItem()</strong>
     </dt>
     <dd>
     Disable the item
@@ -671,7 +680,7 @@ Use this if you called new with no arguments
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-21 00:32:39 </i>
+<i style="float:right;">Last updated 2021-08-23 19:18:19 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
