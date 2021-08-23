@@ -8,7 +8,7 @@
 /***
 Sink info
 
-@classmod SinkInfo
+@entityclass SinkInfo
 @pragma nostrip
 */
 

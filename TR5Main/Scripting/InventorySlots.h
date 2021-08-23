@@ -1,6 +1,6 @@
 #pragma once
 
-// Last generated on 8/8/2021.
+// Last generated on 23/8/2021.
 
 #include <unordered_map>
 #include <string>
@@ -8,7 +8,7 @@
 
 /***
 Constants for items that can be used with GetInvItem and SetInvItem.
-@classmod InvItem
+@enum InvItem
 @pragma nostrip
 */
 

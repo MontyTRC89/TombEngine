@@ -3,7 +3,7 @@
 
 /***
 Settings that will be run on game startup.
-@classmod Settings
+@pregameclass Settings
 @pragma nostrip
 */
 
