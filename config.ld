@@ -6,6 +6,8 @@ new_type("entityclass", "Entity classes", true)
 new_type("pregameclass", "Pre-game script classes", true)
 new_type("miscclass", "Misc classes", true)
 project = "TombEngine"
+title = "TombEngine Lua API"
+description = "TombEngine scripting interface"
 style = true
 wrap = true
 template = true
