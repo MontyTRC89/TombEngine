@@ -49,13 +49,13 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 
 /*** If you create items with this you NEED to give a position, room, 
 and object number, and then call InitialiseItem before it will work.
-	@function ItemInfo.newItem
+	@function ItemInfo.new
 */
 
 /*** Like above, but the returned variable controls the 
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).
-	@function ItemInfo.newItemTemporary
+	@function ItemInfo.newTemporary
 */
 template <bool temp> std::unique_ptr<GameScriptItemInfo> CreateEmpty()
 {
@@ -68,7 +68,7 @@ template <bool temp> std::unique_ptr<GameScriptItemInfo> CreateEmpty()
 associated getters and setters. If you do not know what to set for these,
 most can just be set to zero (see usage). See also the overload which
 takes no arguments.
-	@function ItemInfo.newItem
+	@function ItemInfo.new
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Position position position in level
@@ -88,7 +88,7 @@ takes no arguments.
 	@tparam bool hitStatus hit status of object
 	@return reference to new ItemInfo object
 	@usage 
-	local item = ItemInfo.newItem(
+	local item = ItemInfo.new(
 		ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
@@ -112,7 +112,7 @@ takes no arguments.
 /*** Like the above, but the returned variable controls the 
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).
-	@function ItemInfo.newItemTemporary
+	@function ItemInfo.newTemporary
 	@param see_above same as above function
 */
 
@@ -166,8 +166,8 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 void GameScriptItemInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptItemInfo>(LUA_CLASS_NAME,
-		"newItem", sol::overload(Create<false>, CreateEmpty<false>),
-		"newItemTemporary", sol::overload(Create<true>, CreateEmpty<true>),
+		"new", sol::overload(Create<false>, CreateEmpty<false>),
+		"newTemporary", sol::overload(Create<true>, CreateEmpty<true>),
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
