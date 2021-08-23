@@ -797,6 +797,8 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 		TO_RAD(item->pos.zRot)
 	);
 
+	matrix = matrix.Transpose();
+
 	pos = Vector3::Transform(pos, matrix);
 
 	rx = pos.x;
