@@ -120,10 +120,17 @@ namespace ten::renderer {
 			return;
 
 		m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
-		drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
-		if (LaserSight) {
+		if (BinocularRange && !LaserSight)
+		{
+			drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+		}
+		else if (BinocularRange && LaserSight)
+		{
+			drawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+
+			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+
 			// Draw the aiming point
 			RendererVertex vertices[4];
 
@@ -164,6 +171,10 @@ namespace ten::renderer {
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 			m_primitiveBatch->End();
+		}
+		else
+		{
+			// TODO: Vignette goes here! -- Lwmte, 21.08.21
 		}
 	}
 

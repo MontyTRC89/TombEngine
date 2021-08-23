@@ -5,7 +5,7 @@
 
 namespace ten::entities::tr4 
 {
-    enum MUTANT_STATE
+    enum STATES_CROCGOD
     {
         STATE_MUTANT_EMPTY,
         STATE_MUTANT_APPEAR,

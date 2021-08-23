@@ -519,7 +519,7 @@ namespace ten::renderer
 		void drawRopes(RenderView& view);
 		void drawBats(RenderView& view);
 		void drawRats(RenderView& view);
-		void drawLittleBeetles(RenderView& view);
+		void drawScarabs(RenderView& view);
 		void drawSpiders(RenderView& view);
 		bool drawGunFlashes(RenderView& view);
 		void drawGunShells(RenderView& view);
