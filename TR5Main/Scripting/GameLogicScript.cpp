@@ -444,43 +444,6 @@ void GameScript::FreeLevelScripts()
 	ResetLevelTables();
 }
 
-bool GameScript::ExecuteTrigger(short index)
-{
-	return true;
-	/*
-	// Is this a valid trigger?
-	if (index >= m_triggers.size())
-		return true;
-
-	LuaFunction* trigger = m_triggers[index];
-
-	// We want to execute a trigger just one time 
-	// TODO: implement in the future continoous trigger?
-	if (trigger->Executed)
-		return true;
-
-	// Get the trigger function name
-	char* name = (char*)trigger->Name.c_str();
-
-	// Execute trigger
-	bool result = (*m_lua)[name]();
-
-	// Trigger was executed, don't execute it anymore
-	trigger->Executed = result;
-
-	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
-		if (value.is<bool>())
-			std::cout << key.as<std::string>() << " " << value.as<bool>() << std::endl;
-		else if (value.is<std::string>())
-			std::cout << key.as<std::string>() << " " << value.as<std::string>() << std::endl;
-		else
-			std::cout << key.as<std::string>() << " " << value.as<int>() << std::endl;		
-	});
-
-	return result;
-	*/
-}
-
 void JumpToLevel(int levelNum)
 {
 	if (levelNum >= g_GameFlow->GetNumLevels())
