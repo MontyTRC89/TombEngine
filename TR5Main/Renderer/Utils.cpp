@@ -12,7 +12,7 @@ namespace ten::renderer::Utils {
 	void Utils::throwIfFailed(const HRESULT& res) noexcept {
 		if(FAILED(res)){
 			std::string message = std::system_category().message(res);
-			std::cout << message << std::endl;
+			TENLog(message, LogLevel::Error);
 			throw std::runtime_error("An error occured!");
 		}
 			
