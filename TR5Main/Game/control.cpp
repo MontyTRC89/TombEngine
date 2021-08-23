@@ -872,6 +872,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			result == GAME_STATUS_LEVEL_COMPLETED)
 		{
 			g_GameScript->OnEnd();
+			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
 			S_CDStop();
