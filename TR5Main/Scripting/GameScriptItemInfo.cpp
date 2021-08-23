@@ -17,7 +17,7 @@ Represents any object inside the game world.
 Examples include statics, enemies, doors,
 pickups, and Lara herself.
 
-@classmod ItemInfo
+@entityclass ItemInfo
 @pragma nostrip
 */
 

@@ -1,6 +1,6 @@
 #pragma once
 
-// Last generated on 18/7/2021.
+// Last generated on 23/8/2021.
 
 #include "objectslist.h"
 #include <unordered_map>
@@ -8,7 +8,7 @@
 
 /***
 Constants for object IDs.
-@classmod ObjID
+@enum ObjID
 @pragma nostrip
 */
 
