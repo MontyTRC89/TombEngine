@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "GameScriptSkyLayer.h"
-/***
-Description class for moving clouds, as seen in TR4's City of the Dead.
+/*** Describes a layer of moving clouds.
+As seen in TR4's City of the Dead.
 
-@classmod SkyLayer
+@pregameclass SkyLayer
 @pragma nostrip
 */
 

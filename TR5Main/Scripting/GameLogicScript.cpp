@@ -17,7 +17,7 @@
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@module gamelogic
+@files Level-specific
 @pragma nostrip
 */
 
@@ -178,15 +178,13 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 @section Music
 */
 
-/***
-Set the named track as the ambient track, and start playing it
+/*** Set and play an ambient track
 @function SetAmbientTrack
 @tparam string name of track (without file extension) to play
 */
 	m_lua->set_function("SetAmbientTrack", &SetAmbientTrack);
 
-/***
-Start playing the named track.
+/*** Play an audio track
 @function PlayAudioTrack
 @tparam string name of track (without file extension) to play
 @tparam bool loop if true, the track will loop; if false, it won't (default: false)
@@ -197,8 +195,7 @@ Start playing the named track.
 @section Inventory
 */
 
-/***
-Add x of a certain item to the inventory.
+/*** Add x of an item to the inventory.
 A count of 0 will add the "default" amount of that item
 (i.e. the amount the player would get from a pickup of that type).
 For example, giving "zero" crossbow ammo would give the player

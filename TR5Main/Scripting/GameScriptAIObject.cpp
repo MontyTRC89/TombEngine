@@ -8,7 +8,7 @@
 /***
 AI object
 
-@classmod AIObject
+@entityclass AIObject
 @pragma nostrip
 */
 
