@@ -48,6 +48,7 @@ namespace ten::entities::tr4
 
 	void ScarabsControl(short itemNumber)
 	{
+		return;
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		if (item->triggerFlags)
