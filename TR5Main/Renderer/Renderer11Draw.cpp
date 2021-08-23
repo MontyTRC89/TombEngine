@@ -2290,53 +2290,53 @@ namespace ten::renderer
 		*/
     }
 
-	void Renderer11::drawScarabs(RenderView& view) {
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
+    void Renderer11::drawScarabs(RenderView& view) {
+        UINT stride = sizeof(RendererVertex);
+        UINT offset = 0;
 
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_context->IASetInputLayout(m_inputLayout.Get());
+        m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		if (Objects[ID_LITTLE_BEETLE].loaded)
-		{
-			OBJECT_INFO* obj = &Objects[ID_LITTLE_BEETLE];
-			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
+        if (Objects[ID_LITTLE_BEETLE].loaded)
+        {
+            OBJECT_INFO* obj = &Objects[ID_LITTLE_BEETLE];
+            RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 
-			for (int m = 0; m < 32; m++)
-				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+            for (int m = 0; m < 32; m++)
+                memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int i = 0; i < ten::entities::tr4::NUM_LITTLE_BETTLES; i++)
-			{
-				SCARAB_INFO* beetle = &ten::entities::tr4::Scarabs[i];
+            for (int i = 0; i < ten::entities::tr4::NUM_LITTLE_BETTLES; i++)
+            {
+                SCARAB_INFO* beetle = &ten::entities::tr4::Scarabs[i];
 
-				if (beetle->on)
-				{
-					RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex);
-					Matrix translation = Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->pos.yRot, beetle->pos.xRot, beetle->pos.zRot);
-					Matrix world = rotation * translation;
+                if (beetle->on)
+                {
+                    RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+                    Matrix translation = Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
+                    Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->pos.yRot), TO_RAD(beetle->pos.xRot), TO_RAD(beetle->pos.zRot));
+                    Matrix world = rotation * translation;
 
-					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
-                    m_cbItem.updateData(m_stItem,m_context.Get());
+                    m_stItem.World = world;
+                    m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
+                    m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+                    m_cbItem.updateData(m_stItem, m_context.Get());
 
                     for (int b = 0; b < mesh->buckets.size(); b++)
-					{
-						RendererBucket* bucket = &mesh->buckets[b];
+                    {
+                        RendererBucket* bucket = &mesh->buckets[b];
 
-						if (bucket->Vertices.size() == 0)
-							continue;
+                        if (bucket->Vertices.size() == 0)
+                            continue;
 
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
-					}
-				}
-			}
-		}
-	}
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                        m_numDrawCalls++;
+                    }
+                }
+            }
+        }
+    }
 
     void Renderer11::drawLocusts(RenderView& view) {
         UINT stride = sizeof(RendererVertex);
