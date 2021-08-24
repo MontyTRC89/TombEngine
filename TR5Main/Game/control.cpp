@@ -1429,12 +1429,6 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			// TODO: not used for now
 			break;
 
-		case TO_LUA_SCRIPT:
-			trigger = *(data++);
-			g_GameScript->ExecuteTrigger(trigger & 0x7FFF);
-
-			break;
-
 		default:
 			break;
 		}

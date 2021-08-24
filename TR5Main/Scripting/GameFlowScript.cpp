@@ -13,8 +13,8 @@
 #include <Game/newinv2.h>
 
 /***
-Files that will be run on game startup.
-@module gameflow
+Scripts that will be run on game startup.
+@files Pre-game
 @pragma nostrip
 */
 
@@ -48,20 +48,23 @@ Add a level to the gameflow.
 */
 	m_lua->set_function("AddLevel", &GameFlow::AddLevel, this);
 
-/*** The path of the .jpg or .png image to show when loading the game.
+/*** Image to show when loading the game.
+Must be a .jpg or .png image.
 @function SetIntroImagePath
 @tparam string path the path to the image, relative to the TombEngine exe
 */
 	m_lua->set_function("SetIntroImagePath", &GameFlow::SetIntroImagePath, this);
 
-/*** The path of the .jpg or .png image to show in the background of the title screen.
+/*** Image to show in the background of the title screen.
+Must be a .jpg or .png image.
 __(not yet implemented)__
 @function SetTitleScreenImagePath
 @tparam string path the path to the image, relative to the TombEngine exe
 */
 	m_lua->set_function("SetTitleScreenImagePath", &GameFlow::SetTitleScreenImagePath, this);
 
-/*** The maximum draw distance, in sectors (blocks), of any level in the game.
+/*** Maximum draw distance.
+The maximum draw distance, in sectors (blocks), of any level in the game.
 This is equivalent to TRNG's WorldFarView variable.
 __(not yet implemented)__
 @function SetGameFarView
@@ -98,13 +101,14 @@ You will not need to call them manually.
 */
 /*** Set string variable keys and their translations.
 @function SetStrings
-@tparam table table array-style table with strings
+@tparam tab table array-style table with strings
 */
 	m_lua->set_function("SetStrings", &GameFlow::SetStrings, this);
 
-/*** Specify which translations in the strings table correspond to which languages.
+/*** Set language names for translations.
+Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
-@tparam table table array-style table with language names
+@tparam tab table array-style table with language names
 */
 	m_lua->set_function("SetLanguageNames", &GameFlow::SetLanguageNames, this);
 

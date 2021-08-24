@@ -17,7 +17,7 @@
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@module gamelogic
+@files Level-specific
 @pragma nostrip
 */
 
@@ -178,15 +178,13 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 @section Music
 */
 
-/***
-Set the named track as the ambient track, and start playing it
+/*** Set and play an ambient track
 @function SetAmbientTrack
 @tparam string name of track (without file extension) to play
 */
 	m_lua->set_function("SetAmbientTrack", &SetAmbientTrack);
 
-/***
-Start playing the named track.
+/*** Play an audio track
 @function PlayAudioTrack
 @tparam string name of track (without file extension) to play
 @tparam bool loop if true, the track will loop; if false, it won't (default: false)
@@ -197,8 +195,7 @@ Start playing the named track.
 @section Inventory
 */
 
-/***
-Add x of a certain item to the inventory.
+/*** Add x of an item to the inventory.
 A count of 0 will add the "default" amount of that item
 (i.e. the amount the player would get from a pickup of that type).
 For example, giving "zero" crossbow ammo would give the player
@@ -447,43 +444,6 @@ void GameScript::FreeLevelScripts()
 	ResetLevelTables();
 }
 
-bool GameScript::ExecuteTrigger(short index)
-{
-	return true;
-	/*
-	// Is this a valid trigger?
-	if (index >= m_triggers.size())
-		return true;
-
-	LuaFunction* trigger = m_triggers[index];
-
-	// We want to execute a trigger just one time 
-	// TODO: implement in the future continoous trigger?
-	if (trigger->Executed)
-		return true;
-
-	// Get the trigger function name
-	char* name = (char*)trigger->Name.c_str();
-
-	// Execute trigger
-	bool result = (*m_lua)[name]();
-
-	// Trigger was executed, don't execute it anymore
-	trigger->Executed = result;
-
-	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
-		if (value.is<bool>())
-			std::cout << key.as<std::string>() << " " << value.as<bool>() << std::endl;
-		else if (value.is<std::string>())
-			std::cout << key.as<std::string>() << " " << value.as<std::string>() << std::endl;
-		else
-			std::cout << key.as<std::string>() << " " << value.as<int>() << std::endl;		
-	});
-
-	return result;
-	*/
-}
-
 void JumpToLevel(int levelNum)
 {
 	if (levelNum >= g_GameFlow->GetNumLevels())
@@ -663,7 +623,7 @@ void GameScript::ExecuteFunction(std::string const & name)
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 }
 

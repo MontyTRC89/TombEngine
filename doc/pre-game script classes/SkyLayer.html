@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>Reference</title>
+    <title>TombEngine Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -37,30 +37,39 @@
 </ul>
 
 
-<h2>Classes</h2>
+<h2>Pre-game script classes</h2>
 <ul class="nowrap">
-  <li><a href="../classes/AIObject.html">AIObject</a></li>
-  <li><a href="../classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="../classes/Color.html">Color</a></li>
-  <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
-  <li><a href="../classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="../classes/Level.html">Level</a></li>
-  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="../classes/Mirror.html">Mirror</a></li>
-  <li><a href="../classes/Position.html">Position</a></li>
-  <li><a href="../classes/Rotation.html">Rotation</a></li>
-  <li><a href="../classes/Settings.html">Settings</a></li>
-  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../pre-game script classes/AudioTrack.html">AudioTrack</a></li>
+  <li><a href="../pre-game script classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="../pre-game script classes/Level.html">Level</a></li>
+  <li><a href="../pre-game script classes/Mirror.html">Mirror</a></li>
+  <li><a href="../pre-game script classes/Settings.html">Settings</a></li>
   <li><strong>SkyLayer</strong></li>
-  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-  <li><a href="../classes/InvItem.html">InvItem</a></li>
-  <li><a href="../classes/ObjID.html">ObjID</a></li>
 </ul>
-<h2>Modules</h2>
+<h2>Script Files</h2>
 <ul class="nowrap">
-  <li><a href="../modules/gameflow.html">gameflow</a></li>
-  <li><a href="../modules/gamelogic.html">gamelogic</a></li>
+  <li><a href="../script files/Pre-game.html">Pre-game scripts</a></li>
+  <li><a href="../script files/Level-specific.html">Level-specific scripts</a></li>
+</ul>
+<h2>Enums</h2>
+<ul class="nowrap">
+  <li><a href="../enums/InvItem.html">InvItem</a></li>
+  <li><a href="../enums/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Entity classes</h2>
+<ul class="nowrap">
+  <li><a href="../entity classes/AIObject.html">AIObject</a></li>
+  <li><a href="../entity classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="../entity classes/ItemInfo.html">ItemInfo</a></li>
+  <li><a href="../entity classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../entity classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+</ul>
+<h2>Misc classes</h2>
+<ul class="nowrap">
+  <li><a href="../misc classes/Color.html">Color</a></li>
+  <li><a href="../misc classes/Position.html">Position</a></li>
+  <li><a href="../misc classes/Rotation.html">Rotation</a></li>
 </ul>
 
 </div>
@@ -68,27 +77,25 @@
 <div id="content">
 
 <h1>Class <code>SkyLayer</code></h1>
-<p>Description class for moving clouds, as seen in TR4's City of the Dead.</p>
-<p>
-
-</p>
+<p>Describes a layer of moving clouds.</p>
+<p>As seen in TR4's City of the Dead.</p>
 
 
 <h2><a href="#Members">Members</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#SkyLayer.color">SkyLayer.color</a></td>
-	<td class="summary">(<a href="../classes/Color.html#">Color</a>) RGB sky color</td>
+	<td class="name" ><a href="#color">color</a></td>
+	<td class="summary">(<a href="../misc classes/Color.html#">Color</a>) RGB sky color</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SkyLayer.speed">SkyLayer.speed</a></td>
+	<td class="name" ><a href="#speed">speed</a></td>
 	<td class="summary">(int) cloud speed.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#SkyLayer.new">SkyLayer.new (color, speed)</a></td>
+	<td class="name" ><a href="#SkyLayer.new">SkyLayer.new(color, speed)</a></td>
 	<td class="summary">
 
 </td>
@@ -103,11 +110,11 @@
 
     <dl class="function">
     <dt>
-    <a name = "SkyLayer.color"></a>
-    <strong>SkyLayer.color</strong>
+    <a name = "color"></a>
+    <strong>color</strong>
     </dt>
     <dd>
-    (<a href="../classes/Color.html#">Color</a>) RGB sky color
+    (<a href="../misc classes/Color.html#">Color</a>) RGB sky color
 
 
 
@@ -117,8 +124,8 @@
 
 </dd>
     <dt>
-    <a name = "SkyLayer.speed"></a>
-    <strong>SkyLayer.speed</strong>
+    <a name = "speed"></a>
+    <strong>speed</strong>
     </dt>
     <dd>
     (int) cloud speed. </p>
@@ -140,11 +147,11 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 </dd>
 </dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-    Methods
+
     <dl class="function">
     <dt>
     <a name = "SkyLayer.new"></a>
-    <strong>SkyLayer.new (color, speed)</strong>
+    <strong>SkyLayer.new(color, speed)</strong>
     </dt>
     <dd>
 
@@ -155,7 +162,7 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">color</span>
-            <span class="types"><a class="type" href="../classes/Color.html#">Color</a></span>
+            <span class="types"><span class="type">Color</span></span>
          RGB color
         </li>
         <li><span class="parameter">speed</span>
@@ -181,7 +188,7 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-16 12:53:44 </i>
+<i style="float:right;">Last updated 2021-08-23 20:14:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

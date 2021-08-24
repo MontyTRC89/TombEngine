@@ -6,7 +6,7 @@
 /***
 Sound source info
 
-@classmod SoundSourceInfo
+@entityclass SoundSourceInfo
 @pragma nostrip
 */
 
