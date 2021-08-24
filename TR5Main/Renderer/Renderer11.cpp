@@ -25,9 +25,9 @@
 #include "RenderView/RenderView.h"
 using std::vector;
 
-namespace T5M::Renderer 
+namespace ten::renderer 
 {
-	using namespace T5M::Renderer::Utils;
+	using namespace ten::renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;
 

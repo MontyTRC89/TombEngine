@@ -12,7 +12,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "prng.h"
-using namespace T5M::Math::Random;
+using namespace ten::Math::Random;
 struct PISTOL_DEF
 {
 	short objectNum;

@@ -3,12 +3,12 @@
 #include "camera.h"
 #include "spotcam.h"
 #include "lara.h"
-T5M::Renderer::RendererHUDBar* g_HealthBar;
-T5M::Renderer::RendererHUDBar* g_AirBar;
-T5M::Renderer::RendererHUDBar* g_DashBar;
-T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
-T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
-namespace T5M::Renderer {
+ten::renderer::RendererHUDBar* g_HealthBar;
+ten::renderer::RendererHUDBar* g_AirBar;
+ten::renderer::RendererHUDBar* g_DashBar;
+ten::renderer::RendererHUDBar* g_MusicVolumeBar;
+ten::renderer::RendererHUDBar* g_SFXVolumeBar;
+namespace ten::renderer {
 
 	void Renderer11::initialiseBars()
 {
@@ -120,10 +120,17 @@ namespace T5M::Renderer {
 			return;
 
 		m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
-		drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
-		if (LaserSight) {
+		if (BinocularRange && !LaserSight)
+		{
+			drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+		}
+		else if (BinocularRange && LaserSight)
+		{
+			drawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+
+			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+
 			// Draw the aiming point
 			RendererVertex vertices[4];
 
@@ -164,6 +171,10 @@ namespace T5M::Renderer {
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 			m_primitiveBatch->End();
+		}
+		else
+		{
+			// TODO: Vignette goes here! -- Lwmte, 21.08.21
 		}
 	}
 

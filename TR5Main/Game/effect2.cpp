@@ -17,10 +17,10 @@
 #include <Game\bubble.h>
 #include "smoke.h"
 #include "prng.h"
-using T5M::Renderer::g_Renderer;
-using T5M::Effects::Explosion::TriggerExplosion;
-using namespace T5M::Effects::Spark;
-using namespace T5M::Math::Random;
+using ten::renderer::g_Renderer;
+using ten::Effects::Explosion::TriggerExplosion;
+using namespace ten::Effects::Spark;
+using namespace ten::Math::Random;
 
 int NextSpark;
 int DeadlyBounds[6];
@@ -918,7 +918,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 			continue;
 		}
 	}
-	T5M::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
+	ten::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1437,7 +1437,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 
 	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size >> 2;*/
-	T5M::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
+	ten::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)

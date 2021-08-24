@@ -56,13 +56,13 @@
 using std::vector;
 using std::unordered_map;
 using std::string;
-using namespace T5M::Effects::Explosion;
-using namespace T5M::Effects::Spark;
-using namespace T5M::Effects::Smoke;
-using namespace T5M::Effects;
-using T5M::Renderer::g_Renderer;
-using namespace T5M::Math::Random;
-using namespace T5M::Floordata;
+using namespace ten::Effects::Explosion;
+using namespace ten::Effects::Spark;
+using namespace ten::Effects::Smoke;
+using namespace ten::Effects;
+using ten::renderer::g_Renderer;
+using namespace ten::Math::Random;
+using namespace ten::Floordata;
 
 short ShatterSounds[18][10] =
 	{
@@ -132,8 +132,6 @@ int WeaponEnemyTimer;
 int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
-signed char SkyVelocity1;
-signed char SkyVelocity2;
 CVECTOR SkyColor1;
 CVECTOR SkyColor2;
 int CutSeqNum;
@@ -172,7 +170,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace T5M::Effects::Footprints;
+using namespace ten::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
@@ -556,15 +554,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
-		UpdateLittleBeetles();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		T5M::Effects::Drip::UpdateDrips();
+		ten::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		UpdateLocusts();
-		UpdateLittleBeetles();
+		ten::entities::tr4::UpdateScarabs();
+		ten::entities::tr4::UpdateLocusts();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
@@ -866,6 +863,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			result == GAME_STATUS_LEVEL_COMPLETED)
 		{
 			g_GameScript->OnEnd();
+			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
 			S_CDStop();
@@ -1352,12 +1350,6 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 
 		case TO_CUTSCENE:
 			// TODO: not used for now
-			break;
-
-		case TO_LUA_SCRIPT:
-			trigger = *(data++);
-			g_GameScript->ExecuteTrigger(trigger & 0x7FFF);
-
 			break;
 
 		default:

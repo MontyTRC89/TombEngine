@@ -2,16 +2,18 @@
 #include "ScriptAssert.h"
 #include "GameScriptCameraInfo.h"
 #include "GameScriptPosition.h"
+#include "ScriptUtil.h"
 /***
 Camera info
 
-@classmod CameraInfo
+@entityclass CameraInfo
 @pragma nostrip
 */
 
 static constexpr auto LUA_CLASS_NAME{ "CameraInfo" };
 
 static auto index_error = index_error_maker(GameScriptCameraInfo, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(GameScriptCameraInfo, LUA_CLASS_NAME);
 
 GameScriptCameraInfo::GameScriptCameraInfo(LEVEL_CAMERA_INFO & ref, bool temp) : m_camera{ref}, m_temporary{ temp }
 {};
@@ -27,6 +29,7 @@ void GameScriptCameraInfo::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptCameraInfo>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
+		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos

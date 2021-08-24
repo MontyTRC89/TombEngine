@@ -4,7 +4,7 @@
 #include <iostream>
 #include <wrl/client.h>
 #include <d3dcompiler.h>
-namespace T5M::Renderer::Utils {
+namespace ten::renderer::Utils {
 	using std::wstring;
 	using std::string;
 	using Microsoft::WRL::ComPtr;
@@ -12,7 +12,7 @@ namespace T5M::Renderer::Utils {
 	void Utils::throwIfFailed(const HRESULT& res) noexcept {
 		if(FAILED(res)){
 			std::string message = std::system_category().message(res);
-			std::cout << message << std::endl;
+			TENLog(message, LogLevel::Error);
 			throw std::runtime_error("An error occured!");
 		}
 			

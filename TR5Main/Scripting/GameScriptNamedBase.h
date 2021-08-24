@@ -3,13 +3,6 @@
 #include <functional>
 #include <string>
 
-
-#define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE & item, sol::object key) \
-{ \
-	std::string err = "Attempted to read non-existant var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \
-	throw TENScriptException(err); \
-}
-
 template <typename S> using callbackSetName = std::function<bool(std::string const&, S identifier)>;
 using callbackRemoveName = std::function<bool(std::string const&)>;
 

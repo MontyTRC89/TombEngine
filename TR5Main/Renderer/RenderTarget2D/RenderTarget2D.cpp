@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "RenderTarget2D.h"
 #include "Utils.h"
-namespace T5M::Renderer {
-	using T5M::Renderer::Utils::throwIfFailed;
+namespace ten::renderer {
+	using ten::renderer::Utils::throwIfFailed;
 	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) {
 
 		D3D11_TEXTURE2D_DESC desc = {};

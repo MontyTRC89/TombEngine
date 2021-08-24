@@ -6,7 +6,7 @@
 /***
 Represents the properties of an object as it appears in the inventory.
 
-@classmod InventoryObject
+@pregameclass InventoryObject
 @pragma nostrip
 */
 
@@ -29,7 +29,7 @@ associated getters and setters.
 	@tparam ItemAction action is this usable, equippable, or examinable?
 	@return an InventoryObject
 */
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, float a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
+GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
@@ -44,7 +44,7 @@ GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, 
 void GameScriptInventoryObject::Register(sol::state * lua)
 {
 	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
-		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, float, float, GameScriptRotation const &, rotflags, int, item_options), GameScriptInventoryObject()>(),
+		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, rotflags, int, item_options), GameScriptInventoryObject()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
 */

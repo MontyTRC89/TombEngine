@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-namespace T5M::Memory {
+namespace ten::Memory {
 	/*
 * A fixed size vector-like class
 */

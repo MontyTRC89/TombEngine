@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "RenderPipelineState.h"
 #include "Utils.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	using namespace Utils;
 	RenderPipelineState::RenderPipelineState(ID3D11Device* device, const ShaderCompileOptions& vertexShader, const ShaderCompileOptions& pixelShader, const BlendStateOptions& blendingOptions)
 	{

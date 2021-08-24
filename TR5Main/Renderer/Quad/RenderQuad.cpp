@@ -5,9 +5,9 @@
 #include "Renderer11.h"
 #include "../Utils.h"
 
-namespace T5M::Renderer {
+namespace ten::renderer {
 	ComPtr<ID3D11Buffer> quadVertexBuffer;
-	void T5M::Renderer::initQuad(ID3D11Device* device) {
+	void ten::renderer::initQuad(ID3D11Device* device) {
 		std::array<RendererVertex, 4> quadVertices;
 		//Bottom Left
 		quadVertices[0].Position = Vector3(-0.5, -0.5, 0);

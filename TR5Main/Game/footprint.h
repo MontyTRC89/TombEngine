@@ -2,7 +2,7 @@
 #include "phd_global.h"
 #include "items.h"
 #include <deque>
-namespace T5M{
+namespace ten{
 	namespace Effects {
 		namespace Footprints {
 			constexpr size_t MAX_FOOTPRINTS = 20;
