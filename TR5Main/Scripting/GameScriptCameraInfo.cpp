@@ -6,7 +6,7 @@
 /***
 Camera info
 
-@classmod CameraInfo
+@entityclass CameraInfo
 @pragma nostrip
 */
 

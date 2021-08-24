@@ -5,7 +5,7 @@
 
 /***
 Represents a position in the game world.
-@classmod Position
+@miscclass Position
 @pragma nostrip
 */
 

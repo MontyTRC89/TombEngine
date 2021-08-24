@@ -2,11 +2,11 @@
 #include "GameScriptRotation.h"
 #include "phd_global.h"
 
-/***
-Represents a rotation as a combination of individual
+/*** Represents a rotation.
+Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
 All values will be clamped to [-32768, 32767].
-@classmod Rotation
+@miscclass Rotation
 @pragma nostrip
 */
 

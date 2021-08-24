@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>Reference</title>
+    <title>TombEngine Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -40,37 +40,46 @@
 </ul>
 
 
-<h2>Modules</h2>
+<h2>Script Files</h2>
 <ul class="nowrap">
-  <li><a href="../modules/gameflow.html">gameflow</a></li>
-  <li><strong>gamelogic</strong></li>
+  <li><a href="../script files/Pre-game.html">Pre-game scripts</a></li>
+  <li><strong>Level-specific scripts</strong></li>
 </ul>
-<h2>Classes</h2>
+<h2>Enums</h2>
 <ul class="nowrap">
-  <li><a href="../classes/AIObject.html">AIObject</a></li>
-  <li><a href="../classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="../classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="../classes/Color.html">Color</a></li>
-  <li><a href="../classes/InventoryObject.html">InventoryObject</a></li>
-  <li><a href="../classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="../classes/Level.html">Level</a></li>
-  <li><a href="../classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="../classes/Mirror.html">Mirror</a></li>
-  <li><a href="../classes/Position.html">Position</a></li>
-  <li><a href="../classes/Rotation.html">Rotation</a></li>
-  <li><a href="../classes/Settings.html">Settings</a></li>
-  <li><a href="../classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="../classes/SkyLayer.html">SkyLayer</a></li>
-  <li><a href="../classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-  <li><a href="../classes/InvItem.html">InvItem</a></li>
-  <li><a href="../classes/ObjID.html">ObjID</a></li>
+  <li><a href="../enums/InvItem.html">InvItem</a></li>
+  <li><a href="../enums/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Entity classes</h2>
+<ul class="nowrap">
+  <li><a href="../entity classes/AIObject.html">AIObject</a></li>
+  <li><a href="../entity classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="../entity classes/ItemInfo.html">ItemInfo</a></li>
+  <li><a href="../entity classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="../entity classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="../entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+</ul>
+<h2>Pre-game script classes</h2>
+<ul class="nowrap">
+  <li><a href="../pre-game script classes/AudioTrack.html">AudioTrack</a></li>
+  <li><a href="../pre-game script classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="../pre-game script classes/Level.html">Level</a></li>
+  <li><a href="../pre-game script classes/Mirror.html">Mirror</a></li>
+  <li><a href="../pre-game script classes/Settings.html">Settings</a></li>
+  <li><a href="../pre-game script classes/SkyLayer.html">SkyLayer</a></li>
+</ul>
+<h2>Misc classes</h2>
+<ul class="nowrap">
+  <li><a href="../misc classes/Color.html">Color</a></li>
+  <li><a href="../misc classes/Position.html">Position</a></li>
+  <li><a href="../misc classes/Rotation.html">Rotation</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>gamelogic</code></h1>
+<h1>Level-specific files</code></h1>
 <p>Functions and callbacks for level-specific logic scripts.</p>
 <p>
 
@@ -80,61 +89,61 @@
 <h2><a href="#Ambience_and_music">Ambience and music </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack (name)</a></td>
-	<td class="summary">Set the named track as the ambient track, and start playing it</td>
+	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name)</a></td>
+	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack (name, loop)</a></td>
-	<td class="summary">Start playing the named track.</td>
+	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack(name, loop)</a></td>
+	<td class="summary">Play an audio track</td>
 	</tr>
 </table>
 <h2><a href="#Player_inventory_management">Player inventory management </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#GiveInvItem">GiveInvItem (item, count)</a></td>
-	<td class="summary">Add x of a certain item to the inventory.</td>
+	<td class="name" ><a href="#GiveInvItem">GiveInvItem(item, count)</a></td>
+	<td class="summary">Add x of an item to the inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#TakeInvItem">TakeInvItem (item, count)</a></td>
+	<td class="name" ><a href="#TakeInvItem">TakeInvItem(item, count)</a></td>
 	<td class="summary">Remove x of a certain item from the inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetInvItemCount">GetInvItemCount (item)</a></td>
+	<td class="name" ><a href="#GetInvItemCount">GetInvItemCount(item)</a></td>
 	<td class="summary">Get the amount the player holds of an item.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetInvItemCount">SetInvItemCount (item, count)</a></td>
+	<td class="name" ><a href="#SetInvItemCount">SetInvItemCount(item, count)</a></td>
 	<td class="summary">Set the amount of a certain item the player has in the inventory.</td>
 	</tr>
 </table>
 <h2><a href="#Game_entity_getters">Game entity getters </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#GetItemByName">GetItemByName (name)</a></td>
+	<td class="name" ><a href="#GetItemByName">GetItemByName(name)</a></td>
 	<td class="summary">Get an ItemInfo by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetMeshByName">GetMeshByName (name)</a></td>
+	<td class="name" ><a href="#GetMeshByName">GetMeshByName(name)</a></td>
 	<td class="summary">Get a MeshInfo by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetCameraByName">GetCameraByName (name)</a></td>
+	<td class="name" ><a href="#GetCameraByName">GetCameraByName(name)</a></td>
 	<td class="summary">Get a CameraInfo by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetSinkByName">GetSinkByName (name)</a></td>
+	<td class="name" ><a href="#GetSinkByName">GetSinkByName(name)</a></td>
 	<td class="summary">Get a SinkInfo by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetSoundSourceByName">GetSoundSourceByName (name)</a></td>
+	<td class="name" ><a href="#GetSoundSourceByName">GetSoundSourceByName(name)</a></td>
 	<td class="summary">Get a SoundSourceInfo by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CalculateDistance">CalculateDistance (posA, posB)</a></td>
+	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the distance between two positions.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CalculateHorizontalDistance">CalculateHorizontalDistance (posA, posB)</a></td>
+	<td class="name" ><a href="#CalculateHorizontalDistance">CalculateHorizontalDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the horizontal distance between two positions.</td>
 	</tr>
 </table>
@@ -142,7 +151,7 @@
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#Lara">Lara</a></td>
-	<td class="summary">An <a href="../classes/ItemInfo.html#">ItemInfo</a> representing Lara herself.</td>
+	<td class="summary">An <a href="../entity classes/ItemInfo.html#">ItemInfo</a> representing Lara herself.</td>
 	</tr>
 </table>
 <h2><a href="#Special_tables">Special tables </a></h2>
@@ -170,10 +179,10 @@
     <dl class="function">
     <dt>
     <a name = "SetAmbientTrack"></a>
-    <strong>SetAmbientTrack (name)</strong>
+    <strong>SetAmbientTrack(name)</strong>
     </dt>
     <dd>
-    Set the named track as the ambient track, and start playing it
+    Set and play an ambient track
 
 
     <h3>Parameters:</h3>
@@ -191,10 +200,10 @@
 </dd>
     <dt>
     <a name = "PlayAudioTrack"></a>
-    <strong>PlayAudioTrack (name, loop)</strong>
+    <strong>PlayAudioTrack(name, loop)</strong>
     </dt>
     <dd>
-    Start playing the named track.
+    Play an audio track
 
 
     <h3>Parameters:</h3>
@@ -220,10 +229,10 @@
     <dl class="function">
     <dt>
     <a name = "GiveInvItem"></a>
-    <strong>GiveInvItem (item, count)</strong>
+    <strong>GiveInvItem(item, count)</strong>
     </dt>
     <dd>
-    Add x of a certain item to the inventory.
+    Add x of an item to the inventory.
 A count of 0 will add the "default" amount of that item
 (i.e. the amount the player would get from a pickup of that type).
 For example, giving "zero" crossbow ammo would give the player
@@ -233,7 +242,7 @@ For example, giving "zero" crossbow ammo would give the player
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">item</span>
-            <span class="types"><a class="type" href="../classes/InvItem.html#">InvItem</a></span>
+            <span class="types"><span class="type">InvItem</span></span>
          the item to be added
         </li>
         <li><span class="parameter">count</span>
@@ -249,17 +258,17 @@ For example, giving "zero" crossbow ammo would give the player
 </dd>
     <dt>
     <a name = "TakeInvItem"></a>
-    <strong>TakeInvItem (item, count)</strong>
+    <strong>TakeInvItem(item, count)</strong>
     </dt>
     <dd>
     Remove x of a certain item from the inventory.
-As in <a href="../modules/gamelogic.html#GiveInvItem">GiveInvItem</a>, a count of 0 will remove the "default" amount of that item.
+As in <a href="../script files/Level-specific.html#GiveInvItem">GiveInvItem</a>, a count of 0 will remove the "default" amount of that item.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">item</span>
-            <span class="types"><a class="type" href="../classes/InvItem.html#">InvItem</a></span>
+            <span class="types"><span class="type">InvItem</span></span>
          the item to be removed
         </li>
         <li><span class="parameter">count</span>
@@ -275,7 +284,7 @@ As in <a href="../modules/gamelogic.html#GiveInvItem">GiveInvItem</a>, a count o
 </dd>
     <dt>
     <a name = "GetInvItemCount"></a>
-    <strong>GetInvItemCount (item)</strong>
+    <strong>GetInvItemCount(item)</strong>
     </dt>
     <dd>
     Get the amount the player holds of an item.
@@ -284,7 +293,7 @@ As in <a href="../modules/gamelogic.html#GiveInvItem">GiveInvItem</a>, a count o
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">item</span>
-            <span class="types"><a class="type" href="../classes/InvItem.html#">InvItem</a></span>
+            <span class="types"><span class="type">InvItem</span></span>
          the item to check
         </li>
     </ul>
@@ -302,11 +311,11 @@ As in <a href="../modules/gamelogic.html#GiveInvItem">GiveInvItem</a>, a count o
 </dd>
     <dt>
     <a name = "SetInvItemCount"></a>
-    <strong>SetInvItemCount (item, count)</strong>
+    <strong>SetInvItemCount(item, count)</strong>
     </dt>
     <dd>
     Set the amount of a certain item the player has in the inventory.
-Similar to <a href="../modules/gamelogic.html#GiveInvItem">GiveInvItem</a> but replaces with the new amount instead of adding it.
+Similar to <a href="../script files/Level-specific.html#GiveInvItem">GiveInvItem</a> but replaces with the new amount instead of adding it.
 
 
     <h3>Parameters:</h3>
@@ -337,7 +346,7 @@ or is destroyed in some other way.
     <dl class="function">
     <dt>
     <a name = "GetItemByName"></a>
-    <strong>GetItemByName (name)</strong>
+    <strong>GetItemByName(name)</strong>
     </dt>
     <dd>
     Get an ItemInfo by its name.
@@ -354,7 +363,7 @@ or is destroyed in some other way.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/ItemInfo.html#">ItemInfo</a></span>
+           <span class="types"><span class="type">ItemInfo</span></span>
         a non-owning ItemInfo referencing the item.
     </ol>
 
@@ -364,7 +373,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "GetMeshByName"></a>
-    <strong>GetMeshByName (name)</strong>
+    <strong>GetMeshByName(name)</strong>
     </dt>
     <dd>
     Get a MeshInfo by its name.
@@ -381,7 +390,7 @@ or is destroyed in some other way.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/MeshInfo.html#">MeshInfo</a></span>
+           <span class="types"><span class="type">MeshInfo</span></span>
         a non-owning MeshInfo referencing the mesh.
     </ol>
 
@@ -391,7 +400,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "GetCameraByName"></a>
-    <strong>GetCameraByName (name)</strong>
+    <strong>GetCameraByName(name)</strong>
     </dt>
     <dd>
     Get a CameraInfo by its name.
@@ -408,7 +417,7 @@ or is destroyed in some other way.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/CameraInfo.html#">CameraInfo</a></span>
+           <span class="types"><span class="type">CameraInfo</span></span>
         a non-owning CameraInfo referencing the camera.
     </ol>
 
@@ -418,7 +427,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "GetSinkByName"></a>
-    <strong>GetSinkByName (name)</strong>
+    <strong>GetSinkByName(name)</strong>
     </dt>
     <dd>
     Get a SinkInfo by its name.
@@ -435,7 +444,7 @@ or is destroyed in some other way.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/SinkInfo.html#">SinkInfo</a></span>
+           <span class="types"><span class="type">SinkInfo</span></span>
         a non-owning SinkInfo referencing the sink.
     </ol>
 
@@ -445,7 +454,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "GetSoundSourceByName"></a>
-    <strong>GetSoundSourceByName (name)</strong>
+    <strong>GetSoundSourceByName(name)</strong>
     </dt>
     <dd>
     Get a SoundSourceInfo by its name.
@@ -462,7 +471,7 @@ or is destroyed in some other way.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/SoundSourceInfo.html#">SoundSourceInfo</a></span>
+           <span class="types"><span class="type">SoundSourceInfo</span></span>
         a non-owning SoundSourceInfo referencing the sink.
     </ol>
 
@@ -472,7 +481,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "CalculateDistance"></a>
-    <strong>CalculateDistance (posA, posB)</strong>
+    <strong>CalculateDistance(posA, posB)</strong>
     </dt>
     <dd>
     Calculate the distance between two positions.
@@ -481,11 +490,11 @@ or is destroyed in some other way.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">posA</span>
-            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+            <span class="types"><span class="type">Position</span></span>
          first position
         </li>
         <li><span class="parameter">posB</span>
-            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+            <span class="types"><span class="type">Position</span></span>
          second position
         </li>
     </ul>
@@ -503,7 +512,7 @@ or is destroyed in some other way.
 </dd>
     <dt>
     <a name = "CalculateHorizontalDistance"></a>
-    <strong>CalculateHorizontalDistance (posA, posB)</strong>
+    <strong>CalculateHorizontalDistance(posA, posB)</strong>
     </dt>
     <dd>
     Calculate the horizontal distance between two positions.
@@ -512,11 +521,11 @@ or is destroyed in some other way.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">posA</span>
-            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+            <span class="types"><span class="type">Position</span></span>
          first position
         </li>
         <li><span class="parameter">posB</span>
-            <span class="types"><a class="type" href="../classes/Position.html#">Position</a></span>
+            <span class="types"><span class="type">Position</span></span>
          second position
         </li>
     </ul>
@@ -541,7 +550,7 @@ or is destroyed in some other way.
     <strong>Lara</strong>
     </dt>
     <dd>
-    An <a href="../classes/ItemInfo.html#">ItemInfo</a> representing Lara herself.
+    An <a href="../entity classes/ItemInfo.html#">ItemInfo</a> representing Lara herself.
 
 
 
@@ -577,7 +586,7 @@ some time later, the values <code>3</code> will be put back into <code>LevelVars
 
 <p><strong>This table is emptied when a level is finished.</strong> If the player needs to be able
 to return to the level (like in the Karnak and Alexandria levels in <em>The Last Revelation</em>),
-you will need to use the <a href="../modules/gamelogic.html#GameVars">GameVars</a> table, below.
+you will need to use the <a href="../script files/Level-specific.html#GameVars">GameVars</a> table, below.
 
 
 
@@ -609,7 +618,7 @@ write:</p>
 end
 </code></pre>
 
-<p>Unlike <a href="../modules/gamelogic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.
+<p>Unlike <a href="../script files/Level-specific.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.
 
 
 
@@ -678,7 +687,7 @@ and provides the delta time (a float representing game time since last call) via
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-16 12:53:44 </i>
+<i style="float:right;">Last updated 2021-08-23 20:14:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
