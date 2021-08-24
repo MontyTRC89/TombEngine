@@ -845,13 +845,6 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 			angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
 			direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
 			
-			// 16.08.21: code below was deliberately reintroduced by Monty for whatever reasons.
-			// Identified as regression by ChocolateFan and commented.
-
-			// angle = (angle + 0x2000) / 0x4000;
-			// angle = (angle - ((unsigned short)(dest->yRot + 0x2000) / 0x4000));
-			// angle &= 3;
-			
 			switch (direction)
 			{
 				case 0:
@@ -871,7 +864,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 					break;
 
 				case 2:
-					LaraItem->animNumber = LA_WALK;
+					LaraItem->animNumber = LA_SIDESTEP_RIGHT;
 					LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
 					LaraItem->goalAnimState = LS_STEP_RIGHT;
 					LaraItem->currentAnimState = LS_STEP_RIGHT;
@@ -893,41 +886,29 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		Lara.moveCount = 0;
 	}
 
-	if ((short) (dest->xRot - src->xRot) <= angAdd)
-	{
-		if ((short) (dest->xRot - src->xRot) >= -angAdd)
-			src->xRot = dest->xRot;
-		else
-			src->xRot = src->xRot - angAdd;
-	}
+	short deltaAngle = dest->xRot - src->xRot;
+	if (deltaAngle > angAdd)
+		src->xRot += angAdd;
+	else if (deltaAngle < -angAdd)
+		src->xRot -= angAdd;
 	else
-	{
-		src->xRot = angAdd + src->xRot;
-	}
+		src->xRot = dest->xRot;
 
-	if ((short) (dest->yRot - src->yRot) <= angAdd)
-	{
-		if ((short) (dest->yRot - src->yRot) >= -angAdd)
-			src->yRot = dest->yRot;
-		else
-			src->yRot = src->yRot - angAdd;
-	}
+	deltaAngle = dest->yRot - src->yRot;
+	if (deltaAngle > angAdd)
+		src->yRot += angAdd;
+	else if (deltaAngle < -angAdd)
+		src->yRot -= angAdd;
 	else
-	{
-		src->yRot = angAdd + src->yRot;
-	}
+		src->yRot = dest->yRot;
 
-	if ((short) (dest->zRot - src->zRot) <= angAdd)
-	{
-		if ((short) (dest->zRot - src->zRot) >= -angAdd)
-			src->zRot = dest->zRot;
-		else
-			src->zRot = src->zRot - angAdd;
-	}
+	deltaAngle = dest->zRot - src->zRot;
+	if (deltaAngle > angAdd)
+		src->zRot += angAdd;
+	else if (deltaAngle < -angAdd)
+		src->zRot -= angAdd;
 	else
-	{
-		src->zRot = angAdd + src->zRot;
-	}
+		src->zRot = dest->zRot;
 
 	return (src->xPos == dest->xPos
 		&&  src->yPos == dest->yPos
