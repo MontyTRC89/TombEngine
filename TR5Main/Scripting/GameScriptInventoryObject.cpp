@@ -6,7 +6,7 @@
 /***
 Represents the properties of an object as it appears in the inventory.
 
-@classmod InventoryObject
+@pregameclass InventoryObject
 @pragma nostrip
 */
 

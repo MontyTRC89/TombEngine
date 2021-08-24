@@ -9,7 +9,7 @@
 /***
 Mesh info
 
-@classmod MeshInfo
+@entityclass MeshInfo
 @pragma nostrip
 */
 

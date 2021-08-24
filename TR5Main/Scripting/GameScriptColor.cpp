@@ -5,7 +5,7 @@
 An RGBA or RGB color.
 Components are specified in bytes; all values are clamped to [0, 255].
 
-@classmod Color
+@miscclass Color
 @pragma nostrip
 */
 
