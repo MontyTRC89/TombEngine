@@ -2,11 +2,12 @@
 #include "GameScriptMirror.h"
 
 /***
-A mirror effect, as seen in TR4's Coastal Ruins and Sacred Lake levels.
+A mirror effect.
+As seen in TR4's Coastal Ruins and Sacred Lake levels.
 
 __Not currently implemented.__ 
 
-@classmod Mirror
+@pregameclass Mirror
 @pragma nostrip
 */
 

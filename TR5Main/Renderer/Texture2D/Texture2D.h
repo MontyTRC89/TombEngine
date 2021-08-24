@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <string>
 #include <wrl/client.h>
-namespace T5M::Renderer {
+namespace ten::renderer {
 	using Microsoft::WRL::ComPtr;
 	class Texture2D {
 	public:

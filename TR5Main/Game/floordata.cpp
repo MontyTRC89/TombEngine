@@ -5,7 +5,7 @@
 #include "level.h"
 #include "setup.h"
 
-using namespace T5M::Floordata;
+using namespace ten::Floordata;
 
 int FLOOR_INFO::SectorPlane(int x, int z) const
 {
@@ -216,7 +216,7 @@ void FLOOR_INFO::RemoveItem(short itemNumber)
 	BridgeItem.erase(itemNumber);
 }
 
-namespace T5M::Floordata
+namespace ten::Floordata
 {
 	VectorInt2 GetSectorPoint(int x, int z)
 	{

@@ -34,7 +34,14 @@ bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> f
 	return cond;
 }
 
-void SetErrorMode(ERROR_MODE mode)
+
+void SetScriptErrorMode(ERROR_MODE mode)
 {
 	ScriptErrorMode = mode;
 }
+
+ERROR_MODE GetScriptErrorMode()
+{
+	return ScriptErrorMode;
+}
+

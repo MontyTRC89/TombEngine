@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>Reference</title>
+    <title>TombEngine Lua API</title>
     <link rel="stylesheet" href="ldoc.css" type="text/css" />
 </head>
 <body>
@@ -29,30 +29,39 @@
 
 
 
-<h2>Modules</h2>
+<h2>Script Files</h2>
 <ul class="nowrap">
-  <li><a href="modules/gameflow.html">gameflow</a></li>
-  <li><a href="modules/gamelogic.html">gamelogic</a></li>
+  <li><a href="script files/Pre-game.html">Pre-game scripts</a></li>
+  <li><a href="script files/Level-specific.html">Level-specific scripts</a></li>
 </ul>
-<h2>Classes</h2>
+<h2>Enums</h2>
 <ul class="nowrap">
-  <li><a href="classes/AIObject.html">AIObject</a></li>
-  <li><a href="classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="classes/Color.html">Color</a></li>
-  <li><a href="classes/InventoryObject.html">InventoryObject</a></li>
-  <li><a href="classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="classes/Level.html">Level</a></li>
-  <li><a href="classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="classes/Mirror.html">Mirror</a></li>
-  <li><a href="classes/Position.html">Position</a></li>
-  <li><a href="classes/Rotation.html">Rotation</a></li>
-  <li><a href="classes/Settings.html">Settings</a></li>
-  <li><a href="classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="classes/SkyLayer.html">SkyLayer</a></li>
-  <li><a href="classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-  <li><a href="classes/InvItem.html">InvItem</a></li>
-  <li><a href="classes/ObjID.html">ObjID</a></li>
+  <li><a href="enums/InvItem.html">InvItem</a></li>
+  <li><a href="enums/ObjID.html">ObjID</a></li>
+</ul>
+<h2>Entity classes</h2>
+<ul class="nowrap">
+  <li><a href="entity classes/AIObject.html">AIObject</a></li>
+  <li><a href="entity classes/CameraInfo.html">CameraInfo</a></li>
+  <li><a href="entity classes/ItemInfo.html">ItemInfo</a></li>
+  <li><a href="entity classes/MeshInfo.html">MeshInfo</a></li>
+  <li><a href="entity classes/SinkInfo.html">SinkInfo</a></li>
+  <li><a href="entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+</ul>
+<h2>Pre-game script classes</h2>
+<ul class="nowrap">
+  <li><a href="pre-game script classes/AudioTrack.html">AudioTrack</a></li>
+  <li><a href="pre-game script classes/InventoryObject.html">InventoryObject</a></li>
+  <li><a href="pre-game script classes/Level.html">Level</a></li>
+  <li><a href="pre-game script classes/Mirror.html">Mirror</a></li>
+  <li><a href="pre-game script classes/Settings.html">Settings</a></li>
+  <li><a href="pre-game script classes/SkyLayer.html">SkyLayer</a></li>
+</ul>
+<h2>Misc classes</h2>
+<ul class="nowrap">
+  <li><a href="misc classes/Color.html">Color</a></li>
+  <li><a href="misc classes/Position.html">Position</a></li>
+  <li><a href="misc classes/Rotation.html">Rotation</a></li>
 </ul>
 
 </div>
@@ -60,89 +69,97 @@
 <div id="content">
 
 
+  <h2>TombEngine scripting interface</h2>
 
-<h2>Modules</h2>
+<h2>Script Files</h2>
 <table class="module_list">
 	<tr>
-		<td class="name"  ><a href="modules/gameflow.html">gameflow</a></td>
-		<td class="summary">Files that will be run on game startup.</td>
+		<td class="name"  ><a href="script files/Pre-game.html">Pre-game</a></td>
+		<td class="summary">Scripts that will be run on game startup.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="modules/gamelogic.html">gamelogic</a></td>
+		<td class="name"  ><a href="script files/Level-specific.html">Level-specific</a></td>
 		<td class="summary">Functions and callbacks for level-specific logic scripts.</td>
 	</tr>
 </table>
-<h2>Classes</h2>
+<h2>Enums</h2>
 <table class="module_list">
 	<tr>
-		<td class="name"  ><a href="classes/AIObject.html">AIObject</a></td>
-		<td class="summary">AI object</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/AudioTrack.html">AudioTrack</a></td>
-		<td class="summary">Metadata about audio tracks (music and ambience).</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/CameraInfo.html">CameraInfo</a></td>
-		<td class="summary">Camera info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Color.html">Color</a></td>
-		<td class="summary">An RGBA or RGB color.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/InventoryObject.html">InventoryObject</a></td>
-		<td class="summary">Represents the properties of an object as it appears in the inventory.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/ItemInfo.html">ItemInfo</a></td>
-		<td class="summary">Represents any object inside the game world.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Level.html">Level</a></td>
-		<td class="summary">A container for level metadata - things which aren't present in the compiled
-level file itself.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/MeshInfo.html">MeshInfo</a></td>
-		<td class="summary">Mesh info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Mirror.html">Mirror</a></td>
-		<td class="summary">A mirror effect, as seen in TR4's Coastal Ruins and Sacred Lake levels.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Position.html">Position</a></td>
-		<td class="summary">Represents a position in the game world.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Rotation.html">Rotation</a></td>
-		<td class="summary">Represents a rotation as a combination of individual
-angles, in degrees, about each axis.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/Settings.html">Settings</a></td>
-		<td class="summary">Settings that will be run on game startup.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/SinkInfo.html">SinkInfo</a></td>
-		<td class="summary">Sink info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/SkyLayer.html">SkyLayer</a></td>
-		<td class="summary">Description class for moving clouds, as seen in TR4's City of the Dead.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/SoundSourceInfo.html">SoundSourceInfo</a></td>
-		<td class="summary">Sound source info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="classes/InvItem.html">InvItem</a></td>
+		<td class="name"  ><a href="enums/InvItem.html">InvItem</a></td>
 		<td class="summary">Constants for items that can be used with GetInvItem and SetInvItem.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="classes/ObjID.html">ObjID</a></td>
+		<td class="name"  ><a href="enums/ObjID.html">ObjID</a></td>
 		<td class="summary">Constants for object IDs.</td>
+	</tr>
+</table>
+<h2>Entity classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="entity classes/AIObject.html">AIObject</a></td>
+		<td class="summary">AI object</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="entity classes/CameraInfo.html">CameraInfo</a></td>
+		<td class="summary">Camera info</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="entity classes/ItemInfo.html">ItemInfo</a></td>
+		<td class="summary">Represents any object inside the game world.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="entity classes/MeshInfo.html">MeshInfo</a></td>
+		<td class="summary">Mesh info</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="entity classes/SinkInfo.html">SinkInfo</a></td>
+		<td class="summary">Sink info</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="entity classes/SoundSourceInfo.html">SoundSourceInfo</a></td>
+		<td class="summary">Sound source info</td>
+	</tr>
+</table>
+<h2>Pre-game script classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/AudioTrack.html">AudioTrack</a></td>
+		<td class="summary">Metadata about audio tracks (music and ambience).</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/InventoryObject.html">InventoryObject</a></td>
+		<td class="summary">Represents the properties of an object as it appears in the inventory.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/Level.html">Level</a></td>
+		<td class="summary">Stores level metadata.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/Mirror.html">Mirror</a></td>
+		<td class="summary">A mirror effect.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/Settings.html">Settings</a></td>
+		<td class="summary">Settings that will be run on game startup.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="pre-game script classes/SkyLayer.html">SkyLayer</a></td>
+		<td class="summary">Describes a layer of moving clouds.</td>
+	</tr>
+</table>
+<h2>Misc classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="misc classes/Color.html">Color</a></td>
+		<td class="summary">An RGBA or RGB color.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="misc classes/Position.html">Position</a></td>
+		<td class="summary">Represents a position in the game world.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="misc classes/Rotation.html">Rotation</a></td>
+		<td class="summary">Represents a rotation.</td>
 	</tr>
 </table>
 
@@ -150,7 +167,7 @@ angles, in degrees, about each axis.</td>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-16 12:53:44 </i>
+<i style="float:right;">Last updated 2021-08-23 20:14:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

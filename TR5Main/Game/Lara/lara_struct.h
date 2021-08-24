@@ -1083,7 +1083,7 @@ struct LaraInfo
 	bool mineR;
 	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 	DiaryInfo Diary;
-	T5M::Renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
+	ten::renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];

@@ -656,7 +656,7 @@ void InitialiseSpecialEffects()
 	NextDrip = 0;
 	NextBlood = 0;
 	WBRoom = -1;
-	ClearLittleBeetles();
+	ten::entities::tr4::ClearScarabs();
 }
 
 void CustomObjects()

@@ -17,7 +17,7 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;

@@ -4,7 +4,7 @@
 #include "camera.h"
 #include "level.h"
 #include "Renderer11.h"
-using T5M::Renderer::g_Renderer;
+using ten::renderer::g_Renderer;
 BITE_INFO EnemyBites[9] =
 {
 	{ 20, -95, 240, 13 },

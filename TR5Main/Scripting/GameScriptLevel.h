@@ -54,9 +54,9 @@ struct GameScriptLevel
 	bool Rumble{ false };
 	LARA_TYPE LaraType{ LARA_TYPE::NORMAL };
 	GameScriptMirror Mirror;
-	byte UVRotate{ 0 }; // unused
-	int LevelFarView{ 0 }; // unused
-	bool UnlimitedAir{ false }; //unused
+	byte UVRotate{ 0 };
+	int LevelFarView{ 0 };
+	bool UnlimitedAir{ false };
 	std::vector<GameScriptInventoryObject> InventoryObjects;
 	
 	void SetUVRotate(byte val);

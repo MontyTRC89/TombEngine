@@ -7,7 +7,7 @@
 #include "lara.h"
 #include "input.h"
 
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;

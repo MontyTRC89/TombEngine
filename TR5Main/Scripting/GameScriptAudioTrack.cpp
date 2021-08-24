@@ -6,7 +6,7 @@ Metadata about audio tracks (music and ambience).
 
 __In progress__ 
 
-@classmod AudioTrack
+@pregameclass AudioTrack
 @pragma nostrip
 */
 // TODO FIXME find out what is meant to happen and whether we need this or not

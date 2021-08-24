@@ -32,8 +32,8 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
-namespace T5M::Renderer {
-	using namespace T5M::Effects::Footprints;
+namespace ten::renderer {
+	using namespace ten::Effects::Footprints;
 	using std::vector;
 
 	void Renderer11::drawEnergyArcs(RenderView& view) {
@@ -994,8 +994,8 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawSmokeParticles(RenderView& view)
 {
-		using T5M::Effects::Smoke::SmokeParticles;
-		using T5M::Effects::Smoke::SmokeParticle;
+		using ten::Effects::Smoke::SmokeParticles;
+		using ten::Effects::Smoke::SmokeParticle;
 		for (int i = 0; i < SmokeParticles.size(); i++) {
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
@@ -1005,8 +1005,8 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawSparkParticles(RenderView& view)
 {
-		using T5M::Effects::Spark::SparkParticle;
-		using T5M::Effects::Spark::SparkParticles;
+		using ten::Effects::Spark::SparkParticle;
+		using ten::Effects::Spark::SparkParticles;
 		extern std::array<SparkParticle, 64> SparkParticles;
 		for (int i = 0; i < SparkParticles.size(); i++) {
 			SparkParticle& s = SparkParticles[i];
@@ -1019,9 +1019,9 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawDripParticles(RenderView& view)
 {
-		using T5M::Effects::Drip::DripParticle;
-		using T5M::Effects::Drip::dripParticles;
-		using T5M::Effects::Drip::DRIP_WIDTH;
+		using ten::Effects::Drip::DripParticle;
+		using ten::Effects::Drip::dripParticles;
+		using ten::Effects::Drip::DRIP_WIDTH;
 		for (int i = 0; i < dripParticles.size(); i++) {
 			DripParticle& d = dripParticles[i];
 			if (!d.active) continue;
@@ -1033,8 +1033,8 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawExplosionParticles(RenderView& view)
 {
-		using T5M::Effects::Explosion::explosionParticles;
-		using T5M::Effects::Explosion::ExplosionParticle;
+		using ten::Effects::Explosion::explosionParticles;
+		using ten::Effects::Explosion::ExplosionParticle;
 		for (int i = 0; i < explosionParticles.size(); i++) {
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
@@ -1044,7 +1044,7 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawSimpleParticles(RenderView& view)
 	{
-		using namespace T5M::Effects;
+		using namespace ten::Effects;
 		for(SimpleParticle& s : simpleParticles){
 			if(!s.active) continue;
 			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);

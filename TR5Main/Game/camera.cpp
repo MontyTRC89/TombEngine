@@ -14,7 +14,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "input.h"
-using T5M::Renderer::g_Renderer;
+using ten::renderer::g_Renderer;
 struct OLD_CAMERA
 {
 	short currentAnimState;

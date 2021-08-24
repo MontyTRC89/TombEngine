@@ -59,17 +59,18 @@ private:
 	std::unordered_map<std::string, SOUND_SOURCE_INFO&>	m_soundSourcesMapName{};
 	std::unordered_map<std::string, AI_OBJECT&>			m_aiObjectsMapName{};
 	std::unordered_set<std::string>						m_levelFuncs{};
-	std::vector<LuaFunction*	>						m_triggers{};
 	sol::protected_function								m_onStart{};
 	sol::protected_function								m_onLoad{};
 	sol::protected_function								m_onControlPhase{};
 	sol::protected_function								m_onSave{};
 	sol::protected_function								m_onEnd{};
+
+	void ResetLevelTables();
+
 public:	
 	GameScript(sol::state* lua);
 
 	void								FreeLevelScripts();
-	void								AddTrigger(LuaFunction* function);
 
 	bool								AddLuaNameItem(std::string const & luaName, short itemNumber);
 	bool								RemoveLuaNameItem(std::string const& luaName);
@@ -90,11 +91,11 @@ public:
 	bool								RemoveLuaNameAIObject(std::string const& luaName);
 
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
+	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
 	void								AssignItemsAndLara();
 
 
-	bool								ExecuteTrigger(short index);
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 

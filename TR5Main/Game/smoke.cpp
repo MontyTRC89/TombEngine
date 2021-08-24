@@ -8,8 +8,8 @@
 #include "lara.h"
 #include <algorithm>
 #include "prng.h"
-using namespace T5M::Math::Random;
-namespace T5M {
+using namespace ten::Math::Random;
+namespace ten {
 	namespace Effects {
 		namespace Smoke {
 			std::array<SmokeParticle, 128> SmokeParticles;

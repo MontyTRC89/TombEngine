@@ -7,7 +7,7 @@
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "memory\LinearArrayBuffer.h"
 #include "RendererSprites.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	struct RendererStatic;
 	struct RendererItem;
 	struct RendererLight;
@@ -38,12 +38,12 @@ namespace T5M::Renderer {
 	struct RenderView {
 		RenderViewCamera camera;
 		D3D11_VIEWPORT viewport;
-		T5M::Memory::LinearArrayBuffer<RendererRoom*,MAX_ROOMS_DRAW> roomsToDraw;
-		T5M::Memory::LinearArrayBuffer<RendererStatic*,MAX_STATICS_DRAW> staticsToDraw;
-		T5M::Memory::LinearArrayBuffer<RendererEffect*,MAX_EFFECTS_DRAW> effectsToDraw;
-		T5M::Memory::LinearArrayBuffer<RendererItem*,MAX_ITEMS_DRAW> itemsToDraw;
-		T5M::Memory::LinearArrayBuffer<RendererLight*, MAX_LIGHTS_DRAW> lightsToDraw;
-		T5M::Memory::LinearArrayBuffer<RendererSpriteToDraw, MAX_SPRITES_DRAW> spritesToDraw;
+		ten::Memory::LinearArrayBuffer<RendererRoom*,MAX_ROOMS_DRAW> roomsToDraw;
+		ten::Memory::LinearArrayBuffer<RendererStatic*,MAX_STATICS_DRAW> staticsToDraw;
+		ten::Memory::LinearArrayBuffer<RendererEffect*,MAX_EFFECTS_DRAW> effectsToDraw;
+		ten::Memory::LinearArrayBuffer<RendererItem*,MAX_ITEMS_DRAW> itemsToDraw;
+		ten::Memory::LinearArrayBuffer<RendererLight*, MAX_LIGHTS_DRAW> lightsToDraw;
+		ten::Memory::LinearArrayBuffer<RendererSpriteToDraw, MAX_SPRITES_DRAW> spritesToDraw;
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);

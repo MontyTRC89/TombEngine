@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include "Utils.h"
 #include <wrl\client.h>
-namespace T5M::Renderer {
+namespace ten::renderer {
 	struct RendererVertex;
 	using Microsoft::WRL::ComPtr;
 	class VertexBuffer {

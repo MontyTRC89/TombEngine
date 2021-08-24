@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <array>
 #include <wrl/client.h>
-namespace T5M::Renderer {
+namespace ten::renderer {
 	using Microsoft::WRL::ComPtr;
 	using std::array;
 	using std::vector;
