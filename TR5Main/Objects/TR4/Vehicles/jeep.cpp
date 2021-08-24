@@ -295,9 +295,9 @@ static int JeepCanGetOff()
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 
-	if ((HeightType == BIG_SLOPE)
-		|| (HeightType == DIAGONAL)
-		|| (height == NO_HEIGHT))
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
+
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return 0;
 
 	if (abs(height - item->pos.yPos) > WALL_SIZE / 2)

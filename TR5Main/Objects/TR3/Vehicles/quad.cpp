@@ -166,7 +166,7 @@ static int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
-	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
+	auto item = &g_Level.Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = item->pos.yRot - ANGLE(90);
@@ -177,19 +177,15 @@ static int CanQuadbikeGetOff(int direction)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos + 512 * phd_cos(angle);
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL) || (height == NO_HEIGHT))
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
 
-	if (abs(height - item->pos.yPos) > 512)
+	if (abs(collResult.FloorHeight - item->pos.yPos) > 512)
 		return false;
 
-	int ceiling = GetCeiling(floor, x, y, z);
-
-	if ((ceiling - item->pos.yPos > -LARA_HITE) || (height - ceiling < LARA_HITE))
+	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HITE) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE))
 		return false;
 
 	return true;

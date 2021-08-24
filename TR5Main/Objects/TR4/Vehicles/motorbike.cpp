@@ -964,30 +964,21 @@ static int MotorBikeDynamics(ITEM_INFO* item)
 
 static BOOL MotorbikeCanGetOff(void)
 {
-    ITEM_INFO* item;
-    FLOOR_INFO* floor;
-    int x, y, z;
-    int height, ceiling;
-    short room_number, angle;
+    auto item = &g_Level.Items[Lara.Vehicle];
+    auto angle = item->pos.yRot + 0x4000;
+    auto x = item->pos.xPos + BIKE_RADIUS * phd_sin(angle);
+    auto y = item->pos.yPos;
+    auto z = item->pos.zPos + BIKE_RADIUS * phd_cos(angle);
 
-    item = &g_Level.Items[Lara.Vehicle];
-    angle = item->pos.yRot + 0x4000;
-    x = item->pos.xPos + BIKE_RADIUS * phd_sin(angle);
-    y = item->pos.yPos;
-    z = item->pos.zPos + BIKE_RADIUS * phd_cos(angle);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-    room_number = item->roomNumber;
-    floor = GetFloor(x, y, z, &room_number);
-    height = GetFloorHeight(floor, x, y, z);
-    if (HeightType == BIG_SLOPE || HeightType == DIAGONAL || height == -NO_HEIGHT)
+    if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
         return false;
-
-    if (abs(height - item->pos.yPos) > STEP_SIZE)
+    if (abs(collResult.FloorHeight - item->pos.yPos) > STEP_SIZE)
         return false;
-    ceiling = GetCeiling(floor, x, y, z);
-    if ((ceiling - item->pos.yPos) > -LARA_HITE)
+    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HITE)
         return false;
-    if ((height - ceiling) < LARA_HITE)
+    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HITE)
         return false;
 
     return true;
