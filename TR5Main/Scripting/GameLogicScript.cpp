@@ -17,7 +17,7 @@
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@module gamelogic
+@files Level-specific
 @pragma nostrip
 */
 
@@ -157,21 +157,34 @@ static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor
 
 }
 
+// A "special" table is essentially one that TEN reserves and does things with.
+template <typename funcIndex, typename funcNewindex, typename obj>
+static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
+{
+	std::string metaName{ name + "Meta" };
+	auto meta = sol::table{ *state, sol::create };
+	state->set(metaName, meta);
+	meta.set("__metatable", "\"metatable is protected\"");
+	auto tab = state->create_named_table(name);
+	tab[sol::metatable_key] = meta;
+	state->set(metaName, sol::nil);
+	meta.set_function("__index", fi, objPtr);
+	meta.set_function("__newindex", fni, objPtr);
+}
+
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 /*** Ambience and music
 @section Music
 */
 
-/***
-Set the named track as the ambient track, and start playing it
+/*** Set and play an ambient track
 @function SetAmbientTrack
 @tparam string name of track (without file extension) to play
 */
 	m_lua->set_function("SetAmbientTrack", &SetAmbientTrack);
 
-/***
-Start playing the named track.
+/*** Play an audio track
 @function PlayAudioTrack
 @tparam string name of track (without file extension) to play
 @tparam bool loop if true, the track will loop; if false, it won't (default: false)
@@ -182,8 +195,7 @@ Start playing the named track.
 @section Inventory
 */
 
-/***
-Add x of a certain item to the inventory.
+/*** Add x of an item to the inventory.
 A count of 0 will add the "default" amount of that item
 (i.e. the amount the player would get from a pickup of that type).
 For example, giving "zero" crossbow ammo would give the player
@@ -288,28 +300,9 @@ Calculate the horizontal distance between two positions.
 
 	MakeReadOnlyTable("ObjID", kObjIDs);
 
-	auto MakeSpecialTable = [&](std::string const& name)
-	{
-		std::string metaName{ name + "Meta" };
-		auto meta = sol::table{ *m_lua, sol::create };
-		m_lua->set(metaName, meta);
-		meta.set("__metatable", "\"metatable is protected\"");
-		auto tab = m_lua->create_named_table(name);
-		tab[sol::metatable_key] = meta;
-		m_lua->set(metaName, sol::nil);
-		return meta;
-	};
+	ResetLevelTables();
 
-	auto meta = MakeSpecialTable("LevelFuncs");
-	meta.set_function("__newindex", &GameScript::SetLevelFunc, this);
-
-	meta = MakeSpecialTable("LevelVars");
-	meta.set_function("__index", &LuaVariables::GetVariable, &m_locals);
-	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_locals);
-
-	meta = MakeSpecialTable("GameVars");
-	meta.set_function("__index", &LuaVariables::GetVariable, &m_globals);
-	meta.set_function("__newindex", &LuaVariables::SetVariable, &m_globals);
+	MakeSpecialTable(m_lua, "GameVars", &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptItemInfo::SetNameCallbacks(
@@ -354,10 +347,15 @@ Calculate the horizontal distance between two positions.
 		});
 }
 
-void GameScript::AddTrigger(LuaFunction* function)
+void GameScript::ResetLevelTables()
 {
-	m_triggers.push_back(function);
-	(*m_lua).script(function->Code);
+	MakeSpecialTable(m_lua, "LevelFuncs", &GameScript::GetLevelFunc, &GameScript::SetLevelFunc, this);
+	MakeSpecialTable(m_lua, "LevelVars", &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
+}
+
+sol::protected_function GameScript::GetLevelFunc(sol::table tab, std::string const& luaName)
+{
+	return tab.raw_get<sol::protected_function>(luaName);
 }
 
 bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
@@ -441,60 +439,9 @@ bool GameScript::AddLuaNameAIObject(std::string const& luaName, AI_OBJECT & ref)
 
 void GameScript::FreeLevelScripts()
 {
-	/*
-	// Delete all triggers
-	for (int i = 0; i < m_triggers.size(); i++)
-	{
-		LuaFunction* trigger = m_triggers[i];
-		char* name = (char*)trigger->Name.c_str();
-		(*m_lua)[name] = NULL;
-		delete m_triggers[i];
-	}
-	m_triggers.clear();
-
-	// Clear the items mapping
-	m_itemsMap.clear();
-
-	(*m_lua)["Lara"] = NULL;
-	//delete m_Lara;
-	*/
-}
-
-bool GameScript::ExecuteTrigger(short index)
-{
-	return true;
-	/*
-	// Is this a valid trigger?
-	if (index >= m_triggers.size())
-		return true;
-
-	LuaFunction* trigger = m_triggers[index];
-
-	// We want to execute a trigger just one time 
-	// TODO: implement in the future continoous trigger?
-	if (trigger->Executed)
-		return true;
-
-	// Get the trigger function name
-	char* name = (char*)trigger->Name.c_str();
-
-	// Execute trigger
-	bool result = (*m_lua)[name]();
-
-	// Trigger was executed, don't execute it anymore
-	trigger->Executed = result;
-
-	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
-		if (value.is<bool>())
-			std::cout << key.as<std::string>() << " " << value.as<bool>() << std::endl;
-		else if (value.is<std::string>())
-			std::cout << key.as<std::string>() << " " << value.as<std::string>() << std::endl;
-		else
-			std::cout << key.as<std::string>() << " " << value.as<int>() << std::endl;		
-	});
-
-	return result;
-	*/
+	m_levelFuncs.clear();
+	m_locals = LuaVariables{};
+	ResetLevelTables();
 }
 
 void JumpToLevel(int levelNum)
@@ -676,7 +623,7 @@ void GameScript::ExecuteFunction(std::string const & name)
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 }
 

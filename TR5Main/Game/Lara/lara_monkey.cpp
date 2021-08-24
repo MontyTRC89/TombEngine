@@ -5,7 +5,7 @@
 #include "lara_tests.h"
 #include "lara_monkey.h"
 
-using namespace T5M::Floordata;
+using namespace ten::Floordata;
 
 /*this file has all the related functions to monkeyswinging*/
 

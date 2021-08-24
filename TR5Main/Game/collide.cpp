@@ -12,8 +12,8 @@
 #include "trmath.h"
 #include "prng.h"
 using std::vector;
-using namespace T5M::Math::Random;
-using namespace T5M::Floordata;
+using namespace ten::Math::Random;
+using namespace ten::Floordata;
 char LM[] =
 {
 	LM_HIPS,
@@ -786,15 +786,18 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 
 	Vector3 pos = Vector3(x, y, z);
 
-	// HACK (REMOVED FOR NOW): it seems that a minus sign may be required here. 
-	// I don't know why, but it just works (tm) but we must do more tests -- Monty
-	// 16.08.21: Changed back to non-minus sign by request of Krys and ChocolateFan -- Lwmte
-
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->pos.yRot),
 		TO_RAD(item->pos.xRot),
 		TO_RAD(item->pos.zRot)
 	);
+
+	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
+	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose 
+	// and transposing a matrix is faster.
+	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame 
+	// of the object we are test against.
+	matrix = matrix.Transpose();
 
 	pos = Vector3::Transform(pos, matrix);
 

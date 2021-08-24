@@ -6,7 +6,7 @@
 #include "setup.h"
 #include "Renderer11.h"
 #include "trmath.h"
-using namespace T5M::Renderer;
+using namespace ten::renderer;
 int NumLaraSpheres;
 bool GotLaraSpheres;
 SPHERE LaraSpheres[MAX_SPHERES];

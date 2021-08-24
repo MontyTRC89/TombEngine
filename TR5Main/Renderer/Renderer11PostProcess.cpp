@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer11.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	void Renderer11::enableCinematicBars(bool value) {
 		m_enableCinematicBars = value;
 	}

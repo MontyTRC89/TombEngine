@@ -3,10 +3,10 @@
 #include "ScriptAssert.h"
 
 /***
-A container for level metadata - things which aren't present in the compiled
-level file itself.
+Stores level metadata.
+These are things things which aren't present in the compiled level file itself.
 
-@classmod Level
+@pregameclass Level
 @pragma nostrip
 */
 
@@ -19,23 +19,28 @@ void GameScriptLevel::Register(sol::state* state)
 	state->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
 
-/// (string) string key for the level's (localised) name. Corresponds to an entry in strings.lua.
+/// (string) string key for the level's (localised) name.
+// Corresponds to an entry in strings.lua.
 //@mem nameKey
 		"nameKey", &GameScriptLevel::NameStringKey,
 
-/// (string) path of the Lua file holding the level's logic script, relative to the location of the tombengine executable
+/// (string) Level-specific Lua script file.
+// Path of the Lua file holding the level's logic script, relative to the location of the tombengine executable
 //@mem scriptFile
 		"scriptFile", &GameScriptLevel::ScriptFileName,
 
-/// (string) path of the compiled level file, relative to the location of the tombengine executable
+/// (string) Compiled file path.
+// This path is relative to the location of the TombEngine executable.
 //@mem levelFile
 		"levelFile", &GameScriptLevel::FileName,
 
-/// (string) path of the level's load screen file (.png or .jpg), relative to the location of the tombengine executable
+/// (string) Load screen image.
+// Path of the level's load screen file (.png or .jpg), relative to the location of the tombengine executable
 //@mem loadScreenFile
 		"loadScreenFile", &GameScriptLevel::LoadScreenFileName,
 		
-/// (string) initial ambient sound track to play - this is the filename of the track __without__ the .wav extension
+/// (string) initial ambient sound track to play.
+// This is the filename of the track __without__ the .wav extension.
 //@mem ambientTrack
 		"ambientTrack", &GameScriptLevel::AmbientTrack,
 
@@ -43,36 +48,39 @@ void GameScriptLevel::Register(sol::state* state)
 //@mem layer1
 		"layer1", &GameScriptLevel::Layer1,
 
-/// (@{SkyLayer}) Secondary sky layer __(not yet implemented)__
+/// (@{SkyLayer}) Secondary sky layer
+// __(not yet implemented)__
 //@mem layer2
 		"layer2", &GameScriptLevel::Layer2,
 
-/// (@{Color}) distance fog RGB color (as seen in TR4's Desert Railroad).
+/// (@{Color}) distance fog RGB color.
+// As seen in TR4's Desert Railroad.
 // If not provided, distance fog will be black.
 //
 // __(not yet implemented)__
 //@mem fog
 		"fog", &GameScriptLevel::Fog,
 
-/// (bool) if set to true, the horizon and sky layer will be drawn; if set to false; they won't.
+/// (bool) Draw sky layer? (default: false)
 //@mem horizon
 		"horizon", &GameScriptLevel::Horizon,
 
-/// (bool) if true, the horizon graphic will transition smoothly to the sky layer.
+/// (bool) Enable smooth transition from horizon graphic to sky layer.
 // If set to false, there will be a black band between the two.
 //
 // __(not yet implemented)__
 //@mem colAddHorizon
 		"colAddHorizon", &GameScriptLevel::ColAddHorizon,
 
-/// (bool) equivalent to classic TRLE's LIGHTNING setting.
-// If true, there will be a flickering lightning in the skylayer, as in the TRC Ireland levels.
+/// (bool) Enable flickering lightning in the sky.
+// Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
 //
 // __(thunder sounds not yet implemented)__
 //@mem storm
 		"storm", &GameScriptLevel::Storm,
 
-/// (WeatherType) Must be one of the values WeatherType.NORMAL, WeatherType.RAIN, or WeatherType.SNOW.
+/// (WeatherType) Choose weather effect.
+// Must be one of the values `WeatherType.NORMAL`, `WeatherType.RAIN`, or `WeatherType.SNOW`.
 //
 // __(not yet implemented)__
 //@mem weather
@@ -94,12 +102,12 @@ e.g. `myLevel.laraType = LaraType.DIVESUIT`
  @mem laraType*/
 		"laraType", &GameScriptLevel::LaraType,
 
-/// (bool) If true, an occasional screen shake effect (as seen in TRC's Sinking Submarine) will
-// happen throughout the level.
+/// (bool) Enable occasional screen shake effect.
+// As seen in TRC's Sinking Submarine.
 //@mem rumble
 		"rumble", &GameScriptLevel::Rumble,
 
-/// (@{Mirror}) object holding the location and size of the room's mirror, if present.
+/// (@{Mirror}) Location and size of the level's mirror, if present.
 //
 // __(not yet implemented)__
 //@mem mirror
@@ -119,8 +127,8 @@ __(not yet implemented)__
 @mem UVRotate*/
 		"UVRotate", sol::property(&GameScriptLevel::SetUVRotate),
 
-/*** (byte) The maximum draw distance, in sectors (blocks), of this particular level.
-
+/*** (byte) The maximum draw distance for level.
+Given in sectors (blocks).
 Must be in the range [1, 127], and equal to or less than the value passed to SetGameFarView.
 
 This is equivalent to TRNG's LevelFarView variable.
@@ -128,8 +136,15 @@ This is equivalent to TRNG's LevelFarView variable.
 __(not yet implemented)__
 @mem farView
 */
-
 		"farView", sol::property(&GameScriptLevel::SetLevelFarView),
+
+/*** (bool) Enable unlimited oxygen supply when in water.
+
+ __(not yet implemented)__
+@mem unlimitedAir
+*/
+		"unlimitedAir", &GameScriptLevel::UnlimitedAir,
+
 /// (table of @{InventoryObject}s) table of inventory object overrides
 //@mem objects
 		"objects", &GameScriptLevel::InventoryObjects

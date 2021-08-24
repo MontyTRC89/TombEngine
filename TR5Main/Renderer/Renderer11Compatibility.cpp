@@ -11,7 +11,7 @@
 using std::optional;
 using std::stack;
 using std::vector;
-namespace T5M::Renderer
+namespace ten::renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
@@ -782,4 +782,4 @@ namespace T5M::Renderer
 		*/
 		return true;
 	}
-} // namespace T5M::Renderer
+} // namespace ten::renderer

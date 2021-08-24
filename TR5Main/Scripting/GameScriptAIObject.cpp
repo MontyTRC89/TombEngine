@@ -3,11 +3,12 @@
 #include "GameScriptAIObject.h"
 #include "ScriptAssert.h"
 #include "GameScriptPosition.h"
+#include "ScriptUtil.h"
 #include <sol.hpp>
 /***
 AI object
 
-@classmod AIObject
+@entityclass AIObject
 @pragma nostrip
 */
 
@@ -15,6 +16,7 @@ AI object
 constexpr auto LUA_CLASS_NAME{ "AIObject" };
 
 static auto index_error = index_error_maker(GameScriptAIObject, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(GameScriptAIObject, LUA_CLASS_NAME);
 
 GameScriptAIObject::GameScriptAIObject(AI_OBJECT & ref, bool temp) : m_aiObject{ref}, m_temporary{ temp }
 {};
@@ -30,6 +32,7 @@ void GameScriptAIObject::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptAIObject>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
+		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos

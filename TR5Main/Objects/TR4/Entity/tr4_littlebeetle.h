@@ -1,9 +1,7 @@
 #pragma once
 #include <items.h>
 
-#define NUM_LITTLE_BETTLES 256
-
-struct BEETLE_INFO
+struct SCARAB_INFO
 {
 	PHD_3DPOS pos;
 	short roomNumber;
@@ -13,11 +11,16 @@ struct BEETLE_INFO
 	byte flags;
 };
 
-extern BEETLE_INFO* LittleBeetles;
-extern int NextLittleBeetle;
+namespace ten::entities::tr4
+{
+	constexpr auto NUM_LITTLE_BETTLES = 256;
 
-void InitialiseLittleBeetle(short itemNumber);
-void LittleBeetleControl(short itemNumber);
-short GetNextLittleBeetle();
-void ClearLittleBeetles();
-void UpdateLittleBeetles();
+	extern SCARAB_INFO* Scarabs;
+	extern int NextScarab;
+
+	void InitialiseScarabs(short itemNumber);
+	void ScarabsControl(short itemNumber);
+	short GetFreeScarab();
+	void ClearScarabs();
+	void UpdateScarabs();
+}

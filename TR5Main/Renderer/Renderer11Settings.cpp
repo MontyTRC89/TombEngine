@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 #include "winmain.h"
-namespace T5M::Renderer {
+namespace ten::renderer {
 	void Renderer11::toggleFullScreen()
 {
 		
