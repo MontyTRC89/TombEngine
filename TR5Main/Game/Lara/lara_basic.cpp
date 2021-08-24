@@ -368,8 +368,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 2*/
 	/*collision: lara_col_stop*/
-	short fheight = NO_HEIGHT;
-	short rheight = NO_HEIGHT;
+	COLL_RESULT fheight = {}; fheight.FloorHeight = NO_HEIGHT;
+	COLL_RESULT rheight = {}; rheight.FloorHeight = NO_HEIGHT;
 
 	if (item->hitPoints <= 0)
 	{
@@ -413,9 +413,9 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_FORWARD)
-		fheight = LaraFloorFront(item, item->pos.yRot, LARA_RAD + 4);
+		fheight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
 	else if (TrInput & IN_BACK)
-		rheight = LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180) ?
+		rheight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180) ?
 
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 	{
@@ -428,22 +428,18 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LSTEP)
 		{
-			short height, ceiling;
+			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
 
-			height = LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-			ceiling = LaraCeilingFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
-
-			if ((height < 128 && height > -128) && HeightType != BIG_SLOPE && ceiling <= 0)
+			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
 				item->goalAnimState = LS_STEP_LEFT;
 		}
 		else if (TrInput & IN_RSTEP)
 		{
-			short height, ceiling;
+			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
 
-			height = LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-			ceiling = LaraCeilingFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
-
-			if ((height < 128 && height > -128) && HeightType != BIG_SLOPE && ceiling <= 0)
+			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
 				item->goalAnimState = LS_STEP_RIGHT;
 		}
 		else if (TrInput & IN_LEFT)
@@ -467,7 +463,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 			{
-				if (fheight > -(STEPUP_HEIGHT - 1))
+				if (fheight.FloorHeight > -(STEPUP_HEIGHT - 1))
 				{
 					lara_as_wade(item, coll);
 					wade = true;
@@ -475,7 +471,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if ((fheight < (STEPUP_HEIGHT - 1)) && (fheight > -(STEPUP_HEIGHT - 1)))
+				if ((fheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (fheight.FloorHeight > -(STEPUP_HEIGHT - 1)))
 				{
 					lara_as_wade(item, coll);
 					wade = true;
@@ -501,7 +497,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if ((rheight < (STEPUP_HEIGHT - 1)) && (rheight > -(STEPUP_HEIGHT - 1)))
+			if ((rheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (rheight.FloorHeight > -(STEPUP_HEIGHT - 1)))
 				lara_as_back(item, coll);
 		}
 	}
@@ -513,12 +509,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_FORWARD)
 		{
-			short height, ceiling;
+			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HITE);
 
-			height = LaraFloorFront(item, item->pos.yRot, LARA_RAD + 4);
-			ceiling = LaraCeilingFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HITE);
-
-			if ((HeightType == BIG_SLOPE || HeightType == DIAGONAL) && (height < 0 || ceiling > 0))
+			if ((collFloorResult.HeightType == BIG_SLOPE || collFloorResult.HeightType == DIAGONAL) && (collFloorResult.FloorHeight < 0 || collCeilingResult.CeilingHeight > 0))
 			{
 				item->goalAnimState = LS_STOP;
 				return;
@@ -532,10 +526,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_WALK)
 			{
-				if ((rheight < (STEPUP_HEIGHT - 1)) && (rheight > -(STEPUP_HEIGHT - 1)) && HeightType != BIG_SLOPE)
+				if ((rheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (rheight.FloorHeight > -(STEPUP_HEIGHT - 1)) && rheight.HeightType != BIG_SLOPE)
 					lara_as_back(item, coll);
 			}
-			else if (rheight > -(STEPUP_HEIGHT - 1))
+			else if (rheight.FloorHeight > -(STEPUP_HEIGHT - 1))
 			{
 				item->goalAnimState = LS_HOP_BACK;
 			}

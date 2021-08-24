@@ -1113,34 +1113,40 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 {
+	return LaraCollisionFront(item, ang, dist).FloorHeight;
+}
+
+COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
+{
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - 762;
 	int z = item->pos.zPos + dist * phd_cos(ang);
 
-	ROOM_VECTOR location = GetRoom(item->location, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	int height = GetFloorHeight(location, x, z).value_or(NO_HEIGHT);
+	if (collResult.FloorHeight != NO_HEIGHT)
+		collResult.FloorHeight -= item->pos.yPos;
 
-	if (height != NO_HEIGHT)
-		height -= item->pos.yPos;
-
-	return height;
+	return collResult;
 }
 
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
+{
+	return LaraCeilingCollisionFront(item, ang, dist, h).CeilingHeight;
+}
+
+COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h)
 {
 	int x = item->pos.xPos + dist * phd_sin(ang);
 	int y = item->pos.yPos - h;
 	int z = item->pos.zPos + dist * phd_cos(ang);
 
-	ROOM_VECTOR location = GetRoom(item->location, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	int height = GetCeilingHeight(location, x, z).value_or(NO_HEIGHT);
+	if (collResult.CeilingHeight != NO_HEIGHT)
+		collResult.CeilingHeight += h - item->pos.yPos;
 
-	if (height != NO_HEIGHT)
-		height += h - item->pos.yPos;
-
-	return height;
+	return collResult;
 }
 
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)

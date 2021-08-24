@@ -220,7 +220,7 @@ void SkidooExplode(ITEM_INFO* skidoo)
 
 bool SkidooCheckGetOffOK(int direction)
 {
-	ITEM_INFO* skidoo = &g_Level.Items[Lara.Vehicle];
+	auto skidoo = &g_Level.Items[Lara.Vehicle];
 
 	short angle;
 	if (direction == STATE_SKIDOO_GETOFFL)
@@ -232,9 +232,7 @@ bool SkidooCheckGetOffOK(int direction)
 	int y = skidoo->pos.yPos;
 	int z = skidoo->pos.zPos - SKIDOO_GETOFF_DIST * phd_cos(angle);
 
-	short roomNumber = skidoo->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	auto collResult = GetCollisionResult(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
 	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
@@ -242,8 +240,7 @@ bool SkidooCheckGetOffOK(int direction)
 	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	int ceiling = GetCeiling(floor, x, y, z);
-	if (ceiling - skidoo->pos.yPos > -LARA_HITE || collResult.FloorHeight - ceiling < LARA_HITE)
+	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HITE || collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE)
 		return false;
 
 	return true;

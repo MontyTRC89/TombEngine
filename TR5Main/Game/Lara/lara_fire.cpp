@@ -1111,45 +1111,40 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 
 void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
 {
-	HEIGHT_TYPES oldtype;
-	int ceiling, height, oldonobj, oldheight;
+	int oldonobj;
 	int bs, yang;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	oldheight = GetFloorHeight(floor, x, y, z);
+	auto oldCollResult = GetCollisionResult(x, y, z, item->roomNumber);
 	oldonobj = OnObject;
-	oldtype = HeightType;
+	auto oldtype = oldCollResult.HeightType;
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	if (item->pos.yPos >= height)
+	auto collResult = GetCollisionResult(item);
+	if (item->pos.yPos >= collResult.FloorHeight)
 	{
 		bs = 0;
 
-		if ((HeightType == BIG_SLOPE || HeightType == DIAGONAL) && oldheight < height)
+		if ((collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) && oldCollResult.FloorHeight < collResult.FloorHeight)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
-			if (TiltYOffset < 0)
+			if (collResult.TiltZ < 0)
 			{
 				if (yang >= 0x8000)
 					bs = 1;
 			}
-			else if (TiltYOffset > 0)
+			else if (collResult.TiltZ > 0)
 			{
 				if (yang <= 0x8000)
 					bs = 1;
 			}
 
-			if (TiltXOffset < 0)
+			if (collResult.TiltX < 0)
 			{
 				if (yang >= 0x4000 && yang <= 0xc000)
 					bs = 1;
 			}
-			else if (TiltXOffset > 0)
+			else if (collResult.TiltX > 0)
 			{
 				if (yang <= 0x4000 || yang >= 0xc000)
 					bs = 1;
@@ -1158,7 +1153,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 
 		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
 
-		if (y > (height + 32) && bs == 0 &&
+		if (y > (collResult.FloorHeight + 32) && bs == 0 &&
 			(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 			((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 		{
@@ -1194,13 +1189,13 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 			item->pos.yPos = y;
 			item->pos.zPos = z;
 		}
-		else if (HeightType == BIG_SLOPE || HeightType == DIAGONAL) 	// Hit a steep slope?
+		else if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) 	// Hit a steep slope?
 		{
 			// Need to know which direction the slope is.
 
 			item->speed -= (item->speed / 4);
 
-			if (TiltYOffset < 0 && ((abs(TiltYOffset)) - (abs(TiltXOffset)) >= 2))	// Hit angle = 0x4000
+			if (collResult.TiltZ < 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0x4000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x8000)
 				{
@@ -1212,7 +1207,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= TiltYOffset * 2;
+						item->speed -= collResult.TiltZ * 2;
 						if ((unsigned short)item->pos.yRot > 0x4000 && (unsigned short)item->pos.yRot < 0xc000)
 						{
 							item->pos.yRot -= 4096;
@@ -1233,7 +1228,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltYOffset > 0 && ((abs(TiltYOffset)) - (abs(TiltXOffset)) >= 2))	// Hit angle = 0xc000
+			else if (collResult.TiltZ > 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0xc000
 			{
 				if (((unsigned short)item->pos.yRot) < 0x8000)
 				{
@@ -1245,7 +1240,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltYOffset * 2;
+						item->speed += collResult.TiltZ * 2;
 						if ((unsigned short)item->pos.yRot > 0xc000 || (unsigned short)item->pos.yRot < 0x4000)
 						{
 							item->pos.yRot -= 4096;
@@ -1266,7 +1261,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltXOffset < 0 && ((abs(TiltXOffset)) - (abs(TiltYOffset)) >= 2))	// Hit angle = 0
+			else if (collResult.TiltX < 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0
 			{
 				if (((unsigned short)item->pos.yRot) > 0x4000 && ((unsigned short)item->pos.yRot) < 0xc000)
 				{
@@ -1278,7 +1273,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= TiltXOffset * 2;
+						item->speed -= collResult.TiltX * 2;
 
 						if ((unsigned short)item->pos.yRot < 0x8000)
 						{
@@ -1300,7 +1295,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltXOffset > 0 && ((abs(TiltXOffset)) - (abs(TiltYOffset)) >= 2))	// Hit angle = 0x8000
+			else if (collResult.TiltX > 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0x8000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xc000 || ((unsigned short)item->pos.yRot) < 0x4000)
 				{
@@ -1312,7 +1307,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltXOffset * 2;
+						item->speed += collResult.TiltX * 2;
 
 						if ((unsigned short)item->pos.yRot > 0x8000)
 						{
@@ -1334,7 +1329,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltYOffset < 0 && TiltXOffset < 0)	// Hit angle = 0x2000
+			else if (collResult.TiltZ < 0 && collResult.TiltX < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x6000 && ((unsigned short)item->pos.yRot) < 0xe000)
 				{
@@ -1346,7 +1341,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-TiltYOffset) + (-TiltXOffset);
+						item->speed += (-collResult.TiltZ) + (-collResult.TiltX);
 						if ((unsigned short)item->pos.yRot > 0x2000 && (unsigned short)item->pos.yRot < 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1367,7 +1362,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltYOffset < 0 && TiltXOffset > 0)	// Hit angle = 0x6000
+			else if (collResult.TiltZ < 0 && collResult.TiltX > 0)	// Hit angle = 0x6000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xa000 || ((unsigned short)item->pos.yRot) < 0x2000)
 				{
@@ -1379,7 +1374,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-TiltYOffset) + TiltXOffset;
+						item->speed += (-collResult.TiltZ) + collResult.TiltX;
 						if ((unsigned short)item->pos.yRot < 0xe000 && (unsigned short)item->pos.yRot > 0x6000)
 						{
 							item->pos.yRot -= 4096;
@@ -1400,7 +1395,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltYOffset > 0 && TiltXOffset > 0)	// Hit angle = 0xa000
+			else if (collResult.TiltZ > 0 && collResult.TiltX > 0)	// Hit angle = 0xa000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xe000 || ((unsigned short)item->pos.yRot) < 0x6000)
 				{
@@ -1412,7 +1407,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltYOffset + TiltXOffset;
+						item->speed += collResult.TiltZ + collResult.TiltX;
 						if ((unsigned short)item->pos.yRot < 0x2000 || (unsigned short)item->pos.yRot > 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1433,7 +1428,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (TiltYOffset > 0 && TiltXOffset < 0)	// Hit angle = 0xe000
+			else if (collResult.TiltZ > 0 && collResult.TiltX < 0)	// Hit angle = 0xe000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x2000 && ((unsigned short)item->pos.yRot) < 0xa000)
 				{
@@ -1445,7 +1440,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += TiltYOffset + (-TiltXOffset);
+						item->speed += collResult.TiltZ + (-collResult.TiltX);
 						if ((unsigned short)item->pos.yRot < 0x6000 || (unsigned short)item->pos.yRot > 0xe000)
 						{
 							item->pos.yRot -= 4096;
@@ -1505,23 +1500,20 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->speed = 0;
 				}
 			}
-			item->pos.yPos = height;
+			item->pos.yPos = collResult.FloorHeight;
 		}
 	}
 	else	// Check for on top of object.
 	{
 		if (yv >= 0)
 		{
-			roomNumber = item->roomNumber;
-			floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-			oldheight = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
 			oldonobj = OnObject;
-			roomNumber = item->roomNumber;
-			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+			oldCollResult = GetCollisionResult(item->pos.xPos, y, item->pos.zPos, item->roomNumber);
+			collResult = GetCollisionResult(item);
 
 			/* Bounce off floor */
-			if (item->pos.yPos >= oldheight && oldonobj)	// If old and new pos above object then detect.
+			if (item->pos.yPos >= oldCollResult.FloorHeight && oldonobj)	// If old and new pos above object then detect.
 			{
 				/* Hit the floor; bounce and slow down */
 				if (item->fallspeed > 0)
@@ -1554,18 +1546,17 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 							item->speed = 0;
 					}
 				}
-				item->pos.yPos = oldheight;
+				item->pos.yPos = oldCollResult.FloorHeight;
 			}
 		}
 		//		else
 		{
 			/* Bounce off ceiling */
-			roomNumber = item->roomNumber;
-			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			if (item->pos.yPos < ceiling)
+			collResult = GetCollisionResult(item);
+
+			if (item->pos.yPos < collResult.CeilingHeight)
 			{
-				if (y < ceiling &&
+				if (y < collResult.CeilingHeight &&
 					(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 					((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 				{
@@ -1594,7 +1585,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 					item->pos.zPos = z;
 				}
 				else
-					item->pos.yPos = ceiling;
+					item->pos.yPos = collResult.CeilingHeight;
 
 				if (item->fallspeed < 0)
 					item->fallspeed = -item->fallspeed;
@@ -1602,10 +1593,9 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 		}
 	}
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (roomNumber != item->roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	collResult = GetCollisionResult(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	if (collResult.RoomNumber != item->roomNumber)
+		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
 HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
