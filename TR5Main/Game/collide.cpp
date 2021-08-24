@@ -1063,14 +1063,20 @@ COLL_RESULT GetCollisionResult(ITEM_INFO* item)
 {
 	auto roomNumber = item->roomNumber;
 	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	return GetCollisionResult(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	auto result = GetCollisionResult(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	result.RoomNumber = roomNumber;
+	return result;
 }
 
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
 	auto floor = GetFloor(x, y, z, &room);
-	return GetCollisionResult(floor, x, y, z);
+	auto result = GetCollisionResult(floor, x, y, z);
+	
+	result.RoomNumber = room;
+	return result;
 }
 
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
@@ -1088,7 +1094,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT); 
+	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	if (floor->floor * 256 == NO_HEIGHT || floor->index == 0)
 		return result; // No floordata, block is flat.

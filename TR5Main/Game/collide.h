@@ -12,6 +12,7 @@
 struct COLL_RESULT
 {
 	FLOOR_INFO* Block;
+	int RoomNumber;
 
 	int FloorHeight;
 	int HeightType;
