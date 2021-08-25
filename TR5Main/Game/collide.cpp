@@ -11,9 +11,11 @@
 #include "sound.h"
 #include "trmath.h"
 #include "prng.h"
+
 using std::vector;
 using namespace ten::Math::Random;
 using namespace ten::Floordata;
+
 char LM[] =
 {
 	LM_HIPS,
@@ -34,7 +36,6 @@ char LM[] =
 };
 
 int hitSoundTimer;
-int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
@@ -1062,15 +1063,24 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
+// A handy overload of GetCollisionResult which can be used to quickly get collision parameters
+// such as floor height under specific item.
+
 COLL_RESULT GetCollisionResult(ITEM_INFO* item)
 {
-	auto roomNumber = item->roomNumber;
-	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	auto room = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
 	auto result = GetCollisionResult(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	result.RoomNumber = roomNumber;
+	result.RoomNumber = room;
 	return result;
 }
+
+// This variation of GetCollisionResult is an universal wrapper to be used across whole
+// collisional code to replace "holy trinity" of roomNumber-GetFloor-GetFloorHeight operations.
+// The advantage of this wrapper is that it does NOT modify incoming roomNumber parameter,
+// instead putting modified one returned by GetFloor into return COLL_RESULT structure.
+// This way, function never modifies any external variables.
 
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber)
 {
@@ -1082,12 +1092,22 @@ COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+// GetCollisionResult is a reworked legacy GetFloorHeight function, which does not
+// write any data into globals, but instead into special COLL_RESULT struct.
+// Additionally, it writes ceiling height for same coordinates, so this function
+// may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
+// readability.
+
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 {
 	COLL_RESULT result = {};
 
+	// Return provided block into result as itself.
+	// TODO: Check if we should move it after probing snippet to get bottom block?
 	result.Block = floor;
 
+	// Probe bottom block through portals.
+	// TODO: Check if it is really needed, as GetFloor should take care of it itself?
 	ROOM_INFO* r;
 	while (floor->pitRoom != NO_ROOM)
 	{
@@ -1097,19 +1117,23 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
+	// Floor and ceiling heights are directly borrowed from new floordata.
 	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT); 
 	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
-	if (floor->floor * 256 == NO_HEIGHT || floor->index == 0)
-		return result; // No floordata, block is flat.
+	// Block is wall or no floordata - block is flat.
+	if (floor->floor * CLICK(1) == NO_HEIGHT || !floor->index)
+		return result;
 
-	int height = floor->floor * 256;
+	// TODO: For ChocolateFan: currently we use legacy floordata ONLY for getting TiltX/TiltY and
+	// SplitFloor/SplitCeiling values. These values can be derived from new floordata. After this
+	// we can remove this chain floordata parser.
 
 	short* data = &g_Level.FloorData[floor->index];
-	short type, hadj;
 
+	short type;
 	int xOff, yOff, trigger;
-	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
+	int tilts, t0, t1, t2, t3, t4, dx, dz;
 
 	do
 	{
@@ -1140,16 +1164,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				result.HeightType = BIG_SLOPE;
 			else
 				result.HeightType = SMALL_SLOPE;
-
-			if (xOff >= 0)
-				height += (xOff * ((-1 - z) & 1023) >> 2);
-			else
-				height -= (xOff * (z & 1023) >> 2);
-
-			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 1023) >> 2;
-			else
-				height -= yOff * (x & 1023) >> 2;
 
 			data++;
 			break;
@@ -1187,8 +1201,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			dx = x & 1023;
 			dz = z & 1023;
 
-			xOff = yOff = 0;
-
 			result.HeightType = SPLIT_TRI;
 			result.SplitFloor = (type & DATA_TYPE);
 
@@ -1198,19 +1210,11 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			{
 				if (dx <= (1024 - dz))
 				{
-					hadj = (type >> 10) & 0x1F;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
 					xOff = t2 - t1;
 					yOff = t0 - t1;
 				}
 				else
 				{
-					hadj = (type >> 5) & 0x1F;
-					if (hadj & 0x10)
-						hadj |= 0xFFF0;
-					height += 256 * hadj;
 					xOff = t3 - t0;
 					yOff = t3 - t2;
 				}
@@ -1219,19 +1223,11 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			{
 				if (dx <= dz)
 				{
-					hadj = (type >> 10) & 0x1f;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
 					xOff = t2 - t1;
 					yOff = t3 - t2;
 				}
 				else
 				{
-					hadj = (type >> 5) & 0x1f;
-					if (hadj & 0x10)
-						hadj |= 0xfff0;
-					height += 256 * hadj;
 					xOff = t3 - t0;
 					yOff = t0 - t1;
 				}
@@ -1245,16 +1241,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			else if (result.HeightType != SPLIT_TRI)
 				result.HeightType = SMALL_SLOPE;
 
-			if (xOff >= 0)
-				height += xOff * ((-1 - z) & 1023) >> 2;
-			else
-				height -= xOff * (z & 1023) >> 2;
-
-			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 1023) >> 2;
-			else
-				height -= yOff * (x & 1023) >> 2;
-
 			data++;
 			break;
 
@@ -1262,6 +1248,10 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			break;
 		}
 	} while (!(type & END_BIT));
+
+	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
+	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
+		result.TiltX = result.TiltZ = 0;
 
 	return result;
 }
@@ -1280,20 +1270,20 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	}
 
 	coll->collType = 0;
-	coll->shift.x = 0;
-	coll->shift.y = 0;
-	coll->shift.z = 0;
+	coll->shift.x  = 0;
+	coll->shift.y  = 0;
+	coll->shift.z  = 0;
 	coll->quadrant = GetQuadrant(coll->facing);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
-	int yTop = y - 160;
+	int yTop = y - 160; // FIXME: MAGIC!
 	int z = zPos;
 
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
 
-	// DoFloorThings(floor, x, yTop, z);
 	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room
 
 	int height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1311,31 +1301,29 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->midSplitFloor = collResult.SplitFloor;
 	coll->midSplitCeil = collResult.SplitCeiling;
 
-	short tRoomNumber = roomNumber;
-	int tilt = GetTiltType(GetFloor(x, yTop, z, &tRoomNumber), x, LaraItem->pos.yPos, z);
-	// ||| remove upper thingy if equal 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber); // FIXME: maybe not needed?
+	coll->tiltX = collResult.TiltZ; // FIXME: Swap tilts back!
+	coll->tiltZ = collResult.TiltX;
 
-	// FIXME REPLACE WITH GetCollisionResult
-	coll->tiltX = tilt;
-	coll->tiltZ = tilt / 256;
-	// FIXME REPLACE WITH GetCollisionResult
-
-	// FIXME REPLACE WITH GetCollisionResult
-	if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+	if (true) // TODO: Verification code. Remove when tiltX/Z shuffle is resolved.
 	{
-		auto shit = 1;
+		int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z);
+		byte tiltX = tilt;
+		byte tiltZ = tilt >> 8;
+
+		if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+		{
+			auto fail = 1;
+		}
 	}
-	// FIXME REPLACE WITH GetCollisionResult
 
-
-	int xright, xleft, zright, zleft;
+	int xfront, xright, xleft, zfront, zright, zleft;
 
 	switch (coll->quadrant)
 	{
 	case 0:
-		XFront = phd_sin(coll->facing) * coll->radius;
-		ZFront = coll->radius;
+		xfront = phd_sin(coll->facing) * coll->radius;
+		zfront = coll->radius;
 		xleft = -(coll->radius);
 		zleft = coll->radius;
 		xright = coll->radius;
@@ -1343,8 +1331,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 
 	case 1:
-		XFront = coll->radius;
-		ZFront = phd_cos(coll->facing) * coll->radius;
+		xfront = coll->radius;
+		zfront = phd_cos(coll->facing) * coll->radius;
 		xleft = coll->radius;
 		zleft = coll->radius;
 		xright = coll->radius;
@@ -1352,8 +1340,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 
 	case 2:
-		XFront = phd_sin(coll->facing) * coll->radius;
-		ZFront = -coll->radius;
+		xfront = phd_sin(coll->facing) * coll->radius;
+		zfront = -coll->radius;
 		xleft = coll->radius;
 		zleft = -(coll->radius);
 		xright = -(coll->radius);
@@ -1361,8 +1349,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 
 	case 3:
-		XFront = -(coll->radius);
-		ZFront = phd_cos(coll->facing) * coll->radius;
+		xfront = -(coll->radius);
+		zfront = phd_cos(coll->facing) * coll->radius;
 		xleft = -(coll->radius);
 		zleft = -(coll->radius);
 		xright = -(coll->radius);
@@ -1372,7 +1360,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	default:
 		xleft = zleft = 0;
 		xright = zright = 0;
-		XFront = ZFront = 0;
+		xfront = zfront = 0;
 		break;
 	}
 
@@ -1383,21 +1371,21 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	//xright = ZFront;
 	//zright = -XFront;
 
-	x = XFront + xPos;
-	z = ZFront + zPos;
+	x = xfront + xPos;
+	z = zfront + zPos;
 
 	if (resetRoom)
 	{
 		tfLocation = LaraItem->location;
 		tcLocation = LaraItem->location;
-		tRoomNumber = roomNumber;
+		topRoomNumber = roomNumber;
 	}
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//DoFloorThings(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1415,12 +1403,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->frontSplitFloor = collResult.SplitFloor;
 	coll->frontSplitCeil = collResult.SplitCeiling;
 
-	//DoFloorThings(floor, x + XFront, yTop, z + ZFront);
 	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
+	//DoFloorThings(floor, x + XFront, yTop, z + ZFront);
+	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
-	tfLocation = GetRoom(tfLocation, x + XFront, yTop, z + ZFront);
-	height = GetFloorHeight(tfLocation, x + XFront, z + ZFront).value_or(NO_HEIGHT);
+	tfLocation = GetRoom(tfLocation, x + xfront, yTop, z + zfront);
+	height = GetFloorHeight(tfLocation, x + xfront, z + zfront).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
@@ -1482,7 +1470,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber); // WRONG COPYPASTE BY CHOCO
 	//DoFloorThings(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber); // We use plain x/z values here, proposed by Choco
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1544,7 +1532,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//DoFloorThings(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -1569,7 +1557,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor2 = 512;
 
-	CollideStaticObjects(coll, xPos, yPos, zPos, roomNumber, objectHeight); // check if bugged with roomNumber insted of tRoomNumber
+	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 
 	if (coll->midFloor == NO_HEIGHT)
 	{
@@ -1613,12 +1601,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			case 0:
 			case 2:
 				coll->shift.x = coll->old.x - xPos;
-				coll->shift.z = FindGridShift(zPos + ZFront, zPos);
+				coll->shift.z = FindGridShift(zPos + zfront, zPos);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.x = FindGridShift(xPos + XFront, xPos);
+				coll->shift.x = FindGridShift(xPos + xfront, xPos);
 				coll->shift.z = coll->old.z - zPos;
 				break;
 
@@ -1653,12 +1641,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xleft, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zleft, zPos + zfront);
 				break;
 			}
 		}
@@ -1707,12 +1695,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xright, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
 		}
@@ -1775,6 +1763,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	//FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//int height = GetFloorHeight(floor, x, yTop, z);
 	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto topRoomNumber = collResult.RoomNumber;
 
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
@@ -1789,27 +1778,29 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->midSplitFloor = collResult.SplitFloor;
 	coll->midSplitCeil = collResult.SplitCeiling;
 
-	// FIXME REPLACE WITH GetCollisionResult
-	// collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber); // uncomment this line if yes
-	int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z); // CHECK IF SAME
-	coll->tiltX = tilt;
-	coll->tiltZ = tilt / 256;
-	// FIXME REPLACE WITH GetCollisionResult
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
+	coll->tiltX = collResult.TiltZ; // TODO: Swap tilts back!
+	coll->tiltZ = collResult.TiltX;
 
-	// FIXME REPLACE WITH GetCollisionResult
-	if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+	if (true) // TODO: Verification code. Remove when tiltX/Z shuffle is resolved.
 	{
-		auto shit = 1;
+		int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z);
+		byte tiltX = tilt;
+		byte tiltZ = tilt >> 8;
+
+		if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
+		{
+			auto fail = 1;
+		}
 	}
-	// FIXME REPLACE WITH GetCollisionResult
-	
-	int xright, xleft, zright, zleft;
+
+	int xfront, xright, xleft, zfront, zright, zleft;
 
 	switch (coll->quadrant)
 	{
 	case 0:
-		XFront = phd_sin(coll->facing) * coll->radius;
-		ZFront = coll->radius;
+		xfront = phd_sin(coll->facing) * coll->radius;
+		zfront = coll->radius;
 		xleft = -(coll->radius);
 		zleft = coll->radius;
 		xright = coll->radius;
@@ -1817,8 +1808,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		break;
 
 	case 1:
-		XFront = coll->radius;
-		ZFront = phd_cos(coll->facing) * coll->radius;
+		xfront = coll->radius;
+		zfront = phd_cos(coll->facing) * coll->radius;
 		xleft = coll->radius;
 		zleft = coll->radius;
 		xright = coll->radius;
@@ -1826,8 +1817,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		break;
 
 	case 2:
-		XFront = phd_sin(coll->facing) * coll->radius;
-		ZFront = -coll->radius;
+		xfront = phd_sin(coll->facing) * coll->radius;
+		zfront = -coll->radius;
 		xleft = coll->radius;
 		zleft = -(coll->radius);
 		xright = -(coll->radius);
@@ -1835,8 +1826,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		break;
 
 	case 3:
-		XFront = -(coll->radius);
-		ZFront = phd_cos(coll->facing) * coll->radius;
+		xfront = -(coll->radius);
+		zfront = phd_cos(coll->facing) * coll->radius;
 		xleft = -(coll->radius);
 		zleft = -(coll->radius);
 		xright = -(coll->radius);
@@ -1846,28 +1837,28 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	default:
 		xleft = zleft = 0;
 		xright = zright = 0;
-		XFront = ZFront = 0;
+		xfront = zfront = 0;
 		break;
 	}
 
-	//XFront = phd_sin(coll->facing) * coll->radius;
-	//ZFront = phd_cos(coll->facing) * coll->radius;
-	//xleft = -ZFront;
-	//zleft = XFront;
-	//xright = ZFront;
-	//zright = -XFront;
+	//XFront = phd_sin(coll->facing) * coll->radius; // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//ZFront = phd_cos(coll->facing) * coll->radius; // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//xleft = -ZFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//zleft = XFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//xright = ZFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//zright = -XFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
 
-	x = XFront + xPos;
-	z = ZFront + zPos;
+	x = xfront + xPos;
+	z = zfront + zPos;
 
-	//if (resetRoom)
-	//	tRoomNumber = roomNumber;
-	//
+	if (resetRoom)
+		topRoomNumber = roomNumber;
+
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//
 	//height = GetFloorHeight(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1883,7 +1874,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 
 	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
 	//height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
-	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
+	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
@@ -1911,12 +1902,13 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 
 	x = xPos + xleft;
 	z = zPos + zleft;
+
 	//short lrRoomNumber = roomNumber;
 	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
 	//
 	//height = GetFloorHeight(floor, x, yTop, z);
-	collResult = GetCollisionResult(x + XFront, yTop, z + ZFront, roomNumber);
 
+	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, roomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1940,8 +1932,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//
 	//height = GetFloorHeight(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1969,6 +1961,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
 	//
 	//height = GetFloorHeight(floor, x, yTop, z);
+
 	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 	
 	if (collResult.FloorHeight != NO_HEIGHT)
@@ -1994,7 +1987,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//
 	//height = GetFloorHeight(floor, x, yTop, z);
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+
+	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
@@ -2016,7 +2010,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
 		coll->rightFloor2 = 512;
 
-	CollideStaticObjects(coll, xPos, yPos, zPos, roomNumber, objectHeight); // check if bugged with roomNumber insted of tRoomNumber
+	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 	
 	if (coll->midFloor == NO_HEIGHT)	 
 	{
@@ -2060,12 +2054,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 			case 0:
 			case 2:
 				coll->shift.x = coll->old.x - xPos;
-				coll->shift.z = FindGridShift(zPos + ZFront, zPos);
+				coll->shift.z = FindGridShift(zPos + zfront, zPos);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.x = FindGridShift(xPos + XFront, xPos);
+				coll->shift.x = FindGridShift(xPos + xfront, xPos);
 				coll->shift.z = coll->old.z - zPos;
 				break;
 
@@ -2100,12 +2094,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xleft, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zleft, zPos + zfront);
 				break;
 			}
 		}
@@ -2154,12 +2148,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xright, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
 		}
@@ -2343,6 +2337,11 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 }
+
+// New function for rotating item along XZ slopes.
+// (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
+// Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
+// Warning: dont set it to 0 !!!!
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
