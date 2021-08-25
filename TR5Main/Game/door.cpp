@@ -17,7 +17,7 @@
 #include "input.h"
 #include "sound.h"
 #include "trmath.h"
-
+#include "cog_switch.h"
 
 PHD_VECTOR DoubleDoorPos(0, 0, 220);
 PHD_VECTOR PullDoorPos(-201, 0, 322);
@@ -458,7 +458,7 @@ void DoorControl(short itemNumber)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 			--item->itemFlags[0];
-			item->pos.yPos -= 12;
+			item->pos.yPos -= ten::entities::switches::COG_DOOR_SPEED;
 			int y = bounds->Y1 + item->itemFlags[2] - STEP_SIZE;
 			if (item->pos.yPos < y)
 			{
@@ -491,7 +491,6 @@ void DoorControl(short itemNumber)
 				}
 			}
 		}
-		return;
 	}
 
 	if (item->objectNumber < ID_LIFT_DOORS1 || item->objectNumber > ID_LIFT_DOORS2)

@@ -1211,16 +1211,6 @@ static void StartTrap(OBJECT_INFO *obj)
 
 static void StartSwitch(OBJECT_INFO *obj)
 {
-	obj = &Objects[ID_COG_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = CogSwitchCollision;
-		obj->control = CogSwitchControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
 	obj = &Objects[ID_RAISING_COG];
 	if (obj->loaded)
 	{
