@@ -44,6 +44,7 @@ struct COLL_INFO
 	COLL_FLOOR front_left;    // left2
 	COLL_FLOOR front_right;   // right2
 	*/
+
 	int midFloor;
 	int midCeiling;
 	int midType;
@@ -151,10 +152,6 @@ void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
-// New function for rotating item along XZ slopes.
-// (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
-// Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
-// Warning: dont set it to 0 !!!!
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
