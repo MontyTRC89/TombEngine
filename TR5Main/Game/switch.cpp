@@ -28,12 +28,7 @@ extern PHD_VECTOR OldPickupPos;
 #ifndef NEW_INV
 extern Inventory g_Inventory;
 #endif
-static PHD_VECTOR CogSwitchPos(0, 0, -856);
-OBJECT_COLLISION_BOUNDS CogSwitchBounds =
-{
-	0xFE00, 0x0200, 0x0000, 0x0000, 0xFA00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+
 OBJECT_COLLISION_BOUNDS Switch2Bounds =
 {
 	0xFC00, 0x0400, 0xFC00, 0x0400, 0xFC00, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0,
@@ -52,24 +47,7 @@ OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC = // offset 0xA14FC
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TurnSwitchPosA = { 650, 0, -138 }; // offset 0xA1514
-PHD_VECTOR RailSwitchPos = { 0, 0, -550 }; // offset 0xA1544
-OBJECT_COLLISION_BOUNDS RailSwitchBounds = // offset 0xA1550
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0xFD00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
-PHD_VECTOR RailSwitchPos2 = { 0, 0, 550 }; // offset 0xA1568
-OBJECT_COLLISION_BOUNDS RailSwitchBounds2 = // offset 0xA1574
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0x0200, 0x0300, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
-OBJECT_COLLISION_BOUNDS JumpSwitchBounds = // offset 0xA158C
-{
-	0xFF80, 0x0080, 0xFF00, 0x0100, 0x0180, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
-PHD_VECTOR JumpSwitchPos = { 0, -208, 256 }; // offset 0xA15A4
+
 PHD_VECTOR CrowbarPos = { -89, 0, -328 }; // offset 0xA15B0
 OBJECT_COLLISION_BOUNDS CrowbarBounds = // offset 0xA15BC
 {
@@ -454,147 +432,6 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			OldPickupPos.z = l->pos.zPos;
 			SayNo();
 		}
-	}
-}
-
-void JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	
-	if (TrInput & IN_ACTION)
-	{
-		if (!Lara.gunStatus)
-		{
-			if (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
-			{
-				if (l->status || l->gravityStatus)
-				{
-					if (l->fallspeed > 0 && !item->currentAnimState)
-					{
-						if (TestLaraPosition(&JumpSwitchBounds, item, l))
-						{
-							AlignLaraPosition(&JumpSwitchPos, item, l);
-
-							l->currentAnimState = LS_SWITCH_DOWN;
-							l->animNumber = LA_JUMPSWITCH_PULL;
-							l->fallspeed = 0;
-							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-							l->gravityStatus = false;
-							Lara.gunStatus = LG_HANDS_BUSY;
-							
-							item->goalAnimState = 1;
-							item->status = ITEM_ACTIVE;
-							
-							AddActiveItem(itemNum);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
-{
-	int flag = 0;
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if ((!(TrInput & IN_ACTION) 
-		|| l->currentAnimState != LS_STOP 
-		|| l->animNumber != LA_STAND_IDLE 
-		|| Lara.gunStatus)
-		&& (!Lara.isMoving 
-			|| Lara.generalPtr != (void*)itemNum))
-	{
-		ObjectCollision(itemNum, l, coll);
-		return;
-	}
-
-	if (item->currentAnimState)
-	{
-		if (item->currentAnimState == 1)
-		{
-			l->pos.yRot ^= (short)ANGLE(180);
-			if (TestLaraPosition(&RailSwitchBounds2, item, l))
-			{
-				if (MoveLaraPosition(&RailSwitchPos2, item, l))
-				{
-					item->goalAnimState = 0;
-					flag = 1;
-				}
-				else
-				{
-					Lara.generalPtr = (void*)itemNum;
-				}
-			}
-			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
-			{
-				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
-			}
-
-			l->pos.yRot ^= (short)ANGLE(180);
-
-			if (flag)
-			{
-				l->animNumber = LA_LEVER_PUSH;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->goalAnimState = LS_LEVERSWITCH_PUSH;
-				l->currentAnimState = LS_LEVERSWITCH_PUSH;
-				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-				item->status = ITEM_ACTIVE;
-				AddActiveItem(itemNum);
-				AnimateItem(item);
-
-				return;
-			}
-		}
-		
-		ObjectCollision(itemNum, l, coll);
-	}
-	else
-	{
-		if (TestLaraPosition(&RailSwitchBounds, item, l))
-		{
-			if (MoveLaraPosition(&RailSwitchPos, item, l))
-			{
-				item->goalAnimState = 1;
-				l->animNumber = LA_LEVER_PUSH;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->goalAnimState = LS_LEVERSWITCH_PUSH;
-				l->currentAnimState = LS_LEVERSWITCH_PUSH;
-				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-				item->status = ITEM_ACTIVE;
-				AddActiveItem(itemNum);
-				AnimateItem(item);
-			}
-			else
-			{
-				Lara.generalPtr = (void*)itemNum;
-			}
-		}
-		else if (Lara.isMoving)
-		{
-			if (Lara.generalPtr == (void*)itemNum)
-			{
-				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
-			}
-		}
-
-		ObjectCollision(itemNum, l, coll);
 	}
 }
 
