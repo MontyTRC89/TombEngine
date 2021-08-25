@@ -1,12 +1,20 @@
 #include "framework.h"
 #include "generic_objects.h"
 
-/// objects
+// objects
 #include "generic_trapdoor.h"
 #include "generic_bridge.h"
 
+// switches
+#include "cog_switch.h"
+#include "rail_switch.h"
+#include "jump_switch.h"
+#include "switch.h"
+
 /// necessary import
 #include "setup.h"
+
+using namespace ten::entities::switches;
 
 static void StartObject()
 {
@@ -159,7 +167,41 @@ static void StartObject()
 	}
 }
 
+void StartSwitches()
+{
+	OBJECT_INFO* obj;
+
+	obj = &Objects[ID_COG_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = CogSwitchCollision;
+		obj->control = CogSwitchControl;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_LEVER_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = RailSwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_JUMP_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = JumpSwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+}
+
 void InitialiseGenericObjects()
 {
 	StartObject();
+	StartSwitches();
 }
