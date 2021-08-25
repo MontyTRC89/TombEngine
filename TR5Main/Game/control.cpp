@@ -3383,7 +3383,7 @@ void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int fla
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 {
-	ProcessSectorFlags(GetFloor(x, y, z, &roomNumber));
+	ProcessSectorFlags(GetCollisionResult(x, y, z, roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(FLOOR_INFO* floor)
