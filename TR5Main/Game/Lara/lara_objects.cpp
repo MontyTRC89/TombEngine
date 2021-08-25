@@ -669,7 +669,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_POLE_UP;
 				}
 			}
-			else if (TrInput & IN_BACK && coll->midFloor > 0)
+			else if (TrInput & IN_BACK && coll->middle.Floor > 0)
 			{
 				item->goalAnimState = LS_POLE_DOWN;
 				item->itemFlags[2] = 0;
@@ -678,7 +678,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 			if (TrInput & IN_JUMP)
 				item->goalAnimState = LS_JUMP_BACK;
 		}
-		else if (coll->midFloor <= 0)
+		else if (coll->middle.Floor <= 0)
 		{
 			item->goalAnimState = LS_STOP;
 		}
@@ -738,7 +738,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 
-	if (coll->midFloor < 0)
+	if (coll->middle.Floor < 0)
 	{
 		short roomNumber = item->roomNumber;
 		item->floor = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),

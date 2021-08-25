@@ -494,9 +494,9 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		return;
 	}
 
-	if (coll->midFloor < 0)
+	if (coll->middle.Floor < 0)
 	{
-		v->pos.yPos += coll->midFloor;
+		v->pos.yPos += coll->middle.Floor;
 		sub->RotX += WALLDEFLECT;
 	}
 }

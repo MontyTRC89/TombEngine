@@ -104,12 +104,12 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = coll->midCeiling >= -362;
+		Lara.keepDucked = coll->middle.Ceiling >= -362;
 
 		ShiftItem(item, coll);
 
-		if (coll->midFloor != NO_HEIGHT)
-			item->pos.yPos += coll->midFloor;
+		if (coll->middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->middle.Floor;
 
 		if (TrInput & IN_DUCK && Lara.waterStatus != LW_WADE ||
 			Lara.keepDucked ||
@@ -157,12 +157,12 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 		Lara.gunStatus = LG_NO_ARMS;
 	else if (!TestLaraSlide(item, coll))
 	{
-		if (coll->midCeiling >= -362)
+		if (coll->middle.Ceiling >= -362)
 			Lara.keepDucked = 1;
 		else
 			Lara.keepDucked = 0;
 
-		if (coll->midFloor < coll->badNeg)//hit a wall, stop
+		if (coll->middle.Floor < coll->badNeg)//hit a wall, stop
 		{
 			item->pos.xPos = coll->old.x;
 			item->pos.yPos = coll->old.y;
@@ -173,7 +173,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 		ShiftItem(item, coll);
 
 		if (!LaraHitCeiling(item, coll))
-			item->pos.yPos += coll->midFloor;
+			item->pos.yPos += coll->middle.Floor;
 	}
 }
 /*crouch/duck end*/
@@ -379,14 +379,14 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (!TestLaraSlide(item, coll))
 		{
-			int slope = abs(coll->leftFloor2 - coll->rightFloor2);
+			int slope = abs(coll->frontLeft.Floor - coll->frontRight.Floor);
 
-			Lara.keepDucked = coll->midCeiling >= -362;
+			Lara.keepDucked = coll->middle.Ceiling >= -362;
 
 			ShiftItem(item, coll);
 
-			if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
-				item->pos.yPos += coll->midFloor;
+			if (coll->middle.Floor != NO_HEIGHT && coll->middle.Floor > -256)
+				item->pos.yPos += coll->middle.Floor;
 
 			if (TrInput & IN_DUCK || Lara.keepDucked &&
 				(!(TrInput & IN_FLARE) && !(TrInput & IN_DRAW) || TrInput & IN_FORWARD) &&
@@ -597,8 +597,8 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
-			item->pos.yPos += coll->midFloor;
+		if (coll->middle.Floor != NO_HEIGHT && coll->middle.Floor > -256)
+			item->pos.yPos += coll->middle.Floor;
 	}
 }
 
@@ -652,8 +652,8 @@ void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!TestLaraSlide(item, coll))
 	{
-		if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
-			item->pos.yPos += coll->midFloor;
+		if (coll->middle.Floor != NO_HEIGHT && coll->middle.Floor > -256)
+			item->pos.yPos += coll->middle.Floor;
 	}
 }
 
@@ -738,8 +738,8 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
-			item->pos.yPos += coll->midFloor;
+		if (coll->middle.Floor != NO_HEIGHT && coll->middle.Floor > -256)
+			item->pos.yPos += coll->middle.Floor;
 
 		Lara.moveAngle = item->pos.yRot;
 	}
@@ -793,15 +793,15 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		if (coll->midCeiling < -362)
+		if (coll->middle.Ceiling < -362)
 			Lara.keepDucked = false;
 		else
 			Lara.keepDucked = true;
 
 		ShiftItem(item, coll);
 
-		if (coll->midFloor != NO_HEIGHT)
-			item->pos.yPos += coll->midFloor;
+		if (coll->middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->middle.Floor;
 	}
 }
 /*crawling end*/
@@ -904,7 +904,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 							break;
 						}
 					}
-					item->pos.yPos += coll->frontFloor - bounds->Y1;
+					item->pos.yPos += coll->front.Floor - bounds->Y1;
 					item->pos.yRot = angle;
 
 					item->gravityStatus = true;
