@@ -635,7 +635,7 @@ namespace ten::entities::tr4
 
 					GetJointAbsPosition(item, &pos, 16);
 
-					FLOOR_INFO* floor = &room->floor[((z - room->z) >> 10) + room->ySize * ((x - room->x) >> 10)];
+					auto floor = GetCollisionResult(x, y, z, item->roomNumber).Block;
 					if (floor->stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
@@ -648,6 +648,7 @@ namespace ten::entities::tr4
 								staticMesh->flags &= ~1;
 								floor->stopper = 0;
 								TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+								break;
 							}
 						}
 					}
