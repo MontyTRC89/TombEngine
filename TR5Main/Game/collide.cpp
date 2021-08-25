@@ -1103,7 +1103,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	COLL_RESULT result = {};
 
 	// Return provided block into result as itself.
-	// TODO: Check if we should move it after probing snippet to get bottom block?
 	result.Block = floor;
 
 	// Probe bottom block through portals.
@@ -1117,137 +1116,140 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
+	// Return probed bottom block into result.
+	result.BottomBlock = floor;
+
 	// Floor and ceiling heights are directly borrowed from new floordata.
 	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT); 
 	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
-	// Block is wall or no floordata - block is flat.
-	if (floor->floor * CLICK(1) == NO_HEIGHT || !floor->index)
-		return result;
-
-	// TODO: For ChocolateFan: currently we use legacy floordata ONLY for getting TiltX/TiltY and
-	// SplitFloor/SplitCeiling values. These values can be derived from new floordata. After this
-	// we can remove this chain floordata parser.
-
-	short* data = &g_Level.FloorData[floor->index];
-
-	short type;
-	int xOff, yOff, trigger;
-	int tilts, t0, t1, t2, t3, t4, dx, dz;
-
-	do
+	// Check if block isn't a wall or there is no floordata
+	if (floor->floor * CLICK(1) != NO_HEIGHT && floor->index)
 	{
-		type = *(data++);
+		// TODO: For ChocolateFan: currently we use legacy floordata ONLY for getting TiltX/TiltY and
+		// SplitFloor/SplitCeiling values. These values can be derived from new floordata. After this
+		// we can remove this chain floordata parser.
 
-		switch (type & DATA_TYPE)
+		short* data = &g_Level.FloorData[floor->index];
+
+		short type;
+		int xOff, yOff, trigger;
+		int tilts, t0, t1, t2, t3, t4, dx, dz;
+
+		do
 		{
-		case DOOR_TYPE:
-		case ROOF_TYPE:
-			data++;
-			break;
+			type = *(data++);
 
-		case SPLIT3:
-		case SPLIT4:
-		case NOCOLC1T:
-		case NOCOLC1B:
-		case NOCOLC2T:
-		case NOCOLC2B:
-			result.SplitCeiling = type & DATA_TYPE;
-			data++;
-			break;
-
-		case TILT_TYPE:
-			result.TiltX = xOff = (*data >> 8);
-			result.TiltZ = yOff = *(char*)data;
-
-			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-				result.HeightType = BIG_SLOPE;
-			else
-				result.HeightType = SMALL_SLOPE;
-
-			data++;
-			break;
-
-		case TRIGGER_TYPE:
-			data++;
-			do
+			switch (type & DATA_TYPE)
 			{
-				trigger = *(data++);
+			case DOOR_TYPE:
+			case ROOF_TYPE:
+				data++;
+				break;
 
-				if (TRIG_BITS(trigger) != TO_OBJECT)
+			case SPLIT3:
+			case SPLIT4:
+			case NOCOLC1T:
+			case NOCOLC1B:
+			case NOCOLC2T:
+			case NOCOLC2B:
+				result.SplitCeiling = type & DATA_TYPE;
+				data++;
+				break;
+
+			case TILT_TYPE:
+				result.TiltX = xOff = (*data >> 8);
+				result.TiltZ = yOff = *(char*)data;
+
+				if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+					result.HeightType = BIG_SLOPE;
+				else
+					result.HeightType = SMALL_SLOPE;
+
+				data++;
+				break;
+
+			case TRIGGER_TYPE:
+				data++;
+				do
 				{
-					if (TRIG_BITS(trigger) == TO_CAMERA ||
-						TRIG_BITS(trigger) == TO_FLYBY)
+					trigger = *(data++);
+
+					if (TRIG_BITS(trigger) != TO_OBJECT)
 					{
-						trigger = *(data++);
+						if (TRIG_BITS(trigger) == TO_CAMERA ||
+							TRIG_BITS(trigger) == TO_FLYBY)
+						{
+							trigger = *(data++);
+						}
+					}
+
+				} while (!(trigger & END_BIT));
+				break;
+
+			case SPLIT1:
+			case SPLIT2:
+			case NOCOLF1T:
+			case NOCOLF1B:
+			case NOCOLF2T:
+			case NOCOLF2B:
+				tilts = *data;
+				t0 = tilts & 15;
+				t1 = (tilts >> 4) & 15;
+				t2 = (tilts >> 8) & 15;
+				t3 = (tilts >> 12) & 15;
+
+				dx = x & 1023;
+				dz = z & 1023;
+
+				result.HeightType = SPLIT_TRI;
+				result.SplitFloor = (type & DATA_TYPE);
+
+				if ((type & DATA_TYPE) == SPLIT1 ||
+					(type & DATA_TYPE) == NOCOLF1T ||
+					(type & DATA_TYPE) == NOCOLF1B)
+				{
+					if (dx <= (1024 - dz))
+					{
+						xOff = t2 - t1;
+						yOff = t0 - t1;
+					}
+					else
+					{
+						xOff = t3 - t0;
+						yOff = t3 - t2;
+					}
+				}
+				else
+				{
+					if (dx <= dz)
+					{
+						xOff = t2 - t1;
+						yOff = t3 - t2;
+					}
+					else
+					{
+						xOff = t3 - t0;
+						yOff = t0 - t1;
 					}
 				}
 
-			} while (!(trigger & END_BIT));
-			break;
+				result.TiltX = xOff;
+				result.TiltZ = yOff;
 
-		case SPLIT1:
-		case SPLIT2:
-		case NOCOLF1T:
-		case NOCOLF1B:
-		case NOCOLF2T:
-		case NOCOLF2B:
-			tilts = *data;
-			t0 = tilts & 15;
-			t1 = (tilts >> 4) & 15;
-			t2 = (tilts >> 8) & 15;
-			t3 = (tilts >> 12) & 15;
+				if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+					result.HeightType = DIAGONAL;
+				else if (result.HeightType != SPLIT_TRI)
+					result.HeightType = SMALL_SLOPE;
 
-			dx = x & 1023;
-			dz = z & 1023;
+				data++;
+				break;
 
-			result.HeightType = SPLIT_TRI;
-			result.SplitFloor = (type & DATA_TYPE);
-
-			if ((type & DATA_TYPE) == SPLIT1 ||
-				(type & DATA_TYPE) == NOCOLF1T ||
-				(type & DATA_TYPE) == NOCOLF1B)
-			{
-				if (dx <= (1024 - dz))
-				{
-					xOff = t2 - t1;
-					yOff = t0 - t1;
-				}
-				else
-				{
-					xOff = t3 - t0;
-					yOff = t3 - t2;
-				}
+			default:
+				break;
 			}
-			else
-			{
-				if (dx <= dz)
-				{
-					xOff = t2 - t1;
-					yOff = t3 - t2;
-				}
-				else
-				{
-					xOff = t3 - t0;
-					yOff = t0 - t1;
-				}
-			}
-
-			result.TiltX = xOff;
-			result.TiltZ = yOff;
-
-			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-				result.HeightType = DIAGONAL;
-			else if (result.HeightType != SPLIT_TRI)
-				result.HeightType = SMALL_SLOPE;
-
-			data++;
-			break;
-
-		default:
-			break;
-		}
-	} while (!(type & END_BIT));
+		} while (!(type & END_BIT));
+	}
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
@@ -1428,7 +1430,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	}
 	else if ((coll->lavaIsPit)
 		     && (coll->frontFloor > 0)
-		     && collResult.Block->Flags.Death)
+		     && collResult.BottomBlock->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
@@ -1463,7 +1465,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->leftFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
@@ -1492,7 +1494,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.BottomBlock->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
@@ -1525,7 +1527,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->rightFloor = 512;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
@@ -1554,7 +1556,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.BottomBlock->Flags.Death)
 		coll->rightFloor2 = 512;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
@@ -1895,7 +1897,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 	else if ((coll->lavaIsPit)
 		&& (coll->frontFloor > 0)
-		&& collResult.Block->Flags.Death)
+		&& collResult.BottomBlock->Flags.Death)
 	{
 		coll->frontFloor = 512;
 	}
@@ -1926,7 +1928,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->leftFloor = -32767;
 	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
 		coll->leftFloor = 512;
-	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->leftFloor = 512;
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
@@ -1951,7 +1953,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->leftFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
 		coll->leftFloor2 = 512;
-	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && collResult.BottomBlock->Flags.Death)
 		coll->leftFloor2 = 512;
 
 	x = xPos + xright;
@@ -1981,7 +1983,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->rightFloor = -32767;
 	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
 		coll->rightFloor = 512;
-	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->rightFloor = 512;
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
@@ -2007,7 +2009,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->rightFloor2 = -32767;
 	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
 		coll->rightFloor2 = 512;
-	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.Block->Flags.Death)
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && collResult.BottomBlock->Flags.Death)
 		coll->rightFloor2 = 512;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
