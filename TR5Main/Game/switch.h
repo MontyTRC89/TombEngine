@@ -9,8 +9,6 @@ void CrowDoveSwitchControl(short itemNumber);
 void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void FullBlockSwitchControl(short itemNumber);
 void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void TurnSwitchControl(short itemNum);
 void PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

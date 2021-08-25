@@ -7,6 +7,9 @@
 
 // switches
 #include "cog_switch.h"
+#include "rail_switch.h"
+#include "jump_switch.h"
+#include "switch.h"
 
 /// necessary import
 #include "setup.h"
@@ -174,6 +177,24 @@ void StartSwitches()
 		obj->collision = CogSwitchCollision;
 		obj->control = CogSwitchControl;
 		obj->hitEffect = HIT_RICOCHET;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_LEVER_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = RailSwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_JUMP_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = JumpSwitchCollision;
+		obj->control = SwitchControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
