@@ -225,24 +225,6 @@ void ObjectObjects()
 		}
 	}
 
-	obj = &Objects[ID_LEVER_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = RailSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_JUMP_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = JumpSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
 	obj = &Objects[ID_CROWBAR_SWITCH];
 	if (obj->loaded)
 	{

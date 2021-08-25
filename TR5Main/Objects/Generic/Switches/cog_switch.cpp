@@ -1,9 +1,10 @@
 #include "framework.h"
 #include "cog_switch.h"
-#include <control.h>
-#include <door.h>
-#include <input.h>
-#include <lara.h>
+#include "control.h"
+#include "input.h"
+#include "lara.h"
+#include "generic_switch.h"
+#include "door.h"
 
 namespace ten::entities::switches
 {
@@ -71,7 +72,7 @@ namespace ten::entities::switches
 						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 
 						AddActiveItem(itemNum);
-						item->goalAnimState = 1;
+						item->goalAnimState = SWITCH_ON;
 						item->status = ITEM_ACTIVE;
 
 						if (door != NULL)
@@ -107,12 +108,12 @@ namespace ten::entities::switches
 
 		AnimateItem(item);
 
-		if (item->currentAnimState == 1)
+		if (item->currentAnimState == SWITCH_ON)
 		{
-			if (item->goalAnimState == 1 && !(TrInput & IN_ACTION))
+			if (item->goalAnimState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
 				LaraItem->goalAnimState = LS_STOP;
-				item->goalAnimState = 0;
+				item->goalAnimState = SWITCH_OFF;
 			}
 
 			if (LaraItem->animNumber == LA_COGWHEEL_PULL)
@@ -127,7 +128,7 @@ namespace ten::entities::switches
 		{
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
-				item->currentAnimState = 0;
+				item->currentAnimState = SWITCH_OFF;
 				item->status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
