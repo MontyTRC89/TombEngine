@@ -28,59 +28,21 @@ struct COLL_RESULT
 
 struct COLL_FLOOR
 {
-	int floor;
-	int ceiling;
-	int type;
-	int splitFloor;
-	int splitCeiling;
+	int Floor;
+	int Ceiling;
+	int Type;
+	int SplitFloor;
+	int SplitCeiling;
 };
 
 struct COLL_INFO
 {
-	/*
-	COLL_FLOOR middle;        // mid
-	COLL_FLOOR middle_left;   // left
-	COLL_FLOOR middle_right;  // right
-	COLL_FLOOR front;         // front
-	COLL_FLOOR front_left;    // left2
-	COLL_FLOOR front_right;   // right2
-	*/
-
-	int midFloor;
-	int midCeiling;
-	int midType;
-	int midSplitFloor;
-	int midSplitCeil;
-
-	int frontFloor;
-	int frontCeiling;
-	int frontType;
-	int frontSplitFloor;
-	int frontSplitCeil;
-
-	int leftFloor;
-	int leftCeiling;
-	int leftType;
-	int leftSplitFloor;
-	int leftSplitCeil;
-
-	int rightFloor;
-	int rightCeiling;
-	int rightType;
-	int rightSplitFloor;
-	int rightSplitCeil;
-
-	int leftFloor2;
-	int leftCeiling2;
-	int leftType2;
-	int leftSplitFloor2;
-	int leftSplitCeil2;
-
-	int rightFloor2;
-	int rightCeiling2;
-	int rightType2;
-	int rightSplitFloor2;
-	int rightSplitCeil2;
+	COLL_FLOOR middle;       // mid
+	COLL_FLOOR middleLeft;   // left
+	COLL_FLOOR middleRight;  // right
+	COLL_FLOOR front;        // front
+	COLL_FLOOR frontLeft;    // left2
+	COLL_FLOOR frontRight;   // right2
 
 	int radius;
 	int badPos;

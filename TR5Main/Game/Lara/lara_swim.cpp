@@ -98,8 +98,8 @@ void LaraWaterCurrent(COLL_INFO* coll)
 		LaraItem->pos.yRot -= ANGLE(5);
 	}
 
-	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
-		LaraItem->pos.yPos += coll->midFloor;
+	if (coll->middle.Floor < 0 && coll->middle.Floor != NO_HEIGHT)
+		LaraItem->pos.yPos += coll->middle.Floor;
 
 	ShiftItem(LaraItem, coll);
 
@@ -630,11 +630,11 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
+	if (coll->middle.Floor < 0 && coll->middle.Floor != NO_HEIGHT)
 	{
 		flag = 1;
 		item->pos.xRot += ANGLE(1);
-		item->pos.yPos += coll->midFloor;
+		item->pos.yPos += coll->middle.Floor;
 	}
 
 	if (oldX == item->pos.xPos
