@@ -1053,6 +1053,15 @@
     <ClInclude Include="Scripting\ScriptUtil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\cog_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\jump_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1928,6 +1937,18 @@
     <ClCompile Include="Scripting\ScriptAssert.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\cog_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\jump_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\rail_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\generic_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -1971,6 +1992,7 @@
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
     <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
     <None Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
+    <None Include="Objects\Generic\Switches\rail_switch.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
