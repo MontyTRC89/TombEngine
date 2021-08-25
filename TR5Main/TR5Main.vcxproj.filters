@@ -1053,6 +1053,9 @@
     <ClInclude Include="Scripting\ScriptUtil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\cog_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1926,6 +1929,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\ScriptAssert.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\cog_switch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
