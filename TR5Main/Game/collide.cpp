@@ -1184,7 +1184,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	int x = xPos;
 	int y = yPos - objectHeight;
-	int yTop = y - 160; // FIXME: MAGIC!
+	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
@@ -1651,7 +1651,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 
 	int x = xPos;
 	int y = yPos - objectHeight;
-	int yTop = y - 160;
+	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
 	//short tRoomNumber = roomNumber;

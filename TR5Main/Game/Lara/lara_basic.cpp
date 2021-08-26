@@ -2259,7 +2259,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -256;
+	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->slopesAreWalls = true;
