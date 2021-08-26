@@ -1741,6 +1741,14 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 	return 0;
 }
 
+
+short* GetTriggerIndex(ITEM_INFO* item)
+{
+	auto roomNumber = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+}
+
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
 	ROOM_INFO* r;
