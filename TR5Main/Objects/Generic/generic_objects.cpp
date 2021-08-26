@@ -9,7 +9,9 @@
 #include "cog_switch.h"
 #include "rail_switch.h"
 #include "jump_switch.h"
-#include "switch.h"
+#include "generic_switch.h"
+#include "crowbar_switch.h"
+#include "underwater_switch.h"
 
 /// necessary import
 #include "setup.h"
@@ -197,6 +199,40 @@ void StartSwitches()
 		obj->control = SwitchControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+	}
+
+	for (int objNum = ID_SWITCH_TYPE1; objNum <= ID_SWITCH_TYPE16; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->collision = SwitchCollision;
+			obj->control = SwitchControl;
+			obj->saveFlags = true;
+			obj->saveAnim = true;
+			obj->saveMesh = true;
+		}
+	}
+
+	obj = &Objects[ID_CROWBAR_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = CrowbarSwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	for (int objNum = ID_UNDERWATER_SWITCH1; objNum <= ID_UNDERWATER_SWITCH4; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->control = SwitchControl;
+			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? UnderwaterSwitchCollision : CeilingUnderwaterSwitchCollision;
+			obj->saveFlags = true;
+			obj->saveAnim = true;
+		}
 	}
 }
 

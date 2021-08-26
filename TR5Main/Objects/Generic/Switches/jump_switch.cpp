@@ -41,7 +41,7 @@ namespace ten::entities::switches
 				l->gravityStatus = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
-				item->goalAnimState = 1;
+				item->goalAnimState = SWITCH_ON;
 				item->status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNum);

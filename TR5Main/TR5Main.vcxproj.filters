@@ -1062,6 +1062,12 @@
     <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\crowbar_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\underwater_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1947,6 +1953,12 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Generic\Switches\generic_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\crowbar_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
