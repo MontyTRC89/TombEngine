@@ -110,7 +110,7 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
-void DoObjectDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
+void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
