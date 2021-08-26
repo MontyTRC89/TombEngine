@@ -842,7 +842,7 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
-				TestTriggers(item, true, item->flags & 0x3E00);
+				TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 				
 				item->flags |= 0x3E00;
 				item->itemFlags[3] = 0;

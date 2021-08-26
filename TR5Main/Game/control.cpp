@@ -855,7 +855,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 }
 
-void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
+void TestTriggers(short *data, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -3358,7 +3358,7 @@ int IsRoomOutside(int x, int y, int z)
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, 0);
+	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -3370,7 +3370,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	ParseTriggerFloordata(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ITEM_INFO* item)
