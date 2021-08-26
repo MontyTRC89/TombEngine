@@ -5,15 +5,18 @@
 #include "control.h"
 #include "trmath.h"
 #include "prng.h"
+
 using std::vector;
+using namespace ten::renderer;
+using namespace ten::Math::Random;
+
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
 vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
-using namespace ten::renderer;
-using namespace ten::Math::Random;
+
 DebrisFragment* GetFreeDebrisFragment()
 {
 	for (auto& frag : DebrisFragments) {
@@ -85,7 +88,6 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		}
 	}
 	delete fragmentsMesh;
-
 }
 
 Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
