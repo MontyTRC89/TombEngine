@@ -2071,7 +2071,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 }
 
-void DoObjectDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
+void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
 {
 	int oldonobj;
 	int bs, yang;
