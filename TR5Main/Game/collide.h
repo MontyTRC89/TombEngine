@@ -26,7 +26,7 @@ struct COLL_RESULT
 	int SplitCeiling;
 };
 
-struct COLL_FLOOR
+struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
@@ -37,12 +37,12 @@ struct COLL_FLOOR
 
 struct COLL_INFO
 {
-	COLL_FLOOR middle;       // mid
-	COLL_FLOOR middleLeft;   // left
-	COLL_FLOOR middleRight;  // right
-	COLL_FLOOR front;        // front
-	COLL_FLOOR frontLeft;    // left2
-	COLL_FLOOR frontRight;   // right2
+	COLL_POSITION middle;       // mid
+	COLL_POSITION middleLeft;   // left
+	COLL_POSITION middleRight;  // right
+	COLL_POSITION front;        // front
+	COLL_POSITION frontLeft;    // left2
+	COLL_POSITION frontRight;   // right2
 
 	int radius;
 	int badPos;

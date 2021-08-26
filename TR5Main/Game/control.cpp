@@ -1226,7 +1226,7 @@ void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
 			if (keyResult == 1)
 				break;
 
-			if (g_Level.Cameras[value].flags & 0x100)
+			if (g_Level.Cameras[value].flags & ONESHOT)
 				break;
 
 			Camera.number = value;
@@ -1244,7 +1244,7 @@ void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
 
-				if (trigger & 0x100)
+				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
 
 				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
@@ -1275,7 +1275,7 @@ void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
 
 				if (!(SpotCam[spotCamIndex].flags & SCF_CAMERA_ONE_SHOT))
 				{
-					if (trigger & 0x100)
+					if (trigger & ONESHOT)
 						SpotCam[spotCamIndex].flags |= SCF_CAMERA_ONE_SHOT;
 
 					if (!UseSpotCam || CurrentLevel == 0)
@@ -1356,7 +1356,7 @@ void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
 			break;
 		}
 
-	} while (!(trigger & 0x8000));
+	} while (!(trigger & END_BIT));
 
 	if (cameraItem && (Camera.type == FIXED_CAMERA || Camera.type == HEAVY_CAMERA))
 		Camera.item = cameraItem;
