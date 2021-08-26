@@ -647,7 +647,7 @@ namespace ten::entities::tr4
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 								staticMesh->flags &= ~1;
 								floor->stopper = 0;
-								TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+								TestTriggers(item, true, NULL);
 								break;
 							}
 						}

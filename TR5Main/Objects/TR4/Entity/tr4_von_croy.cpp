@@ -644,7 +644,7 @@ void VonCroyControl(short itemNumber)
 		}
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 120)
 		{
-			TestTriggersAtXYZ(
+			TestTriggers(
 				creature->aiTarget.pos.xPos,
 				creature->aiTarget.pos.yPos,
 				creature->aiTarget.pos.zPos,
@@ -767,7 +767,7 @@ void VonCroyControl(short itemNumber)
 			break;
 		}
 
-		TestTriggersAtXYZ(
+		TestTriggers(
 			creature->aiTarget.pos.xPos,
 			creature->aiTarget.pos.yPos,
 			creature->aiTarget.pos.zPos,

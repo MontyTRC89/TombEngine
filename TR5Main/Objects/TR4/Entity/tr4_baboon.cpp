@@ -287,7 +287,7 @@ void BaboonControl(short itemNumber)
                 item->currentAnimState = BABOON_ACTIVATE_SWITCH;
                 item->aiBits &= ~(FOLLOW);
 
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+				TestTriggers(item, true, NULL);
 
                 baboon->enemy = nullptr;
             }
@@ -530,7 +530,7 @@ void BaboonControl(short itemNumber)
                 floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
                 int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
                 item->floor = height;
-                TestTriggersAtXYZ(pos.x, pos.y, pos.z, pos.roomNumber, TRUE, NULL);
+                TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE, NULL);
                 item->triggerFlags = 1;
             }
             break;

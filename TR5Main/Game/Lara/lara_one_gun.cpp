@@ -649,7 +649,7 @@ void ControlGrenade(short itemNumber)
 							if ((currentItem->flags & IFLAG_ACTIVATION_MASK) &&
 								(currentItem->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 							{
-								TestTriggersAtXYZ(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
+								TestTriggers(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
 							}
 							else
 							{

@@ -574,7 +574,7 @@ void HitmanControl(short itemNumber)
 		{
 			if (creature->enemy)
 			{
-				TestTriggersAtXYZ(
+				TestTriggers(
 					creature->enemy->pos.xPos,
 					creature->enemy->pos.yPos,
 					creature->enemy->pos.zPos, roomNumber, true, NULL);

@@ -139,7 +139,6 @@ void UpdateSky();
 void AnimateWaterfalls();
 short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
-void TestTriggers(short* data, int heavy, int HeavyFlags);
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 void KillMoveItems();
 void KillMoveEffects();
@@ -175,9 +174,13 @@ int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags);
+
+void ParseTriggerFloordata(short* data, bool heavy, int heavyFlags);
+void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags);
+void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags);
 void ProcessSectorFlags(FLOOR_INFO* floor); 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber);
+void ProcessSectorFlags(ITEM_INFO* item);
 void ResetGlobals();
 
 unsigned CALLBACK GameMain(void*);
