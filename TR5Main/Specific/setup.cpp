@@ -163,24 +163,10 @@ void ObjectObjects()
 		obj->saveMesh = true;
 	}
 
-	for (int objNum = ID_SWITCH_TYPE1; objNum <= ID_SWITCH_TYPE16; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->saveMesh = true;
-		}
-	}
-
 	obj = &Objects[ID_AIRLOCK_SWITCH];
 	if (obj->loaded)
 	{
-		obj->collision = SwitchCollision;
+		obj->collision = ten::entities::switches::SwitchCollision;
 		obj->control = SwitchControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
@@ -213,27 +199,6 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}
 
-	for (int objNum = ID_UNDERWATER_SWITCH1; objNum <= ID_UNDERWATER_SWITCH4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->control = SwitchControl;
-			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? SwitchCollision2 : UnderwaterSwitchCollision;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-		}
-	}
-
-	obj = &Objects[ID_CROWBAR_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = CrowbarSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
 	obj = &Objects[ID_PULLEY];
 	if (obj->loaded)
 	{
@@ -243,8 +208,6 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
-
-	
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
 	if (obj->loaded)
