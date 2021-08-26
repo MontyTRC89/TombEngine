@@ -198,7 +198,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 if (!item->triggerFlags)
                 {
                     item->meshBits = 48;                
-                    TestTriggers(item, true, item->flags & 0x3E00);       
+                    TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
                     item->itemFlags[0] = 1;
                     item->pos.yRot = oldRot;
                     
@@ -215,7 +215,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 }
                  
                 item->meshBits = 12;
-                TestTriggers(item, true, item->flags & 0x3E00);
+                TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
                 Lara.Pickups[0]--;
                 item->itemFlags[0] = 1;
                 
@@ -245,7 +245,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
         }
         else
         {
-            TestTriggers(item, true, item->flags & 0x3E00);
+            TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
             AddActiveItem(itemNumber);
             item->status = ITEM_ACTIVE;
             item->itemFlags[0] = 3;

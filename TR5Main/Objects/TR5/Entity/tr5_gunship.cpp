@@ -110,7 +110,7 @@ void ControlGunShip(short itemNumber)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= 0xFFFE;
-					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, 1, 0);
+					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
 					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
 				}
 

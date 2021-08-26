@@ -649,7 +649,7 @@ void VonCroyControl(short itemNumber)
 				creature->aiTarget.pos.yPos,
 				creature->aiTarget.pos.zPos,
 				creature->aiTarget.roomNumber,
-				1, 0);
+				true, NULL);
 
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
@@ -772,7 +772,7 @@ void VonCroyControl(short itemNumber)
 			creature->aiTarget.pos.yPos,
 			creature->aiTarget.pos.zPos,
 			creature->aiTarget.roomNumber,
-			1, 0);
+			true, NULL);
 
 		creature->reachedGoal = false;
 		creature->enemy = NULL;
