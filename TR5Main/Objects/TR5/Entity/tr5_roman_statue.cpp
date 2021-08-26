@@ -614,10 +614,7 @@ void RomanStatueControl(short itemNumber)
 							if (mesh->staticNumber >= 50 && mesh->staticNumber <= 59)
 							{
 								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
-								SoundEffect(
-									(byte)ShatterSounds[CurrentLevel - 5][mesh->staticNumber],
-									(PHD_3DPOS*)mesh,
-									0);
+								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 
 								mesh->flags &= ~1;
 								floor->stopper = false;

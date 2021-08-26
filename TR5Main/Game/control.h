@@ -86,7 +86,6 @@ extern int nAnimUVRanges;
 extern int Wibble;
 extern int SetDebounce;
 extern std::string CurrentAtmosphere;
-extern short ShatterSounds[18][10];
 extern short CurrentRoom;
 extern int GameTimer;
 extern short GlobalCounter;

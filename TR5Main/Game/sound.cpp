@@ -6,15 +6,16 @@
 #include "level.h"
 #include "winmain.h"
 #include <filesystem>
+
 using std::vector;
 using std::unordered_map;
 using std::string;
+
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
 SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];
 HSAMPLE SamplePointer[SOUND_MAX_SAMPLES];
 SoundEffectSlot SoundSlot[SOUND_MAX_CHANNELS];
-char TrackNamePrefix;
 
 const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb presets
 
@@ -24,28 +25,26 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.55f,    0.20f,    1.0f,     0,      -1     },	// 2 = Medium room
   {  1.0f,     0.25f,     0.80f,    0.50f,    1.0f,     0,      -1     },	// 3 = Large room
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
-}; 
+};
 
 unordered_map<string, AudioTrack> g_AudioTracks;
+char TrackNamePrefix;
+
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
-static bool s_initialised{ false };
 
 void SetVolumeMusic(int vol) 
 {
 	GlobalMusicVolume = vol;
 
-	if (s_initialised)
+	float fVol = static_cast<float>(vol) / 100.0f;
+	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
 	{
-		float fVol = static_cast<float>(vol) / 100.0f;
-		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
-		{
-			BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, fVol);
-		}
-		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel))
-		{
-			BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL, fVol);
-		}
+		BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, fVol);
+	}
+	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel))
+	{
+		BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL, fVol);
 	}
 }
 
@@ -659,8 +658,6 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	s_initialised = true;
-
 	// Initialize BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
@@ -715,7 +712,6 @@ void Sound_Init()
 
 void Sound_DeInit()
 {
-	s_initialised = false;
 	BASS_Free();
 }
 
@@ -739,4 +735,14 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 void SayNo()
 {
 	SoundEffect(SFX_TR4_LARA_NO, NULL, SFX_ALWAYS);
+}
+
+int GetShatterSound(int shatterID)
+{
+	// TODO: Add scripted procedure to get shatter sound here.
+
+	if (shatterID < 3)
+		return SFX_TR5_SMASH_WOOD;
+	else
+		return SFX_TR5_SMASH_GLASS;
 }
