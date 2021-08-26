@@ -222,7 +222,8 @@ void TorchControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoObjectDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
 		lara_coll.enableBaddiePush = true;
