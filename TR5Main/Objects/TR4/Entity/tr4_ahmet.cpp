@@ -2,7 +2,7 @@
 #include "tr4_ahmet.h"
 #include "control.h"
 #include "sphere.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "sound.h"
 #include "setup.h"

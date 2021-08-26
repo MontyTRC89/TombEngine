@@ -7,7 +7,7 @@
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
-#include "effect2.h"
+#include "effect.h"
 #include "draw.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -28,7 +28,7 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "debris.h"
 #include "lara_fire.h"

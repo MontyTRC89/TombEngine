@@ -1,9 +1,10 @@
 #include "framework.h"
 #include "tr1_bear.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 #include "lara.h"
 
 BITE_INFO bearBite = { 0, 96, 335, 14 };

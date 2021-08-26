@@ -6,7 +6,7 @@
 #include "lara_two_guns.h"
 #include "camera.h"
 #include "objects.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "draw.h"
 #include "effect2.h"

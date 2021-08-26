@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "effect.h"
 #include "effect2.h"
+#include "effect.h"
 #include "Lara.h"
 #include "lot.h"
 #include "tomb4fx.h"
@@ -23,11 +23,7 @@
 #include "lara_fire.h"
 
 using std::function;
-constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 using namespace ten::Effects::Footprints;
-
-short FXType;
-FX_INFO* EffectList;
 
 function<EffectFunction> effect_routines[59] =
 {
@@ -331,123 +327,4 @@ void finish_level_effect(ITEM_INFO* item)
 void void_effect(ITEM_INFO* item)
 {
 
-}
-
-void TriggerLaraBlood()
-{
-	int i;
-	int node = 1;
-
-	for (i = 0; i < LARA_MESHES::LM_HEAD; i++)
-	{
-		if (node & LaraItem->touchBits)
-		{
-			PHD_VECTOR vec;
-			vec.x = (GetRandomControl() & 31) - 16;
-			vec.y = (GetRandomControl() & 31) - 16;
-			vec.z = (GetRandomControl() & 31) - 16;
-
-			GetLaraJointPosition(&vec, (LARA_MESHES)i);
-			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
-		}
-
-		node *= 2;
-	}
-}
-
-void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	int x, z;
-
-	x = item->pos.xPos - phd_sin(item->pos.yRot + ANGLE(180)) * 512 + phd_sin(item->pos.yRot - ANGLE(90)) * 256;
-	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
-
-	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
-	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
-}
-
-short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
-{
-	short roomNum = roomNumber;
-	GetFloor(x, y, z, &roomNum);
-	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
-		TriggerUnderwaterBlood(x, y, z, a4);
-	else
-		TriggerBlood(x, y, z, a5 / 16, a4);
-	return 0;
-}
-
-static bool ItemCollide(int value, int radius)
-{
-	return value >= -radius && value <= radius;
-}
-
-static bool ItemInRange(int x, int z, int radius)
-{
-	return (SQUARE(x) + SQUARE(z)) <= SQUARE(radius);
-}
-
-bool ItemNearLara(PHD_3DPOS* pos, int radius)
-{
-	BOUNDING_BOX* bounds;
-	GAME_VECTOR target;
-	target.x = pos->xPos - LaraItem->pos.xPos;
-	target.y = pos->yPos - LaraItem->pos.yPos;
-	target.z = pos->zPos - LaraItem->pos.zPos;
-	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
-		return false;
-	if (!ItemCollide(target.x, radius) || !ItemCollide(target.z, radius))
-		return false;
-	if (!ItemInRange(target.x, target.z, radius))
-		return false;
-
-	bounds = GetBoundsAccurate(LaraItem);
-	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RAD))
-		return true;
-
-	return false;
-}
-
-bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
-{
-	BOUNDING_BOX* bounds;
-	PHD_VECTOR pos;
-	pos.x = src->xPos - target->pos.xPos;
-	pos.y = src->yPos - target->pos.yPos;
-	pos.z = src->zPos - target->pos.zPos;
-	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
-		return false;
-	if (!ItemCollide(pos.x, radius) || !ItemCollide(pos.z, radius))
-		return false;
-	if (!ItemInRange(pos.x, pos.z, radius))
-		return false;
-
-	bounds = GetBoundsAccurate(target);
-	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
-		return true;
-
-	return false;
-}
-
-void Richochet(PHD_3DPOS* pos)
-{
-	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->pos.zPos, LaraItem->pos.xPos);
-	GAME_VECTOR target;
-	target.x = pos->xPos;
-	target.y = pos->yPos;
-	target.z = pos->zPos;
-	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
-}
-
-void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
-{
-    for (int i = 0; i < count; i++)
-    {
-        DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
-                     y + 256 - (GetRandomControl() * 512 / 0x8000),
-                     z + 256 - (GetRandomControl() * 512 / 0x8000),
-                     speed, direction, roomNumber);
-    }
 }

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_sword_guardian.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lot.h"
 #include "effect2.h"
 #include "items.h"

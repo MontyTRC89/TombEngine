@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr3_tribesman.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "items.h"
 #include "sphere.h"
 #include "effect2.h"

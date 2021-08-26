@@ -2,8 +2,9 @@
 #include "tr2_rat.h"
 #include "lara.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
+#include "control.h"
 #include "level.h"
 
 BITE_INFO ratBite = { 0, 0, 57, 2 };

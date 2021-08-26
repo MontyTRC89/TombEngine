@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_monk.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "sound.h"
 #include "setup.h"

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "draw.h"
 #include "camera.h"
@@ -11,6 +11,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
+#include "control.h"
 
 using std::vector;
 

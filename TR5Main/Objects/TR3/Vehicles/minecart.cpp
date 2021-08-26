@@ -2,7 +2,7 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
@@ -13,7 +13,9 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
+
 using std::vector;
+
 enum MINECART_STATE {
 	CART_GETIN,
 	CART_GETOUT,

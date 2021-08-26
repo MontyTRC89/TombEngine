@@ -2,7 +2,7 @@
 #include "tr5_lagoon_witch.h"
 #include "items.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "tomb4fx.h"
 #ifdef NEW_INV

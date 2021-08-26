@@ -4,11 +4,12 @@
 #include "sphere.h"
 #include "lara.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "box.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

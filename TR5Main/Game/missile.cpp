@@ -2,7 +2,7 @@
 #include "missile.h"
 #include "sound.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "draw.h"
 #include "debris.h"
 #include "level.h"
