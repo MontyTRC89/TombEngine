@@ -548,7 +548,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->slopesArePits = true;
-	coll->slopesAreWalls = 1;
+	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 
@@ -702,7 +702,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->slopesAreWalls = 0;
+	coll->slopesAreWalls = false;
 	coll->slopesArePits = true;
 
 	coll->badPos = NO_BAD_POS;
@@ -796,7 +796,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
-	coll->slopesAreWalls = 1;
+	coll->slopesAreWalls = true;
 	coll->slopesArePits = true;
 	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
@@ -1294,7 +1294,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 	coll->slopesArePits = true;
-	coll->slopesAreWalls = 1;
+	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
 
