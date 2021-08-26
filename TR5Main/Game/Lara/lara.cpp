@@ -34,7 +34,7 @@
 
 #include "GameFlowScript.h"
 #include "health.h"
-#include "effect.h"
+#include "flipeffect.h"
 #include "sound.h"
 #include "savegame.h"
 #include "rope.h"
