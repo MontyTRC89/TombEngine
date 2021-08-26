@@ -52,7 +52,7 @@ static void AhmetHeavyTriggers(ITEM_INFO* item)
     FLOOR_INFO* floor;
     short room_number;
 
-	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+	TestTriggers(item, true, NULL);
 }
 
 static void TriggerAhmetDeathEffect(ITEM_INFO* item)

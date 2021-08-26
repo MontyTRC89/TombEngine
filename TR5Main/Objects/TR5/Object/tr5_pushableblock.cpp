@@ -179,7 +179,7 @@ void PushableBlockControl(short itemNumber)
 			if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
 			{
 				roomNumber = item->roomNumber;
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
+				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
 			}
 			
 			RemoveActiveItem(itemNumber);
@@ -271,7 +271,7 @@ void PushableBlockControl(short itemNumber)
 				{
 					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
-					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					TestTriggers(item, true, item->flags & 0x3E00);
 				}
 			}
 			else
@@ -333,7 +333,7 @@ void PushableBlockControl(short itemNumber)
 				{
 					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
-					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					TestTriggers(item, true, item->flags & 0x3E00);
 				}
 			}
 			else
@@ -356,7 +356,7 @@ void PushableBlockControl(short itemNumber)
 			AddBridgeStack(itemNumber);
 
 			roomNumber = item->roomNumber;
-			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
+			TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, true, item->flags & 0x3E00);
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)

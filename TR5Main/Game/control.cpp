@@ -528,10 +528,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					SmashedMesh[SmashedMeshCount]->z,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				TestTriggersAtXYZ(SmashedMesh[SmashedMeshCount]->x,
-					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z,
-					SmashedMeshRoom[SmashedMeshCount], true, 0);
+				TestTriggers(SmashedMesh[SmashedMeshCount]->x,
+					         SmashedMesh[SmashedMeshCount]->y,
+					         SmashedMesh[SmashedMeshCount]->z,
+					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
@@ -875,7 +875,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 }
 
-void TestTriggers(short *data, int heavy, int HeavyFlags)
+void ParseTriggerFloordata(short *data, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -966,19 +966,19 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			break;
 
 		case TRIGGER_TYPES::HEAVYSWITCH:
-			if (!HeavyFlags)
+			if (!heavyFlags)
 				return;
 
-			if (HeavyFlags >= 0)
+			if (heavyFlags >= 0)
 			{
 				flags &= CODE_BITS;
-				if (flags != HeavyFlags)
+				if (flags != heavyFlags)
 					return;
 			}
 			else
 			{
 				flags |= CODE_BITS;
-				flags += HeavyFlags;
+				flags += heavyFlags;
 			}
 			break;
 
@@ -1126,7 +1126,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
 			{
-				if (HeavyFlags >= 0)
+				if (heavyFlags >= 0)
 				{
 					if (switchFlag)
 						item->flags |= (flags & CODE_BITS);
@@ -1741,7 +1741,6 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 	return 0;
 }
 
-
 short* GetTriggerIndex(ITEM_INFO* item)
 {
 	auto roomNumber = item->roomNumber;
@@ -2307,7 +2306,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags& IFLAG_ACTIVATION_MASK);
+										TestTriggers(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
@@ -3377,7 +3376,12 @@ int IsRoomOutside(int x, int y, int z)
 	return -2;
 }
 
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags)
+void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
+{
+	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, 0);
+}
+
+void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
 {
 	auto roomNum = roomNumber;
 	auto floor = GetFloor(x, y, z, &roomNum);
@@ -3386,7 +3390,12 @@ void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int fla
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, flags);
+	ParseTriggerFloordata(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+}
+
+void ProcessSectorFlags(ITEM_INFO* item)
+{
+	ProcessSectorFlags(GetCollisionResult(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)

@@ -69,7 +69,7 @@ void SphinxControl(short itemNumber)
 				mesh->flags &= ~0x100;
 				floor->stopper = false;
 
-				TestTriggersAtXYZ(x, y, z, item->roomNumber, true, NULL);
+				TestTriggers(x, y, z, item->roomNumber, true, NULL);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ void SphinxControl(short itemNumber)
 	case SPHINX_HIT:
 		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+			TestTriggers(item, true, NULL);
 
 			if (item->touchBits & 0x40)
 			{

@@ -210,7 +210,7 @@ void AbortionControl(short itemNum)
 		SoundEffect(171, &item->pos, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
 
-		TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, NULL);
+		TestTriggers(item, true, NULL);
 
 		KillItem(itemNum);
 		item->status = ITEM_DEACTIVATED;

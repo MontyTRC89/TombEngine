@@ -121,11 +121,11 @@ void DoppelgangerControl(short itemNum)
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
 		item->floor = h;
-		TestTriggersAtXYZ(x, y, z, item->roomNumber, true, NULL);
+		TestTriggers(x, y, z, item->roomNumber, true, NULL);
 		if (item->pos.yPos >= h)
 		{
 			item->floor = item->pos.yPos = h;
-			TestTriggersAtXYZ(x, h, z, item->roomNumber, true, NULL);
+			TestTriggers(x, h, z, item->roomNumber, true, NULL);
 
 			item->gravityStatus = false;
 			item->fallspeed = 0;

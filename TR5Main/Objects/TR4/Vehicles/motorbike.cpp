@@ -1419,8 +1419,8 @@ int MotorbikeControl(void)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true,  NULL);
-	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
+	TestTriggers(item, true,  NULL);
+	TestTriggers(item, false, NULL);
 
     if (LaraItem->hitPoints <= 0)
     {
