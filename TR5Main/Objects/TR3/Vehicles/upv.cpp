@@ -4,7 +4,7 @@
 #include "items.h"
 #include "sphere.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "collide.h"
 #include "box.h"
 #include "lara_flare.h"

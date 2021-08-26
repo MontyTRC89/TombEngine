@@ -6,9 +6,10 @@
 #include "traps.h"
 #include "draw.h"
 #include "tomb4fx.h"
-#include "effect.h"
+#include "effect2.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 #include "tr4_mutant.h"
 
 namespace ten::entities::all

@@ -5,6 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 void InitialiseReaper(short itemNum)
 {

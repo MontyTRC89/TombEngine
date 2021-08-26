@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "objects.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "draw.h"
 #include "Lara.h"

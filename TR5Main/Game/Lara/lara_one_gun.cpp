@@ -6,7 +6,7 @@
 #include "draw.h"
 #include "box.h"
 #include "control.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "tomb4fx.h"
 #include "lot.h"

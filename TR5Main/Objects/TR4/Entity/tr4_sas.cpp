@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 #include <Specific\input.h>
 #include <Game/tomb4fx.h>
 #include <Game/Lara/lara_one_gun.h>

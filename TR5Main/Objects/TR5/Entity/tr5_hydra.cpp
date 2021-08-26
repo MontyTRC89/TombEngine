@@ -3,7 +3,7 @@
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "effect2.h"
 #include "people.h"

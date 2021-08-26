@@ -34,11 +34,11 @@
 
 #include "GameFlowScript.h"
 #include "health.h"
-#include "effect2.h"
+#include "effect.h"
 #include "sound.h"
 #include "savegame.h"
 #include "rope.h"
-#include <Objects\TR3\Vehicles\rubberboat.h>
+#include "rubberboat.h"
 #include <Game\misc.h>
 
 using std::function;

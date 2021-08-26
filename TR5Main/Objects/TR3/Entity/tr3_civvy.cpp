@@ -2,7 +2,7 @@
 #include "tr3_civvy.h"
 #include "box.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"

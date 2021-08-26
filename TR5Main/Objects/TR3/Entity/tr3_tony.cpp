@@ -7,7 +7,7 @@
 #include "boss.h"
 #include "box.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"

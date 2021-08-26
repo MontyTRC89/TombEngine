@@ -79,8 +79,10 @@ struct OBJECT_COLLISION_BOUNDS
 	short rotZ2;
 };
 
-extern BOUNDING_BOX GlobalCollisionBounds;
 constexpr auto MAX_ITEMS = 1024;
+constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
+
+extern BOUNDING_BOX GlobalCollisionBounds;
 extern ITEM_INFO* CollidedItems[MAX_ITEMS];
 extern MESH_INFO* CollidedMeshes[MAX_ITEMS];
 
@@ -101,7 +103,6 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
-void TriggerLaraBlood();
 int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
 int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
 int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
@@ -112,6 +113,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
+bool ItemNearLara(PHD_3DPOS* pos, int radius);
+bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
