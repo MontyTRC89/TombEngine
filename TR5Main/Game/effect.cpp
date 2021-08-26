@@ -338,7 +338,7 @@ void TriggerLaraBlood()
 	int i;
 	int node = 1;
 
-	for (i = 0; i <= LARA_MESHES::NUM_LARA_MESHES; i++)
+	for (i = 0; i < LARA_MESHES::LM_HEAD; i++)
 	{
 		if (node & LaraItem->touchBits)
 		{
