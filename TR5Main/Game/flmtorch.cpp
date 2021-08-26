@@ -222,7 +222,7 @@ void TorchControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoObjectDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
