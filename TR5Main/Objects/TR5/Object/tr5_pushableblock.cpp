@@ -169,7 +169,7 @@ void PushableBlockControl(short itemNumber)
 			int relY = floorHeight - item->pos.yPos;
 			item->pos.yPos = floorHeight;
 			if (item->fallspeed >= 96)
-				floor_shake_effect(item);
+				FloorShake(item);
 			item->fallspeed = 0;
 			SoundEffect(pushable->fallSound, &item->pos, 2);
 
@@ -530,12 +530,12 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void pushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
+void PushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
 {
 	DoPushPull = 1;
 }
 
-void pushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
+void PushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
 {
 	if (DoPushPull == 1)
 	{
