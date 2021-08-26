@@ -207,14 +207,13 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
 			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
 		{
-
 			s.x = LaraItem->pos.xPos;
 			s.y = LaraItem->pos.yPos - 96;
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
 			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + 160;
+			d.y = s.y + LARA_HEADROOM;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
@@ -240,7 +239,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			s.roomNumber = LaraItem->roomNumber;
 
 			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + 160;
+			d.y = s.y + LARA_HEADROOM;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit3click)
@@ -264,7 +263,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			s.roomNumber = LaraItem->roomNumber;
 
 			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + 160;
+			d.y = s.y + LARA_HEADROOM;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit2click)
@@ -287,7 +286,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			s.roomNumber = LaraItem->roomNumber;
 
 			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + 160;
+			d.y = s.y + LARA_HEADROOM;
 			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit1click)
