@@ -947,9 +947,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.y = item->pos.yPos;
 	coll->old.z = item->pos.zPos;
 
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
+	coll->slopesAreWalls = false;
+	coll->slopesArePits = false;
+	coll->lavaIsPit = false;
 
 	coll->enableBaddiePush = true;
 	coll->enableSpaz = false;
@@ -1059,9 +1059,9 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.y = item->pos.yPos;
 	coll->old.z = item->pos.zPos;
 
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
+	coll->slopesAreWalls = false;
+	coll->slopesArePits = false;
+	coll->lavaIsPit = false;
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 

@@ -52,7 +52,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		coll->badNeg = NO_HEIGHT;
 		coll->badCeiling = 0;
 
-		coll->slopesAreWalls = 0;
+		coll->slopesAreWalls = false;
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
 
@@ -436,7 +436,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->slopesAreWalls = 0;
+	coll->slopesAreWalls = false;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
@@ -472,7 +472,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badNeg = NO_HEIGHT;
 	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->slopesAreWalls = 0;
+	coll->slopesAreWalls = false;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
