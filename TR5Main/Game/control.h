@@ -174,7 +174,7 @@ int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
 
-void ParseTriggerFloordata(short* data, bool heavy, int heavyFlags);
+void TestTriggers(short* data, bool heavy, int heavyFlags);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags);
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags);
 void ProcessSectorFlags(FLOOR_INFO* floor); 

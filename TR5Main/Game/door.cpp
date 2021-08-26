@@ -68,7 +68,7 @@ void SequenceDoorControl(short itemNumber)
 			else
 				item->goalAnimState = 0;
 
-			TestTriggers(item, true, 0);
+			TestTriggers(item, true, NULL);
 		}
 
 		CurrentSequence = 4;
