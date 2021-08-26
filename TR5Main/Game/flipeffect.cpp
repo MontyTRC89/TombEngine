@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "effect2.h"
-#include "effect.h"
+#include "flipeffect.h"
 #include "Lara.h"
 #include "lot.h"
 #include "tomb4fx.h"

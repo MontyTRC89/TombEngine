@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "items.h"
 #include "collide.h"
-#include "effect.h"
+#include "flipeffect.h"
 #include "box.h"
 #include "level.h"
 #include "input.h"

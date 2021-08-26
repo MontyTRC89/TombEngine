@@ -7,7 +7,7 @@
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
-#include "effect.h"
+#include "flipeffect.h"
 #include "draw.h"
 #ifdef NEW_INV
 #include "newinv2.h"
