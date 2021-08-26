@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "Lara.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"
@@ -2715,6 +2715,58 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
 	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
+}
+
+static bool ItemCollide(int value, int radius)
+{
+	return value >= -radius && value <= radius;
+}
+
+static bool ItemInRange(int x, int z, int radius)
+{
+	return (SQUARE(x) + SQUARE(z)) <= SQUARE(radius);
+}
+
+bool ItemNearLara(PHD_3DPOS* pos, int radius)
+{
+	BOUNDING_BOX* bounds;
+	GAME_VECTOR target;
+	target.x = pos->xPos - LaraItem->pos.xPos;
+	target.y = pos->yPos - LaraItem->pos.yPos;
+	target.z = pos->zPos - LaraItem->pos.zPos;
+	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
+		return false;
+	if (!ItemCollide(target.x, radius) || !ItemCollide(target.z, radius))
+		return false;
+	if (!ItemInRange(target.x, target.z, radius))
+		return false;
+
+	bounds = GetBoundsAccurate(LaraItem);
+	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RAD))
+		return true;
+
+	return false;
+}
+
+bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
+{
+	BOUNDING_BOX* bounds;
+	PHD_VECTOR pos;
+	pos.x = src->xPos - target->pos.xPos;
+	pos.y = src->yPos - target->pos.yPos;
+	pos.z = src->zPos - target->pos.zPos;
+	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
+		return false;
+	if (!ItemCollide(pos.x, radius) || !ItemCollide(pos.z, radius))
+		return false;
+	if (!ItemInRange(pos.x, pos.z, radius))
+		return false;
+
+	bounds = GetBoundsAccurate(target);
+	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
+		return true;
+
+	return false;
 }
 
 bool SnapToQuadrant(short& angle, int interval)

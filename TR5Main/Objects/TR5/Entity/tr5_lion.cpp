@@ -3,13 +3,14 @@
 
 #include "items.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lot.h"
 #include "box.h"
 #include "tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 BITE_INFO LionBite1 = { -2, -10, 250, 21 };
 BITE_INFO LionBite2 = { -2, -10, 132, 21 };

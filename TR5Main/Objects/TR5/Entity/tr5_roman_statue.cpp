@@ -9,7 +9,7 @@
 #include "debris.h"
 #include "draw.h"
 #include "control.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"

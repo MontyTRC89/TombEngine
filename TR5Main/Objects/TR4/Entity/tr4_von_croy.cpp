@@ -5,7 +5,7 @@
 #include "effect2.h"
 #include "sphere.h"
 #include "lot.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "setup.h"
 #include "level.h"

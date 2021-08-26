@@ -36,9 +36,6 @@
     <ClInclude Include="Game\draw.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\effect2.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\flmtorch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1060,6 +1057,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effect2.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

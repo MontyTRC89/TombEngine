@@ -2,7 +2,7 @@
 #include "camera.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "debris.h"
 #include "lara_fire.h"

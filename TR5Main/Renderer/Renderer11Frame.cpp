@@ -2,7 +2,7 @@
 #include "Renderer11.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"

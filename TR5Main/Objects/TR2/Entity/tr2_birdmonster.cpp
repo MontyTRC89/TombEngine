@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "tr2_birdmonster.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 
 BITE_INFO birdyBiteL = { 0, 224, 0, 19 };
 BITE_INFO birdyBiteR = { 0, 224, 0, 22 };

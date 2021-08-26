@@ -9,6 +9,7 @@
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
+#include "control.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 

@@ -9,7 +9,7 @@
 #include "debris.h"
 #include "objects.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 
 int GunShipCounter = 0;

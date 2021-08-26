@@ -1,7 +1,7 @@
 #pragma once
 #include "box.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "objectslist.h"
 #include "trmath.h"
 #include "Renderer11.h"

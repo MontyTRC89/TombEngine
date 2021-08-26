@@ -5,7 +5,7 @@
 #include "sphere.h"
 #include "debris.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "people.h"
 #include "setup.h"

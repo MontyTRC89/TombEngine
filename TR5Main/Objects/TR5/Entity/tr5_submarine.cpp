@@ -8,7 +8,7 @@
 #include "effect2.h"
 #include "lara_fire.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_one_gun.h"
 #include "setup.h"
 #include "level.h"

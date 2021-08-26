@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "people.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "draw.h"
 #include "control.h"
