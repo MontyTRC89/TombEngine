@@ -27,49 +27,49 @@ using namespace ten::Effects::Footprints;
 
 function<EffectFunction> effect_routines[59] =
 {
-	turn180_effect,				//0
-	floor_shake_effect,			//1
+	Turn180,					//0
+	FloorShake,					//1
 	PoseidonSFX,				//2
 	LaraBubbles,				//3
-	finish_level_effect,		//4
+	FinishLevel,				//4
 	ActivateCamera,				//5
 	ActivateKey,				//6
 	RubbleFX,					//7
 	SwapCrowbar,				//8
-	pickup,						//9
-	SoundFlipEffect,			//10
+	Pickup,						//9
+	PlaySoundEffect,			//10
 	ExplosionFX,				//11
-	lara_hands_free,			//12
-	puzzle,						//13
-	draw_right_pistol,			//14
-	draw_left_pistol,			//15
-	shoot_right_gun,			//16
-	shoot_left_gun,				//17
-	pushLoop,					//18
-	pushEnd,					//19
-	void_effect,				//20
-	invisibility_on,			//21
-	invisibility_off,			//22
-	void_effect,				//23
-	void_effect,				//24
-	void_effect,				//25
-	reset_hair,					//26
-	void_effect,				//27
+	LaraHandsFree,				//12
+	Puzzle,						//13
+	DrawRightPistol,			//14
+	DrawLeftPistol,				//15
+	ShootRightGun,				//16
+	ShootLeftGun,				//17
+	PushLoop,					//18
+	PushEnd,					//19
+	VoidEffect,					//20
+	InvisibilityOn,				//21
+	InvisibilityOff,			//22
+	VoidEffect,					//23
+	VoidEffect,					//24
+	VoidEffect,					//25
+	ResetHair,					//26
+	VoidEffect,					//27
 	SetFog,						//28
-	void_effect,				//29
+	VoidEffect,					//29
 	LaraLocation,				//30
 	ClearSpidersPatch,			//31
 	AddFootprint,				//32
-	void_effect,				//33
-	void_effect,				//34
-	void_effect,				//35
-	void_effect,				//36
-	void_effect,				//37
-	void_effect,				//38
-	void_effect,				//39
-	void_effect,				//40
-	void_effect,				//41
-	void_effect,				//42
+	VoidEffect,					//33
+	VoidEffect,					//34
+	VoidEffect,					//35
+	VoidEffect,					//36
+	VoidEffect,					//37
+	VoidEffect,					//38
+	VoidEffect,					//39
+	VoidEffect,					//40
+	VoidEffect,					//41
+	VoidEffect,					//42
 	MeshSwapToPour,				//43
 	MeshSwapFromPour,			//44
 	LaraLocationPad,			//45
@@ -86,12 +86,12 @@ void MeshSwapFromPour(ITEM_INFO* item)
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
-void pickup(ITEM_INFO* item)
+void Pickup(ITEM_INFO* item)
 {
 	do_pickup();
 }
 
-void puzzle(ITEM_INFO* item)
+void Puzzle(ITEM_INFO* item)
 {
 	do_puzzle();
 }
@@ -134,17 +134,17 @@ void AddFootprint(ITEM_INFO* item)
 	}
 }
 
-void reset_hair(ITEM_INFO* item)
+void ResetHair(ITEM_INFO* item)
 {
 	InitialiseHair();
 }
 
-void invisibility_off(ITEM_INFO* item)
+void InvisibilityOff(ITEM_INFO* item)
 {
 	item->status = ITEM_ACTIVE;
 }
 
-void invisibility_on(ITEM_INFO* item)
+void InvisibilityOn(ITEM_INFO* item)
 {
 	item->status = ITEM_INVISIBLE;
 }
@@ -154,7 +154,7 @@ void SetFog(ITEM_INFO* item)
 	FlipEffect = -1;
 }
 
-void draw_left_pistol(ITEM_INFO* item)
+void DrawLeftPistol(ITEM_INFO* item)
 {
 	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
 	{
@@ -168,7 +168,7 @@ void draw_left_pistol(ITEM_INFO* item)
 	}
 }
 
-void draw_right_pistol(ITEM_INFO* item)
+void DrawRightPistol(ITEM_INFO* item)
 {
 	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 	{
@@ -182,17 +182,17 @@ void draw_right_pistol(ITEM_INFO* item)
 	}
 }
 
-void shoot_left_gun(ITEM_INFO* item)
+void ShootLeftGun(ITEM_INFO* item)
 {
 	Lara.leftArm.flash_gun = 3;
 }
 
-void shoot_right_gun(ITEM_INFO* item)
+void ShootRightGun(ITEM_INFO* item)
 {
 	Lara.rightArm.flash_gun = 3;
 }
 
-void lara_hands_free(ITEM_INFO* item)
+void LaraHandsFree(ITEM_INFO* item)
 {
 	Lara.gunStatus = LG_NO_ARMS;
 }
@@ -295,13 +295,13 @@ void RubbleFX(ITEM_INFO* item)
 	FlipEffect = -1;
 }
 
-void SoundFlipEffect(ITEM_INFO* item)
+void PlaySoundEffect(ITEM_INFO* item)
 {
 	SoundEffect(TriggerTimer, NULL, 0);
 	FlipEffect = -1;
 }
 
-void floor_shake_effect(ITEM_INFO* item)
+void FloorShake(ITEM_INFO* item)
 {
 	int x = abs(item->pos.xPos - Camera.pos.x);
 	int y = abs(item->pos.yPos - Camera.pos.y);
@@ -313,18 +313,18 @@ void floor_shake_effect(ITEM_INFO* item)
 	}
 }
 
-void turn180_effect(ITEM_INFO* item)
+void Turn180(ITEM_INFO* item)
 {
 	item->pos.yRot -= ANGLE(180);
 	item->pos.xRot = -item->pos.xRot;
 }
 
-void finish_level_effect(ITEM_INFO* item)
+void FinishLevel(ITEM_INFO* item)
 {
 	LevelComplete = CurrentLevel + 1;
 }
 
-void void_effect(ITEM_INFO* item)
+void VoidEffect(ITEM_INFO* item)
 {
 
 }
