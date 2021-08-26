@@ -361,82 +361,6 @@ void UpdateLaraRoom(ITEM_INFO* item, int height)
 		ItemNewRoom(Lara.itemNumber, item->location.roomNumber);
 }
 
-short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
-{
-	ROOM_INFO* r;
-	short* data;
-	short func;
-	int tilt, t0, t1, t2, t3;
-	int dx, dz;
-	short xOff, yOff;
-
-	while (floor->pitRoom != NO_ROOM)
-	{
-		if (CheckNoColFloorTriangle(floor, x, z) == TRUE)
-			break;
-		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	}
-
-	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
-		return FLOOR_TYPE;
-
-	if (!floor->index)
-		return FLOOR_TYPE;
-
-	data = &g_Level.FloorData[floor->index];
-	func = *data & DATA_TYPE;
-	
-	if (func == TILT_TYPE)
-		return data[1];
-	
-	if (func != SPLIT1
-	&&  func != SPLIT2
-	&&  func != NOCOLF1T
-	&&  func != NOCOLF2T
-	&&  func != NOCOLF1B
-	&&  func != NOCOLF2B)
-	{
-		return FLOOR_TYPE;
-	}
-
-	tilt = data[1];
-	t0 = tilt & DATA_TILT;
-	t1 = (tilt / 16) & DATA_TILT;
-	t2 = (tilt / 256) & DATA_TILT;
-	t3 = (tilt / 4096) & DATA_TILT;
-	dx = x & (WALL_SIZE - 1);
-	dz = z & (WALL_SIZE - 1);
-	xOff = 0;
-	yOff = 0;
-
-	if (func == SPLIT1 || func == NOCOLF1T || func == NOCOLF1B)
-	{
-		if (dx > (SECTOR(1) - dz))
-		{
-			xOff = t3 - t0;
-			yOff = t3 - t2;
-		}
-		else
-		{
-			xOff = t2 - t1;
-			yOff = t0 - t1;
-		}
-	}
-	else if (dx > dz)
-	{
-		xOff = t3 - t0;
-		yOff = t0 - t1;
-	}
-	else
-	{
-		xOff = t2 - t1;
-		yOff = t3 - t2;
-	}
-
-	return ((xOff * 256) | (yOff & DATA_STATIC));
-}
-
 int FindGridShift(int x, int z)
 {
 	if ((x / SECTOR(1)) == (z / SECTOR(1)))
@@ -1114,7 +1038,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 		short* data = &g_Level.FloorData[floor->index];
 
 		short type;
-		int xOff, yOff, trigger;
+		int zOff, xOff, trigger;
 		int tilts, t0, t1, t2, t3, t4, dx, dz;
 
 		do
@@ -1139,10 +1063,10 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				break;
 
 			case TILT_TYPE:
-				result.TiltX = xOff = (*data >> 8);
-				result.TiltZ = yOff = *(char*)data;
+				result.TiltZ = zOff = (*data >> 8);
+				result.TiltX = xOff = *(char*)data;
 
-				if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
 					result.HeightType = BIG_SLOPE;
 				else
 					result.HeightType = SMALL_SLOPE;
@@ -1192,33 +1116,33 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				{
 					if (dx <= (1024 - dz))
 					{
-						xOff = t2 - t1;
-						yOff = t0 - t1;
+						zOff = t2 - t1;
+						xOff = t0 - t1;
 					}
 					else
 					{
-						xOff = t3 - t0;
-						yOff = t3 - t2;
+						zOff = t3 - t0;
+						xOff = t3 - t2;
 					}
 				}
 				else
 				{
 					if (dx <= dz)
 					{
-						xOff = t2 - t1;
-						yOff = t3 - t2;
+						zOff = t2 - t1;
+						xOff = t3 - t2;
 					}
 					else
 					{
-						xOff = t3 - t0;
-						yOff = t0 - t1;
+						zOff = t3 - t0;
+						xOff = t0 - t1;
 					}
 				}
 
+				result.TiltZ = zOff;
 				result.TiltX = xOff;
-				result.TiltZ = yOff;
 
-				if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
 					result.HeightType = DIAGONAL;
 				else if (result.HeightType != SPLIT_TRI)
 					result.HeightType = SMALL_SLOPE;
@@ -1234,7 +1158,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
-		result.TiltX = result.TiltZ = 0;
+		result.TiltZ = result.TiltX = 0;
 
 	return result;
 }
@@ -1285,20 +1209,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->middle.SplitCeiling = collResult.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber); // FIXME: maybe not needed?
-	coll->tiltX = collResult.TiltZ; // FIXME: Swap tilts back!
-	coll->tiltZ = collResult.TiltX;
-
-	if (true) // TODO: Verification code. Remove when tiltX/Z shuffle is resolved.
-	{
-		int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z);
-		byte tiltX = tilt;
-		byte tiltZ = tilt >> 8;
-
-		if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
-		{
-			auto fail = 1;
-		}
-	}
+	coll->tiltX = collResult.TiltX;
+	coll->tiltZ = collResult.TiltZ;
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
@@ -1347,12 +1259,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 	}
 
-	//XFront = phd_sin(coll->facing) * coll->radius;
-	//ZFront = phd_cos(coll->facing) * coll->radius;
-	//xleft = -ZFront;
-	//zleft = XFront;
-	//xright = ZFront;
-	//zright = -XFront;
+	//XFront = phd_sin(coll->facing) * coll->radius;  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//ZFront = phd_cos(coll->facing) * coll->radius;  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//xleft = -ZFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//zleft = XFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//xright = ZFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
+	//zright = -XFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
 
 	x = xfront + xPos;
 	z = zfront + zPos;
@@ -1762,20 +1674,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->middle.SplitCeiling = collResult.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
-	coll->tiltX = collResult.TiltZ; // TODO: Swap tilts back!
-	coll->tiltZ = collResult.TiltX;
-
-	if (true) // TODO: Verification code. Remove when tiltX/Z shuffle is resolved.
-	{
-		int tilt = GetTiltType(collResult.Block, x, LaraItem->pos.yPos, z);
-		byte tiltX = tilt;
-		byte tiltZ = tilt >> 8;
-
-		if (collResult.TiltX != coll->tiltX || collResult.TiltZ != coll->tiltZ)
-		{
-			auto fail = 1;
-		}
-	}
+	coll->tiltX = collResult.TiltX;
+	coll->tiltZ = collResult.TiltZ;
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
