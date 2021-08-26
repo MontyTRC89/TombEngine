@@ -149,6 +149,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
+short* GetTriggerIndex(ITEM_INFO* item);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 //void UpdateDebris();
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
