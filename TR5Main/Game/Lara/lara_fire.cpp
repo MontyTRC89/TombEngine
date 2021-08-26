@@ -1128,23 +1128,23 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 		if ((collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) && oldCollResult.FloorHeight < collResult.FloorHeight)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
-			if (collResult.TiltZ < 0)
+			if (collResult.TiltX < 0)
 			{
 				if (yang >= 0x8000)
 					bs = 1;
 			}
-			else if (collResult.TiltZ > 0)
+			else if (collResult.TiltX > 0)
 			{
 				if (yang <= 0x8000)
 					bs = 1;
 			}
 
-			if (collResult.TiltX < 0)
+			if (collResult.TiltZ < 0)
 			{
 				if (yang >= 0x4000 && yang <= 0xc000)
 					bs = 1;
 			}
-			else if (collResult.TiltX > 0)
+			else if (collResult.TiltZ > 0)
 			{
 				if (yang <= 0x4000 || yang >= 0xc000)
 					bs = 1;
@@ -1195,7 +1195,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 
 			item->speed -= (item->speed / 4);
 
-			if (collResult.TiltZ < 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0x4000
+			if (collResult.TiltX < 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0x4000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x8000)
 				{
@@ -1207,7 +1207,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= collResult.TiltZ * 2;
+						item->speed -= collResult.TiltX * 2;
 						if ((unsigned short)item->pos.yRot > 0x4000 && (unsigned short)item->pos.yRot < 0xc000)
 						{
 							item->pos.yRot -= 4096;
@@ -1228,7 +1228,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ > 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0xc000
+			else if (collResult.TiltX > 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0xc000
 			{
 				if (((unsigned short)item->pos.yRot) < 0x8000)
 				{
@@ -1240,7 +1240,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltZ * 2;
+						item->speed += collResult.TiltX * 2;
 						if ((unsigned short)item->pos.yRot > 0xc000 || (unsigned short)item->pos.yRot < 0x4000)
 						{
 							item->pos.yRot -= 4096;
@@ -1261,7 +1261,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX < 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0
+			else if (collResult.TiltZ < 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0
 			{
 				if (((unsigned short)item->pos.yRot) > 0x4000 && ((unsigned short)item->pos.yRot) < 0xc000)
 				{
@@ -1273,7 +1273,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= collResult.TiltX * 2;
+						item->speed -= collResult.TiltZ * 2;
 
 						if ((unsigned short)item->pos.yRot < 0x8000)
 						{
@@ -1295,7 +1295,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX > 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0x8000
+			else if (collResult.TiltZ > 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0x8000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xc000 || ((unsigned short)item->pos.yRot) < 0x4000)
 				{
@@ -1307,7 +1307,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltX * 2;
+						item->speed += collResult.TiltZ * 2;
 
 						if ((unsigned short)item->pos.yRot > 0x8000)
 						{
@@ -1329,7 +1329,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ < 0 && collResult.TiltX < 0)	// Hit angle = 0x2000
+			else if (collResult.TiltX < 0 && collResult.TiltZ < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x6000 && ((unsigned short)item->pos.yRot) < 0xe000)
 				{
@@ -1341,7 +1341,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-collResult.TiltZ) + (-collResult.TiltX);
+						item->speed += (-collResult.TiltX) + (-collResult.TiltZ);
 						if ((unsigned short)item->pos.yRot > 0x2000 && (unsigned short)item->pos.yRot < 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1362,7 +1362,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ < 0 && collResult.TiltX > 0)	// Hit angle = 0x6000
+			else if (collResult.TiltX < 0 && collResult.TiltZ > 0)	// Hit angle = 0x6000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xa000 || ((unsigned short)item->pos.yRot) < 0x2000)
 				{
@@ -1374,7 +1374,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-collResult.TiltZ) + collResult.TiltX;
+						item->speed += (-collResult.TiltX) + collResult.TiltZ;
 						if ((unsigned short)item->pos.yRot < 0xe000 && (unsigned short)item->pos.yRot > 0x6000)
 						{
 							item->pos.yRot -= 4096;
@@ -1395,7 +1395,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ > 0 && collResult.TiltX > 0)	// Hit angle = 0xa000
+			else if (collResult.TiltX > 0 && collResult.TiltZ > 0)	// Hit angle = 0xa000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xe000 || ((unsigned short)item->pos.yRot) < 0x6000)
 				{
@@ -1407,7 +1407,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltZ + collResult.TiltX;
+						item->speed += collResult.TiltX + collResult.TiltZ;
 						if ((unsigned short)item->pos.yRot < 0x2000 || (unsigned short)item->pos.yRot > 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1428,7 +1428,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ > 0 && collResult.TiltX < 0)	// Hit angle = 0xe000
+			else if (collResult.TiltX > 0 && collResult.TiltZ < 0)	// Hit angle = 0xe000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x2000 && ((unsigned short)item->pos.yRot) < 0xa000)
 				{
@@ -1440,7 +1440,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltZ + (-collResult.TiltX);
+						item->speed += collResult.TiltX + (-collResult.TiltZ);
 						if ((unsigned short)item->pos.yRot < 0x6000 || (unsigned short)item->pos.yRot > 0xe000)
 						{
 							item->pos.yRot -= 4096;
