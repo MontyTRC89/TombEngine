@@ -333,6 +333,28 @@ void void_effect(ITEM_INFO* item)
 
 }
 
+void TriggerLaraBlood()
+{
+	int i;
+	int node = 1;
+
+	for (i = 0; i <= LARA_MESHES::NUM_LARA_MESHES; i++)
+	{
+		if (node & LaraItem->touchBits)
+		{
+			PHD_VECTOR vec;
+			vec.x = (GetRandomControl() & 31) - 16;
+			vec.y = (GetRandomControl() & 31) - 16;
+			vec.z = (GetRandomControl() & 31) - 16;
+
+			GetLaraJointPosition(&vec, (LARA_MESHES)i);
+			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
+		}
+
+		node *= 2;
+	}
+}
+
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
