@@ -16,26 +16,6 @@ using std::vector;
 using namespace ten::Math::Random;
 using namespace ten::Floordata;
 
-char LM[] =
-{
-	LM_HIPS,
-	LM_LTHIGH,
-	LM_LSHIN,
-	LM_LFOOT,
-	LM_RTHIGH,
-	LM_RSHIN,
-	LM_RFOOT,
-	LM_TORSO,
-	LM_RINARM,
-	LM_ROUTARM,
-	LM_RHAND,
-	LM_LINARM,
-	LM_LOUTARM,
-	LM_LHAND,
-	LM_HEAD,
-};
-
-int hitSoundTimer;
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
@@ -563,10 +543,12 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
+		static int hitSoundTimer = 0;
+
 		if ((!Lara.hitFrame) && (!hitSoundTimer))
 		{
 				SoundEffect(SFX_TR4_LARA_INJURY, &l->pos, 0);
-				hitSoundTimer = generateFloat(5, 15);
+				hitSoundTimer = generateFloat(15, 35);
 		}
 
 		if (hitSoundTimer)
@@ -659,28 +641,6 @@ void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	l->pos.xPos = item->pos.xPos + pos.x;
 	l->pos.yPos = item->pos.yPos + pos.y;
 	l->pos.zPos = item->pos.zPos + pos.z;
-}
-
-void TriggerLaraBlood() 
-{
-	int i;
-	int node = 1;
-
-	for (i = 0; i < 14; i++)
-	{
-		if (node & LaraItem->touchBits)
-		{
-			PHD_VECTOR vec;
-			vec.x = (GetRandomControl() & 31) - 16;
-			vec.y = (GetRandomControl() & 31) - 16;
-			vec.z = (GetRandomControl() & 31) - 16;
-
-			GetLaraJointPosition(&vec, LM[i]);
-			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
-		}
-
-		node *= 2;
-	}
 }
 
 int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l)
