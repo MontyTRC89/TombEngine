@@ -700,7 +700,7 @@ void SasDragBlokeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 				int y = l->pos.yPos;
 				int z = l->pos.xPos - 512 * phd_cos(l->pos.yRot);
 
-				TestTriggersAtXYZ(x, y, z, l->roomNumber, true, NULL);
+				TestTriggers(x, y, z, l->roomNumber, true, NULL);
 
 				RemoveActiveItem(itemNumber);
 				item->status = ITEM_NOT_ACTIVE;

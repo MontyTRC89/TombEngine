@@ -78,7 +78,7 @@ void ClockworkBeetleControl(short item_number)
 		flag = 1;
 	}
 
-	TestTriggersAtXYZ(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, beetle->roomNumber, false, NULL);
+	TestTriggers(beetle, false, NULL);
 
 	if (roomNum != beetle->roomNumber)
 		ItemNewRoom(item_number, roomNum);

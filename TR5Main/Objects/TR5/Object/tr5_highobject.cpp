@@ -82,7 +82,7 @@ void ControlHighObject1(short itemNumber)
 				targetItem->flags = (item->flags & 0xC1FF) | 0x20;
 				item->itemFlags[0] = 6;
 				item->itemFlags[1] = 768;
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+				TestTriggers(item, true, NULL);
 			}
 
 			return;

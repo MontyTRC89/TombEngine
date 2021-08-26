@@ -184,7 +184,7 @@ void KnightTemplarControl(short itemNumber)
 						mesh->flags &= ~1;
 						currentFloor->stopper = false;
 
-						TestTriggersAtXYZ(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 					}
 
 					mesh++;

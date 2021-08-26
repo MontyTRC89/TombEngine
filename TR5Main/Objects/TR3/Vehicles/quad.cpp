@@ -1284,7 +1284,7 @@ int QuadBikeControl(void)
 	int hfl = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
 	int hfr = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
 
-	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, false, NULL);
+	TestTriggers(item, false, NULL);
 
 	if (LaraItem->hitPoints <= 0)
 	{

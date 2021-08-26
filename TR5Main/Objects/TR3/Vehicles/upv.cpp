@@ -1005,7 +1005,7 @@ int SubControl(void)
 		}
 	}
 
-	TestTriggersAtXYZ(v->pos.xPos, v->pos.yPos, v->pos.zPos, v->roomNumber, false, NULL);
+	TestTriggers(v, false, NULL);
 	SubEffects(Lara.Vehicle);
 
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))

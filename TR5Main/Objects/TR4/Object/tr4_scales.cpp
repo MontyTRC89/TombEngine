@@ -74,7 +74,7 @@ void ScalesControl(short itemNum)
 		item->itemFlags[1] = 1;
 	}
 
-	TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, flags);
+	TestTriggers(item, true, flags);
 	AnimateItem(item);
 }
 
