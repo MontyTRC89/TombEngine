@@ -150,7 +150,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	coll->facing = item->pos.yRot;
 	coll->badNeg = -384;
 	coll->badCeiling = 0;
-	coll->slopesAreWalls = 1;
+	coll->slopesAreWalls = true;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
 
 	if (LaraFallen(item, coll))

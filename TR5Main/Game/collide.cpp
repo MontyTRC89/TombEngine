@@ -1208,7 +1208,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->middle.SplitFloor = collResult.SplitFloor;
 	coll->middle.SplitCeiling = collResult.SplitCeiling;
 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber); // FIXME: maybe not needed?
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
 	coll->tiltX = collResult.TiltX;
 	coll->tiltZ = collResult.TiltZ;
 
@@ -1313,19 +1313,19 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		&& (height < coll->front.Floor)
 		&& (coll->front.Floor < 0))
 	{
-		coll->front.Floor = -32767;
+		coll->front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->slopesArePits
 		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
 		&& (coll->front.Floor > coll->middle.Floor))
 	{
-		coll->front.Floor = 512;
+		coll->front.Floor = STOP_SIZE;
 	}
 	else if ((coll->lavaIsPit)
 		     && (coll->front.Floor > 0)
 		     && collResult.BottomBlock->Flags.Death)
 	{
-		coll->front.Floor = 512;
+		coll->front.Floor = STOP_SIZE;
 	}
 
 	x = xPos + xleft;
@@ -1354,12 +1354,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->middleLeft.SplitFloor = collResult.SplitFloor;
 	coll->middleLeft.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
-		coll->middleLeft.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
+		coll->middleLeft.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor > 0)
-		coll->middleLeft.Floor = 512;
+		coll->middleLeft.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleLeft.Floor = 512;
+		coll->middleLeft.Floor = STOP_SIZE;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
@@ -1383,12 +1383,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->frontLeft.SplitFloor = collResult.SplitFloor;
 	coll->frontLeft.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
-		coll->frontLeft.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
+		coll->frontLeft.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor > 0)
-		coll->frontLeft.Floor = 512;
+		coll->frontLeft.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontLeft.Floor = 512;
+		coll->frontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
 	z = zPos + zright;
@@ -1416,12 +1416,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->middleRight.SplitFloor = collResult.SplitFloor;
 	coll->middleRight.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
-		coll->middleRight.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
+		coll->middleRight.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor > 0)
-		coll->middleRight.Floor = 512;
+		coll->middleRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleRight.Floor = 512;
+		coll->middleRight.Floor = STOP_SIZE;
 
 	tfLocation = GetRoom(tfLocation, x, yTop, z);
 
@@ -1445,12 +1445,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->frontRight.SplitFloor = collResult.SplitFloor;
 	coll->frontRight.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
-		coll->frontRight.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
+		coll->frontRight.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor > 0)
-		coll->frontRight.Floor = 512;
+		coll->frontRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontRight.Floor = 512;
+		coll->frontRight.Floor = STOP_SIZE;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 
@@ -1768,19 +1768,19 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		&& (collResult.FloorHeight < coll->front.Floor)
 		&& (coll->front.Floor < 0))
 	{
-		coll->front.Floor = -32767;
+		coll->front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->slopesArePits
 		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
 		&& (coll->front.Floor > coll->middle.Floor))
 	{
-		coll->front.Floor = 512;
+		coll->front.Floor = STOP_SIZE;
 	}
 	else if ((coll->lavaIsPit)
 		&& (coll->front.Floor > 0)
 		&& collResult.BottomBlock->Flags.Death)
 	{
-		coll->front.Floor = 512;
+		coll->front.Floor = STOP_SIZE;
 	}
 
 	x = xPos + xleft;
@@ -1805,12 +1805,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->middleLeft.SplitFloor = collResult.SplitFloor;
 	coll->middleLeft.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
-		coll->middleLeft.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
+		coll->middleLeft.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor > 0)
-		coll->middleLeft.Floor = 512;
+		coll->middleLeft.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleLeft.Floor = 512;
+		coll->middleLeft.Floor = STOP_SIZE;
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//
@@ -1830,12 +1830,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->frontLeft.SplitFloor = collResult.SplitFloor;
 	coll->frontLeft.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
-		coll->frontLeft.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
+		coll->frontLeft.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor > 0)
-		coll->frontLeft.Floor = 512;
+		coll->frontLeft.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontLeft.Floor = 512;
+		coll->frontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
 	z = zPos + zright;
@@ -1860,12 +1860,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->middleRight.SplitFloor = collResult.SplitFloor;
 	coll->middleRight.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
-		coll->middleRight.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
+		coll->middleRight.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor > 0)
-		coll->middleRight.Floor = 512;
+		coll->middleRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleRight.Floor = 512;
+		coll->middleRight.Floor = STOP_SIZE;
 
 	//floor = GetFloor(x, yTop, z, &tRoomNumber);
 	//
@@ -1886,12 +1886,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->frontRight.SplitFloor = collResult.SplitFloor;
 	coll->frontRight.SplitCeiling = collResult.SplitCeiling;
 
-	if (coll->slopesAreWalls == 1 && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
-		coll->frontRight.Floor = -32767;
+	if (coll->slopesAreWalls && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
+		coll->frontRight.Floor = MAX_HEIGHT;
 	else if (coll->slopesArePits && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor > 0)
-		coll->frontRight.Floor = 512;
+		coll->frontRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontRight.Floor = 512;
+		coll->frontRight.Floor = STOP_SIZE;
 
 	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 	
