@@ -92,7 +92,6 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateLaraRoom(ITEM_INFO* item, int height);
-short GetTiltType(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
