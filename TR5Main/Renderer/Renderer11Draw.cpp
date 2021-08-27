@@ -3220,7 +3220,7 @@ namespace ten::renderer
         m_context->PSSetSamplers(0, 1, &sampler);
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-		int causticsFrame = meshIndex + ((GlobalCounter) % nmeshes);
+		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
         m_context->PSSetShaderResources(1, 1, m_sprites[causticsFrame].Texture->ShaderResourceView.GetAddressOf());
         m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
