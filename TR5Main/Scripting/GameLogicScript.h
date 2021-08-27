@@ -31,7 +31,7 @@ struct GameScriptVector3 {
 class LuaVariables
 {
 public:
-	std::map<std::string, sol::object>			variables;
+	std::unordered_map<std::string, sol::object>			variables;
 
 	sol::object							GetVariable(sol::table tab, std::string key);
 	void								SetVariable(sol::table tab, std::string key, sol::object value);
