@@ -709,6 +709,8 @@ GAME_STATUS DoTitle(int index)
 		// Initialise ponytails
 		InitialiseHair();
 
+		g_GameScript->OnStart();
+
 		ControlPhase(2, 0);
 #ifdef NEW_INV
 		int status = 0, frames;
@@ -747,6 +749,8 @@ GAME_STATUS DoTitle(int index)
 	UseSpotCam = false;
 	S_CDStop();
 
+	g_GameScript->OnEnd();
+	g_GameScript->FreeLevelScripts();
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
