@@ -14,6 +14,7 @@
 #include "pickup.h"
 #include "newinv2.h"
 #include "ObjectIDs.h"
+#include "GameScriptDisplayString.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -152,12 +153,6 @@ static int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScri
 	return static_cast<int>(round(result));
 }
 
-// Misc
-static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
-{
-
-}
-
 // A "special" table is essentially one that TEN reserves and does things with.
 template <typename funcIndex, typename funcNewindex, typename obj>
 static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
@@ -191,6 +186,8 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 @tparam bool loop if true, the track will loop; if false, it won't (default: false)
 */
 	m_lua->set_function("PlayAudioTrack", &PlayAudioTrack);
+
+	m_lua->set_function("PrintString", &GameScript::PrintString, this);
 
 /*** Player inventory management
 @section Inventory
@@ -229,7 +226,7 @@ Set the amount of a certain item the player has in the inventory.
 Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
 @function SetInvItemCount
 @tparam @{InvItem} item the item to be set
-@tparam int count the number of items the player will have 
+@tparam int count the number of items the player will have
 */
 	m_lua->set_function("SetInvItemCount", &InventorySetCount);
 
@@ -299,6 +296,26 @@ Calculate the horizontal distance between two positions.
 */
 	m_lua->set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
 
+/***
+Show some text on-screen.
+@function ShowString
+@tparam DisplayString str the string object to draw
+@tparam float time the time in seconds for which to show the string.
+If not given, the string will have an "infinite" life, and will show
+until @{HideString} is called or until the level is finished.
+Default: nil (i.e. infinite)
+*/
+
+	m_lua->set_function("ShowString", &GameScript::ShowString, this);
+
+/***
+Hide some on-screen text.
+@function HideString
+@tparam DisplayString str the string object to hide. Must previously have been shown
+with a call to @{ShowString}, or this function will have no effect.
+*/
+	m_lua->set_function("HideString", [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
+
 	MakeReadOnlyTable("ObjID", kObjIDs);
 
 	ResetLevelTables();
@@ -341,6 +358,11 @@ Calculate the horizontal distance between two positions.
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
+	GameScriptDisplayString::Register(m_lua);
+	GameScriptDisplayString::SetCallbacks(
+		[this](auto && ... param) {return AddDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); }
+		);
 	GameScriptPosition::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
@@ -379,15 +401,25 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	return true;
 }
 
+bool GameScript::ScheduleRemoveDisplayString(DisplayStringIDType id)
 {
+	auto it = m_userDisplayStrings.find(id);
+	if (std::cend(m_userDisplayStrings) == it)
+		return false;
 
+	it->second.m_deleteWhenZero = true;
+	return true;
 }
 
+bool GameScript::AddDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
 {
+	return m_userDisplayStrings.insert(std::make_pair(id, ds)).second;
 }
 
 
+void GameScript::SetCallbackDrawString(CallbackDrawString cb)
 {
+	m_callbackDrawSring = cb;
 }
 
 void GameScript::FreeLevelScripts()
@@ -482,6 +514,7 @@ template void GameScript::GetVariables<std::string>(std::map<std::string, std::s
 template <typename T>
 void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
+	//TODO Look into serialising tables from these maps, too -- squidshire, 24/08/2021
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
@@ -520,6 +553,45 @@ void GameScript::ResetVariables()
 {
 	(*m_lua)["Lara"] = NULL;
 }
+
+// Misc
+void GameScript::PrintString(std::string const & key, int x, int y, GameScriptColor color, int lifetime, int flags)
+{
+	ten::renderer::g_Renderer.drawString(x, y, key.c_str(), color, flags);
+}
+
+void GameScript::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
+{
+	auto it = m_userDisplayStrings.find(str.GetID());
+	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
+	it->second.m_isInfinite = !nSeconds.has_value();
+}
+
+void GameScript::ProcessDisplayStrings(float dt)
+{
+	auto it = std::begin(m_userDisplayStrings);
+	while (it != std::end(m_userDisplayStrings))
+	{
+		auto& str = it->second;
+		bool endOfLife = (0.0f >= str.m_timeRemaining);
+		if (str.m_deleteWhenZero && endOfLife)
+		{
+			ScriptAssertF(!str.m_isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str.m_key);
+			it = m_userDisplayStrings.erase(it);
+		}
+		else
+		{
+			if (!endOfLife || str.m_isInfinite)
+			{
+				m_callbackDrawSring(g_GameFlow->GetString(str.m_key.c_str()), str.m_color, str.m_x, str.m_y, str.m_flags);
+				if (!endOfLife)
+					str.m_timeRemaining -= dt;
+			}
+			++it;
+		}
+	}
+}
+
 sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
 {
 	if (variables.find(key) == variables.end())
