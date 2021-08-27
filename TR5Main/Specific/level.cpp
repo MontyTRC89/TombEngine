@@ -123,7 +123,7 @@ int LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameItem(item->luaName, i);
+			g_GameScript->AddName(item->luaName, i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -383,7 +383,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddLuaNameCamera(camera.luaName, camera);
+		g_GameScript->AddName(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -409,7 +409,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSink(sink.luaName, sink);
+		g_GameScript->AddName(sink.luaName, sink);
 	}
 }
 
@@ -725,7 +725,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameMesh(mesh.luaName, mesh);
+			g_GameScript->AddName(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -868,7 +868,7 @@ void LoadSoundEffects()
 		ReadBytes(buffer, numBytes);
 		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSoundSource(source.luaName, source);
+		g_GameScript->AddName(source.luaName, source);
 	}
 }
 
@@ -942,7 +942,7 @@ void LoadAIObjects()
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameAIObject(obj.luaName, obj);
+		g_GameScript->AddName(obj.luaName, obj);
 	}
 }
 
