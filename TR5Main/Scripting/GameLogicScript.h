@@ -13,6 +13,7 @@
 #include "GameScriptAIObject.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptCameraInfo.h"
+#include "GameScriptDisplayString.h"
 
 struct LuaFunction {
 	std::string Name;
@@ -47,35 +48,40 @@ struct LuaVariable
 	bool BoolValue;
 };
 
+using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
+using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
 using VarMapVal = std::variant< short,
 	std::reference_wrapper<MESH_INFO>,
 	std::reference_wrapper<LEVEL_CAMERA_INFO>,
 	std::reference_wrapper<SINK_INFO>,
 	std::reference_wrapper<SOUND_SOURCE_INFO>,
 	std::reference_wrapper<AI_OBJECT>>;
-
 class GameScript : public LuaHandler
 {
 private:
 
-	LuaVariables										m_globals{};
-	LuaVariables										m_locals{};
-	std::unordered_map<std::string, VarMapVal>			m_nameMap{};
-	std::unordered_map<std::string, short>				m_itemsMapName{};
-	std::unordered_set<std::string>						m_levelFuncs{};
-	sol::protected_function								m_onStart{};
-	sol::protected_function								m_onLoad{};
-	sol::protected_function								m_onControlPhase{};
-	sol::protected_function								m_onSave{};
-	sol::protected_function								m_onEnd{};
+	LuaVariables								m_globals{};
+	LuaVariables								m_locals{};
+	DisplayStringMap							m_userDisplayStrings{};
+	std::unordered_map<std::string, VarMapVal>	m_nameMap{};
+	std::unordered_map<std::string, short>		m_itemsMapName{};
+	std::unordered_set<std::string>				m_levelFuncs{};
+	sol::protected_function						m_onStart{};
+	sol::protected_function						m_onLoad{};
+	sol::protected_function						m_onControlPhase{};
+	sol::protected_function						m_onSave{};
+	sol::protected_function						m_onEnd{};
 
 	void ResetLevelTables();
 
+	CallbackDrawString							m_callbackDrawSring;
 public:	
 	GameScript(sol::state* lua);
 
 	void								FreeLevelScripts();
 
+	bool								AddDisplayString(DisplayStringIDType id, UserDisplayString const & ds);
+	bool								ScheduleRemoveDisplayString(DisplayStringIDType id);
 
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
@@ -112,7 +118,11 @@ public:
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								ResetVariables();
 
+	void								PrintString(std::string const& key, int x, int y, GameScriptColor color, int lifetime, int flags);
+	void								SetCallbackDrawString(CallbackDrawString cb);
 
+	void								ShowString(GameScriptDisplayString const&, sol::optional<float> nSeconds);
+	void								ProcessDisplayStrings(float dt);
 	void								InitCallbacks();
 	void								OnStart();
 	void								OnLoad();
