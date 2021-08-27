@@ -73,6 +73,7 @@ GameScriptColor::operator Vector4() const
 	return Vector4{ float(r), float(g), float(b), float(a) };
 }
 
+// D3DCOLOR is 32 bits and is layed out as RGBA.
 GameScriptColor::operator D3DCOLOR() const
 {	
 	D3DCOLOR col = a;
