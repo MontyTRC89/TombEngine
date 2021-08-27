@@ -801,8 +801,7 @@ void LoadRooms()
 
 void FreeLevel()
 {
-	malloc_ptr = malloc_buffer;
-	malloc_free = malloc_size;
+	flush_malloc();
 	g_Level.RoomTextures.clear();
 	g_Level.MoveablesTextures.clear();
 	g_Level.StaticsTextures.clear();
