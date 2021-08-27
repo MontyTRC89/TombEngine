@@ -1053,6 +1053,12 @@
     <ClInclude Include="Scripting\ScriptUtil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\GameScriptDisplayString.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ReservedScriptNames.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1926,6 +1932,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\ScriptAssert.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptDisplayString.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
