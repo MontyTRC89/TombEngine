@@ -442,6 +442,12 @@ void GameScript::FreeLevelScripts()
 	m_levelFuncs.clear();
 	m_locals = LuaVariables{};
 	ResetLevelTables();
+	m_onStart = sol::nil;
+	m_onLoad = sol::nil;
+	m_onControlPhase = sol::nil;
+	m_onSave = sol::nil;
+	m_onEnd = sol::nil;
+	m_lua->collect_garbage();
 }
 
 void JumpToLevel(int levelNum)
