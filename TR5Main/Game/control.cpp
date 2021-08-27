@@ -180,6 +180,11 @@ extern short FXType;
 using namespace ten::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
+// This might not be the exact amount of time that has passed, but giving it a
+// value of 1/30 keeps it in lock-step with the rest of the game logic,
+// which assumes 30 iterations per second.
+static constexpr float deltaTime = 1.0f / 30.0f;
+
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
@@ -195,14 +200,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	g_GameScript->ProcessDisplayStrings(deltaTime);
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(1.0f/30.0f);
+		g_GameScript->OnControlPhase(deltaTime);
 		UpdateSky();
 
 		// Poll the keyboard and update input variables
@@ -669,6 +672,11 @@ GAME_STATUS DoTitle(int index)
 		{
 			g_GameScript->ExecuteScript(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
+			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+			{
+				g_Renderer.drawString(x, y, key.c_str(), col, flags);
+			});
+
 		}
 		RequiredStartPos = false;
 		if (InitialiseGame)
@@ -783,6 +791,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	{
 		g_GameScript->ExecuteScript(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
+		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		{
+			g_Renderer.drawString(x, y, key.c_str(), col, flags);
+		});
+
 	}
 
 	// Restore the game?
