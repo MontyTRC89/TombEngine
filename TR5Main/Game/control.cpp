@@ -124,7 +124,6 @@ bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
-int OnObject;
 int KillEverythingFlag;
 int FlipTimer;
 int FlipEffect;
