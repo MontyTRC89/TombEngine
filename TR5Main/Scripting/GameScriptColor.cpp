@@ -73,6 +73,20 @@ GameScriptColor::operator Vector4() const
 	return Vector4{ float(r), float(g), float(b), float(a) };
 }
 
+GameScriptColor::operator D3DCOLOR() const
+{	
+	D3DCOLOR col = a;
+	col <<= 8;
+	col += b;
+	col <<= 8;
+	col += g;
+	col <<= 8;
+	col += r;
+
+	return col;
+}
+
+
 byte GameScriptColor::GetR() const
 {
 	return r;
