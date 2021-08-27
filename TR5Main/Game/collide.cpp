@@ -169,13 +169,14 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 				{
 					ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-					if ((item == collidingItem || ignoreLara && item == LaraItem) 
-						|| (item->flags & 0x8000)
-						|| (item->meshBits == 0)
-						|| (Objects[item->objectNumber].drawRoutine == NULL)
-						|| (Objects[item->objectNumber].collision == NULL && item->objectNumber != ID_LARA) 
-						|| (onlyVisible && item->status == ITEM_INVISIBLE) 
-						|| item->objectNumber == ID_BURNING_FLOOR)
+					if ((item == collidingItem) 
+					 || (item->objectNumber == ID_LARA && ignoreLara)
+					 || (item->flags & 0x8000)
+					 || (item->meshBits == 0)
+					 || (Objects[item->objectNumber].drawRoutine == NULL && item->objectNumber != ID_LARA)
+					 || (Objects[item->objectNumber].collision   == NULL && item->objectNumber != ID_LARA) 
+					 || (onlyVisible && item->status == ITEM_INVISIBLE) 
+					 || (item->objectNumber == ID_BURNING_FLOOR))
 					{
 						itemNumber = item->nextItem;
 						continue;

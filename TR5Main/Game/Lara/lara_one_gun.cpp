@@ -631,15 +631,11 @@ void ControlGrenade(short itemNumber)
 
 					ITEM_INFO* currentItem = CollidedItems[i];
 
-					if (currentItem->objectNumber < ID_SMASH_OBJECT1
-						|| currentItem->objectNumber > ID_SMASH_OBJECT16)
+					if (currentItem->objectNumber < ID_SMASH_OBJECT1 || currentItem->objectNumber > ID_SMASH_OBJECT16)
 					{
-						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 ||
-							currentItem->objectNumber > ID_SHOOT_SWITCH4 ||
-							(currentItem->flags & 0x40))
+						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 || currentItem->objectNumber > ID_SHOOT_SWITCH4 || (currentItem->flags & 0x40))
 						{
-							if (Objects[currentItem->objectNumber].intelligent
-								|| currentItem->objectNumber != ID_LARA)
+							if (Objects[currentItem->objectNumber].intelligent || currentItem->objectNumber == ID_LARA)
 							{
 								DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_GRENADE_LAUNCHER);
 							}
@@ -1754,7 +1750,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 		}
 		else
 		{
-			LaraItem->hitPoints -= Weapons[weapon].damage;
+			LaraItem->hitPoints -= (Weapons[weapon].damage * 5);
 			if (!(g_Level.Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= Weapons[weapon].damage)
 				LaraBurn();
 		}
