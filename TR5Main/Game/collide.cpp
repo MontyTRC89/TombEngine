@@ -970,6 +970,10 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Return provided block into result as itself.
 	result.Block = floor;
 
+	// Floor and ceiling heights are directly borrowed from new floordata.
+	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+
 	// Probe bottom block through portals.
 	// TODO: Check if it is really needed, as GetFloor should take care of it itself?
 	ROOM_INFO* r;
@@ -983,10 +987,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 
 	// Return probed bottom block into result.
 	result.BottomBlock = floor;
-
-	// Floor and ceiling heights are directly borrowed from new floordata.
-	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT); 
-	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	// Check if block isn't a wall or there is no floordata
 	if (floor->floor * CLICK(1) != NO_HEIGHT && floor->index)
