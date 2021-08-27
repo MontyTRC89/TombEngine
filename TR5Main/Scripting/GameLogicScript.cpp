@@ -555,9 +555,9 @@ void GameScript::ResetVariables()
 }
 
 // Misc
-void GameScript::PrintString(std::string const & key, int x, int y, GameScriptColor color, int lifetime, int flags)
+void GameScript::PrintString(std::string const & str, int x, int y, GameScriptColor color, int lifetime, int flags)
 {
-	ten::renderer::g_Renderer.drawString(x, y, key.c_str(), color, flags);
+	ten::renderer::g_Renderer.drawString(x, y, str.c_str(), color, flags);
 }
 
 void GameScript::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
