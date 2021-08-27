@@ -2034,16 +2034,13 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
 {
-	int oldonobj;
 	int bs, yang;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	auto oldCollResult = GetCollisionResult(x, y, z, item->roomNumber);
-	oldonobj = OnObject;
-	auto oldtype = oldCollResult.HeightType;
-
 	auto collResult = GetCollisionResult(item);
+
 	if (item->pos.yPos >= collResult.FloorHeight)
 	{
 		bs = 0;
@@ -2430,13 +2427,16 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			oldonobj = OnObject;
-
 			oldCollResult = GetCollisionResult(item->pos.xPos, y, item->pos.zPos, item->roomNumber);
 			collResult = GetCollisionResult(item);
 
-			/* Bounce off floor */
-			if (item->pos.yPos >= oldCollResult.FloorHeight && oldonobj)	// If old and new pos above object then detect.
+			// Bounce off floor.
+
+			// Removed weird OnObject global check from here which didnt make sense because OnObject
+			// was always set to 0 by GetHeight() function which was called before the check.
+			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
+
+			if (item->pos.yPos >= oldCollResult.FloorHeight) 
 			{
 				/* Hit the floor; bounce and slow down */
 				if (item->fallspeed > 0)

@@ -114,7 +114,6 @@ extern bool ThreadEnded;
 extern int OnFloor;
 extern int SmokeWindX;
 extern int SmokeWindZ;
-extern int OnObject;
 extern int KillEverythingFlag;
 extern int FlipTimer;
 extern int FlipEffect;
