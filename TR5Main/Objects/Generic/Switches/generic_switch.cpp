@@ -230,8 +230,7 @@ namespace TEN::Entities::Switches
 
 	int GetKeyTrigger(ITEM_INFO* item)
 	{
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-		auto triggerIndex = GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		auto triggerIndex = GetTriggerIndex(item);
 
 		if (triggerIndex)
 		{
@@ -258,8 +257,7 @@ namespace TEN::Entities::Switches
 
 	int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 	{
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-		auto triggerIndex = GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		auto triggerIndex = GetTriggerIndex(item);
 
 		if (triggerIndex)
 		{
