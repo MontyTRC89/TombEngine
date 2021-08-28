@@ -12,6 +12,9 @@
 #include "draw.h"
 #include "control.h"
 #include "puzzles_keys.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 enum PuzzleType {
 	PUZZLETYPE_NORMAL, 

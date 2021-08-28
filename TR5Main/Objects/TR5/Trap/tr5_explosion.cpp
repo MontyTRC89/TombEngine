@@ -12,6 +12,9 @@
 #include "lara_one_gun.h"
 #include "switch.h"
 #include "debris.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
 {

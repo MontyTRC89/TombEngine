@@ -51,7 +51,10 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
-#include <Game\Lara\lara_climb.h>
+#include <Game/Lara/lara_climb.h>
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 using std::vector;
 using std::unordered_map;
@@ -539,8 +542,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		ten::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		ten::entities::tr4::UpdateScarabs();
-		ten::entities::tr4::UpdateLocusts();
+		TEN::Entities::TR4::UpdateScarabs();
+		TEN::Entities::TR4::UpdateLocusts();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 

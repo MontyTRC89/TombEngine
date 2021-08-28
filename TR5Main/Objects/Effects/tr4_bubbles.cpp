@@ -412,7 +412,7 @@ namespace ten::entities::all
 					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				case 6:
-					ten::entities::tr4::TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					TEN::Entities::TR4::TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				}
 			}
