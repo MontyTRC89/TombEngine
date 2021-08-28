@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-
+#include "creature.h"
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 
 void SilencerControl(short itemNum)

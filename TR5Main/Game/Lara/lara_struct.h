@@ -980,7 +980,7 @@ struct AnimsNew
 	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
 	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
-
+struct CREATURE_INFO;
 struct LaraInfo
 {
 	short itemNumber;

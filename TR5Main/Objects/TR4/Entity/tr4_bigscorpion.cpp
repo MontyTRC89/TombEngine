@@ -7,6 +7,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "creature.h"
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
 BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };

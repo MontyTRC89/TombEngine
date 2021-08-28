@@ -11,7 +11,7 @@
 #include "setup.h"
 #include "trmath.h"
 #include "objectslist.h"
-
+#include "creature.h"
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)

@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "trmath.h"
 #include "objectslist.h"
+#include "creature.h"
 
 #ifndef NEW_INV
 extern Inventory g_Inventory;

@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "tomb4fx.h"
 #include "level.h"
+#include "creature.h"
 
 namespace TEN::Entities::TR4
 {

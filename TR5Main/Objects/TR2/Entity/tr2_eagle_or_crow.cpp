@@ -6,6 +6,7 @@
 #include "items.h"
 #include "setup.h"
 #include "level.h"
+#include "creature.h"
 
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };

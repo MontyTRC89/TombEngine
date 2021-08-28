@@ -6,6 +6,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature.h"
 
 BITE_INFO yetiBiteR = { 12, 101, 19, 10 };
 BITE_INFO yetiBiteL = { 12, 101, 19, 13 };

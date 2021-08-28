@@ -8,7 +8,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-
+#include "creature.h"
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
 	ABORT_ATTACK3, ABORT_FORWARD, ABORT_SET, ABORT_FALL, ABORT_DEATH, ABORT_KILL

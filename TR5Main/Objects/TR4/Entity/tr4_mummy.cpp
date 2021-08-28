@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "setup.h"
 #include "level.h"
+#include "creature.h"
 
 enum MUMMY_STATES {
 	STATE_MUMMY_ARMS_CROSSED = 0,

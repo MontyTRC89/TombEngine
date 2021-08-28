@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-
+#include "creature.h"
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 
 #define ATTACK_DAMAGE 200
