@@ -5,6 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "creature.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };
 static BITE_INFO DogBite = { 0, 0, 100, 3 };

@@ -7,6 +7,8 @@
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
+#include "creature.h"
+#include "creature.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 

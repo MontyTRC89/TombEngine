@@ -7,6 +7,8 @@
 #include "misc.h"
 #include "Lara.h"
 #include "tomb4fx.h"
+#include "creature.h"
+
 using std::vector;
 BaboonRespawnClass BaboonRespawn;
 static BITE_INFO baboonBite = { 10, 10, 11, 4 };

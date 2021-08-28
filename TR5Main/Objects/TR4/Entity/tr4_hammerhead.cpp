@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "misc.h"
+#include "creature.h"
 
 #define STATE_HAMMERHEAD_STOP       0
 #define STATE_HAMMERHEAD_SWIM_SLOW  1

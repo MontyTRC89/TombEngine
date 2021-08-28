@@ -17,6 +17,7 @@
 #include "jeep.h"
 #include "motorbike.h"
 #include <algorithm>
+#include "creature.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;

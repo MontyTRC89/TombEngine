@@ -11,6 +11,7 @@
 #include "level.h"
 #include <draw.h>
 #include <Game/lot.h>
+#include "creature.h"
 
 /*
 ID_BADDY_1

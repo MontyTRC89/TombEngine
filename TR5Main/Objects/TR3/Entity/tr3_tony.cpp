@@ -13,6 +13,7 @@
 #include "lara.h"
 #include "traps.h"
 #include "sound.h"
+#include "creature.h"
 
 enum TonyFlameType
 {

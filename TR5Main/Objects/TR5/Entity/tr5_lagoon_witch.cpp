@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "creature.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2
