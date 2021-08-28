@@ -1,6 +1,6 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
+struct ITEM_INFO;
+struct COLL_INFO;
 
 struct PUSHABLE_INFO
 {

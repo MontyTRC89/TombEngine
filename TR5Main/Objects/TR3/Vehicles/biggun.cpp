@@ -12,7 +12,8 @@
 #include "lara_struct.h"
 #include "tomb4fx.h"
 #include "draw.h"
-
+#include "setup.h"
+#include "camera.h"
 static long GunRotYAdd = 0;
 bool barrelRotating;
 

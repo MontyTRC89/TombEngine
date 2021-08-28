@@ -4,7 +4,8 @@
 #include "trmath.h"
 #include "sound.h"
 #include "tr5_missile.h"
-
+#include "control.h"
+#include "items.h"
 void ControlBodyPart(short fxNumber)
 {
 	FX_INFO* fx = &EffectList[fxNumber];

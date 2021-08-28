@@ -1,8 +1,8 @@
 #pragma once
 #include "phd_global.h"
-#include "items.h"
 #include "level.h"
-
+struct ITEM_INFO;
+struct BITE_INFO;
 struct CREATURE_INFO;
 struct LOT_INFO;
 enum TARGET_TYPE

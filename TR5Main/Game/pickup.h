@@ -1,7 +1,9 @@
 #pragma once
 
-#include "collide.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
+struct PHD_VECTOR;
+struct BOUNDING_BOX;
 enum GAME_OBJECT_ID : short;
 
 extern int NumRPickups;

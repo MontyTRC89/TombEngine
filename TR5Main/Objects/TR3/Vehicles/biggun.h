@@ -1,6 +1,6 @@
 #pragma once
-#include "lara_struct.h"
-
+struct COLL_INFO;
+struct ITEM_INFO;
 typedef struct {
 	short xRot;
 	short yRot;

@@ -7,6 +7,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
+#include "control.h"
 
 static BITE_INFO raptorBite = { 0, 66, 318, 22 };
 

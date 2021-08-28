@@ -7,7 +7,8 @@
 #include "door.h"
 #include "sound.h"
 #include "switch.h"
-
+#include "setup.h"
+#include "camera.h"
 namespace TEN::Entities::Switches
 {
 	enum TurnSwitchDirection

@@ -17,7 +17,7 @@
 #include "sound.h"
 #include <Game\particle\SimpleParticle.h>
 #include "prng.h"
-
+#include "camera.h"
 using std::vector;
 using namespace ten::Math::Random;
 

@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "level.h"
 #include "control.h"
-
+#include "Renderer11.h"
 using namespace ten::renderer;
 short PickupX;
 short PickupY;

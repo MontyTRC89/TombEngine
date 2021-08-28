@@ -11,6 +11,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
+#include "control.h"
 
 using std::vector;
 

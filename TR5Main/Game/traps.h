@@ -1,10 +1,10 @@
 #pragma once
 
-#include "collide.h"
+struct COLL_INFO;
+struct ITEM_INFO;
 
 extern ITEM_INFO* WBItem;
 extern short WBRoom;
-
 void LaraBurn();
 void LavaBurn(ITEM_INFO* item);
 void FlameControl(short fxNumber);

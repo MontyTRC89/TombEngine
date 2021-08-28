@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "sound.h"
-
+#include "Box.h"
 using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::TR5

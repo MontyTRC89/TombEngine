@@ -19,6 +19,7 @@
 #include "Quad/RenderQuad.h"
 #include <Game\particle\SimpleParticle.h>
 #include <Renderer\RendererSprites.h>
+#include "control.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];

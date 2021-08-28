@@ -11,6 +11,7 @@
 #include <sphere.h>
 #include <people.h>
 #include "creature.h"
+#include "effect.h"
 BITE_INFO BitBeetleBite = { 0,0,0,12 };
 
 void InitialiseBigBeetle(short itemNumber)

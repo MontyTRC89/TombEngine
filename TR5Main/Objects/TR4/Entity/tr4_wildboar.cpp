@@ -8,6 +8,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
+#include "control.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 

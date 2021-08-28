@@ -10,7 +10,7 @@
 #include "level.h"
 #include "lara.h"
 #include "tr4_mutant.h"
-
+#include "control.h"
 namespace ten::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)

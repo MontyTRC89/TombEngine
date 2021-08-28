@@ -1,7 +1,7 @@
 #pragma once
 #include "phd_global.h"
-#include "items.h"
 #include "lara_struct.h"
+struct ITEM_INFO;
 
 struct ENERGY_ARC
 {

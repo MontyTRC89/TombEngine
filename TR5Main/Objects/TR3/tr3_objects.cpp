@@ -34,7 +34,7 @@
 #include "setup.h"
 #include "level.h"
 #include "creature.h"
-
+#include "Box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];

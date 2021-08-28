@@ -6,7 +6,8 @@
 #include "newinv2.h"
 #include "sound.h"
 #include "generic_switch.h"
-
+#include "camera.h"
+#include "collide.h"
 namespace TEN::Entities::Switches
 { 
 	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =

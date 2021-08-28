@@ -12,6 +12,7 @@
 #include "effect.h"
 #include "trmath.h"
 #include "creature.h"
+#include "control.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 

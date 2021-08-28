@@ -1,6 +1,6 @@
 #pragma once
-#include "items.h"
-#include "control.h"
+#include "phd_global.h"
+struct ITEM_INFO;
 
 #define EffectFunction void(ITEM_INFO* item)
 

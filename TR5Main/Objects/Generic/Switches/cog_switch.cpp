@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "door.h"
-
+#include "Box.h"
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =

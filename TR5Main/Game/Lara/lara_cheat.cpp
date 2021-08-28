@@ -8,8 +8,9 @@
 #endif
 #include "effect2.h"
 #include "sound.h"
-
-
+#include "collide.h"
+#include "item.h"
+#include "setup.h"
 extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 

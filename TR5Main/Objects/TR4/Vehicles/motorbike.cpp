@@ -20,7 +20,8 @@
 #include "health.h"
 #include "camera.h"
 #include "prng.h"
-
+#include "Box.h"
+#include "effect.h"
 using namespace ten::Math::Random;
 
 /*collision stuff*/

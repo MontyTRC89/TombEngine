@@ -9,7 +9,8 @@
 #include "sound.h"
 #include "bubble.h"
 #include "draw.h"
-
+#include "camera.h"
+#include "setup.h"
 
 
 #define RUBBER_BOAT_FRONT			750
