@@ -10,6 +10,9 @@
 #include <tomb4fx.h>
 #include <switch.h>
 #include <input.h>
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {
     0x0000, 0x0000, 0xFFC0, 0x0000, 0x0000, 0x0000,

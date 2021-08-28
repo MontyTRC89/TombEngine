@@ -4,6 +4,10 @@
 
 enum GAME_OBJECT_ID : short;
 
+extern int NumRPickups;
+extern short RPickups[16];
+extern PHD_VECTOR OldPickupPos;
+
 void InitialisePickup(short itemNumber);
 void PickedUpObject(GAME_OBJECT_ID objectNumber, int count);
 void RemoveObjectFromInventory(GAME_OBJECT_ID objectNumber, int count);

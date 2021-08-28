@@ -50,6 +50,7 @@
 #include "tr5_rollingball.h"
 #include "tr5_explosion.h"
 /// switch
+#include "tr5_crowdove_switch.h"
 
 /// shatter
 #include "tr5_smashobject.h"
@@ -66,6 +67,8 @@
 #include "level.h"
 /// register objects
 #include "object_helper.h"
+
+using namespace TEN::Entities::TR5;
 
 static void StartBaddy(OBJECT_INFO *obj)
 {
@@ -1220,6 +1223,18 @@ static void StartSwitch(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_CROWDOVE_SWITCH];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCrowDoveSwitch;
+		obj->collision = CrowDoveSwitchCollision;
+		obj->control = CrowDoveSwitchControl;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
 	}
 }
 

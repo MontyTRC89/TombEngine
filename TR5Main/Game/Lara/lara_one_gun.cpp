@@ -25,6 +25,9 @@
 #include "savegame.h"
 #include "sound.h"
 #include "bubble.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 extern GameFlow* g_GameFlow;
 

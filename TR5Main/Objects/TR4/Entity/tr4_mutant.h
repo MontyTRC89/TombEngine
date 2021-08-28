@@ -3,7 +3,7 @@
 #include "framework.h"
 #include "trmath.h"
 
-namespace ten::entities::tr4 
+namespace TEN::Entities::TR4 
 {
     enum STATES_CROCGOD
     {
