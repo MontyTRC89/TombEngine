@@ -11,6 +11,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
+#include "creature.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 

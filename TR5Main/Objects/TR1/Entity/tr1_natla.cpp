@@ -9,7 +9,7 @@
 #include "effect2.h"
 #include "effect.h"
 #include "trmath.h"
-
+#include "creature.h"
 #define NATLA_NEAR_DEATH 200
 
 enum natla_anims {

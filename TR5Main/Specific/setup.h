@@ -2,7 +2,7 @@
 #include "box.h"
 #include "collide.h"
 #include "objectslist.h"
-
+enum ZoneType : char;
 enum HitEffectEnum
 {
     HIT_NONE,

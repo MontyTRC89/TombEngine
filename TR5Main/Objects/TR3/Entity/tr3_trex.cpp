@@ -6,6 +6,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "creature.h"
 
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {

@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-
+#include "creature.h"
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 
 enum bearStates{

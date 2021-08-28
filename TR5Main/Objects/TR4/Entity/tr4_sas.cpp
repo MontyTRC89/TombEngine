@@ -11,6 +11,7 @@
 #include <Specific\input.h>
 #include <Game/tomb4fx.h>
 #include <Game/Lara/lara_one_gun.h>
+#include "creature.h"
 
 enum SAS_STATES
 {

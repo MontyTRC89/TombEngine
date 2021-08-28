@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "misc.h"
+#include "creature.h"
 
 enum CROCODILE_STATE
 {

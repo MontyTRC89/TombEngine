@@ -14,6 +14,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
+#include "creature.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {

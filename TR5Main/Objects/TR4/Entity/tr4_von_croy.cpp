@@ -12,6 +12,7 @@
 #include "lara.h"
 #include "sound.h"
 #include <Game\draw.h>
+#include "creature.h"
 
 #define STATE_VON_CROY_STOP						1
 #define STATE_VON_CROY_WALK						2

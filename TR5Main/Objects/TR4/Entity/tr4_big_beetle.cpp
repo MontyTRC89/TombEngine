@@ -10,7 +10,7 @@
 #include <sound.h>
 #include <sphere.h>
 #include <people.h>
-
+#include "creature.h"
 BITE_INFO BitBeetleBite = { 0,0,0,12 };
 
 void InitialiseBigBeetle(short itemNumber)
