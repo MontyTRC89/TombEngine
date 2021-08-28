@@ -5,7 +5,7 @@
 #include "trmath.h"
 #include "lara.h"
 
-namespace ten::entities::tr4
+namespace TEN::Entities::TR4
 {
 	SCARAB_INFO* Scarabs;
 	int NextScarab;

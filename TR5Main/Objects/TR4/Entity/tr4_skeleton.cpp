@@ -14,7 +14,7 @@
 #include "tomb4fx.h"
 #include "level.h"
 
-namespace ten::entities::tr4
+namespace TEN::Entities::TR4
 {
 	BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 

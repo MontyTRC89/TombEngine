@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 
-namespace ten::entities::switches
+namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
 	{
@@ -41,7 +41,7 @@ namespace ten::entities::switches
 				l->gravityStatus = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
-				item->goalAnimState = 1;
+				item->goalAnimState = SWITCH_ON;
 				item->status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNum);
