@@ -11,7 +11,7 @@ struct SCARAB_INFO
 	byte flags;
 };
 
-namespace ten::entities::tr4
+namespace TEN::Entities::TR4
 {
 	constexpr auto NUM_LITTLE_BETTLES = 256;
 

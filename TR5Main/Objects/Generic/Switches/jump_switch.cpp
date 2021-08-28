@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 
-namespace ten::entities::switches
+namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
 	{

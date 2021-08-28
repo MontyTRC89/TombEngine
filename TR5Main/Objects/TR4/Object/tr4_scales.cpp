@@ -10,6 +10,9 @@
 #include "draw.h"
 #include "tomb4fx.h"
 #include "tr4_ahmet.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {

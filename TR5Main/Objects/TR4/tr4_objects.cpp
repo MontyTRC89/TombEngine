@@ -314,8 +314,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_SKELETON];
 	if (obj->loaded)
 	{
-		obj->initialise = ten::entities::tr4::InitialiseSkeleton;
-		obj->control = ten::entities::tr4::SkeletonControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseSkeleton;
+		obj->control = TEN::Entities::TR4::SkeletonControl;
 		obj->collision = CreatureCollision;
 		obj->hitPoints = 15;
 		obj->hitEffect = HIT_SMOKE;
@@ -664,8 +664,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_CROCODILE_GOD];
 	if (obj->loaded)
 	{
-		obj->initialise = ten::entities::tr4::InitialiseCrocgod;
-		obj->control = ten::entities::tr4::CrocgodControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseCrocgod;
+		obj->control = TEN::Entities::TR4::CrocgodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = NOT_TARGETABLE;
@@ -686,8 +686,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LOCUSTS_EMITTER];
 	if (obj->loaded)
 	{
-		obj->initialise = ten::entities::tr4::InitialiseLocust;
-		obj->control = ten::entities::tr4::LocustControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseLocust;
+		obj->control = TEN::Entities::TR4::LocustControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
@@ -729,8 +729,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LITTLE_BEETLE];
 	if (obj->loaded)
 	{
-		obj->initialise = ten::entities::tr4::InitialiseScarabs;
-		obj->control = ten::entities::tr4::ScarabsControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseScarabs;
+		obj->control = TEN::Entities::TR4::ScarabsControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
@@ -1185,6 +1185,6 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	ten::entities::tr4::Scarabs = game_malloc<SCARAB_INFO>(ten::entities::tr4::NUM_LITTLE_BETTLES);
-	ZeroMemory(ten::entities::tr4::Scarabs, ten::entities::tr4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
+	TEN::Entities::TR4::Scarabs = game_malloc<SCARAB_INFO>(TEN::Entities::TR4::NUM_LITTLE_BETTLES);
+	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
 }

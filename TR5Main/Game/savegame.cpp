@@ -16,6 +16,11 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
+#include "generic_switch.h"
+#include "fullblock_switch.h"
+
+using namespace TEN::Entities::Switches;
+
 using std::string;
 using std::vector;
 FileStream* SaveGame::m_stream;
@@ -68,10 +73,6 @@ std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
 
 SAVEGAME_INFO Savegame;
 //extern vector<AudioTrack> g_AudioTracks;
-extern byte SequenceUsed[6];
-extern byte SequenceResults[3][3][3];
-extern byte Sequences[3];
-extern byte CurrentSequence;
 
 void SaveGame::saveItems()
 {

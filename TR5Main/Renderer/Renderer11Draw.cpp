@@ -2307,9 +2307,9 @@ namespace ten::renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < ten::entities::tr4::NUM_LITTLE_BETTLES; i++)
+            for (int i = 0; i < TEN::Entities::TR4::NUM_LITTLE_BETTLES; i++)
             {
-                SCARAB_INFO* beetle = &ten::entities::tr4::Scarabs[i];
+                SCARAB_INFO* beetle = &TEN::Entities::TR4::Scarabs[i];
 
                 if (beetle->on)
                 {
@@ -2355,9 +2355,9 @@ namespace ten::renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < ten::entities::tr4::MAX_LOCUSTS; i++)
+            for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
             {
-                LOCUST_INFO* locust = &ten::entities::tr4::Locusts[i];
+                LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
 
                 if (locust->on)
                 {
