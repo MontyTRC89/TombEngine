@@ -3386,9 +3386,6 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 {
 	// Monkeyswing
 	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
-
-	// Beetle flag
-	Lara.ClockworkBeetleFlag = floor->Flags.MarkBeetle;
 		
 	// Burn Lara
 	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
