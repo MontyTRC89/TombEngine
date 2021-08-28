@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="File di origine">
@@ -34,6 +34,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\draw.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effect2.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\flmtorch.h">
@@ -259,6 +262,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\health.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\flipeffect.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\tr4_objects.h">
@@ -1056,10 +1062,22 @@
     <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\effect2.h">
+    <ClInclude Include="Objects\Generic\Switches\crowbar_switch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\flipeffect.h">
+    <ClInclude Include="Objects\Generic\Switches\fullblock_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\pulley_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\turn_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\underwater_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1287,6 +1305,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\health.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effect.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp">
@@ -1946,7 +1967,22 @@
     <ClCompile Include="Objects\Generic\Switches\generic_switch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\flipeffect.cpp">
+    <ClCompile Include="Objects\Generic\Switches\crowbar_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\fullblock_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\pulley_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\turn_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,5 +5,5 @@
 
 namespace TEN::Entities::Switches
 {
-	void JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 }

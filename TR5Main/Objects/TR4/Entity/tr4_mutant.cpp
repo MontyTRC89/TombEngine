@@ -11,7 +11,7 @@
 #include "trmath.h"
 #include "control.h"
 
-namespace ten::entities::tr4
+namespace TEN::Entities::TR4
 {
     void TriggerCrocgodMissile(PHD_3DPOS* src, short roomNumber, short counter)
     {
@@ -307,7 +307,7 @@ namespace ten::entities::tr4
         case STATE_MUTANT_LOCUST1:
             frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
             if (frameNumber >= 60 && frameNumber <= 120)
-                ten::entities::tr4::SpawnLocust(item);
+                TEN::Entities::TR4::SpawnLocust(item);
             break;
 
         case STATE_MUTANT_LOCUST2:

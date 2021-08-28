@@ -6,7 +6,7 @@
 #include "generic_switch.h"
 #include "door.h"
 
-namespace ten::entities::switches
+namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 	{

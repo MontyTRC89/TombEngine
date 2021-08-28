@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ten::entities::tr4
+namespace TEN::Entities::TR4
 {
 	enum STATES_SKELETON
 	{
