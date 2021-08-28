@@ -19,7 +19,7 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-
+#include "Box.h"
 using std::vector;
 
 

@@ -10,7 +10,9 @@
 #include "sound.h"
 #include "draw.h"
 #include "pickup.h"
-
+#include "collide.h"
+#include "item.h"
+#include "camera.h"
 bool DoJump = false;
 
 /*generic functions*/

@@ -12,6 +12,7 @@
 #include <draw.h>
 #include <Game/lot.h>
 #include "creature.h"
+#include "control.h"
 
 /*
 ID_BADDY_1

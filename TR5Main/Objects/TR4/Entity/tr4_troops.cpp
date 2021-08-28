@@ -10,7 +10,7 @@
 #include "lot.h"
 #include "level.h"
 #include "creature.h"
-
+#include "control.h"
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
 #define STATE_TROOPS_STOP						1

@@ -10,6 +10,7 @@
 #include "setup.h"
 #include "level.h"
 #include "creature.h"
+#include "control.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

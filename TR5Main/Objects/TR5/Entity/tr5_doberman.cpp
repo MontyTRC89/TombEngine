@@ -6,6 +6,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
+#include "control.h"
 
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
 

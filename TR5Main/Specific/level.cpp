@@ -15,6 +15,7 @@
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>
+#include "Renderer11.h"
 using ten::renderer::g_Renderer;
 using std::vector;
 using std::string;

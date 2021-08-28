@@ -10,6 +10,7 @@
 #include "objectslist.h"
 #include "trmath.h"
 #include "creature.h"
+#include "control.h"
 
 namespace TEN::Entities::TR4
 {

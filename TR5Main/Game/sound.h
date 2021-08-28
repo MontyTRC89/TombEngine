@@ -2,7 +2,8 @@
 #include <bass.h>
 #include <bass_fx.h>
 #include "control.h"
-
+#include <unordered_map>
+#include <string>
 enum SFX_TYPES
 {
 	SFX_LANDANDWATER = 0,

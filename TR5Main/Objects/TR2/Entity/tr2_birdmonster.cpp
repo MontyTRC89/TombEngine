@@ -6,6 +6,8 @@
 #include "setup.h"
 #include "level.h"
 #include "creature.h"
+#include "control.h"
+
 BITE_INFO birdyBiteL = { 0, 224, 0, 19 };
 BITE_INFO birdyBiteR = { 0, 224, 0, 22 };
 

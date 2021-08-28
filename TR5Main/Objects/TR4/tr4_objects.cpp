@@ -70,7 +70,7 @@
 #include "level.h"
 #include "tr4_enemy_jeep.h"
 #include "creature.h"
-
+#include "Box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];

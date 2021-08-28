@@ -3,6 +3,8 @@
 #include "camera.h"
 #include "spotcam.h"
 #include "lara.h"
+#include "control.h"
+
 ten::renderer::RendererHUDBar* g_HealthBar;
 ten::renderer::RendererHUDBar* g_AirBar;
 ten::renderer::RendererHUDBar* g_DashBar;

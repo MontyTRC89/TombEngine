@@ -8,7 +8,8 @@
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
-
+#include "level.h"
+#include "collide.h"
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;

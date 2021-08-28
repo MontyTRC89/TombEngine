@@ -3,7 +3,8 @@
 #include "lara_collide.h"
 #include "input.h"
 #include "sound.h"
-
+#include "collide.h"
+#include "camera.h"
 short OldAngle = 1;
 
 /*this file has all the related functions to sliding*/

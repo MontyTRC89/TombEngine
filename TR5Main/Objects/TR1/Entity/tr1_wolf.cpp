@@ -7,6 +7,7 @@
 #include "setup.h"
 #include "level.h"
 #include "creature.h"
+#include "control.h"
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 
 enum wolfStates {

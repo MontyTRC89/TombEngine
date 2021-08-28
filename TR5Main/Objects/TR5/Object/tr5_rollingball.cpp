@@ -6,7 +6,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "sound.h"
-
+#include "effect.h"
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

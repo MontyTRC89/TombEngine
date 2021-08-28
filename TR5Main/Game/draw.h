@@ -1,5 +1,9 @@
 #pragma once
-#include "box.h"
+#include "Box.h"
+struct PHD_3DPOS;
+struct PHD_VECTOR;
+struct ANIM_FRAME;
+struct ITEM_INFO;
 
 extern BITE_INFO EnemyBites[9];
 extern int LightningCount;

@@ -1089,6 +1089,9 @@
     <ClInclude Include="Game\item.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Lara\lara_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">

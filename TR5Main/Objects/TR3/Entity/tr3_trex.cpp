@@ -7,7 +7,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
-
+#include "control.h"
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {
 	item->goalAnimState = 8;

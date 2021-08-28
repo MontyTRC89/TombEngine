@@ -8,6 +8,7 @@
 #include "setup.h"
 #include "level.h"
 #include "creature.h"
+#include "control.h"
 
 enum MUMMY_STATES {
 	STATE_MUMMY_ARMS_CROSSED = 0,

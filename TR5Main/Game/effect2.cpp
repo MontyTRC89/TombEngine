@@ -17,6 +17,7 @@
 #include <Game\bubble.h>
 #include "smoke.h"
 #include "prng.h"
+#include "Renderer11.h"
 using ten::renderer::g_Renderer;
 using ten::Effects::Explosion::TriggerExplosion;
 using namespace ten::Effects::Spark;

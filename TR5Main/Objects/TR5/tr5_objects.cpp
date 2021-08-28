@@ -68,7 +68,7 @@
 /// register objects
 #include "object_helper.h"
 #include "creature.h"
-
+#include "Box.h"
 using namespace TEN::Entities::TR5;
 
 static void StartBaddy(OBJECT_INFO *obj)

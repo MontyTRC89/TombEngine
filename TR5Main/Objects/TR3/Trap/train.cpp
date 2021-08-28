@@ -8,7 +8,8 @@
 #include "camera.h"
 #include "sphere.h"
 #include "lara.h"
-
+#include "collide.h"
+#include "effect.h"
 #define TRAIN_VEL	260
 #define LARA_TRAIN_DEATH_ANIM 3;
 
