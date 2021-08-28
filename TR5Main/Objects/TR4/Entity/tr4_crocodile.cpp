@@ -10,6 +10,8 @@
 #include "draw.h"
 #include "misc.h"
 #include "creature.h"
+#include "collide.h"
+#include "control.h"
 
 enum CROCODILE_STATE
 {

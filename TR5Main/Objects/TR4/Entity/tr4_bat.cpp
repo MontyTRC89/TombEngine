@@ -9,7 +9,7 @@
 #include "setup.h"
 #include "trmath.h"
 #include "creature.h"
-
+#include "effect.h"
 enum BAT_STATE
 {
 	BAT_EMPTY,

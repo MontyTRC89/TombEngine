@@ -12,7 +12,7 @@
 #include <Game/tomb4fx.h>
 #include <Game/Lara/lara_one_gun.h>
 #include "creature.h"
-
+#include "control.h"
 enum SAS_STATES
 {
 	STATE_SAS_EMPTY,

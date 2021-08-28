@@ -1,6 +1,7 @@
 #pragma once
 #include "lara_struct.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
 #define FRONT_ARC ANGLE(90.0f)
 #define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)

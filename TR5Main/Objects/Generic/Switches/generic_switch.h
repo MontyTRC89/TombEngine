@@ -1,8 +1,8 @@
 #pragma once
 
-#include "items.h"
-#include <collide.h>
 
+struct ITEM_INFO;
+struct COLL_INFO;
 namespace TEN::Entities::Switches
 {
 	enum SwitchStatus

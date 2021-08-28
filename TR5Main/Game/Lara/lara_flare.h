@@ -1,6 +1,8 @@
 #pragma once
-#include "items.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
+struct PHD_VECTOR;
 enum GAME_OBJECT_ID : short;
 
 #define FLARE_AGE	30*30	//30 seconds * 30 frames

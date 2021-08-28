@@ -6,7 +6,7 @@
 #include "input.h"
 #include "control.h"
 #include "sound.h"
-
+#include "camera.h"
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;
 ROPE_STRUCT Ropes[12];

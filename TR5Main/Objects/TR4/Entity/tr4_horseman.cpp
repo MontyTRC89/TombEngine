@@ -9,7 +9,7 @@
 #include <lara.h>
 #include <sound.h>
 #include <sphere.h>
-
+#include "box.h"
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };
 BITE_INFO horseBite3 = { 0, 0, 0, 0x13 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "phd_global.h"
 #include "item.h"
-
+#include <vector>
 enum AIObjectType
 {
 	NO_AI = 0x0000,

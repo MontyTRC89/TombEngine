@@ -40,7 +40,8 @@
 #include "rope.h"
 #include <Objects\TR3\Vehicles\rubberboat.h>
 #include <Game\misc.h>
-
+#include "Renderer11.h"
+#include "camera.h"
 using std::function;
 using ten::renderer::g_Renderer;
 

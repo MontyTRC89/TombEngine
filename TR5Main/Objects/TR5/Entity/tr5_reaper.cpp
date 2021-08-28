@@ -6,7 +6,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
-
+#include "control.h"
 void InitialiseReaper(short itemNum)
 {
     ITEM_INFO* item;

@@ -6,7 +6,7 @@
 #include "tomb4fx.h"
 #include "lara.h"
 #include "input.h"
-
+#include "Renderer11.h"
 using namespace ten::renderer;
 int LastSequence;
 int SpotcamTimer;

@@ -5,6 +5,7 @@
 #include "level.h"
 #include "lara.h"
 #include "fish.h"
+#include "control.h"
 
 #define PIRAHNA_DAMAGE 4
 #define X 0

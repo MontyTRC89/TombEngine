@@ -4,7 +4,7 @@
 #include "control.h"
 #include "trmath.h"
 #include "lara.h"
-
+#include "setup.h"
 namespace TEN::Entities::TR4
 {
 	SCARAB_INFO* Scarabs;

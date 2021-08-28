@@ -5,7 +5,8 @@
 #include "level.h"
 #include "lara.h"
 #include "effect.h"
-
+#include "Box.h"
+#include "control.h"
 void ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];

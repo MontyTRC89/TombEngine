@@ -1,10 +1,6 @@
 #pragma once
-#include "box.h"
-#include "collide.h"
-#include "effect.h"
 #include "objectslist.h"
 #include "trmath.h"
-#include "Renderer11.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
@@ -14,6 +10,15 @@
 #define NUM_PICKUPS_PIECES	(ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1)
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
+
+struct CREATURE_INFO;
+struct ITEM_INFO;
+struct FX_INFO;
+
+namespace ten::renderer {
+	struct RendererMesh;
+}
+
 
 #pragma region state_and_animation
 enum LARA_STATE
@@ -980,7 +985,7 @@ struct AnimsNew
 	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
 	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
-struct CREATURE_INFO;
+
 struct LaraInfo
 {
 	short itemNumber;

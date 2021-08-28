@@ -13,6 +13,7 @@
 #include <sound.h>
 #include <draw.h>
 #include "creature.h"
+#include "setup.h"
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
 	short grenadeItemNumber = CreateItem();

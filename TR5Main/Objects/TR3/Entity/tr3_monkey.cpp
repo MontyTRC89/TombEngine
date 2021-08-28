@@ -9,6 +9,7 @@
 #include "level.h"
 #include "creature.h"
 #include "creature.h"
+#include "control.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 

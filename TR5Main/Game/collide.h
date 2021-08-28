@@ -1,14 +1,15 @@
 #pragma once
 #include "phd_global.h"
 #include "level.h"
-
+#include "floordata.h"
+struct ITEM_INFO;
+struct COLL_INFO;
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
 #define MAX_COLLIDED_OBJECTS 1024
-
 struct COLL_FLOOR
 {
 	int floor;

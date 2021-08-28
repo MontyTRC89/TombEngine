@@ -12,6 +12,7 @@
 #include "level.h"
 #include "lara.h"
 #include "creature.h"
+#include "control.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };
