@@ -238,7 +238,7 @@ void ClockworkBeetleControl(short item_number)
 			beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
 			beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
 
-			if (!Lara.ClockworkBeetleFlag)
+			if (!floor->Flags.MarkBeetle)
 				beetle->itemFlags[3] = 1;
 			else
 			{
@@ -329,7 +329,7 @@ void UseClockworkBeetle(short flag)
 			item->pos.yRot = LaraItem->pos.yRot;
 
 			if (Lara.BeetleLife)
-				item->itemFlags[0] = Lara.ClockworkBeetleFlag;
+				item->itemFlags[0] = GetCollisionResult(item).Block->Flags.MarkBeetle;
 			else
 				item->itemFlags[0] = 0;
 
