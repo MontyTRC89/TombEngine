@@ -1025,7 +1025,6 @@ struct LaraInfo
 	bool litTorch;
 	bool isClimbing;
 	bool fired;
-	bool ClockworkBeetleFlag;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
