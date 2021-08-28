@@ -8,8 +8,6 @@
 
 namespace TEN::Entities::Switches
 {
-	PHD_VECTOR CogSwitchPos(0, 0, -856);
-
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 	{
 		-512, 512,
@@ -19,6 +17,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(30), ANGLE(30),
 		-ANGLE(10), ANGLE(10)
 	};
+	PHD_VECTOR CogSwitchPos(0, 0, -856);
 
 	void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
