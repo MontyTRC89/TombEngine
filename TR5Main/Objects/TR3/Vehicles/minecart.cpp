@@ -213,7 +213,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 									if ((frame >= 12) && (frame <= 22))
 									{
 										SoundEffect(220, &item->pos, 2);
-										TestTriggers(item, false, NULL);
+										TestTriggers(item, true, NULL);
 										item->frameNumber++;
 									}
 								}
