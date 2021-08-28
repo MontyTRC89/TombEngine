@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 
-namespace ten::entities::switches
+namespace TEN::Entities::Switches
 {
 	PHD_VECTOR RailSwitchPos = { 0, 0, -550 };
 

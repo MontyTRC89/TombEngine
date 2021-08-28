@@ -6,8 +6,9 @@
 #include "crowbar_switch.h"
 #include "newinv2.h"
 #include "sound.h"
+#include "pickup.h"
 
-namespace ten::entities::switches
+namespace TEN::Entities::Switches
 {
 	PHD_VECTOR CrowbarPos = { -89, 0, -328 }; 
 
@@ -32,8 +33,6 @@ namespace ten::entities::switches
 		-ANGLE(30), ANGLE(30),
 		-ANGLE(10), ANGLE(10)
 	};
-
-	extern PHD_VECTOR OldPickupPos;
 
 	void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
