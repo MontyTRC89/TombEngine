@@ -579,10 +579,9 @@ void InitialiseRubberBoat(short itemNum)
 	RUBBER_BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	
-	binfo = game_malloc<RUBBER_BOAT_INFO>();
-	boat->data = binfo;
-	
+	boat->data = RUBBER_BOAT_INFO();
+
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->tiltAngle = 0;
 	binfo->rightFallspeed = 0;

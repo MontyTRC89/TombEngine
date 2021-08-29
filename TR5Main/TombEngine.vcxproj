@@ -494,7 +494,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\tomb4fx.h" />
     <ClInclude Include="Game\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
-    <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Game\trmath.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\input.h" />
@@ -795,7 +794,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\tomb4fx.cpp" />
     <ClCompile Include="Game\traps.cpp" />
-    <ClCompile Include="Game\memory\malloc.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />

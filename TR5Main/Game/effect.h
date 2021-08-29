@@ -1,5 +1,7 @@
 #pragma once
 #include "phd_global.h"
+constexpr size_t NUM_EFFECTS = 1024;
+
 struct ITEM_INFO;
 
 #define EffectFunction void(ITEM_INFO* item)
@@ -21,7 +23,7 @@ struct FX_INFO
 };
 
 extern std::function<EffectFunction> effect_routines[];
-extern FX_INFO* EffectList;
+extern FX_INFO EffectList[NUM_EFFECTS];
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);

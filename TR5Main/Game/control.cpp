@@ -597,9 +597,6 @@ unsigned CALLBACK GameMain(void *)
 {
 	try {
 		printf("GameMain\n");
-
-		// Initialise legacy memory buffer and game timer
-		init_game_malloc();
 		TIME_Init();
 		if (g_GameFlow->IntroImagePath.empty())
 		{

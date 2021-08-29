@@ -17,7 +17,7 @@ struct BAT_STRUCT
 };
 
 extern int NextBat;
-extern BAT_STRUCT* Bats;
+extern BAT_STRUCT Bats[NUM_BATS];
 
 
 short GetNextBat();

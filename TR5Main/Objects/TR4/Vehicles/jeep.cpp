@@ -381,8 +381,9 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	JEEP_INFO* jeep = game_malloc<JEEP_INFO>();
-	item->data = jeep;
+	JEEP_INFO* jeep;
+	item->data = JEEP_INFO();
+	jeep = item->data;
 
 	jeep->velocity = 0;
 	jeep->revs = 0;
