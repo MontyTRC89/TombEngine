@@ -13,6 +13,7 @@
 #include "generic_switch.h"
 
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
