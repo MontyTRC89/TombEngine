@@ -12,7 +12,7 @@
 #include "lara.h"
 #include "sound.h"
 #include "effect.h"
-#include "creature.h"
+#include "creature_info.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

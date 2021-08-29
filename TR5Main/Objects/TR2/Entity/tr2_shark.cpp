@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 BITE_INFO sharkBite = { 17, -22, 344, 12 };
 

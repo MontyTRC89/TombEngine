@@ -9,7 +9,7 @@
 #include "sphere.h"
 #include "objectslist.h"
 #include "trmath.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 namespace TEN::Entities::TR4

@@ -12,7 +12,7 @@
 #include <tomb4fx.h>
 #include <sound.h>
 #include <draw.h>
-#include "creature.h"
+#include "creature_info.h"
 #include "setup.h"
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {

@@ -6,7 +6,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 static BITE_INFO raptorBite = { 0, 66, 318, 22 };

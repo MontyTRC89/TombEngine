@@ -7,7 +7,7 @@
 #include "misc.h"
 #include "people.h"
 #include "setup.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 #define BIG_RAT_RUN_TURN ANGLE(6.0f)
