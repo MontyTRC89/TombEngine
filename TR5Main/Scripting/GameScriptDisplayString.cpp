@@ -17,11 +17,48 @@ GameScriptDisplayString::GameScriptDisplayString() {
 	m_id = reinterpret_cast<DisplayStringIDType>(this);
 }
 
-std::unique_ptr<GameScriptDisplayString> GameScriptDisplayString::Create(std::string const & key, int x, int y, GameScriptColor col, int flags)
+/*** Create a DisplayString.
+For use in @{Level-specific.ShowString|ShowString} and @{Level-specific.HideString|HideString}.
+@function DisplayString.new
+@tparam string str string to print or key of translated string
+@tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+@tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+@tparam Color color the color of the text
+@tparam table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
+	DisplayStringOption.CENTER -- see x and y parameters
+	DisplayStringOption.SHADOW -- will give the text a small shadow
+__Default: empty__
+@tparam bool translated if false or omitted, the str argument will be printed.
+If true, the str argument will be the key of a translated string specified in
+strings.lua. __Default: false__.
+@return A new DisplayString object.
+*/
+std::unique_ptr<GameScriptDisplayString> GameScriptDisplayString::Create(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
 {
 	auto ptr = std::make_unique<GameScriptDisplayString>();
 	auto id = ptr->m_id;
-	UserDisplayString ds{ key, x, y, col, flags };
+	FlagArray f{};
+	if (std::holds_alternative<sol::table>(flags))
+	{
+		auto tab = std::get<sol::table>(flags);
+		for (auto& e : tab)
+		{
+			auto i = e.second.as<size_t>();
+			f[i] = true;
+		}
+	}
+	else if (!std::holds_alternative<sol::nil_t>(flags))
+	{
+		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.", ScriptReserved_DisplayString);
+	}
+
+	bool translated = false;
+	if (std::holds_alternative<bool>(maybeTranslated))	
+		translated = std::get<bool>(maybeTranslated);
+	else if (!std::holds_alternative<sol::nil_t>(maybeTranslated))
+		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.", ScriptReserved_DisplayString);
+
+	UserDisplayString ds{ key, x, y, col, f, translated};
 
 	s_addItemCallback(id, ds);
 	return ptr;
