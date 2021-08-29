@@ -674,7 +674,7 @@ GAME_STATUS DoTitle(int index)
 			g_GameScript->InitCallbacks();
 			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
-				g_Renderer.drawString(x, y, key.c_str(), col, flags);
+				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 			});
 
 		}
@@ -797,9 +797,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		g_GameScript->InitCallbacks();
 		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.drawString(x, y, key.c_str(), col, flags);
+			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 		});
-
 	}
 
 	// Restore the game?
