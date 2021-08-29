@@ -305,8 +305,8 @@ static int JeepCanGetOff()
 
 	int ceiling = GetCeiling(floor, x, y, z);
 
-	if ((ceiling - item->pos.yPos > -LARA_HITE)
-		|| (height - ceiling < LARA_HITE))
+	if ((ceiling - item->pos.yPos > -LARA_HEIGHT)
+		|| (height - ceiling < LARA_HEIGHT))
 		return 0;
 
 	return 1;
@@ -418,7 +418,6 @@ static int JeepCheckGetOff()
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 			CurrentAtmosphere = 110;
-			IsAtmospherePlaying = true;
 			S_CDPlay(110, 1);
 			return false;
 		}
@@ -1607,7 +1606,6 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			item->flags |= 0x20;
 
 			CurrentAtmosphere = 98;
-			IsAtmospherePlaying = 1;
 			S_CDPlay(98, 1);
 		}
 		else

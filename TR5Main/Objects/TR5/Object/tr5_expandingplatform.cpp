@@ -143,7 +143,7 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 			xShift = lara_coll.radius / 6;
 	}
 	auto coll = lara_coll;
-	GetCollisionInfo(&coll, LaraItem->pos.xPos + xShift, LaraItem->pos.yPos, LaraItem->pos.zPos + zShift, LaraItem->roomNumber, LARA_HITE);
+	GetCollisionInfo(&coll, LaraItem->pos.xPos + xShift, LaraItem->pos.yPos, LaraItem->pos.zPos + zShift, LaraItem->roomNumber, LARA_HEIGHT);
 
 	if (coll.middle.Ceiling >= 0 || coll.hitStatic)
 		return;

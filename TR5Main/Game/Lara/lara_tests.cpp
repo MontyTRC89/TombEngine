@@ -321,7 +321,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	result = 0;
 	if (Lara.climbStatus)
 	{
@@ -796,7 +796,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (coll->middle.Ceiling >= 0 || coll->collType != CT_FRONT || coll->hitStatic)
 		return 0;
@@ -1112,6 +1112,32 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
+bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
+{
+	auto angle1 = ang + ANGLE(15);
+	auto angle2 = ang - ANGLE(15);
+
+	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
+							item->pos.yPos - (LARA_HEIGHT / 2),
+							item->pos.zPos + dist * phd_cos(angle1), 
+							item->roomNumber);
+
+	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
+							item->pos.yPos - (LARA_HEIGHT / 2),
+							item->pos.zPos + dist * phd_cos(angle2),
+							item->roomNumber);
+
+	auto pos  = GAME_VECTOR(item->pos.xPos,
+							item->pos.yPos,
+							item->pos.zPos,
+							item->roomNumber);
+
+	auto result1 = LOS(&pos, &vec1);
+	auto result2 = LOS(&pos, &vec2);
+
+	return (result1 == 0 && result2 == 0);
+}
+
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 {
 	return LaraCollisionFront(item, ang, dist).FloorHeight;
@@ -1120,7 +1146,7 @@ int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
 {
 	int x = item->pos.xPos + dist * phd_sin(ang);
-	int y = item->pos.yPos - 762;
+	int y = item->pos.yPos - LARA_HEIGHT;
 	int z = item->pos.zPos + dist * phd_cos(ang);
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);

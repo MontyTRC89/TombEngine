@@ -668,7 +668,7 @@ static int CanGetOffRubberBoat(int direction)
 	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
 		return 0;
 
-	if ((collResult.CeilingHeight - boat->pos.yPos > -762) || (collResult.FloorHeight - collResult.CeilingHeight < 762))
+	if ((collResult.CeilingHeight - boat->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return 0;
 
 	return 1;

@@ -62,7 +62,6 @@ enum COMMAND_TYPES
 #define OUTSIDE_SIZE 108
 
 extern int KeyTriggerActive;
-extern byte IsAtmospherePlaying;
 extern byte FlipStatus;
 
 constexpr auto MAX_FLIPMAP = 255;
@@ -89,7 +88,6 @@ extern short CurrentRoom;
 extern int GameTimer;
 extern short GlobalCounter;
 extern byte LevelComplete;
-extern short DelCutSeqPlayer;
 #ifndef NEW_INV
 extern int LastInventoryItem;
 #endif
@@ -99,27 +97,21 @@ extern int InitialiseGame;
 extern int RequiredStartPos;
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
-extern int HeavyTriggered;
 extern short SkyPos1;
 extern short SkyPos2;
 extern CVECTOR SkyColor1;
 extern CVECTOR SkyColor2;
 extern int CutSeqNum;
-extern int CutSeqTriggered;
-extern int GlobalPlayingCutscene;
 extern int CurrentLevel;
-extern bool SoundActive;
 extern bool DoTheGame;
 extern bool ThreadEnded;
 extern int OnFloor;
 extern int SmokeWindX;
 extern int SmokeWindZ;
-extern int KillEverythingFlag;
 extern int FlipTimer;
 extern int FlipEffect;
 extern int TriggerTimer;
 extern int JustLoaded;
-extern int PoisonFlags;
 extern int OldLaraBusy;
 extern int Infrared;
 extern short FlashFadeR;
