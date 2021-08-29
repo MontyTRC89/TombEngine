@@ -46,9 +46,11 @@ DisplayStringIDType GameScriptDisplayString::GetID() const
 }
 
 AddItemCallback GameScriptDisplayString::s_addItemCallback = [](DisplayStringIDType, UserDisplayString)
+SetItemCallback GameScriptDisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
 {
-	std::string err = "\"Add string\" callback is not set.";
+	std::string err = "\"Set string\" callback is not set.";
 	throw TENScriptException(err);
+	return false;
 };
 
 // This is called by a destructor (or will be if we forget to assign it during a refactor)
@@ -57,5 +59,13 @@ RemoveItemCallback GameScriptDisplayString::s_removeItemCallback = [](DisplayStr
 {
 	TENLog("\"Remove string\" callback is not set.", LogLevel::Error);
 	std::terminate();
+	return false;
+};
+
+GetItemCallback GameScriptDisplayString::s_getItemCallback = [](DisplayStringIDType)
+{
+	std::string err = "\"Get string\" callback is not set.";
+	throw TENScriptException(err);
+	return std::nullopt;
 };
 
