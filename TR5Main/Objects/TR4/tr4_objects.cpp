@@ -71,6 +71,9 @@
 #include "tr4_enemy_jeep.h"
 #include "creature_info.h"
 #include "Box.h"
+
+using namespace TEN::Entities::TR4;
+
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
@@ -740,8 +743,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_SAS_DYING];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSasDying;
-		obj->control = SasDyingControl;
+		obj->initialise = InitialiseInjuredSas;
+		obj->control = InjuredSasControl;
 		obj->collision = ObjectCollision;
 		obj->hitEffect = HIT_BLOOD;
 		obj->saveFlags = true;
