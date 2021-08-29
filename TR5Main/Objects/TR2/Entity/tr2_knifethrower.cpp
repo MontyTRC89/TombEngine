@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "sound.h"
 #include "creature_info.h"
+#include "floordata.h"
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
 

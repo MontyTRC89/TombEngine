@@ -9,7 +9,7 @@
 #include <lara.h>
 #include <traps.h>
 #include <tomb4fx.h>
-
+#include "tr4_wraith_info.h"
 constexpr auto WRAITH_COUNT = 8;
 
 short WraithSpeed = 64;

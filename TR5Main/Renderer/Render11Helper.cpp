@@ -223,91 +223,76 @@ namespace ten::renderer
 			{
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
-
-				if (item->objectNumber == ID_QUAD)
-				{
-					QUAD_INFO* quad = (QUAD_INFO*)item->data;
-					if (j == 3 || j == 4) {
-						currentBone->ExtraRotation.x = TO_RAD(quad->rearRot);
+				auto& data = item->data.get();
+				std::visit(overload{
+					[&j,&currentBone](QUAD_INFO& quad) {
+					if(j == 3 || j == 4) {
+						currentBone->ExtraRotation.x = TO_RAD(quad.rearRot);
+					} else if(j == 6 || j == 7) {
+						currentBone->ExtraRotation.x = TO_RAD(quad.frontRot);
 					}
-					else if (j == 6 || j == 7) {
-						currentBone->ExtraRotation.x = TO_RAD(quad->frontRot);
-					}
-				}
-				else if (item->objectNumber == ID_JEEP) {
-					JEEP_INFO* jeep = (JEEP_INFO*)item->data;
-					switch (j) {
+				},
+					[&j,&currentBone](JEEP_INFO& jeep) {
+					switch(j) {
 					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot1);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
 						break;
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot2);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
 
 						break;
 					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot3);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
 
 						break;
 					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot4);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
 
 						break;
 					}
-				}
-				else if (item->objectNumber == ID_MOTORBIKE) {
-					MOTORBIKE_INFO* bike = (MOTORBIKE_INFO*)item->data;
-					switch (j) {
+				},
+					[&j,&currentBone](MOTORBIKE_INFO& bike) {
+					switch(j) {
 					case 2:
 					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike->wheelRight);
+						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
 						break;
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(bike->wheelLeft);
+						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
 					}
-				}
-				else if (item->objectNumber == ID_RUBBER_BOAT)
-				{
-					RUBBER_BOAT_INFO* boat = (RUBBER_BOAT_INFO*)item->data;
-					if (j == 2)
-						currentBone->ExtraRotation.z = TO_RAD(boat->propRot);
-				}
-				else if (item->objectNumber == ID_UPV)
-				{
-					SUB_INFO* upv = (SUB_INFO*)item->data;
-					if (j == 3)
-						currentBone->ExtraRotation.z = TO_RAD(upv->FanRot);
-				}
-				else if (item->objectNumber == ID_BIGGUN)
-				{
-					BIGGUNINFO* biggun = (BIGGUNINFO*)item->data;
-					if (j == 2)
-						currentBone->ExtraRotation.z = biggun->barrelZ;
-				}
-				else
-				{
-					CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-					if (creature != NULL)
-					{
-						if (currentBone->ExtraRotationFlags & ROT_Y)
-						{
-							currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_X)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_Z)
-						{
-							currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
+				},
+					[&j,&currentBone](RUBBER_BOAT_INFO& boat) {
+					if(j == 2)
+						currentBone->ExtraRotation.z = TO_RAD(boat.propRot);
+				},
+					[&j, &currentBone](SUB_INFO& upv) {
+					if(j == 3)
+						currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
+				},
+					[&j, &currentBone](BIGGUNINFO& biggun) {
+					if(j == 2)
+						currentBone->ExtraRotation.z = biggun.barrelZ;
+				},
+					[&j,&currentBone,&lastJoint](CREATURE_INFO& creature) {
+					if(currentBone->ExtraRotationFlags & ROT_Y) {
+						currentBone->ExtraRotation.y = TO_RAD(creature.jointRotation[lastJoint]);
+						lastJoint++;
 					}
-				} 
+
+					if(currentBone->ExtraRotationFlags & ROT_X) {
+						currentBone->ExtraRotation.x = TO_RAD(creature.jointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if(currentBone->ExtraRotationFlags & ROT_Z) {
+						currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
+						lastJoint++;
+					}
+				},
+						   [](auto&) {},
+					}, data
+				);
+				
 			}
 
 			ANIM_FRAME* framePtr[2];
@@ -331,7 +316,6 @@ namespace ten::renderer
 		{
 			RendererItem *itemToDraw = view.itemsToDraw[i];
 			ITEM_INFO *item = itemToDraw->Item;
-			CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
 			// Lara has her own routine
 			if (item->objectNumber == ID_LARA)

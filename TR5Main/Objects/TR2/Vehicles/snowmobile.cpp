@@ -79,9 +79,8 @@ enum SKIDOO_STATE
 void InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo = &g_Level.Items[itemNum];
-
-	SKIDOO_INFO* skinfo = game_malloc<SKIDOO_INFO>();
-	skidoo->data = (void*)skinfo;
+	skidoo->data = ITEM_DATA(ITEM_DATA_TYPE<SKIDOO_INFO>());
+	SKIDOO_INFO* skinfo = skidoo->data;
 	
 	skinfo->alreadyCdPlayed = false;
 

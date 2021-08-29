@@ -13,7 +13,7 @@ void ClearItem(short itemNum)
 	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 	item->collidable = true;
-	item->data = NULL;
+	item->data = nullptr;
 	item->drawRoom = (((item->pos.zPos - room->z) / SECTOR(1)) & 0xFF) | ((((item->pos.xPos - room->x) / SECTOR(1)) & 0xFF) * 256);
 	item->TOSSPAD = item->pos.yRot & 0xE000;
 	item->itemFlags[2] = item->roomNumber | ((item->pos.yPos - room->minfloor) & 0xFF00);
