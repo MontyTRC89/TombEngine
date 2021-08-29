@@ -19,6 +19,7 @@ public:
 	GameScriptColor(byte r, byte g, byte b, byte a);
 	GameScriptColor(Vector3 const &);
 	GameScriptColor(Vector4 const &);
+	GameScriptColor(D3DCOLOR);
 
 	operator Vector3() const;
 	operator Vector4() const;

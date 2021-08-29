@@ -13,6 +13,7 @@ void GameScriptColor::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptColor>("Color",
 		sol::constructors<GameScriptColor(byte, byte, byte), GameScriptColor(byte, byte, byte, byte)>(),
+		sol::meta_function::to_string, &GameScriptColor::ToString,
 
 /// (int) red component
 //@mem r
@@ -63,6 +64,17 @@ GameScriptColor::GameScriptColor(Vector3 const& col) : GameScriptColor{ col.x, c
 
 GameScriptColor::GameScriptColor(Vector4 const& col) : GameScriptColor{ col.x, col.y, col.z, col.w } {}
 
+GameScriptColor::GameScriptColor(D3DCOLOR col)
+{
+	b = col & 0xFF;
+	col >>= 8;
+	g = col & 0xFF;
+	col >>= 8;
+	r = col & 0xFF;
+	col >>= 8;
+	a = col & 0xFF;
+}
+
 GameScriptColor::operator Vector3() const
 {
 	return Vector3{ float(r), float(g), float(b) };
@@ -73,16 +85,16 @@ GameScriptColor::operator Vector4() const
 	return Vector4{ float(r), float(g), float(b), float(a) };
 }
 
-// D3DCOLOR is 32 bits and is layed out as RGBA.
+// D3DCOLOR is 32 bits and is layed out as ARGB.
 GameScriptColor::operator D3DCOLOR() const
 {	
 	D3DCOLOR col = a;
 	col <<= 8;
-	col += b;
+	col += r;
 	col <<= 8;
 	col += g;
 	col <<= 8;
-	col += r;
+	col += b;
 
 	return col;
 }
