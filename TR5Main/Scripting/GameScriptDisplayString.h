@@ -96,5 +96,5 @@ public:
 		s_getItemCallback = cbg;
 	}
 
-	static std::unique_ptr<GameScriptDisplayString> Create(std::string const& key, int x, int y, GameScriptColor col, int flags);
+	static std::unique_ptr<GameScriptDisplayString> Create(std::string const& key, int x, int y, GameScriptColor col, TypeOrNil<sol::table>, TypeOrNil<bool>);
 };
