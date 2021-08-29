@@ -110,7 +110,7 @@ void ScubaControl(short itemNumber)
 			start.roomNumber = item->roomNumber;
 
 			target.x = LaraItem->pos.xPos;
-			target.y = LaraItem->pos.yPos - (LARA_HITE - 150);
+			target.y = LaraItem->pos.yPos - (LARA_HEIGHT - 150);
 			target.z = LaraItem->pos.zPos;
 
 			shoot = LOS(&start, &target);

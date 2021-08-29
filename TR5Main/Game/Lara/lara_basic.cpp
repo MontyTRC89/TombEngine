@@ -28,7 +28,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 }
 
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
@@ -132,7 +132,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	coll->lavaIsPit = 1;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -308,7 +308,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesAreWalls = true;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -429,7 +429,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LSTEP)
 		{
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
 			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
 				item->goalAnimState = LS_STEP_LEFT;
@@ -437,7 +437,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_RSTEP)
 		{
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HITE);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
 			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
 				item->goalAnimState = LS_STEP_RIGHT;
@@ -488,7 +488,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 				coll->radius = LARA_RAD + 2;
 				coll->facing = Lara.moveAngle;
 
-				GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+				GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 				if (TestLaraVault(item, coll))
 					return;
 
@@ -510,7 +510,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_FORWARD)
 		{
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HITE);
+			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
 
 			if ((collFloorResult.HeightType == BIG_SLOPE || collFloorResult.HeightType == DIAGONAL) && (collFloorResult.FloorHeight < 0 || collCeilingResult.CeilingHeight > 0))
 			{
@@ -550,7 +550,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -629,7 +629,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
@@ -710,7 +710,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{
@@ -799,7 +799,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesAreWalls = true;
 	coll->slopesArePits = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 #if 1
 	if (coll->middle.Floor > 100)
@@ -916,7 +916,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 400;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	ShiftItem(item, coll);
 
 	item->hitPoints = -1;
@@ -946,7 +946,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraSlideEdgeJump(item, coll);
 
 	if (coll->middle.Floor <= 0)
@@ -996,7 +996,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	short angle;
 	bool result = false;
@@ -1049,7 +1049,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		LaraSlideEdgeJump(item, coll);
 		coll->facing = Lara.moveAngle;
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 		ShiftItem(item, coll);
 
 		if (item->fallspeed > 0 && coll->middle.Floor <= 0)
@@ -1164,7 +1164,7 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	ShiftItem(item, coll);
 
 	if (coll->middle.Floor >= -256 && coll->middle.Floor <= 256)
@@ -1184,22 +1184,22 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_compress*/
 	if (Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_FORWARD && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
+		if (TrInput & IN_FORWARD && !LaraFacingCorner(item, item->pos.yRot, 256) && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
 			Lara.moveAngle = item->pos.yRot;
 		}
-		else if (TrInput & IN_LEFT && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
+		else if (TrInput & IN_LEFT && !LaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_LEFT;
 			Lara.moveAngle = item->pos.yRot - ANGLE(90);
 		}
-		else if (TrInput & IN_RIGHT && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
+		else if (TrInput & IN_RIGHT && !LaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_RIGHT;
 			Lara.moveAngle = item->pos.yRot + ANGLE(90);
 		}
-		else if (TrInput & IN_BACK && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
+		else if (TrInput & IN_BACK && !LaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
 			Lara.moveAngle = item->pos.yRot + ANGLE(180);
@@ -1222,7 +1222,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraFallen(item, coll))
 	{
@@ -1296,7 +1296,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1418,7 +1418,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{
@@ -1487,7 +1487,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1588,7 +1588,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 	coll->facing = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->fallspeed > 0 && coll->middle.Floor <= 0)
@@ -1803,7 +1803,7 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->fallspeed > 0 && coll->middle.Floor <= 0)
@@ -1837,7 +1837,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1881,7 +1881,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (coll->middle.Floor <= 0 && item->fallspeed > 0)
@@ -1917,7 +1917,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = BAD_JUMP_CEILING;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (coll->middle.Floor <= 0 && item->fallspeed > 0)
@@ -2069,7 +2069,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesAreWalls = true;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -2189,7 +2189,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesAreWalls = true;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -2265,7 +2265,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->slopesAreWalls = true;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (!LaraFallen(item, coll))

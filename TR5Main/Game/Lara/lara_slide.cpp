@@ -65,7 +65,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{

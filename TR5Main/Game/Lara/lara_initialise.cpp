@@ -34,7 +34,6 @@ void InitialiseLara(int restore)
 	Lara.air = 1800;
 	Lara.weaponItem = NO_ITEM;
 	PoisonFlag = 0;
-	Lara.dpoisoned = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
 	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present) {

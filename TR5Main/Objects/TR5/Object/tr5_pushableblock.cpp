@@ -737,7 +737,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	roomNum = LaraItem->roomNumber;
 
-	collResult = GetCollisionResult(x, y - LARA_HITE, z, LaraItem->roomNumber);
+	collResult = GetCollisionResult(x, y - LARA_HEIGHT, z, LaraItem->roomNumber);
 
 	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
@@ -746,7 +746,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (collResult.FloorHeight != y)
 		return 0;
 
-	if (collResult.Block->ceiling * 256 > y - LARA_HITE)
+	if (collResult.Block->ceiling * 256 > y - LARA_HEIGHT)
 		return 0;
 
 	oldX = LaraItem->pos.xPos;

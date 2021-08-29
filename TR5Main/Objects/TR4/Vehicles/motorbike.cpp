@@ -976,9 +976,9 @@ static BOOL MotorbikeCanGetOff(void)
         return false;
     if (abs(collResult.FloorHeight - item->pos.yPos) > STEP_SIZE)
         return false;
-    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HITE)
+    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HEIGHT)
         return false;
-    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HITE)
+    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HEIGHT)
         return false;
 
     return true;

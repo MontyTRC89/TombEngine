@@ -314,7 +314,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yPos += frontFloor - 5;
 
-	UpdateLaraRoom(item, -LARA_HITE / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	/*if (coll->middle.SplitFloor)
 	{

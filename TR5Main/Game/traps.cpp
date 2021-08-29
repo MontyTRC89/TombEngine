@@ -565,15 +565,8 @@ void WreckingBallControl(short itemNumber)
 	}
 	if (item->itemFlags[2] < 900)
 		++item->itemFlags[2];
-	if (GlobalPlayingCutscene)
-	{
-		room = item->roomNumber;
-		item->goalAnimState = 0;
-		item->pos.xPos = 47616;
-		item->pos.zPos = 34816;
-		item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1664;
-	}
-	else if (item->itemFlags[1] <= 0)
+
+	if (item->itemFlags[1] <= 0)
 	{
 		oldX = item->pos.xPos;
 		oldZ = item->pos.zPos;
