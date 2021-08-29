@@ -400,8 +400,9 @@ To be used with @{DisplayString:GetPos}.
 
 	GameScriptDisplayString::Register(m_lua);
 	GameScriptDisplayString::SetCallbacks(
-		[this](auto && ... param) {return AddDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); }
+		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
 		);
 	GameScriptPosition::Register(m_lua);
 
@@ -441,6 +442,14 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	return true;
 }
 
+std::optional<std::reference_wrapper<UserDisplayString>> GameScript::GetDisplayString(DisplayStringIDType id)
+{
+	auto it = m_userDisplayStrings.find(id);
+	if (std::cend(m_userDisplayStrings) == it)
+		return std::nullopt;
+	return std::ref(m_userDisplayStrings.at(id));
+}
+
 bool GameScript::ScheduleRemoveDisplayString(DisplayStringIDType id)
 {
 	auto it = m_userDisplayStrings.find(id);
@@ -451,9 +460,9 @@ bool GameScript::ScheduleRemoveDisplayString(DisplayStringIDType id)
 	return true;
 }
 
-bool GameScript::AddDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
+bool GameScript::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
 {
-	return m_userDisplayStrings.insert(std::make_pair(id, ds)).second;
+	return m_userDisplayStrings.insert_or_assign(id, ds).second;
 }
 
 
