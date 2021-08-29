@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseBaddy(short itemNum);
-void BaddyControl(short itemNum);
+namespace TEN::Entities::TR4
+{
+	void InitialiseBaddy(short itemNum);
+	void BaddyControl(short itemNum);
+}
