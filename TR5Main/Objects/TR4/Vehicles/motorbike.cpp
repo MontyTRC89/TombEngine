@@ -22,6 +22,7 @@
 #include "prng.h"
 #include "Box.h"
 #include "effect.h"
+#include "motorbike_info.h"
 using namespace ten::Math::Random;
 
 /*collision stuff*/

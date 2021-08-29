@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
+#include "minecart_info.h"
 using std::vector;
 enum MINECART_STATE {
 	CART_GETIN,

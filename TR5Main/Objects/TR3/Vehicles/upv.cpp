@@ -18,7 +18,7 @@
 #include "input.h"
 #include "savegame.h"
 #include "sound.h"
-
+#include "upv_info.h"
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
 #define	UPV_DIVE 4

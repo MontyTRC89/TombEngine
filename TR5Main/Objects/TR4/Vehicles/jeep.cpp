@@ -20,6 +20,7 @@
 #include "setup.h"
 #include "level.h"
 #include "Box.h"
+#include "jeep_info.h"
 using std::vector;
 
 

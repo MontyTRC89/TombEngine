@@ -18,7 +18,12 @@
 #include "motorbike.h"
 #include <algorithm>
 #include "creature_info.h"
-
+#include "quad_info.h"
+#include "jeep_info.h"
+#include "motorbike_info.h"
+#include "rubberboat_info.h"
+#include "upv_info.h"
+#include "biggun_info.h"
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
 
