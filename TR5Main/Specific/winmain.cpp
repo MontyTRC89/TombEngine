@@ -173,7 +173,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Initialise the new scripting system
 	sol::state luaState;
-	luaState.open_libraries(sol::lib::base);
+	luaState.open_libraries(sol::lib::base, sol::lib::math);
 	luaState.set_exception_handler(lua_exception_handler);
 
 	try {
