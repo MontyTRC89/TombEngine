@@ -206,7 +206,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.
-	if (distance > radius && false)
+	if (distance > radius)
 		return 0;
 
 	// Set and randomize volume (if needed)
