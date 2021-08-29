@@ -1,19 +1,39 @@
 #include "framework.h"
 #include "GameScriptDisplayString.h"
+#include "ScriptAssert.h"
+#include "ReservedScriptNames.h"
 
-UserDisplayString::UserDisplayString(std::string const& key, int x, int y, D3DCOLOR col, int flags) :
+/*** A string appearing on the screen.
+Can be used for subtitles and "2001, somewhere in Egypt"-style messages.
+
+Uses screen-space coordinates, with x values specifying the number of pixels from the left of the window,
+and y values specifying the number of pixels from the top of the window.
+
+Since different players will have different resolutions, you should work in terms of percentages where possible,
+and use @{Level-specific.ScreenToPercent|ScreenToPercent} and @{Level-specific.PercentToScreen|PercentToScreen}
+when you need to use screen-space coordinates.
+
+@miscclass DisplayString
+@pragma nostrip
+*/
+
+UserDisplayString::UserDisplayString(std::string const& key, int x, int y, D3DCOLOR col, FlagArray const & flags, bool translated) :
 	m_key{ key },
 	m_x{ x },
 	m_y{ y },
 	m_color{ col },
-	m_flags{ flags }
+	m_flags{ flags },
+	m_isTranslated{ translated }
 {
 }
 
 GameScriptDisplayString::GameScriptDisplayString() {
 	// We don't ever dereference this pointer; it's just
-	// a handy way to get a most-likely-unique key
-	// for a hash map.
+	// a handy way to get a unique key for a hash map.
+
+	//TODO Make sure to reset this when loading a save,
+	//TODO because this key will have a chance to no longer
+	//TODO be unique. -- squidshire, 28/08/2021
 	m_id = reinterpret_cast<DisplayStringIDType>(this);
 }
 
@@ -73,8 +93,32 @@ void GameScriptDisplayString::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptDisplayString>(
 		"DisplayString",
-		"new", sol::factories(&GameScriptDisplayString::Create)
-		);
+		"new", &GameScriptDisplayString::Create,
+
+		/// (@{Color}) RBG color
+		// @mem col
+		"col", sol::property(&GameScriptDisplayString::GetCol, &GameScriptDisplayString::SetCol),
+
+		/// (string) String key to use. If `translated` is true when @{DisplayString.new}
+		// is called, this will be the string key for the translation that will be displayed.
+		// If false or omitted, this will be the string that's displayed.
+		// @mem key
+		"key", sol::property(&GameScriptDisplayString::SetKey, &GameScriptDisplayString::GetKey),
+
+		/// Set the position of the string.
+		// Screen-space coordinates are expected.
+		// @function DisplayString:SetPos
+		// @tparam int x x-coordinate of the string
+		// @tparam int y y-coordinate of the string
+		"SetPos", &GameScriptDisplayString::SetPos,
+
+		/// Get the position of the string.
+		// Screen-space coordinates are returned.
+		// @function DisplayString:GetPos
+		// @treturn int x x-coordinate of the string
+		// @treturn int y y-coordinate of the string
+		"GetPos", &GameScriptDisplayString::GetPos
+	);
 }
 
 DisplayStringIDType GameScriptDisplayString::GetID() const
@@ -82,7 +126,46 @@ DisplayStringIDType GameScriptDisplayString::GetID() const
 	return m_id;
 }
 
-AddItemCallback GameScriptDisplayString::s_addItemCallback = [](DisplayStringIDType, UserDisplayString)
+void GameScriptDisplayString::SetPos(int x, int y)
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	s.m_x = x;
+	s.m_y = y;
+}
+
+std::tuple<int, int> GameScriptDisplayString::GetPos() const
+{	
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	return std::make_tuple(s.m_x, s.m_y);
+}
+	
+void GameScriptDisplayString::SetCol(GameScriptColor const & col)
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	s.m_color = col;
+	//todo maybe change getItemCallback to return a ref instead? or move its
+	//todo UserDisplayString object? and then move back?
+	//s_addItemCallback(m_id, s);
+}
+
+GameScriptColor GameScriptDisplayString::GetCol() 
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	return s.m_color;
+}
+
+void GameScriptDisplayString::SetKey(std::string const & key)
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	s.m_key = key;
+}
+
+std::string GameScriptDisplayString::GetKey() const
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	return s.m_key;
+}
+
 SetItemCallback GameScriptDisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
 {
 	std::string err = "\"Set string\" callback is not set.";
