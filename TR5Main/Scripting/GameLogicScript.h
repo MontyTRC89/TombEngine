@@ -120,7 +120,6 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								ResetVariables();
 
-	void								PrintString(std::string const& key, int x, int y, GameScriptColor color, int lifetime, int flags);
 	void								SetCallbackDrawString(CallbackDrawString cb);
 
 	void								ShowString(GameScriptDisplayString const&, sol::optional<float> nSeconds);
