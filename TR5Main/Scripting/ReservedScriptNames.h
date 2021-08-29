@@ -7,6 +7,7 @@ static constexpr char const ScriptReserved_CameraInfo[]			= "CameraInfo";
 static constexpr char const ScriptReserved_SinkInfo[]			= "SinkInfo";
 static constexpr char const ScriptReserved_SoundSourceInfo[]	= "SoundSourceInfo";
 static constexpr char const ScriptReserved_AIObject[]			= "AIObject";
+static constexpr char const ScriptReserved_DisplayString[]		= "DisplayString";
 
 // Functions
 static constexpr char const ScriptReserved_ShowString[]			= "ShowString";
