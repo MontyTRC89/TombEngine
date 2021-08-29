@@ -22,6 +22,7 @@
 #include "pickup.h"
 #include "fullblock_switch.h"
 #include "creature_info.h"
+#include "door_data.h"
 using namespace TEN::Entities::Switches;
 
 PHD_VECTOR DoubleDoorPos(0, 0, 220);

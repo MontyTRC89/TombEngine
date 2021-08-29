@@ -16,6 +16,7 @@
 #include "input.h"
 #include "sound.h"
 #include "prng.h"
+#include "quad_info.h"
 using std::vector;
 using namespace ten::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
