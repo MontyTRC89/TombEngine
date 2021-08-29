@@ -357,6 +357,7 @@ To be used with @{DisplayString:GetPos}.
 */
 	m_lua->set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
+	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();
 
@@ -626,9 +627,18 @@ void GameScript::ProcessDisplayStrings(float dt)
 		{
 			if (!endOfLife || str.m_isInfinite)
 			{
-				m_callbackDrawSring(g_GameFlow->GetString(str.m_key.c_str()), str.m_color, str.m_x, str.m_y, str.m_flags);
-				if (!endOfLife)
-					str.m_timeRemaining -= dt;
+				char const* cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
+				int flags = 0;
+
+				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])
+					flags |= PRINTSTRING_CENTER;
+
+				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
+					flags |= PRINTSTRING_OUTLINE;
+
+				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
+
+				str.m_timeRemaining -= dt;
 			}
 			++it;
 		}
