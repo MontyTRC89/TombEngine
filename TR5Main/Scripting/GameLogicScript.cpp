@@ -603,12 +603,6 @@ void GameScript::ResetVariables()
 	(*m_lua)["Lara"] = NULL;
 }
 
-// Misc
-void GameScript::PrintString(std::string const & str, int x, int y, GameScriptColor color, int lifetime, int flags)
-{
-	ten::renderer::g_Renderer.drawString(x, y, str.c_str(), color, flags);
-}
-
 void GameScript::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
