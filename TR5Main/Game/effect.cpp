@@ -27,7 +27,7 @@ constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 using namespace ten::Effects::Footprints;
 
 short FXType;
-FX_INFO* EffectList;
+FX_INFO EffectList[NUM_EFFECTS];
 
 function<EffectFunction> effect_routines[59] =
 {

@@ -273,8 +273,6 @@ short CreateNewEffect(short roomNum)
 
 void InitialiseFXArray(int allocmem)
 {
-	if (allocmem)
-		EffectList = game_malloc<FX_INFO>(NUM_EFFECTS);
 
 	FX_INFO* fx;
 
@@ -385,7 +383,7 @@ void InitialiseItem(short itemNum)
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
-	item->data = NULL;
+	item->data = std::nullptr_t();
 	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)

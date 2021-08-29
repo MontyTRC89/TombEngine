@@ -44,7 +44,6 @@ constexpr auto NO_ITEM = -1;
 constexpr auto ALL_MESHBITS = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 #define NUM_ITEMS 1024
-#define NUM_EFFECTS 1024
 
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNum, short roomNumber);

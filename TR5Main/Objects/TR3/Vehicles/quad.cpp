@@ -1129,8 +1129,8 @@ void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	item->data = game_malloc<QUAD_INFO>();
-	QUAD_INFO* quad = (QUAD_INFO *)item->data;
+	item->data = QUAD_INFO();
+	QUAD_INFO* quad = item->data;
 
 	quad->velocity = 0;
 

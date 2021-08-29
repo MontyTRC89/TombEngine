@@ -9,7 +9,7 @@
 #include "lara.h"
 
 int NextSpider;
-SPIDER_STRUCT* Spiders;
+SPIDER_STRUCT Spiders[NUM_SPIDERS];
 
 short GetNextSpider()
 {

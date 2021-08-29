@@ -146,8 +146,8 @@ void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->data = game_malloc<LASER_HEAD_INFO>();
-	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
+	item->data = LASER_HEAD_INFO();
+	LASER_HEAD_INFO* info = item->data;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
