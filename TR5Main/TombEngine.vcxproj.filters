@@ -780,9 +780,6 @@
     <ClInclude Include="Game\memory\qmalloc.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\memory\malloc.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1785,9 +1782,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\RenderView\RenderView.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\memory\malloc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\Lara\lara.cpp">

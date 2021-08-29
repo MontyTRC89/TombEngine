@@ -724,10 +724,9 @@ void InitialiseDoor(short itemNumber)
 
 	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 		item->itemFlags[0] = 4096;
+	item->data = DOOR_DATA();
+	DOOR_DATA* door = item->data;
 
-	DOOR_DATA * door = game_malloc<DOOR_DATA>();
-
-	item->data = door;
 	door->opened = false;
 	door->dptr1 = NULL;
 	door->dptr2 = NULL;

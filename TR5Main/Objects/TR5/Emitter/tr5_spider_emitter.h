@@ -14,7 +14,7 @@ struct SPIDER_STRUCT
 };
 
 extern int NextSpider;
-extern SPIDER_STRUCT* Spiders;
+extern SPIDER_STRUCT Spiders[NUM_SPIDERS];
 
 short GetNextSpider();
 void ClearSpiders();

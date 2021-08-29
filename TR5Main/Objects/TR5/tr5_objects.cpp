@@ -1315,12 +1315,7 @@ void InitialiseTR5Objects()
 
 void AllocTR5Objects()
 {
-	Bats = game_malloc<BAT_STRUCT>(NUM_BATS);
 	ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
-
-	Spiders = game_malloc<SPIDER_STRUCT>(NUM_SPIDERS);
 	ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
-
-	Rats = game_malloc<RAT_STRUCT>(NUM_RATS);
 	ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
 }

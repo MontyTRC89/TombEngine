@@ -46,6 +46,7 @@ class ITEM_DATA {
 		float,
 		double,
 		long double,
+		std::array<short, 4>,
 		ITEM_INFO*,
 		CREATURE_INFO,
 		LASER_HEAD_INFO,
