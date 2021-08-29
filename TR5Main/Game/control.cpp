@@ -52,7 +52,7 @@
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
 #include "generic_switch.h"
-#include "creature.h"
+#include "creature_info.h"
 using namespace TEN::Entities::Switches;
 
 using std::vector;

@@ -11,7 +11,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 
 #define	STATE_GUIDE_STOP				1
 #define	STATE_GUIDE_WALK				2

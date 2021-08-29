@@ -33,7 +33,7 @@
 
 #include "generic_switch.h"
 #include "fullblock_switch.h"
-#include "creature.h"
+#include "creature_info.h"
 
 using namespace TEN::Entities::Switches;
 

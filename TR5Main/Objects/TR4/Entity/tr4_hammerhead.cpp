@@ -9,7 +9,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "misc.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 #define STATE_HAMMERHEAD_STOP       0

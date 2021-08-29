@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "draw.h"
-#include "creature.h"
+#include "creature_info.h"
 using std::vector;
 short GF(short animIndex, short frameToStart)
 {

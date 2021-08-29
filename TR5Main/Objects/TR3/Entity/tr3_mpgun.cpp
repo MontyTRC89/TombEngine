@@ -10,7 +10,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 
 enum MPGUN_STATES
 {

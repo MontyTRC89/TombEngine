@@ -10,7 +10,7 @@
 #include <sound.h>
 #include <sphere.h>
 #include <people.h>
-#include "creature.h"
+#include "creature_info.h"
 #include "effect.h"
 BITE_INFO BitBeetleBite = { 0,0,0,12 };
 

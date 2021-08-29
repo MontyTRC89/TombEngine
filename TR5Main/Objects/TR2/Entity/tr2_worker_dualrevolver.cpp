@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "creature.h"
+#include "creature_info.h"
 
 BITE_INFO workerDualGunL = { -2, 275, 23, 6 };
 BITE_INFO workerDualGunR = { 2, 275, 23, 10 };

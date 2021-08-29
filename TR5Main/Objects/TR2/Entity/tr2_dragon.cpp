@@ -12,7 +12,7 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
