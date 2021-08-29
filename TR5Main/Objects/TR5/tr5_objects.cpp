@@ -67,7 +67,7 @@
 #include "level.h"
 /// register objects
 #include "object_helper.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "Box.h"
 using namespace TEN::Entities::TR5;
 

@@ -19,7 +19,7 @@
 #include "savegame.h"
 #include "GameFlowScript.h"
 #include "lara_struct.h"
-#include "creature.h"
+#include "creature_info.h"
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */

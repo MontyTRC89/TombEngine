@@ -5,7 +5,7 @@
 #include "effect.h"
 #include "setup.h"
 #include "level.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO ratBite = { 0, 0, 57, 2 };

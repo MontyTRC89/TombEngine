@@ -1083,7 +1083,7 @@
     <ClInclude Include="Game\itemdata\itemdata.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\itemdata\creature.h">
+    <ClInclude Include="Game\itemdata\creature_info.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\item.h">

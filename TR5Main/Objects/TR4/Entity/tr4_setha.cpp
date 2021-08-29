@@ -10,7 +10,7 @@
 #include <sound.h>
 #include <sphere.h>
 #include <people.h>
-#include "creature.h"
+#include "creature_info.h"
 #include "effect.h"
 BITE_INFO SethaBite1 = { 0,220,50,17 };
 BITE_INFO SethaBite2 = { 0,220,50,13 };

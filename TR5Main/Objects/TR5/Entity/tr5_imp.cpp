@@ -9,7 +9,7 @@
 #include "box.h"
 #include "setup.h"
 #include "level.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 #define STATE_IMP_WALK			0

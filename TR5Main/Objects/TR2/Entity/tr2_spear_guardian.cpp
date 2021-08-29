@@ -7,7 +7,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };

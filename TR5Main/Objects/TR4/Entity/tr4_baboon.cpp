@@ -7,7 +7,7 @@
 #include "misc.h"
 #include "Lara.h"
 #include "tomb4fx.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "effect.h"
 using std::vector;
 BaboonRespawnClass BaboonRespawn;

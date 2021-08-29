@@ -13,7 +13,7 @@
 #include "people.h"
 #include "items.h"
 #include "lot.h"
-#include "creature.h"
+#include "creature_info.h"
 
 enum AHMET_STATE
 {

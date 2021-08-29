@@ -11,7 +11,7 @@
 #include "level.h"
 #include <draw.h>
 #include <Game/lot.h>
-#include "creature.h"
+#include "creature_info.h"
 #include "control.h"
 
 /*

@@ -5,7 +5,7 @@
 #include "camera.h"
 #include "lara.h"
 #include "level.h"
-#include "creature.h"
+#include "creature_info.h"
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 

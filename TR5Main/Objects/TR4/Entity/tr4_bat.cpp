@@ -8,7 +8,7 @@
 #include "lot.h"
 #include "setup.h"
 #include "trmath.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "effect.h"
 enum BAT_STATE
 {

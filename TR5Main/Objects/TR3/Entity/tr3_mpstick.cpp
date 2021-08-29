@@ -9,7 +9,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };

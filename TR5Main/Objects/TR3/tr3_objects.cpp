@@ -33,7 +33,7 @@
 #include "collide.h"
 #include "setup.h"
 #include "level.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "Box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {

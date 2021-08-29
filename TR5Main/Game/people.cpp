@@ -8,7 +8,7 @@
 #include "debris.h"
 #include "lara.h"
 #include "sound.h"
-#include "creature.h"
+#include "creature_info.h"
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;

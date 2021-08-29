@@ -69,7 +69,7 @@
 #include "setup.h"
 #include "level.h"
 #include "tr4_enemy_jeep.h"
-#include "creature.h"
+#include "creature_info.h"
 #include "Box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {
