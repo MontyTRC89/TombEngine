@@ -12,7 +12,7 @@
 #include "setup.h"
 #include "input.h"
 #include "control.h"
-
+#include "kayak_info.h"
 using std::vector;
 
 #define KAYAK_COLLIDE			64

@@ -9,23 +9,9 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-#include <Game\effect2.h>
-#include <Game\particle\SimpleParticle.h>
-
-
-
-struct BOAT_INFO
-{
-	int boatTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	int water;
-	int pitch;
-	short tiltAngle;
-	short extraRotation;
-	short propRot;
-};
-
+#include "effect2.h"
+#include "particle/SimpleParticle.h"
+#include "boat_info.h"
 enum BOAT_STATE
 {
 	STATE_BOAT_GETON,

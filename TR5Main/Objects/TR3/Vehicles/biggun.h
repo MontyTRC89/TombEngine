@@ -1,14 +1,7 @@
 #pragma once
 struct COLL_INFO;
 struct ITEM_INFO;
-typedef struct {
-	short xRot;
-	short yRot;
-	short startYRot;
-	char flags;
-	int fireCount;
-	short barrelZ;
-}BIGGUNINFO;
+
 void FireBigGun(ITEM_INFO *obj);
 void BigGunInitialise(short itemNum);
 static int CanUseGun(ITEM_INFO *obj, ITEM_INFO *lara);

@@ -15,14 +15,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-
-struct LASER_HEAD_INFO
-{
-	short baseItem;
-	short tentacles[8];
-	short puzzleItem;
-};
-
+#include "tr5_laserhead_info.h"
 struct LASER_HEAD_STRUCT
 {
 	PHD_VECTOR target;

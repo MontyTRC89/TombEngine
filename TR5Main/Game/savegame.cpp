@@ -19,6 +19,7 @@
 #include "generic_switch.h"
 #include "fullblock_switch.h"
 #include "creature_info.h"
+#include "quad_info.h"
 using namespace TEN::Entities::Switches;
 
 using std::string;

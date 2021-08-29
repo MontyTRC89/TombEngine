@@ -11,7 +11,7 @@
 #include "draw.h"
 #include "camera.h"
 #include "setup.h"
-
+#include "rubberboat_info.h"
 
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300

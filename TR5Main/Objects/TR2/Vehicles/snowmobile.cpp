@@ -18,6 +18,7 @@
 #include <Game\particle\SimpleParticle.h>
 #include "prng.h"
 #include "camera.h"
+#include "skidoo_info.h"
 using std::vector;
 using namespace ten::Math::Random;
 

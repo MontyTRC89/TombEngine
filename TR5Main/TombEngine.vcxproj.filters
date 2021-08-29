@@ -1092,6 +1092,42 @@
     <ClInclude Include="Game\Lara\lara_info.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\boat_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\skidoo_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\biggun_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\kayak_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\minecart_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\quad_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\rubberboat_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\upv_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Vehicles\jeep_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Vehicles\motorbike_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\door_data.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
