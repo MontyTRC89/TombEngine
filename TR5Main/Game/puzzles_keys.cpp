@@ -28,8 +28,12 @@ short puzzleItem;
 /*bounds*/
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
 {
-	0x0000, 0x0000, 0xFF00, 0x0100, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
+	0, 0,
+	-256, 256,
+	0, 0,
+	-ANGLE(10), ANGLE(10),
+	-ANGLE(30), ANGLE(30),
+	-ANGLE(10), ANGLE(10)
 };
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 {
@@ -57,7 +61,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = PUZZLETYPE_SPECIFIC;
 
-	if ((TrInput & IN_ACTION ||
+	if (((TrInput & IN_ACTION ||
 #ifdef NEW_INV
 		GLOBAL_inventoryitemchosen != NO_ITEM
 #else
@@ -68,7 +72,9 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
 		&& l->animNumber == LA_STAND_IDLE
-		&& GetKeyTrigger(&g_Level.Items[itemNum]))
+		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
+		|| (Lara.isMoving
+			&& Lara.generalPtr == (void*)itemNum))
 	{
 		short oldYrot = item->pos.yRot;
 		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
@@ -119,7 +125,8 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 
 			pos.z = bounds->Z1 - 100;
-			if (flag != PUZZLETYPE_CUTSCENE || item->triggerFlags == 1036)
+
+			if (flag != PUZZLETYPE_CUTSCENE)
 			{
 				if (!MoveLaraPosition(&pos, item, l))
 				{
@@ -195,7 +202,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (l->currentAnimState == LS_MISC_CONTROL)
 				return;
 
-			if (flag != 2)
+			if (flag != PUZZLETYPE_CUTSCENE)
 				ObjectCollision(itemNum, l, coll);
 			return;
 		}
