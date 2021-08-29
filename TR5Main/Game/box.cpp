@@ -364,7 +364,7 @@ void CreatureFloat(short itemNumber)
 
 void CreatureJoint(ITEM_INFO* item, short joint, short required) 
 {
-	if (item->data == NULL)
+	if (!item->data)
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
@@ -403,7 +403,7 @@ void CreatureTilt(ITEM_INFO* item, short angle)
 
 short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 {
-	if (item->data == NULL || maximumTurn == 0)
+	if (!item->data || maximumTurn == 0)
 		return 0;
 
 	CREATURE_INFO* creature;
@@ -446,7 +446,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	int boxHeight, height, nextHeight, nextBox;
 
 	item = &g_Level.Items[itemNumber];
-	if (item->data == NULL)
+	if (!item->data)
 		return false;
 
 	creature = (CREATURE_INFO*)item->data;
@@ -1398,9 +1398,9 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 		if (foundObject != NULL)
 		{
-			ITEM_INFO* aiItem = &creature->aiTarget;
+			CREATURE_TARGET* aiItem = &creature->aiTarget;
 
-			creature->enemy = aiItem;
+			creature->enemy = nullptr;
 
 			aiItem->objectNumber = foundObject->objectNumber;
 			aiItem->roomNumber = foundObject->roomNumber;
@@ -1423,7 +1423,7 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 {
-	if (item->data == NULL)
+	if (!item->data)
 		return;
 
 	CREATURE_INFO * creature;
@@ -1525,7 +1525,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 {
-	if (item->data == NULL)
+	if (!item->data)
 		return;
 
 	CREATURE_INFO* creature;
@@ -1645,7 +1645,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 {
-	if (item->data == NULL)
+	if (!item->data)
 		return;
 
 	CREATURE_INFO* creature;

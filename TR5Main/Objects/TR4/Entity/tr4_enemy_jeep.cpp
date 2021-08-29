@@ -145,16 +145,10 @@ void EnemyJeepControl(short itemNumber)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		ITEM_INFO* target = &creature->aiTarget;
-		creature->enemy = target;
+		creature->enemy = nullptr;
+		CREATURE_TARGET* target = &creature->aiTarget;
 		short angle;
 		int distance;
-		if (target == LaraItem)
-		{
-			angle = info.angle;
-			distance = info.distance;
-		}
-		else
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -326,7 +320,7 @@ void EnemyJeepControl(short itemNumber)
 
 				if (aiObject != NULL)
 				{
-					creature->enemy = target;
+					creature->enemy = nullptr;
 					target->objectNumber = aiObject->objectNumber;
 					target->roomNumber = aiObject->roomNumber;
 					target->pos.xPos = aiObject->x;

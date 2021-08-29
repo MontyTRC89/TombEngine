@@ -53,6 +53,16 @@ enum MOOD_TYPE {
 	ESCAPE_MOOD,
 	STALK_MOOD
 };
+
+struct CREATURE_TARGET {
+	GAME_OBJECT_ID objectNumber;
+	int boxNumber;
+	PHD_3DPOS pos;
+	uint16_t flags; // ItemFlags enum
+	uint16_t triggerFlags;
+	short roomNumber;
+
+};
 struct CREATURE_INFO {
 	short jointRotation[4];
 	short maximumTurn;
@@ -67,7 +77,7 @@ struct CREATURE_INFO {
 	bool monkeyAhead;
 	MOOD_TYPE mood;
 	ITEM_INFO* enemy;
-	ITEM_INFO aiTarget;
+	CREATURE_TARGET aiTarget;
 	short pad;
 	short itemNum;
 	PHD_VECTOR target;

@@ -1,7 +1,7 @@
 #pragma once
 #include "trmath.h"
-#include "items.h"
-
+#include <optional>
+#include "roomvector.h"
 struct SECTOR_COLLISION_INFO
 {
 	float SplitAngle;
@@ -9,9 +9,8 @@ struct SECTOR_COLLISION_INFO
 	Vector3 Planes[2];
 };
 
-class FLOOR_INFO
+struct FLOOR_INFO
 {
-public:
 	int index;
 	int box;
 	int fx;

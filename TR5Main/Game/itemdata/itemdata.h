@@ -9,11 +9,21 @@
 #include "lara_struct.h"
 #include "jeep_info.h"
 #include "motorbike_info.h"
+#include "minecart_info.h"
 #include "biggun_info.h"
 #include "quad_info.h"
 #include "tr5_laserhead_info.h"
 #include "creature_info.h"
+#include "boat_info.h"
+#include "rubberboat_info.h"
 #include <stdexcept>
+#include "phd_global.h"
+#include "tr4_wraith_info.h"
+#include "tr5_pushableblock_info.h"
+
+template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template<class... Ts> overload(Ts...)->overload<Ts...>; // line not needed in C++20...
+
 struct ITEM_INFO;
 
 //Type Wrapper to construct a ITEM_DATA
@@ -23,10 +33,20 @@ struct ITEM_DATA_TYPE {
 };
 class ITEM_DATA {
 	std::variant<std::nullptr_t,
+		char,
+		short,
+		int,
+		long,
 		long long,
+		unsigned char,
+		unsigned short,
+		unsigned int,
+		unsigned long,
 		unsigned long long,
+		float,
+		double,
 		long double,
-		ITEM_INFO,
+		ITEM_INFO*,
 		CREATURE_INFO,
 		LASER_HEAD_INFO,
 		QUAD_INFO,
@@ -37,13 +57,22 @@ class ITEM_DATA {
 		KAYAK_INFO,
 		DOOR_DATA,
 		SKIDOO_INFO,
-		SUB_INFO
+		SUB_INFO,
+		BOAT_INFO,
+		GAME_VECTOR,
+		WRAITH_INFO,
+		RUBBER_BOAT_INFO,
+		PUSHABLE_INFO,
+		CART_INFO
 	> data;
-
+	public:
+	ITEM_DATA();
 	//we have to use a wrapper for a type, because the compiler needs to distinguish different overloads
 	template<typename D>
-	ITEM_DATA(ITEM_DATA_TYPE<D> type) : data(ITEM_DATA_TYPE::type{}) {
-	}
+	ITEM_DATA(ITEM_DATA_TYPE<D> type) : data(ITEM_DATA_TYPE<D>::type{}) {}
+
+	template<typename D>
+	ITEM_DATA(D&& type) : data(type) {}
 
 
 	// conversion operators to keep original syntax!
@@ -67,8 +96,34 @@ class ITEM_DATA {
 	}
 
 	template<typename T>
-	T& operator=(T* newData){
+	ITEM_DATA& operator=(T* newData) {
 		data = *newData;
 		return *this;
+	}
+
+	ITEM_DATA& operator=(std::nullptr_t null) {
+		data = nullptr;
+		return *this;
+	}
+
+	template<typename T>
+	ITEM_DATA& operator=(T& newData) {
+		data = newData;
+		return *this;
+	}
+	template<typename T>
+	ITEM_DATA& operator=(T&& newData) {
+		data = newData;
+		return *this;
+	}
+	operator bool() {
+		return !std::holds_alternative<std::nullptr_t>(data);
+	}
+	struct foo {
+		void operator()(double& d) {}
+	};
+
+	auto& get() const {
+		return data;
 	}
 };
