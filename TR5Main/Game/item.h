@@ -8,6 +8,7 @@ struct ROOM_VECTOR {
 	int roomNumber;
 	int yNumber;
 };
+
 struct ITEM_INFO {
 	int floor;
 	uint32_t touchBits;
