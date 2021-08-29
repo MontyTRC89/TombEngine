@@ -965,7 +965,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 			ceiling = GetCeiling(floor, x + xFront, y, z + zFront) - y;
 			if (ceiling < 512)
 			{
-				if (height - ceiling <= 762)
+				if (height - ceiling <= LARA_HEIGHT)
 				{
 					if (height - ceiling < 512)
 						return 0;

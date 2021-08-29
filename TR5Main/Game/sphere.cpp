@@ -6,8 +6,9 @@
 #include "setup.h"
 #include "Renderer11.h"
 #include "trmath.h"
+
 using namespace ten::renderer;
-int NumLaraSpheres;
+
 bool GotLaraSpheres;
 SPHERE LaraSpheres[MAX_SPHERES];
 SPHERE CreatureSpheres[MAX_SPHERES];
@@ -37,19 +38,14 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 {
 	int flags = 0;
 
-	int num1 = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int num2 = 0;
+	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+	int laraSphereCount = 0;
 
 	if (l == LaraItem)
 	{
-		if (GotLaraSpheres)
+		if (!GotLaraSpheres)
 		{
-			num2 = NumLaraSpheres;
-		}
-		else
-		{
-			num2 = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-			NumLaraSpheres = num2;
+			laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 			if (l == LaraItem)
 				GotLaraSpheres = true;
 		}
@@ -58,22 +54,21 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	{
 		GotLaraSpheres = false;
 
-		num2 = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-		NumLaraSpheres = num2;
+		laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		if (l == LaraItem)
 			GotLaraSpheres = true;
 	}
 
 	l->touchBits = 0;
 
-	if (num1 <= 0)
+	if (creatureSphereCount <= 0)
 	{
 		item->touchBits = 0;
 		return 0;
 	}
 	else
 	{
-		for (int i = 0; i < num1; i++)
+		for (int i = 0; i < creatureSphereCount; i++)
 		{
 			SPHERE* ptr1 = &CreatureSpheres[i];
 			
@@ -84,7 +79,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 
 			if (r1 > 0)
 			{
-				for (int j = 0; j < num2; j++)
+				for (int j = 0; j < laraSphereCount; j++)
 				{
 					SPHERE* ptr2 = &LaraSpheres[j];
 

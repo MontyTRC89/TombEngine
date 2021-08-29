@@ -220,7 +220,7 @@ bool SpeedBoatCanGetOff(int direction)
 	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HITE) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE))
+	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;

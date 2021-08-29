@@ -522,7 +522,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		coll->facing = item->pos.yRot;
 	}
 
-	short height = 762 * phd_sin(item->pos.xRot);
+	short height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) * 64) + 200)

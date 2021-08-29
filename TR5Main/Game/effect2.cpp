@@ -1275,7 +1275,7 @@ void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
 
 void KillAllCurrentItems(short itemNumber)
 {
-	KillEverythingFlag = 1;
+	// TODO: Reimplement this functionality
 }
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1865,9 +1865,4 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->dSize = ((r / 256) & 0xF) + 24;
 		}
 	}
-}
-
-void KillEverything()
-{
-	KillEverythingFlag = 0;
 }

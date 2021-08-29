@@ -240,7 +240,7 @@ bool SkidooCheckGetOffOK(int direction)
 	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HITE || collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE)
+	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HEIGHT || collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT)
 		return false;
 
 	return true;

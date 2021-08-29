@@ -46,7 +46,6 @@ void InitialiseGameFlags()
 
 	FlipEffect = -1;
 	FlipStatus = 0;
-	IsAtmospherePlaying = 0;
 	Camera.underwater = 0;
 }
 

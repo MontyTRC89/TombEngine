@@ -93,7 +93,7 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 	short roomNumber;
 
 	x = v->pos.xPos + phd_sin(ang) * dist;
-	y = v->pos.yPos - LARA_HITE;
+	y = v->pos.yPos - LARA_HEIGHT;
 	z = v->pos.zPos + phd_cos(ang) * dist;
 
 	roomNumber = v->roomNumber;
@@ -163,7 +163,7 @@ static bool CanGetOut(int direction)
 	if (abs(collResult.FloorHeight - v->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HITE) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE))
+	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;

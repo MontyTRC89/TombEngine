@@ -76,7 +76,6 @@ int ClosestDist;
 PHD_VECTOR ClosestCoord;
 int RumbleTimer = 0;
 int InGameCnt = 0;
-byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
 int FlipMap[MAX_FLIPMAP];
@@ -102,7 +101,6 @@ short CurrentRoom;
 int GameTimer;
 short GlobalCounter;
 byte LevelComplete;
-short DelCutSeqPlayer;
 #ifndef NEW_INV
 int LastInventoryItem;
 #endif
@@ -112,27 +110,21 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
 CVECTOR SkyColor1;
 CVECTOR SkyColor2;
 int CutSeqNum;
-int CutSeqTriggered;
-int GlobalPlayingCutscene;
 int CurrentLevel;
-bool SoundActive;
 bool DoTheGame;
 bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
-int KillEverythingFlag;
 int FlipTimer;
 int FlipEffect;
 int TriggerTimer;
 int JustLoaded;
-int PoisonFlags;
 int OldLaraBusy;
 int Infrared;
 short FlashFadeR;
@@ -196,17 +188,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// If cutscene has been triggered then clear input
-		if (CutSeqTriggered)
-			TrInput = IN_NONE;
-
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				SOUND_Stop();
 				g_Renderer.DumpGameScene();
@@ -214,7 +202,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -237,7 +225,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #else
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -435,23 +423,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Lara.poisoned > 4096)
 					Lara.poisoned = 4096;
-				else if (Lara.dpoisoned)
-					Lara.dpoisoned++;
 
-
-				if (!Lara.gassed)
-				{
-					if (Lara.dpoisoned)
-					{
-						Lara.dpoisoned -= 8;
-						if (Lara.dpoisoned < 0)
-							Lara.dpoisoned = 0;
-					}
-				}
 				if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
 				{
-					LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
-					PoisonFlags = 16;
+					LaraItem->hitPoints -= Lara.poisoned >> 8;
 				}
 			}
 
@@ -575,6 +550,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (FlipEffect != -1)
 			effect_routines[FlipEffect](NULL);
 
+		// Clear savegame loaded flag
+		JustLoaded = false;
+
 		// Update timers
 		HealthBarTimer--;
 		GameTimer++;
@@ -657,7 +635,6 @@ GAME_STATUS DoTitle(int index)
 #ifndef NEW_INV
 		LastInventoryItem = -1;
 #endif
-		DelCutSeqPlayer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -669,7 +646,6 @@ GAME_STATUS DoTitle(int index)
 		// Play background music
 		//CurrentAtmosphere = ambient;
 		S_CDPlay(CurrentAtmosphere, 1);
-		IsAtmospherePlaying = true;
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -797,7 +773,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 #ifndef NEW_INV
 	LastInventoryItem = -1;
 #endif
-	DelCutSeqPlayer = 0;
 
 #ifdef NEW_INV
 	GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -813,7 +788,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Play background music
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
-	IsAtmospherePlaying = true;
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -924,8 +898,6 @@ void TestTriggers(short *data, bool heavy, int heavyFlags)
 			}
 		}
 	}
-
-	HeavyTriggered = false;
 
 	if (!data)
 		return;
@@ -1196,7 +1168,6 @@ void TestTriggers(short *data, bool heavy, int heavyFlags)
 						item->touchBits = 0;
 						AddActiveItem(value);
 						item->status = ITEM_ACTIVE;
-						HeavyTriggered = heavy;
 					}
 				}
 			}

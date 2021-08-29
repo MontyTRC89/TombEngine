@@ -756,14 +756,6 @@ void LaraControl(short itemNumber)
 				}
 			}
 		}
-		else if (Lara.gassed)
-		{
-			if (item->hitPoints >= 0 && --Lara.air < 0)
-			{
-				Lara.air = -1;
-				item->hitPoints -= 5;
-			}
-		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
 			if (Lara.Vehicle == NO_ITEM) // only for the upv !!
@@ -924,7 +916,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	UpdateLaraRoom(item, -LARA_HITE / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
@@ -1164,7 +1156,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateLaraRoom(item, -LARA_HITE / 2);
+					UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 					cmd += 3;
 					break;
 

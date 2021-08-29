@@ -185,7 +185,7 @@ static int CanQuadbikeGetOff(int direction)
 	if (abs(collResult.FloorHeight - item->pos.yPos) > 512)
 		return false;
 
-	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HITE) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HITE))
+	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;

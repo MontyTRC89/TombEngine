@@ -1008,7 +1008,6 @@ struct LaraInfo
 	HolsterInfo holsterInfo;
 	short flareFrame;
 	short poisoned;
-	short dpoisoned;
 	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft;
 	bool look;
@@ -1017,7 +1016,6 @@ struct LaraInfo
 	bool isMoving;
 	bool canMonkeySwing;
 	byte burnBlue;
-	bool gassed;
 	bool burnSmoke;
 	bool isDucked;
 	bool hasFired;

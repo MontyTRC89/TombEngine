@@ -285,7 +285,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//g_Renderer->Test();
 
-	SoundActive = false;
 	DoTheGame = true;
 
 	ThreadEnded = false;
