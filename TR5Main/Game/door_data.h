@@ -1,5 +1,6 @@
 #pragma once
 #include "floordata.h"
+struct ITEM_INFO;
 struct DOORPOS_DATA {
 	FLOOR_INFO* floor;
 	FLOOR_INFO data;

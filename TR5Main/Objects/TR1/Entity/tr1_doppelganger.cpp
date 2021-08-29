@@ -61,7 +61,7 @@ void DoppelgangerControl(short itemNum)
 
 	ref = findReference(item, ID_BACON_REFERENCE); // find reference point
 
-	if (item->data == NULL)
+	if (!item->data)
 	{
 		if (ref == nullptr) // if no reference found, she doesn't move
 		{
@@ -106,7 +106,7 @@ void DoppelgangerControl(short itemNum)
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 			item->speed = 0;
-			item->data = (void*)-1;
+			item->data = -1;
 			item->pos.yPos += 50;
 		}
 	}

@@ -2,12 +2,11 @@
 #include <cstdint>
 #include "phd_global.h"
 #include <string>
+#include "itemdata.h"
+#include "roomvector.h"
 enum GAME_OBJECT_ID : short;
 
-struct ROOM_VECTOR {
-	int roomNumber;
-	int yNumber;
-};
+
 
 struct ITEM_INFO {
 	int floor;
@@ -35,7 +34,7 @@ struct ITEM_INFO {
 	short afterDeath;
 	short firedWeapon;
 	short itemFlags[8];
-	void* data;
+	ITEM_DATA data;
 	PHD_3DPOS pos;
 	bool active;
 	short status; // ItemStatus enum

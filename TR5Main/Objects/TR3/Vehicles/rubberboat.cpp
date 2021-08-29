@@ -49,10 +49,10 @@ void DrawRubberBoat(ITEM_INFO *item)
 {
 	RUBBER_BOAT_INFO *b;
 
-	b = (RUBBER_BOAT_INFO*)item->data;
+	b = item->data;
 	item->data = &b->propRot;
 	DrawAnimatingItem(item);
-	item->data = (void *)b;
+	item->data = b;
 }
 
 int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)

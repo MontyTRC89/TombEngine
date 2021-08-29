@@ -495,7 +495,7 @@ int SpeedBoatDynamics(short itemNum)
 	int newspeed;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = (BOAT_INFO*)boat->data;
+	binfo = boat->data;
 
 	boat->pos.zRot -= binfo->tiltAngle;
 
@@ -815,8 +815,8 @@ void InitialiseSpeedBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = game_malloc<BOAT_INFO>();
-	boat->data = (void*)binfo;
+	boat->data = ITEM_DATA(ITEM_DATA_TYPE<BOAT_INFO>());
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->leftFallspeed = 0;
 	binfo->rightFallspeed = 0;

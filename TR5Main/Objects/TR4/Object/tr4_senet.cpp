@@ -28,7 +28,8 @@ void InitialiseGameStix(short itemNumber)
 	
 	item = &g_Level.Items[itemNumber];
 	item->itemFlags[7] = -1;
-	item->data = &item->itemFlags;
+	//not needed
+	//item->data = &item->itemFlags;
 	ActivePiece = -1;
 	SenetDisplacement = 0;
 }

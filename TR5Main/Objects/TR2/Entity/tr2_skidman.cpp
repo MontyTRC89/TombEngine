@@ -45,7 +45,7 @@ void InitialiseSkidman(short itemNum)
 		InitialiseItem(skidoo_item);
 
 		// The skidman remembers his skidoo
-		item->data = (void*)skidoo_item;
+		item->data = skidoo_item;
 
 		g_Level.NumItems++;
 	}

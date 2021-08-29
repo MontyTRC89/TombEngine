@@ -13,7 +13,6 @@
 #include <Game/Lara/lara_one_gun.h>
 #include "creature_info.h"
 #include "control.h"
-void SasControl(short itemNumber)
 namespace TEN::Entities::TR4
 {
 	enum SAS_STATES

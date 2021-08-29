@@ -832,11 +832,10 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 void SubInitialise(short itemNum)
 {
 	ITEM_INFO* v;
-	SUB_INFO* sub;
 
 	v = &g_Level.Items[itemNum];
-	sub = game_malloc<SUB_INFO>();
-	v->data = (void*)sub;
+	v->data = ITEM_DATA(ITEM_DATA_TYPE<SUB_INFO>());
+	SUB_INFO* sub = v->data;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
 	sub->WeaponTimer = 0;

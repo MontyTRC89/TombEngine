@@ -1022,7 +1022,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
 		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
 		if (item->objectNumber == ID_QUAD)
-			item->data = (void*)quadInfo;
+			item->data = quadInfo;
 
 		return true;
 	}
@@ -1418,7 +1418,7 @@ bool SaveGame::readFlare()
 	AddActiveItem(itemNumber);
 
 	// Flare age
-	item->data = (void*)LEB128::ReadInt32(m_stream);
+	item->data = LEB128::ReadInt32(m_stream);
 
 	return true;
 }
@@ -1465,7 +1465,8 @@ bool SaveGame::readTorpedo()
 
 void SaveGame::saveItemQuadInfo(int itemNumber, int arg2)
 {
-	m_stream->WriteBytes(reinterpret_cast<byte*>(g_Level.Items[itemNumber].data), sizeof(QUAD_INFO));
+
+	//m_stream->WriteBytes(reinterpret_cast<byte*>(g_Level.Items[itemNumber].data), sizeof(QUAD_INFO));
 }
 
 void SaveGame::saveRats(int arg1, int arg2)
