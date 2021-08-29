@@ -24,6 +24,8 @@ static constexpr char const ScriptReserved_GetSinkByName[] = "GetSinkByName";
 static constexpr char const ScriptReserved_GetSoundSourceByName[] = "GetSoundSourceByName";
 static constexpr char const ScriptReserved_CalculateDistance[] = "CalculateDistance";
 static constexpr char const ScriptReserved_CalculateHorizontalDistance[] = "CalculateHorizontalDistance";
+static constexpr char const ScriptReserved_ScreenToPercent[] = "ScreenToPercent";
+static constexpr char const ScriptReserved_PercentToScreen[] = "PercentToScreen";
 
 // Functions
 static constexpr char const ScriptReserved_ObjID[]					= "ObjID";
