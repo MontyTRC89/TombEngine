@@ -80,7 +80,7 @@ std::unique_ptr<GameScriptDisplayString> GameScriptDisplayString::Create(std::st
 
 	UserDisplayString ds{ key, x, y, col, f, translated};
 
-	s_addItemCallback(id, ds);
+	s_setItemCallback(id, ds);
 	return ptr;
 }
 
