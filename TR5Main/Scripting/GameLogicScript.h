@@ -80,7 +80,9 @@ public:
 
 	void								FreeLevelScripts();
 
-	bool								AddDisplayString(DisplayStringIDType id, UserDisplayString const & ds);
+	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds);
+	
+std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(DisplayStringIDType id);
 	bool								ScheduleRemoveDisplayString(DisplayStringIDType id);
 
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
