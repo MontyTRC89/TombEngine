@@ -358,7 +358,7 @@ void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 		}
 
 		if (flag)
-			item->speed /= 2;
+			item->speed >>= 1;
 
 		if (objectNum == ID_FLARE_ITEM)
 		{

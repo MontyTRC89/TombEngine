@@ -50,9 +50,9 @@ int EnableBaddieAI(short itemNum, int always)
 		int cameraDistance = 0;
 		if (!always)
 		{
-			int deltaX = (item->pos.xPos - Camera.pos.x) / 256;
-			int deltaY = (item->pos.yPos - Camera.pos.y) / 256;
-			int deltaZ = (item->pos.zPos - Camera.pos.z) / 256;
+			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
 			cameraDistance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 		}
 
@@ -62,9 +62,9 @@ int EnableBaddieAI(short itemNum, int always)
 		{
 			item = &g_Level.Items[creature->itemNum];
 
-			int deltaX = (item->pos.xPos - Camera.pos.x) / 256;
-			int deltaY = (item->pos.yPos - Camera.pos.y) / 256;
-			int deltaZ = (item->pos.zPos - Camera.pos.z) / 256;
+			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
 			int distance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 
 			if (distance > cameraDistance)
