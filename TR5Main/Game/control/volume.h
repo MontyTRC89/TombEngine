@@ -4,7 +4,7 @@
 #include "setup.h"
 #include "Renderer11.h"
 
-namespace ten::Control::Volumes
+namespace TEN::Control::Volumes
 {
 	extern int CurrentCollidedVolume;
 

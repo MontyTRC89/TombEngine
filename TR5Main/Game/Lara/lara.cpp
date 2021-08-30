@@ -43,8 +43,8 @@
 #include <control\volume.h>
 
 using std::function;
-using ten::renderer::g_Renderer;
-using namespace ten::Control::Volumes;
+using TEN::Renderer::g_Renderer;
+using namespace TEN::Control::Volumes;
 
 #ifndef NEW_INV
 extern Inventory g_Inventory;

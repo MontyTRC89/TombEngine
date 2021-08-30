@@ -5,9 +5,9 @@
 #include <Game\trmath.h>
 #include "prng.h"
 using namespace DirectX::SimpleMath;
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 
-namespace ten {
+namespace TEN {
 	namespace Effects {
 		namespace Spark {
 			std::array<SparkParticle, 64> SparkParticles;

@@ -33,8 +33,8 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
-namespace ten::renderer {
-	using namespace ten::Effects::Footprints;
+namespace TEN::Renderer {
+	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
 	void Renderer11::drawEnergyArcs(RenderView& view) {
@@ -995,8 +995,8 @@ namespace ten::renderer {
 
 	void Renderer11::drawSmokeParticles(RenderView& view)
 {
-		using ten::Effects::Smoke::SmokeParticles;
-		using ten::Effects::Smoke::SmokeParticle;
+		using TEN::Effects::Smoke::SmokeParticles;
+		using TEN::Effects::Smoke::SmokeParticle;
 		for (int i = 0; i < SmokeParticles.size(); i++) {
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
@@ -1006,8 +1006,8 @@ namespace ten::renderer {
 
 	void Renderer11::drawSparkParticles(RenderView& view)
 {
-		using ten::Effects::Spark::SparkParticle;
-		using ten::Effects::Spark::SparkParticles;
+		using TEN::Effects::Spark::SparkParticle;
+		using TEN::Effects::Spark::SparkParticles;
 		extern std::array<SparkParticle, 64> SparkParticles;
 		for (int i = 0; i < SparkParticles.size(); i++) {
 			SparkParticle& s = SparkParticles[i];
@@ -1020,9 +1020,9 @@ namespace ten::renderer {
 
 	void Renderer11::drawDripParticles(RenderView& view)
 {
-		using ten::Effects::Drip::DripParticle;
-		using ten::Effects::Drip::dripParticles;
-		using ten::Effects::Drip::DRIP_WIDTH;
+		using TEN::Effects::Drip::DripParticle;
+		using TEN::Effects::Drip::dripParticles;
+		using TEN::Effects::Drip::DRIP_WIDTH;
 		for (int i = 0; i < dripParticles.size(); i++) {
 			DripParticle& d = dripParticles[i];
 			if (!d.active) continue;
@@ -1034,8 +1034,8 @@ namespace ten::renderer {
 
 	void Renderer11::drawExplosionParticles(RenderView& view)
 {
-		using ten::Effects::Explosion::explosionParticles;
-		using ten::Effects::Explosion::ExplosionParticle;
+		using TEN::Effects::Explosion::explosionParticles;
+		using TEN::Effects::Explosion::ExplosionParticle;
 		for (int i = 0; i < explosionParticles.size(); i++) {
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
@@ -1045,7 +1045,7 @@ namespace ten::renderer {
 
 	void Renderer11::drawSimpleParticles(RenderView& view)
 	{
-		using namespace ten::Effects;
+		using namespace TEN::Effects;
 		for(SimpleParticle& s : simpleParticles){
 			if(!s.active) continue;
 			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);

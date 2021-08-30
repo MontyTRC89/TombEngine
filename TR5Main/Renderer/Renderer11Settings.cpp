@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 #include "winmain.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	void Renderer11::toggleFullScreen()
 {
 		

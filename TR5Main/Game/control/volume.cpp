@@ -7,9 +7,9 @@
 #include "RenderEnums.h"
 #include "Renderer11.h"
 
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 
-namespace ten::Control::Volumes
+namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;
 
