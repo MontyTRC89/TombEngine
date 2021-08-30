@@ -493,7 +493,7 @@ void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_SPRINT)
 		{
-			Lara.ropeDFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) * 256;
+			Lara.ropeDFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
 			Lara.ropeFrame = Lara.ropeDFrame;
 
 			item->goalAnimState = LS_ROPE_SWING;
@@ -545,7 +545,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)
 
 			ApplyVelocityToRope(Lara.ropeSegment - 2,
 				item->pos.yRot + (Lara.ropeDirection ? ANGLE(0.0f) : ANGLE(180.0f)),
-				vel / 32);
+				vel >> 5);
 		}
 
 		if (Lara.ropeFrame > Lara.ropeDFrame)
@@ -561,7 +561,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.ropeFrame = Lara.ropeDFrame;
 		}
 
-		item->frameNumber = Lara.ropeFrame / 256;
+		item->frameNumber = Lara.ropeFrame >> 8;
 
 		if (!(TrInput & IN_SPRINT) &&
 			item->frameNumber == g_Level.Anims[LA_ROPE_SWING].frameBase + 32 &&
@@ -774,7 +774,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->itemFlags[2] > ANGLE(90.0f))
 		item->itemFlags[2] = ANGLE(90.0f);
 
-	item->pos.yPos += item->itemFlags[2] / 256;
+	item->pos.yPos += item->itemFlags[2] >> 8;
 }
 
 void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)

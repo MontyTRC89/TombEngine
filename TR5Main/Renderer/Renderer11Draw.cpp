@@ -77,6 +77,7 @@ namespace TEN::Renderer
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
         OBJECT_INFO *obj = &Objects[objectNum];
+        if (!obj->loaded) return;
         RendererObject &moveableObj = *m_moveableObjects[objectNum];
 
         if (obj->animIndex != -1)

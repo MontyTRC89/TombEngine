@@ -20,7 +20,7 @@ int TriggerActive(ITEM_INFO* item)
 {
 	int flag;
 
-	flag = (~item->flags & IFLAG_REVERSE) / 16384;
+	flag = (~item->flags & IFLAG_REVERSE) >> 14;
 	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 	{
 		flag = !flag;
@@ -63,7 +63,7 @@ int GetKeyTrigger(ITEM_INFO* item)
 		}
 		if (*trigger & 4)
 		{
-			for (short* j = &trigger[2]; (*j / 256) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
+			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
 			{
 				if (*j & 0x8000)
 					return 0;
@@ -145,7 +145,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return ((item->flags & 0x100u) / 256);
+		return (item->flags & 0x100u) >> 8;
 	}
 	else
 	{
