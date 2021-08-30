@@ -420,7 +420,10 @@ void GameScript::ResetLevelTables()
 
 sol::protected_function GameScript::GetLevelFunc(sol::table tab, std::string const& luaName)
 {
-	return tab.raw_get<sol::protected_function>(luaName);
+	if (m_levelFuncs.find(luaName) == m_levelFuncs.end())
+		return sol::lua_nil;
+
+	return m_levelFuncs.at(luaName);
 }
 
 bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
@@ -429,11 +432,9 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	{
 	case sol::type::lua_nil:
 		m_levelFuncs.erase(luaName);
-		tab.raw_set(luaName, value);
 		break;
 	case sol::type::function:
-		m_levelFuncs.insert(luaName);
-		tab.raw_set(luaName, value);
+		m_levelFuncs.insert_or_assign(luaName, value.as<sol::protected_function>());
 		break;
 	default:
 		std::string error{ "Could not assign LevelFuncs." };
