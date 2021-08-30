@@ -64,7 +64,6 @@ extern int BinocularOn;
 extern CAMERA_TYPE BinocularOldCamera;
 extern int LaserSight;
 extern int SniperCount;
-extern int ExitingBinocular;
 extern int PhdPerspective;
 extern short CurrentFOV;
 extern int GetLaraOnLOS;

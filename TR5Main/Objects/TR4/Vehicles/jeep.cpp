@@ -8,7 +8,7 @@
 #endif
 #include "effect2.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"
@@ -295,9 +295,9 @@ static int JeepCanGetOff()
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 
-	if ((HeightType == BIG_SLOPE)
-		|| (HeightType == DIAGONAL)
-		|| (height == NO_HEIGHT))
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
+
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return 0;
 
 	if (abs(height - item->pos.yPos) > WALL_SIZE / 2)
@@ -305,8 +305,8 @@ static int JeepCanGetOff()
 
 	int ceiling = GetCeiling(floor, x, y, z);
 
-	if ((ceiling - item->pos.yPos > -LARA_HITE)
-		|| (height - ceiling < LARA_HITE))
+	if ((ceiling - item->pos.yPos > -LARA_HEIGHT)
+		|| (height - ceiling < LARA_HEIGHT))
 		return 0;
 
 	return 1;
@@ -418,7 +418,6 @@ static int JeepCheckGetOff()
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 			CurrentAtmosphere = 110;
-			IsAtmospherePlaying = true;
 			S_CDPlay(110, 1);
 			return false;
 		}
@@ -1607,7 +1606,6 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			item->flags |= 0x20;
 
 			CurrentAtmosphere = 98;
-			IsAtmospherePlaying = 1;
 			S_CDPlay(98, 1);
 		}
 		else
@@ -1645,8 +1643,8 @@ int JeepControl(void)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	TestTriggers(TriggerIndex, 1, 0);
-	TestTriggers(TriggerIndex, 0, 0);
+	TestTriggers(item, true,  NULL);
+	TestTriggers(item, false, NULL);
 
 	if (LaraItem->hitPoints <= 0)
 	{

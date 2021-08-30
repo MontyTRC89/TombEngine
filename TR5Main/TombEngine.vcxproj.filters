@@ -264,7 +264,7 @@
     <ClInclude Include="Game\health.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\effect.h">
+    <ClInclude Include="Game\flipeffect.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\tr4_objects.h">
@@ -1307,7 +1307,7 @@
     <ClCompile Include="Game\health.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\effect.cpp">
+    <ClCompile Include="Game\flipeffect.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp">

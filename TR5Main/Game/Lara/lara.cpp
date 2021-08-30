@@ -34,11 +34,11 @@
 
 #include "GameFlowScript.h"
 #include "health.h"
-#include "effect2.h"
+#include "flipeffect.h"
 #include "sound.h"
 #include "savegame.h"
 #include "rope.h"
-#include <Objects\TR3\Vehicles\rubberboat.h>
+#include "rubberboat.h"
 #include <Game\misc.h>
 
 using std::function;
@@ -756,14 +756,6 @@ void LaraControl(short itemNumber)
 				}
 			}
 		}
-		else if (Lara.gassed)
-		{
-			if (item->hitPoints >= 0 && --Lara.air < 0)
-			{
-				Lara.air = -1;
-				item->hitPoints -= 5;
-			}
-		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
 			if (Lara.Vehicle == NO_ITEM) // only for the upv !!
@@ -833,7 +825,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	coll->oldAnimNumber = item->animNumber;
 	coll->oldFrameNumber = item->frameNumber;
 	coll->radius = LARA_RAD;
-	coll->trigger = NULL;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -920,16 +911,12 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
 
-		// FIXME: refresh floor globals because sometimes they are messed by calling GetFloorHeight
-		// all over the place. Needed for monkeyswing. Remove when block flags decoupled from floordata. -- Lwmte 19.08.21
-		RefreshFloorGlobals(item);
-
 		// Handle Lara collision
 		if (Lara.Vehicle == NO_ITEM)
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	UpdateLaraRoom(item, -LARA_HITE / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
@@ -937,8 +924,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Handle weapons
 	LaraGun();
 
-	// Test if there's a trigger
-	TestTriggers(coll->trigger, FALSE, 0);
+	// Test for flags & triggers
+	ProcessSectorFlags(item);
+	TestTriggers(item, false, NULL);
 }
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
@@ -951,15 +939,14 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.y = item->pos.yPos;
 	coll->old.z = item->pos.zPos;
 
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
+	coll->slopesAreWalls = false;
+	coll->slopesArePits = false;
+	coll->lavaIsPit = false;
 
 	coll->enableBaddiePush = true;
 	coll->enableSpaz = false;
 
 	coll->radius = 300;
-	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1048,7 +1035,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraGun();
 
-	TestTriggers(coll->trigger, 0, 0);
+	ProcessSectorFlags(item);
+	TestTriggers(item, false, NULL);
 }
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
@@ -1063,14 +1051,13 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.y = item->pos.yPos;
 	coll->old.z = item->pos.zPos;
 
-	coll->slopesAreWalls = 0;
-	coll->slopesArePits = 0;
-	coll->lavaIsPit = 0;
+	coll->slopesAreWalls = false;
+	coll->slopesArePits = false;
+	coll->lavaIsPit = false;
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
 
 	coll->radius = 100;
-	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1105,7 +1092,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraGun();
 
-	TestTriggers(coll->trigger, 0, 0);
+	ProcessSectorFlags(item);
+	TestTriggers(item, false, NULL);
 }
 
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
@@ -1168,7 +1156,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateLaraRoom(item, -LARA_HITE / 2);
+					UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 					cmd += 3;
 					break;
 

@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "collide.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "switch.h"
 #include "missile.h"
@@ -46,7 +46,6 @@ void InitialiseGameFlags()
 
 	FlipEffect = -1;
 	FlipStatus = 0;
-	IsAtmospherePlaying = 0;
 	Camera.underwater = 0;
 }
 

@@ -8,7 +8,7 @@
 #else
 #include "inventory.h"
 #endif
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "control.h"
 #include "sphere.h"

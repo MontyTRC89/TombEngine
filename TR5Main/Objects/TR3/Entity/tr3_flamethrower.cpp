@@ -11,7 +11,7 @@
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "effect.h"
+#include "effect2.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

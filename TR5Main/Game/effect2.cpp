@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "effect2.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "tomb4fx.h"
 #include "traps.h"
@@ -17,10 +17,14 @@
 #include <Game\bubble.h>
 #include "smoke.h"
 #include "prng.h"
+
 using ten::renderer::g_Renderer;
 using ten::Effects::Explosion::TriggerExplosion;
 using namespace ten::Effects::Spark;
 using namespace ten::Math::Random;
+
+short FXType;
+FX_INFO* EffectList;
 
 int NextSpark;
 int DeadlyBounds[6];
@@ -1048,9 +1052,76 @@ void SetupRipple(int x, int y, int z, float size, char flags,unsigned int sprite
 	}
 }
 
+short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
+{
+	short roomNum = roomNumber;
+	GetFloor(x, y, z, &roomNum);
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
+		TriggerUnderwaterBlood(x, y, z, a4);
+	else
+		TriggerBlood(x, y, z, a5 / 16, a4);
+	return 0;
+}
+
+void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+			y + 256 - (GetRandomControl() * 512 / 0x8000),
+			z + 256 - (GetRandomControl() * 512 / 0x8000),
+			speed, direction, roomNumber);
+	}
+}
+
+void TriggerLaraBlood()
+{
+	int i;
+	int node = 1;
+
+	for (i = 0; i < LARA_MESHES::LM_HEAD; i++)
+	{
+		if (node & LaraItem->touchBits)
+		{
+			PHD_VECTOR vec;
+			vec.x = (GetRandomControl() & 31) - 16;
+			vec.y = (GetRandomControl() & 31) - 16;
+			vec.z = (GetRandomControl() & 31) - 16;
+
+			GetLaraJointPosition(&vec, (LARA_MESHES)i);
+			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
+		}
+
+		node *= 2;
+	}
+}
+
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
 	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD);
+}
+
+void Richochet(PHD_3DPOS* pos)
+{
+	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->pos.zPos, LaraItem->pos.xPos);
+	GAME_VECTOR target;
+	target.x = pos->xPos;
+	target.y = pos->yPos;
+	target.z = pos->zPos;
+	TriggerRicochetSpark(&target, angle / 16, 3, 0);
+	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
+}
+
+void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	int x, z;
+
+	x = item->pos.xPos - phd_sin(item->pos.yRot + ANGLE(180)) * 512 + phd_sin(item->pos.yRot - ANGLE(90)) * 256;
+	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
+
+	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
+	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1204,7 +1275,7 @@ void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
 
 void KillAllCurrentItems(short itemNumber)
 {
-	KillEverythingFlag = 1;
+	// TODO: Reimplement this functionality
 }
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1794,9 +1865,4 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->dSize = ((r / 256) & 0xF) + 24;
 		}
 	}
-}
-
-void KillEverything()
-{
-	KillEverythingFlag = 0;
 }

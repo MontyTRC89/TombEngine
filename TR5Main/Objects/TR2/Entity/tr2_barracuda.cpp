@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_barracuda.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"

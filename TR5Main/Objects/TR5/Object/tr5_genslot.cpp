@@ -6,7 +6,7 @@
 #include "effect2.h"
 #include "sphere.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "lara_collide.h"
 
