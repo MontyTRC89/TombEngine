@@ -6,8 +6,12 @@
 #include "tomb4fx.h"
 #include "lara.h"
 #include "input.h"
+#include "control\volume.h"
 
 using namespace ten::renderer;
+using namespace ten::Control::Volumes;
+
+
 int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
@@ -552,11 +556,13 @@ void CalculateSpotCameras()
 			if (CurrentLevel != 0)
 			{
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+				TestVolumes(&Camera);
 			}
 			else
 			{
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+				TestVolumes(&Camera);
 			}
 			Camera.type = oldType;
 			CheckTrigger = false;
@@ -746,11 +752,13 @@ void CalculateSpotCameras()
 						if (CurrentLevel)
 						{
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+							TestVolumes(&Camera);
 						}
 						else
 						{
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+							TestVolumes(&Camera);
 						}
 						Camera.type = oldType;
 						CheckTrigger = false;

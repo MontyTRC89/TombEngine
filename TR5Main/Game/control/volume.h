@@ -11,4 +11,5 @@ namespace ten::Control::Volumes
 	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType);
 	void TestVolumes(ITEM_INFO* item);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
+	void TestVolumes(CAMERA_INFO* camera);
 }
