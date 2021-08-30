@@ -60,17 +60,17 @@ class GameScript : public LuaHandler
 {
 private:
 
-	LuaVariables								m_globals{};
-	LuaVariables								m_locals{};
-	DisplayStringMap							m_userDisplayStrings{};
-	std::unordered_map<std::string, VarMapVal>	m_nameMap{};
-	std::unordered_map<std::string, short>		m_itemsMapName{};
-	std::unordered_set<std::string>				m_levelFuncs{};
-	sol::protected_function						m_onStart{};
-	sol::protected_function						m_onLoad{};
-	sol::protected_function						m_onControlPhase{};
-	sol::protected_function						m_onSave{};
-	sol::protected_function						m_onEnd{};
+	LuaVariables												m_globals{};
+	LuaVariables												m_locals{};
+	DisplayStringMap											m_userDisplayStrings{};
+	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
+	std::unordered_map<std::string, short>						m_itemsMapName{};
+	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
+	sol::protected_function										m_onStart{};
+	sol::protected_function										m_onLoad{};
+	sol::protected_function										m_onControlPhase{};
+	sol::protected_function										m_onSave{};
+	sol::protected_function										m_onEnd{};
 
 	void ResetLevelTables();
 
