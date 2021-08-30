@@ -138,6 +138,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\chaffFX.h" />
+    <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\drip.h" />
     <ClInclude Include="Game\explosion.h" />
@@ -496,6 +497,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     </ClCompile>
     <ClCompile Include="Game\bubble.cpp" />
     <ClCompile Include="Game\chaffFX.cpp" />
+    <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\drip.cpp" />
     <ClCompile Include="Game\explosion.cpp" />

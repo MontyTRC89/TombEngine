@@ -120,7 +120,6 @@ extern short FlashFadeB;
 extern short FlashFader;
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
-extern bool g_CollidedVolume;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
@@ -164,7 +163,6 @@ int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
-
 void TestTriggers(short* data, bool heavy, int heavyFlags);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags);
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags);
