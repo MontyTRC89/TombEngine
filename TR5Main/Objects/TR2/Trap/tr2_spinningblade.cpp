@@ -4,7 +4,7 @@
 #include "control.h"
 #include "lara.h"
 #include "setup.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sound.h"
 #include "items.h"
 

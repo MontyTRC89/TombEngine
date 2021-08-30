@@ -12,6 +12,9 @@
 #include "lara_one_gun.h"
 #include "switch.h"
 #include "debris.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
 {
@@ -142,7 +145,7 @@ void ExplosionControl(short itemNumber)
 						CollidedMeshes[i]->y -= 128;
 						TriggerShockwave((PHD_3DPOS *) &CollidedMeshes[i]->x, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						CollidedMeshes[i]->y += 128;
-						SoundEffect(ShatterSounds[CurrentLevel - 5][CollidedMeshes[i]->staticNumber], (PHD_3DPOS *) &CollidedMeshes[i]->x, 0);
+						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), (PHD_3DPOS *) &CollidedMeshes[i]->x, 0);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];

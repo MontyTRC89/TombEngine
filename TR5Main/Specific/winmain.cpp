@@ -17,7 +17,7 @@
 #include <process.h>
 #include <corecrt_io.h>
 #include <iostream>
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 using std::exception;
 using std::string;
 using std::cout;
@@ -285,7 +285,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//g_Renderer->Test();
 
-	SoundActive = false;
 	DoTheGame = true;
 
 	ThreadEnded = false;

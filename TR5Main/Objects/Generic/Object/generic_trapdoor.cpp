@@ -13,7 +13,7 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	ten::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::AddBridge(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 

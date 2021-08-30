@@ -21,7 +21,7 @@
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
 
-namespace ten::renderer
+namespace TEN::Renderer
 {
 	using std::pair;
 	using std::vector;
@@ -41,7 +41,7 @@ namespace ten::renderer
 				z >= r->z && z <= r->z + r->ySize * 1024.0f);
 	}
 
-	std::vector<ten::renderer::RendererVideoAdapter>* Renderer11::getAdapters()
+	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
 {
 		return &m_adapters;
 	}
@@ -887,4 +887,4 @@ namespace ten::renderer
 			*outMatrix = obj.AnimationTransforms[joint] * item.World;
 		}
 	}
-} // namespace ten::renderer
+} // namespace TEN::Renderer

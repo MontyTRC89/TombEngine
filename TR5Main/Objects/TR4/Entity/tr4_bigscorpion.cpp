@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr4_bigscorpion.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
 BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };

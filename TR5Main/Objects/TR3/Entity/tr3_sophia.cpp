@@ -8,7 +8,7 @@
 #include "sphere.h"
 #include "people.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "misc.h"
 #include "setup.h"
 #include "level.h"

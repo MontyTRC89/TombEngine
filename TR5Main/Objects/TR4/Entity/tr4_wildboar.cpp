@@ -2,11 +2,12 @@
 #include "tr4_wildboar.h"
 #include "box.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 

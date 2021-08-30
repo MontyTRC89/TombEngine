@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "items.h"
 #include "collide.h"
-#include "effect.h"
+#include "flipeffect.h"
 #include "box.h"
 #include "level.h"
 #include "input.h"
@@ -99,7 +99,7 @@ void InitialisePushableBlock(short itemNum)
 	if (OCB & 0x40 && (OCB & 0x1F) >= 2)
 	{
 		pushable->hasFloorCeiling = true;
-		ten::Floordata::AddBridge(itemNum);
+		TEN::Floordata::AddBridge(itemNum);
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
@@ -169,7 +169,7 @@ void PushableBlockControl(short itemNumber)
 			int relY = floorHeight - item->pos.yPos;
 			item->pos.yPos = floorHeight;
 			if (item->fallspeed >= 96)
-				floor_shake_effect(item);
+				FloorShake(item);
 			item->fallspeed = 0;
 			SoundEffect(pushable->fallSound, &item->pos, 2);
 
@@ -179,7 +179,7 @@ void PushableBlockControl(short itemNumber)
 			if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
 			{
 				roomNumber = item->roomNumber;
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
+				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & IFLAG_ACTIVATION_MASK);
 			}
 			
 			RemoveActiveItem(itemNumber);
@@ -271,7 +271,7 @@ void PushableBlockControl(short itemNumber)
 				{
 					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
-					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 				}
 			}
 			else
@@ -333,7 +333,7 @@ void PushableBlockControl(short itemNumber)
 				{
 					item->pos.xPos = pushable->moveX = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = pushable->moveZ = item->pos.zPos & 0xFFFFFE00 | 0x200;
-					TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+					TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 				}
 			}
 			else
@@ -356,7 +356,7 @@ void PushableBlockControl(short itemNumber)
 			AddBridgeStack(itemNumber);
 
 			roomNumber = item->roomNumber;
-			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & 0x3E00);
+			TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
@@ -530,12 +530,12 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void pushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
+void PushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
 {
 	DoPushPull = 1;
 }
 
-void pushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
+void PushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
 {
 	if (DoPushPull == 1)
 	{
@@ -582,31 +582,29 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 		break;
 	}
 
-	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
-	ROOM_INFO* r = &g_Level.Rooms[roomNum];
+	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
+
+	ROOM_INFO* r = &g_Level.Rooms[collResult.RoomNumber];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	int floorHeight = GetFloorHeight(floor, x, y - blockhite, z);
-	if (HeightType)
+	if (collResult.HeightType)
 		return 0;
 
 	if (GET_PUSHABLEINFO(item)->canFall)
 	{
-		if (floorHeight < y)
+		if (collResult.FloorHeight < y)
 			return 0;
 	}
 	else
 	{
-		if (floorHeight != y)
+		if (collResult.FloorHeight != y)
 			return 0;
 	}
-	
 
 	int ceiling = y - blockhite + 100;
-	floor = GetFloor(x, ceiling, z, &roomNum);
-	if (GetCeiling(floor, x, ceiling, z) > ceiling)
+
+	if (GetCollisionResult(x, ceiling, z, item->roomNumber).CeilingHeight > ceiling)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -671,20 +669,21 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int z = item->pos.zPos + zadd;
 
 	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y - blockhite, z, &roomNum);
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	if (GetFloorHeight(floor, x, y - blockhite, z) != y)
+	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
+
+	if (collResult.FloorHeight != y)
 		return 0;
 
-	if (HeightType)
+	if (collResult.HeightType)
 		return 0;
 
 	int ceiling = y - blockhite + 100;
-	floor = GetFloor(x, ceiling, z, &roomNum);
-	if (GetCeiling(floor, x, ceiling, z) > ceiling)
+
+	if (GetCollisionResult(x, ceiling, z, item->roomNumber).CeilingHeight > ceiling)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -737,15 +736,17 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	z = LaraItem->pos.zPos + zadd + zAddLara;
 
 	roomNum = LaraItem->roomNumber;
-	floor = GetFloor(x, y - LARA_HITE, z, &roomNum);
+
+	collResult = GetCollisionResult(x, y - LARA_HEIGHT, z, LaraItem->roomNumber);
+
 	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
-	if (GetFloorHeight(floor, x, y - LARA_HITE, z) != y)
+	if (collResult.FloorHeight != y)
 		return 0;
 
-	if (floor->ceiling * 256 > y - LARA_HITE)
+	if (collResult.Block->ceiling * 256 > y - LARA_HEIGHT)
 		return 0;
 
 	oldX = LaraItem->pos.xPos;
@@ -835,7 +836,7 @@ void AddBridgeStack(short itemNum)
 	auto item = &g_Level.Items[itemNum];
 
 	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
-		ten::Floordata::AddBridge(itemNum);
+		TEN::Floordata::AddBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
@@ -843,7 +844,7 @@ void AddBridgeStack(short itemNum)
 		auto stackItem = &g_Level.Items[stackIndex];
 
 		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
-			ten::Floordata::AddBridge(stackIndex);
+			TEN::Floordata::AddBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}
@@ -854,7 +855,7 @@ void RemoveBridgeStack(short itemNum)
 	auto item = &g_Level.Items[itemNum];
 
 	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
-		ten::Floordata::RemoveBridge(itemNum);
+		TEN::Floordata::RemoveBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
@@ -862,7 +863,7 @@ void RemoveBridgeStack(short itemNum)
 		auto stackItem = &g_Level.Items[stackIndex];
 
 		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
-			ten::Floordata::RemoveBridge(stackIndex);
+			TEN::Floordata::RemoveBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}

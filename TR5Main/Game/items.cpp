@@ -4,7 +4,8 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "effect.h"
+#include "control.h"
+#include "effect2.h"
 
 void ClearItem(short itemNum)
 {

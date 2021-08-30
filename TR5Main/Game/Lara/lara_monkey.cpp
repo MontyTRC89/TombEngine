@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "lara.h"
 #include "input.h"
+#include "control.h"
 #include "lara_collide.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
 
-using namespace ten::Floordata;
+using namespace TEN::Floordata;
 
 /*this file has all the related functions to monkeyswinging*/
 
@@ -52,7 +53,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		coll->badNeg = NO_HEIGHT;
 		coll->badCeiling = 0;
 
-		coll->slopesAreWalls = 0;
+		coll->slopesAreWalls = false;
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
 
@@ -64,7 +65,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.NewAnims.Monkey180Roll = 1;
 
 
-		if (TrInput & IN_FORWARD && coll->collType != CT_FRONT && abs(coll->midCeiling - coll->frontCeiling) < 50)
+		if (TrInput & IN_FORWARD && coll->collType != CT_FRONT && abs(coll->middle.Ceiling - coll->front.Ceiling) < 50)
 		{
 			item->goalAnimState = LS_MONKEYSWING_FORWARD;
 		}
@@ -89,7 +90,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
 
-		if (abs(coll->midCeiling - coll->frontCeiling) < 50)
+		if (abs(coll->middle.Ceiling - coll->front.Ceiling) < 50)
 			MonkeySwingSnap(item, coll);
 	}
 	else
@@ -101,19 +102,19 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 			TestForObjectOnLedge(item, coll);
 
 			if (!(TrInput & IN_FORWARD) ||
-				coll->frontFloor <= -850 ||
-				coll->frontFloor >= -650 ||
-				coll->frontFloor < coll->frontCeiling ||
-				coll->leftFloor2 < coll->leftCeiling2 ||
-				coll->rightFloor2 < coll->rightCeiling2 ||
+				coll->front.Floor <= -850 ||
+				coll->front.Floor >= -650 ||
+				coll->front.Floor < coll->front.Ceiling ||
+				coll->frontLeft.Floor < coll->frontLeft.Ceiling ||
+				coll->frontRight.Floor < coll->frontRight.Ceiling ||
 				coll->hitStatic)
 			{
 				if (!(TrInput & IN_FORWARD) ||
-					coll->frontFloor <= -850 ||
-					coll->frontFloor >= -650 ||
-					coll->frontFloor - coll->frontCeiling < -256 ||
-					coll->leftFloor2 - coll->leftCeiling2 < -256 ||
-					coll->rightFloor2 - coll->rightCeiling2 < -256 ||
+					coll->front.Floor <= -850 ||
+					coll->front.Floor >= -650 ||
+					coll->front.Floor - coll->front.Ceiling < -256 ||
+					coll->frontLeft.Floor - coll->frontLeft.Ceiling < -256 ||
+					coll->frontRight.Floor - coll->frontRight.Ceiling < -256 ||
 					coll->hitStatic)
 				{
 					if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
@@ -209,7 +210,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
 		if (coll->collType == CT_FRONT
-			|| abs(coll->midCeiling - coll->frontCeiling) > 50)
+			|| abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
 		{
 			item->animNumber = LA_MONKEYSWING_IDLE;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -218,9 +219,9 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			if (abs(coll->midCeiling - coll->leftCeiling2) <= 50)
+			if (abs(coll->middle.Ceiling - coll->frontLeft.Ceiling) <= 50)
 			{
-				if (abs(coll->midCeiling - coll->rightCeiling2) > 50)
+				if (abs(coll->middle.Ceiling - coll->frontRight.Ceiling) > 50)
 				{
 					ShiftItem(item, coll);
 					item->pos.yRot -= ANGLE(5.0f);
@@ -436,13 +437,13 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->slopesAreWalls = 0;
+	coll->slopesAreWalls = false;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
-	if (abs(coll->midCeiling - coll->frontCeiling) > 50)
+	if (abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
 		return 0;
 
 	if (!coll->collType)
@@ -472,13 +473,13 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badNeg = NO_HEIGHT;
 	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->slopesAreWalls = 0;
+	coll->slopesAreWalls = false;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
-	if (abs(coll->midCeiling - coll->frontCeiling) > 50)
+	if (abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
 		return 0;
 
 	if (!coll->collType)

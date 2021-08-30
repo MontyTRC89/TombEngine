@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "prng.h"
 using std::vector;
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
 void DisableBubbles()
