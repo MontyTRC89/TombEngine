@@ -11,6 +11,8 @@ using ten::renderer::g_Renderer;
 
 namespace ten::Control::Volumes
 {
+	constexpr auto CAM_SIZE = 32;
+
 	int CurrentCollidedVolume;
 
 	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType)
@@ -32,7 +34,7 @@ namespace ten::Control::Volumes
 			{
 			case VOLUME_BOX:
 #ifdef _DEBUG
-				if (roomNumber == LaraItem->roomNumber)
+				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 				contains = volume->box.Intersects(bbox);
@@ -40,7 +42,7 @@ namespace ten::Control::Volumes
 
 			case VOLUME_SPHERE:
 #ifdef _DEBUG
-				if (roomNumber == LaraItem->roomNumber)
+				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 				contains = volume->sphere.Intersects(bbox);
@@ -83,6 +85,16 @@ namespace ten::Control::Volumes
 		}
 	}
 
+	void TestVolumes(CAMERA_INFO* camera)
+	{
+		auto pos = PHD_3DPOS(camera->pos.x, camera->pos.y, camera->pos.z, 0, 0, 0);
+		auto box = BOUNDING_BOX();
+		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
+		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
+		auto bbox = TO_DX_BBOX(&pos, &box);
+		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS);
+	}
+
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
@@ -102,6 +114,8 @@ namespace ten::Control::Volumes
 
 		if (item->objectNumber == ID_LARA)
 			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::PLAYER);
+		else if (Objects[item->objectNumber].intelligent)
+			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::NPC);
 		else
 			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::MOVEABLES);
 	}
