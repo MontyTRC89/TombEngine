@@ -158,7 +158,6 @@ void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
-int TriggerActive(ITEM_INFO* item);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);

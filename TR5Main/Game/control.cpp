@@ -2563,38 +2563,6 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 	return 0;
 }
 
-int TriggerActive(ITEM_INFO *item)
-{
-	int flag;
-
-	flag = (~item->flags & IFLAG_REVERSE) / 16384;
-	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
-	{
-		flag = !flag;
-	}
-	else
-	{
-		if (item->timer)
-		{
-			if (item->timer > 0)
-			{
-				--item->timer;
-				if (!item->timer)
-					item->timer = -1;
-			}
-			else if (item->timer < -1)
-			{
-				++item->timer;
-				if (item->timer == -1)
-					item->timer = 0;
-			}
-			if (item->timer <= -1)
-				flag = !flag;
-		}
-	}
-	return flag;
-}
-
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *r = &g_Level.Rooms[roomNumber];
