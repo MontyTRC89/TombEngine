@@ -30,6 +30,8 @@
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
+#include <control\volume.h>
+
 extern ten::renderer::RendererHUDBar *g_DashBar;
 extern ten::renderer::RendererHUDBar *g_SFXVolumeBar;
 extern ten::renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -2728,7 +2730,7 @@ namespace ten::renderer
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
 				printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
-				printDebugMessage("CollidedVolume: %d", g_CollidedVolume ? 1 : 0);
+				printDebugMessage("CollidedVolume: %d", ten::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
 #endif
