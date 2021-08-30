@@ -815,7 +815,7 @@ void InitialiseSpeedBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	boat->data = ITEM_DATA(ITEM_DATA_TYPE<BOAT_INFO>());
+	boat->data = BOAT_INFO();
 	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->leftFallspeed = 0;

@@ -834,7 +834,7 @@ void SubInitialise(short itemNum)
 	ITEM_INFO* v;
 
 	v = &g_Level.Items[itemNum];
-	v->data = ITEM_DATA(ITEM_DATA_TYPE<SUB_INFO>());
+	v->data = SUB_INFO();
 	SUB_INFO* sub = v->data;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
