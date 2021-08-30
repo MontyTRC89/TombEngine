@@ -7,7 +7,7 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "traps.h"
 #include "level.h"
 #include "debris.h"

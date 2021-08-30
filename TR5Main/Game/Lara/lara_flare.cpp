@@ -61,7 +61,7 @@ void FlareControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= FLARE_AGE)

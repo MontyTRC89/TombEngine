@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr3_raptor.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 static BITE_INFO raptorBite = { 0, 66, 318, 22 };
 

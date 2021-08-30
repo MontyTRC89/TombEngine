@@ -648,34 +648,27 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 
 static int CanGetOffRubberBoat(int direction)
 {
-	ITEM_INFO *boat;
-	FLOOR_INFO *floor;
-	short roomNum, angle;
-	int x, y, z, height, ceiling;
-
-	boat = &g_Level.Items[Lara.Vehicle];
+	short angle;
+	auto boat = &g_Level.Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = boat->pos.yRot - ANGLE(90);
 	else
 		angle = boat->pos.yRot + ANGLE(90);
 
-	x = boat->pos.xPos + 1024 * phd_sin(angle);
-	y = boat->pos.yPos;
-	z = boat->pos.zPos + 1024 * phd_cos(angle);
+	auto x = boat->pos.xPos + 1024 * phd_sin(angle);
+	auto y = boat->pos.yPos;
+	auto z = boat->pos.zPos + 1024 * phd_cos(angle);
 
-	roomNum = boat->roomNumber;
-	floor = GetFloor(x, y, z, &roomNum);
-	height = GetFloorHeight(floor, x, y, z);
-	ceiling = GetCeiling(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, boat->roomNumber);
 
-	if (height - boat->pos.yPos < -512)
+	if (collResult.FloorHeight - boat->pos.yPos < -512)
 		return 0;
 
-	if (HeightType == BIG_SLOPE || HeightType == DIAGONAL)
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
 		return 0;
 
-	if ((ceiling - boat->pos.yPos > -762) || (height - ceiling < 762))
+	if ((collResult.CeilingHeight - boat->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return 0;
 
 	return 1;
@@ -896,8 +889,8 @@ void RubberBoatControl(short itemNum)
 
 	if (Lara.Vehicle == itemNum)
 	{
-		TestTriggers(TriggerIndex, 0, 0);
-		TestTriggers(TriggerIndex, 1, 0);
+		TestTriggers(boat, false, NULL);
+		TestTriggers(boat, true,  NULL);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);

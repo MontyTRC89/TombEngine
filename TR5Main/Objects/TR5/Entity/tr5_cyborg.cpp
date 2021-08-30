@@ -574,14 +574,10 @@ void HitmanControl(short itemNumber)
 		{
 			if (creature->enemy)
 			{
-				roomNumber = creature->enemy->roomNumber;
-				FLOOR_INFO* floor = GetFloor(
+				TestTriggers(
 					creature->enemy->pos.xPos,
 					creature->enemy->pos.yPos,
-					creature->enemy->pos.zPos,
-					&roomNumber);
-				GetFloorHeight(floor, creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos);
-				TestTriggers(TriggerIndex, 1, 0);
+					creature->enemy->pos.zPos, roomNumber, true, NULL);
 				
 				item->requiredAnimState = STATE_HITMAN_WALK;
 

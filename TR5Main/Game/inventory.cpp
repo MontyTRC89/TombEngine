@@ -1879,7 +1879,6 @@ int Inventory::DoTitleInventory()
 	}
 
 	CurrentAtmosphere = CDA_XA11_FLYBY1;
-	IsAtmospherePlaying = true;
 	S_CDPlay(CurrentAtmosphere, 1);
 
 	OpenRing(INV_RING_OPTIONS, true);

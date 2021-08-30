@@ -1,7 +1,7 @@
 #pragma once
 #include "box.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "objectslist.h"
 #include "trmath.h"
 #include "Renderer11.h"
@@ -1008,7 +1008,6 @@ struct LaraInfo
 	HolsterInfo holsterInfo;
 	short flareFrame;
 	short poisoned;
-	short dpoisoned;
 	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft;
 	bool look;
@@ -1017,7 +1016,6 @@ struct LaraInfo
 	bool isMoving;
 	bool canMonkeySwing;
 	byte burnBlue;
-	bool gassed;
 	bool burnSmoke;
 	bool isDucked;
 	bool hasFired;
@@ -1025,7 +1023,6 @@ struct LaraInfo
 	bool litTorch;
 	bool isClimbing;
 	bool fired;
-	bool ClockworkBeetleFlag;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;

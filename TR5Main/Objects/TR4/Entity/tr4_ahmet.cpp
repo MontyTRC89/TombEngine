@@ -2,7 +2,7 @@
 #include "tr4_ahmet.h"
 #include "control.h"
 #include "sphere.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "sound.h"
 #include "setup.h"
@@ -51,13 +51,7 @@ namespace TEN::Entities::TR4
 
     static void AhmetHeavyTriggers(ITEM_INFO* item)
     {
-        FLOOR_INFO* floor;
-        short room_number;
-
-        room_number = item->roomNumber;
-        floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
-        GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-        TestTriggers(TriggerIndex, TRUE, FALSE);
+		TestTriggers(item, true, NULL);
     }
 
     static void TriggerAhmetDeathEffect(ITEM_INFO* item)

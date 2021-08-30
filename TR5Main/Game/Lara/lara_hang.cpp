@@ -92,14 +92,14 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->frontFloor > -850)
+			if (coll->front.Floor > -850)
 			{
-				if (coll->frontFloor < -650 &&
-					coll->frontFloor >= coll->frontCeiling &&
-					coll->frontFloor >= coll->leftCeiling2 &&
-					coll->frontFloor >= coll->rightCeiling2)
+				if (coll->front.Floor < -650 &&
+					coll->front.Floor >= coll->front.Ceiling &&
+					coll->front.Floor >= coll->frontLeft.Ceiling &&
+					coll->front.Floor >= coll->frontRight.Ceiling)
 				{
-					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
 					{
 						if (TrInput & IN_WALK)
 						{
@@ -119,12 +119,12 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 				}
 
-				if (coll->frontFloor < -650 &&
-					coll->frontFloor - coll->frontCeiling >= -256 &&
-					coll->frontFloor - coll->leftCeiling2 >= -256 &&
-					coll->frontFloor - coll->rightCeiling2 >= -256)
+				if (coll->front.Floor < -650 &&
+					coll->front.Floor - coll->front.Ceiling >= -256 &&
+					coll->front.Floor - coll->frontLeft.Ceiling >= -256 &&
+					coll->front.Floor - coll->frontRight.Ceiling >= -256)
 				{
-					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
 					{
 						item->goalAnimState = LS_HANG_TO_CRAWL;
 						item->requiredAnimState = LS_CROUCH_IDLE;
@@ -135,8 +135,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 
 			if (Lara.climbStatus != 0 &&
-				coll->midCeiling <= -256 &&
-				abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
+				coll->middle.Ceiling <= -256 &&
+				abs(coll->frontLeft.Ceiling - coll->frontRight.Ceiling) < 60)
 			{
 				if (LaraTestClimbStance(item, coll))
 				{
@@ -156,7 +156,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_BACK &&
 			Lara.climbStatus &&
-			coll->midFloor > 344 &&
+			coll->middle.Floor > 344 &&
 			item->animNumber == LA_REACH_TO_HANG)
 		{
 			if (LaraTestClimbStance(item, coll))
@@ -356,14 +356,14 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		TestForObjectOnLedge(item, coll);
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->frontFloor > -850)
+			if (coll->front.Floor > -850)
 			{
-				if (coll->frontFloor < -650 &&
-					coll->frontFloor >= coll->frontCeiling &&
-					coll->frontFloor >= coll->leftCeiling2 &&
-					coll->frontFloor >= coll->rightCeiling2)
+				if (coll->front.Floor < -650 &&
+					coll->front.Floor >= coll->front.Ceiling &&
+					coll->front.Floor >= coll->frontLeft.Ceiling &&
+					coll->front.Floor >= coll->frontRight.Ceiling)
 				{
-					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
 					{
 						if (TrInput & IN_WALK)
 						{
@@ -382,12 +382,12 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 					}
 				}
 			}
-			if (coll->frontFloor < -650 &&
-				coll->frontFloor - coll->frontCeiling >= -256 &&
-				coll->frontFloor - coll->leftCeiling2 >= -256 &&
-				coll->frontFloor - coll->rightCeiling2 >= -256)
+			if (coll->front.Floor < -650 &&
+				coll->front.Floor - coll->front.Ceiling >= -256 &&
+				coll->front.Floor - coll->frontLeft.Ceiling >= -256 &&
+				coll->front.Floor - coll->frontRight.Ceiling >= -256)
 			{
-				if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+				if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
 				{
 					item->goalAnimState = LS_HANG_TO_CRAWL;
 					item->requiredAnimState = LS_CROUCH_IDLE;
@@ -397,8 +397,8 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (Lara.climbStatus != 0 &&
-			coll->midCeiling <= -256 &&
-			abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
+			coll->middle.Ceiling <= -256 &&
+			abs(coll->frontLeft.Ceiling - coll->frontRight.Ceiling) < 60)
 		{
 			if (LaraTestClimbStance(item, coll))
 			{

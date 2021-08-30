@@ -2,7 +2,7 @@
 #include "camera.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "debris.h"
 #include "lara_fire.h"
@@ -44,7 +44,6 @@ int TargetSnaps = 0;
 GAME_VECTOR LookCamPosition;
 GAME_VECTOR LookCamTarget;
 int LSHKTimer = 0;
-int ExittingBinos = 0;
 int LSHKShotsFired = 0;
 PHD_VECTOR CamOldPos;
 int TLFlag = 0;
@@ -58,7 +57,6 @@ int BinocularOn;
 CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
 int SniperCount;
-int ExitingBinocular;
 int PhdPerspective;
 short CurrentFOV;
 int GetLaraOnLOS;
@@ -1155,6 +1153,8 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 
 void BinocularCamera(ITEM_INFO* item)
 {
+	static int exittingBinos = 0;
+
 	if (LSHKTimer)
 		--LSHKTimer;
 
@@ -1162,11 +1162,11 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		if (InputBusy & IN_DRAW)
 		{
-			ExittingBinos = 1;
+			exittingBinos = 1;
 		}
-		else if (ExittingBinos)
+		else if (exittingBinos)
 		{
-			ExittingBinos = 0;
+			exittingBinos = 0;
 			BinocularRange = 0;
 			AlterFOV(14560);
 			LaraItem->meshBits = -1;
@@ -1440,6 +1440,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 		if (!(InputBusy & IN_ACTION) || Infrared)
 		{
+			// Reimplement this mode?
 		}
 		else
 		{

@@ -1268,9 +1268,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS 
 			|| Objects[item->objectNumber].waterCreature)
 		{
-			floor = GetFloor(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, &(enemy->roomNumber));
-			GetFloorHeight(floor, enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos);
-			TestTriggers(TriggerIndex, TRUE, 0);
+			TestTriggers(enemy, true, NULL);
 			creature->patrol2 = !creature->patrol2;
 		}
 	}
@@ -1292,9 +1290,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&
 			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
 		{
-			floor = GetFloor(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, &(enemy->roomNumber));
-			GetFloorHeight(floor, enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos);
-			TestTriggers(TriggerIndex, TRUE, 0);
+			TestTriggers(enemy, true, NULL);
 
 			creature->reachedGoal = true;
 			creature->enemy = LaraItem;

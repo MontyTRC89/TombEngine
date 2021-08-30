@@ -3,6 +3,7 @@
 #include "items.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 void FallingCeilingControl(short itemNumber)
 {
