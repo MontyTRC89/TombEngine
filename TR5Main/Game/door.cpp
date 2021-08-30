@@ -724,14 +724,14 @@ void InitialiseDoor(short itemNumber)
 
 	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 		item->itemFlags[0] = 4096;
-	item->data = DOOR_DATA();
+	item->data = ITEM_DATA(DOOR_DATA());
 	DOOR_DATA* door = item->data;
 
 	door->opened = false;
-	door->dptr1 = NULL;
-	door->dptr2 = NULL;
-	door->dptr3 = NULL;
-	door->dptr4 = NULL;
+	door->dptr1 = nullptr;
+	door->dptr2 = nullptr;
+	door->dptr3 = nullptr;
+	door->dptr4 = nullptr;
 
 	int dz, dx;
 	ROOM_INFO* r;
@@ -761,8 +761,7 @@ void InitialiseDoor(short itemNumber)
 		boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 	}
 	door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
-
-	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
+	door->d1.data = *door->d1.floor;
 
 	if (r->flippedRoom != -1)
 	{
@@ -779,7 +778,7 @@ void InitialiseDoor(short itemNumber)
 		}
 		door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
+		door->d1flip.data = *door->d1flip.floor;
 	}
 	else
 		door->d1flip.floor = NULL;
@@ -809,7 +808,7 @@ void InitialiseDoor(short itemNumber)
 		}
 		door->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
+		door->d2.data = *door->d2.floor;
 
 		if (r->flippedRoom != -1)
 		{
@@ -826,7 +825,7 @@ void InitialiseDoor(short itemNumber)
 			}
 			door->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
+			door->d2flip.data = *door->d2flip.floor;
 		}
 		else
 			door->d2flip.floor = NULL;

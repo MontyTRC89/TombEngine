@@ -383,7 +383,6 @@ void InitialiseItem(short itemNum)
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
-	item->data = std::nullptr_t();
 	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)
