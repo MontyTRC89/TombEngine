@@ -17,7 +17,7 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -1879,7 +1879,6 @@ int Inventory::DoTitleInventory()
 	}
 
 	CurrentAtmosphere = CDA_XA11_FLYBY1;
-	IsAtmospherePlaying = true;
 	S_CDPlay(CurrentAtmosphere, 1);
 
 	OpenRing(INV_RING_OPTIONS, true);

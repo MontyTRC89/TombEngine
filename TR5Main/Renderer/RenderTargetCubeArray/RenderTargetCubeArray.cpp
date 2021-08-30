@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "RenderTargetCubeArray.h"
 #include "Utils.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	RenderTargetCubeArray::RenderTargetCubeArray(ID3D11Device* device, size_t resolution, size_t numCubes, DXGI_FORMAT colorFormat,DXGI_FORMAT depthFormat) : numCubes(numCubes), resolution(resolution), viewport(CreateViewport(resolution)) {
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.ArraySize = numCubes*6;

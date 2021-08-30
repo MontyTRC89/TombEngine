@@ -641,7 +641,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 		coll->radius = 100;
 		coll->slopesAreWalls = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 		if (TrInput & IN_ACTION)
 		{
@@ -669,7 +669,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_POLE_UP;
 				}
 			}
-			else if (TrInput & IN_BACK && coll->midFloor > 0)
+			else if (TrInput & IN_BACK && coll->middle.Floor > 0)
 			{
 				item->goalAnimState = LS_POLE_DOWN;
 				item->itemFlags[2] = 0;
@@ -678,7 +678,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 			if (TrInput & IN_JUMP)
 				item->goalAnimState = LS_JUMP_BACK;
 		}
-		else if (coll->midFloor <= 0)
+		else if (coll->middle.Floor <= 0)
 		{
 			item->goalAnimState = LS_STOP;
 		}
@@ -736,13 +736,13 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
-	if (coll->midFloor < 0)
+	if (coll->middle.Floor < 0)
 	{
 		short roomNumber = item->roomNumber;
 		item->floor = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-			item->pos.xPos, item->pos.yPos - 762, item->pos.zPos);
+			item->pos.xPos, item->pos.yPos - LARA_HEIGHT, item->pos.zPos);
 
 		item->goalAnimState = LS_POLE_IDLE;
 		item->itemFlags[2] = 0;
@@ -810,11 +810,6 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 	short roomNumber = item->roomNumber;
 
 	Camera.targetAngle = ANGLE(70.0f);
-
-	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	coll->trigger = TriggerIndex;
 
 	if (!(TrInput & IN_ACTION))
 	{

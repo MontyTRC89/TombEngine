@@ -1,7 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include <d3d11.h>
-namespace ten::renderer {
+namespace TEN::Renderer {
 	class RenderPipelineState;
 	struct ShaderCompileOptions {
 		std::wstring fileName;

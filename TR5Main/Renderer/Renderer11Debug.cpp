@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer11.h"
-namespace  ten::renderer {
+namespace  TEN::Renderer {
 	bool Renderer11::printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message) {
 		return true;
 	}

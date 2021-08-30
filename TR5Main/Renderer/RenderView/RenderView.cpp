@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "RenderView.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	constexpr float EPSILON = 0.00001f;
 	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) {
 		viewport = {};

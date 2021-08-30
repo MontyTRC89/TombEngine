@@ -84,7 +84,7 @@ enum BOAT_STATE
 void DoBoatWakeEffect(ITEM_INFO* boat)
 {
 	SetupRipple(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(boat->pos.yRot));
-	ten::Effects::TriggerSpeedboatFoam(boat);
+	TEN::Effects::TriggerSpeedboatFoam(boat);
 
 	// OLD WAKE EFFECT
 	/*int c = phd_cos(boat->pos.yRot);
@@ -200,7 +200,7 @@ void SpeedBoatGetOff(ITEM_INFO* boat)
 
 bool SpeedBoatCanGetOff(int direction)
 {
-	ITEM_INFO* v = &g_Level.Items[Lara.Vehicle];
+	auto v = &g_Level.Items[Lara.Vehicle];
 
 	short angle;
 	if (direction < 0)
@@ -212,18 +212,15 @@ bool SpeedBoatCanGetOff(int direction)
 	int y = v->pos.yPos;
 	int z = v->pos.zPos + GETOFF_DIST * phd_cos(angle);
 
-	short roomNumber = v->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if ((height - v->pos.yPos) < -(WALL_SIZE / 2))
+	if ((collResult.FloorHeight - v->pos.yPos) < -(WALL_SIZE / 2))
 		return false;
 
-	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL))
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
 		return false;
 
-	int ceiling = GetCeiling(floor, x, y, z);
-	if ((ceiling - v->pos.yPos > -LARA_HITE) || (height - ceiling < LARA_HITE))
+	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -920,8 +917,8 @@ void SpeedBoatControl(short itemNumber)
 
 	if (Lara.Vehicle == itemNumber)
 	{
-		TestTriggers(TriggerIndex, 0, 0);
-		TestTriggers(TriggerIndex, 1, 0);
+		TestTriggers(boat, true, NULL);
+		TestTriggers(boat, false, NULL);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);

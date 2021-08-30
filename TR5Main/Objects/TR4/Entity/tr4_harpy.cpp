@@ -2,7 +2,7 @@
 #include "tr4_harpy.h"
 #include "people.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "items.h"
 #include "sphere.h"
@@ -11,6 +11,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };

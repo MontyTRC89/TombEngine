@@ -17,7 +17,12 @@
 #include "input.h"
 #include "sound.h"
 #include "trmath.h"
+#include "cog_switch.h"
+#include "generic_switch.h"
+#include "pickup.h"
+#include "fullblock_switch.h"
 
+using namespace TEN::Entities::Switches;
 
 PHD_VECTOR DoubleDoorPos(0, 0, 220);
 PHD_VECTOR PullDoorPos(-201, 0, 322);
@@ -45,11 +50,6 @@ ITEM_INFO* ClosedDoors[32];
 byte LiftDoor;
 int DontUnlockBox;
 
-extern byte SequenceUsed[6];
-extern byte SequenceResults[3][3][3];
-extern byte Sequences[3];
-extern byte CurrentSequence;
-extern PHD_VECTOR OldPickupPos;
 #ifndef NEW_INV
 extern Inventory g_Inventory;
 #endif
@@ -68,7 +68,7 @@ void SequenceDoorControl(short itemNumber)
 			else
 				item->goalAnimState = 0;
 
-			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, TRUE, 0);
+			TestTriggers(item, true, NULL);
 		}
 
 		CurrentSequence = 4;
@@ -458,7 +458,7 @@ void DoorControl(short itemNumber)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 			--item->itemFlags[0];
-			item->pos.yPos -= 12;
+			item->pos.yPos -= TEN::Entities::Switches::COG_DOOR_SPEED;
 			int y = bounds->Y1 + item->itemFlags[2] - STEP_SIZE;
 			if (item->pos.yPos < y)
 			{
@@ -491,7 +491,6 @@ void DoorControl(short itemNumber)
 				}
 			}
 		}
-		return;
 	}
 
 	if (item->objectNumber < ID_LIFT_DOORS1 || item->objectNumber > ID_LIFT_DOORS2)

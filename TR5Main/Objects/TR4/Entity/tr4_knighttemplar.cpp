@@ -5,7 +5,7 @@
 #include "sphere.h"
 #include "effect2.h"
 #include "debris.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
@@ -183,8 +183,8 @@ void KnightTemplarControl(short itemNumber)
 
 						mesh->flags &= ~1;
 						currentFloor->stopper = false;
-						int height = GetFloorHeight(currentFloor, pos.x, pos.y, pos.z);
-						TestTriggers(TriggerIndex, 1, 0);
+
+						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 					}
 
 					mesh++;

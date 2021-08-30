@@ -2,7 +2,7 @@
 #include "Texture2D.h"
 #include "Utils.h"
 #include <WICTextureLoader.h>
-namespace ten::renderer {
+namespace TEN::Renderer {
 	using Utils::throwIfFailed;
 	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data) {
 		D3D11_TEXTURE2D_DESC desc;

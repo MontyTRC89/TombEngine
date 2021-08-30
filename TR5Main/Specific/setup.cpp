@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "collide.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "switch.h"
 #include "missile.h"
@@ -31,11 +31,10 @@
 /// register objects
 #include "object_helper.h"
 
-extern byte SequenceUsed[6];
-extern byte SequenceResults[3][3][3];
-extern byte Sequences[3];
-extern byte CurrentSequence;
-extern int NumRPickups;
+#include "generic_switch.h"
+#include "fullblock_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[MAX_STATICS];
@@ -47,7 +46,6 @@ void InitialiseGameFlags()
 
 	FlipEffect = -1;
 	FlipStatus = 0;
-	IsAtmospherePlaying = 0;
 	Camera.underwater = 0;
 }
 
@@ -163,118 +161,14 @@ void ObjectObjects()
 		obj->saveMesh = true;
 	}
 
-	for (int objNum = ID_SWITCH_TYPE1; objNum <= ID_SWITCH_TYPE16; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->saveMesh = true;
-		}
-	}
-
-	obj = &Objects[ID_AIRLOCK_SWITCH];
+	/*obj = &Objects[ID_AIRLOCK_SWITCH];
 	if (obj->loaded)
 	{
-		obj->collision = SwitchCollision;
+		obj->collision = TEN::Entities::Switches::SwitchCollision;
 		obj->control = SwitchControl;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_SEQUENCE_SWITCH1];
-	if (obj->loaded)
-	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_SEQUENCE_SWITCH2];
-	if (obj->loaded)
-	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_SEQUENCE_SWITCH3];
-	if (obj->loaded)
-	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	for (int objNum = ID_UNDERWATER_SWITCH1; objNum <= ID_UNDERWATER_SWITCH4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->control = SwitchControl;
-			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? SwitchCollision2 : UnderwaterSwitchCollision;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-		}
-	}
-
-	obj = &Objects[ID_LEVER_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = RailSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_JUMP_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = JumpSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_CROWBAR_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = CrowbarSwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_PULLEY];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialisePulleySwitch;
-		obj->control = SwitchControl;
-		obj->collision = PulleyCollision;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	
-
-	obj = &Objects[ID_CROWDOVE_SWITCH];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCrowDoveSwitch;
-		obj->collision = CrowDoveSwitchCollision;
-		obj->control = CrowDoveSwitchControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
+	}*/
 
 	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_CLOSED_DOOR6; objNum++)
 	{
@@ -656,7 +550,7 @@ void InitialiseSpecialEffects()
 	NextDrip = 0;
 	NextBlood = 0;
 	WBRoom = -1;
-	ten::entities::tr4::ClearScarabs();
+	TEN::Entities::TR4::ClearScarabs();
 }
 
 void CustomObjects()

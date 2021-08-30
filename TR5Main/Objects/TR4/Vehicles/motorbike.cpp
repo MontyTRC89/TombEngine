@@ -21,7 +21,7 @@
 #include "camera.h"
 #include "prng.h"
 
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 
 /*collision stuff*/
 #define BIKE_FRONT 500
@@ -964,30 +964,21 @@ static int MotorBikeDynamics(ITEM_INFO* item)
 
 static BOOL MotorbikeCanGetOff(void)
 {
-    ITEM_INFO* item;
-    FLOOR_INFO* floor;
-    int x, y, z;
-    int height, ceiling;
-    short room_number, angle;
+    auto item = &g_Level.Items[Lara.Vehicle];
+    auto angle = item->pos.yRot + 0x4000;
+    auto x = item->pos.xPos + BIKE_RADIUS * phd_sin(angle);
+    auto y = item->pos.yPos;
+    auto z = item->pos.zPos + BIKE_RADIUS * phd_cos(angle);
 
-    item = &g_Level.Items[Lara.Vehicle];
-    angle = item->pos.yRot + 0x4000;
-    x = item->pos.xPos + BIKE_RADIUS * phd_sin(angle);
-    y = item->pos.yPos;
-    z = item->pos.zPos + BIKE_RADIUS * phd_cos(angle);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-    room_number = item->roomNumber;
-    floor = GetFloor(x, y, z, &room_number);
-    height = GetFloorHeight(floor, x, y, z);
-    if (HeightType == BIG_SLOPE || HeightType == DIAGONAL || height == -NO_HEIGHT)
+    if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
         return false;
-
-    if (abs(height - item->pos.yPos) > STEP_SIZE)
+    if (abs(collResult.FloorHeight - item->pos.yPos) > STEP_SIZE)
         return false;
-    ceiling = GetCeiling(floor, x, y, z);
-    if ((ceiling - item->pos.yPos) > -LARA_HITE)
+    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HEIGHT)
         return false;
-    if ((height - ceiling) < LARA_HITE)
+    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HEIGHT)
         return false;
 
     return true;
@@ -1410,7 +1401,6 @@ int MotorbikeControl(void)
     FLOOR_INFO* floor;
     PHD_VECTOR oldpos, fl, fr, fm;
     int drive, collide, pitch = 0, dead, ceiling;
-    short room_number;
 
     item = &g_Level.Items[Lara.Vehicle];
     motorbike = GetMotorbikeInfo(item);
@@ -1425,12 +1415,12 @@ int MotorbikeControl(void)
     int hfr = TestMotorbikeHeight(item, BIKE_FRONT, STEP_SIZE / 2, &fr);
     int hfm = TestMotorbikeHeight(item, -BIKE_FRONT, 0, &fm);
 
-    room_number = item->roomNumber;
+	auto room_number = item->roomNumber;
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-    TestTriggers(TriggerIndex, FALSE, FALSE);
-    TestTriggers(TriggerIndex, TRUE, FALSE);
+	TestTriggers(item, true,  NULL);
+	TestTriggers(item, false, NULL);
 
     if (LaraItem->hitPoints <= 0)
     {

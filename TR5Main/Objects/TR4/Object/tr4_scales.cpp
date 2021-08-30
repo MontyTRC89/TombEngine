@@ -10,6 +10,10 @@
 #include "draw.h"
 #include "tomb4fx.h"
 #include "tr4_ahmet.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
@@ -74,11 +78,7 @@ void ScalesControl(short itemNum)
 		item->itemFlags[1] = 1;
 	}
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	TestTriggers(TriggerIndex, TRUE, flags);
+	TestTriggers(item, true, flags);
 	AnimateItem(item);
 }
 

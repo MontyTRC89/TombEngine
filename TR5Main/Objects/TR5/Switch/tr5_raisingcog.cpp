@@ -7,6 +7,9 @@
 #include "sound.h"
 #include "spotcam.h"
 #include "objectslist.h"
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 void InitialiseRaisingCog(short itemNumber)
 {
@@ -29,7 +32,8 @@ void InitialiseRaisingCog(short itemNumber)
 			if (currentItem->objectNumber == ID_PULLEY || currentItem->objectNumber == ID_TRIGGER_TRIGGERER)
 			{
 				currentItem->itemFlags[1] = 1;
-				PulleyItemNumber = itemNos[i];
+				// FIXME: no more hardcoding!
+				//PulleyItemNumber = itemNos[i];
 			}
 		}
 	}

@@ -10,6 +10,9 @@
 #include <tomb4fx.h>
 #include <switch.h>
 #include <input.h>
+#include "generic_switch.h"
+
+using namespace TEN::Entities::Switches;
 
 OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {
     0x0000, 0x0000, 0xFFC0, 0x0000, 0x0000, 0x0000,
@@ -198,7 +201,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 if (!item->triggerFlags)
                 {
                     item->meshBits = 48;                
-                    TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);       
+                    TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
                     item->itemFlags[0] = 1;
                     item->pos.yRot = oldRot;
                     
@@ -215,7 +218,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
                 }
                  
                 item->meshBits = 12;
-                TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+                TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
                 Lara.Pickups[0]--;
                 item->itemFlags[0] = 1;
                 
@@ -245,7 +248,7 @@ void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
         }
         else
         {
-            TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+            TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
             AddActiveItem(itemNumber);
             item->status = ITEM_ACTIVE;
             item->itemFlags[0] = 3;
