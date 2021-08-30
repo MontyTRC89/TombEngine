@@ -6,12 +6,12 @@
 #include "setup.h"
 #include "effect2.h"
 #include "prng.h"
-using namespace ten::Math::Random;
-namespace ten {
+using namespace TEN::Math::Random;
+namespace TEN {
 	namespace Effects {
 		namespace Explosion {
 			using namespace DirectX::SimpleMath;
-			using namespace ten::Effects::Spark;
+			using namespace TEN::Effects::Spark;
 			std::array<ExplosionParticle, 64> explosionParticles;
 			constexpr float PARTICLE_DISTANCE = 512;
 			void TriggerExplosion(Vector3 const& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room)

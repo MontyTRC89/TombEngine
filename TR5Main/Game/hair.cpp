@@ -8,7 +8,7 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 int WindAngle;

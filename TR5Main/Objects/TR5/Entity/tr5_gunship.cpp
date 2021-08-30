@@ -9,7 +9,7 @@
 #include "debris.h"
 #include "objects.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 
 int GunShipCounter = 0;
@@ -110,8 +110,8 @@ void ControlGunShip(short itemNumber)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= 0xFFFE;
-					TestTriggersAtXYZ(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, 1, 0);
-					SoundEffect(ShatterSounds[CurrentLevel - 5][hitMesh->staticNumber], (PHD_3DPOS*)hitMesh, 0);
+					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
+					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
 				}
 
 				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);

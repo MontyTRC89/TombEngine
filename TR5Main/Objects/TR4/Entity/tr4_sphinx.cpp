@@ -3,7 +3,7 @@
 #include "debris.h"
 #include "items.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
@@ -69,7 +69,7 @@ void SphinxControl(short itemNumber)
 				mesh->flags &= ~0x100;
 				floor->stopper = false;
 
-				TestTriggers(TriggerIndex, 1, 0);
+				TestTriggers(x, y, z, item->roomNumber, true, NULL);
 			}
 		}
 	}
@@ -200,13 +200,9 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_HIT:
-		roomNumber = item->roomNumber;
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
 		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			TestTriggers(TriggerIndex, 1, 0);
+			TestTriggers(item, true, NULL);
 
 			if (item->touchBits & 0x40)
 			{

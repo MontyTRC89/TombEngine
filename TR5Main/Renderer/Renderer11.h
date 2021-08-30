@@ -12,7 +12,7 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderTarget2D/RenderTarget2D.h"
@@ -30,7 +30,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 struct CAMERA_INFO;
-namespace ten::renderer
+namespace TEN::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
@@ -217,7 +217,7 @@ namespace ten::renderer
 		int Width;
 		int Height;
 		Vector2 UV[4];
-		ten::renderer::Texture2D* Texture;
+		TEN::Renderer::Texture2D* Texture;
 	};
 	
 	struct RendererSpriteSequence
@@ -314,11 +314,11 @@ namespace ten::renderer
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11Texture2D* m_depthStencilTexture;
 	
-		ten::renderer::RenderTarget2D m_dumpScreenRenderTarget;
-		ten::renderer::RenderTarget2D m_renderTarget;
-		ten::renderer::RenderTarget2D m_currentRenderTarget;
-		ten::renderer::RenderTarget2D m_shadowMap;
-		ten::renderer::RenderTargetCube m_reflectionCubemap;
+		TEN::Renderer::RenderTarget2D m_dumpScreenRenderTarget;
+		TEN::Renderer::RenderTarget2D m_renderTarget;
+		TEN::Renderer::RenderTarget2D m_currentRenderTarget;
+		TEN::Renderer::RenderTarget2D m_shadowMap;
+		TEN::Renderer::RenderTargetCube m_reflectionCubemap;
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
@@ -380,20 +380,20 @@ namespace ten::renderer
 		std::unique_ptr<PrimitiveBatch<RendererVertex>> m_primitiveBatch;
 	
 		// System resources
-		ten::renderer::Texture2D m_HUDBarBorderTexture;
-		ten::renderer::Texture2D m_HUDBarTextures[4];
-		std::vector<ten::renderer::Texture2D> m_caustics;
-		ten::renderer::Texture2D m_binocularsTexture;
-		ten::renderer::Texture2D m_LasersightTexture;
-		ten::renderer::Texture2D m_whiteTexture;
-		ten::renderer::RenderTargetCubeArray m_shadowMaps;
+		TEN::Renderer::Texture2D m_HUDBarBorderTexture;
+		TEN::Renderer::Texture2D m_HUDBarTextures[4];
+		std::vector<TEN::Renderer::Texture2D> m_caustics;
+		TEN::Renderer::Texture2D m_binocularsTexture;
+		TEN::Renderer::Texture2D m_LasersightTexture;
+		TEN::Renderer::Texture2D m_whiteTexture;
+		TEN::Renderer::RenderTargetCubeArray m_shadowMaps;
 	
 		// Level data
-		ten::renderer::Texture2D m_titleScreen;
-		ten::renderer::Texture2D m_loadScreen;
-		ten::renderer::Texture2D m_textureAtlas;
-		ten::renderer::Texture2D m_skyTexture;
-		ten::renderer::Texture2D m_logo;
+		TEN::Renderer::Texture2D m_titleScreen;
+		TEN::Renderer::Texture2D m_loadScreen;
+		TEN::Renderer::Texture2D m_textureAtlas;
+		TEN::Renderer::Texture2D m_skyTexture;
+		TEN::Renderer::Texture2D m_logo;
 		VertexBuffer m_roomsVertexBuffer;
 		IndexBuffer m_roomsIndexBuffer;
 		VertexBuffer m_moveablesVertexBuffer;
@@ -436,7 +436,7 @@ namespace ten::renderer
 		std::vector<TexturePair> m_animatedTextures;
 		std::vector<TexturePair> m_moveablesTextures;
 		std::vector<TexturePair> m_staticsTextures;
-		std::vector<ten::renderer::Texture2D> m_spritesTextures;
+		std::vector<TEN::Renderer::Texture2D> m_spritesTextures;
 	
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 

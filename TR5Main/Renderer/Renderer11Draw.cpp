@@ -30,14 +30,16 @@
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
-extern ten::renderer::RendererHUDBar *g_DashBar;
-extern ten::renderer::RendererHUDBar *g_SFXVolumeBar;
-extern ten::renderer::RendererHUDBar *g_MusicVolumeBar;
+#include <control\volume.h>
+
+extern TEN::Renderer::RendererHUDBar *g_DashBar;
+extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
+extern TEN::Renderer::RendererHUDBar *g_MusicVolumeBar;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
-namespace ten::renderer
+namespace TEN::Renderer
 {
-    using namespace ten::renderer;
+    using namespace TEN::Renderer;
     using namespace std::chrono;
 
     void Renderer11::drawPickup(short objectNum)
@@ -2307,9 +2309,9 @@ namespace ten::renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < ten::entities::tr4::NUM_LITTLE_BETTLES; i++)
+            for (int i = 0; i < TEN::Entities::TR4::NUM_LITTLE_BETTLES; i++)
             {
-                SCARAB_INFO* beetle = &ten::entities::tr4::Scarabs[i];
+                SCARAB_INFO* beetle = &TEN::Entities::TR4::Scarabs[i];
 
                 if (beetle->on)
                 {
@@ -2355,9 +2357,9 @@ namespace ten::renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < ten::entities::tr4::MAX_LOCUSTS; i++)
+            for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
             {
-                LOCUST_INFO* locust = &ten::entities::tr4::Locusts[i];
+                LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
 
                 if (locust->on)
                 {
@@ -2728,7 +2730,7 @@ namespace ten::renderer
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
 				printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
-				printDebugMessage("CollidedVolume: %d", g_CollidedVolume ? 1 : 0);
+				printDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
 #endif
@@ -3220,7 +3222,7 @@ namespace ten::renderer
         m_context->PSSetSamplers(0, 1, &sampler);
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-		int causticsFrame = meshIndex + ((GlobalCounter) % nmeshes);
+		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
         m_context->PSSetShaderResources(1, 1, m_sprites[causticsFrame].Texture->ShaderResourceView.GetAddressOf());
         m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
@@ -3476,4 +3478,4 @@ namespace ten::renderer
         //drawFinalPass();
         m_swapChain->Present(0, 0);
     }
-} // namespace ten::renderer
+} // namespace TEN::Renderer

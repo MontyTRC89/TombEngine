@@ -7,7 +7,7 @@
 #include "lara.h"
 #include "tomb4fx.h"
 
-namespace ten::entities::tr4 {
+namespace TEN::Entities::TR4 {
     LOCUST_INFO Locusts[MAX_LOCUSTS];
 
     int CreateLocust(void)

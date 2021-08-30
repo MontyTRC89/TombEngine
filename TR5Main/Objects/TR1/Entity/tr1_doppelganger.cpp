@@ -6,6 +6,7 @@
 #include "misc.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 
@@ -121,13 +122,12 @@ void DoppelgangerControl(short itemNum)
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
 		item->floor = h;
-		TestTriggers(TriggerIndex, TRUE, 0);
+		TestTriggers(x, y, z, item->roomNumber, true, NULL);
 		if (item->pos.yPos >= h)
 		{
 			item->floor = item->pos.yPos = h;
-			floor = GetFloor(x, h, z, &room_num);
-			GetFloorHeight(floor, x, h, z);
-			TestTriggers(TriggerIndex, TRUE, 0);
+			TestTriggers(x, h, z, item->roomNumber, true, NULL);
+
 			item->gravityStatus = false;
 			item->fallspeed = 0;
 			item->goalAnimState = LS_DEATH;
