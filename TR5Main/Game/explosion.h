@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <array>
-namespace ten {
+namespace TEN {
 	namespace Effects {
 		namespace Explosion {
 			struct ExplosionParticle {

@@ -59,13 +59,13 @@ using namespace TEN::Entities::Switches;
 using std::vector;
 using std::unordered_map;
 using std::string;
-using namespace ten::Effects::Explosion;
-using namespace ten::Effects::Spark;
-using namespace ten::Effects::Smoke;
-using namespace ten::Effects;
-using ten::renderer::g_Renderer;
-using namespace ten::Math::Random;
-using namespace ten::Floordata;
+using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects;
+using TEN::Renderer::g_Renderer;
+using namespace TEN::Math::Random;
+using namespace TEN::Floordata;
 
 
 int KeyTriggerActive;
@@ -142,7 +142,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace ten::Effects::Footprints;
+using namespace TEN::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
@@ -512,7 +512,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		ten::Effects::Drip::UpdateDrips();
+		TEN::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();

@@ -17,7 +17,7 @@
 #include <process.h>
 #include <corecrt_io.h>
 #include <iostream>
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 using std::exception;
 using std::string;
 using std::cout;

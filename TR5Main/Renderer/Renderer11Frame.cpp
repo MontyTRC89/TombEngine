@@ -7,10 +7,10 @@
 #include "level.h"
 #include "setup.h"
 #include "RenderView\RenderView.h"
-namespace ten::renderer
+namespace TEN::Renderer
 {
-	using namespace ten::renderer;
-	using ten::Memory::LinearArrayBuffer;
+	using namespace TEN::Renderer;
+	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 	void Renderer11::collectRooms(RenderView &renderView)
 	{
@@ -460,4 +460,4 @@ namespace ten::renderer
 			m_items[i].DoneAnimations = false;
 		}
 	}
-} // namespace ten::renderer
+} // namespace TEN::Renderer

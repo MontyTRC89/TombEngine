@@ -32,14 +32,14 @@
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
 
-extern ten::renderer::RendererHUDBar *g_DashBar;
-extern ten::renderer::RendererHUDBar *g_SFXVolumeBar;
-extern ten::renderer::RendererHUDBar *g_MusicVolumeBar;
+extern TEN::Renderer::RendererHUDBar *g_DashBar;
+extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
+extern TEN::Renderer::RendererHUDBar *g_MusicVolumeBar;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
-namespace ten::renderer
+namespace TEN::Renderer
 {
-    using namespace ten::renderer;
+    using namespace TEN::Renderer;
     using namespace std::chrono;
 
     void Renderer11::drawPickup(short objectNum)
@@ -2730,7 +2730,7 @@ namespace ten::renderer
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
 				printDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
-				printDebugMessage("CollidedVolume: %d", ten::Control::Volumes::CurrentCollidedVolume);
+				printDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
 #endif
@@ -3478,4 +3478,4 @@ namespace ten::renderer
         //drawFinalPass();
         m_swapChain->Present(0, 0);
     }
-} // namespace ten::renderer
+} // namespace TEN::Renderer

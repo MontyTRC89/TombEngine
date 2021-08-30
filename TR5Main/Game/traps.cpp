@@ -355,7 +355,7 @@ void LavaBurn(ITEM_INFO* item)
 void InitialiseFallingBlock(short itemNumber)
 {
 	g_Level.Items[itemNumber].meshBits = 1;
-	ten::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::AddBridge(itemNumber);
 }
 
 void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
