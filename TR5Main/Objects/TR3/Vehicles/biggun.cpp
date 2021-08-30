@@ -121,7 +121,7 @@ void BigGunInitialise(short itemNum)
 	BIGGUNINFO *gun;
 
 	obj = &g_Level.Items[itemNum];
-	obj->data = ITEM_DATA(ITEM_DATA_TYPE<BIGGUNINFO>());
+	obj->data = BIGGUNINFO();
 
 	gun = obj->data;
 	gun->flags = 0;
