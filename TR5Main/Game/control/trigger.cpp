@@ -16,6 +16,38 @@
 
 using namespace TEN::Entities::Switches;
 
+int TriggerActive(ITEM_INFO* item)
+{
+	int flag;
+
+	flag = (~item->flags & IFLAG_REVERSE) / 16384;
+	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	{
+		flag = !flag;
+	}
+	else
+	{
+		if (item->timer)
+		{
+			if (item->timer > 0)
+			{
+				--item->timer;
+				if (!item->timer)
+					item->timer = -1;
+			}
+			else if (item->timer < -1)
+			{
+				++item->timer;
+				if (item->timer == -1)
+					item->timer = 0;
+			}
+			if (item->timer <= -1)
+				flag = !flag;
+		}
+	}
+	return flag;
+}
+
 int GetKeyTrigger(ITEM_INFO* item)
 {
 	auto triggerIndex = GetTriggerIndex(item);
