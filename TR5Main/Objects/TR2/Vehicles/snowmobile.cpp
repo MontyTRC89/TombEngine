@@ -79,7 +79,7 @@ enum SKIDOO_STATE
 void InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo = &g_Level.Items[itemNum];
-	skidoo->data = ITEM_DATA(ITEM_DATA_TYPE<SKIDOO_INFO>());
+	skidoo->data = SKIDOO_INFO();
 	SKIDOO_INFO* skinfo = skidoo->data;
 	
 	skinfo->alreadyCdPlayed = false;

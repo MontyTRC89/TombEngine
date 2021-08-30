@@ -21,16 +21,11 @@
 #include "tr4_wraith_info.h"
 #include "tr5_pushableblock_info.h"
 
-template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-template<class... Ts> overload(Ts...)->overload<Ts...>; // line not needed in C++20...
+template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
+template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
 struct ITEM_INFO;
 
-//Type Wrapper to construct a ITEM_DATA
-template<typename D>
-struct ITEM_DATA_TYPE {
-	using type = D;
-};
 class ITEM_DATA {
 	std::variant<std::nullptr_t,
 		char,
@@ -68,9 +63,6 @@ class ITEM_DATA {
 	> data;
 	public:
 	ITEM_DATA();
-	//we have to use a wrapper for a type, because the compiler needs to distinguish different overloads
-	template<typename D>
-	ITEM_DATA(ITEM_DATA_TYPE<D> type) : data(ITEM_DATA_TYPE<D>::type{}) {}
 
 	template<typename D>
 	ITEM_DATA(D&& type) : data(std::move(type)) {}
@@ -112,19 +104,24 @@ class ITEM_DATA {
 		data = newData;
 		return *this;
 	}
+
 	template<typename T>
 	ITEM_DATA& operator=(T&& newData) {
 		data = std::move(newData);
 		return *this;
 	}
+
 	operator bool() {
 		return !std::holds_alternative<std::nullptr_t>(data);
 	}
-	struct foo {
-		void operator()(double& d) {}
-	};
 
-	auto& get() const {
-		return data;
+	template<typename ... Funcs>
+	void apply(Funcs&&... funcs) {
+		std::visit(
+		visitor{
+			[](auto const&) {},
+			std::forward<Funcs>(funcs)... 
+		},
+		data);
 	}
 };
