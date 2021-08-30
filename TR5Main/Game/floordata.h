@@ -9,6 +9,20 @@ struct SECTOR_COLLISION_INFO
 	Vector3 Planes[2];
 };
 
+struct SECTOR_FLAGS
+{
+	bool Death;
+	bool Monkeyswing;
+	bool ClimbNorth;
+	bool ClimbSouth;
+	bool ClimbWest;
+	bool ClimbEast;
+	bool MarkBeetle;
+
+	bool MarkTriggerer;
+	bool MarkTriggererActive; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
+};
+
 class FLOOR_INFO
 {
 public:
@@ -22,6 +36,7 @@ public:
 	int ceiling;
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
+	SECTOR_FLAGS Flags;
 	int WallPortal;
 	std::set<short> BridgeItem;
 	int Room;

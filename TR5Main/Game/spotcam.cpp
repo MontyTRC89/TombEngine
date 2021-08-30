@@ -551,12 +551,12 @@ void CalculateSpotCameras()
 			Camera.type = HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
 			}
 			else
 			{
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 0, 0);
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
 			}
 			Camera.type = oldType;
 			CheckTrigger = false;
@@ -745,12 +745,12 @@ void CalculateSpotCameras()
 						Camera.type = HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
 						}
 						else
 						{
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 0, 0);
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
 						}
 						Camera.type = oldType;
 						CheckTrigger = false;

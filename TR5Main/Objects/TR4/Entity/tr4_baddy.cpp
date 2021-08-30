@@ -6,9 +6,10 @@
 #include "effect2.h"
 #include "lara.h"
 #include "people.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 #include <draw.h>
 #include <Game/lot.h>
 

@@ -9,7 +9,8 @@
 #include "tomb4fx.h"
 #include "setup.h"
 #include "level.h"
-#include "effect.h"
+#include "control.h"
+#include "effect2.h"
 #include "trmath.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };

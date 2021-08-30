@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_mutant.h"
 #include "tr4_locusts.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "misc.h"
 #include "lara.h"
@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "objectslist.h"
 #include "trmath.h"
+#include "control.h"
 
 namespace TEN::Entities::TR4
 {

@@ -14,7 +14,6 @@ struct SPHERE
 	int r;
 };
 
-extern int NumLaraSpheres;
 extern bool GotLaraSpheres;
 extern SPHERE LaraSpheres[MAX_SPHERES];
 extern SPHERE CreatureSpheres[MAX_SPHERES];

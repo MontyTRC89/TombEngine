@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2
@@ -366,7 +367,7 @@ void LarsonControl(short itemNumber)
 		if (item->objectNumber == ID_LARSON 
 			&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
-			short roomNumber= item->itemFlags[2] & 0xFF;
+			short roomNumber = item->itemFlags[2] & 0xFF;
 			short floorHeight = item->itemFlags[2] & 0xFF00;
 			ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 			
@@ -374,9 +375,7 @@ void LarsonControl(short itemNumber)
 			int y = r->minfloor + floorHeight;
 			int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
-			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-			GetFloorHeight(floor, x, y, z);
-			TestTriggers(TriggerIndex, 1, 0);
+			TestTriggers(x, y, z, roomNumber, true, NULL);
 
 			joint0 = 0;
 		}

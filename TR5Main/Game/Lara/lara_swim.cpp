@@ -6,7 +6,7 @@
 #include "box.h"
 #include "Lara.h"
 #include "lara_surface.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_fire.h"
 #include "draw.h"
 #include "camera.h"
@@ -98,8 +98,8 @@ void LaraWaterCurrent(COLL_INFO* coll)
 		LaraItem->pos.yRot -= ANGLE(5);
 	}
 
-	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
-		LaraItem->pos.yPos += coll->midFloor;
+	if (coll->middle.Floor < 0 && coll->middle.Floor != NO_HEIGHT)
+		LaraItem->pos.yPos += coll->middle.Floor;
 
 	ShiftItem(LaraItem, coll);
 
@@ -522,7 +522,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		coll->facing = item->pos.yRot;
 	}
 
-	short height = 762 * phd_sin(item->pos.xRot);
+	short height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) * 64) + 200)
@@ -630,11 +630,11 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
+	if (coll->middle.Floor < 0 && coll->middle.Floor != NO_HEIGHT)
 	{
 		flag = 1;
 		item->pos.xRot += ANGLE(1);
-		item->pos.yPos += coll->midFloor;
+		item->pos.yPos += coll->middle.Floor;
 	}
 
 	if (oldX == item->pos.xPos

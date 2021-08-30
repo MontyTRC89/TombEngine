@@ -7,7 +7,7 @@
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
-#include "effect2.h"
+#include "flipeffect.h"
 #include "draw.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -28,7 +28,7 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "debris.h"
 #include "lara_fire.h"
@@ -51,6 +51,7 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
+#include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
 
 using namespace TEN::Entities::Switches;
@@ -75,7 +76,6 @@ int ClosestDist;
 PHD_VECTOR ClosestCoord;
 int RumbleTimer = 0;
 int InGameCnt = 0;
-byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
 int FlipMap[MAX_FLIPMAP];
@@ -86,7 +86,6 @@ short NextFxActive;
 short NextFxFree;
 short NextItemActive;
 short NextItemFree;
-short *TriggerIndex;
 
 int DisableLaraControl = 0;
 int WeatherType;
@@ -102,7 +101,6 @@ short CurrentRoom;
 int GameTimer;
 short GlobalCounter;
 byte LevelComplete;
-short DelCutSeqPlayer;
 #ifndef NEW_INV
 int LastInventoryItem;
 #endif
@@ -112,41 +110,27 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-HEIGHT_TYPES HeightType;
-int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
 CVECTOR SkyColor1;
 CVECTOR SkyColor2;
 int CutSeqNum;
-int CutSeqTriggered;
-int GlobalPlayingCutscene;
 int CurrentLevel;
-bool SoundActive;
 bool DoTheGame;
 bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
-int OnObject;
-int KillEverythingFlag;
 int FlipTimer;
 int FlipEffect;
 int TriggerTimer;
 int JustLoaded;
-int PoisonFlags;
 int OldLaraBusy;
 int Infrared;
 short FlashFadeR;
 short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
-
-int SplitFloor;
-int SplitCeiling;
-int TiltXOffset;
-int TiltYOffset;
-int FramesCount;
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
@@ -178,6 +162,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
@@ -203,17 +188,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// If cutscene has been triggered then clear input
-		if (CutSeqTriggered)
-			TrInput = IN_NONE;
-
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				SOUND_Stop();
 				g_Renderer.DumpGameScene();
@@ -221,7 +202,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -244,7 +225,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #else
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -442,23 +423,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Lara.poisoned > 4096)
 					Lara.poisoned = 4096;
-				else if (Lara.dpoisoned)
-					Lara.dpoisoned++;
 
-
-				if (!Lara.gassed)
-				{
-					if (Lara.dpoisoned)
-					{
-						Lara.dpoisoned -= 8;
-						if (Lara.dpoisoned < 0)
-							Lara.dpoisoned = 0;
-					}
-				}
 				if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
 				{
-					LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
-					PoisonFlags = 16;
+					LaraItem->hitPoints -= Lara.poisoned >> 8;
 				}
 			}
 
@@ -517,13 +485,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					SmashedMesh[SmashedMeshCount]->z,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				int height = GetFloorHeight(
-					floor,
-					SmashedMesh[SmashedMeshCount]->x,
-					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z);
-
-				TestTriggers(TriggerIndex, 1, 0);
+				TestTriggers(SmashedMesh[SmashedMeshCount]->x,
+					         SmashedMesh[SmashedMeshCount]->y,
+					         SmashedMesh[SmashedMeshCount]->z,
+					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
@@ -584,6 +549,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Do flipeffects
 		if (FlipEffect != -1)
 			effect_routines[FlipEffect](NULL);
+
+		// Clear savegame loaded flag
+		JustLoaded = false;
 
 		// Update timers
 		HealthBarTimer--;
@@ -667,7 +635,6 @@ GAME_STATUS DoTitle(int index)
 #ifndef NEW_INV
 		LastInventoryItem = -1;
 #endif
-		DelCutSeqPlayer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -679,7 +646,6 @@ GAME_STATUS DoTitle(int index)
 		// Play background music
 		//CurrentAtmosphere = ambient;
 		S_CDPlay(CurrentAtmosphere, 1);
-		IsAtmospherePlaying = true;
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -807,7 +773,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 #ifndef NEW_INV
 	LastInventoryItem = -1;
 #endif
-	DelCutSeqPlayer = 0;
 
 #ifdef NEW_INV
 	GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -823,7 +788,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Play background music
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
-	IsAtmospherePlaying = true;
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -867,7 +831,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 }
 
-void TestTriggers(short *data, int heavy, int HeavyFlags)
+void TestTriggers(short *data, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -935,78 +899,8 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 		}
 	}
 
-	HeavyTriggered = false;
-
-	if (!heavy)
-	{
-		Lara.canMonkeySwing = false;
-		Lara.climbStatus = false;
-		Lara.ClockworkBeetleFlag = false;
-	}
-
 	if (!data)
 		return;
-
-	// Burn Lara
-	if ((*data & 0x1F) == LAVA_TYPE)
-	{
-		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
-			LavaBurn(LaraItem);
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can climb
-	if ((*data & 0x1F) == CLIMB_TYPE)
-	{
-		if (!heavy)
-		{
-			short quad = GetQuadrant(LaraItem->pos.yRot);
-			if ((1 << (quad + 8)) & *data)
-				Lara.climbStatus = true;
-		}
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can monkey
-	if ((*data & 0x1F) == MONKEY_TYPE)
-	{
-		if (!heavy)
-			Lara.canMonkeySwing = true;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	//for the stupid beetle
-	if ((*data & 0x1F) == MINER_TYPE)
-	{
-		if (!heavy)
-			Lara.ClockworkBeetleFlag = 1;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Trigger triggerer
-	if ((*data & 0x1F) == TRIGTRIGGER_TYPE)
-	{
-		if (!(*data & 0x20) || *data & 0x8000)
-			return;
-
-		data++;
-	}
 
 	short triggerType = (*(data++) >> 8) & 0x3F;
 	short flags = *(data++);
@@ -1021,24 +915,24 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 	{
 		switch (triggerType)
 		{
-		case HEAVY:
-		case HEAVYANTITRIGGER:
+		case TRIGGER_TYPES::HEAVY:
+		case TRIGGER_TYPES::HEAVYANTITRIGGER:
 			break;
 
-		case HEAVYSWITCH:
-			if (!HeavyFlags)
+		case TRIGGER_TYPES::HEAVYSWITCH:
+			if (!heavyFlags)
 				return;
 
-			if (HeavyFlags >= 0)
+			if (heavyFlags >= 0)
 			{
 				flags &= CODE_BITS;
-				if (flags != HeavyFlags)
+				if (flags != heavyFlags)
 					return;
 			}
 			else
 			{
 				flags |= CODE_BITS;
-				flags += HeavyFlags;
+				flags += heavyFlags;
 			}
 			break;
 
@@ -1186,7 +1080,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
 			{
-				if (HeavyFlags >= 0)
+				if (heavyFlags >= 0)
 				{
 					if (switchFlag)
 						item->flags |= (flags & CODE_BITS);
@@ -1274,7 +1168,6 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 						item->touchBits = 0;
 						AddActiveItem(value);
 						item->status = ITEM_ACTIVE;
-						HeavyTriggered = heavy;
 					}
 				}
 			}
@@ -1286,7 +1179,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (keyResult == 1)
 				break;
 
-			if (g_Level.Cameras[value].flags & 0x100)
+			if (g_Level.Cameras[value].flags & ONESHOT)
 				break;
 
 			Camera.number = value;
@@ -1304,7 +1197,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
 
-				if (trigger & 0x100)
+				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
 
 				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
@@ -1335,7 +1228,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 
 				if (!(SpotCam[spotCamIndex].flags & SCF_CAMERA_ONE_SHOT))
 				{
-					if (trigger & 0x100)
+					if (trigger & ONESHOT)
 						SpotCam[spotCamIndex].flags |= SCF_CAMERA_ONE_SHOT;
 
 					if (!UseSpotCam || CurrentLevel == 0)
@@ -1416,7 +1309,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			break;
 		}
 
-	} while (!(trigger & 0x8000));
+	} while (!(trigger & END_BIT));
 
 	if (cameraItem && (Camera.type == FIXED_CAMERA || Camera.type == HEAVY_CAMERA))
 		Camera.item = cameraItem;
@@ -1801,16 +1694,16 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 	return 0;
 }
 
-int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
+short* GetTriggerIndex(ITEM_INFO* item)
 {
+	auto roomNumber = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+}
 
-	TiltYOffset = 0;
-	TiltXOffset = 0;
-	OnObject = 0;
-	HeightType = WALL;
-	SplitFloor = 0;
-
-	ROOM_INFO *r;
+short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+{
+	ROOM_INFO* r;
 	while (floor->pitRoom != NO_ROOM)
 	{
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
@@ -1819,202 +1712,75 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	int height = floor->floor * 256;
-	if (height != NO_HEIGHT)
+	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
+		return NULL;
+
+	short* triggerIndex = NULL;
+
+	short* data = &g_Level.FloorData[floor->index];
+	short type;
+	int trigger;
+	do
 	{
-		//		return height;
+		type = *(data++);
 
-
-		TriggerIndex = NULL;
-
-		if (floor->index != 0)
+		switch (type & DATA_TYPE)
 		{
-			//		return height;
+			case DOOR_TYPE:
+			case TILT_TYPE:
+			case ROOF_TYPE:
+			case SPLIT1:
+			case SPLIT2:
+			case SPLIT3:
+			case SPLIT4:
+			case NOCOLF1T:
+			case NOCOLF1B:
+			case NOCOLF2T:
+			case NOCOLF2B:
+			case NOCOLC1T:
+			case NOCOLC1B:
+			case NOCOLC2T:
+			case NOCOLC2B:
+				data++;
+				break;
 
-			short* data = &g_Level.FloorData[floor->index];
-			short type, hadj;
+			case LAVA_TYPE:
+			case CLIMB_TYPE:
+			case MONKEY_TYPE:
+			case TRIGTRIGGER_TYPE:
+			case MINER_TYPE:
+				break;
 
-			int xOff, yOff, trigger;
-			ITEM_INFO* item;
-			OBJECT_INFO* obj;
-			int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
-			do
-			{
-				type = *(data++);
+			case TRIGGER_TYPE:
+				triggerIndex = data - 1;
+				data++;
 
-				switch (type & DATA_TYPE)
+				do
 				{
-				case DOOR_TYPE:
-				case ROOF_TYPE:
-				case SPLIT3:
-				case SPLIT4:
-				case NOCOLC1T:
-				case NOCOLC1B:
-				case NOCOLC2T:
-				case NOCOLC2B:
-					data++;
-					break;
+					trigger = *(data++);
 
-				case TILT_TYPE:
-					TiltXOffset = xOff = (*data >> 8);
-					TiltYOffset = yOff = *(char*)data;
-
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = BIG_SLOPE;
-					else
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += (xOff * ((-1 - z) & 1023) >> 2);
-					else
-						height -= (xOff * (z & 1023) >> 2);
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				case TRIGGER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-
-					data++;
-
-					do
+					if (TRIG_BITS(trigger) != TO_OBJECT)
 					{
-						trigger = *(data++);
-
-						if (TRIG_BITS(trigger) != TO_OBJECT)
+						if (TRIG_BITS(trigger) == TO_CAMERA ||
+							TRIG_BITS(trigger) == TO_FLYBY)
 						{
-							if (TRIG_BITS(trigger) == TO_CAMERA ||
-								TRIG_BITS(trigger) == TO_FLYBY)
-							{
-								trigger = *(data++);
-							}
-						}
-						else
-						{
-							/*item = &g_Level.Items[trigger & VALUE_BITS];
-							obj = &Objects[item->objectNumber];
-
-							if (obj->floor && !(item->flags & 0x8000))
-							{
-								(obj->floor)(item, x, y, z, &height);
-							}*/
-						}
-
-					} while (!(trigger & END_BIT));
-					break;
-
-				case LAVA_TYPE:
-					TriggerIndex = data - 1;
-					break;
-
-				case CLIMB_TYPE:
-				case MONKEY_TYPE:
-				case TRIGTRIGGER_TYPE:
-				case MINER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-					break;
-
-				case SPLIT1:
-				case SPLIT2:
-				case NOCOLF1T:
-				case NOCOLF1B:
-				case NOCOLF2T:
-				case NOCOLF2B:
-					tilts = *data;
-					t0 = tilts & 15;
-					t1 = (tilts >> 4) & 15;
-					t2 = (tilts >> 8) & 15;
-					t3 = (tilts >> 12) & 15;
-
-					dx = x & 1023;
-					dz = z & 1023;
-
-					xOff = yOff = 0;
-
-					HeightType = SPLIT_TRI;
-					SplitFloor = (type & DATA_TYPE);
-
-					if ((type & DATA_TYPE) == SPLIT1 ||
-						(type & DATA_TYPE) == NOCOLF1T ||
-						(type & DATA_TYPE) == NOCOLF1B)
-					{
-						if (dx <= (1024 - dz))
-						{
-							hadj = (type >> 10) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t0 - t1;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xFFF0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t3 - t2;
-						}
-					}
-					else
-					{
-						if (dx <= dz)
-						{
-							hadj = (type >> 10) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t3 - t2;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t0 - t1;
+							trigger = *(data++);
 						}
 					}
 
-					TiltXOffset = xOff;
-					TiltYOffset = yOff;
+				} while (!(trigger & END_BIT));
+				break;
 
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = DIAGONAL;
-					else if (HeightType != SPLIT_TRI)
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += xOff * ((-1 - z) & 1023) >> 2;
-					else
-						height -= xOff * (z & 1023) >> 2;
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				default:
-					break;
-				}
-			} while (!(type & END_BIT));
+			default:
+				break;
 		}
-	}
-	/*return height;*/
+	} while (!(type & END_BIT));
 
+	return triggerIndex;
+}
+
+int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
+{
 	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
@@ -2332,7 +2098,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	MESH_INFO *mesh;
 	PHD_VECTOR vector;
 	ITEM_INFO *item;
-	short angle, room, triggerItems[8];
+	short angle, triggerItems[8];
 	VECTOR dir;
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();
@@ -2493,9 +2259,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										room = item->roomNumber;
-										GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-										TestTriggers(TriggerIndex, 1, item->flags & IFLAG_ACTIVATION_MASK);
+										TestTriggers(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
@@ -3565,10 +3329,45 @@ int IsRoomOutside(int x, int y, int z)
 	return -2;
 }
 
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags)
+void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
 {
-	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
-	TestTriggers(TriggerIndex, heavy, flags);
+	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, heavy, NULL);
+}
+
+void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
+{
+	auto roomNum = roomNumber;
+	auto floor = GetFloor(x, y, z, &roomNum);
+
+	// Don't process legacy triggers if trigger triggerer wasn't used
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
+		return;
+
+	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+}
+
+void ProcessSectorFlags(ITEM_INFO* item)
+{
+	ProcessSectorFlags(GetCollisionResult(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber).BottomBlock);
+}
+
+void ProcessSectorFlags(int x, int y, int z, short roomNumber)
+{
+	ProcessSectorFlags(GetCollisionResult(x, y, z, roomNumber).BottomBlock);
+}
+
+void ProcessSectorFlags(FLOOR_INFO* floor)
+{
+	// Monkeyswing
+	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
+		
+	// Burn Lara
+	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
+		LavaBurn(LaraItem);
+
+	// Set climb status
+	if ((1 << (GetQuadrant(LaraItem->pos.yRot) + 8)) & GetClimbFlags(floor))
+		Lara.climbStatus = true;
 }
 
 void ResetGlobals()

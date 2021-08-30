@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "tr4_dog.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };
 static BITE_INFO DogBite = { 0, 0, 100, 3 };

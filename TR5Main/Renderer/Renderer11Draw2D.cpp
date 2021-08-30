@@ -3,11 +3,14 @@
 #include "camera.h"
 #include "spotcam.h"
 #include "lara.h"
+#include "control.h"
+
 ten::renderer::RendererHUDBar* g_HealthBar;
 ten::renderer::RendererHUDBar* g_AirBar;
 ten::renderer::RendererHUDBar* g_DashBar;
 ten::renderer::RendererHUDBar* g_MusicVolumeBar;
 ten::renderer::RendererHUDBar* g_SFXVolumeBar;
+
 namespace ten::renderer {
 
 	void Renderer11::initialiseBars()

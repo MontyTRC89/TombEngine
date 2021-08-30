@@ -5,7 +5,7 @@
 #include "effect2.h"
 #include "sphere.h"
 #include "lot.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "setup.h"
 #include "level.h"
@@ -644,12 +644,12 @@ void VonCroyControl(short itemNumber)
 		}
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 120)
 		{
-			TestTriggersAtXYZ(
+			TestTriggers(
 				creature->aiTarget.pos.xPos,
 				creature->aiTarget.pos.yPos,
 				creature->aiTarget.pos.zPos,
 				creature->aiTarget.roomNumber,
-				1, 0);
+				true, NULL);
 
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
@@ -767,12 +767,12 @@ void VonCroyControl(short itemNumber)
 			break;
 		}
 
-		TestTriggersAtXYZ(
+		TestTriggers(
 			creature->aiTarget.pos.xPos,
 			creature->aiTarget.pos.yPos,
 			creature->aiTarget.pos.zPos,
 			creature->aiTarget.roomNumber,
-			1, 0);
+			true, NULL);
 
 		creature->reachedGoal = false;
 		creature->enemy = NULL;

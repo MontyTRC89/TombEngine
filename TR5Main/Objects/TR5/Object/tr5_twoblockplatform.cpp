@@ -135,7 +135,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 		}
 		else
 		{
-			OnObject = false;
+			bool onObject = false;
 
 			int height = LaraItem->pos.yPos + 1;
 			if (IsOnTwoBlocksPlatform(item, LaraItem->pos.xPos, LaraItem->pos.zPos))
@@ -144,12 +144,12 @@ void TwoBlocksPlatformControl(short itemNumber)
 				{
 					if (item->pos.yPos < height)
 					{
-						OnObject = true;
+						onObject = true;
 					}
 				}
 			}
 
-			if (OnObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
+			if (onObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
 				item->itemFlags[1] = 1;
 			else
 				item->itemFlags[1] = -1;

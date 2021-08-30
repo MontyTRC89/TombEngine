@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "items.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_fire.h"
 #include "lara_one_gun.h"
 #include "effect2.h"
@@ -220,7 +220,7 @@ void SkidooExplode(ITEM_INFO* skidoo)
 
 bool SkidooCheckGetOffOK(int direction)
 {
-	ITEM_INFO* skidoo = &g_Level.Items[Lara.Vehicle];
+	auto skidoo = &g_Level.Items[Lara.Vehicle];
 
 	short angle;
 	if (direction == STATE_SKIDOO_GETOFFL)
@@ -232,18 +232,15 @@ bool SkidooCheckGetOffOK(int direction)
 	int y = skidoo->pos.yPos;
 	int z = skidoo->pos.zPos - SKIDOO_GETOFF_DIST * phd_cos(angle);
 
-	short roomNumber = skidoo->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
-	if (HeightType == BIG_SLOPE || height == NO_HEIGHT || HeightType == DIAGONAL)
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
 
-	if (abs(height - skidoo->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	int ceiling = GetCeiling(floor, x, y, z);
-	if (ceiling - skidoo->pos.yPos > -LARA_HITE || height - ceiling < LARA_HITE)
+	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HEIGHT || collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT)
 		return false;
 
 	return true;
@@ -941,8 +938,8 @@ bool SkidooControl()
 	FLOOR_INFO* floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	int height = GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos);
 
-	TestTriggers(TriggerIndex, 0, 0);
-	TestTriggers(TriggerIndex, 1, 0);
+	TestTriggers(skidoo, true,  NULL);
+	TestTriggers(skidoo, false, NULL);
 
 	bool dead = false;
 	int drive = 0;

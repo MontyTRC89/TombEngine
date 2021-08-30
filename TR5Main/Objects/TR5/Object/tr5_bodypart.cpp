@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_bodypart.h"
-#include "effect.h"
+#include "effect2.h"
 #include "trmath.h"
 #include "sound.h"
 #include "tr5_missile.h"

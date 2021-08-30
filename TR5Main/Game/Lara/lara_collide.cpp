@@ -3,6 +3,7 @@
 #include "input.h"
 #include "draw.h"
 #include "effect2.h"
+#include "control.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
@@ -43,9 +44,9 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	case CT_TOP_FRONT:
 		if (!Lara.climbStatus || item->speed != 2)
 		{
-			if (coll->midFloor <= 512)
+			if (coll->middle.Floor <= 512)
 			{
-				if (coll->midFloor <= 128)
+				if (coll->middle.Floor <= 128)
 				{
 					item->goalAnimState = LS_GRAB_TO_FALL;
 					item->currentAnimState = LS_GRAB_TO_FALL;
@@ -87,7 +88,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.zPos -= 400 * phd_cos(coll->facing);
 
 		item->speed = 0;
-		coll->midFloor = 0;
+		coll->middle.Floor = 0;
 
 		if (item->fallspeed <= 0)
 			item->fallspeed = 16;
