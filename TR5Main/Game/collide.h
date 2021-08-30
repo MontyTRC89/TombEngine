@@ -58,7 +58,6 @@ struct COLL_INFO
 	short collType; // CT_enum
 	signed char tiltX;
 	signed char tiltZ;
-	bool hitByBaddie;
 	bool hitStatic;
 	bool slopesAreWalls;
 	bool slopesArePits;
