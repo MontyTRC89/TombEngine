@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-namespace ten::Memory {
+namespace TEN::Memory {
 	/*
 * A fixed size vector-like class
 */

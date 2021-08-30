@@ -1,6 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
-namespace ten::renderer {
+namespace TEN::Renderer {
 	struct RendererVertex {
 		DirectX::SimpleMath::Vector3 Position;
 		DirectX::SimpleMath::Vector3 Normal;

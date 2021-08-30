@@ -1246,7 +1246,7 @@ static void StartShatter(OBJECT_INFO *obj)
 
 static void StartProjectiles(OBJECT_INFO *obj)
 {
-	InitProjectile(obj, ten::entities::all::ControlEnemyMissile, ID_ENERGY_BUBBLES, true);
+	InitProjectile(obj, TEN::entities::all::ControlEnemyMissile, ID_ENERGY_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);

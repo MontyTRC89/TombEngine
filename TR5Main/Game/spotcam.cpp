@@ -8,8 +8,8 @@
 #include "input.h"
 #include "control\volume.h"
 
-using namespace ten::renderer;
-using namespace ten::Control::Volumes;
+using namespace TEN::Renderer;
+using namespace TEN::Control::Volumes;
 
 
 int LastSequence;

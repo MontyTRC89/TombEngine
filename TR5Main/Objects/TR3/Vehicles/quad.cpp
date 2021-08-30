@@ -17,7 +17,7 @@
 #include "sound.h"
 #include "prng.h"
 using std::vector;
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,

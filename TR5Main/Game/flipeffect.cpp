@@ -23,7 +23,7 @@
 #include "lara_fire.h"
 
 using std::function;
-using namespace ten::Effects::Footprints;
+using namespace TEN::Effects::Footprints;
 
 function<EffectFunction> effect_routines[59] =
 {
