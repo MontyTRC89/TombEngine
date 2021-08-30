@@ -296,7 +296,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 	for (int i = 0; i < 2; i++)
 	{
 		GAME_VECTOR s;
-		s.x = (i * 256) - 0x80;
+		s.x = (i << 8) - 0x80;
 		s.y = -256;
 		s.z = 0;
 
@@ -344,10 +344,10 @@ void UpdateLaraRoom(ITEM_INFO* item, int height)
 
 int FindGridShift(int x, int z)
 {
-	if ((x / SECTOR(1)) == (z / SECTOR(1)))
+	if ((x >> 10/*WALL_SHIFT*/) == (z >> 10/*WALL_SHIFT*/))
 		return 0;
 
-	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
+	if ((z >> 10/*WALL_SHIFT*/) <= (x >> 10/*WALL_SHIFT*/))
 		return (-1 - (x & (WALL_SIZE - 1)));
 	else
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));

@@ -474,15 +474,15 @@ void ControlGrenade(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->fallspeed += (5 - item->fallspeed) / 2;
-		item->speed -= item->speed / 4;
+		item->fallspeed += (5 - item->fallspeed) >> 1;
+		item->speed -= item->speed >> 2;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed / 16) + 3) * ANGLE(1));
+			item->pos.zRot += (((item->speed >> 4) + 3) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed / 4) + 3) * ANGLE(1));
+				item->pos.yRot += (((item->speed >> 2) + 3) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed / 4) + 3) * ANGLE(1));
+				item->pos.xRot += (((item->speed >> 2) + 3) * ANGLE(1));
 		}
 	}
 	else
@@ -492,11 +492,11 @@ void ControlGrenade(short itemNumber)
 		item->fallspeed += 3;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
+			item->pos.zRot += (((item->speed >> 2) + 7) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed / 2) + 7) * ANGLE(1));
+				item->pos.yRot += (((item->speed >> 1) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed / 2) + 7) * ANGLE(1));
+				item->pos.xRot += (((item->speed >> 1) + 7) * ANGLE(1));
 
 		}
 	}
@@ -1307,7 +1307,7 @@ void ControlCrossbowBolt(short itemNumber)
 	{
 		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->speed > 64)
-			item->speed -= (item->speed / 16);
+			item->speed -= (item->speed >> 4);
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, roomNumber, 4, 7, 0, 0, 0, 0);
 		aboveWater = false;
@@ -1711,7 +1711,7 @@ void FireRocket()
 				item->pos.yRot += Lara.torsoYrot;
 			}
 
-			item->speed = 16;
+			item->speed = 512 >> 5;
 			item->itemFlags[0] = 0;
 
 			AddActiveItem(itemNumber);
@@ -1772,20 +1772,20 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
 		spark->life = 24;
-		spark->dR = spark->sR / 2;
-		spark->dG = spark->sG / 2;
-		spark->dB = spark->sB / 2;
+		spark->dR = spark->sR >> 1;
+		spark->dG = spark->sG >> 1;
+		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
 		spark->transType = COLADD;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
-		spark->xVel = -128 * phd_sin(random * 16);
+		spark->xVel = -128 * phd_sin(random << 4);
 		spark->yVel = -640 - (byte)GetRandomControl();
-		spark->zVel = 128 * phd_cos(random * 16);
+		spark->zVel = 128 * phd_cos(random << 4);
 		spark->flags = 0;
-		spark->x = x + (spark->xVel / 8);
-		spark->y = y - (spark->yVel / 32);
-		spark->z = z + (spark->zVel / 8);
+		spark->x = x + (spark->xVel >> 3);
+		spark->y = y - (spark->yVel >> 5);
+		spark->z = z + (spark->zVel >> 3);
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}

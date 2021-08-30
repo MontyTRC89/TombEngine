@@ -242,7 +242,7 @@ void TorchControl(short itemNumber)
 			pos.yRot = CollidedMeshes[0]->yRot;
 			ItemPushLaraStatic(item, &sobj->collisionBox, &pos, &lara_coll);
 		}
-		item->speed /= 2;
+		item->speed >>= 1;
 	}
 	if (item->itemFlags[3])
 	{
@@ -315,7 +315,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy / 256) + LA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
 			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
