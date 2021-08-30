@@ -73,7 +73,7 @@ class ITEM_DATA {
 	ITEM_DATA(ITEM_DATA_TYPE<D> type) : data(ITEM_DATA_TYPE<D>::type{}) {}
 
 	template<typename D>
-	ITEM_DATA(D&& type) : data(type) {}
+	ITEM_DATA(D&& type) : data(std::move(type)) {}
 
 
 	// conversion operators to keep original syntax!
@@ -114,7 +114,7 @@ class ITEM_DATA {
 	}
 	template<typename T>
 	ITEM_DATA& operator=(T&& newData) {
-		data = newData;
+		data = std::move(newData);
 		return *this;
 	}
 	operator bool() {
