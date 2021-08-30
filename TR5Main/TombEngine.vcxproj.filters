@@ -1080,6 +1080,9 @@
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\control\volume.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1983,6 +1986,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\control\volume.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -135,8 +135,6 @@ short FlashFader;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
 
-bool g_CollidedVolume = false;
-
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
 #ifndef NEW_INV
@@ -843,61 +841,6 @@ void TestTriggers(short *data, bool heavy, int heavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
-
-	// Test trigger volumes
-	g_CollidedVolume = false;
-
-	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
-	for (size_t i = 0; i < room->triggerVolumes.size(); i++)
-	{
-
-		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
-
-		bool contains = false;
-		switch (volume->type)
-		{
-		case VOLUME_BOX:
-			g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			contains = (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
-			break;
-
-		case VOLUME_SPHERE:
-			g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			contains = (volume->sphere.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
-			break;
-		}
-
-		if (contains)
-		{
-			g_CollidedVolume = true;
-
-			if (volume->status == TriggerStatus::TS_OUTSIDE)
-			{
-				volume->status = TriggerStatus::TS_ENTERING;
-				if (!volume->onEnter.empty())
-					g_GameScript->ExecuteFunction(volume->onEnter);
-			}
-			else
-			{
-				volume->status = TriggerStatus::TS_INSIDE;
-				if (!volume->onInside.empty())
-					g_GameScript->ExecuteFunction(volume->onInside);
-			}
-		}
-		else
-		{
-			if (volume->status == TriggerStatus::TS_INSIDE)
-			{
-				volume->status = TriggerStatus::TS_LEAVING;
-				if (!volume->onLeave.empty())
-					g_GameScript->ExecuteFunction(volume->onLeave);
-			}
-			else
-			{
-				volume->status = TriggerStatus::TS_OUTSIDE;
-			}
-		}
-	}
 
 	if (!data)
 		return;
@@ -2598,10 +2541,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
 
 	// Create the bounding box for raw collision detection
-	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box->X2 + box->X1) / 2.0f, itemOrStaticPos->yPos + (box->Y2 + box->Y1) / 2.0f, itemOrStaticPos->zPos + (box->Z2 + box->Z1) / 2.0f);
-	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TO_RAD(itemOrStaticPos->yRot));
-	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
+	auto obox = TO_DX_BBOX(itemOrStaticPos, box);
 
 	// Get the collision with the bounding box
 	float distance;

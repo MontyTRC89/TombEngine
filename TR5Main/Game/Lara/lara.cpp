@@ -40,9 +40,11 @@
 #include "rope.h"
 #include "rubberboat.h"
 #include <Game\misc.h>
+#include <control\volume.h>
 
 using std::function;
 using ten::renderer::g_Renderer;
+using namespace ten::Control::Volumes;
 
 #ifndef NEW_INV
 extern Inventory g_Inventory;
@@ -927,6 +929,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Test for flags & triggers
 	ProcessSectorFlags(item);
 	TestTriggers(item, false, NULL);
+	TestVolumes(item);
 }
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
@@ -1037,6 +1040,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false, NULL);
+	TestVolumes(item);
 }
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
@@ -1094,6 +1098,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false, NULL);
+	TestVolumes(item);
 }
 
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
