@@ -3331,7 +3331,7 @@ int IsRoomOutside(int x, int y, int z)
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, heavy, NULL);
+	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, heavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
