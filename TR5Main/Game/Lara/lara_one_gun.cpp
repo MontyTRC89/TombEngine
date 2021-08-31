@@ -6,7 +6,7 @@
 #include "draw.h"
 #include "box.h"
 #include "control.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "tomb4fx.h"
 #include "lot.h"
@@ -550,7 +550,7 @@ void ControlGrenade(short itemNumber)
 		short sYrot = item->pos.yRot;
 		item->pos.yRot = item->goalAnimState;
 
-		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
+		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
 
 		item->goalAnimState = item->pos.yRot;
 		item->pos.yRot = sYrot;
@@ -634,28 +634,21 @@ void ControlGrenade(short itemNumber)
 
 					ITEM_INFO* currentItem = CollidedItems[i];
 
-					if (currentItem->objectNumber < ID_SMASH_OBJECT1
-						|| currentItem->objectNumber > ID_SMASH_OBJECT16)
+					if (currentItem->objectNumber < ID_SMASH_OBJECT1 || currentItem->objectNumber > ID_SMASH_OBJECT16)
 					{
-						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 ||
-							currentItem->objectNumber > ID_SHOOT_SWITCH4 ||
-							(currentItem->flags & 0x40))
+						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 || currentItem->objectNumber > ID_SHOOT_SWITCH4 || (currentItem->flags & 0x40))
 						{
-							if (Objects[currentItem->objectNumber].intelligent
-								|| currentItem->objectNumber != ID_LARA)
+							if (Objects[currentItem->objectNumber].intelligent || currentItem->objectNumber == ID_LARA)
 							{
 								DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_GRENADE_LAUNCHER);
 							}
 						}
 						else
 						{
-							if ((currentItem->flags & 0x3E00) &&
-								(currentItem->flags & 0x3E00) != 0x3E00)
+							if ((currentItem->flags & IFLAG_ACTIVATION_MASK) &&
+								(currentItem->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 							{
-								roomNumber = currentItem->roomNumber;
-								FLOOR_INFO* floor = GetFloor(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, &roomNumber);
-								GetFloorHeight(floor, currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos);
-								TestTriggers(TriggerIndex, 1, currentItem->flags & 0x3E00);
+								TestTriggers(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
 							}
 							else
 							{
@@ -1760,7 +1753,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 		}
 		else
 		{
-			LaraItem->hitPoints -= Weapons[weapon].damage;
+			LaraItem->hitPoints -= (Weapons[weapon].damage * 5);
 			if (!(g_Level.Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= Weapons[weapon].damage)
 				LaraBurn();
 		}

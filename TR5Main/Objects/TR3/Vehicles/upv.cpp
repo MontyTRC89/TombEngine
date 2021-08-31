@@ -4,7 +4,7 @@
 #include "items.h"
 #include "sphere.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "collide.h"
 #include "box.h"
 #include "lara_flare.h"
@@ -435,7 +435,6 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->old.y = v->pos.yPos;
 	coll->old.z = v->pos.zPos;
 	coll->radius = SUB_RADIUS;
-	coll->trigger = NULL;
 	coll->slopesAreWalls = false;
 	coll->slopesArePits = false;
 	coll->lavaIsPit = false;
@@ -495,9 +494,9 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		return;
 	}
 
-	if (coll->midFloor < 0)
+	if (coll->middle.Floor < 0)
 	{
-		v->pos.yPos += coll->midFloor;
+		v->pos.yPos += coll->middle.Floor;
 		sub->RotX += WALLDEFLECT;
 	}
 }
@@ -733,7 +732,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->gravityStatus = false;
 			l->pos.xRot = l->pos.zRot = 0;
 
-			UpdateLaraRoom(l, -LARA_HITE / 2);
+			UpdateLaraRoom(l, -LARA_HEIGHT / 2);
 
 			Lara.waterStatus = LW_SURFACE;
 			Lara.waterSurfaceDist = -hfw;
@@ -1005,7 +1004,7 @@ int SubControl(void)
 		}
 	}
 
-	TestTriggers(TriggerIndex, false, 0);
+	TestTriggers(v, false, NULL);
 	SubEffects(Lara.Vehicle);
 
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))

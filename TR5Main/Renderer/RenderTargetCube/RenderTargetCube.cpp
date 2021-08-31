@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "RenderTargetCube.h"
 #include "Utils.h"
-using ten::renderer::Utils::throwIfFailed;
-ten::renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) : resolution(resolution) {
+using TEN::Renderer::Utils::throwIfFailed;
+TEN::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) : resolution(resolution) {
 
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = resolution;

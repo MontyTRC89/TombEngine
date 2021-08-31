@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "RendererSprites.h"
 #include "Renderer11.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	void addSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
 	{
 		if (scale <= 0.0f)

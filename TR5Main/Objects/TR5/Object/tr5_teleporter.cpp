@@ -179,7 +179,6 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->itemFlags[0] == 15)
 		{
-			IsAtmospherePlaying = 0;
 			//S_CDPlay("xa12_z_10", 0);
 		}
 		else if (item->itemFlags[0] == 70)

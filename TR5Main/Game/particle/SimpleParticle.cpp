@@ -4,9 +4,9 @@
 #include "trmath.h"
 #include <Specific\setup.h>
 #include "prng.h"
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 
-namespace ten::Effects{
+namespace TEN::Effects{
 	std::array<SimpleParticle, 15> simpleParticles;
 	SimpleParticle& getFreeSimpleParticle()
 	{

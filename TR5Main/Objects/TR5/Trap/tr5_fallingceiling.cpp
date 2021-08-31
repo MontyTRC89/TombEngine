@@ -4,6 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "control.h"
+
 void FallingCeilingControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

@@ -6,12 +6,14 @@
 #include "traps.h"
 #include "draw.h"
 #include "tomb4fx.h"
-#include "effect.h"
+#include "effect2.h"
 #include "level.h"
 #include "lara.h"
-#include "tr4_mutant.h"
 #include "control.h"
-namespace ten::entities::all
+#include "tr4_mutant.h"
+#include "collide.h"
+
+namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{

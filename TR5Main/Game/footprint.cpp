@@ -6,7 +6,7 @@
 #include "groundfx.h"
 #include "level.h"
 #include "items.h"
-namespace ten {
+namespace TEN {
 	namespace Effects {
 		namespace Footprints {
 			std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();

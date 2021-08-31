@@ -7,7 +7,7 @@
 #include "level.h"
 #include "control.h"
 #include "Renderer11.h"
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 short PickupX;
 short PickupY;
 short CurrentPickup;
@@ -32,11 +32,11 @@ void DrawHealthBarOverlay(int value)
 	if (CurrentLevel)
 	{
 		int color2 = 0;
-		if (Lara.poisoned || Lara.gassed)
+		if (Lara.poisoned)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter,Lara.poisoned || Lara.gassed);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
 	}
 }
 
@@ -44,7 +44,7 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE,GlobalCounter,Lara.poisoned || Lara.gassed);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
 	}
 }
 
@@ -170,13 +170,6 @@ void UpdateAirBar(int flash)
 	}
 	else
 		DrawAirBar(air / 1800.0f);
-
-	if (Lara.gassed)
-	{
-		if (Lara.dpoisoned < 2048)
-			Lara.dpoisoned += 2;
-		Lara.gassed = false;
-	}
 }
 
 void DrawDashBar(int value)

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "objects.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "draw.h"
 #include "Lara.h"
@@ -130,40 +130,13 @@ void ControlTriggerTriggerer(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	
-	if (TriggerIndex)
+
+	if (floor->Flags.MarkTriggerer)
 	{
-		short* trigger = TriggerIndex;
-		
-		if ((*trigger & 0x1F) == 5)
-		{
-			if ((*trigger & 0x8000) != 0)
-				return;
-			trigger++;
-		}
-		
-		if ((*trigger & 0x1F) == 6)
-		{
-			if ((*trigger & 0x8000) != 0)
-				return;
-			trigger++;
-		}
-		
-		if ((*trigger & 0x1F) == 19)
-		{
-			if ((*trigger & 0x8000) != 0)
-				return;
-			trigger++;
-		}
-		
-		if ((*trigger & 0x1F) == 20)
-		{
-			if (TriggerActive(item))
-				*trigger |= 0x20u;
-			else
-				*trigger &= 0xDFu;
-		}
+		if (TriggerActive(item))
+			floor->Flags.MarkTriggererActive = true;
+		else
+			floor->Flags.MarkTriggererActive = false;
 	}
 }
 

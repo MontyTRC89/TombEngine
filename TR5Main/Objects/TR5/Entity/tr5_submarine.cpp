@@ -8,13 +8,14 @@
 #include "effect2.h"
 #include "lara_fire.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_one_gun.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
 #include "creature_info.h"
+#include "collide.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {
@@ -422,7 +423,7 @@ void ChaffFlareControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
+	DoProjectileDynamics(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;

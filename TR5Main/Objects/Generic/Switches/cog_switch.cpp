@@ -21,19 +21,17 @@ namespace TEN::Entities::Switches
 
 	void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto item = &g_Level.Items[itemNum];
+		auto triggerIndex = GetTriggerIndex(item);
 
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-		if (!TriggerIndex)
+		if (!triggerIndex)
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
 		}
 
-		short* trigger = TriggerIndex;
-		for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+		short* trigger = triggerIndex;
+		for (int i = *triggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;

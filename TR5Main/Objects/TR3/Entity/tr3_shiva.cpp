@@ -2,7 +2,7 @@
 #include "tr3_shiva.h"
 #include "effect2.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "items.h"
 #include "setup.h"

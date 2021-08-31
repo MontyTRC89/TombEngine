@@ -14,6 +14,8 @@
 #include <draw.h>
 #include "creature_info.h"
 #include "setup.h"
+#include "control/trigger.h"
+
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
 	short grenadeItemNumber = CreateItem();
@@ -263,7 +265,8 @@ void EnemyJeepControl(short itemNumber)
 
 		if (creature->reachedGoal)
 		{
-			TestTriggersAtXYZ(target->pos.xPos, target->pos.yPos, target->pos.zPos, target->roomNumber, 1, 0);
+			//TODO: CREATURE_TARGET was created to avoid circular dependency between ITEM_INFO and ITEM_DATA 
+			//TestTriggers(target, true, 0x0);
 
 			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
 			{

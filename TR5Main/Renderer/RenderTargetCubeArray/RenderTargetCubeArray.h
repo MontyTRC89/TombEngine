@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <array>
 #include <wrl/client.h>
-namespace ten::renderer {
+namespace TEN::Renderer {
 	using Microsoft::WRL::ComPtr;
 	using std::array;
 	using std::vector;

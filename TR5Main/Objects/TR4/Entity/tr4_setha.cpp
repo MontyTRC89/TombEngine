@@ -11,7 +11,8 @@
 #include <sphere.h>
 #include <people.h>
 #include "creature_info.h"
-#include "effect.h"
+#include "effect2.h"
+
 BITE_INFO SethaBite1 = { 0,220,50,17 };
 BITE_INFO SethaBite2 = { 0,220,50,13 };
 BITE_INFO SethaAttack1 = { -16,200,32,13 };

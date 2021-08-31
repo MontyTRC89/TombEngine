@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "draw.h"
 #include "camera.h"
@@ -1263,7 +1263,8 @@ int KayakControl()
 	short roomNumber = v->roomNumber;
 	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	int h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
-	TestTriggers(TriggerIndex, 0, 0);
+
+	TestTriggers(v, false, NULL);
 
 	int water;
 	if ((kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber)) == NO_HEIGHT)

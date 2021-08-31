@@ -11,6 +11,7 @@
 #include "collide.h"
 #include "item.h"
 #include "setup.h"
+#include "level.h"
 extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 

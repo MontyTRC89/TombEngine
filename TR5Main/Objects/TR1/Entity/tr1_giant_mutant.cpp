@@ -210,9 +210,7 @@ void AbortionControl(short itemNum)
 		SoundEffect(171, &item->pos, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
 
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
-		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		TestTriggers(TriggerIndex, TRUE, 0);
+		TestTriggers(item, true, NULL);
 
 		KillItem(itemNum);
 		item->status = ITEM_DEACTIVATED;

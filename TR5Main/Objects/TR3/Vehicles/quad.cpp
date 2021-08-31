@@ -7,7 +7,7 @@
 #include "collide.h"
 #include "camera.h"
 #include "tomb4fx.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "misc.h"
@@ -18,7 +18,7 @@
 #include "prng.h"
 #include "quad_info.h"
 using std::vector;
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
@@ -167,7 +167,7 @@ static int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
-	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
+	auto item = &g_Level.Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = item->pos.yRot - ANGLE(90);
@@ -178,19 +178,15 @@ static int CanQuadbikeGetOff(int direction)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos + 512 * phd_cos(angle);
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL) || (height == NO_HEIGHT))
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
 
-	if (abs(height - item->pos.yPos) > 512)
+	if (abs(collResult.FloorHeight - item->pos.yPos) > 512)
 		return false;
 
-	int ceiling = GetCeiling(floor, x, y, z);
-
-	if ((ceiling - item->pos.yPos > -LARA_HITE) || (height - ceiling < LARA_HITE))
+	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -1289,11 +1285,7 @@ int QuadBikeControl(void)
 	int hfl = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
 	int hfr = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	TestTriggers(TriggerIndex, 0, 0);
+	TestTriggers(item, false, NULL);
 
 	if (LaraItem->hitPoints <= 0)
 	{

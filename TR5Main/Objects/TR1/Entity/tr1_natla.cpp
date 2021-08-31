@@ -7,7 +7,7 @@
 #include "level.h"
 #include "sound.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "trmath.h"
 #include "creature_info.h"
 #define NATLA_NEAR_DEATH 200

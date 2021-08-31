@@ -10,7 +10,7 @@
 #include "spark.h"
 #include "prng.h"
 #define	MAX_TRIGGER_RANGE	0x4000
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 
 void TriggerChaffEffects(int flareAge)
 {
@@ -90,7 +90,7 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 			Vector3 position = Vector3(pos->x,pos->y,pos->z);
 			Vector3 direction = Vector3(vel->x, vel->y, vel->z);
 			direction.Normalize();
-			ten::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->roomNumber);
+			TEN::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->roomNumber);
 		}
 	}
 }
@@ -132,7 +132,7 @@ void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int 
 	sparkle->gravity = sparkle->maxYvel = 0;
 	sparkle->flags = SP_SCALE;
 	*/
-	ten::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->roomNumber);
+	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->roomNumber);
 }
 
 

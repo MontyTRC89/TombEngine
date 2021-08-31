@@ -5,7 +5,7 @@
 #include "sound.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 void InitialiseJobySpikes(short itemNumber)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];
