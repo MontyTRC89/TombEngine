@@ -813,10 +813,11 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 				g_Level.Rooms[roomIndex].mesh[staticIndex].y,
 				g_Level.Rooms[roomIndex].mesh[staticIndex].z,
 				&roomIndex);
-			int height = GetFloorHeight(floor, g_Level.Rooms[roomIndex].mesh[staticIndex].x,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].y,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].z);
-			TestTriggers(TriggerIndex, 1, 0);
+
+			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].x,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].y,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].z, roomIndex, true, NULL);
+
 			floor->stopper = false;
 		}
 

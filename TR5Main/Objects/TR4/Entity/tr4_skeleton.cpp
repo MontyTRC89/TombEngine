@@ -3,7 +3,7 @@
 #include "items.h"
 #include "box.h"
 #include "people.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "debris.h"
 #include "effect2.h"
@@ -15,6 +15,8 @@
 #include "level.h"
 #include "creature_info.h"
 #include "floordata.h"
+#include "collide.h"
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO skeletonBite = { 0, -16, 200, 11 };
@@ -636,7 +638,7 @@ namespace TEN::Entities::TR4
 
 					GetJointAbsPosition(item, &pos, 16);
 
-					FLOOR_INFO* floor = &room->floor[((z - room->z) >> 10) + room->ySize * ((x - room->x) >> 10)];
+					auto floor = GetCollisionResult(x, y, z, item->roomNumber).Block;
 					if (floor->stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
@@ -648,8 +650,8 @@ namespace TEN::Entities::TR4
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 								staticMesh->flags &= ~1;
 								floor->stopper = 0;
-								GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-								TestTriggers(TriggerIndex, 1, 0);
+								TestTriggers(item, true, NULL);
+								break;
 							}
 						}
 					}

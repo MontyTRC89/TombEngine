@@ -9,6 +9,8 @@
 #include "switch.h"
 #include "setup.h"
 #include "camera.h"
+#include "level.h"
+
 namespace TEN::Entities::Switches
 {
 	enum TurnSwitchDirection

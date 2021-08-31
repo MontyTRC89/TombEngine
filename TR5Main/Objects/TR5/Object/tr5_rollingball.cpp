@@ -6,7 +6,8 @@
 #include "lara.h"
 #include "setup.h"
 #include "sound.h"
-#include "effect.h"
+#include "effect2.h"
+#include "level.h"
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -291,10 +292,7 @@ void RollingBallControl(short itemNumber)
 
 	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) / 2;
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	TestTriggers(TriggerIndex, true, NULL);
+	TestTriggers(item, true, NULL);
 }
 
 void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
@@ -400,7 +398,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		TestTriggers(TriggerIndex, TRUE, NULL);
+		TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum, true, NULL);
 
 		if (item->pos.yPos >= (int)floor - 256)
 		{

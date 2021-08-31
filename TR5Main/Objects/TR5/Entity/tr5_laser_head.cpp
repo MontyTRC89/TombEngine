@@ -9,7 +9,7 @@
 #include "debris.h"
 #include "draw.h"
 #include "control.h"
-#include "effect.h"
+#include "effect2.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
@@ -263,7 +263,7 @@ void LaserHeadControl(short itemNumber)
 				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0x6000, 0);
 
 				g_Level.Items[creature->puzzleItem].pos.yPos = item->pos.yPos;
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+				TestTriggers(item, true, NULL);
 
 				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->pos, 0x800004);
 				SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 20971524);

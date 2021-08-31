@@ -27,7 +27,7 @@ void InitialiseRaisingBlock(short itemNumber)
 	// Get height from animations
 	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
 	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
-	ten::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::AddBridge(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)

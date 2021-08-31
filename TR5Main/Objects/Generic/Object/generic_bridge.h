@@ -1,5 +1,6 @@
 #pragma once
 #include "phd_global.h"
+#include "level.h"
 
 void InitialiseBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);

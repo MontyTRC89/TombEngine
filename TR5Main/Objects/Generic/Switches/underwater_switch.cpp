@@ -8,6 +8,8 @@
 #include "generic_switch.h"
 #include "camera.h"
 #include "collide.h"
+#include "level.h"
+
 namespace TEN::Entities::Switches
 { 
 	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =

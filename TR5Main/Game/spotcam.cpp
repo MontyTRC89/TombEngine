@@ -6,8 +6,12 @@
 #include "tomb4fx.h"
 #include "lara.h"
 #include "input.h"
-#include "Renderer11.h"
-using namespace ten::renderer;
+#include "control\volume.h"
+
+using namespace TEN::Renderer;
+using namespace TEN::Control::Volumes;
+
+
 int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
@@ -551,12 +555,14 @@ void CalculateSpotCameras()
 			Camera.type = HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 0, 0);
-				TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+				TestVolumes(&Camera);
 			}
 			Camera.type = oldType;
 			CheckTrigger = false;
@@ -745,12 +751,14 @@ void CalculateSpotCameras()
 						Camera.type = HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 0, 0);
-							TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+							TestVolumes(&Camera);
 						}
 						Camera.type = oldType;
 						CheckTrigger = false;

@@ -7,7 +7,7 @@
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
-#include "effect2.h"
+#include "flipeffect.h"
 #include "draw.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -28,7 +28,7 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "debris.h"
 #include "lara_fire.h"
@@ -51,6 +51,7 @@
 #include <process.h>
 #include "prng.h"
 #include <Game/Lara/lara_one_gun.h>
+#include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
 #include "creature_info.h"
 using namespace TEN::Entities::Switches;
@@ -58,13 +59,13 @@ using namespace TEN::Entities::Switches;
 using std::vector;
 using std::unordered_map;
 using std::string;
-using namespace ten::Effects::Explosion;
-using namespace ten::Effects::Spark;
-using namespace ten::Effects::Smoke;
-using namespace ten::Effects;
-using ten::renderer::g_Renderer;
-using namespace ten::Math::Random;
-using namespace ten::Floordata;
+using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects;
+using TEN::Renderer::g_Renderer;
+using namespace TEN::Math::Random;
+using namespace TEN::Floordata;
 
 
 int KeyTriggerActive;
@@ -75,7 +76,6 @@ int ClosestDist;
 PHD_VECTOR ClosestCoord;
 int RumbleTimer = 0;
 int InGameCnt = 0;
-byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
 int FlipMap[MAX_FLIPMAP];
@@ -86,7 +86,6 @@ short NextFxActive;
 short NextFxFree;
 short NextItemActive;
 short NextItemFree;
-short *TriggerIndex;
 
 int DisableLaraControl = 0;
 int WeatherType;
@@ -102,7 +101,6 @@ short CurrentRoom;
 int GameTimer;
 short GlobalCounter;
 byte LevelComplete;
-short DelCutSeqPlayer;
 #ifndef NEW_INV
 int LastInventoryItem;
 #endif
@@ -112,29 +110,21 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-HEIGHT_TYPES HeightType;
-int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
 CVECTOR SkyColor1;
 CVECTOR SkyColor2;
 int CutSeqNum;
-int CutSeqTriggered;
-int GlobalPlayingCutscene;
 int CurrentLevel;
-bool SoundActive;
 bool DoTheGame;
 bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
-int OnObject;
-int KillEverythingFlag;
 int FlipTimer;
 int FlipEffect;
 int TriggerTimer;
 int JustLoaded;
-int PoisonFlags;
 int OldLaraBusy;
 int Infrared;
 short FlashFadeR;
@@ -142,16 +132,8 @@ short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
 
-int SplitFloor;
-int SplitCeiling;
-int TiltXOffset;
-int TiltYOffset;
-int FramesCount;
-
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
-
-bool g_CollidedVolume = false;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
@@ -160,7 +142,7 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace ten::Effects::Footprints;
+using namespace TEN::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
@@ -178,6 +160,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
@@ -203,17 +186,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// If cutscene has been triggered then clear input
-		if (CutSeqTriggered)
-			TrInput = IN_NONE;
-
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
 #ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0 && !CutSeqTriggered)
+			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				SOUND_Stop();
 				g_Renderer.DumpGameScene();
@@ -221,7 +200,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -244,7 +223,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 #else
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
@@ -442,23 +421,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Lara.poisoned > 4096)
 					Lara.poisoned = 4096;
-				else if (Lara.dpoisoned)
-					Lara.dpoisoned++;
 
-
-				if (!Lara.gassed)
-				{
-					if (Lara.dpoisoned)
-					{
-						Lara.dpoisoned -= 8;
-						if (Lara.dpoisoned < 0)
-							Lara.dpoisoned = 0;
-					}
-				}
 				if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
 				{
-					LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
-					PoisonFlags = 16;
+					LaraItem->hitPoints -= Lara.poisoned >> 8;
 				}
 			}
 
@@ -517,13 +483,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					SmashedMesh[SmashedMeshCount]->z,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				int height = GetFloorHeight(
-					floor,
-					SmashedMesh[SmashedMeshCount]->x,
-					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z);
-
-				TestTriggers(TriggerIndex, 1, 0);
+				TestTriggers(SmashedMesh[SmashedMeshCount]->x,
+					         SmashedMesh[SmashedMeshCount]->y,
+					         SmashedMesh[SmashedMeshCount]->z,
+					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
@@ -549,7 +512,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		ten::Effects::Drip::UpdateDrips();
+		TEN::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
@@ -584,6 +547,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Do flipeffects
 		if (FlipEffect != -1)
 			effect_routines[FlipEffect](NULL);
+
+		// Clear savegame loaded flag
+		JustLoaded = false;
 
 		// Update timers
 		HealthBarTimer--;
@@ -664,7 +630,6 @@ GAME_STATUS DoTitle(int index)
 #ifndef NEW_INV
 		LastInventoryItem = -1;
 #endif
-		DelCutSeqPlayer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -676,7 +641,6 @@ GAME_STATUS DoTitle(int index)
 		// Play background music
 		//CurrentAtmosphere = ambient;
 		S_CDPlay(CurrentAtmosphere, 1);
-		IsAtmospherePlaying = true;
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -804,7 +768,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 #ifndef NEW_INV
 	LastInventoryItem = -1;
 #endif
-	DelCutSeqPlayer = 0;
 
 #ifdef NEW_INV
 	GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -820,7 +783,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Play background music
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
-	IsAtmospherePlaying = true;
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -861,570 +823,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 			return result;
 		}
-	}
-}
-
-void TestTriggers(short *data, int heavy, int HeavyFlags)
-{
-	int flip = -1;
-	int flipAvailable = 0;
-	int newEffect = -1;
-	int switchOff = 0;
-	int switchFlag = 0;
-	short objectNumber = 0;
-	int keyResult = 0;
-	short cameraFlags = 0;
-	short cameraTimer = 0;
-	int spotCamIndex = 0;
-
-	// Test trigger volumes
-	g_CollidedVolume = false;
-
-	ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
-	for (size_t i = 0; i < room->triggerVolumes.size(); i++)
-	{
-
-		TRIGGER_VOLUME* volume = &room->triggerVolumes[i];
-
-		bool contains = false;
-		switch (volume->type)
-		{
-		case VOLUME_BOX:
-			g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			contains = (volume->box.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
-			break;
-
-		case VOLUME_SPHERE:
-			g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			contains = (volume->sphere.Contains(Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos)) == ContainmentType::CONTAINS);
-			break;
-		}
-
-		if (contains)
-		{
-			g_CollidedVolume = true;
-
-			if (volume->status == TriggerStatus::TS_OUTSIDE)
-			{
-				volume->status = TriggerStatus::TS_ENTERING;
-				if (!volume->onEnter.empty())
-					g_GameScript->ExecuteFunction(volume->onEnter);
-			}
-			else
-			{
-				volume->status = TriggerStatus::TS_INSIDE;
-				if (!volume->onInside.empty())
-					g_GameScript->ExecuteFunction(volume->onInside);
-			}
-		}
-		else
-		{
-			if (volume->status == TriggerStatus::TS_INSIDE)
-			{
-				volume->status = TriggerStatus::TS_LEAVING;
-				if (!volume->onLeave.empty())
-					g_GameScript->ExecuteFunction(volume->onLeave);
-			}
-			else
-			{
-				volume->status = TriggerStatus::TS_OUTSIDE;
-			}
-		}
-	}
-
-	HeavyTriggered = false;
-
-	if (!heavy)
-	{
-		Lara.canMonkeySwing = false;
-		Lara.climbStatus = false;
-		Lara.ClockworkBeetleFlag = false;
-	}
-
-	if (!data)
-		return;
-
-	// Burn Lara
-	if ((*data & 0x1F) == LAVA_TYPE)
-	{
-		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
-			LavaBurn(LaraItem);
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can climb
-	if ((*data & 0x1F) == CLIMB_TYPE)
-	{
-		if (!heavy)
-		{
-			short quad = GetQuadrant(LaraItem->pos.yRot);
-			if ((1 << (quad + 8)) & *data)
-				Lara.climbStatus = true;
-		}
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Lara can monkey
-	if ((*data & 0x1F) == MONKEY_TYPE)
-	{
-		if (!heavy)
-			Lara.canMonkeySwing = true;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	//for the stupid beetle
-	if ((*data & 0x1F) == MINER_TYPE)
-	{
-		if (!heavy)
-			Lara.ClockworkBeetleFlag = 1;
-
-		if (*data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	// Trigger triggerer
-	if ((*data & 0x1F) == TRIGTRIGGER_TYPE)
-	{
-		if (!(*data & 0x20) || *data & 0x8000)
-			return;
-
-		data++;
-	}
-
-	short triggerType = (*(data++) >> 8) & 0x3F;
-	short flags = *(data++);
-	short timer = flags & 0xFF;
-
-	if (Camera.type != HEAVY_CAMERA)
-		RefreshCamera(triggerType, data);
-
-	short value = 0;
-
-	if (heavy)
-	{
-		switch (triggerType)
-		{
-		case HEAVY:
-		case HEAVYANTITRIGGER:
-			break;
-
-		case HEAVYSWITCH:
-			if (!HeavyFlags)
-				return;
-
-			if (HeavyFlags >= 0)
-			{
-				flags &= CODE_BITS;
-				if (flags != HeavyFlags)
-					return;
-			}
-			else
-			{
-				flags |= CODE_BITS;
-				flags += HeavyFlags;
-			}
-			break;
-
-		default:
-			// Enemies can only activate heavy triggers
-			return;
-		}
-	}
-	else
-	{
-		switch (triggerType)
-		{
-		case TRIGGER_TYPES::SWITCH:
-			value = *(data++) & 0x3FF;
-
-			if (flags & ONESHOT)
-				g_Level.Items[value].itemFlags[0] = 1;
-
-			if (!SwitchTrigger(value, timer))
-				return;
-
-			objectNumber = g_Level.Items[value].objectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].triggerFlags == 5)
-				switchFlag = 1;
-
-			switchOff = (g_Level.Items[value].currentAnimState == 1);
-
-			break;
-
-		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->currentAnimState >= LS_MONKEYSWING_IDLE &&
-				(LaraItem->currentAnimState <= LS_MONKEYSWING_TURN_180 ||
-					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT ||
-					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
-				break;
-			return;
-
-		case TRIGGER_TYPES::TIGHTROPE_T:
-			if (LaraItem->currentAnimState >= LS_TIGHTROPE_IDLE &&
-				LaraItem->currentAnimState <= LS_TIGHTROPE_RECOVER_BALANCE &&
-				LaraItem->currentAnimState != LS_DOVESWITCH)
-				break;
-			return;
-
-		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->currentAnimState == LS_DOVESWITCH ||
-				LaraItem->currentAnimState == LS_CRAWL_IDLE ||
-				LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->currentAnimState == LS_CRAWL_BACK ||
-				LaraItem->currentAnimState == LS_CROUCH_IDLE ||
-				LaraItem->currentAnimState == LS_CROUCH_ROLL ||
-				LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
-				LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
-				break;
-			return;
-
-		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->currentAnimState == LS_HANG ||
-				LaraItem->currentAnimState == LS_LADDER_IDLE ||
-				LaraItem->currentAnimState == LS_LADDER_UP ||
-				LaraItem->currentAnimState == LS_LADDER_LEFT ||
-				LaraItem->currentAnimState == LS_LADDER_STOP ||
-				LaraItem->currentAnimState == LS_LADDER_RIGHT ||
-				LaraItem->currentAnimState == LS_LADDER_DOWN ||
-				LaraItem->currentAnimState == LS_MONKEYSWING_IDLE)
-				break;
-			return;
-
-		case TRIGGER_TYPES::PAD:
-		case TRIGGER_TYPES::ANTIPAD:
-			if (LaraItem->pos.yPos == LaraItem->floor)
-				break;
-			return;
-
-		case TRIGGER_TYPES::KEY:
-			value = *(data++) & 0x3FF;
-			keyResult = KeyTrigger(value);
-			if (keyResult != -1)
-				break;
-			return;
-
-		case TRIGGER_TYPES::PICKUP:
-			value = *(data++) & 0x3FF;
-			if (!PickupTrigger(value))
-				return;
-			break;
-
-		case TRIGGER_TYPES::COMBAT:
-			if (Lara.gunStatus == LG_READY)
-				break;
-			return;
-
-	//	case TRIGGER_TYPES::SKELETON_T:	//NO.
-	//		Lara.skelebob = 2;
-	//		break;
-
-		case TRIGGER_TYPES::HEAVY:
-		case TRIGGER_TYPES::DUMMY:
-		case TRIGGER_TYPES::HEAVYSWITCH:
-		case TRIGGER_TYPES::HEAVYANTITRIGGER:
-			return;
-
-		default:
-			break;
-		}
-	}
-
-	short targetType = 0;
-	short trigger = 0;
-
-	ITEM_INFO *item = NULL;
-	ITEM_INFO *cameraItem = NULL;
-
-	do
-	{
-		trigger = *(data++);
-		value = trigger & VALUE_BITS;
-		targetType = (trigger >> 10) & 0xF;
-
-		switch (targetType)
-		{
-		case TO_OBJECT:
-			item = &g_Level.Items[value];
-
-			if (keyResult >= 2 ||
-				(triggerType == TRIGGER_TYPES::ANTIPAD ||
-				 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-				 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
-					item->flags & ATONESHOT)
-				break;
-
-			if (triggerType == TRIGGER_TYPES::SWITCH)
-			{
-				if (item->flags & SWONESHOT)
-					break;
-				if (item->objectNumber == ID_DART_EMITTER && item->active)
-					break;
-			}
-
-			item->timer = timer;
-			if (timer != 1)
-				item->timer = 30 * timer;
-
-			if (triggerType == TRIGGER_TYPES::SWITCH ||
-				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
-			{
-				if (HeavyFlags >= 0)
-				{
-					if (switchFlag)
-						item->flags |= (flags & CODE_BITS);
-					else
-						item->flags ^= (flags & CODE_BITS);
-
-					if (flags & ONESHOT)
-						item->flags |= SWONESHOT;
-				}
-				else
-				{
-					if (((flags ^ item->flags) & CODE_BITS) == CODE_BITS)
-					{
-						item->flags ^= (flags & CODE_BITS);
-						if (flags & ONESHOT)
-							item->flags |= SWONESHOT;
-					}
-				}
-			}
-			else if (triggerType == TRIGGER_TYPES::ANTIPAD ||
-					 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-					 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
-			{
-				if (item->objectNumber == ID_EARTHQUAKE)
-				{
-					item->itemFlags[0] = 0;
-					item->itemFlags[1] = 100;
-				}
-
-				item->flags &= ~(CODE_BITS | REVERSE);
-
-				if (flags & ONESHOT)
-					item->flags |= ATONESHOT;
-
-				if (item->active && Objects[item->objectNumber].intelligent)
-				{
-					item->hitPoints = NOT_TARGETABLE;
-					DisableBaddieAI(value);
-					KillItem(value);
-				}
-			}
-			else if (flags & CODE_BITS)
-			{
-				item->flags |= flags & CODE_BITS;
-			}
-
-			if ((item->flags & CODE_BITS) == CODE_BITS)
-			{
-				item->flags |= 0x20;
-
-				if (flags & ONESHOT)
-					item->flags |= ONESHOT;
-
-				if (!(item->active) && !(item->flags & IFLAG_KILLED))
-				{
-					if (Objects[item->objectNumber].intelligent)
-					{
-						if (item->status != ITEM_NOT_ACTIVE)
-						{
-							if (item->status == ITEM_INVISIBLE)
-							{
-								item->touchBits = 0;
-								if (EnableBaddieAI(value, 0))
-								{
-									item->status = ITEM_ACTIVE;
-									AddActiveItem(value);
-								}
-								else
-								{
-									item->status == ITEM_INVISIBLE;
-									AddActiveItem(value);
-								}
-							}
-						}
-						else
-						{
-							item->touchBits = 0;
-							item->status = ITEM_ACTIVE;
-							AddActiveItem(value);
-							EnableBaddieAI(value, 1);
-						}
-					}
-					else
-					{
-						item->touchBits = 0;
-						AddActiveItem(value);
-						item->status = ITEM_ACTIVE;
-						HeavyTriggered = heavy;
-					}
-				}
-			}
-			break;
-
-		case TO_CAMERA:
-			trigger = *(data++);
-
-			if (keyResult == 1)
-				break;
-
-			if (g_Level.Cameras[value].flags & 0x100)
-				break;
-
-			Camera.number = value;
-
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(g_Level.Cameras[value].flags & 3))
-				break;
-
-			if (triggerType == TRIGGER_TYPES::COMBAT)
-				break;
-
-			if (triggerType == TRIGGER_TYPES::SWITCH && timer && switchOff)
-				break;
-
-			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
-			{
-				Camera.timer = (trigger & 0xFF) * 30;
-
-				if (trigger & 0x100)
-					g_Level.Cameras[Camera.number].flags |= ONESHOT;
-
-				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
-				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
-			}
-			break;
-
-		case TO_FLYBY:
-			trigger = *(data++);
-
-			if (keyResult == 1)
-				break;
-
-			if (triggerType == TRIGGER_TYPES::ANTIPAD ||
-				triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-				triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
-				UseSpotCam = false;
-			else
-			{
-				spotCamIndex = 0;
-				if (SpotCamRemap[value] != 0)
-				{
-					for (int i = 0; i < SpotCamRemap[value]; i++)
-					{
-						spotCamIndex += CameraCnt[i];
-					}
-				}
-
-				if (!(SpotCam[spotCamIndex].flags & SCF_CAMERA_ONE_SHOT))
-				{
-					if (trigger & 0x100)
-						SpotCam[spotCamIndex].flags |= SCF_CAMERA_ONE_SHOT;
-
-					if (!UseSpotCam || CurrentLevel == 0)
-					{
-						UseSpotCam = true;
-						if (LastSpotCam != value)
-							TrackCameraInit = false;
-						InitialiseSpotCam(value);
-					}
-				}
-			}
-			break;
-
-		case TO_TARGET:
-			cameraItem = &g_Level.Items[value];
-			break;
-
-		case TO_SINK:
-			Lara.currentActive = value + 1;
-			break;
-
-		case TO_FLIPMAP:
-			flipAvailable = true;
-
-			if (FlipMap[value] & 0x100)
-				break;
-
-			if (triggerType == TRIGGER_TYPES::SWITCH)
-				FlipMap[value] ^= (flags & CODE_BITS);
-			else if (flags & CODE_BITS)
-				FlipMap[value] |= (flags & CODE_BITS);
-
-			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
-			{
-
-				if (flags & 0x100)
-					FlipMap[value] |= 0x100;
-				if (!FlipStats[value])
-					flip = value;
-			}
-			else if (FlipStats[value])
-				flip = value;
-			break;
-
-		case TO_FLIPON:
-			flipAvailable = true;
-			FlipMap[value] |= CODE_BITS;
-			if (!FlipStats[value])
-				flip = value;
-			break;
-
-		case TO_FLIPOFF:
-			flipAvailable = true;
-			FlipMap[value] &= ~CODE_BITS;
-			if (FlipStats[value])
-				flip = value;
-			break;
-
-		case TO_FLIPEFFECT:
-			TriggerTimer = timer;
-			newEffect = value;
-			break;
-
-		case TO_FINISH:
-			RequiredStartPos = false;
-			LevelComplete = CurrentLevel + 1;
-			break;
-
-		case TO_CD:
-			PlaySoundTrack(value, flags);
-			break;
-
-		case TO_CUTSCENE:
-			// TODO: not used for now
-			break;
-
-		default:
-			break;
-		}
-
-	} while (!(trigger & 0x8000));
-
-	if (cameraItem && (Camera.type == FIXED_CAMERA || Camera.type == HEAVY_CAMERA))
-		Camera.item = cameraItem;
-
-	if (flip != -1)
-		DoFlipMap(flip);
-
-	if (newEffect != -1 && (flip || !flipAvailable))
-	{
-		FlipEffect = newEffect;
-		FlipTimer = 0;
 	}
 }
 
@@ -1800,218 +1198,6 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
-
-	TiltYOffset = 0;
-	TiltXOffset = 0;
-	OnObject = 0;
-	HeightType = WALL;
-	SplitFloor = 0;
-
-	ROOM_INFO *r;
-	while (floor->pitRoom != NO_ROOM)
-	{
-		if (CheckNoColFloorTriangle(floor, x, z) == 1)
-			break;
-		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	}
-
-	int height = floor->floor * 256;
-	if (height != NO_HEIGHT)
-	{
-		//		return height;
-
-
-		TriggerIndex = NULL;
-
-		if (floor->index != 0)
-		{
-			//		return height;
-
-			short* data = &g_Level.FloorData[floor->index];
-			short type, hadj;
-
-			int xOff, yOff, trigger;
-			ITEM_INFO* item;
-			OBJECT_INFO* obj;
-			int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
-			do
-			{
-				type = *(data++);
-
-				switch (type & DATA_TYPE)
-				{
-				case DOOR_TYPE:
-				case ROOF_TYPE:
-				case SPLIT3:
-				case SPLIT4:
-				case NOCOLC1T:
-				case NOCOLC1B:
-				case NOCOLC2T:
-				case NOCOLC2B:
-					data++;
-					break;
-
-				case TILT_TYPE:
-					TiltXOffset = xOff = (*data >> 8);
-					TiltYOffset = yOff = *(char*)data;
-
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = BIG_SLOPE;
-					else
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += (xOff * ((-1 - z) & 1023) >> 2);
-					else
-						height -= (xOff * (z & 1023) >> 2);
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				case TRIGGER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-
-					data++;
-
-					do
-					{
-						trigger = *(data++);
-
-						if (TRIG_BITS(trigger) != TO_OBJECT)
-						{
-							if (TRIG_BITS(trigger) == TO_CAMERA ||
-								TRIG_BITS(trigger) == TO_FLYBY)
-							{
-								trigger = *(data++);
-							}
-						}
-						else
-						{
-							/*item = &g_Level.Items[trigger & VALUE_BITS];
-							obj = &Objects[item->objectNumber];
-
-							if (obj->floor && !(item->flags & 0x8000))
-							{
-								(obj->floor)(item, x, y, z, &height);
-							}*/
-						}
-
-					} while (!(trigger & END_BIT));
-					break;
-
-				case LAVA_TYPE:
-					TriggerIndex = data - 1;
-					break;
-
-				case CLIMB_TYPE:
-				case MONKEY_TYPE:
-				case TRIGTRIGGER_TYPE:
-				case MINER_TYPE:
-					if (!TriggerIndex)
-						TriggerIndex = data - 1;
-					break;
-
-				case SPLIT1:
-				case SPLIT2:
-				case NOCOLF1T:
-				case NOCOLF1B:
-				case NOCOLF2T:
-				case NOCOLF2B:
-					tilts = *data;
-					t0 = tilts & 15;
-					t1 = (tilts >> 4) & 15;
-					t2 = (tilts >> 8) & 15;
-					t3 = (tilts >> 12) & 15;
-
-					dx = x & 1023;
-					dz = z & 1023;
-
-					xOff = yOff = 0;
-
-					HeightType = SPLIT_TRI;
-					SplitFloor = (type & DATA_TYPE);
-
-					if ((type & DATA_TYPE) == SPLIT1 ||
-						(type & DATA_TYPE) == NOCOLF1T ||
-						(type & DATA_TYPE) == NOCOLF1B)
-					{
-						if (dx <= (1024 - dz))
-						{
-							hadj = (type >> 10) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t0 - t1;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1F;
-							if (hadj & 0x10)
-								hadj |= 0xFFF0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t3 - t2;
-						}
-					}
-					else
-					{
-						if (dx <= dz)
-						{
-							hadj = (type >> 10) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t2 - t1;
-							yOff = t3 - t2;
-						}
-						else
-						{
-							hadj = (type >> 5) & 0x1f;
-							if (hadj & 0x10)
-								hadj |= 0xfff0;
-							height += 256 * hadj;
-							xOff = t3 - t0;
-							yOff = t0 - t1;
-						}
-					}
-
-					TiltXOffset = xOff;
-					TiltYOffset = yOff;
-
-					if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
-						HeightType = DIAGONAL;
-					else if (HeightType != SPLIT_TRI)
-						HeightType = SMALL_SLOPE;
-
-					if (xOff >= 0)
-						height += xOff * ((-1 - z) & 1023) >> 2;
-					else
-						height -= xOff * (z & 1023) >> 2;
-
-					if (yOff >= 0)
-						height += yOff * ((-1 - x) & 1023) >> 2;
-					else
-						height -= yOff * (x & 1023) >> 2;
-
-					data++;
-					break;
-
-				default:
-					break;
-				}
-			} while (!(type & END_BIT));
-		}
-	}
-	/*return height;*/
-
 	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
@@ -2329,7 +1515,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	MESH_INFO *mesh;
 	PHD_VECTOR vector;
 	ITEM_INFO *item;
-	short angle, room, triggerItems[8];
+	short angle, triggerItems[8];
 	VECTOR dir;
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();
@@ -2490,9 +1676,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										room = item->roomNumber;
-										GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
-										TestTriggers(TriggerIndex, 1, item->flags & IFLAG_ACTIVATION_MASK);
+										TestTriggers(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
@@ -2831,10 +2015,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
 
 	// Create the bounding box for raw collision detection
-	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box->X2 + box->X1) / 2.0f, itemOrStaticPos->yPos + (box->Y2 + box->Y1) / 2.0f, itemOrStaticPos->zPos + (box->Z2 + box->Z1) / 2.0f);
-	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TO_RAD(itemOrStaticPos->yRot));
-	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
+	auto obox = TO_DX_BBOX(itemOrStaticPos, box);
 
 	// Get the collision with the bounding box
 	float distance;
@@ -3379,38 +2560,6 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 	return 0;
 }
 
-int TriggerActive(ITEM_INFO *item)
-{
-	int flag;
-
-	flag = (~item->flags & IFLAG_REVERSE) / 16384;
-	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
-	{
-		flag = !flag;
-	}
-	else
-	{
-		if (item->timer)
-		{
-			if (item->timer > 0)
-			{
-				--item->timer;
-				if (!item->timer)
-					item->timer = -1;
-			}
-			else if (item->timer < -1)
-			{
-				++item->timer;
-				if (item->timer == -1)
-					item->timer = 0;
-			}
-			if (item->timer <= -1)
-				flag = !flag;
-		}
-	}
-	return flag;
-}
-
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *r = &g_Level.Rooms[roomNumber];
@@ -3560,12 +2709,6 @@ int IsRoomOutside(int x, int y, int z)
 	}
 
 	return -2;
-}
-
-void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags)
-{
-	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
-	TestTriggers(TriggerIndex, heavy, flags);
 }
 
 void ResetGlobals()

@@ -3,7 +3,7 @@
 
 #include "items.h"
 #include "effect2.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lot.h"
 #include "box.h"
 #include "tomb4fx.h"

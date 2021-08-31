@@ -15,7 +15,7 @@ struct CREATURE_INFO;
 struct ITEM_INFO;
 struct FX_INFO;
 
-namespace ten::renderer {
+namespace TEN::Renderer {
 	struct RendererMesh;
 }
 
@@ -970,7 +970,7 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool CrouchRoll;				//crouch roll
-	bool Monkey180Roll;				//the 180° roll on monkeybars
+	bool Monkey180Roll;				//the 180ï¿½ roll on monkeybars
 	bool Crawl1clickup;				//going 1 click up in crawlspaces
 	bool Crawl1clickdown;			//going 1 click down in crawlspaces
 	bool CrawlExit1click;			//crawlspace exit at 1 click
@@ -1013,7 +1013,6 @@ struct LaraInfo
 	HolsterInfo holsterInfo;
 	short flareFrame;
 	short poisoned;
-	short dpoisoned;
 	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft;
 	bool look;
@@ -1022,7 +1021,6 @@ struct LaraInfo
 	bool isMoving;
 	bool canMonkeySwing;
 	byte burnBlue;
-	bool gassed;
 	bool burnSmoke;
 	bool isDucked;
 	bool hasFired;
@@ -1030,7 +1028,6 @@ struct LaraInfo
 	bool litTorch;
 	bool isClimbing;
 	bool fired;
-	bool ClockworkBeetleFlag;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
@@ -1088,7 +1085,7 @@ struct LaraInfo
 	bool mineR;
 	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 	DiaryInfo Diary;
-	ten::renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
+	TEN::Renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];

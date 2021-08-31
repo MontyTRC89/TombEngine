@@ -4,7 +4,7 @@
 #include "items.h"
 #include "effect2.h"
 #include "tomb4fx.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "collide.h"
 #include "sphere.h"
@@ -355,7 +355,7 @@ void LavaBurn(ITEM_INFO* item)
 void InitialiseFallingBlock(short itemNumber)
 {
 	g_Level.Items[itemNumber].meshBits = 1;
-	ten::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::AddBridge(itemNumber);
 }
 
 void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
@@ -565,15 +565,8 @@ void WreckingBallControl(short itemNumber)
 	}
 	if (item->itemFlags[2] < 900)
 		++item->itemFlags[2];
-	if (GlobalPlayingCutscene)
-	{
-		room = item->roomNumber;
-		item->goalAnimState = 0;
-		item->pos.xPos = 47616;
-		item->pos.zPos = 34816;
-		item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1664;
-	}
-	else if (item->itemFlags[1] <= 0)
+
+	if (item->itemFlags[1] <= 0)
 	{
 		oldX = item->pos.xPos;
 		oldZ = item->pos.zPos;
@@ -842,7 +835,7 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+				TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 				
 				item->flags |= 0x3E00;
 				item->itemFlags[3] = 0;

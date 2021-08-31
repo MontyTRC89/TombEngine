@@ -9,8 +9,23 @@ struct SECTOR_COLLISION_INFO
 	Vector3 Planes[2];
 };
 
-struct FLOOR_INFO
+struct SECTOR_FLAGS
 {
+	bool Death;
+	bool Monkeyswing;
+	bool ClimbNorth;
+	bool ClimbSouth;
+	bool ClimbWest;
+	bool ClimbEast;
+	bool MarkBeetle;
+
+	bool MarkTriggerer;
+	bool MarkTriggererActive; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
+};
+
+class FLOOR_INFO
+{
+	public:
 	int index;
 	int box;
 	int fx;
@@ -21,6 +36,7 @@ struct FLOOR_INFO
 	int ceiling;
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
+	SECTOR_FLAGS Flags;
 	int WallPortal;
 	std::set<short> BridgeItem;
 	int Room;
@@ -51,7 +67,7 @@ struct FLOOR_INFO
 	void RemoveItem(short itemNumber);
 };
 
-namespace ten::Floordata
+namespace TEN::Floordata
 {
 	VectorInt2 GetSectorPoint(int x, int z);
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);

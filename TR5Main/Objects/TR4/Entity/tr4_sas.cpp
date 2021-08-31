@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
 #include <Specific\input.h>
 #include <Game/tomb4fx.h>
 #include <Game/Lara/lara_one_gun.h>
@@ -703,11 +704,7 @@ namespace TEN::Entities::TR4
 					int y = l->pos.yPos;
 					int z = l->pos.zPos - 512 * phd_cos(l->pos.yRot);
 
-					short roomNumber = l->roomNumber;
-					FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-					GetFloorHeight(floor, x, y, z);
-
-					TestTriggers(TriggerIndex, 1, 0);
+					TestTriggers(x, y, z, l->roomNumber, true, NULL);
 
 					RemoveActiveItem(itemNumber);
 					item->status = ITEM_NOT_ACTIVE;

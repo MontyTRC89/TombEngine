@@ -47,6 +47,22 @@ enum FireSizeEnum
 	SP_BIGFIRE
 };
 
+struct FX_INFO
+{
+	PHD_3DPOS pos;
+	short roomNumber;
+	short objectNumber;
+	short nextFx;
+	short nextActive;
+	short speed;
+	short fallspeed;
+	short frameNumber;
+	short counter;
+	short shade;
+	short flag1;
+	short flag2;
+};
+
 struct NODEOFFSET_INFO
 {
 	short x;
@@ -164,7 +180,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 #define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
 #define MAX_SPARKS_DYNAMICS 8
-
+#define NUM_EFFECTS 256
 extern int NextSpark;
 extern int DeadlyBounds[6];
 extern SPLASH_SETUP SplashSetup;
@@ -179,6 +195,8 @@ extern int SplashCount;
 extern PHD_VECTOR NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
+extern FX_INFO EffectList[NUM_EFFECTS];
+
 void DetatchSpark(int num, SpriteEnumFlag type);
 int GetFreeSpark();
 void UpdateSparks();
@@ -192,12 +210,15 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID,float rotation = 0);
+void TriggerLaraBlood();
+short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
+void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
+void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(int x, int y, int z, int angle);
 void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit);
 void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
-void ClearDynamicLights();
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);
@@ -207,3 +228,4 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd);
 void Splash(ITEM_INFO* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
+void Richochet(PHD_3DPOS* pos);

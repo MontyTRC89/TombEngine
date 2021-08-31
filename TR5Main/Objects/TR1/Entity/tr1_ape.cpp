@@ -1,11 +1,10 @@
 #include "framework.h"
 #include "tr1_ape.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO apeBite = { 0, -19, 75, 15 };
