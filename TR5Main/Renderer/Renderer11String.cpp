@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer11.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	void Renderer11::drawString(int x, int y, const char* string, D3DCOLOR color, int flags) {
 		int realX = x;
 		int realY = y;

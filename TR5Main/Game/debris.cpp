@@ -7,8 +7,8 @@
 #include "prng.h"
 
 using std::vector;
-using namespace ten::renderer;
-using namespace ten::Math::Random;
+using namespace TEN::Renderer;
+using namespace TEN::Math::Random;
 
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;

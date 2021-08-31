@@ -99,7 +99,7 @@ void InitialisePushableBlock(short itemNum)
 	if (OCB & 0x40 && (OCB & 0x1F) >= 2)
 	{
 		pushable->hasFloorCeiling = true;
-		ten::Floordata::AddBridge(itemNum);
+		TEN::Floordata::AddBridge(itemNum);
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
@@ -836,7 +836,7 @@ void AddBridgeStack(short itemNum)
 	auto item = &g_Level.Items[itemNum];
 
 	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
-		ten::Floordata::AddBridge(itemNum);
+		TEN::Floordata::AddBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
@@ -844,7 +844,7 @@ void AddBridgeStack(short itemNum)
 		auto stackItem = &g_Level.Items[stackIndex];
 
 		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
-			ten::Floordata::AddBridge(stackIndex);
+			TEN::Floordata::AddBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}
@@ -855,7 +855,7 @@ void RemoveBridgeStack(short itemNum)
 	auto item = &g_Level.Items[itemNum];
 
 	if (GET_PUSHABLEINFO(item)->hasFloorCeiling)
-		ten::Floordata::RemoveBridge(itemNum);
+		TEN::Floordata::RemoveBridge(itemNum);
 
 	int stackIndex = g_Level.Items[itemNum].itemFlags[1];
 	while (stackIndex != NO_ITEM)
@@ -863,7 +863,7 @@ void RemoveBridgeStack(short itemNum)
 		auto stackItem = &g_Level.Items[stackIndex];
 
 		if (GET_PUSHABLEINFO(stackItem)->hasFloorCeiling)
-			ten::Floordata::RemoveBridge(stackIndex);
+			TEN::Floordata::RemoveBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].itemFlags[1];
 	}

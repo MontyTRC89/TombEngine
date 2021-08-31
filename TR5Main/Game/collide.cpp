@@ -13,8 +13,8 @@
 #include "prng.h"
 
 using std::vector;
-using namespace ten::Math::Random;
-using namespace ten::Floordata;
+using namespace TEN::Math::Random;
+using namespace TEN::Floordata;
 
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];

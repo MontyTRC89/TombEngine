@@ -8,7 +8,7 @@
 #include "configuration.h"
 #include "sound.h"
 #include <CommCtrl.h>
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 using std::vector;
 extern GameFlow* g_GameFlow;
 GameConfiguration g_Configuration;
