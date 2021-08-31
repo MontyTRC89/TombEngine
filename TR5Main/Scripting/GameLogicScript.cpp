@@ -437,6 +437,10 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 		m_levelFuncs.insert_or_assign(luaName, value.as<sol::protected_function>());
 		break;
 	default:
+		//todo When we save the game, do we save the functions or just the names?
+		//todo It may be better just to save the names so that we can load the callbacks
+		//todo from the level script each time (vital if the builder updates their
+		//todo scripts after release -- squidshire, 31/08/2021
 		std::string error{ "Could not assign LevelFuncs." };
 		error += luaName + "; it must be a function (or nil).";
 		return ScriptAssert(false, error);
