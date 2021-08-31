@@ -1,7 +1,9 @@
 #pragma once
+
 #include "phd_global.h"
 #include "items.h"
 #include "room.h"
+#include "control\trigger.h"
 
 struct BOUNDING_BOX;
 
@@ -120,7 +122,6 @@ extern short FlashFadeB;
 extern short FlashFader;
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
-extern bool g_CollidedVolume;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
@@ -137,8 +138,6 @@ void AlterFloorHeight(ITEM_INFO* item, int height);
 int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
-short* GetTriggerIndex(ITEM_INFO* item);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 //void UpdateDebris();
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
@@ -159,18 +158,10 @@ void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
-int TriggerActive(ITEM_INFO* item);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
-
-void TestTriggers(short* data, bool heavy, int heavyFlags);
-void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags);
-void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags);
-void ProcessSectorFlags(FLOOR_INFO* floor); 
-void ProcessSectorFlags(int x, int y, int z, short roomNumber);
-void ProcessSectorFlags(ITEM_INFO* item);
 void ResetGlobals();
 
 unsigned CALLBACK GameMain(void*);

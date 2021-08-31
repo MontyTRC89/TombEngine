@@ -17,7 +17,7 @@
 #include <draw.h>
 
 using std::vector;
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 
 int LightningRandomSeed = 0x0D371F947;
 float FloatSinCosTable[8192];

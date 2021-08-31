@@ -5,13 +5,13 @@
 #include "lara.h"
 #include "control.h"
 
-ten::renderer::RendererHUDBar* g_HealthBar;
-ten::renderer::RendererHUDBar* g_AirBar;
-ten::renderer::RendererHUDBar* g_DashBar;
-ten::renderer::RendererHUDBar* g_MusicVolumeBar;
-ten::renderer::RendererHUDBar* g_SFXVolumeBar;
+TEN::Renderer::RendererHUDBar* g_HealthBar;
+TEN::Renderer::RendererHUDBar* g_AirBar;
+TEN::Renderer::RendererHUDBar* g_DashBar;
+TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
+TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 
-namespace ten::renderer {
+namespace TEN::Renderer {
 
 	void Renderer11::initialiseBars()
 {

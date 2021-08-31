@@ -11,7 +11,7 @@
 using std::optional;
 using std::stack;
 using std::vector;
-namespace ten::renderer
+namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
@@ -782,4 +782,4 @@ namespace ten::renderer
 		*/
 		return true;
 	}
-} // namespace ten::renderer
+} // namespace TEN::Renderer

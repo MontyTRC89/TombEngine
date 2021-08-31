@@ -7,7 +7,7 @@
 #include "lara_climb.h"
 #include "lara_collide.h"
 
-using namespace ten::Floordata;
+using namespace TEN::Floordata;
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {

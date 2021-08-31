@@ -1,7 +1,7 @@
 #pragma once
 #include <SimpleMath.h>
-namespace ten {
-	namespace renderer {
+namespace TEN {
+	namespace Renderer {
 		using DirectX::SimpleMath::Matrix;
 		using DirectX::SimpleMath::Vector3;
 		using DirectX::SimpleMath::Vector2;

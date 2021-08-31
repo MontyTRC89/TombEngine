@@ -4,7 +4,7 @@
 #include <iostream>
 #include <wrl/client.h>
 #include <d3dcompiler.h>
-namespace ten::renderer::Utils {
+namespace TEN::Renderer::Utils {
 	using std::wstring;
 	using std::string;
 	using Microsoft::WRL::ComPtr;

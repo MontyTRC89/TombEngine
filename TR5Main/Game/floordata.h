@@ -67,7 +67,7 @@ public:
 	void RemoveItem(short itemNumber);
 };
 
-namespace ten::Floordata
+namespace TEN::Floordata
 {
 	VectorInt2 GetSectorPoint(int x, int z);
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
