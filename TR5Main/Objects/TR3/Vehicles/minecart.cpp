@@ -2,7 +2,7 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
@@ -15,6 +15,7 @@
 #include "sound.h"
 #include "minecart_info.h"
 using std::vector;
+
 enum MINECART_STATE {
 	CART_GETIN,
 	CART_GETOUT,
@@ -92,7 +93,7 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 	short roomNumber;
 
 	x = v->pos.xPos + phd_sin(ang) * dist;
-	y = v->pos.yPos - LARA_HITE;
+	y = v->pos.yPos - LARA_HEIGHT;
 	z = v->pos.zPos + phd_cos(ang) * dist;
 
 	roomNumber = v->roomNumber;
@@ -142,35 +143,27 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 
 static bool CanGetOut(int direction)
 {
-	ITEM_INFO* v;
-	FLOOR_INFO* floor;
-	short roomNumber, angle;
-	int x, y, z, height, ceiling;
+	auto v = &g_Level.Items[Lara.Vehicle];
 
-	v = &g_Level.Items[Lara.Vehicle];
-
+	short angle;
 	if (direction < 0)
 		angle = v->pos.yRot + 0x4000;
 	else
 		angle = v->pos.yRot - 0x4000;
 
+	int x = v->pos.xPos - GETOFF_DIST * phd_sin(angle);
+	int y = v->pos.yPos;
+	int z = v->pos.zPos - GETOFF_DIST * phd_cos(angle);
 
-	x = v->pos.xPos - GETOFF_DIST * phd_sin(angle);
-	y = v->pos.yPos;
-	z = v->pos.zPos - GETOFF_DIST * phd_cos(angle);
+	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	roomNumber = v->roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	height = GetFloorHeight(floor, x, y, z);
-
-	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL) || (height == NO_HEIGHT))
+	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
 		return false;
 
-	if (abs(height - v->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.FloorHeight - v->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	ceiling = GetCeiling(floor, x, y, z);
-	if ((ceiling - v->pos.yPos > -LARA_HITE) || (height - ceiling < LARA_HITE))
+	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -220,11 +213,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 									if ((frame >= 12) && (frame <= 22))
 									{
 										SoundEffect(220, &item->pos, 2);
-
-										roomNumber = item->roomNumber;
-										floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-
-										TestTriggers(TriggerIndex, TRUE, 0);
+										TestTriggers(item, true, NULL);
 										item->frameNumber++;
 									}
 								}
@@ -869,7 +858,7 @@ int MineCartControl(void)
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
-	TestTriggers(TriggerIndex, FALSE, 0);
+	TestTriggers(v, false, NULL);
 
 	if (!(cart->Flags & CF_DEAD))
 	{

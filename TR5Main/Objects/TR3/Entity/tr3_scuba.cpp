@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr3_scuba.h"
 #include "items.h"
-#include "effect.h"
 #include "box.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
 #include "creature_info.h"
 #include "control.h"
+#include "effect2.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
@@ -111,7 +111,7 @@ void ScubaControl(short itemNumber)
 			start.roomNumber = item->roomNumber;
 
 			target.x = LaraItem->pos.xPos;
-			target.y = LaraItem->pos.yPos - (LARA_HITE - 150);
+			target.y = LaraItem->pos.yPos - (LARA_HEIGHT - 150);
 			target.z = LaraItem->pos.zPos;
 
 			shoot = LOS(&start, &target);

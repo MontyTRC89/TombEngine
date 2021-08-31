@@ -16,7 +16,7 @@
 #include <process.h>
 #include <zlib.h>
 #include "Renderer11.h"
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
 
@@ -651,6 +651,7 @@ void ReadRooms()
 			floor.floor = ReadInt32();
 			floor.skyRoom = ReadInt32();
 			floor.ceiling = ReadInt32();
+
 			floor.FloorCollision.SplitAngle = ReadFloat();
 			floor.FloorCollision.Portals[0] = ReadInt32();
 			floor.FloorCollision.Portals[1] = ReadInt32();
@@ -670,6 +671,17 @@ void ReadRooms()
 			floor.CeilingCollision.Planes[1].y = ReadFloat();
 			floor.CeilingCollision.Planes[1].z = ReadFloat();
 			floor.WallPortal = ReadInt32();
+
+			floor.Flags.Death = ReadInt8();
+			floor.Flags.Monkeyswing = ReadInt8();
+			floor.Flags.ClimbNorth = ReadInt8();
+			floor.Flags.ClimbSouth = ReadInt8();
+			floor.Flags.ClimbEast = ReadInt8();
+			floor.Flags.ClimbWest = ReadInt8();
+			floor.Flags.MarkTriggerer = ReadInt8();
+			floor.Flags.MarkTriggererActive = 0; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
+			floor.Flags.MarkBeetle = ReadInt8();
+
 			floor.Room = i;
 
 			room.floor.push_back(floor);

@@ -27,7 +27,7 @@ void InitialiseExpandingPlatform(short itemNumber)
 	// Get height from animations
 	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
 	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
-	ten::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::AddBridge(itemNumber);
 }
 
 bool IsOnExpandingPlatform(ITEM_INFO item, int x, int z)
@@ -143,9 +143,9 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 			xShift = lara_coll.radius / 6;
 	}
 	auto coll = lara_coll;
-	GetCollisionInfo(&coll, LaraItem->pos.xPos + xShift, LaraItem->pos.yPos, LaraItem->pos.zPos + zShift, LaraItem->roomNumber, LARA_HITE);
+	GetCollisionInfo(&coll, LaraItem->pos.xPos + xShift, LaraItem->pos.yPos, LaraItem->pos.zPos + zShift, LaraItem->roomNumber, LARA_HEIGHT);
 
-	if (coll.midCeiling >= 0 || coll.hitStatic)
+	if (coll.middle.Ceiling >= 0 || coll.hitStatic)
 		return;
 
 	if (zShift != 0)

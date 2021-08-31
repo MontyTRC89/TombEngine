@@ -2,7 +2,7 @@
 #include "tr4_harpy.h"
 #include "people.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "effect2.h"
 #include "items.h"
 #include "sphere.h"

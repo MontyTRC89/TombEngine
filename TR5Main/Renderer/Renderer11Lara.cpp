@@ -11,7 +11,7 @@
 #include "GameFlowScript.h"
 #include <Specific\setup.h>
 #include "lara_fire.h"
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 
 extern GameFlow *g_GameFlow;
 
@@ -200,7 +200,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-void ten::renderer::Renderer11::drawLara(RenderView& view, bool transparent, bool shadowMap)
+void TEN::Renderer::Renderer11::drawLara(RenderView& view, bool transparent, bool shadowMap)
 {
 	if (transparent && shadowMap)
 		return;

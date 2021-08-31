@@ -5,6 +5,7 @@
 #include "sound.h"
 #include "collide.h"
 #include "camera.h"
+#include "level.h"
 short OldAngle = 1;
 
 /*this file has all the related functions to sliding*/
@@ -66,17 +67,17 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 
 	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HITE);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{
 		LaraDeflectEdge(item, coll);
 
-		if (coll->midFloor <= 200)
+		if (coll->middle.Floor <= 200)
 		{
 			TestLaraSlide(item, coll);
 
-			item->pos.yPos += coll->midFloor;
+			item->pos.yPos += coll->middle.Floor;
 
 			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 			{
@@ -142,7 +143,7 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->speed = 0;
 
-		coll->midFloor = 0;
+		coll->middle.Floor = 0;
 
 		if (item->fallspeed <= 0)
 			item->fallspeed = 16;

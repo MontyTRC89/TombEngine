@@ -7,7 +7,7 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "traps.h"
 #include "level.h"
 #include "debris.h"
@@ -15,6 +15,7 @@
 #include "sound.h"
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
+#include "collide.h"
 
 int DebrisFlags;
 

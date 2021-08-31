@@ -1,5 +1,5 @@
 #pragma once
-namespace ten::renderer {
+namespace TEN::Renderer {
 	struct RendererPolygon {
 		unsigned char Shape;
 		int AnimatedSet;

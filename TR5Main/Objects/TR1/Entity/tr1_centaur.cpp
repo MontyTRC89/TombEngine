@@ -14,7 +14,7 @@
 #include "collide.h"
 #include "item.h"
 #include "setup.h"
-#include "effect.h"
+
 enum centaur_anims { 
 	CENTAUR_EMPTY, 
 	CENTAUR_STOP, 

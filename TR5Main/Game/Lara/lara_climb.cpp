@@ -8,33 +8,34 @@
 #include "level.h"
 #include "input.h"
 
-short LeftIntRightExtTab[4] = // offset 0xA0B7C
+CLIMB_DIRECTION LeftIntRightExtTab[4] =
 {
-	0x0800, 0x0100, 0x0200, 0x0400
+	CLIMB_DIRECTION::West, CLIMB_DIRECTION::North, CLIMB_DIRECTION::East, CLIMB_DIRECTION::South
 };
-short LeftExtRightIntTab[4] = // offset 0xA0B84
+CLIMB_DIRECTION LeftExtRightIntTab[4] =
 {
-	0x0200, 0x0400, 0x0800, 0x0100
+	CLIMB_DIRECTION::East, CLIMB_DIRECTION::South, CLIMB_DIRECTION::West, CLIMB_DIRECTION::North
 };
 
-short GetClimbTrigger(int x, int y, int z, short roomNumber)
+short GetClimbFlags(int x, int y, int z, short roomNumber)
 {
-	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
+	return GetClimbFlags(GetFloor(x, y, z, &roomNumber));
+}
 
-	short* data = TriggerIndex;
+short GetClimbFlags(FLOOR_INFO* floor)
+{
+	short result = 0;
 
-	if (data == NULL)
-		return 0;
+	if (floor->Flags.ClimbEast)
+		result |= (short)CLIMB_DIRECTION::East;
+	if (floor->Flags.ClimbWest)
+		result |= (short)CLIMB_DIRECTION::West;
+	if (floor->Flags.ClimbNorth)
+		result |= (short)CLIMB_DIRECTION::North;
+	if (floor->Flags.ClimbSouth)
+		result |= (short)CLIMB_DIRECTION::South;
 
-	if ((*data & DATA_TYPE) == LAVA_TYPE)
-	{
-		if (*data & END_BIT)
-			return 0;
-
-		data++;
-	}
-
-	return (*data & DATA_TYPE) == CLIMB_TYPE ? *data : 0;
+	return result;
 }
 
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
@@ -620,7 +621,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 	int shift = 0;
 
-	if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftExtRightIntTab[angle])
+	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 	{
 		item->pos.xPos = x;
 		Lara.cornerX = x;
@@ -666,7 +667,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		}
 
-		if (GetClimbTrigger(newX, item->pos.yPos, newZ, item->roomNumber) & LeftIntRightExtTab[angle])
+		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 		{
 			item->pos.xPos = newX;
 			Lara.cornerX = newX;
@@ -718,7 +719,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 	int shift = 0;
 
-	if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftIntRightExtTab[angle])
+	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 	{
 		item->pos.xPos = x;
 		Lara.cornerX = x;
@@ -765,7 +766,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		}
 
-		if (GetClimbTrigger(newX, item->pos.yPos, newZ, item->roomNumber) & LeftExtRightIntTab[angle])
+		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 		{
 			item->pos.xPos = newX;
 			Lara.cornerX = newX;
@@ -964,7 +965,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 			ceiling = GetCeiling(floor, x + xFront, y, z + zFront) - y;
 			if (ceiling < 512)
 			{
-				if (height - ceiling <= 762)
+				if (height - ceiling <= LARA_HEIGHT)
 				{
 					if (height - ceiling < 512)
 						return 0;
@@ -993,11 +994,6 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-
-	GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-		item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-	coll->trigger = TriggerIndex;
 
 	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER)//can't let go on this anim
 		return 0;

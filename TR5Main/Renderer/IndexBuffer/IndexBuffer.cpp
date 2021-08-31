@@ -1,7 +1,7 @@
 #include "IndexBuffer.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	using Microsoft::WRL::ComPtr;
-	using ten::renderer::Utils::throwIfFailed;
+	using TEN::Renderer::Utils::throwIfFailed;
 
 	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices, int* indices) {
 		HRESULT res;

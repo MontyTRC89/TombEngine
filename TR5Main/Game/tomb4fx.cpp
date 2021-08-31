@@ -17,7 +17,7 @@
 #include <draw.h>
 
 using std::vector;
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 
 char FlareTable[121] =
 {
@@ -594,7 +594,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	{
 		spark->mirror = 0;
 	}*/
-	ten::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
+	TEN::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
 	
 }
 
@@ -970,7 +970,7 @@ void UpdateGunShells()
 				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				ten::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
 				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
 				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				gs->fallspeed /= 32;

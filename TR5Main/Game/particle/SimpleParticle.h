@@ -5,7 +5,7 @@
 #include <array>
 #include <unordered_map>
 struct ITEM_INFO;
-namespace ten::Effects{
+namespace TEN::Effects{
 	struct SimpleParticle {
 		DirectX::SimpleMath::Vector3 worldPosition;
 		float size;

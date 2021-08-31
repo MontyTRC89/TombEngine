@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "effect2.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "lara.h"
 #include "tomb4fx.h"
 #include "traps.h"
@@ -18,10 +18,13 @@
 #include "smoke.h"
 #include "prng.h"
 #include "Renderer11.h"
-using ten::renderer::g_Renderer;
-using ten::Effects::Explosion::TriggerExplosion;
-using namespace ten::Effects::Spark;
-using namespace ten::Math::Random;
+using TEN::Renderer::g_Renderer;
+using TEN::Effects::Explosion::TriggerExplosion;
+using namespace TEN::Effects::Spark;
+using namespace TEN::Math::Random;
+
+short FXType;
+FX_INFO EffectList[NUM_EFFECTS];
 
 int NextSpark;
 int DeadlyBounds[6];
@@ -919,7 +922,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 			continue;
 		}
 	}
-	ten::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
+	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1049,9 +1052,76 @@ void SetupRipple(int x, int y, int z, float size, char flags,unsigned int sprite
 	}
 }
 
+short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
+{
+	short roomNum = roomNumber;
+	GetFloor(x, y, z, &roomNum);
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
+		TriggerUnderwaterBlood(x, y, z, a4);
+	else
+		TriggerBlood(x, y, z, a5 / 16, a4);
+	return 0;
+}
+
+void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+			y + 256 - (GetRandomControl() * 512 / 0x8000),
+			z + 256 - (GetRandomControl() * 512 / 0x8000),
+			speed, direction, roomNumber);
+	}
+}
+
+void TriggerLaraBlood()
+{
+	int i;
+	int node = 1;
+
+	for (i = 0; i < LARA_MESHES::LM_HEAD; i++)
+	{
+		if (node & LaraItem->touchBits)
+		{
+			PHD_VECTOR vec;
+			vec.x = (GetRandomControl() & 31) - 16;
+			vec.y = (GetRandomControl() & 31) - 16;
+			vec.z = (GetRandomControl() & 31) - 16;
+
+			GetLaraJointPosition(&vec, (LARA_MESHES)i);
+			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
+		}
+
+		node *= 2;
+	}
+}
+
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
 	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD);
+}
+
+void Richochet(PHD_3DPOS* pos)
+{
+	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->pos.zPos, LaraItem->pos.xPos);
+	GAME_VECTOR target;
+	target.x = pos->xPos;
+	target.y = pos->yPos;
+	target.z = pos->zPos;
+	TriggerRicochetSpark(&target, angle / 16, 3, 0);
+	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
+}
+
+void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	int x, z;
+
+	x = item->pos.xPos - phd_sin(item->pos.yRot + ANGLE(180)) * 512 + phd_sin(item->pos.yRot - ANGLE(90)) * 256;
+	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
+
+	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
+	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1205,7 +1275,7 @@ void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
 
 void KillAllCurrentItems(short itemNumber)
 {
-	KillEverythingFlag = 1;
+	// TODO: Reimplement this functionality
 }
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1438,7 +1508,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 
 	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size >> 2;*/
-	ten::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
+	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
@@ -1506,7 +1576,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
 
-	if (dx >= -ANGLE(90) && dx <= ANGLE(90) && dz >= -ANGLE(90) && dz <= ANGLE(90))
+	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -1527,7 +1597,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 				spark->dR = 32;
 				spark->dG = (GetRandomControl() & 0x3F) - 64;
-				spark->dB = (GetRandomControl() & 0x3F) + -128;
+				spark->dB = (GetRandomControl() & 0x3F) - 128;
 			}
 			else
 			{
@@ -1570,141 +1640,138 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 		if (fxObj != -1)
 		{
-			spark->y = 0;
 			spark->x = (GetRandomControl() & 0x1F) - 16;
+			spark->y = 0;
 			spark->z = (GetRandomControl() & 0x1F) - 16;
-
-		//LABEL_POS_1:
-
-			if (type && type != 1)
+		}
+		else if (type && type != 1)
+		{
+			if (type < 254)
 			{
-				if (type < -2)
-				{
-					spark->y = y;
-					spark->x = (GetRandomControl() & 0xF) + x - 8;
-					spark->z = (GetRandomControl() & 0xF) + z - 8;
-				}
-				else
-				{
-					spark->x = (GetRandomControl() & 0x3F) + x - 32;
-					spark->y = y;
-					spark->z = (GetRandomControl() & 0x3F) + z - 32;
-				}
-			}
-			else
-			{
+				spark->x = (GetRandomControl() & 0xF) + x - 8;
 				spark->y = y;
-				spark->x = (GetRandomControl() & 0x1F) + x - 16;
-				spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			}
-
-			if (type == 2)
-			{
-				spark->xVel = (GetRandomControl() & 0x1F) - 16;
-				spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
-				spark->friction = 68;
-				spark->zVel = (GetRandomControl() & 0x1F) - 16;
+				spark->z = (GetRandomControl() & 0xF) + z - 8;
 			}
 			else
 			{
-				spark->xVel = (GetRandomControl() & 255) - 128;
-				spark->yVel = -16 - (GetRandomControl() & 0xF);
-				spark->zVel = (GetRandomControl() & 255) - 128;
-				if (type == 1)
-				{
-					spark->friction = 51;
-				}
-				else
-				{
-					spark->friction = 5;
-				}
+				spark->x = (GetRandomControl() & 0x3F) + x - 32;
+				spark->y = y;
+				spark->z = (GetRandomControl() & 0x3F) + z - 32;
 			}
+		}
+		else
+		{
+			spark->x = (GetRandomControl() & 0x1F) + x - 16;
+			spark->y = y;
+			spark->z = (GetRandomControl() & 0x1F) + z - 16;
+		}
+
+		if (type == 2)
+		{
+			spark->xVel = (GetRandomControl() & 0x1F) - 16;
+			spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
+			spark->zVel = (GetRandomControl() & 0x1F) - 16;
+			spark->friction = 68;
+		}
+		else
+		{
+			spark->xVel = (GetRandomControl() & 0xFF) - 128;
+			spark->yVel = -16 - (GetRandomControl() & 0xF);
+			spark->zVel = (GetRandomControl() & 0xFF) - 128;
+
+			if (type == 1)
+			{
+				spark->friction = 51;
+			}
+			else
+			{
+				spark->friction = 5;
+			}
+		}
+
+		if (GetRandomControl() & 1)
+		{
+			if (fxObj == -1)
+			{
+				spark->gravity = -16 - (GetRandomControl() & 0x1F);
+				spark->maxYvel = -16 - (GetRandomControl() & 7);
+				spark->flags = 538;
+			}
+			else
+			{
+				spark->flags = 602;
+				spark->fxObj = fxObj;
+				spark->gravity = -32 - (GetRandomControl() & 0x3F);
+				spark->maxYvel = -24 - (GetRandomControl() & 7);
+			}
+
+			spark->rotAng = GetRandomControl() & 0xFFF;
 
 			if (GetRandomControl() & 1)
 			{
-				if (fxObj == -1)
-				{
-					spark->gravity = -16 - (GetRandomControl() & 0x1F);
-					spark->maxYvel = -16 - (GetRandomControl() & 7);
-					spark->flags = 538;
-				}
-				else
-				{
-					spark->flags = 602;
-					spark->fxObj = fxObj;
-					spark->gravity = -32 - (GetRandomControl() & 0x3F);
-					spark->maxYvel = -24 - (GetRandomControl() & 7);
-				}
-
-				spark->rotAng = GetRandomControl() & 0xFFF;
-
-				if (GetRandomControl() & 1)
-				{
-					spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-				}
-				else
-				{
-					spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-				}
+				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			}
 			else
 			{
-				if (fxObj == -1)
-				{
-					spark->flags = 522;
-					spark->gravity = -16 - (GetRandomControl() & 0x1F);
-					spark->maxYvel = -16 - (GetRandomControl() & 7);
-				}
-				else
-				{
-					spark->flags = 586;
-					spark->fxObj = fxObj;
-					spark->gravity = -32 - (GetRandomControl() & 0x3F);
-					spark->maxYvel = -24 - (GetRandomControl() & 7);
-				}
+				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 			}
-
-			spark->scalar = 2;
-
-			if (type)
+		}
+		else
+		{
+			if (fxObj == -1)
 			{
-				if (type == 1)
-				{
-					spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
-				}
-				else if (type < 254)
-				{
-					spark->maxYvel = 0;
-					spark->gravity = 0;
-					spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
-				}
-				else
-				{
-					spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
-				}
+				spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+				spark->gravity = -16 - (GetRandomControl() & 0x1F);
+				spark->maxYvel = -16 - (GetRandomControl() & 7);
 			}
 			else
 			{
-				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
+				spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE | SP_FX;
+				spark->fxObj = fxObj;
+				spark->gravity = -32 - (GetRandomControl() & 0x3F);
+				spark->maxYvel = -24 - (GetRandomControl() & 7);
 			}
+		}
 
-			if (type == 2)
+		spark->scalar = 2;
+
+		if (type)
+		{
+			if (type == 1)
 			{
-				spark->dSize = spark->size / 4;
+				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
+			}
+			else if (type < 254)
+			{
+				spark->maxYvel = 0;
+				spark->gravity = 0;
+				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
 			}
 			else
 			{
-				spark->dSize = spark->size / 16;
-				if (type == 7)
-				{
-					spark->colFadeSpeed /= 4;
-					spark->fadeToBlack = spark->fadeToBlack / 4;
-					spark->life = spark->life / 4;
-					spark->sLife = spark->life / 4;
-				}
+				spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
 			}
+		}
+		else
+		{
+			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
+		}
 
-			return;
+		if (type == 2)
+		{
+			spark->dSize = (spark->size / 4.0f);
+		}
+		else
+		{
+			spark->dSize = (spark->size / 16.0f);
+
+			if (type == 7)
+			{
+				spark->colFadeSpeed >>= 2;
+				spark->fadeToBlack = spark->fadeToBlack >> 2;
+				spark->life = spark->life >> 2;
+				spark->sLife = spark->life >> 2;
+			}
 		}
 	}
 }
@@ -1795,9 +1862,4 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->dSize = ((r / 256) & 0xF) + 24;
 		}
 	}
-}
-
-void KillEverything()
-{
-	KillEverythingFlag = 0;
 }

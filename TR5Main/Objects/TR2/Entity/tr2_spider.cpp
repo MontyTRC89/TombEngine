@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr2_spider.h"
-#include "effect.h"
+#include "effect2.h"
 #include "sphere.h"
 #include "box.h"
 #include "items.h"

@@ -2,7 +2,7 @@
 #include "tr5_dart_emitter.h"
 #include "level.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 #include "items.h"
 #include "effect2.h"
 #include "sound.h"

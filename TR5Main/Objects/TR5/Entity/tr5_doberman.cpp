@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_doberman.h"
 #include "box.h"
-#include "effect.h"
+#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_knifethrower.h"
 #include "items.h"
-#include "effect.h"
+#include "effect2.h"
 #include "box.h"
 #include "people.h"
 #include "setup.h"
@@ -10,6 +10,8 @@
 #include "sound.h"
 #include "creature_info.h"
 #include "floordata.h"
+#include "collide.h"
+
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
 

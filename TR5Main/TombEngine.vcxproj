@@ -138,6 +138,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\chaffFX.h" />
+    <ClInclude Include="Game\control\trigger.h" />
+    <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\door_data.h" />
     <ClInclude Include="Game\drip.h" />
@@ -462,7 +464,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\door.h" />
     <ClInclude Include="Game\draw.h" />
     <ClInclude Include="Game\effect2.h" />
-    <ClInclude Include="Game\effect.h" />
+    <ClInclude Include="Game\flipeffect.h" />
     <ClInclude Include="Game\flmtorch.h" />
     <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\hair.h" />
@@ -514,6 +516,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     </ClCompile>
     <ClCompile Include="Game\bubble.cpp" />
     <ClCompile Include="Game\chaffFX.cpp" />
+    <ClCompile Include="Game\control\trigger.cpp" />
+    <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\drip.cpp" />
     <ClCompile Include="Game\explosion.cpp" />
@@ -765,7 +769,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\door.cpp" />
     <ClCompile Include="Game\draw.cpp" />
     <ClCompile Include="Game\effect2.cpp" />
-    <ClCompile Include="Game\effect.cpp" />
+    <ClCompile Include="Game\flipeffect.cpp" />
     <ClCompile Include="Game\flmtorch.cpp" />
     <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\hair.cpp" />

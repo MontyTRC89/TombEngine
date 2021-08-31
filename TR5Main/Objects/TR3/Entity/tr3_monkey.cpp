@@ -2,12 +2,11 @@
 #include "tr3_monkey.h"
 #include "box.h"
 #include "lara.h"
-#include "effect.h"
+#include "effect2.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
-#include "creature_info.h"
 #include "creature_info.h"
 #include "control.h"
 

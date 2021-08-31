@@ -9,12 +9,12 @@
 #include <memory>
 #include <filesystem>
 
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
-void ten::renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
+void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -153,7 +153,7 @@ void ten::renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	initQuad(m_device.Get());
 }
 
-void ten::renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
@@ -311,7 +311,7 @@ void ten::renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 
 }
 
-void ten::renderer::Renderer11::Create()
+void TEN::Renderer::Renderer11::Create()
 {
 
 	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; // {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_11_1};

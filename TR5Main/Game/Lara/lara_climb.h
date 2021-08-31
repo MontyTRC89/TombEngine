@@ -2,7 +2,17 @@
 #include "items.h"
 #include "collide.h"
 
-short GetClimbTrigger(int x, int y, int z, short roomNumber);
+enum class CLIMB_DIRECTION : short
+{
+	North = 0x0100,
+	East  = 0x0200,
+	South = 0x0400,
+	West  = 0x0800
+};
+
+short GetClimbFlags(int x, int y, int z, short roomNumber);
+short GetClimbFlags(FLOOR_INFO* floor);
+
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll);

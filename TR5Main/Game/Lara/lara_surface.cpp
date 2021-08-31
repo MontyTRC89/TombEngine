@@ -237,7 +237,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 	ShiftItem(item, coll);
 	
 	if (coll->collType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
-		coll->midFloor < 0 && (coll->midType == BIG_SLOPE || coll->midType == DIAGONAL))
+		coll->middle.Floor < 0 && (coll->middle.Type == BIG_SLOPE || coll->middle.Type == DIAGONAL))
 	{
 		item->fallspeed = 0;
 		item->pos.xPos = coll->old.x;
@@ -282,14 +282,14 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
 
-	if (coll->frontCeiling > 0)
+	if (coll->front.Ceiling > 0)
 		return 0;
 
-	if (coll->midCeiling > -384)
+	if (coll->middle.Ceiling > -384)
 		return 0;
 
-	int frontFloor = coll->frontFloor + 700;
-	int frontCeiling = coll->frontCeiling + 700;
+	int frontFloor = coll->front.Floor + 700;
+	int frontCeiling = coll->front.Ceiling + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
@@ -297,13 +297,13 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	int slope = 0;
 	bool result;
 
-	/*if (coll->midSplitFloor)
+	/*if (coll->middle.SplitFloor)
 	{
 		result = SnapToDiagonal(rot, 35);
 	}
 	else*/
 	{
-		if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60)
+		if (abs(coll->frontRight.Floor - coll->frontLeft.Floor) >= 60)
 			return 0;
 
 		result = SnapToQuadrant(rot, 35);
@@ -314,11 +314,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yPos += frontFloor - 5;
 
-	UpdateLaraRoom(item, -LARA_HITE / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
-	/*if (coll->midSplitFloor)
+	/*if (coll->middle.SplitFloor)
 	{
-		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, -LARA_RAD, item->pos.yRot);
+		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->middle.SplitFloor, -LARA_RAD, item->pos.yRot);
 		item->pos.xPos = v.x;
 		item->pos.zPos = v.y;
 	}
@@ -391,14 +391,14 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->collType == CT_FRONT 
-		|| coll->midType == BIG_SLOPE 
-		|| coll->midType == DIAGONAL 
-		|| coll->midFloor >= 0)
+		|| coll->middle.Type == BIG_SLOPE 
+		|| coll->middle.Type == DIAGONAL 
+		|| coll->middle.Floor >= 0)
 	{
 		return 0;
 	}
 
-	if (coll->midFloor >= -128)
+	if (coll->middle.Floor >= -128)
 	{
 		if (item->goalAnimState == LS_ONWATER_LEFT)
 		{
@@ -424,7 +424,7 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 	}
 
-	item->pos.yPos += coll->frontFloor + 695;
+	item->pos.yPos += coll->front.Floor + 695;
 
 	UpdateLaraRoom(item, -381);
 

@@ -7,13 +7,14 @@
 #include "boss.h"
 #include "box.h"
 #include "draw.h"
-#include "effect.h"
+#include "effect2.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
 #include "traps.h"
 #include "sound.h"
 #include "creature_info.h"
+#include "collide.h"
 
 enum TonyFlameType
 {

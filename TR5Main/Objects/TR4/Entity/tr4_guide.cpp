@@ -5,7 +5,7 @@
 #include "effect2.h"
 #include "sphere.h"
 #include "lot.h"
-#include "effect.h"
+#include "effect2.h"
 #include "tomb4fx.h"
 #include "setup.h"
 #include "level.h"
@@ -632,7 +632,7 @@ void GuideControl(short itemNumber)
 			if (item->animNumber != obj->animIndex + 57
 				&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 20)
 			{
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, 0);
+				TestTriggers(item, true, NULL);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -707,7 +707,7 @@ void GuideControl(short itemNumber)
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, 0);
+				TestTriggers(item, true, NULL);
 				item->pos.yRot = enemy->pos.yRot;
 				
 				creature->reachedGoal = false;
@@ -742,7 +742,7 @@ void GuideControl(short itemNumber)
 			{
 				item->goalAnimState = STATE_GUIDE_STOP;
 
-				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, 0);
+				TestTriggers(item, true, NULL);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -804,7 +804,7 @@ void GuideControl(short itemNumber)
 		}
 		if (enemy->flags == 42)
 		{
-			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, true, 0);
+			TestTriggers(item, true, NULL);
 			
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
