@@ -42,7 +42,7 @@ struct ShatterImpactInfo
 struct DebrisMesh
 {
 	BLEND_MODES blendMode;
-	std::array<ten::renderer::RendererVertex, 3> vertices;
+	std::array<TEN::Renderer::RendererVertex, 3> vertices;
 	int tex;
 };
 

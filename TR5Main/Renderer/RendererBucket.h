@@ -3,7 +3,7 @@
 #include "RendererVertex.h"
 #include "RendererPolygon.h"
 #include <vector>
-namespace ten::renderer {
+namespace TEN::Renderer {
 	struct RendererBucket {
 		size_t texture;
 		bool animated;

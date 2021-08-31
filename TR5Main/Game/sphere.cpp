@@ -7,7 +7,7 @@
 #include "Renderer11.h"
 #include "trmath.h"
 
-using namespace ten::renderer;
+using namespace TEN::Renderer;
 
 bool GotLaraSpheres;
 SPHERE LaraSpheres[MAX_SPHERES];

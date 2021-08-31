@@ -12,7 +12,7 @@
 #include "control.h"
 #include "tr4_mutant.h"
 
-namespace ten::entities::all
+namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{

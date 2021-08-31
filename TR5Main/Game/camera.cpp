@@ -14,7 +14,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "input.h"
-using ten::renderer::g_Renderer;
+using TEN::Renderer::g_Renderer;
 struct OLD_CAMERA
 {
 	short currentAnimState;

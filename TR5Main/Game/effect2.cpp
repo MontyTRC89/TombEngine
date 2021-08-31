@@ -18,10 +18,10 @@
 #include "smoke.h"
 #include "prng.h"
 
-using ten::renderer::g_Renderer;
-using ten::Effects::Explosion::TriggerExplosion;
-using namespace ten::Effects::Spark;
-using namespace ten::Math::Random;
+using TEN::Renderer::g_Renderer;
+using TEN::Effects::Explosion::TriggerExplosion;
+using namespace TEN::Effects::Spark;
+using namespace TEN::Math::Random;
 
 short FXType;
 FX_INFO* EffectList;
@@ -922,7 +922,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 			continue;
 		}
 	}
-	ten::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
+	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1508,7 +1508,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 
 	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size >> 2;*/
-	ten::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
+	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)

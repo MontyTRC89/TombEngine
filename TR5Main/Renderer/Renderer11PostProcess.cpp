@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer11.h"
-namespace ten::renderer {
+namespace TEN::Renderer {
 	void Renderer11::enableCinematicBars(bool value) {
 		m_enableCinematicBars = value;
 	}

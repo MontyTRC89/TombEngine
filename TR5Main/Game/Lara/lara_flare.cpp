@@ -17,7 +17,7 @@ constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
 constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.920,0.8020,0.07610,0.197878,0.38978,0.09983,0.00934763,0.8485,0.0762573,0.84642,0.7896,0.517634,0.0923424,0.7589,0.081399,0.92834,0.01978,0.17610,0.497878,0.8978,0.69983,0.934763,0.28485,0.1762573,0.374642 };
 
-using namespace ten::Math::Random;
+using namespace TEN::Math::Random;
 
 void FlareControl(short itemNumber)
 {

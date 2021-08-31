@@ -98,6 +98,16 @@ enum TriggerVolumeType
 	VOLUME_PRISM = 2 // Unsupported as of now
 };
 
+enum TriggerVolumeActivators
+{
+	PLAYER = 1,
+	NPC = 2,
+	MOVEABLES = 4,
+	STATICS = 8,
+	FLYBYS = 16,
+	PHYSICALOBJECTS = 32 // Future-proofness for Bullet
+};
+
 struct TRIGGER_VOLUME
 {
 	TriggerVolumeType type;
