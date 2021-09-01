@@ -2564,7 +2564,7 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 				itemNumber = item->nextItem;
 			}
 
-			if (coll->enableSpaz)
+			if (coll->enableBaddiePush)
 			{
 				for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
 				{
