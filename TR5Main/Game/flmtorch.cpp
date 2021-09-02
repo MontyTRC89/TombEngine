@@ -240,7 +240,7 @@ void TorchControl(short itemNumber)
 			pos.yPos = CollidedMeshes[0]->y;
 			pos.zPos = CollidedMeshes[0]->z;
 			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushLaraStatic(item, &sobj->collisionBox, &pos, &lara_coll);
+			ItemPushStatic(item, &sobj->collisionBox, &pos, &lara_coll);
 		}
 		item->speed /= 2;
 	}
