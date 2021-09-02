@@ -20,87 +20,6 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
-{
-	ROOM_INFO* room;
-	MESH_INFO* mesh;
-	short roomList[255];
-	short numRooms = 0;
-	int xMin = 0, xMax = 0, zMin = 0, zMax = 0;
-	int inXmin, inXmax, inZmin, inZmax, inYmin;
-
-	coll->hitStatic = false;
-
-	inXmin = x - coll->radius;
-	inXmax = x + coll->radius;
-	inZmin = z - coll->radius;
-	inZmax = z + coll->radius;
-	inYmin = y - hite;
-
-	// Collect all the rooms where to check
-	GetRoomList(roomNumber, roomList, &numRooms);
-
-	for (int i = 0; i < numRooms; i++)
-	{
-		room = &g_Level.Rooms[roomList[i]];
-		for (int j = 0; j < room->mesh.size(); j++, mesh++)
-		{
-			mesh = &room->mesh[j];
-			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
-
-			if ((sInfo->flags & 1)) // No collision
-				continue;
-
-			int yMin = mesh->y + sInfo->collisionBox.Y1;
-			int yMax = mesh->y + sInfo->collisionBox.Y2;
-			short yRot = mesh->yRot;
-
-			if (yRot == ANGLE(180))
-			{
-				xMin = mesh->x - sInfo->collisionBox.X2;
-				xMax = mesh->x - sInfo->collisionBox.X1;
-				zMin = mesh->z - sInfo->collisionBox.Z2;
-				zMax = mesh->z - sInfo->collisionBox.Z1;
-			}
-			else if (yRot == -ANGLE(90))
-			{
-				xMin = mesh->x - sInfo->collisionBox.Z2;
-				xMax = mesh->x - sInfo->collisionBox.Z1;
-				zMin = mesh->z + sInfo->collisionBox.X1;
-				zMax = mesh->z + sInfo->collisionBox.X2;
-			}
-			else if (yRot == ANGLE(90))
-			{
-
-				xMin = mesh->x + sInfo->collisionBox.Z1;
-				xMax = mesh->x + sInfo->collisionBox.Z2;
-				zMin = mesh->z - sInfo->collisionBox.X2;
-				zMax = mesh->z - sInfo->collisionBox.X1;
-			}
-			else
-			{
-				xMin = mesh->x + sInfo->collisionBox.X1;
-				xMax = mesh->x + sInfo->collisionBox.X2;
-				zMin = mesh->z + sInfo->collisionBox.Z1;
-				zMax = mesh->z + sInfo->collisionBox.Z2;
-			}
-
-			if (inXmax <= xMin
-			||  inXmin >= xMax
-			||  y <= yMin
-			||  inYmin >= yMax
-			||  inZmax <= zMin
-			||  inZmin >= zMax)		 
-				continue;
-
-			coll->hitStatic = true;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
@@ -413,6 +332,8 @@ int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO
 	||  rz <= minZ
 	||  rz >= maxZ)
 		return false;
+
+	coll->hitStatic = true;
 
 	left = rx - minX;
 	top = maxZ - rz;
@@ -1413,8 +1334,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->frontRight.Floor = STOP_SIZE;
 
-	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
-
 	if (coll->middle.Floor == NO_HEIGHT)
 	{
 		coll->shift.x = coll->old.x - xPos;
@@ -1853,8 +1772,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->frontRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->frontRight.Floor = STOP_SIZE;
-
-	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 	
 	if (coll->middle.Floor == NO_HEIGHT)	 
 	{
@@ -2521,7 +2438,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
+void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
@@ -2563,6 +2480,8 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 				}
 				itemNumber = item->nextItem;
 			}
+
+			coll->hitStatic = false;
 
 			if (coll->enableBaddiePush)
 			{

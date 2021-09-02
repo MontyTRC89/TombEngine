@@ -86,7 +86,6 @@ extern ITEM_INFO* CollidedItems[MAX_ITEMS];
 extern MESH_INFO* CollidedMeshes[MAX_ITEMS];
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
@@ -111,7 +110,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
-void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
+void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
