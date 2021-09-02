@@ -733,7 +733,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			coll.quadrant = short((v->pos.yRot + 0x2000) / 0x4000);
 			coll.radius = CART_RADIUS;
 
-			if (CollideStaticObjects(&coll, v->pos.xPos, v->pos.yPos, v->pos.zPos, v->roomNumber, CART_HEIGHT))
+			DoObjectCollision(v, &coll);
+
+			if (coll.hitStatic)
 			{
 				int hits;
 
