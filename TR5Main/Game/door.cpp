@@ -584,7 +584,7 @@ void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 
 	if (floor != NULL)
 	{
-		memcpy(doorPos->floor, &doorPos->data, sizeof(FLOOR_INFO));
+		*doorPos->floor = doorPos->data;
 		
 		short boxIndex = doorPos->block;
 		if (boxIndex != NO_BOX)
@@ -724,7 +724,7 @@ void InitialiseDoor(short itemNumber)
 
 	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 		item->itemFlags[0] = 4096;
-	item->data = ITEM_DATA(DOOR_DATA());
+	item->data = DOOR_DATA();
 	DOOR_DATA* door = item->data;
 
 	door->opened = false;
