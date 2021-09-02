@@ -307,7 +307,7 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 	}
 }
 
-int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
+int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -389,7 +389,7 @@ int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO
 	return true;
 }
 
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush) // previously ItemPushLara
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -1947,7 +1947,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 }
 
-void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
+void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv) // previously DoProperDetection
 {
 	int bs, yang;
 
@@ -2436,7 +2436,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll)
+void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCollision
 {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
