@@ -333,8 +333,6 @@ int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO
 	||  rz >= maxZ)
 		return false;
 
-	coll->hitStatic = true;
-
 	left = rx - minX;
 	top = maxZ - rz;
 	bottom = rz - minZ;
@@ -2444,7 +2442,10 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll)
 	OBJECT_INFO* obj;
 
 	l->hitStatus = false;
-	Lara.hitDirection = -1;
+	coll->hitStatic = false;
+
+	if (l == LaraItem)
+		Lara.hitDirection = -1;
 
 	if (l->hitPoints > 0)
 	{
@@ -2481,39 +2482,39 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll)
 				itemNumber = item->nextItem;
 			}
 
-			coll->hitStatic = false;
-
-			if (coll->enableBaddiePush)
+			for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
 			{
-				for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+
+				if (mesh->flags & 1)
 				{
-					MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+					int x = l->pos.xPos - mesh->x;
+					int y = l->pos.yPos - mesh->y;
+					int z = l->pos.zPos - mesh->z;
 
-					if (mesh->flags & 1)
+					if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
 					{
-						int x = l->pos.xPos - mesh->x;
-						int y = l->pos.yPos - mesh->y;
-						int z = l->pos.zPos - mesh->z;
+						PHD_3DPOS pos;
+						pos.xPos = mesh->x;
+						pos.yPos = mesh->y;
+						pos.zPos = mesh->z;
+						pos.yRot = mesh->yRot;
 
-						if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
+						if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
 						{
-							PHD_3DPOS pos;
-							pos.xPos = mesh->x;
-							pos.yPos = mesh->y;
-							pos.zPos = mesh->z;
-							pos.yRot = mesh->yRot;
+							coll->hitStatic = true;
 
-							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
+							if (coll->enableBaddiePush)
 								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+							else
+								break;
 						}
 					}
-
-					mesh++;
 				}
 			}
 		}
 
-		if (Lara.hitDirection == -1)
+		if (l == LaraItem && Lara.hitDirection == -1)
 			Lara.hitFrame = 0;
 	}
 }
