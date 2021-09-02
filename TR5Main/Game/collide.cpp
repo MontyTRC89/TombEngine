@@ -388,7 +388,7 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 	}
 }
 
-int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
+int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -397,8 +397,8 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 
 	c = phd_cos(pos->yRot);
 	s = phd_sin(pos->yRot);
-	dx = LaraItem->pos.xPos - pos->xPos;
-	dz = LaraItem->pos.zPos - pos->zPos;
+	dx = l->pos.xPos - pos->xPos;
+	dz = l->pos.zPos - pos->zPos;
 	rx = c * dx - s * dz;
 	rz = c * dz + s * dx;
 	minX = bounds->X1 - coll->radius;
@@ -428,40 +428,40 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	else
 		rz -= bottom;
 
-	item->pos.xPos = pos->xPos + c * rx + s * rz;
-	item->pos.zPos = pos->zPos + c * rz - s * rx;
+	l->pos.xPos = pos->xPos + c * rx + s * rz;
+	l->pos.zPos = pos->zPos + c * rz - s * rx;
 	
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 
 	oldFacing = coll->facing;
-	coll->facing = phd_atan(item->pos.zPos - coll->old.z, item->pos.xPos - coll->old.x);
-	if (item == LaraItem)
+	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
+	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
 	}
 	coll->facing = oldFacing;
 
 	if (coll->collType == CT_NONE)
 	{
-		coll->old.x = item->pos.xPos;
-		coll->old.y = item->pos.yPos;
-		coll->old.z = item->pos.zPos;
+		coll->old.x = l->pos.xPos;
+		coll->old.y = l->pos.yPos;
+		coll->old.z = l->pos.zPos;
 
-		UpdateLaraRoom(item, -10);
+		UpdateLaraRoom(l, -10);
 	}
 	else
 	{
-		item->pos.xPos = coll->old.x;
-		item->pos.zPos = coll->old.z;
+		l->pos.xPos = coll->old.x;
+		l->pos.zPos = coll->old.z;
 	}
 
-	if (item == LaraItem && Lara.isMoving && Lara.moveCount > 15)
+	if (l == LaraItem && Lara.isMoving && Lara.moveCount > 15)
 	{
 		Lara.isMoving = false;
 		Lara.gunStatus = LG_NO_ARMS;
@@ -470,7 +470,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	return true;
 }
 
-int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -618,7 +618,7 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		if (TestCollision(item, l))
 		{
 			if (c->enableBaddiePush)
-				ItemPushLara(item, l, c, false, true);
+				ItemPushItem(item, l, c, false, true);
 		}
 	}
 }
@@ -902,7 +902,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (coll->enableBaddiePush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
 				{
-					ItemPushLara(item, l, coll, coll->enableSpaz, 0);
+					ItemPushItem(item, l, coll, coll->enableSpaz, 0);
 				}
 				else if (coll->enableSpaz)
 				{
@@ -2585,7 +2585,7 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 							pos.yRot = mesh->yRot;
 
 							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
-								ItemPushLaraStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
 						}
 					}
 
@@ -2639,7 +2639,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushLara(item, l, coll, ((deadlyBits & 1) & coll->enableSpaz), 3) && (deadlyBits & 1))
+						if (ItemPushItem(item, l, coll, ((deadlyBits & 1) & coll->enableSpaz), 3) && (deadlyBits & 1))
 						{
 							l->hitPoints -= item->itemFlags[3];
 
