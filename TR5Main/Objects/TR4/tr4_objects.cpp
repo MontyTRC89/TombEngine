@@ -602,6 +602,36 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->zoneType = ZONE_BASIC;
 	}
 
+	obj = &Objects[ID_HORSE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseHorse;
+		obj->control = nullptr;
+		obj->collision = ObjectCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_HORSEMAN];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseHorseman;
+		obj->control = HorsemanControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 25;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->pivotLength = 500;
+		obj->radius = 409;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveMesh = true;
+		obj->zoneType = ZONE_BASIC;
+	}
+
 	obj = &Objects[ID_BABOON_NORMAL];
 	if (obj->loaded)
 	{
