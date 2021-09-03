@@ -1026,7 +1026,10 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 					continue;
 
 				delta = g_Level.Boxes[boxNumber].height - box->height;
-				if ((delta > LOT->step || delta < LOT->drop) && !((flags & BOX_MONKEY) && LOT->canMonkey))
+				if ((delta > LOT->step || delta < LOT->drop) && (!(flags & BOX_MONKEY) || !LOT->canMonkey))
+					continue;
+
+				if ((flags & BOX_JUMP) && !LOT->canJump)
 					continue;
 
 				expand = &LOT->node[boxNumber];
@@ -1119,9 +1122,8 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
 		return false;
 
-	enemyQuad = enemy->pos.yRot / 16384 + 2;
+	enemyQuad = enemy->pos.yRot / ANGLE(90) + 2;
 	
-	// boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
 	if (z > 0)
 		boxQuad = (x > 0) ? 2 : 1;
 	else
@@ -1491,11 +1493,12 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	info->angle = angle - item->pos.yRot;
-	info->enemyFacing = -ANGLE(180) + angle - enemy->pos.yRot;
+	info->enemyFacing = 0x8000 + angle - enemy->pos.yRot;
 
 	x = abs(x);
 	z = abs(z);
 
+	// Makes Lara smaller
 	if (enemy == LaraItem)
 	{
 		short laraState = LaraItem->currentAnimState;
@@ -1511,9 +1514,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	if (x > z)
-		info->xAngle = phd_atan(x + (z / 2), y);
+		info->xAngle = phd_atan(x + (z >> 1), y);
 	else
-		info->xAngle = phd_atan(z + (x / 2), y);
+		info->xAngle = phd_atan(z + (x >> 1), y);
 
 	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE * 2));
