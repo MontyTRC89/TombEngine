@@ -22,7 +22,15 @@
 #define BIFF_AVOID_TURN 1536
 #define FEELER_DISTANCE 512
 #define FEELER_ANGLE ANGLE(45.0f)
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 
+constexpr int HIGH_PRIO = 8;
+constexpr int MEDIUM_PRIO = HIGH_PRIO + HIGH_PRIO * (HIGH_PRIO / 6.0f);
+constexpr int LOW_PRIO = MEDIUM_PRIO + MEDIUM_PRIO * (MEDIUM_PRIO / 24.0f);
+constexpr int NONE_PRIO = LOW_PRIO + LOW_PRIO * (LOW_PRIO / 32.0f);
+constexpr auto FRAME_PRIO_BASE = 4;
+constexpr auto FRAME_PRIO_EXP = 1.5;
+#endif // CREATURE_AI_PRIORITY_OPTIMIZATION
 void DropBaddyPickups(ITEM_INFO* item)
 {
 	ITEM_INFO* pickup = NULL;
@@ -1071,7 +1079,23 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 	return true;
 }
 
-int CreatureActive(short itemNumber) 
+
+#if CREATURE_AI_PRIORITY_OPTIMIZATION
+CREATURE_AI_PRIORITY GetCreatureLOTPriority(ITEM_INFO* item) {
+	Vector3 itemPos = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	Vector3 cameraPos = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	float distance = Vector3::Distance(itemPos, cameraPos);
+	distance /= SECTOR(1);
+	if(distance <= HIGH_PRIO)
+		return CREATURE_AI_PRIORITY::HIGH;
+	if(distance <= MEDIUM_PRIO)
+		return CREATURE_AI_PRIORITY::MEDIUM;
+	if(distance <= LOW_PRIO)
+		return CREATURE_AI_PRIORITY::LOW;
+	return CREATURE_AI_PRIORITY::NONE;
+}
+#endif
+int CreatureActive(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1088,6 +1112,10 @@ int CreatureActive(short itemNumber)
 		}
 		item->status = ITEM_ACTIVE;
 	}
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	creature->priority = GetCreatureLOTPriority(item);
+#endif // CREATURE_AI_PRIORITY_OPTIMIZATION
 
 	return true;
 }
@@ -1611,8 +1639,37 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 	if (LOT->targetBox == NO_BOX)
 		TargetBox(LOT, item->boxNumber);
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 
+	bool shouldUpdateTarget = false;
+	switch(creature->priority) {
+	case CREATURE_AI_PRIORITY::HIGH:
+		shouldUpdateTarget = true;
+	break;
+	case CREATURE_AI_PRIORITY::MEDIUM:
+	{
+		if(creature->framesSinceLOTUpdate > std::pow(FRAME_PRIO_BASE, FRAME_PRIO_EXP))
+			shouldUpdateTarget = true;
+	}
+	break;
+	case CREATURE_AI_PRIORITY::LOW:
+	{
+		if(creature->framesSinceLOTUpdate > std::pow(FRAME_PRIO_BASE,FRAME_PRIO_EXP*2))
+			shouldUpdateTarget = true;
+	}
+	break;
+	default:
+		break;
+	}
+	if(shouldUpdateTarget) {
+		CalculateTarget(&creature->target, item, &creature->LOT);
+		creature->framesSinceLOTUpdate = 0;
+	} else {
+		creature->framesSinceLOTUpdate++;
+	}
+#else
 	CalculateTarget(&creature->target, item, &creature->LOT);
+#endif // CREATURE_AI_PRIORITY_OPTIMIZATION
 
 	creature->jumpAhead = false;
 	creature->monkeyAhead = false;

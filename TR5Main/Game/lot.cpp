@@ -105,8 +105,9 @@ void DisableBaddieAI(short itemNumber)
 	if (creature)
 	{
 		creature->itemNum = NO_ITEM;
-		item->data = nullptr;
 		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
+		item->data = nullptr;
+
 	}
 }
 

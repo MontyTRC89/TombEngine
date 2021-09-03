@@ -64,6 +64,14 @@ struct CREATURE_TARGET {
 	short roomNumber;
 
 };
+
+enum class CREATURE_AI_PRIORITY {
+	HIGH,
+	MEDIUM,
+	LOW,
+	NONE
+};
+
 struct CREATURE_INFO {
 	short jointRotation[4];
 	short maximumTurn;
@@ -83,4 +91,8 @@ struct CREATURE_INFO {
 	short itemNum;
 	PHD_VECTOR target;
 	LOT_INFO LOT;
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
+	CREATURE_AI_PRIORITY priority;
+	size_t framesSinceLOTUpdate;
+#endif
 };
