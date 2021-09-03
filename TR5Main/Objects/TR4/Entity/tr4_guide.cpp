@@ -135,11 +135,10 @@ void GuideControl(short itemNumber)
 			|| item->currentAnimState == STATE_GUIDE_TORCH_ATTACK)
 		{
 			int minDistance = 0x7FFFFFFF;
-			CREATURE_INFO* baddie = &BaddieSlots[0];
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddie = &BaddieSlots[i];
+				CREATURE_INFO* baddie = ActiveCreatures[i];
 
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 					continue;

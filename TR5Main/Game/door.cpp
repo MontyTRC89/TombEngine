@@ -592,9 +592,9 @@ void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 			if (!DontUnlockBox)
 				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				BaddieSlots[i].LOT.targetBox = NO_BOX;
+				ActiveCreatures[i]->LOT.targetBox = NO_BOX;
 			}
 		}
 	}
@@ -682,9 +682,9 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		if (boxIndex != NO_BOX)
 		{
 			g_Level.Boxes[boxIndex].flags |= BLOCKED;
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				BaddieSlots[i].LOT.targetBox = NO_BOX;
+				ActiveCreatures[i]->LOT.targetBox = NO_BOX;
 			}
 		}
 	}

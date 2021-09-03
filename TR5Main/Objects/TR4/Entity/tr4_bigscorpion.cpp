@@ -165,12 +165,11 @@ void ScorpionControl(short itemNumber)
 			else
 			{
 				creature->enemy = NULL;
-				CREATURE_INFO* baddy = &BaddieSlots[0];
 				int minDistance = 0x7FFFFFFF;
 
-				for (int i = 0; i < NUM_SLOTS; i++)
+				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					baddy = &BaddieSlots[i];
+					CREATURE_INFO* baddy = ActiveCreatures[i];
 
 					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 					{

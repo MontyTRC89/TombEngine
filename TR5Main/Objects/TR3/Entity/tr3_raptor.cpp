@@ -41,10 +41,10 @@ void RaptorControl(short itemNum)
 	{
 		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F))
 		{
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNum)
 				{
 					currentCreature++;

@@ -159,7 +159,7 @@ struct EntityStoringInfo
 };
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
-#define XZ_GET_SECTOR(room, x, z) (room->floor[(z) / SECTOR(1) + (x) / SECTOR(1) * room->xSize])
+//#define XZ_GET_SECTOR(room, x, z) (room->floor[(z) / SECTOR(1) + (x) / SECTOR(1) * room->xSize])
 
 constexpr auto UNIT_SHADOW = 256;
 constexpr auto NO_SHADOW = 0;
@@ -242,5 +242,6 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info);
 TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void AdjustStopperFlag(ITEM_INFO* item, int dir, int set);
-
+//(room->floor[ +  * room->xSize])
+FLOOR_INFO* XZ_GET_SECTOR(ROOM_INFO* r, int x, int z); 
 
