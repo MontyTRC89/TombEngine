@@ -24,10 +24,10 @@
 #define FEELER_ANGLE ANGLE(45.0f)
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 
-constexpr int HIGH_PRIO = 8;
-constexpr int MEDIUM_PRIO = HIGH_PRIO + HIGH_PRIO * (HIGH_PRIO / 6.0f);
-constexpr int LOW_PRIO = MEDIUM_PRIO + MEDIUM_PRIO * (MEDIUM_PRIO / 24.0f);
-constexpr int NONE_PRIO = LOW_PRIO + LOW_PRIO * (LOW_PRIO / 32.0f);
+constexpr int HIGH_PRIO_RANGE = 8;
+constexpr int MEDIUM_PRIO_RANGE = HIGH_PRIO_RANGE + HIGH_PRIO_RANGE * (HIGH_PRIO_RANGE / 6.0f);
+constexpr int LOW_PRIO_RANGE = MEDIUM_PRIO_RANGE + MEDIUM_PRIO_RANGE * (MEDIUM_PRIO_RANGE / 24.0f);
+constexpr int NONE_PRIO_RANGE = LOW_PRIO_RANGE + LOW_PRIO_RANGE * (LOW_PRIO_RANGE / 32.0f);
 constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
@@ -1086,11 +1086,11 @@ CREATURE_AI_PRIORITY GetCreatureLOTPriority(ITEM_INFO* item) {
 	Vector3 cameraPos = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 	float distance = Vector3::Distance(itemPos, cameraPos);
 	distance /= SECTOR(1);
-	if(distance <= HIGH_PRIO)
+	if(distance <= HIGH_PRIO_RANGE)
 		return CREATURE_AI_PRIORITY::HIGH;
-	if(distance <= MEDIUM_PRIO)
+	if(distance <= MEDIUM_PRIO_RANGE)
 		return CREATURE_AI_PRIORITY::MEDIUM;
-	if(distance <= LOW_PRIO)
+	if(distance <= LOW_PRIO_RANGE)
 		return CREATURE_AI_PRIORITY::LOW;
 	return CREATURE_AI_PRIORITY::NONE;
 }
