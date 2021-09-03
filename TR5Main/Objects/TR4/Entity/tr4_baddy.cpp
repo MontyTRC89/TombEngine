@@ -1139,11 +1139,11 @@ namespace TEN::Entities::TR4
 				KillItem(currentCreature->enemy - g_Level.Items.data());
 
 				// cancel enemy pointer for other active baddies
-				for (int i = 0; i < NUM_SLOTS; i++)
+				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					if (BaddieSlots[i].itemNum != NO_ITEM && BaddieSlots[i].itemNum != itemNum && BaddieSlots[i].enemy == creature->enemy)
+					if (ActiveCreatures[i]->itemNum != NO_ITEM && ActiveCreatures[i]->itemNum != itemNum && ActiveCreatures[i]->enemy == creature->enemy)
 					{
-						BaddieSlots[i].enemy = NULL;
+						ActiveCreatures[i]->enemy = NULL;
 					}
 				}
 				creature->enemy = NULL;

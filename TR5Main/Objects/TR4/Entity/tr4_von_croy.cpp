@@ -158,11 +158,11 @@ void VonCroyControl(short itemNumber)
 	{
 		int minDistance = 0x7FFFFFFF;
 		int distance;
-		CREATURE_INFO* baddie = &BaddieSlots[0];
+		CREATURE_INFO* baddie = ActiveCreatures[0];
 
-		for (int i = 0; i < NUM_SLOTS; i++)
+		for (int i = 0; i < ActiveCreatures.size(); i++)
 		{
-			baddie = &BaddieSlots[i];
+			baddie = ActiveCreatures[i];
 
 			if (baddie->itemNum == NO_ITEM
 				|| baddie->itemNum == itemNumber

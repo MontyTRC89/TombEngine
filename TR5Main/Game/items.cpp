@@ -408,7 +408,7 @@ void InitialiseItem(short itemNum)
 	item->nextItem = r->itemNumber;
 	r->itemNumber = itemNum;
 
-	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	item->floor = floor->floor * 256;
 	item->boxNumber = floor->box;
 
