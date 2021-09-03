@@ -265,8 +265,7 @@ void EnemyJeepControl(short itemNumber)
 
 		if (creature->reachedGoal)
 		{
-			//TODO: CREATURE_TARGET was created to avoid circular dependency between ITEM_INFO and ITEM_DATA 
-			//TestTriggers(target, true, 0x0);
+			TestTriggers(target->pos.xPos,target->pos.yPos,target->pos.zPos,target->roomNumber, true, 0x0);
 
 			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
 			{
