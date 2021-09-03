@@ -15,7 +15,7 @@
 #include "creature_info.h"
 #include "setup.h"
 #include "control/trigger.h"
-
+ITEM_INFO jeepDummyTarget;
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
 	short grenadeItemNumber = CreateItem();
@@ -147,7 +147,7 @@ void EnemyJeepControl(short itemNumber)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		creature->enemy = nullptr;
+		creature->enemy = &jeepDummyTarget;
 		CREATURE_TARGET* target = &creature->aiTarget;
 		short angle;
 		int distance;
@@ -307,8 +307,8 @@ void EnemyJeepControl(short itemNumber)
 				creature->reachedGoal = false;
 				item->itemFlags[3]++;
 
-				creature->enemy = NULL;
-				AI_OBJECT* aiObject = NULL;
+				creature->enemy = nullptr;
+				AI_OBJECT* aiObject = nullptr;
 
 				for (int i = 0; i < g_Level.AIObjects.size(); i++)
 				{ 
@@ -321,7 +321,7 @@ void EnemyJeepControl(short itemNumber)
 					}
 				}
 
-				if (aiObject != NULL)
+				if (aiObject != nullptr)
 				{
 					creature->enemy = nullptr;
 					target->objectNumber = aiObject->objectNumber;
