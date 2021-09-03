@@ -46,6 +46,7 @@ struct LOT_INFO {
 	bool isMonkeying;
 	PHD_VECTOR target;
 	ZoneType zone;
+	bool initialised;
 };
 enum MOOD_TYPE {
 	BORED_MOOD,

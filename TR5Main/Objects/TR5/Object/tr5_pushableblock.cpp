@@ -585,7 +585,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
 
 	ROOM_INFO* r = &g_Level.Rooms[collResult.RoomNumber];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
 		return 0;
 
 	if (collResult.HeightType)
@@ -670,7 +670,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	short roomNum = item->roomNumber;
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
 		return 0;
 
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
@@ -740,7 +740,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	collResult = GetCollisionResult(x, y - LARA_HEIGHT, z, LaraItem->roomNumber);
 
 	r = &g_Level.Rooms[roomNum];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
 		return 0;
 
 	if (collResult.FloorHeight != y)

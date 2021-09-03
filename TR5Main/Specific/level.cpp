@@ -1055,7 +1055,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadBoxes();
 
-		InitialiseLOTarray(true);
+		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();

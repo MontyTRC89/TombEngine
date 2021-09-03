@@ -141,12 +141,12 @@ void TroopsControl(short itemNumber)
 		{
 			// Search for active troops
 			creature->enemy = NULL;
-			CREATURE_INFO* baddy = &BaddieSlots[0];
+			CREATURE_INFO* baddy = ActiveCreatures[0];
 			int minDistance = 0x7FFFFFFF;
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddy = &BaddieSlots[i];
+				baddy = ActiveCreatures[i];
 
 				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 				{

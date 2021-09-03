@@ -111,7 +111,7 @@ class ITEM_DATA {
 		return *this;
 	}
 
-	operator bool() {
+	operator bool() const {
 		return !std::holds_alternative<std::nullptr_t>(data);
 	}
 
@@ -123,5 +123,9 @@ class ITEM_DATA {
 			std::forward<Funcs>(funcs)... 
 		},
 		data);
+	}
+	template<typename T>
+	bool is() const {
+		return std::holds_alternative<T>(data);
 	}
 };
