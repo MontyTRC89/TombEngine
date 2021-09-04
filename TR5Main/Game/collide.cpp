@@ -229,18 +229,13 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	auto collBounds = TO_DX_BBOX(&item->pos, &collBox);
 
 	// Draw item coll bounds
-
-	// Final generic check before further calculations
-	if (!staticBounds.Intersects(collBounds))
+	if (!staticBounds.Intersects(collBounds)) // Final generic check before further calculations
 	{
 		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 		//return false;
 	}
 	else
 		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
-	// Squeeze static bounds for raytesting
-	//staticBounds.Extents = staticBounds.Extents - Vector3(coll->radius);
 
 	// Decompose static bounds into planes
 	Vector3 corners[8];
@@ -270,9 +265,10 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 
 	// Set up initial test parameters
 	float minDistance = std::numeric_limits<float>::max();
-	int closestPlane = -1;
-	int closestSide  = -1;
-	Ray closestRay;
+
+	int   closestPlane = -1;
+	short closestAngle = 0;
+	Ray   closestRay;
 
 	// Do a series of angular tests with 90 degree steps to determine collision side.
 
@@ -301,58 +297,73 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 
 		for (int p = 0; p < BBOX_PLANE::PLANE_COUNT; p++)
 		{
+			// No plane intersection, quickly discard
 			float d = 0.0f;
 			if (!ray.Intersects(plane[p], d))
 				continue;
 			
+			// Process plane intersection only if distance is smaller
+			// than already found minimum
 			if (d < minDistance)
 			{
 				closestRay = ray;
 				closestPlane = p;
-				closestSide  = i;
+				closestAngle = angle;
 				minDistance = d;
 			}
 		}
-
-		if (closestPlane == -1)
-			continue; // Paranoid
-
-		// Get plane's normal
-		auto normal = plane[closestPlane].Normal();
 	}
 
-	if (staticBounds.Intersects(collBounds) && closestPlane != -1)
+	if (closestPlane != -1)
 	{
 		// Debug raycast
 		Vector3 p = collBounds.Center + (closestRay.direction * minDistance);
 		g_Renderer.addLine3D(collBounds.Center, p, Vector4(1, 0, 1, 1));
 
-		auto shift = (closestRay.direction * distance) - (closestRay.direction * minDistance);
+		// Calculate delta between tested ray and original collision ray.
+		// It is needed because tests are done on rays inverted in space which
+		// allows to find regions where bounds are already submerged into static bounds.
 
-		auto shiftX = (int)ceil(shift.x);
-		auto shiftZ = (int)ceil(shift.z);
+		auto dx = distance * 2 * phd_sin(closestAngle);
+		auto dz = distance * 2 * phd_cos(closestAngle);
+		auto dd = Vector3(dx, 0, dz).Length();
 
+		// Get raw shift values
+		auto shift = closestRay.direction * minDistance;
+
+		// Get final shift values respecting delta
+		auto shiftX = (int)ceil(shift.x) - dx;
+		auto shiftZ = (int)ceil(shift.z) - dz;
+
+		// If both shifts are zero, it means no collision actually
+		// happened and no further processing is needed.
 		if (shiftX == 0 && shiftZ == 0)
 			return true;
 
 		coll->shift.x = shiftX;
 		coll->shift.z = shiftZ;
 
-		switch (closestSide)
-		{
-		case 0:
-		case 2:
-			coll->collType = CT_FRONT;
-			break;
+		// Get plane's normal
+		auto normal = plane[closestPlane].Normal();
 
-		case 1:
-			coll->collType = CT_RIGHT;
-			break;
+		// Calculate angle between plane normal and collision vector
+		//auto collAngle = normal.Angle()
 
-		case 3:
-			coll->collType =  CT_LEFT;
-			break;
-		}
+		//switch (closestSide)
+		//{
+		//case 0:
+		//case 2:
+		//	coll->collType = CT_FRONT;
+		//	break;
+		//
+		//case 1:
+		//	coll->collType = CT_RIGHT;
+		//	break;
+		//
+		//case 3:
+		//	coll->collType =  CT_LEFT;
+		//	break;
+		//}
 	}
 
 	return true;
