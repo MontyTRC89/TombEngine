@@ -232,7 +232,7 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	if (!staticBounds.Intersects(collBounds)) // Final generic check before further calculations
 	{
 		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-		//return false;
+		return false;
 	}
 	else
 		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -328,16 +328,16 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	// It is needed because tests are done on rays inverted in space which
 	// allows to find regions where bounds are already submerged into static bounds.
 
-	auto dx = distance * 2 * phd_sin(closestAngle);
-	auto dz = distance * 2 * phd_cos(closestAngle);
+	auto dx = (distance) * phd_sin(closestAngle);
+	auto dz = (distance) * phd_cos(closestAngle);
 	auto dd = Vector3(dx, 0, dz).Length();
 
 	// Get raw shift values
 	auto shift = closestRay.direction * minDistance;
 
 	// Get final shift values respecting delta
-	auto shiftX = (int)ceil(shift.x) - dx;
-	auto shiftZ = (int)ceil(shift.z) - dz;
+	auto shiftX = (int)ceil(shift.x);
+	auto shiftZ = (int)ceil(shift.z);
 
 	// If both shifts are zero, it means no collision actually
 	// happened and no further processing is needed.
@@ -351,7 +351,7 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	auto normal = plane[closestPlane].Normal();
 
 	// Calculate angle between plane normal and collision vector
-	//auto collAngle = normal.Angle()
+	auto collAngle = acos(normal.Dot(closestRay.direction) / normal.Length() * closestRay.direction.Length());
 
 	//switch (closestSide)
 	//{
@@ -2950,155 +2950,4 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	vect.y = zPos;
 
 	return vect;
-}
-
-void CollideStatics(ITEM_INFO* item, COLL_INFO* coll)
-{
-	short roomsToCheck[128];
-	short numRoomsToCheck = 0;
-	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
-
-	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-	{
-		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-	}
-
-	for (int i = 0; i < numRoomsToCheck; i++)
-	{
-		for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
-		{
-			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
-			if (mesh->flags & 1)
-				CollideStaticSolid(item, mesh, coll);
-		}
-	}
-}
-
-bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
-{
-	auto stInfo = StaticObjects[mesh->staticNumber];
-
-	// Get DX static bounds in global coords
-	auto staticPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
-	auto staticBounds = TO_DX_BBOX(&staticPos, &stInfo.collisionBox);
-
-	// Get local TR bounds and DX item bounds in global coords
-	auto itemBBox = GetBoundsAccurate(item);
-	auto itemBounds = TO_DX_BBOX(&item->pos, itemBBox);
-
-	// Extend bounds a bit for visual testing
-	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE);
-
-	// Filter out any further checks if static isn't nearby
-	if (!staticBounds.Intersects(itemBounds))
-		return false;
-
-	// Bring back extents
-	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
-
-	// Draw static bounds
-	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
-	// Calculate item coll bounds according to radius
-	BOUNDING_BOX collBox;
-	collBox.X1 = -coll->radius;
-	collBox.X2 = coll->radius;
-	collBox.Z1 = -coll->radius;
-	collBox.Z2 = coll->radius;
-	collBox.Y1 = itemBBox->Y1;
-	collBox.Y2 = itemBBox->Y2;
-
-	// Get DX item coll bounds
-	auto collBounds = TO_DX_BBOX(&item->pos, &collBox);
-
-	// Draw item coll bounds
-
-	// Final generic check before further calculations
-	if (!staticBounds.Intersects(collBounds))
-	{
-		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-		//return false;
-	}
-	else
-		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
-	// Decompose static bounds into planes
-	Vector3 corners[8];
-	staticBounds.GetCorners(corners);
-
-	Plane plane[6];
-	plane[BBOX_PLANE::FRONT] = Plane(corners[0], corners[1], corners[2]);
-	plane[BBOX_PLANE::BACK] = Plane(corners[4], corners[5], corners[6]);
-	plane[BBOX_PLANE::LEFT] = Plane(corners[1], corners[5], corners[6]);
-	plane[BBOX_PLANE::RIGHT] = Plane(corners[3], corners[4], corners[7]);
-	plane[BBOX_PLANE::TOP] = Plane(corners[5], corners[4], corners[1]);
-	plane[BBOX_PLANE::BOTTOM] = Plane(corners[3], corners[6], corners[7]);
-
-	// Debug plane points
-	//g_Renderer.addLine3D(corners[1], corners[5], Vector4(1, 1, 1, 1));
-	//g_Renderer.addLine3D(corners[5], corners[6], Vector4(1, 1, 1, 1));
-
-	// Determine testing distance and height
-	auto distance = coll->radius;
-	auto height = (collBox.Y2 - collBox.Y1) / 2;
-
-	// Set up initial test parameters
-	float minDistance = std::numeric_limits<float>::max();
-	int closestPlane = -1;
-	int closestAngle = -1;
-
-	// Do a series of angular tests with 90 degree steps to determine collision side.
-
-	const int angleSteps = 4;
-	for (int i = 0; i < angleSteps; i++)
-	{
-		// Get test point coordinate
-
-		auto angle = item->pos.yRot + (ANGLE((360 / angleSteps) * i));
-
-		auto c = phd_cos(angle);
-		auto s = phd_sin(angle);
-
-		int x = item->pos.xPos + distance * s;
-		int y = item->pos.yPos - height;
-		int z = item->pos.zPos + distance * c;
-
-		// Make a ray and do ray tests against all decomposed planes
-		auto ray = Ray(Vector3(item->pos.xPos, y, item->pos.zPos), Vector3(TO_RAD(item->pos.xRot), TO_RAD(angle), TO_RAD(item->pos.zRot)));
-
-		for (int p = 0; p < BBOX_PLANE::PLANE_COUNT; p++)
-		{
-			float distance = 0.0f;
-			if (!ray.Intersects(plane[p], distance))
-				continue;
-
-			if (distance < minDistance)
-			{
-				closestAngle = angle;
-				closestPlane = p;
-				minDistance = distance;
-			}
-		}
-
-		if (closestPlane == -1)
-			return false; // Paranoid
-
-		// Get plane's normal
-		auto normal = plane[closestPlane].Normal();
-
-		// Draw test point
-		{
-			auto c2 = phd_cos(closestAngle);
-			auto s2 = phd_sin(closestAngle);
-
-			int x2 = item->pos.xPos + minDistance * s2;
-			int y2 = item->pos.yPos - height;
-			int z2 = item->pos.zPos + minDistance * c2;
-
-			g_Renderer.addLine3D(Vector3(item->pos.xPos, y2, item->pos.zPos), Vector3(x2, y2, z2), Vector4(1, 1, 1, 1));
-		}
-
-		return true;
-	}
 }
