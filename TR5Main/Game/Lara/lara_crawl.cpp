@@ -481,7 +481,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 									}
 								}
 							}
-							else if (!(abs(height) >= 127))
+							else if (!(abs(height) >= STEP_SIZE))
 							{
 								item->goalAnimState = LS_CRAWL_BACK;
 							}
