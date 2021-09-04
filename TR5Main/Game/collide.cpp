@@ -314,57 +314,60 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 		}
 	}
 
-	if (closestPlane != -1)
+	// This should never happen, but still
+	if (closestPlane == -1)
+		return false;
+
+	// Debug raycast
 	{
-		// Debug raycast
 		Vector3 p = collBounds.Center + (closestRay.direction * minDistance);
 		g_Renderer.addLine3D(collBounds.Center, p, Vector4(1, 0, 1, 1));
-
-		// Calculate delta between tested ray and original collision ray.
-		// It is needed because tests are done on rays inverted in space which
-		// allows to find regions where bounds are already submerged into static bounds.
-
-		auto dx = distance * 2 * phd_sin(closestAngle);
-		auto dz = distance * 2 * phd_cos(closestAngle);
-		auto dd = Vector3(dx, 0, dz).Length();
-
-		// Get raw shift values
-		auto shift = closestRay.direction * minDistance;
-
-		// Get final shift values respecting delta
-		auto shiftX = (int)ceil(shift.x) - dx;
-		auto shiftZ = (int)ceil(shift.z) - dz;
-
-		// If both shifts are zero, it means no collision actually
-		// happened and no further processing is needed.
-		if (shiftX == 0 && shiftZ == 0)
-			return true;
-
-		coll->shift.x = shiftX;
-		coll->shift.z = shiftZ;
-
-		// Get plane's normal
-		auto normal = plane[closestPlane].Normal();
-
-		// Calculate angle between plane normal and collision vector
-		//auto collAngle = normal.Angle()
-
-		//switch (closestSide)
-		//{
-		//case 0:
-		//case 2:
-		//	coll->collType = CT_FRONT;
-		//	break;
-		//
-		//case 1:
-		//	coll->collType = CT_RIGHT;
-		//	break;
-		//
-		//case 3:
-		//	coll->collType =  CT_LEFT;
-		//	break;
-		//}
 	}
+
+	// Calculate delta between tested ray and original collision ray.
+	// It is needed because tests are done on rays inverted in space which
+	// allows to find regions where bounds are already submerged into static bounds.
+
+	auto dx = distance * 2 * phd_sin(closestAngle);
+	auto dz = distance * 2 * phd_cos(closestAngle);
+	auto dd = Vector3(dx, 0, dz).Length();
+
+	// Get raw shift values
+	auto shift = closestRay.direction * minDistance;
+
+	// Get final shift values respecting delta
+	auto shiftX = (int)ceil(shift.x) - dx;
+	auto shiftZ = (int)ceil(shift.z) - dz;
+
+	// If both shifts are zero, it means no collision actually
+	// happened and no further processing is needed.
+	if (shiftX == 0 && shiftZ == 0)
+		return true;
+
+	coll->shift.x = shiftX;
+	coll->shift.z = shiftZ;
+
+	// Get plane's normal
+	auto normal = plane[closestPlane].Normal();
+
+	// Calculate angle between plane normal and collision vector
+	//auto collAngle = normal.Angle()
+
+	//switch (closestSide)
+	//{
+	//case 0:
+	//case 2:
+	//	coll->collType = CT_FRONT;
+	//	break;
+	//
+	//case 1:
+	//	coll->collType = CT_RIGHT;
+	//	break;
+	//
+	//case 3:
+	//	coll->collType =  CT_LEFT;
+	//	break;
+	//}
 
 	return true;
 }
