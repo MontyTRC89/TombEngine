@@ -261,21 +261,22 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 
 	// Determine testing distance and height
 	auto distance = coll->radius;
-	auto height   = (collBox.Y2 - collBox.Y1) / 2;
+	auto height = (collBox.Y2 - collBox.Y1) / 2;
 
 	// Set up initial test parameters
 	float minDistance = std::numeric_limits<float>::max();
 
+	auto  front = Vector3();
 	int   closestPlane = -1;
 	short closestAngle = 0;
 	Ray   closestRay;
 
 	// Do a series of angular tests with 90 degree steps to determine collision side.
 
-	const int angleSteps = 4;
+	const int angleSteps = 8;
 	for (int i = 0; i < angleSteps; i++)
 	{
-		auto angle = item->pos.yRot + (ANGLE((360 / angleSteps) * i));
+		auto angle = coll->facing + (ANGLE((360 / angleSteps) * i));
 
 		// Calculate ray origin
 
@@ -291,6 +292,9 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(angle), 0, 0);
 		auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
 		auto direction = (mxT * mxR).Translation();
+
+		// Store front direction for further processing
+		if (i == 0)	front = direction;
 
 		// Make a ray and do ray tests against all decomposed planes
 		auto ray = Ray(Vector3(x, y, z), direction);
@@ -339,19 +343,76 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	auto shiftX = (int)ceil(shift.x);
 	auto shiftZ = (int)ceil(shift.z);
 
-	// If both shifts are zero, it means no collision actually
-	// happened and no further processing is needed.
-	if (shiftX == 0 && shiftZ == 0)
-		return true;
+	//// If both shifts are zero, it means no collision actually
+	//// happened and no further processing is needed.
+	//if (shiftX == 0 && shiftZ == 0)
+	//	return true;
+	//
+	//coll->shift.x = shiftX;
+	//coll->shift.z = shiftZ;
 
-	coll->shift.x = shiftX;
-	coll->shift.z = shiftZ;
+	float c, s;
+	int rx, rz, minX, maxX, minZ, maxZ;
+	int left, right, top, bottom;
+	short oldFacing;
+
+	c = phd_cos(staticPos.yRot);
+	s = phd_sin(staticPos.yRot);
+	dx = item->pos.xPos - staticPos.xPos;
+	dz = item->pos.zPos - staticPos.zPos;
+	rx = c * dx - s * dz;
+	rz = c * dz + s * dx;
+	minX = stInfo.collisionBox.X1 - coll->radius;
+	maxX = stInfo.collisionBox.X2 + coll->radius;
+	minZ = stInfo.collisionBox.Z1 - coll->radius;
+	maxZ = stInfo.collisionBox.Z2 + coll->radius;
+
+	if (abs(dx) > 4608
+		|| abs(dz) > 4608
+		|| rx <= minX
+		|| rx >= maxX
+		|| rz <= minZ
+		|| rz >= maxZ)
+		return false;
+
+	left = rx - minX;
+	top = maxZ - rz;
+	bottom = rz - minZ;
+	right = maxX - rx;
+
+	if (right <= left && right <= top && right <= bottom)
+		rx += right;
+	else if (left <= right && left <= top && left <= bottom)
+		rx -= left;
+	else if (top <= left && top <= right && top <= bottom)
+		rz += top;
+	else
+		rz -= bottom;
+
 
 	// Get plane's normal
 	auto normal = plane[closestPlane].Normal();
+	
+	front.Normalize();
+	normal.Normalize();
+
+
+	coll->shift.x = ((staticPos.xPos + c * rx + s * rz) - item->pos.xPos);
+	coll->shift.z = ((staticPos.zPos + c * rz - s * rx) - item->pos.zPos);
+
 
 	// Calculate angle between plane normal and collision vector
-	auto collAngle = acos(normal.Dot(closestRay.direction) / normal.Length() * closestRay.direction.Length());
+	auto collAngle = acos(normal.Dot(front));
+	auto cross = normal.Cross(front);
+
+	auto dot = normal.Dot(front);
+
+	if (abs(dot) > 0.7f)
+		coll->collType = CT_FRONT;
+	else if (dot < 0)
+		coll->collType = CT_RIGHT;
+	else
+		coll->collType = CT_LEFT;
 
 	//switch (closestSide)
 	//{
