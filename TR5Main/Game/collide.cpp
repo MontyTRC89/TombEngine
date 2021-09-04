@@ -168,6 +168,196 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	return (numItems || numMeshes);
 }
 
+void CollideStatics(ITEM_INFO* item, COLL_INFO* coll)
+{
+	short roomsToCheck[128];
+	short numRoomsToCheck = 0;
+	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
+
+	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
+	{
+		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
+	}
+
+	for (int i = 0; i < numRoomsToCheck; i++)
+	{
+		for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+		{
+			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+			if (mesh->flags & 1)
+				CollideStaticSolid(item, mesh, coll);
+		}
+	}
+}
+
+bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
+{
+	auto stInfo = StaticObjects[mesh->staticNumber];
+
+	// Get DX static bounds in global coords
+	auto staticPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
+	auto staticBounds = TO_DX_BBOX(&staticPos, &stInfo.collisionBox);
+
+	// Get local TR bounds and DX item bounds in global coords
+	auto itemBBox = GetBoundsAccurate(item);
+	auto itemBounds = TO_DX_BBOX(&item->pos, itemBBox);
+
+	// Extend bounds a bit for visual testing
+	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE / 3);
+
+	// Filter out any further checks if static isn't nearby
+	if (!staticBounds.Intersects(itemBounds))
+		return false;
+
+	// Bring back extents
+	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE / 3);
+
+	// Draw static bounds
+	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+	// Calculate item coll bounds according to radius
+	BOUNDING_BOX collBox;
+	collBox.X1 = -coll->radius;
+	collBox.X2 =  coll->radius;
+	collBox.Z1 = -coll->radius;
+	collBox.Z2 =  coll->radius;
+	collBox.Y1 = itemBBox->Y1;
+	collBox.Y2 = itemBBox->Y2;
+
+	// Get DX item coll bounds
+	auto collBounds = TO_DX_BBOX(&item->pos, &collBox);
+
+	// Draw item coll bounds
+
+	// Final generic check before further calculations
+	if (!staticBounds.Intersects(collBounds))
+	{
+		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		//return false;
+	}
+	else
+		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+	// Squeeze static bounds for raytesting
+	//staticBounds.Extents = staticBounds.Extents - Vector3(coll->radius);
+
+	// Decompose static bounds into planes
+	Vector3 corners[8];
+	staticBounds.GetCorners(corners);
+
+	Plane plane[6];
+	plane[BBOX_PLANE::FRONT ] = Plane(corners[0], corners[1], corners[2]);
+	plane[BBOX_PLANE::BACK  ] = Plane(corners[4], corners[5], corners[6]);
+	plane[BBOX_PLANE::LEFT  ] = Plane(corners[1], corners[5], corners[6]);
+	plane[BBOX_PLANE::RIGHT ] = Plane(corners[3], corners[4], corners[7]);
+	plane[BBOX_PLANE::TOP   ] = Plane(corners[5], corners[4], corners[1]);
+	plane[BBOX_PLANE::BOTTOM] = Plane(corners[3], corners[6], corners[7]);
+
+	// Debug plane points
+	{
+		//g_Renderer.addLine3D(corners[1], corners[5], Vector4(1, 1, 1, 1));
+		//g_Renderer.addLine3D(corners[5], corners[6], Vector4(1, 1, 1, 1));
+
+		Vector3 p1 = (corners[0] + corners[1] + corners[2]) / 3;
+		Vector3 p2 = p1 + (plane[0].Normal() * 256);
+		g_Renderer.addLine3D(p1, p2, Vector4(1, 1, 1, 1));
+	}
+
+	// Determine testing distance and height
+	auto distance = coll->radius;
+	auto height   = (collBox.Y2 - collBox.Y1) / 2;
+
+	// Set up initial test parameters
+	float minDistance = std::numeric_limits<float>::max();
+	int closestPlane = -1;
+	int closestSide  = -1;
+	Ray closestRay;
+
+	// Do a series of angular tests with 90 degree steps to determine collision side.
+
+	const int angleSteps = 4;
+	for (int i = 0; i < angleSteps; i++)
+	{
+		auto angle = item->pos.yRot + (ANGLE((360 / angleSteps) * i));
+
+		// Calculate ray origin
+
+		auto c = phd_cos(angle);
+		auto s = phd_sin(angle);
+
+ 		int x = item->pos.xPos - distance * s;
+		int y = item->pos.yPos - height;
+		int z = item->pos.zPos - distance * c;
+
+		// Calculate ray direction
+
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(angle), 0, 0);
+		auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
+		auto direction = (mxT * mxR).Translation();
+
+		// Make a ray and do ray tests against all decomposed planes
+		auto ray = Ray(Vector3(x, y, z), direction);
+
+		for (int p = 0; p < BBOX_PLANE::PLANE_COUNT; p++)
+		{
+			float d = 0.0f;
+			if (!ray.Intersects(plane[p], d))
+				continue;
+			
+			if (d < minDistance)
+			{
+				closestRay = ray;
+				closestPlane = p;
+				closestSide  = i;
+				minDistance = d;
+			}
+		}
+
+		if (closestPlane == -1)
+			continue; // Paranoid
+
+		// Get plane's normal
+		auto normal = plane[closestPlane].Normal();
+	}
+
+	if (staticBounds.Intersects(collBounds) && closestPlane != -1)
+	{
+		// Debug raycast
+		Vector3 p = collBounds.Center + (closestRay.direction * minDistance);
+		g_Renderer.addLine3D(collBounds.Center, p, Vector4(1, 0, 1, 1));
+
+		auto shift = (closestRay.direction * distance) - (closestRay.direction * minDistance);
+
+		auto shiftX = (int)ceil(shift.x);
+		auto shiftZ = (int)ceil(shift.z);
+
+		if (shiftX == 0 && shiftZ == 0)
+			return true;
+
+		coll->shift.x = shiftX;
+		coll->shift.z = shiftZ;
+
+		switch (closestSide)
+		{
+		case 0:
+		case 2:
+			coll->collType = CT_FRONT;
+			break;
+
+		case 1:
+			coll->collType = CT_RIGHT;
+			break;
+
+		case 3:
+			coll->collType =  CT_LEFT;
+			break;
+		}
+	}
+
+	return true;
+}
+
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(lara);
@@ -2437,10 +2627,10 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 						{
 							coll->hitStatic = true;
 
-							if (coll->enableBaddiePush)
-								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
-							else
-								break;
+							//if (coll->enableBaddiePush)
+								//ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+							//else
+							//	break;
 						}
 					}
 				}
