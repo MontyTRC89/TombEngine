@@ -441,7 +441,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (!(item->objectNumber >= ID_LIFT_DOORS1 && item->objectNumber <= ID_LIFT_DOORS2) || item->itemFlags[0])
 				{
-					ItemPushLara(item, l, coll, FALSE, TRUE);
+					ItemPushItem(item, l, coll, FALSE, TRUE);
 				}
 			}
 		}
@@ -980,7 +980,7 @@ void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			if (TestCollision(item, l))
 			{
 				if (coll->enableBaddiePush)
-					ItemPushLara(item, l, coll, 0, 1);
+					ItemPushItem(item, l, coll, 0, 1);
 			}
 		}
 	}

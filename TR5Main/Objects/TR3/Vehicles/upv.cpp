@@ -849,7 +849,7 @@ void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
-	ItemPushLara(item, laraitem, coll, 0, 0);
+	ItemPushItem(item, laraitem, coll, 0, 0);
 }
 
 void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)

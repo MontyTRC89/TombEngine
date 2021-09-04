@@ -25,7 +25,7 @@ void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			int dy = 0;
 			int dz = 0;
 
-			if (ItemPushLara(item, l, coll, 1, 1))
+			if (ItemPushItem(item, l, coll, 1, 1))
 			{
 				LaraItem->hitPoints -= item->itemFlags[3];
 

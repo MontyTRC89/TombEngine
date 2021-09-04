@@ -229,7 +229,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 		}
 	}
 
-	ItemPushLara(item, laraitem, coll, 1, 0);
+	ItemPushItem(item, laraitem, coll, 1, 0);
 }
 
 void DragonControl(short backNum)
