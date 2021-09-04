@@ -1034,7 +1034,10 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 					continue;
 
 				delta = g_Level.Boxes[boxNumber].height - box->height;
-				if ((delta > LOT->step || delta < LOT->drop) && !((flags & BOX_MONKEY) && LOT->canMonkey))
+				if ((delta > LOT->step || delta < LOT->drop) && (!(flags & BOX_MONKEY) || !LOT->canMonkey))
+					continue;
+
+				if ((flags & BOX_JUMP) && !LOT->canJump)
 					continue;
 
 				expand = &LOT->node[boxNumber];
@@ -1147,9 +1150,8 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
 		return false;
 
-	enemyQuad = enemy->pos.yRot / 16384 + 2;
+	enemyQuad = enemy->pos.yRot / ANGLE(90) + 2;
 	
-	// boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
 	if (z > 0)
 		boxQuad = (x > 0) ? 2 : 1;
 	else
@@ -1185,13 +1187,20 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNum, angle, 0);
 
-	if (item->floor > y + CHECK_CLICK(13) && creature->LOT.drop == -1792)
-		vault = -7;
+	if (item->floor > y + CHECK_CLICK(9))
+		vault = 0;
 	else if (item->floor > y + CHECK_CLICK(7))
 		vault = -4;
-	else if (item->floor > y + CHECK_CLICK(5))
+	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
+	else if (item->floor > y + CHECK_CLICK(5)
+		&& item->objectNumber != ID_VON_CROY
+		&& item->objectNumber != ID_BADDY1
+		&& item->objectNumber != ID_BADDY2)
 		vault = -3;
-	else if (item->floor > y + CHECK_CLICK(3) && item->objectNumber != ID_BADDY1 && item->objectNumber != ID_BADDY2) // Baddy 1&2 don't have some climb down animations
+	else if (item->floor > y + CHECK_CLICK(3) 
+		&& item->objectNumber != ID_VON_CROY
+		&& item->objectNumber != ID_BADDY1 
+		&& item->objectNumber != ID_BADDY2) 
 		vault = -2;
 	else if (item->pos.yPos > y - CHECK_CLICK(3))
 		return 0;
@@ -1199,11 +1208,10 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 		vault = 2;
 	else if (item->pos.yPos > y - CHECK_CLICK(7))
 		vault = 3;
-	else if (item->pos.yPos > y - CHECK_CLICK(15) && creature->LOT.step == 1792)
-		vault = 7;
 	else
 		vault = 4;
 
+	// Jump
 	newXblock = item->pos.xPos / SECTOR(1);
 	newZblock = item->pos.zPos / SECTOR(1);
 	
@@ -1261,7 +1269,7 @@ void GetAITarget(CREATURE_INFO* creature)
 		enemyObjectNumber = NO_ITEM;
 
 	item = &g_Level.Items[creature->itemNum];
-	
+
 	if (item->aiBits & GUARD)
 	{
 		creature->enemy = LaraItem;
@@ -1271,7 +1279,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			if (item->aiBits & AMBUSH)
 				item->aiBits |= MODIFY;
 		}
-	} 
+	}
 	else if (item->aiBits & PATROL1)
 	{
 		if (creature->alerted || creature->hurtByLara)
@@ -1280,20 +1288,24 @@ void GetAITarget(CREATURE_INFO* creature)
 			if (item->aiBits & AMBUSH)
 			{
 				item->aiBits |= MODIFY;
-				item->itemFlags[3] = (item->TOSSPAD & 0xFF);
+				// NOTE: added in TR5
+				//item->itemFlags[3] = (item->TOSSPAD & 0xFF);
 			}
 		}
-		else if (!creature->patrol2 && enemyObjectNumber != ID_AI_PATROL1)
+		else if (!creature->patrol2)
 		{
-			FindAITargetObject(creature, ID_AI_PATROL1);
+			if (enemyObjectNumber != ID_AI_PATROL1)
+			{
+				FindAITargetObject(creature, ID_AI_PATROL1);
+			}
 		}
-		else if (creature->patrol2 && enemyObjectNumber != ID_AI_PATROL2)
+		else if (enemyObjectNumber != ID_AI_PATROL2)
 		{
 			FindAITargetObject(creature, ID_AI_PATROL2);
 		}
 		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&
-			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&
-			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS 
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS
 			|| Objects[item->objectNumber].waterCreature)
 		{
 			TestTriggers(enemy, true, NULL);
@@ -1302,29 +1314,33 @@ void GetAITarget(CREATURE_INFO* creature)
 	}
 	else if (item->aiBits & AMBUSH)
 	{
-		if (!(item->aiBits & MODIFY) && !creature->hurtByLara)
+		// First if was removed probably after TR3 and was it used by monkeys?
+		/*if (!(item->aiBits & MODIFY) && !creature->hurtByLara)
 		{
 			creature->enemy = LaraItem;
 		}
-		else if (enemyObjectNumber != ID_AI_AMBUSH)
+		else*/ if (enemyObjectNumber != ID_AI_AMBUSH)
 		{
 			FindAITargetObject(creature, ID_AI_AMBUSH);
 		}
-		else if (item->objectNumber == ID_MONKEY)
+		/*else if (item->objectNumber == ID_MONKEY)
 		{
 			return;
-		}
+		}*/
 		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&
-			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&
-			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggers(enemy, true, NULL);
 
 			creature->reachedGoal = true;
 			creature->enemy = LaraItem;
-			item->aiBits &= ~(AMBUSH|MODIFY);
-			item->aiBits |= GUARD;
-			creature->alerted = false;
+			item->aiBits &= ~(AMBUSH /* | MODIFY*/);
+			if (item->aiBits != MODIFY)
+			{
+				item->aiBits |= GUARD;
+				creature->alerted = false;
+			}
 		}
 	}
 	else if (item->aiBits & FOLLOW)
@@ -1343,15 +1359,15 @@ void GetAITarget(CREATURE_INFO* creature)
 		{
 			FindAITargetObject(creature, ID_AI_FOLLOW);
 		}
-		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS && 
-			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS && 
-			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS)
+		else if (abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS &&
+			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS)
 		{
 			creature->reachedGoal = true;
 			item->aiBits &= ~FOLLOW;
 		}
 	}
-	else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_ITEM)
+	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_ITEM)
 	{
 		if (item->aiBits != MODIFY)
 		{
@@ -1367,10 +1383,10 @@ void GetAITarget(CREATURE_INFO* creature)
 				FindAITargetObject(creature, ID_KEY_ITEM4);
 			}
 		}
-	}
+	}*/
 }
 
-// tr3 old way..
+// TR3 old way..
 void FindAITarget(CREATURE_INFO* creature, short objectNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
@@ -1411,6 +1427,11 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 				r = &g_Level.Rooms[aiObject->roomNumber];
 				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z)->box;
+
+				if (item->boxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
+				{
+					return;
+				}
 
 				if (zone[item->boxNumber] == zone[aiObject->boxNumber])
 				{
@@ -1525,11 +1546,12 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	info->angle = angle - item->pos.yRot;
-	info->enemyFacing = -ANGLE(180) + angle - enemy->pos.yRot;
+	info->enemyFacing = 0x8000 + angle - enemy->pos.yRot;
 
 	x = abs(x);
 	z = abs(z);
 
+	// Makes Lara smaller
 	if (enemy == LaraItem)
 	{
 		short laraState = LaraItem->currentAnimState;
@@ -1545,9 +1567,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	if (x > z)
-		info->xAngle = phd_atan(x + (z / 2), y);
+		info->xAngle = phd_atan(x + (z >> 1), y);
 	else
-		info->xAngle = phd_atan(z + (x / 2), y);
+		info->xAngle = phd_atan(z + (x >> 1), y);
 
 	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE * 2));
@@ -1571,7 +1593,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	switch (creature->mood)
 	{
 		case BORED_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber)
 				&& !(GetRandomControl() & 0x0F))
 			{
@@ -1601,7 +1623,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			break;
 
 		case ESCAPE_MOOD:
-			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
+			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber) && LOT->requiredBox == NO_BOX)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
@@ -1619,7 +1641,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 		case STALK_MOOD:
 			if (LOT->requiredBox == NO_BOX || !StalkBox(item, enemy, LOT->requiredBox))
 			{
-				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount / 32768].boxNumber;
+				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 				if (ValidBox(item, info->zoneNumber, boxNumber))
 				{
 					if (StalkBox(item, enemy, boxNumber))
@@ -1688,7 +1710,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 				{
 					nextBox = g_Level.Overlaps[overlapIndex].box;
 					flags = g_Level.Overlaps[overlapIndex++].flags;
-				} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
+				} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == false) && (nextBox != startBox));
 			}
 
 			if (nextBox == startBox)

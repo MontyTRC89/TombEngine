@@ -48,7 +48,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 			GlobalCollisionBounds.Z1 = StargateBounds[3 * i + 2];
 
 			if (TestWithGlobalCollisionBounds(item, l, c))
-				ItemPushLara(item, l, c, 0, 2);
+				ItemPushItem(item, l, c, 0, 2);
 		}
 
 		int result = TestCollision(item, l);
@@ -75,7 +75,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 						int oldY = LaraItem->pos.yPos;
 						int oldZ = LaraItem->pos.zPos;
 
-						if (ItemPushLara(item, l, c, flags & 1, 2))
+						if (ItemPushItem(item, l, c, flags & 1, 2))
 						{
 							if ((flags & 1) &&
 								(oldX != LaraItem->pos.xPos || oldY != LaraItem->pos.yPos || oldZ != LaraItem->pos.zPos) &&

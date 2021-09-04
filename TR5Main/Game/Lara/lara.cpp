@@ -912,7 +912,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	if (Lara.ExtraAnim == -1)
 	{
 		// Check for collision with items
-		LaraBaddieCollision(item, coll);
+		DoObjectCollision(item, coll);
 
 		// Handle Lara collision
 		if (Lara.Vehicle == NO_ITEM)
@@ -1030,7 +1030,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) / 4;
 	item->pos.zPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_cos(item->pos.yRot) / 4;
 
-	LaraBaddieCollision(item, coll);
+	DoObjectCollision(item, coll);
 
 	if (/*Lara.ExtraAnim == -1 &&*/ Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
@@ -1088,7 +1088,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.xPos += item->fallspeed * phd_sin(Lara.moveAngle) / 4;
 	item->pos.zPos += item->fallspeed * phd_cos(Lara.moveAngle) / 4;
 
-	LaraBaddieCollision(item, coll);
+	DoObjectCollision(item, coll);
 
 	if (Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);

@@ -14,9 +14,7 @@ void ClearItem(short itemNum)
 
 	item->collidable = true;
 	item->data = nullptr;
-	item->drawRoom = (((item->pos.zPos - room->z) / SECTOR(1)) & 0xFF) | ((((item->pos.xPos - room->x) / SECTOR(1)) & 0xFF) * 256);
-	item->TOSSPAD = item->pos.yRot & 0xE000;
-	item->itemFlags[2] = item->roomNumber | ((item->pos.yPos - room->minfloor) & 0xFF00);
+	item->startPos = item->pos;
 }
 
 void KillItem(short itemNum)
