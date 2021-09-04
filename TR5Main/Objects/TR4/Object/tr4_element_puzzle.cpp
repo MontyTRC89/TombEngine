@@ -141,7 +141,7 @@ void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
         {
             if (c->enableBaddiePush)
             {
-                ItemPushLara(item, l, c, 0, 0);
+                ItemPushItem(item, l, c, 0, 0);
             }
         }
     }

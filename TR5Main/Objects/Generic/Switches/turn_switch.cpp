@@ -161,14 +161,14 @@ namespace TEN::Entities::Switches
 			GlobalCollisionBounds.Z1 = -512;
 			GlobalCollisionBounds.Z2 = 512;
 
-			ItemPushLara(item, l, coll, 0, 2);
+			ItemPushItem(item, l, coll, 0, 2);
 
 			GlobalCollisionBounds.X1 = 256;
 			GlobalCollisionBounds.X2 = 1024;
 			GlobalCollisionBounds.Z1 = -128;
 			GlobalCollisionBounds.Z2 = 128;
 
-			ItemPushLara(item, l, coll, 0, 2);
+			ItemPushItem(item, l, coll, 0, 2);
 		}
 	}
 
