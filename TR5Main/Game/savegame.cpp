@@ -219,7 +219,7 @@ void SaveGame::saveLara(int arg1, int arg2)
 
 	//lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	//lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
-	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
+	//lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 	
@@ -477,7 +477,7 @@ bool SaveGame::readLara()
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
-	Lara.generalPtr = AddPtr(Lara.generalPtr, char, malloc_buffer);
+	//Lara.generalPtr = AddPtr(Lara.generalPtr, char, malloc_buffer);
 	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
