@@ -302,7 +302,7 @@ int BigGunControl(COLL_INFO *coll)
 
 	coll->enableSpaz = false;
 	coll->enableBaddiePush = false;
-	LaraBaddieCollision(lara, coll);
+	DoObjectCollision(lara, coll);
 	
 	Camera.targetElevation = -ANGLE(15);
 	return 1;
