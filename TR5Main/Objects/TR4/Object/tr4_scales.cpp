@@ -43,7 +43,7 @@ void ScalesControl(short itemNum)
 			return;
 		}
 
-		if (RespawnAhmet((short)Lara.generalPtr))
+		if (RespawnAhmet(Lara.interactedItem))
 		{
 			short itemNos[8];
 			int sw = GetSwitchTrigger(item, itemNos, 0);

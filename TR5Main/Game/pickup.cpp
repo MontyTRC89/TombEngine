@@ -348,7 +348,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				&& l->currentAnimState == LS_UNDERWATER_STOP
 				&& !Lara.gunStatus
 				&& TestLaraPosition(&PickUpBoundsUW, item, l)
-				|| Lara.isMoving && (short)Lara.generalPtr == itemNum)
+				|| Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				if (TestLaraPosition(&PickUpBoundsUW, item, l))
 				{
@@ -372,13 +372,13 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						Lara.isMoving = false;
 						Lara.gunStatus = LG_HANDS_BUSY;
 					}
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 				else
 				{
 					if (Lara.isMoving)
 					{
-						if ((short)Lara.generalPtr == itemNum)
+						if (Lara.interactedItem == itemNum)
 						{
 							getThisItemPlease = itemNum;
 							Lara.isMoving = false;
@@ -414,7 +414,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (!Lara.isMoving)
 		{
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				if (l->currentAnimState != LS_PICKUP && l->currentAnimState != LS_HOLE)
 				{
@@ -435,7 +435,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 
-		if ((short)Lara.generalPtr != itemNum)
+		if (Lara.interactedItem != itemNum)
 		{
 			item->pos.xRot = oldXrot;
 			item->pos.yRot = oldYrot;
@@ -454,7 +454,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if(Lara.isMoving)
 			{
-				if ((short)Lara.generalPtr == itemNum)
+				if (Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
@@ -473,7 +473,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			l->currentAnimState = LS_HOLE;
 			flag = 1;
 		}
-		Lara.generalPtr = (void*)itemNum;
+		Lara.interactedItem = itemNum;
 		break;
 
 	case 2: // Pickup with crowbar
@@ -488,7 +488,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -555,7 +555,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			flag = 1;
 		}
 
-		Lara.generalPtr = (void*)itemNum;
+		Lara.interactedItem = itemNum;
 		break;
 
 	case 3:
@@ -599,7 +599,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				flag = 1;
 			}
-			Lara.generalPtr = (void*)itemNum;
+			Lara.interactedItem = itemNum;
 			break;
 		}
 
@@ -611,7 +611,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 		
-		if ((short)Lara.generalPtr == itemNum)
+		if (Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -640,7 +640,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			AddActiveItem(itemNum);
 			flag = 1;
 		}
-		Lara.generalPtr = (void*)itemNum;
+		Lara.interactedItem = itemNum;
 		break;
 
 	default:
@@ -654,7 +654,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 			
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -679,7 +679,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = LA_CROUCH_PICKUP_FLARE;
 				l->currentAnimState = LS_PICKUP_FLARE;
 				flag = 1;
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 				break;
 			}
 			getThisItemPlease = itemNum;
@@ -692,12 +692,12 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 					break;
 				l->goalAnimState = LS_CROUCH_IDLE;
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 				break;
 			}
 			if (!MoveLaraPosition(&PickUpPosition, item, l))
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 				break;
 			}
 			if (item->objectNumber == ID_FLARE_ITEM)
@@ -706,7 +706,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = LA_PICKUP_FLARE;
 				l->currentAnimState = LS_PICKUP_FLARE;
 				flag = 1;
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 				break;
 			}
 			getThisItemPlease = itemNum;
@@ -714,7 +714,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		l->currentAnimState = LS_PICKUP;
 		flag = 1;
-		Lara.generalPtr = (void*)itemNum;
+		Lara.interactedItem = itemNum;
 	}
 
 	if (flag)
@@ -966,7 +966,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 		&& Lara.gunStatus == LG_NO_ARMS 
 		&& (item->status == ITEM_NOT_ACTIVE 
 			&& item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
-		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
+		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		bounds = GetBoundsAccurate(item);
 		if (item->objectNumber != ID_SEARCH_OBJECT1)
@@ -1013,10 +1013,10 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 			}
 			else
 			{
-				Lara.generalPtr = (void *) itemNumber;
+				Lara.interactedItem = itemNumber;
 			}
 		}
-		else if (Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
+		else if (Lara.isMoving && Lara.interactedItem ==  itemNumber)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;

@@ -54,7 +54,7 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == LS_STOP && 
 		l->animNumber == LA_STAND_IDLE
-		|| Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		short rot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
@@ -70,13 +70,13 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNumber;
+				Lara.interactedItem = itemNumber;
 			}
 			item->pos.yRot = rot;
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+			if (Lara.isMoving && Lara.interactedItem == itemNumber)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -204,7 +204,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
-		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+		&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 	{
 		if (l->currentAnimState == LS_TIGHTROPE_FORWARD && 
 			l->goalAnimState != LS_TIGHTROPE_EXIT && 
@@ -238,13 +238,13 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 			item->pos.yRot += -ANGLE(180);
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 				Lara.isMoving = false;
 			item->pos.yRot += -ANGLE(180);
 		}
@@ -302,7 +302,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) / 2);
 			l->pos.yPos += item->pos.yPos - ((pos1.y + pos2.y) / 2);
 
-			Lara.generalPtr = item;
+			Lara.interactedItem = itemNumber;
 		}
 		else
 		{
