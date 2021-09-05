@@ -183,7 +183,11 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_trfall,//122
 	lara_as_trfall,//123
 	lara_as_null,//124
+#ifdef NEW_TIGHTROPE
+	lara_as_trexit,//125
+#else // !NEW_TIGHTROPE
 	lara_as_null,//125
+#endif
 	lara_as_switchon,//126
 	lara_as_null,//127
 	lara_as_parallelbars,//128

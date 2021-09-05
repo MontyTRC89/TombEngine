@@ -69,3 +69,6 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll);
+#ifdef NEW_TIGHTROPE
+void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll);
+#endif // NEW_TIGHTROPE
