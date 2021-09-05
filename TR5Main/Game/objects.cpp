@@ -206,16 +206,30 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.gunStatus)
 		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
 	{
-		if (l->currentAnimState == LS_TIGHTROPE_FORWARD && 
-			l->goalAnimState != LS_TIGHTROPE_EXIT && 
-			!Lara.tightRopeOff)
+#ifdef NEW_TIGHTROPE
+		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
+		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		   !Lara.tightrope.canGoOff)
 		{
-			if (item->pos.yRot == l->pos.yRot)
+			if(item->pos.yRot == l->pos.yRot)
 			{
-				if (abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+					Lara.tightrope.canGoOff = true;
+			}
+		}
+#else // NEW_TIGHTROPE
+		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
+		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		   !Lara.tightRopeOff)
+		{
+			if(item->pos.yRot == l->pos.yRot)
+			{
+				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
 					Lara.tightRopeOff = 1;
 			}
 		}
+#endif
+		
 	}
 	else
 	{
@@ -232,9 +246,18 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.headXrot = 0;
 				Lara.torsoYrot = 0;
 				Lara.torsoXrot = 0;
+#ifdef NEW_TIGHTROPE
+				Lara.tightrope.balance = 0;
+				Lara.tightrope.canGoOff = false;
+				Lara.tightrope.tightropeItem = itemNum;
+				Lara.tightrope.timeOnTightrope = 0;
+#else // !NEW_TIGHTROPE
 				Lara.tightRopeOnCount = 60;
 				Lara.tightRopeOff = 0;
 				Lara.tightRopeFall = 0;
+#endif
+
+				
 			}
 			else
 			{

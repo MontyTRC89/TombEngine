@@ -22,5 +22,8 @@ int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 int LaraLandedBad(ITEM_INFO* l, COLL_INFO* coll);
+#ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);
+#endif // !NEW_TIGHTROPE
+
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll);
