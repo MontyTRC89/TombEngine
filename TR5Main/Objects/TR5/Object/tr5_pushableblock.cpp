@@ -119,7 +119,7 @@ void InitialisePushableBlock(short itemNum)
 void PushableBlockControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	Lara.generalPtr = (void*)itemNumber;
+	Lara.interactedItem = itemNumber;
 
 	PHD_VECTOR pos;
 	pos.x = 0;
@@ -392,7 +392,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.gunStatus
 		|| item->status == ITEM_INVISIBLE
 		|| item->triggerFlags < 0)
-		&& (!Lara.isMoving || Lara.generalPtr != item))
+		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
 		if ((l->currentAnimState != LS_PUSHABLE_GRAB
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
@@ -513,14 +513,14 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				else
 				{
-					Lara.generalPtr = item;
+					Lara.interactedItem = itemNum;
 					item->pos.yRot = rot;
 				}
 			}
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == item)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;

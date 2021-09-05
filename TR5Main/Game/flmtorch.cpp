@@ -321,12 +321,12 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
-			Lara.generalPtr = (void*)itemNumber;
+			Lara.interactedItem = itemNumber;
 		}
 		
 		item->pos.yRot = rot;
 	}
-	if ((short)Lara.generalPtr == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
+	if (Lara.interactedItem == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
 	{
 		if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 		{

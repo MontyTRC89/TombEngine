@@ -170,7 +170,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 104*/
 	/*collision: lara_default_col*/
-	ITEM_INFO* pulley = (ITEM_INFO*)Lara.generalPtr;
+	ITEM_INFO* pulley = &g_Level.Items[Lara.interactedItem];
 
 	Lara.look = false;
 
@@ -240,7 +240,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 129*/
 	/*collision: lara_default_col*/
-	ITEM_INFO* pitem = (ITEM_INFO*)Lara.generalPtr;
+	ITEM_INFO* pitem = &g_Level.Items[Lara.interactedItem];
 
 	item->gravityStatus = true;
 

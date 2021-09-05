@@ -29,7 +29,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->currentAnimState == LS_STOP &&
 		l->animNumber == LA_STAND_IDLE &&
 		Lara.gunStatus == LG_NO_ARMS ||
-		Lara.isMoving && (short)Lara.generalPtr == itemNum)
+		Lara.isMoving && Lara.interactedItem == itemNum)
 	{
 		if (TestLaraPosition(&SarcophagusBounds, item, l))
 		{
@@ -52,12 +52,12 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 		}
 		else if (Lara.isMoving)
 		{
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
