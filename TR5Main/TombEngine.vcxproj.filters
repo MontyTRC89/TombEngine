@@ -30,9 +30,6 @@
     <ClInclude Include="Game\debris.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\door.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\draw.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1086,6 +1083,24 @@
     <ClInclude Include="Game\control\trigger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\generic_doors.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\sequence_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\underwater_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\pushpull_kick_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\double_doors.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\steel_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1101,9 +1116,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\debris.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\door.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\draw.cpp">
@@ -1995,6 +2007,24 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control\trigger.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\sequence_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\underwater_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\pushpull_kick_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\double_doors.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\steel_door.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

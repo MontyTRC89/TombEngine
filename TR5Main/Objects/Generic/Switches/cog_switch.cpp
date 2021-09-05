@@ -4,7 +4,9 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "door.h"
+#include "generic_doors.h"
+
+using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
