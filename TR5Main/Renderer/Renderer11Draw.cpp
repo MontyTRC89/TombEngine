@@ -14,7 +14,6 @@
 #include "gameflow.h"
 #include "rope.h"
 #include "tomb4fx.h"
-#include "door.h"
 #include "level.h"
 #include "setup.h"
 #include "control.h"

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "malloc.h"
-#include "door.h"
+
 char* malloc_buffer;
 int malloc_size;
 char* malloc_ptr;

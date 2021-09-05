@@ -4,7 +4,6 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "door.h"
 #include "sound.h"
 #include "switch.h"
 
