@@ -1,7 +1,7 @@
 #pragma once
 
 #include "items.h"
-#include <collide.h>
+#include "collide.h"
 
 namespace TEN::Entities::Switches
 {

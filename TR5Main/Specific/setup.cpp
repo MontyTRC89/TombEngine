@@ -14,7 +14,6 @@
 #include "lara_flare.h"
 #include "lara_fire.h"
 #include "objects.h"
-#include "door.h"
 #include "rope.h"
 #include "traps.h"
 #include "flmtorch.h"
@@ -170,92 +169,6 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}*/
 
-	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_CLOSED_DOOR6; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-	}
-
-	obj = &Objects[ID_LIFT_DOORS1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_LIFT_DOORS2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SEQUENCE_DOOR1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = DoorCollision;
-		obj->control = SequenceDoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
-	{
-		obj = &Objects[i];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = DoubleDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
-
-	for (int i = ID_UNDERWATER_DOOR1; i <= ID_UNDERWATER_DOOR4; i++)
-	{
-		obj = &Objects[i];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = UnderwaterDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
-
-	for (int objNum = ID_PUSHPULL_DOOR1; objNum <= ID_KICK_DOOR4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -293,18 +206,6 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->collision = ParallelBarsCollision;
-	}
-
-	obj = &Objects[ID_STEEL_DOOR];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSteelDoor;
-		obj->collision = SteelDoorCollision;
-		//obj->control = Legacy_SteelDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_EARTHQUAKE];

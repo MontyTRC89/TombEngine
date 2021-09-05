@@ -9,15 +9,17 @@
 #include "camera.h"
 #include "control.h"
 #include "pickup.h"
-#include "door.h"
+#include "generic_doors.h"
 #include "box.h"
 #include "sound.h"
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>
+
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;

@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "switch.h"
-#include "door.h"
 #include "items.h"
 #include "lot.h"
 #include "objects.h"
