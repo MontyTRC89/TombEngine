@@ -79,7 +79,6 @@ namespace TEN::Entities::Switches
 							if (!door->opened)
 							{
 								AddActiveItem((target - g_Level.Items.data()));
-								target->itemFlags[2] = target->pos.yPos;
 								target->status = ITEM_ACTIVE;
 							}
 						}
