@@ -49,6 +49,20 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
+		if (item->triggerFlags == 0)
+		{
+			WallUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+		else
+		{
+			CeilingUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+	}
+
+	void WallUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
+
 		if (TrInput & IN_ACTION)
 		{
 			if (item->status == ITEM_NOT_ACTIVE

@@ -31,11 +31,6 @@ namespace TEN::Entities::Doors
 	};
 
 	void InitialiseDoor(short itemNumber);
-	void InitialiseClosedDoors();
-	void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx);
-	void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ);
-	void ProcessClosedDoors();
-	void AssignClosedDoor(ITEM_INFO* item);
 	void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 	void DoorControl(short itemNumber);
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);

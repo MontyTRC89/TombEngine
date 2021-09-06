@@ -101,7 +101,6 @@ int LoadItems()
 
 	g_Level.Items.resize(NUM_ITEMS);
 
-	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -332,7 +331,6 @@ void LoadObjects()
 	}
 
 	InitialiseObjects();
-	InitialiseClosedDoors();
 
 	int numStatics = ReadInt32();
 	for (int i = 0; i < numStatics; i++)

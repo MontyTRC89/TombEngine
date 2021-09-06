@@ -111,7 +111,7 @@ namespace TEN::Entities::Doors
 					return;
 				}
 			}
-			else if (item->objectNumber == ID_PUSHPULL_DOOR1 || item->objectNumber == ID_PUSHPULL_DOOR2)
+			else
 			{
 				if (MoveLaraPosition(&PushDoorPos, item, l))
 				{
