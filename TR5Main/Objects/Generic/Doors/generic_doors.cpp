@@ -279,13 +279,16 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		DOOR_DATA* door = (DOOR_DATA*)item->data;
 
+		// Doors with OCB = 1 are raisable with cog switchs
 		if (item->triggerFlags == 1)
 		{
 			if (item->itemFlags[0])
 			{
 				BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-				--item->itemFlags[0];
+			
+				item->itemFlags[0]--;
 				item->pos.yPos -= TEN::Entities::Switches::COG_DOOR_SPEED;
+				
 				int y = bounds->Y1 + item->itemFlags[2] - STEP_SIZE;
 				if (item->pos.yPos < y)
 				{
@@ -303,11 +306,11 @@ namespace TEN::Entities::Doors
 			}
 			else
 			{
-				if (item->pos.yPos < item->itemFlags[2])
+				if (item->pos.yPos < item->startPos.yPos)
 					item->pos.yPos += 4;
-				if (item->pos.yPos >= item->itemFlags[2])
+				if (item->pos.yPos >= item->startPos.yPos)
 				{
-					item->pos.yPos = item->itemFlags[2];
+					item->pos.yPos = item->startPos.yPos;
 					if (door->opened)
 					{
 						ShutThatDoor(&door->d1, door);
@@ -318,6 +321,8 @@ namespace TEN::Entities::Doors
 					}
 				}
 			}
+
+			return;
 		}
 
 		if (item->objectNumber < ID_LIFT_DOORS1 || item->objectNumber > ID_LIFT_DOORS2)
