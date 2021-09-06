@@ -32,9 +32,6 @@ namespace TEN::Entities::Doors
 		-ANGLE(80), ANGLE(80)
 	};
 
-	ITEM_INFO* ClosedDoors[32];
-	bool DontUnlockBox;
-
 	void InitialiseDoor(short itemNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -63,9 +60,9 @@ namespace TEN::Entities::Doors
 
 		if (item->pos.yRot == 0)
 			dz--;
-		else if (item->pos.yRot == -0x8000)
+		else if (item->pos.yRot == -ANGLE(180))
 			dz++;
-		else if (item->pos.yRot == 0x4000)
+		else if (item->pos.yRot == ANGLE(90))
 			dx--;
 		else
 			dx++;
@@ -159,127 +156,6 @@ namespace TEN::Entities::Doors
 			ItemNewRoom(itemNumber, twoRoom);
 			item->roomNumber = roomNumber;
 			item->inDrawRoom = true;
-		}
-	}
-
-	void InitialiseClosedDoors()
-	{
-		ZeroMemory(ClosedDoors, 32 * sizeof(ITEM_INFO*));
-	}
-
-	void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx)
-	{
-		int absX = dx * SECTOR(1) + item->pos.xPos;
-		int absZ = dz * SECTOR(1) + item->pos.zPos;
-
-		dx *= SECTOR(1);
-		dz *= SECTOR(1);
-
-		ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-		GetClosedDoorNormal(r, &doorData->dptr1, &doorData->dn1, dz, dx, absX, absZ);
-
-		if (r->flippedRoom != -1)
-			GetClosedDoorNormal(&g_Level.Rooms[r->flippedRoom], &doorData->dptr2, &doorData->dn2, dz, dx, absX, absZ);
-
-		r = &g_Level.Rooms[roomNumber];
-		GetClosedDoorNormal(r, &doorData->dptr3, &doorData->dn3, dz, dx, absX, absZ);
-
-		if (r->flippedRoom != -1)
-			GetClosedDoorNormal(&g_Level.Rooms[r->flippedRoom], &doorData->dptr4, &doorData->dn4, dz, dx, absX, absZ);
-	}
-
-	void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ)
-	{
-		/**dptr = NULL;
-
-			int halfX = x >> 1;
-			int halfZ = z >> 1;
-
-			for (int i = 0; i < room->doors.size(); i++)
-			{
-				ROOM_DOOR door = room->doors[i];
-
-				int x1 = halfX + room->x + ((int)door.vertices[0].x + 128) & 0xFFFFFF00;
-				int x2 = halfX + room->x + ((int)door.vertices[2].x + 128) & 0xFFFFFF00;
-
-				if (x1 > x2)
-				{
-					int temp = x1;
-					x1 = x2;
-					x2 = temp;
-				}
-
-				int z1 = halfZ + room->z + ((int)door.vertices[0].z + 128) & 0xFFFFFF00;
-				int z2 = halfZ + room->z + ((int)door.vertices[2].z + 128) & 0xFFFFFF00;
-
-				if (z1 > z2)
-				{
-					int temp = z1;
-					z1 = z2;
-					z2 = temp;
-				}
-
-				if (absX >= x1 && absX <= x2 && absZ >= z1 && absZ <= z2)
-				{
-					*dptr = &door[1];
-
-					if (door[1])
-					{
-						*n = (byte)door[1] & 0x81 | 1;
-					}
-					else if (door[2])
-					{
-						*n = (byte)door[2] & 0x82 | 2;
-					}
-					else
-					{
-						*n = (byte)door[3] & 0x84 | 4;
-					}
-				}
-			}*/
-	}
-
-	void ProcessClosedDoors()
-	{
-		/*for (int i = 0; i < 32; i++)
-		{
-			ITEM_INFO* item = ClosedDoors[i];
-
-			if (item == NULL)
-				break;
-
-			short roomNumber = item->roomNumber;
-			if (!g_Level.Rooms[roomNumber].boundActive && !g_Level.Rooms[item->drawRoom].boundActive)
-				continue;
-
-			if (g_Level.Rooms[item->drawRoom].boundActive)
-			{
-				if (!(item->inDrawRoom))
-				{
-					ItemNewRoom(item - Items, item->drawRoom);
-					item->roomNumber = roomNumber;
-					item->inDrawRoom = true;
-				}
-			}
-			else if (item->inDrawRoom)
-			{
-				item->roomNumber = item->drawRoom;
-				ItemNewRoom(item - Items, roomNumber);
-				item->inDrawRoom = false;
-			}
-		}*/
-	}
-	// keeping these cocmments for now in case they're actually needed?
-
-	void AssignClosedDoor(ITEM_INFO* item)
-	{
-		for (int i = 0; i < 32; i++)
-		{
-			if (ClosedDoors[i] == NULL)
-			{
-				ClosedDoors[i] = item;
-				return;
-			}
 		}
 	}
 
@@ -428,7 +304,7 @@ namespace TEN::Entities::Doors
 			else
 			{
 				if (item->pos.yPos < item->itemFlags[2])
-					item->pos.yPos += 2;
+					item->pos.yPos += 4;
 				if (item->pos.yPos >= item->itemFlags[2])
 				{
 					item->pos.yPos = item->itemFlags[2];
@@ -448,13 +324,11 @@ namespace TEN::Entities::Doors
 		{
 			if (TriggerActive(item))
 			{
-				if (!item->currentAnimState)
+				if (item->currentAnimState == 0)
 				{
 					item->goalAnimState = 1;
-					AnimateItem(item);
-					return;
 				}
-				if (!door->opened)
+				else if (!door->opened)
 				{
 					OpenThatDoor(&door->d1, door);
 					OpenThatDoor(&door->d2, door);
@@ -470,11 +344,8 @@ namespace TEN::Entities::Doors
 				if (item->currentAnimState == 1)
 				{
 					item->goalAnimState = 0;
-					AnimateItem(item);
-					return;
 				}
-
-				if (door->opened)
+				else if (door->opened)
 				{
 					ShutThatDoor(&door->d1, door);
 					ShutThatDoor(&door->d2, door);
@@ -482,50 +353,53 @@ namespace TEN::Entities::Doors
 					ShutThatDoor(&door->d2flip, door);
 					door->opened = false;
 				}
-			}
-			AnimateItem(item);
-			return;
-		}
-
-		if (!TriggerActive(item))
-		{
-			if (item->itemFlags[0] >= SECTOR(4))
-			{
-				if (door->opened)
-				{
-					ShutThatDoor(&door->d1, door);
-					ShutThatDoor(&door->d2, door);
-					ShutThatDoor(&door->d1flip, door);
-					ShutThatDoor(&door->d2flip, door);
-					door->opened = false;
-				}
-			}
-			else
-			{
-				if (!item->itemFlags[0])
-					SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
-				item->itemFlags[0] += STEP_SIZE;
 			}
 		}
 		else
 		{
-			if (item->itemFlags[0] > 0)
+			// TR5 lift doors
+			/*if (!TriggerActive(item))
 			{
-				if (item->itemFlags[0] == SECTOR(4))
-					SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
-				item->itemFlags[0] -= STEP_SIZE;
+				if (item->itemFlags[0] >= SECTOR(4))
+				{
+					if (door->opened)
+					{
+						ShutThatDoor(&door->d1, door);
+						ShutThatDoor(&door->d2, door);
+						ShutThatDoor(&door->d1flip, door);
+						ShutThatDoor(&door->d2flip, door);
+						door->opened = false;
+					}
+				}
+				else
+				{
+					if (!item->itemFlags[0])
+						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
+					item->itemFlags[0] += STEP_SIZE;
+				}
 			}
-			if (!door->opened)
+			else
 			{
-				DontUnlockBox = true;
-				OpenThatDoor(&door->d1, door);
-				OpenThatDoor(&door->d2, door);
-				OpenThatDoor(&door->d1flip, door);
-				OpenThatDoor(&door->d2flip, door);
-				DontUnlockBox = false;
-				door->opened = true;
-			}
+				if (item->itemFlags[0] > 0)
+				{
+					if (item->itemFlags[0] == SECTOR(4))
+						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
+					item->itemFlags[0] -= STEP_SIZE;
+				}
+				if (!door->opened)
+				{
+					DontUnlockBox = true;
+					OpenThatDoor(&door->d1, door);
+					OpenThatDoor(&door->d2, door);
+					OpenThatDoor(&door->d1flip, door);
+					OpenThatDoor(&door->d2flip, door);
+					DontUnlockBox = false;
+					door->opened = true;
+				}
+			}*/
 		}
+
+		AnimateItem(item);
 	}
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
@@ -539,77 +413,12 @@ namespace TEN::Entities::Doors
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_BOX)
 			{
-				if (!DontUnlockBox)
+				//if (!DontUnlockBox)
 					g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
 
 				for (int i = 0; i < NUM_SLOTS; i++)
 				{
 					BaddieSlots[i].LOT.targetBox = NO_BOX;
-				}
-			}
-		}
-
-		if (dd->dptr1)
-		{
-			short n = dd->dn1 < 0 ? -1 : 1;
-			if (dd->dn1 & 1)
-			{
-				dd->dptr1[0] = n;
-			}
-			else if (dd->dn1 & 2)
-			{
-				dd->dptr1[1] = n;
-			}
-			else
-			{
-				dd->dptr1[2] = n;
-			}
-
-			n = dd->dn3 < 0 ? -1 : 1;
-			if (dd->dn3 & 1)
-			{
-				dd->dptr3[0] = n;
-			}
-			else if (dd->dn3 & 2)
-			{
-				dd->dptr3[1] = n;
-			}
-			else
-			{
-				dd->dptr3[2] = n;
-			}
-
-			if (dd->dptr2)
-			{
-				n = dd->dn2 < 0 ? -1 : 1;
-				if (dd->dn2 & 1)
-				{
-					dd->dptr2[0] = n;
-				}
-				else if (dd->dn2 & 2)
-				{
-					dd->dptr2[1] = n;
-				}
-				else
-				{
-					dd->dptr2[2] = n;
-				}
-			}
-
-			if (dd->dptr4)
-			{
-				n = dd->dn4 < 0 ? -1 : 1;
-				if (dd->dn4 & 1)
-				{
-					dd->dptr4[0] = n;
-				}
-				else if (dd->dn4 & 2)
-				{
-					dd->dptr4[1] = n;
-				}
-				else
-				{
-					dd->dptr4[2] = n;
 				}
 			}
 		}
@@ -636,31 +445,6 @@ namespace TEN::Entities::Doors
 				{
 					BaddieSlots[i].LOT.targetBox = NO_BOX;
 				}
-			}
-		}
-
-		if (dd->dptr1)
-		{
-			dd->dptr1[0] = 0;
-			dd->dptr1[1] = 0;
-			dd->dptr1[2] = 0;
-
-			dd->dptr3[0] = 0;
-			dd->dptr3[1] = 0;
-			dd->dptr3[2] = 0;
-
-			if (dd->dptr2)
-			{
-				dd->dptr2[0] = 0;
-				dd->dptr2[1] = 0;
-				dd->dptr2[2] = 0;
-			}
-
-			if (dd->dptr4)
-			{
-				dd->dptr4[0] = 0;
-				dd->dptr4[1] = 0;
-				dd->dptr4[2] = 0;
 			}
 		}
 	}

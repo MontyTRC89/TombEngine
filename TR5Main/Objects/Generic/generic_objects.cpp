@@ -240,7 +240,7 @@ void StartSwitches()
 		if (obj->loaded)
 		{
 			obj->control = SwitchControl;
-			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? UnderwaterSwitchCollision : CeilingUnderwaterSwitchCollision;
+			obj->collision = UnderwaterSwitchCollision;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 		}
