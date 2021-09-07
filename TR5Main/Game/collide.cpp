@@ -241,6 +241,7 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	else
 		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 	
+	// Determine identity static collision bounds
 	auto XMin = mesh->x + stInfo.collisionBox.X1;
 	auto XMax = mesh->x + stInfo.collisionBox.X2;
 	auto YMin = mesh->y + stInfo.collisionBox.Y1;
@@ -248,15 +249,17 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	auto ZMin = mesh->z + stInfo.collisionBox.Z1;
 	auto ZMax = mesh->z + stInfo.collisionBox.Z2;
 
+	// Determine identity rotation/distance
 	auto distance = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos) - Vector3(mesh->x, mesh->y, mesh->z);
-
 	auto c = phd_cos(mesh->yRot);
 	auto s = phd_sin(mesh->yRot);
 
+	// Rotate item to collision bounds identity
 	auto x = round(distance.x * c - distance.z * s) + mesh->x;
 	auto y = item->pos.yPos;
 	auto z = round(distance.x * s + distance.z * c) + mesh->z;
 
+	// Determine item collision bounds
 	auto inXMin = x - coll->radius;
 	auto inXMax = x + coll->radius;
 	auto inYMin = y - (itemBBox->Y2 - itemBBox->Y1);
@@ -264,15 +267,19 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	auto inZMin = z - coll->radius;
 	auto inZMax = z + coll->radius;
 
+	// Don't calculate shifts if not in bounds
 	if (inXMax <= XMin || inXMin >= XMax ||
 		inYMax <= YMin || inYMin >= YMax ||
 		inZMax <= ZMin || inZMin >= ZMax)
 		return false;
+	
+	// Calculate shifts
 
 	PHD_VECTOR rawShift = {};
 
 	auto shiftLeft = inXMax - XMin;
 	auto shiftRight = XMax - inXMin;
+
 	if (shiftLeft < shiftRight)
 		rawShift.x = -shiftLeft;
 	else
@@ -280,27 +287,30 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 
 	shiftLeft = inZMax - ZMin;
 	shiftRight = ZMax - inZMin;
+
 	if (shiftLeft < shiftRight)
 		rawShift.z = -shiftLeft;
 	else
 		rawShift.z = shiftRight;
 
+	// Rotate previous collision position to identity
 	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(mesh->x, mesh->y, mesh->z);
 	auto ox = round(distance.x * c - distance.z * s) + mesh->x;
 	auto oz = round(distance.x * s + distance.z * c) + mesh->z;
 
+	// Calculate collisison type based on identity rotation
 	switch (GetQuadrant(coll->facing - mesh->yRot))
 	{
 	case NORTH:
 		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
 		{
-			coll->shift.z = rawShift.z;                      // Frontal Collision!!!
+			coll->shift.z = rawShift.z;
 			coll->shift.x = ox - x;
 			coll->collType = CT_FRONT;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
 		{
-			coll->shift.x = rawShift.x;                      // Side Collision
+			coll->shift.x = rawShift.x;
 			coll->shift.z = 0;
 			coll->collType = CT_LEFT;
 		}
@@ -315,13 +325,13 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	case SOUTH:
 		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
 		{
-			coll->shift.z = rawShift.z;                      // Frontal Collision!!!
+			coll->shift.z = rawShift.z;
 			coll->shift.x = ox - x;
 			coll->collType = CT_FRONT;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
 		{
-			coll->shift.x = rawShift.x;                      // Side Collision
+			coll->shift.x = rawShift.x;
 			coll->shift.z = 0;
 			coll->collType = CT_RIGHT;
 		}
@@ -336,13 +346,13 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	case EAST:
 		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
 		{
-			coll->shift.x = rawShift.x;                      // Frontal Collision!!!
+			coll->shift.x = rawShift.x;
 			coll->shift.z = oz - z;
 			coll->collType = CT_FRONT;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
 		{
-			coll->shift.z = rawShift.z;                      // Side Collision
+			coll->shift.z = rawShift.z;
 			coll->shift.x = 0;
 			coll->collType = CT_RIGHT;
 		}
@@ -357,13 +367,13 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	case WEST:
 		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
 		{
-			coll->shift.x = rawShift.x;                      // Frontal Collision!!!
-			coll->shift.z = oz - z;            	// Leave X as old value
+			coll->shift.x = rawShift.x;
+			coll->shift.z = oz - z;
 			coll->collType = CT_FRONT;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
 		{
-			coll->shift.z = rawShift.z;                      // Side Collision
+			coll->shift.z = rawShift.z;
 			coll->shift.x = 0;
 			coll->collType = CT_LEFT;
 		}
@@ -376,11 +386,12 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 		break;
 	}
 
+	// Determine final shifts rotation/distance
 	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(mesh->x, mesh->y, mesh->z);
-
 	c = phd_cos(0 - mesh->yRot);
 	s = phd_sin(0 - mesh->yRot);
 
+	// Calculate final shifts rotation/distance
 	coll->shift.x = (round(distance.x * c - distance.z * s) + mesh->x) - item->pos.xPos;
 	coll->shift.z = (round(distance.x * s + distance.z * c) + mesh->z) - item->pos.zPos;
 
