@@ -19,6 +19,13 @@
 
 namespace TEN::Entities::Doors
 {
+	enum STATES_PUSHPULL_KICK_DOOR
+	{
+		STATE_PUSHPULL_KICK_DOOR_OPEN = 0,
+		STATE_PUSHPULL_KICK_DOOR_CLOSED = 1,
+		STATE_PUSHPULL_KICK_DOOR_PUSH = 2,
+		STATE_PUSHPULL_KICK_DOOR_PULL = 3
+	};
 	PHD_VECTOR PullDoorPos(-201, 0, 322);
 	PHD_VECTOR PushDoorPos(201, 0, -702);
 	PHD_VECTOR KickDoorPos(0, 0, -917);
@@ -36,6 +43,7 @@ namespace TEN::Entities::Doors
 	void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
+
 		if (TrInput & IN_ACTION
 			&& l->currentAnimState == LS_STOP
 			&& l->animNumber == LA_STAND_IDLE
@@ -44,100 +52,85 @@ namespace TEN::Entities::Doors
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 		{
-			bool applyRot = false;
+			bool pull = false;
 
 			if (l->roomNumber == item->roomNumber)
 			{
 				item->pos.yRot ^= ANGLE(180);
-				applyRot = true;
+				pull = true;
 			}
 
-			if (!TestLaraPosition(&PushPullKickDoorBounds, item, l))
+			if (TestLaraPosition(&PushPullKickDoorBounds, item, l))
 			{
-				if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				bool openTheDoor = false;
+
+				if (pull)
 				{
+					if (MoveLaraPosition(&PullDoorPos, item, l))
+					{
+						l->animNumber = LA_DOOR_OPEN_PULL;
+						l->frameNumber = GF(LA_DOOR_OPEN_PULL, 0);
+						item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PULL;
+						openTheDoor = true;
+					}
+					else
+					{
+						Lara.generalPtr = (void*)itemNum;
+					}
+				}
+				else
+				{
+					if (item->objectNumber >= ID_KICK_DOOR1)
+					{
+						if (MoveLaraPosition(&KickDoorPos, item, l))
+						{
+							l->animNumber = LA_DOOR_OPEN_KICK;
+							l->frameNumber = GF(LA_DOOR_OPEN_KICK, 0);
+							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							openTheDoor = true;
+						}
+						else
+						{
+							Lara.generalPtr = (void*)itemNum;
+						}
+					}
+					else
+					{
+						if (MoveLaraPosition(&PushDoorPos, item, l))
+						{
+							l->animNumber = LA_DOOR_OPEN_PUSH;
+							l->frameNumber = GF(LA_DOOR_OPEN_PUSH, 0);
+							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							openTheDoor = true;
+						}
+						else
+						{
+							Lara.generalPtr = (void*)itemNum;
+						}
+					}
+				}
+
+				if (openTheDoor)
+				{
+					AddActiveItem(itemNum);
+
+					item->status = ITEM_ACTIVE;
+					l->currentAnimState = LS_MISC_CONTROL;
+					l->goalAnimState = LS_STOP;
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_BUSY;
 				}
-				if (applyRot)
-					item->pos.yRot ^= ANGLE(180);
-				return;
 			}
-
-			if (applyRot)
+			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 			{
-				if (!MoveLaraPosition(&PullDoorPos, item, l))
-				{
-					Lara.generalPtr = (void*)itemNum;
-					item->pos.yRot ^= ANGLE(180);
-					return;
-				}
-
-				l->animNumber = LA_DOOR_OPEN_PULL;
-				l->frameNumber = GF(LA_DOOR_OPEN_PULL, 0);
-				item->goalAnimState = 3;
-
-				AddActiveItem(itemNum);
-
-				item->status = ITEM_ACTIVE;
-				l->currentAnimState = LS_MISC_CONTROL;
-				l->goalAnimState = LS_STOP;
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-				if (applyRot)
-					item->pos.yRot ^= ANGLE(180);
-				return;
+				Lara.gunStatus = LG_NO_ARMS;
 			}
 
-			if (item->objectNumber >= ID_KICK_DOOR1)
-			{
-				if (MoveLaraPosition(&KickDoorPos, item, l))
-				{
-					l->animNumber = LA_DOOR_OPEN_KICK;
-					l->frameNumber = GF(LA_DOOR_OPEN_KICK, 0);
-					item->goalAnimState = 2;
-
-					AddActiveItem(itemNum);
-
-					item->status = ITEM_ACTIVE;
-					l->currentAnimState = LS_MISC_CONTROL;
-					l->goalAnimState = LS_STOP;
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
-
-					if (applyRot)
-						item->pos.yRot ^= ANGLE(180);
-					return;
-				}
-			}
-			else
-			{
-				if (MoveLaraPosition(&PushDoorPos, item, l))
-				{
-					l->animNumber = LA_DOOR_OPEN_PUSH;
-					l->frameNumber = GF(LA_DOOR_OPEN_PUSH, 0);
-					item->goalAnimState = 2;
-
-					AddActiveItem(itemNum);
-
-					item->status = ITEM_ACTIVE;
-					l->currentAnimState = LS_MISC_CONTROL;
-					l->goalAnimState = LS_STOP;
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
-
-					if (applyRot)
-						item->pos.yRot ^= ANGLE(180);
-				}
-				return;
-			}
-
-			Lara.generalPtr = (void*)itemNum;
-			return;
+			if (pull)
+				item->pos.yRot ^= ANGLE(180);
 		}
-
-		if (!item->currentAnimState)
+		else if (item->currentAnimState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNum, l, coll);
 	}
 
