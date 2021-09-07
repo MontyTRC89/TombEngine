@@ -195,6 +195,10 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 {
 	auto stInfo = StaticObjects[mesh->staticNumber];
 
+	// Ignore collision if flag is not set
+	if (stInfo.flags & 1)
+		return false;
+
 	// Get DX static bounds in global coords
 	auto staticPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
 	auto staticBounds = TO_DX_BBOX(&staticPos, &stInfo.collisionBox);
@@ -236,199 +240,152 @@ bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	}
 	else
 		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
-	// Decompose static bounds into planes
-	Vector3 corners[8];
-	staticBounds.GetCorners(corners);
-
-	Plane plane[6];
-	plane[BBOX_PLANE::FRONT ] = Plane(corners[0], corners[1], corners[2]);
-	plane[BBOX_PLANE::BACK  ] = Plane(corners[4], corners[5], corners[6]);
-	plane[BBOX_PLANE::LEFT  ] = Plane(corners[1], corners[5], corners[6]);
-	plane[BBOX_PLANE::RIGHT ] = Plane(corners[3], corners[4], corners[7]);
-	plane[BBOX_PLANE::TOP   ] = Plane(corners[5], corners[4], corners[1]);
-	plane[BBOX_PLANE::BOTTOM] = Plane(corners[3], corners[6], corners[7]);
-
-	// Debug plane points
-	{
-		//g_Renderer.addLine3D(corners[1], corners[5], Vector4(1, 1, 1, 1));
-		//g_Renderer.addLine3D(corners[5], corners[6], Vector4(1, 1, 1, 1));
-
-		Vector3 p1 = (corners[0] + corners[1] + corners[2]) / 3;
-		Vector3 p2 = p1 + (plane[0].Normal() * 256);
-		g_Renderer.addLine3D(p1, p2, Vector4(1, 1, 1, 1));
-	}
-
-	// Determine testing distance and height
-	auto distance = coll->radius;
-	auto height = (collBox.Y2 - collBox.Y1) / 2;
-
-	// Set up initial test parameters
-	float minDistance = std::numeric_limits<float>::max();
-
-	auto  front = Vector3();
-	int   closestPlane = -1;
-	short closestAngle = 0;
-	Ray   closestRay;
-
-	// Do a series of angular tests with 90 degree steps to determine collision side.
-
-	const int angleSteps = 8;
-	for (int i = 0; i < angleSteps; i++)
-	{
-		auto angle = coll->facing + (ANGLE((360 / angleSteps) * i));
-
-		// Calculate ray origin
-
-		auto c = phd_cos(angle);
-		auto s = phd_sin(angle);
-
- 		int x = item->pos.xPos - distance * s;
-		int y = item->pos.yPos - height;
-		int z = item->pos.zPos - distance * c;
-
-		// Calculate ray direction
-
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(angle), 0, 0);
-		auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
-		auto direction = (mxT * mxR).Translation();
-
-		// Store front direction for further processing
-		if (i == 0)	front = direction;
-
-		// Make a ray and do ray tests against all decomposed planes
-		auto ray = Ray(Vector3(x, y, z), direction);
-
-		for (int p = 0; p < BBOX_PLANE::PLANE_COUNT; p++)
-		{
-			// No plane intersection, quickly discard
-			float d = 0.0f;
-			if (!ray.Intersects(plane[p], d))
-				continue;
-			
-			// Process plane intersection only if distance is smaller
-			// than already found minimum
-			if (d < minDistance)
-			{
-				closestRay = ray;
-				closestPlane = p;
-				closestAngle = angle;
-				minDistance = d;
-			}
-		}
-	}
-
-	// This should never happen, but still
-	if (closestPlane == -1)
-		return false;
-
-	// Debug raycast
-	{
-		Vector3 p = collBounds.Center + (closestRay.direction * minDistance);
-		g_Renderer.addLine3D(collBounds.Center, p, Vector4(1, 0, 1, 1));
-	}
-
-	// Calculate delta between tested ray and original collision ray.
-	// It is needed because tests are done on rays inverted in space which
-	// allows to find regions where bounds are already submerged into static bounds.
-
-	auto dx = (distance) * phd_sin(closestAngle);
-	auto dz = (distance) * phd_cos(closestAngle);
-	auto dd = Vector3(dx, 0, dz).Length();
-
-	// Get raw shift values
-	auto shift = closestRay.direction * minDistance;
-
-	// Get final shift values respecting delta
-	auto shiftX = (int)ceil(shift.x);
-	auto shiftZ = (int)ceil(shift.z);
-
-	//// If both shifts are zero, it means no collision actually
-	//// happened and no further processing is needed.
-	//if (shiftX == 0 && shiftZ == 0)
-	//	return true;
-	//
-	//coll->shift.x = shiftX;
-	//coll->shift.z = shiftZ;
-
-	float c, s;
-	int rx, rz, minX, maxX, minZ, maxZ;
-	int left, right, top, bottom;
-	short oldFacing;
-
-	c = phd_cos(staticPos.yRot);
-	s = phd_sin(staticPos.yRot);
-	dx = item->pos.xPos - staticPos.xPos;
-	dz = item->pos.zPos - staticPos.zPos;
-	rx = c * dx - s * dz;
-	rz = c * dz + s * dx;
-	minX = stInfo.collisionBox.X1 - coll->radius;
-	maxX = stInfo.collisionBox.X2 + coll->radius;
-	minZ = stInfo.collisionBox.Z1 - coll->radius;
-	maxZ = stInfo.collisionBox.Z2 + coll->radius;
-
-	if (abs(dx) > 4608
-		|| abs(dz) > 4608
-		|| rx <= minX
-		|| rx >= maxX
-		|| rz <= minZ
-		|| rz >= maxZ)
-		return false;
-
-	left = rx - minX;
-	top = maxZ - rz;
-	bottom = rz - minZ;
-	right = maxX - rx;
-
-	if (right <= left && right <= top && right <= bottom)
-		rx += right;
-	else if (left <= right && left <= top && left <= bottom)
-		rx -= left;
-	else if (top <= left && top <= right && top <= bottom)
-		rz += top;
-	else
-		rz -= bottom;
-
-
-	// Get plane's normal
-	auto normal = plane[closestPlane].Normal();
 	
-	front.Normalize();
-	normal.Normalize();
+	auto XMin = mesh->x + stInfo.collisionBox.X1;
+	auto XMax = mesh->x + stInfo.collisionBox.X2;
+	auto YMin = mesh->y + stInfo.collisionBox.Y1;
+	auto YMax = mesh->y + stInfo.collisionBox.Y2;
+	auto ZMin = mesh->z + stInfo.collisionBox.Z1;
+	auto ZMax = mesh->z + stInfo.collisionBox.Z2;
 
+	auto distance = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos) - Vector3(mesh->x, mesh->y, mesh->z);
 
-	coll->shift.x = ((staticPos.xPos + c * rx + s * rz) - item->pos.xPos);
-	coll->shift.z = ((staticPos.zPos + c * rz - s * rx) - item->pos.zPos);
+	auto c = phd_cos(mesh->yRot);
+	auto s = phd_sin(mesh->yRot);
 
+	auto x = round(distance.x * c - distance.z * s) + mesh->x;
+	auto y = item->pos.yPos;
+	auto z = round(distance.x * s + distance.z * c) + mesh->z;
 
-	// Calculate angle between plane normal and collision vector
-	auto collAngle = acos(normal.Dot(front));
-	auto cross = normal.Cross(front);
+	auto inXMin = x - coll->radius;
+	auto inXMax = x + coll->radius;
+	auto inYMin = y - (itemBBox->Y2 - itemBBox->Y1);
+	auto inYMax = y;
+	auto inZMin = z - coll->radius;
+	auto inZMax = z + coll->radius;
 
-	auto dot = normal.Dot(front);
+	if (inXMax <= XMin || inXMin >= XMax ||
+		inYMax <= YMin || inYMin >= YMax ||
+		inZMax <= ZMin || inZMin >= ZMax)
+		return false;
 
-	if (abs(dot) > 0.7f)
-		coll->collType = CT_FRONT;
-	else if (dot < 0)
-		coll->collType = CT_RIGHT;
+	PHD_VECTOR rawShift = {};
+
+	auto shiftLeft = inXMax - XMin;
+	auto shiftRight = XMax - inXMin;
+	if (shiftLeft < shiftRight)
+		rawShift.x = -shiftLeft;
 	else
-		coll->collType = CT_LEFT;
+		rawShift.x = shiftRight;
 
-	//switch (closestSide)
-	//{
-	//case 0:
-	//case 2:
-	//	coll->collType = CT_FRONT;
-	//	break;
-	//
-	//case 1:
-	//	coll->collType = CT_RIGHT;
-	//	break;
-	//
-	//case 3:
-	//	coll->collType =  CT_LEFT;
-	//	break;
-	//}
+	shiftLeft = inZMax - ZMin;
+	shiftRight = ZMax - inZMin;
+	if (shiftLeft < shiftRight)
+		rawShift.z = -shiftLeft;
+	else
+		rawShift.z = shiftRight;
+
+	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(mesh->x, mesh->y, mesh->z);
+	auto ox = round(distance.x * c - distance.z * s) + mesh->x;
+	auto oz = round(distance.x * s + distance.z * c) + mesh->z;
+
+	switch (GetQuadrant(coll->facing - mesh->yRot))
+	{
+	case NORTH:
+		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		{
+			coll->shift.z = rawShift.z;                      // Frontal Collision!!!
+			coll->shift.x = ox - x;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		{
+			coll->shift.x = rawShift.x;                      // Side Collision
+			coll->shift.z = 0;
+			coll->collType = CT_LEFT;
+		}
+		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_RIGHT;
+		}
+		break;
+
+	case SOUTH:
+		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		{
+			coll->shift.z = rawShift.z;                      // Frontal Collision!!!
+			coll->shift.x = ox - x;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		{
+			coll->shift.x = rawShift.x;                      // Side Collision
+			coll->shift.z = 0;
+			coll->collType = CT_RIGHT;
+		}
+		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_LEFT;
+		}
+		break;
+
+	case EAST:
+		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		{
+			coll->shift.x = rawShift.x;                      // Frontal Collision!!!
+			coll->shift.z = oz - z;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		{
+			coll->shift.z = rawShift.z;                      // Side Collision
+			coll->shift.x = 0;
+			coll->collType = CT_RIGHT;
+		}
+		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_LEFT;
+		}
+		break;
+
+	case WEST:
+		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		{
+			coll->shift.x = rawShift.x;                      // Frontal Collision!!!
+			coll->shift.z = oz - z;            	// Leave X as old value
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		{
+			coll->shift.z = rawShift.z;                      // Side Collision
+			coll->shift.x = 0;
+			coll->collType = CT_LEFT;
+		}
+		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_RIGHT;
+		}
+		break;
+	}
+
+	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(mesh->x, mesh->y, mesh->z);
+
+	c = phd_cos(0 - mesh->yRot);
+	s = phd_sin(0 - mesh->yRot);
+
+	coll->shift.x = (round(distance.x * c - distance.z * s) + mesh->x) - item->pos.xPos;
+	coll->shift.z = (round(distance.x * s + distance.z * c) + mesh->z) - item->pos.zPos;
+
+	if (coll->shift.x == 0 && coll->shift.z == 0)
+		coll->collType = CT_NONE; // Paranoid
 
 	return true;
 }
@@ -2702,10 +2659,10 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 						{
 							coll->hitStatic = true;
 
-							//if (coll->enableBaddiePush)
-								//ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
-							//else
-							//	break;
+							if (coll->enableBaddiePush)
+								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+							else
+								break;
 						}
 					}
 				}
