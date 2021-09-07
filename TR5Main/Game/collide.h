@@ -9,6 +9,8 @@
 
 #define MAX_COLLIDED_OBJECTS 1024
 
+#define COLLISION_CHECK_DISTANCE 6144
+
 enum BBOX_PLANE : unsigned int
 {
 	FRONT,
@@ -106,10 +108,10 @@ void UpdateLaraRoom(ITEM_INFO* item, int height);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
-int FindGridShift(int x, int z);
-int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
+int FindGridShift(int x, int z); 
+int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
 int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
-int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll);
+int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
@@ -130,5 +132,5 @@ bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
-bool CollideStaticSolid(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll);
-void CollideStatics(ITEM_INFO* item, COLL_INFO* coll);
+bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll);
+void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
