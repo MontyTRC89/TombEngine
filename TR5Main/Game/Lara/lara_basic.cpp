@@ -1631,7 +1631,6 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = BAD_JUMP_CEILING;
-	coll->hitCeiling = false;
 	coll->facing = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
@@ -1745,8 +1744,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->collType == CT_CLAMP ||
 		coll->collType == CT_TOP ||
-		coll->collType == CT_TOP_FRONT ||
-		coll->hitCeiling)
+		coll->collType == CT_TOP_FRONT)
 		item->fallspeed = 1;
 
 	if (coll->collType == CT_NONE)
