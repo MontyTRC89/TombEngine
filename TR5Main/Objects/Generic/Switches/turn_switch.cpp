@@ -52,7 +52,7 @@ namespace TEN::Entities::Switches
 			&& l->animNumber == LA_STAND_IDLE
 			&& !l->gravityStatus
 			&& Lara.gunStatus == LG_NO_ARMS
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			short ItemNos[8];
 			if (TestLaraPosition(&TurnSwitchBoundsA, item, l))
@@ -94,7 +94,7 @@ namespace TEN::Entities::Switches
 					}
 					return;
 				}
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 			else
 			{
@@ -112,10 +112,10 @@ namespace TEN::Entities::Switches
 					}
 					else
 					{
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 					}
 				}
-				else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;

@@ -77,7 +77,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 	item = &g_Level.Items[itemNumber];
 	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
-		|| Lara.isMoving && Lara.generalPtr == (void *)itemNumber)
+		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
 		{
@@ -106,7 +106,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void *)itemNumber;
+				Lara.interactedItem =itemNumber;
 			}
 		}
 	}

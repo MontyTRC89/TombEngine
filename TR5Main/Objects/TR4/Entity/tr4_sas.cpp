@@ -693,7 +693,7 @@ namespace TEN::Entities::TR4
 			|| Lara.gunStatus
 			|| l->gravityStatus
 			|| item->flags & 0x3E00)
-			&& (!(Lara.isMoving) || (short)Lara.generalPtr != itemNumber))
+			&& (!(Lara.isMoving) || Lara.interactedItem != itemNumber))
 		{
 			if (item->status == ITEM_ACTIVE)
 			{
@@ -734,7 +734,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNumber;
+					Lara.interactedItem = itemNumber;
 				}
 			}
 		}
