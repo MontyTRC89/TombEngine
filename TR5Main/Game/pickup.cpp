@@ -827,7 +827,7 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 	for (int i = 0; i < room->mesh.size(); i++)
 	{
 		MESH_INFO* mesh = &room->mesh[i];
-		if (mesh->flags & 1)
+		if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 		{
 			if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
 			{

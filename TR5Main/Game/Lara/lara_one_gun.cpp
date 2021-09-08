@@ -270,7 +270,7 @@ void ControlHarpoonBolt(short itemNumber)
 					SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 					SmashedMesh[SmashedMeshCount] = currentMesh;
 					SmashedMeshCount++;
-					currentMesh->flags &= ~1;
+					currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 				}
 			}
 
@@ -709,7 +709,7 @@ void ControlGrenade(short itemNumber)
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
 								SmashedMeshCount++;
-								currentMesh->flags &= ~1;
+								currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 							}
 						}
 
@@ -952,7 +952,7 @@ void ControlRocket(short itemNumber)
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
-						currentMesh->flags &= ~1;
+						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					}
 				}
 
@@ -1459,7 +1459,7 @@ void ControlCrossbowBolt(short itemNumber)
 							SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 							SmashedMesh[SmashedMeshCount] = currentMesh;
 							SmashedMeshCount++;
-							currentMesh->flags &= ~1;
+							currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						}
 					}
 
