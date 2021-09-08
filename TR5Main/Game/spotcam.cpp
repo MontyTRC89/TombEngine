@@ -462,14 +462,14 @@ void CalculateSpotCameras()
 					break;
 			}
 
-			temp /= 2;
+			temp >>= 1;
 			sp = cp - 2 * (temp & 0xFE); // << 2 ?
 
 			if (sp < 0)
 				sp = 0;
 		}
 
-		CurrentSplinePosition += (cp - CurrentSplinePosition) / 32;
+		CurrentSplinePosition += (cp - CurrentSplinePosition) >> 5;
 
 		if ((s->flags & SCF_CUT_PAN))
 		{
@@ -536,7 +536,7 @@ void CalculateSpotCameras()
 
 			if (sqrt(SQUARE(dx) * SQUARE(dy) * SQUARE(dz)) < QuakeCam.epos.boxNumber)
 			{
-				dz = (QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber)) / 2;
+				dz = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber) >> 1;
 				dy = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber);
 				if (dy > 0)
 				{
@@ -849,7 +849,7 @@ void CalculateSpotCameras()
 					CameraYtarget[4] = Camera.target.y;
 					CameraZtarget[4] = Camera.target.z;
 					CameraFOV[4] = CurrentFOV;
-					CameraSpeed[4] = CameraSpeed[2] / 2;
+					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
 					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));

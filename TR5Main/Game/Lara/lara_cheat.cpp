@@ -59,7 +59,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		if (item->fallspeed >= 8)
-			item->fallspeed -= item->fallspeed / 8;
+			item->fallspeed -= item->fallspeed >> 3;
 		else
 			item->fallspeed = 0;
 	}
