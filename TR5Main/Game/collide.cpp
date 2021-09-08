@@ -325,7 +325,6 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 			coll->collType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->collType : CT_CLAMP;
 		}
 
-		coll->hitCeiling = bottom;
 		result = true;
 	}
 
@@ -1661,7 +1660,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		coll->shift.y = coll->middle.Ceiling;
 		coll->collType = CT_TOP;
-		coll->hitCeiling = true;
 	}
 
 	if ((coll->front.Floor > coll->badPos)
@@ -2063,7 +2061,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	{
 		coll->shift.y = coll->middle.Ceiling;
 		coll->collType = CT_TOP;
-		coll->hitCeiling = true;
 	}
 
 	if ((coll->front.Floor > coll->badPos)
