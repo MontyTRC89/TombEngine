@@ -832,9 +832,9 @@ FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_I
 		{
 			long dx, dy, dz;
 
-			dx = (vDest.x - vSrc.x) / 32;
-			dy = (vDest.y - vSrc.y) / 32;
-			dz = (vDest.z - vSrc.z) / 32;
+			dx = (vDest.x - vSrc.x) >> 5;
+			dy = (vDest.y - vSrc.y) >> 5;
+			dz = (vDest.z - vSrc.z) >> 5;
 			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
 		}
 		else if (target->objectNumber == ID_ARMY_WINSTON || target->objectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
@@ -842,7 +842,7 @@ FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_I
 			short ricochet_angle;
 			target->hitStatus = true; //need to do this to maintain defence state
 			target->hitPoints--;
-			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
+			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
 			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
 			SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
 		}
@@ -855,7 +855,7 @@ FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_I
 			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
 				target->hitStatus = true; //need to do this to maintain defence state
-				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) / 16) & 4095;
+				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
 				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
 				SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
 			}
