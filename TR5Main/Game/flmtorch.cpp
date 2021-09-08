@@ -234,13 +234,7 @@ void TorchControl(short itemNumber)
 		}
 		else
 		{
-			STATIC_INFO* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
-			PHD_3DPOS pos;
-			pos.xPos = CollidedMeshes[0]->x;
-			pos.yPos = CollidedMeshes[0]->y;
-			pos.zPos = CollidedMeshes[0]->z;
-			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushStatic(item, &sobj->collisionBox, &pos, &lara_coll);
+			ItemPushStatic(item, CollidedMeshes[0], &lara_coll);
 		}
 		item->speed >>= 1;
 	}

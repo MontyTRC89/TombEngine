@@ -329,7 +329,7 @@ void ControlGladiator(short itemNumber)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
-										mesh->flags &= 0xFEu;
+										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 									}

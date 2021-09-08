@@ -616,7 +616,7 @@ void RomanStatueControl(short itemNumber)
 								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 
-								mesh->flags &= ~1;
+								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->stopper = false;
 
 								TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);

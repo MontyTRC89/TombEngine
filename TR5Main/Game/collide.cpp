@@ -11,10 +11,12 @@
 #include "sound.h"
 #include "trmath.h"
 #include "prng.h"
+#include "room.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
+using namespace TEN::Renderer;
 
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
@@ -43,7 +45,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 				MESH_INFO* mesh = &room->mesh[j];
 				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
 
-				if (mesh->flags & 1)
+				if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 				{
 					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->collisionBox.Y1)
 					{
@@ -167,6 +169,333 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	return (numItems || numMeshes);
 }
 
+void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
+{
+	short roomsToCheck[128];
+	short numRoomsToCheck = 0;
+	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
+
+	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
+	{
+		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
+	}
+
+	for (int i = 0; i < numRoomsToCheck; i++)
+	{
+		for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+		{
+			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+
+			// Only process meshes which are visible and solid
+			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
+			{
+				int x = abs(item->pos.xPos - mesh->x);
+				int y = abs(item->pos.yPos - mesh->y);
+				int z = abs(item->pos.zPos - mesh->z);
+
+				if (x < COLLISION_CHECK_DISTANCE &&
+					y < COLLISION_CHECK_DISTANCE &&
+					z < COLLISION_CHECK_DISTANCE)
+				{
+					auto stInfo = StaticObjects[mesh->staticNumber];
+					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
+
+					if (CollideSolidBounds(item, stInfo.collisionBox, stPos, coll))
+						coll->hitStatic = true;
+				}
+			}
+		}
+	}
+}
+
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll)
+{
+	bool result = false;
+
+	// Get DX static bounds in global coords
+	auto staticBounds = TO_DX_BBOX(&pos, &box);
+
+	// Get local TR bounds and DX item bounds in global coords
+	auto itemBBox = GetBoundsAccurate(item);
+	auto itemBounds = TO_DX_BBOX(&item->pos, itemBBox);
+
+	// Extend bounds a bit for visual testing
+	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE / 3);
+
+	// Filter out any further checks if static isn't nearby
+	if (!staticBounds.Intersects(itemBounds))
+		return false;
+
+	// Bring back extents
+	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE / 3);
+
+	// Draw static bounds
+	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+	// Calculate item coll bounds according to radius
+	BOUNDING_BOX collBox;
+	collBox.X1 = -coll->radius;
+	collBox.X2 =  coll->radius;
+	collBox.Z1 = -coll->radius;
+	collBox.Z2 =  coll->radius;
+	collBox.Y1 = itemBBox->Y1;
+	collBox.Y2 = itemBBox->Y2;
+
+	// Get DX item coll bounds
+	auto collBounds = TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox);
+
+	// Draw item coll bounds
+	if (!staticBounds.Intersects(collBounds)) // Final generic check before further calculations
+	{
+		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		return false;
+	}
+	else
+		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+	// Decompose static bounds into top/bottom plane vertices
+	Vector3 corners[8];
+	staticBounds.GetCorners(corners);
+	Vector3 planeVertices[4][3] = 
+	{ 
+		{ corners[0], corners[4], corners[1] }, 
+		{ corners[5], corners[4], corners[1] }, 
+		{ corners[3], corners[6], corners[7] }, 
+		{ corners[3], corners[6], corners[2] } 
+	};
+
+	// Determine collision box vertical dimensions
+	auto height = collBox.Y2 - collBox.Y1;
+	auto halfHeight = height / 2;
+	auto center = item->pos.yPos - halfHeight;
+
+	// Do a series of angular tests with 90 degree steps to determine top/bottom collision.
+
+	int closestPlane = -1;
+	Ray closestRay;
+	auto minDistance = std::numeric_limits<float>::max();
+
+	for (int i = 0; i < 4; i++)
+	{
+		// Calculate ray direction
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot + (ANGLE(90 * i))), 0);
+		auto mxT = Matrix::CreateTranslation(Vector3::UnitY);
+		auto direction = (mxT * mxR).Translation();
+
+		// Make a ray and do ray tests against all decomposed planes
+		auto ray = Ray(collBounds.Center, direction);
+
+		// Determine if top/bottom planes are closest ones or not
+		for (int p = 0; p < 4; p++)
+		{
+			// No plane intersection, quickly discard
+			float d = 0.0f;
+			if (!ray.Intersects(planeVertices[p][0], planeVertices[p][1], planeVertices[p][2], d))
+				continue;
+
+			// Process plane intersection only if distance is smaller
+			// than already found minimum
+			if (d < minDistance)
+			{
+				closestRay = ray;
+				closestPlane = p;
+				minDistance  = d;
+			}
+		}
+	}
+
+	// Correct position according to top/bottom bounds, if collided
+	if (closestPlane != -1 && minDistance < height)
+	{
+		auto bottom = closestPlane >= 2;
+		auto yPoint = abs((closestRay.direction * minDistance).y);
+		auto distanceToVerticalPlane = halfHeight - yPoint;
+
+		if (bottom)
+		{
+			// HACK: additionally subtract 2 from bottom plane, or else false positives may occur.
+			item->pos.yPos += distanceToVerticalPlane + 2;
+			coll->collType = CT_TOP;
+		}
+		else
+		{
+			// Set collision type only if dry room (in water rooms it causes stucking)
+			item->pos.yPos -= distanceToVerticalPlane;
+			coll->collType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->collType : CT_CLAMP;
+		}
+
+		result = true;
+	}
+
+	// Check if bounds still collide after top/bottom position correction
+	if (!staticBounds.Intersects(TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox)))
+		return result;
+
+	// Determine identity rotation/distance
+	auto distance = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	auto c = phd_cos(pos.yRot);
+	auto s = phd_sin(pos.yRot);
+
+	// Rotate item to collision bounds identity
+	auto x = round(distance.x * c - distance.z * s) + pos.xPos;
+	auto y = item->pos.yPos;
+	auto z = round(distance.x * s + distance.z * c) + pos.zPos;
+	
+	// Determine identity static collision bounds
+	auto XMin = pos.xPos + box.X1;
+	auto XMax = pos.xPos + box.X2;
+	auto YMin = pos.yPos + box.Y1;
+	auto YMax = pos.yPos + box.Y2;
+	auto ZMin = pos.zPos + box.Z1;
+	auto ZMax = pos.zPos + box.Z2;
+
+	// Determine item collision bounds
+	auto inXMin = x - coll->radius;
+	auto inXMax = x + coll->radius;
+	auto inYMin = y - height;
+	auto inYMax = y;
+	auto inZMin = z - coll->radius;
+	auto inZMax = z + coll->radius;
+
+	// Don't calculate shifts if not in bounds
+	if (inXMax <= XMin || inXMin >= XMax ||
+		inYMax <= YMin || inYMin >= YMax ||
+		inZMax <= ZMin || inZMin >= ZMax)
+		return result;
+	
+	// Calculate shifts
+
+	PHD_VECTOR rawShift = {};
+
+	auto shiftLeft = inXMax - XMin;
+	auto shiftRight = XMax - inXMin;
+
+	if (shiftLeft < shiftRight)
+		rawShift.x = -shiftLeft;
+	else
+		rawShift.x = shiftRight;
+
+	shiftLeft = inZMax - ZMin;
+	shiftRight = ZMax - inZMin;
+
+	if (shiftLeft < shiftRight)
+		rawShift.z = -shiftLeft;
+	else
+		rawShift.z = shiftRight;
+
+	// Rotate previous collision position to identity
+	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	auto ox = round(distance.x * c - distance.z * s) + pos.xPos;
+	auto oz = round(distance.x * s + distance.z * c) + pos.zPos;
+
+	// Calculate collisison type based on identity rotation
+	switch (GetQuadrant(coll->facing - pos.yRot))
+	{
+	case NORTH:
+		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = ox - x;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_LEFT;
+		}
+		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_RIGHT;
+		}
+		break;
+
+	case SOUTH:
+		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = ox - x;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_RIGHT;
+		}
+		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = 0;
+			coll->collType = CT_LEFT;
+		}
+		break;
+
+	case EAST:
+		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = oz - z;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_RIGHT;
+		}
+		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_LEFT;
+		}
+		break;
+
+	case WEST:
+		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		{
+			coll->shift.x = rawShift.x;
+			coll->shift.z = oz - z;
+			coll->collType = CT_FRONT;
+		}
+		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_LEFT;
+		}
+		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		{
+			coll->shift.z = rawShift.z;
+			coll->shift.x = 0;
+			coll->collType = CT_RIGHT;
+		}
+		break;
+	}
+
+	// Determine final shifts rotation/distance
+	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	c = phd_cos(-pos.yRot);
+	s = phd_sin(-pos.yRot);
+
+	// Calculate final shifts rotation/distance
+	coll->shift.x = (round(distance.x * c - distance.z * s) + pos.xPos) - item->pos.xPos;
+	coll->shift.z = (round(distance.x * s + distance.z * c) + pos.zPos) - item->pos.zPos;
+
+	if (coll->shift.x == 0 && coll->shift.z == 0)
+		coll->collType = CT_NONE; // Paranoid
+
+	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom
+	if (item == LaraItem && coll->collType == CT_FRONT)
+		coll->splat = (YMin <= inYMin + LARA_HEADROOM);
+
+	return true;
+}
+
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(lara);
@@ -272,32 +601,40 @@ int FindGridShift(int x, int z)
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
 }
 
-int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
+int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 {
-	if (!(bounds->Z2 != 0 || bounds->Z1 != 0 || bounds->X1 != 0 || bounds->X2 != 0 || bounds->Y1 != 0 || bounds->Y2 != 0))
+	PHD_3DPOS pos;
+	pos.xPos = mesh->x;
+	pos.yPos = mesh->y;
+	pos.zPos = mesh->z;
+	pos.yRot = mesh->yRot;
+
+	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
+
+	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
 	ANIM_FRAME* frame = GetBestFrame(LaraItem);
-	if (pos->yPos + bounds->Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
+	if (pos.yPos + bounds.Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
 		return false;
 
-	if (pos->yPos + bounds->Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
+	if (pos.yPos + bounds.Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
 		return false;
 
 	float c, s;
 	int x, z, dx, dz;
 
-	c = phd_cos(pos->yRot);
-	s = phd_sin(pos->yRot);
-	x = LaraItem->pos.xPos - pos->xPos;
-	z = LaraItem->pos.zPos - pos->zPos;
+	c = phd_cos(pos.yRot);
+	s = phd_sin(pos.yRot);
+	x = LaraItem->pos.xPos - pos.xPos;
+	z = LaraItem->pos.zPos - pos.zPos;
 	dx = c * x - s * z;
 	dz = c * z + s * x;
 	
-	if (dx <= radius + bounds->X2
-	&&  dx >= bounds->X1 - radius
-	&&  dz <= radius + bounds->Z2
-	&&  dz >= bounds->Z1 - radius)
+	if (dx <= radius + bounds.X2
+	&&  dx >= bounds.X1 - radius
+	&&  dz <= radius + bounds.Z2
+	&&  dz >= bounds.Z1 - radius)
 	{
 		return true;
 	}
@@ -307,23 +644,27 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 	}
 }
 
-int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll) // previously ItemPushLaraStatic
+int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
-	float c, s;
-	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
-	int left, right, top, bottom;
-	short oldFacing;
+	PHD_3DPOS pos;
+	pos.xPos = mesh->x;
+	pos.yPos = mesh->y;
+	pos.zPos = mesh->z;
+	pos.yRot = mesh->yRot;
 
-	c = phd_cos(pos->yRot);
-	s = phd_sin(pos->yRot);
-	dx = l->pos.xPos - pos->xPos;
-	dz = l->pos.zPos - pos->zPos;
-	rx = c * dx - s * dz;
-	rz = c * dz + s * dx;
-	minX = bounds->X1 - coll->radius;
-	maxX = bounds->X2 + coll->radius;
-	minZ = bounds->Z1 - coll->radius;
-	maxZ = bounds->Z2 + coll->radius;
+	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
+
+	auto c = phd_cos(pos.yRot);
+	auto s = phd_sin(pos.yRot);
+
+	auto dx = l->pos.xPos - pos.xPos;
+	auto dz = l->pos.zPos - pos.zPos;
+	auto rx = c * dx - s * dz;
+	auto rz = c * dz + s * dx;
+	auto minX = bounds.X1 - coll->radius;
+	auto maxX = bounds.X2 + coll->radius;
+	auto minZ = bounds.Z1 - coll->radius;
+	auto maxZ = bounds.Z2 + coll->radius;
 	
 	if (abs(dx) > 4608
 	||  abs(dz) > 4608
@@ -333,10 +674,10 @@ int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO
 	||  rz >= maxZ)
 		return false;
 
-	left = rx - minX;
-	top = maxZ - rz;
-	bottom = rz - minZ;
-	right = maxX - rx;
+	auto left = rx - minX;
+	auto top = maxZ - rz;
+	auto bottom = rz - minZ;
+	auto right = maxX - rx;
 
 	if (right <= left && right <= top && right <= bottom)
 		rx += right;
@@ -347,14 +688,14 @@ int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO
 	else
 		rz -= bottom;
 
-	l->pos.xPos = pos->xPos + c * rx + s * rz;
-	l->pos.zPos = pos->zPos + c * rz - s * rx;
+	l->pos.xPos = pos.xPos + c * rx + s * rz;
+	l->pos.zPos = pos.zPos + c * rz - s * rx;
 	
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 
-	oldFacing = coll->facing;
+	auto oldFacing = coll->facing;
 	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
 	if (l == LaraItem)
 	{
@@ -1299,6 +1640,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->frontRight.Floor = STOP_SIZE;
 
+	CollideSolidStatics(LaraItem, coll);
+
 	if (coll->middle.Floor == NO_HEIGHT)
 	{
 		coll->shift.x = coll->old.x - xPos;
@@ -1321,7 +1664,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		coll->shift.y = coll->middle.Ceiling;
 		coll->collType = CT_TOP;
-		coll->hitCeiling = true;
 	}
 
 	if ((coll->front.Floor > coll->badPos)
@@ -1723,7 +2065,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	{
 		coll->shift.y = coll->middle.Ceiling;
 		coll->collType = CT_TOP;
-		coll->hitCeiling = true;
 	}
 
 	if ((coll->front.Floor > coll->badPos)
@@ -2373,6 +2714,7 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 
 	l->hitStatus = false;
 	coll->hitStatic = false;
+	coll->splat = false;
 
 	if (l == LaraItem)
 		Lara.hitDirection = -1;
@@ -2401,11 +2743,13 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 					obj = &Objects[item->objectNumber];
 					if (obj->collision != nullptr)
 					{
-						int x = l->pos.xPos - item->pos.xPos; 
-						int y = l->pos.yPos - item->pos.yPos;
-						int z = l->pos.zPos - item->pos.zPos;
-						
-						if (x > -3072 && x < 3072 && z > -3072 && z < 3072 && y > -3072 && y < 3072)  
+						int x = abs(l->pos.xPos - item->pos.xPos); 
+						int y = abs(l->pos.yPos - item->pos.yPos);
+						int z = abs(l->pos.zPos - item->pos.zPos);
+
+						if (x < COLLISION_CHECK_DISTANCE &&
+							y < COLLISION_CHECK_DISTANCE &&
+							z < COLLISION_CHECK_DISTANCE)
 							obj->collision(itemNumber, l, coll);
 					}
 				}
@@ -2416,26 +2760,23 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 			{
 				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
 
-				if (mesh->flags & 1)
+				// Only process meshes which are visible and non-solid
+				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
 				{
-					int x = l->pos.xPos - mesh->x;
-					int y = l->pos.yPos - mesh->y;
-					int z = l->pos.zPos - mesh->z;
+					int x = abs(l->pos.xPos - mesh->x);
+					int y = abs(l->pos.yPos - mesh->y);
+					int z = abs(l->pos.zPos - mesh->z);
 
-					if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
+					if (x < COLLISION_CHECK_DISTANCE &&
+						y < COLLISION_CHECK_DISTANCE && 
+						z < COLLISION_CHECK_DISTANCE)
 					{
-						PHD_3DPOS pos;
-						pos.xPos = mesh->x;
-						pos.yPos = mesh->y;
-						pos.zPos = mesh->z;
-						pos.yRot = mesh->yRot;
-
-						if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
+						if (TestBoundsCollideStatic(l, mesh, coll->radius))
 						{
 							coll->hitStatic = true;
 
 							if (coll->enableBaddiePush)
-								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+								ItemPushStatic(l, mesh, coll);
 							else
 								break;
 						}
