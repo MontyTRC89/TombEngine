@@ -14,6 +14,7 @@
 #include "underwater_switch.h"
 #include "pulley_switch.h"
 #include "fullblock_switch.h"
+#include "turn_switch.h"
 
 // Doors
 #include "generic_doors.h"
@@ -252,6 +253,15 @@ void StartSwitches()
 		obj->initialise = InitialisePulleySwitch;
 		obj->control = SwitchControl;
 		obj->collision = PulleySwitchCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_TURN_SWITCH];
+	if (obj->loaded)
+	{
+		obj->control = TurnSwitchControl;
+		obj->collision = TurnSwitchCollision;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
