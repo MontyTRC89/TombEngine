@@ -10,7 +10,7 @@
 #include "level.h"
 #include "control.h"
 #include "effects\effects.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 

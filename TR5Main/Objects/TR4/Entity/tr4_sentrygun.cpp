@@ -14,7 +14,7 @@
 #include "sphere.h"
 #include "people.h"
 #include "Sound\sound.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "objectslist.h"
 
 #ifndef NEW_INV

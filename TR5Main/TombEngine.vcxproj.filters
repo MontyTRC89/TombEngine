@@ -609,16 +609,10 @@
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\phd_global.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\room.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RenderEnums.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\trmath.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\newtypes.h">
@@ -873,9 +867,6 @@
     <ClInclude Include="Renderer\RendererSprites.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\prng.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1083,13 +1074,22 @@
     <ClInclude Include="Sound\sound_tracks.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Sound\groundfx.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\effects\hair.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\pickup\pickup.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\trmath.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\prng.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\phd_global.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\groundfx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1616,9 +1616,6 @@
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\trmath.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1820,9 +1817,6 @@
     <ClCompile Include="Renderer\RendererSprites.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\prng.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -2001,6 +1995,12 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\pickup\pickup.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\trmath.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\prng.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

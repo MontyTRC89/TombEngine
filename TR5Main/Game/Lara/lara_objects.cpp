@@ -8,7 +8,7 @@
 #include "camera.h"
 #include "collide.h"
 #include "control.h"
-#include "prng.h"
+#include "Specific\prng.h"
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
 /*pickups*/

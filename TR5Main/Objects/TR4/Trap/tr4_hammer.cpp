@@ -2,7 +2,7 @@
 #include "tr4_element_puzzle.h"
 #include "level.h"
 #include "control.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>

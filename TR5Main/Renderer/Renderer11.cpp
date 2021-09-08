@@ -16,7 +16,7 @@
 #include "rope.h"
 #include "camera.h"
 #include "effects\tomb4fx.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "misc.h"
 #include "effects\footprint.h"
 #include "setup.h"

@@ -16,7 +16,7 @@
 #include "level.h"
 #include "input.h"
 #include "Sound\sound.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "cog_switch.h"
 #include "generic_switch.h"
 #include "pickup\pickup.h"

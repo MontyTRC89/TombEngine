@@ -3,12 +3,12 @@
 #include <items.h>
 #include <level.h>
 #include <Box.h>
-#include <trmath.h>
+#include <Specific\trmath.h>
 #include <control.h>
 #include <lara.h>
 #include <sphere.h>
 #include <lot.h>
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <effects\effects.h>
 #include <effects\tomb4fx.h>

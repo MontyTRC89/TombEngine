@@ -9,8 +9,8 @@
 #include "misc.h"
 #include "setup.h"
 #include "Sound\sound.h"
-#include "trmath.h"
-#include "prng.h"
+#include "Specific\trmath.h"
+#include "Specific\prng.h"
 #include "room.h"
 
 using std::vector;

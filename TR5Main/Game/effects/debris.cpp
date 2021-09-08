@@ -3,8 +3,8 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
-#include "trmath.h"
-#include "prng.h"
+#include "Specific\trmath.h"
+#include "Specific\prng.h"
 
 using std::vector;
 using namespace TEN::Renderer;

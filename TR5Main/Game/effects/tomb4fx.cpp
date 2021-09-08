@@ -7,7 +7,7 @@
 #include "level.h"
 #include "Sound\sound.h"
 #include "effects\bubble.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "GameFlowScript.h"
 #include "smoke.h"
 #include "drip.h"

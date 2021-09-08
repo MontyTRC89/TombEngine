@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include <cmath>
-#include "prng.h"
+#include "Specific\prng.h"
 
 using namespace TEN::Math::Random;
 

@@ -6,7 +6,7 @@
 #include "effects\effects.h"
 #include "Sound\sound.h"
 #include "sphere.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 void PulseLightControl(short itemNumber)
 {

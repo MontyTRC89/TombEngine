@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "pickup\pickup.h"
-#include "phd_global.h"
+#include "Specific\phd_global.h"
 #include "lara.h"
 #include "draw.h"
 #ifdef NEW_INV

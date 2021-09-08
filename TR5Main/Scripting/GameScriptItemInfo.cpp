@@ -9,7 +9,7 @@
 #include "lot.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "lara.h"
 
 /***
