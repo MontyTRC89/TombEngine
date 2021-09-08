@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "trmath.h"
 #include "prng.h"
+#include "room.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -44,7 +45,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 				MESH_INFO* mesh = &room->mesh[j];
 				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
 
-				if (mesh->flags & 1)
+				if (mesh->flags & StaticMeshFlags::VISIBLE)
 				{
 					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->collisionBox.Y1)
 					{
@@ -194,24 +195,25 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 				y < COLLISION_CHECK_DISTANCE &&
 				z < COLLISION_CHECK_DISTANCE)
 			{
-				if ((mesh->flags & 1) && (mesh->flags & 2))
-					CollideSolidStatic(item, mesh, coll);
+				if ((mesh->flags & StaticMeshFlags::VISIBLE) && (mesh->flags & StaticMeshFlags::SOLID))
+				{
+					auto stInfo = StaticObjects[mesh->staticNumber];
+					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
+
+					if (CollideSolidBounds(item, stInfo.collisionBox, stPos, coll))
+						coll->hitStatic = true;
+				}
 			}
 		}
 	}
 }
 
-bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll)
 {
-	auto stInfo = StaticObjects[mesh->staticNumber];
-
-	// Ignore collision if flag is not set
-	if (stInfo.flags & 1)
-		return false;
+	bool result = false;
 
 	// Get DX static bounds in global coords
-	auto staticPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
-	auto staticBounds = TO_DX_BBOX(&staticPos, &stInfo.collisionBox);
+	auto staticBounds = TO_DX_BBOX(&pos, &box);
 
 	// Get local TR bounds and DX item bounds in global coords
 	auto itemBBox = GetBoundsAccurate(item);
@@ -323,30 +325,30 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 		}
 
 		coll->hitCeiling = bottom;
-		coll->hitStatic = true;
+		result = true;
 	}
 
 	// Check if bounds still collide after top/bottom position correction
 	if (!staticBounds.Intersects(TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox)))
-		return false;
+		return result;
 
 	// Determine identity rotation/distance
-	auto distance = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos) - Vector3(mesh->x, mesh->y, mesh->z);
-	auto c = phd_cos(mesh->yRot);
-	auto s = phd_sin(mesh->yRot);
+	auto distance = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	auto c = phd_cos(pos.yRot);
+	auto s = phd_sin(pos.yRot);
 
 	// Rotate item to collision bounds identity
-	auto x = round(distance.x * c - distance.z * s) + mesh->x;
+	auto x = round(distance.x * c - distance.z * s) + pos.xPos;
 	auto y = item->pos.yPos;
-	auto z = round(distance.x * s + distance.z * c) + mesh->z;
+	auto z = round(distance.x * s + distance.z * c) + pos.zPos;
 	
 	// Determine identity static collision bounds
-	auto XMin = mesh->x + stInfo.collisionBox.X1;
-	auto XMax = mesh->x + stInfo.collisionBox.X2;
-	auto YMin = mesh->y + stInfo.collisionBox.Y1;
-	auto YMax = mesh->y + stInfo.collisionBox.Y2;
-	auto ZMin = mesh->z + stInfo.collisionBox.Z1;
-	auto ZMax = mesh->z + stInfo.collisionBox.Z2;
+	auto XMin = pos.xPos + box.X1;
+	auto XMax = pos.xPos + box.X2;
+	auto YMin = pos.yPos + box.Y1;
+	auto YMax = pos.yPos + box.Y2;
+	auto ZMin = pos.zPos + box.Z1;
+	auto ZMax = pos.zPos + box.Z2;
 
 	// Determine item collision bounds
 	auto inXMin = x - coll->radius;
@@ -360,7 +362,7 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	if (inXMax <= XMin || inXMin >= XMax ||
 		inYMax <= YMin || inYMin >= YMax ||
 		inZMax <= ZMin || inZMin >= ZMax)
-		return false;
+		return result;
 	
 	// Calculate shifts
 
@@ -383,12 +385,12 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity
-	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(mesh->x, mesh->y, mesh->z);
-	auto ox = round(distance.x * c - distance.z * s) + mesh->x;
-	auto oz = round(distance.x * s + distance.z * c) + mesh->z;
+	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	auto ox = round(distance.x * c - distance.z * s) + pos.xPos;
+	auto oz = round(distance.x * s + distance.z * c) + pos.zPos;
 
 	// Calculate collisison type based on identity rotation
-	switch (GetQuadrant(coll->facing - mesh->yRot))
+	switch (GetQuadrant(coll->facing - pos.yRot))
 	{
 	case NORTH:
 		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
@@ -476,18 +478,17 @@ bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll)
 	}
 
 	// Determine final shifts rotation/distance
-	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(mesh->x, mesh->y, mesh->z);
-	c = phd_cos(0 - mesh->yRot);
-	s = phd_sin(0 - mesh->yRot);
+	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	c = phd_cos(-pos.yRot);
+	s = phd_sin(-pos.yRot);
 
 	// Calculate final shifts rotation/distance
-	coll->shift.x = (round(distance.x * c - distance.z * s) + mesh->x) - item->pos.xPos;
-	coll->shift.z = (round(distance.x * s + distance.z * c) + mesh->z) - item->pos.zPos;
+	coll->shift.x = (round(distance.x * c - distance.z * s) + pos.xPos) - item->pos.xPos;
+	coll->shift.z = (round(distance.x * s + distance.z * c) + pos.zPos) - item->pos.zPos;
 
 	if (coll->shift.x == 0 && coll->shift.z == 0)
 		coll->collType = CT_NONE; // Paranoid
 
-	coll->hitStatic = true;
 	return true;
 }
 
@@ -2756,10 +2757,8 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 			{
 				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
 
-				// Flag 0x01: collision
-				// Flag 0x02: solid collision (processed in CollideSolidStatic)
-
-				if ((mesh->flags & 1) && !(mesh->flags & 2))
+				// Only process meshes which are visible and non-solid
+				if ((mesh->flags & StaticMeshFlags::VISIBLE) && !(mesh->flags & StaticMeshFlags::SOLID))
 
 				{
 					int x = abs(l->pos.xPos - mesh->x);
