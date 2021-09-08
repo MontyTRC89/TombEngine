@@ -13,7 +13,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 struct LASER_HEAD_INFO
 {

@@ -9,7 +9,7 @@
 #include "setup.h"
 #include "camera.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "prng.h"
 using namespace TEN::Math::Random;

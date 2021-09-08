@@ -3,7 +3,7 @@
 #include "items.h"
 #include "box.h"
 #include "lot.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "draw.h"
 #include "AudioTracks.h"

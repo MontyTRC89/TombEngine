@@ -6,7 +6,7 @@
 #include "lara.h"
 #include "input.h"
 #include "sphere.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\bubble.h"
 #include "draw.h"
 

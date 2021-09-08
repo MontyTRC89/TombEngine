@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "effects\flmtorch.h"
-
 #include "effects\effects.h"
 #include "lara_flare.h"
 #include "lara.h"
@@ -10,7 +9,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "snowmobile.h"
 
 extern OBJECT_COLLISION_BOUNDS FireBounds;

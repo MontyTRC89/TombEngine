@@ -5,8 +5,8 @@
 #include "lara.h"
 #include "crowbar_switch.h"
 #include "newinv2.h"
-#include "sound.h"
-#include "pickup.h"
+#include "Sound\sound.h"
+#include "pickup\pickup.h"
 
 namespace TEN::Entities::Switches
 {

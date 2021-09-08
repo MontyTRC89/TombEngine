@@ -35,7 +35,7 @@
 #include "GameFlowScript.h"
 #include "health.h"
 #include "flipeffect.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "rope.h"
 #include "rubberboat.h"

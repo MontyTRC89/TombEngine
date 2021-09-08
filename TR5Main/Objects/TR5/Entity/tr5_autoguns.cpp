@@ -6,7 +6,7 @@
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void InitialiseAutoGuns(short itemNumber)
 {

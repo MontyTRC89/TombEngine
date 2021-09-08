@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 enum SPHIX_STATES {
 	SPHINX_EMPTY,

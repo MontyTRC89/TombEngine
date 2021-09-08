@@ -16,7 +16,7 @@
 #include "level.h"
 #include "input.h"
 #include "savegame.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2

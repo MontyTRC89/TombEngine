@@ -2,7 +2,7 @@
 #include "lara_flare.h"
 #include "level.h"
 #include "setup.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "items.h"
 #include "sphere.h"

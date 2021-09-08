@@ -11,7 +11,7 @@
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

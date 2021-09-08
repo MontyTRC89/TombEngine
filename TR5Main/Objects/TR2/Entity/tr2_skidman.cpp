@@ -9,7 +9,7 @@
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "snowmobile.h"
 
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };

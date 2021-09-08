@@ -8,7 +8,7 @@
 #include "box.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #define GET_PUSHABLEINFO(item) ((PUSHABLE_INFO*) item->data)
 
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = {

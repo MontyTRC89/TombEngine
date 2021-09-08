@@ -8,7 +8,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

@@ -2,7 +2,7 @@
 #include "tr5_explosion.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "draw.h"

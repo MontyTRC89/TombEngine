@@ -15,11 +15,11 @@
 #include "box.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "trmath.h"
 #include "cog_switch.h"
 #include "generic_switch.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "fullblock_switch.h"
 
 using namespace TEN::Entities::Switches;

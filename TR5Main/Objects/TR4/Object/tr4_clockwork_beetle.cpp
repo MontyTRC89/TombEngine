@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "draw.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void ClockworkBeetleControl(short item_number)
 {

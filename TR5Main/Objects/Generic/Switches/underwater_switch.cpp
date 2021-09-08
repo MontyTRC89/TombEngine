@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "underwater_switch.h"
 #include "newinv2.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "generic_switch.h"
 
 namespace TEN::Entities::Switches

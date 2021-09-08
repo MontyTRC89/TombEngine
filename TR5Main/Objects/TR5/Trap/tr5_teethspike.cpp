@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "lara.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\tomb4fx.h"
 #include "trmath.h"
 

@@ -3,7 +3,7 @@
 #include "Lara.h"
 #include "winmain.h"
 #include "camera.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 
 using TEN::Renderer::g_Renderer;

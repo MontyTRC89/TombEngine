@@ -9,7 +9,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <Game\draw.h>
 
 #define STATE_VON_CROY_STOP						1

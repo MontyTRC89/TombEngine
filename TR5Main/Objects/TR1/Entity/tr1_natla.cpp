@@ -5,7 +5,7 @@
 #include "items.h"
 #include "missile.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\effects.h"
 #include "trmath.h"
 

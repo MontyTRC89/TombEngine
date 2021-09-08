@@ -13,7 +13,7 @@
 #include "effects\tomb4fx.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];

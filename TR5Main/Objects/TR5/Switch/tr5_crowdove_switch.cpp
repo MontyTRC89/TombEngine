@@ -4,7 +4,7 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 using namespace TEN::Entities::Switches;
 

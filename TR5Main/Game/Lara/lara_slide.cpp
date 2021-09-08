@@ -2,7 +2,7 @@
 #include "lara.h"
 #include "lara_collide.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 short OldAngle = 1;
 

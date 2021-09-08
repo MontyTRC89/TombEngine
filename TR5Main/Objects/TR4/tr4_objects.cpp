@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_objects.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK

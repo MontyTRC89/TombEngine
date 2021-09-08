@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_slicerdicer.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 #include "trmath.h"
 

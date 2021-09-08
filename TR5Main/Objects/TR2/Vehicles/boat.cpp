@@ -8,7 +8,7 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <effects\effects.h>
 #include <Game\particle\SimpleParticle.h>
 

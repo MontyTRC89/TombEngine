@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_senet.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 #include "control.h"
 #include "setup.h"

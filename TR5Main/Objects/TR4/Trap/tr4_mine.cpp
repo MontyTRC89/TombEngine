@@ -2,7 +2,7 @@
 #include "tr4_mine.h"
 #include "level.h"
 #include "sphere.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "items.h"
