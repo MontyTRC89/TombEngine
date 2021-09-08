@@ -1813,7 +1813,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->zVel = (byte)(r >> 6) + zv - 128;
 		spark->sSize = ((r >> 9) & 3) + 4;
 		spark->size = ((r >> 9) & 3) + 4;
-		spark->dSize = ((r >> 12) & 1) + 1;
+		spark->dSize = ((r >> 9) & 1) + 1;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 
