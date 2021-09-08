@@ -27,19 +27,10 @@
     <ClInclude Include="Game\control.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\debris.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\door.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\draw.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\effect2.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\flmtorch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\gameflow.h">
@@ -88,9 +79,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\text.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\tomb4fx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\traps.h">
@@ -180,13 +168,7 @@
     <ClInclude Include="Game\groundfx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\footprint.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Frustum.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\bubble.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\level.h">
@@ -705,21 +687,6 @@
     <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\chaffFX.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\smoke.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\spark.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\drip.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\explosion.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Utils.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1086,6 +1053,39 @@
     <ClInclude Include="Game\control\trigger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\effects\bubble.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\chaffFX.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\debris.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\drip.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\explosion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\flmtorch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\footprint.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\tomb4fx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\spark.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\smoke.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\effects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1100,19 +1100,10 @@
     <ClCompile Include="Game\control.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\debris.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\door.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\draw.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\effect2.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\flmtorch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\gameflow.cpp">
@@ -1160,9 +1151,6 @@
     <ClCompile Include="Game\text.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\tomb4fx.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\traps.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1194,9 +1182,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\footprint.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer11Init.cpp">
@@ -1236,9 +1221,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Frustum.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\bubble.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\level.cpp">
@@ -1688,21 +1670,6 @@
     <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\chaffFX.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\smoke.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\spark.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\drip.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\explosion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Utils.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1868,9 +1835,6 @@
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\lightning.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_hammerhead.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1995,6 +1959,42 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control\trigger.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\bubble.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\chaffFX.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\debris.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\drip.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\explosion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\flmtorch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\footprint.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\lightning.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\tomb4fx.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\spark.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\smoke.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\effects.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

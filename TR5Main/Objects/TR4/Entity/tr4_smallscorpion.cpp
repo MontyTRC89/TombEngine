@@ -2,7 +2,7 @@
 #include "tr4_smallscorpion.h"
 #include "box.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"

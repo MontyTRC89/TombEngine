@@ -1,11 +1,10 @@
 #include "framework.h"
 #include "items.h"
-#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 
 void ClearItem(short itemNum)
 {

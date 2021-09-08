@@ -6,7 +6,7 @@
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sound.h"
 
 

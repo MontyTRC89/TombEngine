@@ -2,15 +2,14 @@
 #include "tr2_worker_flamethrower.h"
 #include "box.h"
 #include "sphere.h"
-#include "effect2.h"
 #include "people.h"
 #include "items.h"
 #include "missile.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "trmath.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };

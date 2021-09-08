@@ -2,7 +2,7 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"

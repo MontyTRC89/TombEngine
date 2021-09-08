@@ -5,7 +5,7 @@
 #include "sound.h"
 #include "items.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 
 void ControlSpikyCeiling(short itemNumber)
 {

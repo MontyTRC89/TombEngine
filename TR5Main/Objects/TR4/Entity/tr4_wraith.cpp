@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr4_wraith.h"
 #include "level.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "control.h"
 #include "objectslist.h"
 #include "trmath.h"
 #include <sound.h>
 #include <lara.h>
 #include <traps.h>
-#include <tomb4fx.h>
+#include <effects\tomb4fx.h>
 
 constexpr auto WRAITH_COUNT = 8;
 

@@ -13,7 +13,7 @@
 #include "lara.h"
 #include "gameflow.h"
 #include "rope.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "door.h"
 #include "level.h"
 #include "setup.h"

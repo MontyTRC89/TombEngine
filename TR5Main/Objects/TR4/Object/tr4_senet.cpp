@@ -4,7 +4,7 @@
 #include "items.h"
 #include "control.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"

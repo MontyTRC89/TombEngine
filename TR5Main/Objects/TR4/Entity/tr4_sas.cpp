@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "tr4_sas.h"
 #include "sphere.h"
-#include "effect2.h"
 #include "box.h"
 #include "items.h"
 #include "people.h"
@@ -9,8 +8,9 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include <Specific\input.h>
-#include <Game/tomb4fx.h>
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
+#include <Specific/input.h>
 #include <Game/Lara/lara_one_gun.h>
 
 namespace TEN::Entities::TR4

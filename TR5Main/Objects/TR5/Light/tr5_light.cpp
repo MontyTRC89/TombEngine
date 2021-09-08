@@ -3,7 +3,7 @@
 #include "items.h"
 #include "level.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sound.h"
 #include "sphere.h"
 #include "trmath.h"

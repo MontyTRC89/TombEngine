@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr3_scuba.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "box.h"
 #include "lara.h"
 #include "setup.h"

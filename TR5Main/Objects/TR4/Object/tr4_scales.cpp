@@ -8,7 +8,7 @@
 #include "switch.h"
 #include "sound.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "tr4_ahmet.h"
 #include "generic_switch.h"
 
