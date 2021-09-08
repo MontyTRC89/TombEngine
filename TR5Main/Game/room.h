@@ -83,6 +83,13 @@ enum RoomEnumFlag
 	ENV_FLAG_UNKNOWN3 = 0x0400
 };
 
+enum StaticMeshFlags : short
+{
+	NONE = 0,
+	VISIBLE = 1,
+	SOLID = 2
+};
+
 enum TriggerStatus 
 {
 	TS_OUTSIDE = 0,
