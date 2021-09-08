@@ -1212,10 +1212,9 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
 
 	return 0;
 }
-
-void GetTighRopeFallOff(int regularity)
-{
-	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
+#ifndef NEW_TIGHTROPE
+void GetTighRopeFallOff(int regularity) {
+	if(LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 	{
 		LaraItem->goalAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
 		LaraItem->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
@@ -1223,9 +1222,12 @@ void GetTighRopeFallOff(int regularity)
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 
-	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
+	if(!Lara.tightRopeFall && !(GetRandomControl() & regularity))
 		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
 }
+#endif // !NEW_TIGHTROPE
+
+
 
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 {
