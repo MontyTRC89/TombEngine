@@ -128,7 +128,7 @@ namespace TEN::Entities::TR4
                 item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = STATE_AHMET_DIE;
                 item->goalAnimState = STATE_AHMET_DIE;
-                Lara.generalPtr = (void*)itemNumber;
+                Lara.interactedItem = itemNumber;
             }
 
             TriggerAhmetDeathEffect(item);

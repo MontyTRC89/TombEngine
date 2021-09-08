@@ -114,7 +114,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	&&  !(item->status && item->gravityStatus)
 	&&  Lara.waterStatus == LW_UNDERWATER
 	&&  !Lara.gunStatus
-	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+	||  Lara.isMoving && Lara.interactedItem == itemNum)
 	{
 		l->pos.yRot ^= ANGLE(180.0f);
 		
@@ -135,13 +135,13 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 			l->pos.yRot ^= ANGLE(180);
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -165,7 +165,7 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	&&  !(item->status && item->gravityStatus)
 	&&  !(l->hitStatus)
 	&&  !Lara.gunStatus
-	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+	||  Lara.isMoving && Lara.interactedItem == itemNum)
 	{
 		item->pos.yRot ^= ANGLE(180);
 		if (TestLaraPosition(&PushPullKickDoorBounds, item, l))
@@ -188,13 +188,13 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 			item->pos.yRot ^= ANGLE(180);
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -213,7 +213,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	&&  item->status != ITEM_ACTIVE
 	&&  !(l->hitStatus)
 	&&  !Lara.gunStatus
-	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+	||  Lara.isMoving && Lara.interactedItem == itemNum)
 	{
 		bool applyRot = false;
 
@@ -225,7 +225,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (!TestLaraPosition(&PushPullKickDoorBounds, item, l))
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -239,7 +239,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!MoveLaraPosition(&PullDoorPos, item, l))
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 				item->pos.yRot ^= ANGLE(180);
 				return;
 			}
@@ -304,7 +304,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		Lara.generalPtr = (void*)itemNum;
+		Lara.interactedItem = itemNum;
 		return;
 	}
 
@@ -349,7 +349,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	&&  l->animNumber == LA_STAND_IDLE
 	&&  !l->hitStatus
 	&&  Lara.gunStatus == LG_NO_ARMS
-	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum))
+	||  Lara.isMoving && Lara.interactedItem == itemNum))
 	{
 		item->pos.yRot ^= ANGLE(180);
 		if (TestLaraPosition(&CrowbarDoorBounds, item, l))
@@ -421,9 +421,9 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			Lara.generalPtr = (void*)itemNum;
+			Lara.interactedItem = itemNum;
 		}
-		else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+		else if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = 0;
 			Lara.gunStatus = LG_NO_ARMS;
