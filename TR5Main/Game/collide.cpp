@@ -187,15 +187,16 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
 
-			int x = abs(item->pos.xPos - mesh->x);
-			int y = abs(item->pos.yPos - mesh->y);
-			int z = abs(item->pos.zPos - mesh->z);
-
-			if (x < COLLISION_CHECK_DISTANCE &&
-				y < COLLISION_CHECK_DISTANCE &&
-				z < COLLISION_CHECK_DISTANCE)
+			// Only process meshes which are visible and solid
+			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
+				int x = abs(item->pos.xPos - mesh->x);
+				int y = abs(item->pos.yPos - mesh->y);
+				int z = abs(item->pos.zPos - mesh->z);
+
+				if (x < COLLISION_CHECK_DISTANCE &&
+					y < COLLISION_CHECK_DISTANCE &&
+					z < COLLISION_CHECK_DISTANCE)
 				{
 					auto stInfo = StaticObjects[mesh->staticNumber];
 					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
@@ -2759,7 +2760,6 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 
 				// Only process meshes which are visible and non-solid
 				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
-
 				{
 					int x = abs(l->pos.xPos - mesh->x);
 					int y = abs(l->pos.yPos - mesh->y);
