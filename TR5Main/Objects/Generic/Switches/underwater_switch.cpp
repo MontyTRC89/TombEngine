@@ -95,14 +95,14 @@ namespace TEN::Entities::Switches
 			&& l->animNumber == LA_UNDERWATER_IDLE
 			&& !Lara.gunStatus
 			&& (item->currentAnimState == SWITCH_OFF)
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, item, l))
 			{
 				if (MoveLaraPosition(&CeilingUnderwaterSwitchPos1, item, l))
 					flag = 1;
 				else
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 			}
 			else
 			{
@@ -113,7 +113,7 @@ namespace TEN::Entities::Switches
 					if (MoveLaraPosition(&CeilingUnderwaterSwitchPos2, item, l))
 						flag = 1;
 					else
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 				}
 
 				l->pos.yRot ^= 0x8000;

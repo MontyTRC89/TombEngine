@@ -1062,7 +1062,7 @@ struct LaraInfo
 	unsigned short ropeFrameRate;
 	unsigned short ropeY;
 	int ropePtr;
-	void* generalPtr;
+	short interactedItem;
 	int ropeOffset;
 	int ropeDownVel;
 	byte ropeFlag;

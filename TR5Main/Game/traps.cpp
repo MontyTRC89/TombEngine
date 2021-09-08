@@ -821,13 +821,13 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
-			Lara.generalPtr = (void*)itemNumber;
+			Lara.interactedItem = itemNumber;
 		}
 		
 		item->pos.yRot = oldYrot;
 	}
 
-	if (Lara.generalPtr == (void*)itemNumber 
+	if (Lara.interactedItem == itemNumber 
 		&& item->status != ITEM_ACTIVE 
 		&& l->currentAnimState == LS_MISC_CONTROL)
 	{
