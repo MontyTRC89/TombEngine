@@ -116,8 +116,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	short roomIndex = NO_ROOM;
 	do
 	{
-		int zFloor = (z - r->z) >> 10;// WALL_SHIFT;
-		int xFloor = (x - r->x) >> 10;// WALL_SHIFT;
+		int zFloor = (z - r->z) / SECTOR(1);
+		int xFloor = (x - r->x) / SECTOR(1);
 
 		if (zFloor <= 0)
 		{

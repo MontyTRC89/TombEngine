@@ -344,10 +344,10 @@ void UpdateLaraRoom(ITEM_INFO* item, int height)
 
 int FindGridShift(int x, int z)
 {
-	if ((x >> 10/*WALL_SHIFT*/) == (z >> 10/*WALL_SHIFT*/))
+	if ((x / SECTOR(1)) == (z / SECTOR(1)))
 		return 0;
 
-	if ((z >> 10/*WALL_SHIFT*/) <= (x >> 10/*WALL_SHIFT*/))
+	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
 		return (-1 - (x & (WALL_SIZE - 1)));
 	else
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
