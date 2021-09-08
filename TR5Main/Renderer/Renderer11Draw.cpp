@@ -80,6 +80,8 @@ namespace TEN::Renderer
         if(!moveableObj)
             return;
 
+        OBJECT_INFO* obj = &Objects[objectNum];
+
         if (obj->animIndex != -1)
         {
             ANIM_FRAME *frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
