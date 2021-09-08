@@ -85,9 +85,8 @@ enum RoomEnumFlag
 
 enum StaticMeshFlags : short
 {
-	NONE = 0,
-	VISIBLE = 1,
-	SOLID = 2
+	SM_VISIBLE = 1,
+	SM_SOLID = 2
 };
 
 enum TriggerStatus 
