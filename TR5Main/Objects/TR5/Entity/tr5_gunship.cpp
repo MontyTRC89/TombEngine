@@ -109,7 +109,7 @@ void ControlGunShip(short itemNumber)
 				if (hitMesh->staticNumber >= 50 && hitMesh->staticNumber < 59)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
-					hitMesh->flags &= 0xFFFE;
+					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
 					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
 				}
