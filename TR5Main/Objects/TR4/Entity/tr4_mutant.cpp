@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "sphere.h"
 #include "objectslist.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "control.h"
 
 namespace TEN::Entities::TR4

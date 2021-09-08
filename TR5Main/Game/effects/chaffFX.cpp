@@ -8,7 +8,7 @@
 #include "level.h"
 #include "smoke.h"
 #include "spark.h"
-#include "prng.h"
+#include "Specific\prng.h"
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
 

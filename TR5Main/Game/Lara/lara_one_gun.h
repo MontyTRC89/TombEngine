@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 enum GRENADE_TYPE
 {

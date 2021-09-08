@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "effects\tomb4fx.h"
 #include "traps.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
@@ -15,7 +15,7 @@
 #include <Game\effects\drip.h>
 #include <Game\effects\bubble.h>
 #include "smoke.h"
-#include "prng.h"
+#include "Specific\prng.h"
 
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;

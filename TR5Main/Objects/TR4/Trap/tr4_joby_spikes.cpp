@@ -3,7 +3,7 @@
 #include "level.h"
 #include "control.h"
 #include "effects\effects.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "items.h"
 
 struct SECTOR_COLLISION_INFO

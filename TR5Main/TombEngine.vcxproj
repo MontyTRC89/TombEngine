@@ -145,7 +145,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
-    <ClInclude Include="Sound\groundfx.h" />
+    <ClInclude Include="Game\effects\groundfx.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
@@ -162,7 +162,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\newinv2.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
-    <ClInclude Include="Game\phd_global.h" />
+    <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
     <ClInclude Include="Game\pickup\pickup_ammo.h" />
@@ -171,7 +171,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\pickup\pickup_misc_items.h" />
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
-    <ClInclude Include="Game\prng.h" />
+    <ClInclude Include="Specific\prng.h" />
     <ClInclude Include="Game\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Switches\cog_switch.h" />
@@ -480,7 +480,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Game\trmath.h" />
+    <ClInclude Include="Specific\trmath.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
@@ -526,7 +526,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\pickup\pickup_key_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
-    <ClCompile Include="Game\prng.cpp" />
+    <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Switches\cog_switch.cpp" />
     <ClCompile Include="Objects\Generic\Switches\crowbar_switch.cpp" />
@@ -544,7 +544,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Scripting\GameScriptColor.cpp" />
     <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
-    <ClCompile Include="Game\trmath.cpp" />
+    <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />

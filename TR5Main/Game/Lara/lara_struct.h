@@ -3,7 +3,7 @@
 #include "collide.h"
 #include "effects\effects.h"
 #include "objectslist.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "Renderer11.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
