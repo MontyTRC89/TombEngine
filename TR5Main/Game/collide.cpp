@@ -20,87 +20,6 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
-{
-	ROOM_INFO* room;
-	MESH_INFO* mesh;
-	short roomList[255];
-	short numRooms = 0;
-	int xMin = 0, xMax = 0, zMin = 0, zMax = 0;
-	int inXmin, inXmax, inZmin, inZmax, inYmin;
-
-	coll->hitStatic = false;
-
-	inXmin = x - coll->radius;
-	inXmax = x + coll->radius;
-	inZmin = z - coll->radius;
-	inZmax = z + coll->radius;
-	inYmin = y - hite;
-
-	// Collect all the rooms where to check
-	GetRoomList(roomNumber, roomList, &numRooms);
-
-	for (int i = 0; i < numRooms; i++)
-	{
-		room = &g_Level.Rooms[roomList[i]];
-		for (int j = 0; j < room->mesh.size(); j++, mesh++)
-		{
-			mesh = &room->mesh[j];
-			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
-
-			if ((sInfo->flags & 1)) // No collision
-				continue;
-
-			int yMin = mesh->y + sInfo->collisionBox.Y1;
-			int yMax = mesh->y + sInfo->collisionBox.Y2;
-			short yRot = mesh->yRot;
-
-			if (yRot == ANGLE(180))
-			{
-				xMin = mesh->x - sInfo->collisionBox.X2;
-				xMax = mesh->x - sInfo->collisionBox.X1;
-				zMin = mesh->z - sInfo->collisionBox.Z2;
-				zMax = mesh->z - sInfo->collisionBox.Z1;
-			}
-			else if (yRot == -ANGLE(90))
-			{
-				xMin = mesh->x - sInfo->collisionBox.Z2;
-				xMax = mesh->x - sInfo->collisionBox.Z1;
-				zMin = mesh->z + sInfo->collisionBox.X1;
-				zMax = mesh->z + sInfo->collisionBox.X2;
-			}
-			else if (yRot == ANGLE(90))
-			{
-
-				xMin = mesh->x + sInfo->collisionBox.Z1;
-				xMax = mesh->x + sInfo->collisionBox.Z2;
-				zMin = mesh->z - sInfo->collisionBox.X2;
-				zMax = mesh->z - sInfo->collisionBox.X1;
-			}
-			else
-			{
-				xMin = mesh->x + sInfo->collisionBox.X1;
-				xMax = mesh->x + sInfo->collisionBox.X2;
-				zMin = mesh->z + sInfo->collisionBox.Z1;
-				zMax = mesh->z + sInfo->collisionBox.Z2;
-			}
-
-			if (inXmax <= xMin
-			||  inXmin >= xMax
-			||  y <= yMin
-			||  inYmin >= yMax
-			||  inZmax <= zMin
-			||  inZmin >= zMax)		 
-				continue;
-
-			coll->hitStatic = true;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
@@ -296,7 +215,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 	for (int i = 0; i < 2; i++)
 	{
 		GAME_VECTOR s;
-		s.x = (i << 8) - 0x80;
+		s.x = (i * 256) - 0x80;
 		s.y = -256;
 		s.z = 0;
 
@@ -388,7 +307,7 @@ int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 	}
 }
 
-int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
+int ItemPushStatic(ITEM_INFO* l, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -397,8 +316,8 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 
 	c = phd_cos(pos->yRot);
 	s = phd_sin(pos->yRot);
-	dx = LaraItem->pos.xPos - pos->xPos;
-	dz = LaraItem->pos.zPos - pos->zPos;
+	dx = l->pos.xPos - pos->xPos;
+	dz = l->pos.zPos - pos->zPos;
 	rx = c * dx - s * dz;
 	rz = c * dz + s * dx;
 	minX = bounds->X1 - coll->radius;
@@ -428,40 +347,40 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	else
 		rz -= bottom;
 
-	item->pos.xPos = pos->xPos + c * rx + s * rz;
-	item->pos.zPos = pos->zPos + c * rz - s * rx;
+	l->pos.xPos = pos->xPos + c * rx + s * rz;
+	l->pos.zPos = pos->zPos + c * rz - s * rx;
 	
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 
 	oldFacing = coll->facing;
-	coll->facing = phd_atan(item->pos.zPos - coll->old.z, item->pos.xPos - coll->old.x);
-	if (item == LaraItem)
+	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
+	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
 	}
 	coll->facing = oldFacing;
 
 	if (coll->collType == CT_NONE)
 	{
-		coll->old.x = item->pos.xPos;
-		coll->old.y = item->pos.yPos;
-		coll->old.z = item->pos.zPos;
+		coll->old.x = l->pos.xPos;
+		coll->old.y = l->pos.yPos;
+		coll->old.z = l->pos.zPos;
 
-		UpdateLaraRoom(item, -10);
+		UpdateLaraRoom(l, -10);
 	}
 	else
 	{
-		item->pos.xPos = coll->old.x;
-		item->pos.zPos = coll->old.z;
+		l->pos.xPos = coll->old.x;
+		l->pos.zPos = coll->old.z;
 	}
 
-	if (item == LaraItem && Lara.isMoving && Lara.moveCount > 15)
+	if (l == LaraItem && Lara.isMoving && Lara.moveCount > 15)
 	{
 		Lara.isMoving = false;
 		Lara.gunStatus = LG_NO_ARMS;
@@ -470,7 +389,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, CO
 	return true;
 }
 
-int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush) // previously ItemPushLara
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -618,7 +537,7 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		if (TestCollision(item, l))
 		{
 			if (c->enableBaddiePush)
-				ItemPushLara(item, l, c, false, true);
+				ItemPushItem(item, l, c, false, true);
 		}
 	}
 }
@@ -902,7 +821,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (coll->enableBaddiePush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
 				{
-					ItemPushLara(item, l, coll, coll->enableSpaz, 0);
+					ItemPushItem(item, l, coll, coll->enableSpaz, 0);
 				}
 				else if (coll->enableSpaz)
 				{
@@ -1148,17 +1067,15 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
-
 	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
 	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room
 
+	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	int height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	ROOM_VECTOR tcLocation = GetRoom(LaraItem->location, x, yTop - LaraItem->fallspeed, z);
-
 	int ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1220,13 +1137,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		break;
 	}
 
-	//XFront = phd_sin(coll->facing) * coll->radius;  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//ZFront = phd_cos(coll->facing) * coll->radius;  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//xleft = -ZFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//zleft = XFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//xright = ZFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//zright = -XFront;								  // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-
 	x = xfront + xPos;
 	z = zfront + zPos;
 
@@ -1237,18 +1147,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		topRoomNumber = roomNumber;
 	}
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
-
-	//floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//DoFloorThings(floor, x, yTop, z);
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
+	tfLocation = GetRoom(tfLocation, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	tcLocation = GetRoom(tcLocation, x, yTop - LaraItem->fallspeed, z);
-
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1259,8 +1165,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->front.SplitFloor = collResult.SplitFloor;
 	coll->front.SplitCeiling = collResult.SplitCeiling;
 
-	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	//DoFloorThings(floor, x + XFront, yTop, z + ZFront);
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
 	tfLocation = GetRoom(tfLocation, x + xfront, yTop, z + zfront);
@@ -1292,19 +1196,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
-
-	//short lrRoomNumber = roomNumber;
-	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	//DoFloorThings(floor, x, yTop, z);
 	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
+	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	ROOM_VECTOR lrcLocation = GetRoom(LaraItem->location, x, yTop - LaraItem->fallspeed, z);
-
 	ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1322,18 +1221,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->middleLeft.Floor = STOP_SIZE;
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
-
-	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber); // WRONG COPYPASTE BY CHOCO
-	//DoFloorThings(floor, x, yTop, z);
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
 
+	tfLocation = GetRoom(tfLocation, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	tcLocation = GetRoom(tcLocation, x, yTop - LaraItem->fallspeed, z);
-
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1354,19 +1249,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	x = xPos + xright;
 	z = zPos + zright;
 
-	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
-
-	//lrRoomNumber = roomNumber;
-	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	//DoFloorThings(floor, x, yTop, z);
 	collResult = GetCollisionResult(x, yTop, z, roomNumber);
 
+	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	lrcLocation = GetRoom(LaraItem->location, x, yTop - LaraItem->fallspeed, z);
-
 	ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1384,18 +1274,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->middleRight.Floor = STOP_SIZE;
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
-
-	//floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//DoFloorThings(floor, x, yTop, z);
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
+	tfLocation = GetRoom(tfLocation, x, yTop, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
 	tcLocation = GetRoom(tcLocation, x, yTop - LaraItem->fallspeed, z);
-
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1412,8 +1298,6 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		coll->frontRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->frontRight.Floor = STOP_SIZE;
-
-	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 
 	if (coll->middle.Floor == NO_HEIGHT)
 	{
@@ -1615,9 +1499,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	//short tRoomNumber = roomNumber;
-	//FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//int height = GetFloorHeight(floor, x, yTop, z);
 	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
 	auto topRoomNumber = collResult.RoomNumber;
 
@@ -1685,22 +1566,11 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		break;
 	}
 
-	//XFront = phd_sin(coll->facing) * coll->radius; // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//ZFront = phd_cos(coll->facing) * coll->radius; // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//xleft = -ZFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//zleft = XFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//xright = ZFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-	//zright = -XFront;								 // WAS COMMENTED BEFORE LWMTE FLOORDATA REFACTOR!
-
 	x = xfront + xPos;
 	z = zfront + zPos;
 
 	if (resetRoom)
 		topRoomNumber = roomNumber;
-
-	//floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//
-	//height = GetFloorHeight(floor, x, yTop, z);
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
@@ -1716,10 +1586,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->front.SplitFloor = collResult.SplitFloor;
 	coll->front.SplitCeiling = collResult.SplitCeiling;
 
-	//floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
-	//height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
-
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1747,11 +1614,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	//short lrRoomNumber = roomNumber;
-	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	//
-	//height = GetFloorHeight(floor, x, yTop, z);
-
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, roomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
@@ -1772,10 +1634,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->middleLeft.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->middleLeft.Floor = STOP_SIZE;
-
-	//floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//
-	//height = GetFloorHeight(floor, x, yTop, z);
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.FloorHeight != NO_HEIGHT)
@@ -1801,13 +1659,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	x = xPos + xright;
 	z = zPos + zright;
 
-	//lrRoomNumber = roomNumber;
-	//floor = GetFloor(x, yTop, z, &lrRoomNumber);
-	//
-	//height = GetFloorHeight(floor, x, yTop, z);
-
 	collResult = GetCollisionResult(x, yTop, z, roomNumber);
-	
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1828,12 +1680,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->middleRight.Floor = STOP_SIZE;
 
-	//floor = GetFloor(x, yTop, z, &tRoomNumber);
-	//
-	//height = GetFloorHeight(floor, x, yTop, z);
-
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-
 	if (collResult.FloorHeight != NO_HEIGHT)
 		collResult.FloorHeight -= yPos;
 
@@ -1853,8 +1700,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->frontRight.Floor = STOP_SIZE;
 	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->frontRight.Floor = STOP_SIZE;
-
-	CollideStaticObjects(coll, xPos, yPos, zPos, topRoomNumber, objectHeight);
 	
 	if (coll->middle.Floor == NO_HEIGHT)	 
 	{
@@ -2032,7 +1877,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	}
 }
 
-void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
+void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv) // previously DoProperDetection
 {
 	int bs, yang;
 
@@ -2521,13 +2366,16 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
+void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCollision
 {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
 
 	l->hitStatus = false;
-	Lara.hitDirection = -1;
+	coll->hitStatic = false;
+
+	if (l == LaraItem)
+		Lara.hitDirection = -1;
 
 	if (l->hitPoints > 0)
 	{
@@ -2564,37 +2412,39 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 				itemNumber = item->nextItem;
 			}
 
-			if (coll->enableSpaz)
+			for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
 			{
-				for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+
+				if (mesh->flags & 1)
 				{
-					MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+					int x = l->pos.xPos - mesh->x;
+					int y = l->pos.yPos - mesh->y;
+					int z = l->pos.zPos - mesh->z;
 
-					if (mesh->flags & 1)
+					if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
 					{
-						int x = l->pos.xPos - mesh->x;
-						int y = l->pos.yPos - mesh->y;
-						int z = l->pos.zPos - mesh->z;
+						PHD_3DPOS pos;
+						pos.xPos = mesh->x;
+						pos.yPos = mesh->y;
+						pos.zPos = mesh->z;
+						pos.yRot = mesh->yRot;
 
-						if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
+						if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
 						{
-							PHD_3DPOS pos;
-							pos.xPos = mesh->x;
-							pos.yPos = mesh->y;
-							pos.zPos = mesh->z;
-							pos.yRot = mesh->yRot;
+							coll->hitStatic = true;
 
-							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
-								ItemPushLaraStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+							if (coll->enableBaddiePush)
+								ItemPushStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
+							else
+								break;
 						}
 					}
-
-					mesh++;
 				}
 			}
 		}
 
-		if (Lara.hitDirection == -1)
+		if (l == LaraItem && Lara.hitDirection == -1)
 			Lara.hitFrame = 0;
 	}
 }
@@ -2639,7 +2489,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushLara(item, l, coll, ((deadlyBits & 1) & coll->enableSpaz), 3) && (deadlyBits & 1))
+						if (ItemPushItem(item, l, coll, ((deadlyBits & 1) & coll->enableSpaz), 3) && (deadlyBits & 1))
 						{
 							l->hitPoints -= item->itemFlags[3];
 
