@@ -316,7 +316,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (TestWall(item, 256, 0, -640))
+			if (coll->splat || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -2195,7 +2195,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (TestWall(item, 256, 0, -640))
+			if (coll->splat || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
