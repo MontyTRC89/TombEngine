@@ -5,7 +5,10 @@
 #include "draw.h"
 #include "rope.h"
 #include "lara_tests.h"
-
+#include "camera.h"
+#include "collide.h"
+#include "control.h"
+#include "prng.h"
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
 /*pickups*/
@@ -277,6 +280,156 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 /*end parallel bars*/
 /*-*/
 /*tightropes*/
+#ifdef NEW_TIGHTROPE
+
+void lara_trbalance_mesh() {
+	LaraItem->pos.zRot = Lara.tightrope.balance / 4;
+	Lara.torsoZrot = -Lara.tightrope.balance;
+}
+
+void lara_trbalance_regen() {
+	if(Lara.tightrope.timeOnTightrope <= 32)
+		Lara.tightrope.timeOnTightrope = 0;
+	else 
+		Lara.tightrope.timeOnTightrope -= 32;
+	if(Lara.tightrope.balance > 0)
+	{
+		if(Lara.tightrope.balance <= 128)
+			Lara.tightrope.balance = 0;
+		else Lara.tightrope.balance -= 128;
+	}
+	if(Lara.tightrope.balance < 0)
+	{
+		if(Lara.tightrope.balance >= -128)
+			Lara.tightrope.balance = 0;
+		else Lara.tightrope.balance += 128;
+	}
+}
+
+void lara_trbalance() {
+	if(TrInput & IN_LEFT)
+		Lara.tightrope.balance -= 256;
+	if(TrInput & IN_RIGHT)
+		Lara.tightrope.balance += 256;
+	const int factor = ((Lara.tightrope.timeOnTightrope >> 7 )& 0xFF)* 128;
+	if(Lara.tightrope.balance < 0)
+	{
+		Lara.tightrope.balance -= factor;
+		if((Lara.tightrope.balance) <= -8000)
+			Lara.tightrope.balance = -8000;
+	} else if(Lara.tightrope.balance > 0)
+	{
+		Lara.tightrope.balance += factor;
+		if((Lara.tightrope.balance) >= 8000)
+			Lara.tightrope.balance = 8000;
+
+	} else
+		Lara.tightrope.balance = GetRandomControl() & 1 ? -1 : 1;
+	
+}
+
+void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if(TrInput & IN_LOOK)
+	{
+		LookLeftRight();
+		LookUpDown();
+	}
+	lara_trbalance_regen();
+	lara_trbalance_mesh();
+	if(TrInput & IN_FORWARD)
+	{
+		item->goalAnimState = LS_TIGHTROPE_FORWARD;
+	}
+	else if((TrInput & IN_ROLL) || (TrInput & IN_BACK))
+	{
+		if(item->animNumber == LA_TIGHTROPE_IDLE)
+		{
+			item->currentAnimState = LS_TIGHTROPE_TURN_180;
+			item->animNumber = LA_TIGHTROPE_TURN_180;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		}
+	}
+}
+
+void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll) {
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+	lara_trbalance_regen();
+	lara_trbalance_mesh();
+	if(item->animNumber == LA_TIGHTROPE_END && item->frameNumber == g_Level.Anims[LA_TIGHTROPE_END].frameEnd)
+	{
+		Lara.torsoZrot = 0;
+		item->pos.zRot = 0;
+	}
+}
+void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) 
+{
+	
+	short roomNumber = item->roomNumber;
+	if(GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
+	   item->pos.xPos, item->pos.yPos, item->pos.zPos) == item->pos.yPos && Lara.tightrope.canGoOff)
+	{
+		lara_trbalance_regen();
+		item->goalAnimState = LS_TIGHTROPE_EXIT;
+	}
+	
+	if(item->goalAnimState != LS_TIGHTROPE_EXIT &&
+	   ((TrInput & IN_BACK || TrInput & IN_ROLL || !(TrInput & IN_FORWARD))))
+	{
+		item->goalAnimState = LS_TIGHTROPE_IDLE;
+	}
+	Lara.tightrope.timeOnTightrope++;
+	lara_trbalance();
+	lara_trbalance_mesh();
+	if((Lara.tightrope.balance) >= 8000)
+	{
+		item->animNumber = LA_TIGHTROPE_FALL_RIGHT;
+		item->currentAnimState = LS_TIGHTROPE_UNBALANCE_RIGHT;
+		item->frameNumber = g_Level.Anims[LA_TIGHTROPE_FALL_RIGHT].frameBase;
+	} else 	if(Lara.tightrope.balance <= -8000)
+	{
+		item->animNumber = LA_TIGHTROPE_FALL_LEFT;
+		item->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
+		item->frameNumber = g_Level.Anims[LA_TIGHTROPE_FALL_LEFT].frameBase;
+	}
+}
+
+
+void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
+	/*states 122, 123*/
+	/*collision: lara_default_col*/
+	lara_trbalance_regen();
+	lara_trbalance_mesh();
+	if(item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+	{
+		PHD_VECTOR pos;
+		pos.x = 0;
+		pos.y = 0;
+		pos.z = 0;
+
+		GetLaraJointPosition(&pos, LM_RFOOT);
+
+		item->pos.xPos = pos.x;
+		item->pos.yPos = pos.y + 75;
+		item->pos.zPos = pos.z;
+
+		item->goalAnimState = LS_FREEFALL;
+		item->currentAnimState = LS_FREEFALL;
+
+		item->animNumber = LA_FREEFALL;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+
+		item->fallspeed = 81;
+		Camera.targetspeed = 16;
+	}
+}
+
+
+#else
+
+
+
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 119*/
@@ -429,6 +582,8 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 }
+
+#endif // NEW_TIGHTROPE
 /*end tightropes*/
 /*-*/
 /*ropes*/

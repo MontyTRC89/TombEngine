@@ -980,7 +980,15 @@ struct AnimsNew
 	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
 	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
-
+#ifdef NEW_TIGHTROPE
+struct LaraTightrope
+{
+	float balance;
+	unsigned short timeOnTightrope;
+	bool canGoOff;
+	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
+};
+#endif
 struct LaraInfo
 {
 	short itemNumber;
@@ -1065,9 +1073,13 @@ struct LaraInfo
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
+#if NEW_TIGHTROPE
+	LaraTightrope tightrope;
+#else
 	byte tightRopeOnCount;
 	byte tightRopeOff;
 	byte tightRopeFall;
+#endif
 	/// =================================== NEW:
 	byte BeetleLife;
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
