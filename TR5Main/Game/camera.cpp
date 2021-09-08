@@ -323,6 +323,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		Camera.pos.roomNumber = ideal->roomNumber;
 	}
 
+	ItemsCollideCamera();
+
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 	LookAt(&Camera, 0);
 	
@@ -1102,6 +1104,8 @@ void LookCamera(ITEM_INFO* item)
 		Camera.pos.roomNumber = LaraItem->roomNumber;
 	}
 
+	ItemsCollideCamera();
+
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 	LookAt(&Camera, 0);
 
@@ -1865,5 +1869,126 @@ void ResetLook()
 			if (!Lara.headYrot)
 				Lara.torsoYrot = 0;
 		}
+	}
+}
+
+long TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, long radius)
+{
+	long x, z, dx, dz, sin, cos;
+
+	if (pos->yPos + bounds->Y2 > Camera.pos.y - radius && pos->yPos + bounds->Y1 < radius + Camera.pos.y)
+	{
+		dx = Camera.pos.x - pos->xPos;
+		dz = Camera.pos.z - pos->zPos;
+		sin = phd_sin(pos->yRot);
+		cos = phd_cos(pos->yRot);
+		x = cos * dx - sin * dz;
+		z = cos * dz + sin * dx;
+
+		if (x >= bounds->X1 - radius && x <= radius + bounds->X2 && z >= bounds->Z1 - radius && z <= radius + bounds->Z2)
+			return 1;
+	}
+
+	return 0;
+}
+
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos)
+{
+	FLOOR_INFO* floor;
+	long x, z, dx, dz, sin, cos, left, right, top, bottom, h, c;
+	short xmin, xmax, zmin, zmax;
+
+	dx = Camera.pos.x - pos->xPos;
+	dz = Camera.pos.z - pos->zPos;
+	sin = phd_sin(pos->yRot);
+	cos = phd_cos(pos->yRot);
+	x = dx * cos - dz * sin;
+	z = dx * sin + dz * cos;
+	xmin = bounds->X1 - 384;
+	xmax = bounds->X2 + 384;
+	zmin = bounds->Z1 - 384;
+	zmax = bounds->Z2 + 384;
+
+	if (abs(dx) > SECTOR(4) || abs(dz) > SECTOR(4) || x <= xmin || x >= xmax || z <= zmin || z >= zmax)
+		return;
+
+	left = x - xmin;
+	right = xmax - x;
+	top = zmax - z;
+	bottom = z - zmin;
+
+	if (left <= right && left <= top && left <= bottom)//left is closest
+		x -= left;
+	else if (right <= left && right <= top && right <= bottom)//right is closest
+		x += right;
+	else if (top <= left && top <= right && top <= bottom)//top is closest
+		z += top;
+	else
+		z -= bottom;//bottom
+
+	Camera.pos.x = pos->xPos + (cos * x + sin * z);
+	Camera.pos.z = pos->zPos + (cos * z - sin * x);
+	floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+	h = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	c = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+	if (h == NO_HEIGHT || Camera.pos.y > h || Camera.pos.y < c)
+	{
+		Camera.pos.x = CamOldPos.x;
+		Camera.pos.y = CamOldPos.y;
+		Camera.pos.z = CamOldPos.z;
+		GetFloor(CamOldPos.x, CamOldPos.y, CamOldPos.z, &Camera.pos.roomNumber);
+	}
+}
+
+void ItemsCollideCamera()
+{
+	ITEM_INFO* item;
+	ITEM_INFO* list[CAM_COLLIDABLE_ITEMS];
+	ROOM_INFO* r;
+	PHD_3DPOS pos;
+	BOUNDING_BOX* bounds;
+	long i, count, dx, dy, dz;
+
+	item = 0;
+
+	for (i = 0; i < CAM_COLLIDABLE_ITEMS; i++)//reset list
+		list[i] = 0;
+
+	for (i = 0, count = 0; i < g_Level.NumItems; i++)//fill list with items to collide with
+	{
+		item = &g_Level.Items[i];
+		dx = Camera.pos.x - item->pos.xPos;
+		dy = Camera.pos.y - item->pos.yPos;
+		dz = Camera.pos.z - item->pos.zPos;
+		bool close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+
+		if (item->collidable && close_enough)//collidable and at a 4 sector radius
+		{
+			list[count] = item;
+			count++;
+
+			if (count >= CAM_COLLIDABLE_ITEMS)
+				break;
+
+			continue;
+		}
+	}
+
+	for (i = 0; i < count; i++)//collide with the list
+	{
+		item = list[i];
+
+		if (!item)//shouldn't happen but just in case..
+			return;
+
+		bounds = GetBoundsAccurate(item);
+		pos.xPos = item->pos.xPos;
+		pos.yPos = item->pos.yPos;
+		pos.zPos = item->pos.zPos;
+		pos.yRot = item->pos.yRot;
+
+		if (TestBoundsCollideCamera(bounds, &pos, 512))//voilà
+			ItemPushCamera(bounds, &pos);
 	}
 }

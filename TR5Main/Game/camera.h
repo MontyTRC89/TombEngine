@@ -52,6 +52,7 @@ enum CAMERA_FLAGS
 
 constexpr auto MAX_CAMERA = 18;
 constexpr auto NO_MINY = 0xFFFFFF;
+constexpr auto CAM_COLLIDABLE_ITEMS = 8;
 
 extern PHD_VECTOR CurrentCameraPosition;
 extern CAMERA_INFO Camera;
@@ -88,3 +89,6 @@ void CalculateCamera();
 void LookLeftRight();
 void LookUpDown();
 void ResetLook();
+long TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, long radius);
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos);
+void ItemsCollideCamera();
