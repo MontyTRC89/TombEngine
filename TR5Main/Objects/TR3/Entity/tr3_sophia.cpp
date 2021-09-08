@@ -12,7 +12,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 static BOSS_STRUCT BossData;
 

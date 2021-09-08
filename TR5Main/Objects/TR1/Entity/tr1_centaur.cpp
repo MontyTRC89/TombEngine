@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "people.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\tomb4fx.h"
 #include "tr1_centaur.h"
 #include "sphere.h"

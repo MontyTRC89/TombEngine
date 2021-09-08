@@ -2,7 +2,7 @@
 #include "tr4_spikywall.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "items.h"
 #include "effects\effects.h"

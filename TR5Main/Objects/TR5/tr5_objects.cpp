@@ -59,7 +59,7 @@
 #include "lara_one_gun.h"
 #include "lara_flare.h"
 #include "lara_initialise.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"

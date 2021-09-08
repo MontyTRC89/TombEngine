@@ -4,7 +4,7 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "effects\effects.h"
 #include "items.h"

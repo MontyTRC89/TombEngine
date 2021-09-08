@@ -13,7 +13,7 @@
 #include "effects\tomb4fx.h"
 #include "sphere.h"
 #include "people.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "trmath.h"
 #include "objectslist.h"
 

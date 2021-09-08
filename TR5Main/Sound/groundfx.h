@@ -1,4 +1,5 @@
 #pragma once
+
 enum GroundMaterial : unsigned char
 {
 	Mud = 0,

@@ -10,7 +10,7 @@
 #include "sphere.h"
 #include "level.h"
 #include "collide.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "input.h"
 using TEN::Renderer::g_Renderer;

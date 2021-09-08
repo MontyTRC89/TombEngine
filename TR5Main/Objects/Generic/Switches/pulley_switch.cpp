@@ -4,8 +4,8 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "sound.h"
-#include "pickup.h"
+#include "Sound\sound.h"
+#include "pickup\pickup.h"
 
 namespace TEN::Entities::Switches
 {

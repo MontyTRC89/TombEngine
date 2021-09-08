@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "GameFlowScript.h"
 
 struct SUBSUIT_INFO

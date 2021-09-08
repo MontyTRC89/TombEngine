@@ -8,7 +8,7 @@
 #include "inventory.h"
 #endif
 #include "switch.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "draw.h"
 #include "control.h"
 #include "puzzles_keys.h"

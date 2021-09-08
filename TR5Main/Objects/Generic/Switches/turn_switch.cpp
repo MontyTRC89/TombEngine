@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "door.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "switch.h"
 
 namespace TEN::Entities::Switches

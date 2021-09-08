@@ -3,7 +3,7 @@
 #include "box.h"
 #include "effects\effects.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
 

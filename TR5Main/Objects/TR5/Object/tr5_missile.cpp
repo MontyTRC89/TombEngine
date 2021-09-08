@@ -11,7 +11,7 @@
 #include "level.h"
 #include "effects\debris.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
 

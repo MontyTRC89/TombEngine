@@ -5,7 +5,7 @@
 #include "items.h"
 #include "sphere.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "people.h"
 #include "draw.h"
 #include "setup.h"

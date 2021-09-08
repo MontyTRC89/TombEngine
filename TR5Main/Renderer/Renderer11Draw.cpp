@@ -18,7 +18,7 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
@@ -26,7 +26,7 @@
 #include <Objects\TR4\Entity\tr4_wraith.h>
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
-#include "hair.h"
+#include "effects\hair.h"
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>

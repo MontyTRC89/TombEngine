@@ -7,9 +7,9 @@
 #include "lara_monkey.h"
 #include "input.h"
 #include "health.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 
 bool DoJump = false;
 

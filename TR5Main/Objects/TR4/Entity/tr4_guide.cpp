@@ -9,7 +9,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 #define	STATE_GUIDE_STOP				1
 #define	STATE_GUIDE_WALK				2

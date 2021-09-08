@@ -5,7 +5,7 @@
 #include "draw.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\bubble.h"
 #include "trmath.h"
 #include "GameFlowScript.h"

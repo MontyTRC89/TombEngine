@@ -36,9 +36,6 @@
     <ClInclude Include="Game\gameflow.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\hair.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\items.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -57,16 +54,10 @@
     <ClInclude Include="Game\people.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\pickup.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\rope.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\savegame.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\sound.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\sphere.h">
@@ -163,9 +154,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\groundfx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\Frustum.h">
@@ -1086,6 +1074,24 @@
     <ClInclude Include="Game\effects\effects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Sound\sound.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\sound_effects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\sound_tracks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\groundfx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\hair.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1109,9 +1115,6 @@
     <ClCompile Include="Game\gameflow.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\hair.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\items.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1127,16 +1130,10 @@
     <ClCompile Include="Game\people.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\pickup.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\savegame.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\sound.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\sphere.cpp">
@@ -1995,6 +1992,15 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\effects\effects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound\sound.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\hair.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include "tr5_bodypart.h"
 #include "effects\effects.h"
 #include "trmath.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "tr5_missile.h"
 
 void ControlBodyPart(short fxNumber)

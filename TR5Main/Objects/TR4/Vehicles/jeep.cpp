@@ -15,7 +15,7 @@
 #include "sphere.h"
 #include "lara_flare.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
 

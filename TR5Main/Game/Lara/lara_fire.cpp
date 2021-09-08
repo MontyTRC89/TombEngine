@@ -14,7 +14,7 @@
 #include "lot.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "GameFlowScript.h"
 #include "lara_struct.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "health.h"
 #include "draw.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "lara.h"
 #include "camera.h"
 #include "level.h"

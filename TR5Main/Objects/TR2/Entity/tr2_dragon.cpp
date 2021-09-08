@@ -11,7 +11,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 
 #define DRAGON_SWIPE_DAMAGE 250

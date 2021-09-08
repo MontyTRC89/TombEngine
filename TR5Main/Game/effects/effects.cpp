@@ -5,7 +5,7 @@
 #include "effects\tomb4fx.h"
 #include "traps.h"
 #include "trmath.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
 #include "objectslist.h"

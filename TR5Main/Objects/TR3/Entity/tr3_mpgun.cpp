@@ -8,7 +8,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 enum MPGUN_STATES
 {

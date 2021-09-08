@@ -4,7 +4,7 @@
 #include "switch.h"
 #include "control.h"
 #include "items.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "spotcam.h"
 #include "objectslist.h"
 #include "generic_switch.h"

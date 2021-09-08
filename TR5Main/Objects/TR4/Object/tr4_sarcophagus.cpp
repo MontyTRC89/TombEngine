@@ -4,7 +4,7 @@
 #include "input.h"
 #include "lara.h"
 #include "items.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "setup.h"
 #include "health.h"
 

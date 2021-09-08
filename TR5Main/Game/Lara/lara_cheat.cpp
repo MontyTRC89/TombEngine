@@ -7,7 +7,7 @@
 #include "inventory.h"
 #endif
 #include "effects\effects.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 
 extern GameFlow* g_GameFlow;
