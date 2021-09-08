@@ -66,7 +66,7 @@ void SphinxControl(short itemNumber)
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
-				mesh->flags &= ~0x100;
+				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 				floor->stopper = false;
 
 				TestTriggers(x, y, z, item->roomNumber, true, NULL);
