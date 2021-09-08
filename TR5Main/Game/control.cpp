@@ -1570,7 +1570,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
-						mesh->flags &= ~0x1;
+						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS *)mesh, 0);
 					}
 					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
@@ -1764,7 +1764,7 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 		{
 			meshp = &room->mesh[m];
 
-			if (meshp->flags & 1)
+			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
 				pos.xPos = meshp->x;
 				pos.yPos = meshp->y;
