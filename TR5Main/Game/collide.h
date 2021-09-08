@@ -66,7 +66,6 @@ struct COLL_INFO
 	bool lavaIsPit;
 	bool enableBaddiePush;
 	bool enableSpaz;
-	bool hitCeiling;
 };
 
 struct OBJECT_COLLISION_BOUNDS
