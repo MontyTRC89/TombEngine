@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "footprint.h"
+#include "effects\footprint.h"
 #include "control.h"
 #include "lara.h"
 #include "draw.h"

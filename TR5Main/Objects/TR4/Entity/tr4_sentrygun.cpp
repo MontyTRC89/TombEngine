@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_sentrygun.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -10,7 +10,7 @@
 #endif
 #include "level.h"
 #include "lot.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "sphere.h"
 #include "people.h"
 #include "sound.h"

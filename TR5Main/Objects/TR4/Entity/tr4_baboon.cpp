@@ -6,7 +6,7 @@
 #include "control.h"
 #include "misc.h"
 #include "Lara.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 using std::vector;
 BaboonRespawnClass BaboonRespawn;
 static BITE_INFO baboonBite = { 10, 10, 11, 4 };

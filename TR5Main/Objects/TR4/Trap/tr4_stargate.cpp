@@ -6,7 +6,7 @@
 #include "collide.h"
 #include "sphere.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 
 short StargateBounds[24] =
 {

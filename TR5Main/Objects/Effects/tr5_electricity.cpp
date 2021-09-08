@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_electricity.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "control.h"
 #include "setup.h"
 #include "draw.h"

@@ -5,11 +5,11 @@
 #include "lara.h"
 #include "people.h"
 #include "sound.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "tr1_centaur.h"
 #include "sphere.h"
 #include "lara_one_gun.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 
 enum centaur_anims { 

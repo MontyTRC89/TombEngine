@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_dragon.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "collide.h"
 #include "box.h"

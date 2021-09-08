@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "flmtorch.h"
+#include "effects\flmtorch.h"
 
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_flare.h"
 #include "lara.h"
 #include "lara_fire.h"

@@ -2,9 +2,8 @@
 #include "traps.h"
 
 #include "items.h"
-#include "effect2.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "collide.h"
 #include "sphere.h"

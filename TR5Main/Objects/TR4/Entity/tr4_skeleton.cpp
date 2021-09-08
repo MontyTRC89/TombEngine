@@ -3,15 +3,14 @@
 #include "items.h"
 #include "box.h"
 #include "people.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sphere.h"
-#include "debris.h"
-#include "effect2.h"
+#include "effects\debris.h"
 #include "lot.h"
 #include "lara.h"
 #include "sound.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 
 namespace TEN::Entities::TR4

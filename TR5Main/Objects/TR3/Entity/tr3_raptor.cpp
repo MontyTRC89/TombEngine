@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr3_raptor.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"

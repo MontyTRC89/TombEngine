@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "camera.h"
 #include "Lara.h"

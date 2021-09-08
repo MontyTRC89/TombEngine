@@ -6,8 +6,8 @@
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
-#include <tomb4fx.h>
+#include <effects\effects.h>
+#include <effects\tomb4fx.h>
 #include <switch.h>
 #include <input.h>
 

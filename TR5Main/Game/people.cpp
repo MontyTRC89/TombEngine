@@ -1,11 +1,10 @@
 #include "framework.h"
 #include "people.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "control.h"
 #include "sphere.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "lara.h"
 #include "sound.h"
 

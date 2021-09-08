@@ -7,7 +7,7 @@
 #include "input.h"
 #include "sphere.h"
 #include "sound.h"
-#include "bubble.h"
+#include "effects\bubble.h"
 #include "draw.h"
 
 

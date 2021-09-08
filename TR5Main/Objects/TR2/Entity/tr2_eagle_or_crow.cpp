@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_eagle_or_crow.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "items.h"
 #include "setup.h"

@@ -6,8 +6,7 @@
 #include "missile.h"
 #include "level.h"
 #include "sound.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "trmath.h"
 
 #define NATLA_NEAR_DEATH 200

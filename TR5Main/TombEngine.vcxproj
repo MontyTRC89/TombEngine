@@ -136,15 +136,15 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\box.h" />
-    <ClInclude Include="Game\bubble.h" />
-    <ClInclude Include="Game\chaffFX.h" />
+    <ClInclude Include="Game\effects\bubble.h" />
+    <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
-    <ClInclude Include="Game\drip.h" />
-    <ClInclude Include="Game\explosion.h" />
+    <ClInclude Include="Game\effects\drip.h" />
+    <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\floordata.h" />
-    <ClInclude Include="Game\footprint.h" />
+    <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -189,8 +189,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Scripting\GameScriptColor.h" />
     <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
-    <ClInclude Include="Game\smoke.h" />
-    <ClInclude Include="Game\spark.h" />
+    <ClInclude Include="Game\effects\smoke.h" />
+    <ClInclude Include="Game\effects\spark.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
     <ClInclude Include="Objects\Generic\Object\generic_bridge.h" />
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
@@ -441,12 +441,12 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collide.h" />
     <ClInclude Include="Game\control.h" />
-    <ClInclude Include="Game\debris.h" />
+    <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\door.h" />
     <ClInclude Include="Game\draw.h" />
-    <ClInclude Include="Game\effect2.h" />
+    <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\flipeffect.h" />
-    <ClInclude Include="Game\flmtorch.h" />
+    <ClInclude Include="Game\effects\flmtorch.h" />
     <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\hair.h" />
     <ClInclude Include="Game\health.h" />
@@ -474,7 +474,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\switch.h" />
     <ClInclude Include="Game\text.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
-    <ClInclude Include="Game\tomb4fx.h" />
+    <ClInclude Include="Game\effects\tomb4fx.h" />
     <ClInclude Include="Game\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
@@ -496,15 +496,15 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Game\bubble.cpp" />
-    <ClCompile Include="Game\chaffFX.cpp" />
+    <ClCompile Include="Game\effects\bubble.cpp" />
+    <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
-    <ClCompile Include="Game\drip.cpp" />
-    <ClCompile Include="Game\explosion.cpp" />
+    <ClCompile Include="Game\effects\drip.cpp" />
+    <ClCompile Include="Game\effects\explosion.cpp" />
     <ClCompile Include="Game\floordata.cpp" />
-    <ClCompile Include="Game\footprint.cpp" />
+    <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
@@ -515,7 +515,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\Lara\lara_objects.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
-    <ClCompile Include="Game\lightning.cpp" />
+    <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\newinv2.cpp" />
     <ClCompile Include="Game\particle\SimpleParticle.cpp" />
@@ -543,8 +543,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
-    <ClCompile Include="Game\smoke.cpp" />
-    <ClCompile Include="Game\spark.cpp" />
+    <ClCompile Include="Game\effects\smoke.cpp" />
+    <ClCompile Include="Game\effects\spark.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_bridge.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />
@@ -746,12 +746,12 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\camera.cpp" />
     <ClCompile Include="Game\collide.cpp" />
     <ClCompile Include="Game\control.cpp" />
-    <ClCompile Include="Game\debris.cpp" />
+    <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\door.cpp" />
     <ClCompile Include="Game\draw.cpp" />
-    <ClCompile Include="Game\effect2.cpp" />
+    <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\flipeffect.cpp" />
-    <ClCompile Include="Game\flmtorch.cpp" />
+    <ClCompile Include="Game\effects\flmtorch.cpp" />
     <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
@@ -777,7 +777,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Game\switch.cpp" />
     <ClCompile Include="Game\text.cpp" />
-    <ClCompile Include="Game\tomb4fx.cpp" />
+    <ClCompile Include="Game\effects\tomb4fx.cpp" />
     <ClCompile Include="Game\traps.cpp" />
     <ClCompile Include="Game\memory\malloc.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />

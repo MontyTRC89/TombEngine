@@ -6,7 +6,7 @@
 #include "level.h"
 #include "room.h"
 #include "trmath.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "prng.h"
 using namespace TEN::Math::Random;

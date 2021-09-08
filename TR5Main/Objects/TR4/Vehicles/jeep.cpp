@@ -6,13 +6,12 @@
 #else
 #include "inventory.h"
 #endif
-#include "effect2.h"
+#include "effects\effects.h"
 #include "collide.h"
-#include "effect2.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "sphere.h"
 #include "lara_flare.h"
 #include "input.h"

@@ -9,7 +9,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-#include <Game\effect2.h>
+#include <effects\effects.h>
 #include <Game\particle\SimpleParticle.h>
 
 

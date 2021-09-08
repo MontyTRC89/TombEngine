@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "Lara.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_dog.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "control.h"
 #include "setup.h"
 #include "level.h"

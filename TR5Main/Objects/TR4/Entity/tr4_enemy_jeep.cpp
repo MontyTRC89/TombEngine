@@ -7,11 +7,11 @@
 #include <control.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
 #include <lot.h>
-#include <tomb4fx.h>
 #include <sound.h>
 #include <draw.h>
+#include <effects\effects.h>
+#include <effects\tomb4fx.h>
 
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {

@@ -3,7 +3,7 @@
 #include "level.h"
 #include "box.h"
 #include "sound.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "items.h"
 #include "trmath.h"
 
