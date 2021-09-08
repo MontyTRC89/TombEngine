@@ -28,22 +28,22 @@ namespace TEN::Entities::TR4
         STATE_AHMET_DIE
     };
 
-    #define AHMET_JUMP_ATK_ANIM         4
-    #define AHMET_START_JUMP_ANIM       7
-    #define AHMET_DIE_ANIM              10
+    constexpr auto AHMET_JUMP_ATK_ANIM = 4;
+    constexpr auto AHMET_START_JUMP_ANIM = 7;
+    constexpr auto AHMET_DIE_ANIM = 10;
 
-    #define AHMET_WALK_ANGLE            ANGLE(5.0f)
-    #define AHMET_RUN_ANGLE             ANGLE(8.0f)
-    #define AHMET_VIEW_ANGLE            ANGLE(45.0f)
-    #define AHMET_ENEMY_ANGLE           ANGLE(90.0f)
-    #define AHMET_AWARE_DISTANCE        SQUARE(1024)
-    #define AHMET_IDLE_RANGE            SQUARE(1280)
-    #define AHMET_RUN_RANGE             SQUARE(2560)
-    #define AHMET_STAND_DUALATK_RANGE   SQUARE(682)
-    #define AHMET_RIGHT_TOUCH           0xF00000
-    #define AHMET_LEFT_TOUCH            0x3C000
-    #define AHMET_HAND_DAMAGE           80
-    #define AHMET_JAW_DAMAGE            120
+    constexpr auto AHMET_WALK_ANGLE = 5 * ONE_DEGREE;
+    constexpr auto AHMET_RUN_ANGLE = 8 * ONE_DEGREE;
+    constexpr auto AHMET_VIEW_ANGLE = 45 * ONE_DEGREE;
+    constexpr auto AHMET_ENEMY_ANGLE = 90 * ONE_DEGREE;
+    constexpr auto AHMET_AWARE_DISTANCE = SQUARE(1024);
+    constexpr auto AHMET_IDLE_RANGE = SQUARE(1280);
+    constexpr auto AHMET_RUN_RANGE = SQUARE(2560);
+    constexpr auto AHMET_STAND_DUALATK_RANGE = SQUARE(682);
+    constexpr auto AHMET_RIGHT_TOUCH = 0xF00000;
+    constexpr auto AHMET_LEFT_TOUCH = 0x3C000;
+    constexpr auto AHMET_HAND_DAMAGE = 80;
+    constexpr auto AHMET_JAW_DAMAGE = 120;
 
     BITE_INFO ahmetBiteLeft = { 0, 0, 0, 16 };
     BITE_INFO ahmetBiteRight = { 0, 0, 0, 22 };
@@ -51,7 +51,7 @@ namespace TEN::Entities::TR4
 
     static void AhmetHeavyTriggers(ITEM_INFO* item)
     {
-		TestTriggers(item, true, NULL);
+        TestTriggers(item, true, NULL);
     }
 
     static void TriggerAhmetDeathEffect(ITEM_INFO* item)
@@ -163,7 +163,7 @@ namespace TEN::Entities::TR4
             ahmet->enemy = LaraItem;
 
             if (lara_info.distance < AHMET_AWARE_DISTANCE
-                || item->hitStatus 
+                || item->hitStatus
                 || TargetVisible(item, &lara_info))
                 AlertAllGuards(itemNumber);
 
