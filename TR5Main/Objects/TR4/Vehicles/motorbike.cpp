@@ -16,7 +16,7 @@
 #include "lara_one_gun.h"
 #include "effects\tomb4fx.h"
 #include "items.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "health.h"
 #include "camera.h"
 #include "prng.h"

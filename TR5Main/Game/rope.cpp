@@ -5,7 +5,7 @@
 #include "level.h"
 #include "input.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;

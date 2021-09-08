@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "missile.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 #include "effects\effects.h"
 #include "draw.h"

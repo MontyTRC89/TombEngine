@@ -13,7 +13,7 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <Game\particle\SimpleParticle.h>
 #include "prng.h"
 

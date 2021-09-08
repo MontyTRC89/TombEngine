@@ -12,7 +12,7 @@
 #include "draw.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "kayak.h"
 
 static short WreckingBallData[2] = {0, 0};

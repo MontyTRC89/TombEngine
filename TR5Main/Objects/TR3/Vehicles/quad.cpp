@@ -13,7 +13,7 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "prng.h"
 using std::vector;
 using namespace TEN::Math::Random;

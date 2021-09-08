@@ -10,7 +10,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2

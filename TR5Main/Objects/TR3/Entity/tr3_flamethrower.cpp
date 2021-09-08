@@ -10,7 +10,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

@@ -8,7 +8,7 @@
 #include "effects\debris.h"
 #include "lot.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "effects\tomb4fx.h"
 #include "level.h"

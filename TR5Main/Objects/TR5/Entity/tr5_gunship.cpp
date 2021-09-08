@@ -2,7 +2,7 @@
 #include "tr5_gunship.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "camera.h"
 #include "effects\effects.h"

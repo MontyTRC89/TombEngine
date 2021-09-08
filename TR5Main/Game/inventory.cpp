@@ -5,7 +5,7 @@
 #include "control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "Lara.h"
 #include "camera.h"

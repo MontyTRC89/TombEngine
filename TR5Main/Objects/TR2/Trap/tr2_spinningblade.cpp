@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "effects\effects.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 
 void InitialiseSpinningBlade(short itemNumber)

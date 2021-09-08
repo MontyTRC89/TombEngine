@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "effects\effects.h"
 #include "items.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void DartControl(short itemNumber)
 {

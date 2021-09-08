@@ -145,7 +145,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
-    <ClInclude Include="Game\groundfx.h" />
+    <ClInclude Include="Sound\groundfx.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
@@ -422,6 +422,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
+    <ClInclude Include="Sound\sound_tracks.h" />
+    <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
     <ClInclude Include="Specific\IO\ChunkWriter.h" />
@@ -448,7 +450,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\flipeffect.h" />
     <ClInclude Include="Game\effects\flmtorch.h" />
     <ClInclude Include="Game\gameflow.h" />
-    <ClInclude Include="Game\hair.h" />
+    <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
@@ -465,10 +467,10 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\objects.h" />
     <ClInclude Include="Game\people.h" />
-    <ClInclude Include="Game\pickup.h" />
+    <ClInclude Include="Game\pickup\pickup.h" />
     <ClInclude Include="Game\rope.h" />
     <ClInclude Include="Game\savegame.h" />
-    <ClInclude Include="Game\sound.h" />
+    <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Game\sphere.h" />
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Game\switch.h" />
@@ -753,7 +755,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\flipeffect.cpp" />
     <ClCompile Include="Game\effects\flmtorch.cpp" />
     <ClCompile Include="Game\gameflow.cpp" />
-    <ClCompile Include="Game\hair.cpp" />
+    <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\inventory.cpp" />
     <ClCompile Include="Game\items.cpp" />
@@ -769,10 +771,10 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
-    <ClCompile Include="Game\pickup.cpp" />
+    <ClCompile Include="Game\pickup\pickup.cpp" />
     <ClCompile Include="Game\rope.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
-    <ClCompile Include="Game\sound.cpp" />
+    <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Game\sphere.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Game\switch.cpp" />

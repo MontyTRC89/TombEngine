@@ -6,7 +6,7 @@
 #include "draw.h"
 #include "lara.h"
 #include "lara_collide.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "sphere.h"
 #include "traps.h"
 

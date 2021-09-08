@@ -6,7 +6,7 @@
 #include "items.h"
 #include "lara.h"
 #include "switch.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "effects\tomb4fx.h"
 #include "tr4_ahmet.h"

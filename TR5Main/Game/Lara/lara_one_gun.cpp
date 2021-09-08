@@ -22,7 +22,7 @@
 #include "setup.h"
 #include "input.h"
 #include "savegame.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "effects\bubble.h"
 #include "generic_switch.h"
 

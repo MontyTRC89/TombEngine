@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "camera.h"
 #include "configuration.h"

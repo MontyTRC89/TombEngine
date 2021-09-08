@@ -8,7 +8,7 @@
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "trmath.h"
 #include "prng.h"
 #include "room.h"

@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 
 int NextRat;
