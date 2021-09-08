@@ -11,17 +11,6 @@
 
 #define COLLISION_CHECK_DISTANCE 6144
 
-enum BBOX_PLANE : unsigned int
-{
-	FRONT,
-	BACK,
-	LEFT,
-	RIGHT,
-	TOP,
-	BOTTOM,
-	PLANE_COUNT
-};
-
 struct COLL_RESULT
 {
 	FLOOR_INFO* Block;

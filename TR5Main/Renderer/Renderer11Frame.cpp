@@ -83,7 +83,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < numStatics; i++)
 		{
 			MESH_INFO *mesh = &r->mesh[i];
-			if (mesh->flags > 0)
+			if (mesh->flags & 1)
 			{
 				RendererStatic* newStatic = &room.Statics[i];
 				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
