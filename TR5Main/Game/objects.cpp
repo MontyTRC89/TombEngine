@@ -297,7 +297,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
 			if (l->pos.yRot & 0x4000)
-				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) / 2);
+				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);
 			else
 				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) / 2);
 			l->pos.yPos += item->pos.yPos - ((pos1.y + pos2.y) / 2);
@@ -427,8 +427,8 @@ void HighObject2Control(short itemNumber)
 
 	if (!item->itemFlags[2])
 	{
-		int div = (item->triggerFlags % 10) * 1024;
-		int mod = (item->triggerFlags / 10) * 1024;
+		int div = item->triggerFlags % 10 << 10;
+		int mod = item->triggerFlags / 10 << 10;
 		item->itemFlags[0] = GetRandomControl() % div;
 		item->itemFlags[1] = GetRandomControl() % mod;
 		item->itemFlags[2] = (GetRandomControl() & 0xF) + 15;
