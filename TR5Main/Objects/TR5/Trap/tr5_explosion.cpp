@@ -150,7 +150,7 @@ void ExplosionControl(short itemNumber)
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];
 						++SmashedMeshCount;
-						CollidedMeshes[i]->flags &= ~0x1;
+						CollidedMeshes[i]->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					}
 					++i;
 				}

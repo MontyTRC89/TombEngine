@@ -54,7 +54,7 @@ short Elevation = 57346;
 extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-COLL_INFO lara_coll;
+COLL_INFO lara_coll = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
