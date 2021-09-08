@@ -158,7 +158,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	}
 	else
 	{
-		world = Matrix::CreateTranslation(-4, -48, -48) * world;
+		world = Matrix::CreateTranslation(-4, -4, -48) * world;
 	}
 
 	pos.x = world.Translation().x; 

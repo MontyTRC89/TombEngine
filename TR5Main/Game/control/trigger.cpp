@@ -718,4 +718,6 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 	// Set climb status
 	if ((1 << (GetQuadrant(LaraItem->pos.yRot) + 8)) & GetClimbFlags(floor))
 		Lara.climbStatus = true;
+	else
+		Lara.climbStatus = false;
 }
