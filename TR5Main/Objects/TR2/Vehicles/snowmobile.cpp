@@ -15,7 +15,7 @@
 #include "input.h"
 #include "Sound\sound.h"
 #include <Game\particle\SimpleParticle.h>
-#include "prng.h"
+#include "Specific\prng.h"
 
 using std::vector;
 using namespace TEN::Math::Random;

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "smoke.h"
 #include "room.h"
 #include "control.h"
@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "lara.h"
 #include <algorithm>
-#include "prng.h"
+#include "Specific\prng.h"
 using namespace TEN::Math::Random;
 namespace TEN {
 	namespace Effects {

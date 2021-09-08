@@ -1,5 +1,5 @@
 #pragma once
-#include "phd_global.h"
+#include "Specific\phd_global.h"
 #include "level.h"
 
 // used by coll->badPos

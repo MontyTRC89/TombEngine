@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "prng.h"
+#include "Specific\prng.h"
 #include <random>
 
 namespace TEN::Math::Random

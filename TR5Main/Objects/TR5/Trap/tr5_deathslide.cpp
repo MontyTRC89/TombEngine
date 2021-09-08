@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_deathslide.h"
 #include "input.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "lara.h"
 #include "setup.h"
 #include "Sound\sound.h"

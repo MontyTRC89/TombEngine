@@ -2,7 +2,7 @@
 #include "tr4_mapper.h"
 #include "level.h"
 #include "control.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 #include <Game\sphere.h>

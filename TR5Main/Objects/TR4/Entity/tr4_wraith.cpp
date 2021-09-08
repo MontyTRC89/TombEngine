@@ -4,8 +4,8 @@
 #include "effects\effects.h"
 #include "control.h"
 #include "objectslist.h"
-#include "trmath.h"
-#include <sound.h>
+#include "Specific\trmath.h"
+#include "Sound\sound.h"
 #include <lara.h>
 #include <traps.h>
 #include <effects\tomb4fx.h>

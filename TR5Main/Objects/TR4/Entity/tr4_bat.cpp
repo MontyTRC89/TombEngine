@@ -7,7 +7,7 @@
 #include "lara.h"
 #include "lot.h"
 #include "setup.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 namespace TEN::Entities::TR4
 {

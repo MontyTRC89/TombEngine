@@ -48,7 +48,7 @@
 #include "tr4_littlebeetle.h"
 #include "particle/SimpleParticle.h"
 #include <process.h>
-#include "prng.h"
+#include "Specific\prng.h"
 #include <Game/Lara/lara_one_gun.h>
 #include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"

@@ -9,7 +9,7 @@
 #include "camera.h"
 #include "control.h"
 #include "setup.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "objectslist.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2

@@ -19,7 +19,7 @@
 #include "Sound\sound.h"
 #include "health.h"
 #include "camera.h"
-#include "prng.h"
+#include "Specific\prng.h"
 
 using namespace TEN::Math::Random;
 
