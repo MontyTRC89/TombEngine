@@ -489,6 +489,10 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	if (coll->shift.x == 0 && coll->shift.z == 0)
 		coll->collType = CT_NONE; // Paranoid
 
+	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom
+	if (item == LaraItem && coll->collType == CT_FRONT)
+		coll->splat = (YMin <= inYMin + LARA_HEADROOM);
+
 	return true;
 }
 
@@ -2710,6 +2714,7 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 
 	l->hitStatus = false;
 	coll->hitStatic = false;
+	coll->splat = false;
 
 	if (l == LaraItem)
 		Lara.hitDirection = -1;
