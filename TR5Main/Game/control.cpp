@@ -2571,8 +2571,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	do
 	{
-		int xBlock = (x - r->x) >> 10;// WALL_SHIFT;
-		int zBlock = (z - r->z) >> 10;// WALL_SHIFT;
+		int xBlock = (x - r->x) / SECTOR(1);
+		int zBlock = (z - r->z) / SECTOR(1);
 
 		if (zBlock <= 0)
 		{
