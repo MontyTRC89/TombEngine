@@ -3,7 +3,7 @@
 #include "floordata.h"
 #include "control.h"
 #include "level.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sound.h"
 #include "camera.h"
 #include "sphere.h"

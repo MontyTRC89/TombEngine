@@ -60,7 +60,7 @@
 #include "lara_flare.h"
 #include "lara_initialise.h"
 #include "pickup.h"
-#include "flmtorch.h"
+#include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"
 #include "objects.h"

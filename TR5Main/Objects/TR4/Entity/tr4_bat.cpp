@@ -2,7 +2,7 @@
 #include "tr4_bat.h"
 #include "box.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "misc.h"
 #include "lara.h"
 #include "lot.h"

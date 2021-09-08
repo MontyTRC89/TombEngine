@@ -6,7 +6,7 @@
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
+#include <effects\effects.h>
 
 void MovingBladeControl(short itemNumber)
 {

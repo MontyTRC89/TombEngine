@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr3_mpstick.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "items.h"
 #include "setup.h"

@@ -3,7 +3,7 @@
 #include "camera.h"
 #include "control.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "input.h"
 #include "control\volume.h"

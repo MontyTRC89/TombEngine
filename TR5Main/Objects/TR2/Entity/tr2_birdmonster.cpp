@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_birdmonster.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"

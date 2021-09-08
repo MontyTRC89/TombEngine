@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "box.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lot.h"
 #include "Lara.h"
 #include "draw.h"

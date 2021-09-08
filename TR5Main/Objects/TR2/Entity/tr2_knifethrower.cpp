@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_knifethrower.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "box.h"
 #include "people.h"
 #include "setup.h"

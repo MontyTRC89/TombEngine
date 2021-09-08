@@ -6,7 +6,7 @@
 #include "box.h"
 #include "Lara.h"
 #include "lara_surface.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_fire.h"
 #include "draw.h"
 #include "camera.h"

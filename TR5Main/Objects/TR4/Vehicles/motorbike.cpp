@@ -3,7 +3,7 @@
 #include "level.h"
 #include "sphere.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -14,7 +14,7 @@
 #include "lara_flare.h"
 #include "setup.h"
 #include "lara_one_gun.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "items.h"
 #include "sound.h"
 #include "health.h"

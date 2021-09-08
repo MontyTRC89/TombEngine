@@ -8,9 +8,9 @@
 #include "lara_flare.h"
 #include "sound.h"
 #include "sphere.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_struct.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "draw.h"
 
 static long GunRotYAdd = 0;

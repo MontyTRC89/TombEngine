@@ -4,7 +4,7 @@
 #include "collide.h"
 #include "lara.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 
 void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {

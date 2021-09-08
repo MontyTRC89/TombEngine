@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "level.h"
 #include "setup.h"
 #include "control.h"

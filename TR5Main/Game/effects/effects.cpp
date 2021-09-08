@@ -1,9 +1,8 @@
 #include "framework.h"
-#include "effect2.h"
 #include "draw.h"
-#include "effect2.h"
+#include "effects.h"
 #include "lara.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "traps.h"
 #include "trmath.h"
 #include "sound.h"
@@ -13,8 +12,8 @@
 #include "GameFlowScript.h"
 #include "spark.h"
 #include "explosion.h"
-#include <Game\drip.h>
-#include <Game\bubble.h>
+#include <Game\effects\drip.h>
+#include <Game\effects\bubble.h>
 #include "smoke.h"
 #include "prng.h"
 

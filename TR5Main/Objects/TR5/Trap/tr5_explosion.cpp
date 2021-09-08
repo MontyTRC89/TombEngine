@@ -3,15 +3,15 @@
 #include "level.h"
 #include "control.h"
 #include "sound.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "draw.h"
 #include "traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"
 #include "lara_one_gun.h"
 #include "switch.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "generic_switch.h"
 
 using namespace TEN::Entities::Switches;

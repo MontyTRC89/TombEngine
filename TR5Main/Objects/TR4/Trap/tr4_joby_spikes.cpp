@@ -2,7 +2,7 @@
 #include "tr4_joby_spikes.h"
 #include "level.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include <sound.h>
 #include <draw.h>
 #include <lara.h>

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_big_beetle.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"

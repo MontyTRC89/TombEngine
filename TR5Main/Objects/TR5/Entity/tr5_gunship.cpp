@@ -5,11 +5,10 @@
 #include "sound.h"
 #include "draw.h"
 #include "camera.h"
-#include "effect2.h"
-#include "debris.h"
+#include "effects\effects.h"
+#include "effects\debris.h"
 #include "objects.h"
 #include "items.h"
-#include "effect2.h"
 #include "lara.h"
 
 int GunShipCounter = 0;

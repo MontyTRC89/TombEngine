@@ -8,11 +8,10 @@
 #else
 #include "inventory.h"
 #endif
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "control.h"
 #include "sphere.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "box.h"
 #include "health.h"
 #include "items.h"
@@ -21,7 +20,7 @@
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
-#include "flmtorch.h"
+#include "effects\flmtorch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"

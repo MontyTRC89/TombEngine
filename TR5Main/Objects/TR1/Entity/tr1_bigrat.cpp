@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr1_bigrat.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "level.h"
 #include "misc.h"

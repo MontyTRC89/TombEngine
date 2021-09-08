@@ -3,10 +3,9 @@
 #include "items.h"
 #include "level.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sphere.h"
 #include "draw.h"
-#include "effect2.h"
 #include "lara.h"
 #include "lara_collide.h"
 

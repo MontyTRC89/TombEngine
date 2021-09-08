@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "bubble.h"
+#include "effects\bubble.h"
 #include "level.h"
 #include "control.h"
 #include "trmath.h"
