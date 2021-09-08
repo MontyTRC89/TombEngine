@@ -121,5 +121,5 @@ bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
-bool CollideSolidStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll);
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
