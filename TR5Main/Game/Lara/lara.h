@@ -14,6 +14,7 @@ constexpr auto LARA_HEIGHT = 762;		// The size of lara (from the floor to the to
 constexpr auto LARA_HEIGHT_CRAWL = 400; // Size of Lara in crawl state
 constexpr auto LARA_HEADROOM = 160;     // Amount of reasonable space above Lara's head
 constexpr auto LARA_RAD = 100;
+constexpr auto LARA_RAD_CRAWL = 200;
 constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_FREEFALL_SPEED = 131;
