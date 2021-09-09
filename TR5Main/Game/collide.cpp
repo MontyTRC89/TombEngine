@@ -171,6 +171,9 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
+	coll->hitTallBounds = false;
+	coll->boundsAbove = INT_MAX;
+
 	short roomsToCheck[128];
 	short numRoomsToCheck = 0;
 	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
@@ -221,14 +224,14 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	auto itemBounds = TO_DX_BBOX(&item->pos, itemBBox);
 
 	// Extend bounds a bit for visual testing
-	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE / 3);
+	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE);
 
 	// Filter out any further checks if static isn't nearby
 	if (!staticBounds.Intersects(itemBounds))
 		return false;
 
 	// Bring back extents
-	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE / 3);
+	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
 
 	// Draw static bounds
 	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -242,17 +245,12 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	collBox.Y1 = itemBBox->Y1;
 	collBox.Y2 = itemBBox->Y2;
 
-	// Get DX item coll bounds
+	// Get and test DX item coll bounds
 	auto collBounds = TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox);
+	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds
-	if (!staticBounds.Intersects(collBounds)) // Final generic check before further calculations
-	{
-		g_Renderer.addDebugBox(collBounds, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-		return false;
-	}
-	else
-		g_Renderer.addDebugBox(collBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.addDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Decompose static bounds into top/bottom plane vertices
 	Vector3 corners[8];
@@ -305,28 +303,38 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 		}
 	}
 
-	// Correct position according to top/bottom bounds, if collided
-	if (closestPlane != -1 && minDistance < height)
+	if (closestPlane != -1) // Top/bottom plane found
 	{
 		auto bottom = closestPlane >= 2;
 		auto yPoint = abs((closestRay.direction * minDistance).y);
 		auto distanceToVerticalPlane = halfHeight - yPoint;
 
-		if (bottom)
+		// Correct position according to top/bottom bounds, if collided and plane is nearby
+		if (intersects && minDistance < height)
 		{
-			// HACK: additionally subtract 2 from bottom plane, or else false positives may occur.
-			item->pos.yPos += distanceToVerticalPlane + 2;
-			coll->collType = CT_TOP;
-		}
-		else
-		{
-			// Set collision type only if dry room (in water rooms it causes stucking)
-			item->pos.yPos -= distanceToVerticalPlane;
-			coll->collType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->collType : CT_CLAMP;
+			if (bottom)
+			{
+				// HACK: additionally subtract 2 from bottom plane, or else false positives may occur.
+				item->pos.yPos += distanceToVerticalPlane + 2;
+				coll->collType = CT_TOP;
+			}
+			else
+			{
+				// Set collision type only if dry room (in water rooms it causes stucking)
+				item->pos.yPos -= distanceToVerticalPlane;
+				coll->collType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->collType : CT_CLAMP;
+			}
+
+			result = true;
 		}
 
-		result = true;
+		if (bottom && coll->boundsAbove > abs(distanceToVerticalPlane))
+			coll->boundsAbove = abs(distanceToVerticalPlane);
 	}
+
+	// If no actual intersection occured, stop testing.
+	if (!intersects)
+		return false;
 
 	// Check if bounds still collide after top/bottom position correction
 	if (!staticBounds.Intersects(TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox)))
@@ -2714,7 +2722,6 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 
 	l->hitStatus = false;
 	coll->hitStatic = false;
-	coll->hitTallBounds = false;
 
 	if (l == LaraItem)
 		Lara.hitDirection = -1;

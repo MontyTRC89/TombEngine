@@ -62,6 +62,7 @@ struct COLL_INFO
 	signed char tiltZ;
 	bool hitStatic;
 	bool hitTallBounds;
+	int boundsAbove;
 	bool slopesAreWalls;
 	bool slopesArePits;
 	bool lavaIsPit;
