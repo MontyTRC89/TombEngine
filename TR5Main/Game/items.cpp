@@ -5,6 +5,7 @@
 #include "lara.h"
 #include "control.h"
 #include "effects\effects.h"
+#include "Game\box.h"
 
 void ClearItem(short itemNum)
 {
