@@ -2,6 +2,7 @@
 #include "lara_struct.h"
 
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStandUp(COLL_INFO* coll);
 int TestWall(ITEM_INFO* item, int front, int right, int down);
 int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll);
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll);
