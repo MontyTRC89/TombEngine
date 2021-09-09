@@ -11,7 +11,8 @@
 #define LARA_FAST_TURN ANGLE(8.0f)
 
 constexpr auto LARA_HEIGHT = 762;		// The size of lara (from the floor to the top of the head)
-constexpr auto LARA_HEADROOM = 160; // Amount of reasonable space above Lara's head
+constexpr auto LARA_HEIGHT_CRAWL = 400; // Size of Lara in crawl state
+constexpr auto LARA_HEADROOM = 160;     // Amount of reasonable space above Lara's head
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_RAD = 100;
 constexpr auto LARA_VELOCITY = 12;

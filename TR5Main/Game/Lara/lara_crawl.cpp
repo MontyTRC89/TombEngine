@@ -97,7 +97,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->slopesAreWalls = true;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_CRAWL);
 
 	if (LaraFallen(item, coll))
 	{
@@ -105,8 +105,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = coll->middle.Ceiling >= -362;
-
+		Lara.keepDucked = TestLaraStandUp(coll);
 		ShiftItem(item, coll);
 
 		if (coll->middle.Floor != NO_HEIGHT)
@@ -152,16 +151,13 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	coll->badNeg = -384;
 	coll->badCeiling = 0;
 	coll->slopesAreWalls = true;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_CRAWL);
 
 	if (LaraFallen(item, coll))
 		Lara.gunStatus = LG_NO_ARMS;
 	else if (!TestLaraSlide(item, coll))
 	{
-		if (coll->middle.Ceiling >= -362)
-			Lara.keepDucked = 1;
-		else
-			Lara.keepDucked = 0;
+		Lara.keepDucked = TestLaraStandUp(coll);
 
 		if (coll->middle.Floor < coll->badNeg)//hit a wall, stop
 		{
@@ -371,7 +367,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		coll->slopesAreWalls = true;
 		coll->slopesArePits = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_CRAWL);
 
 		if (LaraFallen(item, coll))
 		{
@@ -381,8 +377,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			int slope = abs(coll->frontLeft.Floor - coll->frontRight.Floor);
 
-			Lara.keepDucked = coll->middle.Ceiling >= -362;
-
+			Lara.keepDucked = TestLaraStandUp(coll);
 			ShiftItem(item, coll);
 
 			if (coll->middle.Floor != NO_HEIGHT && coll->middle.Floor > -256)
@@ -577,7 +572,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->facing = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -LARA_HEIGHT_CRAWL);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -649,7 +644,7 @@ void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 84 and 85*/
 	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_CRAWL);
 
 	if (!TestLaraSlide(item, coll))
 	{
@@ -718,7 +713,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->facing = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, -LARA_HEIGHT_CRAWL);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -786,7 +781,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badCeiling = 0;
 	coll->slopesAreWalls = true;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 400);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_CRAWL);
 
 	if (LaraFallen(item, coll))
 	{
@@ -794,11 +789,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		if (coll->middle.Ceiling < -362)
-			Lara.keepDucked = false;
-		else
-			Lara.keepDucked = true;
-
+		Lara.keepDucked = TestLaraStandUp(coll);
 		ShiftItem(item, coll);
 
 		if (coll->middle.Floor != NO_HEIGHT)

@@ -216,6 +216,11 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+bool TestLaraStandUp(COLL_INFO* coll)
+{
+	return (coll->middle.Ceiling >= -362 || coll->boundsAbove < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
+}
+
 int TestWall(ITEM_INFO* item, int front, int right, int down)
 {
 	int x = item->pos.xPos;
