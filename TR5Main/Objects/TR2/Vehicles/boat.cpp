@@ -214,13 +214,13 @@ bool SpeedBoatCanGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if ((collResult.FloorHeight - v->pos.yPos) < -(WALL_SIZE / 2))
+	if ((collResult.Position.Floor - v->pos.yPos) < -(WALL_SIZE / 2))
 		return false;
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
+	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - v->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;

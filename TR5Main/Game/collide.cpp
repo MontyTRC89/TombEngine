@@ -1240,8 +1240,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Block = floor;
 
 	// Floor and ceiling heights are directly borrowed from new floordata.
-	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
-	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Floor = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	// Probe bottom block through portals.
 	// TODO: Check if it is really needed, as GetFloor should take care of it itself?
@@ -1287,7 +1287,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			case NOCOLC1B:
 			case NOCOLC2T:
 			case NOCOLC2B:
-				result.SplitCeiling = type & DATA_TYPE;
+				result.Position.SplitCeiling = type & DATA_TYPE;
 				data++;
 				break;
 
@@ -1296,9 +1296,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				result.TiltX = xOff = *(char*)data;
 
 				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.HeightType = BIG_SLOPE;
+					result.Position.Type = BIG_SLOPE;
 				else
-					result.HeightType = SMALL_SLOPE;
+					result.Position.Type = SMALL_SLOPE;
 
 				data++;
 				break;
@@ -1336,8 +1336,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				dx = x & 1023;
 				dz = z & 1023;
 
-				result.HeightType = SPLIT_TRI;
-				result.SplitFloor = (type & DATA_TYPE);
+				result.Position.Type = SPLIT_TRI;
+				result.Position.SplitFloor = (type & DATA_TYPE);
 
 				if ((type & DATA_TYPE) == SPLIT1 ||
 					(type & DATA_TYPE) == NOCOLF1T ||
@@ -1372,9 +1372,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				result.TiltX = xOff;
 
 				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.HeightType = DIAGONAL;
-				else if (result.HeightType != SPLIT_TRI)
-					result.HeightType = SMALL_SLOPE;
+					result.Position.Type = DIAGONAL;
+				else if (result.Position.Type != SPLIT_TRI)
+					result.Position.Type = SMALL_SLOPE;
 
 				data++;
 				break;
@@ -1432,9 +1432,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->Middle.Ceiling = ceiling;
 	coll->Middle.Floor = height;
-	coll->Middle.Type = collResult.HeightType;
-	coll->Middle.SplitFloor = collResult.SplitFloor;
-	coll->Middle.SplitCeiling = collResult.SplitCeiling;
+	coll->Middle.Type = collResult.Position.Type;
+	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
+	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1511,9 +1511,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
-	coll->Front.Type = collResult.HeightType;
-	coll->Front.SplitFloor = collResult.SplitFloor;
-	coll->Front.SplitCeiling = collResult.SplitCeiling;
+	coll->Front.Type = collResult.Position.Type;
+	coll->Front.SplitFloor = collResult.Position.SplitFloor;
+	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
@@ -1560,9 +1560,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
-	coll->MiddleLeft.Type = collResult.HeightType;
-	coll->MiddleLeft.SplitFloor = collResult.SplitFloor;
-	coll->MiddleLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleLeft.Type = collResult.Position.Type;
+	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -1585,9 +1585,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
-	coll->FrontLeft.Type = collResult.HeightType;
-	coll->FrontLeft.SplitFloor = collResult.SplitFloor;
-	coll->FrontLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontLeft.Type = collResult.Position.Type;
+	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -1613,9 +1613,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
-	coll->MiddleRight.Type = collResult.HeightType;
-	coll->MiddleRight.SplitFloor = collResult.SplitFloor;
-	coll->MiddleRight.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleRight.Type = collResult.Position.Type;
+	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -1638,9 +1638,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
-	coll->FrontRight.Type = collResult.HeightType;
-	coll->FrontRight.SplitFloor = collResult.SplitFloor;
-	coll->FrontRight.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontRight.Type = collResult.Position.Type;
+	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;
@@ -1854,18 +1854,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
 	auto topRoomNumber = collResult.RoomNumber;
 
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	int ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
 	coll->Middle.Ceiling = ceiling;
-	coll->Middle.Floor = collResult.FloorHeight;
-	coll->Middle.Type = collResult.HeightType;
-	coll->Middle.SplitFloor = collResult.SplitFloor;
-	coll->Middle.SplitCeiling = collResult.SplitCeiling;
+	coll->Middle.Floor = collResult.Position.Floor;
+	coll->Middle.Type = collResult.Position.Type;
+	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
+	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1925,27 +1925,27 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		topRoomNumber = roomNumber;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
 	coll->Front.Ceiling = ceiling;
-	coll->Front.Floor = collResult.FloorHeight;
-	coll->Front.Type = collResult.HeightType;
-	coll->Front.SplitFloor = collResult.SplitFloor;
-	coll->Front.SplitCeiling = collResult.SplitCeiling;
+	coll->Front.Floor = collResult.Position.Floor;
+	coll->Front.Type = collResult.Position.Type;
+	coll->Front.SplitFloor = collResult.Position.SplitFloor;
+	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	if ((coll->Setup.SlopesAreWalls)
 		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
 		&& (coll->Front.Floor < coll->Middle.Floor)
-		&& (collResult.FloorHeight < coll->Front.Floor)
+		&& (collResult.Position.Floor < coll->Front.Floor)
 		&& (coll->Front.Floor < 0))
 	{
 		coll->Front.Floor = MAX_HEIGHT;
@@ -1967,18 +1967,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	z = zPos + zleft;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, roomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->MiddleLeft.Floor = collResult.FloorHeight;
+	coll->MiddleLeft.Floor = collResult.Position.Floor;
 	coll->MiddleLeft.Ceiling = ceiling;
-	coll->MiddleLeft.Type = collResult.HeightType;
-	coll->MiddleLeft.SplitFloor = collResult.SplitFloor;
-	coll->MiddleLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleLeft.Type = collResult.Position.Type;
+	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -1988,18 +1988,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->MiddleLeft.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->FrontLeft.Floor = collResult.FloorHeight;
+	coll->FrontLeft.Floor = collResult.Position.Floor;
 	coll->FrontLeft.Ceiling = ceiling;
-	coll->FrontLeft.Type = collResult.HeightType;
-	coll->FrontLeft.SplitFloor = collResult.SplitFloor;
-	coll->FrontLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontLeft.Type = collResult.Position.Type;
+	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -2012,18 +2012,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	z = zPos + zright;
 
 	collResult = GetCollisionResult(x, yTop, z, roomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->MiddleRight.Floor = collResult.FloorHeight;
+	coll->MiddleRight.Floor = collResult.Position.Floor;
 	coll->MiddleRight.Ceiling = ceiling;
-	coll->MiddleRight.Type = collResult.HeightType;
-	coll->MiddleRight.SplitFloor = collResult.SplitFloor;
-	coll->MiddleRight.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleRight.Type = collResult.Position.Type;
+	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -2033,18 +2033,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->MiddleRight.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->FrontRight.Floor = collResult.FloorHeight;
+	coll->FrontRight.Floor = collResult.Position.Floor;
 	coll->FrontRight.Ceiling = ceiling;
-	coll->FrontRight.Type = collResult.HeightType;
-	coll->FrontRight.SplitFloor = collResult.SplitFloor;
-	coll->FrontRight.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontRight.Type = collResult.Position.Type;
+	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;
@@ -2237,11 +2237,11 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto oldCollResult = GetCollisionResult(x, y, z, item->roomNumber);
 	auto collResult = GetCollisionResult(item);
 
-	if (item->pos.yPos >= collResult.FloorHeight)
+	if (item->pos.yPos >= collResult.Position.Floor)
 	{
 		bs = 0;
 
-		if ((collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) && oldCollResult.FloorHeight < collResult.FloorHeight)
+		if ((collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) && oldCollResult.Position.Floor < collResult.Position.Floor)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
 			if (collResult.TiltX < 0)
@@ -2269,7 +2269,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
 
-		if (y > (collResult.FloorHeight + 32) && bs == 0 &&
+		if (y > (collResult.Position.Floor + 32) && bs == 0 &&
 			(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 			((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 		{
@@ -2305,7 +2305,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->pos.yPos = y;
 			item->pos.zPos = z;
 		}
-		else if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) 	// Hit a steep slope?
+		else if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) 	// Hit a steep slope?
 		{
 			// Need to know which direction the slope is.
 
@@ -2616,7 +2616,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->speed = 0;
 				}
 			}
-			item->pos.yPos = collResult.FloorHeight;
+			item->pos.yPos = collResult.Position.Floor;
 		}
 	}
 	else	// Check for on top of object.
@@ -2632,7 +2632,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			// was always set to 0 by GetHeight() function which was called before the check.
 			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
 
-			if (item->pos.yPos >= oldCollResult.FloorHeight) 
+			if (item->pos.yPos >= oldCollResult.Position.Floor) 
 			{
 				/* Hit the floor; bounce and slow down */
 				if (item->fallspeed > 0)
@@ -2665,7 +2665,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 							item->speed = 0;
 					}
 				}
-				item->pos.yPos = oldCollResult.FloorHeight;
+				item->pos.yPos = oldCollResult.Position.Floor;
 			}
 		}
 		//		else
@@ -2673,9 +2673,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			/* Bounce off ceiling */
 			collResult = GetCollisionResult(item);
 
-			if (item->pos.yPos < collResult.CeilingHeight)
+			if (item->pos.yPos < collResult.Position.Ceiling)
 			{
-				if (y < collResult.CeilingHeight &&
+				if (y < collResult.Position.Ceiling &&
 					(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 					((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 				{
@@ -2704,7 +2704,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					item->pos.zPos = z;
 				}
 				else
-					item->pos.yPos = collResult.CeilingHeight;
+					item->pos.yPos = collResult.Position.Ceiling;
 
 				if (item->fallspeed < 0)
 					item->fallspeed = -item->fallspeed;

@@ -22,30 +22,35 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
-struct COLL_RESULT
+enum HEIGHT_TYPE
 {
-	FLOOR_INFO* Block;
-	FLOOR_INFO* BottomBlock;
-	int RoomNumber;
-
-	int FloorHeight;
-	int HeightType;
-
-	int TiltX;
-	int TiltZ;
-	int SplitFloor;
-
-	int CeilingHeight;
-	int SplitCeiling;
+	WALL,
+	SMALL_SLOPE,
+	BIG_SLOPE,
+	DIAGONAL,
+	SPLIT_TRI
 };
 
 struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
-	int Type;
 	int SplitFloor;
 	int SplitCeiling;
+	HEIGHT_TYPE Type;
+};
+
+struct COLL_RESULT
+{
+	int RoomNumber;
+
+	FLOOR_INFO* Block;
+	FLOOR_INFO* BottomBlock;
+
+	COLL_POSITION Position;
+
+	int TiltX;
+	int TiltZ;
 };
 
 struct COLL_SETUP
@@ -70,7 +75,7 @@ struct COLL_SETUP
 
 struct COLL_INFO
 {
-	COLL_SETUP    Setup;     // In parameters
+	COLL_SETUP    Setup;    // In parameters
 
 	COLL_POSITION Middle;       
 	COLL_POSITION MiddleLeft;   
