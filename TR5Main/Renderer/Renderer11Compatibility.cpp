@@ -190,7 +190,7 @@ namespace TEN::Renderer
 			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size());
 		}
 
-		m_skyTexture = Texture2D(m_device.Get(), g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
+		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), g_Level.SkyTexture.colorMapData.size());
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
