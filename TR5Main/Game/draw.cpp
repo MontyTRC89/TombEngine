@@ -4,7 +4,9 @@
 #include "camera.h"
 #include "level.h"
 #include "Renderer11.h"
+
 using TEN::Renderer::g_Renderer;
+
 BITE_INFO EnemyBites[9] =
 {
 	{ 20, -95, 240, 13 },
@@ -18,12 +20,6 @@ BITE_INFO EnemyBites[9] =
 	{ 10, -60, 200, 13 }
 };
 
-int LightningCount;
-int LightningRand;
-int StormTimer;
-int dLightningRand;
-byte SkyStormColor[3];
-byte SkyStormColor2[3];
 BOUNDING_BOX InterpolatedBounds;
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
@@ -34,35 +30,6 @@ int DrawPhaseGame()
 	g_Renderer.Draw();
 	Camera.numberFrames = g_Renderer.SyncRenderer();
 	return Camera.numberFrames;
-}
-
-void UpdateStorm()
-{
-	if (LightningCount <= 0)
-	{
-		if (LightningRand < 4)
-			LightningRand = 0;
-		else
-			LightningRand = LightningRand - (LightningRand >> 2);
-	}
-	else if (--LightningCount)
-	{
-		dLightningRand = rand() & 0x1FF;
-		LightningRand = ((dLightningRand - LightningRand) >> 1) + LightningRand;
-	}
-	else
-	{
-		dLightningRand = 0;
-		LightningRand = (rand() & 0x7F) + 400;
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		SkyStormColor2[i] += LightningRand * SkyStormColor2[i] >> 8;
-		SkyStormColor[i] = SkyStormColor2[i];
-		if (SkyStormColor[i] > 255)
-			SkyStormColor[i] = 255;
-	}
 }
 
 BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)
