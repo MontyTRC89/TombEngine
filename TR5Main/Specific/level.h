@@ -129,7 +129,7 @@ struct LEVEL
 	std::vector<TEXTURE> StaticsTextures;
 	std::vector<TEXTURE> AnimatedTextures;
 	std::vector<TEXTURE> SpritesTextures;
-	TEXTURE MiscTextures;
+	TEXTURE SkyTexture;
 	std::vector<ROOM_INFO> Rooms;
 	std::vector<short> FloorData;
 	std::vector<MESH> Meshes;
