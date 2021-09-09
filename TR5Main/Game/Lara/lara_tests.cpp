@@ -1145,7 +1145,7 @@ bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
 {
-	return LaraCollisionFront(item, ang, dist).FloorHeight;
+	return LaraCollisionFront(item, ang, dist).Position.Floor;
 }
 
 COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
@@ -1156,15 +1156,15 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= item->pos.yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= item->pos.yPos;
 
 	return collResult;
 }
 
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
 {
-	return LaraCeilingCollisionFront(item, ang, dist, h).CeilingHeight;
+	return LaraCeilingCollisionFront(item, ang, dist, h).Position.Ceiling;
 }
 
 COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h)
@@ -1175,8 +1175,8 @@ COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int 
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.CeilingHeight != NO_HEIGHT)
-		collResult.CeilingHeight += h - item->pos.yPos;
+	if (collResult.Position.Ceiling != NO_HEIGHT)
+		collResult.Position.Ceiling += h - item->pos.yPos;
 
 	return collResult;
 }

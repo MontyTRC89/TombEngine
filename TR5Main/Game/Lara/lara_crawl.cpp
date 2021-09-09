@@ -395,7 +395,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 					if (TrInput & IN_FORWARD)
 					{
 						auto collResult = LaraCollisionFront(item, item->pos.yRot, 256);
-						if (abs(collResult.FloorHeight < 127 && collResult.HeightType != BIG_SLOPE))
+						if (abs(collResult.Position.Floor < 127 && collResult.Position.Type != BIG_SLOPE))
 							item->goalAnimState = LS_CRAWL_FORWARD;
 					}
 					else if (TrInput & IN_BACK)
@@ -426,9 +426,9 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 							}
 
 							auto collResult = LaraCollisionFront(item, item->pos.yRot, -300);
-							height = collResult.FloorHeight;
+							height = collResult.Position.Floor;
 
-							if (abs(height) >= 255 || collResult.HeightType == BIG_SLOPE)
+							if (abs(height) >= 255 || collResult.Position.Type == BIG_SLOPE)
 							{
 								if (TrInput & IN_ACTION)
 								{

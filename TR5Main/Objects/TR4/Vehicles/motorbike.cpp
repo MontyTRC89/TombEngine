@@ -972,13 +972,13 @@ static BOOL MotorbikeCanGetOff(void)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-    if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
+    if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL || collResult.Position.Floor == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
         return false;
-    if (abs(collResult.FloorHeight - item->pos.yPos) > STEP_SIZE)
+    if (abs(collResult.Position.Floor - item->pos.yPos) > STEP_SIZE)
         return false;
-    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HEIGHT)
+    if ((collResult.Position.Ceiling - item->pos.yPos) > -LARA_HEIGHT)
         return false;
-    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HEIGHT)
+    if ((collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
         return false;
 
     return true;
