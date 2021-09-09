@@ -1,6 +1,6 @@
 #pragma once
 #include "objectslist.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
@@ -985,7 +985,15 @@ struct AnimsNew
 	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
 	bool FeetHanging;				//Daniel's super awesome feet hanging
 };
-
+#ifdef NEW_TIGHTROPE
+struct LaraTightrope
+{
+	float balance;
+	unsigned short timeOnTightrope;
+	bool canGoOff;
+	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
+};
+#endif
 struct LaraInfo
 {
 	short itemNumber;
@@ -1059,7 +1067,7 @@ struct LaraInfo
 	unsigned short ropeFrameRate;
 	unsigned short ropeY;
 	int ropePtr;
-	void* generalPtr;
+	short interactedItem;
 	int ropeOffset;
 	int ropeDownVel;
 	byte ropeFlag;
@@ -1070,9 +1078,13 @@ struct LaraInfo
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
+#if NEW_TIGHTROPE
+	LaraTightrope tightrope;
+#else
 	byte tightRopeOnCount;
 	byte tightRopeOff;
 	byte tightRopeFall;
+#endif
 	/// =================================== NEW:
 	byte BeetleLife;
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2

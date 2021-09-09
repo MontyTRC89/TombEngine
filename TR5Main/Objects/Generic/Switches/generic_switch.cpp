@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 			&& item->status == ITEM_NOT_ACTIVE
 			&& !(item->flags & 0x100)
 			&& item->triggerFlags >= 0
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
@@ -213,10 +213,10 @@ namespace TEN::Entities::Switches
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 			}
-			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;

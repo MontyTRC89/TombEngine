@@ -1,14 +1,13 @@
 #include "framework.h"
 #include "tr3_shiva.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "box.h"
-#include "effect2.h"
 #include "sphere.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };

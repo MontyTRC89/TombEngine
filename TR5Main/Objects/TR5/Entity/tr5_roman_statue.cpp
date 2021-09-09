@@ -2,18 +2,17 @@
 #include "tr5_roman_statue.h"
 #include "sphere.h"
 #include "items.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\tomb4fx.h"
+#include "effects\effects.h"
 #include "box.h"
 #include "people.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "draw.h"
 #include "control.h"
-#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
@@ -617,7 +616,7 @@ void RomanStatueControl(short itemNumber)
 								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 
-								mesh->flags &= ~1;
+								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->stopper = false;
 
 								TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);

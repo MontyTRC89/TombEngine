@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "footprint.h"
 #include "control.h"
 #include "lara.h"
 #include "draw.h"
-#include "groundfx.h"
+#include "effects\groundfx.h"
+#include "effects\footprint.h"
 #include "level.h"
 #include "items.h"
 namespace TEN {

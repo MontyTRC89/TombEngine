@@ -2,12 +2,12 @@
 #include "tr4_bat.h"
 #include "box.h"
 #include "control.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "misc.h"
 #include "lara.h"
 #include "lot.h"
 #include "setup.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "creature_info.h"
 
 namespace TEN::Entities::TR4

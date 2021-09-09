@@ -2,7 +2,7 @@
 #include "tr3_monkey.h"
 #include "box.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"

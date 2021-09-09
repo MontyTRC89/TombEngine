@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 #include "draw.h"
-#include "hair.h"
+#include "effects\hair.h"
 #include "lara.h"
 #include "control.h"
 #include "spotcam.h"

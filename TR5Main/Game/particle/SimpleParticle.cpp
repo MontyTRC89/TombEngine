@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "SimpleParticle.h"
 #include "items.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include <Specific\setup.h>
-#include "prng.h"
+#include "Specific\prng.h"
 using namespace TEN::Math::Random;
 
 namespace TEN::Effects{

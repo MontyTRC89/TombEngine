@@ -3,19 +3,19 @@
 #include <items.h>
 #include <level.h>
 #include <Box.h>
-#include <trmath.h>
+#include <Specific\trmath.h>
 #include <control.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
 #include <lot.h>
-#include <tomb4fx.h>
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include "creature_info.h"
 #include "setup.h"
 #include "control/trigger.h"
+
 ITEM_INFO jeepDummyTarget;
+
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
 	short grenadeItemNumber = CreateItem();

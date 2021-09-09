@@ -3,22 +3,22 @@
 #include "lara.h"
 #include "items.h"
 #include "collide.h"
-#include "effect2.h"
 #include "lara_fire.h"
 #include "lara_one_gun.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_flare.h"
 #include "lot.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
-#include <Game\particle\SimpleParticle.h>
-#include "prng.h"
+#include "Sound\sound.h"
+#include "particle\SimpleParticle.h"
+#include "Specific\prng.h"
 #include "camera.h"
 #include "skidoo_info.h"
+
 using std::vector;
 using namespace TEN::Math::Random;
 

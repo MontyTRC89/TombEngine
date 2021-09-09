@@ -2,7 +2,7 @@
 #include "items.h"
 #include "room.h"
 #include "LuaHandler.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include <unordered_set>
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"

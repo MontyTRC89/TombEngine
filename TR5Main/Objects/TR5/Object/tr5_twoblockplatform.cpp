@@ -4,8 +4,9 @@
 #include "control.h"
 #include "items.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "collide.h"
+
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

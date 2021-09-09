@@ -4,11 +4,11 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 
 void InitialiseObelisk(short itemNumber)
 {

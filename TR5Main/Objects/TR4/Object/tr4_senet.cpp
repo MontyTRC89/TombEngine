@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr4_senet.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 #include "control.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
@@ -416,7 +416,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[item_num];
 
 	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_STOP && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS &&
-		!item->active || Lara.isMoving && Lara.generalPtr == (void*)item_num)
+		!item->active || Lara.isMoving && Lara.interactedItem == item_num)
 	{
 		laraitem->pos.yRot ^= 0x8000;
 
@@ -438,7 +438,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 				return;
 			}
 
-			Lara.generalPtr = (void*)item_num;
+			Lara.interactedItem = item_num;
 		}
 
 		laraitem->pos.yRot ^= 0x8000;

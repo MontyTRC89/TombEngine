@@ -1,7 +1,6 @@
 #include "framework.h"
-#include "flmtorch.h"
-
-#include "effect2.h"
+#include "effects\flmtorch.h"
+#include "effects\effects.h"
 #include "lara_flare.h"
 #include "lara.h"
 #include "lara_fire.h"
@@ -10,7 +9,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "snowmobile.h"
 
 extern OBJECT_COLLISION_BOUNDS FireBounds;
@@ -234,15 +233,9 @@ void TorchControl(short itemNumber)
 		}
 		else
 		{
-			STATIC_INFO* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
-			PHD_3DPOS pos;
-			pos.xPos = CollidedMeshes[0]->x;
-			pos.yPos = CollidedMeshes[0]->y;
-			pos.zPos = CollidedMeshes[0]->z;
-			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushStatic(item, &sobj->collisionBox, &pos, &lara_coll);
+			ItemPushStatic(item, CollidedMeshes[0], &lara_coll);
 		}
-		item->speed /= 2;
+		item->speed >>= 1;
 	}
 	if (item->itemFlags[3])
 	{
@@ -315,18 +308,18 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy / 256) + LA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
 			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
-			Lara.generalPtr = (void*)itemNumber;
+			Lara.interactedItem = itemNumber;
 		}
 		
 		item->pos.yRot = rot;
 	}
-	if ((short)Lara.generalPtr == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
+	if (Lara.interactedItem == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
 	{
 		if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 		{

@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
-#include "bubble.h"
-#include "trmath.h"
+#include "Sound\sound.h"
+#include "effects\bubble.h"
+#include "Specific\trmath.h"
 #include "GameFlowScript.h"
 #include "smoke.h"
 #include "drip.h"
@@ -281,11 +281,11 @@ void UpdateFireSparks()
 
 			if (spark->sLife - spark->life < spark->colFadeSpeed)
 			{
-				int dl = ((spark->sLife - spark->life) * 65536) / spark->colFadeSpeed;
+				int dl = ((spark->sLife - spark->life) << 16) / spark->colFadeSpeed;
 
-				spark->r = (spark->sR + (dl * (spark->dR - spark->sR)) / 65536);
-				spark->g = (spark->sG + (dl * (spark->dG - spark->sG)) / 65536);
-				spark->b = (spark->sB + (dl * (spark->dB - spark->sB)) / 65536);
+				spark->r = spark->sR + (dl * (spark->dR - spark->sR) >> 16);
+				spark->g = spark->sG + (dl * (spark->dG - spark->sG) >> 16);
+				spark->b = spark->sB + (dl * (spark->dB - spark->sB) >> 16);
 			}
 			else if (spark->life >= spark->fadeToBlack)
 			{
@@ -295,11 +295,11 @@ void UpdateFireSparks()
 			}
 			else
 			{
-				int dl = ((spark->life - spark->fadeToBlack) * 65536) / spark->fadeToBlack + 0x10000;
+				int dl = ((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000;
 
-				spark->r = (dl * spark->dR) / 65536;
-				spark->g = (dl * spark->dG) / 65536;
-				spark->b = (dl * spark->dB) / 65536;
+				spark->r = dl * spark->dR >> 16;
+				spark->g = dl * spark->dG >> 16;
+				spark->b = dl * spark->dB >> 16;
 
 				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
 				{
@@ -314,13 +314,13 @@ void UpdateFireSparks()
 			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
 			spark->def = sprite;
 
-			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
+			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 			spark->yVel += spark->gravity;
 			if (spark->maxYvel)
 			{
-				if ((spark->yVel < 0 && spark->yVel < (spark->maxYvel * 32)) ||
-					(spark->yVel > 0 && spark->yVel > (spark->maxYvel * 32)))
-					spark->yVel = spark->maxYvel * 32;
+				if ((spark->yVel < 0 && spark->yVel < (spark->maxYvel << 5)) ||
+					(spark->yVel > 0 && spark->yVel > (spark->maxYvel << 5)))
+					spark->yVel = spark->maxYvel << 5;
 			}
 
 			if (spark->friction)
@@ -413,7 +413,7 @@ void UpdateSmoke()
 				}
 				else
 				{
-					spark->shade = (spark->dShade * (((spark->life - spark->fadeToBlack) * 65536) / spark->fadeToBlack + 0x10000)) / 65536;
+					spark->shade = spark->dShade * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000) >> 16;
 					if (spark->shade < 8)
 					{
 						spark->on = false;
@@ -423,7 +423,7 @@ void UpdateSmoke()
 			}
 			else
 			{
-				spark->shade = (spark->sShade + ((spark->dShade - spark->sShade) * (((spark->sLife - spark->life) * 65536) / spark->colFadeSpeed)) / 65536);
+				spark->shade = spark->sShade + ((spark->dShade - spark->sShade) * (((spark->sLife - spark->life) << 16) / spark->colFadeSpeed) >> 16);
 			}
 
 			if (spark->shade >= 24)
@@ -441,7 +441,7 @@ void UpdateSmoke()
 			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
 
-			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
+			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
 			spark->yVel += spark->gravity;
 			
@@ -471,20 +471,20 @@ void UpdateSmoke()
 
 			if (spark->friction & 0xF0)
 			{
-				spark->yVel -= spark->yVel >> (spark->friction / 16);
+				spark->yVel -= spark->yVel >> (spark->friction >> 4);
 			}
 
-			spark->x += spark->xVel / 32;
-			spark->y += spark->yVel / 32;
-			spark->z += spark->zVel / 32;
+			spark->x += spark->xVel >> 5;
+			spark->y += spark->yVel >> 5;
+			spark->z += spark->zVel >> 5;
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += SmokeWindX / 2;
-				spark->z += SmokeWindZ / 2;
+				spark->x += SmokeWindX >> 1;
+				spark->z += SmokeWindZ >> 1;
 			}
 
-			spark->size = spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536);
+			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
 		}
 	}
 }
@@ -638,8 +638,8 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->gravity = -4 - (GetRandomControl() & 3);
 	spark->maxYvel = -4 - (GetRandomControl() & 3);
 	spark->dSize = (GetRandomControl() & 0x3F) + 64;
-	spark->sSize = spark->dSize / 8;
-	spark->size = spark->dSize / 8;
+	spark->sSize = spark->dSize >> 3;
+	spark->size = spark->dSize >> 3;
 }
 
 int GetFreeBlood()
@@ -696,8 +696,8 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		blood->z = (GetRandomControl() & 0x1F) + z - 16;
 		int a = (unk == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
 		int b = GetRandomControl() & 0xF;
-		blood->zVel = b * phd_cos(a * 16) * 32;
-		blood->xVel = -b * phd_sin(a * 16) * 32;
+		blood->zVel = b * phd_cos(a << 4) * 32;
+		blood->xVel = -b * phd_sin(a << 4) * 32;
 		blood->friction = 4;
 		blood->yVel = -((GetRandomControl() & 0xFF) + 128);
 		blood->rotAng = GetRandomControl() & 0xFFF;
@@ -707,7 +707,7 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		blood->gravity = (GetRandomControl() & 0x1F) + 31;
 		int size = (GetRandomControl() & 7) + 8;
 		blood->sSize = blood->size = size;
-		blood->dSize = size / 4;
+		blood->dSize = size >> 2;
 	}
 }
 
@@ -735,7 +735,7 @@ void UpdateBlood()
 				}
 				else
 				{
-					blood->shade = (blood->dShade * (((blood->life - blood->fadeToBlack) * 65536) / blood->fadeToBlack + 0x10000)) / 65536;
+					blood->shade = blood->dShade * (((blood->life - blood->fadeToBlack) << 16) / blood->fadeToBlack + 0x10000) >> 16;
 					if (blood->shade < 8)
 					{
 						blood->on = false;
@@ -745,7 +745,7 @@ void UpdateBlood()
 			}
 			else
 			{
-				blood->shade = (blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) * 65536) / blood->colFadeSpeed)) / 65536);
+				blood->shade = blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) << 16) / blood->colFadeSpeed) >> 16);
 			}
 			
 			blood->rotAng = (blood->rotAng + blood->rotAdd) & 0xFFF;
@@ -757,13 +757,13 @@ void UpdateBlood()
 				blood->zVel -= blood->zVel >> (blood->friction & 0xF);
 			}
 
-			int dl = ((blood->sLife - blood->life) * 65536) / blood->sLife;
+			int dl = ((blood->sLife - blood->life) << 16) / blood->sLife;
 
-			blood->x += blood->xVel / 32;
-			blood->y += blood->yVel / 32;
-			blood->z += blood->zVel / 32;
+			blood->x += blood->xVel >> 5;
+			blood->y += blood->yVel >> 5;
+			blood->z += blood->zVel >> 5;
 
-			blood->size = blood->sSize + ((dl * (blood->dSize - blood->sSize)) / 65536);
+			blood->size = blood->sSize + (dl * (blood->dSize - blood->sSize) >> 16);
 		}
 	}
 }
@@ -944,20 +944,20 @@ void UpdateGunShells()
 				if (gs->fallspeed <= 8)
 				{
 					if (gs->fallspeed < 0)
-						gs->fallspeed /=  2;
+						gs->fallspeed >>= 1;
 				}
 				else
 				{
 					gs->fallspeed = 8;
 				}
-				gs->speed -= gs->speed / 2;
+				gs->speed -= gs->speed >> 1;
 			}
 			else
 			{
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.xRot += ((gs->speed + 7) / 2) * ANGLE(1);
+			gs->pos.xRot += (gs->speed >> 1 + 7) * ANGLE(1);
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
@@ -973,7 +973,7 @@ void UpdateGunShells()
 				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
 				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
 				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-				gs->fallspeed /= 32;
+				gs->fallspeed >>= 5;
 				continue;
 			}
 
@@ -1002,7 +1002,7 @@ void UpdateGunShells()
 				{
 					if (oldY <= height)
 					{
-						gs->fallspeed = -gs->fallspeed / 2;
+						gs->fallspeed = -gs->fallspeed >> 1;
 					}
 					else
 					{
@@ -1040,14 +1040,14 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->sLife = 24;
 		spark->transType = COLADD;	
 		int random = GetRandomControl() & 0xFFF;
-		spark->xVel = -phd_sin(random * 16) * 128;
+		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -640 - GetRandomControl();
-		spark->zVel = phd_cos(random * 16) * 128;
+		spark->zVel = phd_cos(random << 4) * 128;
 		spark->friction = 5;
 		spark->flags = SP_NONE;
-		spark->x = x + (spark->xVel / 8);
-		spark->y = y - (spark->yVel / 32);
-		spark->z = z + (spark->zVel / 8);
+		spark->x = x + (spark->xVel >> 3);
+		spark->y = y - (spark->yVel >> 5);
+		spark->z = z + (spark->zVel >> 3);
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}
@@ -1142,20 +1142,20 @@ void UpdateDrips()
 
 			if (drip->life < 16)
 			{
-				drip->r -= drip->r / 8;
-				drip->g -= drip->g / 8;
-				drip->b -= drip->b / 8;
+				drip->r -= drip->r >> 3;
+				drip->g -= drip->g >> 3;
+				drip->b -= drip->b >> 3;
 			}
 
 			drip->yVel += drip->gravity;
 			
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
 			{
-				drip->x += SmokeWindX / 2;
-				drip->z += SmokeWindZ / 2;
+				drip->x += SmokeWindX >> 1;
+				drip->z += SmokeWindZ >> 1;
 			}
 
-			drip->y += drip->yVel / 32;
+			drip->y += drip->yVel >> 5;
 			
 			FLOOR_INFO* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
@@ -1278,7 +1278,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		g_Renderer.getBoneMatrix(itemNumber, i, &boneMatrix);
 		boneMatrix = world * boneMatrix;
 
-		bit *= 2;
+		bit <<= 1;
 		if ((bit & meshBits) && (bit & item->meshBits))
 		{
 			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
@@ -1434,7 +1434,7 @@ void UpdateShockwaves()
 			if (sw->life)
 			{
 				sw->outerRad += sw->speed;
-				sw->speed -= (sw->speed / 16);
+				sw->speed -= (sw->speed >> 4);
 
 				if (LaraItem->hitPoints > 0)
 				{
@@ -1462,7 +1462,7 @@ void UpdateShockwaves()
 								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
-							LaraItem->hitPoints -= sw->speed >> (((sw->flags / 2) & 1) + 2);
+							LaraItem->hitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
 						}
 					}
 				}
@@ -1504,8 +1504,8 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
 		spark->maxYvel = 0;
 		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size / 2;
-		spark->size = size / 2;
+		spark->sSize = size >> 1;
+		spark->size = size >> 1;
 		spark->dSize = 2 * size;
 
 		for (int i = 0; i < 8; i++)
@@ -1642,8 +1642,8 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	spark->dR = GetRandomControl() | 0xC0;
 	spark->colFadeSpeed = 16;
 	spark->g = 8;
-	spark->dG = spark->sR / 2;
-	spark->dB = spark->sR / 4;
+	spark->dG = spark->sR >> 1;
+	spark->dB = spark->sR >> 2;
 
 	spark->life = (GetRandomControl() & 7) + 24;
 	spark->sLife = (GetRandomControl() & 7) + 24;
@@ -1654,9 +1654,9 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	spark->y = y;
 	spark->z = z;
 
-	spark->xVel = ((GetRandomControl() & 0xFF) - 128) * 4;
-	spark->yVel = (GetRandomControl() & 0xF) - ((kill * 32) + 8) + (crane * 16);
-	spark->zVel = ((GetRandomControl() & 0xFF) - 128) * 4;
+	spark->xVel = ((GetRandomControl() & 0xFF) - 128) << 2;
+	spark->yVel = (GetRandomControl() & 0xF) - ((kill << 5) + 8) + (crane << 4);
+	spark->zVel = ((GetRandomControl() & 0xFF) - 128) << 2;
 
 	if (crane != 0)
 	{
@@ -1668,7 +1668,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	}
 
 	spark->flags = SP_NONE;
-	spark->gravity = (GetRandomControl() & 0xF) + ((crane * 16) + 16);
+	spark->gravity = (GetRandomControl() & 0xF) + ((crane << 4) + 16);
 	spark->maxYvel = 0;
 }
 
@@ -1708,9 +1708,9 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->friction = 5;
 		sptr->flags = 0;
 
-		sptr->x = x + (sptr->xVel / 8);  
-		sptr->y = y - (sptr->yVel / 32);
-		sptr->z = z + (sptr->zVel / 8);
+		sptr->x = x + (sptr->xVel >> 3);
+		sptr->y = y - (sptr->yVel >> 5);
+		sptr->z = z + (sptr->zVel >> 3);
 
 		sptr->maxYvel = 0;
 		sptr->gravity = (GetRandomControl() & 0xF) + 64; 
@@ -1732,12 +1732,12 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 		return NULL;
 
 	arc->pos1 = *start;
-	arc->pos2.x = (end->x + 3 * start->x) / 4;
-	arc->pos2.y = (end->y + 3 * start->y) / 4;
-	arc->pos2.z = (end->z + 3 * start->z) / 4;
-	arc->pos3.x = (start->x + 3 * end->x) / 4;
-	arc->pos3.y = (start->y + 3 * end->y) / 4;
-	arc->pos3.z = (start->z + 3 * end->z) / 4;
+	arc->pos2.x = (end->x + 3 * start->x) >> 2;
+	arc->pos2.y = (end->y + 3 * start->y) >> 2;
+	arc->pos2.z = (end->z + 3 * start->z) >> 2;
+	arc->pos3.x = (start->x + 3 * end->x) >> 2;
+	arc->pos3.y = (start->y + 3 * end->y) >> 2;
+	arc->pos3.z = (start->z + 3 * end->z) >> 2;
 	arc->pos4 = *end;
 	arc->sLife = life;
 	arc->life = life;

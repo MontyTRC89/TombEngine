@@ -2,7 +2,7 @@
 #include "Renderer11.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
@@ -83,7 +83,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < numStatics; i++)
 		{
 			MESH_INFO *mesh = &r->mesh[i];
-			if (mesh->flags > 0)
+			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 			{
 				RendererStatic* newStatic = &room.Statics[i];
 				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];

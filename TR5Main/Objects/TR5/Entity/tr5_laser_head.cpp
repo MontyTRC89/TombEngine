@@ -2,20 +2,20 @@
 #include "tr5_laser_head.h"
 #include "sphere.h"
 #include "items.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\tomb4fx.h"
+#include "effects\effects.h"
 #include "box.h"
 #include "people.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "draw.h"
 #include "control.h"
-#include "effect2.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "tr5_laserhead_info.h"
+
 struct LASER_HEAD_STRUCT
 {
 	PHD_VECTOR target;

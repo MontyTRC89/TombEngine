@@ -5,10 +5,10 @@
 #include "control.h"
 #include "level.h"
 #include "room.h"
-#include "trmath.h"
-#include "effect2.h"
+#include "Specific\trmath.h"
+#include "effects\effects.h"
 #include "setup.h"
-#include "prng.h"
+#include "Specific\prng.h"
 using namespace TEN::Math::Random;
 namespace TEN {
 	namespace Effects {

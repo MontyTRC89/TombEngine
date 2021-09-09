@@ -7,12 +7,13 @@
 #include "lara_monkey.h"
 #include "input.h"
 #include "health.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "collide.h"
 #include "item.h"
 #include "camera.h"
+
 bool DoJump = false;
 
 /*generic functions*/
@@ -318,7 +319,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (TestWall(item, 256, 0, -640))
+			if (coll->hitTallBounds || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -1633,7 +1634,6 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = BAD_JUMP_CEILING;
-	coll->hitCeiling = false;
 	coll->facing = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
@@ -1747,8 +1747,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->collType == CT_CLAMP ||
 		coll->collType == CT_TOP ||
-		coll->collType == CT_TOP_FRONT ||
-		coll->hitCeiling)
+		coll->collType == CT_TOP_FRONT)
 		item->fallspeed = 1;
 
 	if (coll->collType == CT_NONE)
@@ -1962,14 +1961,14 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -(LARA_FAST_TURN / 2))
-				Lara.turnRate = -(LARA_FAST_TURN / 2);
+			if (Lara.turnRate < -(LARA_FAST_TURN >> 1))
+				Lara.turnRate = -(LARA_FAST_TURN >> 1);
 
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -LARA_LEAN_MAX / 2)
-					item->pos.zRot = -LARA_LEAN_MAX / 2;
+				if (item->pos.zRot < -(LARA_LEAN_MAX >> 1))
+					item->pos.zRot = -(LARA_LEAN_MAX >> 1);
 			}
 			else
 			{
@@ -1987,8 +1986,8 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot += LARA_LEAN_RATE;
-				if (item->pos.zRot > LARA_LEAN_MAX / 2)
-					item->pos.zRot = LARA_LEAN_MAX / 2;
+				if (item->pos.zRot > (LARA_LEAN_MAX >> 1))
+					item->pos.zRot = (LARA_LEAN_MAX >> 1);
 			}
 			else
 			{
@@ -2199,7 +2198,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (TestWall(item, 256, 0, -640))
+			if (coll->hitTallBounds || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))

@@ -1,14 +1,13 @@
 #include "framework.h"
 #include "tr2_sword_guardian.h"
 #include "box.h"
-#include "effect2.h"
 #include "lot.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 BITE_INFO swordBite = { 0, 37, 550, 15 };

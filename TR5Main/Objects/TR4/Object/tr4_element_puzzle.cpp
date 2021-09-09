@@ -2,12 +2,12 @@
 #include "tr4_element_puzzle.h"
 #include "level.h"
 #include "control.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
-#include <tomb4fx.h>
+#include <effects\effects.h>
+#include <effects\tomb4fx.h>
 #include <switch.h>
 #include <input.h>
 #include "generic_switch.h"

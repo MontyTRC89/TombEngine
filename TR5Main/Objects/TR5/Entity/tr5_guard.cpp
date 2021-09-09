@@ -3,14 +3,14 @@
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "draw.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 BITE_INFO SwatGun = { 80, 200, 13, 0 };

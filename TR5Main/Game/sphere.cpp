@@ -5,7 +5,7 @@
 #include "level.h"
 #include "setup.h"
 #include "Renderer11.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 using namespace TEN::Renderer;
 
@@ -133,8 +133,8 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 	{
 	case 0:
 		rot1 = *ptr++;
-		rotX = ((rot0 & 0x3ff0) / 16);
-		rotY = (((rot1 & 0xfc00) / 1024) | ((rot0 & 0xf) * 64) & 0x3ff);
+		rotX = ((rot0 & 0x3ff0) >> 4);
+		rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
 		rotZ = ((rot1) & 0x3ff);
 
 		*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
