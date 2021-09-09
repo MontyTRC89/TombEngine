@@ -124,7 +124,7 @@ COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
 int FindGridShift(int x, int z); 
 int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush);
 int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
