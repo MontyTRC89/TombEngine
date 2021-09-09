@@ -738,7 +738,7 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	return true;
 }
 
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush) // previously ItemPushLara
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -1447,8 +1447,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	case 0:
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = coll->Setup.Radius;
-		xleft = -(coll->Setup.Radius);
-		zleft = coll->Setup.Radius;
+		xleft  = -coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
 		xright = coll->Setup.Radius;
 		zright = coll->Setup.Radius;
 		break;
@@ -1456,32 +1456,32 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	case 1:
 		xfront = coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft = coll->Setup.Radius;
-		zleft = coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
 		xright = coll->Setup.Radius;
-		zright = -(coll->Setup.Radius);
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 2:
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
-		xleft = coll->Setup.Radius;
-		zleft = -(coll->Setup.Radius);
-		xright = -(coll->Setup.Radius);
-		zright = -(coll->Setup.Radius);
+		xleft  = coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 3:
 		xfront = -(coll->Setup.Radius);
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft = -(coll->Setup.Radius);
-		zleft = -(coll->Setup.Radius);
-		xright = -(coll->Setup.Radius);
+		xleft  = -coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
 		zright = coll->Setup.Radius;
 		break;
 
 	default:
-		xleft = zleft = 0;
+		xleft  = zleft  = 0;
 		xright = zright = 0;
 		xfront = zfront = 0;
 		break;
@@ -1878,8 +1878,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	case 0:
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = coll->Setup.Radius;
-		xleft = -(coll->Setup.Radius);
-		zleft = coll->Setup.Radius;
+		xleft  = -(coll->Setup.Radius);
+		zleft  = coll->Setup.Radius;
 		xright = coll->Setup.Radius;
 		zright = coll->Setup.Radius;
 		break;
@@ -1887,8 +1887,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	case 1:
 		xfront = coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft = coll->Setup.Radius;
-		zleft = coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
 		xright = coll->Setup.Radius;
 		zright = -(coll->Setup.Radius);
 		break;
@@ -1896,8 +1896,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	case 2:
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
-		xleft = coll->Setup.Radius;
-		zleft = -(coll->Setup.Radius);
+		xleft  = coll->Setup.Radius;
+		zleft  = -(coll->Setup.Radius);
 		xright = -(coll->Setup.Radius);
 		zright = -(coll->Setup.Radius);
 		break;
@@ -1905,14 +1905,14 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	case 3:
 		xfront = -(coll->Setup.Radius);
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft = -(coll->Setup.Radius);
-		zleft = -(coll->Setup.Radius);
+		xleft  = -(coll->Setup.Radius);
+		zleft  = -(coll->Setup.Radius);
 		xright = -(coll->Setup.Radius);
 		zright = coll->Setup.Radius;
 		break;
 
 	default:
-		xleft = zleft = 0;
+		xleft  = zleft  = 0;
 		xright = zright = 0;
 		xfront = zfront = 0;
 		break;
