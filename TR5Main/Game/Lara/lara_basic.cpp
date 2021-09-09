@@ -913,7 +913,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 384;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.Radius = 400;
+	coll->Setup.Radius = LARA_RAD_DEATH;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);

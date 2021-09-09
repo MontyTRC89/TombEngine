@@ -55,7 +55,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 
 		coll->Setup.SlopesAreWalls = false;
 		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = 100;
+		coll->Setup.Radius = LARA_RAD;
 
 		Lara.moveAngle = item->pos.yRot;
 
@@ -205,7 +205,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.EnableObjectPush = false;
 
 		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = 100;
+		coll->Setup.Radius = LARA_RAD;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
@@ -415,7 +415,7 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 
 		coll->Setup.ForwardAngle = item->pos.yRot;
-		coll->Setup.Radius = 100;
+		coll->Setup.Radius = LARA_RAD;
 		coll->Setup.SlopesAreWalls = true;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
@@ -439,7 +439,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = 100;
+	coll->Setup.Radius = LARA_RAD;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
@@ -475,7 +475,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = 100;
+	coll->Setup.Radius = LARA_RAD;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 

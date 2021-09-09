@@ -955,7 +955,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
 
-	coll->Setup.Radius = 300;
+	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1067,7 +1067,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 
-	coll->Setup.Radius = 100;
+	coll->Setup.Radius = LARA_RAD;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();

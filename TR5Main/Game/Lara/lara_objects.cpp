@@ -793,7 +793,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 
 		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = 100;
+		coll->Setup.Radius = LARA_RAD;
 		coll->Setup.SlopesAreWalls = true;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
@@ -889,7 +889,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = 100;
+	coll->Setup.Radius = LARA_RAD;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
