@@ -149,7 +149,7 @@ namespace TEN::Entities::Switches
 			}
 		}
 
-		if (coll->enableBaddiePush && TestBoundsCollide(item, l, coll->radius))
+		if (coll->Settings.EnableObjectPush && TestBoundsCollide(item, l, coll->Settings.Radius))
 		{
 			GlobalCollisionBounds.X1 = -512;
 			GlobalCollisionBounds.X2 = 512;

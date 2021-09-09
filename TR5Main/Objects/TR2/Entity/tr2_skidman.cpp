@@ -59,15 +59,15 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNum];
-	if (!TestBoundsCollide(item, laraitem, coll->radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Settings.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
 
-	if (coll->enableBaddiePush)
+	if (coll->Settings.EnableObjectPush)
 	{
 		if (item->speed > 0)
-			ItemPushItem(item, laraitem, coll, coll->enableSpaz, 0);
+			ItemPushItem(item, laraitem, coll, coll->Settings.EnableSpaz, 0);
 		else
 			ItemPushItem(item, laraitem, coll, 0, 0);
 	}
