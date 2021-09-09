@@ -821,18 +821,18 @@ void LaraControl(short itemNumber)
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 {
-	coll->Settings.OldPosition.x = item->pos.xPos;
-	coll->Settings.OldPosition.y = item->pos.yPos;
-	coll->Settings.OldPosition.z = item->pos.zPos;
-	coll->Settings.OldAnimState = item->currentAnimState;
-	coll->Settings.EnableObjectPush = true;
-	coll->Settings.EnableSpaz = true;
-	coll->Settings.SlopesAreWalls = false;
-	coll->Settings.SlopesArePits = false;
-	coll->Settings.DeathIsPit = false;
-	coll->Settings.OldAnimNumber = item->animNumber;
-	coll->Settings.OldFrameNumber = item->frameNumber;
-	coll->Settings.Radius = LARA_RAD;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = true;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
+	coll->Setup.Radius = LARA_RAD;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -940,22 +940,22 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Settings.BadHeightUp = 32512;
-	coll->Settings.BadHeightDown = -400;
-	coll->Settings.BadCeilingHeight = 400;
+	coll->Setup.BadHeightUp = 32512;
+	coll->Setup.BadHeightDown = -400;
+	coll->Setup.BadCeilingHeight = 400;
 
-	coll->Settings.OldPosition.x = item->pos.xPos;
-	coll->Settings.OldPosition.y = item->pos.yPos;
-	coll->Settings.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Settings.SlopesAreWalls = false;
-	coll->Settings.SlopesArePits = false;
-	coll->Settings.DeathIsPit = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
 
-	coll->Settings.EnableObjectPush = true;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = false;
 
-	coll->Settings.Radius = 300;
+	coll->Setup.Radius = 300;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1053,21 +1053,21 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetElevation = -ANGLE(22);
 
-	coll->Settings.BadHeightUp = 32512;
-	coll->Settings.BadHeightDown = -128;
-	coll->Settings.BadCeilingHeight = 100;
+	coll->Setup.BadHeightUp = 32512;
+	coll->Setup.BadHeightDown = -128;
+	coll->Setup.BadCeilingHeight = 100;
 
-	coll->Settings.OldPosition.x = item->pos.xPos;
-	coll->Settings.OldPosition.y = item->pos.yPos;
-	coll->Settings.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Settings.SlopesAreWalls = false;
-	coll->Settings.SlopesArePits = false;
-	coll->Settings.DeathIsPit = false;
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
-	coll->Settings.Radius = 100;
+	coll->Setup.Radius = 100;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();

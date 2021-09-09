@@ -2,9 +2,9 @@
 #include "Specific\phd_global.h"
 #include "level.h"
 
-// used by coll->Settings.BadHeightUp
+// used by coll->Setup.BadHeightUp
 #define NO_BAD_POS (-NO_HEIGHT)
-// used by coll->Settings.BadHeightDown
+// used by coll->Setup.BadHeightDown
 #define NO_BAD_NEG NO_HEIGHT
 
 #define MAX_COLLIDED_OBJECTS 1024
@@ -70,7 +70,7 @@ struct COLL_SETUP
 
 struct COLL_INFO
 {
-	COLL_SETUP    Settings;     // In parameters
+	COLL_SETUP    Setup;     // In parameters
 
 	COLL_POSITION Middle;       
 	COLL_POSITION MiddleLeft;   

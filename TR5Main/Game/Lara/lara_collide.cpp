@@ -84,8 +84,8 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(5.0f);
 		break;
 	case CT_CLAMP:
-		item->pos.xPos -= 400 * phd_sin(coll->Settings.ForwardAngle);
-		item->pos.zPos -= 400 * phd_cos(coll->Settings.ForwardAngle);
+		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
+		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
 
 		item->speed = 0;
 		coll->Middle.Floor = 0;
@@ -127,9 +127,9 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_TOP || coll->CollisionType == CT_CLAMP)
 	{
-		item->pos.xPos = coll->Settings.OldPosition.x;
-		item->pos.yPos = coll->Settings.OldPosition.y;
-		item->pos.zPos = coll->Settings.OldPosition.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 
 		item->goalAnimState = LS_STOP;
 		item->currentAnimState = LS_STOP;
@@ -148,15 +148,15 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	switch (coll->Settings.OldAnimState)
+	switch (coll->Setup.OldAnimState)
 	{
 	case LS_STOP:
 	case LS_TURN_RIGHT_SLOW:
 	case LS_TURN_LEFT_SLOW:
 	case LS_TURN_FAST:
-		item->currentAnimState = coll->Settings.OldAnimState;
-		item->animNumber = coll->Settings.OldAnimNumber;
-		item->frameNumber = coll->Settings.OldFrameNumber;
+		item->currentAnimState = coll->Setup.OldAnimState;
+		item->animNumber = coll->Setup.OldAnimNumber;
+		item->frameNumber = coll->Setup.OldFrameNumber;
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
@@ -185,17 +185,17 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
 			return;
 		case EAST:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
 			return;
 		case SOUTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
 			return;
 		case WEST:
 		default:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
 			return;
 		}
 	}
@@ -205,17 +205,17 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
 			return;
 		case EAST:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
 			return;
 		case SOUTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
 			return;
 		case WEST:
 		default:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
 			return;
 		}
 	}
@@ -225,17 +225,17 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFF90 | 0x720;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x720;
 			return;
 		case EAST:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFC70 | 0xE0;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0xE0;
 			return;
 		case SOUTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFC70 | 0xE0;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0xE0;
 			return;
 		case WEST:
 		default:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFF90 | 0x720;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x720;
 			return;
 		}
 	}
@@ -245,17 +245,17 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFC70 | 0xE0;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0xE0;
 			return;
 		case EAST:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFF90 | 0x720;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x720;
 			return;
 		case SOUTH:
-			item->pos.xPos = coll->Settings.OldPosition.x & 0xFFFFFF90 | 0x720;
+			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x720;
 			return;
 		case WEST:
 		default:
-			item->pos.zPos = coll->Settings.OldPosition.z & 0xFFFFFC70 | 0xE0;
+			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0xE0;
 			return;
 		}
 	}

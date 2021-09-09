@@ -15,7 +15,7 @@ void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->itemFlags[3]) // Check this
 	{
-		if (TestBoundsCollide(item, l, coll->Settings.Radius))
+		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{
 			int oldX = LaraItem->pos.xPos;
 			int oldY = LaraItem->pos.yPos;
@@ -43,7 +43,7 @@ void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						l->roomNumber);
 				}
 
-				if (!coll->Settings.EnableObjectPush)
+				if (!coll->Setup.EnableObjectPush)
 				{
 					LaraItem->pos.xPos += dx;
 					LaraItem->pos.yPos += dy;

@@ -613,7 +613,7 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	else
 		return 0;
 
-	if (!TestBoundsCollide(skidoo, LaraItem, coll->Settings.Radius))
+	if (!TestBoundsCollide(skidoo, LaraItem, coll->Setup.Radius))
 		return 0;
 
 	if (!TestCollision(skidoo, LaraItem))

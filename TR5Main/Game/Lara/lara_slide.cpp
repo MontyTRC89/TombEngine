@@ -60,11 +60,11 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Settings.BadHeightUp = NO_BAD_POS;
-	coll->Settings.BadHeightDown = -512;
-	coll->Settings.BadCeilingHeight = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -512;
+	coll->Setup.BadCeilingHeight = 0;
 
-	coll->Settings.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
@@ -136,8 +136,8 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 
 	case CT_CLAMP:
-		item->pos.zPos -= 400 * phd_cos(coll->Settings.ForwardAngle);
-		item->pos.xPos -= 400 * phd_sin(coll->Settings.ForwardAngle);
+		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
+		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
 
 		item->speed = 0;
 

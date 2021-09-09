@@ -68,7 +68,7 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	LaraItem->pos.zPos += Lara.currentZvel >> 8;
 	Lara.currentActive = 0;
 
-	coll->Settings.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Settings.OldPosition.z, LaraItem->pos.xPos - coll->Settings.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);
 
 	GetCollisionInfo(coll, LaraItem->pos.xPos, LaraItem->pos.yPos + 200, LaraItem->pos.zPos, LaraItem->roomNumber, 400);
 	
@@ -103,9 +103,9 @@ void LaraWaterCurrent(COLL_INFO* coll)
 
 	ShiftItem(LaraItem, coll);
 
-	coll->Settings.OldPosition.x = LaraItem->pos.xPos;
-	coll->Settings.OldPosition.y = LaraItem->pos.yPos;
-	coll->Settings.OldPosition.z = LaraItem->pos.zPos;
+	coll->Setup.OldPosition.x = LaraItem->pos.xPos;
+	coll->Setup.OldPosition.y = LaraItem->pos.yPos;
+	coll->Setup.OldPosition.z = LaraItem->pos.zPos;
 }
 
 int GetWaterDepth(int x, int y, int z, short roomNumber)
@@ -514,12 +514,12 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
 		Lara.moveAngle = item->pos.yRot + ANGLE(180);
-		coll->Settings.ForwardAngle = item->pos.yRot - ANGLE(180);
+		coll->Setup.ForwardAngle = item->pos.yRot - ANGLE(180);
 	}
 	else
 	{
 		Lara.moveAngle = item->pos.yRot;
-		coll->Settings.ForwardAngle = item->pos.yRot;
+		coll->Setup.ForwardAngle = item->pos.yRot;
 	}
 
 	short height = LARA_HEIGHT * phd_sin(item->pos.xRot);
@@ -528,7 +528,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
 		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
 	
-	coll->Settings.BadHeightDown = -64;
+	coll->Setup.BadHeightDown = -64;
 	
 	COLL_INFO c1;
 	COLL_INFO c2;
@@ -537,10 +537,10 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
 	
-	c1.Settings.ForwardAngle += ANGLE(45);
+	c1.Setup.ForwardAngle += ANGLE(45);
 	GetCollisionInfo(&c1, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
 	
-	c2.Settings.ForwardAngle -= ANGLE(45);
+	c2.Setup.ForwardAngle -= ANGLE(45);
 	GetCollisionInfo(&c2, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
 	
 	ShiftItem(item, coll);
@@ -623,9 +623,9 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 
 	case CT_CLAMP:
 		flag = 2;
-		item->pos.xPos = coll->Settings.OldPosition.x;
-		item->pos.yPos = coll->Settings.OldPosition.y;
-		item->pos.zPos = coll->Settings.OldPosition.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 		item->fallspeed = 0;
 		break;
 	}
@@ -673,9 +673,9 @@ void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 	if (wd == NO_HEIGHT)
 	{
 		item->fallspeed = 0;
-		item->pos.xPos = coll->Settings.OldPosition.x;
-		item->pos.yPos = coll->Settings.OldPosition.y;
-		item->pos.zPos = coll->Settings.OldPosition.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
 	else if (wd <= 512)
 	{

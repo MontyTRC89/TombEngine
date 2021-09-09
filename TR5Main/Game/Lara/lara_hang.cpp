@@ -21,8 +21,8 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -178,8 +178,8 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -191,7 +191,7 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->Settings.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
@@ -200,8 +200,8 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*collision: lara_col_hangright*/
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
@@ -213,7 +213,7 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 31*/
 	/*state code: lara_as_hangright*/
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->Settings.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
@@ -289,8 +289,8 @@ void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 }
@@ -424,8 +424,8 @@ void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 140*/
 	//collision: lara_col_hang_feet_shimmyr
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -438,7 +438,7 @@ void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 140*/
 	//state code: lara_as_hang_feet_shimmyr
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->Settings.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
@@ -447,8 +447,8 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 141*/
 	//collision: lara_col_hang_feet_shimmyl
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -460,7 +460,7 @@ void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 141*/
 	//state code: lara_as_hang_feet_shimmyl
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->Settings.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
