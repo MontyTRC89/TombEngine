@@ -11,18 +11,18 @@ short OldAngle = 1;
 /*tests and others*/
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
+	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
 		return 0;
 
 	short angle = ANGLE(0.0f);
-	if (coll->tiltX > 2)
+	if (coll->TiltX > 2)
 		angle = -ANGLE(90.0f);
-	else if (coll->tiltX < -2)
+	else if (coll->TiltX < -2)
 		angle = ANGLE(90.0f);
 
-	if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
+	if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
 		angle = ANGLE(180.0f);
-	else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
+	else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
 		angle = ANGLE(0.0f);
 
 	short delta = angle - item->pos.yRot;
@@ -60,24 +60,24 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -512;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -512;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{
 		LaraDeflectEdge(item, coll);
 
-		if (coll->middle.Floor <= 200)
+		if (coll->Middle.Floor <= 200)
 		{
 			TestLaraSlide(item, coll);
 
-			item->pos.yPos += coll->middle.Floor;
+			item->pos.yPos += coll->Middle.Floor;
 
-			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
+			if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
 			{
 				if (TrInput & IN_FORWARD && item->currentAnimState != LS_SLIDE_BACK)
 				{
@@ -119,7 +119,7 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ShiftItem(item, coll);
 
-	switch (coll->collType)
+	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
 		item->pos.yRot += ANGLE(5.0f);
@@ -136,12 +136,12 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 
 	case CT_CLAMP:
-		item->pos.zPos -= 400 * phd_cos(coll->facing);
-		item->pos.xPos -= 400 * phd_sin(coll->facing);
+		item->pos.zPos -= 400 * phd_cos(coll->Settings.ForwardAngle);
+		item->pos.xPos -= 400 * phd_sin(coll->Settings.ForwardAngle);
 
 		item->speed = 0;
 
-		coll->middle.Floor = 0;
+		coll->Middle.Floor = 0;
 
 		if (item->fallspeed <= 0)
 			item->fallspeed = 16;

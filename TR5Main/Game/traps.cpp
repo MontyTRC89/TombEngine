@@ -493,14 +493,14 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	short damage;
 
 	item = &g_Level.Items[itemNumber];
-	if (TestBoundsCollide(item, l, coll->radius))
+	if (TestBoundsCollide(item, l, coll->Settings.Radius))
 	{
 		x = l->pos.xPos;
 		y = l->pos.yPos;
 		z = l->pos.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
 		damage = item->fallspeed > 0 ? 96 : 0;
-		if (ItemPushItem(item, l, coll, coll->enableSpaz, 1))
+		if (ItemPushItem(item, l, coll, coll->Settings.EnableSpaz, 1))
 		{
 			if (test)
 				l->hitPoints = 0;
@@ -517,7 +517,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 						l->pos.zPos + (GetRandomControl() & 63) - 32, -1, 1);
 				}
 			}
-			if (!coll->enableBaddiePush || test)
+			if (!coll->Settings.EnableObjectPush || test)
 			{
 				l->pos.xPos += x;
 				l->pos.yPos += y;

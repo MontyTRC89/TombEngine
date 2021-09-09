@@ -131,17 +131,17 @@ void ElementPuzzleControl(short itemNumber)
     };
 }
 
-void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-    if (TestBoundsCollide(item, l, c->radius))
+    if (TestBoundsCollide(item, l, coll->Settings.Radius))
     {
         if (TestCollision(item, l))
         {
-            if (c->enableBaddiePush)
+            if (coll->Settings.EnableObjectPush)
             {
-                ItemPushItem(item, l, c, 0, 0);
+                ItemPushItem(item, l, coll, 0, 0);
             }
         }
     }

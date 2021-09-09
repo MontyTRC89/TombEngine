@@ -2,14 +2,25 @@
 #include "Specific\phd_global.h"
 #include "level.h"
 
-// used by coll->badPos
+// used by coll->Settings.BadHeightUp
 #define NO_BAD_POS (-NO_HEIGHT)
-// used by coll->badNeg
+// used by coll->Settings.BadHeightDown
 #define NO_BAD_NEG NO_HEIGHT
 
 #define MAX_COLLIDED_OBJECTS 1024
 
 #define COLLISION_CHECK_DISTANCE 6144
+
+enum COLL_TYPE
+{
+	CT_NONE = 0,				// 0x00
+	CT_FRONT = (1 << 0),		// 0x01
+	CT_LEFT = (1 << 1),			// 0x02
+	CT_RIGHT = (1 << 2),		// 0x04
+	CT_TOP = (1 << 3),			// 0x08
+	CT_TOP_FRONT = (1 << 4),	// 0x10
+	CT_CLAMP = (1 << 5)			// 0x20
+};
 
 struct COLL_RESULT
 {
@@ -37,37 +48,45 @@ struct COLL_POSITION
 	int SplitCeiling;
 };
 
+struct COLL_SETUP
+{
+	bool SlopesAreWalls;    // Treat steep slopes as walls
+	bool SlopesArePits;     // Treat steep slopes as pits
+	bool DeathIsPit;        // Treat death sectors as pits
+	bool EnableObjectPush;  // Can be pushed by objects
+	bool EnableSpaz;        // Push is treated as hurt
+						    
+	int   Radius;           // Collision bounds horizontal size
+	short ForwardAngle;     // Forward angle direction
+	int   BadHeightUp;      // Borderline step-up height 
+	int   BadHeightDown;    // Borderline step-down height
+	int   BadCeilingHeight; // Borderline ceiling height
+
+	PHD_VECTOR OldPosition; // Preserve old parameters to restore later
+	short OldAnimState;
+	short OldAnimNumber;
+	short OldFrameNumber;
+};
+
 struct COLL_INFO
 {
-	COLL_POSITION middle;       // mid
-	COLL_POSITION middleLeft;   // left
-	COLL_POSITION middleRight;  // right
-	COLL_POSITION front;        // front
-	COLL_POSITION frontLeft;    // left2
-	COLL_POSITION frontRight;   // right2
+	COLL_SETUP    Settings;     // In parameters
 
-	int radius;
-	int badPos;
-	int badNeg;
-	int badCeiling;
-	PHD_VECTOR shift;
-	PHD_VECTOR old;
-	short oldAnimState;
-	short oldAnimNumber;
-	short oldFrameNumber;
-	short facing;
-	short quadrant;
-	short collType; // CT_enum
-	signed char tiltX;
-	signed char tiltZ;
-	bool hitStatic;
-	bool hitTallBounds;
-	int boundsAbove;
-	bool slopesAreWalls;
-	bool slopesArePits;
-	bool lavaIsPit;
-	bool enableBaddiePush;
-	bool enableSpaz;
+	COLL_POSITION Middle;       
+	COLL_POSITION MiddleLeft;   
+	COLL_POSITION MiddleRight;  
+	COLL_POSITION Front;        
+	COLL_POSITION FrontLeft;    
+	COLL_POSITION FrontRight;   
+
+	PHD_VECTOR Shift;
+	COLL_TYPE CollisionType;
+	int TiltX;
+	int TiltZ;
+
+	bool HitStatic;
+	bool HitTallBounds;
+	int ObjectHeadroom;
 };
 
 struct OBJECT_COLLISION_BOUNDS
