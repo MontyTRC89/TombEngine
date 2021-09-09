@@ -109,10 +109,6 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-short SkyPos1;
-short SkyPos2;
-CVECTOR SkyColor1;
-CVECTOR SkyColor2;
 int CutSeqNum;
 int CurrentLevel;
 bool DoTheGame;
@@ -168,7 +164,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(1.0f/30.0f);
-		UpdateSky();
+		g_Renderer.updateSky();
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
@@ -824,39 +820,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			DisableDebris();
 
 			return result;
-		}
-	}
-}
-
-void UpdateSky()
-{
-	GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
-
-	if (level->Layer1.Enabled)
-	{
-		SkyPos1 += level->Layer1.CloudSpeed;
-		if (SkyPos1 <= 9728)
-		{
-			if (SkyPos1 < 0)
-				SkyPos1 += 9728;
-		}
-		else
-		{
-			SkyPos1 -= 9728;
-		}
-	}
-
-	if (level->Layer2.Enabled)
-	{
-		SkyPos2 += level->Layer2.CloudSpeed;
-		if (SkyPos2 <= 9728)
-		{
-			if (SkyPos2 < 0)
-				SkyPos2 += 9728;
-		}
-		else
-		{
-			SkyPos2 -= 9728;
 		}
 	}
 }

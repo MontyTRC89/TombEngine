@@ -240,28 +240,6 @@ bool GameFlow::DoGameflow()
 
 		CurrentAtmosphere = level->AmbientTrack;
 
-		if (level->Horizon)
-		{
-			SkyColor1.r = level->Layer1.R;
-			SkyColor1.g = level->Layer1.G;
-			SkyColor1.b = level->Layer1.B;
-
-			SkyColor2.r = level->Layer2.R;
-			SkyColor2.g = level->Layer2.G;
-			SkyColor2.b = level->Layer2.B;
-		}
-
-		if (level->Storm)
-		{
-			SkyStormColor[0] = level->Layer1.R;
-			SkyStormColor[1] = level->Layer1.G;
-			SkyStormColor[2] = level->Layer1.B;
-
-			SkyStormColor2[0] = level->Layer1.R;
-			SkyStormColor2[1] = level->Layer1.G;
-			SkyStormColor2[2] = level->Layer1.B;
-		}
-
 		GAME_STATUS status;
 
 		if (CurrentLevel == 0)
