@@ -368,8 +368,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 2*/
 	/*collision: lara_col_stop*/
-	COLL_RESULT fheight = {}; fheight.FloorHeight = NO_HEIGHT;
-	COLL_RESULT rheight = {}; rheight.FloorHeight = NO_HEIGHT;
+	COLL_RESULT fheight = {}; fheight.Position.Floor = NO_HEIGHT;
+	COLL_RESULT rheight = {}; rheight.Position.Floor = NO_HEIGHT;
 
 	if (item->hitPoints <= 0)
 	{
@@ -431,7 +431,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
 			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
+			if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && collFloorResult.Position.Type != BIG_SLOPE && collCeilingResult.Position.Ceiling <= 0)
 				item->goalAnimState = LS_STEP_LEFT;
 		}
 		else if (TrInput & IN_RSTEP)
@@ -439,7 +439,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
 			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-			if ((collFloorResult.FloorHeight < 128 && collFloorResult.FloorHeight > -128) && collFloorResult.HeightType != BIG_SLOPE && collCeilingResult.CeilingHeight <= 0)
+			if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && collFloorResult.Position.Type != BIG_SLOPE && collCeilingResult.Position.Ceiling <= 0)
 				item->goalAnimState = LS_STEP_RIGHT;
 		}
 		else if (TrInput & IN_LEFT)
@@ -463,7 +463,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 			{
-				if (fheight.FloorHeight > -(STEPUP_HEIGHT - 1))
+				if (fheight.Position.Floor > -(STEPUP_HEIGHT - 1))
 				{
 					lara_as_wade(item, coll);
 					wade = true;
@@ -471,7 +471,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if ((fheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (fheight.FloorHeight > -(STEPUP_HEIGHT - 1)))
+				if ((fheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (fheight.Position.Floor > -(STEPUP_HEIGHT - 1)))
 				{
 					lara_as_wade(item, coll);
 					wade = true;
@@ -497,7 +497,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if ((rheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (rheight.FloorHeight > -(STEPUP_HEIGHT - 1)))
+			if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)))
 				lara_as_back(item, coll);
 		}
 	}
@@ -512,7 +512,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
 			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
 
-			if ((collFloorResult.HeightType == BIG_SLOPE || collFloorResult.HeightType == DIAGONAL) && (collFloorResult.FloorHeight < 0 || collCeilingResult.CeilingHeight > 0))
+			if ((collFloorResult.Position.Type == BIG_SLOPE || collFloorResult.Position.Type == DIAGONAL) && (collFloorResult.Position.Floor < 0 || collCeilingResult.Position.Ceiling > 0))
 			{
 				item->goalAnimState = LS_STOP;
 				return;
@@ -526,10 +526,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_WALK)
 			{
-				if ((rheight.FloorHeight < (STEPUP_HEIGHT - 1)) && (rheight.FloorHeight > -(STEPUP_HEIGHT - 1)) && rheight.HeightType != BIG_SLOPE)
+				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && rheight.Position.Type != BIG_SLOPE)
 					lara_as_back(item, coll);
 			}
-			else if (rheight.FloorHeight > -(STEPUP_HEIGHT - 1))
+			else if (rheight.Position.Floor > -(STEPUP_HEIGHT - 1))
 			{
 				item->goalAnimState = LS_HOP_BACK;
 			}
