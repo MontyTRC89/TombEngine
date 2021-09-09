@@ -531,11 +531,11 @@ void LoadTextures()
 		g_Level.SpritesTextures.push_back(texture);
 	}
 
-	g_Level.MiscTextures.width = ReadInt32();
-	g_Level.MiscTextures.height = ReadInt32();
+	g_Level.SkyTexture.width = ReadInt32();
+	g_Level.SkyTexture.height = ReadInt32();
 	size = ReadInt32();
-	g_Level.MiscTextures.colorMapData.resize(size);
-	ReadBytes(g_Level.MiscTextures.colorMapData.data(), size);
+	g_Level.SkyTexture.colorMapData.resize(size);
+	ReadBytes(g_Level.SkyTexture.colorMapData.data(), size);
 }
 
 void ReadRooms()
