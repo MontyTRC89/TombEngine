@@ -359,7 +359,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
-		coll->Setup.Radius = 200;
+		coll->Setup.Radius = LARA_RAD_CRAWL;
 		coll->Setup.BadHeightUp = 255;
 		coll->Setup.BadHeightDown = -127;
 		coll->Setup.BadCeilingHeight = 400;
@@ -561,7 +561,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.Radius = 200;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
 
 	coll->Setup.BadHeightUp = 255;
 	coll->Setup.BadHeightDown = -127;
@@ -702,7 +702,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	coll->Setup.Radius = 250;
+	coll->Setup.Radius = LARA_RAD_CRAWL + 50; // TODO: Check if it still works without 50?
 	coll->Setup.BadHeightUp = 255;
 	coll->Setup.BadHeightDown = -127;
 	coll->Setup.BadCeilingHeight = 400;
