@@ -3,7 +3,7 @@
 #include "objectslist.h"
 #include "items.h"
 #include "level.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 void InitialiseSmokeEmitter(short itemNumber)
 {

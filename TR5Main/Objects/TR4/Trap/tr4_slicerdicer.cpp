@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "tr4_slicerdicer.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 void InitialiseSlicerDicer(short itemNum)
 {

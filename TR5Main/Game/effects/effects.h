@@ -1,7 +1,8 @@
 #pragma once
-#include "phd_global.h"
+#include "Specific\phd_global.h"
 struct ITEM_INFO;
 struct COLL_INFO;
+
 enum RIPPLE_TYPE
 {
 	RIPPLE_FLAG_NONE = 0x0,

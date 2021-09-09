@@ -3,15 +3,15 @@
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 #define STATE_HITMAN_STOP					1

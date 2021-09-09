@@ -37,8 +37,8 @@ namespace TEN::Entities::Switches
 				break;
 			i = trigger[1];
 		}
-
-		ITEM_INFO* target = &g_Level.Items[trigger[3] & 0x3FF];
+		int targetItemNum = trigger[3] & 0x3FF;
+		ITEM_INFO* target = &g_Level.Items[targetItemNum];
 		DOOR_DATA* door = (DOOR_DATA*)target->data;
 
 		if (item->status == ITEM_NOT_ACTIVE)
@@ -50,7 +50,7 @@ namespace TEN::Entities::Switches
 					&& l->currentAnimState == LS_STOP
 					&& l->animNumber == LA_STAND_IDLE
 					|| Lara.isMoving
-					&& Lara.generalPtr == (void*)itemNum))
+					&& Lara.interactedItem == itemNum))
 			{
 				if (TestLaraPosition(&CogSwitchBounds, item, l))
 				{
@@ -62,7 +62,7 @@ namespace TEN::Entities::Switches
 						Lara.torsoYrot = 0;
 						Lara.torsoXrot = 0;
 						Lara.gunStatus = LG_HANDS_BUSY;
-						Lara.generalPtr = target;
+						Lara.interactedItem = targetItemNum;
 						l->animNumber = LA_COGWHEEL_GRAB;
 						l->goalAnimState = LS_COGWHEEL;
 						l->currentAnimState = LS_COGWHEEL;
@@ -84,11 +84,11 @@ namespace TEN::Entities::Switches
 					}
 					else
 					{
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 					}
 					return;
 				}
-				else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
@@ -117,7 +117,8 @@ namespace TEN::Entities::Switches
 			{
 				if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase + 10)
 				{
-					((ITEM_INFO*)Lara.generalPtr)->itemFlags[0] = COG_DOOR_TURN;
+					ITEM_INFO* doorItem = &g_Level.Items[Lara.interactedItem];
+					doorItem->itemFlags[0] = COG_DOOR_TURN;
 				}
 			}
 		}

@@ -2,9 +2,8 @@
 #include "tr4_ahmet.h"
 #include "control.h"
 #include "sphere.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "sound.h"
+#include "effects\effects.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "box.h"
 #include "level.h"
@@ -129,7 +128,7 @@ namespace TEN::Entities::TR4
                 item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = STATE_AHMET_DIE;
                 item->goalAnimState = STATE_AHMET_DIE;
-                Lara.generalPtr = (void*)itemNumber;
+                Lara.interactedItem = itemNumber;
             }
 
             TriggerAhmetDeathEffect(item);

@@ -42,7 +42,7 @@ namespace TEN::Entities::Switches
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus)
 			&& (!Lara.isMoving
-				|| Lara.generalPtr != (void*)itemNum))
+				|| Lara.interactedItem != itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
 		}
@@ -61,10 +61,10 @@ namespace TEN::Entities::Switches
 					}
 					else
 					{
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 					}
 				}
-				else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
@@ -119,12 +119,12 @@ namespace TEN::Entities::Switches
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 			}
 			else if (Lara.isMoving)
 			{
-				if (Lara.generalPtr == (void*)itemNum)
+				if (Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;

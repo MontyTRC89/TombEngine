@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "explosion.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "spark.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
-#include "effect2.h"
-#include "prng.h"
+#include "effects\effects.h"
+#include "Specific\prng.h"
 using namespace TEN::Math::Random;
 namespace TEN {
 	namespace Effects {

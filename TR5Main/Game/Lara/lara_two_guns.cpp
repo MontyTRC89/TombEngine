@@ -2,16 +2,16 @@
 #include "lara_two_guns.h"
 #include "lara_fire.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
-#include "prng.h"
+#include "Specific\prng.h"
 using namespace TEN::Math::Random;
 struct PISTOL_DEF
 {

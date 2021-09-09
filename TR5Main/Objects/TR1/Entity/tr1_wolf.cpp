@@ -2,7 +2,7 @@
 #include "tr1_wolf.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "setup.h"
 #include "control.h"

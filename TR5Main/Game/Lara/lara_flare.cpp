@@ -2,16 +2,16 @@
 #include "lara_flare.h"
 #include "level.h"
 #include "setup.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "items.h"
 #include "sphere.h"
 #include "lara_fire.h"
 #include "Lara.h"
 #include "collide.h"
-#include "effect2.h"
-#include "chaffFX.h"
-#include "prng.h"
+#include "effects\effects.h"
+#include "effects\chaffFX.h"
+#include "Specific\prng.h"
 
 constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920,0.8020,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.84642,0.7896,0.817634,0.923424,0.7589,0.81399,0.92834,0.9978,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.74642 };
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
@@ -357,7 +357,7 @@ void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 		}
 
 		if (flag)
-			item->speed /= 2;
+			item->speed >>= 1;
 
 		if (objectNum == ID_FLARE_ITEM)
 		{

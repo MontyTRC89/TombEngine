@@ -2,14 +2,13 @@
 #include "tr5_gunship.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "camera.h"
-#include "effect2.h"
-#include "debris.h"
+#include "effects\effects.h"
+#include "effects\debris.h"
 #include "objects.h"
 #include "items.h"
-#include "effect2.h"
 #include "lara.h"
 
 int GunShipCounter = 0;
@@ -109,7 +108,7 @@ void ControlGunShip(short itemNumber)
 				if (hitMesh->staticNumber >= 50 && hitMesh->staticNumber < 59)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
-					hitMesh->flags &= 0xFFFE;
+					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
 					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
 				}

@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_horseman.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include <lara.h>
-#include <sound.h>
+#include "Sound\sound.h"
 #include <sphere.h>
 #include "box.h"
 

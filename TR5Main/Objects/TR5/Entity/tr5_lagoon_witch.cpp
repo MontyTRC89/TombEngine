@@ -2,9 +2,8 @@
 #include "tr5_lagoon_witch.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else

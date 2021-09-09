@@ -1,7 +1,8 @@
 #pragma once
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include <optional>
 #include "roomvector.h"
+
 struct SECTOR_COLLISION_INFO
 {
 	float SplitAngle;

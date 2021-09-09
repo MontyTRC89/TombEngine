@@ -5,8 +5,8 @@
 #include "lara.h"
 #include "crowbar_switch.h"
 #include "newinv2.h"
-#include "sound.h"
-#include "pickup.h"
+#include "Sound\sound.h"
+#include "pickup\pickup.h"
 #include "level.h"
 
 namespace TEN::Entities::Switches
@@ -50,7 +50,7 @@ namespace TEN::Entities::Switches
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus
 			|| item->itemFlags[0])
-			&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
@@ -84,7 +84,7 @@ namespace TEN::Entities::Switches
 					}
 					else
 					{
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 					}
 #ifdef NEW_INV
 					GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -97,7 +97,7 @@ namespace TEN::Entities::Switches
 					doSwitch = -1;
 				}
 			}
-			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -108,7 +108,7 @@ namespace TEN::Entities::Switches
 		{
 			if (!TestLaraPosition(&CrowbarBounds, item, l))
 			{
-				if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
@@ -153,7 +153,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 #ifdef NEW_INV
 			GLOBAL_inventoryitemchosen = NO_ITEM;

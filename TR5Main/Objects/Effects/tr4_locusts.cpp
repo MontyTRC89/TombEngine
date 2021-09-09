@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr4_locusts.h"
-#include "sound.h"
-#include "trmath.h"
+#include "Sound\sound.h"
+#include "Specific\trmath.h"
 #include "sphere.h"
 #include "misc.h"
 #include "lara.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "collide.h"
 
 namespace TEN::Entities::TR4 {

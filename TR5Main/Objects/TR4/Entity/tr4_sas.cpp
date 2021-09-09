@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "tr4_sas.h"
 #include "sphere.h"
-#include "effect2.h"
 #include "box.h"
 #include "items.h"
 #include "people.h"
@@ -9,8 +8,9 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include <Specific\input.h>
-#include <Game/tomb4fx.h>
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
+#include <Specific/input.h>
 #include <Game/Lara/lara_one_gun.h>
 #include "creature_info.h"
 #include "control.h"
@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 			|| Lara.gunStatus
 			|| l->gravityStatus
 			|| item->flags & 0x3E00)
-			&& (!(Lara.isMoving) || (short)Lara.generalPtr != itemNumber))
+			&& (!(Lara.isMoving) || Lara.interactedItem != itemNumber))
 		{
 			if (item->status == ITEM_ACTIVE)
 			{
@@ -735,7 +735,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNumber;
+					Lara.interactedItem = itemNumber;
 				}
 			}
 		}

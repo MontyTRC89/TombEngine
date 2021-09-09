@@ -8,7 +8,7 @@
 #include "inventory.h"
 #endif
 #include "switch.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "draw.h"
 #include "control.h"
 #include "puzzles_keys.h"
@@ -75,7 +75,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& l->animNumber == LA_STAND_IDLE
 		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
 		|| (Lara.isMoving
-			&& Lara.generalPtr == (void*)itemNum))
+			&& Lara.interactedItem == itemNum))
 	{
 		short oldYrot = item->pos.yRot;
 		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
@@ -131,7 +131,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (!MoveLaraPosition(&pos, item, l))
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 #ifdef NEW_INV
 					GLOBAL_inventoryitemchosen = NO_ITEM;
 #else
@@ -166,7 +166,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			Lara.torsoXrot = 0;
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->flags |= 0x20;
-			Lara.generalPtr = (void*)itemNum;
+			Lara.interactedItem = itemNum;
 #ifdef NEW_INV
 			GLOBAL_inventoryitemchosen = NO_ITEM;
 #else
@@ -178,7 +178,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (Lara.isMoving)
 		{
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -189,9 +189,9 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		if (!Lara.isMoving && (short)Lara.generalPtr == itemNum || (short)Lara.generalPtr != itemNum)
+		if (!Lara.isMoving && Lara.interactedItem == itemNum || Lara.interactedItem != itemNum)
 		{
-			if ((short)Lara.generalPtr == itemNum)
+			if (Lara.interactedItem == itemNum)
 			{
 				if (l->currentAnimState != LS_MISC_CONTROL)
 				{
@@ -235,7 +235,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
 
 void do_puzzle()
 {
-	puzzleItem = (short)Lara.generalPtr;
+	puzzleItem = Lara.interactedItem;
 	ITEM_INFO* item = &g_Level.Items[puzzleItem];
 	int flag = 0;
 
@@ -296,7 +296,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
 		&& l->animNumber == LA_STAND_IDLE)
-		&& (!Lara.isMoving || (short)Lara.generalPtr != itemNum))
+		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
 		if (item->objectNumber < ID_KEY_HOLE6)
 			ObjectCollision(itemNum, l, coll);
@@ -364,7 +364,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 
 #ifdef NEW_INV
@@ -375,7 +375,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		if (Lara.isMoving && (short)Lara.generalPtr == itemNum)
+		if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;

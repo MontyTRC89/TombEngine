@@ -1,5 +1,5 @@
 #pragma once
-#include "phd_global.h"
+#include "Specific\phd_global.h"
 #include "level.h"
 struct ITEM_INFO;
 struct BITE_INFO;

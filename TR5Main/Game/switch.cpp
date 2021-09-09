@@ -16,7 +16,7 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 // NOTE: we need to decompile/inspect if these functions are still needed
 
