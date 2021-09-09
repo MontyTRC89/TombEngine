@@ -135,11 +135,11 @@ void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-    if (TestBoundsCollide(item, l, coll->Settings.Radius))
+    if (TestBoundsCollide(item, l, coll->Setup.Radius))
     {
         if (TestCollision(item, l))
         {
-            if (coll->Settings.EnableObjectPush)
+            if (coll->Setup.EnableObjectPush)
             {
                 ItemPushItem(item, l, coll, 0, 0);
             }

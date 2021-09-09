@@ -321,11 +321,11 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.xPos -= 4;
 		break;
 	}
-	coll->Settings.BadHeightUp = NO_BAD_POS;
-	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
-	coll->Settings.BadCeilingHeight = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
 	Lara.moveAngle = item->pos.yRot;
-	coll->Settings.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	result = 0;
 	if (Lara.climbStatus)
@@ -338,7 +338,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 				if (item->animNumber != LA_LADDER_TO_HANG_RIGHT && item->animNumber != LA_LADDER_TO_HANG_LEFT)
 				{
 					SnapLaraToEdgeOfBlock(item, coll, dir);
-					item->pos.yPos = coll->Settings.OldPosition.y;
+					item->pos.yPos = coll->Setup.OldPosition.y;
 					item->currentAnimState = LS_HANG;
 					item->goalAnimState = LS_HANG;
 					item->animNumber = LA_REACH_TO_HANG;
@@ -421,9 +421,9 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				item->pos.xPos = coll->Settings.OldPosition.x;
-				item->pos.yPos = coll->Settings.OldPosition.y;
-				item->pos.zPos = coll->Settings.OldPosition.z;
+				item->pos.xPos = coll->Setup.OldPosition.x;
+				item->pos.yPos = coll->Setup.OldPosition.y;
+				item->pos.zPos = coll->Setup.OldPosition.z;
 				if (item->currentAnimState == LS_SHIMMY_LEFT || item->currentAnimState == LS_SHIMMY_RIGHT)
 				{
 					item->currentAnimState = LS_HANG;
@@ -794,13 +794,13 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	coll->Settings.BadHeightUp = NO_BAD_POS;
-	coll->Settings.BadHeightDown = -512;
-	coll->Settings.BadCeilingHeight = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -512;
+	coll->Setup.BadCeilingHeight = 0;
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Settings.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CT_FRONT || coll->HitStatic)
@@ -813,10 +813,10 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
-	if (LaraTestClimbPos(item, coll->Settings.Radius, coll->Settings.Radius + 120, -700, 512, &shift_r) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -700, 512, &shift_r) != 1)
 		return false;
 
-	if (LaraTestClimbPos(item, coll->Settings.Radius, -(coll->Settings.Radius + 120), -700, 512, &shift_l) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -700, 512, &shift_l) != 1)
 		return false;
 
 	if (shift_r)
@@ -883,10 +883,10 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 			return 0;
 	}
 
-	if (LaraTestClimbPos(item, coll->Settings.Radius, coll->Settings.Radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
-		LaraTestClimbPos(item, coll->Settings.Radius, -coll->Settings.Radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
+		LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
 	{
-		result = LaraTestClimbPos(item, coll->Settings.Radius, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
 		if (result)
 		{
 			if (result != 1)
@@ -1024,7 +1024,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	item->pos.xPos = x;
 	item->pos.zPos = z;
 
-	coll->Settings.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	res = LaraHangTest(item, coll);
 
@@ -1071,10 +1071,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 			item->currentAnimState = LS_HANG;
 		}
 
-		coll->Settings.OldPosition.x = Lara.cornerX;
+		coll->Setup.OldPosition.x = Lara.cornerX;
 		item->pos.xPos = Lara.cornerX;
 
-		coll->Settings.OldPosition.z = Lara.cornerZ;
+		coll->Setup.OldPosition.z = Lara.cornerZ;
 		item->pos.zPos = Lara.cornerZ;
 
 		item->pos.yRot += rot;
@@ -1107,10 +1107,10 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 		item->goalAnimState = LS_HANG_FEET;
 		item->currentAnimState = LS_HANG_FEET;
 
-		coll->Settings.OldPosition.x = Lara.cornerX;
+		coll->Setup.OldPosition.x = Lara.cornerX;
 		item->pos.xPos = Lara.cornerX;
 
-		coll->Settings.OldPosition.z = Lara.cornerZ;
+		coll->Setup.OldPosition.z = Lara.cornerZ;
 		item->pos.zPos = Lara.cornerZ;
 
 		item->pos.yRot += rot;

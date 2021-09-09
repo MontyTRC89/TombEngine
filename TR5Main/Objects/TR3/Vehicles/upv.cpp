@@ -427,23 +427,23 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
 
-	coll->Settings.BadHeightUp = NO_BAD_POS;
-	coll->Settings.BadHeightDown = -SUB_HEIGHT;
-	coll->Settings.BadCeilingHeight = SUB_HEIGHT;
-	coll->Settings.OldPosition.x = v->pos.xPos;
-	coll->Settings.OldPosition.y = v->pos.yPos;
-	coll->Settings.OldPosition.z = v->pos.zPos;
-	coll->Settings.Radius = SUB_RADIUS;
-	coll->Settings.SlopesAreWalls = false;
-	coll->Settings.SlopesArePits = false;
-	coll->Settings.DeathIsPit = false;
-	coll->Settings.EnableSpaz = false;
-	coll->Settings.EnableObjectPush = true;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -SUB_HEIGHT;
+	coll->Setup.BadCeilingHeight = SUB_HEIGHT;
+	coll->Setup.OldPosition.x = v->pos.xPos;
+	coll->Setup.OldPosition.y = v->pos.yPos;
+	coll->Setup.OldPosition.z = v->pos.zPos;
+	coll->Setup.Radius = SUB_RADIUS;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
-		coll->Settings.ForwardAngle = Lara.moveAngle = v->pos.yRot;
+		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;
 	else
-		coll->Settings.ForwardAngle = Lara.moveAngle = v->pos.yRot - ANGLE(180);
+		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot - ANGLE(180);
 
 	height = phd_sin(v->pos.xRot) * SUB_LENGTH;
 	if (height < 0)
@@ -451,7 +451,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	if (height < 200)
 		height = 200;
 
-	coll->Settings.BadHeightDown = -height;
+	coll->Setup.BadHeightDown = -height;
 
 	GetCollisionInfo(coll, v->pos.xPos, v->pos.yPos + height / 2, v->pos.zPos, v->roomNumber, height);
 	ShiftItem(v, coll);
@@ -486,9 +486,9 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		v->pos.yRot -= ANGLE(5);
 	else if (coll->CollisionType == CT_CLAMP)
 	{
-		v->pos.xPos = coll->Settings.OldPosition.x;
-		v->pos.yPos = coll->Settings.OldPosition.y;
-		v->pos.zPos = coll->Settings.OldPosition.z;
+		v->pos.xPos = coll->Setup.OldPosition.x;
+		v->pos.yPos = coll->Setup.OldPosition.y;
+		v->pos.zPos = coll->Setup.OldPosition.z;
 		sub->Vel = 0;
 		return;
 	}
@@ -845,7 +845,7 @@ void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
 	ITEM_INFO	*item;
 
 	item = &g_Level.Items[item_num];
-	if (!TestBoundsCollide(item, laraitem, coll->Settings.Radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;

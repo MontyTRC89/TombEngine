@@ -130,17 +130,17 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 			xShift = isExpanding ? -16 : 16;
 		else if (angle == -ANGLE(90))
 			xShift = isExpanding ? 16 : -16;
-	} else if (isExpanding && IsInFrontOfExpandingPlatform(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, lara_coll.Settings.Radius))
+	} else if (isExpanding && IsInFrontOfExpandingPlatform(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, lara_coll.Setup.Radius))
 	{
 		//Push Lara if in front of expanding platform
 		if (angle == ANGLE(0))
-			zShift = -lara_coll.Settings.Radius / 6;
+			zShift = -lara_coll.Setup.Radius / 6;
 		else if (angle == ANGLE(180))
-			zShift = lara_coll.Settings.Radius / 6;
+			zShift = lara_coll.Setup.Radius / 6;
 		else if (angle == ANGLE(90))
-			xShift = -lara_coll.Settings.Radius / 6;
+			xShift = -lara_coll.Setup.Radius / 6;
 		else if (angle == -ANGLE(90))
-			xShift = lara_coll.Settings.Radius / 6;
+			xShift = lara_coll.Setup.Radius / 6;
 	}
 	auto coll = lara_coll;
 	GetCollisionInfo(&coll, LaraItem->pos.xPos + xShift, LaraItem->pos.yPos, LaraItem->pos.zPos + zShift, LaraItem->roomNumber, LARA_HEIGHT);
