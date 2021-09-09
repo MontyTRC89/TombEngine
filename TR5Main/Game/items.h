@@ -3,8 +3,6 @@
 #include "item.h"
 #include <vector>
 
-enum GAME_OBJECT_ID : short;
-
 enum AIObjectType
 {
 	NO_AI = 0x0000,

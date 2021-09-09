@@ -13,6 +13,8 @@
 #include "creature_info.h"
 #include "setup.h"
 #include "control/trigger.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 
 ITEM_INFO jeepDummyTarget;
 

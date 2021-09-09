@@ -12,6 +12,7 @@
 #include "Specific\trmath.h"
 #include "Specific\prng.h"
 #include "room.h"
+#include "Renderer11.h""
 
 using std::vector;
 using namespace TEN::Math::Random;
