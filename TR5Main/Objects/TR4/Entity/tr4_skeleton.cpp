@@ -3,15 +3,14 @@
 #include "items.h"
 #include "box.h"
 #include "people.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sphere.h"
-#include "debris.h"
-#include "effect2.h"
+#include "effects\debris.h"
 #include "lot.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 #include "creature_info.h"
 #include "floordata.h"
@@ -648,7 +647,7 @@ namespace TEN::Entities::TR4
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
-								staticMesh->flags &= ~1;
+								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->stopper = 0;
 								TestTriggers(item, true, NULL);
 								break;

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "camera.h"
 #include "configuration.h"
@@ -221,11 +221,11 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 
 	// Randomly select arbitrary sample from the list, if more than one is present
 	int sampleToPlay = 0;
-	int numSamples = (sampleInfo->flags / 4) & 15;
+	int numSamples = (sampleInfo->flags >> 2) & 15;
 	if (numSamples == 1)
 		sampleToPlay = sampleInfo->number;
 	else
-		sampleToPlay = (sampleInfo->number + (int)((GetRandomControl() * numSamples)) / 32768);
+		sampleToPlay = sampleInfo->number + (int)((GetRandomControl() * numSamples) >> 15);
 
 	// Get free channel to play sample
 	int freeSlot = Sound_GetFreeSlot();
@@ -389,7 +389,7 @@ void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
 	// If existing mask is unmodified (same activation mask setup), track won't play.
 	if (!g_AudioTracks[track].looped)
 	{
-		byte filteredMask = (mask / 256) & 0x3F;
+		byte filteredMask = (mask >> 8) & 0x3F;
 		if ((g_AudioTracks[track].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 

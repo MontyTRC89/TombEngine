@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "chaffFX.h"
-#include "bubble.h"
-#include "tomb4fx.h"
+#include "effects\bubble.h"
+#include "effects\tomb4fx.h"
 #include "control.h"
 #include "lara.h"
 #include "draw.h"
 #include "level.h"
 #include "smoke.h"
 #include "spark.h"
-#include "prng.h"
+#include "Specific\prng.h"
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
 
@@ -150,7 +150,7 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->sShade = 0;
 	if (moving)
 	{
-		trans = (speed * 128) / 32;
+		trans = (speed << 7) >> 5;
 		smoke->dShade = trans;
 	}
 	else
@@ -159,7 +159,7 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->colFadeSpeed = 4 + (GetRandomDraw() & 3);
 	smoke->fadeToBlack = 4;
 
-	rnd = (GetRandomControl() & 3) - (speed / 4096) + 20;
+	rnd = (GetRandomControl() & 3) - (speed >> 12) + 20;
 	if (rnd < 9)
 	{
 		smoke->life = 9;
@@ -201,8 +201,8 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 	smoke->scalar = 1;
 	smoke->gravity = (GetRandomControl() & 3) - 4;
 	smoke->maxYvel = 0;
-	size = (GetRandomControl() & 7) + (speed/ 128) + 32;
-	smoke->sSize = size / 4;
+	size = (GetRandomControl() & 7) + (speed >> 7) + 32;
+	smoke->sSize = size >> 2;
 	smoke->size = smoke->dSize = size;
 }
 

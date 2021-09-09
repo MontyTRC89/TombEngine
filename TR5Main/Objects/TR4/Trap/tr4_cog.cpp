@@ -3,7 +3,7 @@
 #include "level.h"
 #include "control.h"
 #include "sphere.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void CogControl(short itemNum)
 {

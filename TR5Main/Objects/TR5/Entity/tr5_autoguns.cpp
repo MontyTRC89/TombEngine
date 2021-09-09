@@ -3,11 +3,10 @@
 #include "sphere.h"
 #include "lara.h"
 #include "draw.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void InitialiseAutoGuns(short itemNumber)
 {

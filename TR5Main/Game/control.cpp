@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "collide.h"
 #include "control.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "puzzles_keys.h"
 #include "camera.h"
 #include "Lara.h"
-#include "hair.h"
+#include "effects\hair.h"
 #include "items.h"
 #include "flipeffect.h"
 #include "draw.h"
@@ -16,40 +16,39 @@
 #endif
 #include "gameflow.h"
 #include "lot.h"
-#include "pickup.h"
 #include "draw.h"
 #include "health.h"
 #include "savegame.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "spotcam.h"
 #include "box.h"
 #include "objects.h"
 #include "switch.h"
 #include "rope.h"
-#include "tomb4fx.h"
 #include "traps.h"
-#include "effect2.h"
 #include "sphere.h"
-#include "debris.h"
 #include "lara_fire.h"
-#include "footprint.h"
 #include "level.h"
 #include "input.h"
 #include "winmain.h"
 #include "Renderer11.h"
 #include "setup.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
+#include "effects\debris.h"
+#include "effects\footprint.h"
+#include "effects\smoke.h"
+#include "effects\spark.h"
+#include "effects\explosion.h"
+#include "effects\drip.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "tr4_locusts.h"
-#include "smoke.h"
-#include "spark.h"
-#include <tr4_littlebeetle.h>
-#include "explosion.h"
-#include "drip.h"
+#include "tr4_littlebeetle.h"
 #include "particle/SimpleParticle.h"
 #include <process.h>
-#include "prng.h"
+#include "Specific\prng.h"
 #include <Game/Lara/lara_one_gun.h>
 #include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
@@ -912,7 +911,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->skyRoom];
 			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->ceiling * 256);
+				return (floor->ceiling << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
@@ -923,7 +922,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->pitRoom];
 			if (room->flags & ENV_FLAG_WATER)
-				return (floor->floor * 256);
+				return (floor->floor << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
@@ -1236,8 +1235,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	dx = end->x - start->x;
 	if (!dx)
 		return 1;
-	dy = ((end->y - start->y) * 1024) / dx;
-	dz = ((end->z - start->z) * 1024) / dx;
+	dy = (end->y - start->y << 10) / dx;
+	dz = (end->z - start->z << 10) / dx;
 	number_los_rooms = 1;
 	los_rooms[0] = start->roomNumber;
 	room = start->roomNumber;
@@ -1246,8 +1245,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	if (dx < 0)
 	{
 		x = start->x & 0xFFFFFC00;
-		y = (((x - start->x) * dy) / 1024) + start->y;
-		z = (((x - start->x) * dz) / 1024) + start->z;
+		y = ((x - start->x) * dy >> 10) + start->y;
+		z = ((x - start->x) * dz >> 10) + start->z;
 		while (x > end->x)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -1289,8 +1288,8 @@ int xLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	else
 	{
 		x = start->x | 0x3FF;
-		y = (((x - start->x) * dy) / 1024) + start->y;
-		z = (((x - start->x) * dz) / 1024) + start->z;
+		y = ((x - start->x) * dy >> 10) + start->y;
+		z = ((x - start->x) * dz >> 10) + start->z;
 		while (x < end->x)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -1341,8 +1340,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	dz = end->z - start->z;
 	if (!dz)
 		return 1;
-	dx = ((end->x - start->x) * 1024) / dz;
-	dy = ((end->y - start->y) * 1024) / dz;
+	dx = (end->x - start->x << 10) / dz;
+	dy = (end->y - start->y << 10) / dz;
 	number_los_rooms = 1;
 	los_rooms[0] = start->roomNumber;
 	room = start->roomNumber;
@@ -1351,8 +1350,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	if (dz < 0)
 	{
 		z = start->z & 0xFFFFFC00;
-		x = (((z - start->z) * dx) / 1024) + start->x;
-		y = (((z - start->z) * dy) / 1024) + start->y;
+		x = ((z - start->z) * dx >> 10) + start->x;
+		y = ((z - start->z) * dy >> 10) + start->y;
 		while (z > end->z)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -1394,8 +1393,8 @@ int zLOS(GAME_VECTOR *start, GAME_VECTOR *end)
 	else
 	{
 		z = start->z | 0x3FF;
-		x = (((z - start->z) * dx) / 1024) + start->x;
-		y = (((z - start->z) * dy) / 1024) + start->y;
+		x = ((z - start->z) * dx >> 10) + start->x;
+		y = ((z - start->z) * dy >> 10) + start->y;
 		while (z < end->z)
 		{
 			floor = GetFloor(x, y, z, &room);
@@ -1445,14 +1444,14 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 	room = target->roomNumber;
 	if (target->y > GetFloorHeight(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
 	{
-		x = ((7 * (target->x - start->x)) / 8) + start->x;
-		y = ((7 * (target->y - start->y)) / 8) + start->y;
-		z = ((7 * (target->z - start->z)) / 8) + start->z;
+		x = (7 * (target->x - start->x) >> 3) + start->x;
+		y = (7 * (target->y - start->y) >> 3) + start->y;
+		z = (7 * (target->z - start->z) >> 3) + start->z;
 		for (int i = 3; i > 0; --i)
 		{
-			wx = (((target->x - x) * i) / 4) + x;
-			wy = (((target->y - y) * i) / 4) + y;
-			wz = (((target->z - z) * i) / 4) + z;
+			wx = ((target->x - x) * i >> 2) + x;
+			wy = ((target->y - y) * i >> 2) + y;
+			wz = ((target->z - z) * i >> 2) + z;
 			if (wy < GetFloorHeight(GetFloor(wx, wy, wz, &room), wx, wy, wz))
 				break;
 		}
@@ -1465,14 +1464,14 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 	room = target->roomNumber;
 	if (target->y < GetCeiling(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
 	{
-		x = ((7 * (target->x - start->x)) / 8) + start->x;
-		y = ((7 * (target->y - start->y)) / 8) + start->y;
-		z = ((7 * (target->z - start->z)) / 8) + start->z;
+		x = (7 * (target->x - start->x) >> 3) + start->x;
+		y = (7 * (target->y - start->y) >> 3) + start->y;
+		z = (7 * (target->z - start->z) >> 3) + start->z;
 		for (int i = 3; i > 0; --i)
 		{
-			wx = (((target->x - x) * i) / 4) + x;
-			wy = (((target->y - y) * i) / 4) + y;
-			wz = (((target->z - z) * i) / 4) + z;
+			wx = ((target->x - x) * i >> 2) + x;
+			wy = ((target->y - y) * i >> 2) + y;
+			wz = ((target->z - z) * i >> 2) + z;
 			if (wy > GetCeiling(GetFloor(wx, wy, wz, &room), wx, wy, wz))
 				break;
 		}
@@ -1542,9 +1541,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != 999)
 	{
-		target.x = vector.x - ((vector.x - src->x) / 32);
-		target.y = vector.y - ((vector.y - src->y) / 32);
-		target.z = vector.z - ((vector.z - src->z) / 32);
+		target.x = vector.x - (vector.x - src->x >> 5);
+		target.y = vector.y - (vector.y - src->y >> 5);
+		target.z = vector.z - (vector.z - src->z >> 5);
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
@@ -1567,7 +1566,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
-						mesh->flags &= ~0x1;
+						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS *)mesh, 0);
 					}
 					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
@@ -1720,9 +1719,9 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 		}
 		else
 		{
-			target.x -= (target.x - src->x) / 32;
-			target.y -= (target.y - src->y) / 32;
-			target.z -= (target.z - src->z) / 32;
+			target.x -= target.x - src->x >> 5;
+			target.y -= target.y - src->y >> 5;
+			target.z -= target.z - src->z >> 5;
 			if (firing && !result)
 				TriggerRicochetSpark(&target, LaraItem->pos.yRot, 8, 0);
 		}
@@ -1761,7 +1760,7 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 		{
 			meshp = &room->mesh[m];
 
-			if (meshp->flags & 1)
+			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
 				pos.xPos = meshp->x;
 				pos.yPos = meshp->y;
@@ -2345,13 +2344,13 @@ void AnimateItem(ITEM_INFO *item)
 		int velocity = anim->velocity;
 		if (anim->acceleration)
 			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
-		item->speed = velocity / 65536;
+		item->speed = velocity >> 16;
 
 		lateral = anim->Xvelocity;
 		if (anim->Xacceleration)
 			lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
 
-		lateral /= 65536;
+		lateral >>= 16;
 	}
 
 	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);

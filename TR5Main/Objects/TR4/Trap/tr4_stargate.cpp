@@ -2,11 +2,11 @@
 #include "tr4_stargate.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "collide.h"
 #include "sphere.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 
 short StargateBounds[24] =
 {

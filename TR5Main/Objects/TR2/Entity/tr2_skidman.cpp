@@ -9,7 +9,7 @@
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "snowmobile.h"
 #include "creature_info.h"
 #include "skidoo_info.h"

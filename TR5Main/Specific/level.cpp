@@ -8,10 +8,10 @@
 #include "spotcam.h"
 #include "camera.h"
 #include "control.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "door.h"
 #include "box.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>

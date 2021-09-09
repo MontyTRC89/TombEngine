@@ -2,10 +2,11 @@
 #include "tr4_joby_spikes.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
+
 void InitialiseJobySpikes(short itemNumber)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];

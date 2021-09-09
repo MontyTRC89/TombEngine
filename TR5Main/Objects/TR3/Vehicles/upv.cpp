@@ -3,22 +3,22 @@
 #include "lara.h"
 #include "items.h"
 #include "sphere.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "collide.h"
 #include "box.h"
 #include "lara_flare.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "misc.h"
 #include "camera.h"
 #include "setup.h"
-#include "bubble.h"
+#include "effects\bubble.h"
 #include "level.h"
 #include "input.h"
 #include "savegame.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "upv_info.h"
+
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
 #define	UPV_DIVE 4

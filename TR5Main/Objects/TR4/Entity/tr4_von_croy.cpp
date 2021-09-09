@@ -2,15 +2,14 @@
 #include "tr4_guide.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
 #include "sphere.h"
 #include "lot.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <Game\draw.h>
 #include "creature_info.h"
 

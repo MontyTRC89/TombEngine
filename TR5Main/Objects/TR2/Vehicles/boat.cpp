@@ -8,10 +8,11 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
-#include "effect2.h"
-#include "particle/SimpleParticle.h"
+#include "Sound\sound.h"
+#include "effects\effects.h"
+#include "particle\SimpleParticle.h"
 #include "boat_info.h"
+
 enum BOAT_STATE
 {
 	STATE_BOAT_GETON,

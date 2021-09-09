@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			|| Lara.gunStatus
 			|| l->currentAnimState != LS_STOP
 			|| l->animNumber != LA_STAND_IDLE)
-			&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
@@ -69,10 +69,10 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 		}
-		else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+		else if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;

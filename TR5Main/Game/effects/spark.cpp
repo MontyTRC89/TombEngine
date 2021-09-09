@@ -2,8 +2,8 @@
 #include "framework.h"
 #include "spark.h"
 #include <array>
-#include <Game\trmath.h>
-#include "prng.h"
+#include <Specific\trmath.h>
+#include "Specific\prng.h"
 using namespace DirectX::SimpleMath;
 using namespace TEN::Math::Random;
 

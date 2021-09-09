@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "items.h"
-#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "control.h"
-#include "effect2.h"
-#include "Box.h"
+#include "effects\effects.h"
+
 void ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];

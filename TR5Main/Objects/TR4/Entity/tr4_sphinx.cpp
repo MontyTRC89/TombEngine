@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 enum SPHIX_STATES {
@@ -67,7 +67,7 @@ void SphinxControl(short itemNumber)
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
-				mesh->flags &= ~0x100;
+				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 				floor->stopper = false;
 
 				TestTriggers(x, y, z, item->roomNumber, true, NULL);

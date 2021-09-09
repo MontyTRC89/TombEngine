@@ -1,5 +1,5 @@
 #pragma once
-#include "effect2.h"
+#include "effects\effects.h"
 
 constexpr float MAX_BUBBLES = 256;
 constexpr int BUBBLE_FLAG_BIG_SIZE = 0x1;

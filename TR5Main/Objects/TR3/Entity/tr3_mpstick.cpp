@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr3_mpstick.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "creature_info.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };

@@ -2,7 +2,7 @@
 #include "tr2_rat.h"
 #include "lara.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "control.h"
 #include "level.h"

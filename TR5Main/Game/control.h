@@ -1,6 +1,6 @@
 #pragma once
 
-#include "phd_global.h"
+#include "Specific\phd_global.h"
 #include "items.h"
 #include "room.h"
 #include "control\trigger.h"

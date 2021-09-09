@@ -113,7 +113,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[1].z = pos.z;
 	sphere[1].r = (int)mesh->sphere.Radius;
 	if (youngLara)
-		sphere[1].r = sphere[1].r - ((sphere[1].r / 4) + (sphere[1].r / 8));
+		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
 	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HEAD]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
@@ -224,10 +224,10 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 		else if (DWindAngle > 3072)
 			DWindAngle += 6144 - 2 * DWindAngle;
 
-		WindAngle = (WindAngle + ((DWindAngle - WindAngle) / 8)) & 0x1FFE;
+		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
 
-		SmokeWindX = Wind * phd_sin(WindAngle * 8);
-		SmokeWindZ = Wind * phd_cos(WindAngle * 8);
+		SmokeWindX = Wind * phd_sin(WindAngle << 3);
+		SmokeWindZ = Wind * phd_cos(WindAngle << 3);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{

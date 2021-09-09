@@ -1,5 +1,5 @@
 #pragma once
-#include "effect2.h"
+#include "effects\effects.h"
 
 void ShootAtLara(FX_INFO* fx);
 void ControlMissile(short fxNumber);

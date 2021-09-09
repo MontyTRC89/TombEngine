@@ -5,7 +5,7 @@
 #include "control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "Lara.h"
 #include "camera.h"
@@ -16,7 +16,7 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "Renderer11.h"
 
 using namespace TEN::Renderer;

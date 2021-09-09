@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr5_deathslide.h"
 #include "input.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "lara.h"
 #include "setup.h"
-#include "sound.h"
-#include "Box.h"
+#include "Sound\sound.h"
+#include "box.h"
+
 OBJECT_COLLISION_BOUNDS DeathSlideBounds = { -256, 256, -100, 100, 256, 512, 0, 0, -ANGLE(25.0f), ANGLE(25.0f), 0, 0 };
 PHD_VECTOR DeathSlidePosition(0, 0, 371);
 
