@@ -119,7 +119,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
 		return 0;
 
-	if (!TestBoundsCollide(v, l, coll->Settings.Radius))
+	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
 		return false;
 
 	if (!TestCollision(v, l))
@@ -729,7 +729,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if ((l->currentAnimState != CART_DUCK) && (l->currentAnimState != CART_HIT))
 		{
 			COLL_INFO coll;
-			coll.Settings.Radius = CART_RADIUS;
+			coll.Setup.Radius = CART_RADIUS;
 
 			DoObjectCollision(v, &coll);
 

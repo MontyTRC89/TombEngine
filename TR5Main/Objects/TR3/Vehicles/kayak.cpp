@@ -1239,7 +1239,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		coll->Settings.EnableObjectPush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNumber, l, coll);
 	}
 }

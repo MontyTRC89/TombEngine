@@ -300,8 +300,8 @@ int BigGunControl(COLL_INFO *coll)
 	
 	lara->pos.yRot = obj->pos.yRot = gun->startYRot + (gun->yRot * (ANGLE(1) / 4));
 
-	coll->Settings.EnableSpaz = false;
-	coll->Settings.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 	DoObjectCollision(lara, coll);
 	
 	Camera.targetElevation = -ANGLE(15);

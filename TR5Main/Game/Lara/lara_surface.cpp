@@ -49,7 +49,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	Lara.moveAngle = item->pos.yRot;
 	LaraSurfaceCollision(item, coll);
 	LaraTestWaterClimbOut(item, coll);
@@ -231,7 +231,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Settings.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
 	
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos + 700, item->pos.zPos, item->roomNumber, 800);
 	ShiftItem(item, coll);
@@ -240,9 +240,9 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor < 0 && (coll->Middle.Type == BIG_SLOPE || coll->Middle.Type == DIAGONAL))
 	{
 		item->fallspeed = 0;
-		item->pos.xPos = coll->Settings.OldPosition.x;
-		item->pos.yPos = coll->Settings.OldPosition.y;
-		item->pos.zPos = coll->Settings.OldPosition.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
 	else if (coll->CollisionType == CT_LEFT)
 	{
@@ -504,8 +504,8 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Settings.EnableObjectPush = false;
-	coll->Settings.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_HIPS;	//forces the camera to follow Lara instead of snapping
 }

@@ -156,7 +156,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	item = &g_Level.Items[itemNum];
 
-	if (!TestBoundsCollide(item, laraitem, coll->Settings.Radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;

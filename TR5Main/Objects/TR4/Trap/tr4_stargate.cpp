@@ -39,7 +39,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (item->status == ITEM_INVISIBLE)
 		return;
 
-	if (TestBoundsCollide(item, l, coll->Settings.Radius))
+	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
 		for (int i = 0; i < 8; i++)
 		{

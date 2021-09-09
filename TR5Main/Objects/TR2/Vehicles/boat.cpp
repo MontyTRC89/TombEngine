@@ -235,7 +235,7 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->Settings.Radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
 		return BOAT_GETON::NONE;
 
 	if (!TestCollision(boat, LaraItem))
@@ -850,7 +850,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	geton = SpeedBoatCheckGeton(itemNum, coll);
 	if (!geton)
 	{
-		coll->Settings.EnableObjectPush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, litem, coll);
 		return;
 	}
