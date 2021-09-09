@@ -107,7 +107,7 @@ int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
 	if (!getOn)
 		return 0;
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Settings.Radius))
 		return 0;
 
 	if (!TestCollision(boat, LaraItem))
@@ -604,7 +604,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 
 	if (!getOn)
 	{
-		coll->enableBaddiePush = true;
+		coll->Settings.EnableObjectPush = true;
 		ObjectCollision(itemNum, lara, coll);
 		return;
 	}

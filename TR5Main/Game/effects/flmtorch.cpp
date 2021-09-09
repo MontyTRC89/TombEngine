@@ -225,7 +225,7 @@ void TorchControl(short itemNumber)
 
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
-		lara_coll.enableBaddiePush = true;
+		lara_coll.Settings.EnableObjectPush = true;
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)

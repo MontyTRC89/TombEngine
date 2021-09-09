@@ -427,23 +427,23 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -SUB_HEIGHT;
-	coll->badCeiling = SUB_HEIGHT;
-	coll->old.x = v->pos.xPos;
-	coll->old.y = v->pos.yPos;
-	coll->old.z = v->pos.zPos;
-	coll->radius = SUB_RADIUS;
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = true;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -SUB_HEIGHT;
+	coll->Settings.BadCeilingHeight = SUB_HEIGHT;
+	coll->Settings.OldPosition.x = v->pos.xPos;
+	coll->Settings.OldPosition.y = v->pos.yPos;
+	coll->Settings.OldPosition.z = v->pos.zPos;
+	coll->Settings.Radius = SUB_RADIUS;
+	coll->Settings.SlopesAreWalls = false;
+	coll->Settings.SlopesArePits = false;
+	coll->Settings.DeathIsPit = false;
+	coll->Settings.EnableSpaz = false;
+	coll->Settings.EnableObjectPush = true;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
-		coll->facing = Lara.moveAngle = v->pos.yRot;
+		coll->Settings.ForwardAngle = Lara.moveAngle = v->pos.yRot;
 	else
-		coll->facing = Lara.moveAngle = v->pos.yRot - ANGLE(180);
+		coll->Settings.ForwardAngle = Lara.moveAngle = v->pos.yRot - ANGLE(180);
 
 	height = phd_sin(v->pos.xRot) * SUB_LENGTH;
 	if (height < 0)
@@ -451,12 +451,12 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	if (height < 200)
 		height = 200;
 
-	coll->badNeg = -height;
+	coll->Settings.BadHeightDown = -height;
 
 	GetCollisionInfo(coll, v->pos.xPos, v->pos.yPos + height / 2, v->pos.zPos, v->roomNumber, height);
 	ShiftItem(v, coll);
 
-	if (coll->collType == CT_FRONT)
+	if (coll->CollisionType == CT_FRONT)
 	{
 		if (sub->RotX > FRONT_TOLERANCE)
 			sub->RotX += WALLDEFLECT;
@@ -473,29 +473,29 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			sub->Vel = 0;
 		}
 	}
-	else if (coll->collType == CT_TOP)
+	else if (coll->CollisionType == CT_TOP)
 	{
 		if (sub->RotX >= -TOP_TOLERANCE)
 			sub->RotX -= WALLDEFLECT;
 	}
-	else if (coll->collType == CT_TOP_FRONT)
+	else if (coll->CollisionType == CT_TOP_FRONT)
 		sub->Vel = 0;
-	else if (coll->collType == CT_LEFT)
+	else if (coll->CollisionType == CT_LEFT)
 		v->pos.yRot += ANGLE(5);
-	else if (coll->collType == CT_RIGHT)
+	else if (coll->CollisionType == CT_RIGHT)
 		v->pos.yRot -= ANGLE(5);
-	else if (coll->collType == CT_CLAMP)
+	else if (coll->CollisionType == CT_CLAMP)
 	{
-		v->pos.xPos = coll->old.x;
-		v->pos.yPos = coll->old.y;
-		v->pos.zPos = coll->old.z;
+		v->pos.xPos = coll->Settings.OldPosition.x;
+		v->pos.yPos = coll->Settings.OldPosition.y;
+		v->pos.zPos = coll->Settings.OldPosition.z;
 		sub->Vel = 0;
 		return;
 	}
 
-	if (coll->middle.Floor < 0)
+	if (coll->Middle.Floor < 0)
 	{
-		v->pos.yPos += coll->middle.Floor;
+		v->pos.yPos += coll->Middle.Floor;
 		sub->RotX += WALLDEFLECT;
 	}
 }
@@ -845,7 +845,7 @@ void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
 	ITEM_INFO	*item;
 
 	item = &g_Level.Items[item_num];
-	if (!TestBoundsCollide(item, laraitem, coll->radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Settings.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;

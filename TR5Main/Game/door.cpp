@@ -432,11 +432,11 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		item->pos.yRot ^= ANGLE(180);
 	}
 
-	if (TestBoundsCollide(item, l, coll->radius))
+	if (TestBoundsCollide(item, l, coll->Settings.Radius))
 	{
 		if (TestCollision(item, l))
 		{
-			if (coll->enableBaddiePush)
+			if (coll->Settings.EnableObjectPush)
 			{
 				if (!(item->objectNumber >= ID_LIFT_DOORS1 && item->objectNumber <= ID_LIFT_DOORS2) || item->itemFlags[0])
 				{
@@ -976,11 +976,11 @@ void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	
 	if (item->itemFlags[0] != 3)
 	{
-		if (TestBoundsCollide(item, l, coll->radius))
+		if (TestBoundsCollide(item, l, coll->Settings.Radius))
 		{
 			if (TestCollision(item, l))
 			{
-				if (coll->enableBaddiePush)
+				if (coll->Settings.EnableObjectPush)
 					ItemPushItem(item, l, coll, 0, 1);
 			}
 		}

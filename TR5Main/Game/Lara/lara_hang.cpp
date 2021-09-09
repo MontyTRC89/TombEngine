@@ -21,8 +21,8 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -92,14 +92,14 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->front.Floor > -850)
+			if (coll->Front.Floor > -850)
 			{
-				if (coll->front.Floor < -650 &&
-					coll->front.Floor >= coll->front.Ceiling &&
-					coll->front.Floor >= coll->frontLeft.Ceiling &&
-					coll->front.Floor >= coll->frontRight.Ceiling)
+				if (coll->Front.Floor < -650 &&
+					coll->Front.Floor >= coll->Front.Ceiling &&
+					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
+					coll->Front.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
+					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
 					{
 						if (TrInput & IN_WALK)
 						{
@@ -119,12 +119,12 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					}
 				}
 
-				if (coll->front.Floor < -650 &&
-					coll->front.Floor - coll->front.Ceiling >= -256 &&
-					coll->front.Floor - coll->frontLeft.Ceiling >= -256 &&
-					coll->front.Floor - coll->frontRight.Ceiling >= -256)
+				if (coll->Front.Floor < -650 &&
+					coll->Front.Floor - coll->Front.Ceiling >= -256 &&
+					coll->Front.Floor - coll->FrontLeft.Ceiling >= -256 &&
+					coll->Front.Floor - coll->FrontRight.Ceiling >= -256)
 				{
-					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
+					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
 					{
 						item->goalAnimState = LS_HANG_TO_CRAWL;
 						item->requiredAnimState = LS_CROUCH_IDLE;
@@ -135,8 +135,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 
 			if (Lara.climbStatus != 0 &&
-				coll->middle.Ceiling <= -256 &&
-				abs(coll->frontLeft.Ceiling - coll->frontRight.Ceiling) < 60)
+				coll->Middle.Ceiling <= -256 &&
+				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < 60)
 			{
 				if (LaraTestClimbStance(item, coll))
 				{
@@ -156,7 +156,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_BACK &&
 			Lara.climbStatus &&
-			coll->middle.Floor > 344 &&
+			coll->Middle.Floor > 344 &&
 			item->animNumber == LA_REACH_TO_HANG)
 		{
 			if (LaraTestClimbStance(item, coll))
@@ -178,8 +178,8 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -191,7 +191,7 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->radius = LARA_RAD;
+	coll->Settings.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
@@ -200,8 +200,8 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*collision: lara_col_hangright*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
@@ -213,7 +213,7 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 31*/
 	/*state code: lara_as_hangright*/
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->radius = LARA_RAD;
+	coll->Settings.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
@@ -289,8 +289,8 @@ void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 }
@@ -356,14 +356,14 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		TestForObjectOnLedge(item, coll);
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->front.Floor > -850)
+			if (coll->Front.Floor > -850)
 			{
-				if (coll->front.Floor < -650 &&
-					coll->front.Floor >= coll->front.Ceiling &&
-					coll->front.Floor >= coll->frontLeft.Ceiling &&
-					coll->front.Floor >= coll->frontRight.Ceiling)
+				if (coll->Front.Floor < -650 &&
+					coll->Front.Floor >= coll->Front.Ceiling &&
+					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
+					coll->Front.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
+					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
 					{
 						if (TrInput & IN_WALK)
 						{
@@ -382,12 +382,12 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 					}
 				}
 			}
-			if (coll->front.Floor < -650 &&
-				coll->front.Floor - coll->front.Ceiling >= -256 &&
-				coll->front.Floor - coll->frontLeft.Ceiling >= -256 &&
-				coll->front.Floor - coll->frontRight.Ceiling >= -256)
+			if (coll->Front.Floor < -650 &&
+				coll->Front.Floor - coll->Front.Ceiling >= -256 &&
+				coll->Front.Floor - coll->FrontLeft.Ceiling >= -256 &&
+				coll->Front.Floor - coll->FrontRight.Ceiling >= -256)
 			{
-				if (abs(coll->frontLeft.Floor - coll->frontRight.Floor) < 60 && !coll->hitStatic)
+				if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
 				{
 					item->goalAnimState = LS_HANG_TO_CRAWL;
 					item->requiredAnimState = LS_CROUCH_IDLE;
@@ -397,8 +397,8 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (Lara.climbStatus != 0 &&
-			coll->middle.Ceiling <= -256 &&
-			abs(coll->frontLeft.Ceiling - coll->frontRight.Ceiling) < 60)
+			coll->Middle.Ceiling <= -256 &&
+			abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < 60)
 		{
 			if (LaraTestClimbStance(item, coll))
 			{
@@ -424,8 +424,8 @@ void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 140*/
 	//collision: lara_col_hang_feet_shimmyr
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -438,7 +438,7 @@ void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 140*/
 	//state code: lara_as_hang_feet_shimmyr
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->radius = LARA_RAD;
+	coll->Settings.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
@@ -447,8 +447,8 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 141*/
 	//collision: lara_col_hang_feet_shimmyl
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -460,7 +460,7 @@ void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 141*/
 	//state code: lara_as_hang_feet_shimmyl
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->radius = LARA_RAD;
+	coll->Settings.Radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }

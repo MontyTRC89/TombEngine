@@ -22,12 +22,12 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	coll->badPos = 384;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->slopesArePits = true;
-	coll->slopesAreWalls = true;
-	coll->facing = Lara.moveAngle;
+	coll->Settings.BadHeightUp = 384;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.SlopesArePits = true;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 }
 
@@ -40,15 +40,15 @@ void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 }
 
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
@@ -60,8 +60,8 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 }
 
 /*end generic functions*/
@@ -123,15 +123,15 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = 384;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = 384;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->slopesAreWalls = true;
-	coll->slopesArePits = true;
-	coll->lavaIsPit = 1;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.SlopesArePits = true;
+	coll->Settings.DeathIsPit = 1;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
@@ -147,11 +147,11 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!LaraFallen(item, coll))
 		{
-			if (coll->middle.Floor > STEP_SIZE / 2)
+			if (coll->Middle.Floor > STEP_SIZE / 2)
 			{
-				if (coll->front.Floor == NO_HEIGHT || coll->front.Floor <= STEP_SIZE / 2)
+				if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor <= STEP_SIZE / 2)
 				{
-					coll->middle.Floor = 0;
+					coll->Middle.Floor = 0;
 				}
 				else
 				{
@@ -159,13 +159,13 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 					GetChange(item, &g_Level.Anims[item->animNumber]);
 				}
 			}
-			if (coll->middle.Floor >= -STEPUP_HEIGHT && coll->middle.Floor < -STEP_SIZE / 2)
+			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
 			{
-				if (coll->front.Floor == NO_HEIGHT ||
-					coll->front.Floor < -STEPUP_HEIGHT ||
-					coll->front.Floor >= -STEP_SIZE / 2)
+				if (coll->Front.Floor == NO_HEIGHT ||
+					coll->Front.Floor < -STEPUP_HEIGHT ||
+					coll->Front.Floor >= -STEP_SIZE / 2)
 				{
-					coll->middle.Floor = 0;
+					coll->Middle.Floor = 0;
 				}
 				else
 				{
@@ -174,8 +174,8 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (!TestLaraSlide(item, coll) && coll->middle.Floor != NO_HEIGHT)
-				item->pos.yPos += coll->middle.Floor;
+			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+				item->pos.yPos += coll->Middle.Floor;
 		}
 	}
 }
@@ -301,13 +301,13 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_col_run*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->slopesAreWalls = true;
+	coll->Settings.SlopesAreWalls = true;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
@@ -316,7 +316,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->hitTallBounds || TestWall(item, 256, 0, -640))
+			if (coll->HitTallBounds || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -331,11 +331,11 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!LaraFallen(item, coll))
 		{
-			if (coll->middle.Floor >= -STEPUP_HEIGHT && coll->middle.Floor < -STEP_SIZE / 2)
+			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
 			{
-				if (coll->front.Floor == NO_HEIGHT || coll->front.Floor < -STEPUP_HEIGHT || coll->front.Floor >= -STEP_SIZE / 2)
+				if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor < -STEPUP_HEIGHT || coll->Front.Floor >= -STEP_SIZE / 2)
 				{
-					coll->middle.Floor = 0;
+					coll->Middle.Floor = 0;
 				}
 				else
 				{
@@ -346,16 +346,16 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!TestLaraSlide(item, coll))
 			{
-				if (coll->middle.Floor < 50)
+				if (coll->Middle.Floor < 50)
 				{
-					if (coll->middle.Floor != NO_HEIGHT)
-						item->pos.yPos += coll->middle.Floor;
+					if (coll->Middle.Floor != NO_HEIGHT)
+						item->pos.yPos += coll->Middle.Floor;
 				}
 				else
 				{
 					item->goalAnimState = LS_STEP_DOWN; // for theoretical running stepdown anims, not in default anims
 					if (GetChange(item, &g_Level.Anims[item->animNumber]))
-						item->pos.yPos += coll->middle.Floor; // move Lara to middle.Floor
+						item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
 					else
 						item->pos.yPos += 50; // do the default aligment
 				}
@@ -481,18 +481,18 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			if (!wade)
 			{
 				Lara.moveAngle = item->pos.yRot;
-				coll->badPos = NO_BAD_POS;
-				coll->badNeg = -STEPUP_HEIGHT;
-				coll->badCeiling = 0;
-				coll->slopesAreWalls = true;
-				coll->radius = LARA_RAD + 2;
-				coll->facing = Lara.moveAngle;
+				coll->Settings.BadHeightUp = NO_BAD_POS;
+				coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+				coll->Settings.BadCeilingHeight = 0;
+				coll->Settings.SlopesAreWalls = true;
+				coll->Settings.Radius = LARA_RAD + 2;
+				coll->Settings.ForwardAngle = Lara.moveAngle;
 
 				GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 				if (TestLaraVault(item, coll))
 					return;
 
-				coll->radius = LARA_RAD;
+				coll->Settings.Radius = LARA_RAD;
 			}
 		}
 		else if (TrInput & IN_BACK)
@@ -542,14 +542,14 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 2*/
 	/*state code: lara_as_stop*/
 	Lara.moveAngle = item->pos.yRot;
-	coll->badPos = STEPUP_HEIGHT;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = STEPUP_HEIGHT;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->slopesArePits = true;
-	coll->slopesAreWalls = true;
-	coll->facing = Lara.moveAngle;
+	coll->Settings.SlopesArePits = true;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
@@ -564,12 +564,12 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	ShiftItem(item, coll);
 
 #if 1
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 #else
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->middle.Floor < 0)
-		item->pos.yPos += coll->middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->middle.Floor)
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
 		item->pos.yPos += SWAMP_GRAVITY;
 #endif
 }
@@ -624,18 +624,18 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
 		Lara.moveAngle = item->pos.yRot;
 
-	if (coll->middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		if (LaraLandedBad(item, coll))
 		{
@@ -660,8 +660,8 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->speed = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 
 		AnimateLara(item);
 	}
@@ -702,25 +702,25 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = true;
+	coll->Settings.SlopesAreWalls = false;
+	coll->Settings.SlopesArePits = true;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
 	{
-		if (coll->middle.Floor <= 200)
+		if (coll->Middle.Floor <= 200)
 		{
 			if (LaraDeflectEdge(item, coll))
 				LaraCollideStop(item, coll);
 
-			if (!TestLaraSlide(item, coll) && coll->middle.Floor != NO_HEIGHT)
-				item->pos.yPos += coll->middle.Floor;
+			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+				item->pos.yPos += coll->Middle.Floor;
 		}
 		else
 		{
@@ -793,18 +793,18 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	Lara.moveAngle = item->pos.yRot;
-	coll->badPos = STEPUP_HEIGHT;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->slopesAreWalls = true;
-	coll->slopesArePits = true;
-	coll->facing = Lara.moveAngle;
+	coll->Settings.BadHeightUp = STEPUP_HEIGHT;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.SlopesArePits = true;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 #if 1
-	if (coll->middle.Floor > 100)
+	if (coll->Middle.Floor > 100)
 #else
-	if (coll->middle.Floor > 100 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (coll->Middle.Floor > 100 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 #endif
 	{
 		item->fallspeed = 0;
@@ -820,12 +820,12 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 #if 1
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 #else
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->middle.Floor < 0)
-		item->pos.yPos += coll->middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->middle.Floor)
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
 		item->pos.yPos += SWAMP_GRAVITY;
 #endif
 }
@@ -891,8 +891,8 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 8*/
 	/*collision: lara_col_death*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 	if (BinocularRange)
 	{
 		BinocularRange = 0;
@@ -910,20 +910,20 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 
 	Lara.moveAngle = item->pos.yRot;
-	coll->badPos = 384;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->radius = 400;
+	coll->Settings.BadHeightUp = 384;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.Radius = 400;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	ShiftItem(item, coll);
 
 	item->hitPoints = -1;
 	Lara.air = -1;
 
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)
@@ -941,15 +941,15 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fastfall*/
 	item->gravityStatus = true;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraSlideEdgeJump(item, coll);
 
-	if (coll->middle.Floor <= 0)
+	if (coll->Middle.Floor <= 0)
 	{
 		if (LaraLandedBad(item, coll))
 		{
@@ -968,8 +968,8 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = false;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -991,11 +991,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = 0;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = 0;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	short angle;
@@ -1003,9 +1003,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	int edge = 0;
 	int edgeCatch = 0;
 
-	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->hitStatic)
+	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
 	{
-		if (Lara.canMonkeySwing && coll->collType == CT_TOP)
+		if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
 		{
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
@@ -1024,16 +1024,16 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (coll->middle.Ceiling <= -384 &&
-			coll->middle.Floor >= 200 &&
-			coll->collType == CT_FRONT)
+		if (coll->Middle.Ceiling <= -384 &&
+			coll->Middle.Floor >= 200 &&
+			coll->CollisionType == CT_FRONT)
 		{
 			edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
 
 			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				/*if (coll->middle.SplitFloor && coll->front.SplitFloor == coll->middle.SplitFloor)
+				/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
 				{
 					result = SnapToDiagonal(angle, 35);
 				}
@@ -1048,11 +1048,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (!result)
 	{
 		LaraSlideEdgeJump(item, coll);
-		coll->facing = Lara.moveAngle;
+		coll->Settings.ForwardAngle = Lara.moveAngle;
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 		ShiftItem(item, coll);
 
-		if (item->fallspeed > 0 && coll->middle.Floor <= 0)
+		if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 		{
 			if (LaraLandedBad(item, coll))
 			{
@@ -1063,8 +1063,8 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_STOP;
 				item->fallspeed = 0;
 				item->gravityStatus = false;
-				if (coll->middle.Floor != NO_HEIGHT)
-					item->pos.yPos += coll->middle.Floor;
+				if (coll->Middle.Floor != NO_HEIGHT)
+					item->pos.yPos += coll->Middle.Floor;
 			}
 		}
 	}
@@ -1121,11 +1121,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->pos.yPos += coll->front.Floor - bounds->Y1;
+			item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-			/*if (coll->middle.SplitFloor)
+			/*if (coll->Middle.SplitFloor)
 			{
-				Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->middle.SplitFloor, LARA_RAD, angle);
+				Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, angle);
 				item->pos.xPos = v.x;
 				item->pos.zPos = v.y;
 			}
@@ -1156,19 +1156,19 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->slopesAreWalls = true;
-	coll->slopesArePits = true;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.SlopesArePits = true;
 
-	coll->badPos = 384;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = 384;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	ShiftItem(item, coll);
 
-	if (coll->middle.Floor >= -256 && coll->middle.Floor <= 256)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor >= -256 && coll->Middle.Floor <= 256)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
@@ -1217,16 +1217,16 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = NO_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = NO_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraFallen(item, coll))
 	{
-		if (coll->middle.Ceiling > -100)
+		if (coll->Middle.Ceiling > -100)
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -1237,13 +1237,13 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 			item->fallspeed = 0;
 			item->gravityStatus = false;
 
-			item->pos.xPos = coll->old.x;
-			item->pos.yPos = coll->old.y;
-			item->pos.zPos = coll->old.z;
+			item->pos.xPos = coll->Settings.OldPosition.x;
+			item->pos.yPos = coll->Settings.OldPosition.y;
+			item->pos.zPos = coll->Settings.OldPosition.z;
 		}
 
-		if (coll->middle.Floor > -256 && coll->middle.Floor < 256)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor > -256 && coll->Middle.Floor < 256)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1288,14 +1288,14 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	if (Lara.waterStatus == LW_WADE)
-		coll->badPos = NO_BAD_POS;
+		coll->Settings.BadHeightUp = NO_BAD_POS;
 	else
-		coll->badPos = STEPUP_HEIGHT;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->slopesArePits = true;
-	coll->slopesAreWalls = true;
-	coll->facing = Lara.moveAngle;
+		coll->Settings.BadHeightUp = STEPUP_HEIGHT;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.SlopesArePits = true;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
@@ -1307,7 +1307,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraFallen(item, coll))
 		return;
 
-	if (coll->middle.Floor > STEP_SIZE / 2 && coll->middle.Floor < STEPUP_HEIGHT)
+	if (coll->Middle.Floor > STEP_SIZE / 2 && coll->Middle.Floor < STEPUP_HEIGHT)
 	{
 		item->goalAnimState = LS_STEP_BACK_DOWN;
 		GetChange(item, &g_Level.Anims[item->animNumber]);
@@ -1317,13 +1317,13 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 #if 0
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->middle.Floor < 0)
-		item->pos.yPos += coll->middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->middle.Floor)
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
 		item->pos.yPos += SWAMP_GRAVITY;
 #else
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 #endif
 }
 
@@ -1407,17 +1407,17 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	if (Lara.waterStatus == LW_WADE)
-		coll->badPos = NO_BAD_POS;
+		coll->Settings.BadHeightUp = NO_BAD_POS;
 	else
-		coll->badPos = 128;
+		coll->Settings.BadHeightUp = 128;
 
-	coll->slopesAreWalls = true;
-	coll->slopesArePits = true;
+	coll->Settings.SlopesAreWalls = true;
+	coll->Settings.SlopesArePits = true;
 
-	coll->badNeg = -128;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightDown = -128;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll))
@@ -1425,8 +1425,8 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		if (LaraDeflectEdge(item, coll))
 			LaraCollideStop(item, coll);
 
-		if (!LaraFallen(item, coll) && !TestLaraSlide(item, coll) && coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (!LaraFallen(item, coll) && !TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1478,15 +1478,15 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = 0;
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->slopesAreWalls = true;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.SlopesAreWalls = true;
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
@@ -1494,7 +1494,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (coll->middle.Floor > 200)
+	if (coll->Middle.Floor > 200)
 	{
 		item->animNumber = LA_FALL_BACK;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -1507,8 +1507,8 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1583,15 +1583,15 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 25, 26, 27*/
 	/*state code: none, but is called in lara_col_backjump, lara_col_rightjump and lara_col_leftjump*/
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
-	coll->facing = Lara.moveAngle;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->fallspeed > 0 && coll->middle.Floor <= 0)
+	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
@@ -1601,8 +1601,8 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1628,16 +1628,16 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
-	coll->facing = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Settings.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
 
-	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->hitStatic)
+	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
 	{
-		if (Lara.canMonkeySwing && coll->collType == CT_TOP)
+		if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
 		{
 			item->goalAnimState = LS_MONKEYSWING_IDLE;
 			item->currentAnimState = LS_MONKEYSWING_IDLE;
@@ -1654,7 +1654,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (coll->collType == CT_FRONT && coll->middle.Ceiling <= -STEPUP_HEIGHT)
+		if (coll->CollisionType == CT_FRONT && coll->Middle.Ceiling <= -STEPUP_HEIGHT)
 		{
 			int edge;
 			int edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
@@ -1666,7 +1666,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 					short angle = item->pos.yRot;
 					bool result;
 
-					/*if (coll->middle.SplitFloor && coll->front.SplitFloor == coll->middle.SplitFloor)
+					/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
 					{
 						result = SnapToDiagonal(angle, 35);
 					}
@@ -1709,11 +1709,11 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						if (edgeCatch <= 0)
 							item->pos.yPos = edge - bounds->Y1 + 4;
 						else
-							item->pos.yPos += coll->front.Floor - bounds->Y1;
+							item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-						/*if (coll->middle.SplitFloor)
+						/*if (coll->Middle.SplitFloor)
 						{
-							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->middle.SplitFloor, LARA_RAD, item->pos.yRot);
+							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, item->pos.yRot);
 							item->pos.xPos = v.x;
 							item->pos.zPos = v.y;
 						}
@@ -1742,12 +1742,12 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (coll->collType == CT_CLAMP ||
-		coll->collType == CT_TOP ||
-		coll->collType == CT_TOP_FRONT)
+	if (coll->CollisionType == CT_CLAMP ||
+		coll->CollisionType == CT_TOP ||
+		coll->CollisionType == CT_TOP_FRONT)
 		item->fallspeed = 1;
 
-	if (coll->collType == CT_NONE)
+	if (coll->CollisionType == CT_NONE)
 	{
 		if (item->fallspeed < -70)
 		{
@@ -1766,15 +1766,15 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = item->speed <= 0 ? -2 : 2;
 	}
 
-	if (item->fallspeed > 0 && coll->middle.Floor <= 0)
+	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
 		item->goalAnimState = LaraLandedBad(item, coll) ? LS_DEATH : LS_STOP;
 
 		item->gravityStatus = false;
 		item->fallspeed = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1796,15 +1796,15 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fallback*/
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->fallspeed > 0 && coll->middle.Floor <= 0)
+	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
@@ -1814,8 +1814,8 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1825,16 +1825,16 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_void_func*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
-	coll->slopesArePits = false;
-	coll->slopesAreWalls = true;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
+	coll->Settings.SlopesArePits = false;
+	coll->Settings.SlopesAreWalls = true;
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
@@ -1854,16 +1854,16 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (coll->middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->middle.Floor;
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 52*/
 	/*collision: lara_col_swandive*/
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = true;
+	coll->Settings.EnableSpaz = false;
 	if (item->fallspeed > LARA_FREEFALL_SPEED && item->goalAnimState != LS_DIVE)
 		item->goalAnimState = LS_SWANDIVE_END;
 }
@@ -1874,22 +1874,22 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_swandive*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (coll->middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		item->goalAnimState = LS_STOP;
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1899,8 +1899,8 @@ void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_fastdive*/
 	if (TrInput & IN_ROLL && item->goalAnimState == LS_SWANDIVE_END)
 		item->goalAnimState = LS_JUMP_ROLL_180;
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = true;
+	coll->Settings.EnableSpaz = false;
 	item->speed = (item->speed * 95) / 100;
 }
 
@@ -1910,15 +1910,15 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fastdive*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (coll->middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		if (item->fallspeed <= 133)
 			item->goalAnimState = LS_STOP;
@@ -1928,8 +1928,8 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -1937,8 +1937,8 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 54*/
 	/*collision: lara_default_col*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Settings.EnableObjectPush = false;
+	coll->Settings.EnableSpaz = false;
 }
 
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
@@ -2060,13 +2060,13 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_wade*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->slopesAreWalls = true;
+	coll->Settings.SlopesAreWalls = true;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (LaraHitCeiling(item, coll))
@@ -2080,7 +2080,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.zRot = 0;
 
 
-		if ((coll->front.Type == WALL || coll->front.Type == SPLIT_TRI) && coll->front.Floor < -((STEP_SIZE * 5) / 2) && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		if ((coll->Front.Type == WALL || coll->Front.Type == SPLIT_TRI) && coll->Front.Floor < -((STEP_SIZE * 5) / 2) && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -2091,21 +2091,21 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 
-	if (coll->middle.Floor >= -STEPUP_HEIGHT && coll->middle.Floor < -STEP_SIZE / 2 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 	{
 		item->goalAnimState = LS_STEP_UP;
 		GetChange(item, &g_Level.Anims[item->animNumber]);
 	}
 
-	if (coll->middle.Floor >= 50 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (coll->Middle.Floor >= 50 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 	{
 		item->pos.yPos += 50;
 		return;
 	}
 
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->middle.Floor < 0)
-		item->pos.yPos += coll->middle.Floor;   // Enforce to floor height.. if not a swamp room.
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->middle.Floor)
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;   // Enforce to floor height.. if not a swamp room.
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
 		item->pos.yPos += SWAMP_GRAVITY;
 }
 
@@ -2180,13 +2180,13 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_dash*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = 0;
 
-	coll->slopesAreWalls = true;
+	coll->Settings.SlopesAreWalls = true;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
@@ -2195,7 +2195,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->hitTallBounds || TestWall(item, 256, 0, -640))
+			if (coll->HitTallBounds || TestWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -2210,7 +2210,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!LaraFallen(item, coll))
 		{
-			if (coll->middle.Floor >= -STEPUP_HEIGHT && coll->middle.Floor < -STEP_SIZE / 2)
+			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
 			{
 				item->goalAnimState = LS_STEP_UP;
 				GetChange(item, &g_Level.Anims[item->animNumber]);
@@ -2218,16 +2218,16 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!TestLaraSlide(item, coll))
 			{
-				if (coll->middle.Floor < 50)
+				if (coll->Middle.Floor < 50)
 				{
-					if (coll->middle.Floor != NO_HEIGHT)
-						item->pos.yPos += coll->middle.Floor;
+					if (coll->Middle.Floor != NO_HEIGHT)
+						item->pos.yPos += coll->Middle.Floor;
 				}
 				else
 				{
 					item->goalAnimState = LS_STEP_DOWN; // for theoretical sprint stepdown anims, not in default anims
 					if (GetChange(item, &g_Level.Anims[item->animNumber]))
-						item->pos.yPos += coll->middle.Floor; // move Lara to middle.Floor
+						item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
 					else
 						item->pos.yPos += 50; // do the default aligment
 				}
@@ -2256,13 +2256,13 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.moveAngle = item->pos.yRot;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = BAD_JUMP_CEILING;
+	coll->Settings.BadHeightUp = NO_BAD_POS;
+	coll->Settings.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Settings.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->slopesAreWalls = true;
+	coll->Settings.SlopesAreWalls = true;
 
-	coll->facing = Lara.moveAngle;
+	coll->Settings.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
 	LaraDeflectEdgeJump(item, coll);
 
@@ -2271,7 +2271,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->speed < 0)
 			Lara.moveAngle = item->pos.yRot;
 
-		if (coll->middle.Floor <= 0 && item->fallspeed > 0)
+		if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 		{
 			if (LaraLandedBad(item, coll))
 			{
@@ -2288,7 +2288,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->gravityStatus = false;
 			item->fallspeed = 0;
-			item->pos.yPos += coll->middle.Floor;
+			item->pos.yPos += coll->Middle.Floor;
 			item->speed = 0;
 
 			AnimateLara(item);
@@ -2296,7 +2296,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 
 		ShiftItem(item, coll);
 
-		if (coll->middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->middle.Floor;
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
 	}
 }
