@@ -2529,18 +2529,16 @@ void RefreshCamera(short type, short *data)
 
 int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 {
-	short Num;
-
 	if (1 << Node & item->meshBits)
 	{
-		Num = bits;
+		auto num = bits;
 		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
 			SoundEffect(SFX_TR5_SMASH_METAL, &item->pos, 0);
 		}
-		else if (Num == 256)
+		else if (num == 256)
 		{
-			Num = -64;
+			num = -64;
 		}
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
@@ -2552,7 +2550,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, Num, item->roomNumber, NoXZVel);
+		ShatterObject(&ShatterItem, NULL, num, item->roomNumber, NoXZVel);
 		item->meshBits &= ~ShatterItem.bit;
 		return 1;
 	}
