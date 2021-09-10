@@ -609,9 +609,9 @@ void RomanStatueControl(short itemNumber)
 					{
 						mesh = &room->mesh[i];
 						
-						if (!((mesh->z ^ pos.z) & 0xFFFFFC00) && !((mesh->x ^ pos.x) & 0xFFFFFC00))
+						if (!((mesh->pos.zPos ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.xPos ^ pos.x) & 0xFFFFFC00))
 						{
-							if (mesh->staticNumber >= 50 && mesh->staticNumber <= 59)
+							if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);

@@ -98,8 +98,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
-		auto pos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, mesh->yRot, 0, 0);
-		auto bbox = TO_DX_BBOX(&pos, &sinfo->collisionBox);
+		auto bbox = TO_DX_BBOX(&mesh->pos, &sinfo->collisionBox);
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS);
 	}

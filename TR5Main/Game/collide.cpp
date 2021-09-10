@@ -12,7 +12,7 @@
 #include "Specific\trmath.h"
 #include "Specific\prng.h"
 #include "room.h"
-#include "Renderer11.h""
+#include "Renderer11.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -48,14 +48,14 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 				if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 				{
-					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->collisionBox.Y1)
+					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->pos.yPos + staticMesh->collisionBox.Y1)
 					{
-						if (collidingItem->pos.yPos <= mesh->y + staticMesh->collisionBox.Y2)
+						if (collidingItem->pos.yPos <= mesh->pos.yPos + staticMesh->collisionBox.Y2)
 						{
-							s = phd_sin(mesh->yRot);
-							c = phd_cos(mesh->yRot);
-							rx = (collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z);
-							rz = (collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x);
+							s = phd_sin(mesh->pos.yRot);
+							c = phd_cos(mesh->pos.yRot);
+							rx = (collidingItem->pos.xPos - mesh->pos.xPos) * c - s * (collidingItem->pos.zPos - mesh->pos.zPos);
+							rz = (collidingItem->pos.zPos - mesh->pos.zPos) * c + s * (collidingItem->pos.xPos - mesh->pos.xPos);
 
 							if (radius + rx + STEP_SIZE/2 >= staticMesh->collisionBox.X1 && rx - radius - STEP_SIZE/2 <= staticMesh->collisionBox.X2)
 							{
@@ -194,18 +194,16 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				int x = abs(item->pos.xPos - mesh->x);
-				int y = abs(item->pos.yPos - mesh->y);
-				int z = abs(item->pos.zPos - mesh->z);
+				int x = abs(item->pos.xPos - mesh->pos.xPos);
+				int y = abs(item->pos.yPos - mesh->pos.yPos);
+				int z = abs(item->pos.zPos - mesh->pos.zPos);
 
 				if (x < COLLISION_CHECK_DISTANCE &&
 					y < COLLISION_CHECK_DISTANCE &&
 					z < COLLISION_CHECK_DISTANCE)
 				{
 					auto stInfo = StaticObjects[mesh->staticNumber];
-					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
-
-					if (CollideSolidBounds(item, stInfo.collisionBox, stPos, coll))
+					if (CollideSolidBounds(item, stInfo.collisionBox, mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
@@ -612,31 +610,25 @@ int FindGridShift(int x, int z)
 
 int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 {
-	PHD_3DPOS pos;
-	pos.xPos = mesh->x;
-	pos.yPos = mesh->y;
-	pos.zPos = mesh->z;
-	pos.yRot = mesh->yRot;
-
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
 	ANIM_FRAME* frame = GetBestFrame(LaraItem);
-	if (pos.yPos + bounds.Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
+	if (mesh->pos.yPos + bounds.Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
 		return false;
 
-	if (pos.yPos + bounds.Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
+	if (mesh->pos.yPos + bounds.Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
 		return false;
 
 	float c, s;
 	int x, z, dx, dz;
 
-	c = phd_cos(pos.yRot);
-	s = phd_sin(pos.yRot);
-	x = LaraItem->pos.xPos - pos.xPos;
-	z = LaraItem->pos.zPos - pos.zPos;
+	c = phd_cos(mesh->pos.yRot);
+	s = phd_sin(mesh->pos.yRot);
+	x = LaraItem->pos.xPos - mesh->pos.xPos;
+	z = LaraItem->pos.zPos - mesh->pos.zPos;
 	dx = c * x - s * z;
 	dz = c * z + s * x;
 	
@@ -655,19 +647,13 @@ int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 
 int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
-	PHD_3DPOS pos;
-	pos.xPos = mesh->x;
-	pos.yPos = mesh->y;
-	pos.zPos = mesh->z;
-	pos.yRot = mesh->yRot;
-
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
-	auto c = phd_cos(pos.yRot);
-	auto s = phd_sin(pos.yRot);
+	auto c = phd_cos(mesh->pos.yRot);
+	auto s = phd_sin(mesh->pos.yRot);
 
-	auto dx = l->pos.xPos - pos.xPos;
-	auto dz = l->pos.zPos - pos.zPos;
+	auto dx = l->pos.xPos - mesh->pos.xPos;
+	auto dz = l->pos.zPos - mesh->pos.zPos;
 	auto rx = c * dx - s * dz;
 	auto rz = c * dz + s * dx;
 	auto minX = bounds.X1 - coll->Setup.Radius;
@@ -697,8 +683,8 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	else
 		rz -= bottom;
 
-	l->pos.xPos = pos.xPos + c * rx + s * rz;
-	l->pos.zPos = pos.zPos + c * rz - s * rx;
+	l->pos.xPos = mesh->pos.xPos + c * rx + s * rz;
+	l->pos.zPos = mesh->pos.zPos + c * rz - s * rx;
 	
 	coll->Setup.BadHeightUp = NO_BAD_POS;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
@@ -1258,12 +1244,37 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Return probed bottom block into result.
 	result.BottomBlock = floor;
 
+	// Get tilts from new floordata.
+	auto tilts = floor->TiltXZ(x, z);
+	result.TiltX = tilts.first;
+	result.TiltZ = tilts.second;
+
+	// Set surface type based on tilts or split type.
+	if (floor->FloorIsSplit())
+	{
+		if ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2)
+			result.Position.Type = DIAGONAL;
+		else if ((abs(tilts.first)) != 0 || (abs(tilts.second)) != 0)
+			result.Position.Type = SPLIT_TRI;
+		else
+			result.Position.Type = SMALL_SLOPE; // This should never happen...
+	}
+	else
+	{
+		if ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2)
+			result.Position.Type = BIG_SLOPE;
+		else if ((abs(tilts.first)) != 0 || (abs(tilts.second)) != 0)
+			result.Position.Type = SMALL_SLOPE;
+		else
+			result.Position.Type = WALL;
+	}
+
 	// Check if block isn't a wall or there is no floordata
 	if (floor->floor * CLICK(1) != NO_HEIGHT && floor->index)
 	{
-		// TODO: For ChocolateFan: currently we use legacy floordata ONLY for getting TiltX/TiltY and
-		// SplitFloor/SplitCeiling values. These values can be derived from new floordata. After this
-		// we can remove this chain floordata parser.
+		// TODO: For Krys: currently we use legacy floordata ONLY for getting 
+		// SplitFloor/SplitCeiling values. These values can't be derived from new floordata. After removal
+		// of them, we can remove this chain floordata parser.
 
 		short* data = &g_Level.FloorData[floor->index];
 
@@ -1279,6 +1290,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			{
 			case DOOR_TYPE:
 			case ROOF_TYPE:
+			case TILT_TYPE:
 				data++;
 				break;
 
@@ -1288,19 +1300,17 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			case NOCOLC1B:
 			case NOCOLC2T:
 			case NOCOLC2B:
-				result.Position.SplitCeiling = type & DATA_TYPE;
+				result.Position.SplitCeiling = type & DATA_TYPE; // TODO: Remove after Krys removes diagonal stuff!
 				data++;
 				break;
 
-			case TILT_TYPE:
-				result.TiltZ = zOff = (*data >> 8);
-				result.TiltX = xOff = *(char*)data;
-
-				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.Position.Type = BIG_SLOPE;
-				else
-					result.Position.Type = SMALL_SLOPE;
-
+			case SPLIT1:
+			case SPLIT2:
+			case NOCOLF1T:
+			case NOCOLF1B:
+			case NOCOLF2T:
+			case NOCOLF2B:
+				result.Position.SplitFloor = (type & DATA_TYPE); // TODO: Remove after Krys removes diagonal stuff!
 				data++;
 				break;
 
@@ -1320,64 +1330,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 					}
 
 				} while (!(trigger & END_BIT));
-				break;
-
-			case SPLIT1:
-			case SPLIT2:
-			case NOCOLF1T:
-			case NOCOLF1B:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				tilts = *data;
-				t0 = tilts & 15;
-				t1 = (tilts >> 4) & 15;
-				t2 = (tilts >> 8) & 15;
-				t3 = (tilts >> 12) & 15;
-
-				dx = x & 1023;
-				dz = z & 1023;
-
-				result.Position.Type = SPLIT_TRI;
-				result.Position.SplitFloor = (type & DATA_TYPE);
-
-				if ((type & DATA_TYPE) == SPLIT1 ||
-					(type & DATA_TYPE) == NOCOLF1T ||
-					(type & DATA_TYPE) == NOCOLF1B)
-				{
-					if (dx <= (1024 - dz))
-					{
-						zOff = t2 - t1;
-						xOff = t0 - t1;
-					}
-					else
-					{
-						zOff = t3 - t0;
-						xOff = t3 - t2;
-					}
-				}
-				else
-				{
-					if (dx <= dz)
-					{
-						zOff = t2 - t1;
-						xOff = t3 - t2;
-					}
-					else
-					{
-						zOff = t3 - t0;
-						xOff = t0 - t1;
-					}
-				}
-
-				result.TiltZ = zOff;
-				result.TiltX = xOff;
-
-				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.Position.Type = DIAGONAL;
-				else if (result.Position.Type != SPLIT_TRI)
-					result.Position.Type = SMALL_SLOPE;
-
-				data++;
 				break;
 
 			default:
@@ -2794,9 +2746,9 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 				// Only process meshes which are visible and non-solid
 				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
 				{
-					int x = abs(l->pos.xPos - mesh->x);
-					int y = abs(l->pos.yPos - mesh->y);
-					int z = abs(l->pos.zPos - mesh->z);
+					int x = abs(l->pos.xPos - mesh->pos.xPos);
+					int y = abs(l->pos.yPos - mesh->pos.yPos);
+					int z = abs(l->pos.zPos - mesh->pos.zPos);
 
 					if (x < COLLISION_CHECK_DISTANCE &&
 						y < COLLISION_CHECK_DISTANCE && 

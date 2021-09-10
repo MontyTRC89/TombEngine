@@ -828,7 +828,7 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 		MESH_INFO* mesh = &room->mesh[i];
 		if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 		{
-			if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
+			if (item->pos.xPos == mesh->pos.xPos && item->pos.zPos == mesh->pos.zPos)
 			{
 				BOUNDING_BOX* frame = (BOUNDING_BOX*)GetBestFrame(item);
 				STATIC_INFO* s = &StaticObjects[mesh->staticNumber];

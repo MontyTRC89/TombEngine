@@ -105,12 +105,12 @@ void ControlGunShip(short itemNumber)
 
 			if (objOnLos < 0 && GetRandomControl() & 1)
 			{
-				if (hitMesh->staticNumber >= 50 && hitMesh->staticNumber < 59)
+				if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
-					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
+					TestTriggers(hitMesh->pos.xPos, hitMesh->pos.yPos, hitMesh->pos.zPos, end.roomNumber, true, NULL);
+					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos, 0);
 				}
 
 				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);

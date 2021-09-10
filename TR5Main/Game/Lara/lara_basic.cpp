@@ -25,7 +25,7 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
@@ -126,7 +126,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
@@ -913,7 +913,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
@@ -1162,7 +1162,7 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
