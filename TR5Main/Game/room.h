@@ -2,6 +2,7 @@
 #include <framework.h>
 #include <newtypes.h>
 #include "floordata.h"
+#include "Specific\phd_global.h"
 
 struct ANIM_FRAME;
 
@@ -38,10 +39,7 @@ struct ROOM_LIGHT
 
 struct MESH_INFO
 {
-	int x;
-	int y;
-	int z;
-	short yRot;
+	PHD_3DPOS pos;
 	short staticNumber;
 	short flags;
 	Vector4 color;

@@ -37,8 +37,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	if (mesh) {
 		isStatic = false;
 		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
-		yRot = mesh->yRot;
-		pos = Vector3(mesh->x, mesh->y, mesh->z);
+		yRot = mesh->pos.yRot;
+		pos = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 	}
 	else {
 		isStatic = true;

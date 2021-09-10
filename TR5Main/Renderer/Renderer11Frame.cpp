@@ -89,12 +89,12 @@ namespace TEN::Renderer
 				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
 				Vector3 min = Vector3(sinfo->visibilityBox.X1, sinfo->visibilityBox.Y1, sinfo->visibilityBox.Z1);
 				Vector3 max = Vector3(sinfo->visibilityBox.X2, sinfo->visibilityBox.Y2, sinfo->visibilityBox.Z2);
-				min += Vector3(mesh->x, mesh->y, mesh->z);
-				max += Vector3(mesh->x, mesh->y, mesh->z);
+				min += Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
+				max += Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 				if (!renderView.camera.frustum.AABBInFrustum(min, max))
 					continue;
-				Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
-				Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
+				Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->pos.yRot));
+				Vector3 translation = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 				newStatic->Mesh = mesh;
 				newStatic->RoomIndex = roomNumber;
 				newStatic->World = rotation * Matrix::CreateTranslation(translation);
