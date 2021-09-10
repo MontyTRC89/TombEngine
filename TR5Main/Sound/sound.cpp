@@ -740,7 +740,7 @@ void SayNo()
 int GetShatterSound(int shatterID)
 {
 	auto fxID = StaticObjects[shatterID].shatterSound;
-	if (fxID != -1)
+	if (fxID != -1 && fxID < NUM_SFX)
 		return fxID;
 
 	if (shatterID < 3)
