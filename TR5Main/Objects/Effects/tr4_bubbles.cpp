@@ -10,6 +10,7 @@
 #include "lara.h"
 #include "control.h"
 #include "tr4_mutant.h"
+#include "collide.h"
 
 namespace TEN::entities::all
 {

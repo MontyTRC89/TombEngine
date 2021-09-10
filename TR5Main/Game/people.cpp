@@ -7,6 +7,7 @@
 #include "effects\debris.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {

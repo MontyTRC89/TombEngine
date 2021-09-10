@@ -1,8 +1,10 @@
 #pragma once
-#include "box.h"
-#include "collide.h"
-#include "objectslist.h"
 
+#include "objectslist.h"
+#include "phd_global.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+enum ZoneType : char;
 enum HitEffectEnum
 {
     HIT_NONE,

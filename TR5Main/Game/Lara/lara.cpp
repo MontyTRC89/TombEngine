@@ -41,7 +41,8 @@
 #include "rubberboat.h"
 #include <Game\misc.h>
 #include <control\volume.h>
-
+#include "Renderer11.h"
+#include "camera.h"
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;

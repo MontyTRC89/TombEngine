@@ -5,6 +5,7 @@
 #include "lara.h"
 #include "control.h"
 #include "effects\effects.h"
+#include "Game\box.h"
 
 void ClearItem(short itemNum)
 {
@@ -12,7 +13,7 @@ void ClearItem(short itemNum)
 	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 	item->collidable = true;
-	item->data = NULL;
+	item->data = nullptr;
 	item->startPos = item->pos;
 }
 
@@ -270,8 +271,6 @@ short CreateNewEffect(short roomNum)
 
 void InitialiseFXArray(int allocmem)
 {
-	if (allocmem)
-		EffectList = game_malloc<FX_INFO>(NUM_EFFECTS);
 
 	FX_INFO* fx;
 
@@ -382,7 +381,6 @@ void InitialiseItem(short itemNum)
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
-	item->data = NULL;
 	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)
@@ -408,7 +406,7 @@ void InitialiseItem(short itemNum)
 	item->nextItem = r->itemNumber;
 	r->itemNumber = itemNum;
 
-	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	item->floor = floor->floor * 256;
 	item->boxNumber = floor->box;
 

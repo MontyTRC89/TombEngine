@@ -11,6 +11,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO SwatGun = { 80, 200, 13, 0 };
 BITE_INFO SniperGun = { 0, 480, 110, 13 };

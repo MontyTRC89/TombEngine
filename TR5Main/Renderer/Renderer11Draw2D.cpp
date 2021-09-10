@@ -14,7 +14,7 @@ TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 namespace TEN::Renderer {
 
 	void Renderer11::initialiseBars()
-{
+	{
 		std::array<Vector4, 5> healthColors = {
 			//top
 			Vector4(82 / 255.0f,0,0,1),
