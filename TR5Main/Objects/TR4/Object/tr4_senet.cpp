@@ -8,7 +8,8 @@
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
-
+#include "level.h"
+#include "collide.h"
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
@@ -27,7 +28,8 @@ void InitialiseGameStix(short itemNumber)
 	
 	item = &g_Level.Items[itemNumber];
 	item->itemFlags[7] = -1;
-	item->data = &item->itemFlags;
+	//not needed
+	//item->data = &item->itemFlags;
 	ActivePiece = -1;
 	SenetDisplacement = 0;
 }

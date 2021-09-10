@@ -6,7 +6,12 @@
 #include "control\trigger.h"
 
 struct BOUNDING_BOX;
-
+struct ITEM_INFO;
+struct COLL_INFO;
+class FLOOR_INFO;
+struct ANIM_STRUCT;
+struct MESH_INFO;
+struct ROOM_INFO;
 enum GAME_STATUS
 {
 	GAME_STATUS_NONE,

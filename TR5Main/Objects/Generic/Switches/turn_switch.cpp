@@ -7,6 +7,9 @@
 #include "door.h"
 #include "Sound\sound.h"
 #include "switch.h"
+#include "setup.h"
+#include "camera.h"
+#include "level.h"
 
 namespace TEN::Entities::Switches
 {

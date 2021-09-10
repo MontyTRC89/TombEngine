@@ -52,7 +52,7 @@
 #include <Game/Lara/lara_one_gun.h>
 #include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
-
+#include "creature_info.h"
 using namespace TEN::Entities::Switches;
 
 using std::vector;
@@ -562,9 +562,6 @@ unsigned CALLBACK GameMain(void *)
 {
 	try {
 		printf("GameMain\n");
-
-		// Initialise legacy memory buffer and game timer
-		init_game_malloc();
 		TIME_Init();
 		if (g_GameFlow->IntroImagePath.empty())
 		{
@@ -906,7 +903,7 @@ void TranslateItem(ITEM_INFO *item, int x, int y, int z)
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO *floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
+	FLOOR_INFO *floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
@@ -915,7 +912,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &g_Level.Rooms[floor->skyRoom];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->ceiling << 8);
-			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
+			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
 	}
@@ -926,7 +923,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &g_Level.Rooms[floor->pitRoom];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->floor << 8);
-			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
+			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
 
@@ -2406,9 +2403,9 @@ void DoFlipMap(short group)
 	FlipStats[group] = status;
 	FlipStatus = status;
 
-	for (int i = 0; i < NUM_SLOTS; i++)
+	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
-		BaddieSlots[i].LOT.targetBox = NO_BOX;
+		ActiveCreatures[i]->LOT.targetBox = NO_BOX;
 	}
 }
 
@@ -2613,7 +2610,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			r = &g_Level.Rooms[floor->skyRoom];
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 			if (floor->skyRoom == NO_ROOM)
 				break;
 		}
@@ -2629,7 +2626,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			r = &g_Level.Rooms[floor->pitRoom];
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 			if (floor->pitRoom == NO_ROOM)
 				break;
 		}

@@ -12,6 +12,8 @@
 #include "lara.h"
 #include "traps.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
+#include "collide.h"
 
 enum TonyFlameType
 {

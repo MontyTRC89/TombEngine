@@ -4,6 +4,7 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
+#include "level.h"
 
 namespace TEN::Entities::Switches
 {

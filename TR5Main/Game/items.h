@@ -1,7 +1,7 @@
 #pragma once
 #include "Specific\phd_global.h"
-
-enum GAME_OBJECT_ID : short;
+#include "item.h"
+#include <vector>
 
 enum AIObjectType
 {
@@ -32,60 +32,8 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-struct ROOM_VECTOR
-{
-	int roomNumber;
-	int yNumber;
-};
 
-struct ITEM_INFO
-{
-	int floor;
-	DWORD touchBits;
-	DWORD meshBits;
-	GAME_OBJECT_ID objectNumber;
-	short currentAnimState;
-	short goalAnimState;
-	short requiredAnimState;
-	short animNumber;
-	short frameNumber;
-	short roomNumber;
-	ROOM_VECTOR location;
-	short nextItem;
-	short nextActive;
-	short speed;
-	short fallspeed;
-	short hitPoints;
-	int boxNumber;
-	short timer;
-	unsigned short flags; // ItemFlags enum
-	short shade;
-	short triggerFlags;
-	short carriedItem;
-	short afterDeath;
-	short firedWeapon;
-	short itemFlags[8];
-	void* data;
-	PHD_3DPOS pos;
-	bool active;
-	short status; // ItemStatus enum
-	bool gravityStatus;
-	bool hitStatus;
-	bool collidable;
-	bool lookedAt;
-	bool dynamicLight;
-	bool poisoned;
-	byte aiBits; // AIObjectType enum
-	bool reallyActive;
-	bool inDrawRoom;
-	bool friendly;
-	int swapMeshFlags;
-	short drawRoom;
-	short TOSSPAD;
-	PHD_3DPOS startPos;
-	short locationAI;
-	std::string luaName;
-};
+
 
 // used by fx->shade !
 #define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
@@ -97,7 +45,6 @@ constexpr auto NO_ITEM = -1;
 constexpr auto ALL_MESHBITS = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 #define NUM_ITEMS 1024
-#define NUM_EFFECTS 1024
 
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNum, short roomNumber);

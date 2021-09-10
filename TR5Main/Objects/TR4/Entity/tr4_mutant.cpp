@@ -8,6 +8,7 @@
 #include "sphere.h"
 #include "objectslist.h"
 #include "Specific\trmath.h"
+#include "creature_info.h"
 #include "control.h"
 
 namespace TEN::Entities::TR4

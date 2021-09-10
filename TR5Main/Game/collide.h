@@ -1,6 +1,10 @@
 #pragma once
 #include "Specific\phd_global.h"
-#include "level.h"
+#include "trmath.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+struct FLOOR_INFO;
+struct MESH_INFO;
 
 // used by coll->Setup.BadHeightUp
 #define NO_BAD_POS (-NO_HEIGHT)

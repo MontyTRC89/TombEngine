@@ -3,8 +3,8 @@
 #include "input.h"
 #include "draw.h"
 #include "effects\effects.h"
+#include "collide.h"
 #include "control.h"
-
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
 int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)

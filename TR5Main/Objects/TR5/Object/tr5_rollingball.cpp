@@ -7,6 +7,7 @@
 #include "setup.h"
 #include "Sound\sound.h"
 #include "effects\effects.h"
+#include "level.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
