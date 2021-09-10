@@ -1,32 +1,10 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
-#include "room.h"
+struct COLL_INFO;
+struct ITEM_INFO;
+struct ROOM_INFO;
+struct DOORPOS_DATA;
+struct DOOR_DATA;
 
-struct DOORPOS_DATA
-{
-	FLOOR_INFO* floor;
-	FLOOR_INFO data;
-	short block;
-};
-
-struct DOOR_DATA
-{
-	DOORPOS_DATA d1;
-	DOORPOS_DATA d1flip;
-	DOORPOS_DATA d2;
-	DOORPOS_DATA d2flip;
-	short opened;
-	short* dptr1;
-	short* dptr2;
-	short* dptr3;
-	short* dptr4;
-	byte dn1;
-	byte dn2;
-	byte dn3;
-	byte dn4;
-	ITEM_INFO* item;
-};
 
 void SequenceDoorControl(short itemNumber);
 void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

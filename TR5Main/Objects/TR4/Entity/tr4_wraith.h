@@ -1,18 +1,7 @@
 #pragma once
-#include "items.h"
+struct ITEM_INFO;
 
-struct WRAITH_INFO
-{
-	int xPos;
-	int yPos;
-	int zPos;
-	short xRot;
-	short yRot;
-	short zRot;
-	byte r;
-	byte g;
-	byte b;
-};
+
 
 void InitialiseWraith(short itemNumber);
 void WraithControl(short itemNumber);

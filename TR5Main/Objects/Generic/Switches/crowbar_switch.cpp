@@ -7,6 +7,7 @@
 #include "newinv2.h"
 #include "Sound\sound.h"
 #include "pickup\pickup.h"
+#include "level.h"
 
 namespace TEN::Entities::Switches
 {

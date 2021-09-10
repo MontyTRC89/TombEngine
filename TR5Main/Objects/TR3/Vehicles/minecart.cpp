@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "input.h"
 #include "Sound\sound.h"
+#include "minecart_info.h"
 
 using std::vector;
 
@@ -766,8 +767,8 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &g_Level.Items[itemNum];
-	cart = game_malloc<CART_INFO>();
-	v->data = (void*)cart;
+	v->data = CART_INFO();
+	cart = v->data;
 	cart->Flags = NULL;
 	cart->Speed = 0;
 	cart->YVel = 0;
@@ -833,8 +834,8 @@ int MineCartControl(void)
 	short roomNumber;
 
 	v = &g_Level.Items[Lara.Vehicle];
-	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
-	cart = (CART_INFO*)v->data;
+	if (!v->data) { printf("v->data is nullptr !"); return 0; }
+	cart = v->data;
 
 	DoUserInput(v, LaraItem, cart);
 

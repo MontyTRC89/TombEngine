@@ -130,8 +130,8 @@ struct LEVEL_CAMERA_INFO
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
-		this->roomNumber = NULL;
-		this->flags = NULL;
+		this->roomNumber = 0;
+		this->flags = 0x0;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos)
@@ -139,8 +139,8 @@ struct LEVEL_CAMERA_INFO
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->roomNumber = NULL;
-		this->flags = NULL;
+		this->roomNumber = 0;
+		this->flags = 0x0;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room)
@@ -149,12 +149,11 @@ struct LEVEL_CAMERA_INFO
 		this->y = ypos;
 		this->z = zpos;
 		this->roomNumber = room;
-		this->flags = NULL;
+		this->flags = 0x0;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
 	{
-		UNREFERENCED_PARAMETER(isFlags);
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
@@ -205,7 +204,7 @@ struct SINK_INFO
 		this->y = ypos;
 		this->z = zpos;
 		this->strength = strength;
-		this->boxIndex = NULL;
+		this->boxIndex = 0;
 	}
 
 	SINK_INFO(int xpos, int ypos, int zpos, short strength, short boxIndex)
@@ -232,8 +231,8 @@ struct SOUND_SOURCE_INFO
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
-		this->soundId = NULL;
-		this->flags = NULL;
+		this->soundId = 0;
+		this->flags = 0x0;
 	}
 
 	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos)
@@ -241,8 +240,8 @@ struct SOUND_SOURCE_INFO
 		this->x = xpos;
 		this->y = ypos;
 		this->z = zpos;
-		this->soundId = NULL;
-		this->flags = NULL;
+		this->soundId = 0;
+		this->flags = 0x0;
 	}
 
 	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId)
@@ -251,7 +250,7 @@ struct SOUND_SOURCE_INFO
 		this->y = ypos;
 		this->z = zpos;
 		this->soundId = soundId;
-		this->flags = NULL;
+		this->flags = 0x0;
 	}
 
 	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId, short newflags)

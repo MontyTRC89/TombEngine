@@ -1,10 +1,6 @@
 #pragma once
-#include "box.h"
-#include "collide.h"
-#include "effects\effects.h"
 #include "objectslist.h"
 #include "Specific\trmath.h"
-#include "Renderer11.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
@@ -14,6 +10,15 @@
 #define NUM_PICKUPS_PIECES	(ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1)
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
+
+struct CREATURE_INFO;
+struct ITEM_INFO;
+struct FX_INFO;
+
+namespace TEN::Renderer {
+	struct RendererMesh;
+}
+
 
 #pragma region state_and_animation
 enum LARA_STATE
@@ -965,7 +970,7 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool CrouchRoll;				//crouch roll
-	bool Monkey180Roll;				//the 180° roll on monkeybars
+	bool Monkey180Roll;				//the 180ï¿½ roll on monkeybars
 	bool Crawl1clickup;				//going 1 click up in crawlspaces
 	bool Crawl1clickdown;			//going 1 click down in crawlspaces
 	bool CrawlExit1click;			//crawlspace exit at 1 click

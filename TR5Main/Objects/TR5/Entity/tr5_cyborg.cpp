@@ -12,6 +12,7 @@
 #include "setup.h"
 #include "level.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

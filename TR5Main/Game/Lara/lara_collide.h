@@ -1,6 +1,6 @@
 #pragma once
-#include "lara_struct.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
 int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll);
 void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll);

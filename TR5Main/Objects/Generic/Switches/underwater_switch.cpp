@@ -6,6 +6,9 @@
 #include "newinv2.h"
 #include "Sound\sound.h"
 #include "generic_switch.h"
+#include "camera.h"
+#include "collide.h"
+#include "level.h"
 
 namespace TEN::Entities::Switches
 { 

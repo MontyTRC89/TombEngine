@@ -1,6 +1,7 @@
 #pragma once
 #include "Specific\phd_global.h"
-#include "items.h"
+struct ITEM_INFO;
+struct COLL_INFO;
 
 enum RIPPLE_TYPE
 {
@@ -180,7 +181,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 #define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
 #define MAX_SPARKS_DYNAMICS 8
-
+#define NUM_EFFECTS 256
 extern int NextSpark;
 extern int DeadlyBounds[6];
 extern SPLASH_SETUP SplashSetup;
@@ -195,7 +196,7 @@ extern int SplashCount;
 extern PHD_VECTOR NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
-extern FX_INFO* EffectList;
+extern FX_INFO EffectList[NUM_EFFECTS];
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 int GetFreeSpark();

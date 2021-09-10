@@ -10,6 +10,9 @@
 #include "Sound\sound.h"
 #include "draw.h"
 #include "pickup\pickup.h"
+#include "collide.h"
+#include "item.h"
+#include "camera.h"
 
 bool DoJump = false;
 

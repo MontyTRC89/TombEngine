@@ -14,8 +14,10 @@
 #include "level.h"
 #include "input.h"
 #include "Sound\sound.h"
-#include <Game\particle\SimpleParticle.h>
+#include "particle\SimpleParticle.h"
 #include "Specific\prng.h"
+#include "camera.h"
+#include "skidoo_info.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -77,9 +79,8 @@ enum SKIDOO_STATE
 void InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo = &g_Level.Items[itemNum];
-
-	SKIDOO_INFO* skinfo = game_malloc<SKIDOO_INFO>();
-	skidoo->data = (void*)skinfo;
+	skidoo->data = SKIDOO_INFO();
+	SKIDOO_INFO* skinfo = skidoo->data;
 	
 	skinfo->alreadyCdPlayed = false;
 

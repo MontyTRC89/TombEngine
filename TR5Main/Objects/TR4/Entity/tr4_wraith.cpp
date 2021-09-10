@@ -9,6 +9,7 @@
 #include <lara.h>
 #include <traps.h>
 #include <effects\tomb4fx.h>
+#include "tr4_wraith_info.h"
 
 constexpr auto WRAITH_COUNT = 8;
 
@@ -19,10 +20,10 @@ void InitialiseWraith(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	WRAITH_INFO* wraithData;
 	
-	wraithData = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
-	item->data = wraithData;
+	item->data = WRAITH_INFO();
+	WRAITH_INFO* wraithData = item->data;
+
 	item->itemFlags[0] = 0;
 	item->itemFlags[6] = 0;
 	item->speed = WraithSpeed;
