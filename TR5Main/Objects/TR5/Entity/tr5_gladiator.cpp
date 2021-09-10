@@ -321,11 +321,11 @@ void ControlGladiator(short itemNumber)
 						{
 							mesh = &r->mesh[i];
 
-							if (!((pos.z ^ mesh->z) & 0xFFFFFC00))
+							if (!((pos.z ^ mesh->pos.zPos) & 0xFFFFFC00))
 							{
-								if (!((pos.x ^ mesh->x) & 0xFFFFFC00))
+								if (!((pos.x ^ mesh->pos.xPos) & 0xFFFFFC00))
 								{
-									if (mesh->staticNumber >= 50 && mesh->staticNumber <= 59)
+									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
