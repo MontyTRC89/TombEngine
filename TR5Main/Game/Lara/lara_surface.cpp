@@ -49,7 +49,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->badNeg = -384;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	Lara.moveAngle = item->pos.yRot;
 	LaraSurfaceCollision(item, coll);
 	LaraTestWaterClimbOut(item, coll);
@@ -231,24 +231,24 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->facing = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
 	
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos + 700, item->pos.zPos, item->roomNumber, 800);
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, 700, 0), 800);
 	ShiftItem(item, coll);
 	
-	if (coll->collType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
-		coll->middle.Floor < 0 && (coll->middle.Type == BIG_SLOPE || coll->middle.Type == DIAGONAL))
+	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
+		coll->Middle.Floor < 0 && (coll->Middle.Type == BIG_SLOPE || coll->Middle.Type == DIAGONAL))
 	{
 		item->fallspeed = 0;
-		item->pos.xPos = coll->old.x;
-		item->pos.yPos = coll->old.y;
-		item->pos.zPos = coll->old.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
-	else if (coll->collType == CT_LEFT)
+	else if (coll->CollisionType == CT_LEFT)
 	{
 		item->pos.yRot += ANGLE(5);
 	}
-	else if (coll->collType == CT_RIGHT)
+	else if (coll->CollisionType == CT_RIGHT)
 	{
 		item->pos.yRot -= ANGLE(5);
 	}
@@ -271,7 +271,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
+	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
@@ -282,14 +282,14 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
 
-	if (coll->front.Ceiling > 0)
+	if (coll->Front.Ceiling > 0)
 		return 0;
 
-	if (coll->middle.Ceiling > -384)
+	if (coll->Middle.Ceiling > -384)
 		return 0;
 
-	int frontFloor = coll->front.Floor + 700;
-	int frontCeiling = coll->front.Ceiling + 700;
+	int frontFloor = coll->Front.Floor + 700;
+	int frontCeiling = coll->Front.Ceiling + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
@@ -297,13 +297,13 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	int slope = 0;
 	bool result;
 
-	/*if (coll->middle.SplitFloor)
+	/*if (coll->Middle.SplitFloor)
 	{
 		result = SnapToDiagonal(rot, 35);
 	}
 	else*/
 	{
-		if (abs(coll->frontRight.Floor - coll->frontLeft.Floor) >= 60)
+		if (abs(coll->FrontRight.Floor - coll->FrontLeft.Floor) >= 60)
 			return 0;
 
 		result = SnapToQuadrant(rot, 35);
@@ -316,9 +316,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
-	/*if (coll->middle.SplitFloor)
+	/*if (coll->Middle.SplitFloor)
 	{
-		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->middle.SplitFloor, -LARA_RAD, item->pos.yRot);
+		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, -LARA_RAD, item->pos.yRot);
 		item->pos.xPos = v.x;
 		item->pos.zPos = v.y;
 	}
@@ -390,15 +390,15 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->collType == CT_FRONT 
-		|| coll->middle.Type == BIG_SLOPE 
-		|| coll->middle.Type == DIAGONAL 
-		|| coll->middle.Floor >= 0)
+	if (coll->CollisionType == CT_FRONT 
+		|| coll->Middle.Type == BIG_SLOPE 
+		|| coll->Middle.Type == DIAGONAL 
+		|| coll->Middle.Floor >= 0)
 	{
 		return 0;
 	}
 
-	if (coll->middle.Floor >= -128)
+	if (coll->Middle.Floor >= -128)
 	{
 		if (item->goalAnimState == LS_ONWATER_LEFT)
 		{
@@ -424,7 +424,7 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 	}
 
-	item->pos.yPos += coll->front.Floor + 695;
+	item->pos.yPos += coll->Front.Floor + 695;
 
 	UpdateLaraRoom(item, -381);
 
@@ -441,7 +441,7 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for water to ladder move
 {
-	if (!Lara.climbStatus || coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
+	if (!Lara.climbStatus || coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
@@ -504,8 +504,8 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_HIPS;	//forces the camera to follow Lara instead of snapping
 }

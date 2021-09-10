@@ -1,4 +1,5 @@
 #include "framework.h"
+
 #include "Lara.h"
 #include "lara_basic.h"
 #include "lara_tests.h"
@@ -7,11 +8,6 @@
 #include "lara_objects.h"
 #include "lara_hang.h"
 #include "lara_slide.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "lara_fire.h"
 #include "lara_surface.h"
 #include "lara_swim.h"
@@ -43,6 +39,13 @@
 #include <control\volume.h>
 #include "Renderer11.h"
 #include "camera.h"
+
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
+#include "inventory.h"
+#endif
+
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
@@ -51,8 +54,8 @@ using namespace TEN::Control::Volumes;
 extern Inventory g_Inventory;
 #endif
 
-short Elevation = 57346;
 extern short FXType;
+
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
 COLL_INFO lara_coll = {};
@@ -820,18 +823,18 @@ void LaraControl(short itemNumber)
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 {
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
-	coll->oldAnimState = item->currentAnimState;
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = true;
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->oldAnimNumber = item->animNumber;
-	coll->oldFrameNumber = item->frameNumber;
-	coll->radius = LARA_RAD;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = true;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
+	coll->Setup.Radius = LARA_RAD;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -939,22 +942,22 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->badPos = 32512;
-	coll->badNeg = -400;
-	coll->badCeiling = 400;
+	coll->Setup.BadHeightUp = 32512;
+	coll->Setup.BadHeightDown = -400;
+	coll->Setup.BadCeilingHeight = 400;
 
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
 
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = false;
 
-	coll->radius = 300;
+	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1052,21 +1055,21 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetElevation = -ANGLE(22);
 
-	coll->badPos = 32512;
-	coll->badNeg = -128;
-	coll->badCeiling = 100;
+	coll->Setup.BadHeightUp = 32512;
+	coll->Setup.BadHeightDown = -128;
+	coll->Setup.BadCeilingHeight = 100;
 
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathIsPit = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
-	coll->radius = 100;
+	coll->Setup.Radius = LARA_RAD;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();

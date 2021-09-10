@@ -561,7 +561,6 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
-
 	
 	switch (quadrant)
 	{
@@ -588,23 +587,23 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
 		return 0;
 
-	if (collResult.HeightType)
+	if (collResult.Position.Type)
 		return 0;
 
 	if (((PUSHABLE_INFO*)item->data)->canFall)
 	{
-		if (collResult.FloorHeight < y)
+		if (collResult.Position.Floor < y)
 			return 0;
 	}
 	else
 	{
-		if (collResult.FloorHeight != y)
+		if (collResult.Position.Floor != y)
 			return 0;
 	}
 
 	int ceiling = y - blockhite + 100;
 
-	if (GetCollisionResult(x, ceiling, z, item->roomNumber).CeilingHeight > ceiling)
+	if (GetCollisionResult(x, ceiling, z, item->roomNumber).Position.Ceiling > ceiling)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -675,15 +674,15 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
 
-	if (collResult.FloorHeight != y)
+	if (collResult.Position.Floor != y)
 		return 0;
 
-	if (collResult.HeightType)
+	if (collResult.Position.Type)
 		return 0;
 
 	int ceiling = y - blockhite + 100;
 
-	if (GetCollisionResult(x, ceiling, z, item->roomNumber).CeilingHeight > ceiling)
+	if (GetCollisionResult(x, ceiling, z, item->roomNumber).Position.Ceiling > ceiling)
 		return 0;
 
 	int oldX = item->pos.xPos;
@@ -743,7 +742,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
 		return 0;
 
-	if (collResult.FloorHeight != y)
+	if (collResult.Position.Floor != y)
 		return 0;
 
 	if (collResult.Block->ceiling * 256 > y - LARA_HEIGHT)

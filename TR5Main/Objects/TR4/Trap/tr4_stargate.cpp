@@ -32,14 +32,14 @@ void StargateControl(short itemNum)
 	}
 }
 
-void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
+void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->status == ITEM_INVISIBLE)
 		return;
 
-	if (TestBoundsCollide(item, l, c->radius))
+	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
 		for (int i = 0; i < 8; i++)
 		{
@@ -47,8 +47,8 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 			GlobalCollisionBounds.Y1 = StargateBounds[3 * i + 1];
 			GlobalCollisionBounds.Z1 = StargateBounds[3 * i + 2];
 
-			if (TestWithGlobalCollisionBounds(item, l, c))
-				ItemPushItem(item, l, c, 0, 2);
+			if (TestWithGlobalCollisionBounds(item, l, coll))
+				ItemPushItem(item, l, coll, 0, 2);
 		}
 
 		int result = TestCollision(item, l);
@@ -75,7 +75,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 						int oldY = LaraItem->pos.yPos;
 						int oldZ = LaraItem->pos.zPos;
 
-						if (ItemPushItem(item, l, c, flags & 1, 2))
+						if (ItemPushItem(item, l, coll, flags & 1, 2))
 						{
 							if ((flags & 1) &&
 								(oldX != LaraItem->pos.xPos || oldY != LaraItem->pos.yPos || oldZ != LaraItem->pos.zPos) &&

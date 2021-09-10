@@ -234,13 +234,13 @@ bool SkidooCheckGetOffOK(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.Position.Floor - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HEIGHT || collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT)
+	if (collResult.Position.Ceiling - skidoo->pos.yPos > -LARA_HEIGHT || collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT)
 		return false;
 
 	return true;
@@ -614,7 +614,7 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	else
 		return 0;
 
-	if (!TestBoundsCollide(skidoo, LaraItem, coll->radius))
+	if (!TestBoundsCollide(skidoo, LaraItem, coll->Setup.Radius))
 		return 0;
 
 	if (!TestCollision(skidoo, LaraItem))

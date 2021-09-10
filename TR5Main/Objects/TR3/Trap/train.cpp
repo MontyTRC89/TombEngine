@@ -105,7 +105,7 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 
 	train = &g_Level.Items[trainNum];
 
-	if (!TestBoundsCollide(train, larA, coll->radius))
+	if (!TestBoundsCollide(train, larA, coll->Setup.Radius))
 		return;
 	if (!TestCollision(train, larA))
 		return;
