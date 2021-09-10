@@ -94,7 +94,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
@@ -779,7 +779,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = 384;
+	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
