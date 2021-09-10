@@ -12,7 +12,7 @@
 #include "setup.h"
 #include "input.h"
 #include "Sound\sound.h"
-
+#include "creature_info.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -478,7 +478,7 @@ void InitialiseBartoli(short itemNum)
 		InitialiseItem(back_item);
 		back->meshBits = 0x1FFFFF;
 
-		item->data = (void*)back_item;
+		item->data = back_item;
 
 		front = &g_Level.Items[front_item];
 		front->objectNumber = ID_DRAGON_FRONT;
@@ -492,7 +492,7 @@ void InitialiseBartoli(short itemNum)
 
 		InitialiseItem(front_item);
 
-		back->data = (void*)front_item;
+		back->data = front_item;
 
 		g_Level.NumItems += 2;
 	}

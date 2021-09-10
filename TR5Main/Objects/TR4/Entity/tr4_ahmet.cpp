@@ -12,6 +12,7 @@
 #include "people.h"
 #include "items.h"
 #include "lot.h"
+#include "creature_info.h"
 
 namespace TEN::Entities::TR4
 {

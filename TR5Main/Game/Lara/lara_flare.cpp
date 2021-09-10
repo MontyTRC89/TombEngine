@@ -63,7 +63,8 @@ void FlareControl(short itemNumber)
 
 	DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
-	short age = (short)(item->data) & 0x7FFF;
+	short& age = item->data;
+	age &= 0x7FFF;
 	if (age >= FLARE_AGE)
 	{
 		if (!item->fallspeed && !item->speed)
@@ -84,8 +85,6 @@ void FlareControl(short itemNumber)
 
 		age |= 0x8000;
 	}
-
-	item->data = (void*)age;
 }
 
 void ready_flare()
@@ -362,10 +361,12 @@ void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 
 		if (objectNum == ID_FLARE_ITEM)
 		{
+			item->data = (short)0;
+			short& age = item->data;
 			if (DoFlareLight((PHD_VECTOR*)&item->pos, Lara.flareAge))
-				item->data = (void*)(Lara.flareAge | 0x8000);
+				age = (Lara.flareAge | 0x8000);
 			else
-				item->data = (void*)(Lara.flareAge & 0x7FFF);
+				age = (Lara.flareAge & 0x7FFF);
 		}
 		else
 		{

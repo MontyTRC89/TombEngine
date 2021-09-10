@@ -7,7 +7,10 @@
 #include "draw.h"
 #include "control.h"
 #include <Game/Lara/lara_flare.h>
-
+#include "collide.h"
+#include "item.h"
+#include "camera.h"
+#include "control.h"
 /*this file has all the related functions to ducking and crawling*/
 
 /*crouch/duck start*/

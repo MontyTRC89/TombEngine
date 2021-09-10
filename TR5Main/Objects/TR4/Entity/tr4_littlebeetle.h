@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto NUM_LITTLE_BETTLES = 256;
 
-	extern SCARAB_INFO* Scarabs;
+	extern SCARAB_INFO Scarabs[NUM_LITTLE_BETTLES];
 	extern int NextScarab;
 
 	void InitialiseScarabs(short itemNumber);

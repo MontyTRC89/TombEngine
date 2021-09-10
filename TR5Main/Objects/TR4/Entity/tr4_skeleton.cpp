@@ -12,6 +12,9 @@
 #include "setup.h"
 #include "effects\tomb4fx.h"
 #include "level.h"
+#include "creature_info.h"
+#include "floordata.h"
+#include "collide.h"
 
 namespace TEN::Entities::TR4
 {

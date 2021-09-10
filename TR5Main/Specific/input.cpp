@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "Sound\sound.h"
 #include "savegame.h"
+#include "Renderer11.h"
 
 using TEN::Renderer::g_Renderer;
 
