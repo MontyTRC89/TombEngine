@@ -64,7 +64,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 
 		Lara.moveAngle = item->pos.yRot;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_MONKEY);
 
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
 		Lara.NewAnims.Monkey180Roll = 1;
@@ -212,7 +212,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 		coll->Setup.Radius = LARA_RAD;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_MONKEY);
 
 		if (coll->CollisionType == CT_FRONT
 			|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
@@ -423,7 +423,7 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.Radius = LARA_RAD;
 		coll->Setup.SlopesAreWalls = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_MONKEY);
 		MonkeySwingSnap(item, coll);
 	}
 	else
@@ -446,7 +446,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_MONKEY);
 
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
@@ -482,7 +482,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT_MONKEY);
 
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
