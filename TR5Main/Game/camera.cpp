@@ -842,7 +842,7 @@ void FixedCamera(ITEM_INFO* item)
 					else if (objLos < 0)
 					{
 						MESH_INFO* mesh = CollidedMeshes[0];
-						if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+						if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 						{
 							ShatterObject(0, mesh, 128, to.roomNumber, 0);
 							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;

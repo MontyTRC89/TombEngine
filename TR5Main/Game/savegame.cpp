@@ -809,14 +809,14 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		if (!flags)
 		{
-			FLOOR_INFO* floor = GetFloor(g_Level.Rooms[roomIndex].mesh[staticIndex].x,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].y,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].z,
-				&roomIndex);
+			FLOOR_INFO* floor = GetFloor(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
+										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
+										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos,
+										 &roomIndex);
 
-			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].x,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].y,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].z, roomIndex, true, NULL);
+			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos, roomIndex, true, NULL);
 
 			floor->Stopper = false;
 		}
