@@ -3177,8 +3177,8 @@ namespace TEN::Renderer
             {
                 RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-                m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-                m_stStatic.Position = Vector4(msh->x,msh->y,msh->z,1);
+                m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->pos.yRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+                m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
                 m_stStatic.Color = msh->color;
                 m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());

@@ -744,7 +744,9 @@ void SayNo()
 
 int GetShatterSound(int shatterID)
 {
-	// TODO: Add scripted procedure to get shatter sound here.
+	auto fxID = StaticObjects[shatterID].shatterSound;
+	if (fxID != -1)
+		return fxID;
 
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;

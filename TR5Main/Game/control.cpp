@@ -477,14 +477,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				SmashedMeshCount--;
 
 				FLOOR_INFO *floor = GetFloor(
-					SmashedMesh[SmashedMeshCount]->x,
-					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z,
+					SmashedMesh[SmashedMeshCount]->pos.xPos,
+					SmashedMesh[SmashedMeshCount]->pos.yPos,
+					SmashedMesh[SmashedMeshCount]->pos.zPos,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				TestTriggers(SmashedMesh[SmashedMeshCount]->x,
-					         SmashedMesh[SmashedMeshCount]->y,
-					         SmashedMesh[SmashedMeshCount]->z,
+				TestTriggers(SmashedMesh[SmashedMeshCount]->pos.xPos,
+					         SmashedMesh[SmashedMeshCount]->pos.yPos,
+					         SmashedMesh[SmashedMeshCount]->pos.zPos,
 					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->Stopper = false;
@@ -1354,10 +1354,10 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 			{
 				if (itemNumber < 0)
 				{
-					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+					if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterImpactData.impactDirection = direction;
-						ShatterImpactData.impactLocation = Vector3(mesh->x, mesh->y, mesh->z);
+						ShatterImpactData.impactLocation = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
@@ -1558,10 +1558,10 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 
 			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
-				pos.xPos = meshp->x;
-				pos.yPos = meshp->y;
-				pos.zPos = meshp->z;
-				pos.yRot = meshp->yRot;
+				pos.xPos = meshp->pos.xPos;
+				pos.yPos = meshp->pos.yPos;
+				pos.zPos = meshp->pos.zPos;
+				pos.yRot = meshp->pos.yRot;
 
 				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].collisionBox, &pos, vec, -1 - meshp->staticNumber))
 				{

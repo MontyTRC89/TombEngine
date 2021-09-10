@@ -48,14 +48,14 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 
 				if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 				{
-					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->collisionBox.Y1)
+					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->pos.yPos + staticMesh->collisionBox.Y1)
 					{
-						if (collidingItem->pos.yPos <= mesh->y + staticMesh->collisionBox.Y2)
+						if (collidingItem->pos.yPos <= mesh->pos.yPos + staticMesh->collisionBox.Y2)
 						{
-							s = phd_sin(mesh->yRot);
-							c = phd_cos(mesh->yRot);
-							rx = (collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z);
-							rz = (collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x);
+							s = phd_sin(mesh->pos.yRot);
+							c = phd_cos(mesh->pos.yRot);
+							rx = (collidingItem->pos.xPos - mesh->pos.xPos) * c - s * (collidingItem->pos.zPos - mesh->pos.zPos);
+							rz = (collidingItem->pos.zPos - mesh->pos.zPos) * c + s * (collidingItem->pos.xPos - mesh->pos.xPos);
 
 							if (radius + rx + STEP_SIZE/2 >= staticMesh->collisionBox.X1 && rx - radius - STEP_SIZE/2 <= staticMesh->collisionBox.X2)
 							{
@@ -194,18 +194,16 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				int x = abs(item->pos.xPos - mesh->x);
-				int y = abs(item->pos.yPos - mesh->y);
-				int z = abs(item->pos.zPos - mesh->z);
+				int x = abs(item->pos.xPos - mesh->pos.xPos);
+				int y = abs(item->pos.yPos - mesh->pos.yPos);
+				int z = abs(item->pos.zPos - mesh->pos.zPos);
 
 				if (x < COLLISION_CHECK_DISTANCE &&
 					y < COLLISION_CHECK_DISTANCE &&
 					z < COLLISION_CHECK_DISTANCE)
 				{
 					auto stInfo = StaticObjects[mesh->staticNumber];
-					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
-
-					if (CollideSolidBounds(item, stInfo.collisionBox, stPos, coll))
+					if (CollideSolidBounds(item, stInfo.collisionBox, mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
@@ -612,31 +610,25 @@ int FindGridShift(int x, int z)
 
 bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 {
-	PHD_3DPOS pos;
-	pos.xPos = mesh->x;
-	pos.yPos = mesh->y;
-	pos.zPos = mesh->z;
-	pos.yRot = mesh->yRot;
-
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
 	ANIM_FRAME* frame = GetBestFrame(LaraItem);
-	if (pos.yPos + bounds.Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
+	if (mesh->pos.yPos + bounds.Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
 		return false;
 
-	if (pos.yPos + bounds.Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
+	if (mesh->pos.yPos + bounds.Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
 		return false;
 
 	float c, s;
 	int x, z, dx, dz;
 
-	c = phd_cos(pos.yRot);
-	s = phd_sin(pos.yRot);
-	x = LaraItem->pos.xPos - pos.xPos;
-	z = LaraItem->pos.zPos - pos.zPos;
+	c = phd_cos(mesh->pos.yRot);
+	s = phd_sin(mesh->pos.yRot);
+	x = LaraItem->pos.xPos - mesh->pos.xPos;
+	z = LaraItem->pos.zPos - mesh->pos.zPos;
 	dx = c * x - s * z;
 	dz = c * z + s * x;
 	
@@ -655,19 +647,13 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 
 bool ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
-	PHD_3DPOS pos;
-	pos.xPos = mesh->x;
-	pos.yPos = mesh->y;
-	pos.zPos = mesh->z;
-	pos.yRot = mesh->yRot;
-
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
-	auto c = phd_cos(pos.yRot);
-	auto s = phd_sin(pos.yRot);
+	auto c = phd_cos(mesh->pos.yRot);
+	auto s = phd_sin(mesh->pos.yRot);
 
-	auto dx = l->pos.xPos - pos.xPos;
-	auto dz = l->pos.zPos - pos.zPos;
+	auto dx = l->pos.xPos - mesh->pos.xPos;
+	auto dz = l->pos.zPos - mesh->pos.zPos;
 	auto rx = c * dx - s * dz;
 	auto rz = c * dz + s * dx;
 	auto minX = bounds.X1 - coll->Setup.Radius;
@@ -697,8 +683,8 @@ bool ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previousl
 	else
 		rz -= bottom;
 
-	l->pos.xPos = pos.xPos + c * rx + s * rz;
-	l->pos.zPos = pos.zPos + c * rz - s * rx;
+	l->pos.xPos = mesh->pos.xPos + c * rx + s * rz;
+	l->pos.zPos = mesh->pos.zPos + c * rz - s * rx;
 	
 	coll->Setup.BadHeightUp = NO_BAD_POS;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
@@ -2584,9 +2570,9 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 				// Only process meshes which are visible and non-solid
 				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
 				{
-					int x = abs(l->pos.xPos - mesh->x);
-					int y = abs(l->pos.yPos - mesh->y);
-					int z = abs(l->pos.zPos - mesh->z);
+					int x = abs(l->pos.xPos - mesh->pos.xPos);
+					int y = abs(l->pos.yPos - mesh->pos.yPos);
+					int z = abs(l->pos.zPos - mesh->pos.zPos);
 
 					if (x < COLLISION_CHECK_DISTANCE &&
 						y < COLLISION_CHECK_DISTANCE && 

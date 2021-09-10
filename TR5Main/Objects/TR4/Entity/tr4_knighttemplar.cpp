@@ -174,9 +174,9 @@ void KnightTemplarControl(short itemNumber)
 				{
 					MESH_INFO* mesh = &room->mesh[i];
 
-					if (floor(pos.x) == floor(mesh->x) &&
-						floor(pos.z) == floor(mesh->z) &&
-						mesh->staticNumber >= 50)
+					if (floor(pos.x) == floor(mesh->pos.xPos) &&
+						floor(pos.z) == floor(mesh->pos.zPos) &&
+						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
