@@ -454,7 +454,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 	coll->Setup.BadHeightDown = -height;
 
-	GetCollisionInfo(coll, v->pos.xPos, v->pos.yPos + height / 2, v->pos.zPos, v->roomNumber, height);
+	GetCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0), height);
 	ShiftItem(v, coll);
 
 	if (coll->CollisionType == CT_FRONT)

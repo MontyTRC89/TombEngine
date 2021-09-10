@@ -233,7 +233,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos + 700, item->pos.zPos, item->roomNumber, 800);
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, 700, 0), 800);
 	ShiftItem(item, coll);
 	
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||

@@ -708,11 +708,11 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	coll->Setup.ForwardAngle = phd_atan(l->pos.zPos - coll->Setup.OldPosition.z, l->pos.xPos - coll->Setup.OldPosition.x);
 	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 	coll->Setup.ForwardAngle = oldFacing;
 
@@ -838,11 +838,11 @@ int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, ch
 
 	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 
 	coll->Setup.ForwardAngle = facing;
@@ -1393,7 +1393,12 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+{
+	GetCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+}
+
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1413,12 +1418,16 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
 
+	int xPos = item->pos.xPos + offset.x;
+	int yPos = item->pos.yPos + offset.y;
+	int zPos = item->pos.zPos + offset.z;
+
 	int x = xPos;
 	int y = yPos - objectHeight;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room
 
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
@@ -1437,7 +1446,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
 	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
 
@@ -1495,7 +1504,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		tfLocation = LaraItem->location;
 		tcLocation = LaraItem->location;
-		topRoomNumber = roomNumber;
+		topRoomNumber = item->roomNumber;
 	}
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
@@ -1547,7 +1556,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 
 	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
@@ -1600,7 +1609,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 
 	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
@@ -1650,7 +1659,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
 
-	CollideSolidStatics(LaraItem, coll);
+	CollideSolidStatics(item, coll);
 
 	if (coll->Middle.Floor == NO_HEIGHT)
 	{
@@ -1827,7 +1836,13 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	}
 }
 
-void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+{
+	GetObjectCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+}
+
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1847,12 +1862,16 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 
 	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
 
+	int xPos = item->pos.xPos + offset.x;
+	int yPos = item->pos.yPos + offset.y;
+	int zPos = item->pos.zPos + offset.z;
+
 	int x = xPos;
 	int y = yPos - objectHeight;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber;
 
 	if (collResult.Position.Floor != NO_HEIGHT)
@@ -1868,7 +1887,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
 	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
 
@@ -1923,7 +1942,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	z = zfront + zPos;
 
 	if (resetRoom)
-		topRoomNumber = roomNumber;
+		topRoomNumber = item->roomNumber;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
@@ -1967,7 +1986,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, roomNumber);
+	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, item->roomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
@@ -2012,7 +2031,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
@@ -2053,6 +2072,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		coll->FrontRight.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
+
+	CollideSolidStatics(item, coll);
 	
 	if (coll->Middle.Floor == NO_HEIGHT)	 
 	{
