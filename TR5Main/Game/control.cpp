@@ -473,14 +473,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				SmashedMeshCount--;
 
 				FLOOR_INFO *floor = GetFloor(
-					SmashedMesh[SmashedMeshCount]->x,
-					SmashedMesh[SmashedMeshCount]->y,
-					SmashedMesh[SmashedMeshCount]->z,
+					SmashedMesh[SmashedMeshCount]->pos.xPos,
+					SmashedMesh[SmashedMeshCount]->pos.yPos,
+					SmashedMesh[SmashedMeshCount]->pos.zPos,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				TestTriggers(SmashedMesh[SmashedMeshCount]->x,
-					         SmashedMesh[SmashedMeshCount]->y,
-					         SmashedMesh[SmashedMeshCount]->z,
+				TestTriggers(SmashedMesh[SmashedMeshCount]->pos.xPos,
+					         SmashedMesh[SmashedMeshCount]->pos.yPos,
+					         SmashedMesh[SmashedMeshCount]->pos.zPos,
 					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
 				floor->stopper = false;
@@ -1521,10 +1521,10 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 			{
 				if (itemNumber < 0)
 				{
-					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+					if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterImpactData.impactDirection = direction;
-						ShatterImpactData.impactLocation = Vector3(mesh->x, mesh->y, mesh->z);
+						ShatterImpactData.impactLocation = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
@@ -1725,10 +1725,10 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 
 			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
-				pos.xPos = meshp->x;
-				pos.yPos = meshp->y;
-				pos.zPos = meshp->z;
-				pos.yRot = meshp->yRot;
+				pos.xPos = meshp->pos.xPos;
+				pos.yPos = meshp->pos.yPos;
+				pos.zPos = meshp->pos.zPos;
+				pos.yRot = meshp->pos.yRot;
 
 				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].collisionBox, &pos, vec, -1 - meshp->staticNumber))
 				{
@@ -2492,18 +2492,16 @@ void RefreshCamera(short type, short *data)
 
 int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 {
-	short Num;
-
 	if (1 << Node & item->meshBits)
 	{
-		Num = bits;
+		auto num = bits;
 		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
 			SoundEffect(SFX_TR5_SMASH_METAL, &item->pos, 0);
 		}
-		else if (Num == 256)
+		else if (num == 256)
 		{
-			Num = -64;
+			num = -64;
 		}
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
@@ -2515,7 +2513,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, Num, item->roomNumber, NoXZVel);
+		ShatterObject(&ShatterItem, NULL, num, item->roomNumber, NoXZVel);
 		item->meshBits &= ~ShatterItem.bit;
 		return 1;
 	}
