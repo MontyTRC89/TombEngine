@@ -16,6 +16,7 @@
 #include <Game\effects\bubble.h>
 #include "smoke.h"
 #include "Specific\prng.h"
+#include "Renderer11.h"
 
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
@@ -23,7 +24,7 @@ using namespace TEN::Effects::Spark;
 using namespace TEN::Math::Random;
 
 short FXType;
-FX_INFO* EffectList;
+FX_INFO EffectList[NUM_EFFECTS];
 
 int NextSpark;
 int DeadlyBounds[6];

@@ -12,6 +12,7 @@
 #include "Specific\trmath.h"
 #include "Specific\prng.h"
 #include "room.h"
+#include "Renderer11.h""
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -1251,7 +1252,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
 		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
 	// Return probed bottom block into result.

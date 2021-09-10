@@ -8,6 +8,7 @@
 #include "lot.h"
 #include "setup.h"
 #include "Specific\trmath.h"
+#include "creature_info.h"
 
 namespace TEN::Entities::TR4
 {

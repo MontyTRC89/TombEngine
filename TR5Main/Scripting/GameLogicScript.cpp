@@ -14,7 +14,7 @@
 #include "pickup\pickup.h"
 #include "newinv2.h"
 #include "ObjectIDs.h"
-
+#include "camera.h"
 /***
 Functions and callbacks for level-specific logic scripts.
 @files Level-specific

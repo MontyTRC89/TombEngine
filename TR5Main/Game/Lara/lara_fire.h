@@ -1,6 +1,7 @@
 #pragma once
 #include "lara.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
 enum FireWeaponType
 {
 	FW_MISS = -1,

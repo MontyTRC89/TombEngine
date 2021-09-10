@@ -11,7 +11,7 @@
 #include <switch.h>
 #include <input.h>
 #include "generic_switch.h"
-
+#include "collide.h"
 using namespace TEN::Entities::Switches;
 
 OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {

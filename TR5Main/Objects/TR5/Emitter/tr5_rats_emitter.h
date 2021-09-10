@@ -14,7 +14,7 @@ struct RAT_STRUCT
 };
 
 extern int NextRat;
-extern RAT_STRUCT* Rats;
+extern RAT_STRUCT Rats[NUM_RATS];
 
 void ClearRats();
 short GetNextRat();

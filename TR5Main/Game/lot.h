@@ -1,9 +1,7 @@
 #pragma once
 #include "box.h"
 
-constexpr auto NUM_SLOTS = 32;
-extern int SlotsUsed;
-extern std::vector<CREATURE_INFO> BaddieSlots;
+extern std::vector<CREATURE_INFO*> ActiveCreatures;
 
 void InitialiseLOTarray(int allocMem);
 int EnableBaddieAI(short itemNum, int always);

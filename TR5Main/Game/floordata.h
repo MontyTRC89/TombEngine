@@ -1,6 +1,7 @@
 #pragma once
 #include "Specific\trmath.h"
-#include "items.h"
+#include <optional>
+#include "roomvector.h"
 
 struct SECTOR_COLLISION_INFO
 {
@@ -25,7 +26,7 @@ struct SECTOR_FLAGS
 
 class FLOOR_INFO
 {
-public:
+	public:
 	int index;
 	int box;
 	int fx;

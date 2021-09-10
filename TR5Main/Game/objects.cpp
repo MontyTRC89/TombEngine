@@ -14,6 +14,7 @@
 #include "level.h"
 #include "input.h"
 #include "Sound\sound.h"
+#include "collide.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
