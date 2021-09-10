@@ -5,46 +5,35 @@
 #include "camera.h"
 #include "lara.h"
 #include "level.h"
-
+#include "creature_info.h"
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
 int SlotsUsed;
-std::vector<CREATURE_INFO> BaddieSlots;
+std::vector<CREATURE_INFO*> ActiveCreatures;
 
-void InitialiseLOTarray(int allocMem)
+void InitialiseLOTarray(int itemNum)
 {
-	if (allocMem)
-	{
-		BaddieSlots.clear();
-		BaddieSlots.resize(NUM_SLOTS);
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	
+	CREATURE_INFO* creature = item->data;
+	if(!creature->LOT.initialised) {
+		creature->LOT.node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
+		creature->LOT.initialised = true;
 	}
-
-	CREATURE_INFO* creature = BaddieSlots.data();
-	for (int i = 0; i < NUM_SLOTS; i++, creature++)
-	{
-		creature->itemNum = NO_ITEM;
-		if (allocMem)
-		{
-			creature->LOT.node.clear();
-			creature->LOT.node.resize(g_Level.Boxes.size());
-			for (int j = 0; j < g_Level.Boxes.size(); j++)
-			{
-				creature->LOT.node.emplace_back(BOX_NODE());
-			}
-		}
-	}
-
-	SlotsUsed = 0;
+	
 }
 
 int EnableBaddieAI(short itemNum, int always)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (item->data != NULL)
+	if (item->data.is<CREATURE_INFO>())
 		return true;
 
+
+	
+	/*
 	if (SlotsUsed >= NUM_SLOTS)
 	{
 		int cameraDistance = 0;
@@ -57,9 +46,11 @@ int EnableBaddieAI(short itemNum, int always)
 		}
 
 		int slotToDisable = -1;
-		CREATURE_INFO* creature = BaddieSlots.data();
-		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
+
+
+		for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 		{
+			CREATURE_INFO* creature = ActiveCreatures[slot];
 			item = &g_Level.Items[creature->itemNum];
 
 			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
@@ -77,17 +68,18 @@ int EnableBaddieAI(short itemNum, int always)
 		if (slotToDisable < 0 || slotToDisable > NUM_SLOTS)
 			return false;
 
-		ITEM_INFO* itemToDisable = &g_Level.Items[BaddieSlots[slotToDisable].itemNum];
-		CREATURE_INFO* creatureToDisable = &BaddieSlots[slotToDisable];
+		ITEM_INFO* itemToDisable = &g_Level.Items[ActiveCreatures[slotToDisable].itemNum];
+		CREATURE_INFO* creatureToDisable = &ActiveCreatures[slotToDisable];
 
 		itemToDisable->status = ITEM_INVISIBLE;
 		DisableBaddieAI(creatureToDisable->itemNum);
 		InitialiseSlot(itemNum, slotToDisable);
 		return true;
 	}
-	else
+	else*/
 	{
-		CREATURE_INFO* creature = BaddieSlots.data();
+		/*
+		CREATURE_INFO* creature = ActiveCreatures.data();
 		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			if (creature->itemNum == NO_ITEM)
@@ -96,9 +88,12 @@ int EnableBaddieAI(short itemNum, int always)
 				return true;
 			}
 		}
+		*/
+		InitialiseSlot(itemNum, 0);
+		ActiveCreatures.push_back(item->data);
 	}
 
-	return false;
+	return true;
 }
 
 void DisableBaddieAI(short itemNumber)
@@ -106,11 +101,13 @@ void DisableBaddieAI(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
-	item->data = NULL;
+	
 	if (creature)
 	{
 		creature->itemNum = NO_ITEM;
-		SlotsUsed--;
+		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
+		item->data = nullptr;
+
 	}
 }
 
@@ -118,9 +115,10 @@ void InitialiseSlot(short itemNum, short slot)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	CREATURE_INFO* creature = &BaddieSlots[slot];
 
-	item->data = creature;
+	item->data = CREATURE_INFO();
+	CREATURE_INFO* creature = item->data;
+	InitialiseLOTarray(itemNum);
 	creature->itemNum = itemNum;
 	creature->mood = BORED_MOOD;
 	creature->jointRotation[0] = 0;
@@ -283,12 +281,11 @@ void ClearLOT(LOT_INFO* LOT)
 	LOT->requiredBox = NO_BOX;
 
 	BOX_NODE* node = LOT->node.data();
-	for (int i = 0; i < g_Level.Boxes.size(); i++)
+	for(auto& node : LOT->node) 
 	{
-		node->exitBox = NO_BOX;
-		node->nextExpansion = NO_BOX;
-		node->searchNumber = 0;
-		node++;
+		node.exitBox = NO_BOX;
+		node.nextExpansion = NO_BOX;
+		node.searchNumber = 0;
 	}
 }
 
@@ -297,7 +294,7 @@ void CreateZone(ITEM_INFO* item)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
-	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
+	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->box;
 
 	if (creature->LOT.fly)
 	{

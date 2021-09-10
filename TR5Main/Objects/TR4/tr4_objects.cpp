@@ -69,6 +69,8 @@
 #include "setup.h"
 #include "level.h"
 #include "tr4_enemy_jeep.h"
+#include "creature_info.h"
+#include "Box.h"
 
 using namespace TEN::Entities::TR4;
 
@@ -1217,6 +1219,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	TEN::Entities::TR4::Scarabs = game_malloc<SCARAB_INFO>(TEN::Entities::TR4::NUM_LITTLE_BETTLES);
 	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
 }

@@ -20,6 +20,8 @@
 #include "health.h"
 #include "camera.h"
 #include "Specific\prng.h"
+#include "Box.h"
+#include "motorbike_info.h"
 
 using namespace TEN::Math::Random;
 
@@ -138,8 +140,8 @@ void InitialiseMotorbike(short itemNumber)
     MOTORBIKE_INFO* motorbike;
 
     item = &g_Level.Items[itemNumber];
-    motorbike = game_malloc<MOTORBIKE_INFO>();
-    item->data = (void*)motorbike;
+    item->data = ITEM_DATA(MOTORBIKE_INFO());
+    motorbike = item->data;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
     motorbike->pitch = 0;

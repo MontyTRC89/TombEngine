@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr3_scuba.h"
 #include "items.h"
-#include "effects\effects.h"
 #include "box.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
+#include "effects\effects.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 

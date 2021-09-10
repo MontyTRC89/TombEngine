@@ -5,6 +5,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "Sound\sound.h"
+#include "collide.h"
 
 void ClockworkBeetleControl(short item_number)
 {

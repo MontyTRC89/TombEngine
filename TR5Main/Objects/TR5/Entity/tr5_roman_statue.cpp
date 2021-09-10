@@ -13,6 +13,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2
@@ -599,7 +600,7 @@ void RomanStatueControl(short itemNumber)
 				GetJointAbsPosition(item, &pos, 16);
 
 				room = &g_Level.Rooms[item->roomNumber];
-				floor = &XZ_GET_SECTOR(room, pos.x - room->x, pos.z - room->z);
+				floor = XZ_GET_SECTOR(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 				if (floor->stopper)

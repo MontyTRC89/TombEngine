@@ -11,7 +11,7 @@
 #include <Game\items.h>
 
 int NextBat;
-BAT_STRUCT* Bats;
+BAT_STRUCT Bats[NUM_BATS];
 
 void InitialiseLittleBats(short itemNumber)
 {

@@ -7,6 +7,7 @@
 #include "Sound\sound.h"
 #include "effects\tomb4fx.h"
 #include "Specific\trmath.h"
+#include "setup.h"
 
 short SPyoffs[8] =
 {

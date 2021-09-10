@@ -7,6 +7,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 

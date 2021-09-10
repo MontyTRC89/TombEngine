@@ -12,6 +12,7 @@
 #include "level.h"
 #include "lara.h"
 #include "control.h"
+#include "creature_info.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 

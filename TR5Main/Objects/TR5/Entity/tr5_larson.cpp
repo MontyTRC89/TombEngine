@@ -9,8 +9,8 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
-
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2
 #define STATE_TR5_LARSON_RUN		3

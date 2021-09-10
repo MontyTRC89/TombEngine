@@ -6,6 +6,8 @@
 #include "level.h"
 #include "control.h"
 #include "lara.h"
+#include "creature_info.h"
+#include "control.h"
 
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 
