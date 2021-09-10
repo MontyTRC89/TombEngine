@@ -172,8 +172,8 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->hitTallBounds = false;
-	coll->boundsAbove = INT_MAX;
+	coll->HitTallBounds = false;
+	coll->ObjectHeadroom = INT_MAX;
 
 	short roomsToCheck[128];
 	short numRoomsToCheck = 0;
@@ -206,7 +206,7 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 					auto stPos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
 
 					if (CollideSolidBounds(item, stInfo.collisionBox, stPos, coll))
-						coll->hitStatic = true;
+						coll->HitStatic = true;
 				}
 			}
 		}
@@ -239,10 +239,10 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 
 	// Calculate item coll bounds according to radius
 	BOUNDING_BOX collBox;
-	collBox.X1 = -coll->radius;
-	collBox.X2 =  coll->radius;
-	collBox.Z1 = -coll->radius;
-	collBox.Z2 =  coll->radius;
+	collBox.X1 = -coll->Setup.Radius;
+	collBox.X2 =  coll->Setup.Radius;
+	collBox.Z1 = -coll->Setup.Radius;
+	collBox.Z2 =  coll->Setup.Radius;
 	collBox.Y1 = itemBBox->Y1;
 	collBox.Y2 = itemBBox->Y2;
 
@@ -317,20 +317,20 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 			{
 				// HACK: additionally subtract 2 from bottom plane, or else false positives may occur.
 				item->pos.yPos += distanceToVerticalPlane + 2;
-				coll->collType = CT_TOP;
+				coll->CollisionType = CT_TOP;
 			}
 			else
 			{
 				// Set collision type only if dry room (in water rooms it causes stucking)
 				item->pos.yPos -= distanceToVerticalPlane;
-				coll->collType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->collType : CT_CLAMP;
+				coll->CollisionType = (g_Level.Rooms[item->roomNumber].flags & 1) ? coll->CollisionType : CT_CLAMP;
 			}
 
 			result = true;
 		}
 
-		if (bottom && coll->boundsAbove > abs(distanceToVerticalPlane))
-			coll->boundsAbove = abs(distanceToVerticalPlane);
+		if (bottom && coll->ObjectHeadroom > abs(distanceToVerticalPlane))
+			coll->ObjectHeadroom = abs(distanceToVerticalPlane);
 	}
 
 	// If no actual intersection occured, stop testing.
@@ -360,12 +360,12 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	auto ZMax = pos.zPos + box.Z2;
 
 	// Determine item collision bounds
-	auto inXMin = x - coll->radius;
-	auto inXMax = x + coll->radius;
+	auto inXMin = x - coll->Setup.Radius;
+	auto inXMax = x + coll->Setup.Radius;
 	auto inYMin = y - height;
 	auto inYMax = y;
-	auto inZMin = z - coll->radius;
-	auto inZMax = z + coll->radius;
+	auto inZMin = z - coll->Setup.Radius;
+	auto inZMax = z + coll->Setup.Radius;
 
 	// Don't calculate shifts if not in bounds
 	if (inXMax <= XMin || inXMin >= XMax ||
@@ -394,113 +394,113 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity
-	distance = Vector3(coll->old.x, coll->old.y, coll->old.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	distance = Vector3(coll->Setup.OldPosition.x, coll->Setup.OldPosition.y, coll->Setup.OldPosition.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
 	auto ox = round(distance.x * c - distance.z * s) + pos.xPos;
 	auto oz = round(distance.x * s + distance.z * c) + pos.zPos;
 
 	// Calculate collisison type based on identity rotation
-	switch (GetQuadrant(coll->facing - pos.yRot))
+	switch (GetQuadrant(coll->Setup.ForwardAngle - pos.yRot))
 	{
 	case NORTH:
-		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		if (rawShift.x > coll->Setup.Radius || rawShift.x < -coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = ox - x;
-			coll->collType = CT_FRONT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = ox - x;
+			coll->CollisionType = CT_FRONT;
 		}
-		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = 0;
-			coll->collType = CT_LEFT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = 0;
+			coll->CollisionType = CT_LEFT;
 		}
-		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = 0;
-			coll->collType = CT_RIGHT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = 0;
+			coll->CollisionType = CT_RIGHT;
 		}
 		break;
 
 	case SOUTH:
-		if (rawShift.x > coll->radius || rawShift.x < -coll->radius)
+		if (rawShift.x > coll->Setup.Radius || rawShift.x < -coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = ox - x;
-			coll->collType = CT_FRONT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = ox - x;
+			coll->CollisionType = CT_FRONT;
 		}
-		else if (rawShift.x > 0 && rawShift.x <= coll->radius)
+		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = 0;
-			coll->collType = CT_RIGHT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = 0;
+			coll->CollisionType = CT_RIGHT;
 		}
-		else if (rawShift.x < 0 && rawShift.x >= -coll->radius)
+		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = 0;
-			coll->collType = CT_LEFT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = 0;
+			coll->CollisionType = CT_LEFT;
 		}
 		break;
 
 	case EAST:
-		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		if (rawShift.z > coll->Setup.Radius || rawShift.z < -coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = oz - z;
-			coll->collType = CT_FRONT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = oz - z;
+			coll->CollisionType = CT_FRONT;
 		}
-		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = 0;
-			coll->collType = CT_RIGHT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = 0;
+			coll->CollisionType = CT_RIGHT;
 		}
-		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = 0;
-			coll->collType = CT_LEFT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = 0;
+			coll->CollisionType = CT_LEFT;
 		}
 		break;
 
 	case WEST:
-		if (rawShift.z > coll->radius || rawShift.z < -coll->radius)
+		if (rawShift.z > coll->Setup.Radius || rawShift.z < -coll->Setup.Radius)
 		{
-			coll->shift.x = rawShift.x;
-			coll->shift.z = oz - z;
-			coll->collType = CT_FRONT;
+			coll->Shift.x = rawShift.x;
+			coll->Shift.z = oz - z;
+			coll->CollisionType = CT_FRONT;
 		}
-		else if (rawShift.z > 0 && rawShift.z <= coll->radius)
+		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = 0;
-			coll->collType = CT_LEFT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = 0;
+			coll->CollisionType = CT_LEFT;
 		}
-		else if (rawShift.z < 0 && rawShift.z >= -coll->radius)
+		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
-			coll->shift.z = rawShift.z;
-			coll->shift.x = 0;
-			coll->collType = CT_RIGHT;
+			coll->Shift.z = rawShift.z;
+			coll->Shift.x = 0;
+			coll->CollisionType = CT_RIGHT;
 		}
 		break;
 	}
 
 	// Determine final shifts rotation/distance
-	distance = Vector3(x + coll->shift.x, y, z + coll->shift.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
+	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - Vector3(pos.xPos, pos.yPos, pos.zPos);
 	c = phd_cos(-pos.yRot);
 	s = phd_sin(-pos.yRot);
 
 	// Calculate final shifts rotation/distance
-	coll->shift.x = (round(distance.x * c - distance.z * s) + pos.xPos) - item->pos.xPos;
-	coll->shift.z = (round(distance.x * s + distance.z * c) + pos.zPos) - item->pos.zPos;
+	coll->Shift.x = (round(distance.x * c - distance.z * s) + pos.xPos) - item->pos.xPos;
+	coll->Shift.z = (round(distance.x * s + distance.z * c) + pos.zPos) - item->pos.zPos;
 
-	if (coll->shift.x == 0 && coll->shift.z == 0)
-		coll->collType = CT_NONE; // Paranoid
+	if (coll->Shift.x == 0 && coll->Shift.z == 0)
+		coll->CollisionType = CT_NONE; // Paranoid
 
 	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom
-	if (item == LaraItem && coll->collType == CT_FRONT)
-		coll->hitTallBounds = (YMin <= inYMin + LARA_HEADROOM);
+	if (item == LaraItem && coll->CollisionType == CT_FRONT)
+		coll->HitTallBounds = (YMin <= inYMin + LARA_HEADROOM);
 
 	return true;
 }
@@ -524,28 +524,28 @@ int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* c
 	int x = c * dx - s * dz;
 	int z = c * dz + s * dx;
 
-	if (x < GlobalCollisionBounds.X1 - coll->radius ||
-		x > GlobalCollisionBounds.X2 + coll->radius ||
-		z < GlobalCollisionBounds.Z1 - coll->radius ||
-		z > GlobalCollisionBounds.Z2 + coll->radius)
+	if (x < GlobalCollisionBounds.X1 - coll->Setup.Radius ||
+		x > GlobalCollisionBounds.X2 + coll->Setup.Radius ||
+		z < GlobalCollisionBounds.Z1 - coll->Setup.Radius ||
+		z > GlobalCollisionBounds.Z2 + coll->Setup.Radius)
 		return false;
 
 	return true;
 }
 
-void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (!TestBoundsCollide(item, l, c->radius))
+		if (!TestBoundsCollide(item, l, coll->Setup.Radius))
 			return;
 
 		TestCollision(item, LaraItem);    
 	}
 	else if (item->status != ITEM_INVISIBLE)
-		ObjectCollision(itemNumber, l, c);
+		ObjectCollision(itemNumber, l, coll);
 }
 
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
@@ -573,19 +573,19 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 		// CHECK
 		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != 999)
 		{
-			coll->hitStatic = true;
+			coll->HitStatic = true;
 		}*/
 	}
 }
 
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->pos.xPos += coll->shift.x;
-	item->pos.yPos += coll->shift.y;
-	item->pos.zPos += coll->shift.z;
-	coll->shift.z = 0;
-	coll->shift.y = 0;
-	coll->shift.x = 0;
+	item->pos.xPos += coll->Shift.x;
+	item->pos.yPos += coll->Shift.y;
+	item->pos.zPos += coll->Shift.z;
+	coll->Shift.z = 0;
+	coll->Shift.y = 0;
+	coll->Shift.x = 0;
 }
 
 void UpdateLaraRoom(ITEM_INFO* item, int height)
@@ -670,10 +670,10 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	auto dz = l->pos.zPos - pos.zPos;
 	auto rx = c * dx - s * dz;
 	auto rz = c * dz + s * dx;
-	auto minX = bounds.X1 - coll->radius;
-	auto maxX = bounds.X2 + coll->radius;
-	auto minZ = bounds.Z1 - coll->radius;
-	auto maxZ = bounds.Z2 + coll->radius;
+	auto minX = bounds.X1 - coll->Setup.Radius;
+	auto maxX = bounds.X2 + coll->Setup.Radius;
+	auto minZ = bounds.Z1 - coll->Setup.Radius;
+	auto maxZ = bounds.Z2 + coll->Setup.Radius;
 	
 	if (abs(dx) > 4608
 	||  abs(dz) > 4608
@@ -700,34 +700,34 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	l->pos.xPos = pos.xPos + c * rx + s * rz;
 	l->pos.zPos = pos.zPos + c * rz - s * rx;
 	
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
 
-	auto oldFacing = coll->facing;
-	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
+	auto oldFacing = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = phd_atan(l->pos.zPos - coll->Setup.OldPosition.z, l->pos.xPos - coll->Setup.OldPosition.x);
 	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l, LARA_HEIGHT);
 	}
-	coll->facing = oldFacing;
+	coll->Setup.ForwardAngle = oldFacing;
 
-	if (coll->collType == CT_NONE)
+	if (coll->CollisionType == CT_NONE)
 	{
-		coll->old.x = l->pos.xPos;
-		coll->old.y = l->pos.yPos;
-		coll->old.z = l->pos.zPos;
+		coll->Setup.OldPosition.x = l->pos.xPos;
+		coll->Setup.OldPosition.y = l->pos.yPos;
+		coll->Setup.OldPosition.z = l->pos.zPos;
 
 		UpdateLaraRoom(l, -10);
 	}
 	else
 	{
-		l->pos.xPos = coll->old.x;
-		l->pos.zPos = coll->old.z;
+		l->pos.xPos = coll->Setup.OldPosition.x;
+		l->pos.zPos = coll->Setup.OldPosition.z;
 	}
 
 	if (l == LaraItem && Lara.isMoving && Lara.moveCount > 15)
@@ -739,7 +739,7 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	return true;
 }
 
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush) // previously ItemPushLara
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -771,10 +771,10 @@ int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 	if (bigpush & 1)
 	{
-		minX -= coll->radius;
-		maxX += coll->radius;
-		minZ -= coll->radius;
-		maxZ += coll->radius;
+		minX -= coll->Setup.Radius;
+		maxX += coll->Setup.Radius;
+		minZ -= coll->Setup.Radius;
+		maxZ += coll->Setup.Radius;
 	}
 
 	// Big enemies
@@ -829,37 +829,37 @@ int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 			Lara.hitFrame = 34;
 	}
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
 
-	facing = coll->facing;
-	coll->facing = phd_atan(l->pos.zPos - coll->old.z, l->pos.xPos - coll->old.x);
+	facing = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = phd_atan(l->pos.zPos - coll->Setup.OldPosition.z, l->pos.xPos - coll->Setup.OldPosition.x);
 
 	if (l == LaraItem)
 	{
-		GetCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, l->pos.xPos, l->pos.yPos, l->pos.zPos, l->roomNumber, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, l, LARA_HEIGHT);
 	}
 
-	coll->facing = facing;
+	coll->Setup.ForwardAngle = facing;
 
-	if (coll->collType == CT_NONE)
+	if (coll->CollisionType == CT_NONE)
 	{
-		coll->old.x = l->pos.xPos;
-		coll->old.y = l->pos.yPos;
-		coll->old.z = l->pos.zPos;
+		coll->Setup.OldPosition.x = l->pos.xPos;
+		coll->Setup.OldPosition.y = l->pos.yPos;
+		coll->Setup.OldPosition.z = l->pos.zPos;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
 		// UpdateLaraRoom(l, -10);
 	}
 	else
 	{
-		l->pos.xPos = coll->old.x;
-		l->pos.zPos = coll->old.z;
+		l->pos.xPos = coll->Setup.OldPosition.x;
+		l->pos.zPos = coll->Setup.OldPosition.z;
 	}
 
 	if (Lara.isMoving && Lara.moveCount > 15)
@@ -878,16 +878,16 @@ void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		item->status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, l, c->radius))
+	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
 		if (TestCollision(item, l))
 		{
-			if (c->enableBaddiePush)
-				ItemPushItem(item, l, c, false, true);
+			if (coll->Setup.EnableObjectPush)
+				ItemPushItem(item, l, coll, false, true);
 		}
 	}
 }
@@ -1165,15 +1165,15 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->objectNumber != ID_HITMAN || item->currentAnimState != LS_INSERT_PUZZLE)
 	{
-		if (TestBoundsCollide(item, l, coll->radius))
+		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{
 			if (TestCollision(item, l))
 			{
-				if (coll->enableBaddiePush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
+				if (coll->Setup.EnableObjectPush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
 				{
-					ItemPushItem(item, l, coll, coll->enableSpaz, 0);
+					ItemPushItem(item, l, coll, coll->Setup.EnableSpaz, 0);
 				}
-				else if (coll->enableSpaz)
+				else if (coll->Setup.EnableSpaz)
 				{
 					x = l->pos.xPos - item->pos.xPos;
 					z = l->pos.zPos - item->pos.zPos;
@@ -1241,8 +1241,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Block = floor;
 
 	// Floor and ceiling heights are directly borrowed from new floordata.
-	result.FloorHeight = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
-	result.CeilingHeight = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Floor = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	// Probe bottom block through portals.
 	// TODO: Check if it is really needed, as GetFloor should take care of it itself?
@@ -1288,7 +1288,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			case NOCOLC1B:
 			case NOCOLC2T:
 			case NOCOLC2B:
-				result.SplitCeiling = type & DATA_TYPE;
+				result.Position.SplitCeiling = type & DATA_TYPE;
 				data++;
 				break;
 
@@ -1297,9 +1297,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				result.TiltX = xOff = *(char*)data;
 
 				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.HeightType = BIG_SLOPE;
+					result.Position.Type = BIG_SLOPE;
 				else
-					result.HeightType = SMALL_SLOPE;
+					result.Position.Type = SMALL_SLOPE;
 
 				data++;
 				break;
@@ -1337,8 +1337,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				dx = x & 1023;
 				dz = z & 1023;
 
-				result.HeightType = SPLIT_TRI;
-				result.SplitFloor = (type & DATA_TYPE);
+				result.Position.Type = SPLIT_TRI;
+				result.Position.SplitFloor = (type & DATA_TYPE);
 
 				if ((type & DATA_TYPE) == SPLIT1 ||
 					(type & DATA_TYPE) == NOCOLF1T ||
@@ -1373,9 +1373,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 				result.TiltX = xOff;
 
 				if ((abs(zOff)) > 2 || (abs(xOff)) > 2)
-					result.HeightType = DIAGONAL;
-				else if (result.HeightType != SPLIT_TRI)
-					result.HeightType = SMALL_SLOPE;
+					result.Position.Type = DIAGONAL;
+				else if (result.Position.Type != SPLIT_TRI)
+					result.Position.Type = SMALL_SLOPE;
 
 				data++;
 				break;
@@ -1393,7 +1393,12 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+{
+	GetCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+}
+
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1406,18 +1411,23 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		resetRoom = 1;
 	}
 
-	coll->collType = 0;
-	coll->shift.x  = 0;
-	coll->shift.y  = 0;
-	coll->shift.z  = 0;
-	coll->quadrant = GetQuadrant(coll->facing);
+	coll->CollisionType = CT_NONE;
+	coll->Shift.x  = 0;
+	coll->Shift.y  = 0;
+	coll->Shift.z  = 0;
+	
+	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
+
+	int xPos = item->pos.xPos + offset.x;
+	int yPos = item->pos.yPos + offset.y;
+	int zPos = item->pos.zPos + offset.z;
 
 	int x = xPos;
 	int y = yPos - objectHeight;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room
 
 	ROOM_VECTOR tfLocation = GetRoom(LaraItem->location, x, yTop, z);
@@ -1430,58 +1440,58 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middle.Ceiling = ceiling;
-	coll->middle.Floor = height;
-	coll->middle.Type = collResult.HeightType;
-	coll->middle.SplitFloor = collResult.SplitFloor;
-	coll->middle.SplitCeiling = collResult.SplitCeiling;
+	coll->Middle.Ceiling = ceiling;
+	coll->Middle.Floor = height;
+	coll->Middle.Type = collResult.Position.Type;
+	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
+	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
-	coll->tiltX = collResult.TiltX;
-	coll->tiltZ = collResult.TiltZ;
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
+	coll->TiltX = collResult.TiltX;
+	coll->TiltZ = collResult.TiltZ;
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
-	switch (coll->quadrant)
+	switch (quadrant)
 	{
 	case 0:
-		xfront = phd_sin(coll->facing) * coll->radius;
-		zfront = coll->radius;
-		xleft = -(coll->radius);
-		zleft = coll->radius;
-		xright = coll->radius;
-		zright = coll->radius;
+		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront = coll->Setup.Radius;
+		xleft  = -coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
+		xright = coll->Setup.Radius;
+		zright = coll->Setup.Radius;
 		break;
 
 	case 1:
-		xfront = coll->radius;
-		zfront = phd_cos(coll->facing) * coll->radius;
-		xleft = coll->radius;
-		zleft = coll->radius;
-		xright = coll->radius;
-		zright = -(coll->radius);
+		xfront = coll->Setup.Radius;
+		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
+		xright = coll->Setup.Radius;
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 2:
-		xfront = phd_sin(coll->facing) * coll->radius;
-		zfront = -coll->radius;
-		xleft = coll->radius;
-		zleft = -(coll->radius);
-		xright = -(coll->radius);
-		zright = -(coll->radius);
+		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront = -coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 3:
-		xfront = -(coll->radius);
-		zfront = phd_cos(coll->facing) * coll->radius;
-		xleft = -(coll->radius);
-		zleft = -(coll->radius);
-		xright = -(coll->radius);
-		zright = coll->radius;
+		xfront = -(coll->Setup.Radius);
+		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  = -coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
+		zright = coll->Setup.Radius;
 		break;
 
 	default:
-		xleft = zleft = 0;
+		xleft  = zleft  = 0;
 		xright = zright = 0;
 		xfront = zfront = 0;
 		break;
@@ -1494,7 +1504,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		tfLocation = LaraItem->location;
 		tcLocation = LaraItem->location;
-		topRoomNumber = roomNumber;
+		topRoomNumber = item->roomNumber;
 	}
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
@@ -1509,11 +1519,11 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->front.Ceiling = ceiling;
-	coll->front.Floor = height;
-	coll->front.Type = collResult.HeightType;
-	coll->front.SplitFloor = collResult.SplitFloor;
-	coll->front.SplitCeiling = collResult.SplitCeiling;
+	coll->Front.Ceiling = ceiling;
+	coll->Front.Floor = height;
+	coll->Front.Type = collResult.Position.Type;
+	coll->Front.SplitFloor = collResult.Position.SplitFloor;
+	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
@@ -1522,31 +1532,31 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	if ((coll->slopesAreWalls)
-		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
-		&& (coll->front.Floor < coll->middle.Floor)
-		&& (height < coll->front.Floor)
-		&& (coll->front.Floor < 0))
+	if ((coll->Setup.SlopesAreWalls)
+		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
+		&& (coll->Front.Floor < coll->Middle.Floor)
+		&& (height < coll->Front.Floor)
+		&& (coll->Front.Floor < 0))
 	{
-		coll->front.Floor = MAX_HEIGHT;
+		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->slopesArePits
-		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
-		&& (coll->front.Floor > coll->middle.Floor))
+	else if (coll->Setup.SlopesArePits
+		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
+		&& (coll->Front.Floor > coll->Middle.Floor))
 	{
-		coll->front.Floor = STOP_SIZE;
+		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->lavaIsPit)
-		     && (coll->front.Floor > 0)
+	else if ((coll->Setup.DeathIsPit)
+		     && (coll->Front.Floor > 0)
 		     && collResult.BottomBlock->Flags.Death)
 	{
-		coll->front.Floor = STOP_SIZE;
+		coll->Front.Floor = STOP_SIZE;
 	}
 
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 
 	ROOM_VECTOR lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
@@ -1558,18 +1568,18 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middleLeft.Floor = height;
-	coll->middleLeft.Ceiling = ceiling;
-	coll->middleLeft.Type = collResult.HeightType;
-	coll->middleLeft.SplitFloor = collResult.SplitFloor;
-	coll->middleLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleLeft.Floor = height;
+	coll->MiddleLeft.Ceiling = ceiling;
+	coll->MiddleLeft.Type = collResult.Position.Type;
+	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
-		coll->middleLeft.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor > 0)
-		coll->middleLeft.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleLeft.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
+		coll->MiddleLeft.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
+		coll->MiddleLeft.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->MiddleLeft.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
 
@@ -1583,23 +1593,23 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->frontLeft.Floor = height;
-	coll->frontLeft.Ceiling = ceiling;
-	coll->frontLeft.Type = collResult.HeightType;
-	coll->frontLeft.SplitFloor = collResult.SplitFloor;
-	coll->frontLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontLeft.Floor = height;
+	coll->FrontLeft.Ceiling = ceiling;
+	coll->FrontLeft.Type = collResult.Position.Type;
+	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
-		coll->frontLeft.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor > 0)
-		coll->frontLeft.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->frontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontLeft.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
+		coll->FrontLeft.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
+		coll->FrontLeft.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->FrontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 
 	lrfLocation = GetRoom(LaraItem->location, x, yTop, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
@@ -1611,18 +1621,18 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middleRight.Floor = height;
-	coll->middleRight.Ceiling = ceiling;
-	coll->middleRight.Type = collResult.HeightType;
-	coll->middleRight.SplitFloor = collResult.SplitFloor;
-	coll->middleRight.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleRight.Floor = height;
+	coll->MiddleRight.Ceiling = ceiling;
+	coll->MiddleRight.Type = collResult.Position.Type;
+	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
-		coll->middleRight.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor > 0)
-		coll->middleRight.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleRight.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
+		coll->MiddleRight.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
+		coll->MiddleRight.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->MiddleRight.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 
@@ -1636,197 +1646,203 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->frontRight.Floor = height;
-	coll->frontRight.Ceiling = ceiling;
-	coll->frontRight.Type = collResult.HeightType;
-	coll->frontRight.SplitFloor = collResult.SplitFloor;
-	coll->frontRight.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontRight.Floor = height;
+	coll->FrontRight.Ceiling = ceiling;
+	coll->FrontRight.Type = collResult.Position.Type;
+	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
-		coll->frontRight.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor > 0)
-		coll->frontRight.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontRight.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
+		coll->FrontRight.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
+		coll->FrontRight.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->FrontRight.Floor = STOP_SIZE;
 
-	CollideSolidStatics(LaraItem, coll);
+	CollideSolidStatics(item, coll);
 
-	if (coll->middle.Floor == NO_HEIGHT)
+	if (coll->Middle.Floor == NO_HEIGHT)
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_FRONT;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_FRONT;
 		return;
 	}
 
-	if (coll->middle.Floor - coll->middle.Ceiling <= 0)
+	if (coll->Middle.Floor - coll->Middle.Ceiling <= 0)
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_CLAMP;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_CLAMP;
 		return;
 	}
 
-	if (coll->middle.Ceiling >= 0)
+	if (coll->Middle.Ceiling >= 0)
 	{
-		coll->shift.y = coll->middle.Ceiling;
-		coll->collType = CT_TOP;
+		coll->Shift.y = coll->Middle.Ceiling;
+		coll->CollisionType = CT_TOP;
 	}
 
-	if ((coll->front.Floor > coll->badPos)
-		|| (coll->front.Floor < coll->badNeg)
-		|| (coll->front.Ceiling > coll->badCeiling))
+	if ((coll->Front.Floor > coll->Setup.BadHeightUp)
+		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
+		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if ((coll->front.Type == DIAGONAL)
-			|| (coll->front.Type == SPLIT_TRI))
+		if ((coll->Front.Type == DIAGONAL)
+			|| (coll->Front.Type == SPLIT_TRI))
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = coll->old.x - xPos;
-				coll->shift.z = FindGridShift(zPos + zfront, zPos);
+				coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+				coll->Shift.z = FindGridShift(zPos + zfront, zPos);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.x = FindGridShift(xPos + xfront, xPos);
-				coll->shift.z = coll->old.z - zPos;
+				coll->Shift.x = FindGridShift(xPos + xfront, xPos);
+				coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 				break;
 
 			}
 		}
 
-		coll->collType = CT_FRONT;
+		coll->CollisionType = CT_FRONT;
 		return;
 	}
 
-	if (coll->front.Ceiling >= coll->badCeiling)
+	if (coll->Front.Ceiling >= coll->Setup.BadCeilingHeight)
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_TOP_FRONT;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_TOP_FRONT;
 		return;
 	}
 
-	if (coll->middleLeft.Floor > coll->badPos ||
-		coll->middleLeft.Floor < coll->badNeg ||
-		coll->middleLeft.Ceiling > coll->badCeiling)
+	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightUp ||
+		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
+		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->middleLeft.Type == SPLIT_TRI && coll->middle.Type == SPLIT_TRI)
+		if (coll->MiddleLeft.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xleft, xPos + xfront);
+				coll->Shift.x = FindGridShift(xPos + xleft, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zleft, zPos + zfront);
+				coll->Shift.z = FindGridShift(zPos + zleft, zPos + zfront);
 				break;
 			}
 		}
 
-		if (coll->middleLeft.SplitFloor && coll->middleLeft.SplitFloor == coll->middle.SplitFloor)
+		if (coll->MiddleLeft.SplitFloor && coll->MiddleLeft.SplitFloor == coll->Middle.SplitFloor)
 		{
-			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			switch (coll->middleLeft.SplitFloor)
+			switch (coll->MiddleLeft.SplitFloor)
 			{
 			case SPLIT1:
 			case NOCOLF1T:
 			case NOCOLF1B:
 				if (quarter)
-					coll->collType = CT_LEFT;
+					coll->CollisionType = CT_LEFT;
 				break;
 			case SPLIT2:
 			case NOCOLF2T:
 			case NOCOLF2B:
 				if (!quarter)
-					coll->collType = CT_LEFT;
+					coll->CollisionType = CT_LEFT;
 				break;
 			}
 		}
 		else
 		{
-			coll->collType = CT_LEFT;
+			coll->CollisionType = CT_LEFT;
 		}
 
 		return;
 	}
 
-	if (coll->middleRight.Floor > coll->badPos ||
-		coll->middleRight.Floor < coll->badNeg ||
-		coll->middleRight.Ceiling > coll->badCeiling)
+	if (coll->MiddleRight.Floor > coll->Setup.BadHeightUp ||
+		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
+		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->middleRight.Type == SPLIT_TRI && coll->middle.Type == SPLIT_TRI)
+		if (coll->MiddleRight.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xright, xPos + xfront);
+				coll->Shift.x = FindGridShift(xPos + xright, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zright, zPos + zfront);
+				coll->Shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
 		}
 
-		if (coll->middleRight.SplitFloor && coll->middleRight.SplitFloor == coll->middle.SplitFloor)
+		if (coll->MiddleRight.SplitFloor && coll->MiddleRight.SplitFloor == coll->Middle.SplitFloor)
 		{
-			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			switch (coll->middleRight.SplitFloor)
+			switch (coll->MiddleRight.SplitFloor)
 			{
 			case SPLIT1:
 			case NOCOLF1T:
 			case NOCOLF1B:
 				if (quarter)
-					coll->collType = CT_RIGHT;
+					coll->CollisionType = CT_RIGHT;
 				break;
 			case SPLIT2:
 			case NOCOLF2T:
 			case NOCOLF2B:
 				if (!quarter)
-					coll->collType = CT_RIGHT;
+					coll->CollisionType = CT_RIGHT;
 				break;
 			}
 		}
 		else
 		{
-			coll->collType = CT_RIGHT;
+			coll->CollisionType = CT_RIGHT;
 		}
 
 		return;
 	}
 }
 
-void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+{
+	GetObjectCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+}
+
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1839,79 +1855,84 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 		resetRoom = 1;
 	}
 
-	coll->collType = 0;
-	coll->shift.x = 0;
-	coll->shift.y = 0;
-	coll->shift.z = 0;
-	coll->quadrant = GetQuadrant(coll->facing);
+	coll->CollisionType = CT_NONE;
+	coll->Shift.x = 0;
+	coll->Shift.y = 0;
+	coll->Shift.z = 0;
+
+	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
+
+	int xPos = item->pos.xPos + offset.x;
+	int yPos = item->pos.yPos + offset.y;
+	int zPos = item->pos.zPos + offset.z;
 
 	int x = xPos;
 	int y = yPos - objectHeight;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, roomNumber);
+	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber;
 
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	int ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middle.Ceiling = ceiling;
-	coll->middle.Floor = collResult.FloorHeight;
-	coll->middle.Type = collResult.HeightType;
-	coll->middle.SplitFloor = collResult.SplitFloor;
-	coll->middle.SplitCeiling = collResult.SplitCeiling;
+	coll->Middle.Ceiling = ceiling;
+	coll->Middle.Floor = collResult.Position.Floor;
+	coll->Middle.Type = collResult.Position.Type;
+	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
+	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
-	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, roomNumber);
-	coll->tiltX = collResult.TiltX;
-	coll->tiltZ = collResult.TiltZ;
+	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
+	coll->TiltX = collResult.TiltX;
+	coll->TiltZ = collResult.TiltZ;
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
-	switch (coll->quadrant)
+	switch (quadrant)
 	{
 	case 0:
-		xfront = phd_sin(coll->facing) * coll->radius;
-		zfront = coll->radius;
-		xleft = -(coll->radius);
-		zleft = coll->radius;
-		xright = coll->radius;
-		zright = coll->radius;
+		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront = coll->Setup.Radius;
+		xleft  = -(coll->Setup.Radius);
+		zleft  = coll->Setup.Radius;
+		xright = coll->Setup.Radius;
+		zright = coll->Setup.Radius;
 		break;
 
 	case 1:
-		xfront = coll->radius;
-		zfront = phd_cos(coll->facing) * coll->radius;
-		xleft = coll->radius;
-		zleft = coll->radius;
-		xright = coll->radius;
-		zright = -(coll->radius);
+		xfront = coll->Setup.Radius;
+		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = coll->Setup.Radius;
+		xright = coll->Setup.Radius;
+		zright = -(coll->Setup.Radius);
 		break;
 
 	case 2:
-		xfront = phd_sin(coll->facing) * coll->radius;
-		zfront = -coll->radius;
-		xleft = coll->radius;
-		zleft = -(coll->radius);
-		xright = -(coll->radius);
-		zright = -(coll->radius);
+		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront = -coll->Setup.Radius;
+		xleft  = coll->Setup.Radius;
+		zleft  = -(coll->Setup.Radius);
+		xright = -(coll->Setup.Radius);
+		zright = -(coll->Setup.Radius);
 		break;
 
 	case 3:
-		xfront = -(coll->radius);
-		zfront = phd_cos(coll->facing) * coll->radius;
-		xleft = -(coll->radius);
-		zleft = -(coll->radius);
-		xright = -(coll->radius);
-		zright = coll->radius;
+		xfront = -(coll->Setup.Radius);
+		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  = -(coll->Setup.Radius);
+		zleft  = -(coll->Setup.Radius);
+		xright = -(coll->Setup.Radius);
+		zright = coll->Setup.Radius;
 		break;
 
 	default:
-		xleft = zleft = 0;
+		xleft  = zleft  = 0;
 		xright = zright = 0;
 		xfront = zfront = 0;
 		break;
@@ -1921,306 +1942,308 @@ void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int r
 	z = zfront + zPos;
 
 	if (resetRoom)
-		topRoomNumber = roomNumber;
+		topRoomNumber = item->roomNumber;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->front.Ceiling = ceiling;
-	coll->front.Floor = collResult.FloorHeight;
-	coll->front.Type = collResult.HeightType;
-	coll->front.SplitFloor = collResult.SplitFloor;
-	coll->front.SplitCeiling = collResult.SplitCeiling;
+	coll->Front.Ceiling = ceiling;
+	coll->Front.Floor = collResult.Position.Floor;
+	coll->Front.Type = collResult.Position.Type;
+	coll->Front.SplitFloor = collResult.Position.SplitFloor;
+	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
-	if ((coll->slopesAreWalls)
-		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
-		&& (coll->front.Floor < coll->middle.Floor)
-		&& (collResult.FloorHeight < coll->front.Floor)
-		&& (coll->front.Floor < 0))
+	if ((coll->Setup.SlopesAreWalls)
+		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
+		&& (coll->Front.Floor < coll->Middle.Floor)
+		&& (collResult.Position.Floor < coll->Front.Floor)
+		&& (coll->Front.Floor < 0))
 	{
-		coll->front.Floor = MAX_HEIGHT;
+		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->slopesArePits
-		&& ((coll->front.Type == BIG_SLOPE) || (coll->front.Type == DIAGONAL))
-		&& (coll->front.Floor > coll->middle.Floor))
+	else if (coll->Setup.SlopesArePits
+		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
+		&& (coll->Front.Floor > coll->Middle.Floor))
 	{
-		coll->front.Floor = STOP_SIZE;
+		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->lavaIsPit)
-		&& (coll->front.Floor > 0)
+	else if ((coll->Setup.DeathIsPit)
+		&& (coll->Front.Floor > 0)
 		&& collResult.BottomBlock->Flags.Death)
 	{
-		coll->front.Floor = STOP_SIZE;
+		coll->Front.Floor = STOP_SIZE;
 	}
 
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, roomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, item->roomNumber);
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middleLeft.Floor = collResult.FloorHeight;
-	coll->middleLeft.Ceiling = ceiling;
-	coll->middleLeft.Type = collResult.HeightType;
-	coll->middleLeft.SplitFloor = collResult.SplitFloor;
-	coll->middleLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleLeft.Floor = collResult.Position.Floor;
+	coll->MiddleLeft.Ceiling = ceiling;
+	coll->MiddleLeft.Type = collResult.Position.Type;
+	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor < 0)
-		coll->middleLeft.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->middleLeft.Type == BIG_SLOPE || coll->middleLeft.Type == DIAGONAL) && coll->middleLeft.Floor > 0)
-		coll->middleLeft.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->middleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleLeft.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
+		coll->MiddleLeft.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
+		coll->MiddleLeft.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->MiddleLeft.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->frontLeft.Floor = collResult.FloorHeight;
-	coll->frontLeft.Ceiling = ceiling;
-	coll->frontLeft.Type = collResult.HeightType;
-	coll->frontLeft.SplitFloor = collResult.SplitFloor;
-	coll->frontLeft.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontLeft.Floor = collResult.Position.Floor;
+	coll->FrontLeft.Ceiling = ceiling;
+	coll->FrontLeft.Type = collResult.Position.Type;
+	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor < 0)
-		coll->frontLeft.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->frontLeft.Type == BIG_SLOPE || coll->frontLeft.Type == DIAGONAL) && coll->frontLeft.Floor > 0)
-		coll->frontLeft.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->frontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontLeft.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
+		coll->FrontLeft.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
+		coll->FrontLeft.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->FrontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, roomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->middleRight.Floor = collResult.FloorHeight;
-	coll->middleRight.Ceiling = ceiling;
-	coll->middleRight.Type = collResult.HeightType;
-	coll->middleRight.SplitFloor = collResult.SplitFloor;
-	coll->middleRight.SplitCeiling = collResult.SplitCeiling;
+	coll->MiddleRight.Floor = collResult.Position.Floor;
+	coll->MiddleRight.Ceiling = ceiling;
+	coll->MiddleRight.Type = collResult.Position.Type;
+	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor < 0)
-		coll->middleRight.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->middleRight.Type == BIG_SLOPE || coll->middleRight.Type == DIAGONAL) && coll->middleRight.Floor > 0)
-		coll->middleRight.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->middleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->middleRight.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
+		coll->MiddleRight.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
+		coll->MiddleRight.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->MiddleRight.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
-	if (collResult.FloorHeight != NO_HEIGHT)
-		collResult.FloorHeight -= yPos;
+	if (collResult.Position.Floor != NO_HEIGHT)
+		collResult.Position.Floor -= yPos;
 
 	ceiling = GetCeiling(collResult.Block, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->frontRight.Floor = collResult.FloorHeight;
-	coll->frontRight.Ceiling = ceiling;
-	coll->frontRight.Type = collResult.HeightType;
-	coll->frontRight.SplitFloor = collResult.SplitFloor;
-	coll->frontRight.SplitCeiling = collResult.SplitCeiling;
+	coll->FrontRight.Floor = collResult.Position.Floor;
+	coll->FrontRight.Ceiling = ceiling;
+	coll->FrontRight.Type = collResult.Position.Type;
+	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
+	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
-	if (coll->slopesAreWalls && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor < 0)
-		coll->frontRight.Floor = MAX_HEIGHT;
-	else if (coll->slopesArePits && (coll->frontRight.Type == BIG_SLOPE || coll->frontRight.Type == DIAGONAL) && coll->frontRight.Floor > 0)
-		coll->frontRight.Floor = STOP_SIZE;
-	else if (coll->lavaIsPit && coll->frontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
-		coll->frontRight.Floor = STOP_SIZE;
+	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
+		coll->FrontRight.Floor = MAX_HEIGHT;
+	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
+		coll->FrontRight.Floor = STOP_SIZE;
+	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+		coll->FrontRight.Floor = STOP_SIZE;
+
+	CollideSolidStatics(item, coll);
 	
-	if (coll->middle.Floor == NO_HEIGHT)	 
+	if (coll->Middle.Floor == NO_HEIGHT)	 
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_FRONT;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_FRONT;
 		return;
 	}
 
-	if (coll->middle.Floor - coll->middle.Ceiling <= 0)
+	if (coll->Middle.Floor - coll->Middle.Ceiling <= 0)
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_CLAMP;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_CLAMP;
 		return;
 	}
 
-	if (coll->middle.Ceiling >= 0)
+	if (coll->Middle.Ceiling >= 0)
 	{
-		coll->shift.y = coll->middle.Ceiling;
-		coll->collType = CT_TOP;
+		coll->Shift.y = coll->Middle.Ceiling;
+		coll->CollisionType = CT_TOP;
 	}
 
-	if ((coll->front.Floor > coll->badPos)
-		|| (coll->front.Floor < coll->badNeg)
-		|| (coll->front.Ceiling > coll->badCeiling))
+	if ((coll->Front.Floor > coll->Setup.BadHeightUp)
+		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
+		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if ((coll->front.Type == DIAGONAL)
-			|| (coll->front.Type == SPLIT_TRI))
+		if ((coll->Front.Type == DIAGONAL)
+			|| (coll->Front.Type == SPLIT_TRI))
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = coll->old.x - xPos;
-				coll->shift.z = FindGridShift(zPos + zfront, zPos);
+				coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+				coll->Shift.z = FindGridShift(zPos + zfront, zPos);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.x = FindGridShift(xPos + xfront, xPos);
-				coll->shift.z = coll->old.z - zPos;
+				coll->Shift.x = FindGridShift(xPos + xfront, xPos);
+				coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 				break;
 
 			}
 		}
 
-		coll->collType = CT_FRONT;
+		coll->CollisionType = CT_FRONT;
 		return;
 	}
 
-	if (coll->front.Ceiling >= coll->badCeiling)
+	if (coll->Front.Ceiling >= coll->Setup.BadCeilingHeight)
 	{
-		coll->shift.x = coll->old.x - xPos;
-		coll->shift.y = coll->old.y - yPos;
-		coll->shift.z = coll->old.z - zPos;
-		coll->collType = CT_TOP_FRONT;
+		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
+		coll->Shift.z = coll->Setup.OldPosition.z - zPos;
+		coll->CollisionType = CT_TOP_FRONT;
 		return;
 	}
 
-	if (coll->middleLeft.Floor > coll->badPos ||
-		coll->middleLeft.Floor < coll->badNeg ||
-		coll->middleLeft.Ceiling > coll->badCeiling)
+	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightUp ||
+		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
+		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->middleLeft.Type == SPLIT_TRI && coll->middle.Type == SPLIT_TRI)
+		if (coll->MiddleLeft.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xleft, xPos + xfront);
+				coll->Shift.x = FindGridShift(xPos + xleft, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zleft, zPos + zfront);
+				coll->Shift.z = FindGridShift(zPos + zleft, zPos + zfront);
 				break;
 			}
 		}
 		
-		if (coll->middleLeft.SplitFloor && coll->middleLeft.SplitFloor == coll->middle.SplitFloor)
+		if (coll->MiddleLeft.SplitFloor && coll->MiddleLeft.SplitFloor == coll->Middle.SplitFloor)
 		{
-			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			switch (coll->middleLeft.SplitFloor)
+			switch (coll->MiddleLeft.SplitFloor)
 			{
 			case SPLIT1:
 			case NOCOLF1T:
 			case NOCOLF1B:
 				if (quarter)
-					coll->collType = CT_LEFT;
+					coll->CollisionType = CT_LEFT;
 				break;
 			case SPLIT2:
 			case NOCOLF2T:
 			case NOCOLF2B:
 				if (!quarter)
-					coll->collType = CT_LEFT;
+					coll->CollisionType = CT_LEFT;
 				break;
 			}
 		}
 		else
 		{
-			coll->collType = CT_LEFT;
+			coll->CollisionType = CT_LEFT;
 		}
 
 		return;
 	}
 
-	if (coll->middleRight.Floor > coll->badPos ||
-		coll->middleRight.Floor < coll->badNeg ||
-		coll->middleRight.Ceiling > coll->badCeiling)
+	if (coll->MiddleRight.Floor > coll->Setup.BadHeightUp ||
+		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
+		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->middleRight.Type == SPLIT_TRI && coll->middle.Type == SPLIT_TRI)
+		if (coll->MiddleRight.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
 		{
-			coll->shift.x = coll->old.x - xPos;
-			coll->shift.z = coll->old.z - zPos;
+			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
+			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
 		else
 		{
-			switch (coll->quadrant)
+			switch (quadrant)
 			{
 			case 0:
 			case 2:
-				coll->shift.x = FindGridShift(xPos + xright, xPos + xfront);
+				coll->Shift.x = FindGridShift(xPos + xright, xPos + xfront);
 				break;
 
 			case 1:
 			case 3:
-				coll->shift.z = FindGridShift(zPos + zright, zPos + zfront);
+				coll->Shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
 		}
 		
-		if (coll->middleRight.SplitFloor && coll->middleRight.SplitFloor == coll->middle.SplitFloor)
+		if (coll->MiddleRight.SplitFloor && coll->MiddleRight.SplitFloor == coll->Middle.SplitFloor)
 		{
-			int quarter = (unsigned short)(coll->facing) / ANGLE(90); // different from coll->quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			switch (coll->middleRight.SplitFloor)
+			switch (coll->MiddleRight.SplitFloor)
 			{
 			case SPLIT1:
 			case NOCOLF1T:
 			case NOCOLF1B:
 				if (quarter)
-					coll->collType = CT_RIGHT;
+					coll->CollisionType = CT_RIGHT;
 				break;
 			case SPLIT2:
 			case NOCOLF2T:
 			case NOCOLF2B:
 				if (!quarter)
-					coll->collType = CT_RIGHT;
+					coll->CollisionType = CT_RIGHT;
 				break;
 			}
 		}
 		else
 		{
-			coll->collType = CT_RIGHT;
+			coll->CollisionType = CT_RIGHT;
 		}
 
 		return;
@@ -2236,11 +2259,11 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto oldCollResult = GetCollisionResult(x, y, z, item->roomNumber);
 	auto collResult = GetCollisionResult(item);
 
-	if (item->pos.yPos >= collResult.FloorHeight)
+	if (item->pos.yPos >= collResult.Position.Floor)
 	{
 		bs = 0;
 
-		if ((collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) && oldCollResult.FloorHeight < collResult.FloorHeight)
+		if ((collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) && oldCollResult.Position.Floor < collResult.Position.Floor)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
 			if (collResult.TiltX < 0)
@@ -2268,7 +2291,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
 
-		if (y > (collResult.FloorHeight + 32) && bs == 0 &&
+		if (y > (collResult.Position.Floor + 32) && bs == 0 &&
 			(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 			((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 		{
@@ -2304,7 +2327,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->pos.yPos = y;
 			item->pos.zPos = z;
 		}
-		else if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL) 	// Hit a steep slope?
+		else if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) 	// Hit a steep slope?
 		{
 			// Need to know which direction the slope is.
 
@@ -2615,7 +2638,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->speed = 0;
 				}
 			}
-			item->pos.yPos = collResult.FloorHeight;
+			item->pos.yPos = collResult.Position.Floor;
 		}
 	}
 	else	// Check for on top of object.
@@ -2631,7 +2654,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			// was always set to 0 by GetHeight() function which was called before the check.
 			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
 
-			if (item->pos.yPos >= oldCollResult.FloorHeight) 
+			if (item->pos.yPos >= oldCollResult.Position.Floor) 
 			{
 				/* Hit the floor; bounce and slow down */
 				if (item->fallspeed > 0)
@@ -2664,7 +2687,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 							item->speed = 0;
 					}
 				}
-				item->pos.yPos = oldCollResult.FloorHeight;
+				item->pos.yPos = oldCollResult.Position.Floor;
 			}
 		}
 		//		else
@@ -2672,9 +2695,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			/* Bounce off ceiling */
 			collResult = GetCollisionResult(item);
 
-			if (item->pos.yPos < collResult.CeilingHeight)
+			if (item->pos.yPos < collResult.Position.Ceiling)
 			{
-				if (y < collResult.CeilingHeight &&
+				if (y < collResult.Position.Ceiling &&
 					(((x / SECTOR(1)) != (item->pos.xPos / SECTOR(1))) ||
 					((z / SECTOR(1)) != (item->pos.zPos / SECTOR(1)))))
 				{
@@ -2703,7 +2726,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					item->pos.zPos = z;
 				}
 				else
-					item->pos.yPos = collResult.CeilingHeight;
+					item->pos.yPos = collResult.Position.Ceiling;
 
 				if (item->fallspeed < 0)
 					item->fallspeed = -item->fallspeed;
@@ -2722,7 +2745,7 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	OBJECT_INFO* obj;
 
 	l->hitStatus = false;
-	coll->hitStatic = false;
+	coll->HitStatic = false;
 
 	if (l == LaraItem)
 		Lara.hitDirection = -1;
@@ -2779,11 +2802,11 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 						y < COLLISION_CHECK_DISTANCE && 
 						z < COLLISION_CHECK_DISTANCE)
 					{
-						if (TestBoundsCollideStatic(l, mesh, coll->radius))
+						if (TestBoundsCollideStatic(l, mesh, coll->Setup.Radius))
 						{
-							coll->hitStatic = true;
+							coll->HitStatic = true;
 
-							if (coll->enableBaddiePush)
+							if (coll->Setup.EnableObjectPush)
 								ItemPushStatic(l, mesh, coll);
 							else
 								break;
@@ -2804,7 +2827,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->status != ITEM_INVISIBLE)
 	{
-		if (TestBoundsCollide(item, l, coll->radius))
+		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{
 			int collidedBits = TestCollision(item, l);
 			if (collidedBits)
@@ -2838,7 +2861,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushItem(item, l, coll, ((deadlyBits & 1) & coll->enableSpaz), 3) && (deadlyBits & 1))
+						if (ItemPushItem(item, l, coll, ((deadlyBits & 1) & coll->Setup.EnableSpaz), 3) && (deadlyBits & 1))
 						{
 							l->hitPoints -= item->itemFlags[3];
 
@@ -2852,7 +2875,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 									TriggerLaraBlood();
 							}
 
-							if (!coll->enableBaddiePush)
+							if (!coll->Setup.EnableObjectPush)
 							{
 								l->pos.xPos += dx;
 								l->pos.yPos += dy;

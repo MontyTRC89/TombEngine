@@ -13,7 +13,7 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, l, coll->radius))
+	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
 		if (TestCollision(item, l))
 		{
@@ -306,14 +306,14 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (!TestBoundsCollide(item, lara, coll->radius))
+		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
 		if (!TestCollision(item, lara))
 			return;
 		if (lara->gravityStatus)
 		{
-			if (coll->enableBaddiePush)
-				ItemPushItem(item, lara, coll, coll->enableSpaz, 1);
+			if (coll->Setup.EnableObjectPush)
+				ItemPushItem(item, lara, coll, coll->Setup.EnableSpaz, 1);
 			lara->hitPoints -= 100;
 			x = lara->pos.xPos - item->pos.xPos;
 			y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);

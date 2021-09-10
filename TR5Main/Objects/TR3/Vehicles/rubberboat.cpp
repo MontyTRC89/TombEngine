@@ -108,7 +108,7 @@ int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
 	if (!getOn)
 		return 0;
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
 		return 0;
 
 	if (!TestCollision(boat, LaraItem))
@@ -604,7 +604,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 
 	if (!getOn)
 	{
-		coll->enableBaddiePush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, lara, coll);
 		return;
 	}
@@ -662,13 +662,13 @@ static int CanGetOffRubberBoat(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, boat->roomNumber);
 
-	if (collResult.FloorHeight - boat->pos.yPos < -512)
+	if (collResult.Position.Floor - boat->pos.yPos < -512)
 		return 0;
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
+	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL)
 		return 0;
 
-	if ((collResult.CeilingHeight - boat->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - boat->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return 0;
 
 	return 1;

@@ -180,13 +180,13 @@ static int CanQuadbikeGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(collResult.FloorHeight - item->pos.yPos) > 512)
+	if (abs(collResult.Position.Floor - item->pos.yPos) > 512)
 		return false;
 
-	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - item->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;
