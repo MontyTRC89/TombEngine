@@ -9,6 +9,7 @@
 #include <lara.h>
 #include "Sound\sound.h"
 #include <sphere.h>
+#include "box.h"
 
 namespace TEN::Entities::TR4
 {

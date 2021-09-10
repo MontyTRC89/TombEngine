@@ -5,6 +5,7 @@
 #include "items.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "collide.h"
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {

@@ -9,22 +9,9 @@
 #include "level.h"
 #include "input.h"
 #include "Sound\sound.h"
-#include <effects\effects.h>
-#include <Game\particle\SimpleParticle.h>
-
-
-
-struct BOAT_INFO
-{
-	int boatTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	int water;
-	int pitch;
-	short tiltAngle;
-	short extraRotation;
-	short propRot;
-};
+#include "effects\effects.h"
+#include "particle\SimpleParticle.h"
+#include "boat_info.h"
 
 enum BOAT_STATE
 {
@@ -506,7 +493,7 @@ int SpeedBoatDynamics(short itemNum)
 	int newspeed;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = (BOAT_INFO*)boat->data;
+	binfo = boat->data;
 
 	boat->pos.zRot -= binfo->tiltAngle;
 
@@ -826,8 +813,8 @@ void InitialiseSpeedBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = game_malloc<BOAT_INFO>();
-	boat->data = (void*)binfo;
+	boat->data = BOAT_INFO();
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->leftFallspeed = 0;
 	binfo->rightFallspeed = 0;

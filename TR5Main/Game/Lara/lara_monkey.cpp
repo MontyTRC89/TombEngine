@@ -5,7 +5,12 @@
 #include "lara_collide.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
-
+#include "floordata.h"
+#include "collide.h"
+#include "item.h"
+#include "camera.h"
+#include "control.h"
+#include "level.h"
 using namespace TEN::Floordata;
 
 /*this file has all the related functions to monkeyswinging*/

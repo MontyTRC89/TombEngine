@@ -14,13 +14,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-
-struct LASER_HEAD_INFO
-{
-	short baseItem;
-	short tentacles[8];
-	short puzzleItem;
-};
+#include "tr5_laserhead_info.h"
 
 struct LASER_HEAD_STRUCT
 {
@@ -152,8 +146,8 @@ void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->data = game_malloc<LASER_HEAD_INFO>();
-	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
+	item->data = LASER_HEAD_INFO();
+	LASER_HEAD_INFO* info = item->data;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{

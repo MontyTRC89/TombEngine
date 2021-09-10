@@ -5,7 +5,8 @@
 #include "generic_switch.h"
 #include "sphere.h"
 #include "draw.h"
-
+#include "collide.h"
+#include "floordata.h"
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS SwitchBounds = 

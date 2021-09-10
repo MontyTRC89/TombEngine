@@ -1,6 +1,8 @@
 #pragma once
-#include "lara_struct.h"
+#include "collide.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStandUp(COLL_INFO* coll);
 int TestWall(ITEM_INFO* item, int front, int right, int down);

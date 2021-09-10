@@ -12,7 +12,9 @@
 #include "lara_struct.h"
 #include "effects\tomb4fx.h"
 #include "draw.h"
-
+#include "setup.h"
+#include "camera.h"
+#include "biggun_info.h"
 static long GunRotYAdd = 0;
 bool barrelRotating;
 
@@ -119,10 +121,9 @@ void BigGunInitialise(short itemNum)
 	BIGGUNINFO *gun;
 
 	obj = &g_Level.Items[itemNum];
+	obj->data = BIGGUNINFO();
 
-	gun = (BIGGUNINFO*)malloc(sizeof(BIGGUNINFO));
-	obj->data = malloc(sizeof(BIGGUNINFO));
-
+	gun = obj->data;
 	gun->flags = 0;
 	gun->fireCount = 0;
 	gun->xRot = GETOFF_FRAME;

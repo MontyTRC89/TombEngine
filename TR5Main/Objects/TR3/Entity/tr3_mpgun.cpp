@@ -9,6 +9,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 enum MPGUN_STATES
 {
@@ -115,9 +116,9 @@ void MPGunControl(short itemNumber)
 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 			
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
-			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
+			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[slot];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 

@@ -6,6 +6,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature_info.h"
 
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 

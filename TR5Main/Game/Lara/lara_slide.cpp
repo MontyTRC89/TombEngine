@@ -3,6 +3,9 @@
 #include "lara_collide.h"
 #include "input.h"
 #include "Sound\sound.h"
+#include "collide.h"
+#include "camera.h"
+#include "level.h"
 
 short OldAngle = 1;
 

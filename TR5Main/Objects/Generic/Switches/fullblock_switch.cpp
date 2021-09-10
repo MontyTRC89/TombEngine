@@ -4,7 +4,9 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-
+#include "setup.h"
+#include "collide.h"
+#include "level.h"
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 

@@ -37,6 +37,8 @@
 #include "rubberboat.h"
 #include <Game\misc.h>
 #include <control\volume.h>
+#include "Renderer11.h"
+#include "camera.h"
 
 #ifdef NEW_INV
 #include "newinv2.h"
