@@ -11,7 +11,8 @@
 #include "level.h"
 #include "Sound\sound.h"
 #include "snowmobile.h"
-
+#include "creature_info.h"
+#include "skidoo_info.h"
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
 #define SMAN_MIN_TURN (ANGLE(6.0f)/3)
@@ -44,7 +45,7 @@ void InitialiseSkidman(short itemNum)
 		InitialiseItem(skidoo_item);
 
 		// The skidman remembers his skidoo
-		item->data = (void*)skidoo_item;
+		item->data = skidoo_item;
 
 		g_Level.NumItems++;
 	}

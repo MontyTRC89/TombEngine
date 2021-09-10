@@ -9,8 +9,9 @@
 #include "Sound\sound.h"
 #include "effects\bubble.h"
 #include "draw.h"
-
-
+#include "camera.h"
+#include "setup.h"
+#include "rubberboat_info.h"
 
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300
@@ -48,10 +49,10 @@ void DrawRubberBoat(ITEM_INFO *item)
 {
 	RUBBER_BOAT_INFO *b;
 
-	b = (RUBBER_BOAT_INFO*)item->data;
+	b = item->data;
 	item->data = &b->propRot;
 	DrawAnimatingItem(item);
-	item->data = (void *)b;
+	item->data = b;
 }
 
 int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
@@ -578,10 +579,9 @@ void InitialiseRubberBoat(short itemNum)
 	RUBBER_BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	
-	binfo = game_malloc<RUBBER_BOAT_INFO>();
-	boat->data = binfo;
-	
+	boat->data = RUBBER_BOAT_INFO();
+
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->tiltAngle = 0;
 	binfo->rightFallspeed = 0;

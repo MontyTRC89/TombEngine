@@ -6,7 +6,7 @@
 #include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
-
+#include "creature_info.h"
 BITE_INFO monkBite = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;

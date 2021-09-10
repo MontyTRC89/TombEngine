@@ -9,7 +9,7 @@
 #include "lara.h"
 
 int NextRat;
-RAT_STRUCT* Rats;
+RAT_STRUCT Rats[NUM_RATS];
 
 short GetNextRat()
 {

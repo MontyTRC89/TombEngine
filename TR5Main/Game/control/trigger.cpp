@@ -163,7 +163,7 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
 		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
 	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)

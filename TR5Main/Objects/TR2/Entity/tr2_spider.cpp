@@ -9,6 +9,7 @@
 #include "setup.h"
 #include "effects\tomb4fx.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };

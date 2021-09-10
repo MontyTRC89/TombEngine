@@ -11,6 +11,9 @@
 #include "lara_one_gun.h"
 #include "effects\effects.h"
 #include "draw.h"
+#include "collide.h"
+#include "item.h"
+#include "setup.h"
 
 enum centaur_anims { 
 	CENTAUR_EMPTY, 

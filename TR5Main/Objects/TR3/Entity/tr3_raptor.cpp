@@ -6,6 +6,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "creature_info.h"
 #include "control.h"
 
 static BITE_INFO raptorBite = { 0, 66, 318, 22 };
@@ -40,10 +41,10 @@ void RaptorControl(short itemNum)
 	{
 		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F))
 		{
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNum)
 				{
 					currentCreature++;

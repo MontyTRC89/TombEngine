@@ -2,19 +2,7 @@
 #include "items.h"
 #include "collide.h"
 
-struct SKIDOO_INFO
-{
-	short trackMesh;
-	int skidooTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	short momentumAngle;
-	short extraRotation;
-	int pitch;
-	bool alreadyCdPlayed;
-	bool armed;
-	int flashTimer;
-};
+
 
 void InitialiseSkidoo(short itemNum);
 void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);

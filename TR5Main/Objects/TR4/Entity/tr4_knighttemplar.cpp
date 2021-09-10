@@ -9,6 +9,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

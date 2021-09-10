@@ -6,7 +6,7 @@
 #include "newtypes.h"
 #include "items.h"
 #include "room.h"
-
+#include "item.h"
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
 #define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
