@@ -201,13 +201,13 @@ bool SpeedBoatCanGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if ((collResult.FloorHeight - v->pos.yPos) < -(WALL_SIZE / 2))
+	if ((collResult.Position.Floor - v->pos.yPos) < -(WALL_SIZE / 2))
 		return false;
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
+	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - v->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -222,7 +222,7 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
 		return BOAT_GETON::NONE;
 
 	if (!TestCollision(boat, LaraItem))
@@ -837,7 +837,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	geton = SpeedBoatCheckGeton(itemNum, coll);
 	if (!geton)
 	{
-		coll->enableBaddiePush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, litem, coll);
 		return;
 	}

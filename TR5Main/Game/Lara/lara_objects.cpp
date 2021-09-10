@@ -18,8 +18,8 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 39, 98*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = SECTOR(1);
@@ -30,8 +30,8 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 67*/
 	/*collison: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = SECTOR(1);
@@ -46,8 +46,8 @@ void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 	/*states 40, 126*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = SECTOR(1);
@@ -59,8 +59,8 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 41*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = SECTOR(1);
@@ -71,7 +71,7 @@ void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 95*/
 	/*state code: lara_as_controlledl*/
-	if (coll->old.x != item->pos.xPos || coll->old.z != item->pos.zPos)
+	if (coll->Setup.OldPosition.x != item->pos.xPos || coll->Setup.OldPosition.z != item->pos.zPos)
 	{
 		if (item->animNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
@@ -98,8 +98,8 @@ void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 42*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -4550;
 	Camera.targetDistance = SECTOR(1);
@@ -111,8 +111,8 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	Lara.look = false;
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
@@ -136,8 +136,8 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 36*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
@@ -149,8 +149,8 @@ void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 37*/
 	/*collision: lara_default_col*/
 	Lara.look = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
@@ -161,8 +161,8 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 38*/
 	/*collision: lara_default_col*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	Camera.targetAngle = ANGLE(75.0f);
 	if (!(TrInput & IN_ACTION))
 		item->goalAnimState = LS_STOP;
@@ -178,8 +178,8 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.look = false;
 
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 
 	if (TrInput & IN_ACTION && pulley->triggerFlags)
 	{
@@ -354,8 +354,8 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll) {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	lara_trbalance_regen();
 	lara_trbalance_mesh();
 	if(item->animNumber == LA_TIGHTROPE_END && item->frameNumber == g_Level.Anims[LA_TIGHTROPE_END].frameEnd)
@@ -782,22 +782,22 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 
 	if (item->animNumber == LA_POLE_IDLE)
 	{
-		coll->badPos = NO_BAD_POS;
-		coll->badNeg = -STEPUP_HEIGHT;
-		coll->badCeiling = BAD_JUMP_CEILING;
+		coll->Setup.BadHeightUp = NO_BAD_POS;
+		coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 		Lara.moveAngle = item->pos.yRot;
 
-		coll->facing = Lara.moveAngle;
-		coll->radius = 100;
-		coll->slopesAreWalls = true;
+		coll->Setup.ForwardAngle = Lara.moveAngle;
+		coll->Setup.Radius = LARA_RAD;
+		coll->Setup.SlopesAreWalls = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, item, LARA_HEIGHT);
 
 		if (TrInput & IN_ACTION)
 		{
@@ -825,7 +825,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_POLE_UP;
 				}
 			}
-			else if (TrInput & IN_BACK && coll->middle.Floor > 0)
+			else if (TrInput & IN_BACK && coll->Middle.Floor > 0)
 			{
 				item->goalAnimState = LS_POLE_DOWN;
 				item->itemFlags[2] = 0;
@@ -834,7 +834,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 			if (TrInput & IN_JUMP)
 				item->goalAnimState = LS_JUMP_BACK;
 		}
-		else if (coll->middle.Floor <= 0)
+		else if (coll->Middle.Floor <= 0)
 		{
 			item->goalAnimState = LS_STOP;
 		}
@@ -851,8 +851,8 @@ void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 100*/
 	/*state code: lara_as_null*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
@@ -872,8 +872,8 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 101*/
 	/*state code: lara_as_null*/
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
@@ -881,20 +881,20 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & (IN_BACK | IN_ACTION)) != (IN_BACK | IN_ACTION) || item->hitPoints <= 0)
 		item->goalAnimState = LS_POLE_IDLE;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
+	coll->Setup.BadHeightUp = NO_BAD_POS;
+	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->slopesAreWalls = true;
+	coll->Setup.SlopesAreWalls = true;
 
-	coll->facing = Lara.moveAngle;
-	coll->radius = 100;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.Radius = LARA_RAD;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+	GetCollisionInfo(coll, item, LARA_HEIGHT);
 
-	if (coll->middle.Floor < 0)
+	if (coll->Middle.Floor < 0)
 	{
 		short roomNumber = item->roomNumber;
 		item->floor = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
@@ -937,8 +937,8 @@ void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 102*/
 	/*collision: lara_void_func*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	if (!(TrInput & IN_LEFT) || !(TrInput & IN_ACTION) || (TrInput & (IN_FORWARD | IN_BACK)) || item->hitPoints <= 0)
 		item->goalAnimState = LS_POLE_IDLE;
 	else
@@ -949,8 +949,8 @@ void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 103*/
 	/*collision: lara_void_func*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	if (!(TrInput & IN_RIGHT) || !(TrInput & IN_ACTION) || (TrInput & (IN_FORWARD | IN_BACK)) || item->hitPoints <= 0)
 		item->goalAnimState = LS_POLE_IDLE;
 	else
