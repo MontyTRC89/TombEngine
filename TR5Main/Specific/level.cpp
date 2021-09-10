@@ -137,7 +137,7 @@ int LoadItems()
 	{
 		for (const auto& mesh : r.mesh)
 		{
-			FLOOR_INFO* floor = &r.floor[((mesh.z - r.z) / 1024) + r.xSize * ((mesh.x - r.x) / 1024)];
+			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
 			 
 			if (floor->box == NO_BOX)
 				continue;
@@ -146,7 +146,7 @@ int LoadItems()
 			{
 				int fl = floor->floor * 4;
 				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
-				if (fl <= mesh.y - st->collisionBox.Y2 + 512 && fl < mesh.y - st->collisionBox.Y1)
+				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
 				{
 					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
 						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
@@ -358,7 +358,6 @@ void LoadObjects()
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
 		StaticObjects[meshID].shatterType = (short)ReadInt16();
-		StaticObjects[meshID].shatterDamage = (short)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
@@ -722,10 +721,12 @@ void ReadRooms()
 		for (int j = 0; j < numStatics; j++)
 		{
 			auto & mesh = room.mesh.emplace_back();
-			mesh.x = ReadInt32();
-			mesh.y = ReadInt32();
-			mesh.z = ReadInt32();
-			mesh.yRot = ReadUInt16();
+			mesh.pos.xPos = ReadInt32();
+			mesh.pos.yPos = ReadInt32();
+			mesh.pos.zPos = ReadInt32();
+			mesh.pos.xRot = 0;
+			mesh.pos.yRot = ReadUInt16();
+			mesh.pos.zRot = 0;
 			mesh.flags = ReadUInt16();
 			Vector3 rgb = ReadVector3();
 			float a = ReadFloat();
