@@ -1,7 +1,7 @@
 #pragma once
 
-#include "items.h"
-#include "control.h"
+struct ITEM_INFO;
+struct FLOOR_INFO;
 
 int GetKeyTrigger(ITEM_INFO* item);
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch);

@@ -15,6 +15,8 @@
 #include "input.h"
 #include "Sound\sound.h"
 #include "Specific\prng.h"
+#include "quad_info.h"
+
 using std::vector;
 using namespace TEN::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
@@ -1123,8 +1125,8 @@ void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	item->data = game_malloc<QUAD_INFO>();
-	QUAD_INFO* quad = (QUAD_INFO *)item->data;
+	item->data = QUAD_INFO();
+	QUAD_INFO* quad = item->data;
 
 	quad->velocity = 0;
 

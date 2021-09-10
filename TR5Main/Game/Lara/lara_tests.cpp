@@ -6,6 +6,7 @@
 #include "control.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
+#include "control.h"
 
 using namespace TEN::Floordata;
 
@@ -214,6 +215,11 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			return 1;
 		}
 	}
+}
+
+bool TestLaraStandUp(COLL_INFO* coll)
+{
+	return (coll->middle.Ceiling >= -362 || coll->boundsAbove < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)

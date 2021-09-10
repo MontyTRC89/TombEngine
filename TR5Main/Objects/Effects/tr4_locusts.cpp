@@ -6,6 +6,7 @@
 #include "misc.h"
 #include "lara.h"
 #include "effects\tomb4fx.h"
+#include "collide.h"
 
 namespace TEN::Entities::TR4 {
     LOCUST_INFO Locusts[MAX_LOCUSTS];

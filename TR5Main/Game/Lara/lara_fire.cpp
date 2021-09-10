@@ -18,7 +18,7 @@
 #include "savegame.h"
 #include "GameFlowScript.h"
 #include "lara_struct.h"
-
+#include "creature_info.h"
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */
@@ -1006,11 +1006,11 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	maxDistance = weapon->targetDist;
 	targets = 0;
 
-	for (slot = 0; slot < NUM_SLOTS; ++slot)
+	for (slot = 0; slot < ActiveCreatures.size(); ++slot)
 	{
-		if (BaddieSlots[slot].itemNum != NO_ITEM)
+		if (ActiveCreatures[slot]->itemNum != NO_ITEM)
 		{
-			item = &g_Level.Items[BaddieSlots[slot].itemNum];
+			item = &g_Level.Items[ActiveCreatures[slot]->itemNum];
 			if (item->hitPoints > 0)
 			{
 				x = item->pos.xPos - src.x;

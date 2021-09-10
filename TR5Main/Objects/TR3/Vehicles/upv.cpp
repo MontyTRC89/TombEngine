@@ -17,6 +17,7 @@
 #include "input.h"
 #include "savegame.h"
 #include "Sound\sound.h"
+#include "upv_info.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
@@ -830,11 +831,10 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 void SubInitialise(short itemNum)
 {
 	ITEM_INFO* v;
-	SUB_INFO* sub;
 
 	v = &g_Level.Items[itemNum];
-	sub = game_malloc<SUB_INFO>();
-	v->data = (void*)sub;
+	v->data = SUB_INFO();
+	SUB_INFO* sub = v->data;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
 	sub->WeaponTimer = 0;

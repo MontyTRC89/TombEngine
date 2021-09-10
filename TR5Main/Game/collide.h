@@ -1,6 +1,10 @@
 #pragma once
 #include "Specific\phd_global.h"
-#include "level.h"
+#include "trmath.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+struct FLOOR_INFO;
+struct MESH_INFO;
 
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)
@@ -62,6 +66,7 @@ struct COLL_INFO
 	signed char tiltZ;
 	bool hitStatic;
 	bool hitTallBounds;
+	int boundsAbove;
 	bool slopesAreWalls;
 	bool slopesArePits;
 	bool lavaIsPit;

@@ -8,6 +8,7 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
+#include "Renderer11.h"
 using TEN::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
