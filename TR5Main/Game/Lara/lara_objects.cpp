@@ -797,7 +797,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.Radius = LARA_RAD;
 		coll->Setup.SlopesAreWalls = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+		GetCollisionInfo(coll, item, LARA_HEIGHT);
 
 		if (TrInput & IN_ACTION)
 		{
@@ -892,7 +892,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+	GetCollisionInfo(coll, item, LARA_HEIGHT);
 
 	if (coll->Middle.Floor < 0)
 	{

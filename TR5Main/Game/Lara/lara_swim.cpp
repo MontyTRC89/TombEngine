@@ -70,7 +70,7 @@ void LaraWaterCurrent(COLL_INFO* coll)
 
 	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);
 
-	GetCollisionInfo(coll, LaraItem->pos.xPos, LaraItem->pos.yPos + 200, LaraItem->pos.zPos, LaraItem->roomNumber, 400);
+	GetCollisionInfo(coll, LaraItem, PHD_VECTOR(0, 200, 0), 400);
 	
 	if (coll->CollisionType == CT_FRONT)
 	{
@@ -535,13 +535,13 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	memcpy(&c1, coll, sizeof(COLL_INFO));
 	memcpy(&c2, coll, sizeof(COLL_INFO) - 2);
 
-	GetCollisionInfo(coll, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0), height);
 	
 	c1.Setup.ForwardAngle += ANGLE(45);
-	GetCollisionInfo(&c1, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
+	GetCollisionInfo(&c1, item, PHD_VECTOR(0, height / 2, 0), height);
 	
 	c2.Setup.ForwardAngle -= ANGLE(45);
-	GetCollisionInfo(&c2, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
+	GetCollisionInfo(&c2, item, PHD_VECTOR(0, height / 2, 0), height);
 	
 	ShiftItem(item, coll);
 	
