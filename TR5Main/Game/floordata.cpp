@@ -27,6 +27,41 @@ int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
+std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
+{
+	auto plane = FloorCollision.Planes[SectorPlane(x, z)];
+	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
+	auto tiltZ = (int)-(plane.y * WALL_SIZE / STEP_SIZE);
+
+	return std::make_pair(tiltX, tiltZ);
+}
+
+bool FLOOR_INFO::FloorIsSplit() const
+{
+	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
+	bool differentPortals = FloorCollision.Portals[0] != FloorCollision.Portals[1];
+
+	return differentPlanes || differentPortals;
+}
+
+bool FLOOR_INFO::CeilingIsSplit() const
+{
+	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
+	bool differentPortals = CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
+
+	return differentPlanes || differentPortals;
+}
+
+bool FLOOR_INFO::FloorIsDiagonalStep() const
+{
+	return FloorCollision.Planes[0].z != FloorCollision.Planes[1].z;
+}
+
+bool FLOOR_INFO::CeilingIsDiagonalStep() const
+{
+	return CeilingCollision.Planes[0].z != CeilingCollision.Planes[1].z;
+}
+
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
 {
 	const auto room = FloorCollision.Portals[plane];
