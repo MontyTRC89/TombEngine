@@ -1,19 +1,21 @@
 #pragma once
 #include "Specific\phd_global.h"
 #include "trmath.h"
+
 struct ITEM_INFO;
 struct COLL_INFO;
 struct FLOOR_INFO;
 struct MESH_INFO;
 
-// used by coll->Setup.BadHeightUp
-#define NO_BAD_POS (-NO_HEIGHT)
-// used by coll->Setup.BadHeightDown
-#define NO_BAD_NEG NO_HEIGHT
+constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadHeightUp
+constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadHeightDown
+constexpr auto MAX_COLLIDED_OBJECTS = 1024;
+constexpr auto COLLISION_CHECK_DISTANCE = 6144;
+constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
-#define MAX_COLLIDED_OBJECTS 1024
-
-#define COLLISION_CHECK_DISTANCE 6144
+extern BOUNDING_BOX GlobalCollisionBounds;
+extern ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
+extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 enum COLL_TYPE
 {
@@ -108,13 +110,6 @@ struct OBJECT_COLLISION_BOUNDS
 	short rotZ1;
 	short rotZ2;
 };
-
-constexpr auto MAX_ITEMS = 1024;
-constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
-
-extern BOUNDING_BOX GlobalCollisionBounds;
-extern ITEM_INFO* CollidedItems[MAX_ITEMS];
-extern MESH_INFO* CollidedMeshes[MAX_ITEMS];
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
