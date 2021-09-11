@@ -113,7 +113,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
 void UpdateSky();
 void AnimateWaterfalls();
-short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 void KillMoveItems();

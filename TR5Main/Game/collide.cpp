@@ -1283,75 +1283,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 			result.Position.Type = WALL;
 	}
 
-	// Check if block isn't a wall or there is no floordata
-	if (floor->floor * CLICK(1) != NO_HEIGHT && floor->index)
-	{
-		// TODO: For Krys: currently we use legacy floordata ONLY for getting 
-		// SplitFloor/SplitCeiling values. These values can't be derived from new floordata. After removal
-		// of them, we can remove this chain floordata parser.
-
-		short* data = &g_Level.FloorData[floor->index];
-
-		short type;
-		int zOff, xOff, trigger;
-		int tilts, t0, t1, t2, t3, t4, dx, dz;
-
-		do
-		{
-			type = *(data++);
-
-			switch (type & DATA_TYPE)
-			{
-			case DOOR_TYPE:
-			case ROOF_TYPE:
-			case TILT_TYPE:
-				data++;
-				break;
-
-			case SPLIT3:
-			case SPLIT4:
-			case NOCOLC1T:
-			case NOCOLC1B:
-			case NOCOLC2T:
-			case NOCOLC2B:
-				result.Position.SplitCeiling = type & DATA_TYPE; // TODO: Remove after Krys removes diagonal stuff!
-				data++;
-				break;
-
-			case SPLIT1:
-			case SPLIT2:
-			case NOCOLF1T:
-			case NOCOLF1B:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				result.Position.SplitFloor = (type & DATA_TYPE); // TODO: Remove after Krys removes diagonal stuff!
-				data++;
-				break;
-
-			case TRIGGER_TYPE:
-				data++;
-				do
-				{
-					trigger = *(data++);
-
-					if (TRIG_BITS(trigger) != TO_OBJECT)
-					{
-						if (TRIG_BITS(trigger) == TO_CAMERA ||
-							TRIG_BITS(trigger) == TO_FLYBY)
-						{
-							trigger = *(data++);
-						}
-					}
-
-				} while (!(trigger & END_BIT));
-				break;
-
-			default:
-				break;
-			}
-		} while (!(type & END_BIT));
-	}
-
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
 		result.TiltZ = result.TiltX = 0;
@@ -1718,32 +1649,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 			}
 		}
 
-		if (coll->MiddleLeft.SplitFloor && coll->MiddleLeft.SplitFloor == coll->Middle.SplitFloor)
-		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
-			quarter %= 2;
-
-			switch (coll->MiddleLeft.SplitFloor)
-			{
-			case SPLIT1:
-			case NOCOLF1T:
-			case NOCOLF1B:
-				if (quarter)
-					coll->CollisionType = CT_LEFT;
-				break;
-			case SPLIT2:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				if (!quarter)
-					coll->CollisionType = CT_LEFT;
-				break;
-			}
-		}
-		else
-		{
-			coll->CollisionType = CT_LEFT;
-		}
-
 		return;
 	}
 
@@ -1770,32 +1675,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 				coll->Shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
-		}
-
-		if (coll->MiddleRight.SplitFloor && coll->MiddleRight.SplitFloor == coll->Middle.SplitFloor)
-		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
-			quarter %= 2;
-
-			switch (coll->MiddleRight.SplitFloor)
-			{
-			case SPLIT1:
-			case NOCOLF1T:
-			case NOCOLF1B:
-				if (quarter)
-					coll->CollisionType = CT_RIGHT;
-				break;
-			case SPLIT2:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				if (!quarter)
-					coll->CollisionType = CT_RIGHT;
-				break;
-			}
-		}
-		else
-		{
-			coll->CollisionType = CT_RIGHT;
 		}
 
 		return;
@@ -2132,32 +2011,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 			}
 		}
 		
-		if (coll->MiddleLeft.SplitFloor && coll->MiddleLeft.SplitFloor == coll->Middle.SplitFloor)
-		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
-			quarter %= 2;
-
-			switch (coll->MiddleLeft.SplitFloor)
-			{
-			case SPLIT1:
-			case NOCOLF1T:
-			case NOCOLF1B:
-				if (quarter)
-					coll->CollisionType = CT_LEFT;
-				break;
-			case SPLIT2:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				if (!quarter)
-					coll->CollisionType = CT_LEFT;
-				break;
-			}
-		}
-		else
-		{
-			coll->CollisionType = CT_LEFT;
-		}
-
 		return;
 	}
 
@@ -2184,32 +2037,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 				coll->Shift.z = FindGridShift(zPos + zright, zPos + zfront);
 				break;
 			}
-		}
-		
-		if (coll->MiddleRight.SplitFloor && coll->MiddleRight.SplitFloor == coll->Middle.SplitFloor)
-		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
-			quarter %= 2;
-
-			switch (coll->MiddleRight.SplitFloor)
-			{
-			case SPLIT1:
-			case NOCOLF1T:
-			case NOCOLF1B:
-				if (quarter)
-					coll->CollisionType = CT_RIGHT;
-				break;
-			case SPLIT2:
-			case NOCOLF2T:
-			case NOCOLF2B:
-				if (!quarter)
-					coll->CollisionType = CT_RIGHT;
-				break;
-			}
-		}
-		else
-		{
-			coll->CollisionType = CT_RIGHT;
 		}
 
 		return;
@@ -3011,46 +2838,6 @@ bool SnapToDiagonal(short& angle, int interval)
 		return true;
 	}
 	return false;
-}
-
-Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot)
-{
-	Vector2 vect;
-
-	int dx = (xPos % WALL_SIZE) - WALL_SIZE/2;
-	int dz = (zPos % WALL_SIZE) - WALL_SIZE/2;
-	int xGrid = xPos - dx;
-	int zGrid = zPos - dz;
-	
-	switch (splitType)
-	{
-	case SPLIT1:
-	case NOCOLF1T:
-	case NOCOLF1B:
-		xPos = xGrid + (dx - dz) / 2;
-		zPos = zGrid - (dx - dz) / 2;
-		break;
-	case SPLIT2:
-	case NOCOLF2T:
-	case NOCOLF2B:
-		xPos = xGrid + (dx + dz) / 2;
-		zPos = zGrid + (dx + dz) / 2;
-		break;
-	default:
-		break;
-	}
-
-	if (splitType)
-	{
-		yRot = floor(yRot / 16384.0f) * ANGLE(90) + ANGLE(45);
-		xPos -= int(radius * sin(TO_RAD(yRot)));
-		zPos -= int(radius * cos(TO_RAD(yRot)));
-	}
-
-	vect.x = xPos;
-	vect.y = zPos;
-
-	return vect;
 }
 
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)

@@ -858,38 +858,6 @@ void UpdateSky()
 	}
 }
 
-short GetDoor(FLOOR_INFO *floor)
-{
-	if (!floor->index)
-		return NO_ROOM;
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type = *(data++);
-
-	if (((type & DATA_TYPE) == TILT_TYPE) || ((type & DATA_TYPE) == SPLIT1) || ((type & DATA_TYPE) == SPLIT2) || ((type & DATA_TYPE) == NOCOLF1B) || ((type & DATA_TYPE) == NOCOLF1T) || ((type & DATA_TYPE) == NOCOLF2B) || ((type & DATA_TYPE) == NOCOLF2T))
-	{
-		if (type & END_BIT)
-			return NO_ROOM;
-
-		data++;
-		type = *(data++);
-	}
-
-	if (((type & DATA_TYPE) == ROOF_TYPE) || ((type & DATA_TYPE) == SPLIT3) || ((type & DATA_TYPE) == SPLIT4) || ((type & DATA_TYPE) == NOCOLC1B) || ((type & DATA_TYPE) == NOCOLC1T) || ((type & DATA_TYPE) == NOCOLC2B) || ((type & DATA_TYPE) == NOCOLC2T))
-	{
-		if (type & END_BIT)
-			return NO_ROOM;
-
-		data++;
-		type = *(data++);
-	}
-
-	if ((type & DATA_TYPE) == DOOR_TYPE)
-		return (*data);
-
-	return NO_ROOM;
-}
-
 void TranslateItem(ITEM_INFO *item, int x, int y, int z)
 {
 	float c = phd_cos(item->pos.yRot);
@@ -1041,92 +1009,6 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 
 FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 {
-#if 0
-	ROOM_INFO *r;
-	FLOOR_INFO *floor;
-	short data;
-	int xFloor = 0;
-	int yFloor = 0;
-	short roomDoor = 0;
-	int retval;
-
-	r = &g_Level.Rooms[*roomNumber];
-	do
-	{
-		xFloor = (z - r->z) / SECTOR(1);
-		yFloor = (x - r->x) / SECTOR(1);
-
-		if (xFloor <= 0)
-		{
-			xFloor = 0;
-			if (yFloor < 1)
-				yFloor = 1;
-			else if (yFloor > r->ySize - 2)
-				yFloor = r->ySize - 2;
-		}
-		else if (xFloor >= r->xSize - 1)
-		{
-			xFloor = r->xSize - 1;
-			if (yFloor < 1)
-				yFloor = 1;
-			else if (yFloor > r->ySize - 2)
-				yFloor = r->ySize - 2;
-		}
-		else if (yFloor < 0)
-		{
-			yFloor = 0;
-		}
-		else if (yFloor >= r->ySize)
-		{
-			yFloor = r->ySize - 1;
-		}
-
-		floor = &r->floor[xFloor + (yFloor * r->xSize)];
-		data = GetDoor(floor);
-		if (data != NO_ROOM)
-		{
-			*roomNumber = data;
-			r = &g_Level.Rooms[data];
-		}
-	} while (data != NO_ROOM);
-
-	if (y < floor->floor * 256)
-	{
-		if (y < floor->ceiling * 256 && floor->skyRoom != NO_ROOM)
-		{
-			do
-			{
-				int noCollision = CheckNoColCeilingTriangle(floor, x, z);
-				if (noCollision == 1 || noCollision == -1 && y >= r->maxceiling)
-					break;
-
-				*roomNumber = floor->skyRoom;
-				r = &g_Level.Rooms[floor->skyRoom];
-				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-				if (y >= floor->ceiling * 256)
-					break;
-			} while (floor->skyRoom != NO_ROOM);
-		}
-	}
-	else if (floor->pitRoom != NO_ROOM)
-	{
-		do
-		{
-			int noCollision = CheckNoColFloorTriangle(floor, x, z);
-			if (noCollision == 1 || noCollision == -1 && y < r->minfloor)
-				break;
-
-			*roomNumber = floor->pitRoom;
-			r = &g_Level.Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (y < floor->floor * 256)
-				break;
-		} while (floor->pitRoom != NO_ROOM);
-	}
-
-	return floor;
-#endif
-
 	const auto location = GetRoom(ROOM_VECTOR{*roomNumber, y}, x, y, z);
 	*roomNumber = location.roomNumber;
 	return &GetFloor(*roomNumber, x, z);
@@ -1134,27 +1016,24 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (!floor->index)
-		return 0;
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type = *(data)&DATA_TYPE;
-
-	if (type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B)
+	if (floor->FloorIsSplit() && 
+	    (floor->FloorCollision.Portals[0] != 0 || floor->FloorCollision.Portals[1] != 0))
 	{
 		int dx = x & 1023;
 		int dz = z & 1023;
 
-		if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLF2T && dx <= dz)
-			return -1;
-		else if (type == NOCOLF2B && dx > dz)
-			return -1;
-		else
-			return 1;
+		//if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
+		//	return -1;
+		//else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
+		//	return -1;
+		//else if (type == NOCOLF2T && dx <= dz)
+		//	return -1;
+		//else if (type == NOCOLF2B && dx > dz)
+		//	return -1;
+		//else
+		//	return 1;
+
+		return 1;
 	}
 
 	return 0;
@@ -1162,34 +1041,24 @@ int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 
 int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (!floor->index)
-		return 0;
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type = *(data)&DATA_TYPE;
-
-	if (type == TILT_TYPE || type == SPLIT1 || type == SPLIT2 || type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B) // gibby
-	{
-		if (*(data)&END_BIT)
-			return 0;
-		type = *(data + 2) & DATA_TYPE;
-	}
-
-	if (type == NOCOLC1T || type == NOCOLC1B || type == NOCOLC2T || type == NOCOLC2B)
+	if (floor->CeilingIsSplit() &&
+		(floor->CeilingCollision.Portals[0] != 0 || floor->CeilingCollision.Portals[1] != 0))
 	{
 		int dx = x & 1023;
 		int dz = z & 1023;
 
-		if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLC1B && dx > (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLC2T && dx <= dz)
-			return -1;
-		else if (type == NOCOLC2B && dx > dz)
-			return -1;
-		else
-			return 1;
+		//if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
+		//	return -1;
+		//else if (type == NOCOLC1B && dx > (SECTOR(1) - dz))
+		//	return -1;
+		//else if (type == NOCOLC2T && dx <= dz)
+		//	return -1;
+		//else if (type == NOCOLC2B && dx > dz)
+		//	return -1;
+		//else
+		//	return 1;
+
+		return 1;
 	}
 
 	return 0;
@@ -1819,189 +1688,6 @@ int GetRandomDraw()
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 {
-#if 0
-	ROOM_INFO *room;
-	FLOOR_INFO *floor2;
-	int ceiling, t0, t1, t2, t3, dx, dz, xOff, yOff;
-	short type, type2, function, cadj, trigger, *data;
-	bool end;
-	ITEM_INFO *item;
-
-	SplitCeiling = 0;
-	floor2 = floor;
-	while (floor2->skyRoom != NO_ROOM)
-	{
-		if (CheckNoColCeilingTriangle(floor, x, z) == 1)
-			break;
-		room = &g_Level.Rooms[floor2->skyRoom];
-		floor2 = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
-	}
-	ceiling = 256 * floor2->ceiling;
-	if (ceiling != NO_HEIGHT)
-	{
-		if (floor2->index)
-		{
-			data = &g_Level.FloorData[floor2->index];
-			type = *data;
-			function = type & DATA_TYPE;
-			++data;
-			end = false;
-			if (function == TILT_TYPE || function == SPLIT1 || function == SPLIT2 || function == NOCOLF1T || function == NOCOLF1B || function == NOCOLF2T || function == NOCOLF2B)
-			{
-				++data;
-				if (type & END_BIT)
-					end = true;
-				type = *data;
-				function = type & DATA_TYPE;
-				++data;
-			}
-			if (!end)
-			{
-				xOff = 0;
-				yOff = 0;
-				if (function != ROOF_TYPE)
-				{
-					if (function == SPLIT3 || function == SPLIT4 || function == NOCOLC1T || function == NOCOLC1B || function == NOCOLC2T || function == NOCOLC2B)
-					{
-						SplitCeiling = function;
-						dx = x & 0x3FF;
-						dz = z & 0x3FF;
-						t0 = -(*data & DATA_TILT);
-						t1 = -(*data >> 4 & DATA_TILT);
-						t2 = -(*data >> 8 & DATA_TILT);
-						t3 = -(*data >> 12 & DATA_TILT);
-						if (function == SPLIT3 || function == NOCOLC1T || function == NOCOLC1B)
-						{
-							if (dx <= 1024 - dz)
-							{
-								cadj = type >> 10 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t2 - t1;
-								yOff = t3 - t2;
-							}
-							else
-							{
-								cadj = type >> 5 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t3 - t0;
-								yOff = t0 - t1;
-							}
-						}
-						else
-						{
-							if (dx <= dz)
-							{
-								cadj = type >> 10 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t2 - t1;
-								yOff = t0 - t1;
-							}
-							else
-							{
-								cadj = type >> 5 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t3 - t0;
-								yOff = t3 - t2;
-							}
-						}
-					}
-				}
-				else
-				{
-					xOff = *data >> 8;
-					yOff = *(char *)data;
-				}
-				if (xOff < 0)
-				{
-					ceiling += (z & 0x3FF) * xOff >> 2;
-				}
-				else
-				{
-					ceiling -= (-1 - z & 0x3FF) * xOff >> 2;
-				}
-				if (yOff < 0)
-				{
-					ceiling += (-1 - x & 0x3FF) * yOff >> 2;
-				}
-				else
-				{
-					ceiling -= (x & 0x3FF) * yOff >> 2;
-				}
-			}
-		}
-		while (floor->pitRoom != NO_ROOM)
-		{
-			if (CheckNoColFloorTriangle(floor, x, z) == 1)
-				break;
-			room = &g_Level.Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
-		}
-		if (floor->index)
-		{
-			data = &g_Level.FloorData[floor->index];
-			do
-			{
-				type = *data;
-				function = type & DATA_TYPE;
-				++data;
-				switch (function)
-				{
-				case DOOR_TYPE:
-				case TILT_TYPE:
-				case ROOF_TYPE:
-				case SPLIT1:
-				case SPLIT2:
-				case SPLIT3:
-				case SPLIT4:
-				case NOCOLF1T:
-				case NOCOLF1B:
-				case NOCOLF2T:
-				case NOCOLF2B:
-				case NOCOLC1T:
-				case NOCOLC1B:
-				case NOCOLC2T:
-				case NOCOLC2B:
-					++data;
-					break;
-				case TRIGGER_TYPE:
-					++data;
-					do
-					{
-						type2 = *data;
-						trigger = TRIG_BITS(type2);
-						++data;
-						if (trigger != TO_OBJECT)
-						{
-							if (trigger == TO_CAMERA || trigger == TO_FLYBY)
-							{
-								type2 = *data;
-								++data;
-							}
-						}
-						else
-						{
-							item = &g_Level.Items[type2 & VALUE_BITS];
-							if (Objects[item->objectNumber].ceiling && !(item->flags & 0x8000))
-							{
-								Objects[item->objectNumber].ceiling(item, x, y, z, &ceiling);
-							}
-						}
-					} while (!(type2 & END_BIT));
-				}
-			} while (!(type & END_BIT));
-		}
-	}
-	return ceiling;
-#endif
-
 	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
@@ -2590,7 +2276,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			xBlock = r->ySize - 1;
 
 		floor = &r->floor[zBlock + xBlock * r->xSize];
-		adjoiningRoom = GetDoor(floor);
+		adjoiningRoom = floor->WallPortal;
 
 		if (adjoiningRoom != NO_ROOM)
 		{
