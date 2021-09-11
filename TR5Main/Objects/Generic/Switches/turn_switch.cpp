@@ -4,12 +4,12 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "door.h"
-#include "Sound\sound.h"
+#include "sound.h"
 #include "switch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
+#include "collide.h"
 
 namespace TEN::Entities::Switches
 {
@@ -47,17 +47,16 @@ namespace TEN::Entities::Switches
 	void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
-		int flag = 0;
+		int doSwitch = 0;
 
-		if (item->currentAnimState
+		if (item->currentAnimState == TURN_SWITCH_STOP
 			&& TrInput & IN_ACTION
 			&& l->currentAnimState == LS_STOP
 			&& l->animNumber == LA_STAND_IDLE
-			&& !l->gravityStatus
+			&& l->gravityStatus == false
 			&& Lara.gunStatus == LG_NO_ARMS
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			short ItemNos[8];
 			if (TestLaraPosition(&TurnSwitchBoundsA, item, l))
 			{
 				if (MoveLaraPosition(&TurnSwitchPosA, item, l))
@@ -66,38 +65,16 @@ namespace TEN::Entities::Switches
 					l->frameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
 					item->animNumber = Objects[item->objectNumber].animIndex + 4;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->itemFlags[0] = 1;
+					item->itemFlags[0] = TURN_SWITCH_ANTICLOCKWISE;
 					ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot);
 					ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot);
-				
-					Lara.isMoving = false;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.gunStatus = LG_HANDS_BUSY;
-					l->currentAnimState = LA_REACH;
 
-					UseForcedFixedCamera = true;
-					ForcedFixedCamera.y = item->pos.yPos - 2048;
-					ForcedFixedCamera.roomNumber = item->roomNumber;
-
-					AddActiveItem(itemNum);
-
-					item->status = ITEM_ACTIVE;
-					item->itemFlags[1] = 0;
-
-					if (GetSwitchTrigger(item, ItemNos, 0))
-					{
-						if (!TriggerActive(&g_Level.Items[ItemNos[0]]))
-						{
-							g_Level.Items[ItemNos[0]].animNumber = Objects[g_Level.Items[ItemNos[0]].objectNumber].animIndex;
-							g_Level.Items[ItemNos[0]].frameNumber = g_Level.Anims[g_Level.Items[ItemNos[0]].animNumber].frameBase;
-						}
-					}
-					return;
+					doSwitch = -1;
 				}
-				Lara.interactedItem = itemNum;
+				else
+				{
+					Lara.interactedItem = itemNum;
+				}
 			}
 			else
 			{
@@ -106,12 +83,12 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(&TurnSwitchPos, item, l))
 					{
-						l->animNumber = 319;
-						flag = 1;
-						l->frameNumber = g_Level.Anims[319].frameBase;
-						item->itemFlags[0] = 2;
+						l->animNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
+						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						item->itemFlags[0] = TURN_SWITCH_CLOCKWISE;
 						ForcedFixedCamera.x = item->pos.xPos + 1024 * phd_sin(item->pos.yRot);
 						ForcedFixedCamera.z = item->pos.zPos + 1024 * phd_cos(item->pos.yRot);
+						doSwitch = 1;
 					}
 					else
 					{
@@ -124,51 +101,59 @@ namespace TEN::Entities::Switches
 					Lara.gunStatus = LG_NO_ARMS;
 				}
 				l->pos.yRot ^= (short)ANGLE(180);
-				if (flag)
-				{
-					Lara.isMoving = 0;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.gunStatus = LG_HANDS_BUSY;
-					l->currentAnimState = LA_REACH;
-					UseForcedFixedCamera = true;
-					ForcedFixedCamera.y = item->pos.yPos - 2048;
-					ForcedFixedCamera.roomNumber = item->roomNumber;
-					AddActiveItem(itemNum);
-					item->status = ITEM_ACTIVE;
-					item->itemFlags[1] = 0;
-					if (GetSwitchTrigger(item, ItemNos, 0))
-					{
-						if (!TriggerActive(&g_Level.Items[ItemNos[0]]))
-						{
-							g_Level.Items[ItemNos[0]].animNumber = Objects[g_Level.Items[ItemNos[0]].objectNumber].animIndex + 4;
-							g_Level.Items[ItemNos[0]].frameNumber = g_Level.Anims[g_Level.Items[ItemNos[0]].animNumber].frameBase;
-						}
-					}
-					return;
-				}
 			}
 		}
 
-		if (coll->enableBaddiePush && TestBoundsCollide(item, l, coll->radius))
+		if (doSwitch)
 		{
-			GlobalCollisionBounds.X1 = -512;
-			GlobalCollisionBounds.X2 = 512;
-			GlobalCollisionBounds.Y1 = -512;
-			GlobalCollisionBounds.Y2 = 0;
-			GlobalCollisionBounds.Z1 = -512;
-			GlobalCollisionBounds.Z2 = 512;
+			short ItemNos[8];
 
-			ItemPushItem(item, l, coll, 0, 2);
+			Lara.isMoving = false;
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			Lara.gunStatus = LG_HANDS_BUSY;
+			l->currentAnimState = LA_REACH;
 
-			GlobalCollisionBounds.X1 = 256;
-			GlobalCollisionBounds.X2 = 1024;
-			GlobalCollisionBounds.Z1 = -128;
-			GlobalCollisionBounds.Z2 = 128;
+			UseForcedFixedCamera = true;
+			ForcedFixedCamera.y = item->pos.yPos - 2048;
+			ForcedFixedCamera.roomNumber = item->roomNumber;
 
-			ItemPushItem(item, l, coll, 0, 2);
+			AddActiveItem(itemNum);
+
+			item->status = ITEM_ACTIVE;
+			item->itemFlags[1] = 0;
+
+			if (GetSwitchTrigger(item, ItemNos, 0))
+			{
+				if (!TriggerActive(&g_Level.Items[ItemNos[0]]))
+				{
+					g_Level.Items[ItemNos[0]].animNumber = Objects[g_Level.Items[ItemNos[0]].objectNumber].animIndex;
+					g_Level.Items[ItemNos[0]].frameNumber = g_Level.Anims[g_Level.Items[ItemNos[0]].animNumber].frameBase;
+				}
+			}
+		}
+		else
+		{
+			if (coll->enableBaddiePush && TestBoundsCollide(item, l, coll->radius))
+			{
+				GlobalCollisionBounds.X1 = -512;
+				GlobalCollisionBounds.X2 = 512;
+				GlobalCollisionBounds.Y1 = -512;
+				GlobalCollisionBounds.Y2 = 0;
+				GlobalCollisionBounds.Z1 = -512;
+				GlobalCollisionBounds.Z2 = 512;
+
+				ItemPushItem(item, l, coll, 0, 2);
+
+				GlobalCollisionBounds.X1 = 256;
+				GlobalCollisionBounds.X2 = 1024;
+				GlobalCollisionBounds.Z1 = -128;
+				GlobalCollisionBounds.Z2 = 128;
+
+				ItemPushItem(item, l, coll, 0, 2);
+			}
 		}
 	}
 
