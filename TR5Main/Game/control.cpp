@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "collide.h"
 #include "control.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "puzzles_keys.h"
 #include "camera.h"
 #include "Lara.h"
