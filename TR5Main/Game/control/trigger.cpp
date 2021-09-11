@@ -6,7 +6,7 @@
 #include "box.h"
 #include "camera.h"
 #include "puzzles_keys.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "lot.h"
 #include "spotcam.h"
 #include "traps.h"
