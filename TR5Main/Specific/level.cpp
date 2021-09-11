@@ -378,6 +378,7 @@ void LoadCameras()
 		camera.z = ReadInt32();
 		camera.roomNumber = ReadInt32();
 		camera.flags = ReadInt32();
+		camera.speed = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
