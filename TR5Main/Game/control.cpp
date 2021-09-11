@@ -1022,6 +1022,8 @@ int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 		int dx = x & 1023;
 		int dz = z & 1023;
 
+		// TODO: bring these checks back!
+
 		//if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
 		//	return -1;
 		//else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
@@ -1046,6 +1048,8 @@ int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 	{
 		int dx = x & 1023;
 		int dz = z & 1023;
+
+		// TODO: bring these checks back!
 
 		//if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
 		//	return -1;
