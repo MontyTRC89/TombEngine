@@ -262,11 +262,11 @@ namespace TEN::Entities::Doors
 			item->pos.yRot ^= ANGLE(180);
 		}
 
-		if (TestBoundsCollide(item, l, coll->radius))
+		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{
 			if (TestCollision(item, l))
 			{
-				if (coll->enableBaddiePush)
+				if (coll->Setup.EnableObjectPush)
 				{
 					if (!(item->objectNumber >= ID_LIFT_DOORS1 && item->objectNumber <= ID_LIFT_DOORS2) || item->itemFlags[0])
 					{
