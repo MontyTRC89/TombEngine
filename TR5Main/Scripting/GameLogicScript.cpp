@@ -11,7 +11,7 @@
 #include "level.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
-#include "pickup.h"
+#include "pickup\pickup.h"
 #include "newinv2.h"
 #include "ObjectIDs.h"
 #include "camera.h"
