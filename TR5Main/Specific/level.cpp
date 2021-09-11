@@ -8,7 +8,7 @@
 #include "spotcam.h"
 #include "camera.h"
 #include "control.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "generic_doors.h"
 #include "box.h"
 #include "sound.h"

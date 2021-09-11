@@ -6,7 +6,7 @@
 #include "crowbar_switch.h"
 #include "newinv2.h"
 #include "Sound\sound.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "level.h"
 #include "collide.h"
 
