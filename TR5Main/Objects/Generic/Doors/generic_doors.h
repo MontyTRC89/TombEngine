@@ -1,10 +1,10 @@
 #pragma once
 
+struct COLL_INFO;
+struct ITEM_INFO;
+struct ROOM_INFO;
 struct DOORPOS_DATA;
 struct DOOR_DATA;
-struct ITEM_INFO;
-struct COLL_INFO;
-struct FLOOR_INFO;
 
 namespace TEN::Entities::Doors
 {
