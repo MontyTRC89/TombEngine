@@ -875,9 +875,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		while (floor->skyRoom != NO_ROOM)
+		while (floor->RoomAbove() != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->skyRoom];
+			room = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->ceiling << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
@@ -886,9 +886,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->pitRoom != NO_ROOM)
+		while (floor->RoomBelow() != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->pitRoom];
+			room = &g_Level.Rooms[floor->RoomBelow()];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->floor << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
@@ -1016,56 +1016,24 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (floor->FloorIsSplit() && 
-	    (floor->FloorCollision.Portals[0] != 0 || floor->FloorCollision.Portals[1] != 0))
-	{
-		int dx = x & 1023;
-		int dz = z & 1023;
+	if (!floor->FloorIsSplit())
+		return 0;
 
-		// TODO: bring these checks back!
-
-		//if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
-		//	return -1;
-		//else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
-		//	return -1;
-		//else if (type == NOCOLF2T && dx <= dz)
-		//	return -1;
-		//else if (type == NOCOLF2B && dx > dz)
-		//	return -1;
-		//else
-		//	return 1;
-
+	if (floor->FloorCollision.Portals[floor->SectorPlane(x, z)] == NO_ROOM)
 		return 1;
-	}
-
-	return 0;
+	else
+		return -1;
 }
 
 int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (floor->CeilingIsSplit() &&
-		(floor->CeilingCollision.Portals[0] != 0 || floor->CeilingCollision.Portals[1] != 0))
-	{
-		int dx = x & 1023;
-		int dz = z & 1023;
+	if (!floor->CeilingIsSplit())
+		return 0;
 
-		// TODO: bring these checks back!
-
-		//if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
-		//	return -1;
-		//else if (type == NOCOLC1B && dx > (SECTOR(1) - dz))
-		//	return -1;
-		//else if (type == NOCOLC2T && dx <= dz)
-		//	return -1;
-		//else if (type == NOCOLC2B && dx > dz)
-		//	return -1;
-		//else
-		//	return 1;
-
+	if (floor->CeilingCollision.Portals[floor->SectorPlaneCeiling(x, z)] == NO_ROOM)
 		return 1;
-	}
-
-	return 0;
+	else
+		return -1;
 }
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
@@ -2291,15 +2259,15 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-		while (floor->skyRoom != NO_ROOM)
+		while (floor->RoomAbove() != NO_ROOM)
 		{
 			if (CheckNoColCeilingTriangle(floor, x, z) == 1)
 				break;
-			r = &g_Level.Rooms[floor->skyRoom];
+			r = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->skyRoom == NO_ROOM)
+			if (floor->RoomAbove() == NO_ROOM)
 				break;
 		}
 
@@ -2307,15 +2275,15 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->pitRoom != NO_ROOM)
+		while (floor->RoomBelow() != NO_ROOM)
 		{
 			if (CheckNoColFloorTriangle(floor, x, z) == 1)
 				break;
-			r = &g_Level.Rooms[floor->pitRoom];
+			r = &g_Level.Rooms[floor->RoomBelow()];
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->pitRoom == NO_ROOM)
+			if (floor->RoomBelow() == NO_ROOM)
 				break;
 		}
 	}

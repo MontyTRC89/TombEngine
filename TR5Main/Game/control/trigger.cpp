@@ -153,11 +153,11 @@ int SwitchTrigger(short itemNum, short timer)
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
 	ROOM_INFO* r;
-	while (floor->pitRoom != NO_ROOM)
+	while (floor->RoomBelow() != NO_ROOM)
 	{
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
-		r = &g_Level.Rooms[floor->pitRoom];
+		r = &g_Level.Rooms[floor->RoomBelow()];
 		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 

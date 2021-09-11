@@ -31,9 +31,7 @@ class FLOOR_INFO
 	int box;
 	int fx;
 	int stopper;
-	int pitRoom;
 	int floor;
-	int skyRoom;
 	int ceiling;
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
@@ -42,13 +40,18 @@ class FLOOR_INFO
 	std::set<short> BridgeItem;
 	int Room;
 
+	// These two functions return single floor/ceiling portal for legacy code.
+	// Later, when there will be possible to make 2 separate portals in 2 
+	// planes, these functions should be somehow resolved along with legacy code.
+
+	int RoomAbove() const;
+	int RoomBelow() const;
+
 	int SectorPlane(int x, int z) const;
 	int SectorPlaneCeiling(int x, int z) const;
 	std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
 	bool FloorIsSplit() const;
 	bool CeilingIsSplit() const;
-	bool FloorIsDiagonalStep() const;
-	bool CeilingIsDiagonalStep() const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;

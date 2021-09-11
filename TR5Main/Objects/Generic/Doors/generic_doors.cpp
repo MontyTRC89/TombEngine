@@ -438,11 +438,17 @@ namespace TEN::Entities::Doors
 		if (floor)
 		{
 			floor->box = NO_BOX;
-			floor->ceiling = -127;
-			floor->floor = -127;
 			floor->index = 0;
-			floor->skyRoom = NO_ROOM;
-			floor->pitRoom = NO_ROOM;
+
+			// FIXME: HACK!!!!!!!
+			floor->FloorCollision.Portals[0] = NO_ROOM;
+			floor->FloorCollision.Portals[1] = NO_ROOM;
+			floor->CeilingCollision.Portals[0] = NO_ROOM;
+			floor->CeilingCollision.Portals[1] = NO_ROOM;
+			floor->FloorCollision.Planes[0].z = -127;
+			floor->FloorCollision.Planes[1].z = -127;
+			floor->CeilingCollision.Planes[0].z = -127;
+			floor->CeilingCollision.Planes[1].z = -127;
 
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_BOX)
