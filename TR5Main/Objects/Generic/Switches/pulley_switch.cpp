@@ -5,8 +5,9 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "Sound\sound.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "level.h"
+#include "collide.h"
 
 namespace TEN::Entities::Switches
 {

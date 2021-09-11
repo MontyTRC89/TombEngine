@@ -1,13 +1,14 @@
 #include "framework.h"
-#include "jump_switch.h"
+#include "generic_switch.h"
 #include "control.h"
 #include "input.h"
 #include "lara.h"
 #include "crowbar_switch.h"
 #include "newinv2.h"
 #include "Sound\sound.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "level.h"
+#include "collide.h"
 
 namespace TEN::Entities::Switches
 {
@@ -40,94 +41,110 @@ namespace TEN::Entities::Switches
 		int doSwitch = 0;
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if ((!(TrInput & IN_ACTION) &&
+		if ((((TrInput & IN_ACTION) ||
 #ifdef NEW_INV
-			GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM
+			GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM)
 #else
-			g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM
+			g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
 #endif
-			|| l->currentAnimState != LS_STOP
-			|| l->animNumber != LA_STAND_IDLE
-			|| Lara.gunStatus
-			|| item->itemFlags[0])
-			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
+			&& l->currentAnimState == LS_STOP
+			&& l->animNumber == LA_STAND_IDLE
+			&& Lara.gunStatus == LG_NO_ARMS
+			&& item->itemFlags[0] == 0)
+			|| (Lara.isMoving && Lara.interactedItem == itemNum))
 		{
-			ObjectCollision(itemNum, l, coll);
-			return;
-		}
-
-		if (item->currentAnimState)
-		{
-			if (item->currentAnimState != 1)
+			if (item->currentAnimState == SWITCH_ON)
 			{
-				ObjectCollision(itemNum, l, coll);
-				return;
-			}
+				l->pos.yRot ^= (short)ANGLE(180);
 
-			l->pos.yRot ^= (short)ANGLE(180);
-			if (TestLaraPosition(&CrowbarBounds2, item, l))
-			{
-				if (Lara.isMoving ||
-#ifdef NEW_INV
-					GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
-#else
-					g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
-#endif
-					)
+				if (TestLaraPosition(&CrowbarBounds2, item, l))
 				{
-					if (MoveLaraPosition(&CrowbarPos2, item, l))
+					if (Lara.isMoving ||
+#ifdef NEW_INV
+						GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
+#else
+						g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
+#endif
+						)
 					{
-						l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
-						doSwitch = 1;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-						item->goalAnimState = 0;
+						if (MoveLaraPosition(&CrowbarPos2, item, l))
+						{
+							doSwitch = 1;
+							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
+							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+							item->goalAnimState = SWITCH_OFF;
+						}
+						else
+						{
+							Lara.interactedItem = itemNum;
+						}
+#ifdef NEW_INV
+						GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
+						g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
 					}
 					else
 					{
-						Lara.interactedItem = itemNum;
+						doSwitch = -1;
 					}
-#ifdef NEW_INV
-					GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-					g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
 				}
-				else
-				{
-					doSwitch = -1;
-				}
-			}
-			else if (Lara.isMoving && Lara.interactedItem == itemNum)
-			{
-				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
-			}
-			l->pos.yRot ^= (short)ANGLE(180);
-		}
-		else
-		{
-			if (!TestLaraPosition(&CrowbarBounds, item, l))
-			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
 				}
-				ObjectCollision(itemNum, l, coll);
-				return;
+				l->pos.yRot ^= (short)ANGLE(180);
 			}
-
-			if (!(Lara.isMoving &&
+			else
+			{
+				if (TestLaraPosition(&CrowbarBounds, item, l))
+				{
+					if (Lara.isMoving ||
 #ifdef NEW_INV
-				GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+						GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
 #else
-				g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
+						g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
 #endif
-				)
+						)
+					{
+						if (MoveLaraPosition(&CrowbarPos, item, l))
+						{
+							doSwitch = 1;
+							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
+							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+							item->goalAnimState = SWITCH_ON;
+						}
+						else
+						{
+							Lara.interactedItem = itemNum;
+						}
+#ifdef NEW_INV
+						GLOBAL_inventoryitemchosen = NO_ITEM;
+#else
+						g_Inventory.SetSelectedObject(NO_ITEM);
+#endif
+					}
+					else
+					{
+						doSwitch = -1;
+					}
+				}
+				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				{
+					Lara.isMoving = false;
+					Lara.gunStatus = LG_NO_ARMS;
+				}
+			}
+		}
+
+		if (doSwitch)
+		{
+			if (doSwitch == -1)
 			{
 				if (Lara.Crowbar)
 #ifdef NEW_INV
-					GLOBAL_inventoryitemchosen = ID_CROWBAR_ITEM;
+					GLOBAL_enterinventory = ID_CROWBAR_ITEM;
 #else
 					g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
 #endif
@@ -141,67 +158,26 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				return;
-			}
-
-			if (MoveLaraPosition(&CrowbarPos, item, l))
-			{
-				l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
-				doSwitch = 1;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				item->goalAnimState = 1;
 			}
 			else
 			{
-				Lara.interactedItem = itemNum;
+				l->goalAnimState = LS_SWITCH_DOWN;
+				l->currentAnimState = LS_SWITCH_DOWN;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				item->status = ITEM_ACTIVE;
+
+				AddActiveItem(itemNum);
+				AnimateItem(item);
 			}
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
 		}
-
-		if (!doSwitch)
-		{
-			ObjectCollision(itemNum, l, coll);
-			return;
-		}
-
-		if (doSwitch != -1)
-		{
-			l->goalAnimState = LS_SWITCH_DOWN;
-			l->currentAnimState = LS_SWITCH_DOWN;
-			Lara.isMoving = false;
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
-			Lara.gunStatus = LG_HANDS_BUSY;
-			item->status = ITEM_ACTIVE;
-
-			AddActiveItem(itemNum);
-			AnimateItem(item);
-
-			return;
-		}
-
-		if (Lara.Crowbar)
-#ifdef NEW_INV
-			GLOBAL_enterinventory = ID_CROWBAR_ITEM;
-#else
-			g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
-#endif
 		else
 		{
-			if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
-			{
-				OldPickupPos.x = l->pos.xPos;
-				OldPickupPos.y = l->pos.yPos;
-				OldPickupPos.z = l->pos.zPos;
-				SayNo();
-			}
+			ObjectCollision(itemNum, l, coll);
 		}
 	}
-
 }
