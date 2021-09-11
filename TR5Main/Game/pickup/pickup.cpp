@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "Specific\phd_global.h"
 #include "lara.h"
 #include "draw.h"

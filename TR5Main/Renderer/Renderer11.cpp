@@ -6,7 +6,7 @@
 #include "configuration.h"
 #include "draw.h"
 #include "health.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
