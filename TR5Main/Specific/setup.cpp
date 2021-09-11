@@ -7,7 +7,7 @@
 #include "switch.h"
 #include "missile.h"
 #include "control.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "camera.h"
 #include "lara_one_gun.h"
 #include "lara_flare.h"

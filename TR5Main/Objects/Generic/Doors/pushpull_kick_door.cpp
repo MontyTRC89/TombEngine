@@ -7,7 +7,7 @@
 #include "lot.h"
 #include "newinv2.h"
 #include "input.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "sound.h"
 #include "draw.h"
 #include "sphere.h"
