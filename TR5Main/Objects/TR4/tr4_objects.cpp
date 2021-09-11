@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_objects.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
@@ -38,6 +38,8 @@
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
 #include "tr4_clockwork_beetle.h"
+#include "tr4_obelisk.h"
+
 /// puzzle
 #include "tr4_scales.h"
 /// switch
@@ -941,6 +943,16 @@ static void StartObject(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->collision = PickupCollision;
+	}
+
+	obj = &Objects[ID_OBELISK];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseObelisk;
+		obj->control = ObeliskControl;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
 	}
 }
 
