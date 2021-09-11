@@ -16,7 +16,7 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "Renderer11.h"
 
 using namespace TEN::Renderer;

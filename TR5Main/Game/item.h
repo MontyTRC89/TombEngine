@@ -4,9 +4,8 @@
 #include <string>
 #include "itemdata.h"
 #include "roomvector.h"
+
 enum GAME_OBJECT_ID : short;
-
-
 
 struct ITEM_INFO {
 	int floor;
