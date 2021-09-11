@@ -9,7 +9,7 @@
 #include "health.h"
 #include "Sound\sound.h"
 #include "draw.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "collide.h"
 #include "item.h"
 #include "camera.h"
