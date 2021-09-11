@@ -1089,6 +1089,7 @@
     <ClInclude Include="Game\effects\groundfx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Objects\Generic\Doors\generic_doors.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1107,6 +1108,8 @@
     <ClInclude Include="Objects\Generic\Doors\steel_door.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+=======
+>>>>>>> 6eab035789e2955114728dcb249ce68df2fe69ca
     <ClInclude Include="Game\door_data.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -2069,6 +2072,7 @@
     <ClCompile Include="Specific\prng.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -2087,6 +2091,8 @@
     <ClCompile Include="Objects\Generic\Doors\steel_door.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+=======
+>>>>>>> 6eab035789e2955114728dcb249ce68df2fe69ca
     <ClCompile Include="Game\itemdata\itemdata.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
