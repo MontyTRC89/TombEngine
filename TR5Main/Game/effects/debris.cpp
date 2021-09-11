@@ -129,18 +129,18 @@ void UpdateDebris()
 			deb.angularVelocity *= deb.angularDrag;
 
 			roomNumber = deb.roomNumber;
-			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z,&roomNumber);
+			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z, &roomNumber);
 
 			if (deb.worldPosition.y < floor->ceiling*256)
 			{
-				if (floor->skyRoom != NO_ROOM)
-					deb.roomNumber = floor->skyRoom;
+				if (floor->RoomAbove() != NO_ROOM)
+					deb.roomNumber = floor->RoomAbove();
 			}
 
 			if (deb.worldPosition.y > floor->floor*256)
 			{
-				if (floor->pitRoom != NO_ROOM)
-					deb.roomNumber = floor->pitRoom;
+				if (floor->RoomBelow() != NO_ROOM)
+					deb.roomNumber = floor->RoomBelow();
 
 				if (deb.numBounces > 3)
 				{

@@ -648,9 +648,7 @@ void ReadRooms()
 			floor.box = ReadInt32();
 			floor.fx = ReadInt32();
 			floor.stopper = ReadInt32();
-			floor.pitRoom = ReadInt32();
 			floor.floor = ReadInt32();
-			floor.skyRoom = ReadInt32();
 			floor.ceiling = ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
