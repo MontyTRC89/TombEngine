@@ -81,12 +81,7 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 
 	if (triggerIndex)
 	{
-		short* trigger;
-		for (trigger = triggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
-		{
-			if (*trigger & END_BIT)
-				break;
-		}
+		short* trigger = triggerIndex;
 
 		if (*trigger & 4)
 		{
@@ -166,71 +161,10 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
+	if (floor->index == 0)
 		return NULL;
 
-	short* triggerIndex = NULL;
-
-	short* data = &g_Level.FloorData[floor->index];
-	short type;
-	int trigger;
-	do
-	{
-		type = *(data++);
-
-		switch (type & DATA_TYPE)
-		{
-		case DOOR_TYPE:
-		case TILT_TYPE:
-		case ROOF_TYPE:
-		case SPLIT1:
-		case SPLIT2:
-		case SPLIT3:
-		case SPLIT4:
-		case NOCOLF1T:
-		case NOCOLF1B:
-		case NOCOLF2T:
-		case NOCOLF2B:
-		case NOCOLC1T:
-		case NOCOLC1B:
-		case NOCOLC2T:
-		case NOCOLC2B:
-			data++;
-			break;
-
-		case LAVA_TYPE:
-		case CLIMB_TYPE:
-		case MONKEY_TYPE:
-		case TRIGTRIGGER_TYPE:
-		case MINER_TYPE:
-			break;
-
-		case TRIGGER_TYPE:
-			triggerIndex = data - 1;
-			data++;
-
-			do
-			{
-				trigger = *(data++);
-
-				if (TRIG_BITS(trigger) != TO_OBJECT)
-				{
-					if (TRIG_BITS(trigger) == TO_CAMERA ||
-						TRIG_BITS(trigger) == TO_FLYBY)
-					{
-						trigger = *(data++);
-					}
-				}
-
-			} while (!(trigger & END_BIT));
-			break;
-
-		default:
-			break;
-		}
-	} while (!(type & END_BIT));
-
-	return triggerIndex;
+	return &g_Level.FloorData[floor->index];
 }
 
 short* GetTriggerIndex(ITEM_INFO* item)

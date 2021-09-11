@@ -141,7 +141,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			xFloor = r->ySize - 1;
 
 		floor = &r->floor[zFloor + xFloor * r->xSize];
-		roomIndex = GetDoor(floor);
+		roomIndex = floor->WallPortal;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
