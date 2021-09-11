@@ -762,6 +762,14 @@ void FixedCamera(ITEM_INFO* item)
 {
 	GAME_VECTOR from, to;
 
+	// Fixed cameras before TR3 had optional "movement" effect. 
+	// Later for some reason it was forced to always be 1, and actual speed value
+	// from camera trigger was ignored. In TEN, we move speed value out of legacy
+	// floordata trigger to camera itself and make use of it again. Still, by default,
+	// value is 1 for UseForcedFixedCamera hack.
+
+	int moveSpeed = 1;
+
 	if (UseForcedFixedCamera)
 	{
 		from.x = ForcedFixedCamera.x;
@@ -777,6 +785,9 @@ void FixedCamera(ITEM_INFO* item)
 		from.y = camera->y;
 		from.z = camera->z;
 		from.roomNumber = camera->roomNumber;
+
+		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
+		moveSpeed = camera->speed * 8; 
 
 		if (camera->flags & 2)
 		{
@@ -853,7 +864,7 @@ void FixedCamera(ITEM_INFO* item)
 
 	Camera.fixedCamera = 1;
 
-	MoveCamera(&from, 1);
+	MoveCamera(&from, moveSpeed);
 
 	if (Camera.timer)
 	{
