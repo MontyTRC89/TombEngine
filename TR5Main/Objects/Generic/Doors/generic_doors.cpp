@@ -45,14 +45,14 @@ namespace TEN::Entities::Doors
 		if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 			item->itemFlags[0] = 4096;
 
-		item->data = DOOR_DATA();
+		item->data = ITEM_DATA(DOOR_DATA());
 		DOOR_DATA* door = item->data;
 
 		door->opened = false;
-		door->dptr1 = NULL;
-		door->dptr2 = NULL;
-		door->dptr3 = NULL;
-		door->dptr4 = NULL;
+		door->dptr1 = nullptr;
+		door->dptr2 = nullptr;
+		door->dptr3 = nullptr;
+		door->dptr4 = nullptr;
 
 		int dz, dx;
 		ROOM_INFO* r;
@@ -73,7 +73,7 @@ namespace TEN::Entities::Doors
 		r = &g_Level.Rooms[item->roomNumber];
 
 		door->d1.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
-		roomNumber = GetDoor(door->d1.floor);
+		roomNumber = door->d1.floor->WallPortal;
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d1.floor->box;
 		else
@@ -81,16 +81,16 @@ namespace TEN::Entities::Doors
 			b = &g_Level.Rooms[roomNumber];
 			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 		}
-		door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-		memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
+		door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+		door->d1.data = *door->d1.floor;
 
 		if (r->flippedRoom != -1)
 		{
 			r = &g_Level.Rooms[r->flippedRoom];
 
 			door->d1flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
-			roomNumber = GetDoor(door->d1flip.floor);
+			roomNumber = door->d1flip.floor->WallPortal;
 			if (roomNumber == NO_ROOM)
 				boxNumber = door->d1flip.floor->box;
 			else
@@ -98,14 +98,14 @@ namespace TEN::Entities::Doors
 				b = &g_Level.Rooms[roomNumber];
 				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
 			}
-			door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-			memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
+			door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			door->d1flip.data = *door->d1flip.floor;
 		}
 		else
 			door->d1flip.floor = NULL;
 
-		twoRoom = GetDoor(door->d1.floor);
+		twoRoom = door->d1.floor->WallPortal;
 
 		ShutThatDoor(&door->d1, door);
 		ShutThatDoor(&door->d1flip, door);
@@ -120,7 +120,7 @@ namespace TEN::Entities::Doors
 			r = &g_Level.Rooms[twoRoom];
 
 			door->d2.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
-			roomNumber = GetDoor(door->d2.floor);
+			roomNumber = door->d2.floor->WallPortal;
 			if (roomNumber == NO_ROOM)
 				boxNumber = door->d2.floor->box;
 			else
@@ -128,16 +128,16 @@ namespace TEN::Entities::Doors
 				b = &g_Level.Rooms[roomNumber];
 				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 			}
-			door->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-			memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
+			door->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			door->d2.data = *door->d2.floor;
 
 			if (r->flippedRoom != -1)
 			{
 				r = &g_Level.Rooms[r->flippedRoom];
 
 				door->d2flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
-				roomNumber = GetDoor(door->d2flip.floor);
+				roomNumber = door->d2flip.floor->WallPortal;
 				if (roomNumber == NO_ROOM)
 					boxNumber = door->d2flip.floor->box;
 				else
@@ -145,9 +145,9 @@ namespace TEN::Entities::Doors
 					b = &g_Level.Rooms[roomNumber];
 					boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
 				}
-				door->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
-				memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
+				door->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+				door->d2flip.data = *door->d2flip.floor;
 			}
 			else
 				door->d2flip.floor = NULL;
