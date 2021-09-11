@@ -134,6 +134,7 @@ namespace TEN::Entities::Switches
 				}
 			}
 		}
+		else
 		{
 			if (coll->Setup.EnableObjectPush && TestBoundsCollide(item, l, coll->Setup.Radius))
 			{
