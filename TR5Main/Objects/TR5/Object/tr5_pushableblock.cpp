@@ -547,10 +547,10 @@ int TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (floor->floor == NO_HEIGHT / 256)
+	if (floor->AverageFloor == NO_HEIGHT / 256)
 		return 1;
 
-	if (floor->floor * 256 != item->pos.yPos - blokhite)
+	if (floor->AverageFloor * 256 != item->pos.yPos - blokhite)
 		return 0;
 
 	return 1;
@@ -745,7 +745,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (collResult.Position.Floor != y)
 		return 0;
 
-	if (collResult.Block->ceiling * 256 > y - LARA_HEIGHT)
+	if (collResult.Block->AverageCeiling * 256 > y - LARA_HEIGHT)
 		return 0;
 
 	oldX = LaraItem->pos.xPos;
