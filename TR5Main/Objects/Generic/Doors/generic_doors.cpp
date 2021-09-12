@@ -438,7 +438,7 @@ namespace TEN::Entities::Doors
 		if (floor)
 		{
 			floor->box = NO_BOX;
-			floor->index = 0;
+			floor->TriggerIndex = 0;
 
 			// FIXME: HACK!!!!!!!
 			floor->FloorCollision.Portals[0] = NO_ROOM;

@@ -27,10 +27,10 @@ struct SECTOR_FLAGS
 class FLOOR_INFO
 {
 	public:
-	int index;
+	int TriggerIndex;
 	int box;
-	int fx;
-	int stopper;
+	int Material;
+	int Stopper;
 	int floor;
 	int ceiling;
 	SECTOR_COLLISION_INFO FloorCollision;

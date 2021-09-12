@@ -315,7 +315,7 @@ void ControlGladiator(short itemNumber)
 					GetJointAbsPosition(item, &pos, 16);
 
 					floor = XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
-					if (floor->stopper)
+					if (floor->Stopper)
 					{
 						for (i = 0; i < r->mesh.size(); i++)
 						{

@@ -638,7 +638,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, 16);
 
 					auto floor = GetCollisionResult(x, y, z, item->roomNumber).Block;
-					if (floor->stopper)
+					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
 						{
@@ -648,7 +648,7 @@ namespace TEN::Entities::TR4
 								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-								floor->stopper = 0;
+								floor->Stopper = 0;
 								TestTriggers(item, true, NULL);
 								break;
 							}

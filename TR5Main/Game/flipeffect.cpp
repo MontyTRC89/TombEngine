@@ -8,6 +8,7 @@
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
+#include "collide.h"
 #include "savegame.h"
 #include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
@@ -20,10 +21,13 @@
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "effects\footprint.h"
+#include "effects\groundfx.h"
 #include "effects\debris.h"
 
 using std::function;
 using namespace TEN::Effects::Footprints;
+
+short FXType;
 
 function<EffectFunction> effect_routines[59] =
 {
@@ -96,14 +100,83 @@ void Puzzle(ITEM_INFO* item)
 	do_puzzle();
 }
 
-// TODO: here are sound for lara footstep too !
 void AddFootprint(ITEM_INFO* item)
 {
 	if (item != LaraItem)
 		return;
 
+	PHD_VECTOR position;
+	if (FXType == SFX_LANDONLY)
+		GetLaraJointPosition(&position, LM_LFOOT);
+	else
+		GetLaraJointPosition(&position, LM_RFOOT);
+
+	auto fx = sound_effects::SFX_TR4_LARA_FEET;
+	auto floor = GetCollisionResult(position.x, position.y, position.z, item->roomNumber).BottomBlock;
+
+	switch (floor->Material)
+	{
+	case GroundMaterial::Concrete:
+		fx = sound_effects::SFX_TR4_LARA_FEET;
+		break;
+
+	case GroundMaterial::Grass:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+		break;
+
+	case GroundMaterial::Gravel:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_GRAVEL;
+		break;
+
+	case GroundMaterial::Ice:
+		fx = sound_effects::SFX_TR3_FOOTSTEPS_ICE;
+		break;
+
+	case GroundMaterial::Marble:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_MARBLE;
+		break;
+
+	case GroundMaterial::Metal:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+		break;
+
+	case GroundMaterial::Mud:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_MUD;
+		break;
+
+	case GroundMaterial::OldMetal:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+		break;
+
+	case GroundMaterial::OldWood:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+		break;
+
+	case GroundMaterial::Sand:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+		break;
+
+	case GroundMaterial::Snow:
+		fx = sound_effects::SFX_TR3_FOOTSTEPS_SNOW;
+		break;
+
+	case GroundMaterial::Stone:
+		fx = sound_effects::SFX_TR4_LARA_FEET;
+		break;
+
+	case GroundMaterial::Water:
+		fx = sound_effects::SFX_TR4_LARA_WET_FEET;
+		break;
+
+	case GroundMaterial::Wood:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+		break;
+	}
+	
+	SoundEffect(fx, &item->pos, 0);
+
 	FOOTPRINT_STRUCT footprint;
-	PHD_3DPOS footprintPosition;
+	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, 0, 0, 0);
 
 	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
 	{

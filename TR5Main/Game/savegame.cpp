@@ -818,7 +818,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 						 g_Level.Rooms[roomIndex].mesh[staticIndex].y,
 						 g_Level.Rooms[roomIndex].mesh[staticIndex].z, roomIndex, true, NULL);
 
-			floor->stopper = false;
+			floor->Stopper = false;
 		}
 
 		return true;

@@ -487,7 +487,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					         SmashedMesh[SmashedMeshCount]->z,
 					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
-				floor->stopper = false;
+				floor->Stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
 			} while (SmashedMeshCount != 0);
 		}
