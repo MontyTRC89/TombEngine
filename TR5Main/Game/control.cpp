@@ -997,7 +997,7 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
 
-	box = &g_Level.Boxes[floor->box];
+	box = &g_Level.Boxes[floor->Box];
 	if (box->flags & BLOCKABLE)
 	{
 		if (height >= 0)

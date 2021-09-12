@@ -140,10 +140,10 @@ int LoadItems()
 		{
 			FLOOR_INFO* floor = &r.floor[((mesh.z - r.z) / 1024) + r.xSize * ((mesh.x - r.x) / 1024)];
 			 
-			if (floor->box == NO_BOX)
+			if (floor->Box == NO_BOX)
 				continue;
 
-			if (!(g_Level.Boxes[floor->box].flags & BLOCKED))
+			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
 				int fl = floor->floor * 4;
 				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
@@ -645,7 +645,7 @@ void ReadRooms()
 			FLOOR_INFO floor;
 
 			floor.TriggerIndex = ReadInt32();
-			floor.box = ReadInt32();
+			floor.Box = ReadInt32();
 			floor.Material = ReadInt32();
 			floor.Stopper = ReadInt32();
 			floor.floor = ReadInt32();

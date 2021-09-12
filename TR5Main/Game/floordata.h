@@ -28,7 +28,7 @@ class FLOOR_INFO
 {
 	public:
 	int TriggerIndex;
-	int box;
+	int Box;
 	int Material;
 	int Stopper;
 	int floor;
