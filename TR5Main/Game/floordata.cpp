@@ -59,17 +59,23 @@ std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
 bool FLOOR_INFO::FloorIsSplit() const
 {
 	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
-	bool differentPortals = FloorCollision.Portals[0] != FloorCollision.Portals[1];
-
-	return differentPlanes || differentPortals;
+	return differentPlanes || FloorHasSplitPortal();
 }
 
 bool FLOOR_INFO::CeilingIsSplit() const
 {
 	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
-	bool differentPortals = CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
+	return differentPlanes || CeilingHasSplitPortal();
+}
 
-	return differentPlanes || differentPortals;
+bool FLOOR_INFO::FloorHasSplitPortal() const
+{
+	return FloorCollision.Portals[0] != FloorCollision.Portals[1];
+}
+
+bool FLOOR_INFO::CeilingHasSplitPortal() const
+{
+	return CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
 }
 
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
