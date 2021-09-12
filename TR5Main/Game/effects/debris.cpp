@@ -34,13 +34,15 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	short yRot = 0;
 	Vector3 pos;
 	bool isStatic;
-	if (mesh) {
+	if (mesh) 
+	{
 		isStatic = false;
 		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
 		yRot = mesh->yRot;
 		pos = Vector3(mesh->x, mesh->y, mesh->z);
 	}
-	else {
+	else 
+	{
 		isStatic = true;
 		meshPtr = item->meshp;
 		yRot = item->yRot;
@@ -52,19 +54,23 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
 		{
 			DebrisFragment* fragment = GetFreeDebrisFragment();
-			if (!fragment) {
+			if (!fragment) 
+			{
 				break;
 			}
-			if (!fragment->active) {
+			if (!fragment->active) 
+			{
 				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
 				RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
 				RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
 				RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
+
 				//Take the average of all 3 local positions
 				Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
 				vtx0.Position -= localPos;
 				vtx1.Position -= localPos;
 				vtx2.Position -= localPos;
+
 				Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
 				fragment->worldPosition = worldPos + pos;
 				fragment->mesh.vertices[0] = vtx0;
@@ -124,20 +130,20 @@ void UpdateDebris()
 			deb.velocity *= deb.linearDrag;
 			deb.velocity += deb.gravity;
 			deb.velocity = XMVector3ClampLength(deb.velocity, 0, deb.terminalVelocity);
-			deb.rotation *= Quaternion::CreateFromYawPitchRoll(deb.angularVelocity.x,deb.angularVelocity.y,deb.angularVelocity.z);
+			deb.rotation *= Quaternion::CreateFromYawPitchRoll(deb.angularVelocity.x, deb.angularVelocity.y, deb.angularVelocity.z);
 			deb.worldPosition += deb.velocity;
 			deb.angularVelocity *= deb.angularDrag;
 
 			roomNumber = deb.roomNumber;
 			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z, &roomNumber);
 
-			if (deb.worldPosition.y < floor->AverageCeiling*256)
+			if (deb.worldPosition.y < floor->AverageCeiling * 256)
 			{
 				if (floor->RoomAbove() != NO_ROOM)
 					deb.roomNumber = floor->RoomAbove();
 			}
 
-			if (deb.worldPosition.y > floor->AverageFloor*256)
+			if (deb.worldPosition.y > floor->AverageFloor * 256)
 			{
 				if (floor->RoomBelow() != NO_ROOM)
 					deb.roomNumber = floor->RoomBelow();
