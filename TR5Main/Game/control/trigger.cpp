@@ -315,10 +315,6 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 				break;
 			return;
 
-			//	case TRIGGER_TYPES::SKELETON_T:	//NO.
-			//		Lara.skelebob = 2;
-			//		break;
-
 		case TRIGGER_TYPES::HEAVY:
 		case TRIGGER_TYPES::DUMMY:
 		case TRIGGER_TYPES::HEAVYSWITCH:
