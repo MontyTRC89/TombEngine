@@ -1610,7 +1610,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 
 			}
 		}
-
 		coll->CollisionType = CT_FRONT;
 		return;
 	}
