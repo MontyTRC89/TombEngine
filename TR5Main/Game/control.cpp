@@ -1016,7 +1016,7 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 
 int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (!floor->FloorIsSplit())
+	if (!floor->FloorHasSplitPortal())
 		return 0;
 
 	if (floor->FloorCollision.Portals[floor->SectorPlane(x, z)] == NO_ROOM)
@@ -1027,7 +1027,7 @@ int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
 
 int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
 {
-	if (!floor->CeilingIsSplit())
+	if (!floor->CeilingHasSplitPortal())
 		return 0;
 
 	if (floor->CeilingCollision.Portals[floor->SectorPlaneCeiling(x, z)] == NO_ROOM)
