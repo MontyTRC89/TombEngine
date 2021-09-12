@@ -1648,7 +1648,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 				break;
 			}
 		}
-
+		coll->CollisionType = CT_LEFT;
 		return;
 	}
 
@@ -1676,7 +1676,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 				break;
 			}
 		}
-
+		coll->CollisionType = CT_RIGHT;
 		return;
 	}
 }
