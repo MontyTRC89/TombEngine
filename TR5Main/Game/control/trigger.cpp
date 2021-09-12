@@ -161,10 +161,10 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	if (floor->index == 0)
+	if (floor->TriggerIndex == -1)
 		return NULL;
 
-	return &g_Level.FloorData[floor->index];
+	return &g_Level.FloorData[floor->TriggerIndex];
 }
 
 short* GetTriggerIndex(ITEM_INFO* item)

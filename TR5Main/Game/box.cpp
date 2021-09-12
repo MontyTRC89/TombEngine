@@ -2073,7 +2073,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	FLOOR_INFO* floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	floor->stopper = set;
+	floor->Stopper = set;
 
 	x = item->pos.xPos + 1024 * phd_sin(dir);
 	z = item->pos.zPos + 1024 * phd_cos(dir);
@@ -2083,7 +2083,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	r = &g_Level.Rooms[roomNumber];
 
 	floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	floor->stopper = set;
+	floor->Stopper = set;
 }
 
 FLOOR_INFO* XZ_GET_SECTOR(ROOM_INFO* r, int x, int z) {

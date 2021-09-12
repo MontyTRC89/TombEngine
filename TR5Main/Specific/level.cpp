@@ -154,7 +154,7 @@ int LoadItems()
 						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
 						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
 					{
-						floor->stopper = true;
+						floor->Stopper = true;
 					}
 				}
 			}
@@ -644,10 +644,10 @@ void ReadRooms()
 		{
 			FLOOR_INFO floor;
 
-			floor.index = ReadInt32();
+			floor.TriggerIndex = ReadInt32();
 			floor.box = ReadInt32();
-			floor.fx = ReadInt32();
-			floor.stopper = ReadInt32();
+			floor.Material = ReadInt32();
+			floor.Stopper = ReadInt32();
 			floor.floor = ReadInt32();
 			floor.ceiling = ReadInt32();
 
