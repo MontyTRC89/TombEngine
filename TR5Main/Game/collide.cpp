@@ -1284,7 +1284,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	}
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
-	if ((y + CLICK(2)) < (floor->floor * CLICK(1)))
+	if ((y + CLICK(2)) < (floor->AverageFloor * CLICK(1)))
 		result.TiltZ = result.TiltX = 0;
 
 	return result;

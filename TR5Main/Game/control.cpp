@@ -879,7 +879,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->ceiling << 8);
+				return (floor->AverageCeiling << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
@@ -890,7 +890,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->RoomBelow()];
 			if (room->flags & ENV_FLAG_WATER)
-				return (floor->floor << 8);
+				return (floor->AverageFloor << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
@@ -983,15 +983,15 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
 
-	/*if (floor->floor == NO_HEIGHT / STEP_SIZE)
+	/*if (floor->AverageFloor == NO_HEIGHT / STEP_SIZE)
 	{
-		floor->floor = ceiling->ceiling + height / STEP_SIZE;
+		floor->AverageFloor = ceiling->ceiling + height / STEP_SIZE;
 	}
 	else
 	{
-		floor->floor += height / STEP_SIZE;
-		if (floor->floor == ceiling->ceiling && !flag)
-			floor->floor = NO_HEIGHT / STEP_SIZE;
+		floor->AverageFloor += height / STEP_SIZE;
+		if (floor->AverageFloor == ceiling->ceiling && !flag)
+			floor->AverageFloor = NO_HEIGHT / STEP_SIZE;
 	}*/
 
 	floor->FloorCollision.Planes[0].z += height;

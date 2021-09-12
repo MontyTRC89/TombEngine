@@ -31,8 +31,8 @@ class FLOOR_INFO
 	int Box;
 	int Material;
 	int Stopper;
-	int floor;
-	int ceiling;
+	int AverageFloor;
+	int AverageCeiling;
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
 	SECTOR_FLAGS Flags;
