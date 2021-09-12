@@ -145,7 +145,7 @@ int LoadItems()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int fl = floor->floor * 4;
+				int fl = floor->AverageFloor * 4;
 				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
 				if (fl <= mesh.y - st->collisionBox.Y2 + 512 && fl < mesh.y - st->collisionBox.Y1)
 				{
@@ -648,8 +648,8 @@ void ReadRooms()
 			floor.Box = ReadInt32();
 			floor.Material = ReadInt32();
 			floor.Stopper = ReadInt32();
-			floor.floor = ReadInt32();
-			floor.ceiling = ReadInt32();
+			floor.AverageFloor = ReadInt32();
+			floor.AverageCeiling = ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
 			floor.FloorCollision.Portals[0] = ReadInt32();

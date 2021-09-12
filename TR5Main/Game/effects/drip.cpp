@@ -36,7 +36,7 @@ namespace TEN {
 					d.height = lerp(DRIP_WIDTH / 0.15625, 0, normalizedAge);
 					short room = d.room;
 					FLOOR_INFO* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
-					int floorheight = floor->floor;
+					int floorheight = floor->AverageFloor;
 					int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
 					if (d.pos.y > floorheight) {
 						d.active = false;
