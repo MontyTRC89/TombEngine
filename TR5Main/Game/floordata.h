@@ -52,6 +52,8 @@ class FLOOR_INFO
 	std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
 	bool FloorIsSplit() const;
 	bool CeilingIsSplit() const;
+	bool FLOOR_INFO::FloorHasSplitPortal() const;
+	bool FLOOR_INFO::CeilingHasSplitPortal() const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;
