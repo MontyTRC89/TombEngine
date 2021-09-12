@@ -24,40 +24,40 @@ int DoPushPull = 0;
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	if (floor->box == NO_BOX)
+	if (floor->Box == NO_BOX)
 		return;
-	g_Level.Boxes[floor->box].flags &= (~BLOCKED);
-	short height = g_Level.Boxes[floor->box].height;
+	g_Level.Boxes[floor->Box].flags &= (~BLOCKED);
+	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
 	floor = GetFloor(x + 1024, y, z, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x - 1024, y, z, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x, y, z + 1024, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x, y, z - 1024, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
 }
