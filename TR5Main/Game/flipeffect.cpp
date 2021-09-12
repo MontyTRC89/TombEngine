@@ -117,7 +117,7 @@ void AddFootprint(ITEM_INFO* item)
 	switch (floor->Material)
 	{
 	case GroundMaterial::Concrete:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
+		//fx = sound_effects::SFX_TR4_LARA_FEET;
 		break;
 
 	case GroundMaterial::Grass:
@@ -161,7 +161,7 @@ void AddFootprint(ITEM_INFO* item)
 		break;
 
 	case GroundMaterial::Stone:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
+		//fx = sound_effects::SFX_TR4_LARA_FEET;
 		break;
 
 	case GroundMaterial::Water:
@@ -176,7 +176,17 @@ void AddFootprint(ITEM_INFO* item)
 	SoundEffect(fx, &item->pos, 0);
 
 	FOOTPRINT_STRUCT footprint;
-	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, 0, 0, 0);
+
+	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
+
+	auto x = Vector2(plane.x * WALL_SIZE, WALL_SIZE);
+	auto z = Vector2(WALL_SIZE, plane.y * WALL_SIZE);
+
+	auto xRot = FROM_RAD(atan2(0 - x.y, 0 - x.x));
+	auto yRot = item->pos.yRot;
+	auto zRot = FROM_RAD(atan2(0 - z.y, 0 - z.x));
+
+	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, xRot, yRot, zRot);
 
 	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
 	{
