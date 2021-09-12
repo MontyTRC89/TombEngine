@@ -17,7 +17,7 @@ namespace TEN {
 				int z = item.pos.zPos;
 				short roomNumber = item.roomNumber;
 				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-				if (!(floor->fx == GroundMaterial::Ice || floor->fx == GroundMaterial::Sand || floor->fx == GroundMaterial::Mud)) {
+				if (!(floor->Material == GroundMaterial::Ice || floor->Material == GroundMaterial::Sand || floor->Material == GroundMaterial::Mud)) {
 					return false;
 				}
 				int height = GetFloorHeight(floor, x, y, z);
