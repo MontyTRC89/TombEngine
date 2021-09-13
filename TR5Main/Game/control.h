@@ -52,6 +52,8 @@ enum COMMAND_TYPES
 extern int KeyTriggerActive;
 extern byte FlipStatus;
 
+constexpr auto NO_LOS_ITEM = INT_MAX;
+
 constexpr auto MAX_FLIPMAP = 255;
 extern int FlipStats[MAX_FLIPMAP];
 extern int FlipMap[MAX_FLIPMAP];
