@@ -2075,11 +2075,6 @@ void RemoveRoomFlipItems(ROOM_INFO *r)
 	}
 }
 
-void PlaySoundTrack(short track, short flags)
-{
-	S_CDPlayEx(track, flags, 0);
-}
-
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
