@@ -1362,8 +1362,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->Middle.Ceiling = ceiling;
 	coll->Middle.Floor = height;
 	coll->Middle.Type = collResult.Position.Type;
-	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
-	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1441,8 +1439,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
 	coll->Front.Type = collResult.Position.Type;
-	coll->Front.SplitFloor = collResult.Position.SplitFloor;
-	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
@@ -1490,8 +1486,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 	coll->MiddleLeft.Type = collResult.Position.Type;
-	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
-	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -1515,8 +1509,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 	coll->FrontLeft.Type = collResult.Position.Type;
-	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
-	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -1543,8 +1535,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 	coll->MiddleRight.Type = collResult.Position.Type;
-	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
-	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -1568,8 +1558,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 	coll->FrontRight.Type = collResult.Position.Type;
-	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
-	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;
@@ -1750,8 +1738,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->Middle.Ceiling = ceiling;
 	coll->Middle.Floor = collResult.Position.Floor;
 	coll->Middle.Type = collResult.Position.Type;
-	coll->Middle.SplitFloor = collResult.Position.SplitFloor;
-	coll->Middle.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x, LaraItem->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1821,8 +1807,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = collResult.Position.Floor;
 	coll->Front.Type = collResult.Position.Type;
-	coll->Front.SplitFloor = collResult.Position.SplitFloor;
-	coll->Front.SplitCeiling = collResult.Position.SplitCeiling;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
@@ -1863,8 +1847,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->MiddleLeft.Floor = collResult.Position.Floor;
 	coll->MiddleLeft.Ceiling = ceiling;
 	coll->MiddleLeft.Type = collResult.Position.Type;
-	coll->MiddleLeft.SplitFloor = collResult.Position.SplitFloor;
-	coll->MiddleLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -1884,8 +1866,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->FrontLeft.Floor = collResult.Position.Floor;
 	coll->FrontLeft.Ceiling = ceiling;
 	coll->FrontLeft.Type = collResult.Position.Type;
-	coll->FrontLeft.SplitFloor = collResult.Position.SplitFloor;
-	coll->FrontLeft.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -1908,8 +1888,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->MiddleRight.Floor = collResult.Position.Floor;
 	coll->MiddleRight.Ceiling = ceiling;
 	coll->MiddleRight.Type = collResult.Position.Type;
-	coll->MiddleRight.SplitFloor = collResult.Position.SplitFloor;
-	coll->MiddleRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -1929,8 +1907,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	coll->FrontRight.Floor = collResult.Position.Floor;
 	coll->FrontRight.Ceiling = ceiling;
 	coll->FrontRight.Type = collResult.Position.Type;
-	coll->FrontRight.SplitFloor = collResult.Position.SplitFloor;
-	coll->FrontRight.SplitCeiling = collResult.Position.SplitCeiling;
 
 	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;

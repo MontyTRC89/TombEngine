@@ -48,8 +48,6 @@ struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
-	int SplitFloor;
-	int SplitCeiling;
 	HEIGHT_TYPE Type;
 };
 
