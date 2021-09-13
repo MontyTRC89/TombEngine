@@ -295,20 +295,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	short rot = item->pos.yRot;
 	int slope = 0;
-	bool result;
 
-	/*if (coll->Middle.SplitFloor)
-	{
-		result = SnapToDiagonal(rot, 35);
-	}
-	else*/
-	{
-		if (abs(coll->FrontRight.Floor - coll->FrontLeft.Floor) >= 60)
-			return 0;
+	if (abs(coll->FrontRight.Floor - coll->FrontLeft.Floor) >= 60)
+		return 0;
 
-		result = SnapToQuadrant(rot, 35);
-	}
-
+	bool result = SnapToQuadrant(rot, 35);
 	if (!result)
 		return 0;
 
@@ -316,18 +307,10 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
-	/*if (coll->Middle.SplitFloor)
-	{
-		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, -LARA_RAD, item->pos.yRot);
-		item->pos.xPos = v.x;
-		item->pos.zPos = v.y;
-	}
-	else*/
-	{
-		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
-		item->pos.xPos = v.x;
-		item->pos.zPos = v.y;
-	}
+
+	Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
+	item->pos.xPos = v.x;
+	item->pos.zPos = v.y;
 
 	if (frontFloor <= -256)
 	{

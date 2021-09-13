@@ -1036,14 +1036,8 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
-				{
-					result = SnapToDiagonal(angle, 35);
-				}
-				else*/
-				{
-					result = SnapToQuadrant(angle, 35);
-				}
+				
+				result = SnapToQuadrant(angle, 35);
 			}
 		}
 	}
@@ -1126,18 +1120,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-			/*if (coll->Middle.SplitFloor)
-			{
-				Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, angle);
-				item->pos.xPos = v.x;
-				item->pos.zPos = v.y;
-			}
-			else*/
-			{
-				Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
-				item->pos.xPos = v.x;
-				item->pos.zPos = v.y;
-			}
+			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
+			item->pos.xPos = v.x;
+			item->pos.zPos = v.y;
 		}
 
 		item->pos.yRot = angle;
@@ -1667,16 +1652,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 				if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
 				{
 					short angle = item->pos.yRot;
-					bool result;
-
-					/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
-					{
-						result = SnapToDiagonal(angle, 35);
-					}
-					else*/
-					{
-						result = SnapToQuadrant(angle, 35);
-					}
+					bool result = SnapToQuadrant(angle, 35);
 
 					if (result)
 					{
@@ -1714,18 +1690,9 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						else
 							item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-						/*if (coll->Middle.SplitFloor)
-						{
-							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, item->pos.yRot);
-							item->pos.xPos = v.x;
-							item->pos.zPos = v.y;
-						}
-						else*/
-						{
-							Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-							item->pos.xPos = v.x;
-							item->pos.zPos = v.y;
-						}
+						Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
+						item->pos.xPos = v.x;
+						item->pos.zPos = v.y;
 						item->pos.yRot = angle;
 
 						item->gravityStatus = false;

@@ -36,19 +36,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType == CT_FRONT)
 	{
 		short angle = item->pos.yRot;
-		bool result;
 
-		/*if (coll->Middle.SplitFloor)
-		{
-			if (coll->Front.SplitFloor != coll->Middle.SplitFloor)
-				return 0;
-			result = SnapToDiagonal(angle, 30);
-		}
-		else*/
-		{
-			result = SnapToQuadrant(angle, 30);
-		}
-
+		bool result = SnapToQuadrant(angle, 30);
 		if (!result)
 			return 0;
 
@@ -183,18 +172,10 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = angle;
 		ShiftItem(item, coll);
 
-		/*if (coll->Middle.SplitFloor) // diagonal alignment
-		{
-			Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, item->pos.yRot);
-			item->pos.xPos = v.x;
-			item->pos.zPos = v.y;
-		}
-		else*/ // regular aligment
-		{
-			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-			item->pos.xPos = v.x;
-			item->pos.zPos = v.y;
-		}
+		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
+		item->pos.xPos = v.x;
+		item->pos.zPos = v.y;
+
 		return 1;
 	}
 	else if (Lara.NewAnims.MonkeyVault)//gross
