@@ -9,6 +9,7 @@
 #include "pickup.h"
 #include "lot.h"
 #include "spotcam.h"
+#include "Sound\sound.h"
 #include "traps.h"
 #include "lara.h"
 #include "Lara\lara_climb.h"

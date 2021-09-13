@@ -297,6 +297,11 @@ void Sound_FreeSamples()
 		Sound_FreeSample(i);
 }
 
+void PlaySoundTrack(short track, short flags)
+{
+	S_CDPlayEx(track, flags, 0);
+}
+
 void S_CDPlay(std::string track, unsigned int mode)
 {
 	bool crossfade = false;
