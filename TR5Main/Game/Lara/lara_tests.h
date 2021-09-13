@@ -4,7 +4,7 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 
-SPLAT_COLL TestWall(ITEM_INFO* item, int front, int right, int down);
+SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStandUp(COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
