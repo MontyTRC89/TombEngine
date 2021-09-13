@@ -63,13 +63,16 @@ namespace TEN::Renderer
         y *= (ScreenHeight / 600.0f);
 
 #ifdef NEW_INV
-        INVOBJ* objme;
+		auto index = convert_obj_to_invobj(objectNum);
 
-        objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
-        y += objme->yoff;
-        rotX += objme->xrot;
-        rotY += objme->yrot;
-        rotZ += objme->zrot;
+		if (index != -1)
+		{
+			auto objme = &inventry_objects_list[index];
+			y    += objme->yoff;
+			rotX += objme->xrot;
+			rotY += objme->yrot;
+			rotZ += objme->zrot;
+		}
 #endif
 
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
