@@ -258,7 +258,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	bool doJump = false;
+	static bool doJump = false;
 
 	if (item->animNumber == LA_STAND_TO_RUN)
 	{
