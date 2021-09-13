@@ -22,10 +22,10 @@ static short RightClimbTab[4] = // offset 0xA0640
 
 /*this file has all the generic test functions called in lara's state code*/
 
-int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
-		return 0;
+		return false;
 
 	//##LUA debug etc.
 //	Lara.NewAnims.CrawlVault1click = 1;
@@ -39,7 +39,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		bool result = SnapToQuadrant(angle, 30);
 		if (!result)
-			return 0;
+			return false;
 
 		int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60;
 
@@ -64,7 +64,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
-					return 0;
+					return false;
 #endif
 
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
@@ -85,7 +85,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				return 0;
+				return false;
 			}
 		}
 		else if (coll->Front.Floor >= -896 && coll->Front.Floor <= -640)
@@ -118,14 +118,14 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				return 0;
+				return false;
 			}
 		}
 		else if (!slope && coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
 		{
 #if 0
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-				return 0;
+				return false;
 #endif
 
 			item->animNumber = LA_STAND_SOLID;
@@ -155,10 +155,10 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 						AnimateLara(item);
 						item->pos.yRot = angle;
 						Lara.gunStatus = LG_HANDS_BUSY;
-						return 1;
+						return true;
 					}
 				}
-				return 0;
+				return false;
 			}
 
 			item->animNumber = LA_STAND_SOLID;
@@ -176,7 +176,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.xPos = v.x;
 		item->pos.zPos = v.y;
 
-		return 1;
+		return true;
 	}
 	else if (Lara.NewAnims.MonkeyVault)//gross
 	{
@@ -187,15 +187,17 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
 
 			if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
-				return 0;
+				return false;
 
 			item->animNumber = LA_STAND_IDLE;
 			item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_TEST_1;
-			return 1;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 bool TestLaraStandUp(COLL_INFO* coll)
@@ -254,7 +256,7 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
-int TestWall(ITEM_INFO* item, int front, int right, int down)
+SPLAT_COLL TestWall(ITEM_INFO* item, int front, int right, int down)
 {
 	int x = item->pos.xPos;
 	int y = item->pos.yPos + down;
@@ -309,12 +311,12 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)
 	c = GetCeiling(floor, x, y, z);
 
 	if (h == NO_HEIGHT)
-		return 1;
+		return SPLAT_COLL::SPLAT_WALL;
 
 	if (y >= h || y <= c)
-		return 2;
+		return SPLAT_COLL::SPLAT_STEP;
 
-	return 0;
+	return SPLAT_COLL::SPLAT_NONE;
 }
 
 int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
@@ -1000,7 +1002,7 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	Lara.NewAnims.FeetHanging = 0;
 
 	if (Lara.climbStatus || !Lara.NewAnims.FeetHanging)
-		return 0;
+		return false;
 
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
@@ -1022,8 +1024,10 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	if (h != NO_HEIGHT)
 	{
 		if (g > 0 && m < -128 && j > -72)
-			return 1;
+			return true;
 	}
+
+	return false;
 }
 
 bool CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
