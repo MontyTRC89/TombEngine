@@ -1649,6 +1649,29 @@ void FireCrossbow(PHD_3DPOS* pos)
 	}
 }
 
+void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
+{
+	short angles[2];
+	PHD_3DPOS pos;
+
+	/* this part makes arrows fire at bad angles
+	target->x &= ~1023;
+	target->z &= ~1023;
+	target->x |= 512;
+	target->z |= 512;*/
+
+	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
+
+	pos.xPos = src->x;
+	pos.yPos = src->y;
+	pos.zPos = src->z;
+	pos.xRot = angles[1];
+	pos.yRot = angles[0];
+	pos.zRot = 0;
+
+	FireCrossbow(&pos);
+}
+
 void FireRocket()
 {
 	Ammo& ammos = GetAmmo(WEAPON_ROCKET_LAUNCHER);
