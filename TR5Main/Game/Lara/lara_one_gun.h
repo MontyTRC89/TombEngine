@@ -42,6 +42,7 @@ void draw_shotgun(int weaponType);
 void AnimateShotgun(int weaponType);
 void ControlCrossbowBolt(short itemNumber);
 void FireCrossbow(PHD_3DPOS* pos);
+void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target);
 void RifleHandler(int weaponType);
 void DoExplosiveDamageOnBaddie(ITEM_INFO* src, ITEM_INFO* dest, int weapon);
 void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag);
