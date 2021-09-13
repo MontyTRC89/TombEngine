@@ -1198,6 +1198,28 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
+SPLIT_COLL CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z)
+{
+	if (!floor->FloorHasSplitPortal())
+		return SPLIT_NONE;
+
+	if (floor->FloorCollision.Portals[floor->SectorPlane(x, z)] == NO_ROOM)
+		return SPLIT_SOLID;
+	else
+		return SPLIT_PORTAL;
+}
+
+SPLIT_COLL CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z)
+{
+	if (!floor->CeilingHasSplitPortal())
+		return SPLIT_NONE;
+
+	if (floor->CeilingCollision.Portals[floor->SectorPlaneCeiling(x, z)] == NO_ROOM)
+		return SPLIT_SOLID;
+	else
+		return SPLIT_PORTAL;
+}
+
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
 // such as floor height under specific item.
 
@@ -1249,7 +1271,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	ROOM_INFO* r;
 	while (floor->RoomBelow() != NO_ROOM)
 	{
-		if (CheckNoColFloorTriangle(floor, x, z) == 1)
+		if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
 			break;
 		r = &g_Level.Rooms[floor->RoomBelow()];
 		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
