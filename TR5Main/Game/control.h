@@ -139,7 +139,6 @@ void AnimateItem(ITEM_INFO* item);
 void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);
 void RemoveRoomFlipItems(ROOM_INFO* r);
-void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
