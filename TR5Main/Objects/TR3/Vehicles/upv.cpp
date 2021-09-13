@@ -437,7 +437,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.Radius = SUB_RADIUS;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
-	coll->Setup.DeathIsPit = false;
+	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 

@@ -70,7 +70,7 @@ struct COLL_SETUP
 {
 	bool SlopesAreWalls;    // Treat steep slopes as walls
 	bool SlopesArePits;     // Treat steep slopes as pits
-	bool DeathIsPit;        // Treat death sectors as pits
+	bool DeathFlagIsPit;        // Treat death sectors as pits
 	bool EnableObjectPush;  // Can be pushed by objects
 	bool EnableSpaz;        // Push is treated as hurt
 						    

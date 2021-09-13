@@ -130,7 +130,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
-	coll->Setup.DeathIsPit = 1;
+	coll->Setup.DeathFlagIsPit = 1;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, LARA_HEIGHT);
