@@ -65,7 +65,7 @@ int GetKeyTrigger(ITEM_INFO* item)
 		{
 			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
 			{
-				if (*j & 0x8000)
+				if (*j & END_BIT)
 					return 0;
 			}
 			return 1;
@@ -126,7 +126,7 @@ int SwitchTrigger(short itemNum, short timer)
 
 			item->status = ITEM_NOT_ACTIVE;
 			if (!item->itemFlags[0] == 0)
-				item->flags |= 0x100;
+				item->flags |= ONESHOT;
 			if (item->currentAnimState != 1)
 				return 1;
 			if (item->triggerFlags != 5 && item->triggerFlags != 6)
@@ -140,7 +140,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return (item->flags & 0x100u) >> 8;
+		return (item->flags & ONESHOT) >> 8;
 	}
 	else
 	{
@@ -535,7 +535,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 		case TO_FLIPMAP:
 			flipAvailable = true;
 
-			if (FlipMap[value] & 0x100)
+			if (FlipMap[value] & ONESHOT)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH)
@@ -546,8 +546,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
 			{
 
-				if (flags & 0x100)
-					FlipMap[value] |= 0x100;
+				if (flags & ONESHOT)
+					FlipMap[value] |= ONESHOT;
 				if (!FlipStats[value])
 					flip = value;
 			}
