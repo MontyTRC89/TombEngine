@@ -1465,7 +1465,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->Setup.DeathIsPit)
+	else if ((coll->Setup.DeathFlagIsPit)
 		     && (coll->Front.Floor > 0)
 		     && collResult.BottomBlock->Flags.Death)
 	{
@@ -1497,7 +1497,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
 		coll->MiddleLeft.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
@@ -1522,7 +1522,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
 		coll->FrontLeft.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
@@ -1550,7 +1550,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
 		coll->MiddleRight.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
@@ -1575,7 +1575,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
 		coll->FrontRight.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
 
 	CollideSolidStatics(item, coll);
@@ -1842,7 +1842,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->Setup.DeathIsPit)
+	else if ((coll->Setup.DeathFlagIsPit)
 		&& (coll->Front.Floor > 0)
 		&& collResult.BottomBlock->Flags.Death)
 	{
@@ -1870,7 +1870,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
 		coll->MiddleLeft.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
@@ -1891,7 +1891,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
 		coll->FrontLeft.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontLeft.Floor = STOP_SIZE;
 
 	x = xPos + xright;
@@ -1915,7 +1915,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
 		coll->MiddleRight.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
@@ -1936,7 +1936,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
 		coll->FrontRight.Floor = STOP_SIZE;
-	else if (coll->Setup.DeathIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
 
 	CollideSolidStatics(item, coll);

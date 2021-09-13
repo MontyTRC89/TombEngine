@@ -831,7 +831,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	coll->Setup.EnableSpaz = true;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
-	coll->Setup.DeathIsPit = false;
+	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 	coll->Setup.Radius = LARA_RAD;
@@ -952,7 +952,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
-	coll->Setup.DeathIsPit = false;
+	coll->Setup.DeathFlagIsPit = false;
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
@@ -1065,7 +1065,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
-	coll->Setup.DeathIsPit = false;
+	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 
