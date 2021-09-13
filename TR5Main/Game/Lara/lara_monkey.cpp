@@ -100,7 +100,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		LaraHangTest(item, coll);
+		TestLaraHang(item, coll);
 
 		if (item->goalAnimState == LS_MONKEYSWING_IDLE)
 		{
