@@ -12,6 +12,7 @@ class FLOOR_INFO;
 struct ANIM_STRUCT;
 struct MESH_INFO;
 struct ROOM_INFO;
+
 enum GAME_STATUS
 {
 	GAME_STATUS_NONE,
@@ -119,8 +120,6 @@ void KillMoveItems();
 void KillMoveEffects();
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 void AlterFloorHeight(ITEM_INFO* item, int height);
-int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
-int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 //void UpdateDebris();
