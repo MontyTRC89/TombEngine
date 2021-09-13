@@ -1358,7 +1358,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 	hit = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
-	if (itemNumber != 999)
+	if (itemNumber != NO_LOS_ITEM)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
 		target.y = vector.y - (vector.y - src->y >> 5);
@@ -1568,7 +1568,7 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 	MESH_INFO *meshp;
 	BOUNDING_BOX* box;
 
-	ClosestItem = 999;
+	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
 
 	for (r = 0; r < number_los_rooms; ++r)

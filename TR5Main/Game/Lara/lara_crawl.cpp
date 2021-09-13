@@ -219,7 +219,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 			{
 				// TODO: fix ObjectOnLOS2
-				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == 999)
+				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == NO_LOS_ITEM)
 				{*/
 				item->animNumber = LA_CRAWL_JUMP_FLIP_DOWN;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
