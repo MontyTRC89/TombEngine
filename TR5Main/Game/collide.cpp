@@ -23,7 +23,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
 	short roomsArray[255];
@@ -505,7 +505,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	return true;
 }
 
-int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(lara);
 
@@ -610,7 +610,7 @@ int FindGridShift(int x, int z)
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
 }
 
-int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
+bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 {
 	PHD_3DPOS pos;
 	pos.xPos = mesh->x;
@@ -653,7 +653,7 @@ int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 	}
 }
 
-int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
+bool ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
 {
 	PHD_3DPOS pos;
 	pos.xPos = mesh->x;
@@ -739,7 +739,7 @@ int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll) // previously
 	return true;
 }
 
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
 {
 	float c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -913,7 +913,7 @@ void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	l->pos.zPos = item->pos.zPos + pos.z;
 }
 
-int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l)
+bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l)
 {
 	int x, y, z, rx, ry, rz;
 	short xRotRel, yRotRel, zRotRel;
@@ -968,7 +968,7 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	return true;
 }
 
-int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd)
+bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd)
 {
 	int x, y, z;
 	int distance, direction;
@@ -1072,7 +1072,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		&&  src->zRot == dest->zRot);
 }
 
-int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
+bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 {
 	FLOOR_INFO* floor;
 	PHD_3DPOS dest;
@@ -1121,7 +1121,7 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	return false;
 }
 
-int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
+bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 {
 	BOUNDING_BOX* bounds;
 	BOUNDING_BOX* laraBounds;
