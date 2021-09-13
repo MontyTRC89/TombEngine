@@ -6,7 +6,7 @@
 #include "box.h"
 #include "camera.h"
 #include "puzzles_keys.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "lot.h"
 #include "spotcam.h"
 #include "traps.h"
@@ -551,12 +551,9 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
-
+				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
-
-				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
-				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 			}
 			break;
 

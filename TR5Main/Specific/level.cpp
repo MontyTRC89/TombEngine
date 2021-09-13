@@ -8,17 +8,19 @@
 #include "spotcam.h"
 #include "camera.h"
 #include "control.h"
-#include "pickup\pickup.h"
-#include "door.h"
+#include "pickup.h"
+#include "generic_doors.h"
 #include "box.h"
-#include "Sound\sound.h"
+#include "sound.h"
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>
 #include "Renderer11.h"
+
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
@@ -100,7 +102,6 @@ int LoadItems()
 
 	g_Level.Items.resize(NUM_ITEMS);
 
-	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -331,7 +332,6 @@ void LoadObjects()
 	}
 
 	InitialiseObjects();
-	InitialiseClosedDoors();
 
 	int numStatics = ReadInt32();
 	for (int i = 0; i < numStatics; i++)
@@ -377,6 +377,7 @@ void LoadCameras()
 		camera.z = ReadInt32();
 		camera.roomNumber = ReadInt32();
 		camera.flags = ReadInt32();
+		camera.speed = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
