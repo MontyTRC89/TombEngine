@@ -817,7 +817,7 @@ void FixedCamera(ITEM_INFO* item)
 
 				PHD_VECTOR pos;
 				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
-				objLos = (objLos != 999 && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
+				objLos = (objLos != NO_LOS_ITEM && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
 
 				if (!(GetRandomControl() & 0x3F)
 					|| !(GlobalCounter & 0x3F)

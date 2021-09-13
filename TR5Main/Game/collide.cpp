@@ -571,7 +571,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 		MESH_INFO* mesh;
 
 		// CHECK
-		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != 999)
+		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != NO_LOS_ITEM)
 		{
 			coll->HitStatic = true;
 		}*/
