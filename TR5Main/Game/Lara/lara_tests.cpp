@@ -146,7 +146,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					ShiftItem(item, coll);
 
-					if (LaraTestClimbStance(item, coll))
+					if (TestLaraClimbStance(item, coll))
 					{
 						item->animNumber = LA_STAND_SOLID;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -319,7 +319,7 @@ SPLAT_COLL TestWall(ITEM_INFO* item, int front, int right, int down)
 	return SPLAT_COLL::SPLAT_NONE;
 }
 
-bool LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ANIM_FRAME* frame;
 
@@ -375,7 +375,7 @@ bool LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			Lara.moveAngle = angle;
 
-			if (!LaraTestHangOnClimbWall(item, coll))
+			if (!TestLaraHangOnClimbWall(item, coll))
 			{
 				if (item->animNumber != LA_LADDER_TO_HANG_RIGHT && item->animNumber != LA_LADDER_TO_HANG_LEFT)
 				{
@@ -390,7 +390,7 @@ bool LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if (item->animNumber == LA_REACH_TO_HANG && item->frameNumber == g_Level.Anims[LA_REACH_TO_HANG].frameBase + 21 && LaraTestClimbStance(item, coll))
+				if (item->animNumber == LA_REACH_TO_HANG && item->frameNumber == g_Level.Anims[LA_REACH_TO_HANG].frameBase + 21 && TestLaraClimbStance(item, coll))
 					item->goalAnimState = LS_LADDER_IDLE;
 			}
 		}
@@ -441,7 +441,7 @@ bool LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (256 << dir & GetClimbFlags(x, item->pos.yPos, z, item->roomNumber))
 			{
-				if (!LaraTestHangOnClimbWall(item, coll))
+				if (!TestLaraHangOnClimbWall(item, coll))
 					dfront = 0;
 			}
 			else if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60)
@@ -512,7 +512,7 @@ bool LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-bool LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraHangLeftCorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return false;
@@ -546,7 +546,7 @@ bool LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.cornerZ = z;
 	item->pos.yRot -= ANGLE(90.0f);
 
-	bool result = -IsValidHangPos(item, coll);
+	bool result = -TestLaraValidHangPos(item, coll);
 	if (result)
 	{
 		if (Lara.climbStatus)
@@ -611,7 +611,7 @@ bool LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.cornerZ = z;
 	item->pos.yRot += ANGLE(90.0f);
 
-	result = IsValidHangPos(item, coll);
+	result = TestLaraValidHangPos(item, coll);
 	if (!result)
 	{
 		item->pos.xPos = oldXpos;
@@ -667,7 +667,7 @@ bool LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-bool LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraHangRightCorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return false;
@@ -701,7 +701,7 @@ bool LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.cornerZ = z;
 	item->pos.yRot += ANGLE(90.0f);
 
-	bool result = -IsValidHangPos(item, coll);
+	bool result = -TestLaraValidHangPos(item, coll);
 	if (result)
 	{
 		if (Lara.climbStatus)
@@ -766,7 +766,7 @@ bool LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.cornerZ = z;
 	item->pos.yRot -= ANGLE(90.0f);
 
-	result = IsValidHangPos(item, coll);
+	result = TestLaraValidHangPos(item, coll);
 	if (!result)
 	{
 		item->pos.xPos = oldXpos;
@@ -822,7 +822,7 @@ bool LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-bool IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return false;
@@ -861,7 +861,7 @@ bool IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	return abs(coll->Front.Floor - coll->FrontRight.Floor) < 60;
 }
 
-bool LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
@@ -896,7 +896,7 @@ bool LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
-bool LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	BOUNDING_BOX* bounds;
 	int shift, result;
@@ -949,7 +949,7 @@ bool LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
+int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 {
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	int hdif = coll->Front.Floor - bounds->Y1;
@@ -1047,7 +1047,7 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	return false;
 }
 
-bool CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
+bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	int oldx = item->pos.xPos;
 	int oldz = item->pos.zPos;
@@ -1077,7 +1077,7 @@ bool CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
-	auto res = LaraHangTest(item, coll);
+	auto res = TestLaraHang(item, coll);
 
 	item->pos.xPos = oldx;
 	item->pos.zPos = oldz;

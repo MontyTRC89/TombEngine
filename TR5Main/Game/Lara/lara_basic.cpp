@@ -1031,9 +1031,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			coll->Middle.Floor >= 200 &&
 			coll->CollisionType == CT_FRONT)
 		{
-			edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+			edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
-			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
+			if (!(!edgeCatch || edgeCatch < 0 && !TestLaraHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
 				
@@ -1645,11 +1645,11 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 		if (coll->CollisionType == CT_FRONT && coll->Middle.Ceiling <= -STEPUP_HEIGHT)
 		{
 			int edge;
-			int edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+			int edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 			if (edgeCatch)
 			{
-				if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
+				if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
 				{
 					short angle = item->pos.yRot;
 					bool result = SnapToQuadrant(angle, 35);

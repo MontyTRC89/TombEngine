@@ -825,11 +825,11 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
 		GetCollisionInfo(coll, item, 870);
-		edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+		edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 		if (edgeCatch)
 		{
-			if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
+			if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
 			{
 				short angle = item->pos.yRot;
 				if (SnapToQuadrant(angle, 35))
