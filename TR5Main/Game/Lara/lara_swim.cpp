@@ -677,7 +677,11 @@ void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos = coll->Setup.OldPosition.y;
 		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
-	else if (wd <= 512)
+
+	// Height check was at STEP_SIZE * 2 before but changed to this 
+	// because now Lara surfaces on a head level, not mid-body level.
+
+	if (wd <= LARA_HEIGHT - LARA_HEADROOM / 2) 
 	{
 		item->animNumber = LA_UNDERWATER_TO_STAND;
 		item->currentAnimState = LS_ONWATER_EXIT;
