@@ -256,7 +256,7 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
-SPLAT_COLL TestWall(ITEM_INFO* item, int front, int right, int down)
+SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 {
 	int x = item->pos.xPos;
 	int y = item->pos.yPos + down;
