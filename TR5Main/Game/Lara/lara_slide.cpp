@@ -7,59 +7,7 @@
 #include "camera.h"
 #include "level.h"
 
-short OldAngle = 1;
-
 /*this file has all the related functions to sliding*/
-
-/*tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
-		return 0;
-
-	short angle = ANGLE(0.0f);
-	if (coll->TiltX > 2)
-		angle = -ANGLE(90.0f);
-	else if (coll->TiltX < -2)
-		angle = ANGLE(90.0f);
-
-	if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
-		angle = ANGLE(180.0f);
-	else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
-		angle = ANGLE(0.0f);
-
-	short delta = angle - item->pos.yRot;
-
-	ShiftItem(item, coll);
-
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
-	{
-		if (item->currentAnimState == LS_SLIDE_BACK && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_BACK_START;
-		item->goalAnimState = LS_SLIDE_BACK;
-		item->currentAnimState = LS_SLIDE_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->pos.yRot = angle + ANGLE(180.0f);
-	}
-	else
-	{
-		if (item->currentAnimState == LS_SLIDE_FORWARD && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_FORWARD;
-		item->goalAnimState = LS_SLIDE_FORWARD;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_SLIDE_FORWARD;
-		item->pos.yRot = angle;
-	}
-
-	Lara.moveAngle = angle;
-	OldAngle = angle;
-
-	return 1;
-}
 
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
