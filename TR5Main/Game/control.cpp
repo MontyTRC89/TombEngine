@@ -53,19 +53,20 @@
 #include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
 #include "creature_info.h"
-using namespace TEN::Entities::Switches;
 
 using std::vector;
 using std::unordered_map;
 using std::string;
+
+using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects;
-using TEN::Renderer::g_Renderer;
+using namespace TEN::Entities::Switches;
+using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
-
 
 int KeyTriggerActive;
 int number_los_rooms;
@@ -141,8 +142,6 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace TEN::Effects::Footprints;
-extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -500,7 +499,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBubbles();
 		UpdateDebris();
 		UpdateGunShells();
-		updateFootprints();
+		UpdateFootprints();
 		UpdateSplashes();
 		UpdateEnergyArcs();
 		UpdateLightning();

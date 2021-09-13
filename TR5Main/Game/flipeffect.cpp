@@ -195,6 +195,7 @@ void AddFootprint(ITEM_INFO* item)
 		
 		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
+		footprint.foot = 0;
 		footprint.lifeStartFading = 30 * 10;
 		footprint.startOpacity = 64;
 		footprint.life = 30 * 20;
@@ -209,6 +210,7 @@ void AddFootprint(ITEM_INFO* item)
 
 		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
+		footprint.foot = 1;
 		footprint.lifeStartFading = 30*10;
 		footprint.startOpacity = 64;
 		footprint.life = 30 * 20;
