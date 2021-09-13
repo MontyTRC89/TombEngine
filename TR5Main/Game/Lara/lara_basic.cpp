@@ -14,8 +14,6 @@
 #include "item.h"
 #include "camera.h"
 
-bool DoJump = false;
-
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -260,21 +258,23 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
+	bool doJump = false;
+
 	if (item->animNumber == LA_STAND_TO_RUN)
 	{
-		DoJump = false;
+		doJump = false;
 	}
 	else if (item->animNumber == LA_RUN)
 	{
 		if (item->frameNumber == 4)
-			DoJump = true;
+			doJump = true;
 	}
 	else
 	{
-		DoJump = true;
+		doJump = true;
 	}
 
-	if (TrInput & IN_JUMP && DoJump && !item->gravityStatus)
+	if (TrInput & IN_JUMP && doJump && !item->gravityStatus)
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
 	}
