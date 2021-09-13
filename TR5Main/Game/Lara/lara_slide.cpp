@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "lara.h"
 #include "lara_collide.h"
+#include "lara_tests.h"
 #include "input.h"
 #include "Sound\sound.h"
 #include "collide.h"
