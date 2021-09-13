@@ -363,9 +363,9 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
 		coll->Setup.Radius = LARA_RAD_CRAWL;
-		coll->Setup.BadHeightUp = 255;
+		coll->Setup.BadHeightUp = STEP_SIZE - 1;
 		coll->Setup.BadHeightDown = -127;
-		coll->Setup.BadCeilingHeight = 400;
+		coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 
 		coll->Setup.SlopesAreWalls = true;
 		coll->Setup.SlopesArePits = true;
@@ -431,7 +431,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 							auto collResult = LaraCollisionFront(item, item->pos.yRot, -300);
 							height = collResult.Position.Floor;
 
-							if (abs(height) >= 255 || collResult.Position.Type == BIG_SLOPE)
+							if (abs(height) >= STEP_SIZE - 1 || collResult.Position.Type == BIG_SLOPE)
 							{
 								if (TrInput & IN_ACTION)
 								{
@@ -566,9 +566,9 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 
-	coll->Setup.BadHeightUp = 255;
+	coll->Setup.BadHeightUp = STEP_SIZE - 1;
 	coll->Setup.BadHeightDown = -127;
-	coll->Setup.BadCeilingHeight = 400;
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -737,7 +737,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -STEP_SIZE)
 			item->pos.yPos += coll->Middle.Floor;
 
 		Lara.moveAngle = item->pos.yRot;
