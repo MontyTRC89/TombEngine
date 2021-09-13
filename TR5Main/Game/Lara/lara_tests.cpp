@@ -901,7 +901,6 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 {
-
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	int hdif = coll->Front.Floor - bounds->Y1;
 
@@ -922,7 +921,7 @@ int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 		return 0;
 	}
 
-	if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= SLOPE_DIF)
+	if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= SLOPE_DIFFERENCE)
 		return 0;
 
 	return 1;
