@@ -430,7 +430,7 @@ int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
 
-	if (!LaraTestClimbStance(item, coll))
+	if (!TestLaraClimbStance(item, coll))
 		return 0;
 	
 	short rot = item->pos.yRot;
