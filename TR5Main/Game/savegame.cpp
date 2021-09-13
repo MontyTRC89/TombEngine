@@ -3,7 +3,7 @@
 #include "Lara.h"
 #include "items.h"
 #include "box.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "lot.h"
 #include "switch.h"
 #include "spotcam.h"

@@ -6,6 +6,11 @@
 #include "generic_switch.h"
 #include "door_data.h"
 #include "Box.h"
+#include "generic_doors.h"
+#include "collide.h"
+
+using namespace TEN::Entities::Doors;
+
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
@@ -77,7 +82,6 @@ namespace TEN::Entities::Switches
 							if (!door->opened)
 							{
 								AddActiveItem((target - g_Level.Items.data()));
-								target->itemFlags[2] = target->pos.yPos;
 								target->status = ITEM_ACTIVE;
 							}
 						}
