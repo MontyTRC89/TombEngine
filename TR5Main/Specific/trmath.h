@@ -23,6 +23,7 @@ constexpr auto STEP_SIZE = WALL_SIZE / 4;
 constexpr auto STOP_SIZE = WALL_SIZE / 2;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
+constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = (-0x7F00);
 constexpr auto MAX_HEIGHT = (-0x7FFF);
 
