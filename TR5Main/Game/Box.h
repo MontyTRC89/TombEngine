@@ -62,8 +62,6 @@ struct OBJECT_BONES
 	}
 };
 
-
-
 struct AI_INFO
 {
 	int zoneNumber;
@@ -186,7 +184,6 @@ constexpr auto NO_BOX = -1;
 constexpr auto NO_ZONE = -1;
 constexpr auto BOX_JUMP = 0x800;
 constexpr auto BOX_MONKEY = 0x2000;
-constexpr auto BOX_NUMBER = 0x7FF;
 constexpr auto BOX_END_BIT = 0x8000;
 constexpr auto EXPAND_LEFT = 0x1;
 constexpr auto EXPAND_RIGHT = 0x2;

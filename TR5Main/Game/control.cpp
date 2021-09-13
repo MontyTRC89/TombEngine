@@ -1014,28 +1014,6 @@ FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 	return &GetFloor(*roomNumber, x, z);
 }
 
-int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
-{
-	if (!floor->FloorHasSplitPortal())
-		return 0;
-
-	if (floor->FloorCollision.Portals[floor->SectorPlane(x, z)] == NO_ROOM)
-		return 1;
-	else
-		return -1;
-}
-
-int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
-{
-	if (!floor->CeilingHasSplitPortal())
-		return 0;
-
-	if (floor->CeilingCollision.Portals[floor->SectorPlaneCeiling(x, z)] == NO_ROOM)
-		return 1;
-	else
-		return -1;
-}
-
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 {
 	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
@@ -2261,7 +2239,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomAbove() != NO_ROOM)
 		{
-			if (CheckNoColCeilingTriangle(floor, x, z) == 1)
+			if (CheckNoColCeilingTriangle(floor, x, z) == SPLIT_SOLID)
 				break;
 			r = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
@@ -2277,7 +2255,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomBelow() != NO_ROOM)
 		{
-			if (CheckNoColFloorTriangle(floor, x, z) == 1)
+			if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
 				break;
 			r = &g_Level.Rooms[floor->RoomBelow()];
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))

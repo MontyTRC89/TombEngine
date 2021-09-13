@@ -28,6 +28,13 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
+enum SPLIT_COLL
+{
+	SPLIT_NONE,
+	SPLIT_SOLID,
+	SPLIT_PORTAL
+};
+
 enum HEIGHT_TYPE
 {
 	WALL,
@@ -118,6 +125,8 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateLaraRoom(ITEM_INFO* item, int height);
+SPLIT_COLL CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
+SPLIT_COLL CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
