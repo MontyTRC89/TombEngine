@@ -123,6 +123,7 @@ struct LEVEL_CAMERA_INFO
 	int z;
 	int roomNumber;
 	int flags;
+	int speed;
 	std::string luaName;
 
 	LEVEL_CAMERA_INFO()
@@ -132,6 +133,7 @@ struct LEVEL_CAMERA_INFO
 		this->z = 0;
 		this->roomNumber = 0;
 		this->flags = 0x0;
+		this->speed = 1;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos)
@@ -141,6 +143,7 @@ struct LEVEL_CAMERA_INFO
 		this->z = zpos;
 		this->roomNumber = 0;
 		this->flags = 0x0;
+		this->speed = 1;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room)
@@ -150,6 +153,7 @@ struct LEVEL_CAMERA_INFO
 		this->z = zpos;
 		this->roomNumber = room;
 		this->flags = 0x0;
+		this->speed = 1;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
@@ -159,6 +163,7 @@ struct LEVEL_CAMERA_INFO
 		this->z = zpos;
 		this->roomNumber = 0;
 		this->flags = flags;
+		this->speed = 1;
 	}
 
 	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room, short newflags)
@@ -168,6 +173,7 @@ struct LEVEL_CAMERA_INFO
 		this->z = zpos;
 		this->roomNumber = room;
 		this->flags = newflags;
+		this->speed = 1;
 	}
 };
 
