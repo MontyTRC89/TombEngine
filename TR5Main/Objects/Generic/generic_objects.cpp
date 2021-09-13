@@ -298,7 +298,7 @@ void StartDoors()
 {
 	OBJECT_INFO* obj;
 
-	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_CLOSED_DOOR6; objNum++)
+	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_DOOR_TYPE30; objNum++)
 	{
 		obj = &Objects[objNum];
 		if (obj->loaded)
