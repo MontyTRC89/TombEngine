@@ -706,9 +706,9 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->Setup.Radius = LARA_RAD_CRAWL + 50; // TODO: Check if it still works without 50?
-	coll->Setup.BadHeightUp = 255;
-	coll->Setup.BadHeightDown = -127;
-	coll->Setup.BadCeilingHeight = 400;
+	coll->Setup.BadHeightUp = STEP_SIZE - 1;
+	coll->Setup.BadHeightDown = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 
