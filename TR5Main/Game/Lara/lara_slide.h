@@ -4,7 +4,6 @@ struct ITEM_INFO;
 struct COLL_INFO;
 
 /*Tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 /*end tests and others*/

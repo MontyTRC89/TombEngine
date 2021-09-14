@@ -301,7 +301,7 @@ void LaserHeadControl(short itemNumber)
 				// Check if there's a valid LOS between guardian and Lara 
 				// and if distance is less than 8 sectors  and if Lara is alive and not burning
 				if (LOS(&src, &dest)
-					&& distance <= 8192
+					&& distance <= MAX_VISIBILITY_DISTANCE
 					&& LaraItem->hitPoints > 0
 					&& !Lara.burn
 					&& (LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
@@ -529,15 +529,15 @@ void LaserHeadControl(short itemNumber)
 
 									int distance = sqrt(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
 
-									if (distance < 8192)
+									if (distance < MAX_VISIBILITY_DISTANCE)
 									{
 										int dl = distance + 512;
 
-										if (dl < 8192)
+										if (dl < MAX_VISIBILITY_DISTANCE)
 										{
-											dest.x = src.x + dl * (dest.x - src.x) / 8192;
-											dest.y = src.y + dl * (dest.y - src.y) / 8192;
-											dest.z = src.z + dl * (dest.z - src.z) / 8192;
+											dest.x = src.x + dl * (dest.x - src.x) / MAX_VISIBILITY_DISTANCE;
+											dest.y = src.y + dl * (dest.y - src.y) / MAX_VISIBILITY_DISTANCE;
+											dest.z = src.z + dl * (dest.z - src.z) / MAX_VISIBILITY_DISTANCE;
 										}
 
 										int dx = (dest.x - src.x) / 32;

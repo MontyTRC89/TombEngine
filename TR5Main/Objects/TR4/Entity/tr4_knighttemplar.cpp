@@ -168,7 +168,7 @@ void KnightTemplarControl(short itemNumber)
 
 			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->xSize];
 
-			if (currentFloor->stopper)
+			if (currentFloor->Stopper)
 			{
 				for (int i = 0; i < room->mesh.size(); i++)
 				{
@@ -182,7 +182,7 @@ void KnightTemplarControl(short itemNumber)
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-						currentFloor->stopper = false;
+						currentFloor->Stopper = false;
 
 						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 					}

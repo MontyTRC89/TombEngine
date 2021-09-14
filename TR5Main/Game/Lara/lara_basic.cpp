@@ -14,8 +14,6 @@
 #include "item.h"
 #include "camera.h"
 
-bool DoJump = false;
-
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -132,7 +130,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
-	coll->Setup.DeathIsPit = 1;
+	coll->Setup.DeathFlagIsPit = 1;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, LARA_HEIGHT);
@@ -260,21 +258,23 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
+	static bool doJump = false;
+
 	if (item->animNumber == LA_STAND_TO_RUN)
 	{
-		DoJump = false;
+		doJump = false;
 	}
 	else if (item->animNumber == LA_RUN)
 	{
 		if (item->frameNumber == 4)
-			DoJump = true;
+			doJump = true;
 	}
 	else
 	{
-		DoJump = true;
+		doJump = true;
 	}
 
-	if (TrInput & IN_JUMP && DoJump && !item->gravityStatus)
+	if (TrInput & IN_JUMP && doJump && !item->gravityStatus)
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
 	}
@@ -319,7 +319,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallBounds || TestWall(item, 256, 0, -640))
+			if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -665,8 +665,6 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->Middle.Floor != NO_HEIGHT)
 			item->pos.yPos += coll->Middle.Floor;
-
-		AnimateLara(item);
 	}
 }
 
@@ -1031,19 +1029,13 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			coll->Middle.Floor >= 200 &&
 			coll->CollisionType == CT_FRONT)
 		{
-			edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+			edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
-			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
+			if (!(!edgeCatch || edgeCatch < 0 && !TestLaraHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
-				{
-					result = SnapToDiagonal(angle, 35);
-				}
-				else*/
-				{
-					result = SnapToQuadrant(angle, 35);
-				}
+				
+				result = SnapToQuadrant(angle, 35);
 			}
 		}
 	}
@@ -1126,18 +1118,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-			/*if (coll->Middle.SplitFloor)
-			{
-				Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, angle);
-				item->pos.xPos = v.x;
-				item->pos.zPos = v.y;
-			}
-			else*/
-			{
-				Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
-				item->pos.xPos = v.x;
-				item->pos.zPos = v.y;
-			}
+			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
+			item->pos.xPos = v.x;
+			item->pos.zPos = v.y;
 		}
 
 		item->pos.yRot = angle;
@@ -1660,23 +1643,14 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 		if (coll->CollisionType == CT_FRONT && coll->Middle.Ceiling <= -STEPUP_HEIGHT)
 		{
 			int edge;
-			int edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+			int edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 			if (edgeCatch)
 			{
-				if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
+				if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
 				{
 					short angle = item->pos.yRot;
-					bool result;
-
-					/*if (coll->Middle.SplitFloor && coll->Front.SplitFloor == coll->Middle.SplitFloor)
-					{
-						result = SnapToDiagonal(angle, 35);
-					}
-					else*/
-					{
-						result = SnapToQuadrant(angle, 35);
-					}
+					bool result = SnapToQuadrant(angle, 35);
 
 					if (result)
 					{
@@ -1714,18 +1688,9 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						else
 							item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-						/*if (coll->Middle.SplitFloor)
-						{
-							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->Middle.SplitFloor, LARA_RAD, item->pos.yRot);
-							item->pos.xPos = v.x;
-							item->pos.zPos = v.y;
-						}
-						else*/
-						{
-							Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-							item->pos.xPos = v.x;
-							item->pos.zPos = v.y;
-						}
+						Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
+						item->pos.xPos = v.x;
+						item->pos.zPos = v.y;
 						item->pos.yRot = angle;
 
 						item->gravityStatus = false;
@@ -2198,7 +2163,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallBounds || TestWall(item, 256, 0, -640))
+			if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))

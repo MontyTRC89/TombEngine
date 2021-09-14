@@ -12,6 +12,7 @@ class FLOOR_INFO;
 struct ANIM_STRUCT;
 struct MESH_INFO;
 struct ROOM_INFO;
+
 enum GAME_STATUS
 {
 	GAME_STATUS_NONE,
@@ -50,6 +51,8 @@ enum COMMAND_TYPES
 
 extern int KeyTriggerActive;
 extern byte FlipStatus;
+
+constexpr auto NO_LOS_ITEM = INT_MAX;
 
 constexpr auto MAX_FLIPMAP = 255;
 extern int FlipStats[MAX_FLIPMAP];
@@ -108,15 +111,12 @@ GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
 void AnimateWaterfalls();
-short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 void KillMoveItems();
 void KillMoveEffects();
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 void AlterFloorHeight(ITEM_INFO* item, int height);
-int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
-int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
@@ -133,7 +133,6 @@ void AnimateItem(ITEM_INFO* item);
 void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);
 void RemoveRoomFlipItems(ROOM_INFO* r);
-void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);

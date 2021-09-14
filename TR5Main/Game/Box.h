@@ -62,8 +62,6 @@ struct OBJECT_BONES
 	}
 };
 
-
-
 struct AI_INFO
 {
 	int zoneNumber;
@@ -159,7 +157,6 @@ struct EntityStoringInfo
 };
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
-//#define XZ_GET_SECTOR(room, x, z) (room->floor[(z) / SECTOR(1) + (x) / SECTOR(1) * room->xSize])
 
 constexpr auto UNIT_SHADOW = 256;
 constexpr auto NO_SHADOW = 0;
@@ -172,9 +169,6 @@ constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Cent
 constexpr auto TIMID = 0;
 constexpr auto VIOLENT = 1;
 constexpr auto ONESHOT = 0x100;
-constexpr auto DATA_TYPE = 0x1F;
-constexpr auto DATA_TILT = 0xF;    // tile type (FLOOR_TYPE enum)
-constexpr auto DATA_STATIC = 0xFF; // probably add static collision
 constexpr auto END_BIT = 0x8000;
 constexpr auto VALUE_BITS = 0x3FF;
 constexpr auto CODE_BITS = 0x3E00;
@@ -190,7 +184,6 @@ constexpr auto NO_BOX = -1;
 constexpr auto NO_ZONE = -1;
 constexpr auto BOX_JUMP = 0x800;
 constexpr auto BOX_MONKEY = 0x2000;
-constexpr auto BOX_NUMBER = 0x7FF;
 constexpr auto BOX_END_BIT = 0x8000;
 constexpr auto EXPAND_LEFT = 0x1;
 constexpr auto EXPAND_RIGHT = 0x2;
@@ -204,7 +197,6 @@ constexpr auto CLIP_TOP = 0x4;
 constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
-constexpr auto SLOPE_DIF = 60;
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);

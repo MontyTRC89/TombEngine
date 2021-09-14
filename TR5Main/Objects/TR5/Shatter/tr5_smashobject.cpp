@@ -15,7 +15,7 @@ void InitialiseSmashObject(short itemNumber)
 
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	BOX_INFO* box = &g_Level.Boxes[floor->box];
+	BOX_INFO* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
 }
@@ -26,7 +26,7 @@ void SmashObject(short itemNumber)
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 	int sector = ((item->pos.zPos - r->z) / 1024) + r->xSize * ((item->pos.xPos - r->x) / 1024);
 
-	BOX_INFO* box = &g_Level.Boxes[r->floor[sector].box];
+	BOX_INFO* box = &g_Level.Boxes[r->floor[sector].Box];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 

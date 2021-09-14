@@ -75,11 +75,11 @@ namespace TEN::Entities::Doors
 		door->d1.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
 		roomNumber = door->d1.floor->WallPortal;
 		if (roomNumber == NO_ROOM)
-			boxNumber = door->d1.floor->box;
+			boxNumber = door->d1.floor->Box;
 		else
 		{
 			b = &g_Level.Rooms[roomNumber];
-			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
+			boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].Box;
 		}
 
 		door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
@@ -92,11 +92,11 @@ namespace TEN::Entities::Doors
 			door->d1flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + dz + ((item->pos.xPos - r->x) / SECTOR(1) + dx) * r->xSize];
 			roomNumber = door->d1flip.floor->WallPortal;
 			if (roomNumber == NO_ROOM)
-				boxNumber = door->d1flip.floor->box;
+				boxNumber = door->d1flip.floor->Box;
 			else
 			{
 				b = &g_Level.Rooms[roomNumber];
-				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].box;
+				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + dz + ((item->pos.xPos - b->x) / SECTOR(1) + dx) * b->xSize].Box;
 			}
 
 			door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
@@ -122,11 +122,11 @@ namespace TEN::Entities::Doors
 			door->d2.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
 			roomNumber = door->d2.floor->WallPortal;
 			if (roomNumber == NO_ROOM)
-				boxNumber = door->d2.floor->box;
+				boxNumber = door->d2.floor->Box;
 			else
 			{
 				b = &g_Level.Rooms[roomNumber];
-				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
+				boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].Box;
 			}
 
 			door->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
@@ -139,11 +139,11 @@ namespace TEN::Entities::Doors
 				door->d2flip.floor = &r->floor[(item->pos.zPos - r->z) / SECTOR(1) + (item->pos.xPos - r->x) / SECTOR(1) * r->xSize];
 				roomNumber = door->d2flip.floor->WallPortal;
 				if (roomNumber == NO_ROOM)
-					boxNumber = door->d2flip.floor->box;
+					boxNumber = door->d2flip.floor->Box;
 				else
 				{
 					b = &g_Level.Rooms[roomNumber];
-					boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].box;
+					boxNumber = b->floor[(item->pos.zPos - b->z) / SECTOR(1) + (item->pos.xPos - b->x) / SECTOR(1) * b->xSize].Box;
 				}
 
 				door->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
@@ -437,12 +437,21 @@ namespace TEN::Entities::Doors
 
 		if (floor)
 		{
-			floor->box = NO_BOX;
-			floor->ceiling = -127;
-			floor->floor = -127;
-			floor->index = 0;
-			floor->skyRoom = NO_ROOM;
-			floor->pitRoom = NO_ROOM;
+			floor->Box = NO_BOX;
+			floor->TriggerIndex = 0;
+
+			// FIXME: HACK!!!!!!!
+			// We should find a better way of dealing with doors using new floordata.
+
+			floor->WallPortal = -1;
+			floor->FloorCollision.Portals[0] = NO_ROOM;
+			floor->FloorCollision.Portals[1] = NO_ROOM;
+			floor->CeilingCollision.Portals[0] = NO_ROOM;
+			floor->CeilingCollision.Portals[1] = NO_ROOM;
+			floor->FloorCollision.Planes[0].z = -127;
+			floor->FloorCollision.Planes[1].z = -127;
+			floor->CeilingCollision.Planes[0].z = -127;
+			floor->CeilingCollision.Planes[1].z = -127;
 
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_BOX)
