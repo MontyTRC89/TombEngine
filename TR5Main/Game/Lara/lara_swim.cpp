@@ -156,7 +156,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			r = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP)))
 			{
-				int wh = floor->AverageCeiling << 8;
+				int wh = floor->CeilingHeight(x, z);
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -171,7 +171,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			r = &g_Level.Rooms[floor->RoomBelow()];
 			if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 			{
-				int wh = floor->AverageFloor << 8;
+				int wh = floor->FloorHeight(x, z);
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
