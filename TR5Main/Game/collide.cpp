@@ -2825,30 +2825,25 @@ bool SnapToDiagonal(short& angle, int interval)
 
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 {
-	Vector2 vect;
-
-	int xGrid = xPos - (xPos % WALL_SIZE);
-	int zGrid = zPos - (zPos % WALL_SIZE);
+	auto vect = Vector2(xPos, zPos);
 
 	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
+
 	switch (dir)
 	{
 	case NORTH:
-		zPos = zGrid + (WALL_SIZE - 1) - radius;
+		vect.y = (zPos | (WALL_SIZE - 1)) - radius;
 		break;
 	case EAST:
-		xPos = xGrid + (WALL_SIZE - 1) - radius;
+		vect.x = (xPos | (WALL_SIZE - 1)) - radius;
 		break;
 	case SOUTH:
-		zPos = zGrid + radius;
+		vect.y = (zPos & ~(WALL_SIZE - 1)) + radius;
 		break;
 	case WEST:
-		xPos = xGrid + radius;
+		vect.x = (xPos & ~(WALL_SIZE - 1)) + radius;
 		break;
 	}
-
-	vect.x = xPos;
-	vect.y = zPos;
 
 	return vect;
 }
