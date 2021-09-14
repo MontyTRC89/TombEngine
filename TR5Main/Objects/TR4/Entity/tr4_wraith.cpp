@@ -6,9 +6,10 @@
 #include "objectslist.h"
 #include "Specific\trmath.h"
 #include "Sound\sound.h"
-#include <lara.h>
-#include <traps.h>
-#include <effects\tomb4fx.h>
+#include "lara.h"
+#include "traps.h"
+#include "people.h"
+#include "effects\tomb4fx.h"
 #include "tr4_wraith_info.h"
 
 constexpr auto WRAITH_COUNT = 8;
