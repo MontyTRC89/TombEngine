@@ -441,6 +441,8 @@ namespace TEN::Entities::Doors
 			floor->TriggerIndex = 0;
 
 			// FIXME: HACK!!!!!!!
+			// We should find a better way of dealing with doors using new floordata.
+
 			floor->WallPortal = -1;
 			floor->FloorCollision.Portals[0] = NO_ROOM;
 			floor->FloorCollision.Portals[1] = NO_ROOM;

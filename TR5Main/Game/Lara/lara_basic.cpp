@@ -665,8 +665,6 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->Middle.Floor != NO_HEIGHT)
 			item->pos.yPos += coll->Middle.Floor;
-
-		AnimateLara(item);
 	}
 }
 
