@@ -787,7 +787,7 @@ void FixedCamera(ITEM_INFO* item)
 		from.roomNumber = camera->roomNumber;
 
 		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
-		moveSpeed = (camera->speed + 1) * 8; 
+		moveSpeed = camera->speed * 8 + 1;
 
 		if (camera->flags & 2)
 		{
