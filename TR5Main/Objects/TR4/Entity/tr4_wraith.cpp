@@ -75,7 +75,7 @@ void WraithControl(short itemNumber)
 		z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
 
 		distance = SQUARE(x) + SQUARE(z);
-		dy = abs((distance / 8192) - 768);
+		dy = abs((distance / MAX_VISIBILITY_DISTANCE) - 768);
 		y = room->y + ((room->minfloor - room->maxceiling) / 2);
 	}
 

@@ -17,13 +17,13 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 	int hit = 0;
 	int targetable = 0;
 
-	if (info->distance <= SQUARE(8192) && Targetable(item, info))
+	if (info->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(8192) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
 		distance = info->distance + SQUARE(distance);
-		if (distance <= SQUARE(8192))
+		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
-			int random = (SQUARE(8192) - info->distance) / (SQUARE(8192) / 0x5000) + 8192;
+			int random = (SQUARE(MAX_VISIBILITY_DISTANCE) - info->distance) / (SQUARE(MAX_VISIBILITY_DISTANCE) / 0x5000) + 8192;
 			hit = (GetRandomControl() < random);
 		}
 		else
@@ -121,7 +121,7 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
 
-	if (enemy != NULL && enemy->hitPoints > 0 && enemy->data != NULL && info->ahead && info->distance < SQUARE(8192))
+	if (enemy != NULL && enemy->hitPoints > 0 && enemy->data != NULL && info->ahead && info->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 	{
 		GAME_VECTOR start, target;
 
@@ -155,7 +155,7 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 	if (enemy != NULL)
 	{
 		short angle = info->angle - creature->jointRotation[2];
-		if (enemy->hitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(8192))
+		if (enemy->hitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
 			GAME_VECTOR start;
 			start.x = item->pos.xPos;
