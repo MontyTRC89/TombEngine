@@ -34,11 +34,11 @@ namespace TEN::Entities::Doors
 
 		if (item->itemFlags[0] != 3)
 		{
-			if (TestBoundsCollide(item, l, coll->radius))
+			if (TestBoundsCollide(item, l, coll->Setup.Radius))
 			{
 				if (TestCollision(item, l))
 				{
-					if (coll->enableBaddiePush)
+					if (coll->Setup.EnableObjectPush)
 						ItemPushItem(item, l, coll, 0, 1);
 				}
 			}
