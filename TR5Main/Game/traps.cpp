@@ -2,9 +2,8 @@
 #include "traps.h"
 
 #include "items.h"
-#include "effect2.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "collide.h"
 #include "sphere.h"
@@ -13,7 +12,7 @@
 #include "draw.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "kayak.h"
 
 static short WreckingBallData[2] = {0, 0};
@@ -83,7 +82,7 @@ void FlameEmitterControl(short itemNumber)
 				if (item->itemFlags[0])
 				{
 					if (item->itemFlags[1])
-						item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] / 4);
+						item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] >> 2);
 
 					if (item->itemFlags[2] < 256)
 						item->itemFlags[2] += 8;
@@ -96,8 +95,8 @@ void FlameEmitterControl(short itemNumber)
 				{
 					if (!--item->itemFlags[3])
 					{
-						if (flags / 8)
-							item->itemFlags[0] = (GetRandomControl() & 0x1F) + 30 * (flags / 8);
+						if (flags >> 3)
+							item->itemFlags[0] = (GetRandomControl() & 0x1F) + 30 * (flags >> 3);
 						else
 							item->itemFlags[0] = (GetRandomControl() & 0x3F) + 60;
 					}
@@ -122,7 +121,7 @@ void FlameEmitterControl(short itemNumber)
 						TriggerSuperJetFlame(item, item->itemFlags[1], GlobalCounter & 1);
 
 					TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos,
-						((-item->itemFlags[1]) / 1024) - (GetRandomControl() & 1) + 16,
+						(-item->itemFlags[1] >> 10) - (GetRandomControl() & 1) + 16,
 						(GetRandomControl() & 0x3F) + 192,
 						(GetRandomControl() & 0x1F) + 96, 0);
 				}
@@ -198,8 +197,8 @@ void FlameEmitter2Control(short itemNumber)
 				{
 					TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos,
 						10,
-						((GetRandomControl() & 0x3F) + 192) * item->itemFlags[3] / 256,
-						(GetRandomControl() & 0x1F) + 96 * item->itemFlags[3] / 256,
+						((GetRandomControl() & 0x3F) + 192) * item->itemFlags[3] >> 8,
+						(GetRandomControl() & 0x1F) + 96 * item->itemFlags[3] >> 8,
 						0);
 				}
 				else
@@ -501,7 +500,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		z = l->pos.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
 		damage = item->fallspeed > 0 ? 96 : 0;
-		if (ItemPushLara(item, l, coll, coll->enableSpaz, 1))
+		if (ItemPushItem(item, l, coll, coll->enableSpaz, 1))
 		{
 			if (test)
 				l->hitPoints = 0;
@@ -547,8 +546,8 @@ void WreckingBallControl(short itemNumber)
 				WreckingBallData[0] = GetRandomControl() % 7 - 3;
 				WreckingBallData[1] = GetRandomControl() % 7 - 3;
 			}
-			x = (WreckingBallData[0] * 1024) + 51712;
-			z = (WreckingBallData[1] * 1024) + 34304;
+			x = (WreckingBallData[0] << 10) + 51712;
+			z = (WreckingBallData[1] << 10) + 34304;
 			test = 0;
 		}
 		else
@@ -693,7 +692,7 @@ void WreckingBallControl(short itemNumber)
 			if (item->fallspeed > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->fallspeed = -item->fallspeed / 8;
+				item->fallspeed = -item->fallspeed >> 3;
 			}
 			else
 			{
@@ -718,7 +717,7 @@ void WreckingBallControl(short itemNumber)
 			if (item->fallspeed < -32)
 			{
 				SoundEffect(SFX_TR5_J_GRAB_IMPACT, &item->pos, 4104);
-				item->fallspeed = -item->fallspeed / 8;
+				item->fallspeed = -item->fallspeed >> 3;
 				BounceCamera(item, 16, 8192);
 			}
 			else
@@ -814,20 +813,20 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy / 256) + LA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
 			
 			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
-			Lara.generalPtr = (void*)itemNumber;
+			Lara.interactedItem = itemNumber;
 		}
 		
 		item->pos.yRot = oldYrot;
 	}
 
-	if (Lara.generalPtr == (void*)itemNumber 
+	if (Lara.interactedItem == itemNumber 
 		&& item->status != ITEM_ACTIVE 
 		&& l->currentAnimState == LS_MISC_CONTROL)
 	{
@@ -1007,7 +1006,7 @@ void FlameEmitter3Control(short itemNumber)
 
 			if (item->triggerFlags >= 3 && !(GlobalCounter & 1))
 			{
-				short targetItemNumber = item->itemFlags[((GlobalCounter / 4) & 1) + 2];
+				short targetItemNumber = item->itemFlags[((GlobalCounter >> 2) & 1) + 2];
 				ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 
 				dest.x = 0;
@@ -1072,7 +1071,7 @@ void FlameEmitter3Control(short itemNumber)
 			}
 			else
 			{
-				i = 2 * (item->itemFlags[1] / 8);
+				i = 2 * (item->itemFlags[1] >> 3);
 				x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 				z = 16 * (Flame3xzoffs[i + 8][1] - 32);
 				TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
@@ -1080,7 +1079,7 @@ void FlameEmitter3Control(short itemNumber)
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 
-			TriggerDynamicLight(x, item->pos.yPos, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() / 16) & 0x1F) + 96, 0);
+			TriggerDynamicLight(x, item->pos.yPos, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 			
 			PHD_3DPOS pos;
 			pos.xPos = item->pos.xPos;

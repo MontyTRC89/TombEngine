@@ -3,14 +3,14 @@
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
-#include "debris.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\debris.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 
@@ -314,7 +314,7 @@ void ControlGladiator(short itemNumber)
 					pos.z = 0;
 					GetJointAbsPosition(item, &pos, 16);
 
-					floor = &XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
+					floor = XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
 					if (floor->stopper)
 					{
 						for (i = 0; i < r->mesh.size(); i++)
@@ -329,7 +329,7 @@ void ControlGladiator(short itemNumber)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
-										mesh->flags &= 0xFEu;
+										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 									}

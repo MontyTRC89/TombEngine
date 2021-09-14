@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_hammerhead.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "items.h"
 #include "setup.h"
@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "misc.h"
+#include "creature_info.h"
 #include "control.h"
 
 #define STATE_HAMMERHEAD_STOP       0

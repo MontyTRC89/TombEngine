@@ -20,7 +20,7 @@ int TriggerActive(ITEM_INFO* item)
 {
 	int flag;
 
-	flag = (~item->flags & IFLAG_REVERSE) / 16384;
+	flag = (~item->flags & IFLAG_REVERSE) >> 14;
 	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 	{
 		flag = !flag;
@@ -63,7 +63,7 @@ int GetKeyTrigger(ITEM_INFO* item)
 		}
 		if (*trigger & 4)
 		{
-			for (short* j = &trigger[2]; (*j / 256) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
+			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
 			{
 				if (*j & 0x8000)
 					return 0;
@@ -145,7 +145,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return ((item->flags & 0x100u) / 256);
+		return (item->flags & 0x100u) >> 8;
 	}
 	else
 	{
@@ -163,7 +163,7 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
 		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
 	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
@@ -551,12 +551,9 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
-
+				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
-
-				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
-				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 			}
 			break;
 
@@ -718,4 +715,6 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 	// Set climb status
 	if ((1 << (GetQuadrant(LaraItem->pos.yRot) + 8)) & GetClimbFlags(floor))
 		Lara.climbStatus = true;
+	else
+		Lara.climbStatus = false;
 }

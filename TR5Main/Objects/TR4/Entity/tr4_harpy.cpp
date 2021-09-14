@@ -2,8 +2,7 @@
 #include "tr4_harpy.h"
 #include "people.h"
 #include "box.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "sphere.h"
 #include "draw.h"
@@ -11,6 +10,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
@@ -335,13 +335,12 @@ void HarpyControl(short itemNumber)
 			GetAITarget(creature);
 		}
 
-		CREATURE_INFO* baddie = &BaddieSlots[0];
 		int minDistance = 0x7FFFFFFF;
 
 		creature->enemy = NULL;
 
-		for (int i = 0; i < NUM_SLOTS; i++, baddie++)
-		{
+		for(int i = 0; i < ActiveCreatures.size(); i++) {
+			CREATURE_INFO* baddie = ActiveCreatures[i];
 			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 				continue;
 

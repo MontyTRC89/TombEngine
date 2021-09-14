@@ -9,15 +9,18 @@
 #include "camera.h"
 #include "control.h"
 #include "pickup.h"
-#include "door.h"
+#include "generic_doors.h"
 #include "box.h"
 #include "sound.h"
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>
+#include "Renderer11.h"
+
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
@@ -99,7 +102,6 @@ int LoadItems()
 
 	g_Level.Items.resize(NUM_ITEMS);
 
-	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -330,7 +332,6 @@ void LoadObjects()
 	}
 
 	InitialiseObjects();
-	InitialiseClosedDoors();
 
 	int numStatics = ReadInt32();
 	for (int i = 0; i < numStatics; i++)
@@ -377,6 +378,7 @@ void LoadCameras()
 		camera.z = ReadInt32();
 		camera.roomNumber = ReadInt32();
 		camera.flags = ReadInt32();
+		camera.speed = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
@@ -813,34 +815,32 @@ void LoadRooms()
 
 void FreeLevel()
 {
-	malloc_ptr = malloc_buffer;
-	malloc_free = malloc_size;
-	g_Level.RoomTextures.clear();
-	g_Level.MoveablesTextures.clear();
-	g_Level.StaticsTextures.clear();
-	g_Level.AnimatedTextures.clear();
-	g_Level.SpritesTextures.clear();
-	g_Level.AnimatedTexturesSequences.clear();
-	g_Level.Rooms.clear();
-	g_Level.ObjectTextures.clear();
-	g_Level.Bones.clear();
-	g_Level.Meshes.clear();
-	MoveablesIds.clear();
-	g_Level.Boxes.clear();
-	g_Level.Overlaps.clear();
-	g_Level.Anims.clear();
-	g_Level.Changes.clear();
-	g_Level.Ranges.clear();
-	g_Level.Commands.clear();
-	g_Level.Frames.clear();
-	g_Level.Sprites.clear();
-	g_Level.SoundDetails.clear();
-	g_Level.SoundMap.clear();
-	g_Level.FloorData.clear();
-	g_Level.Cameras.clear();
-	g_Level.Sinks.clear();
-	g_Level.SoundSources.clear();
-	g_Level.AIObjects.clear();
+	g_Level.RoomTextures.resize(0);
+	g_Level.MoveablesTextures.resize(0);
+	g_Level.StaticsTextures.resize(0);
+	g_Level.AnimatedTextures.resize(0);
+	g_Level.SpritesTextures.resize(0);
+	g_Level.AnimatedTexturesSequences.resize(0);
+	g_Level.Rooms.resize(0);
+	g_Level.ObjectTextures.resize(0);
+	g_Level.Bones.resize(0);
+	g_Level.Meshes.resize(0);
+	MoveablesIds.resize(0);
+	g_Level.Boxes.resize(0);
+	g_Level.Overlaps.resize(0);
+	g_Level.Anims.resize(0);
+	g_Level.Changes.resize(0);
+	g_Level.Ranges.resize(0);
+	g_Level.Commands.resize(0);
+	g_Level.Frames.resize(0);
+	g_Level.Sprites.resize(0);
+	g_Level.SoundDetails.resize(0);
+	g_Level.SoundMap.resize(0);
+	g_Level.FloorData.resize(0);
+	g_Level.Cameras.resize(0);
+	g_Level.Sinks.resize(0);
+	g_Level.SoundSources.resize(0);
+	g_Level.AIObjects.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -1056,7 +1056,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadBoxes();
 
-		InitialiseLOTarray(true);
+		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();

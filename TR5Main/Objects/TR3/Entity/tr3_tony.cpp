@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "tr3_tony.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "sphere.h"
 #include "items.h"
 #include "lot.h"
 #include "boss.h"
 #include "box.h"
 #include "draw.h"
-#include "effect2.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
 #include "traps.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
+#include "collide.h"
 
 enum TonyFlameType
 {

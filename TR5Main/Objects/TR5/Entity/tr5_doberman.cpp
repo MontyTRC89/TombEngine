@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "tr5_doberman.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };

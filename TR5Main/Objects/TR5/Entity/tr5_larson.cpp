@@ -3,14 +3,14 @@
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "lot.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
-
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2
 #define STATE_TR5_LARSON_RUN		3

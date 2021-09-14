@@ -6,9 +6,9 @@
 #include "items.h"
 #include "lara.h"
 #include "switch.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "tr4_ahmet.h"
 #include "generic_switch.h"
 
@@ -43,7 +43,7 @@ void ScalesControl(short itemNum)
 			return;
 		}
 
-		if (RespawnAhmet((short)Lara.generalPtr))
+		if (RespawnAhmet(Lara.interactedItem))
 		{
 			short itemNos[8];
 			int sw = GetSwitchTrigger(item, itemNos, 0);
@@ -97,17 +97,17 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			GlobalCollisionBounds.Z1 = -256;
 			GlobalCollisionBounds.Z2 = 384;
 
-			ItemPushLara(item, l, coll, 0, 2);
+			ItemPushItem(item, l, coll, 0, 2);
 
 			GlobalCollisionBounds.X1 = -256;
 			GlobalCollisionBounds.X2 = 256;
 
-			ItemPushLara(item, l, coll, 0, 2);
+			ItemPushItem(item, l, coll, 0, 2);
 
 			GlobalCollisionBounds.X1 = -1280;
 			GlobalCollisionBounds.X2 = -640;
 
-			ItemPushLara(item, l, coll, 0, 2);
+			ItemPushItem(item, l, coll, 0, 2);
 		}
 		else
 		{

@@ -5,10 +5,10 @@
 #include "control.h"
 #include "box.h"
 #include "objectslist.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "camera.h"
 #include "lara.h"
-
+#include "collide.h"
 void InitialiseExpandingPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

@@ -2,11 +2,11 @@
 #include "tr4_moving_blade.h"
 #include "level.h"
 #include "control.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
+#include <effects\effects.h>
 
 void MovingBladeControl(short itemNumber)
 {

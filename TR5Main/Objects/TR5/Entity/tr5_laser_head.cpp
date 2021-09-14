@@ -2,26 +2,19 @@
 #include "tr5_laser_head.h"
 #include "sphere.h"
 #include "items.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\tomb4fx.h"
+#include "effects\effects.h"
 #include "box.h"
 #include "people.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "draw.h"
 #include "control.h"
-#include "effect2.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
-
-struct LASER_HEAD_INFO
-{
-	short baseItem;
-	short tentacles[8];
-	short puzzleItem;
-};
+#include "Sound\sound.h"
+#include "tr5_laserhead_info.h"
 
 struct LASER_HEAD_STRUCT
 {
@@ -153,8 +146,8 @@ void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->data = game_malloc<LASER_HEAD_INFO>();
-	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
+	item->data = LASER_HEAD_INFO();
+	LASER_HEAD_INFO* info = item->data;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{

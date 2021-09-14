@@ -2,7 +2,7 @@
 #include "winmain.h"
 #include "resource.h"
 #include "draw.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #ifndef NEW_INV
 #include "inventory.h"
 #endif

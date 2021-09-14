@@ -3,15 +3,15 @@
 #include "level.h"
 #include "control.h"
 #include "setup.h"
-#include "effect2.h"
-#include "tomb4fx.h"
-#include "sound.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "draw.h"
 #include <Game\items.h>
 
 int NextBat;
-BAT_STRUCT* Bats;
+BAT_STRUCT Bats[NUM_BATS];
 
 void InitialiseLittleBats(short itemNumber)
 {

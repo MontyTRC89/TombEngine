@@ -27,25 +27,10 @@
     <ClInclude Include="Game\control.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\debris.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\door.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\draw.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\effect2.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\flmtorch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\gameflow.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\hair.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\items.h">
@@ -66,16 +51,10 @@
     <ClInclude Include="Game\people.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\pickup.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\rope.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\savegame.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\sound.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\sphere.h">
@@ -88,9 +67,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\text.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\tomb4fx.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\traps.h">
@@ -141,12 +117,6 @@
     <ClInclude Include="Game\inventory.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\GameFlowScript.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameLogicScript.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\IO\ChunkReader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -168,25 +138,13 @@
     <ClInclude Include="Renderer\Renderer11.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\LanguageScript.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\configuration.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\groundfx.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\footprint.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Frustum.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\bubble.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\level.h">
@@ -639,16 +597,10 @@
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\phd_global.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\room.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RenderEnums.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\trmath.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\newtypes.h">
@@ -703,21 +655,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\chaffFX.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\smoke.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\spark.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\drip.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\explosion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\Utils.h">
@@ -918,9 +855,6 @@
     <ClInclude Include="Renderer\RendererSprites.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\prng.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -963,24 +897,6 @@
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\LuaHandler.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\AudioTracks.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptItemInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptColor.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptPosition.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptRotation.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\pickup\pickuputil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -999,7 +915,199 @@
     <ClInclude Include="Game\pickup\pickup_weapon.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\GameScriptCameraInfo.h">
+    <ClInclude Include="Game\memory\Vector.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\cog_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\jump_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\crowbar_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\fullblock_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\pulley_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\turn_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Switches\underwater_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\control\volume.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\control\trigger.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\bubble.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\chaffFX.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\debris.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\drip.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\explosion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\flmtorch.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\footprint.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\tomb4fx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\spark.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\smoke.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\effects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\sound.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\sound_effects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\sound_tracks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\hair.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\pickup\pickup.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\trmath.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\prng.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\phd_global.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\groundfx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\generic_doors.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\sequence_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\underwater_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\pushpull_kick_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\double_doors.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Generic\Doors\steel_door.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\door_data.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\item.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\roomvector.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\boat_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\creature_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\itemdata\itemdata.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Lara\lara_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\skidoo_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\biggun_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\kayak_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\minecart_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\quad_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\rubberboat_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\upv_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_wraith_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Vehicles\jeep_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Vehicles\motorbike_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LanguageScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaHandler.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\AudioTracks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptItemInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptColor.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptPosition.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptRotation.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+	  <ClInclude Include="Scripting\GameScriptCameraInfo.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\GameScriptMeshInfo.h">
@@ -1044,46 +1152,10 @@
     <ClInclude Include="Scripting\InventorySlots.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\memory\Vector.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Scripting\ItemEnumPair.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\ScriptUtil.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\cog_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\jump_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\generic_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\crowbar_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\fullblock_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\pulley_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\turn_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Generic\Switches\underwater_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\control\volume.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\control\trigger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\ReservedScriptNames.h">
@@ -1106,25 +1178,10 @@
     <ClCompile Include="Game\control.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\debris.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\door.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\draw.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\effect2.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\flmtorch.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameflow.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\hair.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\items.cpp">
@@ -1142,16 +1199,10 @@
     <ClCompile Include="Game\people.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\pickup.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\savegame.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\sound.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\sphere.cpp">
@@ -1164,9 +1215,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\text.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\tomb4fx.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\traps.cpp">
@@ -1184,12 +1232,6 @@
     <ClCompile Include="Game\inventory.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\GameFlowScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameLogicScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Renderer11.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1200,9 +1242,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\footprint.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer11Init.cpp">
@@ -1242,9 +1281,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Frustum.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\bubble.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\level.cpp">
@@ -1643,9 +1679,6 @@
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\trmath.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1694,21 +1727,6 @@
     <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\chaffFX.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\smoke.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\spark.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\drip.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\explosion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Utils.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1740,9 +1758,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\RenderView\RenderView.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\memory\malloc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\Lara\lara.cpp">
@@ -1862,9 +1877,6 @@
     <ClCompile Include="Renderer\RendererSprites.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\prng.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1872,9 +1884,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\lightning.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_hammerhead.cpp">
@@ -1898,21 +1907,6 @@
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\LuaHandler.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptColor.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptPosition.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptRotation.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\pickup\pickup_consumable.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1928,43 +1922,7 @@
     <ClCompile Include="Game\pickup\pickup_ammo.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptAIObject.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptLevel.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptMirror.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSettings.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\debug\debug.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\ScriptAssert.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Generic\Switches\cog_switch.cpp">
@@ -2001,6 +1959,135 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control\trigger.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\bubble.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\chaffFX.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\debris.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\drip.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\explosion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\flmtorch.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\footprint.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\lightning.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\tomb4fx.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\spark.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\smoke.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\effects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound\sound.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\hair.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\pickup\pickup.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\trmath.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\prng.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\sequence_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\underwater_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\pushpull_kick_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\double_doors.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Doors\steel_door.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\itemdata\itemdata.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameFlowScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameLogicScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaHandler.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptColor.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptPosition.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptRotation.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAIObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptLevel.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMirror.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSettings.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\ScriptAssert.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp">

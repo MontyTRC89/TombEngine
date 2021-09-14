@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_dragon.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "collide.h"
 #include "box.h"
@@ -11,8 +11,8 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
-
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -229,7 +229,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 		}
 	}
 
-	ItemPushLara(item, laraitem, coll, 1, 0);
+	ItemPushItem(item, laraitem, coll, 1, 0);
 }
 
 void DragonControl(short backNum)
@@ -478,7 +478,7 @@ void InitialiseBartoli(short itemNum)
 		InitialiseItem(back_item);
 		back->meshBits = 0x1FFFFF;
 
-		item->data = (void*)back_item;
+		item->data = back_item;
 
 		front = &g_Level.Items[front_item];
 		front->objectNumber = ID_DRAGON_FRONT;
@@ -492,7 +492,7 @@ void InitialiseBartoli(short itemNum)
 
 		InitialiseItem(front_item);
 
-		back->data = (void*)front_item;
+		back->data = front_item;
 
 		g_Level.NumItems += 2;
 	}

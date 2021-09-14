@@ -3,14 +3,14 @@
 #include "box.h"
 #include "items.h"
 #include "sphere.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "people.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
-
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
 #define STATE_TROOPS_STOP						1
@@ -141,12 +141,12 @@ void TroopsControl(short itemNumber)
 		{
 			// Search for active troops
 			creature->enemy = NULL;
-			CREATURE_INFO* baddy = &BaddieSlots[0];
+			CREATURE_INFO* baddy = ActiveCreatures[0];
 			int minDistance = 0x7FFFFFFF;
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddy = &BaddieSlots[i];
+				baddy = ActiveCreatures[i];
 
 				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 				{

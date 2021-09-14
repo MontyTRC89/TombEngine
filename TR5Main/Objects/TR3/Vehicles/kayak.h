@@ -1,21 +1,9 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+struct PHD_VECTOR;
+struct KAYAK_INFO;
 
-struct KAYAK_INFO
-{
-	int Vel;
-	int Rot;
-	int FallSpeedF;
-	int FallSpeedL;
-	int FallSpeedR;
-	int Water;
-	PHD_3DPOS OldPos;
-	char Turn;
-	char Forward;
-	char TrueWater;
-	char Flags;
-};
 
 void KayakDoWake(ITEM_INFO* v, short xoff, short zoff, short rotate);
 void KayakDoRipple(ITEM_INFO* v, short xoff, short zoff);

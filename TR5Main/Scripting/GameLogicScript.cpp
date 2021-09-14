@@ -6,16 +6,17 @@
 #include "lara.h"
 #include "savegame.h"
 #include "lot.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\tomb4fx.h"
+#include "effects\effects.h"
 #include "pickup.h"
 #include "newinv2.h"
 #include "ObjectIDs.h"
 #include "GameScriptDisplayString.h"
 #include "ReservedScriptNames.h"
+#include "camera.h"
 
 /***
 Functions and callbacks for level-specific logic scripts.

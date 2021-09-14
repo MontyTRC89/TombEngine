@@ -2,10 +2,9 @@
 #include "tr5_dart_emitter.h"
 #include "level.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
-#include "effect2.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void DartControl(short itemNumber)
 {

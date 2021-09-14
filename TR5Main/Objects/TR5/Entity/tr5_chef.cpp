@@ -3,15 +3,15 @@
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
-#include "debris.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\debris.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2

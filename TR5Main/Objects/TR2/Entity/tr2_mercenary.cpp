@@ -5,7 +5,8 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
+#include "creature_info.h"
 
 BITE_INFO mercUziBite = { 0, 150, 19, 17 };
 BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };

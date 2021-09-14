@@ -2,12 +2,12 @@
 #include "tr4_littlebeetle.h"
 #include "level.h"
 #include "control.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 #include "lara.h"
-
+#include "setup.h"
 namespace TEN::Entities::TR4
 {
-	SCARAB_INFO* Scarabs;
+	SCARAB_INFO Scarabs[NUM_LITTLE_BETTLES];
 	int NextScarab;
 
 	void InitialiseScarabs(short itemNumber)

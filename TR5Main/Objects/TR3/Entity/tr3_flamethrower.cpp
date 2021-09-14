@@ -2,7 +2,7 @@
 #include "tr3_flamethrower.h"
 #include "box.h"
 #include "sphere.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "items.h"
 #include "draw.h"
@@ -10,8 +10,8 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
-#include "effect2.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
@@ -257,11 +257,11 @@ void FlameThrowerControl(short itemNumber)
 			creature->enemy = NULL;
 
 			int minDistance = 0x7FFFFFFF;
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
 
-			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 

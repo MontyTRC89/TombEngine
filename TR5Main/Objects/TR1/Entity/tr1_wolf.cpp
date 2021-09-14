@@ -2,12 +2,13 @@
 #include "tr1_wolf.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "setup.h"
 #include "control.h"
 #include "level.h"
-
+#include "creature_info.h"
+#include "control.h"
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 
 enum wolfStates {

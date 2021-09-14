@@ -3,10 +3,10 @@
 #include "items.h"
 #include "level.h"
 #include "control.h"
-#include "effect2.h"
-#include "sound.h"
+#include "effects\effects.h"
+#include "Sound\sound.h"
 #include "sphere.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
 void PulseLightControl(short itemNumber)
 {

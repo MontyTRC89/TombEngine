@@ -6,7 +6,7 @@
 #include "input.h"
 #include "GameFlowScript.h"
 #include "configuration.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <CommCtrl.h>
 using namespace TEN::Renderer;
 using std::vector;

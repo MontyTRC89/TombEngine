@@ -3,21 +3,21 @@
 #include "lara.h"
 #include "items.h"
 #include "sphere.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "collide.h"
 #include "box.h"
 #include "lara_flare.h"
 #include "draw.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "misc.h"
 #include "camera.h"
 #include "setup.h"
-#include "bubble.h"
+#include "effects\bubble.h"
 #include "level.h"
 #include "input.h"
 #include "savegame.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "upv_info.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
@@ -831,11 +831,10 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 void SubInitialise(short itemNum)
 {
 	ITEM_INFO* v;
-	SUB_INFO* sub;
 
 	v = &g_Level.Items[itemNum];
-	sub = game_malloc<SUB_INFO>();
-	v->data = (void*)sub;
+	v->data = SUB_INFO();
+	SUB_INFO* sub = v->data;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
 	sub->WeaponTimer = 0;
@@ -850,7 +849,7 @@ void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
-	ItemPushLara(item, laraitem, coll, 0, 0);
+	ItemPushItem(item, laraitem, coll, 0, 0);
 }
 
 void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)

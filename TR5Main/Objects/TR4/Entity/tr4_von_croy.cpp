@@ -2,16 +2,16 @@
 #include "tr4_guide.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
 #include "sphere.h"
 #include "lot.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include <Game\draw.h>
+#include "creature_info.h"
 
 #define STATE_VON_CROY_STOP						1
 #define STATE_VON_CROY_WALK						2
@@ -157,11 +157,11 @@ void VonCroyControl(short itemNumber)
 	{
 		int minDistance = 0x7FFFFFFF;
 		int distance;
-		CREATURE_INFO* baddie = &BaddieSlots[0];
+		CREATURE_INFO* baddie = ActiveCreatures[0];
 
-		for (int i = 0; i < NUM_SLOTS; i++)
+		for (int i = 0; i < ActiveCreatures.size(); i++)
 		{
-			baddie = &BaddieSlots[i];
+			baddie = ActiveCreatures[i];
 
 			if (baddie->itemNum == NO_ITEM
 				|| baddie->itemNum == itemNumber

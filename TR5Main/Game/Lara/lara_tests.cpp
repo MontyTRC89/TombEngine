@@ -6,6 +6,7 @@
 #include "control.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
+#include "control.h"
 
 using namespace TEN::Floordata;
 
@@ -214,6 +215,11 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			return 1;
 		}
 	}
+}
+
+bool TestLaraStandUp(COLL_INFO* coll)
+{
+	return (coll->middle.Ceiling >= -362 || coll->boundsAbove < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
 }
 
 int TestWall(ITEM_INFO* item, int front, int right, int down)
@@ -1212,10 +1218,9 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
 
 	return 0;
 }
-
-void GetTighRopeFallOff(int regularity)
-{
-	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
+#ifndef NEW_TIGHTROPE
+void GetTighRopeFallOff(int regularity) {
+	if(LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 	{
 		LaraItem->goalAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
 		LaraItem->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
@@ -1223,9 +1228,12 @@ void GetTighRopeFallOff(int regularity)
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 
-	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
+	if(!Lara.tightRopeFall && !(GetRandomControl() & regularity))
 		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
 }
+#endif // !NEW_TIGHTROPE
+
+
 
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 {

@@ -4,10 +4,12 @@
 #include "lara.h"
 #include "box.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "control.h"
 #include "level.h"
+#include "creature_info.h"
+#include "control.h"
 
 enum MUMMY_STATES {
 	STATE_MUMMY_ARMS_CROSSED = 0,

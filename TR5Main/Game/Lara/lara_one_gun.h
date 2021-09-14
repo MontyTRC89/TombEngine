@@ -1,7 +1,7 @@
 #pragma once
-#include "items.h"
-#include "trmath.h"
+#include "Specific\trmath.h"
 
+struct ITEM_INFO;
 enum GRENADE_TYPE
 {
 	GRENADE_NORMAL,
