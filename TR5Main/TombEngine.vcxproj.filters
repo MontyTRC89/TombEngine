@@ -117,12 +117,6 @@
     <ClInclude Include="Game\inventory.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\GameFlowScript.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameLogicScript.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\IO\ChunkReader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -142,9 +136,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\Renderer11.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\LanguageScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\configuration.h">
@@ -906,24 +897,6 @@
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\LuaHandler.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\AudioTracks.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptItemInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptColor.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptPosition.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptRotation.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\pickup\pickuputil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -942,58 +915,7 @@
     <ClInclude Include="Game\pickup\pickup_weapon.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\GameScriptCameraInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptMeshInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptNamedBase.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptSinkInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\ObjectIDs.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptAIObject.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptLevel.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptSkyLayer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptMirror.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptInventoryObject.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptSettings.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\GameScriptAudioTrack.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\ScriptAssert.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\InventorySlots.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\memory\Vector.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\ItemEnumPair.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripting\ScriptUtil.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Generic\Switches\cog_switch.h">
@@ -1164,6 +1086,84 @@
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\LanguageScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaHandler.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\AudioTracks.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptItemInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptColor.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptPosition.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptRotation.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+	  <ClInclude Include="Scripting\GameScriptCameraInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptMeshInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptNamedBase.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptSinkInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ObjectIDs.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptAIObject.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptLevel.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptSkyLayer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptMirror.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptInventoryObject.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptSettings.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptAudioTrack.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ScriptAssert.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\InventorySlots.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ItemEnumPair.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ScriptUtil.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ReservedScriptNames.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScriptDisplayString.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1230,12 +1230,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\inventory.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameFlowScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameLogicScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer11.cpp">
@@ -1913,21 +1907,6 @@
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\LuaHandler.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptColor.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptPosition.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptRotation.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\pickup\pickup_consumable.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1943,43 +1922,7 @@
     <ClCompile Include="Game\pickup\pickup_ammo.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptAIObject.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptLevel.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptMirror.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptSettings.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\debug\debug.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripting\ScriptAssert.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Generic\Switches\cog_switch.cpp">
@@ -2088,6 +2031,66 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\itemdata\itemdata.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameFlowScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameLogicScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaHandler.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptColor.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptPosition.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptRotation.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAIObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptLevel.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMirror.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSettings.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\ScriptAssert.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptDisplayString.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

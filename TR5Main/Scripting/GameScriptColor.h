@@ -1,6 +1,7 @@
 #pragma once
-
 #include "framework.h"
+
+typedef DWORD D3DCOLOR;
 
 namespace sol {
 	class state;
@@ -18,9 +19,11 @@ public:
 	GameScriptColor(byte r, byte g, byte b, byte a);
 	GameScriptColor(Vector3 const &);
 	GameScriptColor(Vector4 const &);
+	GameScriptColor(D3DCOLOR);
 
 	operator Vector3() const;
 	operator Vector4() const;
+	operator D3DCOLOR() const;
 
 	byte								GetR() const;
 	void								SetR(byte v);
