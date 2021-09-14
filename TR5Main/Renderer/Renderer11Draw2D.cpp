@@ -114,6 +114,16 @@ namespace TEN::Renderer {
 		m_lines2DToDraw.push_back(line);
 	}
 
+	void Renderer11::addQuad2D(RECT rect, byte r, byte g, byte b, byte a) 
+	{
+		RendererRect2D* quad = &m_rects2DBuffer[m_nextRect2D++];
+
+		quad->Rectangle = rect;
+		quad->Color = Vector4(r, g, b, a);
+
+		m_rects2DToDraw.push_back(quad);
+	}
+
 	void Renderer11::drawOverlays(RenderView& view)
 	{
 		if (CurrentLevel == 0)
@@ -180,31 +190,4 @@ namespace TEN::Renderer {
 			// TODO: Vignette goes here! -- Lwmte, 21.08.21
 		}
 	}
-
-	void Renderer11::drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color) {
-		float factorW = ScreenWidth / 800.0f;
-		float factorH = ScreenHeight / 600.0f;
-
-		RECT rect;
-		rect.top = y * factorH;
-		rect.left = x * factorW;
-		rect.bottom = (y + h) * factorH;
-		rect.right = (x + w) * factorW;
-
-		m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->AlphaBlend(), NULL, m_states->DepthRead());
-		m_spriteBatch->Draw(m_whiteTexture.ShaderResourceView.Get(), rect, color);
-		m_spriteBatch->End();
-
-		int shiftW = 4 * factorW;
-		int shiftH = 4 * factorH;
-
-		addLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, 128, 128, 128, 128);
-		addLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
-		addLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
-		addLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
-
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-	}
-
 }
