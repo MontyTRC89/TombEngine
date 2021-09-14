@@ -15,6 +15,7 @@ enum GAME_OBJECT_ID : short;
 class GameScriptItemInfo : public GameScriptNamedBase<GameScriptItemInfo, short>
 {
 public:
+	using IdentifierType = short;
 	GameScriptItemInfo(short num, bool temporary);
 	~GameScriptItemInfo();
 	GameScriptItemInfo& operator=(GameScriptItemInfo const& other) = delete;

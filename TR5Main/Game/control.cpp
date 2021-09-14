@@ -143,6 +143,11 @@ extern Inventory g_Inventory;
 extern int SplashCount;
 extern short FXType;
 
+// This might not be the exact amount of time that has passed, but giving it a
+// value of 1/30 keeps it in lock-step with the rest of the game logic,
+// which assumes 30 iterations per second.
+static constexpr float deltaTime = 1.0f / 30.0f;
+
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
@@ -158,15 +163,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	g_GameScript->ProcessDisplayStrings(deltaTime);
+	
 	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
 		GlobalCounter++;
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(1.0f/30.0f);
+		g_GameScript->OnControlPhase(deltaTime);
 		UpdateSky();
 
 		// Poll the keyboard and update input variables
@@ -613,6 +617,11 @@ GAME_STATUS DoTitle(int index)
 		{
 			g_GameScript->ExecuteScript(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
+			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+			{
+				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+			});
+
 		}
 		RequiredStartPos = false;
 		if (InitialiseGame)
@@ -642,6 +651,8 @@ GAME_STATUS DoTitle(int index)
 
 		// Initialise ponytails
 		InitialiseHair();
+
+		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
 #ifdef NEW_INV
@@ -681,6 +692,8 @@ GAME_STATUS DoTitle(int index)
 	UseSpotCam = false;
 	S_CDStop();
 
+	g_GameScript->OnEnd();
+	g_GameScript->FreeLevelScripts();
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
@@ -725,6 +738,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	{
 		g_GameScript->ExecuteScript(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
+		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		{
+			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+		});
 	}
 
 	// Restore the game?

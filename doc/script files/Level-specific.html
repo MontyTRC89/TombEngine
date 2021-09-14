@@ -71,6 +71,7 @@
 <h2>Misc classes</h2>
 <ul class="nowrap">
   <li><a href="../misc classes/Color.html">Color</a></li>
+  <li><a href="../misc classes/DisplayString.html">DisplayString</a></li>
   <li><a href="../misc classes/Position.html">Position</a></li>
   <li><a href="../misc classes/Rotation.html">Rotation</a></li>
 </ul>
@@ -145,6 +146,22 @@
 	<tr>
 	<td class="name" ><a href="#CalculateHorizontalDistance">CalculateHorizontalDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the horizontal distance between two positions.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ShowString">ShowString(str, time)</a></td>
+	<td class="summary">Show some text on-screen.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#HideString">HideString(str)</a></td>
+	<td class="summary">Hide some on-screen text.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#PercentToScreen">PercentToScreen(x, y)</a></td>
+	<td class="summary">Translate a pair of percentages to screen-space pixel coordinates.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ScreenToPercent">ScreenToPercent(x, y)</a></td>
+	<td class="summary">Translate a pair of coordinates to percentages of window dimensions.</td>
 	</tr>
 </table>
 <h2><a href="#Special_objects">Special objects </a></h2>
@@ -541,6 +558,126 @@ or is destroyed in some other way.
 
 
 </dd>
+    <dt>
+    <a name = "ShowString"></a>
+    <strong>ShowString(str, time)</strong>
+    </dt>
+    <dd>
+    Show some text on-screen.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><span class="type">DisplayString</span></span>
+         the string object to draw
+        </li>
+        <li><span class="parameter">time</span>
+            <span class="types"><span class="type">float</span></span>
+         the time in seconds for which to show the string.
+If not given, the string will have an "infinite" life, and will show
+until <a href="../script files/Level-specific.html#HideString">HideString</a> is called or until the level is finished.
+Default: nil (i.e. infinite)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "HideString"></a>
+    <strong>HideString(str)</strong>
+    </dt>
+    <dd>
+    Hide some on-screen text.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><span class="type">DisplayString</span></span>
+         the string object to hide. Must previously have been shown
+with a call to <a href="../script files/Level-specific.html#ShowString">ShowString</a>, or this function will have no effect.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PercentToScreen"></a>
+    <strong>PercentToScreen(x, y)</strong>
+    </dt>
+    <dd>
+    Translate a pair of percentages to screen-space pixel coordinates.
+To be used with <a href="../misc classes/DisplayString.html#DisplayString:SetPos">DisplayString:SetPos</a> and <a href="../misc classes/DisplayString.html#DisplayString.new">DisplayString.new</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+            <span class="types"><span class="type">float</span></span>
+         percent value to translate to x-coordinate
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">float</span></span>
+         percent value to translate to y-coordinate
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        x x coordinate in pixels</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        y y coordinate in pixels</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ScreenToPercent"></a>
+    <strong>ScreenToPercent(x, y)</strong>
+    </dt>
+    <dd>
+    Translate a pair of coordinates to percentages of window dimensions.
+To be used with <a href="../misc classes/DisplayString.html#DisplayString:GetPos">DisplayString:GetPos</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+            <span class="types"><span class="type">int</span></span>
+         pixel value to translate to a percentage of the window width
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">int</span></span>
+         pixel value to translate to a percentage of the window height
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        x coordinate as percentage</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        y coordinate as percentage</li>
+    </ol>
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Special_objects"></a>Special objects </h2>
 
@@ -687,7 +824,7 @@ and provides the delta time (a float representing game time since last call) via
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-23 20:14:37 </i>
+<i style="float:right;">Last updated 2021-08-30 18:45:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
