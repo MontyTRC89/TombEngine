@@ -7,6 +7,26 @@
 
 using namespace TEN::Floordata;
 
+int FLOOR_INFO::RoomBelow() const
+{
+	if (FloorCollision.Portals[0] != NO_ROOM)
+		return FloorCollision.Portals[0];
+	else if (FloorCollision.Portals[1] != NO_ROOM)
+		return FloorCollision.Portals[1];
+	else
+		return NO_ROOM;
+}
+
+int FLOOR_INFO::RoomAbove() const
+{
+	if (CeilingCollision.Portals[0] != NO_ROOM)
+		return CeilingCollision.Portals[0];
+	else if (CeilingCollision.Portals[1] != NO_ROOM)
+		return CeilingCollision.Portals[1];
+	else
+		return NO_ROOM;
+}
+
 int FLOOR_INFO::SectorPlane(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
@@ -39,27 +59,23 @@ std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
 bool FLOOR_INFO::FloorIsSplit() const
 {
 	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
-	bool differentPortals = FloorCollision.Portals[0] != FloorCollision.Portals[1];
-
-	return differentPlanes || differentPortals;
+	return differentPlanes || FloorHasSplitPortal();
 }
 
 bool FLOOR_INFO::CeilingIsSplit() const
 {
 	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
-	bool differentPortals = CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
-
-	return differentPlanes || differentPortals;
+	return differentPlanes || CeilingHasSplitPortal();
 }
 
-bool FLOOR_INFO::FloorIsDiagonalStep() const
+bool FLOOR_INFO::FloorHasSplitPortal() const
 {
-	return FloorCollision.Planes[0].z != FloorCollision.Planes[1].z;
+	return FloorCollision.Portals[0] != FloorCollision.Portals[1];
 }
 
-bool FLOOR_INFO::CeilingIsDiagonalStep() const
+bool FLOOR_INFO::CeilingHasSplitPortal() const
 {
-	return CeilingCollision.Planes[0].z != CeilingCollision.Planes[1].z;
+	return CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
 }
 
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const

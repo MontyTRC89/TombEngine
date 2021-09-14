@@ -603,7 +603,7 @@ void RomanStatueControl(short itemNumber)
 				floor = XZ_GET_SECTOR(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
-				if (floor->stopper)
+				if (floor->Stopper)
 				{
 					for (i = 0; i < room->mesh.size(); i++)
 					{
@@ -617,7 +617,7 @@ void RomanStatueControl(short itemNumber)
 								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 
 								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-								floor->stopper = false;
+								floor->Stopper = false;
 
 								TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
 							}

@@ -125,7 +125,7 @@ int LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameItem(item->luaName, i);
+			g_GameScript->AddName(item->luaName, i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -140,12 +140,12 @@ int LoadItems()
 		{
 			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
 			 
-			if (floor->box == NO_BOX)
+			if (floor->Box == NO_BOX)
 				continue;
 
-			if (!(g_Level.Boxes[floor->box].flags & BLOCKED))
+			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int fl = floor->floor * 4;
+				int fl = floor->AverageFloor * 4;
 				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
 				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
 				{
@@ -154,7 +154,7 @@ int LoadItems()
 						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
 						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
 					{
-						floor->stopper = true;
+						floor->Stopper = true;
 					}
 				}
 			}
@@ -384,7 +384,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddLuaNameCamera(camera.luaName, camera);
+		g_GameScript->AddName(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -410,7 +410,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSink(sink.luaName, sink);
+		g_GameScript->AddName(sink.luaName, sink);
 	}
 }
 
@@ -643,14 +643,12 @@ void ReadRooms()
 		{
 			FLOOR_INFO floor;
 
-			floor.index = ReadInt32();
-			floor.box = ReadInt32();
-			floor.fx = ReadInt32();
-			floor.stopper = ReadInt32();
-			floor.pitRoom = ReadInt32();
-			floor.floor = ReadInt32();
-			floor.skyRoom = ReadInt32();
-			floor.ceiling = ReadInt32();
+			floor.TriggerIndex = ReadInt32();
+			floor.Box = ReadInt32();
+			floor.Material = ReadInt32();
+			floor.Stopper = ReadInt32();
+			floor.AverageFloor = ReadInt32();
+			floor.AverageCeiling = ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
 			floor.FloorCollision.Portals[0] = ReadInt32();
@@ -740,7 +738,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameMesh(mesh.luaName, mesh);
+			g_GameScript->AddName(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -881,7 +879,7 @@ void LoadSoundEffects()
 		ReadBytes(buffer, numBytes);
 		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSoundSource(source.luaName, source);
+		g_GameScript->AddName(source.luaName, source);
 	}
 }
 
@@ -955,7 +953,7 @@ void LoadAIObjects()
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameAIObject(obj.luaName, obj);
+		g_GameScript->AddName(obj.luaName, obj);
 	}
 }
 

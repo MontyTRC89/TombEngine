@@ -28,6 +28,20 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
+enum SPLIT_COLL
+{
+	SPLIT_NONE,
+	SPLIT_SOLID,
+	SPLIT_PORTAL
+};
+
+enum SPLAT_COLL
+{
+	SPLAT_NONE,
+	SPLAT_WALL,
+	SPLAT_STEP
+};
+
 enum HEIGHT_TYPE
 {
 	WALL,
@@ -41,8 +55,6 @@ struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
-	int SplitFloor;
-	int SplitCeiling;
 	HEIGHT_TYPE Type;
 };
 
@@ -63,7 +75,7 @@ struct COLL_SETUP
 {
 	bool SlopesAreWalls;    // Treat steep slopes as walls
 	bool SlopesArePits;     // Treat steep slopes as pits
-	bool DeathIsPit;        // Treat death sectors as pits
+	bool DeathFlagIsPit;        // Treat death sectors as pits
 	bool EnableObjectPush;  // Can be pushed by objects
 	bool EnableSpaz;        // Push is treated as hurt
 						    
@@ -112,26 +124,28 @@ struct OBJECT_COLLISION_BOUNDS
 };
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
-int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
+bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateLaraRoom(ITEM_INFO* item, int height);
+SPLIT_COLL CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
+SPLIT_COLL CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
 int FindGridShift(int x, int z); 
-int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
-int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush);
-int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
+bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush);
+bool ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
-int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
-int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
-int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
-int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
+bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
+bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
+bool MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
+bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight);
@@ -145,7 +159,6 @@ bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
-Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);

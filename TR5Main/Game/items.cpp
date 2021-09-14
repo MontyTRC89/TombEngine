@@ -407,8 +407,8 @@ void InitialiseItem(short itemNum)
 	r->itemNumber = itemNum;
 
 	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	item->floor = floor->floor * 256;
-	item->boxNumber = floor->box;
+	item->floor = floor->AverageFloor * 256;
+	item->boxNumber = floor->Box;
 
 	if (Objects[item->objectNumber].initialise != NULL)
 	{

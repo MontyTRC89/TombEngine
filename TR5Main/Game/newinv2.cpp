@@ -2375,6 +2375,8 @@ int convert_obj_to_invobj(short obj)
 		if (inventry_objects_list[i].object_number == obj)
 			return i;
 	}
+
+	return -1;
 }
 
 int convert_invobj_to_obj(int obj)
