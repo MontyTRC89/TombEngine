@@ -597,6 +597,9 @@ GAME_STATUS DoTitle(int index)
 	//DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 
+	// Reset all the globals for the game which needs this
+	ResetGlobals();
+
 	// Load the level
 	S_LoadLevelFile(index);
 
@@ -719,11 +722,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		Savegame.Level.Kills = 0;
 	}
 
-	// Load the level
-	S_LoadLevelFile(index);
-
 	// Reset all the globals for the game which needs this
 	ResetGlobals();
+
+	// Load the level
+	S_LoadLevelFile(index);
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
@@ -2311,5 +2314,8 @@ void ResetGlobals()
 	// Needs to be cleared because otherwise a list of active creatures from previous level
 	// will spill into new level
 	ActiveCreatures.clear();
+
+	// Clear spotcam array
+	ClearSpotCamSequences();
 }
 
