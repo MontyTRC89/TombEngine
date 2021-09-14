@@ -107,13 +107,13 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BO
 	tbounds->Z2 = bMax.z;
 }
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS* pos, BOUNDING_BOX* box)
+BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
 	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos->yRot), TO_RAD(pos->xRot), TO_RAD(pos->zRot));
+	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.yRot), TO_RAD(pos.xRot), TO_RAD(pos.zRot));
 
 	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos->xPos, pos->yPos, pos->zPos));
+	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.xPos, pos.yPos, pos.zPos));
 	return result;
 }

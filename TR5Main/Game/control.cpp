@@ -862,7 +862,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->AverageCeiling << 8);
+				return (floor->CeilingHeight(x, z));
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
@@ -873,7 +873,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 		{
 			room = &g_Level.Rooms[floor->RoomBelow()];
 			if (room->flags & ENV_FLAG_WATER)
-				return (floor->AverageFloor << 8);
+				return (floor->FloorHeight(x, z));
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
@@ -1610,7 +1610,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS 
 	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
 
 	// Create the bounding box for raw collision detection
-	auto obox = TO_DX_BBOX(itemOrStaticPos, box);
+	auto obox = TO_DX_BBOX(*itemOrStaticPos, box);
 
 	// Get the collision with the bounding box
 	float distance;

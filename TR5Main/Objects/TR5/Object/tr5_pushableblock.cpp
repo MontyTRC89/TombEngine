@@ -428,6 +428,9 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (!CheckStackLimit(item))
 			return;
 
+		if (!TestBlockMovable(item, blockHeight))
+			return;
+
 		if (TrInput & IN_FORWARD)
 		{
 			if (!TestBlockPush(item, blockHeight, quadrant) || pushable->disablePush)
@@ -543,20 +546,21 @@ void PushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
 	}
 }
 
-int TestBlockMovable(ITEM_INFO* item, int blokhite)
+bool TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (floor->AverageFloor == NO_HEIGHT / 256)
-		return 1;
 
-	if (floor->AverageFloor * 256 != item->pos.yPos - blokhite)
-		return 0;
+	if (floor->IsWall(floor->SectorPlane(item->pos.xPos, item->pos.zPos)))
+		return false;
 
-	return 1;
+	if (floor->FloorHeight(item->pos.xPos, item->pos.zPos) != item->pos.yPos)
+		return false;
+
+	return true;
 }
 
-int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
+bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 {
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
@@ -585,26 +589,26 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 
 	ROOM_INFO* r = &g_Level.Rooms[collResult.RoomNumber];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
-		return 0;
+		return false;
 
 	if (collResult.Position.Type)
-		return 0;
+		return false;
 
 	if (((PUSHABLE_INFO*)item->data)->canFall)
 	{
 		if (collResult.Position.Floor < y)
-			return 0;
+			return false;
 	}
 	else
 	{
 		if (collResult.Position.Floor != y)
-			return 0;
+			return false;
 	}
 
 	int ceiling = y - blockhite + 100;
 
 	if (GetCollisionResult(x, ceiling, z, item->roomNumber).Position.Ceiling > ceiling)
-		return 0;
+		return false;
 
 	int oldX = item->pos.xPos;
 	int oldZ = item->pos.zPos;
@@ -618,7 +622,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	while (CollidedItems[i] != NULL)
 	{
 		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
-			return 0;
+			return false;
 		else
 		{
 			const auto& object = Objects[CollidedItems[i]->objectNumber];
@@ -630,16 +634,16 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 
 			// check if floor function returns nullopt
 			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
-				return 0;
+				return false;
 		}
 
 		i++;
 	}
 
-	return 1;
+	return true;
 }
 
-int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
+bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 {
 	int xadd = 0;
 	int zadd = 0;
@@ -670,12 +674,12 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	short roomNum = item->roomNumber;
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
-		return 0;
+		return false;
 
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
 
 	if (collResult.Position.Floor != y)
-		return 0;
+		return false;
 
 	if (collResult.Position.Type)
 		return 0;
@@ -683,7 +687,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int ceiling = y - blockhite + 100;
 
 	if (GetCollisionResult(x, ceiling, z, item->roomNumber).Position.Ceiling > ceiling)
-		return 0;
+		return false;
 
 	int oldX = item->pos.xPos;
 	int oldZ = item->pos.zPos;
@@ -697,7 +701,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	while (CollidedItems[i] != NULL)
 	{
 		if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
-			return 0;
+			return false;
 		else
 		{
 			const auto& object = Objects[CollidedItems[i]->objectNumber];
@@ -708,7 +712,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 			int zCol = CollidedItems[i]->pos.zPos;
 
 			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
-				return 0;
+				return false;
 		}
 
 		i++;
@@ -740,13 +744,13 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
-		return 0;
+		return false;
 
 	if (collResult.Position.Floor != y)
-		return 0;
+		return false;
 
-	if (collResult.Block->AverageCeiling * 256 > y - LARA_HEIGHT)
-		return 0;
+	if (collResult.Block->CeilingHeight(x, z) > y - LARA_HEIGHT)
+		return false;
 
 	oldX = LaraItem->pos.xPos;
 	oldZ = LaraItem->pos.zPos;
@@ -762,7 +766,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 		if (CollidedItems[i] != item) // if collided item is not pushblock in which lara embedded
 		{
 			if (Objects[CollidedItems[i]->objectNumber].floor == NULL)
-				return 0;
+				return false;
 			else
 			{
 				const auto& object = Objects[CollidedItems[i]->objectNumber];
@@ -772,14 +776,14 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 				int zCol = CollidedItems[i]->pos.zPos;
 
 				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
-					return 0;
+					return false;
 			}
 		}
 
 		i++;
 	}
 
-	return 1;
+	return true;
 }
 
 void MoveStackXZ(short itemNum)
