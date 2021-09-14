@@ -145,7 +145,7 @@ int LoadItems()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int fl = floor->AverageFloor * 4;
+				int fl = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
 				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
 				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
 				{

@@ -91,21 +91,21 @@ namespace TEN::Control::Volumes
 		auto box = BOUNDING_BOX();
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
-		auto bbox = TO_DX_BBOX(&pos, &box);
+		auto bbox = TO_DX_BBOX(pos, &box);
 		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
-		auto bbox = TO_DX_BBOX(&mesh->pos, &sinfo->collisionBox);
+		auto bbox = TO_DX_BBOX(mesh->pos, &sinfo->collisionBox);
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS);
 	}
 
 	void TestVolumes(ITEM_INFO* item)
 	{
-		auto bbox = TO_DX_BBOX(&item->pos, GetBoundsAccurate(item));
+		auto bbox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
 		g_Renderer.addDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);

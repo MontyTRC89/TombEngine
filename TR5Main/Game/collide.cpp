@@ -216,11 +216,11 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	bool result = false;
 
 	// Get DX static bounds in global coords
-	auto staticBounds = TO_DX_BBOX(&pos, &box);
+	auto staticBounds = TO_DX_BBOX(pos, &box);
 
 	// Get local TR bounds and DX item bounds in global coords
 	auto itemBBox = GetBoundsAccurate(item);
-	auto itemBounds = TO_DX_BBOX(&item->pos, itemBBox);
+	auto itemBounds = TO_DX_BBOX(item->pos, itemBBox);
 
 	// Extend bounds a bit for visual testing
 	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE);
@@ -245,7 +245,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	collBox.Y2 = itemBBox->Y2;
 
 	// Get and test DX item coll bounds
-	auto collBounds = TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox);
+	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds
@@ -336,7 +336,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 		return false;
 
 	// Check if bounds still collide after top/bottom position correction
-	if (!staticBounds.Intersects(TO_DX_BBOX(&PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox)))
+	if (!staticBounds.Intersects(TO_DX_BBOX(PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox)))
 		return result;
 
 	// Determine identity rotation/distance
@@ -1292,7 +1292,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	}
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
-	if ((y + CLICK(2)) < (floor->AverageFloor * CLICK(1)))
+	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
 		result.TiltZ = result.TiltX = 0;
 
 	return result;
