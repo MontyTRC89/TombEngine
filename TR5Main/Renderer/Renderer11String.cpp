@@ -58,7 +58,6 @@ namespace TEN::Renderer {
 		}
 
 		m_strings.push_back(str);
-
 	}
 
 	void Renderer11::drawAllStrings()

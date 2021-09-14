@@ -288,6 +288,12 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector2 Vertices[2];
 		DirectX::SimpleMath::Vector4 Color;
 	};
+
+	struct RendererRect2D
+	{
+		RECT Rectangle;
+		DirectX::SimpleMath::Vector4 Color;
+	};
 	
 	class Renderer11
 	{
@@ -407,12 +413,15 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> m_dynamicLights;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
+		std::vector<RendererRect2D*> m_rects2DToDraw;
 		std::vector<RendererBucket*> m_bucketsToDraw;
 		int m_nextSprite;
 		RendererLine3D* m_lines3DBuffer;
 		int m_nextLine3D;
 		RendererLine2D* m_lines2DBuffer;
 		int m_nextLine2D;
+		RendererRect2D* m_rects2DBuffer;
+		int m_nextRect2D;
 		RendererLight* m_shadowLight;
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
@@ -512,7 +521,8 @@ namespace TEN::Renderer
 		void drawSplahes(RenderView& view);
 		void drawSprites(RenderView& view);
 		void drawLines3D(RenderView& view);
-		void drawLines2D(RenderView& view);
+		void drawLines2D();
+		void drawRects2D();
 		void drawOverlays(RenderView& view);
 		void drawRopes(RenderView& view);
 		void drawBats(RenderView& view);
@@ -597,6 +607,7 @@ namespace TEN::Renderer
 		std::vector<RendererVideoAdapter>* getAdapters();
 		void renderTitleImage();
 		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
+		void addQuad2D(RECT rect, byte r, byte g, byte b, byte a);
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		void addBox(Vector3 min, Vector3 max, Vector4 color); 
 		void addBox(Vector3* corners, Vector4 color);

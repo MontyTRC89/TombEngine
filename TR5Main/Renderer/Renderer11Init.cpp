@@ -122,6 +122,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
+	m_rects2DBuffer = (RendererRect2D*)malloc(sizeof(RendererRect2D) * MAX_RECTS_2D);
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
