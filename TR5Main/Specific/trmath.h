@@ -38,7 +38,7 @@ short FROM_RAD(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle); 
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS* pos, BOUNDING_BOX* box);
+BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 
 float phd_sin(short a);
 float phd_cos(short a);

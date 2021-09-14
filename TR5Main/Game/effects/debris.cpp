@@ -137,13 +137,13 @@ void UpdateDebris()
 			roomNumber = deb.roomNumber;
 			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z, &roomNumber);
 
-			if (deb.worldPosition.y < floor->AverageCeiling * 256)
+			if (deb.worldPosition.y < floor->CeilingHeight(deb.worldPosition.x, deb.worldPosition.z))
 			{
 				if (floor->RoomAbove() != NO_ROOM)
 					deb.roomNumber = floor->RoomAbove();
 			}
 
-			if (deb.worldPosition.y > floor->AverageFloor * 256)
+			if (deb.worldPosition.y > floor->FloorHeight(deb.worldPosition.x, deb.worldPosition.z))
 			{
 				if (floor->RoomBelow() != NO_ROOM)
 					deb.roomNumber = floor->RoomBelow();
