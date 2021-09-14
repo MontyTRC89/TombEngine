@@ -46,12 +46,18 @@ int LastSpotCam;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
-SPOTCAM SpotCam[64];
+SPOTCAM SpotCam[MAX_SPOTCAMS];
 int NumberSpotcams;
 int CheckTrigger = 0;
 int UseSpotCam = 0;
 int SpotcamDontDrawLara;
 int SpotcamOverlay;
+
+void ClearSpotCamSequences()
+{
+	for (int i = 0; i < MAX_SPOTCAMS; i++)
+		SpotCam[i] = {};
+}
 
 void InitSpotCamSequences() 
 {
