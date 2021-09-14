@@ -60,6 +60,7 @@ namespace TEN::Renderer
 	void Renderer11::clearSceneItems() {
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
+		m_rects2DToDraw.clear();
 		gameCamera.clear();
 	}
 

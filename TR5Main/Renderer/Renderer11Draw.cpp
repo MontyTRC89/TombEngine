@@ -988,6 +988,8 @@ namespace TEN::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
             break;
         }
+		drawLines2D();
+		drawRects2D();
         drawAllStrings();
     }
 
@@ -1115,9 +1117,11 @@ namespace TEN::Renderer
         rect.bottom = ScreenHeight;
 
         m_lines2DToDraw.clear();
+		m_rects2DToDraw.clear();
         m_strings.clear();
 
         m_nextLine2D = 0;
+		m_nextRect2D = 0;
 
         // Set basic render states
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
@@ -1221,19 +1225,13 @@ namespace TEN::Renderer
 
         if (GLOBAL_invMode == IM_PAUSE)
         {
-            bool drawThing;
             if (pause_menu_to_display == pause_main_menu || pause_menu_to_display == pause_options_menu)
-                drawThing = 1;
-            else
-                drawThing = 0;
-
-            if (drawThing)
             {
-                guiRect.left = 345;
-                guiRect.right = 115;
+                guiRect.left  = pause_menu_to_display == pause_main_menu ? 335 : 295;
+                guiRect.right = pause_menu_to_display == pause_main_menu ? 135 : 215;
                 guiRect.top = 265;
                 guiRect.bottom = 100;
-                drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
+                addQuad2D(guiRect, 0, 0, 64, 180);
             }
 
             renderPauseMenu();
@@ -2078,8 +2076,8 @@ namespace TEN::Renderer
 
     }
 
-    void Renderer11::drawLines2D(RenderView& view)
-{
+    void Renderer11::drawLines2D()
+	{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -2129,8 +2127,55 @@ namespace TEN::Renderer
         m_context->RSSetState(m_states->CullCounterClockwise());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
     }
+	
+	void Renderer11::drawRects2D()
+	{
+		m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
+
+		m_context->RSSetState(m_states->CullNone());
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+		float factorW = ScreenWidth / 800.0f;
+		float factorH = ScreenHeight / 600.0f;
+		int shiftW = 4 * factorW;
+		int shiftH = 4 * factorH;
+
+		m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->AlphaBlend(), NULL, m_states->DepthRead());
+
+		for (int i = 0; i < m_rects2DToDraw.size(); i++)
+		{
+			auto rawRect = m_rects2DToDraw[i]->Rectangle;
+			auto color = m_rects2DToDraw[i]->Color / 255.0f;
+
+			RECT rect;
+			rect.top = rawRect.top * factorH;
+			rect.left = rawRect.left * factorW;
+			rect.bottom = (rawRect.top + rawRect.bottom) * factorH;
+			rect.right = (rawRect.left + rawRect.right) * factorW;
+
+
+			m_spriteBatch->Draw(m_whiteTexture.ShaderResourceView.Get(), rect, color);
+
+			auto r = m_rects2DToDraw[i]->Color.x * 0.5f;
+			auto g = m_rects2DToDraw[i]->Color.y * 0.5f;
+			auto b = m_rects2DToDraw[i]->Color.z * 0.5f;
+			auto a = m_rects2DToDraw[i]->Color.w;
+
+			addLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, r, g, b, a);
+			addLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, r, g, b, a);
+			addLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, r, g, b, a);
+			addLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, r, g, b, a);
+		}
+
+		m_spriteBatch->End();
+
+		m_context->RSSetState(m_states->CullCounterClockwise());
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+	}
 
     void Renderer11::drawSpiders(RenderView& view)
 {
@@ -2770,6 +2815,7 @@ namespace TEN::Renderer
 		m_nextSprite = 0;
 		m_nextLine3D = 0;
 		m_nextLine2D = 0;
+		m_nextRect2D = 0;
 
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
@@ -2874,7 +2920,8 @@ namespace TEN::Renderer
         drawRopes(view);
         drawSprites(view);
         drawLines3D(view);
-		drawLines2D(view);
+		drawRects2D();
+		drawLines2D();
 
         // Bars
         int flash = FlashIt();
