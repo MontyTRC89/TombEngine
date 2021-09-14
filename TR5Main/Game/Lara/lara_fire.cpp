@@ -254,8 +254,8 @@ short HoldStates[] = {
 
 extern GameFlow* g_GameFlow;
 bool MonksAttackLara;
-ITEM_INFO* LastTargets[8];
-ITEM_INFO* TargetList[8];
+ITEM_INFO* LastTargets[MAX_TARGETS];
+ITEM_INFO* TargetList[MAX_TARGETS];
 
 GAME_OBJECT_ID WeaponObject(int weaponType)
 {
@@ -1052,7 +1052,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	}
 	else
 	{
-		for (slot = 0; slot < 8; ++slot)
+		for (slot = 0; slot < MAX_TARGETS; ++slot)
 		{
 			if (!TargetList[slot])
 				Lara.target = NULL;
@@ -1070,10 +1070,10 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 			{
 				Lara.target = NULL;
 				flag = true;
-				for (match = 0; match < 8 && TargetList[match]; ++match)
+				for (match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
 				{
 					loop = false;
-					for (slot = 0; slot < 8 && LastTargets[slot]; ++slot)
+					for (slot = 0; slot < MAX_TARGETS && LastTargets[slot]; ++slot)
 					{
 						if (LastTargets[slot] == TargetList[match])
 						{
