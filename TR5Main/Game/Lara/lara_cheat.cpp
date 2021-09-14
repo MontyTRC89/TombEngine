@@ -6,9 +6,12 @@
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "effect2.h"
-#include "sound.h"
-
+#include "effects\effects.h"
+#include "Sound\sound.h"
+#include "collide.h"
+#include "item.h"
+#include "setup.h"
+#include "level.h"
 
 extern GameFlow* g_GameFlow;
 int NoCheatCounter;
@@ -59,7 +62,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		if (item->fallspeed >= 8)
-			item->fallspeed -= item->fallspeed / 8;
+			item->fallspeed -= item->fallspeed >> 3;
 		else
 			item->fallspeed = 0;
 	}

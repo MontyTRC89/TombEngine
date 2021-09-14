@@ -1,6 +1,10 @@
 #pragma once
-#include "phd_global.h"
-#include "level.h"
+#include "Specific\phd_global.h"
+#include "trmath.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+struct FLOOR_INFO;
+struct MESH_INFO;
 
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)
@@ -8,6 +12,8 @@
 #define NO_BAD_NEG NO_HEIGHT
 
 #define MAX_COLLIDED_OBJECTS 1024
+
+#define COLLISION_CHECK_DISTANCE 6144
 
 struct COLL_RESULT
 {
@@ -59,12 +65,13 @@ struct COLL_INFO
 	signed char tiltX;
 	signed char tiltZ;
 	bool hitStatic;
+	bool hitTallBounds;
+	int boundsAbove;
 	bool slopesAreWalls;
 	bool slopesArePits;
 	bool lavaIsPit;
 	bool enableBaddiePush;
 	bool enableSpaz;
-	bool hitCeiling;
 };
 
 struct OBJECT_COLLISION_BOUNDS
@@ -86,7 +93,6 @@ extern ITEM_INFO* CollidedItems[MAX_ITEMS];
 extern MESH_INFO* CollidedMeshes[MAX_ITEMS];
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
@@ -96,13 +102,13 @@ void UpdateLaraRoom(ITEM_INFO* item, int height);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
-int FindGridShift(int x, int z);
-int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
-int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll);
+int FindGridShift(int x, int z); 
+int TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
+int ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
+int ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
-int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
 int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
 int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
 int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
@@ -111,7 +117,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void GetObjectCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
-void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
+void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
@@ -120,3 +126,5 @@ bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
+void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);

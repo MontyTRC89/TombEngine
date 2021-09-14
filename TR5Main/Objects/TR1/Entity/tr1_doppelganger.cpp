@@ -107,7 +107,7 @@ void DoppelgangerControl(short itemNum)
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 			item->speed = 0;
-			item->data = (void*)-1;
+			item->data = -1;
 			item->pos.yPos += 50;
 		}
 	}

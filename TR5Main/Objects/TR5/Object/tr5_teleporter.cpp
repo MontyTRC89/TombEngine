@@ -3,10 +3,10 @@
 #include "items.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "lara.h"
 #include "camera.h"
-
+#include "Box.h"
 void InitialiseTeleporter(short itemNumber)
 {
 	/*ITEM_INFO* item = &g_Level.Items[itemNumber];

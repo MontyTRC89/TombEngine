@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "people.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "control.h"
 #include "sphere.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
@@ -85,9 +85,9 @@ short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	GAME_VECTOR pos;
 
-	pos.x = LaraItem->pos.xPos + ((GetRandomControl() - 0x4000) * 512) / 0x7FFF;
+	pos.x = LaraItem->pos.xPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.y = LaraItem->floor;
-	pos.z = LaraItem->pos.zPos + ((GetRandomControl() - 0x4000) * 512) / 0x7FFF;
+	pos.z = LaraItem->pos.zPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.roomNumber = LaraItem->roomNumber;
 
 	Richochet((PHD_3DPOS*)&pos);
@@ -103,7 +103,7 @@ short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 	pos.y = 0;
 	pos.z = 0;
 
-	GetLaraJointPosition(&pos, (25 * GetRandomControl()) / 32768);
+	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->pos.yRot, LaraItem->roomNumber);
 	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->pos, 0);

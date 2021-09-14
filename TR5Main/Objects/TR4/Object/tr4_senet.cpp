@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "tr4_senet.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "items.h"
 #include "control.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
-
+#include "level.h"
+#include "collide.h"
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
@@ -27,7 +28,8 @@ void InitialiseGameStix(short itemNumber)
 	
 	item = &g_Level.Items[itemNumber];
 	item->itemFlags[7] = -1;
-	item->data = &item->itemFlags;
+	//not needed
+	//item->data = &item->itemFlags;
 	ActivePiece = -1;
 	SenetDisplacement = 0;
 }
@@ -414,7 +416,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[item_num];
 
 	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_STOP && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS &&
-		!item->active || Lara.isMoving && Lara.generalPtr == (void*)item_num)
+		!item->active || Lara.isMoving && Lara.interactedItem == item_num)
 	{
 		laraitem->pos.yRot ^= 0x8000;
 
@@ -436,7 +438,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 				return;
 			}
 
-			Lara.generalPtr = (void*)item_num;
+			Lara.interactedItem = item_num;
 		}
 
 		laraitem->pos.yRot ^= 0x8000;

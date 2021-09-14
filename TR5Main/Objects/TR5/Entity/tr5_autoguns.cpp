@@ -3,11 +3,10 @@
 #include "sphere.h"
 #include "lara.h"
 #include "draw.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
-#include "sound.h"
+#include "Sound\sound.h"
 
 void InitialiseAutoGuns(short itemNumber)
 {
@@ -15,7 +14,10 @@ void InitialiseAutoGuns(short itemNumber)
 
     item = &g_Level.Items[itemNumber];
     item->meshBits = 1024;
-    item->data = game_malloc<uint8_t>(5702);
+    //5702 bytes!?
+	//item->data = game_malloc<uint8_t>(5702);
+	item->data = std::array<short,4>();
+	
 }
 
 static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
@@ -55,7 +57,7 @@ void AutoGunsControl(short itemNumber)
 	{
 		if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 		{
-			short* data = (short*)item->data;
+			std::array<short, 4>& data = item->data;
 
 			item->meshBits = 1664;
 

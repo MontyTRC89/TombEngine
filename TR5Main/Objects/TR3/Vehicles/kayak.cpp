@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "camera.h"
 #include "Lara.h"
@@ -12,7 +11,7 @@
 #include "setup.h"
 #include "input.h"
 #include "control.h"
-
+#include "kayak_info.h"
 using std::vector;
 
 #define KAYAK_COLLIDE			64
@@ -1169,9 +1168,9 @@ void KayakLaraRapidsDrown()
 void InitialiseKayak(short itemNumber)
 {
 	ITEM_INFO* v = &g_Level.Items[itemNumber];
-
-	KAYAK_INFO* kayak = game_malloc<KAYAK_INFO>();
-	v->data = kayak;
+	KAYAK_INFO* kayak;
+	v->data = KAYAK_INFO();
+	kayak = v->data;
 
 	kayak->Vel = kayak->Rot = kayak->Flags = 0;
 	kayak->FallSpeedF = kayak->FallSpeedL = kayak->FallSpeedR = 0;

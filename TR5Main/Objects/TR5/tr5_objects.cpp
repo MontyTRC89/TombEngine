@@ -60,14 +60,15 @@
 #include "lara_flare.h"
 #include "lara_initialise.h"
 #include "pickup.h"
-#include "flmtorch.h"
+#include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"
 #include "objects.h"
 #include "level.h"
 /// register objects
 #include "object_helper.h"
-
+#include "creature_info.h"
+#include "Box.h"
 using namespace TEN::Entities::TR5;
 
 static void StartBaddy(OBJECT_INFO *obj)
@@ -1314,12 +1315,7 @@ void InitialiseTR5Objects()
 
 void AllocTR5Objects()
 {
-	Bats = game_malloc<BAT_STRUCT>(NUM_BATS);
 	ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
-
-	Spiders = game_malloc<SPIDER_STRUCT>(NUM_SPIDERS);
 	ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
-
-	Rats = game_malloc<RAT_STRUCT>(NUM_RATS);
 	ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
 }

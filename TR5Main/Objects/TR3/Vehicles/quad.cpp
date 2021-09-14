@@ -1,21 +1,22 @@
 #include "framework.h"
 #include "quad.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "sphere.h"
 #include "collide.h"
 #include "camera.h"
-#include "tomb4fx.h"
-#include "effect2.h"
+#include "effects\tomb4fx.h"
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "misc.h"
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
-#include "prng.h"
+#include "Sound\sound.h"
+#include "Specific\prng.h"
+#include "quad_info.h"
+
 using std::vector;
 using namespace TEN::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
@@ -1124,8 +1125,8 @@ void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	item->data = game_malloc<QUAD_INFO>();
-	QUAD_INFO* quad = (QUAD_INFO *)item->data;
+	item->data = QUAD_INFO();
+	QUAD_INFO* quad = item->data;
 
 	quad->velocity = 0;
 

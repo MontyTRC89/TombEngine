@@ -5,6 +5,8 @@
 #include "generic_switch.h"
 #include "sphere.h"
 #include "draw.h"
+#include "collide.h"
+#include "floordata.h"
 
 namespace TEN::Entities::Switches
 {
@@ -54,7 +56,7 @@ namespace TEN::Entities::Switches
 			&& item->status == ITEM_NOT_ACTIVE
 			&& !(item->flags & 0x100)
 			&& item->triggerFlags >= 0
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
@@ -105,43 +107,6 @@ namespace TEN::Entities::Switches
 						}
 						
 						item->goalAnimState = SWITCH_OFF;
-
-						// NOTE: TR5 OCBs, to evaluate if keep them
-						/*if (item->triggerFlags)
-						{
-							if (item->triggerFlags >= 3)
-							{
-								if (item->triggerFlags == 4)
-								{
-									l->currentAnimState = LS_SWITCH_UP;
-									l->animNumber = LA_SWITCH_SMALL_DOWN;
-									item->goalAnimState = SWITCH_OFF;
-								}
-								else
-								{
-									if (item->triggerFlags >= 5 && item->triggerFlags <= 7)
-									{
-										if (item->triggerFlags == 6)
-											DisableLaraControl = true;
-										l->currentAnimState = LS_SWITCH_DOWN;
-										l->animNumber = LA_BUTTON_SMALL_PUSH;
-									}
-									item->goalAnimState = SWITCH_OFF;
-								}
-							}
-							else
-							{
-								l->animNumber = LA_HOLESWITCH_ACTIVATE;
-								l->currentAnimState = LS_HOLE;
-								item->goalAnimState = SWITCH_OFF;
-							}
-						}
-						else
-						{
-							l->currentAnimState = LS_SWITCH_UP;
-							l->animNumber = LA_WALLSWITCH_DOWN;
-							item->goalAnimState = SWITCH_OFF;
-						}*/
 					}
 					else /* Switch up */
 					{
@@ -164,38 +129,6 @@ namespace TEN::Entities::Switches
 						}
 
 						item->goalAnimState = SWITCH_ON;
-
-						// NOTE: TR5 OCBs, to evaluate if keep them
-						/*if (item->triggerFlags)
-						{
-							if (item->triggerFlags == 3)
-							{
-								l->currentAnimState = LS_SWITCH_DOWN;
-								l->animNumber = LA_BUTTON_LARGE_PUSH;
-							}
-							else if (item->triggerFlags == 4)
-							{
-								l->currentAnimState = LS_SWITCH_DOWN;
-								l->animNumber = LA_SWITCH_SMALL_UP;
-							}
-							else if (item->triggerFlags < 8)
-							{
-								l->currentAnimState = LS_HOLE;
-								l->animNumber = LA_HOLESWITCH_ACTIVATE;
-							}
-							else
-							{
-								l->currentAnimState = LS_SWITCH_DOWN;
-								l->animNumber = LA_VALVE_TURN;
-							}
-						}
-						else
-						{
-							l->currentAnimState = LS_SWITCH_DOWN;
-							l->animNumber = LA_WALLSWITCH_UP;
-						}
-
-						item->goalAnimState = SWITCH_ON;*/
 					}
 
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
@@ -212,10 +145,10 @@ namespace TEN::Entities::Switches
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 			}
-			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;

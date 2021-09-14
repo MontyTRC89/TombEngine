@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr2_monk.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
-
+#include "creature_info.h"
 BITE_INFO monkBite = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;

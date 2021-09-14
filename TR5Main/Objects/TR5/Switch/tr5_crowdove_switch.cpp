@@ -4,7 +4,8 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "box.h"
 
 using namespace TEN::Entities::Switches;
 
@@ -38,7 +39,7 @@ namespace TEN::Entities::TR5
 				|| l->currentAnimState != LS_STOP
 				|| l->animNumber != LA_STAND_IDLE
 				|| l->gravityStatus)
-			&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 		{
 			if (l->currentAnimState != LS_DOVESWITCH)
 				ObjectCollision(itemNum, l, coll);
@@ -69,17 +70,17 @@ namespace TEN::Entities::TR5
 					Lara.torsoYrot = 0;
 					Lara.torsoXrot = 0;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.generalPtr = (void*)item;
+					Lara.interactedItem = itemNum;
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 				item->pos.yRot = oldYrot;
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;

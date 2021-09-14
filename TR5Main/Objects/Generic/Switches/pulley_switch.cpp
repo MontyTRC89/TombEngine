@@ -4,8 +4,10 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "pickup.h"
+#include "level.h"
+#include "collide.h"
 
 namespace TEN::Entities::Switches
 {
@@ -44,7 +46,7 @@ namespace TEN::Entities::Switches
 			&& l->currentAnimState == LS_STOP
 			&& l->animNumber == LA_STAND_IDLE
 			&& l->gravityStatus == false
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			short oldYrot = item->pos.yRot;
 			item->pos.yRot = l->pos.yRot;
@@ -77,17 +79,17 @@ namespace TEN::Entities::Switches
 					Lara.torsoYrot = 0;
 					Lara.torsoXrot = 0;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.generalPtr = item;
+					Lara.interactedItem = itemNum;
 				}
 				else
 				{
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 				}
 				item->pos.yRot = oldYrot;
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;

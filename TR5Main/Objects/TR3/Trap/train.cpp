@@ -3,11 +3,12 @@
 #include "floordata.h"
 #include "control.h"
 #include "level.h"
-#include "effect2.h"
-#include "sound.h"
+#include "effects\effects.h"
+#include "Sound\sound.h"
 #include "camera.h"
 #include "sphere.h"
 #include "lara.h"
+#include "collide.h"
 
 #define TRAIN_VEL	260
 #define LARA_TRAIN_DEATH_ANIM 3;

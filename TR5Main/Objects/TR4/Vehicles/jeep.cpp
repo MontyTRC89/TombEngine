@@ -6,20 +6,20 @@
 #else
 #include "inventory.h"
 #endif
-#include "effect2.h"
+#include "effects\effects.h"
 #include "collide.h"
-#include "effect2.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "sphere.h"
 #include "lara_flare.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
-
+#include "Box.h"
+#include "jeep_info.h"
 using std::vector;
 
 
@@ -380,8 +380,9 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	JEEP_INFO* jeep = game_malloc<JEEP_INFO>();
-	item->data = jeep;
+	JEEP_INFO* jeep;
+	item->data = JEEP_INFO();
+	jeep = item->data;
 
 	jeep->velocity = 0;
 	jeep->revs = 0;

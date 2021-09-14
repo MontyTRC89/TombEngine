@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr2_barracuda.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
-
+#include "creature_info.h"
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 
 void BarracudaControl(short itemNum)

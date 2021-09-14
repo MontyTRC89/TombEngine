@@ -1,6 +1,6 @@
 #pragma once
-#include "lara_struct.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll);
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll);
@@ -69,3 +69,6 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll);
+#ifdef NEW_TIGHTROPE
+void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll);
+#endif // NEW_TIGHTROPE

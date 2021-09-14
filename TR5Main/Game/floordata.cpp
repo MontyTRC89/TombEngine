@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "trmath.h"
 #include "floordata.h"
+#include "Specific\trmath.h"
 #include "room.h"
 #include "level.h"
 #include "setup.h"

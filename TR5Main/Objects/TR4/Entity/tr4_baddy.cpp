@@ -3,15 +3,16 @@
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara.h"
 #include "people.h"
-#include "effect2.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"
 #include <draw.h>
 #include <Game/lot.h>
+#include "creature_info.h"
+#include "control.h"
 
 /*
 ID_BADDY_1
@@ -1137,11 +1138,11 @@ namespace TEN::Entities::TR4
 				KillItem(currentCreature->enemy - g_Level.Items.data());
 
 				// cancel enemy pointer for other active baddies
-				for (int i = 0; i < NUM_SLOTS; i++)
+				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					if (BaddieSlots[i].itemNum != NO_ITEM && BaddieSlots[i].itemNum != itemNum && BaddieSlots[i].enemy == creature->enemy)
+					if (ActiveCreatures[i]->itemNum != NO_ITEM && ActiveCreatures[i]->itemNum != itemNum && ActiveCreatures[i]->enemy == creature->enemy)
 					{
-						BaddieSlots[i].enemy = NULL;
+						ActiveCreatures[i]->enemy = NULL;
 					}
 				}
 				creature->enemy = NULL;

@@ -2,16 +2,16 @@
 #include "tr4_element_puzzle.h"
 #include "level.h"
 #include "control.h"
-#include <sound.h>
+#include "Sound\sound.h"
 #include <draw.h>
 #include <lara.h>
 #include <sphere.h>
-#include <effect2.h>
-#include <tomb4fx.h>
+#include <effects\effects.h>
+#include <effects\tomb4fx.h>
 #include <switch.h>
 #include <input.h>
 #include "generic_switch.h"
-
+#include "collide.h"
 using namespace TEN::Entities::Switches;
 
 OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {
@@ -141,7 +141,7 @@ void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
         {
             if (c->enableBaddiePush)
             {
-                ItemPushLara(item, l, c, 0, 0);
+                ItemPushItem(item, l, c, 0, 0);
             }
         }
     }

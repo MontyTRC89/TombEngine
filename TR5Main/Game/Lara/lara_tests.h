@@ -1,7 +1,10 @@
 #pragma once
-#include "lara_struct.h"
+#include "collide.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStandUp(COLL_INFO* coll);
 int TestWall(ITEM_INFO* item, int front, int right, int down);
 int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll);
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll);
@@ -22,5 +25,8 @@ int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 int LaraLandedBad(ITEM_INFO* l, COLL_INFO* coll);
+#ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);
+#endif // !NEW_TIGHTROPE
+
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll);

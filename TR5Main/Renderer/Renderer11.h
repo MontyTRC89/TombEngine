@@ -12,7 +12,7 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "items.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderTarget2D/RenderTarget2D.h"

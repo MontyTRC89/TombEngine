@@ -1,6 +1,7 @@
 #pragma once
-#include "collide.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
 /*puzzles*/
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

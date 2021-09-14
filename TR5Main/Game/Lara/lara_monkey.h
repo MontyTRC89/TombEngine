@@ -1,6 +1,6 @@
 #pragma once
-#include "lara_struct.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
 /*monkeyswing state handling functions*/
 void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll);

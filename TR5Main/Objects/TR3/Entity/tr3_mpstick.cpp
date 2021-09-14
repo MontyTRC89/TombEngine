@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "tr3_mpstick.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "people.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
@@ -96,9 +97,9 @@ void MPStickControl(short itemNumber)
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 
 			int bestDistance = 0x7fffffff;
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
-			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
+			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[slot];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 

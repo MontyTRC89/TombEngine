@@ -2,18 +2,18 @@
 #include "tr5_explosion.h"
 #include "level.h"
 #include "control.h"
-#include "sound.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "Sound\sound.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "draw.h"
 #include "traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"
 #include "lara_one_gun.h"
 #include "switch.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "generic_switch.h"
-
+#include "collide.h"
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
@@ -150,7 +150,7 @@ void ExplosionControl(short itemNumber)
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];
 						++SmashedMeshCount;
-						CollidedMeshes[i]->flags &= ~0x1;
+						CollidedMeshes[i]->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					}
 					++i;
 				}

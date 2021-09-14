@@ -4,13 +4,16 @@
 #include "level.h"
 #include "lara.h"
 #include "people.h"
-#include "sound.h"
-#include "tomb4fx.h"
+#include "Sound\sound.h"
+#include "effects\tomb4fx.h"
 #include "tr1_centaur.h"
 #include "sphere.h"
 #include "lara_one_gun.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
+#include "collide.h"
+#include "item.h"
+#include "setup.h"
 
 enum centaur_anims { 
 	CENTAUR_EMPTY, 

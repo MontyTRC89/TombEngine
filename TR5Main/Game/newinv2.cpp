@@ -5,7 +5,7 @@
 #include "control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "Lara.h"
 #include "camera.h"
@@ -17,6 +17,7 @@
 #include "level.h"
 #include "input.h"
 #include "pickup.h"
+#include "Renderer11.h"
 
 using namespace TEN::Renderer;
 bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
