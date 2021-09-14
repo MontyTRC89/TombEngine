@@ -17,6 +17,7 @@
 #include "GameScriptDisplayString.h"
 #include "ReservedScriptNames.h"
 #include "camera.h"
+#include <Renderer/RenderEnums.h>
 
 /***
 Functions and callbacks for level-specific logic scripts.
