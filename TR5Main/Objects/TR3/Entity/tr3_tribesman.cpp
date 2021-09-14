@@ -396,11 +396,11 @@ void TribemanDartsControl(short itemNum)
 				else
 					item->goalAnimState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(512))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 4;
 			else if (creature->mood == BORED_MOOD)
 			{
@@ -433,11 +433,11 @@ void TribemanDartsControl(short itemNum)
 				else
 					item->goalAnimState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(512))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 6;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			else if (creature->mood == BORED_MOOD && GetRandomControl() < 0x200)
 				item->goalAnimState = 2;
@@ -448,11 +448,11 @@ void TribemanDartsControl(short itemNum)
 		case 2:
 			creature->maximumTurn = ANGLE(9);
 
-			if (info.bite && info.distance < SQUARE(512))
+			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 3;
@@ -474,9 +474,9 @@ void TribemanDartsControl(short itemNum)
 			creature->maximumTurn = ANGLE(6);
 			tilt = angle / 4;
 
-			if (info.bite && info.distance < SQUARE(512))
+			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			if (item->aiBits & GUARD)
 				item->goalAnimState = 11;
