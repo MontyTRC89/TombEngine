@@ -74,6 +74,13 @@ namespace Sky
 			Color = color;
 	}
 
+	void SkyController::ClearSky()
+	{
+		StormTimer = 0;
+		SkyStormColor = 1;
+		SkyStormColor2 = 1;
+	}
+
 	void SkyController::UpdateStorm()
 	{
 		LightningCount--;

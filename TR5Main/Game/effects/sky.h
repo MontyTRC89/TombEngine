@@ -15,6 +15,7 @@ namespace Sky {
 		Vector4 Color;
 
 		void UpdateSky();
+		void ClearSky();
 
 	private:
 
