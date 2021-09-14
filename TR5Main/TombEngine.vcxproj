@@ -144,6 +144,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
+    <ClInclude Include="Game\effects\sky.h" />
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
@@ -529,6 +530,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\effects\drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
+    <ClCompile Include="Game\effects\sky.cpp" />
     <ClCompile Include="Game\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
