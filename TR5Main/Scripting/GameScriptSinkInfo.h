@@ -11,6 +11,7 @@ class GameScriptPosition;
 class GameScriptSinkInfo : public GameScriptNamedBase<GameScriptSinkInfo, SINK_INFO &>
 {
 public:
+	using IdentifierType = std::reference_wrapper<SINK_INFO>;
 	GameScriptSinkInfo(SINK_INFO& ref, bool temp);
 	~GameScriptSinkInfo();
 	GameScriptSinkInfo& operator=(GameScriptSinkInfo const& other) = delete;

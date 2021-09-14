@@ -23,7 +23,6 @@ using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math::Random;
 
-short FXType;
 FX_INFO EffectList[NUM_EFFECTS];
 
 int NextSpark;

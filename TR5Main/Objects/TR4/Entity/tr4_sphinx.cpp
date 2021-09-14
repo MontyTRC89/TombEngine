@@ -54,7 +54,7 @@ void SphinxControl(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, y, z);
 
-	if (item->currentAnimState == 5 && floor->stopper)
+	if (item->currentAnimState == 5 && floor->Stopper)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
@@ -70,7 +70,7 @@ void SphinxControl(short itemNumber)
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-				floor->stopper = false;
+				floor->Stopper = false;
 
 				TestTriggers(x, y, z, item->roomNumber, true, NULL);
 			}

@@ -9,6 +9,7 @@
 #include "pickup.h"
 #include "lot.h"
 #include "spotcam.h"
+#include "Sound\sound.h"
 #include "traps.h"
 #include "lara.h"
 #include "Lara\lara_climb.h"
@@ -65,7 +66,7 @@ int GetKeyTrigger(ITEM_INFO* item)
 		{
 			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
 			{
-				if (*j & 0x8000)
+				if (*j & END_BIT)
 					return 0;
 			}
 			return 1;
@@ -81,12 +82,7 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 
 	if (triggerIndex)
 	{
-		short* trigger;
-		for (trigger = triggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
-		{
-			if (*trigger & END_BIT)
-				break;
-		}
+		short* trigger = triggerIndex;
 
 		if (*trigger & 4)
 		{
@@ -131,7 +127,7 @@ int SwitchTrigger(short itemNum, short timer)
 
 			item->status = ITEM_NOT_ACTIVE;
 			if (!item->itemFlags[0] == 0)
-				item->flags |= 0x100;
+				item->flags |= ONESHOT;
 			if (item->currentAnimState != 1)
 				return 1;
 			if (item->triggerFlags != 5 && item->triggerFlags != 6)
@@ -145,7 +141,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return (item->flags & 0x100u) >> 8;
+		return (item->flags & ONESHOT) >> 8;
 	}
 	else
 	{
@@ -158,79 +154,18 @@ int SwitchTrigger(short itemNum, short timer)
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
 	ROOM_INFO* r;
-	while (floor->pitRoom != NO_ROOM)
+	while (floor->RoomBelow() != NO_ROOM)
 	{
-		if (CheckNoColFloorTriangle(floor, x, z) == 1)
+		if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
 			break;
-		r = &g_Level.Rooms[floor->pitRoom];
+		r = &g_Level.Rooms[floor->RoomBelow()];
 		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
+	if (floor->TriggerIndex == -1)
 		return NULL;
 
-	short* triggerIndex = NULL;
-
-	short* data = &g_Level.FloorData[floor->index];
-	short type;
-	int trigger;
-	do
-	{
-		type = *(data++);
-
-		switch (type & DATA_TYPE)
-		{
-		case DOOR_TYPE:
-		case TILT_TYPE:
-		case ROOF_TYPE:
-		case SPLIT1:
-		case SPLIT2:
-		case SPLIT3:
-		case SPLIT4:
-		case NOCOLF1T:
-		case NOCOLF1B:
-		case NOCOLF2T:
-		case NOCOLF2B:
-		case NOCOLC1T:
-		case NOCOLC1B:
-		case NOCOLC2T:
-		case NOCOLC2B:
-			data++;
-			break;
-
-		case LAVA_TYPE:
-		case CLIMB_TYPE:
-		case MONKEY_TYPE:
-		case TRIGTRIGGER_TYPE:
-		case MINER_TYPE:
-			break;
-
-		case TRIGGER_TYPE:
-			triggerIndex = data - 1;
-			data++;
-
-			do
-			{
-				trigger = *(data++);
-
-				if (TRIG_BITS(trigger) != TO_OBJECT)
-				{
-					if (TRIG_BITS(trigger) == TO_CAMERA ||
-						TRIG_BITS(trigger) == TO_FLYBY)
-					{
-						trigger = *(data++);
-					}
-				}
-
-			} while (!(trigger & END_BIT));
-			break;
-
-		default:
-			break;
-		}
-	} while (!(type & END_BIT));
-
-	return triggerIndex;
+	return &g_Level.FloorData[floor->TriggerIndex];
 }
 
 short* GetTriggerIndex(ITEM_INFO* item)
@@ -380,10 +315,6 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Lara.gunStatus == LG_READY)
 				break;
 			return;
-
-			//	case TRIGGER_TYPES::SKELETON_T:	//NO.
-			//		Lara.skelebob = 2;
-			//		break;
 
 		case TRIGGER_TYPES::HEAVY:
 		case TRIGGER_TYPES::DUMMY:
@@ -605,7 +536,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 		case TO_FLIPMAP:
 			flipAvailable = true;
 
-			if (FlipMap[value] & 0x100)
+			if (FlipMap[value] & ONESHOT)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH)
@@ -616,8 +547,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
 			{
 
-				if (flags & 0x100)
-					FlipMap[value] |= 0x100;
+				if (flags & ONESHOT)
+					FlipMap[value] |= ONESHOT;
 				if (!FlipStats[value])
 					flip = value;
 			}

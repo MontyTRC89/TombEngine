@@ -55,19 +55,19 @@
 #include "generic_switch.h"
 #include "creature_info.h"
 
-using namespace TEN::Entities::Switches;
-
 using std::vector;
 using std::unordered_map;
 using std::string;
+
+using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects;
-using TEN::Renderer::g_Renderer;
+using namespace TEN::Entities::Switches;
+using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
-
 
 int KeyTriggerActive;
 int number_los_rooms;
@@ -139,8 +139,11 @@ extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
 extern short FXType;
-using namespace TEN::Effects::Footprints;
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+
+// This might not be the exact amount of time that has passed, but giving it a
+// value of 1/30 keeps it in lock-step with the rest of the game logic,
+// which assumes 30 iterations per second.
+static constexpr float deltaTime = 1.0f / 30.0f;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -157,6 +160,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
+	g_GameScript->ProcessDisplayStrings(deltaTime);
+	
 	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
@@ -165,7 +170,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(1.0f/30.0f);
+		g_GameScript->OnControlPhase(deltaTime);
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
@@ -484,7 +489,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					         SmashedMesh[SmashedMeshCount]->pos.zPos,
 					         SmashedMeshRoom[SmashedMeshCount], true, 0);
 
-				floor->stopper = false;
+				floor->Stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
 			} while (SmashedMeshCount != 0);
 		}
@@ -497,7 +502,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBubbles();
 		UpdateDebris();
 		UpdateGunShells();
-		updateFootprints();
+		UpdateFootprints();
 		UpdateSplashes();
 		UpdateEnergyArcs();
 		UpdateLightning();
@@ -612,6 +617,11 @@ GAME_STATUS DoTitle(int index)
 		{
 			g_GameScript->ExecuteScript(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
+			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+			{
+				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+			});
+
 		}
 		RequiredStartPos = false;
 		if (InitialiseGame)
@@ -641,6 +651,8 @@ GAME_STATUS DoTitle(int index)
 
 		// Initialise ponytails
 		InitialiseHair();
+
+		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
 #ifdef NEW_INV
@@ -680,6 +692,8 @@ GAME_STATUS DoTitle(int index)
 	UseSpotCam = false;
 	S_CDStop();
 
+	g_GameScript->OnEnd();
+	g_GameScript->FreeLevelScripts();
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
@@ -724,6 +738,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	{
 		g_GameScript->ExecuteScript(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
+		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		{
+			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+		});
 	}
 
 	// Restore the game?
@@ -855,6 +873,39 @@ short GetDoor(FLOOR_INFO *floor)
 	return NO_ROOM;
 }
 
+void UpdateSky()
+{
+	GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (level->Layer1.Enabled)
+	{
+		SkyPos1 += level->Layer1.CloudSpeed;
+		if (SkyPos1 <= 9728)
+		{
+			if (SkyPos1 < 0)
+				SkyPos1 += 9728;
+		}
+		else
+		{
+			SkyPos1 -= 9728;
+		}
+	}
+
+	if (level->Layer2.Enabled)
+	{
+		SkyPos2 += level->Layer2.CloudSpeed;
+		if (SkyPos2 <= 9728)
+		{
+			if (SkyPos2 < 0)
+				SkyPos2 += 9728;
+		}
+		else
+		{
+			SkyPos2 -= 9728;
+		}
+	}
+}
+
 void TranslateItem(ITEM_INFO *item, int x, int y, int z)
 {
 	float c = phd_cos(item->pos.yRot);
@@ -872,22 +923,22 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		while (floor->skyRoom != NO_ROOM)
+		while (floor->RoomAbove() != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->skyRoom];
+			room = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->ceiling << 8);
+				return (floor->AverageCeiling << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
 	}
 	else
 	{
-		while (floor->pitRoom != NO_ROOM)
+		while (floor->RoomBelow() != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->pitRoom];
+			room = &g_Level.Rooms[floor->RoomBelow()];
 			if (room->flags & ENV_FLAG_WATER)
-				return (floor->floor << 8);
+				return (floor->AverageFloor << 8);
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
@@ -980,21 +1031,21 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
 
-	/*if (floor->floor == NO_HEIGHT / STEP_SIZE)
+	/*if (floor->AverageFloor == NO_HEIGHT / STEP_SIZE)
 	{
-		floor->floor = ceiling->ceiling + height / STEP_SIZE;
+		floor->AverageFloor = ceiling->ceiling + height / STEP_SIZE;
 	}
 	else
 	{
-		floor->floor += height / STEP_SIZE;
-		if (floor->floor == ceiling->ceiling && !flag)
-			floor->floor = NO_HEIGHT / STEP_SIZE;
+		floor->AverageFloor += height / STEP_SIZE;
+		if (floor->AverageFloor == ceiling->ceiling && !flag)
+			floor->AverageFloor = NO_HEIGHT / STEP_SIZE;
 	}*/
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
 
-	box = &g_Level.Boxes[floor->box];
+	box = &g_Level.Boxes[floor->Box];
 	if (box->flags & BLOCKABLE)
 	{
 		if (height >= 0)
@@ -1006,158 +1057,9 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 
 FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
 {
-#if 0
-	ROOM_INFO *r;
-	FLOOR_INFO *floor;
-	short data;
-	int xFloor = 0;
-	int yFloor = 0;
-	short roomDoor = 0;
-	int retval;
-
-	r = &g_Level.Rooms[*roomNumber];
-	do
-	{
-		xFloor = (z - r->z) / SECTOR(1);
-		yFloor = (x - r->x) / SECTOR(1);
-
-		if (xFloor <= 0)
-		{
-			xFloor = 0;
-			if (yFloor < 1)
-				yFloor = 1;
-			else if (yFloor > r->ySize - 2)
-				yFloor = r->ySize - 2;
-		}
-		else if (xFloor >= r->xSize - 1)
-		{
-			xFloor = r->xSize - 1;
-			if (yFloor < 1)
-				yFloor = 1;
-			else if (yFloor > r->ySize - 2)
-				yFloor = r->ySize - 2;
-		}
-		else if (yFloor < 0)
-		{
-			yFloor = 0;
-		}
-		else if (yFloor >= r->ySize)
-		{
-			yFloor = r->ySize - 1;
-		}
-
-		floor = &r->floor[xFloor + (yFloor * r->xSize)];
-		data = GetDoor(floor);
-		if (data != NO_ROOM)
-		{
-			*roomNumber = data;
-			r = &g_Level.Rooms[data];
-		}
-	} while (data != NO_ROOM);
-
-	if (y < floor->floor * 256)
-	{
-		if (y < floor->ceiling * 256 && floor->skyRoom != NO_ROOM)
-		{
-			do
-			{
-				int noCollision = CheckNoColCeilingTriangle(floor, x, z);
-				if (noCollision == 1 || noCollision == -1 && y >= r->maxceiling)
-					break;
-
-				*roomNumber = floor->skyRoom;
-				r = &g_Level.Rooms[floor->skyRoom];
-				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-				if (y >= floor->ceiling * 256)
-					break;
-			} while (floor->skyRoom != NO_ROOM);
-		}
-	}
-	else if (floor->pitRoom != NO_ROOM)
-	{
-		do
-		{
-			int noCollision = CheckNoColFloorTriangle(floor, x, z);
-			if (noCollision == 1 || noCollision == -1 && y < r->minfloor)
-				break;
-
-			*roomNumber = floor->pitRoom;
-			r = &g_Level.Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (y < floor->floor * 256)
-				break;
-		} while (floor->pitRoom != NO_ROOM);
-	}
-
-	return floor;
-#endif
-
 	const auto location = GetRoom(ROOM_VECTOR{*roomNumber, y}, x, y, z);
 	*roomNumber = location.roomNumber;
 	return &GetFloor(*roomNumber, x, z);
-}
-
-int CheckNoColFloorTriangle(FLOOR_INFO *floor, int x, int z)
-{
-	if (!floor->index)
-		return 0;
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type = *(data)&DATA_TYPE;
-
-	if (type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B)
-	{
-		int dx = x & 1023;
-		int dz = z & 1023;
-
-		if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLF2T && dx <= dz)
-			return -1;
-		else if (type == NOCOLF2B && dx > dz)
-			return -1;
-		else
-			return 1;
-	}
-
-	return 0;
-}
-
-int CheckNoColCeilingTriangle(FLOOR_INFO *floor, int x, int z)
-{
-	if (!floor->index)
-		return 0;
-
-	short *data = &g_Level.FloorData[floor->index];
-	short type = *(data)&DATA_TYPE;
-
-	if (type == TILT_TYPE || type == SPLIT1 || type == SPLIT2 || type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B) // gibby
-	{
-		if (*(data)&END_BIT)
-			return 0;
-		type = *(data + 2) & DATA_TYPE;
-	}
-
-	if (type == NOCOLC1T || type == NOCOLC1B || type == NOCOLC2T || type == NOCOLC2B)
-	{
-		int dx = x & 1023;
-		int dz = z & 1023;
-
-		if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLC1B && dx > (SECTOR(1) - dz))
-			return -1;
-		else if (type == NOCOLC2T && dx <= dz)
-			return -1;
-		else if (type == NOCOLC2B && dx > dz)
-			return -1;
-		else
-			return 1;
-	}
-
-	return 0;
 }
 
 int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
@@ -1449,29 +1351,6 @@ int ClipTarget(GAME_VECTOR *start, GAME_VECTOR *target)
 	return 1;
 }
 
-void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
-{
-	short angles[2];
-	PHD_3DPOS pos;
-
-	/* this part makes arrows fire at bad angles
-	target->x &= ~1023;
-	target->z &= ~1023;
-	target->x |= 512;
-	target->z |= 512;*/
-
-	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
-	
-	pos.xPos = src->x;
-	pos.yPos = src->y;
-	pos.zPos = src->z;
-	pos.xRot = angles[1];
-	pos.yRot = angles[0];
-	pos.zRot = 0;
-
-	FireCrossbow(&pos);
-}
-
 int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firing)
 {
 	GAME_VECTOR target;
@@ -1504,7 +1383,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 	hit = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
-	if (itemNumber != 999)
+	if (itemNumber != NO_LOS_ITEM)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
 		target.y = vector.y - (vector.y - src->y >> 5);
@@ -1714,7 +1593,7 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 	MESH_INFO *meshp;
 	BOUNDING_BOX* box;
 
-	ClosestItem = 999;
+	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
 
 	for (r = 0; r < number_los_rooms; ++r)
@@ -1784,189 +1663,6 @@ int GetRandomDraw()
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 {
-#if 0
-	ROOM_INFO *room;
-	FLOOR_INFO *floor2;
-	int ceiling, t0, t1, t2, t3, dx, dz, xOff, yOff;
-	short type, type2, function, cadj, trigger, *data;
-	bool end;
-	ITEM_INFO *item;
-
-	SplitCeiling = 0;
-	floor2 = floor;
-	while (floor2->skyRoom != NO_ROOM)
-	{
-		if (CheckNoColCeilingTriangle(floor, x, z) == 1)
-			break;
-		room = &g_Level.Rooms[floor2->skyRoom];
-		floor2 = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
-	}
-	ceiling = 256 * floor2->ceiling;
-	if (ceiling != NO_HEIGHT)
-	{
-		if (floor2->index)
-		{
-			data = &g_Level.FloorData[floor2->index];
-			type = *data;
-			function = type & DATA_TYPE;
-			++data;
-			end = false;
-			if (function == TILT_TYPE || function == SPLIT1 || function == SPLIT2 || function == NOCOLF1T || function == NOCOLF1B || function == NOCOLF2T || function == NOCOLF2B)
-			{
-				++data;
-				if (type & END_BIT)
-					end = true;
-				type = *data;
-				function = type & DATA_TYPE;
-				++data;
-			}
-			if (!end)
-			{
-				xOff = 0;
-				yOff = 0;
-				if (function != ROOF_TYPE)
-				{
-					if (function == SPLIT3 || function == SPLIT4 || function == NOCOLC1T || function == NOCOLC1B || function == NOCOLC2T || function == NOCOLC2B)
-					{
-						SplitCeiling = function;
-						dx = x & 0x3FF;
-						dz = z & 0x3FF;
-						t0 = -(*data & DATA_TILT);
-						t1 = -(*data >> 4 & DATA_TILT);
-						t2 = -(*data >> 8 & DATA_TILT);
-						t3 = -(*data >> 12 & DATA_TILT);
-						if (function == SPLIT3 || function == NOCOLC1T || function == NOCOLC1B)
-						{
-							if (dx <= 1024 - dz)
-							{
-								cadj = type >> 10 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t2 - t1;
-								yOff = t3 - t2;
-							}
-							else
-							{
-								cadj = type >> 5 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t3 - t0;
-								yOff = t0 - t1;
-							}
-						}
-						else
-						{
-							if (dx <= dz)
-							{
-								cadj = type >> 10 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t2 - t1;
-								yOff = t0 - t1;
-							}
-							else
-							{
-								cadj = type >> 5 & DATA_TYPE;
-								if (cadj & 0x10)
-									cadj |= 0xFFF0;
-								ceiling += 256 * cadj;
-								xOff = t3 - t0;
-								yOff = t3 - t2;
-							}
-						}
-					}
-				}
-				else
-				{
-					xOff = *data >> 8;
-					yOff = *(char *)data;
-				}
-				if (xOff < 0)
-				{
-					ceiling += (z & 0x3FF) * xOff >> 2;
-				}
-				else
-				{
-					ceiling -= (-1 - z & 0x3FF) * xOff >> 2;
-				}
-				if (yOff < 0)
-				{
-					ceiling += (-1 - x & 0x3FF) * yOff >> 2;
-				}
-				else
-				{
-					ceiling -= (x & 0x3FF) * yOff >> 2;
-				}
-			}
-		}
-		while (floor->pitRoom != NO_ROOM)
-		{
-			if (CheckNoColFloorTriangle(floor, x, z) == 1)
-				break;
-			room = &g_Level.Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
-		}
-		if (floor->index)
-		{
-			data = &g_Level.FloorData[floor->index];
-			do
-			{
-				type = *data;
-				function = type & DATA_TYPE;
-				++data;
-				switch (function)
-				{
-				case DOOR_TYPE:
-				case TILT_TYPE:
-				case ROOF_TYPE:
-				case SPLIT1:
-				case SPLIT2:
-				case SPLIT3:
-				case SPLIT4:
-				case NOCOLF1T:
-				case NOCOLF1B:
-				case NOCOLF2T:
-				case NOCOLF2B:
-				case NOCOLC1T:
-				case NOCOLC1B:
-				case NOCOLC2T:
-				case NOCOLC2B:
-					++data;
-					break;
-				case TRIGGER_TYPE:
-					++data;
-					do
-					{
-						type2 = *data;
-						trigger = TRIG_BITS(type2);
-						++data;
-						if (trigger != TO_OBJECT)
-						{
-							if (trigger == TO_CAMERA || trigger == TO_FLYBY)
-							{
-								type2 = *data;
-								++data;
-							}
-						}
-						else
-						{
-							item = &g_Level.Items[type2 & VALUE_BITS];
-							if (Objects[item->objectNumber].ceiling && !(item->flags & 0x8000))
-							{
-								Objects[item->objectNumber].ceiling(item, x, y, z, &ceiling);
-							}
-						}
-					} while (!(type2 & END_BIT));
-				}
-			} while (!(type & END_BIT));
-		}
-	}
-	return ceiling;
-#endif
-
 	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
@@ -2404,11 +2100,6 @@ void RemoveRoomFlipItems(ROOM_INFO *r)
 	}
 }
 
-void PlaySoundTrack(short track, short flags)
-{
-	S_CDPlayEx(track, flags, 0);
-}
-
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
@@ -2555,7 +2246,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			xBlock = r->ySize - 1;
 
 		floor = &r->floor[zBlock + xBlock * r->xSize];
-		adjoiningRoom = GetDoor(floor);
+		adjoiningRoom = floor->WallPortal;
 
 		if (adjoiningRoom != NO_ROOM)
 		{
@@ -2566,15 +2257,15 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-		while (floor->skyRoom != NO_ROOM)
+		while (floor->RoomAbove() != NO_ROOM)
 		{
-			if (CheckNoColCeilingTriangle(floor, x, z) == 1)
+			if (CheckNoColCeilingTriangle(floor, x, z) == SPLIT_SOLID)
 				break;
-			r = &g_Level.Rooms[floor->skyRoom];
+			r = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->skyRoom == NO_ROOM)
+			if (floor->RoomAbove() == NO_ROOM)
 				break;
 		}
 
@@ -2582,15 +2273,15 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->pitRoom != NO_ROOM)
+		while (floor->RoomBelow() != NO_ROOM)
 		{
-			if (CheckNoColFloorTriangle(floor, x, z) == 1)
+			if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
 				break;
-			r = &g_Level.Rooms[floor->pitRoom];
+			r = &g_Level.Rooms[floor->RoomBelow()];
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->pitRoom == NO_ROOM)
+			if (floor->RoomBelow() == NO_ROOM)
 				break;
 		}
 	}

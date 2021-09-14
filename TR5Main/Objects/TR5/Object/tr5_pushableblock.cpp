@@ -24,40 +24,40 @@ int DoPushPull = 0;
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	if (floor->box == NO_BOX)
+	if (floor->Box == NO_BOX)
 		return;
-	g_Level.Boxes[floor->box].flags &= (~BLOCKED);
-	short height = g_Level.Boxes[floor->box].height;
+	g_Level.Boxes[floor->Box].flags &= (~BLOCKED);
+	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
 	floor = GetFloor(x + 1024, y, z, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x - 1024, y, z, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x, y, z + 1024, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
 	floor = GetFloor(x, y, z - 1024, &roomNumber);
-	if (floor->box != NO_BOX)
+	if (floor->Box != NO_BOX)
 	{
-		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
+		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
 }
@@ -547,10 +547,10 @@ int TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (floor->floor == NO_HEIGHT / 256)
+	if (floor->AverageFloor == NO_HEIGHT / 256)
 		return 1;
 
-	if (floor->floor * 256 != item->pos.yPos - blokhite)
+	if (floor->AverageFloor * 256 != item->pos.yPos - blokhite)
 		return 0;
 
 	return 1;
@@ -584,7 +584,7 @@ int TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
 
 	ROOM_INFO* r = &g_Level.Rooms[collResult.RoomNumber];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
 		return 0;
 
 	if (collResult.Position.Type)
@@ -669,7 +669,7 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 
 	short roomNum = item->roomNumber;
 	ROOM_INFO* r = &g_Level.Rooms[roomNum];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
 		return 0;
 
 	auto collResult = GetCollisionResult(x, y - blockhite, z, item->roomNumber);
@@ -739,13 +739,13 @@ int TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	collResult = GetCollisionResult(x, y - LARA_HEIGHT, z, LaraItem->roomNumber);
 
 	r = &g_Level.Rooms[roomNum];
-	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->stopper)
+	if (XZ_GET_SECTOR(r, x - r->x, z - r->z)->Stopper)
 		return 0;
 
 	if (collResult.Position.Floor != y)
 		return 0;
 
-	if (collResult.Block->ceiling * 256 > y - LARA_HEIGHT)
+	if (collResult.Block->AverageCeiling * 256 > y - LARA_HEIGHT)
 		return 0;
 
 	oldX = LaraItem->pos.xPos;

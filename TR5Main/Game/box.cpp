@@ -118,15 +118,15 @@ bool SameZone(CREATURE_INFO* creature, ITEM_INFO* target)
 	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
 	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 	FLOOR_INFO* floor = XZ_GET_SECTOR(room, item->pos.xPos - room->x, item->pos.zPos - room->z);
-	if (floor->box == NO_BOX)
+	if (floor->Box == NO_BOX)
 		return false;
-	item->boxNumber = floor->box;
+	item->boxNumber = floor->Box;
 
 	room = &g_Level.Rooms[target->roomNumber];
 	floor = XZ_GET_SECTOR(room, target->pos.xPos - room->x, target->pos.zPos - room->z);
-	if (floor->box == NO_BOX)
+	if (floor->Box == NO_BOX)
 		return false;
-	target->boxNumber = floor->box;
+	target->boxNumber = floor->Box;
 
 	return (zone[item->boxNumber] == zone[target->boxNumber]);
 }
@@ -489,18 +489,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	roomNumber = item->roomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
 	floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-	height = g_Level.Boxes[floor->box].height;
+	height = g_Level.Boxes[floor->Box].height;
 	nextHeight = 0;
 
 	if (!Objects[item->objectNumber].nonLot)
 	{
-		nextBox = LOT->node[floor->box].exitBox;
+		nextBox = LOT->node[floor->Box].exitBox;
 	}
 	else
 	{
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		height = g_Level.Boxes[floor->box].height;
-		nextBox = floor->box;
+		height = g_Level.Boxes[floor->Box].height;
+		nextBox = floor->Box;
 	}
 
 	if (nextBox == NO_BOX)
@@ -508,7 +508,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		nextHeight = g_Level.Boxes[nextBox].height;
 
-	if (floor->box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && item->boxNumber != NO_BOX && zone[item->boxNumber] != zone[floor->box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
+	if (floor->Box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && item->boxNumber != NO_BOX && zone[item->boxNumber] != zone[floor->Box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
 	{
 		xPos = item->pos.xPos / SECTOR(1);
 		zPos = item->pos.zPos / SECTOR(1);
@@ -526,16 +526,16 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			item->pos.zPos = old.z | (WALL_SIZE - 1);
 
 		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-		height = g_Level.Boxes[floor->box].height;
+		height = g_Level.Boxes[floor->Box].height;
 		if (!Objects[item->objectNumber].nonLot)
 		{
-			nextHeight = LOT->node[floor->box].exitBox;
+			nextHeight = LOT->node[floor->Box].exitBox;
 		}
 		else
 		{
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			height = g_Level.Boxes[floor->box].height;
-			nextBox = floor->box;
+			height = g_Level.Boxes[floor->Box].height;
+			nextBox = floor->Box;
 		}
 
 		if (nextBox == NO_BOX)
@@ -837,16 +837,16 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	int height;
 
 	floor = GetFloor(x, y, z, &roomNumber);
-	if (floor->box == NO_BOX)
+	if (floor->Box == NO_BOX)
 		return true;
 
 	if (LOT->isJumping)
 		return false;
 
-	if (g_Level.Boxes[floor->box].flags & LOT->blockMask)
+	if (g_Level.Boxes[floor->Box].flags & LOT->blockMask)
 		return true;
 
-	height = g_Level.Boxes[floor->box].height;
+	height = g_Level.Boxes[floor->Box].height;
 	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
 		return true;
 
@@ -1423,10 +1423,10 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 				int* zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 
 				ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->box;
+				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->Box;
 
 				r = &g_Level.Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z)->box;
+				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z)->Box;
 
 				if (item->boxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
 				{
@@ -1495,7 +1495,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	item->boxNumber = NO_BOX;
 	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	if(floor)
-		item->boxNumber = floor->box;
+		item->boxNumber = floor->Box;
 	if (item->boxNumber != NO_BOX)
 		info->zoneNumber = zone[item->boxNumber];
 	else
@@ -1505,7 +1505,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	enemy->boxNumber = NO_BOX;
 	floor = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z);
 	if(floor)
-		enemy->boxNumber = floor->box;
+		enemy->boxNumber = floor->Box;
 	if (enemy->boxNumber != NO_BOX)
 		info->enemyZone = zone[enemy->boxNumber];
 	else
@@ -2073,7 +2073,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	FLOOR_INFO* floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	floor->stopper = set;
+	floor->Stopper = set;
 
 	x = item->pos.xPos + 1024 * phd_sin(dir);
 	z = item->pos.zPos + 1024 * phd_cos(dir);
@@ -2083,7 +2083,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	r = &g_Level.Rooms[roomNumber];
 
 	floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	floor->stopper = set;
+	floor->Stopper = set;
 }
 
 FLOOR_INFO* XZ_GET_SECTOR(ROOM_INFO* r, int x, int z) {

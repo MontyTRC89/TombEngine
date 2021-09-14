@@ -70,7 +70,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		&& Lara.NewAnims.CrouchRoll)
 	{
 		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor
-			TestWall(item, WALL_SIZE / 2, 0, -256))			//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
+			TestLaraWall(item, WALL_SIZE / 2, 0, -256))			//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
 			return;
 
 		if (!(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
@@ -219,7 +219,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 			{
 				// TODO: fix ObjectOnLOS2
-				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == 999)
+				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == NO_LOS_ITEM)
 				{*/
 				item->animNumber = LA_CRAWL_JUMP_FLIP_DOWN;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -363,9 +363,9 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
 		coll->Setup.Radius = LARA_RAD_CRAWL;
-		coll->Setup.BadHeightUp = 255;
+		coll->Setup.BadHeightUp = STEP_SIZE - 1;
 		coll->Setup.BadHeightDown = -127;
-		coll->Setup.BadCeilingHeight = 400;
+		coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 
 		coll->Setup.SlopesAreWalls = true;
 		coll->Setup.SlopesArePits = true;
@@ -431,7 +431,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 							auto collResult = LaraCollisionFront(item, item->pos.yRot, -300);
 							height = collResult.Position.Floor;
 
-							if (abs(height) >= 255 || collResult.Position.Type == BIG_SLOPE)
+							if (abs(height) >= STEP_SIZE - 1 || collResult.Position.Type == BIG_SLOPE)
 							{
 								if (TrInput & IN_ACTION)
 								{
@@ -566,9 +566,9 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 
-	coll->Setup.BadHeightUp = 255;
+	coll->Setup.BadHeightUp = STEP_SIZE - 1;
 	coll->Setup.BadHeightDown = -127;
-	coll->Setup.BadCeilingHeight = 400;
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -706,9 +706,9 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->Setup.Radius = LARA_RAD_CRAWL + 50; // TODO: Check if it still works without 50?
-	coll->Setup.BadHeightUp = 255;
-	coll->Setup.BadHeightDown = -127;
-	coll->Setup.BadCeilingHeight = 400;
+	coll->Setup.BadHeightUp = STEP_SIZE - 1;
+	coll->Setup.BadHeightDown = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 
@@ -737,7 +737,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -STEP_SIZE)
 			item->pos.yPos += coll->Middle.Floor;
 
 		Lara.moveAngle = item->pos.yRot;
@@ -825,11 +825,11 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
 		GetCollisionInfo(coll, item, 870);
-		edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+		edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 		if (edgeCatch)
 		{
-			if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
+			if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
 			{
 				short angle = item->pos.yRot;
 				if (SnapToQuadrant(angle, 35))

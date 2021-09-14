@@ -141,7 +141,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			xFloor = r->ySize - 1;
 
 		floor = &r->floor[zFloor + xFloor * r->xSize];
-		roomIndex = GetDoor(floor);
+		roomIndex = floor->WallPortal;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
@@ -151,12 +151,12 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 	{
-		while (floor->skyRoom != NO_ROOM)
+		while (floor->RoomAbove() != NO_ROOM)
 		{
-			r = &g_Level.Rooms[floor->skyRoom];
+			r = &g_Level.Rooms[floor->RoomAbove()];
 			if (!(r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP)))
 			{
-				int wh = floor->ceiling << 8;
+				int wh = floor->AverageCeiling << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -166,12 +166,12 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->pitRoom != NO_ROOM)
+		while (floor->RoomBelow() != NO_ROOM)
 		{
-			r = &g_Level.Rooms[floor->pitRoom];
+			r = &g_Level.Rooms[floor->RoomBelow()];
 			if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 			{
-				int wh = floor->floor << 8;
+				int wh = floor->AverageFloor << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -677,7 +677,11 @@ void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos = coll->Setup.OldPosition.y;
 		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
-	else if (wd <= 512)
+
+	// Height check was at STEP_SIZE * 2 before but changed to this 
+	// because now Lara surfaces on a head level, not mid-body level.
+
+	if (wd <= LARA_HEIGHT - LARA_HEADROOM / 2) 
 	{
 		item->animNumber = LA_UNDERWATER_TO_STAND;
 		item->currentAnimState = LS_ONWATER_EXIT;

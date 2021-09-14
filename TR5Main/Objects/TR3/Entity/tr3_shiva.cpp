@@ -242,7 +242,7 @@ void ShivaControl(short itemNum)
 				z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + 0x8000);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
-				if (!shiva->flags && floor->box != NO_BOX && !(g_Level.Boxes[floor->box].flags & BLOCKABLE))
+				if (!shiva->flags && floor->Box != NO_BOX && !(g_Level.Boxes[floor->Box].flags & BLOCKABLE))
 					item->goalAnimState = 8;
 				else
 					item->goalAnimState = 2;

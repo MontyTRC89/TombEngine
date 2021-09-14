@@ -86,7 +86,7 @@ void ControlGunShip(short itemNumber)
 
 		GetLaraOnLOS = 0;
 
-		if (objOnLos == 999 || objOnLos < 0)
+		if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 		{
 			if (GunShipCounter >= 15)
 				return AnimateItem(item);
