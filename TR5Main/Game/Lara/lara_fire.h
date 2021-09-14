@@ -1,7 +1,11 @@
 #pragma once
 #include "lara.h"
+
 struct ITEM_INFO;
 struct COLL_INFO;
+
+constexpr auto MAX_TARGETS = 8;
+
 enum FireWeaponType
 {
 	FW_MISS = -1,

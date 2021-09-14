@@ -2301,9 +2301,12 @@ int IsRoomOutside(int x, int y, int z)
 
 void ResetGlobals()
 {
-	// It's kinda lonely here for now, but I recommend gradually putting here all the globals which need reset
-	// on level change, unless we refactor all the code better way -- Lwmte
-
+	// Needs to be cleared or otherwise controls will lockup if user will exit to title
+	// while playing flyby with locked controls
 	DisableLaraControl = false;
+
+	// Needs to be cleared because otherwise a list of active creatures from previous level
+	// will spill into new level
+	ActiveCreatures.clear();
 }
 
