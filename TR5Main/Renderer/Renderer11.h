@@ -151,20 +151,6 @@ namespace TEN::Renderer
 		float Distance;
 		int RoomNumber;
 	};
-
-	struct RendererSky
-	{
-		Vector4 Color;
-		short Position1;
-		short Position2;
-
-		int LightningCount;
-		int LightningRand;
-
-		int StormTimer;
-		byte SkyStormColor  = 1;
-		byte SkyStormColor2 = 1;
-	};
 	
 	struct RendererRoomNode
 	{
@@ -472,7 +458,6 @@ namespace TEN::Renderer
 		bool m_firstWeather;
 		RendererWeatherParticle	m_rain[NUM_RAIN_DROPS];
 		RendererWeatherParticle	m_snow[NUM_SNOW_PARTICLES];
-		RendererSky m_Sky = {};
 		RENDERER_FADE_STATUS m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
 		float m_fadeFactor;
 		int m_progress;
@@ -504,7 +489,6 @@ namespace TEN::Renderer
 		bool drawAmbientCubeMap(short roomNumber);
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
-		void updateStorm();
 		void drawRooms(bool transparent, bool animated, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
@@ -625,7 +609,6 @@ namespace TEN::Renderer
 		void resetAnimations();
 		void updateLaraAnimations(bool force);
 		void updateItemAnimations(int itemNumber, bool force);
-		void updateSky();
 		void getLaraAbsBonePosition(DirectX::SimpleMath::Vector3* pos, int joint);
 		void getItemAbsBonePosition(int itemNumber, DirectX::SimpleMath::Vector3* pos, int joint);
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);

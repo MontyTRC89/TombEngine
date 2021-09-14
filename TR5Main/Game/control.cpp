@@ -41,6 +41,7 @@
 #include "effects\spark.h"
 #include "effects\explosion.h"
 #include "effects\drip.h"
+#include "effects\sky.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
@@ -53,6 +54,7 @@
 #include <Game/Lara/lara_climb.h>
 #include "generic_switch.h"
 #include "creature_info.h"
+
 using namespace TEN::Entities::Switches;
 
 using std::vector;
@@ -164,7 +166,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(1.0f/30.0f);
-		g_Renderer.updateSky();
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
@@ -508,6 +509,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSmokeParticles();
 		updateSimpleParticles();
 		TEN::Effects::Drip::UpdateDrips();
+		TEN::Effects::Sky::Sky.UpdateSky();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
