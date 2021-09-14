@@ -31,9 +31,10 @@ template <typename T, typename S> callbackSetName<S> GameScriptNamedBase<T, S>::
 		return false;
 	};
 
+// this could potentially be called by the GameScriptItemInfo destructor, and thus cannot throw
 template <typename T, typename S> callbackRemoveName GameScriptNamedBase<T, S>::s_callbackRemoveName = [](std::string const& n) {
-		std::string err = "\"Remove Name\" callback is not set.";
-		throw TENScriptException(err);
+		TENLog("\"Remove Name\" callback is not set.", LogLevel::Error);
+		std::terminate();
 		return false;
 	};
 
