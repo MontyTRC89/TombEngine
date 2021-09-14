@@ -2033,6 +2033,9 @@
     <ClCompile Include="Game\itemdata\itemdata.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClInclude Include="Game\effects\sky.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
     <ClCompile Include="Scripting\GameFlowScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
