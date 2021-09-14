@@ -21,8 +21,9 @@ namespace Footprints {
 		short roomNumber = item.roomNumber;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		if (!(floor->Material == GroundMaterial::Ice  || 
-			  floor->Material == GroundMaterial::Sand || 
+		if (!(floor->Material == GroundMaterial::Sand   ||
+			  floor->Material == GroundMaterial::Snow   ||
+			  floor->Material == GroundMaterial::Gravel ||
 			  floor->Material == GroundMaterial::Mud)) 
 		{
 			return false;
