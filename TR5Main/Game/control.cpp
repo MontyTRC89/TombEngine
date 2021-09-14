@@ -2305,6 +2305,9 @@ void ResetGlobals()
 	// while playing flyby with locked controls
 	DisableLaraControl = false;
 
+	// ClearSky resets lightning parameters so user won't see prev lightning in new level
+	TEN::Effects::Sky::Sky.ClearSky();
+
 	// Needs to be cleared because otherwise a list of active creatures from previous level
 	// will spill into new level
 	ActiveCreatures.clear();
