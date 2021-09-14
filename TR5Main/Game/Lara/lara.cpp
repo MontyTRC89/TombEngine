@@ -433,28 +433,25 @@ void LaraControl(short itemNumber)
 		switch (Lara.waterStatus)
 		{
 		case LW_ABOVE_WATER:
-			if (hfw != NO_HEIGHT && hfw >= STEP_SIZE && Lara.Vehicle == NO_ITEM)
+			if (hfw != NO_HEIGHT && hfw >= WADE_DEPTH)
 			{
-				if (wd <= 474)
+				if (wd <= SWIM_DEPTH - STEP_SIZE)
 				{
-					if (hfw > 256)
+					Lara.waterStatus = LW_WADE;
+					if (!(item->gravityStatus))
 					{
-						Lara.waterStatus = LW_WADE;
-						if (!(item->gravityStatus))
-						{
-							item->goalAnimState = LS_STOP;
-						}
-						else if (isWater & ENV_FLAG_SWAMP)
-						{
-							if (item->currentAnimState == LS_SWANDIVE_START 
-								|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
-								item->pos.yPos = wh + 1000;
+						item->goalAnimState = LS_STOP;
+					}
+					else if (isWater & ENV_FLAG_SWAMP)
+					{
+						if (item->currentAnimState == LS_SWANDIVE_START 
+							|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
+							item->pos.yPos = wh + 1000;
 
-							item->goalAnimState = LS_WADE_FORWARD;
-							item->currentAnimState = LS_WADE_FORWARD;
-							item->animNumber = LA_WADE;
-							item->frameNumber = GF(LA_WADE, 0);
-						}
+						item->goalAnimState = LS_WADE_FORWARD;
+						item->currentAnimState = LS_WADE_FORWARD;
+						item->animNumber = LA_WADE;
+						item->frameNumber = GF(LA_WADE, 0);
 					}
 				}
 				else if (!(isWater & ENV_FLAG_SWAMP))
@@ -500,9 +497,10 @@ void LaraControl(short itemNumber)
 				}
 
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw > 256)
+
+				if (hfw >= WADE_DEPTH)
 				{
-					if (hfw > 730)
+					if (hfw > SWIM_DEPTH)
 					{
 						Lara.waterStatus = LW_SURFACE;
 						item->pos.yPos += 1 - hfw;
@@ -564,17 +562,17 @@ void LaraControl(short itemNumber)
 
 		case LW_UNDERWATER:
 			roomNumber = item->roomNumber;
-			GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+			GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, &roomNumber);
 
 			if (wd == NO_HEIGHT
-				|| abs(hfw) >= 256
+				|| abs(hfw) >= STEP_SIZE
 				|| g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER
 				|| item->animNumber == LA_UNDERWATER_RESURFACE
 				|| item->animNumber == LA_ONWATER_DIVE)
 			{
 				if (!isWater)
 				{
-					if (wd == NO_HEIGHT || abs(hfw) >= 256)
+					if (wd == NO_HEIGHT || abs(hfw) >= STEP_SIZE)
 					{
 						Lara.waterStatus = LW_ABOVE_WATER;
 						item->animNumber = LA_FALL_START;
@@ -639,7 +637,7 @@ void LaraControl(short itemNumber)
 		case LW_SURFACE:
 			if (!isWater)
 			{
-				if (hfw <= 256)
+				if (hfw <= WADE_DEPTH)
 				{
 					Lara.waterStatus = LW_ABOVE_WATER;
 					item->animNumber = LA_FALL_START;
@@ -672,9 +670,9 @@ void LaraControl(short itemNumber)
 
 		case LW_WADE:
 			Camera.targetElevation = -ANGLE(22);
-			if (hfw > 256)
+			if (hfw >= WADE_DEPTH)
 			{
-				if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
+				if (hfw > SWIM_DEPTH && !(isWater & ENV_FLAG_SWAMP))
 				{
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - hfw;
