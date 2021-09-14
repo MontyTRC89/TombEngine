@@ -26,6 +26,7 @@
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 #include "effects\hair.h"
+#include "effects\sky.h"
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
@@ -3311,93 +3312,6 @@ namespace TEN::Renderer
         }
     }
 
-	void Renderer11::updateSky()
-	{
-		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-
-		if (level->Layer1.Enabled)
-		{
-			m_Sky.Position1 += level->Layer1.CloudSpeed;
-			if (m_Sky.Position1 <= 9728)
-			{
-				if (m_Sky.Position1 < 0)
-					m_Sky.Position1 += 9728;
-			}
-			else
-			{
-				m_Sky.Position1 -= 9728;
-			}
-		}
-
-		if (level->Layer2.Enabled)
-		{
-			m_Sky.Position2 += level->Layer2.CloudSpeed;
-			if (m_Sky.Position2 <= 9728)
-			{
-				if (m_Sky.Position2 < 0)
-					m_Sky.Position2 += 9728;
-			}
-			else
-			{
-				m_Sky.Position2 -= 9728;
-			}
-		}
-
-		auto color = Vector4(level->Layer1.R / 255.0f, level->Layer1.G / 255.0f, level->Layer1.B / 255.0f, 1.0f);
-
-		// Storm
-		if (level->Storm)
-		{
-			if (m_Sky.LightningCount || m_Sky.LightningRand)
-			{
-				updateStorm();
-				if (m_Sky.StormTimer > -1)
-					m_Sky.StormTimer--;
-				if (!m_Sky.StormTimer)
-					SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL, 0);
-			}
-			else if (!(rand() & 0x7F))
-			{
-				m_Sky.LightningCount = (rand() & 0x1F) + 16;
-				m_Sky.StormTimer = (rand() & 3) + 12;
-			}
-
-			auto flashBrightness = m_Sky.SkyStormColor / 255.0f;
-			auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);
-			auto g = std::clamp(color.y + flashBrightness, 0.0f, 1.0f);
-			auto b = std::clamp(color.z + flashBrightness, 0.0f, 1.0f);
-
-			m_Sky.Color = Vector4(r, g, b, color.w);
-		}
-		else
-			m_Sky.Color = color;
-	}
-
-	void Renderer11::updateStorm()
-	{
-		m_Sky.LightningCount--;
-
-		if (m_Sky.LightningCount <= 0)
-		{
-			m_Sky.SkyStormColor = 0;
-			m_Sky.LightningRand = 0;
-		}
-		else if (m_Sky.LightningCount < 5 && m_Sky.SkyStormColor < 50)
-		{
-			auto newColor = m_Sky.SkyStormColor - m_Sky.LightningCount * 2;
-			if (newColor < 0)
-				newColor = 0;
-			m_Sky.SkyStormColor = newColor;
-		}
-		else if (m_Sky.LightningCount)
-		{
-			m_Sky.LightningRand = ((rand() & 0x1FF - m_Sky.LightningRand) >> 1) + m_Sky.LightningRand;
-			m_Sky.SkyStormColor2 += m_Sky.LightningRand * m_Sky.SkyStormColor2 >> 8;
-			m_Sky.SkyStormColor = m_Sky.SkyStormColor2;
-			if (m_Sky.SkyStormColor > 255)
-				m_Sky.SkyStormColor = 255;
-		}
-	}
 
     void Renderer11::drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
     {
@@ -3488,11 +3402,13 @@ namespace TEN::Renderer
 
         for (int i = 0; i < 2; i++)
         {
-            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + m_Sky.Position1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+			auto sky = TEN::Effects::Sky::Sky;
+
+            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + sky.Position1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
             Matrix world = rotation * translation;
 
             m_stStatic.World = (rotation * translation);
-            m_stStatic.Color = m_Sky.Color;
+            m_stStatic.Color = sky.Color;
             m_cbStatic.updateData(m_stStatic, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
