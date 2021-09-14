@@ -13,12 +13,11 @@
 #include "lara.h"
 #include "gameflow.h"
 #include "rope.h"
-#include "tomb4fx.h"
-#include "door.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 #include "setup.h"
 #include "control.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
@@ -26,7 +25,7 @@
 #include <Objects\TR4\Entity\tr4_wraith.h>
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
-#include "hair.h"
+#include "effects\hair.h"
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
@@ -76,13 +75,16 @@ namespace TEN::Renderer
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
-        OBJECT_INFO *obj = &Objects[objectNum];
-        RendererObject &moveableObj = *m_moveableObjects[objectNum];
+        auto& moveableObj = m_moveableObjects[objectNum];
+        if(!moveableObj)
+            return;
+
+        OBJECT_INFO* obj = &Objects[objectNum];
 
         if (obj->animIndex != -1)
         {
             ANIM_FRAME *frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
-            updateAnimation(NULL, moveableObj, frame, 0, 0, 0xFFFFFFFF);
+            updateAnimation(NULL, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
         }
 
         Vector3 pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
@@ -115,9 +117,9 @@ namespace TEN::Renderer
         m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
-        for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
+        for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
         {
-            RendererMesh *mesh = moveableObj.ObjectMeshes[n];
+            RendererMesh *mesh = (*moveableObj).ObjectMeshes[n];
 
             /*if (GLOBAL_invMode)
             {
@@ -138,9 +140,9 @@ namespace TEN::Renderer
             world = world * translation;
 
             if (obj->animIndex != -1)
-                m_stItem.World = (moveableObj.AnimationTransforms[n] * world);
+                m_stItem.World = ((*moveableObj).AnimationTransforms[n] * world);
             else
-                m_stItem.World = (moveableObj.BindPoseTransforms[n] * world);
+                m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
             m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
             m_cbItem.updateData(m_stItem, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());

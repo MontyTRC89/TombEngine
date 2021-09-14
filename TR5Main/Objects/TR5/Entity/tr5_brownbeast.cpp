@@ -2,13 +2,13 @@
 #include "tr5_brownbeast.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
-#include "effect2.h"
-#include "tomb4fx.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO BrownBeastBite1 = { 0, 0, 0, 16 };
 BITE_INFO BrownBeastBite2 = { 0, 0, 0, 22 };

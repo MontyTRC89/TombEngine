@@ -2,12 +2,12 @@
 #include "tr5_ghost.h"
 #include "items.h"
 #include "box.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 

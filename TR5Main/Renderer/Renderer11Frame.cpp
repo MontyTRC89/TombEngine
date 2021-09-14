@@ -2,7 +2,7 @@
 #include "Renderer11.h"
 #include "draw.h"
 #include "lara.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
@@ -83,12 +83,12 @@ namespace TEN::Renderer
 		for (int i = 0; i < numStatics; i++)
 		{
 			MESH_INFO *mesh = &r->mesh[i];
-			if (mesh->flags > 0)
+			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 			{
 				RendererStatic* newStatic = &room.Statics[i];
 				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
-				Vector3 min = Vector3(sinfo->collisionBox.X1, sinfo->collisionBox.Y1, sinfo->collisionBox.Z1);
-				Vector3 max = Vector3(sinfo->collisionBox.X2, sinfo->collisionBox.Y2, sinfo->collisionBox.Z2);
+				Vector3 min = Vector3(sinfo->visibilityBox.X1, sinfo->visibilityBox.Y1, sinfo->visibilityBox.Z1);
+				Vector3 max = Vector3(sinfo->visibilityBox.X2, sinfo->visibilityBox.Y2, sinfo->visibilityBox.Z2);
 				min += Vector3(mesh->x, mesh->y, mesh->z);
 				max += Vector3(mesh->x, mesh->y, mesh->z);
 				if (!renderView.camera.frustum.AABBInFrustum(min, max))

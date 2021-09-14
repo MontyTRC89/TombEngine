@@ -2,14 +2,14 @@
 #include "tr5_lion.h"
 
 #include "items.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lot.h"
 #include "box.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO LionBite1 = { -2, -10, 250, 21 };

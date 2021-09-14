@@ -3,13 +3,13 @@
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
-#include "effect2.h"
-#include "debris.h"
-#include "effect2.h"
+#include "effects\effects.h"
+#include "effects\debris.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
@@ -181,7 +181,7 @@ void KnightTemplarControl(short itemNumber)
 						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
-						mesh->flags &= ~1;
+						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->stopper = false;
 
 						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);

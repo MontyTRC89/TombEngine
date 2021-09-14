@@ -3,14 +3,14 @@
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
-#include "effect2.h"
 #include "people.h"
 #include "draw.h"
 #include "level.h"
 #include "lara.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "creature_info.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1

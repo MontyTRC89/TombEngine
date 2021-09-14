@@ -3,13 +3,13 @@
 #include "level.h"
 #include "control.h"
 #include "setup.h"
-#include "effect2.h"
-#include "tomb4fx.h"
-#include "sound.h"
+#include "effects\effects.h"
+#include "effects\tomb4fx.h"
+#include "Sound\sound.h"
 #include "lara.h"
 
 int NextSpider;
-SPIDER_STRUCT* Spiders;
+SPIDER_STRUCT Spiders[NUM_SPIDERS];
 
 short GetNextSpider()
 {

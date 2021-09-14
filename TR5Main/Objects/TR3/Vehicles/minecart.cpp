@@ -2,7 +2,7 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
@@ -12,7 +12,8 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "minecart_info.h"
 
 using std::vector;
 
@@ -733,7 +734,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			coll.quadrant = short((v->pos.yRot + 0x2000) / 0x4000);
 			coll.radius = CART_RADIUS;
 
-			if (CollideStaticObjects(&coll, v->pos.xPos, v->pos.yPos, v->pos.zPos, v->roomNumber, CART_HEIGHT))
+			DoObjectCollision(v, &coll);
+
+			if (coll.hitStatic)
 			{
 				int hits;
 
@@ -764,8 +767,8 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &g_Level.Items[itemNum];
-	cart = game_malloc<CART_INFO>();
-	v->data = (void*)cart;
+	v->data = CART_INFO();
+	cart = v->data;
 	cart->Flags = NULL;
 	cart->Speed = 0;
 	cart->YVel = 0;
@@ -831,8 +834,8 @@ int MineCartControl(void)
 	short roomNumber;
 
 	v = &g_Level.Items[Lara.Vehicle];
-	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
-	cart = (CART_INFO*)v->data;
+	if (!v->data) { printf("v->data is nullptr !"); return 0; }
+	cart = v->data;
 
 	DoUserInput(v, LaraItem, cart);
 

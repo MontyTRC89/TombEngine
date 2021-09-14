@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr2_yeti.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO yetiBiteR = { 12, 101, 19, 10 };

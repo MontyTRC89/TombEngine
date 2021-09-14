@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "tr3_tiger.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"
 #include "lara.h"
+#include "creature_info.h"
+#include "control.h"
 
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 

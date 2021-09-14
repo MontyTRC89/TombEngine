@@ -4,8 +4,11 @@
 #include "lara.h"
 #include "underwater_switch.h"
 #include "newinv2.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "generic_switch.h"
+#include "camera.h"
+#include "collide.h"
+#include "level.h"
 
 namespace TEN::Entities::Switches
 { 
@@ -46,6 +49,20 @@ namespace TEN::Entities::Switches
 	PHD_VECTOR CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
 	void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
+
+		if (item->triggerFlags == 0)
+		{
+			WallUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+		else
+		{
+			CeilingUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+	}
+
+	void WallUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
@@ -95,14 +112,14 @@ namespace TEN::Entities::Switches
 			&& l->animNumber == LA_UNDERWATER_IDLE
 			&& !Lara.gunStatus
 			&& (item->currentAnimState == SWITCH_OFF)
-			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, item, l))
 			{
 				if (MoveLaraPosition(&CeilingUnderwaterSwitchPos1, item, l))
 					flag = 1;
 				else
-					Lara.generalPtr = (void*)itemNum;
+					Lara.interactedItem = itemNum;
 			}
 			else
 			{
@@ -113,7 +130,7 @@ namespace TEN::Entities::Switches
 					if (MoveLaraPosition(&CeilingUnderwaterSwitchPos2, item, l))
 						flag = 1;
 					else
-						Lara.generalPtr = (void*)itemNum;
+						Lara.interactedItem = itemNum;
 				}
 
 				l->pos.yRot ^= 0x8000;

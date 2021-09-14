@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr4_bigscorpion.h"
 #include "box.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "items.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
+#include "creature_info.h"
 #include "control.h"
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
@@ -164,12 +165,11 @@ void ScorpionControl(short itemNumber)
 			else
 			{
 				creature->enemy = NULL;
-				CREATURE_INFO* baddy = &BaddieSlots[0];
 				int minDistance = 0x7FFFFFFF;
 
-				for (int i = 0; i < NUM_SLOTS; i++)
+				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					baddy = &BaddieSlots[i];
+					CREATURE_INFO* baddy = ActiveCreatures[i];
 
 					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 					{

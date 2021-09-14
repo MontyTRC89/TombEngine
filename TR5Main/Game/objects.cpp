@@ -1,20 +1,20 @@
 #include "framework.h"
 #include "objects.h"
 #include "items.h"
-#include "effect2.h"
-#include "effect2.h"
+#include "effects\effects.h"
 #include "draw.h"
 #include "Lara.h"
 #include "sphere.h"
-#include "debris.h"
+#include "effects\debris.h"
 #include "control.h"
 #include "switch.h"
 #include "box.h"
 #include "setup.h"
-#include "tomb4fx.h"
+#include "effects\tomb4fx.h"
 #include "level.h"
 #include "input.h"
-#include "sound.h"
+#include "Sound\sound.h"
+#include "collide.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
@@ -54,7 +54,7 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == LS_STOP && 
 		l->animNumber == LA_STAND_IDLE
-		|| Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		short rot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
@@ -70,13 +70,13 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNumber;
+				Lara.interactedItem = itemNumber;
 			}
 			item->pos.yRot = rot;
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+			if (Lara.isMoving && Lara.interactedItem == itemNumber)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -204,18 +204,32 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
-		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+		&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 	{
-		if (l->currentAnimState == LS_TIGHTROPE_FORWARD && 
-			l->goalAnimState != LS_TIGHTROPE_EXIT && 
-			!Lara.tightRopeOff)
+#ifdef NEW_TIGHTROPE
+		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
+		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		   !Lara.tightrope.canGoOff)
 		{
-			if (item->pos.yRot == l->pos.yRot)
+			if(item->pos.yRot == l->pos.yRot)
 			{
-				if (abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+					Lara.tightrope.canGoOff = true;
+			}
+		}
+#else // NEW_TIGHTROPE
+		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
+		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		   !Lara.tightRopeOff)
+		{
+			if(item->pos.yRot == l->pos.yRot)
+			{
+				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
 					Lara.tightRopeOff = 1;
 			}
 		}
+#endif
+		
 	}
 	else
 	{
@@ -232,19 +246,28 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.headXrot = 0;
 				Lara.torsoYrot = 0;
 				Lara.torsoXrot = 0;
+#ifdef NEW_TIGHTROPE
+				Lara.tightrope.balance = 0;
+				Lara.tightrope.canGoOff = false;
+				Lara.tightrope.tightropeItem = itemNum;
+				Lara.tightrope.timeOnTightrope = 0;
+#else // !NEW_TIGHTROPE
 				Lara.tightRopeOnCount = 60;
 				Lara.tightRopeOff = 0;
 				Lara.tightRopeFall = 0;
+#endif
+
+				
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNum;
+				Lara.interactedItem = itemNum;
 			}
 			item->pos.yRot += -ANGLE(180);
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+			if (Lara.isMoving && Lara.interactedItem == itemNum)
 				Lara.isMoving = false;
 			item->pos.yRot += -ANGLE(180);
 		}
@@ -297,12 +320,12 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
 			if (l->pos.yRot & 0x4000)
-				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) / 2);
+				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);
 			else
 				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) / 2);
 			l->pos.yPos += item->pos.yPos - ((pos1.y + pos2.y) / 2);
 
-			Lara.generalPtr = item;
+			Lara.interactedItem = itemNumber;
 		}
 		else
 		{
@@ -427,8 +450,8 @@ void HighObject2Control(short itemNumber)
 
 	if (!item->itemFlags[2])
 	{
-		int div = (item->triggerFlags % 10) * 1024;
-		int mod = (item->triggerFlags / 10) * 1024;
+		int div = item->triggerFlags % 10 << 10;
+		int mod = item->triggerFlags / 10 << 10;
 		item->itemFlags[0] = GetRandomControl() % div;
 		item->itemFlags[1] = GetRandomControl() % mod;
 		item->itemFlags[2] = (GetRandomControl() & 0xF) + 15;

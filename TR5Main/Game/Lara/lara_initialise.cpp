@@ -2,7 +2,10 @@
 #include "lara.h"
 #include "lara_initialise.h"
 #include "health.h"
-
+#include "item.h"
+#include "items.h"
+#include "setup.h"
+#include "level.h"
 void InitialiseLara(int restore)
 {
 	if (Lara.itemNumber == NO_ITEM)
@@ -10,7 +13,7 @@ void InitialiseLara(int restore)
 
 	short itemNumber = Lara.itemNumber;
 
-	LaraItem->data = &Lara;
+	//LaraItem->data = &Lara;
 	LaraItem->collidable = false;
 	LaraItem->location.roomNumber = LaraItem->roomNumber;
 	LaraItem->location.yNumber = LaraItem->pos.yPos;

@@ -35,13 +35,14 @@
 #include "GameFlowScript.h"
 #include "health.h"
 #include "flipeffect.h"
-#include "sound.h"
+#include "Sound\sound.h"
 #include "savegame.h"
 #include "rope.h"
 #include "rubberboat.h"
 #include <Game\misc.h>
 #include <control\volume.h>
-
+#include "Renderer11.h"
+#include "camera.h"
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
@@ -54,7 +55,7 @@ short Elevation = 57346;
 extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-COLL_INFO lara_coll;
+COLL_INFO lara_coll = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
@@ -183,7 +184,11 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_trfall,//122
 	lara_as_trfall,//123
 	lara_as_null,//124
+#ifdef NEW_TIGHTROPE
+	lara_as_trexit,//125
+#else // !NEW_TIGHTROPE
 	lara_as_null,//125
+#endif
 	lara_as_switchon,//126
 	lara_as_null,//127
 	lara_as_parallelbars,//128
@@ -911,7 +916,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	if (Lara.ExtraAnim == -1)
 	{
 		// Check for collision with items
-		LaraBaddieCollision(item, coll);
+		DoObjectCollision(item, coll);
 
 		// Handle Lara collision
 		if (Lara.Vehicle == NO_ITEM)
@@ -1029,7 +1034,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) / 4;
 	item->pos.zPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_cos(item->pos.yRot) / 4;
 
-	LaraBaddieCollision(item, coll);
+	DoObjectCollision(item, coll);
 
 	if (/*Lara.ExtraAnim == -1 &&*/ Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
@@ -1087,7 +1092,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.xPos += item->fallspeed * phd_sin(Lara.moveAngle) / 4;
 	item->pos.zPos += item->fallspeed * phd_cos(Lara.moveAngle) / 4;
 
-	LaraBaddieCollision(item, coll);
+	DoObjectCollision(item, coll);
 
 	if (Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
@@ -1259,13 +1264,13 @@ void AnimateLara(ITEM_INFO* item)
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
-	lateral /= 65536;
+	lateral >>= 16;
 
 	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
 	{
 		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			item->speed -= item->speed * 8;
+			item->speed -= item->speed >> 3;
 			if (abs(item->speed) < 8)
 			{
 				item->speed = 0;
@@ -1281,8 +1286,8 @@ void AnimateLara(ITEM_INFO* item)
 		else
 		{
 			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
-			item->speed -= (velocity / 65536);
-			item->speed += ((velocity + anim->acceleration) / 65536);
+			item->speed -= velocity >> 16;
+			item->speed += (velocity + anim->acceleration) >> 16;
 			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
 			item->pos.yPos += item->fallspeed;
 		}
@@ -1293,9 +1298,9 @@ void AnimateLara(ITEM_INFO* item)
 
 		if (Lara.waterStatus == LW_WADE && g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			velocity = (anim->velocity / 2);
+			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)
-				velocity += ((anim->acceleration * (item->frameNumber - anim->frameBase)) / 4);
+				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
 		}
 		else
 		{
@@ -1304,7 +1309,7 @@ void AnimateLara(ITEM_INFO* item)
 				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
 		}
 
-		item->speed = velocity / 65536;
+		item->speed = velocity >> 16;
 	}
 
 	if (Lara.ropePtr != -1)

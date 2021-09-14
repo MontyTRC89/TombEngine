@@ -1,7 +1,8 @@
 #pragma once
 
-#include "collide.h"
-
+struct ITEM_INFO;
+struct COLL_INFO;
+struct OBJECT_TEXTURE;
 extern OBJECT_TEXTURE* WaterfallTextures[6];
 extern float WaterfallY[6];
 
