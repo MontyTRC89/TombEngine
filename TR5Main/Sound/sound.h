@@ -128,6 +128,7 @@ void S_CDPlay(int index, unsigned int mode);
 void S_CDPlayEx(int index, DWORD mask, DWORD unknown);
 void S_CDStop();
 void SayNo();
+void PlaySoundSources();
 int  GetShatterSound(int shatterID);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
