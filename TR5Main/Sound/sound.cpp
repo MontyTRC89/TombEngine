@@ -28,8 +28,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-unordered_map<string, AudioTrack> g_AudioTracks;
-char TrackNamePrefix;
+unordered_map<string, AudioTrack> SoundTracks;
+std::string CurrentLoopedSoundTrack;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -393,28 +393,28 @@ void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
 {
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
-	if (!g_AudioTracks[track].looped)
+	if (!SoundTracks[track].looped)
 	{
 		byte filteredMask = (mask >> 8) & 0x3F;
-		if ((g_AudioTracks[track].Mask & filteredMask) == filteredMask)
+		if ((SoundTracks[track].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
-		g_AudioTracks[track].Mask |= filteredMask;
+		SoundTracks[track].Mask |= filteredMask;
 	}
 
-	S_CDPlay(track, g_AudioTracks[track].looped);
+	S_CDPlay(track, SoundTracks[track].looped);
 }
 
 // Legacy!
 void S_CDPlay(int index, unsigned int mode)
 {
-	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
+	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
 	S_CDPlay(track.first, mode);
 }
 
 void S_CDPlayEx(int index, DWORD mask, DWORD unknown)
 {
-	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
+	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
 	S_CDPlayEx(track.first, mask, unknown);
 }
 

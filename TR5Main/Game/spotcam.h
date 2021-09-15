@@ -56,6 +56,7 @@ extern int NumberSpotcams;
 extern int UseSpotCam;
 extern int SpotcamDontDrawLara;
 extern int SpotcamOverlay;
+extern int TrackCameraInit;
 
 void ClearSpotCamSequences();
 void InitSpotCamSequences();

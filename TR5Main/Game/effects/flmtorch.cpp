@@ -1,16 +1,14 @@
 #include "framework.h"
-#include "effects\flmtorch.h"
-#include "effects\effects.h"
+#include "effects/flmtorch.h"
+#include "effects/effects.h"
 #include "lara_flare.h"
 #include "lara.h"
-#include "lara_fire.h"
 #include "draw.h"
 #include "items.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "snowmobile.h"
+#include "Sound/sound.h"
 
 extern OBJECT_COLLISION_BOUNDS FireBounds;
 
@@ -163,8 +161,6 @@ void DoFlameTorch()
 			TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 		
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
-
-		TorchRoom = LaraItem->roomNumber;
 	}
 }
 
@@ -242,7 +238,6 @@ void TorchControl(short itemNumber)
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		if (!(Wibble & 7))
 			TriggerTorchFlame(itemNumber, 1);
-		TorchRoom = item->roomNumber;
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 	}
 }
