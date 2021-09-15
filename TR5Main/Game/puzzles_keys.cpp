@@ -384,20 +384,3 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	return;
 }
-int KeyTrigger(short itemNum)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	int oldkey;
-
-	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
-		return -1;
-
-	oldkey = KeyTriggerActive;
-
-	if (!oldkey)
-		item->status = ITEM_DEACTIVATED;
-
-	KeyTriggerActive = false;
-
-	return oldkey;
-}

@@ -50,8 +50,6 @@ enum COMMAND_TYPES
 extern int KeyTriggerActive;
 extern byte FlipStatus;
 
-constexpr auto NO_LOS_ITEM = INT_MAX;
-
 constexpr auto MAX_FLIPMAP = 255;
 extern int FlipStats[MAX_FLIPMAP];
 extern int FlipMap[MAX_FLIPMAP];
@@ -109,16 +107,9 @@ int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 void AlterFloorHeight(ITEM_INFO* item, int height);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
-int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
-int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
-int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
-int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing);
-int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh);
 int GetRandomControl();
 int GetRandomDraw();
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
-int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 void AnimateItem(ITEM_INFO* item);
 void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);

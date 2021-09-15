@@ -1173,6 +1173,9 @@
     <ClInclude Include="Game\effects\weather.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\control\los.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -2103,6 +2106,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\effects\weather.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\control\los.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
