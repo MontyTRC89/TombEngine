@@ -2,8 +2,6 @@
 #include <SimpleMath.h>
 #include "Scripting/GameScriptLevel.h"
 
-using namespace DirectX::SimpleMath;
-
 namespace TEN {
 namespace Effects {
 namespace Environment {
