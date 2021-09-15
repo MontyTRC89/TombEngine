@@ -22,6 +22,7 @@ extern unsigned int ThreadID;
 extern uintptr_t ThreadHandle;
 extern HACCEL hAccTable;
 extern HWND WindowsHandle;
+
 #if _DEBUG
 extern std::string commit;
 #endif

@@ -26,7 +26,6 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
-//#include "rubberboat.h"
 
 #include "GameFlowScript.h"
 #include "health.h"
@@ -56,8 +55,10 @@ extern Inventory g_Inventory;
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-COLL_INFO lara_coll = {};
+COLL_INFO LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
+bool DisableLaraControl = false;
+bool OldLaraBusy;
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
 {
@@ -379,6 +380,21 @@ void LaraControl(short itemNumber)
 	ITEM_INFO* item = LaraItem;
 
 	LaraCheatyBits();
+
+	if (Lara.hasFired)
+	{
+		AlertNearbyGuards(LaraItem);
+		Lara.hasFired = false;
+	}
+
+	if (Lara.poisoned)
+	{
+		if (Lara.poisoned > 4096)
+			Lara.poisoned = 4096;
+
+		if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
+			LaraItem->hitPoints -= Lara.poisoned >> 8;
+	}
 
 	if (Lara.isMoving)
 	{
@@ -736,7 +752,7 @@ void LaraControl(short itemNumber)
 		item->hitPoints = -1;
 
 		if (Lara.deathCount == 0)
-			S_CDStop();
+			StopSoundTracks();
 
 		Lara.deathCount++;
 		if ((LaraItem->flags & 0x100))
@@ -773,7 +789,7 @@ void LaraControl(short itemNumber)
 					Lara.air = 1800;
 			}
 		}
-		LaraAboveWater(item, &lara_coll);
+		LaraAboveWater(item, &LaraCollision);
 		break;
 
 	case LW_UNDERWATER:
@@ -795,7 +811,7 @@ void LaraControl(short itemNumber)
 				item->hitPoints -= 5;
 			}
 		}
-		LaraUnderWater(item, &lara_coll);
+		LaraUnderWater(item, &LaraCollision);
 		break;
 
 	case LW_SURFACE:
@@ -805,11 +821,11 @@ void LaraControl(short itemNumber)
 			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
-		LaraSurface(item, &lara_coll);
+		LaraSurface(item, &LaraCollision);
 		break;
 
 	case LW_FLYCHEAT:
-		LaraCheat(item, &lara_coll);
+		LaraCheat(item, &LaraCollision);
 		break;
 	}
 

@@ -419,7 +419,7 @@ static int JeepCheckGetOff()
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 			CurrentLoopedSoundTrack = 110;
-			S_CDPlay(110, 1);
+			S_CDPlay(110, SOUND_TRACK_BGM);
 			return false;
 		}
 	}
@@ -1607,7 +1607,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			item->flags |= 0x20;
 
 			CurrentLoopedSoundTrack = 98;
-			S_CDPlay(98, 1);
+			S_CDPlay(98, SOUND_TRACK_BGM);
 		}
 		else
 			ObjectCollision(itemNumber, l, coll);

@@ -16,8 +16,6 @@ using TEN::Renderer::g_Renderer;
 
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
-extern GameFlow* g_GameFlow;
-
 void InitialiseHair()
 {
 	for (int h = 0; h < HAIR_MAX; h++)

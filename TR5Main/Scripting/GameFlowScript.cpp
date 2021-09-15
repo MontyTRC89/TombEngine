@@ -1,16 +1,10 @@
 #include "framework.h"
 #include "GameFlowScript.h"
-#include "items.h"
-#include "box.h"
-#include "lot.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "savegame.h"
-#include "draw.h"
-#include "AudioTracks.h"
 #include "GameScriptInventoryObject.h"
 #include "InventorySlots.h"
-#include <Objects/objectslist.h>
-#include <Game/newinv2.h>
+#include "Game/newinv2.h"
 
 /***
 Scripts that will be run on game startup.
@@ -22,7 +16,8 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-extern unordered_map<string, AudioTrack> SoundTracks;
+GameFlow* g_GameFlow;
+GameScript* g_GameScript;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
@@ -309,5 +304,3 @@ bool GameFlow::DoGameflow()
 
 	return true;
 }
-
-GameFlow* g_GameFlow;

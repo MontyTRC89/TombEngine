@@ -21,9 +21,6 @@ BITE_INFO EnemyBites[9] =
 };
 
 BOUNDING_BOX InterpolatedBounds;
-LARGE_INTEGER PerformanceCount;
-double LdFreq;
-double LdSync;
 
 int DrawPhaseGame()
 {
@@ -88,38 +85,6 @@ int GetFrame_D2(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 	if (second>anim->frameEnd)                       // Clamp KeyFrame to End if need be
 		*rate = anim->frameEnd - (second - rat);
 	return(interp);
-}
-
-bool TIME_Reset()
-{
-	LARGE_INTEGER fq;
-	QueryPerformanceCounter(&fq);
-	LdSync = (double)fq.LowPart + (double)fq.HighPart * (double)0xffffffff;
-	LdSync /= LdFreq;
-	return true;
-}
-
-bool TIME_Init()
-{
-	LARGE_INTEGER fq;
-	if (!QueryPerformanceFrequency(&fq))
-		return false;
-	LdFreq = (double)fq.LowPart + (double)fq.HighPart * (double)0xFFFFFFFF;
-	LdFreq /= 60.0;
-	TIME_Reset();
-	return true;
-}
-
-int Sync()
-{
-	LARGE_INTEGER ct;
-	double dCounter;
-	QueryPerformanceCounter(&ct);
-	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
-	dCounter /= LdFreq;
-	long nFrames = long(dCounter) - long(LdSync);
-	LdSync = dCounter;
-	return nFrames;
 }
 
 void DrawAnimatingItem(ITEM_INFO* item)
