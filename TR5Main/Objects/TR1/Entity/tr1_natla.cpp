@@ -133,7 +133,7 @@ void NatlaControl(short itemNum)
 				natla->flags = 0;
 				timer = 0;
 				item->hitPoints = NATLA_NEAR_DEATH;
-				//S_CDPlay(54, 0);
+				//S_CDPlay(54, SOUND_TRACK_ONESHOT);
 			}
 			else
 				item->hitPoints = -16384;

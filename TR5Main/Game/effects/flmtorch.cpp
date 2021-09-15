@@ -221,15 +221,15 @@ void TorchControl(short itemNumber)
 
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
-		lara_coll.Setup.EnableObjectPush = true;
+		LaraCollision.Setup.EnableObjectPush = true;
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &lara_coll);
+				ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
 		}
 		else
 		{
-			ItemPushStatic(item, CollidedMeshes[0], &lara_coll);
+			ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
 		}
 		item->speed >>= 1;
 	}

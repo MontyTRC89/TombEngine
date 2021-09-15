@@ -33,9 +33,6 @@ char* LevelDataPtr;
 ChunkReader* g_levelChunkIO;
 LEVEL g_Level;
 
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
-
 short ReadInt8()
 {
 	byte value = *(byte*)LevelDataPtr;

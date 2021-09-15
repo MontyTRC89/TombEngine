@@ -71,9 +71,6 @@ extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
-extern bool DisableLaraControl;
-extern bool OldLaraBusy;
-
 extern int WeatherType;
 extern int LaraDrawType;
 
@@ -99,6 +96,7 @@ void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void KillMoveItems();
 void KillMoveEffects();
+void UpdateShatters();
 
 int IsObjectInRoom(short roomNumber, short objectNumber);
 int IsRoomOutside(int x, int y, int z);

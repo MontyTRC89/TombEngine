@@ -13,7 +13,6 @@
 #include "setup.h"
 #include "level.h"
 
-extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)

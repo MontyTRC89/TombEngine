@@ -66,8 +66,6 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 	{ 0, 0, 0, 0, false }, // Empty
 };
 
-extern GameFlow* g_GameFlow;
-
 void DetatchSpark(int num, SpriteEnumFlag type)
 {
 	FX_INFO* fx;

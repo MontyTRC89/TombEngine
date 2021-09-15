@@ -122,12 +122,13 @@ void StopSoundEffect(short effectID);
 bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void Sound_FreeSamples();
 void SOUND_Stop();
+
 void PlaySoundTrack(short track, short flags);
 void S_CDPlay(std::string trackName, unsigned int mode);
 void S_CDPlayEx(std::string trackName, DWORD mask, DWORD unknown);
 void S_CDPlay(int index, unsigned int mode);
 void S_CDPlayEx(int index, DWORD mask, DWORD unknown);
-void S_CDStop();
+void StopSoundTracks();
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);

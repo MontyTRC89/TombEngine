@@ -30,8 +30,6 @@
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
 
-extern GameFlow* g_GameFlow;
-
 //int HKCounter = 0;
 //int HKTimer = 0;
 //int HKFlag = 0;

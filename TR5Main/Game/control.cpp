@@ -42,9 +42,11 @@
 #include "tr4_littlebeetle.h"
 #include "particle/SimpleParticle.h"
 #include "Specific/prng.h"
+#include "Specific/time.h"
 #include "control/flipmap.h"
 #include "Lara/lara_one_gun.h"
 #include "generic_switch.h"
+#include "Scripting/GameFlowScript.h"
 
 using std::vector;
 using std::unordered_map;
@@ -84,9 +86,6 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
-bool DisableLaraControl = false;
-bool OldLaraBusy;
-
 int WeatherType;
 int LaraDrawType;
 
@@ -100,14 +99,6 @@ extern Inventory g_Inventory;
 
 short IsRoomOutsideNo;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
-
-extern GameFlow *g_GameFlow;
-extern GameScript *g_GameScript;
-
-// This might not be the exact amount of time that has passed, but giving it a
-// value of 1/30 keeps it in lock-step with the rest of the game logic,
-// which assumes 30 iterations per second.
-static constexpr float deltaTime = 1.0f / 30.0f;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -124,7 +115,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	g_GameScript->ProcessDisplayStrings(deltaTime);
+	g_GameScript->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int FramesCount = 0;
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
@@ -134,7 +125,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(deltaTime);
+		g_GameScript->OnControlPhase(DELTA_TIME);
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
@@ -359,23 +350,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0)
 		{
-			if (Lara.hasFired)
-			{
-				AlertNearbyGuards(LaraItem);
-				Lara.hasFired = false;
-			}
-
-			// Is Lara poisoned?
-			if (Lara.poisoned)
-			{
-				if (Lara.poisoned > 4096)
-					Lara.poisoned = 4096;
-
-				if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
-				{
-					LaraItem->hitPoints -= Lara.poisoned >> 8;
-				}
-			}
 
 			// Control Lara
 			InItemControlLoop = true;
@@ -414,38 +388,17 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			CalculateCamera();
 		}
 
-		//WTF: what is this? It's used everywhere so it has to stay
+		// Update oscillator seed
 		Wibble = (Wibble + 4) & 0xFC;
 
-		// Update special effects
-		TriggerLaraDrips();
-
-		if (SmashedMeshCount)
-		{
-			do
-			{
-				SmashedMeshCount--;
-
-				FLOOR_INFO *floor = GetFloor(
-					SmashedMesh[SmashedMeshCount]->pos.xPos,
-					SmashedMesh[SmashedMeshCount]->pos.yPos,
-					SmashedMesh[SmashedMeshCount]->pos.zPos,
-					&SmashedMeshRoom[SmashedMeshCount]);
-
-				TestTriggers(SmashedMesh[SmashedMeshCount]->pos.xPos,
-					         SmashedMesh[SmashedMeshCount]->pos.yPos,
-					         SmashedMesh[SmashedMeshCount]->pos.zPos,
-					         SmashedMeshRoom[SmashedMeshCount], true);
-
-				floor->Stopper = false;
-				SmashedMesh[SmashedMeshCount] = 0;
-			} while (SmashedMeshCount != 0);
-		}
+		// Smash shatters and clear stopper flags under them
+		UpdateShatters();
 
 		// Update weather
 		Weather.Update();
 
 		// Update special FX
+		TriggerLaraDrips();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -492,9 +445,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 unsigned CALLBACK GameMain(void *)
 {
-	try {
+	try 
+	{
 		printf("GameMain\n");
-		TIME_Init();
+
+		TimeInit();
+
 		if (g_GameFlow->IntroImagePath.empty())
 		{
 			throw TENScriptException("Intro image path is not set.");
@@ -512,7 +468,8 @@ unsigned CALLBACK GameMain(void *)
 		PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
 		EndThread();
 	}
-	catch (TENScriptException const& e) {
+	catch (TENScriptException const& e) 
+	{
 		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
 		throw;
@@ -553,8 +510,8 @@ GAME_STATUS DoTitle(int index)
 			{
 				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 			});
-
 		}
+
 		RequiredStartPos = false;
 		if (InitialiseGame)
 		{
@@ -572,14 +529,11 @@ GAME_STATUS DoTitle(int index)
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
-
-		InitialiseSpotCam(2);
-		CurrentLoopedSoundTrack = "083_horus";
+		InitialiseSpotCam(0);
 		UseSpotCam = true;
 
 		// Play background music
-		//CurrentLoopedSoundTrack = ambient;
-		S_CDPlay(CurrentLoopedSoundTrack, 1);
+		S_CDPlay("083_horus", SOUND_TRACK_BGM);
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -621,11 +575,11 @@ GAME_STATUS DoTitle(int index)
 #endif
 	}
 
-	UseSpotCam = false;
-	S_CDStop();
+	StopSoundTracks();
 
 	g_GameScript->OnEnd();
 	g_GameScript->FreeLevelScripts();
+
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
@@ -728,8 +682,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitSpotCamSequences();
 
 	// Play background music
-	CurrentLoopedSoundTrack = ambient;
-	S_CDPlay(CurrentLoopedSoundTrack, 1);
+	S_CDPlay(ambient, SOUND_TRACK_BGM);
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -764,7 +717,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();
-			S_CDStop();
+			StopSoundTracks();
 			DisableBubbles();
 			DisableDebris();
 
@@ -811,6 +764,31 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 
 	return NO_HEIGHT;
+}
+
+void UpdateShatters()
+{
+	if (!SmashedMeshCount)
+		return;
+
+	do
+	{
+		SmashedMeshCount--;
+
+		FLOOR_INFO* floor = GetFloor(
+			SmashedMesh[SmashedMeshCount]->pos.xPos,
+			SmashedMesh[SmashedMeshCount]->pos.yPos,
+			SmashedMesh[SmashedMeshCount]->pos.zPos,
+			&SmashedMeshRoom[SmashedMeshCount]);
+
+		TestTriggers(SmashedMesh[SmashedMeshCount]->pos.xPos,
+			SmashedMesh[SmashedMeshCount]->pos.yPos,
+			SmashedMesh[SmashedMeshCount]->pos.zPos,
+			SmashedMeshRoom[SmashedMeshCount], true);
+
+		floor->Stopper = false;
+		SmashedMesh[SmashedMeshCount] = 0;
+	} while (SmashedMeshCount != 0);
 }
 
 void KillMoveItems()

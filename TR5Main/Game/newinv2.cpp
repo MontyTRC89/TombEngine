@@ -30,7 +30,6 @@ int pause_menu_to_display = 0;
 __int64 pause_selected_option = 1;
 int pause_flag;
 int GLOBAL_invMode;
-extern GameFlow* g_GameFlow;
 titleSettings CurrentSettings;
 /*inventory*/
 RINGME pcring1;//items ring
@@ -2418,7 +2417,7 @@ void use_current_item()
 	long OldBinocular;
 
 	OldBinocular = BinocularRange;
-	OldLaraBusy = 0;
+	OldLaraBusy = false;
 	BinocularRange = 0;
 	LaraItem->meshBits = -1;
 	invobject = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
@@ -2491,7 +2490,7 @@ void use_current_item()
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
-				OldLaraBusy = 1;
+				OldLaraBusy = true;
 				BinocularRange = 128;
 
 				if (Lara.gunStatus != LG_NO_ARMS)
