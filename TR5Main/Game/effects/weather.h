@@ -12,7 +12,7 @@ namespace Environment {
 	{
 	public:
 		Vector3 Wind() { return Vector3(WindFinalX / 2.0f, 0, WindFinalZ / 2.0f); }
-		Vector4 FlashColor() { return FlashColorBase * sin(FlashProgress * PI / 2);; }
+		Vector4 FlashColor() { return FlashColorBase * sin(FlashProgress * PI / 2.0f); }
 		Vector4 SkyColor() { return SkyCurrentColor; }
 		short   SkyLayer1Position() { return SkyPosition1; }
 		short   SkyLayer2Position() { return SkyPosition2; }
@@ -35,7 +35,7 @@ namespace Environment {
 		int WindCurrent;
 
 		// Flash fader
-		Vector3 FlashColorBase = {};
+		Vector4 FlashColorBase = {};
 		float   FlashSpeed = 1.0f;
 		float   FlashProgress = 0.0f;
 
