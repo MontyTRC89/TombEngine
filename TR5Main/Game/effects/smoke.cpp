@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "framework.h"
 #include "Specific\trmath.h"
 #include "smoke.h"
@@ -6,9 +7,12 @@
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
-#include <algorithm>
 #include "Specific\prng.h"
+#include "effects\weather.h"
+
+using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
+
 namespace TEN {
 	namespace Effects {
 		namespace Smoke {
@@ -41,8 +45,8 @@ namespace TEN {
 					s.position += s.velocity;
 					if (s.affectedByWind) {
 						if (g_Level.Rooms[s.room].flags & ENV_FLAG_WIND) {
-							s.position.x += SmokeWindX / 2;
-							s.position.z += SmokeWindZ / 2;
+							s.position.x += Weather.Wind().x;
+							s.position.z += Weather.Wind().z;
 						}
 					}
 					float normalizedLife = std::clamp(s.age / s.life,0.0f,1.0f);

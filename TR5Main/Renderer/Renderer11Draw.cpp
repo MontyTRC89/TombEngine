@@ -26,7 +26,7 @@
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 #include "effects\hair.h"
-#include "effects\sky.h"
+#include "effects\weather.h"
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
@@ -3452,13 +3452,13 @@ namespace TEN::Renderer
 
         for (int i = 0; i < 2; i++)
         {
-			auto sky = TEN::Effects::Sky::Sky;
+			auto weather = TEN::Effects::Environment::Weather;
 
-            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + sky.Position1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyLayer1Position() - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
             Matrix world = rotation * translation;
 
             m_stStatic.World = (rotation * translation);
-            m_stStatic.Color = sky.Color;
+            m_stStatic.Color = weather.SkyColor();
             m_cbStatic.updateData(m_stStatic, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());

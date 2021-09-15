@@ -12,8 +12,9 @@
 #include "GameFlowScript.h"
 #include "spark.h"
 #include "explosion.h"
-#include <Game\effects\drip.h>
-#include <Game\effects\bubble.h>
+#include "effects\drip.h"
+#include "effects\bubble.h"
+#include "effects\weather.h"
 #include "smoke.h"
 #include "Specific\prng.h"
 #include "Renderer11.h"
@@ -21,6 +22,7 @@
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
 FX_INFO EffectList[NUM_EFFECTS];
@@ -280,8 +282,8 @@ void UpdateSparks()
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ >> 1;
+				spark->x += Weather.Wind().x;
+				spark->z += Weather.Wind().z;
 			}
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
