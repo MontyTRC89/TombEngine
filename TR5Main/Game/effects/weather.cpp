@@ -4,8 +4,6 @@
 #include "Sound\sound.h"
 #include "Scripting\GameScriptLevel.h"
 
-using namespace TEN::Effects::Environment;
-
 namespace TEN {
 namespace Effects {
 namespace Environment 
