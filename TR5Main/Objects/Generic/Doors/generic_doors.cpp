@@ -444,14 +444,14 @@ namespace TEN::Entities::Doors
 			// We should find a better way of dealing with doors using new floordata.
 
 			floor->WallPortal = -1;
-			floor->FloorCollision.Portals[0] = NO_ROOM;
-			floor->FloorCollision.Portals[1] = NO_ROOM;
+			floor->FloorCollision.Portals[0]   = NO_ROOM;
+			floor->FloorCollision.Portals[1]   = NO_ROOM;
 			floor->CeilingCollision.Portals[0] = NO_ROOM;
 			floor->CeilingCollision.Portals[1] = NO_ROOM;
-			floor->FloorCollision.Planes[0].z = -127;
-			floor->FloorCollision.Planes[1].z = -127;
-			floor->CeilingCollision.Planes[0].z = -127;
-			floor->CeilingCollision.Planes[1].z = -127;
+			floor->FloorCollision.Planes[0]    = WALL_PLANE;
+			floor->FloorCollision.Planes[1]    = WALL_PLANE;
+			floor->CeilingCollision.Planes[0]  = WALL_PLANE;
+			floor->CeilingCollision.Planes[1]  = WALL_PLANE;
 
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_BOX)

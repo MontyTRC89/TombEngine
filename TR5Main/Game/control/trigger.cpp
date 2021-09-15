@@ -49,61 +49,59 @@ int TriggerActive(ITEM_INFO* item)
 	return flag;
 }
 
-int GetKeyTrigger(ITEM_INFO* item)
+bool GetKeyTrigger(ITEM_INFO* item)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex)
+	if (triggerIndex == 0)
+		return false;
+
+	short* trigger = triggerIndex;
+
+	if (*trigger & END_BIT)
+		return false;
+
+	for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & VALUE_BITS]; j++)
 	{
-		short* trigger = triggerIndex;
-		for (short i = *triggerIndex; (i & 0x1F) != 4; trigger++)
-		{
-			if (i < 0)
-				break;
-			i = trigger[1];
-		}
-		if (*trigger & 4)
-		{
-			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
-			{
-				if (*j & END_BIT)
-					return 0;
-			}
-			return 1;
-		}
+		if (*j & END_BIT)
+			return false;
 	}
 
-	return 0;
+	return true;
 }
 
-int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
+int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex)
+	if (triggerIndex == 0)
+		return 0;
+
+	short* trigger = triggerIndex;
+
+	if (*trigger & END_BIT)
+		return 0;
+
+	trigger += 2;
+	short* current = itemNos;
+	int k = 0;
+
+	do
 	{
-		short* trigger = triggerIndex;
-
-		if (*trigger & 4)
+		if (TRIG_BITS(*trigger) == TO_OBJECT && item != &g_Level.Items[*trigger & VALUE_BITS])
 		{
-			trigger += 2;
-			short* current = itemNos;
-			int k = 0;
-			do
-			{
-				if (TRIG_BITS(*trigger) == TO_OBJECT && item != &g_Level.Items[*trigger & VALUE_BITS])
-				{
-					current[k] = *trigger & VALUE_BITS;
-					++k;
-				}
-				if (*trigger & END_BIT)
-					break;
-				++trigger;
-			} while (true);
-
-			return k;
+			current[k] = *trigger & VALUE_BITS;
+			++k;
 		}
-	}
+
+		if (*trigger & END_BIT)
+			break;
+
+		++trigger;
+
+	} while (true);
+
+	return k;
 
 	return 0;
 }

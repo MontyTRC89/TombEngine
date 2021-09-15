@@ -3,6 +3,22 @@
 struct ITEM_INFO;
 struct FLOOR_INFO;
 
+#define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
+
+constexpr auto ONESHOT     = 0x0100;
+constexpr auto SWONESHOT   = 0x0040;
+constexpr auto ATONESHOT   = 0x0080;
+constexpr auto VALUE_BITS  = 0x03FF;
+constexpr auto CODE_BITS   = 0x3E00;
+constexpr auto END_BIT     = 0x8000;
+
+enum FLOORDATA_MASKS
+{
+	FD_MASK_FUNCTION = 0x001F,
+	FD_MASK_SUBFUNCTION = 0x7F00,
+	FD_MASK_END_DATA = 0x8000
+};
+
 enum TRIGGER_TYPES
 {
 	TRIGGER,
@@ -41,15 +57,8 @@ enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE
 };
 
-enum FLOORDATA_MASKS
-{
-	FD_MASK_FUNCTION = 0x1F,
-	FD_MASK_SUBFUNCTION = 0x7F00,
-	FD_MASK_END_DATA = 0x8000
-};
-
-int GetKeyTrigger(ITEM_INFO* item);
-int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch);
+bool GetKeyTrigger(ITEM_INFO* item);
+int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNum, short timer);
 int TriggerActive(ITEM_INFO* item);
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);

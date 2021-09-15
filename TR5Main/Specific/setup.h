@@ -2,9 +2,17 @@
 
 #include "objectslist.h"
 #include "phd_global.h"
+
 struct ITEM_INFO;
 struct COLL_INFO;
 enum ZoneType : char;
+
+constexpr auto UNIT_SHADOW = 256;
+constexpr auto NO_SHADOW = 0;
+constexpr auto DEFAULT_RADIUS = 10;
+constexpr auto ROT_X = 0x0004;
+constexpr auto ROT_Y = 0x0008;
+constexpr auto ROT_Z = 0x0010;
 
 enum HitEffectEnum
 {
