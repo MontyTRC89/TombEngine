@@ -36,4 +36,5 @@ void Puzzle(ITEM_INFO* item);
 void DrawRightPistol(ITEM_INFO* item);
 void DrawLeftPistol(ITEM_INFO* item);
 void MeshSwapToPour(ITEM_INFO* item);
-void MeshSwapFromPour(ITEM_INFO* item);
+void MeshSwapFromPour(ITEM_INFO* item); 
+void FlashOrange(ITEM_INFO* item);

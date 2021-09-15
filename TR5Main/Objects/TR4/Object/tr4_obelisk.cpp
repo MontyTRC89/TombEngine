@@ -135,7 +135,7 @@ void ObeliskControl(short itemNumber)
 						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -1, 0, item2->roomNumber);
 
 						item->itemFlags[2] = NO_ITEM;
-						item2 = find_a_fucking_item(ID_PUZZLE_ITEM1_COMBO1);
+						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
 						item2->status = ITEM_NOT_ACTIVE;
 
 						SoundEffect(SFX_TR4_EXPLOSION1, &item2->pos, 0);

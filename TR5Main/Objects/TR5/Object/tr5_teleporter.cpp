@@ -17,7 +17,7 @@ void InitialiseTeleporter(short itemNumber)
 
 	if (item->triggerFlags == 512)
 	{
-		ITEM_INFO* puzzleHoleItem = find_a_fucking_item(ID_PUZZLE_HOLE2);
+		ITEM_INFO* puzzleHoleItem = FindItem(ID_PUZZLE_HOLE2);
 		v4 = (signed int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 9;
 		result = (unsigned int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 31;
 		item->itemFlags[1] = result + v4;
