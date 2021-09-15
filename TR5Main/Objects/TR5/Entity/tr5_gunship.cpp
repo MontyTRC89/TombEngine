@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_gunship.h"
 #include "level.h"
-#include "control.h"
+#include "control\los.h"
 #include "Sound\sound.h"
 #include "draw.h"
 #include "camera.h"

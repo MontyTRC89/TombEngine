@@ -3,10 +3,10 @@
 #include "lara_tests.h"
 #include "input.h"
 #include "draw.h"
-#include "control.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
 #include "control.h"
+#include "control\los.h"
 
 using namespace TEN::Floordata;
 

@@ -60,6 +60,8 @@ enum TRIGOBJECTS_TYPES
 bool GetKeyTrigger(ITEM_INFO* item);
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNum, short timer);
+int KeyTrigger(short itemNum);
+int PickupTrigger(short itemNum);
 int TriggerActive(ITEM_INFO* item);
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
 short* GetTriggerIndex(ITEM_INFO* item);

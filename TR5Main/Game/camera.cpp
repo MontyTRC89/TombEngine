@@ -12,6 +12,7 @@
 #include "level.h"
 #include "collide.h"
 #include "Sound\sound.h"
+#include "control\los.h"
 #include "savegame.h"
 #include "input.h"
 

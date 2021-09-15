@@ -150,6 +150,41 @@ int SwitchTrigger(short itemNum, short timer)
 	return 0;
 }
 
+int KeyTrigger(short itemNum)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	int oldkey;
+
+	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
+		return -1;
+
+	oldkey = KeyTriggerActive;
+
+	if (!oldkey)
+		item->status = ITEM_DEACTIVATED;
+
+	KeyTriggerActive = false;
+
+	return oldkey;
+}
+
+int PickupTrigger(short itemNum)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+
+	if (item->flags & IFLAG_KILLED
+		|| (item->status != ITEM_INVISIBLE
+			|| item->itemFlags[3] != 1
+			|| item->triggerFlags & 0x80))
+	{
+		return 0;
+	}
+
+	KillItem(itemNum);
+
+	return 1;
+}
+
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
 	ROOM_INFO* r;

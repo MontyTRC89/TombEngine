@@ -8,7 +8,7 @@
 #include "people.h"
 #include "effects\debris.h"
 #include "draw.h"
-#include "control.h"
+#include "control\los.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"

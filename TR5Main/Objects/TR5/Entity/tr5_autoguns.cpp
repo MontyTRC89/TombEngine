@@ -3,6 +3,7 @@
 #include "sphere.h"
 #include "lara.h"
 #include "draw.h"
+#include "control\los.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "level.h"

@@ -186,23 +186,6 @@ void CollectCarriedItems(ITEM_INFO* item)
 	item->carriedItem = NO_ITEM;
 }
 
-int PickupTrigger(short itemNum) 
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (item->flags & IFLAG_KILLED
-	|| (item->status != ITEM_INVISIBLE
-	||  item->itemFlags[3] != 1
-	||  item->triggerFlags & 0x80))
-	{
-		return 0;
-	}
-
-	KillItem(itemNum);
-
-	return 1;
-}
-
 void do_pickup()
 {
 	if (getThisItemPlease == NO_ITEM)

@@ -2,7 +2,7 @@
 #include "people.h"
 #include "effects\effects.h"
 #include "draw.h"
-#include "control.h"
+#include "control\los.h"
 #include "sphere.h"
 #include "effects\debris.h"
 #include "lara.h"

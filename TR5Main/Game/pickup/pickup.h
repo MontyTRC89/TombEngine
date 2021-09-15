@@ -15,7 +15,6 @@ void PickedUpObject(GAME_OBJECT_ID objectNumber, int count);
 void RemoveObjectFromInventory(GAME_OBJECT_ID objectNumber, int count);
 int GetInventoryCount(GAME_OBJECT_ID objID);
 void CollectCarriedItems(ITEM_INFO* item);
-int PickupTrigger(short itemNum);
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void RegeneratePickups();
 BOUNDING_BOX* FindPlinth(ITEM_INFO* item);
