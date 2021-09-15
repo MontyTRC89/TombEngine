@@ -1,11 +1,11 @@
 #include "framework.h"
+#include <process.h>
 #include "collide.h"
 #include "control.h"
 #include "pickup.h"
-#include "puzzles_keys.h"
 #include "camera.h"
 #include "Lara.h"
-#include "effects\hair.h"
+#include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
 #include "draw.h"
@@ -14,46 +14,36 @@
 #else
 #include "inventory.h"
 #endif
-#include "gameflow.h"
 #include "lot.h"
-#include "draw.h"
 #include "health.h"
 #include "savegame.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "spotcam.h"
 #include "box.h"
-#include "objects.h"
-#include "switch.h"
-#include "rope.h"
-#include "traps.h"
 #include "sphere.h"
-#include "lara_fire.h"
 #include "level.h"
 #include "input.h"
 #include "winmain.h"
-#include "Renderer11.h"
 #include "setup.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "effects\debris.h"
-#include "effects\footprint.h"
-#include "effects\smoke.h"
-#include "effects\spark.h"
-#include "effects\explosion.h"
-#include "effects\drip.h"
-#include "effects\weather.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "effects/debris.h"
+#include "effects/footprint.h"
+#include "effects/smoke.h"
+#include "effects/spark.h"
+#include "effects/explosion.h"
+#include "effects/drip.h"
+#include "effects/weather.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "tr4_locusts.h"
 #include "tr4_littlebeetle.h"
 #include "particle/SimpleParticle.h"
-#include <process.h>
-#include "Specific\prng.h"
-#include <Game/Lara/lara_one_gun.h>
-#include <Game/Lara/lara_climb.h>
+#include "Specific/prng.h"
+#include "control/flipmap.h"
+#include "Lara/lara_one_gun.h"
 #include "generic_switch.h"
-#include "creature_info.h"
 
 using std::vector;
 using std::unordered_map;
@@ -70,12 +60,8 @@ using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
 
-int KeyTriggerActive;
 int RumbleTimer = 0;
 int InGameCnt = 0;
-byte FlipStatus = 0;
-int FlipStats[MAX_FLIPMAP];
-int FlipMap[MAX_FLIPMAP];
 bool InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[512];
@@ -1189,81 +1175,6 @@ void AnimateItem(ITEM_INFO *item)
 	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
-void DoFlipMap(short group)
-{
-	ROOM_INFO temp;
-
-	for (size_t i = 0; i < g_Level.Rooms.size(); i++)
-	{
-		ROOM_INFO *r = &g_Level.Rooms[i];
-
-		if (r->flippedRoom >= 0 && r->flipNumber == group)
-		{
-			RemoveRoomFlipItems(r);
-
-			ROOM_INFO *flipped = &g_Level.Rooms[r->flippedRoom];
-
-			temp = *r;
-			*r = *flipped;
-			*flipped = temp;
-
-			r->flippedRoom = flipped->flippedRoom;
-			flipped->flippedRoom = -1;
-
-			r->itemNumber = flipped->itemNumber;
-			r->fxNumber = flipped->fxNumber;
-
-			AddRoomFlipItems(r);
-
-			g_Renderer.flipRooms(static_cast<short>(i), r->flippedRoom);
-
-			for (auto& fd : r->floor)
-				fd.Room = i;
-			for (auto& fd : flipped->floor)
-				fd.Room = r->flippedRoom;
-		}
-	}
-
-	int status = FlipStats[group] == 0;
-	FlipStats[group] = status;
-	FlipStatus = status;
-
-	for (int i = 0; i < ActiveCreatures.size(); i++)
-	{
-		ActiveCreatures[i]->LOT.targetBox = NO_BOX;
-	}
-}
-
-void AddRoomFlipItems(ROOM_INFO *r)
-{
-	for (short linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
-	{
-		ITEM_INFO *item = &g_Level.Items[linkNum];
-
-		//if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
-		//	AlterFloorHeight(item, -1024);
-
-		if (item->objectNumber == ID_RAISING_BLOCK2)
-		{
-			//if (item->itemFlags[1])
-			//	AlterFloorHeight(item, -2048);
-		}
-	}
-}
-
-void RemoveRoomFlipItems(ROOM_INFO *r)
-{
-	for (short linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
-	{
-		ITEM_INFO *item = &g_Level.Items[linkNum];
-
-		if (item->flags & 0x100 && Objects[item->objectNumber].intelligent && item->hitPoints <= 0 && item->hitPoints != NOT_TARGETABLE)
-		{
-			KillItem(linkNum);
-		}
-	}
-}
-
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
@@ -1453,7 +1364,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
-int is_object_in_room(short roomNumber, short objectNumber)
+int IsObjectInRoom(short roomNumber, short objectNumber)
 {
 	short itemNumber = g_Level.Rooms[roomNumber].itemNumber;
 
@@ -1474,21 +1385,6 @@ int is_object_in_room(short roomNumber, short objectNumber)
 	}
 
 	return 1;
-}
-
-void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
-{
-	int deltaAngle = angle - *rotation;
-
-	if (deltaAngle < -32768)
-		deltaAngle += 65536;
-	else if (deltaAngle > 32768)
-		deltaAngle -= 65536;
-
-	if (outAngle)
-		*outAngle = static_cast<short>(deltaAngle);
-
-	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
 int IsRoomOutside(int x, int y, int z)

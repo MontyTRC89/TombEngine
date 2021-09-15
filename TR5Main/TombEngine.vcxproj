@@ -136,6 +136,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\box.h" />
+    <ClInclude Include="Game\control\flipmap.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
@@ -526,6 +527,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Game\control\filpmap.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
