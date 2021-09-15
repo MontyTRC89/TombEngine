@@ -14,7 +14,6 @@
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
 
-int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 extern GameFlow* g_GameFlow;
@@ -23,15 +22,15 @@ void InitialiseHair()
 {
 	for (int h = 0; h < HAIR_MAX; h++)
 	{
-		FirstHair[h] = 1;
-
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
+		Hairs[h][0].initialized = true;
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
+			Hairs[h][i].initialized = true;
 			Hairs[h][i].pos.xPos = *(bone + 1);
 			Hairs[h][i].pos.yPos = *(bone + 2);
 			Hairs[h][i].pos.zPos = *(bone + 3);
@@ -42,7 +41,6 @@ void InitialiseHair()
 		}
 	}
 }
-
 
 void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 {
@@ -169,10 +167,9 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 
 	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-	if (FirstHair[ponytail])
+	if (Hairs[ponytail][0].initialized)
 	{
-		FirstHair[ponytail] = 0;
-
+		Hairs[ponytail][0].initialized = false;
 		Hairs[ponytail][0].pos.xPos = pos.x;
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
@@ -183,6 +180,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
+			Hairs[ponytail][i + 1].initialized = false;
 			Hairs[ponytail][i + 1].pos.xPos = world.Translation().x;
 			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y;
 			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z;
