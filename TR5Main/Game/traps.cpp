@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "traps.h"
-
 #include "items.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
+#include "effects\weather.h"
 #include "lara.h"
 #include "collide.h"
 #include "sphere.h"
@@ -14,6 +14,8 @@
 #include "input.h"
 #include "Sound\sound.h"
 #include "kayak.h"
+
+using namespace TEN::Effects::Environment;
 
 static short WreckingBallData[2] = {0, 0};
 ITEM_INFO* WBItem;
@@ -221,10 +223,7 @@ void FlameEmitter2Control(short itemNumber)
 				
 				if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 				{
-					FlashFadeR = 255;
-					FlashFadeG = 128;
-					FlashFadeB = 0;
-					FlashFader = 32;
+					Weather.Flash(255, 128, 0, 0.03f);
 					KillItem(itemNumber);
 					return;
 				}

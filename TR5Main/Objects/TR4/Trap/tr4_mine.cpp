@@ -5,9 +5,12 @@
 #include "Sound\sound.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
+#include "effects\weather.h"
 #include "items.h"
 #include "collide.h"
 #include "objectslist.h"
+
+using namespace TEN::Effects::Environment;
 
 void InitialiseMine(short itemNum)
 {
@@ -47,10 +50,7 @@ void MineControl(short itemNum)
 				ExplodeItemNode(item, i, 0, -128);
 		}
 
-		FlashFadeR = 255;
-		FlashFadeG = 192;
-		FlashFadeB = 64;
-		FlashFader = 32;
+		Weather.Flash(255, 192, 64, 0.03f);
 
 		short currentItemNumber = g_Level.Rooms[item->roomNumber].itemNumber;
 

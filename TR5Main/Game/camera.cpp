@@ -7,13 +7,17 @@
 #include "lara_fire.h"
 #include "lara.h"
 #include "effects\flmtorch.h"
+#include "effects\weather.h"
 #include "sphere.h"
 #include "level.h"
 #include "collide.h"
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "input.h"
+
 using TEN::Renderer::g_Renderer;
+using namespace TEN::Effects::Environment;
+
 struct OLD_CAMERA
 {
 	short currentAnimState;
@@ -791,11 +795,6 @@ void FixedCamera(ITEM_INFO* item)
 
 		if (camera->flags & 2)
 		{
-			if (FlashFader > 2)
-			{
-				FlashFader = (FlashFader >> 1) & 0xFE;
-			}
-
 			SniperOverlay = 1;
 			
 			Camera.target.x = (Camera.target.x + 2 * LastTarget.x) / 3;
@@ -825,11 +824,11 @@ void FixedCamera(ITEM_INFO* item)
 				{
 					SoundEffect(SFX_TR4_EXPLOSION1, 0, 83886084);
 					SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
-					
-					FlashFadeR = 192;
-					FlashFadeB = 0;
-					FlashFader = 24;
-					FlashFadeG = (GetRandomControl() & 0x1F) + 160;
+
+					auto R = 192;
+					auto G = (GetRandomControl() & 0x1F) + 160;
+					auto B = 0;
+					Weather.Flash(R, G, B, 0.04f);
 					
 					SniperCount = 15;
 					
