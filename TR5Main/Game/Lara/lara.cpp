@@ -1248,7 +1248,8 @@ void AnimateLara(ITEM_INFO* item)
 
 				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
-				effect_routines[effectID](item);
+				if (effectID < NUM_FLIPEFFECTS && effect_routines[effectID] != nullptr)
+					effect_routines[effectID](item);
 
 				cmd += 2;
 				break;

@@ -4,6 +4,8 @@
 
 #define EffectFunction void(ITEM_INFO* item)
 
+constexpr auto NUM_FLIPEFFECTS = 47;
+
 extern int FlipEffect;
 extern short FXType;
 
