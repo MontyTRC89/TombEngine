@@ -47,13 +47,6 @@ enum COMMAND_TYPES
 #define OUTSIDE_Z 64
 #define OUTSIDE_SIZE 108
 
-extern int KeyTriggerActive;
-extern byte FlipStatus;
-
-constexpr auto MAX_FLIPMAP = 255;
-extern int FlipStats[MAX_FLIPMAP];
-extern int FlipMap[MAX_FLIPMAP];
-
 extern bool InItemControlLoop;
 extern short ItemNewRoomNo;
 extern short ItemNewRooms[512];
@@ -98,29 +91,35 @@ extern short IsRoomOutsideNo;
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
-void AnimateWaterfalls();
+
+int GetRandomControl();
+int GetRandomDraw();
+
+int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
+void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
-int GetWaterSurface(int x, int y, int z, short roomNumber);
 void KillMoveItems();
 void KillMoveEffects();
-int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
+
+int IsObjectInRoom(short roomNumber, short objectNumber);
+int IsRoomOutside(int x, int y, int z);
+
+void RumbleScreen();
+void RefreshCamera(short type, short* data);
+
+void ResetGlobals();
+
+void AnimateWaterfalls();
+
 void AlterFloorHeight(ITEM_INFO* item, int height);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int GetRandomControl();
-int GetRandomDraw();
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
-void AnimateItem(ITEM_INFO* item);
-void DoFlipMap(short group);
-void AddRoomFlipItems(ROOM_INFO* r);
-void RemoveRoomFlipItems(ROOM_INFO* r);
-void RumbleScreen();
-void RefreshCamera(short type, short* data);
+
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
+
+int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
-int is_object_in_room(short roomNumber, short objectNumber);
-void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
-int IsRoomOutside(int x, int y, int z);
-void ResetGlobals();
+
 
 unsigned CALLBACK GameMain(void*);

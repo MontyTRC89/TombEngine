@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "items.h"
-#include "control.h"
+#include "control/flipmap.h"
 #include "floordata.h"
 #include "flipeffect.h"
 #include "objectslist.h"
@@ -17,6 +17,8 @@
 #include "Objects\Generic\Switches\generic_switch.h"
 
 using namespace TEN::Entities::Switches;
+
+int KeyTriggerActive;
 
 int TriggerActive(ITEM_INFO* item)
 {

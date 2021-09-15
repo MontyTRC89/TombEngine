@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "box.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "lot.h"
 #include "Lara.h"
 #include "draw.h"
 #include "sphere.h"
-#include "misc.h"
 #include "camera.h"
 #include "control.h"
+#include "control/flipmap.h"
 #include "setup.h"
-#include "Specific\trmath.h"
+#include "Specific/trmath.h"
 #include "objectslist.h"
 #include "creature_info.h"
+
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
@@ -22,8 +23,8 @@
 #define BIFF_AVOID_TURN 1536
 #define FEELER_DISTANCE 512
 #define FEELER_ANGLE ANGLE(45.0f)
-#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 constexpr int HIGH_PRIO_RANGE = 8;
 constexpr int MEDIUM_PRIO_RANGE = HIGH_PRIO_RANGE + HIGH_PRIO_RANGE * (HIGH_PRIO_RANGE / 6.0f);
 constexpr int LOW_PRIO_RANGE = MEDIUM_PRIO_RANGE + MEDIUM_PRIO_RANGE * (MEDIUM_PRIO_RANGE / 24.0f);
@@ -31,6 +32,7 @@ constexpr int NONE_PRIO_RANGE = LOW_PRIO_RANGE + LOW_PRIO_RANGE * (LOW_PRIO_RANG
 constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
+
 void DropBaddyPickups(ITEM_INFO* item)
 {
 	ITEM_INFO* pickup = NULL;
