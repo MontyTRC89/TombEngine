@@ -16,45 +16,77 @@ namespace Environment
 	{
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		// Sky
+		UpdateSky(level);
+		UpdateStorm(level);
+		UpdateWind(level);
+		UpdateFlash(level);
+	}
 
+	void EnvironmentController::Clear()
+	{
+		// Clear storm vars
+		StormTimer     = 0;
+		StormSkyColor  = 1;
+		StormSkyColor2 = 1;
+
+		// Clear wind vars
+		WindCurrent = WindFinalX = WindFinalZ = 0;
+		WindAngle = WindDAngle = 2048;
+
+		// Clear flash vars
+		FlashProgress = 0.0f;
+		FlashColorBase = Vector3(0, 0, 0);
+	}
+
+	void EnvironmentController::Flash(int r, int g, int b, float speed)
+	{
+		FlashProgress = 1.0f;
+		FlashSpeed = std::clamp(speed, 0.01f, 1.0f);
+		FlashColorBase = Vector3(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+							     std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
+	}
+
+	void EnvironmentController::UpdateSky(GameScriptLevel* level)
+	{
 		if (level->Layer1.Enabled)
 		{
-			Position1 += level->Layer1.CloudSpeed;
-			if (Position1 <= 9728)
+			SkyPosition1 += level->Layer1.CloudSpeed;
+			if (SkyPosition1 <= 9728)
 			{
-				if (Position1 < 0)
-					Position1 += 9728;
+				if (SkyPosition1 < 0)
+					SkyPosition1 += 9728;
 			}
 			else
 			{
-				Position1 -= 9728;
+				SkyPosition1 -= 9728;
 			}
 		}
 
 		if (level->Layer2.Enabled)
 		{
-			Position2 += level->Layer2.CloudSpeed;
-			if (Position2 <= 9728)
+			SkyPosition2 += level->Layer2.CloudSpeed;
+			if (SkyPosition2 <= 9728)
 			{
-				if (Position2 < 0)
-					Position2 += 9728;
+				if (SkyPosition2 < 0)
+					SkyPosition2 += 9728;
 			}
 			else
 			{
-				Position2 -= 9728;
+				SkyPosition2 -= 9728;
 			}
 		}
+	}
 
+	void EnvironmentController::UpdateStorm(GameScriptLevel* level)
+	{
 		auto color = Vector4(level->Layer1.R / 255.0f, level->Layer1.G / 255.0f, level->Layer1.B / 255.0f, 1.0f);
-
-		// Storm
 
 		if (level->Storm)
 		{
-			if (LightningCount || LightningRand)
+			if (StormCount || StormRand)
 			{
-				UpdateStorm();
+				UpdateLightning();
 				if (StormTimer > -1)
 					StormTimer--;
 				if (!StormTimer)
@@ -62,75 +94,75 @@ namespace Environment
 			}
 			else if (!(rand() & 0x7F))
 			{
-				LightningCount = (rand() & 0x1F) + 16;
+				StormCount = (rand() & 0x1F) + 16;
 				StormTimer = (rand() & 3) + 12;
 			}
 
-			auto flashBrightness = SkyStormColor / 255.0f;
+			auto flashBrightness = StormSkyColor / 255.0f;
 			auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);
 			auto g = std::clamp(color.y + flashBrightness, 0.0f, 1.0f);
 			auto b = std::clamp(color.z + flashBrightness, 0.0f, 1.0f);
 
-			Color = Vector4(r, g, b, color.w);
+			SkyCurrentColor = Vector4(r, g, b, color.w);
 		}
 		else
-			Color = color;
-
-		// Wind
-
-		CurrentWind += (GetRandomControl() & 7) - 3;
-		if (CurrentWind <= -2)
-			CurrentWind++;
-		else if (CurrentWind >= 9)
-			CurrentWind--;
-
-		DWindAngle = (DWindAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
-
-		if (DWindAngle < 1024)
-			DWindAngle = 2048 - DWindAngle;
-		else if (DWindAngle > 3072)
-			DWindAngle += 6144 - 2 * DWindAngle;
-
-		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
-
-		FinalWindX = CurrentWind * phd_sin(WindAngle << 3);
-		FinalWindZ = CurrentWind * phd_cos(WindAngle << 3);
+			SkyCurrentColor = color;
 	}
 
-	void EnvironmentController::Clear()
+	void EnvironmentController::UpdateLightning()
 	{
-		StormTimer = 0;
-		SkyStormColor = 1;
-		SkyStormColor2 = 1;
+		StormCount--;
 
-		CurrentWind = FinalWindX = FinalWindZ = 0;
-		WindAngle = DWindAngle = 2048;
-	}
-
-	void EnvironmentController::UpdateStorm()
-	{
-		LightningCount--;
-
-		if (LightningCount <= 0)
+		if (StormCount <= 0)
 		{
-			SkyStormColor = 0;
-			LightningRand = 0;
+			StormSkyColor = 0;
+			StormRand = 0;
 		}
-		else if (LightningCount < 5 && SkyStormColor < 50)
+		else if (StormCount < 5 && StormSkyColor < 50)
 		{
-			auto newColor =SkyStormColor - LightningCount * 2;
+			auto newColor = StormSkyColor - StormCount * 2;
 			if (newColor < 0)
 				newColor = 0;
-			SkyStormColor = newColor;
+			StormSkyColor = newColor;
 		}
-		else if (LightningCount)
+		else if (StormCount)
 		{
-			LightningRand = ((rand() & 0x1FF - LightningRand) >> 1) + LightningRand;
-			SkyStormColor2 += LightningRand * SkyStormColor2 >> 8;
-			SkyStormColor = SkyStormColor2;
-			if (SkyStormColor > 255)
-				SkyStormColor = 255;
+			StormRand = ((rand() & 0x1FF - StormRand) >> 1) + StormRand;
+			StormSkyColor2 += StormRand * StormSkyColor2 >> 8;
+			StormSkyColor = StormSkyColor2;
+			if (StormSkyColor > 255)
+				StormSkyColor = 255;
 		}
 	}
 
+	void EnvironmentController::UpdateWind(GameScriptLevel* level)
+	{
+		WindCurrent += (GetRandomControl() & 7) - 3;
+		if (WindCurrent <= -2)
+			WindCurrent++;
+		else if (WindCurrent >= 9)
+			WindCurrent--;
+
+		WindDAngle = (WindDAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
+
+		if (WindDAngle < 1024)
+			WindDAngle = 2048 - WindDAngle;
+		else if (WindDAngle > 3072)
+			WindDAngle += 6144 - 2 * WindDAngle;
+
+		WindAngle = (WindAngle + ((WindDAngle - WindAngle) >> 3)) & 0x1FFE;
+
+		WindFinalX = WindCurrent * phd_sin(WindAngle << 3);
+		WindFinalZ = WindCurrent * phd_cos(WindAngle << 3);
+	}
+
+	void EnvironmentController::UpdateFlash(GameScriptLevel* level)
+	{
+		if (FlashProgress > 0.0f)
+		{
+			FlashProgress -= FlashSpeed;
+			if (FlashProgress < 0.0f)
+				FlashProgress = 0.0f;
+		}
+	}
 }}}

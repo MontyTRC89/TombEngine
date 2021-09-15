@@ -11,6 +11,7 @@
 #include "lot.h"
 #include "collide.h"
 #include "effects\debris.h"
+#include "effects\weather.h"
 #include "lara_two_guns.h"
 #include "switch.h"
 #include "objects.h"
@@ -27,6 +28,7 @@
 #include "generic_switch.h"
 
 using namespace TEN::Entities::Switches;
+using namespace TEN::Effects::Environment;
 
 extern GameFlow* g_GameFlow;
 
@@ -392,20 +394,20 @@ void ControlGrenade(short itemNumber)
 			if (item->itemFlags[0] == GRENADE_FLASH)
 			{
 				// Flash grenades
+				int R, G, B;
 				if (item->itemFlags[1] == 1)
 				{
 					WeaponEnemyTimer = 120;
-					FlashFadeR = 255;
-					FlashFadeG = 255;
-					FlashFadeB = 255;
+					R = 255;
+					G = 255;
+					B = 255;
 				}
 				else
 				{
-					FlashFadeR = (GetRandomControl() & 0x1F) + 224;
-					FlashFadeG = FlashFadeB = FlashFadeR - GetRandomControl() & 0x1F;
+					R = (GetRandomControl() & 0x1F) + 224;
+					G = B = R - GetRandomControl() & 0x1F;
 				}
-
-				FlashFader = 32;
+				Weather.Flash(R, G, B, 0.03f);
 
 				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -740,11 +742,7 @@ void ControlGrenade(short itemNumber)
 	{
 		if (item->itemFlags[0] == GRENADE_FLASH)
 		{
-			FlashFader = 32;
-			FlashFadeR = 255;
-			FlashFadeG = 255;
-			FlashFadeB = 255;
-
+			Weather.Flash(255, 255, 255, 0.03f);
 			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 		}

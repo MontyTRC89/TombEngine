@@ -3,6 +3,7 @@
 #include "control.h"
 #include "sphere.h"
 #include "effects\effects.h"
+#include "effects\weather.h"
 #include "Sound\sound.h"
 #include "setup.h"
 #include "box.h"
@@ -13,6 +14,8 @@
 #include "items.h"
 #include "lot.h"
 #include "creature_info.h"
+
+using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
 {
@@ -366,10 +369,7 @@ namespace TEN::Entities::TR4
         if (item->currentAnimState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
             return false;
 
-        FlashFadeR = 255;
-        FlashFadeG = 64;
-        FlashFadeB = 0;
-        FlashFader = 32;
+		Weather.Flash(255, 64, 0, 0.03f);
 
         item->pos.xPos = (item->itemFlags[0] * 1024) + 512;
         item->pos.yPos = (item->itemFlags[1] * 256);
