@@ -30,9 +30,7 @@ int EnableBaddieAI(short itemNum, int always)
 
 	if (item->data.is<CREATURE_INFO>())
 		return true;
-
-
-	
+	   	
 	/*
 	if (SlotsUsed >= NUM_SLOTS)
 	{
