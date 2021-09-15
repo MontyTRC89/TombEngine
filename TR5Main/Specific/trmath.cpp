@@ -107,6 +107,21 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BO
 	tbounds->Z2 = bMax.z;
 }
 
+void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
+{
+	int deltaAngle = angle - *rotation;
+
+	if (deltaAngle < -32768)
+		deltaAngle += 65536;
+	else if (deltaAngle > 32768)
+		deltaAngle -= 65536;
+
+	if (outAngle)
+		*outAngle = static_cast<short>(deltaAngle);
+
+	*rotation += static_cast<short>(deltaAngle >> shift);
+}
+
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
 	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);

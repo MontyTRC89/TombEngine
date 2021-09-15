@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "traps.h"
 #include "items.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "effects\weather.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "effects/weather.h"
 #include "lara.h"
 #include "collide.h"
 #include "sphere.h"
@@ -12,8 +12,8 @@
 #include "draw.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "kayak.h"
+#include "Sound/sound.h"
+#include "control/flipmap.h"
 
 using namespace TEN::Effects::Environment;
 

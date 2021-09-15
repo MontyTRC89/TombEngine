@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "pickup.h"
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 #include "lara.h"
 #include "draw.h"
 #ifdef NEW_INV
@@ -8,25 +8,20 @@
 #else
 #include "inventory.h"
 #endif
-#include "effects\effects.h"
-#include "control.h"
-#include "sphere.h"
-#include "effects\debris.h"
-#include "box.h"
+#include "control/flipmap.h"
+#include "effects/debris.h"
 #include "health.h"
 #include "items.h"
-#include "switch.h"
 #include "lara_fire.h"
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
-#include "effects\flmtorch.h"
+#include "effects/flmtorch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "savegame.h"
+#include "Sound/sound.h"
 #include "tr4_clockwork_beetle.h"
 #include "pickup/pickup_ammo.h"
 #include "pickup/pickup_key_items.h"
@@ -98,7 +93,6 @@ int NumRPickups;
 short RPickups[16];
 short getThisItemPlease = NO_ITEM;
 PHD_VECTOR OldPickupPos;
-extern int KeyTriggerActive;
 #ifndef NEW_INV
 extern Inventory g_Inventory;
 #endif

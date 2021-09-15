@@ -57,6 +57,8 @@ enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE
 };
 
+extern int KeyTriggerActive;
+
 bool GetKeyTrigger(ITEM_INFO* item);
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNum, short timer);
