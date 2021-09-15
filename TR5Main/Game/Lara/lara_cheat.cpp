@@ -93,6 +93,7 @@ void LaraCheatyBits()
 					LaraItem->pos.xRot = ANGLE(30);
 					LaraItem->fallspeed = 30;
 					LaraItem->hitPoints = 1000;
+					Lara.poisoned = 0;
 					Lara.air = 1800;
 					Lara.deathCount = 0;
 					Lara.torsoYrot = 0;
