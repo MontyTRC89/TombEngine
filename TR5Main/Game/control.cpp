@@ -2309,7 +2309,7 @@ void ResetGlobals()
 	// while playing flyby with locked controls
 	DisableLaraControl = false;
 
-	// Sky.Clear resets lightning and wind parameters so user won't see prev weather in new level
+	// Weather.Clear resets lightning and wind parameters so user won't see prev weather in new level
 	Weather.Clear();
 
 	// Needs to be cleared because otherwise a list of active creatures from previous level
