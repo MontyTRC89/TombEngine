@@ -1,3 +1,6 @@
 #pragma once
 
-void SpikeballControl(short itemNum);
+namespace TEN::Entities::TR4
+{
+	void SpikeballControl(short itemNum);
+}
