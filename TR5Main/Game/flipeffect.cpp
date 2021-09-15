@@ -28,6 +28,7 @@ using std::function;
 using namespace TEN::Effects::Footprints;
 
 short FXType;
+int FlipEffect;
 
 function<EffectFunction> effect_routines[59] =
 {

@@ -117,8 +117,6 @@ int CurrentLevel;
 bool DoTheGame;
 bool ThreadEnded;
 int OnFloor;
-int FlipTimer;
-int FlipEffect;
 int TriggerTimer;
 int JustLoaded;
 int OldLaraBusy;
@@ -137,7 +135,6 @@ extern GameScript *g_GameScript;
 extern Inventory g_Inventory;
 #endif
 extern int SplashCount;
-extern short FXType;
 
 // This might not be the exact amount of time that has passed, but giving it a
 // value of 1/30 keeps it in lock-step with the rest of the game logic,

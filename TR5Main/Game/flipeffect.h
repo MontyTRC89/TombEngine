@@ -4,6 +4,9 @@
 
 #define EffectFunction void(ITEM_INFO* item)
 
+extern int FlipEffect;
+extern short FXType;
+
 extern std::function<EffectFunction> effect_routines[];
 
 void AddFootprint(ITEM_INFO* item);

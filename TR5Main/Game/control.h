@@ -90,8 +90,6 @@ extern int CurrentLevel;
 extern bool DoTheGame;
 extern bool ThreadEnded;
 extern int OnFloor;
-extern int FlipTimer;
-extern int FlipEffect;
 extern int TriggerTimer;
 extern int JustLoaded;
 extern int OldLaraBusy;

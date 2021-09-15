@@ -54,8 +54,6 @@ using namespace TEN::Control::Volumes;
 extern Inventory g_Inventory;
 #endif
 
-extern short FXType;
-
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
 COLL_INFO lara_coll = {};
