@@ -41,7 +41,7 @@ namespace Environment
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
 	{
 		FlashProgress = 1.0f;
-		FlashSpeed = std::clamp(speed, 0.01f, 1.0f);
+		FlashSpeed = std::clamp(speed, 0.005f, 1.0f);
 		FlashColorBase = Vector4(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
 							     std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
 								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX,
