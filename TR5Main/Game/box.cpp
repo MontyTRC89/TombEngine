@@ -1308,7 +1308,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS
 			|| Objects[item->objectNumber].waterCreature)
 		{
-			TestTriggers(enemy, true, NULL);
+			TestTriggers(enemy, true);
 			creature->patrol2 = !creature->patrol2;
 		}
 	}
@@ -1331,7 +1331,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS &&
 			abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS)
 		{
-			TestTriggers(enemy, true, NULL);
+			TestTriggers(enemy, true);
 
 			creature->reachedGoal = true;
 			creature->enemy = LaraItem;

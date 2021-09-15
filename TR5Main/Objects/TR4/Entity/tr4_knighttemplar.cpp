@@ -184,7 +184,7 @@ void KnightTemplarControl(short itemNumber)
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;
 
-						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 					}
 
 					mesh++;

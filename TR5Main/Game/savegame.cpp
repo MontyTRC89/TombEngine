@@ -817,7 +817,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 
 			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
 						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos, roomIndex, true, NULL);
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos, roomIndex, true);
 
 			floor->Stopper = false;
 		}

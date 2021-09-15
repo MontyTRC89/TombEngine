@@ -37,7 +37,7 @@ namespace TEN::Entities::Doors
 				else
 					item->goalAnimState = 0;
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 			}
 
 			CurrentSequence = 4;

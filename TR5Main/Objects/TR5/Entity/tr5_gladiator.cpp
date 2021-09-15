@@ -331,7 +331,7 @@ void ControlGladiator(short itemNumber)
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
 										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
-										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 									}
 								}
 							}

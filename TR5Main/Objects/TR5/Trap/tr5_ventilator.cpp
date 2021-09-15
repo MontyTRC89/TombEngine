@@ -149,7 +149,7 @@ void VentilatorControl(short itemNumber)
 	else
 	{
 		xChange = 1;
-		TestTriggers(item, true, NULL);
+		TestTriggers(item, true);
 		if (item->currentAnimState == 1)
 		{
 			//result = 5 * item->animNumber;
