@@ -17,11 +17,15 @@
 #include <process.h>
 #include <corecrt_io.h>
 #include <iostream>
+#include "Scripting/GameFlowScript.h"
+#include "Scripting/GameLogicScript.h"
+
 using namespace TEN::Renderer;
 using std::exception;
 using std::string;
 using std::cout;
 using std::endl;
+
 WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;
@@ -29,11 +33,6 @@ HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
 HWND WindowsHandle;
-int App_Unk00D9ABFD;
-extern int IsLevelLoading;
-extern GameFlow* g_GameFlow;
-GameScript* g_GameScript;
-extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
 
 #if _DEBUG
@@ -124,7 +123,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
-			App_Unk00D9ABFD = 0;
 			return 0;
 		}
 	}
@@ -132,8 +130,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		App_Unk00D9ABFD = 1;
-
 		if (!Debug)
 			SuspendThread((HANDLE)ThreadHandle);
 	}
@@ -141,7 +137,8 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-int main() {
+int main() 
+{
 	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLine(), SW_SHOW);
 }
 

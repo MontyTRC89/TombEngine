@@ -1179,6 +1179,9 @@
     <ClInclude Include="Game\control\flipmap.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Specific\time.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -2115,6 +2118,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control\filpmap.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\time.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

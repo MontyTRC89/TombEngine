@@ -25,11 +25,9 @@ Functions and callbacks for level-specific logic scripts.
 @pragma nostrip
 */
 
-extern GameFlow* g_GameFlow;
-
 static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> looped)
 {
-	S_CDPlay(trackName, looped.value_or(false));
+	S_CDPlay(trackName, looped.value_or(SOUND_TRACK_ONESHOT));
 }
 
 static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
@@ -53,8 +51,7 @@ static void PlaySoundEffect(int id, int flags)
 
 static void SetAmbientTrack(std::string const & trackName)
 {
-	CurrentLoopedSoundTrack = trackName;
-	S_CDPlay(CurrentLoopedSoundTrack, 1);
+	S_CDPlay(trackName, SOUND_TRACK_BGM);
 }
 
 static int FindRoomNumber(GameScriptPosition pos)
@@ -517,7 +514,7 @@ void AddOneSecret()
 	if (Savegame.Level.Secrets >= 255)
 		return;
 	Savegame.Level.Secrets++;
-	S_CDPlay(TRACK_FOUND_SECRET, 0);
+	S_CDPlay(TRACK_FOUND_SECRET, SOUND_TRACK_ONESHOT);
 }
 
 /*

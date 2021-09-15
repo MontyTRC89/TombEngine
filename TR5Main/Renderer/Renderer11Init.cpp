@@ -12,7 +12,6 @@
 using namespace TEN::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
-extern GameFlow* g_GameFlow;
 
 void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {

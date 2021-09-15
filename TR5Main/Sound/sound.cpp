@@ -300,7 +300,7 @@ void Sound_FreeSamples()
 
 void PlaySoundTrack(short track, short flags)
 {
-	S_CDPlayEx(track, flags, 0);
+	S_CDPlayEx(track, flags, SOUND_TRACK_ONESHOT);
 }
 
 void S_CDPlay(std::string track, unsigned int mode)
@@ -325,6 +325,7 @@ void S_CDPlay(std::string track, unsigned int mode)
 			crossfade = true;
 			crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
 			flags |= BASS_SAMPLE_LOOP;
+			CurrentLoopedSoundTrack = track;
 			break;
 	}
 
@@ -418,7 +419,7 @@ void S_CDPlayEx(int index, DWORD mask, DWORD unknown)
 	S_CDPlayEx(track.first, mask, unknown);
 }
 
-void S_CDStop()
+void StopSoundTracks()
 {
 	// Do quick fadeouts.
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);

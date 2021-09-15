@@ -40,13 +40,13 @@ QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 int Unk_0051D024;
 short CurrentSplineCamera;
-byte SpotCamRemap[16];
-byte CameraCnt[16];
 int LastSpotCam;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
 SPOTCAM SpotCam[MAX_SPOTCAMS];
+byte SpotCamRemap[MAX_SPOTCAMS];
+byte CameraCnt[MAX_SPOTCAMS];
 int NumberSpotcams;
 int CheckTrigger = 0;
 int UseSpotCam = 0;
@@ -55,6 +55,8 @@ int SpotcamOverlay;
 
 void ClearSpotCamSequences()
 {
+	UseSpotCam = false;
+
 	for (int i = 0; i < MAX_SPOTCAMS; i++)
 		SpotCam[i] = {};
 }

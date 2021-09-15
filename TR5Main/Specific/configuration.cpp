@@ -8,9 +8,10 @@
 #include "configuration.h"
 #include "Sound\sound.h"
 #include <CommCtrl.h>
+
 using namespace TEN::Renderer;
 using std::vector;
-extern GameFlow* g_GameFlow;
+
 GameConfiguration g_Configuration;
 
 void LoadResolutionsInCombobox(HWND handle, int index)

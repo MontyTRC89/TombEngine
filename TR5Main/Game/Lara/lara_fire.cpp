@@ -254,7 +254,6 @@ short HoldStates[] = {
 	-1
 };
 
-extern GameFlow* g_GameFlow;
 bool MonksAttackLara;
 ITEM_INFO* LastTargets[MAX_TARGETS];
 ITEM_INFO* TargetList[MAX_TARGETS];

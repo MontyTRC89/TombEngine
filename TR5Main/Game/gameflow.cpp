@@ -11,8 +11,6 @@ SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 vector<string> g_NewStrings;
 
-extern GameFlow* g_GameFlow;
-
 int LoadSavegameInfos()
 {
 	char fileName[255];
