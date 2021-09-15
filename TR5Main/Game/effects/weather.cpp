@@ -33,17 +33,16 @@ namespace Environment
 
 		// Clear flash vars
 		FlashProgress = 0.0f;
-		FlashColorBase = Vector4::Zero;
+		FlashColorBase = Vector3::Zero;
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
 	{
 		FlashProgress = 1.0f;
 		FlashSpeed = std::clamp(speed, 0.005f, 1.0f);
-		FlashColorBase = Vector4(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+		FlashColorBase = Vector3(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
 							     std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
-								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX,
-								 1.0f);
+								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
 	}
 
 	void EnvironmentController::UpdateSky(GameScriptLevel* level)
@@ -163,5 +162,8 @@ namespace Environment
 			if (FlashProgress < 0.0f)
 				FlashProgress = 0.0f;
 		}
+
+		if (FlashProgress == 0.0f)
+			FlashColorBase = Vector3::Zero;
 	}
 }}}

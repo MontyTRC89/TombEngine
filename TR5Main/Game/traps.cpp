@@ -477,7 +477,7 @@ void InitialiseWreckingBall(short itemNumber)
 	short room;
 
 	item = &g_Level.Items[itemNumber];
-	item->itemFlags[3] = FindItem(ID_ANIMATING16)[0];
+	item->itemFlags[3] = FindAllItems(ID_ANIMATING16)[0];
 	room = item->roomNumber;
 	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1644;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);

@@ -488,7 +488,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-std::vector<int> FindItem(short objectNumber)
+std::vector<int> FindAllItems(short objectNumber)
 {
 	std::vector<int> itemList;
 
@@ -501,7 +501,7 @@ std::vector<int> FindItem(short objectNumber)
 	return itemList;
 }
 
-ITEM_INFO* find_a_fucking_item(int object_number)
+ITEM_INFO* FindItem(int object_number)
 {
 	ITEM_INFO* item;
 
