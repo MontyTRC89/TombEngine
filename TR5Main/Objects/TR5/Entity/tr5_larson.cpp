@@ -375,7 +375,7 @@ void LarsonControl(short itemNumber)
 			int y = r->minfloor + floorHeight;
 			int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
-			TestTriggers(x, y, z, roomNumber, true, NULL);
+			TestTriggers(x, y, z, roomNumber, true);
 
 			joint0 = 0;
 		}

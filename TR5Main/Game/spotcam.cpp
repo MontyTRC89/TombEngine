@@ -561,13 +561,13 @@ void CalculateSpotCameras()
 			Camera.type = HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 				TestVolumes(&Camera);
 			}
 			Camera.type = oldType;
@@ -757,13 +757,13 @@ void CalculateSpotCameras()
 						Camera.type = HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 							TestVolumes(&Camera);
 						}
 						Camera.type = oldType;

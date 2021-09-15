@@ -936,8 +936,8 @@ bool SkidooControl()
 	FLOOR_INFO* floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	int height = GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos);
 
-	TestTriggers(skidoo, true,  NULL);
-	TestTriggers(skidoo, false, NULL);
+	TestTriggers(skidoo, true);
+	TestTriggers(skidoo, false);
 
 	bool dead = false;
 	int drive = 0;

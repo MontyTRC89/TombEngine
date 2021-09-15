@@ -1263,7 +1263,7 @@ int KayakControl()
 	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	int h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 
-	TestTriggers(v, false, NULL);
+	TestTriggers(v, false);
 
 	int water;
 	if ((kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber)) == NO_HEIGHT)

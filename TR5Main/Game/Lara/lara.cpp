@@ -59,7 +59,8 @@ ITEM_INFO* LaraItem;
 COLL_INFO lara_coll = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
-function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
+function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
+{
 	lara_as_walk,
 	lara_as_run,
 	lara_as_stop,
@@ -217,6 +218,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_stepoff_left,
 	lara_as_stepoff_right
 };
+
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_walk,
 	lara_col_run,
@@ -932,7 +934,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 
 	// Test for flags & triggers
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 
@@ -1043,7 +1045,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	LaraGun();
 
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 
@@ -1101,7 +1103,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	LaraGun();
 
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 

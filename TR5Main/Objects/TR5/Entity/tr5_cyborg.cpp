@@ -578,7 +578,7 @@ void HitmanControl(short itemNumber)
 				TestTriggers(
 					creature->enemy->pos.xPos,
 					creature->enemy->pos.yPos,
-					creature->enemy->pos.zPos, roomNumber, true, NULL);
+					creature->enemy->pos.zPos, roomNumber, true);
 				
 				item->requiredAnimState = STATE_HITMAN_WALK;
 

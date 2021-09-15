@@ -630,7 +630,7 @@ void GuideControl(short itemNumber)
 			if (item->animNumber != obj->animIndex + 57
 				&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 20)
 			{
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -705,7 +705,7 @@ void GuideControl(short itemNumber)
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 				item->pos.yRot = enemy->pos.yRot;
 				
 				creature->reachedGoal = false;
@@ -740,7 +740,7 @@ void GuideControl(short itemNumber)
 			{
 				item->goalAnimState = STATE_GUIDE_STOP;
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -802,7 +802,7 @@ void GuideControl(short itemNumber)
 		}
 		if (enemy->flags == 42)
 		{
-			TestTriggers(item, true, NULL);
+			TestTriggers(item, true);
 			
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
