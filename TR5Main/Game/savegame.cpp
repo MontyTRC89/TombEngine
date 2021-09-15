@@ -12,6 +12,7 @@
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
+#include "flipeffect.h"
 #include "quad.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
@@ -20,6 +21,7 @@
 #include "fullblock_switch.h"
 #include "creature_info.h"
 #include "quad_info.h"
+
 using namespace TEN::Entities::Switches;
 
 using std::string;
@@ -455,7 +457,6 @@ bool SaveGame::readGameStatus()
 	LastInventoryItem = LEB128::ReadInt32(m_stream);
 #endif
 	FlipEffect = LEB128::ReadInt32(m_stream);
-	FlipTimer = LEB128::ReadInt32(m_stream);
 	CurrentAtmosphere = LEB128::ReadByte(m_stream);
 	CurrentSequence = LEB128::ReadByte(m_stream);
 

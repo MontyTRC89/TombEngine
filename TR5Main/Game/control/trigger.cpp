@@ -2,6 +2,7 @@
 #include "items.h"
 #include "control.h"
 #include "floordata.h"
+#include "flipeffect.h"
 #include "objectslist.h"
 #include "box.h"
 #include "camera.h"
@@ -599,10 +600,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 		DoFlipMap(flip);
 
 	if (newEffect != -1 && (flip || !flipAvailable))
-	{
 		FlipEffect = newEffect;
-		FlipTimer = 0;
-	}
 }
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
