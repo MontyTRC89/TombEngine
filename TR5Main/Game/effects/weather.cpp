@@ -1,20 +1,22 @@
 #include "framework.h"
 #include "savegame.h"
-#include "sky.h"
+#include "weather.h"
 #include "Sound\sound.h"
 #include "Scripting\GameScriptLevel.h"
 
-using namespace TEN::Effects::Sky;
+using namespace TEN::Effects::Environment;
 
 namespace TEN {
 namespace Effects {
-namespace Sky 
+namespace Environment 
 {
-	SkyController Sky;
+	EnvironmentController Weather;
 
-	void SkyController::UpdateSky()
+	void EnvironmentController::Update()
 	{
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+
+		// Sky
 
 		if (level->Layer1.Enabled)
 		{
@@ -47,6 +49,7 @@ namespace Sky
 		auto color = Vector4(level->Layer1.R / 255.0f, level->Layer1.G / 255.0f, level->Layer1.B / 255.0f, 1.0f);
 
 		// Storm
+
 		if (level->Storm)
 		{
 			if (LightningCount || LightningRand)
@@ -72,16 +75,39 @@ namespace Sky
 		}
 		else
 			Color = color;
+
+		// Wind
+
+		CurrentWind += (GetRandomControl() & 7) - 3;
+		if (CurrentWind <= -2)
+			CurrentWind++;
+		else if (CurrentWind >= 9)
+			CurrentWind--;
+
+		DWindAngle = (DWindAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
+
+		if (DWindAngle < 1024)
+			DWindAngle = 2048 - DWindAngle;
+		else if (DWindAngle > 3072)
+			DWindAngle += 6144 - 2 * DWindAngle;
+
+		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
+
+		FinalWindX = CurrentWind * phd_sin(WindAngle << 3);
+		FinalWindZ = CurrentWind * phd_cos(WindAngle << 3);
 	}
 
-	void SkyController::ClearSky()
+	void EnvironmentController::Clear()
 	{
 		StormTimer = 0;
 		SkyStormColor = 1;
 		SkyStormColor2 = 1;
+
+		CurrentWind = FinalWindX = FinalWindZ = 0;
+		WindAngle = DWindAngle = 2048;
 	}
 
-	void SkyController::UpdateStorm()
+	void EnvironmentController::UpdateStorm()
 	{
 		LightningCount--;
 

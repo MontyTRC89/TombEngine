@@ -144,7 +144,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
-    <ClInclude Include="Game\effects\sky.h" />
+    <ClInclude Include="Game\effects\weather.h" />
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
@@ -532,7 +532,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\effects\drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
-    <ClCompile Include="Game\effects\sky.cpp" />
+    <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
@@ -819,7 +819,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp" />
-	  <ClCompile Include="Scripting\GameScriptLevel.cpp" />
+    <ClCompile Include="Scripting\GameScriptLevel.cpp" />
     <ClCompile Include="Scripting\GameScriptMeshInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptMirror.cpp" />
     <ClCompile Include="Scripting\GameScriptPosition.cpp" />
@@ -828,13 +828,13 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptSkyLayer.cpp" />
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
-	  <ClCompile Include="Scripting\GameScriptAIObject.cpp" />
+    <ClCompile Include="Scripting\GameScriptAIObject.cpp" />
     <ClCompile Include="Scripting\GameScriptAudioTrack.cpp" />
     <ClCompile Include="Scripting\GameScriptCameraInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptColor.cpp" />
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
     <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />	
+    <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />

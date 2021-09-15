@@ -8,13 +8,14 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
+#include "effects\weather.h"
 #include "Renderer11.h"
+
+using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
+
 int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
-int WindAngle;
-int DWindAngle;
-int Wind;
 
 extern GameFlow* g_GameFlow;
 
@@ -186,9 +187,6 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y;
 			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z;
 		}
-
-		Wind = SmokeWindX = SmokeWindZ = 0;
-		WindAngle = DWindAngle = 2048;
 	}
 	else
 	{
@@ -210,24 +208,6 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 			wh = GetWaterHeight(x, y, z, roomNumber);
 		}
-
-		Wind += (GetRandomControl() & 7) - 3;
-		if (Wind <= -2)
-			Wind++;
-		else if (Wind >= 9)
-			Wind--;
-
-		DWindAngle = (DWindAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
-
-		if (DWindAngle < 1024)
-			DWindAngle = 2048 - DWindAngle;
-		else if (DWindAngle > 3072)
-			DWindAngle += 6144 - 2 * DWindAngle;
-
-		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
-
-		SmokeWindX = Wind * phd_sin(WindAngle << 3);
-		SmokeWindZ = Wind * phd_cos(WindAngle << 3);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
@@ -253,8 +233,8 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 
 			if (Lara.waterStatus == LW_ABOVE_WATER && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
 			{
-				Hairs[ponytail][i].pos.xPos += SmokeWindX;
-				Hairs[ponytail][i].pos.zPos += SmokeWindZ;
+				Hairs[ponytail][i].pos.xPos += Weather.Wind().x * 2.0f;
+				Hairs[ponytail][i].pos.zPos += Weather.Wind().z * 2.0f;
 			}
 
 			switch (Lara.waterStatus)
