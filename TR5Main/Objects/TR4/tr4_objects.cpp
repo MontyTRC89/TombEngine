@@ -1143,7 +1143,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->control = CogControl;
-		obj->collision = GenericSphereBoxCollision;
+		obj->collision = CogCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
