@@ -1107,7 +1107,7 @@
     <ClInclude Include="Scripting\GameScriptRotation.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-	  <ClInclude Include="Scripting\GameScriptCameraInfo.h">
+    <ClInclude Include="Scripting\GameScriptCameraInfo.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\GameScriptMeshInfo.h">
@@ -1162,6 +1162,15 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\GameScriptDisplayString.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameFlowScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameLogicScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effects\weather.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2033,9 +2042,6 @@
     <ClCompile Include="Game\itemdata\itemdata.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClInclude Include="Game\effects\sky.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClCompile Include="Scripting\GameFlowScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -2094,6 +2100,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effects\weather.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

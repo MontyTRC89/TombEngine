@@ -7,9 +7,13 @@
 #include "room.h"
 #include "Specific\trmath.h"
 #include "effects\effects.h"
+#include "effects\weather.h"
 #include "setup.h"
 #include "Specific\prng.h"
+
+using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
+
 namespace TEN {
 	namespace Effects {
 		namespace Drip {
@@ -27,8 +31,8 @@ namespace TEN {
 						d.active = false;
 					d.velocity.y += d.gravity;
 					if (g_Level.Rooms[d.room].flags & ENV_FLAG_WIND) {
-						d.velocity.x = SmokeWindX / 2;
-						d.velocity.z = SmokeWindZ / 2;
+						d.velocity.x = Weather.Wind().x;
+						d.velocity.z = Weather.Wind().z;
 					}
 					d.pos += d.velocity;
 					float normalizedAge = d.age / d.life;

@@ -41,7 +41,7 @@
 #include "effects\spark.h"
 #include "effects\explosion.h"
 #include "effects\drip.h"
-#include "effects\sky.h"
+#include "effects\weather.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
@@ -63,6 +63,7 @@ using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Renderer;
@@ -116,8 +117,6 @@ int CurrentLevel;
 bool DoTheGame;
 bool ThreadEnded;
 int OnFloor;
-int SmokeWindX;
-int SmokeWindZ;
 int FlipTimer;
 int FlipEffect;
 int TriggerTimer;
@@ -494,6 +493,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			} while (SmashedMeshCount != 0);
 		}
 
+		// Update weather
+		Weather.Update();
+
 		// Update special FX
 		UpdateSparks();
 		UpdateFireSparks();
@@ -514,7 +516,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSmokeParticles();
 		updateSimpleParticles();
 		TEN::Effects::Drip::UpdateDrips();
-		TEN::Effects::Sky::Sky.UpdateSky();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
@@ -2308,8 +2309,8 @@ void ResetGlobals()
 	// while playing flyby with locked controls
 	DisableLaraControl = false;
 
-	// ClearSky resets lightning parameters so user won't see prev lightning in new level
-	TEN::Effects::Sky::Sky.ClearSky();
+	// Sky.Clear resets lightning and wind parameters so user won't see prev weather in new level
+	Weather.Clear();
 
 	// Needs to be cleared because otherwise a list of active creatures from previous level
 	// will spill into new level

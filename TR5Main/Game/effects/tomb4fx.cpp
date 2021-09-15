@@ -14,11 +14,13 @@
 #include "drip.h"
 #include <effects.h>
 #include "Renderer11.h"
-#include <effects.h>
-#include <draw.h>
+#include "effects/effects.h"
+#include "effects/weather.h"
+#include "draw.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;
+using namespace TEN::Effects::Environment;
 
 char FlareTable[121] =
 {
@@ -481,8 +483,8 @@ void UpdateSmoke()
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ >> 1;
+				spark->x += Weather.Wind().x;
+				spark->z += Weather.Wind().z;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
@@ -1152,8 +1154,8 @@ void UpdateDrips()
 			
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
 			{
-				drip->x += SmokeWindX >> 1;
-				drip->z += SmokeWindZ >> 1;
+				drip->x += Weather.Wind().x;
+				drip->z += Weather.Wind().z;
 			}
 
 			drip->y += drip->yVel >> 5;
