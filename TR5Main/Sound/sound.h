@@ -114,7 +114,8 @@ struct AudioTrack
 	bool looped;
 };
 
-extern std::unordered_map<std::string, AudioTrack> g_AudioTracks;
+extern std::unordered_map<std::string, AudioTrack> SoundTracks;
+extern std::string CurrentLoopedSoundTrack;
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
 void StopSoundEffect(short effectID);

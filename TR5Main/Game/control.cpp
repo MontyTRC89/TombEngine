@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "Lara.h"
 #include "effects/hair.h"
+#include "effects/flmtorch.h"
 #include "items.h"
 #include "flipeffect.h"
 #include "draw.h"
@@ -60,58 +61,48 @@ using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
 
-int RumbleTimer = 0;
-int InGameCnt = 0;
-bool InItemControlLoop;
+int GameTimer       = 0;
+int RumbleTimer     = 0;
+int InGameCounter   = 0;
+short GlobalCounter = 0;
+int Wibble          = 0;
+
+bool InitialiseGame;
+bool DoTheGame;
+bool JustLoaded;
+bool ThreadEnded;
+
+int RequiredStartPos;
+int CurrentLevel;
+int LevelComplete;
+
+bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[512];
-short NextFxActive;
-short NextFxFree;
 short NextItemActive;
 short NextItemFree;
+short NextFxActive;
+short NextFxFree;
 
-int DisableLaraControl = 0;
+bool DisableLaraControl = false;
+bool OldLaraBusy;
+
 int WeatherType;
 int LaraDrawType;
-int NumAnimatedTextures;
-short *AnimTextureRanges;
-int nAnimUVRanges;
-int Wibble = 0;
-int SetDebounce = 0;
 
-std::string CurrentAtmosphere;
-short CurrentRoom;
-int GameTimer;
-short GlobalCounter;
-byte LevelComplete;
 #ifndef NEW_INV
 int LastInventoryItem;
+extern Inventory g_Inventory;
 #endif
-int TrackCameraInit;
-short TorchRoom;
-int InitialiseGame;
-int RequiredStartPos;
+
 int WeaponDelay;
 int WeaponEnemyTimer;
-int CutSeqNum;
-int CurrentLevel;
-bool DoTheGame;
-bool ThreadEnded;
-int OnFloor;
-int TriggerTimer;
-int JustLoaded;
-int OldLaraBusy;
-int Infrared;
 
-std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 short IsRoomOutsideNo;
+std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
-extern int SplashCount;
 
 // This might not be the exact amount of time that has passed, but giving it a
 // value of 1/30 keeps it in lock-step with the rest of the game logic,
@@ -290,8 +281,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						DbInput = 0;
 					}
 				}
-
-				Infrared = false;
 			}
 			else if (BinocularRange == 0)
 			{
@@ -304,20 +293,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 					Lara.busy = true;
 					LaserSight = true;
-					Infrared = true;
-				}
-				else
-					Infrared = false;
-			}
-			else
-			{
-				if (LaserSight)
-				{
-					Infrared = true;
-				}
-				else
-				{
-					Infrared = false;
 				}
 			}
 		}
@@ -599,12 +574,12 @@ GAME_STATUS DoTitle(int index)
 		InitSpotCamSequences();
 
 		InitialiseSpotCam(2);
-		CurrentAtmosphere = "083_horus";
+		CurrentLoopedSoundTrack = "083_horus";
 		UseSpotCam = true;
 
 		// Play background music
-		//CurrentAtmosphere = ambient;
-		S_CDPlay(CurrentAtmosphere, 1);
+		//CurrentLoopedSoundTrack = ambient;
+		S_CDPlay(CurrentLoopedSoundTrack, 1);
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -753,8 +728,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitSpotCamSequences();
 
 	// Play background music
-	CurrentAtmosphere = ambient;
-	S_CDPlay(CurrentAtmosphere, 1);
+	CurrentLoopedSoundTrack = ambient;
+	S_CDPlay(CurrentLoopedSoundTrack, 1);
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -1165,7 +1140,7 @@ void RumbleScreen()
 	{
 		if (!(GetRandomControl() & 0x1FF))
 		{
-			InGameCnt = 0;
+			InGameCounter = 0;
 			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
 			return;
 		}
@@ -1173,15 +1148,15 @@ void RumbleScreen()
 
 	if (RumbleTimer < 0)
 	{
-		if (InGameCnt >= abs(RumbleTimer))
+		if (InGameCounter >= abs(RumbleTimer))
 		{
 			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
 			RumbleTimer++;
 		}
 		else
 		{
-			InGameCnt++;
-			Camera.bounce = -(GetRandomControl() % InGameCnt);
+			InGameCounter++;
+			Camera.bounce = -(GetRandomControl() % InGameCounter);
 		}
 	}
 }
@@ -1404,6 +1379,9 @@ int IsRoomOutside(int x, int y, int z)
 
 void ResetGlobals()
 {
+	// Reset oscillator seed
+	Wibble = 0;
+
 	// Needs to be cleared or otherwise controls will lockup if user will exit to title
 	// while playing flyby with locked controls
 	DisableLaraControl = false;

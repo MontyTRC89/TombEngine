@@ -1232,9 +1232,9 @@ int DoPauseMenu()
 	}
 
 	clear_input_vars(1);
-	SetDebounce = 1;
+	SetDebounce = true;
 	S_UpdateInput();
-	SetDebounce = 0;
+	SetDebounce = false;
 	do_debounced_input();
 
 	if (pause_menu_to_display <= pause_options_menu)
@@ -3603,7 +3603,7 @@ int S_CallInventory2()
 		if (compassNeedleAngle != 1024)
 			compassNeedleAngle -= 32;
 
-		SetDebounce = 1;
+		SetDebounce = true;
 		S_UpdateInput();
 		TrInput = InputBusy;
 		GameTimer++;
@@ -3646,7 +3646,7 @@ int S_CallInventory2()
 		/*	do
 			{
 				S_InitialisePolyList();
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
 				input = inputBusy;
 				UpdatePulseColour();

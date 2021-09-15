@@ -22,7 +22,7 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-extern unordered_map<string, AudioTrack> g_AudioTracks;
+extern unordered_map<string, AudioTrack> SoundTracks;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
@@ -182,7 +182,7 @@ void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>
 		track.Name = t.trackName;
 		track.Mask = 0;
 		track.looped = t.looped;
-		g_AudioTracks.insert_or_assign(track.Name, track);
+		SoundTracks.insert_or_assign(track.Name, track);
 	}
 }
 
@@ -238,7 +238,7 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentAtmosphere = level->AmbientTrack;
+		CurrentLoopedSoundTrack = level->AmbientTrack;
 
 		GAME_STATUS status;
 
@@ -268,7 +268,7 @@ bool GameFlow::DoGameflow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, CurrentAtmosphere, loadFromSavegame);
+			status = DoLevel(CurrentLevel, CurrentLoopedSoundTrack, loadFromSavegame);
 			loadFromSavegame = false;
 		}
 

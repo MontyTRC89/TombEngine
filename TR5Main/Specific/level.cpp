@@ -883,8 +883,8 @@ void LoadSoundEffects()
 
 void LoadAnimatedTextures()
 {
-	NumAnimatedTextures = ReadInt32();
-	for (int i = 0; i < NumAnimatedTextures; i++)
+	int numAnimatedTextures = ReadInt32();
+	for (int i = 0; i < numAnimatedTextures; i++)
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
@@ -904,7 +904,9 @@ void LoadAnimatedTextures()
 		}
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-	nAnimUVRanges = ReadInt8();
+
+	// Unused for now
+	int nAnimUVRanges = ReadInt8();
 }
 
 void LoadTextureInfos()
@@ -1079,8 +1081,6 @@ unsigned CALLBACK LoadLevel(void* data)
 	// Initialise the game
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	Wibble = 0;
-	TorchRoom = -1;
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();

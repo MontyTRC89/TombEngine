@@ -5,6 +5,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "effects\effects.h"
+#include "effects\flmtorch.h"
 #include "box.h"
 #include "setup.h"
 #include "level.h"
@@ -251,8 +252,6 @@ void ImpControl(short itemNumber)
 
 			case STATE_IMP_SCARED:
 				creature->maximumTurn = ANGLE(7);
-				if (TorchRoom != 11)
-					item->goalAnimState = STATE_IMP_STOP;
 				break;
 
 			case STATE_IMP_START_CLIMB:
@@ -297,9 +296,6 @@ void ImpControl(short itemNumber)
 				item->pos.yRot += angle2;
 			}
 		}
-
-		if (TorchRoom == 11)
-			item->goalAnimState = STATE_IMP_SCARED;
 
 		CreatureTilt(item, 0);
 		CreatureJoint(item, 1, joint1);

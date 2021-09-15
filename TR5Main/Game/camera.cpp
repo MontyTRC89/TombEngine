@@ -1448,7 +1448,7 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		GetTargetOnLOS(&Camera.pos, &Camera.target, 0, 0);
 
-		if (!(InputBusy & IN_ACTION) || Infrared)
+		if (!(InputBusy & IN_ACTION))
 		{
 			// Reimplement this mode?
 		}

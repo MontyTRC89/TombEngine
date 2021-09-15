@@ -7,6 +7,7 @@
 #include "spotcam.h"
 #include "traps.h"
 #include "control/flipmap.h"
+#include "sound/sound.h"
 #include "level.h"
 #include "setup.h"
 #include "flipeffect.h"
@@ -69,7 +70,7 @@ std::unique_ptr<ChunkId> SaveGame::m_chunkExamineCombo;
 std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
 
 SAVEGAME_INFO Savegame;
-//extern vector<AudioTrack> g_AudioTracks;
+//extern vector<AudioTrack> SoundTracks;
 
 void SaveGame::saveItems()
 {
@@ -181,7 +182,7 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 #endif
 	LEB128::Write(m_stream, FlipEffect);
 	LEB128::Write(m_stream, FlipTimer);
-	//LEB128::Write(m_stream, CurrentAtmosphere);
+	//LEB128::Write(m_stream, CurrentLoopedSoundTrack);
 	LEB128::Write(m_stream, CurrentSequence);
 
 	// Now the sub-chunks
@@ -195,8 +196,8 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 	for (int i = 0; i < NumberSpotcams; i++)
 		m_writer->WriteChunk(m_chunkFlybyFlags.get(), &saveFlybyFlags, i, SpotCam[i].flags);
 
-	for (int i = 0; i < g_AudioTracks.size(); i++)
-		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, g_AudioTracks[i].Mask);
+	for (int i = 0; i < SoundTracks.size(); i++)
+		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, SoundTracks[i].Mask);
 
 	for (int i = 0; i < NumberCameras; i++)
 		m_writer->WriteChunk(m_chunkCamera.get(), &saveCamera, i, FixedCameras[i].flags);
@@ -451,7 +452,7 @@ bool SaveGame::readGameStatus()
 	LastInventoryItem = LEB128::ReadInt32(m_stream);
 #endif
 	FlipEffect = LEB128::ReadInt32(m_stream);
-	CurrentAtmosphere = LEB128::ReadByte(m_stream);
+	CurrentLoopedSoundTrack = LEB128::ReadByte(m_stream);
 	CurrentSequence = LEB128::ReadByte(m_stream);
 
 	m_reader->ReadChunks(&readGameStatusChunks, 0);
@@ -839,8 +840,8 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 		short index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
 		short value = LEB128::ReadInt16(m_stream);
-		if (index < g_AudioTracks.size())
-			g_AudioTracks[index].Mask = value;
+		if (index < SoundTracks.size())
+			SoundTracks[index].Mask = value;
 		return true;
 	}*/
 	else if (chunkId->EqualsTo(m_chunkCamera.get()))

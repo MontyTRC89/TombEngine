@@ -422,7 +422,6 @@ void FallingBlockControl(short itemNumber)
 //		{
 //			*height = item->pos.yPos;
 //			HeightType = WALL;
-//			OnFloor = 1;
 //		}
 //	}
 //}
