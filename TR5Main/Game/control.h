@@ -47,32 +47,43 @@ enum COMMAND_TYPES
 #define OUTSIDE_Z 64
 #define OUTSIDE_SIZE 108
 
-extern bool InItemControlLoop;
+
+extern int GameTimer;
+extern int RumbleTimer;
+extern int InGameCounter;
+extern short GlobalCounter;
+extern int Wibble;
+
+extern bool InitialiseGame;
+extern bool DoTheGame;
+extern bool JustLoaded;
+extern bool ThreadEnded;
+
+extern int RequiredStartPos;
+extern int CurrentLevel;
+extern int LevelComplete;
+
+extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
 extern short ItemNewRooms[512];
-extern short NextFxActive;
-extern short NextFxFree;
 extern short NextItemActive;
 extern short NextItemFree;
+extern short NextFxActive;
+extern short NextFxFree;
+
 extern bool DisableLaraControl;
+extern bool OldLaraBusy;
+
 extern int WeatherType;
 extern int LaraDrawType;
-extern int Wibble;
-extern int GameTimer;
-extern short GlobalCounter;
-extern int LevelComplete;
+
+extern int WeaponDelay;
+extern int WeaponEnemyTimer;
+
 #ifndef NEW_INV
 extern int LastInventoryItem;
 #endif
-extern bool InitialiseGame;
-extern int RequiredStartPos;
-extern int WeaponDelay;
-extern int WeaponEnemyTimer;
-extern int CurrentLevel;
-extern bool DoTheGame;
-extern bool ThreadEnded;
-extern bool JustLoaded;
-extern bool OldLaraBusy;
+
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
 
