@@ -1,8 +1,7 @@
 #include "framework.h"
 #include "winmain.h"
 #include "resource.h"
-#include "draw.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
@@ -12,13 +11,11 @@
 #include "level.h"
 #include "configuration.h"
 #include "Renderer11.h"
-#include <CommCtrl.h>
-#include <fcntl.h>
-#include <process.h>
-#include <corecrt_io.h>
-#include <iostream>
 #include "Scripting/GameFlowScript.h"
 #include "Scripting/GameLogicScript.h"
+#include <CommCtrl.h>
+#include <process.h>
+#include <iostream>
 
 using namespace TEN::Renderer;
 using std::exception;
