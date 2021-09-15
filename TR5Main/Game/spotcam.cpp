@@ -11,7 +11,7 @@
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
 
-
+int TrackCameraInit;
 int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
@@ -135,7 +135,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
-	DisableLaraControl = 0;
+	DisableLaraControl = false;
 
 	LastFOV = CurrentFOV;
 	LaraAir = Lara.air;
@@ -175,7 +175,7 @@ void InitialiseSpotCam(short Sequence)
 
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		DisableLaraControl = 1;
+		DisableLaraControl = true;
 		g_Renderer.enableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
@@ -774,7 +774,7 @@ void CalculateSpotCameras()
 					g_Renderer.enableCinematicBars(false);
 
 					UseSpotCam = 0;
-					DisableLaraControl = 0;
+					DisableLaraControl = false;
 					CheckTrigger = 0;
 					Camera.oldType = FIXED_CAMERA;
 					Camera.type = CHASE_CAMERA;

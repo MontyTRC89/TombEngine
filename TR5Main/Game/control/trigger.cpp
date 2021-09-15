@@ -18,6 +18,7 @@
 
 using namespace TEN::Entities::Switches;
 
+int TriggerTimer;
 int KeyTriggerActive;
 
 int TriggerActive(ITEM_INFO* item)

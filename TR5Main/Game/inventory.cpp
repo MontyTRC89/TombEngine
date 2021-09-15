@@ -1878,8 +1878,8 @@ int Inventory::DoTitleInventory()
 		UpdateSceneAndDrawInventory();
 	}
 
-	CurrentAtmosphere = CDA_XA11_FLYBY1;
-	S_CDPlay(CurrentAtmosphere, 1);
+	CurrentLoopedSoundTrack = CDA_XA11_FLYBY1;
+	S_CDPlay(CurrentLoopedSoundTrack, 1);
 
 	OpenRing(INV_RING_OPTIONS, true);
 
@@ -1888,7 +1888,6 @@ int Inventory::DoTitleInventory()
 	while (true /*!ResetFlag*/)
 	{
 		SetDebounce = true;
-
 		S_UpdateInput();
 		SetDebounce = false;
 
@@ -2093,9 +2092,9 @@ int Inventory::DoPassport()
 			int selectedSavegame = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2165,9 +2164,9 @@ int Inventory::DoPassport()
 			int selectedSavegame = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2240,9 +2239,9 @@ int Inventory::DoPassport()
 			int selectedLevel = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2309,9 +2308,9 @@ int Inventory::DoPassport()
 			// New game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2363,9 +2362,9 @@ int Inventory::DoPassport()
 			// Exit game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2417,9 +2416,9 @@ int Inventory::DoPassport()
 			// Exit game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)

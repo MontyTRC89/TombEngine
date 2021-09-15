@@ -53,8 +53,8 @@ static void PlaySoundEffect(int id, int flags)
 
 static void SetAmbientTrack(std::string const & trackName)
 {
-	CurrentAtmosphere = trackName;
-	S_CDPlay(CurrentAtmosphere, 1);
+	CurrentLoopedSoundTrack = trackName;
+	S_CDPlay(CurrentLoopedSoundTrack, 1);
 }
 
 static int FindRoomNumber(GameScriptPosition pos)

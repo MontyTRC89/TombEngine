@@ -57,6 +57,7 @@ enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE
 };
 
+extern int TriggerTimer;
 extern int KeyTriggerActive;
 
 bool GetKeyTrigger(ITEM_INFO* item);
