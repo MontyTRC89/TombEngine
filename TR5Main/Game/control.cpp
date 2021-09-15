@@ -501,29 +501,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (level->Rumble)
 			RumbleScreen();
 
-		// Play sound sources
-		for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
-		{
-			SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
-
-			short t = sound->flags & 31;
-			short group = t & 1;
-			group += t & 2;
-			group += ((t >> 2) & 1) * 3;
-			group += ((t >> 3) & 1) * 4;
-			group += ((t >> 4) & 1) * 5;
-
-			if (!FlipStats[group] && (sound->flags & 128) == 0)
-				continue;
-			else if (FlipStats[group] && (sound->flags & 128) == 0)
-				continue;
-
-			SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
-		}
-
-		// Do flipeffects
-		if (FlipEffect != -1 && FlipEffect < NUM_FLIPEFFECTS && effect_routines[FlipEffect] != nullptr)
-			effect_routines[FlipEffect](NULL);
+		PlaySoundSources();
+		DoFlipEffect(FlipEffect);
 
 		// Clear savegame loaded flag
 		JustLoaded = false;
@@ -1131,8 +1110,7 @@ void AnimateItem(ITEM_INFO *item)
 
 				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
-				if (effectID < NUM_FLIPEFFECTS && effect_routines[effectID] != nullptr)
-					effect_routines[effectID](item);
+				DoFlipEffect(effectID, item);
 
 				cmd += 2;
 				break;
