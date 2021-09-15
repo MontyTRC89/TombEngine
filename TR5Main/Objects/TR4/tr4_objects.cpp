@@ -978,26 +978,6 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_FLOOR_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_CEILING_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_CATWALK_BLADE];
 	if (obj->loaded)
 	{
@@ -1093,6 +1073,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1102,6 +1083,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
