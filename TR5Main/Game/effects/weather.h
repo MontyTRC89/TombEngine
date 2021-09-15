@@ -4,8 +4,8 @@
 
 namespace TEN {
 namespace Effects {
-namespace Environment {
-
+namespace Environment 
+{
 	class EnvironmentController
 	{
 	public:
