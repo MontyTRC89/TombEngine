@@ -2614,7 +2614,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 				item->pos.yRot = oldRot;
 
-				int deadlyBits = item->itemFlags[0];
+				int deadlyBits = *item->itemFlags;
 				SPHERE* sphere = &CreatureSpheres[0];
 
 				if (item->itemFlags[2] != 0)
