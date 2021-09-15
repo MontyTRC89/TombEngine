@@ -29,23 +29,36 @@ namespace TEN::Entities::Switches
 		auto item = &g_Level.Items[itemNum];
 		auto triggerIndex = GetTriggerIndex(item);
 
-		if (!triggerIndex)
+		int targetItemNum;
+		ITEM_INFO* target = nullptr;
+		DOOR_DATA* door   = nullptr;
+
+		// Try to find first item in a trigger list, and if it is a door,
+		// attach it to cog. If no object found or object is not door,
+		// bypass further processing and do ordinary object collision.
+
+		if (triggerIndex)
+		{
+			short* trigger = triggerIndex;
+			targetItemNum = trigger[3] & VALUE_BITS;
+
+			if (targetItemNum < g_Level.Items.size())
+			{
+				target = &g_Level.Items[targetItemNum];
+				if (target->data.is<DOOR_DATA>())
+					door = (DOOR_DATA*)target->data;
+			}
+		}
+
+		// Door was not found, do ordinary collision and exit.
+
+		if (door == nullptr)
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
 		}
 
-		short* trigger = triggerIndex;
-		int targetItemNum = trigger[3] & VALUE_BITS;
-
-		if (targetItemNum > g_Level.Items.size())
-		{
-			ObjectCollision(itemNum, l, coll);
-			return;
-		}
-
-		ITEM_INFO* target = &g_Level.Items[targetItemNum];
-		DOOR_DATA* door = (DOOR_DATA*)target->data;
+		// Door is found, attach to it.
 
 		if (item->status == ITEM_NOT_ACTIVE)
 		{
