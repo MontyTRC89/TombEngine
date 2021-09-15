@@ -36,13 +36,14 @@ namespace TEN::Entities::Switches
 		}
 
 		short* trigger = triggerIndex;
-		for (int i = *triggerIndex; (i & 0x1F) != 4; trigger++)
+		int targetItemNum = trigger[3] & VALUE_BITS;
+
+		if (targetItemNum > g_Level.Items.size())
 		{
-			if (i < 0)
-				break;
-			i = trigger[1];
+			ObjectCollision(itemNum, l, coll);
+			return;
 		}
-		int targetItemNum = trigger[3] & 0x3FF;
+
 		ITEM_INFO* target = &g_Level.Items[targetItemNum];
 		DOOR_DATA* door = (DOOR_DATA*)target->data;
 

@@ -158,26 +158,13 @@ struct EntityStoringInfo
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
 
-constexpr auto UNIT_SHADOW = 256;
-constexpr auto NO_SHADOW = 0;
-constexpr auto DEFAULT_RADIUS = 10;
-constexpr auto ROT_X = 0x0004;
-constexpr auto ROT_Y = 0x0008;
-constexpr auto ROT_Z = 0x0010;
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
 constexpr auto TIMID = 0;
 constexpr auto VIOLENT = 1;
-constexpr auto ONESHOT = 0x100;
-constexpr auto END_BIT = 0x8000;
-constexpr auto VALUE_BITS = 0x3FF;
-constexpr auto CODE_BITS = 0x3E00;
 constexpr auto REVERSE = 0x4000;
-constexpr auto SWONESHOT = 0x40;
-constexpr auto ATONESHOT = 0x80;
 constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED = 0x4000;
-constexpr auto OVERLAP_INDEX = 0x3FFF;
 constexpr auto SEARCH_NUMBER = 0x7FFF;
 constexpr auto BLOCKED_SEARCH = 0x8000;
 constexpr auto NO_BOX = -1;

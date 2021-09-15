@@ -44,8 +44,6 @@ enum COMMAND_TYPES
 	COMMAND_EFFECT
 };
 
-#define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
-
 #define OUTSIDE_Z 64
 #define OUTSIDE_SIZE 108
 
