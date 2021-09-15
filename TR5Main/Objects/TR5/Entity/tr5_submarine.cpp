@@ -15,6 +15,7 @@
 #include "Sound\sound.h"
 #include "creature_info.h"
 #include "collide.h"
+#include "control\los.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {

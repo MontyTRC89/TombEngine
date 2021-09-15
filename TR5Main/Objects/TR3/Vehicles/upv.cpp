@@ -18,6 +18,7 @@
 #include "savegame.h"
 #include "Sound\sound.h"
 #include "upv_info.h"
+#include "control\los.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2

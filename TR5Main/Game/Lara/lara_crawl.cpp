@@ -5,8 +5,8 @@
 #include "lara_slide.h"
 #include "lara_collide.h"
 #include "draw.h"
-#include "control.h"
-#include <Game/Lara/lara_flare.h>
+#include "control\los.h"
+#include "Lara\lara_flare.h"
 #include "collide.h"
 #include "item.h"
 #include "camera.h"
