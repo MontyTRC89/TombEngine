@@ -90,13 +90,13 @@ bool OldLaraBusy;
 int WeatherType;
 int LaraDrawType;
 
+int WeaponDelay;
+int WeaponEnemyTimer;
+
 #ifndef NEW_INV
 int LastInventoryItem;
 extern Inventory g_Inventory;
 #endif
-
-int WeaponDelay;
-int WeaponEnemyTimer;
 
 short IsRoomOutsideNo;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
