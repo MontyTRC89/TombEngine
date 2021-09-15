@@ -1,5 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
+#include "Scripting/GameScriptLevel.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -10,35 +11,46 @@ namespace Environment {
 	class EnvironmentController
 	{
 	public:
-		Vector3 Wind() { return Vector3(FinalWindX / 2.0f, 0, FinalWindZ / 2.0f); }
-		Vector4 SkyColor() { return Color; }
-		short   SkyLayer1Position() { return Position1; }
-		short   SkyLayer2Position() { return Position2; }
+		Vector3 Wind() { return Vector3(WindFinalX / 2.0f, 0, WindFinalZ / 2.0f); }
+		Vector4 FlashColor() { return FlashColorBase * sin(FlashProgress * PI / 2);; }
+		Vector4 SkyColor() { return SkyCurrentColor; }
+		short   SkyLayer1Position() { return SkyPosition1; }
+		short   SkyLayer2Position() { return SkyPosition2; }
 
+		void Flash(int r, int g, int b, float speed);
 		void Update();
 		void Clear();
 
 	private:
 		// Sky
-		Vector4 Color;
-		short Position1;
-		short Position2;
+		Vector4 SkyCurrentColor;
+		short   SkyPosition1;
+		short   SkyPosition2;
 
 		// Wind
-		int FinalWindX;
-		int FinalWindZ;
+		int WindFinalX;
+		int WindFinalZ;
 		int WindAngle;
-		int DWindAngle;
-		int CurrentWind;
+		int WindDAngle;
+		int WindCurrent;
+
+		// Flash fader
+		Vector3 FlashColorBase = {};
+		float   FlashSpeed = 1.0f;
+		float   FlashProgress = 0.0f;
 
 		// Lightning
-		int LightningCount;
-		int LightningRand;
-		int StormTimer;
-		byte SkyStormColor = 1;
-		byte SkyStormColor2 = 1;
+		int  StormCount;
+		int  StormRand;
+		int  StormTimer;
+		byte StormSkyColor = 1;
+		byte StormSkyColor2 = 1;
 
-		void UpdateStorm();
+		void UpdateSky(GameScriptLevel* level);
+		void UpdateStorm(GameScriptLevel* level);
+		void UpdateWind(GameScriptLevel* level);
+		void UpdateFlash(GameScriptLevel* level);
+		void UpdateLightning();
 	};
 
 	extern EnvironmentController Weather;

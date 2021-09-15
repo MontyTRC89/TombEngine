@@ -4,9 +4,13 @@
 #include "level.h"
 #include "control.h"
 #include "Sound\sound.h"
+#include "effects\weather.h"
 #include "lara.h"
 #include "camera.h"
 #include "Box.h"
+
+using namespace TEN::Effects::Environment;
+
 void InitialiseTeleporter(short itemNumber)
 {
 	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -55,11 +59,6 @@ void ControlTeleporter(short itemNumber)
 				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
 				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
-				if (FlashFader > 4)
-				{
-					FlashFader = (FlashFader >> 1) & 0xFE;
-				}
-
 				if (GlobalCounter & 1)
 				{
 					PHD_VECTOR src;
@@ -93,10 +92,12 @@ void ControlTeleporter(short itemNumber)
 					v23 = item->itemFlags[0];
 					v24 = item->itemFlags[0];
 					v25 = GetRandomControl();
-					FlashFadeR = v23;
-					FlashFadeB = v24 >> 2;
-					FlashFader = 32;
-					FlashFadeG = v24 - v25 % (v24 >> 1);
+
+					auto R = v23;
+					auto G = v24 - v25 % (v24 >> 1);
+					auto B = v24 >> 2;
+					Weather.Flash(R, G, B, 0.03f);
+
 					LOBYTE(v3) = SoundEffect(399, 0, 0);
 				}
 				if (!(GlobalCounter & 3))

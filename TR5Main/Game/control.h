@@ -94,10 +94,6 @@ extern int TriggerTimer;
 extern int JustLoaded;
 extern int OldLaraBusy;
 extern int Infrared;
-extern short FlashFadeR;
-extern short FlashFadeG;
-extern short FlashFadeB;
-extern short FlashFader;
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
 

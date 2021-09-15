@@ -7,10 +7,12 @@
 #include "misc.h"
 #include "Lara.h"
 #include "effects\effects.h"
+#include "effects\weather.h"
 #include "effects\tomb4fx.h"
 #include "creature_info.h"
 
 using std::vector;
+using namespace TEN::Effects::Environment;
 
 BaboonRespawnClass BaboonRespawn;
 static BITE_INFO baboonBite = { 10, 10, 11, 4 };
@@ -99,10 +101,7 @@ void BaboonDieEffect(ITEM_INFO* item)
     TriggerBaboonShockwave(pos, ANGLE(135.0f));
 
     // trigger flash screen
-    FlashFadeR = 255;
-    FlashFadeG = 64;
-    FlashFadeB = 0;
-    FlashFader = 32;
+	Weather.Flash(255, 64, 0, 0.03f);
 }
 
 static void KillRespawnedBaboon(short itemNumber, bool remove = false)
