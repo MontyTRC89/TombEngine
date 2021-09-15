@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
         
         if (item->status != ITEM_INVISIBLE)
         {
-            if (TestBoundsCollide(item, l, coll->radius))
+            if (TestBoundsCollide(item, l, coll->Setup.Radius))
             {
                 if (TriggerActive(item))
                 {
@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
                         l->roomNumber);
                     LaraItem->hitPoints -= 10;
                 }
-                else if (coll->enableBaddiePush)
+                else if (coll->Setup.EnableObjectPush)
                 {
                     ItemPushItem(item, l, coll, 0, 0);
                 }
