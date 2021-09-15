@@ -293,7 +293,7 @@ void RollingBallControl(short itemNumber)
 
 	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) / 2;
 
-	TestTriggers(item, true, NULL);
+	TestTriggers(item, true);
 }
 
 void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
@@ -399,7 +399,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum, true, NULL);
+		TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum, true);
 
 		if (item->pos.yPos >= (int)floor - 256)
 		{

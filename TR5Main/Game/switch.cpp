@@ -26,7 +26,7 @@ void ProcessExplodingSwitchType8(ITEM_INFO* item)
 	pos.y = 0;
 	pos.z = 0;
 	GetJointAbsPosition(item, &pos, 0);
-	TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+	TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 	ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
 	item->meshBits |= 1 << ((Objects[item->objectNumber].nmeshes & 0xFF) - 2);
 }

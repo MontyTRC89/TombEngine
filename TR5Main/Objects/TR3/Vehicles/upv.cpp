@@ -1004,7 +1004,7 @@ int SubControl(void)
 		}
 	}
 
-	TestTriggers(v, false, NULL);
+	TestTriggers(v, false);
 	SubEffects(Lara.Vehicle);
 
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))

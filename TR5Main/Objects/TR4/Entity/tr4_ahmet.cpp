@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
 
     static void AhmetHeavyTriggers(ITEM_INFO* item)
     {
-        TestTriggers(item, true, NULL);
+        TestTriggers(item, true);
     }
 
     static void TriggerAhmetDeathEffect(ITEM_INFO* item)

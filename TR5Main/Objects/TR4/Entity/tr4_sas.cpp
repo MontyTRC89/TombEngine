@@ -704,7 +704,7 @@ namespace TEN::Entities::TR4
 					int y = l->pos.yPos;
 					int z = l->pos.zPos - 512 * phd_cos(l->pos.yRot);
 
-					TestTriggers(x, y, z, l->roomNumber, true, NULL);
+					TestTriggers(x, y, z, l->roomNumber, true);
 
 					RemoveActiveItem(itemNumber);
 					item->status = ITEM_NOT_ACTIVE;

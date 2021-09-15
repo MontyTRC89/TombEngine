@@ -479,7 +479,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				TestTriggers(SmashedMesh[SmashedMeshCount]->pos.xPos,
 					         SmashedMesh[SmashedMeshCount]->pos.yPos,
 					         SmashedMesh[SmashedMeshCount]->pos.zPos,
-					         SmashedMeshRoom[SmashedMeshCount], true, 0);
+					         SmashedMeshRoom[SmashedMeshCount], true);
 
 				floor->Stopper = false;
 				SmashedMesh[SmashedMeshCount] = 0;
