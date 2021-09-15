@@ -2,6 +2,7 @@
 #include "tr5_spider_emitter.h"
 #include "level.h"
 #include "control.h"
+#include "flipeffect.h"
 #include "setup.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
