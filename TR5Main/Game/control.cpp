@@ -541,7 +541,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Do flipeffects
-		if (FlipEffect != -1)
+		if (FlipEffect != -1 && FlipEffect < NUM_FLIPEFFECTS && effect_routines[FlipEffect] != nullptr)
 			effect_routines[FlipEffect](NULL);
 
 		// Clear savegame loaded flag
@@ -1914,7 +1914,8 @@ void AnimateItem(ITEM_INFO *item)
 
 				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
-				effect_routines[effectID](item);
+				if (effectID < NUM_FLIPEFFECTS && effect_routines[effectID] != nullptr)
+					effect_routines[effectID](item);
 
 				cmd += 2;
 				break;

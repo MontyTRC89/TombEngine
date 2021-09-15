@@ -32,7 +32,7 @@ using namespace TEN::Effects::Environment;
 short FXType;
 int FlipEffect;
 
-function<EffectFunction> effect_routines[59] =
+function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 {
 	Turn180,					//0
 	FloorShake,					//1
