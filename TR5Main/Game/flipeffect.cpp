@@ -20,12 +20,14 @@
 #include "lara_fire.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
+#include "effects\weather.h"
 #include "effects\footprint.h"
 #include "effects\groundfx.h"
 #include "effects\debris.h"
 
 using std::function;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Environment;
 
 short FXType;
 int FlipEffect;
@@ -52,7 +54,7 @@ function<EffectFunction> effect_routines[59] =
 	ShootLeftGun,				//17
 	PushLoop,					//18
 	PushEnd,					//19
-	VoidEffect,					//20
+	FlashOrange,				//20
 	InvisibilityOn,				//21
 	InvisibilityOff,			//22
 	VoidEffect,					//23
@@ -80,6 +82,12 @@ function<EffectFunction> effect_routines[59] =
 	LaraLocationPad,			//45
 	KillActiveBaddies			//46
 };
+
+void FlashOrange(ITEM_INFO* item) 
+{
+	FlipEffect = -1;
+	Weather.Flash(255, 128, 0, 0.03f);
+}
 
 void MeshSwapToPour(ITEM_INFO* item)
 {
@@ -363,7 +371,7 @@ void PoseidonSFX(ITEM_INFO* item)
 
 void RubbleFX(ITEM_INFO* item)
 {
-	const auto itemList = FindItem(ID_EARTHQUAKE);
+	const auto itemList = FindAllItems(ID_EARTHQUAKE);
 
 	if (itemList.size() > 0)
 	{

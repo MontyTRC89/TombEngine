@@ -4,6 +4,9 @@
 #include "spotcam.h"
 #include "lara.h"
 #include "control.h"
+#include "effects\weather.h"
+
+using namespace TEN::Effects::Environment;
 
 TEN::Renderer::RendererHUDBar* g_HealthBar;
 TEN::Renderer::RendererHUDBar* g_AirBar;
@@ -126,6 +129,13 @@ namespace TEN::Renderer {
 
 	void Renderer11::drawOverlays(RenderView& view)
 	{
+		auto flashColor = Weather.FlashColor();
+		if (flashColor != Vector3::Zero)
+		{
+			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			drawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor, false);
+		}
+
 		if (CurrentLevel == 0)
 			return;
 
