@@ -1,11 +1,12 @@
 #include "framework.h"
-#include "Sound\sound.h"
-#include "lara.h"
-#include "camera.h"
-#include "configuration.h"
-#include "level.h"
 #include "winmain.h"
 #include <filesystem>
+#include "Sound/sound.h"
+#include "lara.h"
+#include "camera.h"
+#include "control/flipmap.h"
+#include "configuration.h"
+#include "level.h"
 
 using std::vector;
 using std::unordered_map;
@@ -752,4 +753,26 @@ int GetShatterSound(int shatterID)
 		return SFX_TR5_SMASH_WOOD;
 	else
 		return SFX_TR5_SMASH_GLASS;
+}
+
+void PlaySoundSources()
+{
+	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
+	{
+		SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+
+		short t = sound->flags & 31;
+		short group = t & 1;
+		group += t & 2;
+		group += ((t >> 2) & 1) * 3;
+		group += ((t >> 3) & 1) * 4;
+		group += ((t >> 4) & 1) * 5;
+
+		if (!FlipStats[group] && (sound->flags & 128) == 0)
+			continue;
+		else if (FlipStats[group] && (sound->flags & 128) == 0)
+			continue;
+
+		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
+	}
 }
