@@ -2,11 +2,11 @@
 #include "tr4_cog.h"
 #include "level.h"
 #include "control.h"
-#include "sphere.h"
-#include "Sound\sound.h"
-#include "Game\collide.h"
-#include "Game\effects\effects.h"
-#include <Game/Lara/lara.h>
+#include "Sound/sound.h"
+#include "collide.h"
+#include "effects/effects.h"
+#include "Lara/lara.h"
+#include "animation.h"
 
 namespace TEN::Entities::TR4
 {

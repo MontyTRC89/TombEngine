@@ -3,7 +3,7 @@
 #include "lara_fire.h"
 #include "lara.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "level.h"
 #include "setup.h"

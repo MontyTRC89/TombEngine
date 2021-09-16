@@ -15,7 +15,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "fullblock_switch.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 using namespace TEN::Entities::Switches;
 

@@ -6,13 +6,13 @@
 #include "lot.h"
 #include "boss.h"
 #include "box.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
 #include "traps.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "collide.h"
 
 enum TonyFlameType

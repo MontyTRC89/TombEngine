@@ -2,9 +2,10 @@
 #include "tr4_laradouble.h"
 #include "items.h"
 #include "level.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "box.h"
 #include "lara.h"
+#include "animation.h"
 
 void InitialiseLaraDouble(short itemNum)
 {

@@ -2,6 +2,7 @@
 #include "tr4_plinthblade.h"
 #include "level.h"
 #include "control.h"
+#include "animation.h"
 
 void PlinthBladeControl(short itemNum)
 {

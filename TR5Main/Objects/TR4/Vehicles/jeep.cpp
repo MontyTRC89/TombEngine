@@ -6,22 +6,21 @@
 #else
 #include "inventory.h"
 #endif
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "collide.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"
-#include "effects\tomb4fx.h"
-#include "sphere.h"
+#include "effects/tomb4fx.h"
 #include "lara_flare.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "setup.h"
 #include "level.h"
-#include "Box.h"
+#include "animation.h"
 #include "jeep_info.h"
-using std::vector;
 
+using std::vector;
 
 enum JEEP_STATES 
 {

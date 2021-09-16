@@ -12,7 +12,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2

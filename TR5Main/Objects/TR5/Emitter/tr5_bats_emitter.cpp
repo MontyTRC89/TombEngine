@@ -7,7 +7,7 @@
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include <Game\items.h>
 
 int NextBat;

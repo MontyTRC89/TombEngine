@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "rope.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "level.h"
 #include "input.h"

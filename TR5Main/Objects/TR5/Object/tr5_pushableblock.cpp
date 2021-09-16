@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_pushableblock.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "items.h"
 #include "collide.h"
 #include "flipeffect.h"

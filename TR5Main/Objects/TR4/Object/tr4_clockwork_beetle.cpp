@@ -3,7 +3,7 @@
 #include "items.h"
 #include "level.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "Sound\sound.h"
 #include "collide.h"
 

@@ -27,9 +27,6 @@
     <ClInclude Include="Game\control.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\draw.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\gameflow.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1029,9 +1026,6 @@
     <ClInclude Include="Objects\Generic\Doors\steel_door.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\door_data.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\item.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1039,9 +1033,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\creature_info.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\itemdata\itemdata.h">
@@ -1182,6 +1173,15 @@
     <ClInclude Include="Specific\time.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\animation.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\itemdata\door_data.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\itemdata\creature_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1194,9 +1194,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\draw.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\gameflow.cpp">
@@ -2121,6 +2118,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\time.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\animation.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

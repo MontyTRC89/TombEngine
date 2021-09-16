@@ -9,10 +9,13 @@
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "snowmobile.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "skidoo_info.h"
+#include "animation.h"
+
+
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
 #define SMAN_MIN_TURN (ANGLE(6.0f)/3)

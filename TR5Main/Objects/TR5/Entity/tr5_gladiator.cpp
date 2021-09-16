@@ -2,15 +2,15 @@
 #include "tr5_gladiator.h"
 #include "items.h"
 #include "box.h"
-#include "sphere.h"
-#include "effects\debris.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "effects/debris.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 

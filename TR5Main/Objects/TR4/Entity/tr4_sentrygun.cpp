@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_sentrygun.h"
 #include "box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -10,13 +10,13 @@
 #endif
 #include "level.h"
 #include "lot.h"
-#include "effects\tomb4fx.h"
-#include "sphere.h"
+#include "effects/tomb4fx.h"
 #include "people.h"
-#include "Sound\sound.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "Specific/trmath.h"
 #include "objectslist.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
 #ifndef NEW_INV
 extern Inventory g_Inventory;

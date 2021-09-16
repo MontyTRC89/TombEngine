@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "lara.h"
 #include "input.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\effects.h"
 #include "collide.h"
 #include "control.h"

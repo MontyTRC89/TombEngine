@@ -2,7 +2,7 @@
 #include "Renderer11.h"
 #include "configuration.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "level.h"
 #include "control.h"
@@ -17,7 +17,7 @@
 #include "jeep.h"
 #include "motorbike.h"
 #include <algorithm>
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "quad_info.h"
 #include "jeep_info.h"
 #include "motorbike_info.h"
@@ -192,7 +192,7 @@ namespace TEN::Renderer
 		item.animNumber = animation;
 		item.frameNumber = frame;
 
-		return GetFrame_D2(&item, framePtr, rate);
+		return GetFrame(&item, framePtr, rate);
 	}
 
 	void Renderer11::updateItemAnimations(int itemNumber, bool force)
@@ -294,7 +294,7 @@ namespace TEN::Renderer
 
 			ANIM_FRAME* framePtr[2];
 			int rate;
-			int frac = GetFrame_D2(item, framePtr, &rate);
+			int frac = GetFrame(item, framePtr, &rate);
 
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 

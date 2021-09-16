@@ -5,12 +5,12 @@
 #include "effects\effects.h"
 #include "items.h"
 #include "sphere.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };

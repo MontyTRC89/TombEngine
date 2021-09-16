@@ -1,17 +1,15 @@
 #include "framework.h"
-#include "tr4_guide.h"
 #include "items.h"
 #include "box.h"
-#include "sphere.h"
 #include "lot.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include <Game\draw.h>
-#include "creature_info.h"
+#include "Sound/sound.h"
+#include "animation.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_VON_CROY_STOP						1
 #define STATE_VON_CROY_WALK						2

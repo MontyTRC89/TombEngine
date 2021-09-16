@@ -10,7 +10,7 @@
 #include "Sound\sound.h"
 #include <sphere.h>
 #include <people.h>
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4
 {

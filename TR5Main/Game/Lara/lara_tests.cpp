@@ -2,7 +2,7 @@
 #include "lara.h"
 #include "lara_tests.h"
 #include "input.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
 #include "control.h"

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects.h"
 #include "lara.h"
 #include "effects\tomb4fx.h"

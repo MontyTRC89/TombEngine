@@ -8,7 +8,7 @@
 #include "input.h"
 #include "health.h"
 #include "Sound\sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "pickup.h"
 #include "collide.h"
 #include "item.h"

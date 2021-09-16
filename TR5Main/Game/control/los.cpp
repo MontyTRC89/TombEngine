@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "los.h"
-#include "draw.h"
+#include "animation.h"
 #include "Sound/sound.h"
 #include "objects.h"
 #include "switch.h"

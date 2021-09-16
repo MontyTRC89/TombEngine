@@ -8,7 +8,7 @@
 #include "lara_surface.h"
 #include "effects\effects.h"
 #include "lara_fire.h"
-#include "draw.h"
+#include "animation.h"
 #include "camera.h"
 #include "level.h"
 #include "input.h"

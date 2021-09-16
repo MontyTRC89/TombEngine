@@ -3,7 +3,7 @@
 #include "effects\debris.h"
 #include "items.h"
 #include "traps.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
 #include "level.h"

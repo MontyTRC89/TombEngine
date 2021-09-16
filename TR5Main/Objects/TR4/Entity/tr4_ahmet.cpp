@@ -13,7 +13,7 @@
 #include "people.h"
 #include "items.h"
 #include "lot.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 using namespace TEN::Effects::Environment;
 

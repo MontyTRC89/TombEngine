@@ -3,7 +3,7 @@
 #include "level.h"
 #include "setup.h"
 #include "Sound\sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "items.h"
 #include "sphere.h"
 #include "lara_fire.h"

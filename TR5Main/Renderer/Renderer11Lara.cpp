@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer11.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\hair.h"
 #include "lara.h"
 #include "control.h"
@@ -80,7 +80,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	ANIM_FRAME* framePtr[2];
 	int rate, frac;
 
-	frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	frac = GetFrame(LaraItem, framePtr, &rate);
 	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
@@ -88,7 +88,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-		frac = GetFrame_D2(LaraItem, framePtr, &rate);
+		frac = GetFrame(LaraItem, framePtr, &rate);
 		updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 	}
 	else
@@ -187,7 +187,7 @@ void Renderer11::updateLaraAnimations(bool force)
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frac = GetFrame_D2(LaraItem, framePtr, &rate);
+			frac = GetFrame(LaraItem, framePtr, &rate);
 			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 			break;
 		}

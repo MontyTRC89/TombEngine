@@ -5,7 +5,7 @@
 #include "Sound\sound.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
-#include "draw.h"
+#include "animation.h"
 #include "traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"

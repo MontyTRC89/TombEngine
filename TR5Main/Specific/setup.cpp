@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "setup.h"
-#include "draw.h"
+#include "animation.h"
 #include "collide.h"
 #include "flipeffect.h"
 #include "effects/effects.h"
@@ -25,7 +25,7 @@
 #include "object_helper.h"
 
 #include "fullblock_switch.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 using namespace TEN::Entities::Switches;
 

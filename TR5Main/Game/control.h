@@ -33,17 +33,6 @@ enum HEADINGS
 	WEST
 };
 
-enum COMMAND_TYPES
-{
-	COMMAND_NULL = 0,
-	COMMAND_MOVE_ORIGIN,
-	COMMAND_JUMP_VELOCITY,
-	COMMAND_ATTACK_READY,
-	COMMAND_DEACTIVATE,
-	COMMAND_SOUND_FX,
-	COMMAND_EFFECT
-};
-
 #define OUTSIDE_Z 64
 #define OUTSIDE_SIZE 108
 
@@ -84,6 +73,8 @@ extern int LastInventoryItem;
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
 
+int DrawPhase();
+
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
@@ -91,9 +82,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode);
 int GetRandomControl();
 int GetRandomDraw();
 
-int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
-void AnimateItem(ITEM_INFO* item);
-void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
@@ -106,8 +94,6 @@ void RefreshCamera(short type, short* data);
 
 void ResetGlobals();
 
-void AnimateWaterfalls();
-
 void AlterFloorHeight(ITEM_INFO* item, int height);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
@@ -117,6 +103,5 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
-
 
 unsigned CALLBACK GameMain(void*);

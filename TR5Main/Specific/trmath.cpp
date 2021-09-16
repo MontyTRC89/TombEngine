@@ -122,6 +122,51 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
+void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
+{
+	short* ptr = &frameptr[0];
+
+	ptr += 9;
+	for (int i = 0; i < index; i++)
+	{
+		ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
+	}
+
+	int rot0 = *ptr++;
+	int frameMode = (rot0 & 0xc000);
+
+	int rot1;
+	int rotX;
+	int rotY;
+	int rotZ;
+
+	switch (frameMode)
+	{
+	case 0:
+		rot1 = *ptr++;
+		rotX = ((rot0 & 0x3ff0) >> 4);
+		rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
+		rotZ = ((rot1) & 0x3ff);
+
+		*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
+			rotX * (360.0f / 1024.0f) * RADIAN,
+			rotZ * (360.0f / 1024.0f) * RADIAN);
+		break;
+
+	case 0x4000:
+		*matrix = Matrix::CreateRotationX((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		break;
+
+	case 0x8000:
+		*matrix = Matrix::CreateRotationY((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		break;
+
+	case 0xc000:
+		*matrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		break;
+	}
+}
+
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
 	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);

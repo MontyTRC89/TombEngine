@@ -33,8 +33,8 @@
 #include "collide.h"
 #include "setup.h"
 #include "level.h"
-#include "creature_info.h"
-#include "Box.h"
+#include "itemdata/creature_info.h"
+#include "box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];

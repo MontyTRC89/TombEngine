@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "sphere.h"
-#include "draw.h"
+#include "animation.h"
 #include "collide.h"
 #include "floordata.h"
 

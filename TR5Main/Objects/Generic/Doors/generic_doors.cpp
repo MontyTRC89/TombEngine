@@ -9,7 +9,7 @@
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "cog_switch.h"
 #include "objectslist.h"
@@ -17,7 +17,7 @@
 #include "lara.h"
 #include "trmath.h"
 #include "misc.h"
-#include "door_data.h"
+#include "itemdata/door_data.h"
 #include "collide.h"
 #include "itemdata/itemdata.h"
 

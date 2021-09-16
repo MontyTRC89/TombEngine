@@ -7,7 +7,7 @@
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 int CutSeqNum;

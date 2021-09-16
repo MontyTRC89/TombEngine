@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "control.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\groundfx.h"
 #include "effects\footprint.h"
 #include "level.h"

@@ -8,9 +8,10 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
-#include "particle\SimpleParticle.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "particle/SimpleParticle.h"
 #include "boat_info.h"
 
 enum BOAT_STATE

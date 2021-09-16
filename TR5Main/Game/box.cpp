@@ -3,7 +3,7 @@
 #include "effects/tomb4fx.h"
 #include "lot.h"
 #include "Lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "camera.h"
 #include "control.h"
@@ -11,7 +11,7 @@
 #include "setup.h"
 #include "Specific/trmath.h"
 #include "objectslist.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)

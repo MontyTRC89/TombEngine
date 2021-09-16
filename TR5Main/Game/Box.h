@@ -1,18 +1,18 @@
 #pragma once
 #include "Specific\phd_global.h"
 #include "level.h"
+
 struct ITEM_INFO;
 struct BITE_INFO;
 struct CREATURE_INFO;
 struct LOT_INFO;
+
 enum TARGET_TYPE
 {
 	NO_TARGET,
 	PRIME_TARGET,
 	SECONDARY_TARGET
 };
-
-
 
 struct OBJECT_BONES
 {

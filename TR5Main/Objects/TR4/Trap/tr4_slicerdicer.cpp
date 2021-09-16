@@ -3,6 +3,7 @@
 #include "level.h"
 #include "Sound\sound.h"
 #include "items.h"
+#include "animation.h"
 #include "Specific\trmath.h"
 
 void InitialiseSlicerDicer(short itemNum)

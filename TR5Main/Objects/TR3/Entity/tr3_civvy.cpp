@@ -7,7 +7,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 

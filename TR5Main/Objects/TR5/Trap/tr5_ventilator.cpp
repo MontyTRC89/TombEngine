@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_ventilator.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "control.h"
 #include "lara.h"

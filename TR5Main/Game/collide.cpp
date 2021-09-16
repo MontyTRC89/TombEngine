@@ -2,7 +2,7 @@
 #include "control.h"
 #include "control\los.h"
 #include "collide.h"
-#include "draw.h"
+#include "animation.h"
 #include "Lara.h"
 #include "items.h"
 #include "effects\effects.h"

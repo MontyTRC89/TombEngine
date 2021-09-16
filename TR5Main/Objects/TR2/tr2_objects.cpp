@@ -34,7 +34,7 @@
 #include "box.h"
 #include "setup.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {

@@ -4,7 +4,7 @@
 #include "effects\tomb4fx.h"
 #include "control.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "smoke.h"
 #include "spark.h"
