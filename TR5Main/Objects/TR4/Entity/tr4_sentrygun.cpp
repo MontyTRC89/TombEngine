@@ -98,139 +98,139 @@ void SentryGunControl(short itemNum)
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	AI_INFO info;
+	AI_INFO info = {};
 	int c = 0;
 
-	if (creature)
+	if (!creature)
+		return;
+
+	// Flags set by the ID_MINE object?
+	if (item->meshBits & 0x40)
 	{
-		// Flags set by the ID_MINE object?
-		if (item->meshBits & 0x40)
+		if (item->itemFlags[0])
 		{
-			if (item->itemFlags[0])
+			PHD_VECTOR pos;
+
+			pos.x = sentryGunBite.x;
+			pos.y = sentryGunBite.y;
+			pos.z = sentryGunBite.z;
+
+			GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
+
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
+
+			item->itemFlags[0]--;
+		}
+
+		if (item->itemFlags[0] & 1)
+			item->meshBits |= 0x100;
+		else
+			item->meshBits &= ~0x100;
+
+		if (item->triggerFlags == 0)
+		{
+			item->pos.yPos -= 512;
+			CreatureAIInfo(item, &info);
+			item->pos.yPos += 512;
+
+			int deltaAngle = info.angle - creature->jointRotation[0];
+			
+			info.ahead = true;
+			if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
+				info.ahead = false;
+
+			if (Targetable(item, &info))
 			{
-				PHD_VECTOR pos;
-
-				pos.x = sentryGunBite.x;
-				pos.y = sentryGunBite.y;
-				pos.z = sentryGunBite.z;
-
-				GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
-
-				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
-
-				item->itemFlags[0]--;
-			}
-
-			if (item->itemFlags[0] & 1)
-				item->meshBits |= 0x100;
-			else
-				item->meshBits &= ~0x100;
-
-			if (item->triggerFlags == 0)
-			{
-				item->pos.yPos -= 512;
-				CreatureAIInfo(item, &info);
-				item->pos.yPos += 512;
-
-				int deltaAngle = info.angle - creature->jointRotation[0];
-				
-				info.ahead = true;
-				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
-					info.ahead = false;
-
-				if (Targetable(item, &info))
+				if (info.distance < SQUARE(SECTOR(9)))
 				{
-					if (info.distance < SQUARE(SECTOR(9)))
-					{
 #ifdef NEW_INV
-						if (!have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+					if (!have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 #else
-						if (!g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+					if (!g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 #endif
+					{
+						if (info.distance <= SQUARE(SECTOR(2)))
 						{
-							if (info.distance <= SQUARE(SECTOR(2)))
-							{
-								// Throw fire
-								SentryGunThrowFire(item);
-								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
-							}
-							else
-							{
-								// Shot to Lara with bullets
-								c = 0;
-								item->itemFlags[0] = 2;
-
-								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
-								SoundEffect(SFX_TR4_AUTOGUNS, &item->pos, 0);
-
-								item->itemFlags[2] += 256;
-								if (item->itemFlags[2] > 6144)
-								{
-									item->itemFlags[2] = 6144;
-								}
-							}
-						}
-
-						deltaAngle = c + info.angle - creature->jointRotation[0];
-						if (deltaAngle <= ANGLE(10))
-						{
-							if (deltaAngle < -ANGLE(10))
-							{
-								deltaAngle = -ANGLE(10);
-							}
+							// Throw fire
+							SentryGunThrowFire(item);
+							c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
 						}
 						else
 						{
-							deltaAngle = ANGLE(10);
+							// Shot to Lara with bullets
+							c = 0;
+							item->itemFlags[0] = 2;
+
+							ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
+							SoundEffect(SFX_TR4_AUTOGUNS, &item->pos, 0);
+
+							item->itemFlags[2] += 256;
+							if (item->itemFlags[2] > 6144)
+							{
+								item->itemFlags[2] = 6144;
+							}
 						}
-
-						creature->jointRotation[0] += deltaAngle;
-
-						CreatureJoint(item, 1, -info.xAngle);
 					}
-				}
 
-				item->itemFlags[2] -= 32;
+					deltaAngle = c + info.angle - creature->jointRotation[0];
+					if (deltaAngle <= ANGLE(10))
+					{
+						if (deltaAngle < -ANGLE(10))
+						{
+							deltaAngle = -ANGLE(10);
+						}
+					}
+					else
+					{
+						deltaAngle = ANGLE(10);
+					}
 
-				if (item->itemFlags[2] < 0)
-				{
-					item->itemFlags[2] = 0;
-				}
+					creature->jointRotation[0] += deltaAngle;
 
-				creature->jointRotation[3] += item->itemFlags[2];
-				creature->jointRotation[2] += item->itemFlags[1];
-
-				if (creature->jointRotation[2] > ANGLE(90) ||
-					creature->jointRotation[2] < -ANGLE(90))
-				{
-					item->itemFlags[1] = -item->itemFlags[1];
+					CreatureJoint(item, 1, -info.xAngle);
 				}
 			}
-			else
+
+			item->itemFlags[2] -= 32;
+
+			if (item->itemFlags[2] < 0)
 			{
-				// Stuck sentry gun 
-				CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
-				CreatureJoint(item, 1, ANGLE(45));
-				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45));
+				item->itemFlags[2] = 0;
+			}
+
+			creature->jointRotation[3] += item->itemFlags[2];
+			creature->jointRotation[2] += item->itemFlags[1];
+
+			if (creature->jointRotation[2] > ANGLE(90) ||
+				creature->jointRotation[2] < -ANGLE(90))
+			{
+				item->itemFlags[1] = -item->itemFlags[1];
 			}
 		}
 		else
 		{
-			ExplodingDeath(itemNum, -1, 257);
-			DisableBaddieAI(itemNum);
-			KillItem(itemNum);
-
-			item->flags |= 1u;
-			item->status = ITEM_DEACTIVATED;
-
-			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
-
-			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
-			for (int i = 0; i < 2; i++)
-				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
-
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+			// Stuck sentry gun 
+			CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
+			CreatureJoint(item, 1, ANGLE(45));
+			CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45));
 		}
+	}
+	else
+	{
+		ExplodingDeath(itemNum, -1, 257);
+		DisableBaddieAI(itemNum);
+		KillItem(itemNum);
+
+		item->flags |= 1u;
+		item->status = ITEM_DEACTIVATED;
+
+		RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
+
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
+		for (int i = 0; i < 2; i++)
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
+
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 	}
 }
