@@ -137,7 +137,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
-	DisableLaraControl = false;
+	Lara.uncontrollable = false;
 
 	LastFOV = CurrentFOV;
 	LaraAir = Lara.air;
@@ -177,7 +177,7 @@ void InitialiseSpotCam(short Sequence)
 
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		DisableLaraControl = true;
+		Lara.uncontrollable = true;
 		g_Renderer.enableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
@@ -393,7 +393,7 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO Backup;
 
-	if (DisableLaraControl)
+	if (Lara.uncontrollable)
 	{
 		LaraItem->hitPoints = LaraHealth;
 		Lara.air = LaraAir;
@@ -662,7 +662,7 @@ void CalculateSpotCameras()
 				{
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS))
 					{
-						DisableLaraControl = false;
+						Lara.uncontrollable = false;
 					}
 
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
@@ -670,7 +670,7 @@ void CalculateSpotCameras()
 						//SetFadeClip(16, 1);
 						if (CurrentLevel)
 							g_Renderer.enableCinematicBars(true);
-						DisableLaraControl = true;
+						Lara.uncontrollable = true;
 					}
 
 					int sp2 = 0;
@@ -776,7 +776,7 @@ void CalculateSpotCameras()
 					g_Renderer.enableCinematicBars(false);
 
 					UseSpotCam = 0;
-					DisableLaraControl = false;
+					Lara.uncontrollable = false;
 					CheckTrigger = 0;
 					Camera.oldType = FIXED_CAMERA;
 					Camera.type = CHASE_CAMERA;
@@ -891,7 +891,7 @@ void CalculateSpotCameras()
 	{
 		g_Renderer.enableCinematicBars(false);
 		UseSpotCam = false;
-		DisableLaraControl = false;
+		Lara.uncontrollable = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera();

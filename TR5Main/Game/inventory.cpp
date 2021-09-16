@@ -1507,7 +1507,7 @@ void Inventory::UseCurrentItem()
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{
-				OldLaraBusy = true;
+				Lara.oldBusy = true;
 				BinocularRange = 128;
 				if (Lara.gunStatus)
 					Lara.gunStatus = LG_UNDRAW_GUNS;

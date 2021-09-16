@@ -135,7 +135,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Has Lara control been disabled?
-		if (DisableLaraControl || CurrentLevel == 0)
+		if (Lara.uncontrollable || CurrentLevel == 0)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
@@ -353,7 +353,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			// Control Lara
 			InItemControlLoop = true;
-		//	Lara.skelebob = NULL;
 			LaraControl(Lara.itemNumber);
 			InItemControlLoop = false;
 			KillMoveItems();
@@ -1362,7 +1361,7 @@ void ResetGlobals()
 
 	// Needs to be cleared or otherwise controls will lockup if user will exit to title
 	// while playing flyby with locked controls
-	DisableLaraControl = false;
+	Lara.uncontrollable = false;
 
 	// Weather.Clear resets lightning and wind parameters so user won't see prev weather in new level
 	Weather.Clear();

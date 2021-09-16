@@ -6,6 +6,7 @@
 #include "items.h"
 #include "setup.h"
 #include "level.h"
+
 void InitialiseLara(int restore)
 {
 	if (Lara.itemNumber == NO_ITEM)
@@ -13,7 +14,7 @@ void InitialiseLara(int restore)
 
 	short itemNumber = Lara.itemNumber;
 
-	//LaraItem->data = &Lara;
+	LaraItem->data = &Lara;
 	LaraItem->collidable = false;
 	LaraItem->location.roomNumber = LaraItem->roomNumber;
 	LaraItem->location.yNumber = LaraItem->pos.yPos;
@@ -60,7 +61,6 @@ void InitialiseLara(int restore)
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = 1000;
 	Lara.gunStatus = LG_NO_ARMS;
-//	Lara.skelebob = 0;
 	memset(&Lara.NewAnims, 0, sizeof(AnimsNew));	//make sure script changes these AFTER Lara is initialized?
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;

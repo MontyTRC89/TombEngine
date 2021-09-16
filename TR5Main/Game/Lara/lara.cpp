@@ -57,8 +57,6 @@ LaraInfo Lara;
 ITEM_INFO* LaraItem;
 COLL_INFO LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
-bool DisableLaraControl = false;
-bool OldLaraBusy;
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
 {
@@ -406,7 +404,7 @@ void LaraControl(short itemNumber)
 		++Lara.moveCount;
 	}
 
-	if (!DisableLaraControl)
+	if (!Lara.uncontrollable)
 		Lara.locationPad = 128;
 
 	int oldX = LaraItem->pos.xPos;
