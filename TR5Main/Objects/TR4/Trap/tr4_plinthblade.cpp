@@ -3,23 +3,26 @@
 #include "level.h"
 #include "control.h"
 
-void PlinthBladeControl(short itemNum)
+namespace TEN::Entities::TR4
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (!TriggerActive(item))
+	void PlinthBladeControl(short itemNum)
 	{
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	}
-	else
-	{
-		short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-			item->itemFlags[3] = 0;
+		if (!TriggerActive(item))
+		{
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		}
 		else
-			item->itemFlags[3] = 200;
+		{
+			short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-		AnimateItem(item);
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+				item->itemFlags[3] = 0;
+			else
+				item->itemFlags[3] = 200;
+
+			AnimateItem(item);
+		}
 	}
 }
