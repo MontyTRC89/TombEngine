@@ -13,6 +13,8 @@
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "input.h"
+#include "pickup/pickup.h"
+
 using TEN::Renderer::g_Renderer;
 struct OLD_CAMERA
 {
@@ -1892,7 +1894,7 @@ long TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, long radius)
 	return 0;
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos)
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short rad)
 {
 	FLOOR_INFO* floor;
 	long x, z, dx, dz, sin, cos, left, right, top, bottom, h, c;
@@ -1904,12 +1906,12 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos)
 	cos = phd_cos(pos->yRot);
 	x = dx * cos - dz * sin;
 	z = dx * sin + dz * cos;
-	xmin = bounds->X1 - 384;
-	xmax = bounds->X2 + 384;
-	zmin = bounds->Z1 - 384;
-	zmax = bounds->Z2 + 384;
+	xmin = bounds->X1 - rad;
+	xmax = bounds->X2 + rad;
+	zmin = bounds->Z1 - rad;
+	zmax = bounds->Z2 + rad;
 
-	if (abs(dx) > SECTOR(4) || abs(dz) > SECTOR(4) || x <= xmin || x >= xmax || z <= zmin || z >= zmax)
+	if (x <= xmin || x >= xmax || z <= zmin || z >= zmax)
 		return;
 
 	left = x - xmin;
@@ -1941,54 +1943,186 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos)
 	}
 }
 
+static bool CheckItemCollideCamera(short item_number)
+{
+	ITEM_INFO* item;
+	long dx, dy, dz;
+	bool close_enough;
+
+	item = &g_Level.Items[item_number];
+	dx = Camera.pos.x - item->pos.xPos;
+	dy = Camera.pos.y - item->pos.yPos;
+	dz = Camera.pos.z - item->pos.zPos;
+	close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+
+	if (!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
+		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem &&
+		item->collidable && close_enough)
+		return 1;
+
+	return 0;
+}
+
+std::vector<short> FillCollideableItemList()
+{
+	std::vector<short> itemList;
+
+	for (short i = 0; i < g_Level.NumItems; i++)
+	{
+		if (CheckItemCollideCamera(i))
+			itemList.push_back(i);
+	}
+
+	return itemList;
+}
+
+static bool CheckStaticCollideCamera(MESH_INFO* mesh)
+{
+	long dx, dy, dz;
+	bool close_enough;
+
+	dx = Camera.pos.x - mesh->x;
+	dy = Camera.pos.y - mesh->y;
+	dz = Camera.pos.z - mesh->z;
+	close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+
+	if (close_enough)//literally anything else?
+		return 1;
+
+	return 0;
+}
+
+std::vector<MESH_INFO*> FillCollideableStaticsList()
+{
+	std::vector<MESH_INFO*> staticList;
+	std::vector<short> roomList;
+	ROOM_INFO* room;
+	MESH_INFO* mesh;
+	short roomNum;
+	
+	roomNum = Camera.pos.roomNumber;
+	room = &g_Level.Rooms[roomNum];
+	roomList.push_back(roomNum);//definitely check camera room
+
+	for (short i = 0; i < room->doors.size(); i++)
+		roomList.push_back(room->doors[i].room);//and neighbouring rooms
+
+	for (short i = 0; i < roomList.size(); i++)
+	{
+		room = &g_Level.Rooms[roomList[i]];
+
+		for (short j = 0; j < room->mesh.size(); j++)
+			staticList.push_back(&room->mesh[j]);
+	}
+
+	return staticList;
+}
+
 void ItemsCollideCamera()
 {
 	ITEM_INFO* item;
-	ITEM_INFO* list[CAM_COLLIDABLE_ITEMS];
-	ROOM_INFO* r;
+	std::vector<short> itemList;
+	STATIC_INFO* stat;
+	MESH_INFO* mesh;
+	std::vector<MESH_INFO*> staticList;
 	PHD_3DPOS pos;
 	BOUNDING_BOX* bounds;
-	long i, count, dx, dy, dz;
+	long i, dx, dy, dz, xmin, xmax, ymin, ymax, zmin, zmax;
+	short rad;
 
-	item = 0;
+	itemList = FillCollideableItemList();
+	rad = 128;
 
-	for (i = 0; i < CAM_COLLIDABLE_ITEMS; i++)//reset list
-		list[i] = 0;
-
-	for (i = 0, count = 0; i < g_Level.NumItems; i++)//fill list with items to collide with
+	for (i = 0; i < itemList.size(); i++)//collide with the items list
 	{
-		item = &g_Level.Items[i];
-		dx = Camera.pos.x - item->pos.xPos;
-		dy = Camera.pos.y - item->pos.yPos;
-		dz = Camera.pos.z - item->pos.zPos;
-		bool close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+		item = &g_Level.Items[itemList[i]];
 
-		if (item->collidable && close_enough)//collidable and at a 4 sector radius
-		{
-			list[count] = item;
-			count++;
-
-			if (count >= CAM_COLLIDABLE_ITEMS)
-				break;
-
-			continue;
-		}
-	}
-
-	for (i = 0; i < count; i++)//collide with the list
-	{
-		item = list[i];
-
-		if (!item)//shouldn't happen but just in case..
+		if (!item)
 			return;
 
+		dx = abs(LaraItem->pos.xPos - item->pos.xPos);
+		dy = abs(LaraItem->pos.yPos - item->pos.yPos);
+		dz = abs(LaraItem->pos.zPos - item->pos.zPos);
+
+		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))//if camera is stuck behind some item, and Lara runs off somewhere
+			continue;
+
 		bounds = GetBoundsAccurate(item);
+		xmin = bounds->X1 + item->pos.xPos - rad;
+		xmax = bounds->X2 + item->pos.xPos + rad;
+		ymin = bounds->Y1 + item->pos.yPos - rad;
+		ymax = bounds->Y2 + item->pos.yPos + rad;
+		zmin = bounds->Z1 + item->pos.zPos - rad;
+		zmax = bounds->Z2 + item->pos.zPos + rad;
+
+		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
+			Camera.pos.y > ymin && Camera.pos.y < ymax &&	//camera stuck inside box?
+			Camera.pos.z > zmin && Camera.pos.z < zmax)
+			continue;
+
 		pos.xPos = item->pos.xPos;
 		pos.yPos = item->pos.yPos;
 		pos.zPos = item->pos.zPos;
 		pos.yRot = item->pos.yRot;
 
 		if (TestBoundsCollideCamera(bounds, &pos, 512))//voilà
-			ItemPushCamera(bounds, &pos);
+			ItemPushCamera(bounds, &pos, rad);
+
+#ifdef _DEBUG
+		TEN::Renderer::g_Renderer.addDebugBox(Vector3(xmin, ymin, zmin), Vector3(xmax, ymax, zmax),
+			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+#endif
 	}
+
+	itemList.clear();//done
+
+	/*now statics*/
+
+	staticList = FillCollideableStaticsList();
+
+	for (i = 0; i < staticList.size(); i++)
+	{
+		mesh = staticList[i];
+		stat = &StaticObjects[mesh->staticNumber];
+
+		if (!mesh || !stat)
+			return;
+
+		dx = abs(LaraItem->pos.xPos - mesh->x);
+		dy = abs(LaraItem->pos.yPos - mesh->y);
+		dz = abs(LaraItem->pos.zPos - mesh->z);
+
+		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
+			continue;
+
+		bounds = &stat->visibilityBox;//seems fine?
+		//still need to rotate it
+		pos.xPos = mesh->x;
+		pos.yPos = mesh->y;
+		pos.zPos = mesh->z;
+		pos.yRot = mesh->yRot;
+		pos.xRot = 0;
+		pos.zRot = 0;
+		xmin = bounds->X1 + mesh->x - rad;
+		xmax = bounds->X2 + mesh->x + rad;
+		ymin = bounds->Y1 + mesh->y - rad;
+		ymax = bounds->Y2 + mesh->y + rad;
+		zmin = bounds->Z1 + mesh->z - rad;
+		zmax = bounds->Z2 + mesh->z + rad;
+
+		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
+			Camera.pos.y > ymin && Camera.pos.y < ymax &&	//camera stuck inside box?
+			Camera.pos.z > zmin && Camera.pos.z < zmax)
+			continue;
+
+		if (TestBoundsCollideCamera(bounds, &pos, 512))//voilà
+			ItemPushCamera(bounds, &pos, rad);
+
+#ifdef _DEBUG
+		TEN::Renderer::g_Renderer.addDebugBox(Vector3(xmin, ymin, zmin), Vector3(xmax, ymax, zmax),
+			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+#endif
+	}
+
+	staticList.clear();//done
 }
