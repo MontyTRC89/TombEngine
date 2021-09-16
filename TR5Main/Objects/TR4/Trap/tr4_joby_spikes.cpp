@@ -3,7 +3,7 @@
 #include "level.h"
 #include "control.h"
 #include "Sound\sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "effects\effects.h"
 
@@ -36,7 +36,7 @@ void JobySpikesControl(short itemNumber)
     int rate;
 
     SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
-    GetFrame_D2(LaraItem, &framePtr, &rate);
+    GetFrame(LaraItem, &framePtr, &rate);
 
     int dy = LaraItem->pos.yPos + framePtr->boundingBox.Y1;
     int dl = 3328 * item->itemFlags[1] / 4096;

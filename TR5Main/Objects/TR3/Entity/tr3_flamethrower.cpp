@@ -5,13 +5,13 @@
 #include "effects\effects.h"
 #include "people.h"
 #include "items.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

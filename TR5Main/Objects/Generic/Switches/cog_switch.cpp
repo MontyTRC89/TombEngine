@@ -4,10 +4,11 @@
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "door_data.h"
-#include "Box.h"
+#include "itemdata/door_data.h"
+#include "box.h"
 #include "generic_doors.h"
 #include "collide.h"
+#include "animation.h"
 
 using namespace TEN::Entities::Doors;
 

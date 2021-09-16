@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "tr4_sas.h"
-#include "sphere.h"
 #include "box.h"
 #include "items.h"
 #include "people.h"
@@ -8,12 +7,13 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include <Specific/input.h>
-#include <Game/Lara/lara_one_gun.h>
-#include "creature_info.h"
-#include "control.h"
+#include "animation.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "Specific/input.h"
+#include "Lara/lara_one_gun.h"
+#include "itemdata/creature_info.h"
+
 namespace TEN::Entities::TR4
 {
 	enum SAS_STATES

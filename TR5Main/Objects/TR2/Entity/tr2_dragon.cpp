@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_dragon.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "collide.h"
 #include "box.h"
@@ -11,8 +11,9 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10

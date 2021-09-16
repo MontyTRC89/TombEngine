@@ -8,7 +8,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "floordata.h"
 #include "collide.h"
 

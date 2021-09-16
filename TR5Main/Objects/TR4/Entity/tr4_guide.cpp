@@ -2,15 +2,15 @@
 #include "tr4_guide.h"
 #include "items.h"
 #include "box.h"
-#include "sphere.h"
 #include "lot.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 #define	STATE_GUIDE_STOP				1
 #define	STATE_GUIDE_WALK				2

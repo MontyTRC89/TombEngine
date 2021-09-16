@@ -7,13 +7,13 @@
 #include "box.h"
 #include "people.h"
 #include "effects\debris.h"
-#include "draw.h"
+#include "animation.h"
 #include "control.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2

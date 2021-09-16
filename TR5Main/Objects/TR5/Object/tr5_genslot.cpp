@@ -5,7 +5,7 @@
 #include "control.h"
 #include "effects\effects.h"
 #include "sphere.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "lara_collide.h"
 

@@ -2,7 +2,7 @@
 #include "room.h"
 #include "setup.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "savegame.h"
 #include "RenderEnums.h"
 #include "Renderer11.h"

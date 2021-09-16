@@ -8,7 +8,7 @@
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO swordBite = { 0, 37, 550, 15 };
 

@@ -2,7 +2,7 @@
 #include "tr2_springboard.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "animation.h"
 
 void SpringBoardControl(short itemNumber)
 {

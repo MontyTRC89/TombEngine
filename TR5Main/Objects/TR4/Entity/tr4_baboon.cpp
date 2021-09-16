@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_baboon.h"
-#include "Box.h"
+#include "box.h"
 #include "lot.h"
 #include "setup.h"
 #include "control.h"
@@ -9,7 +9,7 @@
 #include "effects\effects.h"
 #include "effects\weather.h"
 #include "effects\tomb4fx.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 using std::vector;
 using namespace TEN::Effects::Environment;

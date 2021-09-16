@@ -2,14 +2,15 @@
 #include "tr3_mpgun.h"
 #include "box.h"
 #include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "people.h"
 #include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 enum MPGUN_STATES
 {

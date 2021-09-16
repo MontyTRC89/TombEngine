@@ -5,9 +5,10 @@
 #include "control.h"
 #include "lara.h"
 #include "setup.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
 #include "level.h"
+#include "animation.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {

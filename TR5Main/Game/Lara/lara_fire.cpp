@@ -8,7 +8,7 @@
 #include "objects.h"
 #include "effects\effects.h"
 #include "sphere.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\flmtorch.h"
 #include "level.h"
 #include "lot.h"
@@ -19,7 +19,7 @@
 #include "savegame.h"
 #include "GameFlowScript.h"
 #include "lara_struct.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {

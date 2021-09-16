@@ -1,7 +1,7 @@
 #include "framework.h"
 #ifndef NEW_INV
 #include "inventory.h"
-#include "draw.h"
+#include "animation.h"
 #include "control.h"
 #include "lara_fire.h"
 #include "gameflow.h"

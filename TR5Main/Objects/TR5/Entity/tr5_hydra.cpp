@@ -6,11 +6,11 @@
 #include "effects\effects.h"
 #include "setup.h"
 #include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "lara.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1

@@ -7,10 +7,10 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };
 BITE_INFO tribesmanDartsBite1 = { 0, 0, -200, 13 };

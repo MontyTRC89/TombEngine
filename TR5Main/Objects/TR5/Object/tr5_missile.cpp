@@ -6,7 +6,7 @@
 #include "sphere.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "traps.h"
 #include "level.h"
 #include "effects\debris.h"

@@ -3,7 +3,7 @@
 #include "effects\effects.h"
 #include "control.h"
 #include "setup.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "lara_collide.h"
 #include "Sound\sound.h"

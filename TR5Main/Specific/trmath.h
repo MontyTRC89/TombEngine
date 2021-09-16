@@ -54,3 +54,4 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
+void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index);

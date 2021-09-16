@@ -3,7 +3,7 @@
 #include "level.h"
 #include "control\los.h"
 #include "Sound\sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "camera.h"
 #include "effects\effects.h"
 #include "effects\debris.h"

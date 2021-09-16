@@ -7,7 +7,7 @@
 #include "effects\weather.h"
 #include "lara.h"
 #include "camera.h"
-#include "Box.h"
+#include "box.h"
 
 using namespace TEN::Effects::Environment;
 

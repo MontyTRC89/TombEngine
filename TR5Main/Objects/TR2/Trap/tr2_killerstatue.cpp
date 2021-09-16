@@ -4,7 +4,8 @@
 #include "setup.h"
 #include "control.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
+#include "animation.h"
 
 void InitialiseKillerStatue(short itemNumber)
 {

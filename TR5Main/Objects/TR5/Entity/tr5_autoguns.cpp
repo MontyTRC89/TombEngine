@@ -2,7 +2,7 @@
 #include "tr5_autoguns.h"
 #include "sphere.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "control\los.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"

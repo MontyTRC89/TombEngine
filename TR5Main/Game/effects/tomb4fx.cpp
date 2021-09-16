@@ -2,7 +2,7 @@
 #include "effects\tomb4fx.h"
 #include "lara.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "level.h"
 #include "gameflow.h"
@@ -16,7 +16,7 @@
 #include "Renderer11.h"
 #include "effects/effects.h"
 #include "effects/weather.h"
-#include "draw.h"
+#include "animation.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;

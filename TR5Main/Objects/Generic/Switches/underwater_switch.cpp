@@ -1,14 +1,12 @@
 #include "framework.h"
-#include "control.h"
 #include "input.h"
 #include "lara.h"
 #include "underwater_switch.h"
-#include "newinv2.h"
-#include "Sound\sound.h"
 #include "generic_switch.h"
 #include "camera.h"
 #include "collide.h"
 #include "level.h"
+#include "animation.h"
 
 namespace TEN::Entities::Switches
 { 

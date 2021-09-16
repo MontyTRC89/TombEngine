@@ -9,7 +9,7 @@
 #endif
 #include "switch.h"
 #include "pickup.h"
-#include "draw.h"
+#include "animation.h"
 #include "control.h"
 #include "puzzles_keys.h"
 #include "generic_switch.h"

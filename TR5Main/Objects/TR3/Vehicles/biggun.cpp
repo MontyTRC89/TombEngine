@@ -11,7 +11,7 @@
 #include "effects\effects.h"
 #include "lara_struct.h"
 #include "effects\tomb4fx.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "camera.h"
 #include "biggun_info.h"

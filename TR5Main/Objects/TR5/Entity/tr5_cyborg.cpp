@@ -5,14 +5,14 @@
 #include "box.h"
 #include "effects\effects.h"
 #include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"
 #include "traps.h"
 #include "setup.h"
 #include "level.h"
 #include "Sound\sound.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

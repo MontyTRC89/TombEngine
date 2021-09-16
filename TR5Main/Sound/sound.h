@@ -121,7 +121,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
 void StopSoundEffect(short effectID);
 bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void Sound_FreeSamples();
-void SOUND_Stop();
+void Sound_Stop();
 
 void PlaySoundTrack(short track, short flags);
 void S_CDPlay(std::string trackName, unsigned int mode);

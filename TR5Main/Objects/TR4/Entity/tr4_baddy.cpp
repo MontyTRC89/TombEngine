@@ -9,9 +9,9 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include <draw.h>
+#include "animation.h"
 #include <Game/lot.h>
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 /*

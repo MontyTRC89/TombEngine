@@ -143,7 +143,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
-    <ClInclude Include="Game\door_data.h" />
+    <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
@@ -153,7 +153,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\item.h" />
     <ClInclude Include="Game\roomvector.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
-    <ClInclude Include="Game\creature_info.h" />
+    <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -474,7 +474,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\collide.h" />
     <ClInclude Include="Game\control.h" />
     <ClInclude Include="Game\effects\debris.h" />
-    <ClInclude Include="Game\draw.h" />
+    <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\flipeffect.h" />
     <ClInclude Include="Game\effects\flmtorch.h" />
@@ -774,7 +774,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\collide.cpp" />
     <ClCompile Include="Game\control.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
-    <ClCompile Include="Game\draw.cpp" />
+    <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\flipeffect.cpp" />
     <ClCompile Include="Game\effects\flmtorch.cpp" />

@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "camera.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,

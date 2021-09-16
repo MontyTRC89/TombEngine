@@ -2,6 +2,7 @@
 #include "tr4_catwalkblade.h"
 #include "level.h"
 #include "control.h"
+#include "animation.h"
 
 void CatwalkBladeControl(short itemNum)
 {

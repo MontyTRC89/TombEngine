@@ -5,7 +5,7 @@
 #include "sphere.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "camera.h"
 #include "control.h"
 #include "effects\debris.h"
@@ -33,7 +33,21 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
-namespace TEN::Renderer {
+BITE_INFO EnemyBites[9] =
+{
+	{ 20, -95, 240, 13 },
+	{ 48, 0, 180, -11 },
+	{ -48, 0, 180, 14 },
+	{ -48, 5, 225, 14 },
+	{ 15, -60, 195, 13 },
+	{ -30, -65, 250, 18 },
+	{ 0, -110, 480, 13 },
+	{ -20, -80, 190, -10 },
+	{ 10, -60, 200, 13 }
+};
+
+namespace TEN::Renderer 
+{
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 

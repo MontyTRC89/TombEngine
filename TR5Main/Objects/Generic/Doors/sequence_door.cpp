@@ -9,7 +9,7 @@
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "lara_struct.h"
 #include "lara.h"
@@ -17,7 +17,7 @@
 #include "misc.h"
 #include "sequence_door.h"
 #include "fullblock_switch.h"
-#include "door_data.h"
+#include "itemdata/door_data.h"
 
 using namespace TEN::Entities::Switches;
 

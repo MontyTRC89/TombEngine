@@ -2,6 +2,7 @@
 #include "tr4_chain.h"
 #include "level.h"
 #include "control.h"
+#include "animation.h"
 
 namespace TEN::Entities::TR4
 {

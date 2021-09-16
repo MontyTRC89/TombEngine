@@ -7,7 +7,7 @@
 #include "box.h"
 #include "sphere.h"
 #include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "misc.h"
 #include "setup.h"
 #include "level.h"
