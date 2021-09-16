@@ -800,16 +800,14 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, c
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
-		static int hitSoundTimer = 0;
-
-		if ((!Lara.hitFrame) && (!hitSoundTimer))
+		if ((!Lara.hitFrame) && (!Lara.spazEffectCount))
 		{
 				SoundEffect(SFX_TR4_LARA_INJURY, &l->pos, 0);
-				hitSoundTimer = generateFloat(15, 35);
+				Lara.spazEffectCount = generateInt(15, 35);
 		}
 
-		if (hitSoundTimer)
-			hitSoundTimer--;
+		if (Lara.spazEffectCount)
+			Lara.spazEffectCount--;
 
 		Lara.hitFrame++;
 		if (Lara.hitFrame > 34) 

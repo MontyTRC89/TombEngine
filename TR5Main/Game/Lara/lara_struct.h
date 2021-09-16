@@ -1033,6 +1033,8 @@ struct LaraInfo
 	bool isDucked;
 	bool hasFired;
 	bool busy;
+	bool oldBusy;
+	bool uncontrollable;
 	bool litTorch;
 	bool isClimbing;
 	bool fired;

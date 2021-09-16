@@ -26,8 +26,6 @@ extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
 extern COLL_INFO LaraCollision;
 extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
-extern bool DisableLaraControl;
-extern bool OldLaraBusy;
 
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
