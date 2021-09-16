@@ -1554,19 +1554,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	z = abs(z);
 
 	// Makes Lara smaller
-	if (enemy == LaraItem)
-	{
-		short laraState = LaraItem->currentAnimState;
-		if (laraState == LS_CROUCH_IDLE ||
-			laraState == LS_CROUCH_TURN_LEFT ||
-			laraState == LS_CROUCH_TURN_RIGHT ||
-			laraState == LS_CROUCH_ROLL ||
-			laraState <= LS_MONKEYSWING_TURN_180 ||
-			laraState >= LS_HANG_TO_CRAWL)
-		{
-			y -= STEPUP_HEIGHT;
-		}
-	}
+	if (enemy == LaraItem && ((LaraInfo*)enemy)->isDucked)
+		y -= STEPUP_HEIGHT;
 
 	if (x > z)
 		info->xAngle = phd_atan(x + (z >> 1), y);
