@@ -2,11 +2,12 @@
 #include "tr4_stargate.h"
 #include "level.h"
 #include "control.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "collide.h"
 #include "sphere.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
+#include "animation.h"
 
 namespace TEN::Entities::TR4
 {

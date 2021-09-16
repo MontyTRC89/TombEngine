@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "control.h"
 #include "level.h"
+#include "animation.h"
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};

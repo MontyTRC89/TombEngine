@@ -8,9 +8,9 @@
 #include "level.h"
 #include "control.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "misc.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "collide.h"
 #include "control.h"
 

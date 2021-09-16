@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "level.h"
 #include "setup.h"
-#include "draw.h"
+#include "animation.h"
 #include "lot.h"
 #include "Lara.h"
 #include "savegame.h"
@@ -1172,7 +1172,7 @@ int S_LoadLevelFile(int levelIndex)
 	//DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
 	 
-	SOUND_Stop();
+	Sound_Stop();
 	Sound_FreeSamples();
 	if (!g_FirstLevel)
 		FreeLevel();

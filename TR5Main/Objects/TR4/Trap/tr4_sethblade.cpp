@@ -3,6 +3,7 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
+#include "animation.h"
 
 void InitialiseSethBlade(short itemNum)
 {

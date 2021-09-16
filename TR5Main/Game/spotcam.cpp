@@ -2,7 +2,7 @@
 #include "spotcam.h"
 #include "camera.h"
 #include "control.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"
 #include "input.h"

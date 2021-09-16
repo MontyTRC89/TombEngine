@@ -27,6 +27,7 @@
 #include "kayak.h"
 #include "minecart.h"
 
+#include "animation.h"
 #include "GameFlowScript.h"
 #include "health.h"
 #include "flipeffect.h"
@@ -34,8 +35,8 @@
 #include "savegame.h"
 #include "rope.h"
 #include "rubberboat.h"
-#include <Game\misc.h>
-#include <control\volume.h>
+#include "misc.h"
+#include "control\volume.h"
 #include "Renderer11.h"
 #include "camera.h"
 

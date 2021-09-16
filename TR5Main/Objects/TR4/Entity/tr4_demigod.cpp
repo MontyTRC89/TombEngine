@@ -5,14 +5,14 @@
 #include "people.h"
 #include "sphere.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "camera.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "control.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 

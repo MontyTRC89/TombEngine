@@ -4,7 +4,7 @@
 #include <cstddef>
 #include "upv_info.h"
 #include "skidoo_info.h"
-#include "door_data.h"
+#include "itemdata/door_data.h"
 #include "kayak_info.h"
 #include "lara_struct.h"
 #include "jeep_info.h"
@@ -13,7 +13,7 @@
 #include "biggun_info.h"
 #include "quad_info.h"
 #include "tr5_laserhead_info.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "boat_info.h"
 #include "rubberboat_info.h"
 #include <stdexcept>

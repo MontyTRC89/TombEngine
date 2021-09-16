@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_teethspike.h"
 #include "control.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "level.h"
 #include "Sound\sound.h"

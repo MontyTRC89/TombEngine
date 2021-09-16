@@ -1,6 +1,7 @@
 #pragma once
 #include "phd_global.h"
 #include <vector>
+
 struct BOX_NODE {
 	int exitBox;
 	int searchNumber;

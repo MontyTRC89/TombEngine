@@ -6,7 +6,7 @@
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
-#include "draw.h"
+#include "animation.h"
 #include "misc.h"
 #include "camera.h"
 #include "level.h"

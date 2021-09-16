@@ -3,13 +3,12 @@
 #include "control.h"
 #include "input.h"
 #include "lara.h"
-#include "generic_switch.h"
 #include "sound.h"
-#include "switch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
 #include "collide.h"
+#include "animation.h"
 
 namespace TEN::Entities::Switches
 {

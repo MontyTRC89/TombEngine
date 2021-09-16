@@ -3,7 +3,7 @@
 #include "items.h"
 #include "Lara.h"
 #include "lara_fire.h"
-#include "draw.h"
+#include "animation.h"
 #include "box.h"
 #include "control.h"
 #include "effects\effects.h"

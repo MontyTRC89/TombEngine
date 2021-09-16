@@ -3,13 +3,13 @@
 #include "items.h"
 #include "sphere.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\effects.h"
 #include "effects\flmtorch.h"
 #include "box.h"
 #include "setup.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 #define STATE_IMP_WALK			0

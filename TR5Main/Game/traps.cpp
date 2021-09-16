@@ -9,7 +9,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "tr5_light.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "input.h"
 #include "Sound/sound.h"

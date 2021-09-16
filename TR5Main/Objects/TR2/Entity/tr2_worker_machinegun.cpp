@@ -6,7 +6,7 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 

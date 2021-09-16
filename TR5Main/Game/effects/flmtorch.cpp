@@ -3,7 +3,7 @@
 #include "effects/effects.h"
 #include "lara_flare.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "items.h"
 #include "level.h"
 #include "setup.h"

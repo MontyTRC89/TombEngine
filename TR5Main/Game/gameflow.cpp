@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "gameflow.h"
-#include "draw.h"
+#include "animation.h"
 #include "savegame.h"
 #include "input.h"
 

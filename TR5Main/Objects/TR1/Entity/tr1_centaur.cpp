@@ -10,7 +10,7 @@
 #include "sphere.h"
 #include "lara_one_gun.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "collide.h"
 #include "item.h"
 #include "setup.h"

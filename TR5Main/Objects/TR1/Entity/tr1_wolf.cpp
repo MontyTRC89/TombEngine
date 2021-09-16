@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "control.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 

@@ -8,7 +8,7 @@
 #include "sphere.h"
 #include "Sound\sound.h"
 #include "effects\bubble.h"
-#include "draw.h"
+#include "animation.h"
 #include "camera.h"
 #include "setup.h"
 #include "rubberboat_info.h"

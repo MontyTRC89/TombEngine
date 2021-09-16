@@ -2,7 +2,7 @@
 #include "lara_climb.h"
 #include "Lara.h"
 #include "control.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "camera.h"
 #include "level.h"

@@ -3,8 +3,8 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "draw.h"
-#include "creature_info.h"
+#include "animation.h"
+#include "itemdata/creature_info.h"
 using std::vector;
 short GF(short animIndex, short frameToStart)
 {

@@ -7,7 +7,7 @@
 #include "box.h"
 #include "people.h"
 #include "effects\debris.h"
-#include "draw.h"
+#include "animation.h"
 #include "control\los.h"
 #include "traps.h"
 #include "setup.h"

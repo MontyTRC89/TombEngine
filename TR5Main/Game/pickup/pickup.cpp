@@ -2,7 +2,7 @@
 #include "pickup.h"
 #include "Specific/phd_global.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else

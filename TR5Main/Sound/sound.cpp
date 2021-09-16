@@ -283,7 +283,7 @@ void StopSoundEffect(short effectID)
 			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 }
 
-void SOUND_Stop()
+void Sound_Stop()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel))
@@ -293,7 +293,7 @@ void SOUND_Stop()
 
 void Sound_FreeSamples()
 {
-	SOUND_Stop();
+	Sound_Stop();
 	for (int i = 0; i < SOUND_MAX_SAMPLES; i++)
 		Sound_FreeSample(i);
 }

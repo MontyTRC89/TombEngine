@@ -9,7 +9,7 @@
 #else
 #include "inventory.h"
 #endif
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "camera.h"
 #include "setup.h"

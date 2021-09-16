@@ -4,7 +4,7 @@
 #include "savegame.h"
 #include "health.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
@@ -3518,8 +3518,7 @@ namespace TEN::Renderer
     }
 
     void Renderer11::Draw()
-{
-
+	{
         renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
         renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();

@@ -1,15 +1,14 @@
 #include "framework.h"
 #include <process.h>
+#include "winmain.h"
 #include "collide.h"
 #include "control.h"
 #include "pickup.h"
 #include "camera.h"
 #include "Lara.h"
 #include "effects/hair.h"
-#include "effects/flmtorch.h"
 #include "items.h"
 #include "flipeffect.h"
-#include "draw.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
@@ -21,10 +20,10 @@
 #include "Sound/sound.h"
 #include "spotcam.h"
 #include "box.h"
+#include "objects.h"
 #include "sphere.h"
 #include "level.h"
 #include "input.h"
-#include "winmain.h"
 #include "setup.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
@@ -100,6 +99,13 @@ extern Inventory g_Inventory;
 short IsRoomOutsideNo;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
+int DrawPhase()
+{
+	g_Renderer.Draw();
+	Camera.numberFrames = g_Renderer.SyncRenderer();
+	return Camera.numberFrames;
+}
+
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
@@ -150,7 +156,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
-				SOUND_Stop();
+				Sound_Stop();
 				g_Renderer.DumpGameScene();
 				GLOBAL_invMode = IM_PAUSE;
 				pause_menu_to_display = pause_main_menu;
@@ -159,7 +165,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
-				SOUND_Stop();
+				Sound_Stop();
 
 				if (S_CallInventory2())
 					return GAME_STATUS_LOAD_GAME;
@@ -182,7 +188,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
-				SOUND_Stop();
+				Sound_Stop();
 				int inventoryResult = g_Inventory.DoInventory();
 				switch (inventoryResult)
 				{
@@ -421,7 +427,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
 		TEN::Entities::TR4::UpdateLocusts();
-		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
 		// Rumble screen (like in submarine level of TRC)
@@ -496,7 +501,7 @@ GAME_STATUS DoTitle(int index)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		SOUND_Stop();
+		Sound_Stop();
 
 		// Run the level script
 		GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -614,7 +619,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	SOUND_Stop();
+	Sound_Stop();
 
 	// Run the level script
 	GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -705,7 +710,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	while (true)
 	{
 		result = ControlPhase(nframes, 0);
-		nframes = DrawPhaseGame();
+		nframes = DrawPhase();
 		Sound_UpdateScene();
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
@@ -715,7 +720,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
-			SOUND_Stop();
+			Sound_Stop();
 			StopSoundTracks();
 			DisableBubbles();
 			DisableDebris();
@@ -723,16 +728,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			return result;
 		}
 	}
-}
-
-void TranslateItem(ITEM_INFO *item, int x, int y, int z)
-{
-	float c = phd_cos(item->pos.yRot);
-	float s = phd_sin(item->pos.yRot);
-
-	item->pos.xPos += c * x + s * z;
-	item->pos.yPos += y;
-	item->pos.zPos += -s * x + c * z;
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)
@@ -824,36 +819,6 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
-int GetChange(ITEM_INFO *item, ANIM_STRUCT *anim)
-{
-	if (item->currentAnimState == item->goalAnimState)
-		return 0;
-
-	if (anim->numberChanges <= 0)
-		return 0;
-
-	for (int i = 0; i < anim->numberChanges; i++)
-	{
-		CHANGE_STRUCT *change = &g_Level.Changes[anim->changeIndex + i];
-		if (change->goalAnimState == item->goalAnimState)
-		{
-			for (int j = 0; j < change->numberRanges; j++)
-			{
-				RANGE_STRUCT *range = &g_Level.Ranges[change->rangeIndex + j];
-				if (item->frameNumber >= range->startFrame && item->frameNumber <= range->endFrame)
-				{
-					item->animNumber = range->linkAnimNum;
-					item->frameNumber = range->linkFrameNum;
-
-					return 1;
-				}
-			}
-		}
-	}
-
-	return 0;
-}
-
 void AlterFloorHeight(ITEM_INFO *item, int height)
 {
 	FLOOR_INFO *floor;
@@ -924,185 +889,6 @@ int GetRandomDraw()
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 {
 	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
-}
-
-void AnimateItem(ITEM_INFO *item)
-{
-	item->touchBits = 0;
-	item->hitStatus = false;
-
-	item->frameNumber++;
-
-	ANIM_STRUCT *anim = &g_Level.Anims[item->animNumber];
-	if (anim->numberChanges > 0 && GetChange(item, anim))
-	{
-		anim = &g_Level.Anims[item->animNumber];
-
-		item->currentAnimState = anim->currentAnimState;
-
-		if (item->requiredAnimState == item->currentAnimState)
-			item->requiredAnimState = 0;
-	}
-
-	if (item->frameNumber > anim->frameEnd)
-	{
-		if (anim->numberCommands > 0)
-		{
-			short *cmd = &g_Level.Commands[anim->commandIndex];
-			for (int i = anim->numberCommands; i > 0; i--)
-			{
-				switch (*(cmd++))
-				{
-				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					cmd += 3;
-					break;
-
-				case COMMAND_JUMP_VELOCITY:
-					item->fallspeed = *(cmd++);
-					item->speed = *(cmd++);
-					item->gravityStatus = true;
-					break;
-
-				case COMMAND_DEACTIVATE:
-					if (Objects[item->objectNumber].intelligent && !item->afterDeath)
-						item->afterDeath = 1;
-					item->status = ITEM_DEACTIVATED;
-					break;
-				case COMMAND_SOUND_FX:
-				case COMMAND_EFFECT:
-					cmd += 2;
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
-
-		item->animNumber = anim->jumpAnimNum;
-		item->frameNumber = anim->jumpFrameNum;
-
-		anim = &g_Level.Anims[item->animNumber];
-
-		if (item->currentAnimState != anim->currentAnimState)
-		{
-			item->currentAnimState = anim->currentAnimState;
-			item->goalAnimState = anim->currentAnimState;
-		}
-
-		if (item->requiredAnimState == item->currentAnimState)
-			item->requiredAnimState = 0;
-	}
-
-	if (anim->numberCommands > 0)
-	{
-		short *cmd = &g_Level.Commands[anim->commandIndex];
-		int flags;
-		int effectID = 0;
-
-		for (int i = anim->numberCommands; i > 0; i--)
-		{
-			switch (*(cmd++))
-			{
-			case COMMAND_MOVE_ORIGIN:
-				cmd += 3;
-				break;
-
-			case COMMAND_JUMP_VELOCITY:
-				cmd += 2;
-				break;
-
-			case COMMAND_SOUND_FX:
-				if (item->frameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-
-				flags = cmd[1] & 0xC000;
-
-				if (!Objects[item->objectNumber].waterCreature)
-				{
-					if (item->roomNumber == NO_ROOM)
-					{
-						item->pos.xPos = LaraItem->pos.xPos;
-						item->pos.yPos = LaraItem->pos.yPos - 762;
-						item->pos.zPos = LaraItem->pos.zPos;
-
-						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
-					}
-					else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-					{
-						if (!flags || flags == SFX_WATERONLY && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
-						{
-							SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
-						}
-					}
-					else if (!flags || flags == SFX_LANDONLY && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
-					{
-						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
-					}
-				}
-				else
-				{
-					if (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER)
-						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 1);
-					else
-						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 0);
-				}
-				break;
-
-			case COMMAND_EFFECT:
-				if (item->frameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-
-				FXType = cmd[1] & 0xC000;
-				effectID = cmd[1] & 0x3FFF;
-				DoFlipEffect(effectID, item);
-
-				cmd += 2;
-				break;
-
-			default:
-				break;
-			}
-		}
-	}
-
-	int lateral = 0;
-
-	if (item->gravityStatus)
-	{
-		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
-		item->pos.yPos += item->fallspeed;
-	}
-	else
-	{
-		int velocity = anim->velocity;
-		if (anim->acceleration)
-			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
-		item->speed = velocity >> 16;
-
-		lateral = anim->Xvelocity;
-		if (anim->Xacceleration)
-			lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
-
-		lateral >>= 16;
-	}
-
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
-
-	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90));
-	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90));
-
-	// Update matrices
-	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
 void RumbleScreen()

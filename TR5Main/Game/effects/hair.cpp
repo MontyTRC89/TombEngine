@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "hair.h"
 
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "control.h"
 #include "GameFlowScript.h"

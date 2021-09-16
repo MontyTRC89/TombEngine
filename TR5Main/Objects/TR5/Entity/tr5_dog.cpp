@@ -6,7 +6,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };

@@ -9,7 +9,7 @@
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "lara_struct.h"
 #include "lara.h"

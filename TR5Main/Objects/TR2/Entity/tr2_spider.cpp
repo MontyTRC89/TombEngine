@@ -1,16 +1,16 @@
 #include "framework.h"
 #include "tr2_spider.h"
-#include "effects\effects.h"
-#include "sphere.h"
+#include "effects/effects.h"
 #include "box.h"
 #include "items.h"
 #include "lot.h"
 #include "lara.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
+#include "animation.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 

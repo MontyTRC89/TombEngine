@@ -3,7 +3,7 @@
 #include "Lara.h"
 #include "lot.h"
 #include "effects\hair.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "level.h"
 #include "setup.h"

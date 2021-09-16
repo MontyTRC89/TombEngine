@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr4_locusts.h"
-#include "Sound\sound.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "Specific/trmath.h"
 #include "sphere.h"
-#include "misc.h"
 #include "lara.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "collide.h"
+#include "animation.h"
 
 namespace TEN::Entities::TR4 {
     LOCUST_INFO Locusts[MAX_LOCUSTS];

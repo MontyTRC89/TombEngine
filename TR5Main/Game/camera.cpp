@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "effects\effects.h"
 #include "effects\debris.h"

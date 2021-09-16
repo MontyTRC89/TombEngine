@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "generic_switch.h"
-#include "control.h"
 #include "input.h"
 #include "lara.h"
 #include "crowbar_switch.h"
 #include "newinv2.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "pickup.h"
 #include "level.h"
 #include "collide.h"
+#include "animation.h"
 
 namespace TEN::Entities::Switches
 {

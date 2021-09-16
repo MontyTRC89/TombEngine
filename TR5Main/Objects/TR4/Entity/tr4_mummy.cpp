@@ -8,7 +8,7 @@
 #include "setup.h"
 #include "control.h"
 #include "level.h"
-#include "creature_info.h"
+#include "itemdata/creature_info.h"
 #include "control.h"
 
 enum MUMMY_STATES {

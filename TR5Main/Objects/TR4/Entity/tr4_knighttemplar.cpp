@@ -2,14 +2,14 @@
 #include "tr4_knighttemplar.h"
 #include "items.h"
 #include "box.h"
-#include "sphere.h"
-#include "effects\effects.h"
-#include "effects\debris.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include "creature_info.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

@@ -2,7 +2,7 @@
 #include "lara.h"
 #include "input.h"
 #include "Sound\sound.h"
-#include "draw.h"
+#include "animation.h"
 #include "rope.h"
 #include "lara_tests.h"
 #include "camera.h"

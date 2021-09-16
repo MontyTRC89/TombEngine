@@ -4,7 +4,7 @@
 #include "lara_tests.h"
 #include "lara_slide.h"
 #include "lara_collide.h"
-#include "draw.h"
+#include "animation.h"
 #include "control\los.h"
 #include "Lara\lara_flare.h"
 #include "collide.h"
