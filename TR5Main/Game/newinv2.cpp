@@ -2417,7 +2417,7 @@ void use_current_item()
 	long OldBinocular;
 
 	OldBinocular = BinocularRange;
-	OldLaraBusy = false;
+	Lara.oldBusy = false;
 	BinocularRange = 0;
 	LaraItem->meshBits = -1;
 	invobject = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
@@ -2490,7 +2490,7 @@ void use_current_item()
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
-				OldLaraBusy = true;
+				Lara.oldBusy = true;
 				BinocularRange = 128;
 
 				if (Lara.gunStatus != LG_NO_ARMS)
@@ -3581,7 +3581,7 @@ int S_CallInventory2()
 {
 	int return_value;
 
-	OldLaraBusy = Lara.busy;
+	Lara.oldBusy = Lara.busy;
 
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
@@ -3680,7 +3680,7 @@ int S_CallInventory2()
 	if (useItem)
 		use_current_item();
 
-	Lara.busy = OldLaraBusy;
+	Lara.busy = Lara.oldBusy;
 	GLOBAL_invMode = IM_NONE;
 
 	return return_value;
