@@ -1,3 +1,6 @@
 #pragma once
 
-void CatwalkBladeControl(short itemNum);
+namespace TEN::Entities::TR4
+{
+	void CatwalkBladeControl(short itemNum);
+}
