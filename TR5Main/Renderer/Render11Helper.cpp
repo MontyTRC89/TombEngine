@@ -165,7 +165,7 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					rotation = rotation * extraRotation;
+					rotation = extraRotation * rotation;
 				}
 
 				if (bone != obj.Skeleton)
