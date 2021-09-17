@@ -64,7 +64,7 @@ void TriggerChaffEffects(ITEM_INFO* Item,int age)
 
 void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool isUnderwater,int age)
 {
-	int numSparks = (int)generateFloat(2, 5);
+	int numSparks = (int)GenerateFloat(2, 5);
 	for (int i = 0; i < numSparks; i++)
 	{
 		long	dx, dz;
@@ -215,19 +215,19 @@ void TriggerChaffBubbles(PHD_VECTOR* pos, int FlareRoomNumber)
 	bubble.active = true;
 	bubble.size = 0;
 	bubble.age = 0;
-	bubble.speed = generateFloat(4, 16);
+	bubble.speed = GenerateFloat(4, 16);
 	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = generateFloat(0.3, 0.8);
+	float shade = GenerateFloat(0.3, 0.8);
 	bubble.destinationColor = Vector4(shade, shade, shade, 0.8);
 	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = generateFloat(32, 96);
+	bubble.destinationSize = GenerateFloat(32, 96);
 	bubble.spriteNum = SPR_BUBBLES;
 	bubble.rotation = 0;
 	bubble.worldPosition = Vector3(pos->x, pos->y, pos->z);
 	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude));
+	bubble.amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
 	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(generateFloat(-3.14, 3.14), generateFloat(-3.14, 3.14), generateFloat(-3.14, 3.14));
-	bubble.waveSpeed = Vector3(1 / generateFloat(8, 16), 1 / generateFloat(8, 16), 1 / generateFloat(8, 16));
+	bubble.wavePeriod = Vector3(GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14));
+	bubble.waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
 	bubble.roomNumber = FlareRoomNumber;
 }

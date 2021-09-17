@@ -336,7 +336,7 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LM_LHAND : LM_RHAND);
-			TriggerDynamicLight(pos.x+generateFloat(-128,128), pos.y + generateFloat(-128, 128), pos.z + generateFloat(-128, 128), generateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+			TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
 
