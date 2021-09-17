@@ -232,7 +232,7 @@ bool SkidooCheckGetOffOK(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
-	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL || collResult.Position.Floor == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
 	if (abs(collResult.Position.Floor - skidoo->pos.yPos) > WALL_SIZE / 2)

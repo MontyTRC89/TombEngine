@@ -205,7 +205,7 @@ bool SpeedBoatCanGetOff(int direction)
 	if ((collResult.Position.Floor - v->pos.yPos) < -(WALL_SIZE / 2))
 		return false;
 
-	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
 	if ((collResult.Position.Ceiling - v->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))

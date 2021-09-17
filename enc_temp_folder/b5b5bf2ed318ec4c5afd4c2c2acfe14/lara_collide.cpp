@@ -5,8 +5,6 @@
 #include "effects\effects.h"
 #include "collide.h"
 #include "control.h"
-#include "lara_collide.h"
-
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
 int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
@@ -25,12 +23,12 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? 12.0f : 5.0f);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? 12.0f : 5.0f);
 	}
 
 	return 0;
