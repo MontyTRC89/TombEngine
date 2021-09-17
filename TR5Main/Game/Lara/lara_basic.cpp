@@ -495,7 +495,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		auto enoughHeadroom = GetCollisionResult(item).Position.Ceiling + LARA_HEIGHT < -LARA_HEADROOM;
+		auto enoughHeadroom = coll->Middle.Ceiling <= -LARA_HEADROOM;
 
 		if (TrInput & IN_JUMP)
 		{
