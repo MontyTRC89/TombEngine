@@ -41,7 +41,7 @@
 #include "tr4_littlebeetle.h"
 #include "particle/SimpleParticle.h"
 #include "Specific/prng.h"
-#include "Specific/time.h"
+#include "Specific/clock.h"
 #include "control/flipmap.h"
 #include "Lara/lara_one_gun.h"
 #include "generic_switch.h"

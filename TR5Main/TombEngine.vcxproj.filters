@@ -1170,9 +1170,6 @@
     <ClInclude Include="Game\control\flipmap.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\time.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\animation.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1180,6 +1177,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\itemdata\creature_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\clock.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2117,13 +2117,13 @@
     <ClCompile Include="Game\control\filpmap.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Specific\time.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\animation.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\room.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\clock.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
