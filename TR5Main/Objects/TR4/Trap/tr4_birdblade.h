@@ -1,3 +1,6 @@
 #pragma once
 
-void BirdBladeControl(short itemNum);
+namespace TEN::Entities::TR4
+{
+	void BirdBladeControl(short itemNum);
+}
