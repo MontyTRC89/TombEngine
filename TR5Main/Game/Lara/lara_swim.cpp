@@ -163,7 +163,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			floor = GetSector(r, x - r->x, z - r->z);
 		}
 
-		return MAX_HEIGHT;
+		return DEEP_WATER;
 	}
 	else
 	{
@@ -178,6 +178,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			}
 			floor = GetSector(r, x - r->x, z - r->z);
 		}
+
 		return NO_HEIGHT;
 	}
 }
