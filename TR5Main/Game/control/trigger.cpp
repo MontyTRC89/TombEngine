@@ -190,19 +190,12 @@ int PickupTrigger(short itemNum)
 
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
-	ROOM_INFO* r;
-	while (floor->RoomBelow() != NO_ROOM)
-	{
-		if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
-			break;
-		r = &g_Level.Rooms[floor->RoomBelow()];
-		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-	}
+	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
 
-	if (floor->TriggerIndex == -1)
-		return NULL;
+	if (bottomBlock->TriggerIndex == -1)
+		return nullptr;
 
-	return &g_Level.FloorData[floor->TriggerIndex];
+	return &g_Level.FloorData[bottomBlock->TriggerIndex];
 }
 
 short* GetTriggerIndex(ITEM_INFO* item)

@@ -737,20 +737,21 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		while (floor->RoomAbove() != NO_ROOM)
+		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->RoomAbove()];
+			room = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->CeilingHeight(x, z));
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
+
 		return NO_HEIGHT;
 	}
 	else
 	{
-		while (floor->RoomBelow() != NO_ROOM)
+		while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->RoomBelow()];
+			room = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->FloorHeight(x, z));
 			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
@@ -1048,15 +1049,17 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-		while (floor->RoomAbove() != NO_ROOM)
+
+		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{
-			if (CheckNoColCeilingTriangle(floor, x, z) == SPLIT_SOLID)
-				break;
-			r = &g_Level.Rooms[floor->RoomAbove()];
+			auto r = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];
+
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
+
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->RoomAbove() == NO_ROOM)
+
+			if (floor->RoomAbove(x, z, y).value_or(NO_ROOM) == NO_ROOM)
 				break;
 		}
 
@@ -1064,15 +1067,16 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->RoomBelow() != NO_ROOM)
+		while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{
-			if (CheckNoColFloorTriangle(floor, x, z) == SPLIT_SOLID)
-				break;
-			r = &g_Level.Rooms[floor->RoomBelow()];
+			auto r = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
+
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
+
 			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
-			if (floor->RoomBelow() == NO_ROOM)
+
+			if (floor->RoomBelow(x, z, y).value_or(NO_ROOM) == NO_ROOM)
 				break;
 		}
 	}

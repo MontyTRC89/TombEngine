@@ -693,7 +693,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->gravityStatus = false;
 			l->pos.xRot = l->pos.zRot = 0;
 
-			UpdateLaraRoom(l, 0);
+			UpdateItemRoom(l, 0);
 
 			Lara.waterStatus = LW_UNDERWATER;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -733,7 +733,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->gravityStatus = false;
 			l->pos.xRot = l->pos.zRot = 0;
 
-			UpdateLaraRoom(l, -LARA_HEIGHT / 2);
+			UpdateItemRoom(l, -LARA_HEIGHT / 2);
 
 			Lara.waterStatus = LW_SURFACE;
 			Lara.waterSurfaceDist = -hfw;

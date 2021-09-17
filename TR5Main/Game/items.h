@@ -60,5 +60,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
+void UpdateItemRoom(ITEM_INFO* item, int height);
 std::vector<int> FindAllItems(short objectNumber);
-ITEM_INFO* FindItem(int object_number);
+ITEM_INFO* FindItem(int object_number); 
+int FindItem(ITEM_INFO* item);
