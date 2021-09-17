@@ -97,7 +97,8 @@ void Renderer11::updateLaraAnimations(bool force)
 
 		if (Lara.gunType == WEAPON_REVOLVER) // im so sorry but it's either this or crazy arms with the revolver
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 		else
 		{
