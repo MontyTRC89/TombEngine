@@ -414,45 +414,35 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
+	if (TrInput & IN_LSTEP)
+	{
+		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
+		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+			item->goalAnimState = LS_STEP_LEFT;
+	}
+	else if (TrInput & IN_RSTEP)
+	{
+		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
+		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+			item->goalAnimState = LS_STEP_RIGHT;
+	}
+	else if (TrInput & IN_LEFT)
+	{
+		item->goalAnimState = LS_TURN_LEFT_SLOW;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+	}
+
 	if (TrInput & IN_FORWARD)
 		fheight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
 	else if (TrInput & IN_BACK)
-		rheight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180) ?
-
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-	{
-		if (TrInput & IN_LEFT)
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
-		else if (TrInput & IN_RIGHT)
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
-	}
-	else
-	{
-		if (TrInput & IN_LSTEP)
-		{
-			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
-
-			if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
-				item->goalAnimState = LS_STEP_LEFT;
-		}
-		else if (TrInput & IN_RSTEP)
-		{
-			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
-
-			if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) &&! collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
-				item->goalAnimState = LS_STEP_RIGHT;
-		}
-		else if (TrInput & IN_LEFT)
-		{
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
-		}
-	}
+		rheight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180)?
 
 	if (Lara.waterStatus == LW_WADE)
 	{
@@ -505,22 +495,33 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
+		auto enoughHeadroom = GetCollisionResult(item).Position.Ceiling + LARA_HEIGHT < -LARA_HEADROOM;
+
 		if (TrInput & IN_JUMP)
 		{
-			item->goalAnimState = LS_JUMP_PREPARE;
+			if (enoughHeadroom)
+				item->goalAnimState = LS_JUMP_PREPARE;
 		}
 		else if (TrInput & IN_FORWARD)
 		{
-			auto collFloorResult = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
-			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
+			auto cheight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
 
-			if (collFloorResult.Position.Slope && (collFloorResult.Position.Floor < 0 || collCeilingResult.Position.Ceiling > 0))
+			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
 				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
 
-			if (TrInput & IN_WALK)
-				lara_as_walk(item, coll);
+			if ((fheight.Position.Floor < STEP_SIZE && fheight.Position.Floor > -STEP_SIZE) && cheight.Position.Ceiling <= 0)
+			{
+				if (TrInput & IN_WALK)
+					lara_as_walk(item, coll);
+				else
+					lara_as_run(item, coll);
+			}
 			else
-				lara_as_run(item, coll);
+			{
+				if (!enoughHeadroom)
+					item->goalAnimState = LS_STOP;
+					return;
+			}
 		}
 		else if (TrInput & IN_BACK)
 		{
@@ -751,7 +752,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (Lara.turnRate > ANGLE(4.0f))
 		{
-			if (TrInput & IN_WALK)
+			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
 				Lara.turnRate = ANGLE(4.0f);
 			else
 				item->goalAnimState = LS_TURN_FAST;
@@ -844,7 +845,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (Lara.turnRate < -ANGLE(4.0f))
 		{
-			if (TrInput & IN_WALK)
+			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
 				Lara.turnRate = -ANGLE(4.0f);
 			else
 				item->goalAnimState = LS_TURN_FAST;
