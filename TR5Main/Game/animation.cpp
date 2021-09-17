@@ -131,7 +131,7 @@ void AnimateItem(ITEM_INFO* item)
 				}
 				else
 				{
-					if (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER)
+					if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 1);
 					else
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 0);
