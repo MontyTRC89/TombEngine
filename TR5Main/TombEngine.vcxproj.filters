@@ -2123,6 +2123,9 @@
     <ClCompile Include="Game\animation.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Game\room.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

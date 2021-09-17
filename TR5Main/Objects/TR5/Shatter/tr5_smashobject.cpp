@@ -14,7 +14,7 @@ void InitialiseSmashObject(short itemNumber)
 	item->meshBits = 1;
 
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	FLOOR_INFO* floor = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	BOX_INFO* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;

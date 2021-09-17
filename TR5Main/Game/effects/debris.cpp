@@ -85,8 +85,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->restitution = 0.6f;
 				fragment->friction = 0.6f;
 				fragment->linearDrag = .99f;
-				fragment->angularVelocity = Vector3(generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39);
-				fragment->angularDrag = generateFloat(0.9f, 0.999f);
+				fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
+				fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
@@ -103,10 +103,10 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 	radiusNormVec.Normalize();
 	float radiusStrenght =  1-((fragmentWorldPosition - impactLocation).Length() / 1024);
 	radiusStrenght = fmax(radiusStrenght, 0);
-	Vector3 radiusRandomVector = Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f)) + radiusNormVec;
+	Vector3 radiusRandomVector = Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
 	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
-	Vector3 impactDirectionVelocity = (impactDirection + Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f))) * 80 ;
+	Vector3 impactDirectionVelocity = (impactDirection + Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }
 

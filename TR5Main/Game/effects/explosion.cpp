@@ -18,7 +18,7 @@ namespace TEN {
 			{
 				SpawnExplosionParticle(pos);
 				for (int i = 0; i < 3; i++) {
-					Vector3 particlePos = pos + Vector3(generateFloat(-size / 2, size / 2), generateFloat(-size / 2, size / 2), generateFloat(-size / 2, size / 2));
+					Vector3 particlePos = pos + Vector3(GenerateFloat(-size / 2, size / 2), GenerateFloat(-size / 2, size / 2), GenerateFloat(-size / 2, size / 2));
 					SpawnExplosionParticle(particlePos);
 				}
 				if (triggerSparks) {
@@ -73,13 +73,13 @@ namespace TEN {
 				e = {};
 				e.pos = pos;
 				const float maxVel = 10;
-				e.vel = Vector3(generateFloat(-maxVel / 2, maxVel / 2), generateFloat(-maxVel / 2, maxVel / 2), generateFloat(-maxVel / 2, maxVel / 2));
+				e.vel = Vector3(GenerateFloat(-maxVel / 2, maxVel / 2), GenerateFloat(-maxVel / 2, maxVel / 2), GenerateFloat(-maxVel / 2, maxVel / 2));
 				e.active = true;
 				e.tint = Vector4(1, 1, 1, 1);
-				e.life = generateFloat(60, 90);
-				e.size = generateFloat(512, 768);
-				e.angularVel = generateFloat(-RADIAN, RADIAN);
-				e.rotation = generateFloat(-0.05, 0.05);
+				e.life = GenerateFloat(60, 90);
+				e.size = GenerateFloat(512, 768);
+				e.angularVel = GenerateFloat(-RADIAN, RADIAN);
+				e.rotation = GenerateFloat(-0.05, 0.05);
 			}
 		}
 	}

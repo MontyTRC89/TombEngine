@@ -205,7 +205,7 @@ void SkidooExplode(ITEM_INFO* skidoo)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 	auto pos = PHD_3DPOS(skidoo->pos.xPos, skidoo->pos.yPos - 128, skidoo->pos.zPos, 0, skidoo->pos.yRot, 0);
-	TriggerShockwave(&pos, 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
+	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 //	ExplodingDeath(Lara.Vehicle, -1, 256);
 //	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;

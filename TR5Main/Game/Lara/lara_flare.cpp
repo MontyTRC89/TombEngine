@@ -416,7 +416,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	int falloff;
 	if (age >= FLARE_AGE || age == 0)
 		return 0;
-	random = generateFloat();
+	random = GenerateFloat();
 
 	x = pos->x + (random* 120);
 	y = pos->y + (random * 120) - 256;

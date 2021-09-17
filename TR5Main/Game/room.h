@@ -183,3 +183,5 @@ struct ANIM_STRUCT
 
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
+
+FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);
