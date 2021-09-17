@@ -792,7 +792,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 		if ((!Lara.hitFrame) && (!Lara.spazEffectCount))
 		{
 				SoundEffect(SFX_TR4_LARA_INJURY, &item2->pos, 0);
-				Lara.spazEffectCount = generateInt(15, 35);
+				Lara.spazEffectCount = GenerateInt(15, 35);
 		}
 
 		if (Lara.spazEffectCount)
@@ -1222,7 +1222,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 	{
 		auto r = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
-		floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		floor = GetSector(r, x - r->x, z - r->z);
 	}
 
 	// Return probed bottom block into result.

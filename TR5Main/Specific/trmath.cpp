@@ -37,16 +37,16 @@ const float lerp(float v0, float v1, float t)
 
 const Vector3 getRandomVector()
 {
-	Vector3 v = {generateFloat(-1,1),generateFloat(-1,1),generateFloat(-1,1)};
+	Vector3 v = {GenerateFloat(-1,1),GenerateFloat(-1,1),GenerateFloat(-1,1)};
 	v.Normalize();
 	return v;
 }
 
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
 {
-	float x = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	float y = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	float z = generateFloat(-angleDegrees, angleDegrees) * RADIAN;
+	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
+	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
+	float z = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	Matrix m = Matrix::CreateRotationX(x)* Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 	Vector3 result = direction.TransformNormal(direction, m);
 	result.Normalize();

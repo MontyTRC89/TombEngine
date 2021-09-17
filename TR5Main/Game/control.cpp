@@ -733,7 +733,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO *floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
+	FLOOR_INFO *floor = GetSector(room, x - room->x, z - room->z);
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
@@ -742,7 +742,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->CeilingHeight(x, z));
-			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
 		return NO_HEIGHT;
@@ -754,7 +754,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->FloorHeight(x, z));
-			floor = XZ_GET_SECTOR(room, x - room->x, z - room->z);
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 	}
 
@@ -879,12 +879,12 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 
 int GetRandomControl()
 {
-	return generateInt();
+	return GenerateInt();
 }
 
 int GetRandomDraw()
 {
-	return generateInt();
+	return GenerateInt();
 }
 
 int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
@@ -1057,7 +1057,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
 
-			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			floor = GetSector(r, x - r->x, z - r->z);
 
 			if (floor->RoomAbove(x, z, y).value_or(NO_ROOM) == NO_ROOM)
 				break;
@@ -1074,7 +1074,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
 
-			floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			floor = GetSector(r, x - r->x, z - r->z);
 
 			if (floor->RoomBelow(x, z, y).value_or(NO_ROOM) == NO_ROOM)
 				break;

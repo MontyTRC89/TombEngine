@@ -119,13 +119,13 @@ bool SameZone(CREATURE_INFO* creature, ITEM_INFO* target)
 	int* zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
 	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-	FLOOR_INFO* floor = XZ_GET_SECTOR(room, item->pos.xPos - room->x, item->pos.zPos - room->z);
+	FLOOR_INFO* floor = GetSector(room, item->pos.xPos - room->x, item->pos.zPos - room->z);
 	if (floor->Box == NO_BOX)
 		return false;
 	item->boxNumber = floor->Box;
 
 	room = &g_Level.Rooms[target->roomNumber];
-	floor = XZ_GET_SECTOR(room, target->pos.xPos - room->x, target->pos.zPos - room->z);
+	floor = GetSector(room, target->pos.xPos - room->x, target->pos.zPos - room->z);
 	if (floor->Box == NO_BOX)
 		return false;
 	target->boxNumber = floor->Box;
@@ -1425,10 +1425,10 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 				int* zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 
 				ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->Box;
+				item->boxNumber = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->Box;
 
 				r = &g_Level.Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z)->Box;
+				aiObject->boxNumber = GetSector(r, aiObject->x - r->x, aiObject->z - r->z)->Box;
 
 				if (item->boxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
 				{
@@ -1495,7 +1495,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	r = &g_Level.Rooms[item->roomNumber];
 	item->boxNumber = NO_BOX;
-	FLOOR_INFO* floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	FLOOR_INFO* floor = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	if(floor)
 		item->boxNumber = floor->Box;
 	if (item->boxNumber != NO_BOX)
@@ -1505,7 +1505,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	r = &g_Level.Rooms[enemy->roomNumber];
 	enemy->boxNumber = NO_BOX;
-	floor = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z);
+	floor = GetSector(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z);
 	if(floor)
 		enemy->boxNumber = floor->Box;
 	if (enemy->boxNumber != NO_BOX)
@@ -2063,7 +2063,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 
 	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
-	FLOOR_INFO* floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	FLOOR_INFO* floor = GetSector(r, x - r->x, z - r->z);
 	floor->Stopper = set;
 
 	x = item->pos.xPos + 1024 * phd_sin(dir);
@@ -2073,16 +2073,6 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	GetFloor(x, item->pos.yPos, z, &roomNumber);
 	r = &g_Level.Rooms[roomNumber];
 
-	floor = XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	floor = GetSector(r, x - r->x, z - r->z);
 	floor->Stopper = set;
-}
-
-FLOOR_INFO* XZ_GET_SECTOR(ROOM_INFO* r, int x, int z) {
-	int sectorX = (x) / SECTOR(1);
-	int sectorZ = (z) / SECTOR(1);
-	int index = sectorZ + sectorX * r->xSize;
-	if(index > r->floor.size()) {
-		return nullptr;
-	}
-	return &r->floor[index];
 }

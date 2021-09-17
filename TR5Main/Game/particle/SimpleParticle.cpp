@@ -18,7 +18,7 @@ namespace TEN::Effects{
 	void TriggerSnowmobileSnow(ITEM_INFO* snowMobile)
 	{
 		float angle = TO_RAD(snowMobile->pos.yRot);
-		const float angleVariation = generateFloat(-10, 10) * RADIAN;
+		const float angleVariation = GenerateFloat(-10, 10) * RADIAN;
 		float x = std::sin(angle + angleVariation);
 		float z = std::cos(angle + angleVariation);
 		x = x* -500 + snowMobile->pos.xPos;
@@ -26,13 +26,13 @@ namespace TEN::Effects{
 		SimpleParticle& p = getFreeSimpleParticle();
 		p = {};
 		p.active = true;
-		p.life = generateFloat(8, 14);
+		p.life = GenerateFloat(8, 14);
 		p.room = snowMobile->roomNumber;
-		p.ageRate = generateFloat(0.9, 1.3);
-		float size = generateFloat(96, 128);
+		p.ageRate = GenerateFloat(0.9, 1.3);
+		float size = GenerateFloat(96, 128);
 		p.worldPosition = {x,float(snowMobile->pos.yPos) - size/2,z};
 		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;
-		p.size = generateFloat(256, 512);
+		p.size = GenerateFloat(256, 512);
 
 	}
 
@@ -48,13 +48,13 @@ namespace TEN::Effects{
 			SimpleParticle& p = getFreeSimpleParticle();
 			p = {};
 			p.active = true;
-			p.life = generateFloat(5, 9);
+			p.life = GenerateFloat(5, 9);
 			p.room = boat->roomNumber;
-			p.ageRate = generateFloat(0.9, 1.3);
-			float size = generateFloat(96, 128);
+			p.ageRate = GenerateFloat(0.9, 1.3);
+			float size = GenerateFloat(96, 128);
 			p.worldPosition = { x,float(boat->pos.yPos) - size / 2,z };
 			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
-			p.size = generateFloat(256, 512);
+			p.size = GenerateFloat(256, 512);
 		}
 		
 	}
