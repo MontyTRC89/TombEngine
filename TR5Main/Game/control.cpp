@@ -1049,7 +1049,6 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-
 		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto r = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];

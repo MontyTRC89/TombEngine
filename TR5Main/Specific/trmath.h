@@ -28,6 +28,7 @@ constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = (-0x7F00);
 constexpr auto MAX_HEIGHT = (-0x7FFF);
+constexpr auto DEEP_WATER = 0x7FFF;
 
 constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
