@@ -161,11 +161,11 @@ namespace TEN::Renderer
 					auto scale = Vector3{};
 					auto translation = Vector3{};
 					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					rotation = extraRotation * rotation * Matrix::CreateFromQuaternion(invertedQuat);
+					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
 				}
 				else
 				{
-					rotation = extraRotation * rotation;
+					rotation = rotation * extraRotation;
 				}
 
 				if (bone != obj.Skeleton)
