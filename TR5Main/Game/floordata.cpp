@@ -435,7 +435,7 @@ namespace TEN::Floordata
 		const auto floorHeight = floor->FloorHeight(x, z, y);
 		const auto ceilingHeight = floor->CeilingHeight(x, z, y);
 
-		y = std::clamp(y, ceilingHeight, floorHeight);
+		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, y, y == ceilingHeight, y == floorHeight))
 		{
@@ -491,7 +491,7 @@ namespace TEN::Floordata
 		const auto floorHeight = floor->FloorHeight(x, z, y);
 		const auto ceilingHeight = floor->CeilingHeight(x, z, y);
 
-		y = std::clamp(y, ceilingHeight, floorHeight);
+		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, y, y == ceilingHeight, y == floorHeight))
 		{
@@ -533,7 +533,7 @@ namespace TEN::Floordata
 		auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 		auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		location.yNumber = std::clamp(location.yNumber, ceilingHeight, floorHeight);
+		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
@@ -595,7 +595,7 @@ namespace TEN::Floordata
 		auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 		auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		location.yNumber = std::clamp(location.yNumber, ceilingHeight, floorHeight);
+		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
