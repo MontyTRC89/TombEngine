@@ -35,20 +35,13 @@ enum SPLAT_COLL
 	SPLAT_STEP
 };
 
-enum HEIGHT_TYPE
-{
-	WALL,
-	SMALL_SLOPE,
-	BIG_SLOPE,
-	DIAGONAL,
-	SPLIT_TRI
-};
-
 struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
-	HEIGHT_TYPE Type;
+	bool Slope;
+	bool DiagonalStep;
+	float SplitAngle;
 };
 
 struct COLL_RESULT
@@ -103,6 +96,11 @@ struct COLL_INFO
 	bool HitStatic;
 	bool HitTallBounds;
 	int ObjectHeadroom;
+
+	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
+	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight(); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft(); }
 };
 
 struct OBJECT_COLLISION_BOUNDS

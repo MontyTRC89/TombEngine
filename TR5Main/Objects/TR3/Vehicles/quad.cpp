@@ -180,7 +180,7 @@ static int CanQuadbikeGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL || collResult.Position.Floor == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
 	if (abs(collResult.Position.Floor - item->pos.yPos) > 512)
