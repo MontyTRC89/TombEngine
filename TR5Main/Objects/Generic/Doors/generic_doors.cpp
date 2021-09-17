@@ -54,32 +54,30 @@ namespace TEN::Entities::Doors
 		door->dptr3 = nullptr;
 		door->dptr4 = nullptr;
 
-		int dz, dx;
-		ROOM_INFO* r;
-		ROOM_INFO* b;
-		short boxNumber, twoRoom, roomNumber;
+		short boxNumber, twoRoom;
 
-		dz = dx = 0;
+		int xOffset = 0;
+		int zOffset = 0;
 
 		if (item->pos.yRot == 0)
-			dz--;
-		else if (item->pos.yRot == -ANGLE(180))
-			dz++;
+			zOffset = -WALL_SIZE;
+		else if (item->pos.yRot == ANGLE(180))
+			zOffset = WALL_SIZE;
 		else if (item->pos.yRot == ANGLE(90))
-			dx--;
+			xOffset = -WALL_SIZE;
 		else
-			dx++;
+			xOffset = WALL_SIZE;
 
-		r = &g_Level.Rooms[item->roomNumber];
-		door->d1.floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x + dx, item->pos.zPos - r->z + dz);
+		auto r = &g_Level.Rooms[item->roomNumber];
+		door->d1.floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x + xOffset, item->pos.zPos - r->z + zOffset);
 
-		roomNumber = door->d1.floor->WallPortal;
+		auto roomNumber = door->d1.floor->WallPortal;
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d1.floor->Box;
 		else
 		{
-			b = &g_Level.Rooms[roomNumber];
-			boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x + dx, item->pos.zPos - b->z + dz)->Box;
+			auto b = &g_Level.Rooms[roomNumber];
+			boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x + xOffset, item->pos.zPos - b->z + zOffset)->Box;
 		}
 
 		door->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
@@ -88,15 +86,15 @@ namespace TEN::Entities::Doors
 		if (r->flippedRoom != -1)
 		{
 			r = &g_Level.Rooms[r->flippedRoom];
-			door->d1flip.floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x + dx, item->pos.zPos - r->z + dz);
+			door->d1flip.floor = XZ_GET_SECTOR(r, item->pos.xPos - r->x + xOffset, item->pos.zPos - r->z + zOffset);
 				
 			roomNumber = door->d1flip.floor->WallPortal;
 			if (roomNumber == NO_ROOM)
 				boxNumber = door->d1flip.floor->Box;
 			else
 			{
-				b = &g_Level.Rooms[roomNumber];
-				boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x + dx, item->pos.zPos - b->z + dz)->Box;
+				auto b = &g_Level.Rooms[roomNumber];
+				boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x + xOffset, item->pos.zPos - b->z + zOffset)->Box;
 			}
 
 			door->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
@@ -125,7 +123,7 @@ namespace TEN::Entities::Doors
 				boxNumber = door->d2.floor->Box;
 			else
 			{
-				b = &g_Level.Rooms[roomNumber];
+				auto b = &g_Level.Rooms[roomNumber];
 				boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z)->Box;
 			}
 
@@ -142,7 +140,7 @@ namespace TEN::Entities::Doors
 					boxNumber = door->d2flip.floor->Box;
 				else
 				{
-					b = &g_Level.Rooms[roomNumber];
+					auto b = &g_Level.Rooms[roomNumber];
 					boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z)->Box;
 				}
 

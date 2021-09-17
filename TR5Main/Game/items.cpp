@@ -4,8 +4,11 @@
 #include "level.h"
 #include "lara.h"
 #include "control.h"
+#include "floordata.h"
 #include "effects\effects.h"
 #include "Game\box.h"
+
+using namespace TEN::Floordata;
 
 void ClearItem(short itemNum)
 {
@@ -488,6 +491,18 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
+void UpdateItemRoom(ITEM_INFO* item, int height)
+{
+	int x = item->pos.xPos;
+	int y = height + item->pos.yPos;
+	int z = item->pos.zPos;
+	item->location = GetRoom(item->location, x, y, z);
+	item->floor = GetFloorHeight(item->location, x, z).value_or(NO_HEIGHT);
+
+	if (item->roomNumber != item->location.roomNumber)
+		ItemNewRoom(FindItem(item), item->location.roomNumber);
+}
+
 std::vector<int> FindAllItems(short objectNumber)
 {
 	std::vector<int> itemList;
@@ -514,4 +529,16 @@ ITEM_INFO* FindItem(int object_number)
 	}
 
 	return 0;
+}
+
+int FindItem(ITEM_INFO* item)
+{
+	if (item == LaraItem)
+		return Lara.itemNumber;
+
+	for (int i = 0; i < g_Level.NumItems; i++)
+		if (item == &g_Level.Items[i])
+			return i;
+
+	return -1;
 }

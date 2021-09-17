@@ -476,7 +476,7 @@ void LaraControl(short itemNumber)
 					item->gravityStatus = false;
 					item->pos.yPos += 100;
 
-					UpdateLaraRoom(LaraItem, 0);
+					UpdateItemRoom(LaraItem, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
 					if (item->currentAnimState == LS_SWANDIVE_START)
@@ -561,7 +561,7 @@ void LaraControl(short itemNumber)
 						Lara.headYrot = 0;
 						Lara.headXrot = 0;
 
-						UpdateLaraRoom(item, 0);
+						UpdateItemRoom(item, 0);
 					}
 				}
 				else
@@ -622,7 +622,7 @@ void LaraControl(short itemNumber)
 						Lara.headYrot = 0;
 						Lara.headXrot = 0;
 
-						UpdateLaraRoom(item, -381);
+						UpdateItemRoom(item, -381);
 						SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 					}
 				}
@@ -644,7 +644,7 @@ void LaraControl(short itemNumber)
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
 
-				UpdateLaraRoom(item, 0);
+				UpdateItemRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 			}
 			break;
@@ -733,7 +733,7 @@ void LaraControl(short itemNumber)
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;
 
-					UpdateLaraRoom(item, 0);
+					UpdateItemRoom(item, 0);
 				}
 			}
 			else
@@ -939,7 +939,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
@@ -1055,7 +1055,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (/*Lara.ExtraAnim == -1 &&*/ Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
 
-	UpdateLaraRoom(item, 0);
+	UpdateItemRoom(item, 0);
 
 	LaraGun();
 
@@ -1113,7 +1113,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
 
-	UpdateLaraRoom(item, 100);
+	UpdateItemRoom(item, 100);
 
 	LaraGun();
 
@@ -1182,7 +1182,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+					UpdateItemRoom(item, -LARA_HEIGHT / 2);
 					cmd += 3;
 					break;
 
