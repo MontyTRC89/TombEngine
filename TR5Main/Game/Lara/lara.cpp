@@ -579,7 +579,7 @@ void LaraControl(short itemNumber)
 			roomNumber = item->roomNumber;
 			GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, &roomNumber);
 
-			if (wd == NO_HEIGHT
+			if (wd == DEEP_WATER
 				|| abs(hfw) >= STEP_SIZE
 				|| g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER
 				|| item->animNumber == LA_UNDERWATER_RESURFACE
@@ -587,7 +587,7 @@ void LaraControl(short itemNumber)
 			{
 				if (!isWater)
 				{
-					if (wd == NO_HEIGHT || abs(hfw) >= STEP_SIZE)
+					if (wd == DEEP_WATER || abs(hfw) >= STEP_SIZE)
 					{
 						Lara.waterStatus = LW_ABOVE_WATER;
 						item->animNumber = LA_FALL_START;
