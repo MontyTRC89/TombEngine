@@ -6,7 +6,7 @@
 #include "gameflow.h"
 #include "camera.h"
 #include "effects/tomb4fx.h"
-#include "Specific/time.h"
+#include "Specific/clock.h"
 #include "Specific/trmath.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
