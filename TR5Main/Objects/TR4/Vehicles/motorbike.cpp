@@ -304,7 +304,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && 
