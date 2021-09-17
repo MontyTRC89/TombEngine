@@ -7,26 +7,6 @@
 
 using namespace TEN::Floordata;
 
-int FLOOR_INFO::RoomBelow() const
-{
-	if (FloorCollision.Portals[0] != NO_ROOM)
-		return FloorCollision.Portals[0];
-	else if (FloorCollision.Portals[1] != NO_ROOM)
-		return FloorCollision.Portals[1];
-	else
-		return NO_ROOM;
-}
-
-int FLOOR_INFO::RoomAbove() const
-{
-	if (CeilingCollision.Portals[0] != NO_ROOM)
-		return CeilingCollision.Portals[0];
-	else if (CeilingCollision.Portals[1] != NO_ROOM)
-		return CeilingCollision.Portals[1];
-	else
-		return NO_ROOM;
-}
-
 int FLOOR_INFO::SectorPlane(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);

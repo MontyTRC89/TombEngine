@@ -305,7 +305,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yPos += frontFloor - 5;
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 
 	Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
@@ -409,7 +409,7 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yPos += coll->Front.Floor + 695;
 
-	UpdateLaraRoom(item, -381);
+	UpdateItemRoom(item, -381);
 
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
