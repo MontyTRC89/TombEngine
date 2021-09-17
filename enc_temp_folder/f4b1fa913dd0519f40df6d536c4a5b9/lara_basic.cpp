@@ -515,8 +515,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
 
 			if (collFloorResult.Position.Slope && (collFloorResult.Position.Floor < 0 || collCeilingResult.Position.Ceiling > 0))
-				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
-
+			{
+				//item->goalAnimState = LS_STOP;
+				return;
+			}
 			if (TrInput & IN_WALK)
 				lara_as_walk(item, coll);
 			else

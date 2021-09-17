@@ -1233,25 +1233,10 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.TiltX = tilts.first;
 	result.TiltZ = tilts.second;
 
-	// Set surface type based on tilts or split type.
-	if (floor->FloorIsSplit())
-	{
-		if ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2)
-			result.Position.Type = DIAGONAL;
-		else if ((abs(tilts.first)) != 0 || (abs(tilts.second)) != 0)
-			result.Position.Type = SPLIT_TRI;
-		else
-			result.Position.Type = SMALL_SLOPE; // This should never happen...
-	}
-	else
-	{
-		if ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2)
-			result.Position.Type = BIG_SLOPE;
-		else if ((abs(tilts.first)) != 0 || (abs(tilts.second)) != 0)
-			result.Position.Type = SMALL_SLOPE;
-		else
-			result.Position.Type = WALL;
-	}
+	// Split and slope data
+	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
+	result.Position.Slope = ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
+	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
@@ -1307,9 +1292,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->Middle = collResult.Position;
 	coll->Middle.Ceiling = ceiling;
 	coll->Middle.Floor = height;
-	coll->Middle.Type = collResult.Position.Type;
 
 	collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1384,9 +1369,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
-	coll->Front.Type = collResult.Position.Type;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 
@@ -1395,22 +1380,22 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	if ((coll->Setup.SlopesAreWalls)
-		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
-		&& (coll->Front.Floor < coll->Middle.Floor)
-		&& (height < coll->Front.Floor)
-		&& (coll->Front.Floor < 0))
+	if (coll->Setup.SlopesAreWalls 
+	   && coll->Front.Slope
+	   && coll->Front.Floor < coll->Middle.Floor
+	   && height < coll->Front.Floor
+	   && coll->Front.Floor < 0)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.SlopesArePits
-		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
-		&& (coll->Front.Floor > coll->Middle.Floor))
+	else if (coll->Setup.SlopesArePits 
+			&& coll->Front.Slope 
+			&& coll->Front.Floor > coll->Middle.Floor)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->Setup.DeathFlagIsPit)
-		     && (coll->Front.Floor > 0)
+	else if (coll->Setup.DeathFlagIsPit
+		     && coll->Front.Floor > 0
 		     && collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
@@ -1431,13 +1416,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->MiddleLeft = collResult.Position;
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
-	coll->MiddleLeft.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->MiddleLeft.Slope && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->MiddleLeft.Slope && coll->MiddleLeft.Floor > 0)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
@@ -1454,13 +1439,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->FrontLeft = collResult.Position;
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
-	coll->FrontLeft.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->FrontLeft.Slope && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->FrontLeft.Slope && coll->FrontLeft.Floor > 0)
 		coll->FrontLeft.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontLeft.Floor = STOP_SIZE;
@@ -1480,13 +1465,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->MiddleRight = collResult.Position;
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
-	coll->MiddleRight.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->MiddleRight.Slope && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->MiddleRight.Slope && coll->MiddleRight.Floor > 0)
 		coll->MiddleRight.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
@@ -1503,13 +1488,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->FrontRight = collResult.Position;
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
-	coll->FrontRight.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->FrontRight.Slope && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->FrontRight.Slope && coll->FrontRight.Floor > 0)
 		coll->FrontRight.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
@@ -1544,8 +1529,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if ((coll->Front.Type == DIAGONAL)
-			|| (coll->Front.Type == SPLIT_TRI))
+		if (coll->Front.SplitAngle != 0.0f)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1585,7 +1569,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
 		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->MiddleLeft.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
+		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1605,7 +1589,26 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 				break;
 			}
 		}
-		coll->CollisionType = CT_LEFT;
+
+		if (coll->DiagonalStepAtLeft())
+		{
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
+			quarter %= 2;
+
+			if (coll->MiddleLeft.SplitAngle != RADIAN * 45)
+			{
+				if (quarter) coll->CollisionType = CT_LEFT;
+			}
+			else
+			{
+				if (!quarter) coll->CollisionType = CT_LEFT;
+			}
+		}
+		else
+		{
+			coll->CollisionType = CT_LEFT;
+		}
+
 		return;
 	}
 
@@ -1613,7 +1616,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
 		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->MiddleRight.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
+		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1633,7 +1636,26 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 				break;
 			}
 		}
-		coll->CollisionType = CT_RIGHT;
+
+		if (coll->DiagonalStepAtRight())
+		{
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
+			quarter %= 2;
+
+			if (coll->MiddleRight.SplitAngle != RADIAN * 45)
+			{
+				if (quarter) coll->CollisionType = CT_RIGHT;
+			}
+			else
+			{
+				if (!quarter) coll->CollisionType = CT_RIGHT;
+			}
+		}
+		else
+		{
+			coll->CollisionType = CT_RIGHT;
+		}
+
 		return;
 	}
 }
@@ -1683,9 +1705,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->Middle = collResult.Position;
 	coll->Middle.Ceiling = ceiling;
-	coll->Middle.Floor = collResult.Position.Floor;
-	coll->Middle.Type = collResult.Position.Type;
 
 	collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
@@ -1752,31 +1773,30 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
+	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
-	coll->Front.Floor = collResult.Position.Floor;
-	coll->Front.Type = collResult.Position.Type;
 
 	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	if ((coll->Setup.SlopesAreWalls)
-		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
-		&& (coll->Front.Floor < coll->Middle.Floor)
-		&& (collResult.Position.Floor < coll->Front.Floor)
-		&& (coll->Front.Floor < 0))
+	if (coll->Setup.SlopesAreWalls
+		&& coll->Front.Slope
+		&& coll->Front.Floor < coll->Middle.Floor
+		&& collResult.Position.Floor < coll->Front.Floor
+		&& coll->Front.Floor < 0)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.SlopesArePits
-		&& ((coll->Front.Type == BIG_SLOPE) || (coll->Front.Type == DIAGONAL))
-		&& (coll->Front.Floor > coll->Middle.Floor))
+		     && coll->Front.Slope
+		     && coll->Front.Floor > coll->Middle.Floor)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if ((coll->Setup.DeathFlagIsPit)
-		&& (coll->Front.Floor > 0)
-		&& collResult.BottomBlock->Flags.Death)
+	else if (coll->Setup.DeathFlagIsPit
+		     && coll->Front.Floor > 0
+		     && collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
@@ -1792,13 +1812,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->MiddleLeft.Floor = collResult.Position.Floor;
+	coll->MiddleLeft = collResult.Position;
 	coll->MiddleLeft.Ceiling = ceiling;
-	coll->MiddleLeft.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->MiddleLeft.Slope && coll->MiddleLeft.Floor < 0)
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->MiddleLeft.Type == BIG_SLOPE || coll->MiddleLeft.Type == DIAGONAL) && coll->MiddleLeft.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->MiddleLeft.Slope && coll->MiddleLeft.Floor > 0)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
@@ -1811,13 +1830,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->FrontLeft.Floor = collResult.Position.Floor;
+	coll->FrontLeft = collResult.Position;
 	coll->FrontLeft.Ceiling = ceiling;
-	coll->FrontLeft.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->FrontLeft.Slope && coll->FrontLeft.Floor < 0)
 		coll->FrontLeft.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->FrontLeft.Type == BIG_SLOPE || coll->FrontLeft.Type == DIAGONAL) && coll->FrontLeft.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->FrontLeft.Slope && coll->FrontLeft.Floor > 0)
 		coll->FrontLeft.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->FrontLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontLeft.Floor = STOP_SIZE;
@@ -1833,13 +1851,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->MiddleRight.Floor = collResult.Position.Floor;
+	coll->MiddleRight = collResult.Position;
 	coll->MiddleRight.Ceiling = ceiling;
-	coll->MiddleRight.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->MiddleRight.Slope && coll->MiddleRight.Floor < 0)
 		coll->MiddleRight.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->MiddleRight.Type == BIG_SLOPE || coll->MiddleRight.Type == DIAGONAL) && coll->MiddleRight.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->MiddleRight.Slope && coll->MiddleRight.Floor > 0)
 		coll->MiddleRight.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
@@ -1852,13 +1869,12 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
-	coll->FrontRight.Floor = collResult.Position.Floor;
+	coll->FrontRight = collResult.Position;
 	coll->FrontRight.Ceiling = ceiling;
-	coll->FrontRight.Type = collResult.Position.Type;
 
-	if (coll->Setup.SlopesAreWalls && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor < 0)
+	if (coll->Setup.SlopesAreWalls && coll->FrontRight.Slope && coll->FrontRight.Floor < 0)
 		coll->FrontRight.Floor = MAX_HEIGHT;
-	else if (coll->Setup.SlopesArePits && (coll->FrontRight.Type == BIG_SLOPE || coll->FrontRight.Type == DIAGONAL) && coll->FrontRight.Floor > 0)
+	else if (coll->Setup.SlopesArePits && coll->FrontRight.Slope && coll->FrontRight.Floor > 0)
 		coll->FrontRight.Floor = STOP_SIZE;
 	else if (coll->Setup.DeathFlagIsPit && coll->FrontRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->FrontRight.Floor = STOP_SIZE;
@@ -1893,8 +1909,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if ((coll->Front.Type == DIAGONAL)
-			|| (coll->Front.Type == SPLIT_TRI))
+		if (coll->Front.SplitAngle != 0.0f)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1935,7 +1950,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
 		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->MiddleLeft.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
+		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1963,7 +1978,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
 		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
-		if (coll->MiddleRight.Type == SPLIT_TRI && coll->Middle.Type == SPLIT_TRI)
+		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -2001,7 +2016,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		bs = 0;
 
-		if ((collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) && oldCollResult.Position.Floor < collResult.Position.Floor)
+		if (collResult.Position.Slope && oldCollResult.Position.Floor < collResult.Position.Floor)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
 			if (collResult.TiltX < 0)
@@ -2065,7 +2080,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->pos.yPos = y;
 			item->pos.zPos = z;
 		}
-		else if (collResult.Position.Type == BIG_SLOPE || collResult.Position.Type == DIAGONAL) 	// Hit a steep slope?
+		else if (collResult.Position.Slope) 	// Hit a steep slope?
 		{
 			// Need to know which direction the slope is.
 

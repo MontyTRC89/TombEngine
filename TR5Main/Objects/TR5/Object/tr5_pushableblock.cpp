@@ -591,7 +591,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (GetSector(r, x - r->x, z - r->z)->Stopper)
 		return false;
 
-	if (collResult.Position.Type)
+	if (collResult.Position.Slope || collResult.Position.DiagonalStep)
 		return false;
 
 	if (((PUSHABLE_INFO*)item->data)->canFall)
@@ -681,7 +681,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (collResult.Position.Floor != y)
 		return false;
 
-	if (collResult.Position.Type)
+	if (collResult.Position.Slope || collResult.Position.DiagonalStep)
 		return 0;
 
 	int ceiling = y - blockhite + 100;

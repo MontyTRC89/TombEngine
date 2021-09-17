@@ -42,6 +42,11 @@ bool FLOOR_INFO::FloorIsSplit() const
 	return differentPlanes || FloorHasSplitPortal();
 }
 
+bool FLOOR_INFO::FloorIsDiagonalStep() const
+{
+	return FloorIsSplit() && round(FloorCollision.Planes[0].z) != round(FloorCollision.Planes[1].z);
+}
+
 bool FLOOR_INFO::CeilingIsSplit() const
 {
 	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
