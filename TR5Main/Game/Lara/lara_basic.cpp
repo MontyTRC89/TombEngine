@@ -421,7 +421,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_LEFT;
-		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
@@ -430,17 +429,14 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_RIGHT;
-		return;
 	}
 	else if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
-		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-		return;
 	}
 
 	if (TrInput & IN_FORWARD)
