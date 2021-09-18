@@ -16,7 +16,7 @@ namespace TEN::Entities::TR4
 
 			if (TriggerActive(item))
 			{
-				item->itemFlags[0] = 30846;
+				*((int*)&item->itemFlags[0]) = 0x787E;
 				AnimateItem(item);
 				return;
 			}
@@ -27,12 +27,12 @@ namespace TEN::Entities::TR4
 
 			if (TriggerActive(item))
 			{
-				item->itemFlags[0] = 1920;
+				*((int*)&item->itemFlags[0]) = 0x780;
 				AnimateItem(item);
 				return;
 			}
 		}
 
-		item->itemFlags[0] = 0;
+		*((int*)&item->itemFlags[0]) = 0;
 	}
 }
