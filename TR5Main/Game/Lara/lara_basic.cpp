@@ -421,6 +421,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_LEFT;
+		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
@@ -429,14 +430,17 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_RIGHT;
+		return;
 	}
 	else if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
+		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		return;
 	}
 
 	if (TrInput & IN_FORWARD)
@@ -495,33 +499,21 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		auto enoughHeadroom = coll->Middle.Ceiling <= -LARA_HEADROOM;
-
 		if (TrInput & IN_JUMP)
 		{
-			if (enoughHeadroom)
+			if (coll->Middle.Ceiling <= -LARA_HEADROOM)
 				item->goalAnimState = LS_JUMP_PREPARE;
 		}
 		else if (TrInput & IN_FORWARD)
 		{
 			auto cheight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
-
 			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
 				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
 
-			if ((fheight.Position.Floor < STEP_SIZE && fheight.Position.Floor > -STEP_SIZE) && cheight.Position.Ceiling <= 0)
-			{
-				if (TrInput & IN_WALK)
-					lara_as_walk(item, coll);
-				else
-					lara_as_run(item, coll);
-			}
+			if (TrInput & IN_WALK)
+				lara_as_walk(item, coll);
 			else
-			{
-				if (!enoughHeadroom)
-					item->goalAnimState = LS_STOP;
-					return;
-			}
+				lara_as_run(item, coll);
 		}
 		else if (TrInput & IN_BACK)
 		{
