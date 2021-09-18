@@ -62,6 +62,8 @@
 #include "tr4_cog.h"
 #include "tr4_laradouble.h"
 #include "tr4_setha.h"
+#include "tr4_teethspike.h"
+
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
@@ -1166,6 +1168,14 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_TEETH_SPIKES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTeethSpikes;
+		obj->control = ControlTeethSpikes;
+		obj->saveFlags = 1;
 	}
 }
 
