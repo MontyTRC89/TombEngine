@@ -1,5 +1,9 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
 
-void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+struct ITEM_INFO;
+struct COLL_INFO;
+
+namespace TEN::Entities::TR4
+{
+	void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+}
