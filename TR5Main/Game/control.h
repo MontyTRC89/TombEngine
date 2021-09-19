@@ -93,7 +93,7 @@ extern int SetDebounce;
 extern std::string CurrentAtmosphere;
 extern short CurrentRoom;
 extern int GameTimer;
-extern short GlobalCounter;
+extern unsigned int GlobalCounter;
 extern byte LevelComplete;
 #ifndef NEW_INV
 extern int LastInventoryItem;
