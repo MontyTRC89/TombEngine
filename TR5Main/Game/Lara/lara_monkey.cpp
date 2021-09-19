@@ -54,8 +54,8 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.canMonkeySwing)
 	{
-		coll->Setup.BadHeightUp = NO_BAD_POS;
-		coll->Setup.BadHeightDown = NO_HEIGHT;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = NO_HEIGHT;
 		coll->Setup.BadCeilingHeight = 0;
 
 		coll->Setup.SlopesAreWalls = false;
@@ -201,8 +201,8 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_monkeyswing*/
 	if (TrInput & IN_ACTION && Lara.canMonkeySwing)
 	{
-		coll->Setup.BadHeightUp = NO_BAD_POS;
-		coll->Setup.BadHeightDown = NO_HEIGHT;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = NO_HEIGHT;
 		coll->Setup.BadCeilingHeight = 0;
 
 		Lara.moveAngle = item->pos.yRot;
@@ -415,8 +415,8 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_hangturnr(83), lara_as_hangturnl(82)*/
 	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
 	{
-		coll->Setup.BadHeightUp = NO_BAD_POS;
-		coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeight = 0;
 
 		Lara.moveAngle = item->pos.yRot;
@@ -443,8 +443,8 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -481,8 +481,8 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = NO_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;

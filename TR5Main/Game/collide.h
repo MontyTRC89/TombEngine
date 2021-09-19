@@ -7,8 +7,8 @@ struct COLL_INFO;
 struct FLOOR_INFO;
 struct MESH_INFO;
 
-constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadHeightUp
-constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadHeightDown
+constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadHeightDown
+constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadHeightUp
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto COLLISION_CHECK_DISTANCE = 6144;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
@@ -68,8 +68,8 @@ struct COLL_SETUP
 	int   Radius;           // Collision bounds horizontal size
 	int   Height;			// Collision bounds vertical size
 	short ForwardAngle;     // Forward angle direction
-	int   BadHeightUp;      // Borderline step-up height 
-	int   BadHeightDown;    // Borderline step-down height
+	int   BadHeightDown;      // Borderline step-up height 
+	int   BadHeightUp;    // Borderline step-down height
 	int   BadCeilingHeight; // Borderline ceiling height
 
 	PHD_VECTOR OldPosition; // Preserve old parameters to restore later

@@ -531,7 +531,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
 		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
 	
-	coll->Setup.BadHeightDown = -64;
+	coll->Setup.BadHeightUp = -64;
 	coll->Setup.Height = height;
 	
 	COLL_INFO c1;

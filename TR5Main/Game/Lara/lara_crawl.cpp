@@ -95,8 +95,8 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 
@@ -152,9 +152,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 
@@ -166,7 +166,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	{
 		Lara.keepDucked = TestLaraStandUp(coll);
 
-		if (coll->Middle.Floor < coll->Setup.BadHeightDown)//hit a wall, stop
+		if (coll->Middle.Floor < coll->Setup.BadHeightUp)//hit a wall, stop
 		{
 			item->pos.xPos = coll->Setup.OldPosition.x;
 			item->pos.yPos = coll->Setup.OldPosition.y;
@@ -368,8 +368,8 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 		coll->Setup.Radius = LARA_RAD_CRAWL;
 		coll->Setup.Height = LARA_HEIGHT_CRAWL;
-		coll->Setup.BadHeightUp = STEP_SIZE - 1;
-		coll->Setup.BadHeightDown = -127;
+		coll->Setup.BadHeightDown = STEP_SIZE - 1;
+		coll->Setup.BadHeightUp = -127;
 		coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 		coll->Setup.SlopesAreWalls = true;
 		coll->Setup.SlopesArePits = true;
@@ -570,8 +570,8 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightUp = STEP_SIZE - 1;
-	coll->Setup.BadHeightDown = -127;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -127;
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -712,8 +712,8 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Radius = LARA_RAD_CRAWL + 50; // TODO: Check if it still works without 50?
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightUp = STEP_SIZE - 1;
-	coll->Setup.BadHeightDown = -(STEP_SIZE - 1);
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -784,8 +784,8 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 
@@ -823,8 +823,8 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += 255;
 
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-		coll->Setup.BadHeightUp = NO_BAD_POS;
-		coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
