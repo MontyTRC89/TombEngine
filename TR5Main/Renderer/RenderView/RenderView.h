@@ -38,12 +38,12 @@ namespace TEN::Renderer {
 	struct RenderView {
 		RenderViewCamera camera;
 		D3D11_VIEWPORT viewport;
-		TEN::Memory::LinearArrayBuffer<RendererRoom*,MAX_ROOMS_DRAW> roomsToDraw;
-		TEN::Memory::LinearArrayBuffer<RendererStatic*,MAX_STATICS_DRAW> staticsToDraw;
-		TEN::Memory::LinearArrayBuffer<RendererEffect*,MAX_EFFECTS_DRAW> effectsToDraw;
-		TEN::Memory::LinearArrayBuffer<RendererItem*,MAX_ITEMS_DRAW> itemsToDraw;
-		TEN::Memory::LinearArrayBuffer<RendererLight*, MAX_LIGHTS_DRAW> lightsToDraw;
-		TEN::Memory::LinearArrayBuffer<RendererSpriteToDraw, MAX_SPRITES_DRAW> spritesToDraw;
+		std::vector<RendererRoom*> roomsToDraw;
+		std::vector<RendererStatic*> staticsToDraw;
+		std::vector<RendererEffect*> effectsToDraw;
+		std::vector<RendererItem*> itemsToDraw;
+		std::vector<RendererLight*> lightsToDraw;
+		std::vector<RendererSpriteToDraw> spritesToDraw;
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);
