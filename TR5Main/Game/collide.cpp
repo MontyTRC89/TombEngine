@@ -2599,7 +2599,7 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						int y = l->pos.yPos;
 						int z = l->pos.zPos;
 
-						if (ItemPushItem(item, l, coll, ((deadlyBits & 1) & coll->Setup.EnableSpaz), 3) && (deadlyBits & 1))
+						if (ItemPushItem(item, l, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
 						{
 							l->hitPoints -= item->itemFlags[3];
 
