@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr3_shiva.h"
+#include "animation.h"
 #include "effects/effects.h"
 #include "box.h"
 #include "items.h"

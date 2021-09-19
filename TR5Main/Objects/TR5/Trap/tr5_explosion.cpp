@@ -2,18 +2,19 @@
 #include "tr5_explosion.h"
 #include "level.h"
 #include "control.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "animation.h"
 #include "traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"
 #include "lara_one_gun.h"
-#include "switch.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "generic_switch.h"
 #include "collide.h"
+#include "box.h"
+
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)

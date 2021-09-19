@@ -4,9 +4,9 @@
 #include "animation.h"
 #include "lara.h"
 #include "level.h"
-#include "Sound\sound.h"
-#include "effects\tomb4fx.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "effects/tomb4fx.h"
+#include "Specific/trmath.h"
 #include "setup.h"
 
 short SPyoffs[8] =

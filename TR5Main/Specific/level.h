@@ -7,6 +7,8 @@
 #include "items.h"
 #include "room.h"
 #include "item.h"
+#include "animation.h"
+
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
 #define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
@@ -111,15 +113,6 @@ struct MESH
 	std::vector<Vector3> effects; // X = glow, Y = move, Z = refract
 	std::vector<int> bones;
 	std::vector<BUCKET> buckets;
-};
-
-struct ANIM_FRAME
-{
-	BOUNDING_BOX boundingBox;
-	short offsetX;
-	short offsetY;
-	short offsetZ;
-	std::vector<Quaternion> angles;
 };
 
 struct LEVEL

@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr2_worker_flamethrower.h"
+#include "animation.h"
 #include "box.h"
 #include "people.h"
 #include "items.h"
