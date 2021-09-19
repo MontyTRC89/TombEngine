@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr2_worker_machinegun.h"
+#include "animation.h"
 #include "people.h"
 #include "box.h"
 #include "items.h"

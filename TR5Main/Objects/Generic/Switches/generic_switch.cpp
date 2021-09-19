@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "control.h"
 #include "input.h"
+#include "level.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "sphere.h"
 #include "animation.h"
 #include "collide.h"
-#include "floordata.h"
 
 namespace TEN::Entities::Switches
 {

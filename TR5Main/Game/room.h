@@ -1,6 +1,6 @@
 #pragma once
 #include <framework.h>
-#include <newtypes.h>
+#include "newtypes.h"
 #include "floordata.h"
 #include "Specific\phd_global.h"
 
@@ -160,25 +160,6 @@ struct ROOM_INFO
 	short fxNumber;
 	bool boundActive;
 	std::vector<TRIGGER_VOLUME> triggerVolumes;
-};
-
-struct ANIM_STRUCT
-{
-	int framePtr;
-	short interpolation;
-	short currentAnimState;
-	int velocity;
-	int acceleration;
-	int Xvelocity;
-	int Xacceleration;
-	short frameBase;
-	short frameEnd;
-	short jumpAnimNum;
-	short jumpFrameNum;
-	short numberChanges;
-	short changeIndex;
-	short numberCommands;
-	short commandIndex;
 };
 
 constexpr auto NUM_ROOMS = 1024;

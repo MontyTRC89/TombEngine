@@ -1,16 +1,17 @@
 #include "framework.h"
 #include "lara.h"
 #include "input.h"
+#include "level.h"
 #include "lara_tests.h"
-#include "lara_slide.h"
 #include "lara_collide.h"
 #include "animation.h"
-#include "control\los.h"
-#include "Lara\lara_flare.h"
+#include "control/los.h"
+#include "Lara/lara_flare.h"
 #include "collide.h"
 #include "item.h"
 #include "camera.h"
 #include "control.h"
+
 /*this file has all the related functions to ducking and crawling*/
 
 /*crouch/duck start*/

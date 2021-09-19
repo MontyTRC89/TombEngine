@@ -1,10 +1,37 @@
 #pragma once
-#include "box.h"
+#include "Specific/phd_global.h"
 
 struct PHD_3DPOS;
 struct PHD_VECTOR;
-struct ANIM_FRAME;
 struct ITEM_INFO;
+
+struct ANIM_FRAME
+{
+	BOUNDING_BOX boundingBox;
+	short offsetX;
+	short offsetY;
+	short offsetZ;
+	std::vector<Quaternion> angles;
+};
+
+struct ANIM_STRUCT
+{
+	int framePtr;
+	short interpolation;
+	short currentAnimState;
+	int velocity;
+	int acceleration;
+	int Xvelocity;
+	int Xacceleration;
+	short frameBase;
+	short frameEnd;
+	short jumpAnimNum;
+	short jumpFrameNum;
+	short numberChanges;
+	short changeIndex;
+	short numberCommands;
+	short commandIndex;
+};
 
 enum ANIMCOMMAND_TYPES
 {

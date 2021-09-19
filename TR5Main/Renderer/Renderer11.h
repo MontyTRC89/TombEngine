@@ -12,6 +12,7 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "items.h"
+#include "animation.h"
 #include "effects\effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
@@ -29,6 +30,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+
 struct CAMERA_INFO;
 namespace TEN::Renderer
 {
