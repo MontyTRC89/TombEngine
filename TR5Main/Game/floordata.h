@@ -3,7 +3,7 @@
 #include "Specific\trmath.h"
 #include "roomvector.h"
 
-constexpr auto WALL_PLANE = Vector3(0, 0, -127);
+constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
 struct SECTOR_COLLISION_INFO
 {
