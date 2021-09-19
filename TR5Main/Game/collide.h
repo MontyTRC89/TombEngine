@@ -42,6 +42,9 @@ struct COLL_POSITION
 	bool Slope;
 	bool DiagonalStep;
 	float SplitAngle;
+
+	bool HasSplit() { return SplitAngle != 0.0f; }
+	bool HasFlippedSplit() { return HasSplit() && SplitAngle != 45.0f * RADIAN; }
 };
 
 struct COLL_RESULT

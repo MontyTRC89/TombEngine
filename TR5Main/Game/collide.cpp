@@ -1528,7 +1528,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		|| (coll->Front.Floor < coll->Setup.BadHeightUp)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if (coll->Front.SplitAngle != 0.0f)
+		if (coll->Front.HasSplit())
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1594,7 +1594,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			if (coll->MiddleLeft.SplitAngle != RADIAN * 45)
+			if (coll->MiddleLeft.HasFlippedSplit())
 			{
 				if (quarter) coll->CollisionType = CT_LEFT;
 			}
@@ -1641,7 +1641,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
 			quarter %= 2;
 
-			if (coll->MiddleRight.SplitAngle != RADIAN * 45)
+			if (coll->MiddleRight.HasFlippedSplit())
 			{
 				if (quarter) coll->CollisionType = CT_RIGHT;
 			}
@@ -1894,7 +1894,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 		|| (coll->Front.Floor < coll->Setup.BadHeightUp)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
-		if (coll->Front.SplitAngle != 0.0f)
+		if (coll->Front.HasSplit())
 		{
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
