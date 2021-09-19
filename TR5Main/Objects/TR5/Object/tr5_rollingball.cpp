@@ -487,9 +487,8 @@ void InitialiseClassicRollingBall(short itemNum)
 	GAME_VECTOR* old;
 
 	item = &g_Level.Items[itemNum];
-	old = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
-	item->data = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
-
+	item->data = GAME_VECTOR{ };
+	old = item->data;
 	old->x = item->pos.xPos;
 	old->y = item->pos.yPos;
 	old->z = item->pos.zPos;
