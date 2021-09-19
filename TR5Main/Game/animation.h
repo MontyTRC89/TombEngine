@@ -55,3 +55,6 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint);
 void ClampRotation(PHD_3DPOS* pos, short angle, short rot);
 
 void DrawAnimatingItem(ITEM_INFO* item);
+
+short GF(short animIndex, short frameToStart); // for lara
+short GF2(short objectID, short animIndex, short frameToStart); // for entity
