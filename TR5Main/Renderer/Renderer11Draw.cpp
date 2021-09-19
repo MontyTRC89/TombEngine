@@ -3066,7 +3066,19 @@ namespace TEN::Renderer
         if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
         {
             item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
-            item->World = item->Scale * item->Rotation * item->Translation;
+
+            // Override rotation matrix here 
+            // In original game was:
+            // phd_RotX(item->pos.x_rot);
+            // phd_RotZ(item->pos.z_rot);
+            // phd_RotY(item->pos.y_rot);
+
+            Matrix rotation = 
+                Matrix::CreateRotationY(TO_RAD(item->Item->pos.yRot)) *
+                Matrix::CreateRotationZ(TO_RAD(item->Item->pos.zRot)) *
+                Matrix::CreateRotationX(TO_RAD(item->Item->pos.xRot));
+
+            item->World = item->Scale * rotation * item->Translation;
 
             return drawAnimatingItem(view,item, transparent, animated);
         }
