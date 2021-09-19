@@ -480,11 +480,6 @@ void ChaseCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, 384, 1);
 
-	if (Camera.oldType == FIXED_CAMERA)
-	{
-		Camera.speed = 1;
-	}
-
 	MoveCamera(&ideal, Camera.speed);
 }
 
