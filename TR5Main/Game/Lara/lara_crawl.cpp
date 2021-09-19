@@ -575,7 +575,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, -LARA_HEIGHT_CRAWL);
+	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL, true);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -716,7 +716,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, -LARA_HEIGHT_CRAWL);
+	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL, true);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -824,7 +824,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
-		GetCollisionInfo(coll, item, 870);
+		GetCollisionInfo(coll, item, LARA_HEIGHT_STRETCH);
 		edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 		if (edgeCatch)
