@@ -787,8 +787,8 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->animNumber == LA_POLE_IDLE)
 	{
-		coll->Setup.BadHeightUp = NO_BAD_POS;
-		coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 		Lara.moveAngle = item->pos.yRot;
@@ -881,8 +881,8 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & (IN_BACK | IN_ACTION)) != (IN_BACK | IN_ACTION) || item->hitPoints <= 0)
 		item->goalAnimState = LS_POLE_IDLE;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	Lara.moveAngle = item->pos.yRot;

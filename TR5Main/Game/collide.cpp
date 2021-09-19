@@ -686,8 +686,8 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	item->pos.xPos = mesh->pos.xPos + c * rx + s * rz;
 	item->pos.zPos = mesh->pos.zPos + c * rz - s * rx;
 	
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	auto oldFacing = coll->Setup.ForwardAngle;
@@ -813,8 +813,8 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 			Lara.hitFrame = 34;
 	}
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	facing = coll->Setup.ForwardAngle;
@@ -1524,8 +1524,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->CollisionType = CT_TOP;
 	}
 
-	if ((coll->Front.Floor > coll->Setup.BadHeightUp)
-		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
+	if ((coll->Front.Floor > coll->Setup.BadHeightDown)
+		|| (coll->Front.Floor < coll->Setup.BadHeightUp)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
 		if (coll->Front.SplitAngle != 0.0f)
@@ -1564,8 +1564,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightUp ||
-		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
+	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightDown ||
+		coll->MiddleLeft.Floor < coll->Setup.BadHeightUp ||
 		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
@@ -1611,8 +1611,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleRight.Floor > coll->Setup.BadHeightUp ||
-		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
+	if (coll->MiddleRight.Floor > coll->Setup.BadHeightDown ||
+		coll->MiddleRight.Floor < coll->Setup.BadHeightUp ||
 		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
@@ -1890,8 +1890,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 		coll->CollisionType = CT_TOP;
 	}
 
-	if ((coll->Front.Floor > coll->Setup.BadHeightUp)
-		|| (coll->Front.Floor < coll->Setup.BadHeightDown)
+	if ((coll->Front.Floor > coll->Setup.BadHeightDown)
+		|| (coll->Front.Floor < coll->Setup.BadHeightUp)
 		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
 	{
 		if (coll->Front.SplitAngle != 0.0f)
@@ -1931,8 +1931,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 		return;
 	}
 
-	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightUp ||
-		coll->MiddleLeft.Floor < coll->Setup.BadHeightDown ||
+	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightDown ||
+		coll->MiddleLeft.Floor < coll->Setup.BadHeightUp ||
 		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
@@ -1959,8 +1959,8 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 		return;
 	}
 
-	if (coll->MiddleRight.Floor > coll->Setup.BadHeightUp ||
-		coll->MiddleRight.Floor < coll->Setup.BadHeightDown ||
+	if (coll->MiddleRight.Floor > coll->Setup.BadHeightDown ||
+		coll->MiddleRight.Floor < coll->Setup.BadHeightUp ||
 		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)

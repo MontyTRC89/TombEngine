@@ -23,8 +23,8 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -124,8 +124,8 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.SlopesAreWalls = true;
@@ -304,8 +304,8 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_col_run*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -473,8 +473,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			if (!wade)
 			{
 				Lara.moveAngle = item->pos.yRot;
-				coll->Setup.BadHeightUp = NO_BAD_POS;
-				coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+				coll->Setup.BadHeightDown = NO_BAD_POS;
+				coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 				coll->Setup.BadCeilingHeight = 0;
 				coll->Setup.SlopesAreWalls = true;
 				coll->Setup.Radius = LARA_RAD + 2;
@@ -531,8 +531,8 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 2*/
 	/*state code: lara_as_stop*/
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -613,8 +613,8 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -692,8 +692,8 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = true;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -780,8 +780,8 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
@@ -897,8 +897,8 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
 
@@ -928,8 +928,8 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fastfall*/
 	item->gravityStatus = true;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -978,8 +978,8 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = 0;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1131,8 +1131,8 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 
-	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1189,8 +1189,8 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = NO_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1260,10 +1260,10 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 	if (Lara.waterStatus == LW_WADE)
-		coll->Setup.BadHeightUp = NO_BAD_POS;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
 	else
-		coll->Setup.BadHeightUp = STEPUP_HEIGHT;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+		coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -1379,14 +1379,14 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	if (Lara.waterStatus == LW_WADE)
-		coll->Setup.BadHeightUp = NO_BAD_POS;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
 	else
-		coll->Setup.BadHeightUp = 128;
+		coll->Setup.BadHeightDown = 128;
 
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 
-	coll->Setup.BadHeightDown = -128;
+	coll->Setup.BadHeightUp = -128;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1450,8 +1450,8 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = 0;
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 
@@ -1555,8 +1555,8 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 25, 26, 27*/
 	/*state code: none, but is called in lara_col_backjump, lara_col_rightjump and lara_col_leftjump*/
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
@@ -1601,8 +1601,8 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
@@ -1751,8 +1751,8 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fallback*/
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1780,8 +1780,8 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_void_func*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.SlopesAreWalls = true;
@@ -1829,8 +1829,8 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_swandive*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1865,8 +1865,8 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_fastdive*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -2015,8 +2015,8 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_wade*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.SlopesAreWalls = true;
@@ -2135,8 +2135,8 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_dash*/
 	Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.SlopesAreWalls = true;
@@ -2211,8 +2211,8 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.moveAngle = item->pos.yRot;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.SlopesAreWalls = true;

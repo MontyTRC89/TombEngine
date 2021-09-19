@@ -429,8 +429,8 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
 
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -SUB_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -SUB_HEIGHT;
 	coll->Setup.BadCeilingHeight = SUB_HEIGHT;
 	coll->Setup.OldPosition.x = v->pos.xPos;
 	coll->Setup.OldPosition.y = v->pos.yPos;
@@ -453,7 +453,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	if (height < 200)
 		height = 200;
 
-	coll->Setup.BadHeightDown = -height;
+	coll->Setup.BadHeightUp = -height;
 	coll->Setup.Height = height;
 
 	GetCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));

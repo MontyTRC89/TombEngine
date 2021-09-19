@@ -12,8 +12,8 @@
 
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.BadHeightUp = NO_BAD_POS;
-	coll->Setup.BadHeightDown = -512;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -512;
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
