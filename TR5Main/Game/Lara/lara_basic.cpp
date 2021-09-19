@@ -1605,7 +1605,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, 870);
+	GetCollisionInfo(coll, item, LARA_HEIGHT_STRETCH);
 
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
 	{
