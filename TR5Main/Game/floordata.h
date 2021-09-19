@@ -44,10 +44,11 @@ class FLOOR_INFO
 	int SectorPlaneCeiling(int x, int z) const;
 	std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
 	bool FloorIsSplit() const;
-	bool FLOOR_INFO::FloorIsDiagonalStep() const;
+	bool FloorIsDiagonalStep() const;
+	bool CeilingIsDiagonalStep() const;
 	bool CeilingIsSplit() const;
-	bool FLOOR_INFO::FloorHasSplitPortal() const;
-	bool FLOOR_INFO::CeilingHasSplitPortal() const;
+	bool FloorHasSplitPortal() const;
+	bool CeilingHasSplitPortal() const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;
