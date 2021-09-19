@@ -3166,11 +3166,12 @@ namespace TEN::Renderer
         {
             MESH_INFO *msh = view.staticsToDraw[i]->Mesh;
 
-            /*if (!(msh->flags & 1))
-                continue;*/
+            if (!(msh->flags & 1))
+                continue;
 
             RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
-
+            if(!m_staticObjects[msh->staticNumber])
+                continue;
             RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
 
             if (staticObj.ObjectMeshes.size() > 0)
