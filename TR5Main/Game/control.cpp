@@ -98,7 +98,7 @@ int SetDebounce = 0;
 std::string CurrentAtmosphere;
 short CurrentRoom;
 int GameTimer;
-short GlobalCounter;
+unsigned int GlobalCounter;
 byte LevelComplete;
 #ifndef NEW_INV
 int LastInventoryItem;
