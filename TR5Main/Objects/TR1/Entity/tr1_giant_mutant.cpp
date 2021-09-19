@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "items.h"
 #include "camera.h"

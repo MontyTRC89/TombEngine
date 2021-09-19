@@ -2,7 +2,7 @@
 #include "tr5_rollingball.h"
 #include "sphere.h"
 #include "camera.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "setup.h"
 #include "Sound/sound.h"

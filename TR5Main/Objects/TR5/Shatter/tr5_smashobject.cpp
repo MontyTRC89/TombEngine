@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_smashobject.h"
 #include "level.h"
-#include "box.h"
+#include "control/box.h"
 #include "Sound\sound.h"
 #include "effects\tomb4fx.h"
 #include "items.h"

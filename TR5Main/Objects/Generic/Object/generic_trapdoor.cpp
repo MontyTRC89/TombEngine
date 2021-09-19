@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "input.h"
 #include "camera.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "animation.h"
 

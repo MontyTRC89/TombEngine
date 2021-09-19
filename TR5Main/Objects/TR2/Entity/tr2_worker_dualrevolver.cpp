@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr2_worker_dualrevolver.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"

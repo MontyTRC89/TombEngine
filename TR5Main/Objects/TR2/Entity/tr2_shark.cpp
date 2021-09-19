@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr2_shark.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 BITE_INFO sharkBite = { 17, -22, 344, 12 };

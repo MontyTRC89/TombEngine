@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "lot.h"
-#include "box.h"
+#include "control/lot.h"
+#include "control/box.h"
 #include "setup.h"
 #include "camera.h"
 #include "lara.h"

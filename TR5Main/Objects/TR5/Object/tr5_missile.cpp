@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_missile.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "sphere.h"
 #include "effects\tomb4fx.h"

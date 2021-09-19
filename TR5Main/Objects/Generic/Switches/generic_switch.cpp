@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "control.h"
+#include "control/control.h"
 #include "input.h"
 #include "level.h"
 #include "lara.h"

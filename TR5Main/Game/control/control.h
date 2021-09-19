@@ -34,10 +34,6 @@ enum HEADINGS
 	WEST
 };
 
-#define OUTSIDE_Z 64
-#define OUTSIDE_SIZE 108
-
-
 extern int GameTimer;
 extern int RumbleTimer;
 extern int InGameCounter;
@@ -86,9 +82,7 @@ int GetRandomDraw();
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
-
-int IsObjectInRoom(short roomNumber, short objectNumber);
-int IsRoomOutside(int x, int y, int z);
+int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
 
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
@@ -98,10 +92,7 @@ void ResetGlobals();
 void AlterFloorHeight(ITEM_INFO* item, int height);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
-
-int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
-
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);	
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 

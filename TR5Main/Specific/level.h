@@ -6,7 +6,7 @@
 #include "newtypes.h"
 #include "items.h"
 #include "room.h"
-#include "item.h"
+#include "items.h"
 #include "animation.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));

@@ -2,7 +2,7 @@
 #include "tr3_shiva.h"
 #include "animation.h"
 #include "effects/effects.h"
-#include "box.h"
+#include "control/box.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_birdblade.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 void BirdBladeControl(short itemNum)

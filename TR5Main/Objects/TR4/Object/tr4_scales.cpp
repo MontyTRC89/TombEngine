@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_scales.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "setup.h"
 #include "items.h"
 #include "lara.h"

@@ -5,7 +5,7 @@
 #include "animation.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"

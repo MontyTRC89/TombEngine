@@ -1,7 +1,7 @@
 #pragma once
 #include <bass.h>
 #include <bass_fx.h>
-#include "control.h"
+#include "control/control.h"
 #include "sound_effects.h"
 
 enum SFX_TYPES

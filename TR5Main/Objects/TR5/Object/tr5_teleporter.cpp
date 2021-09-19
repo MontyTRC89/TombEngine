@@ -2,12 +2,12 @@
 #include "tr5_teleporter.h"
 #include "items.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
 #include "effects\weather.h"
 #include "lara.h"
 #include "camera.h"
-#include "box.h"
+#include "control/box.h"
 
 using namespace TEN::Effects::Environment;
 

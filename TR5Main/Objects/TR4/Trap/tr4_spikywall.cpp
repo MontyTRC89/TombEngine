@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_spikywall.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
 #include "lara.h"
 #include "items.h"

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "jump_switch.h"
-#include "control.h"
+#include "control/control.h"
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"

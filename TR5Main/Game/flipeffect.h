@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "control.h"
+#include "control/control.h"
 
 #define EffectFunction void(ITEM_INFO* item)
 

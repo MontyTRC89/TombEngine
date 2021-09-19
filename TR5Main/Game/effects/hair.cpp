@@ -3,7 +3,7 @@
 
 #include "animation.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "GameFlowScript.h"
 #include "setup.h"
 #include "sphere.h"

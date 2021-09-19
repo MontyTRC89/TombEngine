@@ -10,7 +10,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "control.h"
+#include "control/control.h"
 #include "kayak_info.h"
 using std::vector;
 

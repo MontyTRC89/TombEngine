@@ -3,7 +3,7 @@
 #include "Specific\trmath.h"
 #include "smoke.h"
 #include "room.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"

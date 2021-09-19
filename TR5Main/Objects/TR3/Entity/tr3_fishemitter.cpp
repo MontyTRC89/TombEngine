@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "fish.h"
-#include "control.h"
+#include "control/control.h"
 #include "effects\effects.h"
 
 #define PIRAHNA_DAMAGE 4

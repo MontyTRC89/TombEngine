@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr2_barracuda.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "lara.h"
 #include "setup.h"

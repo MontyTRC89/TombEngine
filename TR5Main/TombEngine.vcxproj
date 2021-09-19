@@ -135,8 +135,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Game\box.h" />
-    <ClInclude Include="Game\control\flipmap.h" />
+    <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
@@ -150,7 +149,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
-    <ClInclude Include="Game\item.h" />
     <ClInclude Include="Game\roomvector.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
@@ -472,7 +470,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collide.h" />
-    <ClInclude Include="Game\control.h" />
+    <ClInclude Include="Game\control\control.h" />
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
@@ -491,7 +489,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\Lara\lara_flare.h" />
     <ClInclude Include="Game\Lara\lara_surface.h" />
     <ClInclude Include="Game\Lara\lara_swim.h" />
-    <ClInclude Include="Game\lot.h" />
+    <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\objects.h" />
@@ -528,7 +526,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Game\control\filpmap.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -770,10 +767,10 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_troops.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wraith.cpp" />
     <ClCompile Include="Renderer\Renderer11.cpp" />
-    <ClCompile Include="Game\box.cpp" />
+    <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\camera.cpp" />
     <ClCompile Include="Game\collide.cpp" />
-    <ClCompile Include="Game\control.cpp" />
+    <ClCompile Include="Game\control\control.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
@@ -792,7 +789,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
     <ClCompile Include="Game\Lara\lara_surface.cpp" />
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
-    <ClCompile Include="Game\lot.cpp" />
+    <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />

@@ -3,7 +3,7 @@
 #include "items.h"
 #include "level.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound/sound.h"
 #include "lara.h"
 #include "effects/effects.h"

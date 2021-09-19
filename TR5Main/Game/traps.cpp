@@ -12,8 +12,8 @@
 #include "animation.h"
 #include "level.h"
 #include "input.h"
+#include "room.h"
 #include "Sound/sound.h"
-#include "control/flipmap.h"
 
 using namespace TEN::Effects::Environment;
 

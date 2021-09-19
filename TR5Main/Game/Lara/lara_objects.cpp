@@ -7,8 +7,8 @@
 #include "rope.h"
 #include "camera.h"
 #include "collide.h"
-#include "item.h"
-#include "control.h"
+#include "items.h"
+#include "control/control.h"
 
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 

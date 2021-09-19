@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_spinningblade.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "setup.h"
 #include "effects/effects.h"

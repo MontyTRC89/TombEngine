@@ -6,7 +6,7 @@
 #include "objectslist.h"
 #include "level.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
 #include "Specific\trmath.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_joby_spikes.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 #include "Sound/sound.h"
 #include "lara.h"

@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr4_bigscorpion.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "items.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 
 int CutSeqNum;
 

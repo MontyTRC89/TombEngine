@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_explosion.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound/sound.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
@@ -13,7 +13,7 @@
 #include "effects/debris.h"
 #include "generic_switch.h"
 #include "collide.h"
-#include "box.h"
+#include "control/box.h"
 
 using namespace TEN::Entities::Switches;
 
