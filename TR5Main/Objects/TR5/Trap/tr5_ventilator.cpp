@@ -2,7 +2,7 @@
 #include "tr5_ventilator.h"
 #include "animation.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "camera.h"
 #include "effects\effects.h"

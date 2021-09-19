@@ -2,7 +2,7 @@
 #include <process.h>
 #include "winmain.h"
 #include "collide.h"
-#include "control.h"
+#include "control/control.h"
 #include "pickup.h"
 #include "camera.h"
 #include "Lara.h"
@@ -14,17 +14,18 @@
 #else
 #include "inventory.h"
 #endif
-#include "lot.h"
+#include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
 #include "Sound/sound.h"
 #include "spotcam.h"
-#include "box.h"
+#include "control/box.h"
 #include "objects.h"
 #include "sphere.h"
 #include "level.h"
 #include "input.h"
 #include "setup.h"
+#include "room.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "effects/debris.h"
@@ -42,7 +43,6 @@
 #include "particle/SimpleParticle.h"
 #include "Specific/prng.h"
 #include "Specific/clock.h"
-#include "control/flipmap.h"
 #include "Lara/lara_one_gun.h"
 #include "generic_switch.h"
 #include "Scripting/GameFlowScript.h"
@@ -95,9 +95,6 @@ int WeaponEnemyTimer;
 int LastInventoryItem;
 extern Inventory g_Inventory;
 #endif
-
-short IsRoomOutsideNo;
-std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase()
 {
@@ -1081,66 +1078,6 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	}
 
 	return NO_HEIGHT;
-}
-
-int IsObjectInRoom(short roomNumber, short objectNumber)
-{
-	short itemNumber = g_Level.Rooms[roomNumber].itemNumber;
-
-	if (itemNumber == NO_ITEM)
-		return 0;
-
-	while (true)
-	{
-		ITEM_INFO *item = &g_Level.Items[itemNumber];
-
-		if (item->objectNumber == objectNumber)
-			break;
-
-		itemNumber = item->nextItem;
-
-		if (itemNumber == NO_ITEM)
-			return 0;
-	}
-
-	return 1;
-}
-
-int IsRoomOutside(int x, int y, int z)
-{
-	if (x < 0 || z < 0)
-		return -2;
-
-	int xTable = x / 1024;
-	int zTable = z / 1024;
-
-	if (OutsideRoomTable[xTable][zTable].size() == 0)
-		return -2;
-
-	for (size_t i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
-	{
-		short roomNumber = OutsideRoomTable[xTable][zTable][i];
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-
-		if ((y > r->maxceiling) && (y < r->minfloor)
-			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
-		{
-			IsRoomOutsideNo = roomNumber;
-
-			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-			int height = GetFloorHeight(floor, x, y, z);
-			if (height == NO_HEIGHT || y > height)
-				return -2;
-			height = GetCeiling(floor, x, y, z);
-			if (y < height)
-				return -2;
-
-			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? 1 : -3);
-		}
-	}
-
-	return -2;
 }
 
 void ResetGlobals()

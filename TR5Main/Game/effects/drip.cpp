@@ -2,7 +2,7 @@
 #include "drip.h"
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "room.h"
 #include "Specific\trmath.h"

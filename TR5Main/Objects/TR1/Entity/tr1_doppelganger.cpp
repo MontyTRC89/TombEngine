@@ -5,7 +5,7 @@
 #include "misc.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.

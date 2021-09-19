@@ -14,7 +14,7 @@
 /// traps
 
 /// necessary import
-#include "box.h"
+#include "control/box.h"
 #include "collide.h"
 #include "setup.h"
 #include "level.h"

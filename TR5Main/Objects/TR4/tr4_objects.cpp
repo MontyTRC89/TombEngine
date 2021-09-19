@@ -72,7 +72,7 @@
 #include "level.h"
 #include "tr4_enemy_jeep.h"
 #include "itemdata/creature_info.h"
-#include "box.h"
+#include "control/box.h"
 
 using namespace TEN::Entities::TR4;
 

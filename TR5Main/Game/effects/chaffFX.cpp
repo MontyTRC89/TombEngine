@@ -2,7 +2,7 @@
 #include "chaffFX.h"
 #include "effects\bubble.h"
 #include "effects\tomb4fx.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "animation.h"
 #include "level.h"

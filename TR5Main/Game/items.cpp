@@ -3,10 +3,9 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "floordata.h"
-#include "effects\effects.h"
-#include "Game\box.h"
+#include "effects/effects.h"
 
 using namespace TEN::Floordata;
 

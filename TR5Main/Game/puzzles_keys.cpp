@@ -10,7 +10,7 @@
 #endif
 #include "pickup.h"
 #include "animation.h"
-#include "control.h"
+#include "control/control.h"
 #include "puzzles_keys.h"
 #include "generic_switch.h"
 #include "camera.h"

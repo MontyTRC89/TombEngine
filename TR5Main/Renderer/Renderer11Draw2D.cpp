@@ -3,7 +3,7 @@
 #include "camera.h"
 #include "spotcam.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "effects\weather.h"
 
 using namespace TEN::Effects::Environment;

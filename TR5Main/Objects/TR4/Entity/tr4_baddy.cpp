@@ -1,18 +1,16 @@
 #include "framework.h"
 #include "tr4_baddy.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "lara.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
-#include <Game/lot.h>
+#include "control/lot.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
 
 /*
 ID_BADDY_1

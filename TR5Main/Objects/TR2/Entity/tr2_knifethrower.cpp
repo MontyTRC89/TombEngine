@@ -2,7 +2,7 @@
 #include "tr2_knifethrower.h"
 #include "items.h"
 #include "effects\effects.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"

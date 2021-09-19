@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "switch.h"
 #include "items.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "objects.h"
 #include "Lara.h"
 #ifdef NEW_INV

@@ -12,7 +12,7 @@
 #include "animation.h"
 #include "pickup.h"
 #include "collide.h"
-#include "item.h"
+#include "items.h"
 #include "camera.h"
 
 /*generic functions*/

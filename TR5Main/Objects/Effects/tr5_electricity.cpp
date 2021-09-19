@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_electricity.h"
 #include "effects\effects.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "setup.h"
 #include "animation.h"

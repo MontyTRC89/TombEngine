@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "level.h"
 #include "input.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
 #include "camera.h"
 

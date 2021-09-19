@@ -3,7 +3,7 @@
 #include "level.h"
 #include "savegame.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "objects.h"
 #include <lara_struct.h>
 #include <tuple>

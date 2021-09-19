@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_littlebeetle.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific\trmath.h"
 #include "lara.h"
 #include "setup.h"

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_chef.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "sphere.h"
 #include "effects\debris.h"
 #include "effects\effects.h"

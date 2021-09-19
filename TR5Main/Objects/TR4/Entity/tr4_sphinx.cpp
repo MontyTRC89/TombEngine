@@ -2,7 +2,7 @@
 #include "tr4_sphinx.h"
 #include "effects\debris.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "setup.h"
 #include "level.h"

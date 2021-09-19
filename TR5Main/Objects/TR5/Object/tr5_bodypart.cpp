@@ -4,7 +4,7 @@
 #include "Specific\trmath.h"
 #include "Sound\sound.h"
 #include "tr5_missile.h"
-#include "control.h"
+#include "control/control.h"
 #include "items.h"
 void ControlBodyPart(short fxNumber)
 {

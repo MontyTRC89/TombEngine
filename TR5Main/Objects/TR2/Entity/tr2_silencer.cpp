@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr2_silencer.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "itemdata/creature_info.h"
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 

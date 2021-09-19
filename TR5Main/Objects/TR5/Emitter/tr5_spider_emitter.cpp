@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_spider_emitter.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "flipeffect.h"
 #include "setup.h"
 #include "effects\effects.h"

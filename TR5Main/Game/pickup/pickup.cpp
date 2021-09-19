@@ -8,7 +8,7 @@
 #else
 #include "inventory.h"
 #endif
-#include "control/flipmap.h"
+#include "room.h"
 #include "effects/debris.h"
 #include "health.h"
 #include "items.h"

@@ -11,7 +11,7 @@
 #include "animation.h"
 #include "effects\flmtorch.h"
 #include "level.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "setup.h"
 #include "input.h"
 #include "Sound\sound.h"

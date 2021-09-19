@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "volume.h"
 #include "room.h"
 #include "setup.h"
 #include "lara.h"

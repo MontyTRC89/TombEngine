@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_sentrygun.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "items.h"
 #ifdef NEW_INV
@@ -9,7 +9,7 @@
 #include "inventory.h"
 #endif
 #include "level.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "effects/tomb4fx.h"
 #include "people.h"
 #include "Sound/sound.h"

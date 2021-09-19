@@ -2,7 +2,7 @@
 #ifdef NEW_INV
 #include "newinv2.h"
 #include "animation.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
 #include "Sound\sound.h"

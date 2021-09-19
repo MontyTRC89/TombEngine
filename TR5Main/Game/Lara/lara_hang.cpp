@@ -2,10 +2,11 @@
 #include "lara.h"
 #include "input.h"
 #include "lara_tests.h"
-#include "item.h"
+#include "items.h"
 #include "collide.h"
 #include "camera.h"
 #include "level.h"
+
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
 /*normal hanging and shimmying*/

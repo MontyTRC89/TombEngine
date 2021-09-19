@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "flipeffect.h"
 #include "Lara.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "effects\hair.h"
 #include "animation.h"
 #include "sphere.h"

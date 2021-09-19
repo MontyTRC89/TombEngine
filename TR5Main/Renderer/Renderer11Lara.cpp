@@ -3,7 +3,7 @@
 #include "animation.h"
 #include "effects\hair.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "spotcam.h"
 #include "camera.h"
 #include "sphere.h"

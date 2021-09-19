@@ -6,7 +6,7 @@
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "switch.h"
-#include "control/flipmap.h"
+#include "room.h"
 #include "pickup.h"
 #include "camera.h"
 #include "objects.h"

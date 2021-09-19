@@ -9,7 +9,7 @@
 #include "objectslist.h"
 #include "Specific/trmath.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 namespace TEN::Entities::TR4

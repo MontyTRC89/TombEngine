@@ -24,16 +24,10 @@
     <ClInclude Include="Game\collide.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\control.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\gameflow.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\items.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\lot.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\misc.h">
@@ -145,9 +139,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\level.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\box.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Entity\tr4_wraith.h">
@@ -1026,9 +1017,6 @@
     <ClInclude Include="Objects\Generic\Doors\steel_door.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\item.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\roomvector.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1167,9 +1155,6 @@
     <ClInclude Include="Game\control\los.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\control\flipmap.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\animation.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1182,27 +1167,27 @@
     <ClInclude Include="Specific\clock.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\control\lot.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\control\box.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\control\control.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game\box.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\camera.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\collide.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\control.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\gameflow.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\items.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\lot.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\missile.cpp">
@@ -2114,9 +2099,6 @@
     <ClCompile Include="Game\control\los.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\control\filpmap.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\animation.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -2124,6 +2106,15 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\clock.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\control\lot.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\control\box.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\control\control.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

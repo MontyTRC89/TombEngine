@@ -1,6 +1,6 @@
 #pragma once
 
-#include "box.h"
+#include "control/box.h"
 
 constexpr auto MAX_VISIBILITY_DISTANCE = WALL_SIZE * 8;
 

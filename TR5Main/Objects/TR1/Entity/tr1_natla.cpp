@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr1_natla.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "items.h"
 #include "missile.h"
