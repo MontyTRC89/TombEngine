@@ -535,7 +535,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	COLL_INFO c1;
 	COLL_INFO c2;
 	memcpy(&c1, coll, sizeof(COLL_INFO));
-	memcpy(&c2, coll, sizeof(COLL_INFO) - 2);
+	memcpy(&c2, coll, sizeof(COLL_INFO));
 
 	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0), height);
 	
@@ -648,18 +648,6 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (flag == 2)
 			return;
-	}
-	else if (item->fallspeed > 100)
-	{
-	/*	if (LaraDrawType == 5)
-		{
-			SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) << 8) | 6);
-		}
-
-		if (Lara.anxiety < 96)
-		{
-			Lara.anxiety += 16;
-		}*/
 	}
 
 	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
