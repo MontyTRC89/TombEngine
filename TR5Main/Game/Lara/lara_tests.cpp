@@ -366,7 +366,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	bool result = false;
 
@@ -854,7 +854,7 @@ int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CT_FRONT || coll->HitStatic)
 		return 0;

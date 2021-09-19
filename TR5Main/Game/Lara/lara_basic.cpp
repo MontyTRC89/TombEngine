@@ -29,7 +29,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 }
 
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
@@ -133,7 +133,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = 1;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -310,7 +310,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -480,7 +480,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 				coll->Setup.Radius = LARA_RAD + 2;
 				coll->Setup.ForwardAngle = Lara.moveAngle;
 
-				GetCollisionInfo(coll, item, LARA_HEIGHT);
+				GetCollisionInfo(coll, item);
 				if (TestLaraVault(item, coll))
 					return;
 
@@ -539,7 +539,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -618,7 +618,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
@@ -697,7 +697,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll))
 	{
@@ -786,7 +786,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 #if 1
 	if (coll->Middle.Floor > 100)
@@ -903,7 +903,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD_DEATH;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
 
 	item->hitPoints = -1;
@@ -933,7 +933,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraSlideEdgeJump(item, coll);
 
 	if (coll->Middle.Floor <= 0)
@@ -983,7 +983,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	short angle;
 	bool result = false;
@@ -1030,7 +1030,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		LaraSlideEdgeJump(item, coll);
 		coll->Setup.ForwardAngle = Lara.moveAngle;
-		GetCollisionInfo(coll, item, LARA_HEIGHT);
+		GetCollisionInfo(coll, item);
 		ShiftItem(item, coll);
 
 		if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
@@ -1136,7 +1136,7 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
 
 	if (coll->Middle.Floor >= -256 && coll->Middle.Floor <= 256)
@@ -1194,7 +1194,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraFallen(item, coll))
 	{
@@ -1268,7 +1268,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1390,7 +1390,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll))
 	{
@@ -1459,7 +1459,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1560,7 +1560,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
@@ -1600,12 +1600,13 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
+	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightUp = NO_BAD_POS;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT_STRETCH);
+	GetCollisionInfo(coll, item);
 
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
 	{
@@ -1755,7 +1756,7 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
@@ -1789,7 +1790,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -1833,7 +1834,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
@@ -1869,7 +1870,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
@@ -2021,7 +2022,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (LaraHitCeiling(item, coll))
 		return;
@@ -2141,7 +2142,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -2217,7 +2218,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item, LARA_HEIGHT);
+	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (!LaraFallen(item, coll))

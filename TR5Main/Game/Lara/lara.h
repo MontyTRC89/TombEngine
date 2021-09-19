@@ -15,6 +15,7 @@ constexpr auto LARA_HEIGHT = 762;		  // The size of Lara (from the floor to the 
 constexpr auto LARA_HEIGHT_CRAWL = 400;   // Size of Lara in crawl state
 constexpr auto LARA_HEIGHT_MONKEY = 600;  // Size of Lara in monkey state
 constexpr auto LARA_HEIGHT_STRETCH = 870; // Size of Lara in jump-up or ledge hanging state
+constexpr auto LARA_HEIGHT_SURFACE = 800; // Size of Lara when surfacing water
 constexpr auto LARA_HEADROOM = 160;       // Amount of reasonable space above Lara's head
 constexpr auto LARA_RAD = 100;
 constexpr auto LARA_RAD_CRAWL = 200;
