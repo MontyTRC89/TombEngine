@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
         //v6 = 1321528399i64 * ((height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) << 12);
         //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
 
-        item->itemFlags[3] = (height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) * 1024 * 12 / 13;
+        item->itemFlags[3] = (short)((height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) * 1024 * 12 / 13);
     }
 
     void JobySpikesControl(short itemNumber)
@@ -34,13 +34,13 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        ANIM_FRAME* framePtr;
+        ANIM_FRAME* framePtr[2];
         int rate;
 
         SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
-        GetFrame_D2(LaraItem, &framePtr, &rate);
+        GetFrame_D2(LaraItem, framePtr, &rate);
 
-        int dy = LaraItem->pos.yPos + framePtr->boundingBox.Y1;
+        int dy = LaraItem->pos.yPos + framePtr[0]->boundingBox.Y1;
         int dl = 3328 * item->itemFlags[1] / 4096;
 
         if (LaraItem->hitPoints > 0)
