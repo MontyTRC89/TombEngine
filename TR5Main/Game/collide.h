@@ -52,6 +52,9 @@ struct COLL_RESULT
 	FLOOR_INFO* BottomBlock;
 
 	COLL_POSITION Position;
+
+	int TiltX;
+	int TiltZ;
 };
 
 struct COLL_SETUP
