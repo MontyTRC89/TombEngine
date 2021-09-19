@@ -6,7 +6,7 @@
 #include "animation.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
-#include "control.h"
+#include "control/control.h"
 #include "control\los.h"
 
 using namespace TEN::Floordata;

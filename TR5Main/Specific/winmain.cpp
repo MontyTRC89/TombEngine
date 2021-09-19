@@ -5,7 +5,7 @@
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "control.h"
+#include "control/control.h"
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"

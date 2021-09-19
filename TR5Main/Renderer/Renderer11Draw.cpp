@@ -16,7 +16,7 @@
 #include "effects\tomb4fx.h"
 #include "level.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"

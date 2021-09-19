@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_plough.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 void PloughControl(short itemNum)

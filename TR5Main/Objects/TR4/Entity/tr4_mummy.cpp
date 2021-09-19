@@ -2,14 +2,14 @@
 #include "tr4_mummy.h"
 #include "items.h"
 #include "lara.h"
-#include "box.h"
+#include "control/box.h"
 #include "lara.h"
 #include "effects\effects.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 
 enum MUMMY_STATES {
 	STATE_MUMMY_ARMS_CROSSED = 0,

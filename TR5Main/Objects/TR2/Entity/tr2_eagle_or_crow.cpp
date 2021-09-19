@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr2_eagle_or_crow.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "lara.h"
 #include "items.h"

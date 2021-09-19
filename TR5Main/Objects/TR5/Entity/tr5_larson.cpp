@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr5_larson.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "people.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 #define STATE_TR5_LARSON_STOP		1

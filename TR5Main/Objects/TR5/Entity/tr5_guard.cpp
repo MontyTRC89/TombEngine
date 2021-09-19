@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_guard.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"

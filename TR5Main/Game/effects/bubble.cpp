@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "effects\bubble.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific\trmath.h"
 #include "objectslist.h"
 #include "setup.h"

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "turn_switch.h"
-#include "control.h"
+#include "control/control.h"
 #include "input.h"
 #include "lara.h"
 #include "sound.h"

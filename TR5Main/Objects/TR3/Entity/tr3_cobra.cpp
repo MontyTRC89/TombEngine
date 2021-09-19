@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr3_cobra.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "items.h"
 #include "lara.h"

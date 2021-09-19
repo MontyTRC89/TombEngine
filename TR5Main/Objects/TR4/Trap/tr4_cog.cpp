@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_cog.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound/sound.h"
 #include "collide.h"
 #include "effects/effects.h"

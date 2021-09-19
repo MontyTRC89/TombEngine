@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_teethspike.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 #include "lara.h"
 #include "level.h"

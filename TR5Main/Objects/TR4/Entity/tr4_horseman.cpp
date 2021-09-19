@@ -4,12 +4,12 @@
 #include "effects/effects.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific/trmath.h"
 #include "lara.h"
 #include "Sound/sound.h"
 #include "sphere.h"
-#include "box.h"
+#include "control/box.h"
 #include "animation.h"
 
 namespace TEN::Entities::TR4

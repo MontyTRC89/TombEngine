@@ -2,7 +2,7 @@
 #include "tr5_cyborg.h"
 #include "items.h"
 #include "sphere.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "people.h"
 #include "animation.h"

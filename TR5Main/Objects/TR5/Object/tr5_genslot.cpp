@@ -2,7 +2,7 @@
 #include "tr5_genslot.h"
 #include "items.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "effects\effects.h"
 #include "sphere.h"
 #include "animation.h"

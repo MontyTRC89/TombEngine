@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "tr4_harpy.h"
 #include "people.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "items.h"
 #include "sphere.h"
 #include "animation.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };

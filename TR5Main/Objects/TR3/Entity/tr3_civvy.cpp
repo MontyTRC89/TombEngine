@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr3_civvy.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "people.h"
 #include "setup.h"

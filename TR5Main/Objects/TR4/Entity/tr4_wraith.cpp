@@ -2,7 +2,7 @@
 #include "tr4_wraith.h"
 #include "level.h"
 #include "effects/effects.h"
-#include "control/flipmap.h"
+#include "room.h"
 #include "flipeffect.h"
 #include "objectslist.h"
 #include "Specific/trmath.h"

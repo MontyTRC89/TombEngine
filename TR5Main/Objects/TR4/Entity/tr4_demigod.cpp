@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_demigod.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "sphere.h"
 #include "effects\effects.h"
@@ -11,7 +11,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "itemdata/creature_info.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];

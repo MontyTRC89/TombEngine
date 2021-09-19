@@ -5,7 +5,7 @@
 #include "animation.h"
 #include "effects/effects.h"
 #include "collide.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara_collide.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/

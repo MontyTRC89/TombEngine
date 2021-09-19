@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "animation.h"
 #include "effects\groundfx.h"

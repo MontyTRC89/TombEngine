@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "animation.h"
 #include "tr2_spear_guardian.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "items.h"
 #include "setup.h"

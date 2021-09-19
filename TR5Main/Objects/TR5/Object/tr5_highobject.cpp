@@ -2,7 +2,7 @@
 #include "tr5_highobject.h"
 #include "items.h"
 #include "level.h"
-#include "control/flipmap.h"
+#include "room.h"
 #include "Sound/sound.h"
 #include "objectslist.h"
 

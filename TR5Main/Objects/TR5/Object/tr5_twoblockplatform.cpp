@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_twoblockplatform.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "items.h"
 #include "lara.h"
 #include "Sound\sound.h"

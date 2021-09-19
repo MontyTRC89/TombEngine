@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "items.h"
 #include "floordata.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
 #include "effects/effects.h"
 #include "Sound/sound.h"

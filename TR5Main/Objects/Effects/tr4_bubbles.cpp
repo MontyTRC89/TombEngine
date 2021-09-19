@@ -8,7 +8,7 @@
 #include "effects\effects.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "tr4_mutant.h"
 #include "collide.h"
 

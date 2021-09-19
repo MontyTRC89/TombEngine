@@ -2,7 +2,7 @@
 #include "tr4_senet.h"
 #include "Sound\sound.h"
 #include "items.h"
-#include "control.h"
+#include "control/control.h"
 #include "setup.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"

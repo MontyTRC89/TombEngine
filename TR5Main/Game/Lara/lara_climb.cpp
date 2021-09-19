@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "lara_climb.h"
 #include "Lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 #include "sphere.h"
 #include "camera.h"

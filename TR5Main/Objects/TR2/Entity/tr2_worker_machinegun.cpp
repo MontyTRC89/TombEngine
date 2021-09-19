@@ -2,11 +2,11 @@
 #include "tr2_worker_machinegun.h"
 #include "animation.h"
 #include "people.h"
-#include "box.h"
+#include "control/box.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "itemdata/creature_info.h"
 
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };

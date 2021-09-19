@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "motorbike.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "effects/effects.h"
 #include "lara.h"
 #ifdef NEW_INV

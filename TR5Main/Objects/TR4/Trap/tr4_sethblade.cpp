@@ -2,7 +2,7 @@
 #include "tr4_sethblade.h"
 #include "level.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 
 void InitialiseSethBlade(short itemNum)

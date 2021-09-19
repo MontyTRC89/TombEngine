@@ -5,7 +5,7 @@
 #include "sphere.h"
 #include "effects\effects.h"
 #include "collide.h"
-#include "box.h"
+#include "control/box.h"
 #include "lara_flare.h"
 #include "animation.h"
 #include "effects\tomb4fx.h"

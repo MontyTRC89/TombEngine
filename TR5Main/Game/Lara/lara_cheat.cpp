@@ -6,10 +6,10 @@
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "effects\effects.h"
-#include "Sound\sound.h"
+#include "effects/effects.h"
+#include "Sound/sound.h"
 #include "collide.h"
-#include "item.h"
+#include "items.h"
 #include "setup.h"
 #include "level.h"
 

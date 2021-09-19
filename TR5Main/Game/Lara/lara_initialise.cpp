@@ -2,7 +2,6 @@
 #include "lara.h"
 #include "lara_initialise.h"
 #include "health.h"
-#include "item.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"

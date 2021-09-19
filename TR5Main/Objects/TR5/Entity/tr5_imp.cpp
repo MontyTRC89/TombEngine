@@ -6,11 +6,11 @@
 #include "animation.h"
 #include "effects\effects.h"
 #include "effects\flmtorch.h"
-#include "box.h"
+#include "control/box.h"
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

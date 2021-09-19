@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_knighttemplar.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects/effects.h"
 #include "effects/debris.h"
 #include "setup.h"

@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr5_reaper.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
-#include "control.h"
+#include "control/control.h"
 void InitialiseReaper(short itemNum)
 {
     ITEM_INFO* item;

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "spotcam.h"
 #include "camera.h"
-#include "control.h"
+#include "control/control.h"
 #include "animation.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"
