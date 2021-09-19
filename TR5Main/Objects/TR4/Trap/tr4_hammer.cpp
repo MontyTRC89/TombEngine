@@ -19,20 +19,20 @@ void HammerControl(short itemNumber)
 
     if (!TriggerActive(item))
     {
-        *item->itemFlags = 0;
+        *((int*)&item->itemFlags[0]) = 0;
     }
 
     int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
    
     if (!item->triggerFlags)
     {
-        *item->itemFlags = (frameNumber >= 52 ? 0 : 0xE0);
+        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0xE0);
         AnimateItem((int)item);
     }
     else if (item->currentAnimState != 1 || item->goalAnimState != 1)
     {
         item->goalAnimState = 1;
-        *item->itemFlags = (frameNumber >= 52 ? 0 : 0x7E0);
+        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0x7E0);
 
         if (frameNumber == 8)
         {

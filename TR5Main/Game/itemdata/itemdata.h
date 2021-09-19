@@ -49,7 +49,7 @@ class ITEM_DATA {
 		BIGGUNINFO,
 		MOTORBIKE_INFO,
 		JEEP_INFO,
-		LaraInfo,
+		LaraInfo*,
 		KAYAK_INFO,
 		DOOR_DATA,
 		SKIDOO_INFO,
@@ -87,13 +87,13 @@ class ITEM_DATA {
 		}
 		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
 	}
-
+	/* Uncommented, we want to store pointers to global data, too (LaraInfo for example)
 	template<typename T>
 	ITEM_DATA& operator=(T* newData) {
 		data = *newData;
 		return *this;
 	}
-
+	*/
 	ITEM_DATA& operator=(std::nullptr_t null) {
 		data = nullptr;
 		return *this;
