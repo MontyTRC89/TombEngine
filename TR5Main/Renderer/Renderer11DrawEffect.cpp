@@ -657,26 +657,10 @@ namespace TEN::Renderer {
 
 	void Renderer11::drawSprites(RenderView& view)
 	{
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
-		for (int i = 0; i < numSpritesToDraw; i++) {
+		for (auto& spr : view.spritesToDraw) {
 			Matrix billboardMatrix;
-			RendererSpriteToDraw& spr = view.spritesToDraw[i];
 			if(spr.BlendMode != currentBlendMode)
 			{
 				currentBlendMode = spr.BlendMode;
@@ -687,10 +671,25 @@ namespace TEN::Renderer {
 			m_context->PSSetSamplers(0, 1, &sampler);
 			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				Matrix billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
@@ -698,7 +697,22 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-				//Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
 				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
@@ -714,6 +728,21 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				Matrix translation = Matrix::CreateTranslation(spr.pos);
 				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
 
@@ -725,7 +754,21 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			}else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
-				m_primitiveBatch->Begin();
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				Vector3 p0t = spr.vtx1;
 				Vector3 p1t = spr.vtx2;
 				Vector3 p2t = spr.vtx3;
@@ -766,14 +809,15 @@ namespace TEN::Renderer {
 				m_stSprite.isBillboard = false;
 				m_cbSprite.updateData(m_stSprite, m_context.Get());
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-
+				m_primitiveBatch->Begin();
+				m_primitiveBatch->DrawTriangle(v0, v1, v3);
+				m_primitiveBatch->DrawTriangle(v1, v2, v3);
 				m_primitiveBatch->End();
 			}
 			m_numDrawCalls++;
 		}
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		//m_context->RSSetState(m_states->CullCounterClockwise());
+		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	}
 

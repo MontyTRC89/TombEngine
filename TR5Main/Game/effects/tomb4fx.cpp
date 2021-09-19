@@ -1626,7 +1626,7 @@ void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b
 	spark->flags = SP_DEF | SP_SCALE;
 	spark->scalar = 3;
 	spark->maxYvel = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
+	spark->def = Objects[ID_MISC_SPRITES].meshIndex;
 	spark->gravity = 0;
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
