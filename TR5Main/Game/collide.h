@@ -52,9 +52,6 @@ struct COLL_RESULT
 	FLOOR_INFO* BottomBlock;
 
 	COLL_POSITION Position;
-
-	int TiltX;
-	int TiltZ;
 };
 
 struct COLL_SETUP
@@ -135,8 +132,8 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 bool MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight);
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight);
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight, bool resetRoom = false);
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight, bool resetRoom = false);
 void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight);
 void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);

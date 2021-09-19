@@ -1245,24 +1245,13 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight, bool resetRoom)
 {
-	GetCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+	GetCollisionInfo(coll, item, PHD_VECTOR(), objectHeight, resetRoom);
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight, bool resetRoom)
 {
-	int resetRoom;
-	if (objectHeight >= 0)
-	{
-		resetRoom = 0;
-	}
-	else
-	{
-		objectHeight = -objectHeight;
-		resetRoom = 1;
-	}
-
 	coll->CollisionType = CT_NONE;
 	coll->Shift.x  = 0;
 	coll->Shift.y  = 0;
@@ -1668,17 +1657,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
 
 void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
 {
-	int resetRoom;
-	if (objectHeight >= 0)
-	{
-		resetRoom = 0;
-	}
-	else
-	{
-		objectHeight = -objectHeight;
-		resetRoom = 1;
-	}
-
 	coll->CollisionType = CT_NONE;
 	coll->Shift.x = 0;
 	coll->Shift.y = 0;
@@ -1761,9 +1739,6 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 
 	x = xfront + xPos;
 	z = zfront + zPos;
-
-	if (resetRoom)
-		topRoomNumber = item->roomNumber;
 
 	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
