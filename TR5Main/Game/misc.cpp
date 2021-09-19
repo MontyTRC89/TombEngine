@@ -5,17 +5,8 @@
 #include "lara.h"
 #include "animation.h"
 #include "itemdata/creature_info.h"
+
 using std::vector;
-short GF(short animIndex, short frameToStart)
-{
-	return g_Level.Anims[animIndex].frameBase + frameToStart;
-}
-
-short GF2(short objectID, short animIndex, short frameToStart)
-{
-	return g_Level.Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
-}
-
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
 {
     return (CREATURE_INFO*)item->data;
