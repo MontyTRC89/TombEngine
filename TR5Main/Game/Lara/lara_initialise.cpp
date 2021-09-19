@@ -13,7 +13,7 @@ void InitialiseLara(int restore)
 
 	short itemNumber = Lara.itemNumber;
 
-	//LaraItem->data = &Lara;
+	LaraItem->data = &Lara;
 	LaraItem->collidable = false;
 	LaraItem->location.roomNumber = LaraItem->roomNumber;
 	LaraItem->location.yNumber = LaraItem->pos.yPos;

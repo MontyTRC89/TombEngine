@@ -47,12 +47,14 @@ enum BOAT_STATE
 
 void DrawRubberBoat(ITEM_INFO *item)
 {
+	/* TODO: WTF?
 	RUBBER_BOAT_INFO *b;
 
 	b = item->data;
 	item->data = &b->propRot;
 	DrawAnimatingItem(item);
 	item->data = b;
+	*/
 }
 
 int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
