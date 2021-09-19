@@ -2,10 +2,11 @@
 #include "tr5_raisingblock.h"
 #include "items.h"
 #include "level.h"
+#include "animation.h"
 #include "control.h"
 #include "box.h"
 #include "objectslist.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "camera.h"
 
 void InitialiseRaisingBlock(short itemNumber)

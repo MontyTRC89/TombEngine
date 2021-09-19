@@ -1,20 +1,20 @@
 #include "framework.h"
 #include "collide.h"
 #include "input.h"
+#include "level.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
 #include "inventory.h"
 #endif
-#include "switch.h"
 #include "pickup.h"
 #include "animation.h"
 #include "control.h"
 #include "puzzles_keys.h"
 #include "generic_switch.h"
 #include "camera.h"
-#include "control.h"
+
 using namespace TEN::Entities::Switches;
 
 enum PuzzleType {

@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "animation.h"
 #include "level.h"
 #include "setup.h"
 #include "animation.h"

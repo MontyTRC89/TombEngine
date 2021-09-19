@@ -2,9 +2,10 @@
 #include "tr5_crowdove_switch.h"
 #include "control.h"
 #include "input.h"
+#include "level.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "animation.h"
 
 using namespace TEN::Entities::Switches;
