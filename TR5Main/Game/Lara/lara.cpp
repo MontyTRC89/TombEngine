@@ -848,6 +848,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -971,6 +972,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
+	coll->Setup.Height = LARA_HEIGHT;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1083,6 +1085,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 
 	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = -LARA_HEIGHT_SURFACE; // Negative because most of her body is underwater
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();

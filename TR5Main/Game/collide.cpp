@@ -236,14 +236,25 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	// Draw static bounds
 	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-	// Calculate item coll bounds according to radius
+	// Calculate horizontal item coll bounds according to radius
 	BOUNDING_BOX collBox;
 	collBox.X1 = -coll->Setup.Radius;
 	collBox.X2 =  coll->Setup.Radius;
 	collBox.Z1 = -coll->Setup.Radius;
 	collBox.Z2 =  coll->Setup.Radius;
-	collBox.Y1 = itemBBox->Y1;
-	collBox.Y2 = itemBBox->Y2;
+
+	// Calculate vertical item coll bounds according to either height (land mode) or precise bounds (water mode).
+	// Water mode needs special processing because height calc in original engines is inconsistent in such cases.
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	{
+		collBox.Y1 = itemBBox->Y1;
+		collBox.Y2 = itemBBox->Y2;
+	}
+	else
+	{
+		collBox.Y1 = -coll->Setup.Height;
+		collBox.Y2 = 0;
+	}
 
 	// Get and test DX item coll bounds
 	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos), &collBox);
@@ -265,8 +276,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 
 	// Determine collision box vertical dimensions
 	auto height = collBox.Y2 - collBox.Y1;
-	auto halfHeight = height / 2;
-	auto center = item->pos.yPos - halfHeight;
+	auto center = item->pos.yPos - height / 2;
 
 	// Do a series of angular tests with 90 degree steps to determine top/bottom collision.
 
@@ -307,7 +317,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	{
 		auto bottom = closestPlane >= 2;
 		auto yPoint = abs((closestRay.direction * minDistance).y);
-		auto distanceToVerticalPlane = halfHeight - yPoint;
+		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby
 		if (intersects && minDistance < height)
@@ -359,12 +369,12 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	auto ZMax = pos.zPos + box.Z2;
 
 	// Determine item collision bounds
-	auto inXMin = x - coll->Setup.Radius;
-	auto inXMax = x + coll->Setup.Radius;
-	auto inYMin = y - height;
-	auto inYMax = y;
-	auto inZMin = z - coll->Setup.Radius;
-	auto inZMax = z + coll->Setup.Radius;
+	auto inXMin = x + collBox.X1;
+	auto inXMax = x + collBox.X2;
+	auto inYMin = y + collBox.Y1;
+	auto inYMax = y + collBox.Y2;
+	auto inZMin = z + collBox.Z1;
+	auto inZMax = z + collBox.Z2;
 
 	// Don't calculate shifts if not in bounds
 	if (inXMax <= XMin || inXMin >= XMax ||
@@ -684,11 +694,11 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	coll->Setup.ForwardAngle = phd_atan(item->pos.zPos - coll->Setup.OldPosition.z, item->pos.xPos - coll->Setup.OldPosition.x);
 	if (item == LaraItem)
 	{
-		GetCollisionInfo(coll, item, LARA_HEIGHT);
+		GetCollisionInfo(coll, item);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, item, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, item);
 	}
 	coll->Setup.ForwardAngle = oldFacing;
 
@@ -812,11 +822,11 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 
 	if (item2 == LaraItem)
 	{
-		GetCollisionInfo(coll, item2, LARA_HEIGHT);
+		GetCollisionInfo(coll, item2);
 	}
 	else
 	{
-		GetObjectCollisionInfo(coll, item2, LARA_HEIGHT);
+		GetObjectCollisionInfo(coll, item2);
 	}
 
 	coll->Setup.ForwardAngle = facing;
@@ -1245,12 +1255,12 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight, bool resetRoom)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom)
 {
-	GetCollisionInfo(coll, item, PHD_VECTOR(), objectHeight, resetRoom);
+	GetCollisionInfo(coll, item, PHD_VECTOR(), resetRoom);
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight, bool resetRoom)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom)
 {
 	coll->CollisionType = CT_NONE;
 	coll->Shift.x  = 0;
@@ -1264,7 +1274,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 	int zPos = item->pos.zPos + offset.z;
 
 	int x = xPos;
-	int y = yPos - objectHeight;
+	int y = yPos - coll->Setup.Height;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 
@@ -1650,12 +1660,12 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int o
 }
 
 
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight)
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item)
 {
-	GetObjectCollisionInfo(coll, item, PHD_VECTOR(), objectHeight);
+	GetObjectCollisionInfo(coll, item, PHD_VECTOR());
 }
 
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight)
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 {
 	coll->CollisionType = CT_NONE;
 	coll->Shift.x = 0;
@@ -1669,7 +1679,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset,
 	int zPos = item->pos.zPos + offset.z;
 
 	int x = xPos;
-	int y = yPos - objectHeight;
+	int y = yPos - coll->Setup.Height;
 	int yTop = y - LARA_HEADROOM;
 	int z = zPos;
 

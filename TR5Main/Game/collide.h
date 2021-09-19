@@ -66,6 +66,7 @@ struct COLL_SETUP
 	bool EnableSpaz;        // Push is treated as hurt
 						    
 	int   Radius;           // Collision bounds horizontal size
+	int   Height;			// Collision bounds vertical size
 	short ForwardAngle;     // Forward angle direction
 	int   BadHeightUp;      // Borderline step-up height 
 	int   BadHeightDown;    // Borderline step-down height
@@ -135,10 +136,10 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 bool MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight, bool resetRoom = false);
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight, bool resetRoom = false);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, int objectHeight);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, int objectHeight);
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom = false);
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset);
+void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);

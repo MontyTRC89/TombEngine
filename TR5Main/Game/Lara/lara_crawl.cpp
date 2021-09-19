@@ -93,14 +93,14 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-
 	coll->Setup.SlopesAreWalls = true;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL);
+	GetCollisionInfo(coll, item);
 
 	if (LaraFallen(item, coll))
 	{
@@ -148,13 +148,17 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	/*state code: lara_as_crouch_roll*/
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
+
 	Lara.moveAngle = item->pos.yRot;
+
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL);
+
+	GetCollisionInfo(coll, item);
 
 	if (LaraFallen(item, coll))
 		Lara.gunStatus = LG_NO_ARMS;
@@ -360,17 +364,17 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->goalAnimState != LS_CRAWL_TO_HANG)
 	{
 		Lara.moveAngle = item->pos.yRot;
-		coll->Setup.ForwardAngle = Lara.moveAngle;
 
+		coll->Setup.ForwardAngle = Lara.moveAngle;
 		coll->Setup.Radius = LARA_RAD_CRAWL;
+		coll->Setup.Height = LARA_HEIGHT_CRAWL;
 		coll->Setup.BadHeightUp = STEP_SIZE - 1;
 		coll->Setup.BadHeightDown = -127;
 		coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
-
 		coll->Setup.SlopesAreWalls = true;
 		coll->Setup.SlopesArePits = true;
 
-		GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL);
+		GetCollisionInfo(coll, item);
 
 		if (LaraFallen(item, coll))
 		{
@@ -565,17 +569,15 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.Radius = LARA_RAD_CRAWL;
-
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightUp = STEP_SIZE - 1;
 	coll->Setup.BadHeightDown = -127;
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
-
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL, true);
+	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -647,7 +649,8 @@ void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 84 and 85*/
 	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	GetCollisionInfo(coll, item);
 
 	if (!TestLaraSlide(item, coll))
 	{
@@ -705,18 +708,19 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+
 	coll->Setup.Radius = LARA_RAD_CRAWL + 50; // TODO: Check if it still works without 50?
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightUp = STEP_SIZE - 1;
 	coll->Setup.BadHeightDown = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
-
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL, true);
+	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
@@ -778,13 +782,14 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadHeightUp = STEPUP_HEIGHT;
 	coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 
-	GetCollisionInfo(coll, item, LARA_HEIGHT_CRAWL);
+	GetCollisionInfo(coll, item);
 
 	if (LaraFallen(item, coll))
 	{
@@ -817,14 +822,15 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 512;
 		item->pos.yPos += 255;
 
+		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.BadHeightUp = NO_BAD_POS;
 		coll->Setup.BadHeightDown = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
-		Lara.moveAngle = item->pos.yRot;
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 
-		GetCollisionInfo(coll, item, LARA_HEIGHT_STRETCH);
+		Lara.moveAngle = item->pos.yRot;
+
+		GetCollisionInfo(coll, item);
 		edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
 		if (edgeCatch)

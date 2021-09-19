@@ -69,8 +69,9 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	Lara.currentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 
-	GetCollisionInfo(coll, LaraItem, PHD_VECTOR(0, 200, 0), 400);
+	GetCollisionInfo(coll, LaraItem, PHD_VECTOR(0, 200, 0));
 	
 	if (coll->CollisionType == CT_FRONT)
 	{
@@ -524,26 +525,27 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = item->pos.yRot;
 	}
 
-	short height = LARA_HEIGHT * phd_sin(item->pos.xRot);
+	int height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
 		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
 	
 	coll->Setup.BadHeightDown = -64;
+	coll->Setup.Height = height;
 	
 	COLL_INFO c1;
 	COLL_INFO c2;
 	memcpy(&c1, coll, sizeof(COLL_INFO));
 	memcpy(&c2, coll, sizeof(COLL_INFO));
 
-	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0), height);
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0));
 	
 	c1.Setup.ForwardAngle += ANGLE(45);
-	GetCollisionInfo(&c1, item, PHD_VECTOR(0, height / 2, 0), height);
+	GetCollisionInfo(&c1, item, PHD_VECTOR(0, height / 2, 0));
 	
 	c2.Setup.ForwardAngle -= ANGLE(45);
-	GetCollisionInfo(&c2, item, PHD_VECTOR(0, height / 2, 0), height);
+	GetCollisionInfo(&c2, item, PHD_VECTOR(0, height / 2, 0));
 	
 	ShiftItem(item, coll);
 	

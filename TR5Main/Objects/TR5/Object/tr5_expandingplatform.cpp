@@ -144,7 +144,7 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 			xShift = LaraCollision.Setup.Radius / 6;
 	}
 	auto coll = LaraCollision;
-	GetCollisionInfo(&coll, LaraItem, PHD_VECTOR(xShift, 0, zShift), LARA_HEIGHT);
+	GetCollisionInfo(&coll, LaraItem, PHD_VECTOR(xShift, 0, zShift));
 
 	if (coll.Middle.Ceiling >= 0 || coll.HitStatic)
 		return;
