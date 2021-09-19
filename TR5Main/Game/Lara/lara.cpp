@@ -1085,7 +1085,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = -LARA_HEIGHT_SURFACE; // Negative because most of her body is underwater
+	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
