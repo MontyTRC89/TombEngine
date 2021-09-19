@@ -124,7 +124,7 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	if (enemy == NULL || enemy->hitPoints <= 0 || !info->ahead || info->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return 0;
 
-	if (!enemy->data.is<CREATURE_INFO>() && !enemy->data.is<LaraInfo>())
+	if (!enemy->data.is<CREATURE_INFO>() && !enemy->data.is<LaraInfo*>())
 		return 0;
 
 	GAME_VECTOR start, target;
