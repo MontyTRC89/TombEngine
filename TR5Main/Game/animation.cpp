@@ -321,3 +321,13 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
 		pos->yRot += rot;
 	}
 }
+
+short GF(short animIndex, short frameToStart)
+{
+	return g_Level.Anims[animIndex].frameBase + frameToStart;
+}
+
+short GF2(short objectID, short animIndex, short frameToStart)
+{
+	return g_Level.Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
+}
