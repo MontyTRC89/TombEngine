@@ -2,8 +2,6 @@
 #include "items.h"
 #include "collide.h"
 
-
-
 void InitialiseSkidoo(short itemNum);
 void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);
 bool SkidooControl();
