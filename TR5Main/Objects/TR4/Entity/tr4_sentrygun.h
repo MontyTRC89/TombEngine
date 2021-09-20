@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseSentryGun(short itemNum);
-void SentryGunControl(short itemNum);
+namespace TEN::Entities::TR4
+{
+	void InitialiseSentryGun(short itemNum);
+	void SentryGunControl(short itemNum);
+}
