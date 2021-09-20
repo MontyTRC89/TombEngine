@@ -261,10 +261,10 @@ enum GAME_OBJECT_ID : short
 	ID_SPIKY_CEILING,
 	ID_TEETH_SPIKES,			// TR4 - TESTING
 	ID_JOBY_SPIKES,				// TR4 - TESTING
-	ID_SENTRY_GUN,				// TR4 - TESTING
-	ID_MAPPER,
-	ID_MOVING_BLADE,			// TR4 - TESTING
-	ID_ELEMENT_PUZZLE,
+	ID_SENTRY_GUN,				// TR4 - OK
+	ID_MAPPER,					// TR4 - TESTING
+	ID_MOVING_BLADE,			// TR4 - OK
+	ID_ELEMENT_PUZZLE,			// TR4 - TESTING
 	ID_LIGHTING_CONDUCTOR,		// LUA
 	ID_HAMMER,					// TR4 - Hardcoded setup, not decompiled for now
 	ID_OBELISK,					// TR4 - Hardcoded setup, not decompiled for now
@@ -273,7 +273,7 @@ enum GAME_OBJECT_ID : short
 	ID_GAME_PIECE2,				// TR4 - OK
 	ID_GAME_PIECE3,				// TR4 - OK
 	ID_RAISING_COG,
-	ID_MINE,					
+	ID_MINE,					// TR4 - TESTING	
 	ID_SCALES,					// TR4 - OK			
 	ID_ROME_HAMMER,
 	ID_FLAME,
