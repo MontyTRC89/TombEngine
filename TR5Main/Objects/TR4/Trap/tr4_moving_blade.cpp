@@ -8,17 +8,20 @@
 #include <sphere.h>
 #include <effects\effects.h>
 
-void MovingBladeControl(short itemNumber)
+namespace TEN::Entities::TR4
 {
-    ITEM_INFO* item = &g_Level.Items[itemNumber];
+    void MovingBladeControl(short itemNumber)
+    {
+        ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-    if (TriggerActive(item))
-    {
-        item->itemFlags[3] = 50;
-        AnimateItem(item);
-    }
-    else
-    {
-        item->frameNumber = g_Level.Anims[item->animNumber].frameBase; 
+        if (TriggerActive(item))
+        {
+            item->itemFlags[3] = 50;
+            AnimateItem(item);
+        }
+        else
+        {
+            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+        }
     }
 }

@@ -549,7 +549,7 @@
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TR5\Trap\tr5_teethspike.h">
+    <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h">
@@ -1643,7 +1643,7 @@
     <ClCompile Include="Objects\TR5\Object\tr5_missile.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR5\Trap\tr5_teethspike.cpp">
+    <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp">

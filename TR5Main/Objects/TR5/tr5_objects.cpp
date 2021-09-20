@@ -41,7 +41,6 @@
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
 /// traps
-#include "tr5_teethspike.h"
 #include "tr5_ventilator.h"
 #include "tr5_deathslide.h"
 #include "tr5_electricity.h"
@@ -1081,14 +1080,6 @@ static void StartTrap(OBJECT_INFO *obj)
 	{
 		obj->initialise = InitialiseVentilator;
 		obj->control = VentilatorControl;
-	}
-
-	obj = &Objects[ID_TEETH_SPIKES];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTeethSpikes;
-		obj->control = ControlTeethSpikes;
-		obj->saveFlags = 1;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
