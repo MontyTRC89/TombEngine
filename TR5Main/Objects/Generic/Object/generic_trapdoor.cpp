@@ -32,15 +32,14 @@ void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item;
-	int result, result2;
+	auto item = &g_Level.Items[itemNumber];
+	bool itemIsAbove = item->pos.yPos <= l->pos.yPos - LARA_HEIGHT + LARA_HEADROOM;
+	bool result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
+	l->pos.yRot += ANGLE(180);
+	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
+	l->pos.yRot += ANGLE(180);
 
-	item = &g_Level.Items[itemNumber];
-	result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
-	result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && itemIsAbove && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
