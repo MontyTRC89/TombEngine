@@ -75,7 +75,7 @@ void SethaControl(short itemNumber)
 	int height4 = GetFloorHeight(floor, x, y, z);
 
 	AI_INFO info;
-	short angle;
+	short angle = 0;
 
 	if (item->hitPoints <= 0)
 	{

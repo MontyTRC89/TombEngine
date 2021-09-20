@@ -126,7 +126,7 @@ void AddFootprint(ITEM_INFO* item)
 	switch (floor->Material)
 	{
 	case GroundMaterial::Concrete:
-		//fx = sound_effects::SFX_TR4_LARA_FEET;
+		fx = sound_effects::SFX_TR4_LARA_FEET;
 		break;
 
 	case GroundMaterial::Grass:
@@ -170,7 +170,7 @@ void AddFootprint(ITEM_INFO* item)
 		break;
 
 	case GroundMaterial::Stone:
-		//fx = sound_effects::SFX_TR4_LARA_FEET;
+		fx = sound_effects::SFX_TR4_LARA_FEET;
 		break;
 
 	case GroundMaterial::Water:
@@ -182,7 +182,9 @@ void AddFootprint(ITEM_INFO* item)
 		break;
 	}
 	
-	SoundEffect(fx, &item->pos, 0);
+	// HACK: must be here until reference wad2 is revised
+	if (fx != sound_effects::SFX_TR4_LARA_FEET)
+		SoundEffect(fx, &item->pos, 0);
 
 	FOOTPRINT_STRUCT footprint;
 
