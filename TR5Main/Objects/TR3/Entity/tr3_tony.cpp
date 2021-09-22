@@ -14,6 +14,9 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 enum TonyFlameType
 {
