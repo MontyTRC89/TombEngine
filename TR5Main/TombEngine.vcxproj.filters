@@ -94,7 +94,6 @@
     <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
-    <ClCompile Include="Objects\TR5\Emitter\tr5_dart_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_twoblockplatform.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_deathslide.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
@@ -316,6 +315,7 @@
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Game\effects\lara_burn.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -458,7 +458,6 @@
     <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h" />
-    <ClInclude Include="Objects\TR5\Emitter\tr5_dart_emitter.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_twoblockplatform.h" />
@@ -708,6 +707,7 @@
     <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Game\effects\lara_burn.h" />
+    <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
