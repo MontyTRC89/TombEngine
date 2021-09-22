@@ -30,7 +30,7 @@ namespace TEN::Entities::TR4
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0);
 			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 
 			if (num > 0)
 			{

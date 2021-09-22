@@ -762,7 +762,7 @@ void ControlGrenade(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
@@ -979,7 +979,7 @@ void ControlRocket(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
@@ -1495,7 +1495,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);

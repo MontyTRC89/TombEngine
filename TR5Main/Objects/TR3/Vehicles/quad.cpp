@@ -1321,9 +1321,9 @@ int QuadBikeControl(void)
 		quad->pitch = pitch;
 		if (quad->pitch < -0x8000)
 			quad->pitch = -0x8000;
-		else if (quad->pitch > 0xa000)
-			quad->pitch = 0xa000;
-		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, (PITCH_SHIFT + ((0x10000 + quad->pitch)) * 256));
+		else if (quad->pitch > 0xA000)
+			quad->pitch = 0xA000;
+		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, 0, 0.5f + (float)abs(quad->pitch) / (float)MAX_VELOCITY);
 	}
 	else
 	{
