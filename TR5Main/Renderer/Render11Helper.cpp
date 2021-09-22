@@ -110,7 +110,9 @@ namespace TEN::Renderer
 
 	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
-		RendererBone *Bones[32];
+		std::vector<int> boneIndexList;
+		
+		RendererBone *Bones[32] = {};
 		int nextBone = 0;
 
 		Matrix rotation;
@@ -179,29 +181,28 @@ namespace TEN::Renderer
 				else
 					transforms[bone->Index] = rotation * translation;
 
-
-				if (item && item->Item->data.is<MUTATOR_INFO>())
-				{
-					auto mute = (MUTATOR_INFO*)item->Item->data;
-					auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[bone->Index].Rotation.y, mute->Nodes[bone->Index].Rotation.x, mute->Nodes[bone->Index].Rotation.z);
-
-					Quaternion invertedQuat;
-					auto scale = Vector3{};
-					auto translation = Vector3{};
-					if (bone != obj.Skeleton)
-						transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					transforms[bone->Index] = transforms[bone->Index] * (m * Matrix::CreateFromQuaternion(invertedQuat));
-				}
-
 				if (bone != obj.Skeleton)
 
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
+			boneIndexList.push_back(bone->Index);
+
 			for (int i = 0; i < bone->Children.size(); i++)
 			{
 				// Push
 				Bones[nextBone++] = bone->Children[i];
+			}
+		}
+
+		// Apply mutations on top
+		if (item && item->Item->data.is<MUTATOR_INFO>())
+		{
+			auto mute = (MUTATOR_INFO*)item->Item->data;
+			for (int i = 0; i < boneIndexList.size(); i++)
+			{
+				auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[boneIndexList[i]].Rotation.y, mute->Nodes[boneIndexList[i]].Rotation.x, mute->Nodes[boneIndexList[i]].Rotation.z);
+				transforms[boneIndexList[i]] = m * transforms[boneIndexList[i]];
 			}
 		}
 	}
