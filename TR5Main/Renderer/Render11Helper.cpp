@@ -159,19 +159,6 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-				
-				if (item && item->Item->data.is<MUTATOR_INFO>())
-				{
-					auto mute = (MUTATOR_INFO*)item->Item->data;
-					auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[bone->Index].Rotation.y, mute->Nodes[bone->Index].Rotation.x, mute->Nodes[bone->Index].Rotation.z);
-
-					Quaternion invertedQuat;
-					auto scale = Vector3{};
-					auto translation = Vector3{};
-					if (bone!= obj.Skeleton)
-					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					rotation = rotation * m * Matrix::CreateFromQuaternion(invertedQuat);
-				}
 					
 
 				if (useObjectWorldRotation)
@@ -191,6 +178,20 @@ namespace TEN::Renderer
 					transforms[bone->Index] = rotation * bone->Transform;
 				else
 					transforms[bone->Index] = rotation * translation;
+
+
+				if (item && item->Item->data.is<MUTATOR_INFO>())
+				{
+					auto mute = (MUTATOR_INFO*)item->Item->data;
+					auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[bone->Index].Rotation.y, mute->Nodes[bone->Index].Rotation.x, mute->Nodes[bone->Index].Rotation.z);
+
+					Quaternion invertedQuat;
+					auto scale = Vector3{};
+					auto translation = Vector3{};
+					if (bone != obj.Skeleton)
+						transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
+					transforms[bone->Index] = transforms[bone->Index] * (m * Matrix::CreateFromQuaternion(invertedQuat));
+				}
 
 				if (bone != obj.Skeleton)
 
