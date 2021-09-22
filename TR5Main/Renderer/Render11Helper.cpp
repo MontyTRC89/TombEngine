@@ -120,10 +120,10 @@ namespace TEN::Renderer
 		// Push
 		Bones[nextBone++] = obj.Skeleton;
 
+		Vector3 accum = {};
+
 		while (nextBone != 0)
 		{
-			Vector3 accum = {};
-
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
 			if (!bone) return;//otherwise inventory crashes mm
@@ -159,6 +159,19 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+				
+				if (item && item->Item->data.is<MUTATOR_INFO>())
+				{
+					auto mute = (MUTATOR_INFO*)item->Item->data;
+					auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[bone->Index].Rotation.y, mute->Nodes[bone->Index].Rotation.x, mute->Nodes[bone->Index].Rotation.z);
+
+					Quaternion invertedQuat;
+					auto scale = Vector3{};
+					auto translation = Vector3{};
+					if (bone!= obj.Skeleton)
+					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
+					rotation = rotation * m * Matrix::CreateFromQuaternion(invertedQuat);
+				}
 					
 
 				if (useObjectWorldRotation)
@@ -317,18 +330,7 @@ namespace TEN::Renderer
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
 			for (int m = 0; m < itemToDraw->NumMeshes; m++)
-			{
-				if (item && itemToDraw->Item->data.is<MUTATOR_INFO>())
-				{
-					auto mute = (MUTATOR_INFO*)itemToDraw->Item->data;
-					auto mu = Matrix::CreateFromYawPitchRoll(mute->Nodes[m].Rotation.y, mute->Nodes[m].Rotation.x, mute->Nodes[m].Rotation.z);
-
-					//if (m > 0)
-					//	mu =  itemToDraw->AnimationTransforms[m - 1].Invert() * mu;
-
-					itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m] * mu;
-				}
-			}
+				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 		}
 
 		itemToDraw->DoneAnimations = true;
