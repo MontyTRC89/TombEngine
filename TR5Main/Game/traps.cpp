@@ -380,16 +380,6 @@ void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			item->flags |= 0x3E00;
 		}
 	}
-
-
-	auto mutator = (MUTATOR_INFO*)item->data;
-
-	for (int i = 0; i < mutator->Nodes.size(); i++)
-	{
-		mutator->Nodes[i].Rotation.x = RADIAN * GenerateFloat(5, 14);
-		mutator->Nodes[i].Rotation.y = RADIAN * GenerateFloat(5, 14);
-		mutator->Nodes[i].Rotation.z = RADIAN * GenerateFloat(5, 14);
-	}
 }
 
 void FallingBlockControl(short itemNumber)
@@ -404,8 +394,16 @@ void FallingBlockControl(short itemNumber)
 	{
 		if (item->itemFlags[0])
 		{
-			if (item->itemFlags[0] < 60)
+			if (item->itemFlags[0] < 160)
 			{
+				auto mutator = (MUTATOR_INFO*)item->data;
+
+				for (int i = 0; i < mutator->Nodes.size(); i++)
+				{
+					mutator->Nodes[i].Rotation.x = RADIAN * GenerateFloat(-5, 5);
+					mutator->Nodes[i].Rotation.y = RADIAN * GenerateFloat(-5, 5);
+					mutator->Nodes[i].Rotation.z = RADIAN * GenerateFloat(-5, 5);
+				}
 
 				if (item->itemFlags[0] < 52)
 				{
