@@ -6,7 +6,6 @@
 #include "effects/weather.h"
 #include "lara.h"
 #include "collide.h"
-#include "sphere.h"
 #include "camera.h"
 #include "tr5_light.h"
 #include "animation.h"
@@ -14,8 +13,10 @@
 #include "input.h"
 #include "room.h"
 #include "Sound/sound.h"
+#include "Specific/prng.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math::Random;
 
 static short WreckingBallData[2] = {0, 0};
 ITEM_INFO* WBItem;
@@ -352,6 +353,14 @@ void LavaBurn(ITEM_INFO* item)
 
 void InitialiseFallingBlock(short itemNumber)
 {
+	MUTATOR_INFO* mutator;
+
+	auto item = &g_Level.Items[itemNumber];
+	item->data = ITEM_DATA(MUTATOR_INFO());
+	
+	mutator = item->data;
+	mutator->Nodes.resize(Objects[item->objectNumber].nmeshes);
+
 	g_Level.Items[itemNumber].meshBits = 1;
 	TEN::Floordata::AddBridge(itemNumber);
 }
@@ -371,6 +380,16 @@ void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			item->flags |= 0x3E00;
 		}
 	}
+
+
+	auto mutator = (MUTATOR_INFO*)item->data;
+
+	for (int i = 0; i < mutator->Nodes.size(); i++)
+	{
+		mutator->Nodes[i].Rotation.x = RADIAN * GenerateFloat(5, 14);
+		mutator->Nodes[i].Rotation.y = RADIAN * GenerateFloat(5, 14);
+		mutator->Nodes[i].Rotation.z = RADIAN * GenerateFloat(5, 14);
+	}
 }
 
 void FallingBlockControl(short itemNumber)
@@ -387,10 +406,13 @@ void FallingBlockControl(short itemNumber)
 		{
 			if (item->itemFlags[0] < 60)
 			{
+
 				if (item->itemFlags[0] < 52)
 				{
 					if (!(GetRandomControl() % (62 - item->itemFlags[0])))
+					{
 						item->pos.yPos += (GetRandomControl() & 3) + 1;
+					}
 					item->itemFlags[0]++;
 				}
 				else
