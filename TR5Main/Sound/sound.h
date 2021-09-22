@@ -12,7 +12,6 @@ enum SFX_TYPES
 };
 
 #define SFX_ALWAYS 2
-#define PITCH_SHIFT	4
 
 #define SOUND_BASS_UNITS			 1.0f / 1024.0f	// TR->BASS distance unit coefficient
 #define SOUND_MAXVOL_RADIUS			 1024.0f			// Max. volume hearing distance
@@ -117,7 +116,7 @@ struct AudioTrack
 extern std::unordered_map<std::string, AudioTrack> SoundTracks;
 extern std::string CurrentLoopedSoundTrack;
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
+long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void Sound_FreeSamples();
@@ -150,3 +149,4 @@ float Sound_DistanceToListener(PHD_3DPOS *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
 bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force = false);
+bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain);

@@ -54,7 +54,7 @@ enum TONY_STATE
 
 static BOSS_STRUCT BossData;
 #define TONYBOSS_TURN ANGLE(2.0f)
-#define TONYBOSS_HITS 100
+#define TONYBOSS_HITS 1 //Tony Harder To Kill, was 100 (6 shotgun shots)
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 static void TriggerTonyEffect(const TONY_FLAME flame)
@@ -430,7 +430,7 @@ void ControlTonyFireBall(short fxNumber)
 			LaraItem->hitStatus = true;
 			KillEffect(fxNumber);
 			LaraItem->hitPoints -= 200;
-			LaraBurn();
+			//LaraBurn();
 			return;
 		}
 	}
@@ -496,8 +496,6 @@ static void ExplodeTonyBoss(ITEM_INFO* item)
 		TriggerExplosionSparks(x, y, z, 3, -2, 0, item->roomNumber);
 		for (int i = 0; i < 2; i++)
 			TriggerExplosionSparks(x, y, z, 3, -1, 0, item->roomNumber);
-
-		SoundEffect(SFX_TR3_BLAST_CIRCLE, &item->pos, PITCH_SHIFT | 0x800000);
 	}
 
 	if (BossData.DrawExplode)

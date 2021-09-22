@@ -984,7 +984,7 @@ bool SkidooControl()
 		skinfo->trackMesh = ((skinfo->trackMesh & 3) == 1) ? 2 : 1;
 
 		skinfo->pitch += (pitch - skinfo->pitch) / 4;
-		SoundEffect(SFX_TR2_SKIDOO_ACCELERATE, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) * 256));
+		SoundEffect(skinfo->pitch ? SFX_TR2_SKIDOO_MOVING : SFX_TR2_SKIDOO_ACCELERATE, &skidoo->pos, 0, 0.5f + skinfo->pitch / (float)SKIDOO_MAX_SPEED);
 	}
 	else
 	{
