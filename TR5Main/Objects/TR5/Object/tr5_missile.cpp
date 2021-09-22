@@ -15,6 +15,9 @@
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
 #include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 int DebrisFlags;
 

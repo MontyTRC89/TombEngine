@@ -18,7 +18,9 @@
 #include "smoke.h"
 #include "Specific\prng.h"
 #include "Renderer11.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;

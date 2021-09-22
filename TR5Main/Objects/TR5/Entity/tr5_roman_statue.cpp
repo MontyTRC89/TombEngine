@@ -14,6 +14,9 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
+#include <Game/effects/lightning.h>
+
+using namespace TEN::Effects::Lightning;
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2
@@ -34,7 +37,7 @@
 struct ROMAN_STATUE_STRUCT
 {
 	PHD_VECTOR pos;
-	ENERGY_ARC* energyArcs[8];
+	LIGHTNING_INFO* energyArcs[8];
 	int counter;
 };
 
@@ -364,7 +367,7 @@ void RomanStatueControl(short itemNumber)
 		short roomNumber;
 		PHD_3DPOS attackPos;
 		byte r, g, b;
-		ENERGY_ARC* arc;
+		LIGHTNING_INFO* arc;
 		short random;
 
 		switch (item->currentAnimState)
@@ -857,15 +860,15 @@ void RomanStatueControl(short itemNumber)
 					{
 						if (deltaFrame == 24)
 						{
-							TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
+							/*TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
 								(((GetRandomControl() & 0x3F) + 128) / 2), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
-								ENERGY_ARC_STRAIGHT_LINE);
+								ENERGY_ARC_STRAIGHT_LINE);*/
 						}
 					}
 					else
 					{
-						TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
-							ENERGY_ARC_STRAIGHT_LINE);
+						/*TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
+							ENERGY_ARC_STRAIGHT_LINE);*/
 
 						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
 							&pos1,

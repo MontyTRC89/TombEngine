@@ -46,6 +46,7 @@
 #include "Lara/lara_one_gun.h"
 #include "generic_switch.h"
 #include "Scripting/GameFlowScript.h"
+#include <Game/effects/lightning.h>
 
 using std::vector;
 using std::unordered_map;
@@ -410,8 +411,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		UpdateEnergyArcs();
-		UpdateLightning();
+		TEN::Effects::Lightning::UpdateLightning();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
