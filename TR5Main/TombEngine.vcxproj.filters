@@ -1176,6 +1176,9 @@
     <ClInclude Include="Game\control\control.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\itemdata\mutator_info.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\camera.cpp">

@@ -18,6 +18,7 @@
 #include "motorbike.h"
 #include <algorithm>
 #include "itemdata/creature_info.h"
+#include "itemdata/mutator_info.h"
 #include "quad_info.h"
 #include "jeep_info.h"
 #include "motorbike_info.h"
@@ -121,6 +122,8 @@ namespace TEN::Renderer
 
 		while (nextBone != 0)
 		{
+			Vector3 accum = {};
+
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
 			if (!bone) return;//otherwise inventory crashes mm
@@ -156,6 +159,8 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+					
+
 				if (useObjectWorldRotation)
 				{
 					Quaternion invertedQuat;
@@ -289,6 +294,18 @@ namespace TEN::Renderer
 					currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
 					lastJoint++;
 				}
+				},
+				[&j, &currentBone, &lastJoint](MUTATOR_INFO& mutator) {
+					
+					if (mutator.Nodes[lastJoint].Rotation.x != 0)
+					{
+						auto aaa = 1;
+					}
+					
+					//currentBone->ExtraRotation.x = mutator.Nodes[j].Rotation.x;
+					//currentBone->ExtraRotation.y = mutator.Nodes[j].Rotation.y;
+					//currentBone->ExtraRotation.z = mutator.Nodes[j].Rotation.z;
+					lastJoint++;
 				}
 				);
 			}
@@ -300,7 +317,18 @@ namespace TEN::Renderer
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
 			for (int m = 0; m < itemToDraw->NumMeshes; m++)
-				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+			{
+				if (item && itemToDraw->Item->data.is<MUTATOR_INFO>())
+				{
+					auto mute = (MUTATOR_INFO*)itemToDraw->Item->data;
+					auto mu = Matrix::CreateFromYawPitchRoll(mute->Nodes[m].Rotation.y, mute->Nodes[m].Rotation.x, mute->Nodes[m].Rotation.z);
+
+					//if (m > 0)
+					//	mu =  itemToDraw->AnimationTransforms[m - 1].Invert() * mu;
+
+					itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m] * mu;
+				}
+			}
 		}
 
 		itemToDraw->DoneAnimations = true;
