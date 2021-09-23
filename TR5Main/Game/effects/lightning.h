@@ -47,7 +47,7 @@ namespace TEN::Effects::Lightning
 	extern PHD_VECTOR LightningPos[6];
 	extern short LightningBuffer[1024];
 
-	extern vector<LIGHTNING_INFO> Lightning;
+	extern std::vector<LIGHTNING_INFO> Lightning;
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();

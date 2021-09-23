@@ -43,6 +43,7 @@ void InitialiseEffectsObjects()
 	obj = &Objects[ID_FLAME_EMITTER3];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseFlameEmitter3;
 		obj->control = FlameEmitter3Control;
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;

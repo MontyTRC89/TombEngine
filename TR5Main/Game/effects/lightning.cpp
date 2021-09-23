@@ -29,7 +29,7 @@ namespace TEN::Effects::Lightning
 	PHD_VECTOR LightningPos[6];
 	short LightningBuffer[1024];
 	
-	vector<LIGHTNING_INFO> Lightning;
+	std::vector<LIGHTNING_INFO> Lightning;
 
 	void InitialiseFloatSinCosTable()
 	{
@@ -57,6 +57,11 @@ namespace TEN::Effects::Lightning
 						arc->interpolation[j] = (signed char)(arc->interpolation[j] - (arc->interpolation[j] >> 4));
 						positions++;
 					}
+				}
+				else
+				{
+					//Lightning.erase(Lightning.begin() + i);
+					//i--;
 				}
 			}
 		}

@@ -56,7 +56,7 @@ struct ITEM_INFO
 	short timer;
 	uint16_t flags; // ItemFlags enum
 	short shade;
-	uint16_t triggerFlags;
+	short triggerFlags;
 	short carriedItem;
 	short afterDeath;
 	short firedWeapon;
