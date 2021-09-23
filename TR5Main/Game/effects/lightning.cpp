@@ -58,12 +58,15 @@ namespace TEN::Effects::Lightning
 						positions++;
 					}
 				}
-				else
-				{
-					//Lightning.erase(Lightning.begin() + i);
-					//i--;
-				}
 			}
+		}
+
+		if (Lightning.size() > 0)
+		{
+			Lightning.erase(
+				std::remove_if(Lightning.begin(), Lightning.end(),
+					[](const LIGHTNING_INFO& o) { return o.life == 0; }),
+				Lightning.end());
 		}
 	}
 
