@@ -20,24 +20,22 @@ using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::Effects
 {
-	byte Flame3xzoffs[16][2] =
-	{
-		{ 0x09, 0x09 },
-		{ 0x18, 0x09 },
-		{ 0x28, 0x09 },
-		{ 0x37, 0x09 },
-		{ 0x09, 0x18 },
-		{ 0x18, 0x18 },
-		{ 0x28, 0x18 },
-		{ 0x37, 0x18 },
-		{ 0x09, 0x28 },
-		{ 0x18, 0x28 },
-		{ 0x28, 0x28 },
-		{ 0x37, 0x28 },
-		{ 0x09, 0x37 },
-		{ 0x18, 0x37 },
-		{ 0x28, 0x37 },
-		{ 0x37, 0x37 }
+	byte Flame3xzoffs[16][2] = {{ 9, 9 },
+								{ 24, 9 },
+								{ 40, 9	},
+								{ 55, 9 },
+								{ 9, 24 },
+								{ 24, 24 },
+								{ 40, 24 },
+								{ 55, 24 },
+								{ 9, 40 },
+								{ 24, 40 },
+								{ 40, 40 },
+								{ 55, 40 },
+								{ 9, 55	 },
+								{ 24, 55 },
+								{ 40, 55 },
+								{ 55, 55 }
 	};
 
 	OBJECT_COLLISION_BOUNDS FireBounds = {
@@ -427,6 +425,27 @@ namespace TEN::Entities::Effects
 		}
 	}
 
+	void InitialiseFlameEmitter3(short itemNumber)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+		if (item->triggerFlags >= 3)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				ITEM_INFO* currentItem = &g_Level.Items[i];
+
+				if (currentItem->objectNumber == ID_ANIMATING3)
+				{
+					if (currentItem->triggerFlags == item->triggerFlags)
+						item->itemFlags[2] = i;
+					else if (currentItem->triggerFlags == 0)
+						item->itemFlags[3] = i;
+				}
+			}
+		}
+	}
+
 	void FlameEmitter3Control(short itemNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -575,14 +594,14 @@ namespace TEN::Entities::Effects
 
 				if (!(Wibble & 4))
 				{
-					i = 2 * (item->itemFlags[1] & 7);
+					i = item->itemFlags[1] & 7;
 					x = 16 * (Flame3xzoffs[i][0] - 32);
 					z = 16 * (Flame3xzoffs[i][1] - 32);
 					TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
 				}
 				else
 				{
-					i = 2 * (item->itemFlags[1] >> 3);
+					i = item->itemFlags[1] >> 3;
 					x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 					z = 16 * (Flame3xzoffs[i + 8][1] - 32);
 					TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
