@@ -92,7 +92,7 @@ void FallingBlockControl(short itemNumber)
 
 			item->itemFlags[0]++;
 
-			if (GetDistanceToFloor(itemNumber) > -STEP_SIZE / 2)
+			if (GetDistanceToFloor(itemNumber) >= 0)
 			{
 				// If crumbled before actual delay (e.g. too low position), force delay to be correct
 				if (item->itemFlags[0] < FALLINGBLOCK_DELAY)
@@ -103,7 +103,7 @@ void FallingBlockControl(short itemNumber)
 				ShatterItem.yRot = item->pos.yRot;
 				ShatterItem.meshp = meshpp;
 				ShatterItem.sphere.x = item->pos.xPos;
-				ShatterItem.sphere.y = item->pos.yPos;
+				ShatterItem.sphere.y = item->pos.yPos - STEP_SIZE; // So debris won't spawn below floor
 				ShatterItem.sphere.z = item->pos.zPos;
 				ShatterItem.bit = 0;
 				ShatterObject(&ShatterItem, nullptr, 0, item->roomNumber, false);
@@ -127,7 +127,7 @@ std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	int height = item->pos.yPos;
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
 	return std::optional{ height };
 }
 
@@ -138,18 +138,18 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	int height = item->pos.yPos + STEP_SIZE / 2;
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
 	return std::optional{ height };
 }
 
 int FallingBlockFloorBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos;
+	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
 }
 
 int FallingBlockCeilingBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return (item->pos.yPos + STEP_SIZE / 2);
+	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
 }
