@@ -3014,23 +3014,12 @@ namespace TEN::Renderer
             RendererRoom &const room = m_rooms[item->Item->roomNumber];
             RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
-            short objectNumber = item->Item->objectNumber;
-            if (moveableObj.DoNotDraw)
-            {
-                continue;
-            }
-            else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2 
-                || objectNumber == ID_JOBY_SPIKES)
-            {
-                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
-                drawScaledSpikes(view,item, transparent, animated);
-            }
-            else if (objectNumber == ID_EXPANDING_PLATFORM)
-            {
-                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
-                drawExpandingPlatform(view, item, transparent, animated);
-            }
-            else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+			if (moveableObj.DoNotDraw)
+				continue;
+            
+			short objectNumber = item->Item->objectNumber;
+
+            if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
             {
                 // We'll draw waterfalls later
                 continue;
@@ -3108,42 +3097,6 @@ namespace TEN::Renderer
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			}
         }
-
-    }
-
-    void Renderer11::drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated)
-    {
-        short objectNumber = item->Item->objectNumber;
-        if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
-        {
-            item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
-
-            // Override rotation matrix here 
-            // In original game was:
-            // phd_RotX(item->pos.x_rot);
-            // phd_RotZ(item->pos.z_rot);
-            // phd_RotY(item->pos.y_rot);
-
-            Matrix rotation = 
-                Matrix::CreateRotationY(TO_RAD(item->Item->pos.yRot)) *
-                Matrix::CreateRotationZ(TO_RAD(item->Item->pos.zRot)) *
-                Matrix::CreateRotationX(TO_RAD(item->Item->pos.xRot));
-
-            item->World = item->Scale * rotation * item->Translation;
-
-            return drawAnimatingItem(view,item, transparent, animated);
-        }
-    }
-
-    void Renderer11::drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated)
-    {
-        short objectNumber = item->Item->objectNumber;
-        float xTranslate = item->Item->pos.yRot == ANGLE(90) ? CLICK(2) : item->Item->pos.yRot == ANGLE(270) ? -CLICK(2) : 0.0f;
-        float zTranslate = item->Item->pos.yRot == 0 ? CLICK(2) : item->Item->pos.yRot == ANGLE(180) ? -CLICK(2) : 0.0f;
-        item->Translation *=  Matrix::CreateTranslation(xTranslate, 0.0f, zTranslate);
-        item->Scale = Matrix::CreateScale(1.0f, 1.0f, item->Item->itemFlags[1] / 4096.0f);
-        item->World = item->Scale * item->Rotation * item->Translation;
-        return drawAnimatingItem(view, item, transparent, animated);
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
