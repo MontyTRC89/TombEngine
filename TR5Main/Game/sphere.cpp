@@ -6,7 +6,7 @@
 #include "setup.h"
 #include "Renderer11.h"
 #include "Specific\trmath.h"
-
+#include "item.h"
 using namespace TEN::Renderer;
 
 bool GotLaraSpheres;

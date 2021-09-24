@@ -12,7 +12,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include <Objects/Generic/Traps/dart_emitter.h>
-
+#include "item.h"
 using namespace TEN::Entities::Traps;
 
 BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };

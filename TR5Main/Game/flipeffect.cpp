@@ -24,7 +24,7 @@
 #include "effects\footprint.h"
 #include "effects\groundfx.h"
 #include "effects\debris.h"
-
+#include "item.h"
 using std::function;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;

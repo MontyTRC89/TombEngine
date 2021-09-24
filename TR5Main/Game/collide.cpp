@@ -14,7 +14,7 @@
 #include "Specific\prng.h"
 #include "room.h"
 #include "Renderer11.h"
-
+#include "item.h"
 using std::vector;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;

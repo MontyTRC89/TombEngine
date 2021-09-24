@@ -708,6 +708,7 @@
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Game\effects\lara_burn.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
+    <ClInclude Include="Game\item.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

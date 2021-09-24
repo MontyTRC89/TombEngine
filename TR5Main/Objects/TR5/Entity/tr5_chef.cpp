@@ -12,7 +12,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2
 #define STATE_CHEF_ATTACK			3

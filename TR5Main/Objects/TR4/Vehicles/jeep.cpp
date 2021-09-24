@@ -19,7 +19,7 @@
 #include "level.h"
 #include "animation.h"
 #include "jeep_info.h"
-
+#include "item.h"
 using std::vector;
 
 enum JEEP_STATES 

@@ -7,7 +7,7 @@
 #include "collide.h"
 #include "level.h"
 #include "animation.h"
-
+#include "item.h"
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 

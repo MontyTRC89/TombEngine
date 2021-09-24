@@ -11,6 +11,7 @@
 #include "Sound\sound.h"
 #include "setup.h"
 #include "tr5_pushableblock_info.h"
+#include "item.h"
 
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 	0x0000, 0x0000, 0xFFC0, 0x0000,

@@ -10,6 +10,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
+#include "item.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2

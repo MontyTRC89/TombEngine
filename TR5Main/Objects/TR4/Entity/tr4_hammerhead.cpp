@@ -11,7 +11,7 @@
 #include "misc.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-
+#include "item.h"
 #define STATE_HAMMERHEAD_STOP       0
 #define STATE_HAMMERHEAD_SWIM_SLOW  1
 #define STATE_HAMMERHEAD_SWIM_FAST  2

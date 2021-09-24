@@ -14,7 +14,7 @@
 #include "collide.h"
 #include "items.h"
 #include "camera.h"
-
+#include "item.h"
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 {

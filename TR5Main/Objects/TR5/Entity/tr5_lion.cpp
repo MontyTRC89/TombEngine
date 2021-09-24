@@ -11,6 +11,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "item.h"
 
 BITE_INFO LionBite1 = { -2, -10, 250, 21 };
 BITE_INFO LionBite2 = { -2, -10, 132, 21 };

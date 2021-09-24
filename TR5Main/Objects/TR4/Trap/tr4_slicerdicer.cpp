@@ -5,7 +5,7 @@
 #include "items.h"
 #include "animation.h"
 #include "Specific\trmath.h"
-
+#include "item.h"
 namespace TEN::Entities::TR4
 {
 	void InitialiseSlicerDicer(short itemNum)

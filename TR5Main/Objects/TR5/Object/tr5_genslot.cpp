@@ -8,7 +8,7 @@
 #include "animation.h"
 #include "lara.h"
 #include "lara_collide.h"
-
+#include "item.h"
 void GenSlot1Control(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

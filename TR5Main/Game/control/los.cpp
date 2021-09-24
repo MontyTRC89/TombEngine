@@ -9,7 +9,7 @@
 #include "effects/tomb4fx.h"
 #include "effects/debris.h"
 #include "Lara/lara_one_gun.h"
-
+#include "item.h"
 int NumberLosRooms;
 short LosRooms[20];
 int ClosestItem;

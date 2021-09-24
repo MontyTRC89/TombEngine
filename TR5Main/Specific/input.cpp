@@ -6,7 +6,7 @@
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "Renderer11.h"
-
+#include "item.h"
 using TEN::Renderer::g_Renderer;
 
 const char* g_KeyNames[] = {

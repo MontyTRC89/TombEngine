@@ -9,7 +9,7 @@
 #include "collide.h"
 #include "items.h"
 #include "control/control.h"
-
+#include "item.h"
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
 /*pickups*/

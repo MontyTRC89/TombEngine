@@ -11,7 +11,7 @@
 #include "sphere.h"
 #include "traps.h"
 #include "Game/effects/lara_burn.h"
-
+#include "item.h"
 using namespace TEN::Effects::Fire;
 
 void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int flags)

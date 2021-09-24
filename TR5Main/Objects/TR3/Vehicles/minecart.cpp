@@ -14,7 +14,7 @@
 #include "input.h"
 #include "Sound\sound.h"
 #include "minecart_info.h"
-
+#include "item.h"
 using std::vector;
 
 enum MINECART_STATE {

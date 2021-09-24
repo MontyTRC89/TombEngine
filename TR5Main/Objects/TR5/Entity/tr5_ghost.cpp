@@ -8,7 +8,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 
 void InitialiseInvisibleGhost(short itemNum)

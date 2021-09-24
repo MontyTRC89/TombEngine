@@ -12,7 +12,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-
+#include "item.h"
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };
 BITE_INFO harpyBite3 = { 0, 0, 0, 21 };

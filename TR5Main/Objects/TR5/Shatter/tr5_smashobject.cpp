@@ -6,6 +6,7 @@
 #include "effects\tomb4fx.h"
 #include "items.h"
 #include "Specific\trmath.h"
+#include "item.h"
 
 void InitialiseSmashObject(short itemNumber)
 {
