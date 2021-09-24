@@ -28,7 +28,7 @@
 #include "pickup/pickup_weapon.h"
 #include "pickup/pickup_consumable.h"
 #include "pickup/pickup_misc_items.h"
-
+#include "item.h"
 OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
 	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0x0000, 0x0000,

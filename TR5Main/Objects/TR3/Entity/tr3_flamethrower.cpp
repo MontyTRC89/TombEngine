@@ -12,7 +12,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
 static void TriggerPilotFlame(int itemnum)

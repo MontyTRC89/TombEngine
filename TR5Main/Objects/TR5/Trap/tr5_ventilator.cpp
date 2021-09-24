@@ -6,6 +6,7 @@
 #include "lara.h"
 #include "camera.h"
 #include "effects\effects.h"
+#include "item.h"
 
 static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
 {

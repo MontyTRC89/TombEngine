@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "setup.h"
 #include "rubberboat_info.h"
-
+#include "item.h"
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300
 #define RUBBER_BOAT_RADIUS			500

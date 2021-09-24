@@ -12,7 +12,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
-
+#include "item.h"
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
 #define STATE_TROOPS_STOP						1

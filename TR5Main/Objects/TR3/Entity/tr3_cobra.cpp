@@ -7,7 +7,7 @@
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 
 void InitialiseCobra(short itemNum)

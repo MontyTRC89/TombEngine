@@ -13,7 +13,7 @@
 #include "lara.h"
 #include "control/control.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)

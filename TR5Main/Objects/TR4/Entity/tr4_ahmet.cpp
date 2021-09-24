@@ -14,7 +14,7 @@
 #include "items.h"
 #include "control/lot.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4

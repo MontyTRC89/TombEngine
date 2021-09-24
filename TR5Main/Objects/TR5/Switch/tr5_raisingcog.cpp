@@ -8,6 +8,7 @@
 #include "objectslist.h"
 #include "generic_switch.h"
 #include "animation.h"
+#include "item.h"
 
 using namespace TEN::Entities::Switches;
 

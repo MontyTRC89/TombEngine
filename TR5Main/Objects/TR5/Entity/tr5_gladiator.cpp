@@ -11,7 +11,7 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "animation.h"
-
+#include "item.h"
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 
 void InitialiseGladiator(short itemNum)

@@ -2,6 +2,7 @@
 #include "tr5_romehammer.h"
 #include "items.h"
 #include "level.h"
+#include "item.h"
 
 void InitialiseRomeHammer(short itemNumber)
 {

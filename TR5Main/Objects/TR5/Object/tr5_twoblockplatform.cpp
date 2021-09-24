@@ -6,6 +6,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "collide.h"
+#include "item.h"
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {

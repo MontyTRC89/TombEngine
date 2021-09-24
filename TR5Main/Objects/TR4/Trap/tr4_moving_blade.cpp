@@ -7,7 +7,7 @@
 #include <lara.h>
 #include <sphere.h>
 #include <effects\effects.h>
-
+#include "item.h"
 namespace TEN::Entities::TR4
 {
     void MovingBladeControl(short itemNumber)

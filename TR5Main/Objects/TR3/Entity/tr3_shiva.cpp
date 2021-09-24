@@ -10,7 +10,7 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
 

@@ -13,7 +13,7 @@
 #include "effects/effects.h"
 #include "Specific/trmath.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
 static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)

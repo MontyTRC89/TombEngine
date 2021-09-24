@@ -11,7 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
-
+#include "item.h"
 namespace TEN::Entities::TR4
 {
     void TriggerCrocgodMissile(PHD_3DPOS* src, short roomNumber, short counter)

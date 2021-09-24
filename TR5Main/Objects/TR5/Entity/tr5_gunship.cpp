@@ -10,7 +10,7 @@
 #include "objects.h"
 #include "items.h"
 #include "lara.h"
-
+#include "item.h"
 int GunShipCounter = 0;
 
 void ControlGunShip(short itemNumber)

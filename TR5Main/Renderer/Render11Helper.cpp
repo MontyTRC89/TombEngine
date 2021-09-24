@@ -24,7 +24,7 @@
 #include "rubberboat_info.h"
 #include "upv_info.h"
 #include "biggun_info.h"
-
+#include "item.h"
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
 

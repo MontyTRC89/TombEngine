@@ -9,7 +9,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-
+#include "item.h"
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 
 void InitialiseWildBoar(short itemNumber)

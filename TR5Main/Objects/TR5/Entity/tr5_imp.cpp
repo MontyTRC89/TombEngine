@@ -11,6 +11,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "item.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

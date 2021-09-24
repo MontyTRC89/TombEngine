@@ -20,7 +20,7 @@
 #include "particle/SimpleParticle.h"
 #include "Renderer/RendererSprites.h"
 #include <Game/effects/lightning.h>
-
+#include "item.h"
 using namespace TEN::Effects::Lightning;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];

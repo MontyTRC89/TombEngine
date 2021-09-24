@@ -4,7 +4,7 @@
 #include "control/lot.h"
 #include "control/volume.h"
 #include "Renderer11.h"
-
+#include "item.h"
 using namespace TEN::Renderer;
 
 byte FlipStatus = 0;

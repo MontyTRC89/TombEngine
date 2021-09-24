@@ -4,7 +4,7 @@
 #include "room.h"
 #include "level.h"
 #include "setup.h"
-
+#include "item.h"
 using namespace TEN::Floordata;
 
 int FLOOR_INFO::SectorPlane(int x, int z) const

@@ -11,7 +11,7 @@
 #include <sphere.h>
 #include <people.h>
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 namespace TEN::Entities::TR4
 {
 	BITE_INFO BitBeetleBite = { 0,0,0,12 };

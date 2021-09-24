@@ -8,7 +8,7 @@
 #include "level.h"
 #include "control/control.h"
 #include "itemdata/creature_info.h"
-
+#include "item.h"
 BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 
 static void ShotLara_WithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite, short angle_y, int damage)

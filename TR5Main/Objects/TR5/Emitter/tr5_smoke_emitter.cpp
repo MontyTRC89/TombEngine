@@ -4,6 +4,7 @@
 #include "items.h"
 #include "level.h"
 #include "Specific\trmath.h"
+#include "item.h"
 
 void InitialiseSmokeEmitter(short itemNumber)
 {

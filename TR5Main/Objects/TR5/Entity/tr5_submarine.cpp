@@ -16,6 +16,7 @@
 #include "itemdata/creature_info.h"
 #include "collide.h"
 #include "control\los.h"
+#include "item.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {
