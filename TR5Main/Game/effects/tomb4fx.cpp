@@ -58,7 +58,6 @@ BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 DRIP_STRUCT Drips[MAX_DRIPS]; 
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
 FIRE_LIST Fires[MAX_FIRE_LIST];
-ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
 int GetFreeFireSpark()
 {
@@ -337,19 +336,6 @@ void UpdateFireSparks()
 			spark->z += spark->zVel / 48;
 
 			spark->size = spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536);
-		}
-	}
-}
-
-void UpdateEnergyArcs()
-{
-	for (int i = 0; i < MAX_ENERGYARCS; i++)
-	{
-		ENERGY_ARC* arc = &EnergyArcs[i];
-
-		if (arc->life > 0)
-		{
-			arc->life--;
 		}
 	}
 }
@@ -1604,36 +1590,6 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 	SetUpLensFlare(0, 0, 0, &pos);
 }*/
 
-void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->dG = g;
-	spark->sG = g;
-	spark->life = 4;
-	spark->sLife = 4;
-	spark->dR = r;
-	spark->sR = r;
-	spark->colFadeSpeed = 2;
-	spark->transType = COLADD;
-	spark->on = 1;
-	spark->dB = b;
-	spark->sB = b;
-	spark->fadeToBlack = 0;
-	spark->x = x;
-	spark->y = y;
-	spark->z = z;
-	spark->xVel = 0;
-	spark->yVel = 0;
-	spark->zVel = 0;
-	spark->flags = SP_DEF | SP_SCALE;
-	spark->scalar = 3;
-	spark->maxYvel = 0;
-	spark->def = Objects[ID_MISC_SPRITES].meshIndex;
-	spark->gravity = 0;
-	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
-}
-
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
@@ -1718,42 +1674,4 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->maxYvel = 0;
 		sptr->gravity = (GetRandomControl() & 0xF) + 64; 
 	}
-}
-
-ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type)
-{
-	ENERGY_ARC* arc = NULL;
-
-	for (int i = 0; i < MAX_ENERGYARCS; i++)
-	{
-		arc = &EnergyArcs[i];
-		if (arc->life == 0)
-			break;
-	}
-
-	if (arc == NULL)
-		return NULL;
-
-	arc->pos1 = *start;
-	arc->pos2.x = (end->x + 3 * start->x) >> 2;
-	arc->pos2.y = (end->y + 3 * start->y) >> 2;
-	arc->pos2.z = (end->z + 3 * start->z) >> 2;
-	arc->pos3.x = (start->x + 3 * end->x) >> 2;
-	arc->pos3.y = (start->y + 3 * end->y) >> 2;
-	arc->pos3.z = (start->z + 3 * end->z) >> 2;
-	arc->pos4 = *end;
-	arc->sLife = life;
-	arc->life = life;
-	arc->sAmplitude = amplitude;
-	arc->segmentSize = segmentSize;
-	arc->amplitude = 0;
-	arc->r = r;
-	arc->g = g;
-	arc->b = b;
-	arc->type = type;
-	arc->flags = flags;
-	arc->direction = 1;
-	arc->rotation = GetRandomControl();
-
-	return arc;
 }

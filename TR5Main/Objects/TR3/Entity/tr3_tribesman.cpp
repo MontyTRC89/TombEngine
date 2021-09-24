@@ -11,6 +11,9 @@
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
+#include <Objects/Generic/Traps/dart_emitter.h>
+
+using namespace TEN::Entities::Traps;
 
 BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };
 BITE_INFO tribesmanDartsBite1 = { 0, 0, -200, 13 };

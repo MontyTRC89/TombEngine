@@ -13,6 +13,11 @@
 #include "level.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lightning;
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

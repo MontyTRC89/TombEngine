@@ -24,11 +24,15 @@
 #include "steel_door.h"
 #include "underwater_door.h"
 
+// Traps
+#include "Objects/Generic/Traps/dart_emitter.h"
+
 /// necessary import
 #include "setup.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
+using namespace TEN::Entities::Traps;
 
 static void StartObject()
 {
@@ -396,8 +400,42 @@ void StartDoors()
 	}
 }
 
+void StartTraps()
+{
+	OBJECT_INFO* obj;
+
+	obj = &Objects[ID_DARTS];
+	if (obj->loaded)
+	{
+		obj->shadowSize = UNIT_SHADOW / 2;
+		//obj->drawRoutine = DrawDart;
+		obj->collision = ObjectCollision;
+		obj->control = DartControl;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_HOMING_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+}
+
 void InitialiseGenericObjects()
 {
+	StartTraps();
 	StartObject();
 	StartSwitches();
 	StartDoors();

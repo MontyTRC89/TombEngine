@@ -25,7 +25,6 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-#include "tr5_dart_emitter.h"
 #include "tr5_smoke_emitter.h"
 /// objects
 #include "tr5_pushableblock.h"
@@ -1143,34 +1142,6 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_DARTS];
-	if (obj->loaded)
-	{
-		obj->shadowSize = UNIT_SHADOW / 2;
-		//obj->drawRoutine = DrawDart;
-		obj->collision = ObjectCollision;
-		obj->control = DartControl;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_HOMING_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
