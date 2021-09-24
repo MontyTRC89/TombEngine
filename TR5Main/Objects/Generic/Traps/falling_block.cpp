@@ -92,7 +92,7 @@ void FallingBlockControl(short itemNumber)
 
 			item->itemFlags[0]++;
 
-			if (GetDistanceToFloor(itemNumber) > -STEP_SIZE)
+			if (GetDistanceToFloor(itemNumber) > -STEP_SIZE / 2)
 			{
 				// If crumbled before actual delay (e.g. too low position), force delay to be correct
 				if (item->itemFlags[0] < FALLINGBLOCK_DELAY)
@@ -138,7 +138,7 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	int height = item->pos.yPos + STEP_SIZE;
+	int height = item->pos.yPos + STEP_SIZE / 2;
 	return std::optional{ height };
 }
 
@@ -151,5 +151,5 @@ int FallingBlockFloorBorder(short itemNumber)
 int FallingBlockCeilingBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return (item->pos.yPos + STEP_SIZE);
+	return (item->pos.yPos + STEP_SIZE / 2);
 }
