@@ -18,7 +18,6 @@
 #include "motorbike.h"
 #include <algorithm>
 #include "itemdata/creature_info.h"
-#include "itemdata/mutator_info.h"
 #include "quad_info.h"
 #include "jeep_info.h"
 #include "motorbike_info.h"
@@ -110,7 +109,8 @@ namespace TEN::Renderer
 
 	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
-		std::vector<int> boneIndexList;
+		static std::vector<int> boneIndexList;
+		boneIndexList.clear();
 		
 		RendererBone *Bones[32] = {};
 		int nextBone = 0;
@@ -121,8 +121,6 @@ namespace TEN::Renderer
 
 		// Push
 		Bones[nextBone++] = obj.Skeleton;
-
-		Vector3 accum = {};
 
 		while (nextBone != 0)
 		{
@@ -196,13 +194,19 @@ namespace TEN::Renderer
 		}
 
 		// Apply mutations on top
-		if (item && item->Item->data.is<MUTATOR_INFO>())
+		if (item && item->Item->mutator.size() == boneIndexList.size()) // Paranoid
 		{
-			auto mute = (MUTATOR_INFO*)item->Item->data;
 			for (int i = 0; i < boneIndexList.size(); i++)
 			{
-				auto m = Matrix::CreateFromYawPitchRoll(mute->Nodes[boneIndexList[i]].Rotation.y, mute->Nodes[boneIndexList[i]].Rotation.x, mute->Nodes[boneIndexList[i]].Rotation.z);
-				transforms[boneIndexList[i]] = m * transforms[boneIndexList[i]];
+				auto mutator = item->Item->mutator[boneIndexList[i]];
+				if (mutator.IsEmpty())
+					continue;
+
+				auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+				auto s = Matrix::CreateScale(mutator.Scale);
+				auto t = Matrix::CreateTranslation(mutator.Offset);
+
+				transforms[boneIndexList[i]] = m  * transforms[boneIndexList[i]];
 			}
 		}
 	}
@@ -309,18 +313,6 @@ namespace TEN::Renderer
 					currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
 					lastJoint++;
 				}
-				},
-				[&j, &currentBone, &lastJoint](MUTATOR_INFO& mutator) {
-					
-					if (mutator.Nodes[lastJoint].Rotation.x != 0)
-					{
-						auto aaa = 1;
-					}
-					
-					//currentBone->ExtraRotation.x = mutator.Nodes[j].Rotation.x;
-					//currentBone->ExtraRotation.y = mutator.Nodes[j].Rotation.y;
-					//currentBone->ExtraRotation.z = mutator.Nodes[j].Rotation.z;
-					lastJoint++;
 				}
 				);
 			}

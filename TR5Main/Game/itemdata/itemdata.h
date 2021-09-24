@@ -14,7 +14,6 @@
 #include "quad_info.h"
 #include "tr5_laserhead_info.h"
 #include "itemdata/creature_info.h"
-#include "itemdata/mutator_info.h"
 #include "boat_info.h"
 #include "rubberboat_info.h"
 #include <stdexcept>
@@ -60,8 +59,7 @@ class ITEM_DATA {
 		WRAITH_INFO,
 		RUBBER_BOAT_INFO,
 		PUSHABLE_INFO,
-		CART_INFO,
-		MUTATOR_INFO
+		CART_INFO
 	> data;
 	public:
 	ITEM_DATA();

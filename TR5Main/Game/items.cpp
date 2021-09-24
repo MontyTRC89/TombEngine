@@ -412,10 +412,10 @@ void InitialiseItem(short itemNum)
 	item->floor = floor->FloorHeight(item->pos.xPos, item->pos.zPos);
 	item->boxNumber = floor->Box;
 
+	item->mutator.resize(Objects[item->objectNumber].nmeshes);
+
 	if (Objects[item->objectNumber].initialise != NULL)
-	{
 		Objects[item->objectNumber].initialise(itemNum);
-	}
 }
 
 short CreateItem()
