@@ -383,10 +383,20 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 				item->flags & ATONESHOT)
 				break;
 
-			if (triggerType == TRIGGER_TYPES::SWITCH)
+			if (triggerType == TRIGGER_TYPES::SWITCH && item->flags & SWONESHOT)
+				break;
+
+			if (triggerType != TRIGGER_TYPES::SWITCH
+				&& triggerType != TRIGGER_TYPES::ANTIPAD
+				&& triggerType != TRIGGER_TYPES::ANTITRIGGER
+				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER
+				&& (item->flags & ONESHOT))
+				break;
+
+			if (triggerType != TRIGGER_TYPES::ANTIPAD 
+				&& triggerType != TRIGGER_TYPES::ANTITRIGGER 
+				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->flags & SWONESHOT)
-					break;
 				if (item->objectNumber == ID_DART_EMITTER && item->active)
 					break;
 			}
