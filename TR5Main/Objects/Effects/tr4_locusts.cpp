@@ -9,7 +9,8 @@
 #include "collide.h"
 #include "animation.h"
 
-namespace TEN::Entities::TR4 {
+namespace TEN::Entities::TR4 
+{
     LOCUST_INFO Locusts[MAX_LOCUSTS];
 
     int CreateLocust(void)

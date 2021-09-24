@@ -18,7 +18,9 @@
 #include "smoke.h"
 #include "Specific\prng.h"
 #include "Renderer11.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;
@@ -1195,81 +1197,6 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->maxYvel = 0;
 	spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
 	spark->dSize = spark->size * 2;
-}
-
-void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
-{
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
-	
-	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
-		return;
-
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-	spark->on = 1;
-	spark->sR = 16;
-	spark->sG = 8;
-	spark->sB = 4;
-	spark->dR = 64;
-	spark->dG = 48;
-	spark->dB = 32;
-	spark->colFadeSpeed = 8;
-	spark->fadeToBlack = 4;
-	spark->transType = COLADD;
-	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	if (hit)
-	{
-		spark->xVel = GetRandomControl() - xv - 128;
-		spark->yVel = -4 - (GetRandomControl() & 3);
-		spark->zVel = GetRandomControl() - zv - 128;
-	}
-	else
-	{
-		if (xv)
-			spark->xVel = -xv;
-		else
-			spark->xVel = GetRandomControl() - 128;
-		spark->yVel = -4 - (GetRandomControl() & 3);
-		if (!zv)
-		{
-			spark->zVel = GetRandomControl();
-		}
-		else
-			spark->zVel = -zv;
-	}
-
-	spark->friction = 3;
-	if (GetRandomControl() & 1)
-	{
-		spark->flags = 538;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-		else
-			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-	}
-	else
-	{
-		spark->flags = 522;
-	}
-	spark->scalar = 1;
-	int size = (GetRandomControl() & 0x3F) + 72;
-	if (hit)
-	{
-		spark->maxYvel = 0;
-		spark->sSize = spark->size = spark->dSize = size >> 3;
-		spark->gravity = 0;
-	}
-	else
-	{
-		spark->sSize = spark->size = size >> 4;
-		spark->gravity = -4 - (GetRandomControl() & 3);
-		spark->dSize = size;
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-	}
 }
 
 void KillAllCurrentItems(short itemNumber)
