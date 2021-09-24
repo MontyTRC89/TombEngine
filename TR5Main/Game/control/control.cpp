@@ -324,10 +324,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		InItemControlLoop = false;
 		KillMoveItems();
 
-		float waaa = sin(((GlobalCounter % 128) / 128.0) * (PI * 2)) + 0.5f;
-		LaraItem->mutator[14].Scale = Vector3::One + Vector3(waaa * 0.25f);
-		LaraItem->mutator[14].Offset.y = waaa * -32.0f;
-
 		// Update all effects
 		InItemControlLoop = true;
 
