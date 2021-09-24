@@ -11,6 +11,9 @@
 #include "control/control.h"
 #include "tr4_mutant.h"
 #include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 namespace TEN::entities::all
 {

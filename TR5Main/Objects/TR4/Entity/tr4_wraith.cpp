@@ -12,6 +12,9 @@
 #include "people.h"
 #include "effects/tomb4fx.h"
 #include "tr4_wraith_info.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 constexpr auto WRAITH_COUNT = 8;
 

@@ -19,6 +19,9 @@
 #include "Quad/RenderQuad.h"
 #include "particle/SimpleParticle.h"
 #include "Renderer/RendererSprites.h"
+#include <Game/effects/lightning.h>
+
+using namespace TEN::Effects::Lightning;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -30,7 +33,6 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
 BITE_INFO EnemyBites[9] =
 {
@@ -51,9 +53,9 @@ namespace TEN::Renderer
 	using std::vector;
 
 	void Renderer11::drawEnergyArcs(RenderView& view) {
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < Lightning.size(); i++)
 		{
-			ENERGY_ARC* arc = &EnergyArcs[i];
+			LIGHTNING_INFO* arc = &Lightning[i];
 
 			if (arc->life)
 			{

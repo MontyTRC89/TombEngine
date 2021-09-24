@@ -14,6 +14,9 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 enum TonyFlameType
 {
@@ -51,7 +54,7 @@ enum TONY_STATE
 
 static BOSS_STRUCT BossData;
 #define TONYBOSS_TURN ANGLE(2.0f)
-#define TONYBOSS_HITS 100
+#define TONYBOSS_HITS 1 //Tony Harder To Kill, was 100 (6 shotgun shots)
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 static void TriggerTonyEffect(const TONY_FLAME flame)
@@ -427,7 +430,7 @@ void ControlTonyFireBall(short fxNumber)
 			LaraItem->hitStatus = true;
 			KillEffect(fxNumber);
 			LaraItem->hitPoints -= 200;
-			LaraBurn();
+			//LaraBurn();
 			return;
 		}
 	}

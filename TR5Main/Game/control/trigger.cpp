@@ -15,7 +15,9 @@
 #include "lara.h"
 #include "Lara\lara_climb.h"
 #include "Objects\Generic\Switches\generic_switch.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 
 int TriggerTimer;
