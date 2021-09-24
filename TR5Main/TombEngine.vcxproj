@@ -149,8 +149,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
-    <ClInclude Include="Game\itemdata\mutator_info.h" />
     <ClInclude Include="Game\roomvector.h" />
+    <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
@@ -559,6 +559,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />

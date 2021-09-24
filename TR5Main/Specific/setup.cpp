@@ -20,7 +20,8 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include <tr4_littlebeetle.h>
+#include "tr4_littlebeetle.h"
+#include "Objects/Generic/Traps/falling_block.h"
 /// register objects
 #include "object_helper.h"
 

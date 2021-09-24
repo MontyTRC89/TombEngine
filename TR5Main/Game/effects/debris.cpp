@@ -27,7 +27,7 @@ DebrisFragment* GetFreeDebrisFragment()
 	return nullptr;
 }
 
-void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
+void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
 	MESH* meshPtr = nullptr;
 	RendererMesh* fragmentsMesh;
