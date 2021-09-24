@@ -10,10 +10,10 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FALLINGBLOCK_INITIAL_SPEED = 15;
-constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 2;
+constexpr auto FALLINGBLOCK_INITIAL_SPEED = 10;
+constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 1;
 constexpr auto FALLINGBLOCK_DELAY = 52;
-constexpr auto FALLINGBLOCK_WIBBLE = 4;
+constexpr auto FALLINGBLOCK_WIBBLE = 3;
 constexpr auto FALLINGBLOCK_CRUMBLE_DELAY = 100;
 
 void InitialiseFallingBlock(short itemNumber)
@@ -69,7 +69,7 @@ void FallingBlockControl(short itemNumber)
 				for (int i = 0; i < item->mutator.size(); i++)
 				{
 					auto rotSpeed = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
-					rotSpeed += i % 3 ? rotSpeed / 4 : rotSpeed;
+					rotSpeed += i % 3 ? rotSpeed / 2 : rotSpeed;
 					item->mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
 					item->mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
 					item->mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
