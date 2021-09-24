@@ -22,6 +22,10 @@ void InitialiseFallingBlock(short itemNumber)
 
 	g_Level.Items[itemNumber].meshBits = 1;
 	TEN::Floordata::AddBridge(itemNumber);
+
+	// Set mutators to 0 by default
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i].Rotation = Vector3::Zero;
 }
 
 void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
