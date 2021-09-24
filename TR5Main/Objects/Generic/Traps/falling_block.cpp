@@ -11,6 +11,7 @@
 using namespace TEN::Math::Random;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED = 10;
+constexpr auto FALLINGBLOCK_FALL_SPEED = 4;
 constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 1;
 constexpr auto FALLINGBLOCK_DELAY = 52;
 constexpr auto FALLINGBLOCK_WIBBLE = 3;
@@ -84,7 +85,7 @@ void FallingBlockControl(short itemNumber)
 
 				if (item->itemFlags[1] > 0)
 				{
-					item->itemFlags[1] += 2;
+					item->itemFlags[1] += FALLINGBLOCK_FALL_SPEED;
 					item->pos.yPos += item->itemFlags[1];
 				}
 			}
