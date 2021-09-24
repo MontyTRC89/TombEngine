@@ -413,6 +413,8 @@ void InitialiseItem(short itemNum)
 	item->boxNumber = floor->Box;
 
 	item->mutator.resize(Objects[item->objectNumber].nmeshes);
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i] = {};
 
 	if (Objects[item->objectNumber].initialise != NULL)
 		Objects[item->objectNumber].initialise(itemNum);
