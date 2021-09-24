@@ -206,7 +206,7 @@ namespace TEN::Renderer
 				auto s = Matrix::CreateScale(mutator.Scale);
 				auto t = Matrix::CreateTranslation(mutator.Offset);
 
-				transforms[boneIndexList[i]] = m  * transforms[boneIndexList[i]];
+				transforms[boneIndexList[i]] = m * s * t * transforms[boneIndexList[i]];
 			}
 		}
 	}
