@@ -1091,7 +1091,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	result.Block->AddItem(itemNumber);
 
 	auto bounds = GetBoundsAccurate(item);
-	int minHeight = precise ? std::max(bounds->Y1, bounds->Y2) : 0;
+	int minHeight = precise ? bounds->Y2 : 0;
 
 	return minHeight + item->pos.yPos - height;
 }
