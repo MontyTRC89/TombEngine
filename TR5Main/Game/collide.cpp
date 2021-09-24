@@ -1275,7 +1275,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y - LARA_HEADROOM;
+	int yTop = y; // TODO: Make sure that -LARA_HEADROOM is not necessary for yTop anymore!
 	int z = zPos;
 
 	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
@@ -1680,7 +1680,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y - LARA_HEADROOM;
+	int yTop = y; // -LARA_HEADROOM;
 	int z = zPos;
 
 	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
