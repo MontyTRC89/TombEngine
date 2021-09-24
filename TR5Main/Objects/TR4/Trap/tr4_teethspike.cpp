@@ -33,6 +33,10 @@ namespace TEN::Entities::TR4
 		item = &g_Level.Items[itemNumber];
 		item->status = ITEM_INVISIBLE;
 
+		// Set mutators to 0 by default
+		for (int i = 0; i < item->mutator.size(); i++)
+			item->mutator[i].Scale.y = 0.0f;
+
 		short rotations[8] =
 		{
 			0x8000,
@@ -238,6 +242,13 @@ namespace TEN::Entities::TR4
 				if (item->itemFlags[1] < 0)
 					item->itemFlags[1] = 0;
 			}
+		}
+
+		// Update bone mutators
+		if (item->itemFlags[1])
+		{
+			for (int i = 0; i < item->mutator.size(); i++)
+				item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
 		}
 	}
 }

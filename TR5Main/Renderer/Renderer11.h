@@ -504,8 +504,6 @@ namespace TEN::Renderer
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
-		void drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated);
-		void drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawStatics(bool transparent, RenderView& view);
 		void renderShadowMap(RenderView& view);
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
