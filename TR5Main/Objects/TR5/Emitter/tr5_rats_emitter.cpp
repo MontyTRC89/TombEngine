@@ -8,6 +8,7 @@
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
+#include "item.h"
 
 int NextRat;
 RAT_STRUCT Rats[NUM_RATS];

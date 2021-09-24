@@ -18,7 +18,7 @@
 #include "Specific/prng.h"
 #include "camera.h"
 #include "skidoo_info.h"
-
+#include "item.h"
 using std::vector;
 using namespace TEN::Math::Random;
 

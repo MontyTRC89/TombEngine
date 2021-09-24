@@ -4,6 +4,7 @@
 #include "Specific\trmath.h"
 #include <Specific\setup.h>
 #include "Specific\prng.h"
+#include "item.h"
 using namespace TEN::Math::Random;
 
 namespace TEN::Effects{

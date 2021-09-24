@@ -8,7 +8,7 @@
 #include "effects/tomb4fx.h"
 #include "collide.h"
 #include "animation.h"
-
+#include "item.h"
 namespace TEN::Entities::TR4 
 {
     LOCUST_INFO Locusts[MAX_LOCUSTS];

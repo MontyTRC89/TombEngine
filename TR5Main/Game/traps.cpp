@@ -14,6 +14,7 @@
 #include "input.h"
 #include "room.h"
 #include "Sound/sound.h"
+#include "item.h"
 
 using namespace TEN::Effects::Environment;
 

@@ -9,7 +9,7 @@
 #include "items.h"
 #include "collide.h"
 #include "objectslist.h"
-
+#include "item.h"
 using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4

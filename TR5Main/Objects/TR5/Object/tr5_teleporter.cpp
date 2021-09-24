@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "camera.h"
 #include "control/box.h"
+#include "item.h"
 
 using namespace TEN::Effects::Environment;
 

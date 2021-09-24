@@ -5,7 +5,7 @@
 #include "items.h"
 #include "setup.h"
 #include "level.h"
-
+#include "item.h"
 void InitialiseLara(int restore)
 {
 	if (Lara.itemNumber == NO_ITEM)

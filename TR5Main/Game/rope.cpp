@@ -7,7 +7,7 @@
 #include "control/control.h"
 #include "Sound\sound.h"
 #include "camera.h"
-
+#include "item.h"
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;
 ROPE_STRUCT Ropes[12];

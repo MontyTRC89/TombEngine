@@ -9,7 +9,7 @@
 #include "camera.h"
 #include "lara.h"
 #include "collide.h"
-
+#include "item.h"
 void InitialiseExpandingPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

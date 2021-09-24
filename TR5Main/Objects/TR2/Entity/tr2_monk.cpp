@@ -7,6 +7,7 @@
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
+#include "item.h"
 BITE_INFO monkBite = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;

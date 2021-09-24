@@ -11,7 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
-
+#include "item.h"
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 
 static void S_SpiderBite(ITEM_INFO* item)

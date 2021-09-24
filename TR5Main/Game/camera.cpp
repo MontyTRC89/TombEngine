@@ -15,7 +15,7 @@
 #include "control\los.h"
 #include "savegame.h"
 #include "input.h"
-
+#include "item.h"
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Environment;
 

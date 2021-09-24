@@ -15,7 +15,7 @@
 #include "control/trigger.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
-
+#include "item.h"
 ITEM_INFO jeepDummyTarget;
 
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)

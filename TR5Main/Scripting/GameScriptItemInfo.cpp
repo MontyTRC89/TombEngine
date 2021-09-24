@@ -11,7 +11,7 @@
 #include "GameScriptRotation.h"
 #include "Specific\trmath.h"
 #include "lara.h"
-
+#include "item.h"
 /***
 Represents any object inside the game world.
 Examples include statics, enemies, doors,

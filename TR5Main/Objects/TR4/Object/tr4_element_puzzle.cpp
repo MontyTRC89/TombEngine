@@ -12,7 +12,7 @@
 #include <input.h>
 #include "generic_switch.h"
 #include "collide.h"
-
+#include "item.h"
 using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::TR4

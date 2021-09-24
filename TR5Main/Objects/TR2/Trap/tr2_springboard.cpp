@@ -3,7 +3,7 @@
 #include "level.h"
 #include "lara.h"
 #include "animation.h"
-
+#include "item.h"
 void SpringBoardControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

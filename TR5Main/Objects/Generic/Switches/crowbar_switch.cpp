@@ -9,7 +9,7 @@
 #include "level.h"
 #include "collide.h"
 #include "animation.h"
-
+#include "item.h"
 namespace TEN::Entities::Switches
 {
 	PHD_VECTOR CrowbarPos = { -89, 0, -328 }; 

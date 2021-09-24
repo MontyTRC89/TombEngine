@@ -39,7 +39,7 @@
 #include "control\volume.h"
 #include "Renderer11.h"
 #include "camera.h"
-
+#include "item.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else

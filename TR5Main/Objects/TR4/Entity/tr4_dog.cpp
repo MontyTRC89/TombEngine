@@ -7,7 +7,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-
+#include "item.h"
 namespace TEN::Entities::TR4
 {
 	enum DOG_STATES

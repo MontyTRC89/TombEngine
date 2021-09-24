@@ -11,7 +11,7 @@
 #include "items.h"
 #include "camera.h"
 #include "control/control.h"
-
+#include "item.h"
 /*this file has all the related functions to ducking and crawling*/
 
 /*crouch/duck start*/

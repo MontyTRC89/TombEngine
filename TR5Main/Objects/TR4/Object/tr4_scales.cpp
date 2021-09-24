@@ -11,7 +11,7 @@
 #include "effects\tomb4fx.h"
 #include "tr4_ahmet.h"
 #include "generic_switch.h"
-
+#include "item.h"
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
