@@ -1231,10 +1231,15 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	{
 		if ((GetRandomControl() & 3) == 0)
 		{
-			short fxNumber = CreateNewEffect(item->roomNumber);
+			PHD_3DPOS pos{};
+			pos.xPos = item->pos.xPos;
+			pos.yPos = item->pos.yPos; 
+			pos.zPos = item->pos.zPos;
+			short fxNumber = CreateNewEffect(item->roomNumber, ID_BODY_PART, pos);
 			if (fxNumber != NO_ITEM)
 			{
-				FX_INFO* fx = &EffectList[fxNumber];
+				ITEM_INFO* fx = &g_Level.Items[fxNumber];
+				FX_INFO* fxInfo = fx->data;
 
 				Matrix boneMatrix;
 				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
@@ -1268,7 +1273,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				fx->objectNumber = ID_BODY_PART;
 				fx->frameNumber = obj->meshIndex;
 				fx->shade = 16912;
-				fx->flag2 = flags;
+				fxInfo->flag2 = flags;
 			}
 
 			item->meshBits -= bit;
@@ -1286,10 +1291,15 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		{
 			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
 			{
-				short fxNumber = CreateNewEffect(item->roomNumber);
+				PHD_3DPOS pos{};
+				pos.xPos = item->pos.xPos;
+				pos.yPos = item->pos.yPos;
+				pos.zPos = item->pos.zPos;
+				short fxNumber = CreateNewEffect(item->roomNumber, ID_BODY_PART, pos);
 				if (fxNumber != NO_ITEM)
 				{
-					FX_INFO* fx = &EffectList[fxNumber];
+					ITEM_INFO* fx = &g_Level.Items[fxNumber];
+					FX_INFO* fxInfo = fx->data;
 
 					fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
 					fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
@@ -1319,7 +1329,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 
 					fx->objectNumber = ID_BODY_PART;
 					fx->shade = 16912;
-					fx->flag2 = flags;
+					fxInfo->flag2 = flags;
 					fx->frameNumber = obj->meshIndex + i;
 				}
 

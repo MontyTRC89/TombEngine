@@ -142,7 +142,7 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 		spark->gravity = -spark->yVel >> 2;
 		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 4;
 		spark->dSize = 2 * spark->size;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+		spark->sSprite = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
 	}*/
 }
 

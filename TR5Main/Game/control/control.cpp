@@ -325,7 +325,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Update all effects
 		InItemControlLoop = true;
-
+		/*
 		short fxNum = NextFxActive;
 		while (fxNum != NO_ITEM)
 		{
@@ -335,7 +335,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				Objects[fx->objectNumber].control(fxNum);
 			fxNum = nextFx;
 		}
-
+		*/
 		InItemControlLoop = false;
 		KillMoveEffects();
 

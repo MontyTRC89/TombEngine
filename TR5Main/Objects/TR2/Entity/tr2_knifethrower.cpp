@@ -17,21 +17,21 @@ BITE_INFO knifeRight = { 0, 0, 0, 8 };
 
 void KnifeControl(short fxNum)
 {
-	FX_INFO* fx;
+	ITEM_INFO* fx;
 	int speed;
 	short roomNumber;
 	FLOOR_INFO* floor;
 
-	fx = &EffectList[fxNum];
-
-	if (fx->counter <= 0)
+	fx = &g_Level.Items[fxNum];
+	FX_INFO* fxInfo = fx->data;
+	if (fxInfo->counter <= 0)
 	{
 		KillEffect(fxNum);
 		return;
 	}
 	else
 	{
-		fx->counter--;
+		fxInfo->counter--;
 	}
 
 	speed = fx->speed * phd_cos(fx->pos.xRot);
@@ -60,7 +60,7 @@ void KnifeControl(short fxNum)
 
 		fx->pos.yRot = LaraItem->pos.yRot;
 		fx->speed = LaraItem->speed;
-		fx->frameNumber = fx->counter = 0;
+		fx->frameNumber = fxInfo->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
 		DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 80, fx->pos.yRot, fx->roomNumber);

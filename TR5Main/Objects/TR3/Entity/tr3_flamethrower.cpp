@@ -153,11 +153,11 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	int yv;
 	int zv;
 
-	short effectNumber = CreateNewEffect(item->roomNumber);
+	short effectNumber = CreateNewEffect(item->roomNumber,ID_FLAME_EMITTER,item->pos);
 	if (effectNumber != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[effectNumber];
-
+		ITEM_INFO* fx = &g_Level.Items[effectNumber];
+		FX_INFO* fxInfo = fx->data;
 		pos1.x = bite->x;
 		pos1.y = bite->y;
 		pos1.z = bite->z;
@@ -180,8 +180,8 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		fx->pos.zRot = 0;
 		fx->pos.yRot = angles[0];
 		fx->speed = speed * 4;
-		fx->counter = 20;
-		fx->flag1 = 0;
+		fxInfo->counter = 20;
+		fxInfo->flag1 = 0;
 
 		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
 

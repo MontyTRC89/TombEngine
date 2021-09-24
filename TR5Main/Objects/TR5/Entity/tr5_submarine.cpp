@@ -45,6 +45,7 @@ static void TriggerSubmarineSparks(short itemNumber)
 	spark->maxYvel = 0;
 	spark->gravity = 0;
 	spark->scalar = 1;
+	SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, 11, 11);
 	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 }
@@ -71,6 +72,7 @@ static void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char facto
 	spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
 	spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
 	spark->friction = 0;
+	SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, 17,17);
 	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
 	spark->maxYvel = 0;
 	spark->gravity = -4 - (GetRandomControl() & 3);

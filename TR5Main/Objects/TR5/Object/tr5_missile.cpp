@@ -20,8 +20,9 @@ int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
-	FX_INFO* fx = &EffectList[itemNumber];
-	if (fx->flag1 == 2)
+	ITEM_INFO* fx = &g_Level.Items[itemNumber];
+	FX_INFO* fxInfo = fx->data;
+	if (fxInfo->flag1 == 2)
 	{
 		fx->pos.zRot += 16 * fx->speed;
 
@@ -45,20 +46,20 @@ void MissileControl(short itemNumber)
 			angles);
 
 		int dh;
-		if (fx->flag1)
+		if (fxInfo->flag1)
 		{
-			dh = fx->flag1 != 1 ? 768 : 384;
+			dh = fxInfo->flag1 != 1 ? 768 : 384;
 		}
 		else
 		{
-			if (fx->counter)
-				fx->counter--;
+			if (fxInfo->counter)
+				fxInfo->counter--;
 			dh = 256;
 		}
 
 		if (fx->speed < 192)
 		{
-			if (fx->flag1 == 0 || fx->flag1 == 1)
+			if (fxInfo->flag1 == 0 || fxInfo->flag1 == 1)
 				fx->speed++;
 
 			int dy = angles[0] - fx->pos.yRot;
@@ -97,7 +98,7 @@ void MissileControl(short itemNumber)
 		
 		fx->pos.zRot += 16 * fx->speed;
 
-		if (!fx->flag1)
+		if (!fxInfo->flag1)
 			fx->pos.zRot += 16 * fx->speed;
 	}
 
@@ -122,9 +123,9 @@ void MissileControl(short itemNumber)
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 
-		if (fx->flag1)
+		if (fxInfo->flag1)
 		{
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.yPos -= 64;
@@ -132,7 +133,7 @@ void MissileControl(short itemNumber)
 				fx->pos.yPos -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
-			else if (fx->flag1 == 2)
+			else if (fxInfo->flag1 == 2)
 			{
 				ExplodeFX(fx, 0, 32);
 				SoundEffect(251, &fx->pos, 0);
@@ -150,9 +151,9 @@ void MissileControl(short itemNumber)
 	{
 		LaraItem->hitStatus = true;
 		
-		if (fx->flag1)
+		if (fxInfo->flag1)
 		{
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
@@ -165,7 +166,7 @@ void MissileControl(short itemNumber)
 			}
 			else
 			{
-				if (fx->flag1 == 2)
+				if (fxInfo->flag1 == 2)
 				{
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
@@ -206,7 +207,7 @@ void MissileControl(short itemNumber)
 			int yv = y - fx->pos.yPos;
 			int zv = z - fx->pos.zPos;
 
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				TriggerRomanStatueMissileSparks(&pos, itemNumber);
 			}
@@ -219,8 +220,9 @@ void MissileControl(short itemNumber)
 	}
 }
 
-void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
+void ExplodeFX(ITEM_INFO* fx, int noXZVel, int bits)
 {
+	FX_INFO* fxInfo = fx->data;
 	MESH* meshpp = &g_Level.Meshes[fx->frameNumber];
 
 	ShatterItem.yRot = fx->pos.yRot;
@@ -229,9 +231,9 @@ void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 	ShatterItem.sphere.y = fx->pos.yPos;
 	ShatterItem.sphere.z = fx->pos.zPos;
 	ShatterItem.bit = 0;
-	ShatterItem.flags = fx->flag2 & 0x1400;
+	ShatterItem.flags = fxInfo->flag2 & 0x1400;
 
-	if (fx->flag2 & 0x2000)
+	if (fxInfo->flag2 & 0x2000)
 		DebrisFlags = 1;
 
 	ShatterObject(&ShatterItem, 0, bits, fx->roomNumber, noXZVel);

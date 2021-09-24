@@ -3,6 +3,10 @@
 struct COLL_INFO;
 struct ITEM_INFO;
 
+enum FLAME_STATES : short {
+	FLAME_NORMAL_STATE = 0,
+	FLAME_PROJECTILE_STATE = 1
+};
 extern ITEM_INFO* WBItem;
 extern short WBRoom;
 void LaraBurn();

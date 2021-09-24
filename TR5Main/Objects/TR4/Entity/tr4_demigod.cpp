@@ -18,11 +18,11 @@ extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 {
-	short fxNum = CreateNewEffect(roomNumber);
-	if (fxNum != -1)
+	short fxNum = CreateNewEffect(roomNumber,ID_ENERGY_BUBBLES,*pos);
+	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
-
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
@@ -40,13 +40,12 @@ static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags
 
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
-		fx->flag1 = flags;
+		fxInfo->counter = 2 * GetRandomControl() + -ANGLE(180);
+		fxInfo->flag1 = flags;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
-		fx->objectNumber = ID_ENERGY_BUBBLES;
 		if (flags >= 4)
 			flags--;
-		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx->meshBits = 1 << static_cast<uint32_t>(BUBBLES_MESH::TR4_DART_BLUE) * flags;
 	}
 }
 

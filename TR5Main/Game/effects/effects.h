@@ -2,7 +2,7 @@
 #include "Specific\phd_global.h"
 struct ITEM_INFO;
 struct COLL_INFO;
-
+enum GAME_OBJECT_ID : short;
 enum RIPPLE_TYPE
 {
 	RIPPLE_FLAG_NONE = 0x0,
@@ -48,18 +48,27 @@ enum FireSizeEnum
 	SP_BIGFIRE
 };
 
+enum class BUBBLES_MESH: unsigned int {
+	TR4_DART_BLUE = 0,
+	TR4_SPIKY_BALL = 1,
+	TR4_DART_ORANGE = 2,
+	TR4_DART_BLUE_2 = 3,
+	TR4_DART_ORANGE_2 = 4,
+	TR4_FIREBALL = 5,
+	TR5_ROCK_1 = 6,
+	TR5_ROCK_2 = 7,
+	TR5_ROCK_3 = 8,
+	TR5_ROCK_4 = 9,
+	TR5_ROCK_5 = 10,
+	TR5_ROCK_6 = 11,
+	TR5_ROCK_7 = 12,
+	TR5_SPIRAL_FLAME = 13
+
+};
+
 struct FX_INFO
 {
-	PHD_3DPOS pos;
-	short roomNumber;
-	short objectNumber;
-	short nextFx;
-	short nextActive;
-	short speed;
-	short fallspeed;
-	short frameNumber;
 	short counter;
-	short shade;
 	short flag1;
 	short flag2;
 };
@@ -115,7 +124,9 @@ struct SPARKS
 	float size;
 	unsigned char friction;
 	unsigned char scalar;
-	unsigned char def;
+	short sSprite;
+	short def;
+	short dSprite;
 	signed char rotAdd;
 	signed char maxYvel;
 	bool on;
@@ -230,3 +241,5 @@ void Splash(ITEM_INFO* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Richochet(PHD_3DPOS* pos);
+void SparkSpriteSequence(SPARKS* spark, GAME_OBJECT_ID spriteSequence);
+void SparkSpriteSequence(SPARKS* spark, GAME_OBJECT_ID spriteSequence,int src, int dest);

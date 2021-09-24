@@ -16,7 +16,8 @@ namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 
 		int dx = LaraItem->pos.xPos - fx->pos.xPos;
 		int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -56,7 +57,7 @@ namespace TEN::entities::all
 			spark->gravity = 0;
 			spark->maxYvel = 0;
 			spark->fxObj = fxNum;
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				spark->scalar = 3;
 			}
@@ -71,8 +72,8 @@ namespace TEN::entities::all
 
 	void TriggerHarpyFlameFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
-
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		int dx = LaraItem->pos.xPos - fx->pos.xPos;
 		int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
@@ -118,8 +119,8 @@ namespace TEN::entities::all
 
 	void TriggerDemigodMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
-
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		int dx = LaraItem->pos.xPos - fx->pos.xPos;
 		int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
@@ -128,7 +129,7 @@ namespace TEN::entities::all
 			SPARKS* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
-			if (fx->flag1 == 3 || fx->flag1 == 4)
+			if (fxInfo->flag1 == 3 || fxInfo->flag1 == 4)
 			{
 				spark->sR = 0;
 				spark->dR = 0;
@@ -176,22 +177,23 @@ namespace TEN::entities::all
 		}
 	}
 
-	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
+	void BubblesShatterFunction(ITEM_INFO* fx, int param1, int param2)
 	{
+		FX_INFO* fxInfo = fx->data;
 		ShatterItem.yRot = fx->pos.yRot;
 		ShatterItem.meshp = &g_Level.Meshes[fx->frameNumber];
 		ShatterItem.sphere.x = fx->pos.xPos;
 		ShatterItem.sphere.y = fx->pos.yPos;
 		ShatterItem.sphere.z = fx->pos.zPos;
 		ShatterItem.bit = 0;
-		ShatterItem.flags = fx->flag2 & 0x400;
+		ShatterItem.flags = fxInfo->flag2 & 0x400;
 		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
 	}
 
 	void ControlEnemyMissile(short fxNum)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
-
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		short angles[2];
 		phd_GetVectorAngles(
 			LaraItem->pos.xPos - fx->pos.xPos,
@@ -202,18 +204,18 @@ namespace TEN::entities::all
 		int maxRotation = 0;
 		int maxSpeed = 0;
 
-		if (fx->flag1 == 1)
+		if (fxInfo->flag1 == 1)
 		{
 			maxRotation = 512;
 			maxSpeed = 256;
 		}
 		else
 		{
-			if (fx->flag1 == 6)
+			if (fxInfo->flag1 == 6)
 			{
-				if (fx->counter)
+				if (fxInfo->counter)
 				{
-					fx->counter--;
+					fxInfo->counter--;
 				}
 				maxRotation = 256;
 			}
@@ -226,7 +228,7 @@ namespace TEN::entities::all
 
 		if (fx->speed < maxSpeed)
 		{
-			if (fx->flag1 == 6)
+			if (fxInfo->flag1 == 6)
 			{
 				fx->speed++;
 			}
@@ -258,7 +260,7 @@ namespace TEN::entities::all
 			else if (dx > maxRotation)
 				dx = maxRotation;
 
-			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
+			if (fxInfo->flag1 != 4 && (fxInfo->flag1 != 6 || !fxInfo->counter))
 			{
 				fx->pos.yRot += dy;
 			}
@@ -266,7 +268,7 @@ namespace TEN::entities::all
 		}
 
 		fx->pos.zRot += 16 * fx->speed;
-		if (fx->flag1 == 6)
+		if (fxInfo->flag1 == 6)
 			fx->pos.zRot += 16 * fx->speed;
 
 		int oldX = fx->pos.xPos;
@@ -289,31 +291,31 @@ namespace TEN::entities::all
 			fx->pos.yPos = oldY;
 			fx->pos.zPos = oldZ;
 
-			if (fx->flag1 != 6)
+			if (fxInfo->flag1 != 6)
 				BubblesShatterFunction(fx, 0, -32);
 
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			}
 			else
 			{
-				if (fx->flag1)
+				if (fxInfo->flag1)
 				{
-					if (fx->flag1 == 3 || fx->flag1 == 4)
+					if (fxInfo->flag1 == 3 || fxInfo->flag1 == 4)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					}
-					else if (fx->flag1 == 5)
+					else if (fxInfo->flag1 == 5)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
 					}
 					else
 					{
-						if (fx->flag1 != 2)
+						if (fxInfo->flag1 != 2)
 						{
-							if (fx->flag1 == 6)
+							if (fxInfo->flag1 == 6)
 							{
 								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 2);
@@ -343,22 +345,22 @@ namespace TEN::entities::all
 		if (ItemNearLara(&fx->pos, 200))
 		{
 			LaraItem->hitStatus = true;
-			if (fx->flag1 != 6)
+			if (fxInfo->flag1 != 6)
 			{
 				BubblesShatterFunction(fx, 0, -32);
 			}
 
 			KillEffect(fxNum);
 
-			if (fx->flag1 == 1)
+			if (fxInfo->flag1 == 1)
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 				LaraBurn();
 			}
-			else if (fx->flag1)
+			else if (fxInfo->flag1)
 			{
-				switch (fx->flag1)
+				switch (fxInfo->flag1)
 				{
 				case 3:
 				case 4:
@@ -397,7 +399,7 @@ namespace TEN::entities::all
 
 			if (Wibble & 4)
 			{
-				switch (fx->flag1)
+				switch (fxInfo->flag1)
 				{
 				default:
 				case 1:

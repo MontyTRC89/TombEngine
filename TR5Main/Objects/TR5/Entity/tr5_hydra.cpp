@@ -46,10 +46,11 @@ void InitialiseHydra(short itemNum)
 
 static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 {
-	short fxNum = CreateNewEffect(roomNumber);
+	short fxNum = CreateNewEffect(roomNumber,ID_ENERGY_BUBBLES,*pos);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
@@ -57,11 +58,10 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.yRot = pos->yRot;
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 16 * count + 15;
-		fx->flag1 = 0;
-		fx->objectNumber = ID_BUBBLES;
+		fxInfo->counter = 16 * count + 15;
+		fxInfo->flag1 = 0;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
+		fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
 	}
 }
 

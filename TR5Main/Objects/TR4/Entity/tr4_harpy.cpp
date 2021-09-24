@@ -28,11 +28,11 @@ BITE_INFO harpyAttack2 = { 0, 128, 0, 4 };
 
 static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 {
-	short fxNumber = CreateNewEffect(roomNumber);
+	short fxNumber = CreateNewEffect(roomNumber,ID_ENERGY_BUBBLES,*pos);
 	if (fxNumber != -1)
 	{
-		FX_INFO* fx = &EffectList[fxNumber];
-
+		ITEM_INFO* fx = &g_Level.Items[fxNumber];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
@@ -40,11 +40,11 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.yRot = pos->yRot;
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -32768;
+		fxInfo->counter = 2 * GetRandomControl() + -32768;
 		fx->objectNumber = ID_ENERGY_BUBBLES;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
-		fx->flag1 = count;
-		fx->frameNumber = Objects[fx->objectNumber].meshIndex + 2 * count;
+		fxInfo->flag1 = count;
+		fx->meshBits = 2 * count;
 	}
 }
 

@@ -82,11 +82,15 @@ static void ImpThrowStones(ITEM_INFO* item)
 
 	angles[0] += GetRandomControl() % (distance / 4) - (distance / 8);
 	angles[1] += GetRandomControl() % (distance / 2) - (distance / 4);
-	
-	short fxNum = CreateNewEffect(item->roomNumber);
+	PHD_3DPOS pos3;
+	pos3.xPos = pos1.x;
+	pos3.yPos = pos1.y;
+	pos3.zPos = pos1.z;
+	short fxNum = CreateNewEffect(item->roomNumber,ID_IMP_ROCK,pos3);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = pos1.x;
 		fx->pos.yPos = pos1.y;
 		fx->pos.zPos = pos1.z;
@@ -101,10 +105,10 @@ static void ImpThrowStones(ITEM_INFO* item)
 		fxNum = Objects[ID_IMP_ROCK].meshIndex + (GetRandomControl() & 7);
 		fx->objectNumber = ID_IMP_ROCK;
 		fx->shade = 16912;
-		fx->counter = 0;
+		fxInfo->counter = 0;
 		fx->frameNumber = fxNum;
-		fx->flag1 = 2;
-		fx->flag2 = 0x2000;
+		fxInfo->flag1 = 2;
+		fxInfo->flag2 = 0x2000;
 	}
 }
 

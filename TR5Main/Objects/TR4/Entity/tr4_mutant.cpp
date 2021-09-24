@@ -16,13 +16,14 @@ namespace TEN::Entities::TR4
 {
     void TriggerCrocgodMissile(PHD_3DPOS* src, short roomNumber, short counter)
     {
-        FX_INFO* fx;
         short fxNumber = NO_ITEM;
 
-        fxNumber = CreateNewEffect(roomNumber);
+        fxNumber = CreateNewEffect(roomNumber,ID_ENERGY_BUBBLES,*src);
         if (fxNumber != NO_ITEM)
         {
-            fx = &EffectList[fxNumber];
+            
+            ITEM_INFO* fx = &g_Level.Items[fxNumber];
+            FX_INFO* fxInfo = fx->data;
             fx->pos.xPos = src->xPos;
             fx->pos.yPos = src->yPos - (GetRandomControl() & 0x3F) - 32;
             fx->pos.zPos = src->zPos;
@@ -30,17 +31,15 @@ namespace TEN::Entities::TR4
             fx->pos.yRot = src->yRot;
             fx->pos.zRot = 0;
             fx->roomNumber = roomNumber;
-            fx->counter = 16 * counter + 15;
-            fx->objectNumber = ID_ENERGY_BUBBLES;
-            fx->frameNumber = Objects[fx->objectNumber].meshIndex + 5;
+            fxInfo->counter = 16 * counter + 15;
+            fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR4_FIREBALL);
             fx->speed = (GetRandomControl() & 0x1F) + 96;
-            fx->flag1 = 6;
+            fxInfo->flag1 = 6;
         }
     }
 
     void TriggerCrocgodMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
     {
-        FX_INFO* fx;
         SPARKS* sptr;
         BYTE color, life, size;
 
@@ -48,7 +47,7 @@ namespace TEN::Entities::TR4
         //z = LaraItem->pos.zPos - Effects[m_fxNumber].pos.zPos;
         //if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
-        fx = &EffectList[fxNumber];
+        ITEM_INFO* fx = &g_Level.Items[fxNumber];
         sptr = &Sparks[GetFreeSpark()];
         sptr->on = true;
         color = (GetRandomControl() & 0x3F) - 128;

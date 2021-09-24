@@ -18,7 +18,7 @@
 #include "smoke.h"
 #include "Specific\prng.h"
 #include "Renderer11.h"
-
+#include "setup.h"
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;
@@ -68,7 +68,7 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 
 void DetatchSpark(int num, SpriteEnumFlag type)
 {
-	FX_INFO* fx;
+	ITEM_INFO* fx;
 	ITEM_INFO* item;
 	SPARKS* sptr;
 	int lp;
@@ -87,7 +87,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)
 					}
 					else
 					{
-						fx = &EffectList[num];
+						fx = &g_Level.Items[num];
 						sptr->x += fx->pos.xPos;
 						sptr->y += fx->pos.yPos;
 						sptr->z += fx->pos.zPos;
@@ -159,7 +159,8 @@ int GetFreeSpark()
 	SPARKS * spark = &Sparks[sparkNumber];
 	spark->extras = 0;
 	spark->dynamic = -1;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->sSprite = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->dSprite = spark->sSprite;
 
 	return sparkNumber;
 }
@@ -288,6 +289,7 @@ void UpdateSparks()
 			int ds = dl * (spark->dSize - spark->sSize);
 			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
+			spark->def = lerp(spark->sSprite, spark->dSprite, alpha);
 			spark->size = lerp(spark->sSize, spark->dSize,alpha );
 
 			if (spark->flags & SP_FIRE && !Lara.burn || spark->flags & SP_DAMAGE)
@@ -1111,6 +1113,19 @@ void Richochet(PHD_3DPOS* pos)
 	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
 }
 
+void SparkSpriteSequence(SPARKS* spark, GAME_OBJECT_ID spriteSequence)
+{
+	spark->sSprite = Objects[spriteSequence].meshIndex;
+	int numSprites = Objects[spriteSequence].nmeshes;
+	spark->dSprite = Objects[spriteSequence].meshIndex + (-numSprites);
+}
+
+void SparkSpriteSequence(SPARKS* spark, GAME_OBJECT_ID spriteSequence, int src, int dest)
+{
+	spark->sSprite = Objects[spriteSequence].meshIndex + src;
+	spark->dSprite = Objects[spriteSequence].meshIndex + dest;
+}
+
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -1624,8 +1639,8 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			else
 			{
 				spark->fadeToBlack = 8;
-				spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
-				spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
+				spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
+				spark->life = spark->sLife = 8 + (GetRandomControl() & 3) + 16;
 			}
 		}
 		else
@@ -1675,7 +1690,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 		else
 		{
 			spark->xVel = (GetRandomControl() & 0xFF) - 128;
-			spark->yVel = -16 - (GetRandomControl() & 0xF);
+			spark->yVel = -(GetRandomControl() & 0x6);
 			spark->zVel = (GetRandomControl() & 0xFF) - 128;
 
 			if (type == 1)
@@ -1684,7 +1699,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			}
 			else
 			{
-				spark->friction = 5;
+				spark->friction = 32;
 			}
 		}
 
@@ -1727,8 +1742,8 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			{
 				spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE | SP_FX;
 				spark->fxObj = fxObj;
-				spark->gravity = -32 - (GetRandomControl() & 0x3F);
-				spark->maxYvel = -24 - (GetRandomControl() & 7);
+				spark->gravity = -16 - (GetRandomControl() & 0x3F);
+				spark->maxYvel = -16 - (GetRandomControl() & 7);
 			}
 		}
 
@@ -1748,7 +1763,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			}
 			else
 			{
-				spark->dSize = spark->size / 16;
+				spark->dSize = spark->size;
 				if (type == 7)
 				{
 					spark->colFadeSpeed >>= 2;
@@ -1770,7 +1785,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 		}
 		else
 		{
-			spark->dSize = (spark->size / 16.0f);
+			spark->dSize = (spark->size * 1.1);
 
 			if (type == 7)
 			{
@@ -1780,6 +1795,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 				spark->sLife = spark->life >> 2;
 			}
 		}
+		SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 	}
 }
 

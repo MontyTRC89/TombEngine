@@ -168,7 +168,8 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 
 void EffectNewRoom(short fxNumber, short roomNumber)
 {
-	if (InItemControlLoop)
+	ItemNewRoom(fxNumber, roomNumber);
+	/*if (InItemControlLoop)
 	{
 		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber;
 		ItemNewRooms[2 * ItemNewRoomNo + 1] = roomNumber;
@@ -200,10 +201,12 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 		fx->nextFx = g_Level.Rooms[roomNumber].fxNumber;
 		g_Level.Rooms[roomNumber].fxNumber = fxNumber;
 	}
+	*/
 }
 
 void KillEffect(short fxNumber)
 {
+	/*
 	if (InItemControlLoop)
 	{
 		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber | 0x8000;
@@ -249,31 +252,30 @@ void KillEffect(short fxNumber)
 		fx->nextFx = NextFxFree;
 		NextFxFree = fxNumber;
 	}
+	*/
+	KillItem(fxNumber);
 }
 
-short CreateNewEffect(short roomNum) 
+short CreateNewEffect(short roomNum,GAME_OBJECT_ID objectNum,PHD_3DPOS pos) 
 {
-	short fxNumber = NextFxFree;
+	auto fxNumber = CreateItem();
 
-	if (NextFxFree != NO_ITEM)
+	if (fxNumber != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[NextFxFree];
-		NextFxFree = fx->nextFx;
-		ROOM_INFO* r = &g_Level.Rooms[roomNum];
-		fx->roomNumber = roomNum;
-		fx->nextFx = r->fxNumber;
-		r->fxNumber = fxNumber;
-		fx->nextActive = NextFxActive;
-		NextFxActive = fxNumber;
-		fx->shade = GRAY555;
+		auto& fx = g_Level.Items[fxNumber];
+		fx.data = FX_INFO();
+		fx.roomNumber = roomNum;
+		fx.pos = pos;
+		fx.objectNumber = objectNum;
+		InitialiseItem(fxNumber);
+		AddActiveItem(fxNumber);
 	}
-
 	return fxNumber;
 }
 
 void InitialiseFXArray(int allocmem)
 {
-
+	/*
 	FX_INFO* fx;
 
 	NextFxActive = NO_ITEM;
@@ -284,6 +286,7 @@ void InitialiseFXArray(int allocmem)
 		fx->nextFx = i + 1;
 	}
 	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
+	*/
 }
 
 void RemoveDrawnItem(short itemNum) 

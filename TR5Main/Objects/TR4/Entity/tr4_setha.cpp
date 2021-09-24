@@ -533,11 +533,12 @@ void TriggerSethaSparks2(short itemNumber, char node, int size)
 
 void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
 {
-	short fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != -1)
+	short fxNumber = CreateNewEffect(roomNumber, ID_ENERGY_BUBBLES,*pos);
+	if (fxNumber != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNumber];
-
+		
+		ITEM_INFO* fx = &g_Level.Items[fxNumber];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
@@ -545,11 +546,10 @@ void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
 		fx->pos.yRot = pos->yRot;
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
-		fx->flag1 = mesh;
-		fx->objectNumber = ID_BODY_PART;
+		fxInfo->counter = 2 * GetRandomControl() + -ANGLE(180);
+		fxInfo->flag1 = mesh;
 		fx->speed = (GetRandomControl() & 0x1F) - (mesh != 1 ? 0 : 64) + 96;
-		fx->frameNumber = Objects[ID_BODY_PART].meshIndex + mesh;
+		fx->meshBits = 1 << mesh;
 	}
 }
 
@@ -642,7 +642,7 @@ void SethaAttack(int itemNumber)
 			attackPos.xRot = angles[1];
 			attackPos.yRot = angles[0];
 
-			SethaThrowAttack(&attackPos, item->roomNumber, 0);
+			SethaThrowAttack(&attackPos, item->roomNumber, static_cast<unsigned>(BUBBLES_MESH::TR4_DART_BLUE));
 		}
 		else if (item->itemFlags[0] >= 122 && item->itemFlags[0] <= 125)
 		{
@@ -783,7 +783,7 @@ void SethaAttack(int itemNumber)
 			attackPos.xRot = angles[1];
 			attackPos.yRot = angles[0];
 
-			SethaThrowAttack(&attackPos, item->roomNumber, 0);
+			SethaThrowAttack(&attackPos, item->roomNumber, static_cast<unsigned>(BUBBLES_MESH::TR4_SPIKY_BALL));
 		}
 
 		break;

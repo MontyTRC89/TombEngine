@@ -56,10 +56,15 @@ static BOSS_STRUCT BossData;
 
 static void TriggerTonyEffect(const TONY_FLAME flame)
 {
-	short fx_number = CreateNewEffect(flame.room_number);
+	PHD_3DPOS pos{};
+	pos.xPos = flame.pos.x;
+	pos.yPos = flame.pos.y;
+	pos.zPos = flame.pos.z;
+	short fx_number = CreateNewEffect(flame.room_number, ID_TONY_BOSS_FLAME, pos);
 	if (fx_number != -1)
 	{
-		FX_INFO* fx = &EffectList[fx_number];
+		ITEM_INFO* fx = &g_Level.Items[fx_number];
+		FX_INFO* fxInfo = fx->data;
 		fx->pos.xPos = flame.pos.x;
 		fx->pos.yPos = flame.pos.y;
 		fx->pos.zPos = flame.pos.z;
@@ -70,16 +75,16 @@ static void TriggerTonyEffect(const TONY_FLAME flame)
 		fx->objectNumber = ID_TONY_BOSS_FLAME;
 		fx->speed = flame.speed;
 		fx->shade = 0;
-		fx->flag1 = flame.type;
-		fx->flag2 = (GetRandomControl() & 3) + 1;
+		fxInfo->flag1 = flame.type;
+		fxInfo->flag2 = (GetRandomControl() & 3) + 1;
 
 		switch (flame.type)
 		{
 		case T_ZAPPDEBRIS:
-			fx->flag2 *= 2;
+			fxInfo->flag2 *= 2;
 			break;
 		case T_ZAPP:
-			fx->flag2 = 0;
+			fxInfo->flag2 = 0;
 			break;
 		}
 	}
@@ -142,7 +147,8 @@ static void TriggerTonyFlame(short itemNum, int hand)
 	unsigned char size = (GetRandomControl() & 31) + 32;
 	sptr->size = size;
 	sptr->sSize = size;
-	sptr->dSize = size / 4;
+	sptr->dSize = size * 4;
+	SparkSpriteSequence(sptr, ID_FIRE_SPRITES);
 }
 
 static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
@@ -150,8 +156,8 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	SPARKS* sptr;
 	int dx, dz;
 
-	dx = LaraItem->pos.xPos - EffectList[fxNumber].pos.xPos;
-	dz = LaraItem->pos.zPos - EffectList[fxNumber].pos.zPos;
+	dx = LaraItem->pos.xPos - g_Level.Items[fxNumber].pos.xPos;
+	dz = LaraItem->pos.zPos - g_Level.Items[fxNumber].pos.zPos;
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
@@ -321,7 +327,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lar
 
 void ControlTonyFireBall(short fxNumber)
 {
-	FX_INFO* fx;
+	
 	FLOOR_INFO* floor;
 	long old_x, old_y, old_z, x;
 	long rnd, j;
@@ -329,42 +335,43 @@ void ControlTonyFireBall(short fxNumber)
 	TonyFlameType type;
 	short room_number;
 
-	fx = &EffectList[fxNumber];
+	ITEM_INFO* fx = &g_Level.Items[fxNumber];
+	FX_INFO* fxInfo = fx->data;
 	old_x = fx->pos.xPos;
 	old_y = fx->pos.yPos;
 	old_z = fx->pos.zPos;
 
-	if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
+	if (fxInfo->flag1 == T_ROCKZAPPL || fxInfo->flag1 == T_ROCKZAPPR)
 	{
 		fx->fallspeed += (fx->fallspeed / 8) + 1;
 		if (fx->fallspeed < -4096)
 			fx->fallspeed = -4096;
 		fx->pos.yPos += fx->fallspeed;
 		if (Wibble & 4)
-			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, 0, 0, 0);
+			TriggerFireBallFlame(fxNumber, (TonyFlameType)fxInfo->flag1, 0, 0, 0);
 	}
-	else if (fx->flag1 == T_DROPPER)
+	else if (fxInfo->flag1 == T_DROPPER)
 	{
 		fx->fallspeed += 2;
 		fx->pos.yPos += fx->fallspeed;
 		if (Wibble & 4)
-			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, 0, 0, 0);
+			TriggerFireBallFlame(fxNumber, (TonyFlameType)fxInfo->flag1, 0, 0, 0);
 	}
 	else
 	{
-		if (fx->flag1 != T_ZAPP)
+		if (fxInfo->flag1 != T_ZAPP)
 		{
 			if (fx->speed > 48)
 				fx->speed--;
 		}
-		fx->fallspeed += fx->flag2;
+		fx->fallspeed += fxInfo->flag2;
 		if (fx->fallspeed > 512)
 			fx->fallspeed = 512;
 		fx->pos.yPos += fx->fallspeed / 2;
 		fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
 		fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
 		if (Wibble & 4)
-			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((old_x - fx->pos.xPos) * 8), (short)((old_y - fx->pos.yPos) * 8), (short)((old_z - fx->pos.zPos) * 4));
+			TriggerFireBallFlame(fxNumber, (TonyFlameType)fxInfo->flag1, (short)((old_x - fx->pos.xPos) * 8), (short)((old_y - fx->pos.yPos) * 8), (short)((old_z - fx->pos.zPos) * 4));
 	}
 
 	room_number = fx->roomNumber;
@@ -372,12 +379,12 @@ void ControlTonyFireBall(short fxNumber)
 	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
 		fx->pos.yPos < GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
-		if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR || fx->flag1 == T_ZAPP || fx->flag1 == T_DROPPER)
+		if (fxInfo->flag1 == T_ROCKZAPPL || fxInfo->flag1 == T_ROCKZAPPR || fxInfo->flag1 == T_ZAPP || fxInfo->flag1 == T_DROPPER)
 		{
 			PHD_VECTOR pos;
 
 			TriggerExplosionSparks(old_x, old_y, old_z, 3, -2, 0, fx->roomNumber);
-			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
+			if (fxInfo->flag1 == T_ROCKZAPPL || fxInfo->flag1 == T_ROCKZAPPR)
 			{
 				for (x = 0; x < 2; x++)
 					TriggerExplosionSparks(old_x, old_y, old_z, 3, -1, 0, fx->roomNumber);
@@ -385,13 +392,13 @@ void ControlTonyFireBall(short fxNumber)
 			pos.x = old_x;
 			pos.y = old_y;
 			pos.z = old_z;
-			if (fx->flag1 == T_ZAPP)
+			if (fxInfo->flag1 == T_ZAPP)
 				j = 7;
 			else
 				j = 3;
-			if (fx->flag1 == T_ZAPP)
+			if (fxInfo->flag1 == T_ZAPP)
 				type = T_ZAPPDEBRIS;
-			else if (fx->flag1 == T_DROPPER)
+			else if (fxInfo->flag1 == T_DROPPER)
 				type = T_DROPPERDEBRIS;
 			else
 				type = T_ROCKZAPPDEBRIS;
@@ -399,7 +406,7 @@ void ControlTonyFireBall(short fxNumber)
 			for (x = 0; x < j; x++)
 				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.yRot, 32 + (x * 4));
 
-			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
+			if (fxInfo->flag1 == T_ROCKZAPPL || fxInfo->flag1 == T_ROCKZAPPR)
 			{
 				room_number = LaraItem->roomNumber;
 				floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &room_number);
@@ -435,13 +442,13 @@ void ControlTonyFireBall(short fxNumber)
 	if (room_number != fx->roomNumber)
 		EffectNewRoom(fxNumber, LaraItem->roomNumber);
 
-	if (radtab[fx->flag1])
+	if (radtab[fxInfo->flag1])
 	{
 		rnd = GetRandomControl();
 		BYTE r3 = 31 - ((rnd / 16) & 3);
 		BYTE g3 = 24 - ((rnd / 64) & 3);
 		BYTE b3 = rnd & 7;
-		TriggerDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, radtab[fx->flag1], r3, g3, b3);
+		TriggerDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, radtab[fxInfo->flag1], r3, g3, b3);
 	}
 }
 

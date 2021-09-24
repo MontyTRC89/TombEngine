@@ -3318,7 +3318,7 @@ namespace TEN::Renderer
             RendererRoom *room = view.roomsToDraw[index];
 
             m_stLights.NumLights = view.lightsToDraw.size();
-            for (int j = 0; j < view.lightsToDraw.size(); j++)
+            for (int j = 0; j < std::min(view.lightsToDraw.size(),(size_t)32); j++)
                 memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
             m_cbLights.updateData(m_stLights, m_context.Get());
             m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());

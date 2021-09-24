@@ -17,7 +17,7 @@
 #define ROCKET_SPEED 220
 #define NATLAGUN_SPEED 400
 
-void ShootAtLara(FX_INFO *fx)
+void ShootAtLara(ITEM_INFO *fx)
 {
 	int x, y, z, distance;
 	BOUNDING_BOX* bounds;
@@ -40,12 +40,13 @@ void ShootAtLara(FX_INFO *fx)
 
 void ControlMissile(short fxNumber)
 {
-	FX_INFO *fx;
+	ITEM_INFO* fx;
 	FLOOR_INFO *floor;
 	short roomNumber;
 	int speed;
 
-	fx = &EffectList[fxNumber];
+	fx = &g_Level.Items[fxNumber];
+	FX_INFO* fxInfo = fx->data;
 	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !(g_Level.Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
@@ -111,7 +112,7 @@ void ControlMissile(short fxNumber)
 
 		fx->pos.yRot = LaraItem->pos.yRot;
 		fx->speed = LaraItem->speed;
-		fx->frameNumber = fx->counter = 0;
+		fx->frameNumber = fxInfo->counter = 0;
 	}
 
 	/* Create bubbles in wake of harpoon bolt */
@@ -129,13 +130,13 @@ void ControlMissile(short fxNumber)
 
 void ControlNatlaGun(short fx_number)
 {
-	FX_INFO* fx, *newfx;
+	ITEM_INFO* fx, *newfx;
 	OBJECT_INFO* object;
 	FLOOR_INFO* floor;
 	short roomNumber;
 	int x, y, z;
 
-	fx = &EffectList[fx_number];
+	fx = &g_Level.Items[fx_number];
 	object = &Objects[fx->objectNumber];
 	fx->frameNumber--;
 	if (fx->frameNumber <= Objects[fx->objectNumber].nmeshes)
@@ -153,11 +154,14 @@ void ControlNatlaGun(short fx_number)
 		/* Don't create one if hit a wall */
 		if (y >= GetFloorHeight(floor, x, y, z) || y <= GetCeiling(floor, x, y, z))
 			return;
-
-		fx_number = CreateNewEffect(roomNumber);
+		PHD_3DPOS pos{};
+		pos.xPos = x;
+		pos.yPos = y;
+		pos.zPos = z;
+		fx_number = CreateNewEffect(roomNumber,ID_PROJ_NATLA,pos);
 		if (fx_number != NO_ITEM)
 		{
-			newfx = &EffectList[fx_number];
+			newfx = &g_Level.Items[fx_number];
 			newfx->pos.xPos = x;
 			newfx->pos.yPos = y;
 			newfx->pos.zPos = z;
@@ -173,12 +177,15 @@ void ControlNatlaGun(short fx_number)
 short ShardGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
+	ITEM_INFO* fx;
+	PHD_3DPOS pos{};
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
+	fx_number = CreateNewEffect(roomNumber,ID_PROJ_SHARD,pos);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		fx = &g_Level.Items[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
@@ -198,12 +205,15 @@ short ShardGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 short BombGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
+	ITEM_INFO* fx;
+	PHD_3DPOS pos{};
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
+	fx_number = CreateNewEffect(roomNumber,ID_PROJ_BOMB,pos);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		fx = &g_Level.Items[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
@@ -223,12 +233,15 @@ short BombGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 short NatlaGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
+	ITEM_INFO* fx;
+	PHD_3DPOS pos{};
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
+	fx_number = CreateNewEffect(roomNumber,ID_PROJ_NATLA,pos);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		fx = &g_Level.Items[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;

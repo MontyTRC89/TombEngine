@@ -16,24 +16,27 @@
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
-static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
+void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
 {
 	short fx_number;
 	short cam_rot;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
+	ITEM_INFO* fx;
+	PHD_3DPOS pos{};
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
+	fx_number = CreateNewEffect(roomNumber,ID_FLAME,pos);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
-		fx->roomNumber = roomNumber;
+		fx = &g_Level.Items[fx_number];
+		//fx->flags = IFLAG_ACTIVATION_MASK;
+		fx->currentAnimState = 0x0001;
+		FX_INFO* fxInfo = fx->data;
 		//TODO: complete fx parameters
 		fx->shade = 14 * 256;
-		fx->counter = 40;
+		fxInfo->counter = 40;
 		ShootAtLara(fx);
+		fx->speed = speed;
 	}
 }
 
@@ -86,7 +89,7 @@ void WorkerFlamethrower(short itemNum)
 		if (item->currentAnimState != 5 && item->currentAnimState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
+			//AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
 		}
 		else
 		{
@@ -217,6 +220,8 @@ void WorkerFlamethrower(short itemNum)
 			{
 				torso_y = info.angle;
 				torso_x = info.xAngle;
+				if(!(Wibble & 0xF))
+					Flame(pos.x, pos.y, pos.z, 200, info.angle, item->roomNumber);
 			}
 
 			if (item->goalAnimState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))

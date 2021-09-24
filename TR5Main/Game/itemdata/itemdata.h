@@ -20,7 +20,7 @@
 #include "phd_global.h"
 #include "tr4_wraith_info.h"
 #include "tr5_pushableblock_info.h"
-
+#include "effects\effects.h"
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
@@ -59,7 +59,8 @@ class ITEM_DATA {
 		WRAITH_INFO,
 		RUBBER_BOAT_INFO,
 		PUSHABLE_INFO,
-		CART_INFO
+		CART_INFO,
+		FX_INFO
 	> data;
 	public:
 	ITEM_DATA();

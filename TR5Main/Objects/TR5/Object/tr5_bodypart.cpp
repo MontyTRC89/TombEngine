@@ -6,14 +6,16 @@
 #include "tr5_missile.h"
 #include "control/control.h"
 #include "items.h"
+#include "level.h"
 void ControlBodyPart(short fxNumber)
 {
-	FX_INFO* fx = &EffectList[fxNumber];
+	ITEM_INFO* fx = &g_Level.Items[fxNumber];
+	FX_INFO* fxInfo = fx->data;
 	int x = fx->pos.xPos;
 	int y = fx->pos.yPos;
 	int z = fx->pos.zPos;
 
-	if (fx->counter <= 0)
+	if (fxInfo->counter <= 0)
 	{
 		if (fx->speed)
 			fx->pos.xRot += 4 * fx->fallspeed;
@@ -21,7 +23,7 @@ void ControlBodyPart(short fxNumber)
 	}
 	else
 	{
-		int modulus = 62 - fx->counter;
+		int modulus = 62 - fxInfo->counter;
 		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
 		if (fxNumber & 1)
 		{
@@ -33,7 +35,7 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.zRot += random;
 			fx->pos.xRot -= random;
 		}
-		if (--fx->counter < 8)
+		if (--fxInfo->counter < 8)
 			fx->fallspeed += 2;
 	}
 
@@ -44,7 +46,7 @@ void ControlBodyPart(short fxNumber)
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 
-	if (!fx->counter)
+	if (!fxInfo->counter)
 	{
 		int ceiling = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 		if (fx->pos.yPos < ceiling)
@@ -57,19 +59,19 @@ void ControlBodyPart(short fxNumber)
 		int height = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 		if (fx->pos.yPos >= height)
 		{
-			if (fx->flag2 & 1)
+			if (fxInfo->flag2 & 1)
 			{
 				fx->pos.xPos = x;
 				fx->pos.yPos = y;
 				fx->pos.zPos = z;
 
-				if (fx->flag2 & 0x200)
+				if (fxInfo->flag2 & 0x200)
 					ExplodeFX(fx, -2, 32);
 				else
 					ExplodeFX(fx, -1, 32);
 
 				KillEffect(fxNumber);
-				if (fx->flag2 & 0x800)
+				if (fxInfo->flag2 & 0x800)
 					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos, 0);
 				return;
 			}
@@ -94,13 +96,13 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.yPos = y;
 		}
 
-		if (!fx->speed && ++fx->flag1 > 32)
+		if (!fx->speed && ++fxInfo->flag1 > 32)
 		{
 			KillEffect(fxNumber);
 			return;
 		}
 
-		if (fx->flag2 & 2 && (GetRandomControl() & 1))
+		if (fxInfo->flag2 & 2 && (GetRandomControl() & 1))
 		{
 			DoBloodSplat(
 				(GetRandomControl() & 0x3F) + fx->pos.xPos - 32,

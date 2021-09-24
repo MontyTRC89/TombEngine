@@ -2,7 +2,7 @@
 #include <vector>
 #include "Specific\phd_global.h"
 #include "itemdata\itemdata.h"
-
+using ItemStateFunction = std::add_pointer<void(short,ITEM_INFO*)>::type;
 enum GAME_OBJECT_ID : short;
 
 enum AIObjectType
@@ -103,7 +103,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNum);
 void RemoveDrawnItem(short itemNum);
 void InitialiseFXArray(int allocmem);
-short CreateNewEffect(short roomNum);
+short CreateNewEffect(short roomNum,GAME_OBJECT_ID objectNum,PHD_3DPOS pos);
 void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);

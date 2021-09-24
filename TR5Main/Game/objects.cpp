@@ -493,9 +493,10 @@ void HighObject2Control(short itemNumber)
 		else
 		{
 			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
-			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+			//spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 			spark->scalar = 1;
 			spark->gravity = (GetRandomControl() & 0xF) + 64;
+			SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, SPR_UNDERWATERDUST, SPR_UNDERWATERDUST);
 		}
 	}
 }

@@ -47,11 +47,15 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 
 	if (!(GetRandomControl() & 0x1F))
 	{
-		short fxNumber = CreateNewEffect(item->roomNumber);
+		PHD_3DPOS position;
+		position.xPos = pos->x;
+		position.yPos = pos->y;
+		position.zPos = pos->z;
+		short fxNumber = CreateNewEffect(item->roomNumber,ID_ENERGY_BUBBLES, position);
 		if (fxNumber != -1)
 		{
-			FX_INFO* fx = &EffectList[fxNumber];
-
+			ITEM_INFO* fx = &g_Level.Items[fxNumber];
+			FX_INFO* fxInfo = fx->data;
 			fx->pos.xPos = pos->x;
 			fx->pos.yPos = pos->y;
 			fx->pos.zPos = pos->z;
@@ -63,10 +67,10 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 			fx->fallspeed = 0;
 			fx->objectNumber = ID_BODY_PART;
 			fx->shade = 16912;
-			fx->flag2 = 9729;
-			fx->frameNumber = Objects[ID_BUBBLES].meshIndex + (GetRandomControl() & 7);
-			fx->counter = 0;
-			fx->flag1 = 0;
+			fxInfo->flag2 = 9729;
+			fx->meshBits = (GetRandomControl() & 7);
+			fxInfo->counter = 0;
+			fxInfo->flag1 = 0;
 		}
 	}
 
@@ -124,7 +128,8 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 	spark->flags = SP_SCALE | SP_DEF;
 	spark->scalar = 3;
 	spark->maxYvel = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, 11, 11);
+	//spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->gravity = 0;
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
@@ -207,11 +212,12 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 
 static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 {
-	short fxNum = CreateNewEffect(roomNumber);
+	short fxNum = CreateNewEffect(roomNumber,ID_ENERGY_BUBBLES,*pos);
 
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		ITEM_INFO* fx = &g_Level.Items[fxNum];
+		FX_INFO* fxInfo = fx->data;
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos;
@@ -220,11 +226,10 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->pos.yRot = pos->yRot;
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 16 * count + 15;
-		fx->flag1 = 1;
-		fx->objectNumber = ID_BUBBLES;
+		fxInfo->counter = 16 * count + 15;
+		fxInfo->flag1 = 1;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
+		fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
 	}
 }
 

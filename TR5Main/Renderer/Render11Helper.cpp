@@ -97,6 +97,7 @@ namespace TEN::Renderer
 
 	void Renderer11::updateEffects(RenderView& view)
 	{
+		/*
 		for (int i = 0; i < view.effectsToDraw.size(); i++)
 		{
 			RendererEffect *fx = view.effectsToDraw[i];
@@ -105,6 +106,7 @@ namespace TEN::Renderer
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
 			view.effectsToDraw[i]->World = rotation * translation;
 		}
+		*/
 	}
 
 	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
@@ -838,6 +840,7 @@ namespace TEN::Renderer
 
 		short objNum = item->objectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
+
 		RendererObject &moveable = *m_moveableObjects[objNum];
 
 		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)

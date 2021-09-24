@@ -20,6 +20,7 @@ using namespace TEN::Effects::Environment;
 static short WreckingBallData[2] = {0, 0};
 ITEM_INFO* WBItem;
 short WBRoom;
+extern std::array<ItemStateFunction, 2> FlameStateFunctions;
 
 byte Flame3xzoffs[16][2] =
 {
@@ -49,10 +50,10 @@ void LaraBurn()
 {
 	if (!Lara.burn && !Lara.burnSmoke)
 	{
-		short fxNum = CreateNewEffect(LaraItem->roomNumber);
+		short fxNum = CreateNewEffect(LaraItem->roomNumber,ID_FLAME,LaraItem->pos);
 		if (fxNum != NO_ITEM)
 		{
-			EffectList[fxNum].objectNumber = ID_FLAME;
+			g_Level.Items[fxNum].objectNumber = ID_FLAME;
 			Lara.burn = true;
 		}
 	}
@@ -251,14 +252,38 @@ void FlameEmitter2Control(short itemNumber)
 		}
 	}
 }
+void TriggerFlameProjectileSparks(PHD_3DPOS* pos) {
+	SPARKS& sparks = Sparks[GetFreeSpark()];
+	sparks.on = true;
+	sparks.sR = sparks.dR = 255;
+	sparks.sG = sparks.dG = 156 + (GetRandomControl() & 32);
+	sparks.sB = sparks.dB = 48;
+	sparks.colFadeSpeed = 4 + (GetRandomControl() & 3);
+	sparks.fadeToBlack = 8;
+	sparks.life = sparks.sLife = (GetRandomControl() & 3) + 18;
+	sparks.transType = COLADD;
+	sparks.extras = 0;
+	sparks.dynamic = -1;
+	sparks.x = pos->xPos;
+	sparks.y = pos->yPos;
+	sparks.z = pos->zPos;
+	sparks.rotAdd = ANGLE(360);
+	sparks.xVel = ((GetRandomControl() & 255) - 128);
+	sparks.yVel = ((GetRandomControl() & 255) - 128) + 128;
+	sparks.zVel = ((GetRandomControl() & 255) - 128);
+	sparks.friction = 3;
+	//sparks.def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sparks.scalar = 3;
+	sparks.sSize = sparks.size = 32;
+	sparks.dSize = 32 + (GetRandomControl() & 32);
+	sparks.flags = SP_DEF | SP_SCALE | SP_ROTATE;
+	SparkSpriteSequence(&sparks, ID_FIRE_SPRITES);
+}
 
-void FlameControl(short fxNumber)
-{
-	FX_INFO* fx = &EffectList[fxNumber];
-
+void FlameStateNormal(short fxNumber,ITEM_INFO* fx) {
 	for (int i = 0; i < 14; i++)
 	{
-		if (!(Wibble & 0x2))
+		if (!(Wibble & 0xF))
 		{
 			fx->pos.xPos = 0;
 			fx->pos.yPos = 0;
@@ -294,7 +319,7 @@ void FlameControl(short fxNumber)
 			if (Lara.burnBlue == 128)
 			{
 				b = r;
-				
+
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 13, 0, g, b);
 			}
 			else if (Lara.burnBlue == 256)
@@ -308,7 +333,7 @@ void FlameControl(short fxNumber)
 
 	if (LaraItem->roomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, LaraItem->roomNumber);
-	
+
 	int wh = GetWaterHeight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 	if (wh == NO_HEIGHT || fx->pos.yPos <= wh || Lara.burnBlue)
 	{
@@ -328,6 +353,31 @@ void FlameControl(short fxNumber)
 		KillEffect(fxNumber);
 		Lara.burn = false;
 	}
+}
+
+void FlameStateProjectile(short fxNumber, ITEM_INFO* fx) {
+	if (fx->data.is<FX_INFO>()) {
+		FX_INFO* fxInfo = fx->data;
+		if (ItemNearLara(&fx->pos, 256)) {
+			LaraBurn();
+			Lara.burn = true;
+		}
+		fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
+		fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
+		fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
+		fx->pos.yPos += 20;
+		TriggerFlameProjectileSparks(&fx->pos);
+		fxInfo->counter--;
+		if (fxInfo->counter <= 0) {
+			KillEffect(fxNumber);
+		}
+	}
+}
+
+void FlameControl(short fxNumber)
+{
+	ITEM_INFO* fx = &g_Level.Items[fxNumber];
+	FlameStateFunctions[fx->currentAnimState](fxNumber,fx);
 }
 
 void LavaBurn(ITEM_INFO* item)
@@ -1101,3 +1151,9 @@ void FlameEmitter3Control(short itemNumber)
 		}
 	}
 }
+
+
+std::array<ItemStateFunction, 2> FlameStateFunctions = {
+	FlameStateNormal,
+	FlameStateProjectile
+};

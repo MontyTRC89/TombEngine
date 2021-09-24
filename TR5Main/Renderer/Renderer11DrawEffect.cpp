@@ -175,7 +175,7 @@ namespace TEN::Renderer
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 
 					if (spark->flags & SP_FX) {
-						FX_INFO* fx = &EffectList[spark->fxObj];
+						ITEM_INFO* fx = &g_Level.Items[spark->fxObj];
 
 						pos.x += fx->pos.xPos;
 						pos.y += fx->pos.yPos;
@@ -700,10 +700,11 @@ namespace TEN::Renderer
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
-				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+				billboardMatrix = scale * rotation * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), -cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
@@ -729,7 +730,7 @@ namespace TEN::Renderer
 				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
-				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
+				billboardMatrix = scale *rotation * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
@@ -836,6 +837,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) {
+		/*
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -876,10 +878,11 @@ namespace TEN::Renderer
 			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
-
+		*/
 	}
 
 	void Renderer11::drawEffects(RenderView& view,bool transparent) {
+		/*
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -899,7 +902,7 @@ namespace TEN::Renderer
 			if (obj->drawRoutine && obj->loaded)
 				drawEffect(view,effect, transparent);
 		}
-
+		*/
 	}
 
 	void Renderer11::drawDebris(RenderView& view,bool transparent) {

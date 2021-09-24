@@ -105,6 +105,7 @@ namespace TEN::Renderer
 
 	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
 	{
+		/*
 		effect->Lights.clear();
 		if (m_rooms.size() < roomNumber) {
 			return;
@@ -202,6 +203,7 @@ namespace TEN::Renderer
 		{
 			renderView.lightsToDraw.push_back(tempLights[i]);
 		}
+		*/
 	}
 
 	void Renderer11::collectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
@@ -424,6 +426,7 @@ namespace TEN::Renderer
 
 	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)
 	{
+		/*
 		if (m_rooms.size() < roomNumber)
 			return;
 		RendererRoom &const room = m_rooms[roomNumber];
@@ -451,6 +454,7 @@ namespace TEN::Renderer
 
 			renderView.effectsToDraw.push_back(newEffect);
 		}
+		*/
 	}
 
 	void Renderer11::resetAnimations()

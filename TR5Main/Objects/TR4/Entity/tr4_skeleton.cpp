@@ -22,11 +22,11 @@ namespace TEN::Entities::TR4
 
 	void TriggerRiseEffect(ITEM_INFO* item)
 	{
-		short fxNum = CreateNewEffect(item->roomNumber);
+		short fxNum = CreateNewEffect(item->roomNumber,ID_BODY_PART,item->pos);
 		if (fxNum != NO_ITEM)
 		{
-			FX_INFO* fx = &EffectList[fxNum];
-
+			ITEM_INFO* fx = &g_Level.Items[fxNum];
+			FX_INFO* fxInfo = fx->data;
 			short roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 			fx->frameNumber = Objects[103].meshIndex;
 			fx->objectNumber = ID_BODY_PART;
 			fx->shade = 0x4210;
-			fx->flag2 = 0x601;
+			fxInfo->flag2 = 0x601;
 
 			SPARKS* spark = &Sparks[GetFreeSpark()];
 			spark->on = 1;
