@@ -1080,6 +1080,22 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
+int GetDistanceToFloor(int itemNumber, bool precise)
+{
+	auto item = &g_Level.Items[itemNumber];
+	auto result = GetCollisionResult(item);
+
+	// HACK: Remove item from bridge objects temporarily.
+	result.Block->RemoveItem(itemNumber);
+	auto height = GetFloorHeight(result.Block, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	result.Block->AddItem(itemNumber);
+
+	auto bounds = GetBoundsAccurate(item);
+	int minHeight = precise ? std::max(bounds->Y1, bounds->Y2) : 0;
+
+	return minHeight + item->pos.yPos - height;
+}
+
 void ResetGlobals()
 {
 	// Reset oscillator seed

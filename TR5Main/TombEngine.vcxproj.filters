@@ -1176,7 +1176,7 @@
     <ClInclude Include="Game\control\control.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\itemdata\mutator_info.h">
+    <ClInclude Include="Objects\Generic\Traps\falling_block.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2118,6 +2118,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\control\control.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Generic\Traps\falling_block.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

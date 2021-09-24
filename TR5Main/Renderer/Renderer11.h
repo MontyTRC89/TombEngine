@@ -30,10 +30,8 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
-#include "itemdata/mutator_info.h"
 
 struct CAMERA_INFO;
-struct MUTATOR_INFO;
 namespace TEN::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;

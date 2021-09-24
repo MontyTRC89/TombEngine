@@ -30,7 +30,6 @@ namespace Footprints {
 		}
 
 		int height = GetFloorHeight(floor, x, y, z);
-		int diff;
 		PHD_VECTOR pos;
 
 		pos.x = pos.z = 0;

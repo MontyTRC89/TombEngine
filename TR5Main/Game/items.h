@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "animation.h"
 #include "Specific\phd_global.h"
 #include "itemdata\itemdata.h"
 
@@ -45,6 +46,7 @@ struct ITEM_INFO
 	short requiredAnimState;
 	short animNumber;
 	short frameNumber;
+	std::vector<BONE_MUTATOR> mutator;
 	short roomNumber;
 	ROOM_VECTOR location;
 	short nextItem;
