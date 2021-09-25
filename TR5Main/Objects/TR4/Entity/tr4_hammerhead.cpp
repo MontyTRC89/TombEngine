@@ -1,16 +1,13 @@
 #include "framework.h"
 #include "tr4_hammerhead.h"
 #include "control/box.h"
-#include "effects\effects.h"
-#include "people.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "animation.h"
-#include "misc.h"
 #include "itemdata/creature_info.h"
-#include "control/control.h"
 
 #define STATE_HAMMERHEAD_STOP       0
 #define STATE_HAMMERHEAD_SWIM_SLOW  1

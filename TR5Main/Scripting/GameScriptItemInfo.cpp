@@ -9,8 +9,7 @@
 #include "control/lot.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
-#include "Specific\trmath.h"
-#include "lara.h"
+#include "Specific/trmath.h"
 
 /***
 Represents any object inside the game world.

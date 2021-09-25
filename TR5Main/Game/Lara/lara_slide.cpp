@@ -7,6 +7,7 @@
 #include "collide.h"
 #include "camera.h"
 #include "level.h"
+#include "items.h"
 
 /*this file has all the related functions to sliding*/
 

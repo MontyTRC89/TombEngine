@@ -4,6 +4,7 @@
 #include "room.h"
 #include "level.h"
 #include "setup.h"
+#include "items.h"
 
 using namespace TEN::Floordata;
 

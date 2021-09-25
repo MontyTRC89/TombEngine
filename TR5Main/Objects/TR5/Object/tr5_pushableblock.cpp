@@ -8,7 +8,7 @@
 #include "control/box.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "setup.h"
 #include "tr5_pushableblock_info.h"
 

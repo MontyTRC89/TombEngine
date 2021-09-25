@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "items.h"
 
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
 

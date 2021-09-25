@@ -7,6 +7,7 @@
 #include "effects\tomb4fx.h"
 #include "Specific\trmath.h"
 #include "setup.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

@@ -18,7 +18,7 @@
 #include "ReservedScriptNames.h"
 #include "camera.h"
 #include <Renderer/RenderEnums.h>
-#include <Game/effects/lightning.h>
+#include "Game/effects/lightning.h"
 
 using namespace TEN::Effects::Lightning;
 

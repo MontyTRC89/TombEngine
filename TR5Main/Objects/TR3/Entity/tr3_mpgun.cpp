@@ -11,6 +11,7 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
+#include "items.h"
 
 enum MPGUN_STATES
 {

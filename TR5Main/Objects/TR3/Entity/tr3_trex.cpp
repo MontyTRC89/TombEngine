@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {
 	item->goalAnimState = 8;

@@ -2,10 +2,9 @@
 #include "tr5_lion.h"
 
 #include "items.h"
-#include "effects\effects.h"
-#include "control/lot.h"
+#include "effects/effects.h"
 #include "control/box.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"

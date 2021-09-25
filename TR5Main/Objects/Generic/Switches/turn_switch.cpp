@@ -9,6 +9,8 @@
 #include "level.h"
 #include "collide.h"
 #include "animation.h"
+#include "items.h"
+
 
 namespace TEN::Entities::Switches
 {

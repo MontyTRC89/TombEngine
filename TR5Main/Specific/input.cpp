@@ -6,6 +6,7 @@
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "Renderer11.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
 

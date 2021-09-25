@@ -9,6 +9,8 @@
 #include "setup.h"
 #include "Specific\trmath.h"
 #include "itemdata/creature_info.h"
+#include "items.h"
+
 
 namespace TEN::Entities::TR4
 {

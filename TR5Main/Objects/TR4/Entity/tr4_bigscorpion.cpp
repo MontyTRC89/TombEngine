@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_bigscorpion.h"
 #include "control/box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "setup.h"
 #include "control/lot.h"

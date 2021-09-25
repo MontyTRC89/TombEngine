@@ -7,6 +7,7 @@
 #include "generic_switch.h"
 #include "Sound/sound.h"
 #include "animation.h"
+#include "items.h"
 
 using namespace TEN::Entities::Switches;
 

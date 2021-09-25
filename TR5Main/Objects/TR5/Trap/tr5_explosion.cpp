@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr5_explosion.h"
 #include "level.h"
+#include "setup.h"
 #include "control/control.h"
 #include "Sound/sound.h"
 #include "effects/effects.h"
@@ -15,6 +16,7 @@
 #include "collide.h"
 #include "control/box.h"
 #include "Game/effects/lara_burn.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;

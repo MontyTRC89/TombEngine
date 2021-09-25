@@ -19,7 +19,8 @@
 #include "Quad/RenderQuad.h"
 #include "particle/SimpleParticle.h"
 #include "Renderer/RendererSprites.h"
-#include <Game/effects/lightning.h>
+#include "Game/effects/lightning.h"
+#include "items.h"
 
 using namespace TEN::Effects::Lightning;
 
