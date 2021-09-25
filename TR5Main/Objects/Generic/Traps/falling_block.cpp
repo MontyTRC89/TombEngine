@@ -103,17 +103,12 @@ void FallingBlockControl(short itemNumber)
 				if (item->itemFlags[0] < FALLINGBLOCK_DELAY)
 					item->itemFlags[0] = FALLINGBLOCK_DELAY;
 
-				auto bounds = GetBoundsAccurate(item);
-				auto x = (bounds->X2 - bounds->X1) / 2;
-				auto z = (bounds->Z2 - bounds->Z1) / 2;
-
 				// Convert object to shatter item
-				MESH* meshpp = &g_Level.Meshes[Objects[item->objectNumber].meshIndex];
 				ShatterItem.yRot = item->pos.yRot;
-				ShatterItem.meshp = meshpp;
-				ShatterItem.sphere.x = x + item->pos.xPos;
+				ShatterItem.meshp = &g_Level.Meshes[Objects[item->objectNumber].meshIndex];
+				ShatterItem.sphere.x = item->pos.xPos;
 				ShatterItem.sphere.y = item->pos.yPos - STEP_SIZE; // So debris won't spawn below floor
-				ShatterItem.sphere.z = z + item->pos.zPos;
+				ShatterItem.sphere.z = item->pos.zPos;
 				ShatterItem.bit = 0;
 				ShatterImpactData.impactDirection = Vector3(0, -(float)item->itemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
 				ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
