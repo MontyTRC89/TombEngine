@@ -404,7 +404,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 					if (TrInput & IN_FORWARD)
 					{
 						auto collResult = LaraCollisionFront(item, item->pos.yRot, 256);
-						if (abs(collResult.Position.Floor < 127) && !collResult.Position.Slope)
+						if (abs(collResult.Position.Floor) < 127 && !collResult.Position.Slope)
 							item->goalAnimState = LS_CRAWL_FORWARD;
 					}
 					else if (TrInput & IN_BACK)

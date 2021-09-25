@@ -186,7 +186,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
+void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	if (item->currentAnimState == LS_SHIMMY_RIGHT)
 	{
@@ -266,6 +266,18 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0xE0;
 			return;
 		}
+	}
+}
+
+void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// This routine cleans gravity status flag and fallspeed, making it
+	// impossible to perform bugs such as QWOP and flare jump. Found by Troye -- Lwmte, 25.09.2021
+
+	if (coll->Middle.Floor <= STEPUP_HEIGHT)
+	{
+		item->gravityStatus = false;
+		item->fallspeed = 0;
 	}
 }
 

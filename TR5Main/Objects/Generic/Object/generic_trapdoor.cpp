@@ -177,13 +177,13 @@ void OpenTrapDoor(short itemNumber)
 int TrapDoorFloorBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos;
+	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
 }
 
 int TrapDoorCeilingBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return (item->pos.yPos + 128);
+	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
 }
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
@@ -192,7 +192,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos;
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
 	return std::optional{ height };
 }
 
@@ -203,6 +203,6 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + 32;
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
 	return std::optional{ height };
 }

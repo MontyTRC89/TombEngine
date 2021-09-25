@@ -19,6 +19,9 @@ void InitialiseExpandingPlatform(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
+	// Set mutators to default
+	ExpandingPlatformUpdateMutators(itemNumber);
+
 	if (item->triggerFlags < 0)
 	{
 		item->aiBits |= ALL_AIOBJ;
@@ -219,6 +222,8 @@ void ControlExpandingPlatform(short itemNumber)
 		item->itemFlags[1] -= 64;
 		ShiftLaraOnPlatform(itemNumber, false);
 	}
+
+	ExpandingPlatformUpdateMutators(itemNumber);
 }
 
 std::optional<int> ExpandingPlatformFloor(short itemNumber, int x, int y, int z)
@@ -249,4 +254,18 @@ int ExpandingPlatformCeilingBorder(short itemNumber)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	return item.pos.yPos + 1;
+}
+
+void ExpandingPlatformUpdateMutators(short itemNumber)
+{
+	auto item = &g_Level.Items[itemNumber];
+
+	// Update bone mutators
+	float xTranslate = item->pos.yRot == ANGLE(90) ? CLICK(2) : item->pos.yRot == ANGLE(270) ? -CLICK(2) : 0.0f;
+	float zTranslate = item->pos.yRot == 0 ? CLICK(2) : item->pos.yRot == ANGLE(180) ? -CLICK(2) : 0.0f;
+	for (int i = 0; i < item->mutator.size(); i++)
+	{
+		item->mutator[i].Offset = Vector3(xTranslate, 0, zTranslate);
+		item->mutator[i].Scale = Vector3(1.0f, 1.0f, item->itemFlags[1] / 4096.0f);
+	}
 }

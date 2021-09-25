@@ -100,17 +100,6 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 	return false;
 }
 
-std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	if (!item->meshBits)
-		return std::nullopt;
-
-	int height = item->pos.yPos;
-	return std::optional{ height };
-}
-
 void TwoBlocksPlatformControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -184,6 +173,17 @@ void TwoBlocksPlatformControl(short itemNumber)
 	}
 }
 
+std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (!item->meshBits)
+		return std::nullopt;
+
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
+	return std::optional{ height };
+}
+
 std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -191,19 +191,18 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 	if (!item->meshBits)
 		return std::nullopt;
 
-	//+ 256 is more accurate, but prevents a tall block from entering underneath
-	int height = item->pos.yPos + 20;
+	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
 	return std::optional{ height };
 }
 
 int TwoBlocksPlatformFloorBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos;
+	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
 }
 
 int TwoBlocksPlatformCeilingBorder(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return (item->pos.yPos + 256);
+	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
 }

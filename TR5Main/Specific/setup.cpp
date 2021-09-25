@@ -20,7 +20,8 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include <tr4_littlebeetle.h>
+#include "tr4_littlebeetle.h"
+#include "Objects/Generic/Traps/falling_block.h"
 /// register objects
 #include "object_helper.h"
 
@@ -148,8 +149,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		//obj->floor = FallingBlockFloor;
-		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveMesh = true;
