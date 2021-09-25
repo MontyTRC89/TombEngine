@@ -227,7 +227,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 	short flags = *(data++);
 	short timer = flags & 0xFF;
 
-	if (Camera.type != HEAVY_CAMERA)
+	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
 		RefreshCamera(triggerType, data);
 
 	short value = 0;
@@ -467,7 +467,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 								}
 								else
 								{
-									item->status == ITEM_INVISIBLE;
+									item->status = ITEM_INVISIBLE;
 									AddActiveItem(value);
 								}
 							}
@@ -501,7 +501,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 
 			Camera.number = value;
 
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(g_Level.Cameras[value].flags & 3))
+			if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA && !(g_Level.Cameras[value].flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -513,7 +513,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
-				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
+				Camera.type = heavy ? CAMERA_TYPE::HEAVY_CAMERA : CAMERA_TYPE::FIXED_CAMERA;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
 			}
@@ -625,7 +625,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 
 	} while (!(trigger & END_BIT));
 
-	if (cameraItem && (Camera.type == FIXED_CAMERA || Camera.type == HEAVY_CAMERA))
+	if (cameraItem && (Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
 		Camera.item = cameraItem;
 
 	if (flip != -1)

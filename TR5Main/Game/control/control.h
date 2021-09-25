@@ -14,7 +14,7 @@ struct ANIM_STRUCT;
 struct MESH_INFO;
 struct ROOM_INFO;
 
-enum GAME_STATUS
+enum class GAME_STATUS
 {
 	GAME_STATUS_NONE,
 	GAME_STATUS_NEW_GAME,

@@ -173,7 +173,7 @@ void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving,
 		smoke->sLife = rnd;
 	}
 
-	smoke->transType = COLADD;
+	smoke->transType = TransTypeEnum::COLADD;
 	
 	smoke->x = pos->x + (GetRandomControl() & 7) - 3;
 	smoke->y = pos->y + (GetRandomControl() & 7) - 3;

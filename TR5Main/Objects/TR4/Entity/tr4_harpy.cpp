@@ -114,7 +114,7 @@ static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
 		spark->sLife = 16;
 		spark->colFadeSpeed = 4;
 		spark->y = y;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->fadeToBlack = 4;
 		spark->x = x;
 		spark->z = z;

@@ -135,7 +135,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (S_UpdateInput() == -1)
-				return GAME_STATUS_NONE;
+				return GAME_STATUS::GAME_STATUS_NONE;
 		}
 
 		// Has Lara control been disabled?
@@ -166,7 +166,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				Sound_Stop();
 
 				if (S_CallInventory2())
-					return GAME_STATUS_LOAD_GAME;
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 		}
 
@@ -178,7 +178,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			int z = DoPauseMenu();
 
 			if (z == INV_RESULT_EXIT_TO_TILE)
-				return GAME_STATUS_EXIT_TO_TITLE;
+				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
 #else
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
@@ -201,7 +201,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
-			return GAME_STATUS_LEVEL_COMPLETED;
+			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
 
 		int oldInput = TrInput;
 
@@ -209,7 +209,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
 #ifdef NEW_INV
-			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
+			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
 #else
 			int inventoryResult = g_Inventory.DoInventory();
 			switch (inventoryResult)
@@ -441,7 +441,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
-	return GAME_STATUS_NONE;
+	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -584,14 +584,14 @@ GAME_STATUS DoTitle(int index)
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
-		return GAME_STATUS_NEW_GAME;
+		return GAME_STATUS::GAME_STATUS_NEW_GAME;
 	case INV_RESULT_LOAD_GAME:
-		return GAME_STATUS_LOAD_GAME;
+		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 	case INV_RESULT_EXIT_GAME:
-		return GAME_STATUS_EXIT_GAME;
+		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
-	return GAME_STATUS_NEW_GAME;
+	return GAME_STATUS::GAME_STATUS_NEW_GAME;
 }
 
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
@@ -710,9 +710,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		nframes = DrawPhase();
 		Sound_UpdateScene();
 
-		if (result == GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
+			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
+			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
@@ -942,13 +942,13 @@ void RefreshCamera(short type, short *data)
 			{
 				Camera.number = value;
 
-				if ((Camera.timer < 0) || (Camera.type == LOOK_CAMERA) || (Camera.type == COMBAT_CAMERA))
+				if ((Camera.timer < 0) || (Camera.type == CAMERA_TYPE::LOOK_CAMERA) || (Camera.type == CAMERA_TYPE::COMBAT_CAMERA))
 				{
 					Camera.timer = -1;
 					targetOk = 0;
 					break;
 				}
-				Camera.type = FIXED_CAMERA;
+				Camera.type = CAMERA_TYPE::FIXED_CAMERA;
 				targetOk = 1;
 			}
 			else
@@ -956,7 +956,7 @@ void RefreshCamera(short type, short *data)
 			break;
 
 		case TO_TARGET:
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+			if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 				break;
 
 			Camera.item = &g_Level.Items[value];

@@ -164,7 +164,7 @@ void ControlGunShip(short itemNumber)
 			spark->dR = 0;
 			spark->dG = 0;
 			spark->colFadeSpeed = 12;
-			spark->transType = COLADD;
+			spark->transType = TransTypeEnum::COLADD;
 			spark->fadeToBlack = 0;
 			spark->life = 12;
 			spark->sLife = 12;

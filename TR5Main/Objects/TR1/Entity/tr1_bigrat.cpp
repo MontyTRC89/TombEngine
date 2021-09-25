@@ -258,7 +258,7 @@ void BigRatControl(short itemNumber)
     CreatureJoint(item, 0, head);
     CreatureAnimation(itemNumber, angle, 0);
 
-    if (RatIsInWater)
+    if (RatIsInWater(item, big_rat))
     {
         CreatureUnderwater(item, CLICK(0));
         item->pos.yPos = WaterHeight;
