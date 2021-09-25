@@ -11,7 +11,8 @@
 using namespace TEN::Math::Random;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED = 10;
-constexpr auto FALLINGBLOCK_FALL_SPEED = 4;
+constexpr auto FALLINGBLOCK_MAX_SPEED = 100;
+constexpr auto FALLINGBLOCK_FALL_VELOCITY = 4;
 constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 1;
 constexpr auto FALLINGBLOCK_DELAY = 52;
 constexpr auto FALLINGBLOCK_WIBBLE = 3;
@@ -85,7 +86,11 @@ void FallingBlockControl(short itemNumber)
 
 				if (item->itemFlags[1] > 0)
 				{
-					item->itemFlags[1] += FALLINGBLOCK_FALL_SPEED;
+					item->itemFlags[1] += FALLINGBLOCK_FALL_VELOCITY;
+
+					if (item->itemFlags[1] > FALLINGBLOCK_MAX_SPEED)
+						item->itemFlags[1] = FALLINGBLOCK_MAX_SPEED;
+
 					item->pos.yPos += item->itemFlags[1];
 				}
 			}
@@ -106,6 +111,8 @@ void FallingBlockControl(short itemNumber)
 				ShatterItem.sphere.y = item->pos.yPos - STEP_SIZE; // So debris won't spawn below floor
 				ShatterItem.sphere.z = item->pos.zPos;
 				ShatterItem.bit = 0;
+				ShatterImpactData.impactDirection = Vector3(0.15f, -(float)item->itemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
+				ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
 				ShatterObject(&ShatterItem, nullptr, 0, item->roomNumber, false);
 
 				SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->pos, 0);
