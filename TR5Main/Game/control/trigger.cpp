@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "items.h"
 #include "room.h"
+#include "setup.h"
 #include "floordata.h"
 #include "flipeffect.h"
 #include "objectslist.h"

@@ -6,7 +6,7 @@
 #include "effects/effects.h"
 #include "collide.h"
 #include "control/box.h"
-#include "lara_flare.h"c
+#include "lara_flare.h"
 #include "animation.h"
 #include "camera.h"
 #include "setup.h"
