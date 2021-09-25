@@ -18,7 +18,6 @@
 #include "pushpull_kick_door.h"
 #include "collide.h"
 #include "itemdata/door_data.h"
-#include "item.h"
 
 namespace TEN::Entities::Doors
 {

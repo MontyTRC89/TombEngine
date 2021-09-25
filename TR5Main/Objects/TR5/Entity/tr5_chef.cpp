@@ -2,17 +2,14 @@
 #include "tr5_chef.h"
 #include "items.h"
 #include "control/box.h"
-#include "sphere.h"
-#include "effects\debris.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2

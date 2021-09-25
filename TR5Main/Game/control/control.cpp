@@ -46,8 +46,7 @@
 #include "Lara/lara_one_gun.h"
 #include "generic_switch.h"
 #include "Scripting/GameFlowScript.h"
-#include <Game/effects/lightning.h>
-#include "item.h"
+#include "Game/effects/lightning.h"
 
 using std::vector;
 using std::unordered_map;

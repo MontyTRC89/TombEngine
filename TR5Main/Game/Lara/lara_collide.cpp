@@ -7,7 +7,7 @@
 #include "collide.h"
 #include "control/control.h"
 #include "lara_collide.h"
-#include "item.h"
+#include "items.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 

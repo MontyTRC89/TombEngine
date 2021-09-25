@@ -8,7 +8,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-#include "item.h"
+#include "items.h"
 
 BITE_INFO ratBite = { 0, 0, 57, 2 };
 

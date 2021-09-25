@@ -7,9 +7,8 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-#include "control\los.h"
-#include "effects\effects.h"
-#include "item.h"
+#include "control/los.h"
+#include "effects/effects.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 

@@ -11,8 +11,7 @@
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-#include <Objects/Generic/Traps/dart_emitter.h>
-#include "item.h"
+#include "Objects/Generic/Traps/dart_emitter.h"
 
 using namespace TEN::Entities::Traps;
 

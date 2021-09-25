@@ -4,9 +4,8 @@
 #include "control/control.h"
 #include "items.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "collide.h"
-#include "item.h"
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {

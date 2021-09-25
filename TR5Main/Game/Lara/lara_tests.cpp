@@ -8,7 +8,7 @@
 #include "lara_collide.h"
 #include "control/control.h"
 #include "control\los.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Floordata;
 

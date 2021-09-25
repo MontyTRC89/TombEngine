@@ -7,7 +7,6 @@
 #include "pickup.h"
 #include "setup.h"
 #include "health.h"
-#include "item.h"
 
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {

@@ -10,7 +10,6 @@
 #include "Sound/sound.h"
 #include "animation.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 #define STATE_VON_CROY_STOP						1
 #define STATE_VON_CROY_WALK						2

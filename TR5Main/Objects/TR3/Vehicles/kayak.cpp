@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "animation.h"
 #include "camera.h"
 #include "Lara.h"
@@ -12,7 +12,6 @@
 #include "input.h"
 #include "control/control.h"
 #include "kayak_info.h"
-#include "item.h"
 
 using std::vector;
 

@@ -6,7 +6,7 @@
 #include "generic_switch.h"
 #include "level.h"
 #include "collide.h"
-#include "item.h"
+#include "items.h"
 
 namespace TEN::Entities::Switches
 {

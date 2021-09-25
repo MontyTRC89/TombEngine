@@ -7,7 +7,7 @@
 #include <lara.h>
 #include <Game\sphere.h>
 #include <effects\effects.h>
-#include "item.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

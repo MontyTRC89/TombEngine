@@ -1,16 +1,15 @@
 #include "framework.h"
 #include "tr4_senet.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "items.h"
 #include "control/control.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
 #include "level.h"
 #include "collide.h"
-#include "item.h"
 
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];

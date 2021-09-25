@@ -2,19 +2,17 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
 #include "animation.h"
-#include "misc.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "minecart_info.h"
-#include "item.h"
 
 using std::vector;
 

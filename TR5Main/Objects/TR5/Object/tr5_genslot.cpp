@@ -3,12 +3,10 @@
 #include "items.h"
 #include "level.h"
 #include "control/control.h"
-#include "effects\effects.h"
-#include "sphere.h"
+#include "effects/effects.h"
 #include "animation.h"
 #include "lara.h"
 #include "lara_collide.h"
-#include "item.h"
 
 void GenSlot1Control(short itemNumber)
 {

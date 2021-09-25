@@ -10,7 +10,6 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

@@ -4,7 +4,7 @@
 #include "setup.h"
 #include "control/control.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

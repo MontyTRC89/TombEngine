@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_dog.h"
 #include "control/box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-#include "item.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

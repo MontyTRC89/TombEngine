@@ -6,17 +6,13 @@
 #include "objectslist.h"
 #include "control/box.h"
 #include "camera.h"
-#include "puzzles_keys.h"
-#include "pickup.h"
 #include "control/lot.h"
 #include "spotcam.h"
-#include "Sound\sound.h"
-#include "traps.h"
+#include "Sound/sound.h"
 #include "lara.h"
-#include "Lara\lara_climb.h"
-#include "Objects\Generic\Switches\generic_switch.h"
+#include "Lara/lara_climb.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
 
 
 using namespace TEN::Effects::Fire;

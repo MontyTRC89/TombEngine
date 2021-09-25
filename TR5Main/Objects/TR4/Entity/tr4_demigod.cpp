@@ -3,17 +3,15 @@
 #include "items.h"
 #include "control/box.h"
 #include "people.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "animation.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "camera.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "control/control.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 

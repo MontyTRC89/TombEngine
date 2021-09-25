@@ -1,15 +1,13 @@
 #include "framework.h"
 #include "missile.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "animation.h"
-#include "effects\debris.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
 #include "collide.h"
-#include "item.h"
 
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100

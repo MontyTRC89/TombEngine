@@ -2,8 +2,7 @@
 #include "tr4_troops.h"
 #include "control/box.h"
 #include "items.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara.h"
 #include "people.h"
 #include "setup.h"
@@ -12,7 +11,6 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
-#include "item.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 

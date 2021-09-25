@@ -1,16 +1,15 @@
 #include "framework.h"
 #include "tr5_gunship.h"
 #include "level.h"
-#include "control\los.h"
-#include "Sound\sound.h"
+#include "control/los.h"
+#include "Sound/sound.h"
 #include "animation.h"
 #include "camera.h"
-#include "effects\effects.h"
-#include "effects\debris.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
 #include "objects.h"
 #include "items.h"
 #include "lara.h"
-#include "item.h"
 
 int GunShipCounter = 0;
 

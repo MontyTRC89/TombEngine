@@ -5,7 +5,6 @@
 #include "room.h"
 #include "Sound/sound.h"
 #include "objectslist.h"
-#include "item.h"
 
 void InitialiseHighObject1(short itemNumber)
 {
