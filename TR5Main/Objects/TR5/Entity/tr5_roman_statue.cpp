@@ -208,6 +208,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->scalar = 2;
 	spark->dSize = 4;
 	spark->sSize = (spark->size = factor * ((GetRandomControl() & 0x1F) + 64)) / 16;
+	SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, 11, 11);
 }
 
 static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
@@ -227,9 +228,9 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
 		fxInfo->counter = 16 * count + 15;
-		fxInfo->flag1 = 1;
+		fxInfo->flag1 = 8;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
+		fx->meshBits = 1 << static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
 	}
 }
 
@@ -265,6 +266,7 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 	spark->scalar = 2;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
 	spark->dSize = spark->size / 4;
+	SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 }
 
 void InitialiseRomanStatue(short itemNum)

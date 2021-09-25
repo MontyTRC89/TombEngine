@@ -12,6 +12,7 @@
 #include "tr4_mutant.h"
 #include "collide.h"
 #include "tr5_hydra.h"
+#include "tr5_roman_statue.h"
 namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
@@ -418,9 +419,16 @@ namespace TEN::entities::all
 					break;
 				case 7:
 					{
-						PHD_VECTOR pos{fx->pos.xPos,fx->pos.yPos,fx->pos.zPos};
+						PHD_VECTOR pos{ fx->pos.xPos,fx->pos.yPos,fx->pos.zPos };
 						TriggerHydraMissileSparks(&pos, dx, dy, dz);
 					}
+					break;
+				case 8:
+					{
+						PHD_VECTOR pos{ fx->pos.xPos,fx->pos.yPos,fx->pos.zPos };
+						TriggerRomanStatueMissileSparks(&pos,fxNum);
+					}
+					break;
 				}
 			}
 		}

@@ -1642,6 +1642,7 @@ void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b
 	spark->def = Objects[ID_MISC_SPRITES].meshIndex;
 	spark->gravity = 0;
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
+	SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, 32, 32);
 }
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
