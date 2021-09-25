@@ -2,9 +2,9 @@
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "level.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 
 namespace TEN::Entities::Traps
 {

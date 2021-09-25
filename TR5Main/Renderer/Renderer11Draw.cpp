@@ -31,6 +31,7 @@
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
+#include "items.h"
 
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;

@@ -6,6 +6,7 @@
 #include "lara.h"
 #include "effects/effects.h"
 #include "animation.h"
+#include "items.h"
 
 void InitialiseKillerStatue(short itemNumber)
 {

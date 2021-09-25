@@ -7,6 +7,7 @@
 #include "lara_monkey.h"
 #include "input.h"
 #include "level.h"
+#include "setup.h"
 #include "health.h"
 #include "Sound/sound.h"
 #include "animation.h"

@@ -11,6 +11,7 @@
 #include "sphere.h"
 #include "traps.h"
 #include "Game/effects/lara_burn.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 

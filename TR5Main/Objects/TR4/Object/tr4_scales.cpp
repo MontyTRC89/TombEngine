@@ -5,10 +5,9 @@
 #include "setup.h"
 #include "items.h"
 #include "lara.h"
-#include "switch.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "animation.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "tr4_ahmet.h"
 #include "generic_switch.h"
 

@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+
 void InitialiseReaper(short itemNum)
 {
     ITEM_INFO* item;

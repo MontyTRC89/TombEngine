@@ -3,16 +3,11 @@
 #include "control/control.h"
 #include "camera.h"
 #include "items.h"
-#include "control/box.h"
 #include "Lara.h"
-#include "lara_surface.h"
-#include "effects\effects.h"
-#include "lara_fire.h"
 #include "animation.h"
-#include "camera.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "GameFlowScript.h"
 
 struct SUBSUIT_INFO

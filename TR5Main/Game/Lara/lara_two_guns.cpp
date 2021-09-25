@@ -12,6 +12,8 @@
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "Specific\prng.h"
+#include "items.h"
+
 using namespace TEN::Math::Random;
 struct PISTOL_DEF
 {

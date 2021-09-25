@@ -8,6 +8,7 @@
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
+#include "items.h"
 
 int NextSpider;
 SPIDER_STRUCT Spiders[NUM_SPIDERS];

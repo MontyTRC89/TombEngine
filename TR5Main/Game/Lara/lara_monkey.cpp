@@ -9,7 +9,6 @@
 #include "collide.h"
 #include "items.h"
 #include "camera.h"
-#include "control/control.h"
 #include "level.h"
 
 using namespace TEN::Floordata;

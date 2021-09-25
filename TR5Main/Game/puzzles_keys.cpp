@@ -2,6 +2,7 @@
 #include "collide.h"
 #include "input.h"
 #include "level.h"
+#include "setup.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -14,6 +15,7 @@
 #include "puzzles_keys.h"
 #include "generic_switch.h"
 #include "camera.h"
+#include "items.h"
 
 using namespace TEN::Entities::Switches;
 

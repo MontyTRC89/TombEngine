@@ -1,8 +1,11 @@
 #pragma once
+#include <cstdint>
+#include <string>
 #include <vector>
-#include "animation.h"
 #include "Specific\phd_global.h"
+#include "animation.h"
 #include "itemdata\itemdata.h"
+#include "roomvector.h"
 
 enum GAME_OBJECT_ID : short;
 
@@ -35,7 +38,7 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-struct ITEM_INFO 
+struct ITEM_INFO
 {
 	int floor;
 	uint32_t touchBits;
@@ -112,5 +115,5 @@ void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
 void UpdateItemRoom(ITEM_INFO* item, int height);
 std::vector<int> FindAllItems(short objectNumber);
-ITEM_INFO* FindItem(int object_number); 
+ITEM_INFO* FindItem(int object_number);
 int FindItem(ITEM_INFO* item);

@@ -8,6 +8,7 @@
 #include "effects\tomb4fx.h"
 #include "level.h"
 #include "Sound\sound.h"
+#include "items.h"
 
 void InitialiseAutoGuns(short itemNumber)
 {

@@ -3,9 +3,11 @@
 #include "Lara.h"
 #include "camera.h"
 #include "level.h"
+#include "setup.h"
 #include "Renderer11.h"
 #include "Sound/sound.h"
 #include "flipeffect.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
 

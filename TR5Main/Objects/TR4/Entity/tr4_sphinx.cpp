@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "items.h"
 #include "control/box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 
 enum SPHIX_STATES {
