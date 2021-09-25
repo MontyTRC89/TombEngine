@@ -59,9 +59,9 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
 		fxInfo->counter = 16 * count + 15;
-		fxInfo->flag1 = 0;
+		fxInfo->flag1 = 7;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
+		fx->meshBits = 1 << static_cast<unsigned>(BUBBLES_MESH::TR5_SPIRAL_FLAME);
 	}
 }
 
@@ -92,16 +92,17 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->zVel = zv;
 	spark->friction = 68;
 	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
-	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark->rotAng = GetRandomControl() & 0xFFFF;
 	if (GetRandomControl() & 1)
 		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 	else
 		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
 	spark->gravity = 0;
 	spark->maxYvel = 0;
-	spark->scalar = 1;
+	spark->scalar = 2;
 	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
-	spark->dSize = spark->size / 4;
+	spark->dSize = spark->size * 1.4f;
+	SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 }
 
 static void TriggerHydraSparks(short itemNumber, int frame)
@@ -125,12 +126,12 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->transType = COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
-	spark->x = (GetRandomControl() & 0xF) - 8;
-	spark->y = 0;
-	spark->z = (GetRandomControl() & 0xF) - 8;
-	spark->xVel = (byte)GetRandomControl() - 128;
-	spark->yVel = 0;
-	spark->zVel = (byte)GetRandomControl() - 128;
+	spark->x = (GetRandomControl() & 64) - 64;
+	spark->y = (GetRandomControl() & 64) - 64;
+	spark->z = (GetRandomControl() & 64) - 64;
+	spark->xVel = (GetRandomControl() & 128) - 128;
+	spark->yVel = (GetRandomControl() & 128) - 128;
+	spark->zVel = (GetRandomControl() & 128) - 128;
 	spark->friction = 4;
 	spark->flags = 4762;
 	spark->fxObj = itemNumber;
@@ -138,10 +139,11 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->rotAng = GetRandomControl() & 0xFFF;
 	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 	spark->maxYvel = 0;
-	spark->gravity = -8 - (GetRandomControl() & 7);
-	spark->scalar = 0;
-	spark->dSize = 4;
-	spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 16)) / 16;
+	spark->gravity = 8 - (GetRandomControl() & 7);
+	spark->scalar = 3;
+	spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 32)) / 16.0f;
+	spark->dSize = spark->sSize*2;
+	SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 }
 
 void HydraControl(short itemNumber)

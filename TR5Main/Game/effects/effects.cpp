@@ -46,11 +46,11 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 	{ 0, 0, 256, 8, false }, // TR5 offset 2
 	{ 0, 0, 256, 17, false }, // TR5 offset 3
 	{ 0, 0, 256, 26, false }, // TR5 offset 4
-	{ 0, 144, 40, 10, false }, // TR5 offset 5
+	{ 0, 144, 40, 10, false }, // TR5 offset 5 Hydra Mouth
 	{ -40, 64, 360, 14, false }, // TR5 offset 6
 	{ 0, -600, -40, 0, false }, // TR5 offset 7
 	{ 0, 32, 16, 9, false }, // TR5 offset 8
-	{ 0, 340, 0, 7, false }, // TR3 offset 0
+	{ 0, 340, 0, 7, false }, // TR3 offset 0 FlameThrower
 	{ 0, 0, -96, 10, false }, // TR3 offset 1
 	{ 13, 48, 320, 13, false }, // TR3 offset 2
 	{ 0, -256, 0, 5, false }, // TR3 offset 3

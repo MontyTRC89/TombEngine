@@ -62,7 +62,8 @@ enum class BUBBLES_MESH: unsigned int {
 	TR5_ROCK_5 = 10,
 	TR5_ROCK_6 = 11,
 	TR5_ROCK_7 = 12,
-	TR5_SPIRAL_FLAME = 13
+	TR5_ROCK_8 = 13,
+	TR5_SPIRAL_FLAME = 14
 
 };
 

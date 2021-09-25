@@ -11,7 +11,7 @@
 #include "control/control.h"
 #include "tr4_mutant.h"
 #include "collide.h"
-
+#include "tr5_hydra.h"
 namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
@@ -416,6 +416,11 @@ namespace TEN::entities::all
 				case 6:
 					TEN::Entities::TR4::TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
+				case 7:
+					{
+						PHD_VECTOR pos{fx->pos.xPos,fx->pos.yPos,fx->pos.zPos};
+						TriggerHydraMissileSparks(&pos, dx, dy, dz);
+					}
 				}
 			}
 		}
