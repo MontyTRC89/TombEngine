@@ -14,6 +14,7 @@
 #include "collide.h"
 #include "control/control.h"
 #include "item.h"
+
 enum CROCODILE_STATE
 {
     CROC_EMPTY,

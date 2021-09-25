@@ -11,6 +11,7 @@
 #include "effects\tomb4fx.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 using std::vector;
 using namespace TEN::Effects::Environment;
 

@@ -12,6 +12,7 @@
 #include "control/box.h"
 #include "animation.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	enum HORSEMAN_STATES

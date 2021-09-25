@@ -8,6 +8,7 @@
 #include "level.h"
 #include "input.h"
 #include "item.h"
+
 CLIMB_DIRECTION LeftIntRightExtTab[4] =
 {
 	CLIMB_DIRECTION::West, CLIMB_DIRECTION::North, CLIMB_DIRECTION::East, CLIMB_DIRECTION::South

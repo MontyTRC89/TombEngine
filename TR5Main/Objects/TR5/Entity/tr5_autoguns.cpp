@@ -9,6 +9,7 @@
 #include "level.h"
 #include "Sound\sound.h"
 #include "item.h"
+
 void InitialiseAutoGuns(short itemNumber)
 {
     ITEM_INFO* item;

@@ -10,6 +10,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 
 void InitialiseMonkey(short itemNumber)

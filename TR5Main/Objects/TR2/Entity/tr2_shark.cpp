@@ -8,6 +8,7 @@
 #include "control/control.h"
 #include "animation.h"
 #include "item.h"
+
 BITE_INFO sharkBite = { 17, -22, 344, 12 };
 
 void SharkControl(short itemNum)

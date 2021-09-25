@@ -10,6 +10,7 @@
 #include "control\los.h"
 #include "effects\effects.h"
 #include "item.h"
+
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
 static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)

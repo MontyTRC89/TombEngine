@@ -12,6 +12,7 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1
 #define STATE_HYDRA_AIM				2

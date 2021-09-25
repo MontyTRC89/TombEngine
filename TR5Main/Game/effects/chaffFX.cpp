@@ -10,6 +10,7 @@
 #include "spark.h"
 #include "Specific\prng.h"
 #include "item.h"
+
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
 

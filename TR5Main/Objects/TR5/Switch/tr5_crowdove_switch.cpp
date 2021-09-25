@@ -8,6 +8,7 @@
 #include "Sound/sound.h"
 #include "animation.h"
 #include "item.h"
+
 using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::TR5

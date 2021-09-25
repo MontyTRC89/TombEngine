@@ -15,6 +15,7 @@
 #include "Sound\sound.h"
 #include "GameFlowScript.h"
 #include "item.h"
+
 struct SUBSUIT_INFO
 {
 	short XRot;

@@ -16,6 +16,7 @@
 #include "floordata.h"
 #include "collide.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO skeletonBite = { 0, -16, 200, 11 };

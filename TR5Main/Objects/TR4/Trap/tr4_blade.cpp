@@ -6,6 +6,7 @@
 #include "control/control.h"
 #include "effects\effects.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)

@@ -8,6 +8,7 @@
 #include "Specific\trmath.h"
 #include "setup.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	short SPyoffs[8] =

@@ -7,6 +7,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 
 void BarracudaControl(short itemNum)

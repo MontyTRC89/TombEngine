@@ -9,6 +9,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 
 void TigerControl(short itemNum)

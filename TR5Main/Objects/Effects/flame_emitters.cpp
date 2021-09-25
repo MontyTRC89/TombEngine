@@ -14,6 +14,7 @@
 #include <Game/effects/lightning.h>
 #include "Game/effects/lara_burn.h"
 #include "item.h"
+
 using namespace TEN::Effects::Fire;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;

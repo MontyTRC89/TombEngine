@@ -14,6 +14,7 @@
 #include "particle/SimpleParticle.h"
 #include "boat_info.h"
 #include "item.h"
+
 enum BOAT_STATE
 {
 	STATE_BOAT_GETON,

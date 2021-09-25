@@ -9,6 +9,7 @@
 #include "items.h"
 #include "animation.h"
 #include "item.h"
+
 void InitialiseSpinningBlade(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

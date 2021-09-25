@@ -16,6 +16,7 @@
 #include "animation.h"
 #include "item.h"
 
+
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
 #define SMAN_MIN_TURN (ANGLE(6.0f)/3)

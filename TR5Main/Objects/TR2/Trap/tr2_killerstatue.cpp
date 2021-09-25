@@ -7,6 +7,7 @@
 #include "effects/effects.h"
 #include "animation.h"
 #include "item.h"
+
 void InitialiseKillerStatue(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

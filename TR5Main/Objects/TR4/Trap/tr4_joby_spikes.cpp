@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "effects/effects.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
     void InitialiseJobySpikes(short itemNumber)

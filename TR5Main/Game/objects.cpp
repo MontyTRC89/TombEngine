@@ -16,6 +16,7 @@
 #include "Sound\sound.h"
 #include "collide.h"
 #include "item.h"
+
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;

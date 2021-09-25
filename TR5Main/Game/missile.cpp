@@ -10,6 +10,7 @@
 #include "lara.h"
 #include "collide.h"
 #include "item.h"
+
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100
 #define DIVER_HARPOON_DAMAGE 50

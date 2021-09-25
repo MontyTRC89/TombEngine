@@ -18,6 +18,7 @@
 #include "effects/weather.h"
 #include "animation.h"
 #include "item.h"
+
 using std::vector;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Environment;

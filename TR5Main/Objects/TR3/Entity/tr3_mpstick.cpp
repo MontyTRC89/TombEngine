@@ -11,6 +11,7 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
 
