@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
+#include "items.h"
 
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 

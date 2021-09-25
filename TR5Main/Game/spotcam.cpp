@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "input.h"
 #include "control\volume.h"
+#include "items.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;

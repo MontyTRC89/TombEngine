@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "animation.h"
 #include <Game\items.h>
+#include "items.h"
 
 int NextBat;
 BAT_STRUCT Bats[NUM_BATS];

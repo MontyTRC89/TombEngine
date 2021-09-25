@@ -7,6 +7,8 @@
 #include "level.h"
 #include "setup.h"
 #include "RenderView\RenderView.h"
+#include "items.h"
+
 namespace TEN::Renderer
 {
 	using namespace TEN::Renderer;

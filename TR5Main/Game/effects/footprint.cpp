@@ -2,8 +2,8 @@
 #include "control/control.h"
 #include "lara.h"
 #include "animation.h"
-#include "effects\groundfx.h"
-#include "effects\footprint.h"
+#include "effects/groundfx.h"
+#include "effects/footprint.h"
 #include "level.h"
 #include "items.h"
 

@@ -1,7 +1,6 @@
 #pragma once
-#include "Specific\phd_global.h"
-#include "items.h"
 #include <deque>
+#include "Specific/phd_global.h"
 
 namespace TEN{
 namespace Effects {

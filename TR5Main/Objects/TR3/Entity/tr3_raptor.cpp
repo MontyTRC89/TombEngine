@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "items.h"
 
 static BITE_INFO raptorBite = { 0, 66, 318, 22 };
 

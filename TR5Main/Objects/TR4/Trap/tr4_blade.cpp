@@ -4,7 +4,8 @@
 #include "collide.h"
 #include "lara.h"
 #include "control/control.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

@@ -7,6 +7,8 @@
 #include "level.h"
 #include "control/control.h"
 #include "Renderer11.h"
+#include "items.h"
+
 using namespace TEN::Renderer;
 short PickupX;
 short PickupY;

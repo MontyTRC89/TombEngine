@@ -13,6 +13,7 @@
 #include "effects/tomb4fx.h"
 #include "tr4_wraith_info.h"
 #include "Game/effects/lara_burn.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 

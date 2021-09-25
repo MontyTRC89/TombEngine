@@ -1,10 +1,11 @@
 #include "framework.h"
-#include "winmain.h"
 #include <filesystem>
+#include "winmain.h"
 #include "Sound/sound.h"
 #include "lara.h"
 #include "camera.h"
 #include "room.h"
+#include "setup.h"
 #include "configuration.h"
 #include "level.h"
 

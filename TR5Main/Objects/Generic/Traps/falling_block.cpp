@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "animation.h"
 #include "level.h"
+#include "setup.h"
 #include "room.h"
 #include "Sound/sound.h"
 #include "Specific/prng.h"

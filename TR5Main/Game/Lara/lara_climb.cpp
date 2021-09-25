@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "level.h"
 #include "input.h"
+#include "items.h"
 
 CLIMB_DIRECTION LeftIntRightExtTab[4] =
 {

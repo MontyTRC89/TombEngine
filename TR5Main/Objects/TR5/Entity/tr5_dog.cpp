@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "items.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };
 static BITE_INFO DogBite = { 0, 0, 100, 3 };

@@ -10,6 +10,7 @@
 #include "level.h"
 #include "effects\weather.h"
 #include "Renderer11.h"
+#include "items.h"
 
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;

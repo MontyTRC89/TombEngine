@@ -9,6 +9,7 @@
 #include "effects/effects.h"
 #include "level.h"
 #include "animation.h"
+#include "items.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {

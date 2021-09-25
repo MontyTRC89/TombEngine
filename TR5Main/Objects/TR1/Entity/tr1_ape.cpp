@@ -6,6 +6,7 @@
 #include "level.h"
 #include "lara.h"
 #include "control/control.h"
+#include "items.h"
 
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 

@@ -7,7 +7,6 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 

@@ -39,6 +39,7 @@
 #include "control\volume.h"
 #include "Renderer11.h"
 #include "camera.h"
+#include "items.h"
 
 #ifdef NEW_INV
 #include "newinv2.h"
