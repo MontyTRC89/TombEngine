@@ -31,6 +31,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
 }
 
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
@@ -312,6 +313,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
 	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
