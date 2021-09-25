@@ -517,8 +517,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
 				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
-				if (Vector3::Distance(origin, SoundSlot[i].origin) < 64.0f ||
-					Vector3(SoundSlot[i].origin - origin).Length() < SOUND_MAXVOL_RADIUS)
+				if (Vector3::Distance(origin, SoundSlot[i].origin) < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
 			else
@@ -577,11 +576,12 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(SoundSlot[index].channel, &info);
-		if ((info.flags & BASS_SAMPLE_3D) && 
-			!(!force && SoundSlot[index].origin.x == position->xPos &&
-						SoundSlot[index].origin.y == position->yPos &&
-						SoundSlot[index].origin.z == position->zPos))
+		if (info.flags & BASS_SAMPLE_3D)
 		{
+			SoundSlot[index].origin.x = position->xPos;
+			SoundSlot[index].origin.y = position->yPos;
+			SoundSlot[index].origin.z = position->zPos;
+
 			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
 			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
 			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &pos, &rot, NULL);

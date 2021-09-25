@@ -1015,10 +1015,8 @@ void SpeedBoatControl(short itemNumber)
 	pitch = boat->speed;
 	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
-	if (boat->speed > 8)
-		SoundEffect(SFX_TR2_BOAT_ACCELERATE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
-	else if (drive)
-		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
+	int fx = (boat->speed > 8) ? SFX_TR2_BOAT_MOVING : (drive ? SFX_TR2_BOAT_IDLE : SFX_TR2_BOAT_ACCELERATE);
+	SoundEffect(fx, &boat->pos, 0, binfo->pitch / (float)BOAT_MAX_SPEED);
 
 	if (boat->speed && water - 5 == boat->pos.yPos)
 		DoBoatWakeEffect(boat);

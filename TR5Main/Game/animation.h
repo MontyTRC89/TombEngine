@@ -44,6 +44,15 @@ enum ANIMCOMMAND_TYPES
 	COMMAND_EFFECT
 };
 
+struct BONE_MUTATOR
+{
+	Vector3 Scale    = Vector3::One;
+	Vector3 Offset   = Vector3::Zero;
+	Vector3 Rotation = Vector3::Zero;
+
+	bool IsEmpty() { return (Scale == Vector3::One) && (Offset == Vector3::Zero) && (Rotation == Vector3::Zero); };
+};
+
 void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
