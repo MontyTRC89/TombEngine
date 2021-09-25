@@ -466,7 +466,7 @@ void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv)
 		spark->life = 16;
 		spark->sLife = 16;
 		spark->colFadeSpeed = 4;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->fadeToBlack = 4;
 		spark->x = x;
 		spark->y = y;
@@ -502,7 +502,7 @@ void TriggerSethaSparks2(short itemNumber, char node, int size)
 		spark->dB = spark->dG + 64;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
 		spark->x = (GetRandomControl() & 0xF) - 8;
 		spark->y = 0;

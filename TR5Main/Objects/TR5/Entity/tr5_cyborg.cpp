@@ -64,7 +64,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 		spark->dB = -64 - spark->dG;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->flags = SP_SCALE;

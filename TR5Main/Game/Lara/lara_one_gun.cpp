@@ -1126,7 +1126,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3)) 
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3)) 
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -1211,7 +1211,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_HK)// && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
@@ -1514,7 +1514,7 @@ void RifleHandler(int weaponType)
 	{
 		Lara.torsoXrot = Lara.leftArm.xRot;
 		Lara.torsoYrot = Lara.leftArm.yRot;
-		if (Camera.oldType != LOOK_CAMERA && !BinocularRange)
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
 		{
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
