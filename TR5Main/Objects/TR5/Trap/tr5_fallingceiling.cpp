@@ -5,7 +5,6 @@
 #include "lara.h"
 #include "control/control.h"
 #include "animation.h"
-#include "item.h"
 
 void FallingCeilingControl(short itemNumber)
 {

@@ -15,7 +15,7 @@
 #include "collide.h"
 #include "control/box.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;

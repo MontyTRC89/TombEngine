@@ -12,7 +12,6 @@
 #include "items.h"
 #include "setup.h"
 #include "level.h"
-#include "item.h"
 
 int NoCheatCounter;
 

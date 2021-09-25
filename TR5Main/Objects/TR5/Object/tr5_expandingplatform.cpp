@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr5_ExpandingPlatform.h"
+#include "tr5_expandingplatform.h"
 #include "items.h"
 #include "level.h"
 #include "control/control.h"
@@ -9,7 +9,6 @@
 #include "camera.h"
 #include "lara.h"
 #include "collide.h"
-#include "item.h"
 
 void InitialiseExpandingPlatform(short itemNumber)
 {

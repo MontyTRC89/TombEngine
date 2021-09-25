@@ -1,21 +1,16 @@
 #include "framework.h"
 #include "objects.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "animation.h"
 #include "Lara.h"
 #include "sphere.h"
-#include "effects\debris.h"
 #include "control/control.h"
-#include "switch.h"
-#include "control/box.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "collide.h"
-#include "item.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];

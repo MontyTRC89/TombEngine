@@ -8,12 +8,12 @@
 #include "effects/tomb4fx.h"
 #include "collide.h"
 #include "animation.h"
-#include <Game/effects/effects.h>
-#include <weather.h>
-#include <Specific/setup.h>
-#include <Game/effects/lightning.h>
+#include "Game/effects/effects.h"
+#include "weather.h"
+#include "Specific/setup.h"
+#include "Game/effects/lightning.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Effects::Lightning;

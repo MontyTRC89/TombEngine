@@ -2,17 +2,16 @@
 #include "tr4_element_puzzle.h"
 #include "level.h"
 #include "control/control.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "animation.h"
-#include <lara.h>
-#include <sphere.h>
-#include <effects\effects.h>
-#include <effects\tomb4fx.h>
-#include <switch.h>
-#include <input.h>
+#include "lara.h"
+#include "sphere.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "input.h"
 #include "generic_switch.h"
 #include "collide.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Entities::Switches;
 

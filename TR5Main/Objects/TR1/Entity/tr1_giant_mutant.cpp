@@ -10,7 +10,6 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "animation.h"
-#include "item.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,

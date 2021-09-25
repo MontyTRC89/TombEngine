@@ -6,13 +6,12 @@
 #include "lara.h"
 #include "input.h"
 #include "sphere.h"
-#include "Sound\sound.h"
-#include "effects\bubble.h"
+#include "Sound/sound.h"
+#include "effects/bubble.h"
 #include "animation.h"
 #include "camera.h"
 #include "setup.h"
 #include "rubberboat_info.h"
-#include "item.h"
 
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300

@@ -17,7 +17,6 @@
 #include "misc.h"
 #include "steel_door.h"
 #include "collide.h"
-#include "item.h"
 
 namespace TEN::Entities::Doors
 {

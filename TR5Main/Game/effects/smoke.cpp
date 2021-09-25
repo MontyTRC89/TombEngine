@@ -9,7 +9,7 @@
 #include "lara.h"
 #include "Specific\prng.h"
 #include "effects\weather.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;

@@ -1,21 +1,19 @@
 #include "framework.h"
 #include "tr5_roman_statue.h"
-#include "sphere.h"
 #include "items.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
+#include "effects/tomb4fx.h"
+#include "effects/effects.h"
 #include "control/box.h"
 #include "people.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "animation.h"
 #include "control/control.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include <Game/effects/lightning.h>
-#include "item.h"
+#include "Game/effects/lightning.h"
 
 using namespace TEN::Effects::Lightning;
 

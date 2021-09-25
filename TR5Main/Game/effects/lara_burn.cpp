@@ -5,7 +5,6 @@
 #include "Game/effects/lara_burn.h"
 #include "Game/items.h"
 #include "Game/control/control.h"
-#include "item.h"
 
 namespace TEN::Effects::Fire
 {

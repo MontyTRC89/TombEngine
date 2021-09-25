@@ -18,7 +18,6 @@
 #include "sequence_door.h"
 #include "fullblock_switch.h"
 #include "itemdata/door_data.h"
-#include "item.h"
 
 using namespace TEN::Entities::Switches;
 

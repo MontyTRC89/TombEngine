@@ -11,7 +11,6 @@
 #include "animation.h"
 #include "control/lot.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 /*
 ID_BADDY_1

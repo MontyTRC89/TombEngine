@@ -14,7 +14,7 @@
 #include "puzzles_keys.h"
 #include "generic_switch.h"
 #include "camera.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Entities::Switches;
 

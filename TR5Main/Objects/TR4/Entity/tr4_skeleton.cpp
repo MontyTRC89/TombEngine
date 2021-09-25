@@ -15,7 +15,6 @@
 #include "itemdata/creature_info.h"
 #include "floordata.h"
 #include "collide.h"
-#include "item.h"
 
 namespace TEN::Entities::TR4
 {

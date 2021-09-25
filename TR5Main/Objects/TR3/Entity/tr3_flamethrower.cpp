@@ -1,8 +1,7 @@
 #include "framework.h"
 #include "tr3_flamethrower.h"
 #include "control/box.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "people.h"
 #include "items.h"
 #include "animation.h"
@@ -10,9 +9,8 @@
 #include "control/lot.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

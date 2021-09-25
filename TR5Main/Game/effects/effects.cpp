@@ -19,7 +19,7 @@
 #include "Specific\prng.h"
 #include "Renderer11.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Effects::Fire;
 using TEN::Renderer::g_Renderer;

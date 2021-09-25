@@ -1,13 +1,12 @@
 #include "framework.h"
 #include "tr2_eagle_or_crow.h"
 #include "control/box.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };

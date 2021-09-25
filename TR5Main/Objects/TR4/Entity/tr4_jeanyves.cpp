@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "control/control.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 void InitialiseJeanYves(short itemNumber)
 {

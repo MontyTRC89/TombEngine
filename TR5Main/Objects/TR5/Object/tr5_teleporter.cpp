@@ -3,12 +3,10 @@
 #include "items.h"
 #include "level.h"
 #include "control/control.h"
-#include "Sound\sound.h"
-#include "effects\weather.h"
+#include "Sound/sound.h"
+#include "effects/weather.h"
 #include "lara.h"
 #include "camera.h"
-#include "control/box.h"
-#include "item.h"
 
 using namespace TEN::Effects::Environment;
 

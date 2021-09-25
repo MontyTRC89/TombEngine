@@ -3,20 +3,16 @@
 #include "items.h"
 #include "control/box.h"
 #include "people.h"
-#include "sphere.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
-#include "lara_fire.h"
+#include "effects/effects.h"
 #include "animation.h"
 #include "lara_one_gun.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "collide.h"
-#include "control\los.h"
-#include "item.h"
+#include "control/los.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {

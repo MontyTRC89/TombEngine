@@ -8,7 +8,6 @@
 #include "Sound/sound.h"
 #include "items.h"
 #include "animation.h"
-#include "item.h"
 
 void InitialiseSpinningBlade(short itemNumber)
 {

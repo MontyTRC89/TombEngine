@@ -1,7 +1,7 @@
 #include "framework.h"
+#include <array>
 #include "pickup_misc_items.h"
 #include "objectslist.h"
-#include <array>
 #include "lara_struct.h"
 #include "pickuputil.h"
 

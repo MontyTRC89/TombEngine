@@ -14,7 +14,6 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10

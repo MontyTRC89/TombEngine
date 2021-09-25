@@ -7,7 +7,7 @@
 #include "collide.h"
 #include "level.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 
 namespace TEN::Entities::Switches

@@ -11,7 +11,6 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 #define	STATE_GUIDE_STOP				1
 #define	STATE_GUIDE_WALK				2

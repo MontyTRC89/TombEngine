@@ -2,13 +2,12 @@
 #include "tr4_smallscorpion.h"
 #include "control/box.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-#include "item.h"
 
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
