@@ -19,6 +19,10 @@ void InitialiseRaisingBlock(short itemNumber)
 	if(floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
+	// Set mutators to 0 by default
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i].Scale.y = 0;
+
 	if (item->triggerFlags < 0)
 	{
 		item->aiBits |= ALL_AIOBJ;
@@ -136,6 +140,13 @@ void ControlRaisingBlock(short itemNumber)
 		}
 
 		item->itemFlags[1] -= 64;
+	}
+
+	// Update bone mutators
+	if (item->triggerFlags > -1)
+	{
+		for (int i = 0; i < item->mutator.size(); i++)
+			item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 
