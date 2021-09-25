@@ -17,6 +17,7 @@
 #include "input.h"
 #include "Sound\sound.h"
 #include "item.h"
+
 // NOTE: we need to decompile/inspect if these functions are still needed
 
 void ProcessExplodingSwitchType8(ITEM_INFO* item) 

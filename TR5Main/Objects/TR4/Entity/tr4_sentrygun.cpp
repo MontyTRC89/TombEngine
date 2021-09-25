@@ -18,6 +18,7 @@
 #include "itemdata/creature_info.h"
 #include "animation.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 #ifndef NEW_INV

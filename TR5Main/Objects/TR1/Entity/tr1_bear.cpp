@@ -9,6 +9,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 
 enum bearStates{

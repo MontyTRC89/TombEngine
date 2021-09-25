@@ -7,6 +7,7 @@
 #include "items.h"
 #include "effects\effects.h"
 #include "item.h"
+
 void ControlSpikyWall(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];

@@ -9,6 +9,7 @@
 #include "effects/effects.h"
 #include "animation.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	short StargateBounds[24] =

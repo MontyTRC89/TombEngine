@@ -11,6 +11,7 @@
 #include "Sound/sound.h"
 #include "Objects/Effects/flame_emitters.h"
 #include "item.h"
+
 using namespace TEN::Entities::Effects;
 
 void TriggerTorchFlame(char fxObj, char node)

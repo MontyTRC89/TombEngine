@@ -6,6 +6,7 @@
 #include "animation.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 using std::vector;
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
 {

@@ -11,6 +11,7 @@
 #include "level.h"
 #include "collide.h"
 #include "item.h"
+
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;

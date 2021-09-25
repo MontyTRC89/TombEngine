@@ -11,6 +11,7 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO swordBite = { 0, 37, 550, 15 };
 
 void InitialiseSwordGuardian(short itemNum)

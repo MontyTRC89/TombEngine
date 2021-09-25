@@ -7,6 +7,7 @@
 #include "level.h"
 #include "items.h"
 #include "item.h"
+
 namespace TEN {
 namespace Effects {
 namespace Footprints {

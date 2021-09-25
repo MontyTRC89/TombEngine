@@ -7,6 +7,7 @@
 #include "level.h"
 #include "collide.h"
 #include "item.h"
+
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  

@@ -28,6 +28,7 @@
 #include "generic_switch.h"
 #include "Game/effects/lara_burn.h"
 #include "item.h"
+
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;

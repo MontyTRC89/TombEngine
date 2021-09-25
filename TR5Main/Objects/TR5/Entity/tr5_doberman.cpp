@@ -8,6 +8,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
 
 void InitialiseDoberman(short itemNum)

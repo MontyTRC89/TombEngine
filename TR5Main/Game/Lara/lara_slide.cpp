@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "level.h"
 #include "item.h"
+
 /*this file has all the related functions to sliding*/
 
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)

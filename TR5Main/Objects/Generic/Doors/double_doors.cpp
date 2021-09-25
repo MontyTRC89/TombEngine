@@ -18,6 +18,7 @@
 #include "double_doors.h"
 #include "collide.h"
 #include "item.h"
+
 namespace TEN::Entities::Doors
 {
 	PHD_VECTOR DoubleDoorPos(0, 0, 220);

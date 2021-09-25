@@ -7,6 +7,7 @@
 #include "setup.h"
 #include "flipeffect.h"
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
 	SCARAB_INFO Scarabs[NUM_LITTLE_BETTLES];

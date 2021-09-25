@@ -8,6 +8,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };
 

@@ -21,6 +21,7 @@
 #include "lara_struct.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */

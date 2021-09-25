@@ -9,6 +9,7 @@
 #include "control/control.h"
 #include "control\los.h"
 #include "item.h"
+
 using namespace TEN::Floordata;
 
 static short LeftClimbTab[4] = // offset 0xA0638

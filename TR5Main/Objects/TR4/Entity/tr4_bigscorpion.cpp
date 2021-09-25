@@ -10,6 +10,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 int CutSeqNum;
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };

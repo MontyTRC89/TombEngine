@@ -8,6 +8,7 @@
 #include <Game\sphere.h>
 #include <effects\effects.h>
 #include "item.h"
+
 namespace TEN::Entities::TR4
 {
     void InitialiseMapper(short itemNumber)

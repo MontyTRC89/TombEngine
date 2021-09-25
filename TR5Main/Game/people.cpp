@@ -9,6 +9,7 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;

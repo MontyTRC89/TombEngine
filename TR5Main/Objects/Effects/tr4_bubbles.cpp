@@ -13,6 +13,7 @@
 #include "collide.h"
 #include "Game/effects/lara_burn.h"
 #include "item.h"
+
 using namespace TEN::Effects::Fire;
 
 namespace TEN::entities::all

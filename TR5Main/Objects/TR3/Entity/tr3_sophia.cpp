@@ -14,6 +14,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "item.h"
+
 static BOSS_STRUCT BossData;
 
 #define MAX_TRIGGER_RANGE 0x4000
