@@ -1,19 +1,12 @@
 #include "framework.h"
 #include "tr3_sophia.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "control/lot.h"
 #include "boss.h"
-#include "control/box.h"
-#include "sphere.h"
-#include "people.h"
 #include "animation.h"
-#include "misc.h"
-#include "setup.h"
 #include "level.h"
-#include "lara.h"
-#include "Sound\sound.h"
-#include "item.h"
+#include "Sound/sound.h"
 
 static BOSS_STRUCT BossData;
 

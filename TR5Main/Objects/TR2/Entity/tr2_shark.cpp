@@ -7,7 +7,7 @@
 #include "level.h"
 #include "control/control.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 BITE_INFO sharkBite = { 17, -22, 344, 12 };
 

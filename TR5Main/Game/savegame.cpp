@@ -17,7 +17,6 @@
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;

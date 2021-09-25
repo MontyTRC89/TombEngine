@@ -3,7 +3,7 @@
 #include "level.h"
 #include "lara.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 void SpringBoardControl(short itemNumber)
 {

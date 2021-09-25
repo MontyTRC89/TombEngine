@@ -2,9 +2,9 @@
 #include "tr4_ahmet.h"
 #include "control/control.h"
 #include "sphere.h"
-#include "effects\effects.h"
-#include "effects\weather.h"
-#include "Sound\sound.h"
+#include "effects/effects.h"
+#include "effects/weather.h"
+#include "Sound/sound.h"
 #include "setup.h"
 #include "control/box.h"
 #include "level.h"
@@ -14,7 +14,6 @@
 #include "items.h"
 #include "control/lot.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 using namespace TEN::Effects::Environment;
 

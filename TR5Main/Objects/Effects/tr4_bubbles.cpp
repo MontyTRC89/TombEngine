@@ -1,18 +1,15 @@
 #include "framework.h"
 #include "tr4_bubbles.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "items.h"
-#include "traps.h"
-#include "animation.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
+#include "effects/tomb4fx.h"
+#include "effects/effects.h"
 #include "level.h"
 #include "lara.h"
 #include "control/control.h"
 #include "tr4_mutant.h"
 #include "collide.h"
 #include "Game/effects/lara_burn.h"
-#include "item.h"
 
 using namespace TEN::Effects::Fire;
 

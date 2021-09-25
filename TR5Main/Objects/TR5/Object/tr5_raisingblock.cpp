@@ -8,7 +8,6 @@
 #include "objectslist.h"
 #include "Sound/sound.h"
 #include "camera.h"
-#include "item.h"
 
 void InitialiseRaisingBlock(short itemNumber)
 {

@@ -6,16 +6,14 @@
 #include "input.h"
 #include "lara.h"
 #include "lara_flare.h"
-#include "Sound\sound.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
 #include "lara_struct.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "animation.h"
 #include "setup.h"
 #include "camera.h"
 #include "biggun_info.h"
-#include "item.h"
 
 static long GunRotYAdd = 0;
 bool barrelRotating;

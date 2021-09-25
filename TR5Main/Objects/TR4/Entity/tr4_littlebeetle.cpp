@@ -6,7 +6,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "flipeffect.h"
-#include "item.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

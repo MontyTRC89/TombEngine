@@ -7,7 +7,6 @@
 #include "lara.h"
 #include "effects/effects.h"
 #include "animation.h"
-#include "item.h"
 
 void ControlSpikyCeiling(short itemNumber)
 {

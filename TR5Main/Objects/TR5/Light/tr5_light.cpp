@@ -6,7 +6,7 @@
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 void PulseLightControl(short itemNumber)
 {

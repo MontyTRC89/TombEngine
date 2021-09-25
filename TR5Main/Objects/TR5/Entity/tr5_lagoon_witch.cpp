@@ -2,8 +2,8 @@
 #include "tr5_lagoon_witch.h"
 #include "items.h"
 #include "control/box.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
@@ -13,7 +13,6 @@
 #include "level.h"
 #include "lara.h"
 #include "itemdata/creature_info.h"
-#include "item.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2

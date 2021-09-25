@@ -16,7 +16,6 @@
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "quad_info.h"
-#include "item.h"
 
 using std::vector;
 using namespace TEN::Math::Random;

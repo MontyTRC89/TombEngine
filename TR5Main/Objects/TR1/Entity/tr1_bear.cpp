@@ -8,7 +8,7 @@
 #include "lara.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
-#include "item.h"
+#include "items.h"
 
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 

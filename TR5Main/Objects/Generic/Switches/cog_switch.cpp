@@ -9,7 +9,7 @@
 #include "generic_doors.h"
 #include "collide.h"
 #include "animation.h"
-#include "item.h"
+#include "items.h"
 
 using namespace TEN::Entities::Doors;
 

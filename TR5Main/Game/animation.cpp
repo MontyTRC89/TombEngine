@@ -6,7 +6,7 @@
 #include "Renderer11.h"
 #include "Sound/sound.h"
 #include "flipeffect.h"
-#include "item.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
 

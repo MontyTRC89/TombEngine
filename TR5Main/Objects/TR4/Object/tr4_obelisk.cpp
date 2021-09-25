@@ -7,11 +7,9 @@
 #include "Sound/sound.h"
 #include "lara.h"
 #include "effects/effects.h"
-#include "effects/tomb4fx.h"
 #include "input.h"
 #include "animation.h"
-#include <Game/effects/lightning.h>
-#include "item.h"
+#include "Game/effects/lightning.h"
 
 using namespace TEN::Effects::Lightning;
 
