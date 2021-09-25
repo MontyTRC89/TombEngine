@@ -89,7 +89,7 @@ namespace TEN::entities::all
 			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = COLADD;
+			spark->transType = TransTypeEnum::COLADD;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -149,7 +149,7 @@ namespace TEN::entities::all
 			}
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = COLADD;
+			spark->transType = TransTypeEnum::COLADD;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;

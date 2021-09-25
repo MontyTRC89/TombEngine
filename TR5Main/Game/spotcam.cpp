@@ -561,7 +561,7 @@ void CalculateSpotCameras()
 		if (CheckTrigger)
 		{
 			CAMERA_TYPE oldType = Camera.type;
-			Camera.type = HEAVY_CAMERA;
+			Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -757,7 +757,7 @@ void CalculateSpotCameras()
 					if (CheckTrigger)
 					{
 						CAMERA_TYPE oldType = Camera.type;
-						Camera.type = HEAVY_CAMERA;
+						Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -779,8 +779,8 @@ void CalculateSpotCameras()
 					UseSpotCam = 0;
 					Lara.uncontrollable = false;
 					CheckTrigger = 0;
-					Camera.oldType = FIXED_CAMERA;
-					Camera.type = CHASE_CAMERA;
+					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 					Camera.speed = 1;
 
 					if (s->flags & SCF_PAN_TO_LARA_CAM)
@@ -821,8 +821,8 @@ void CalculateSpotCameras()
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
 					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
-					Camera.oldType = FIXED_CAMERA;
-					Camera.type = CHASE_CAMERA;
+					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 					Camera.speed = 1;
 
 					int elevation = Camera.targetElevation;
@@ -882,7 +882,7 @@ void CalculateSpotCameras()
 	{
 		if (!Unk_0051D024)
 		{
-			Camera.oldType = FIXED_CAMERA;
+			Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
 			Unk_0051D024 = true;
 		}
 

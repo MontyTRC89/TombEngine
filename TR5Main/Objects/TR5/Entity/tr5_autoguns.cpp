@@ -31,7 +31,7 @@ static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 	spark->dShade = shade;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 32;
-	spark->transType = COLADD;
+	spark->transType = 2;//COLLADD
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 40;
 	spark->x = pos->x - 16 + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;

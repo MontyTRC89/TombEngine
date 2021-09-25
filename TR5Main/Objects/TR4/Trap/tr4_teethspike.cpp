@@ -40,10 +40,10 @@ namespace TEN::Entities::TR4
 
 		short rotations[8] =
 		{
-			0x8000,
-			0xa000,
-			0xc000,
-			0xe000,
+			(short)0x8000,
+			(short)0xa000,
+			(short)0xc000,
+			(short)0xe000,
 			0,
 			0x2000,
 			0x4000,

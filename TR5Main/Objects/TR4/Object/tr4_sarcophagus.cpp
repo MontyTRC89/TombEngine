@@ -10,8 +10,8 @@
 
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
-	0xFE00, 512, 0xFF9C, 100, 0xFE00, 0,
-	0xF8E4, 1820, 0xEAAC, 5460, 0, 0
+	(short)0xFE00, 512, (short)0xFF9C, 100, (short)0xFE00, 0,
+	(short)0xF8E4, (short)1820, (short)0xEAAC, (short)5460, 0, 0
 };
 static PHD_VECTOR SarcophagusPosition(0, 0, -300);
 

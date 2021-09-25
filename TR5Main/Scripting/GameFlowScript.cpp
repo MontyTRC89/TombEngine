@@ -269,17 +269,17 @@ bool GameFlow::DoGameflow()
 
 		switch (status)
 		{
-		case GAME_STATUS_EXIT_GAME:
+		case GAME_STATUS::GAME_STATUS_EXIT_GAME:
 			return true;
-		case GAME_STATUS_EXIT_TO_TITLE:
+		case GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE:
 			CurrentLevel = 0;
 			break;
-		case GAME_STATUS_NEW_GAME:
+		case GAME_STATUS::GAME_STATUS_NEW_GAME:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
 			InitialiseGame = true;
 			break;
-		case GAME_STATUS_LOAD_GAME:
+		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
 			// Load the header of the savegame for getting the level to load
 			char fileName[255];
 			ZeroMemory(fileName, 255);
@@ -291,7 +291,7 @@ bool GameFlow::DoGameflow()
 			loadFromSavegame = true;
 
 			break;
-		case GAME_STATUS_LEVEL_COMPLETED:
+		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
 			if (LevelComplete == Levels.size())
 			{
 				// TODO: final credits

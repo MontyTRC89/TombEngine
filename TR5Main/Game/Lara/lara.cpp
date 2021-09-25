@@ -427,7 +427,8 @@ void LaraControl(short itemNumber)
 
 	Lara.isDucked = false;
 
-	bool isWater = g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+	bool isWater = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+	bool isSwamp = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP;
 
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -458,7 +459,7 @@ void LaraControl(short itemNumber)
 					{
 						item->goalAnimState = LS_STOP;
 					}
-					else if (isWater & ENV_FLAG_SWAMP)
+					else if (isSwamp)
 					{
 						if (item->currentAnimState == LS_SWANDIVE_START 
 							|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
@@ -470,7 +471,7 @@ void LaraControl(short itemNumber)
 						item->frameNumber = GF(LA_WADE, 0);
 					}
 				}
-				else if (!(isWater & ENV_FLAG_SWAMP))
+				else if (!isSwamp)
 				{
 					Lara.air = 1800;
 					Lara.waterStatus = LW_UNDERWATER;
@@ -688,7 +689,7 @@ void LaraControl(short itemNumber)
 			Camera.targetElevation = -ANGLE(22);
 			if (hfw >= WADE_DEPTH)
 			{
-				if (hfw > SWIM_DEPTH && !(isWater & ENV_FLAG_SWAMP))
+				if (hfw > SWIM_DEPTH && !isSwamp)
 				{
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - hfw;
