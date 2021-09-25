@@ -12,6 +12,7 @@
 #include "lara.h"
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
+#include "traps.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
@@ -50,11 +51,12 @@ static void TriggerPilotFlame(int itemnum)
 
 	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 	spark->fxObj = itemnum;
-	spark->nodeNumber = 0;
+	spark->nodeNumber = 9;
 	spark->friction = 4;
 	spark->gravity = -(GetRandomControl() & 3) - 2;
 	spark->maxYvel = -(GetRandomControl() & 3) - 4;
 	//spark->def = Objects[EXPLOSION1].mesh_index;
+	SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 	spark->scalar = 0;
 	int size = (GetRandomControl() & 7) + 32;
 	spark->size = size / 2;
@@ -74,18 +76,20 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	spark->dG = 128 + (GetRandomControl() & 63);
 	spark->dB = 32;
 
-	if (xv || yv || zv)
+	if (true/*xv || yv || zv*/)
 	{
 		spark->colFadeSpeed = 6;
 		spark->fadeToBlack = 2;
 		spark->sLife = spark->life = (GetRandomControl() & 1) + 12;
 	}
+	/*
 	else
 	{
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 16;
 		spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
 	}
+	*/
 
 	spark->transType = COLADD;
 
@@ -126,7 +130,7 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 31) + 64;
 
-	if (xv || yv || zv)
+	if (true/*xv || yv || zv*/)
 	{
 		spark->size = size / 32;
 		if (fxnum == -2)
@@ -134,13 +138,15 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 		else
 			spark->scalar = 3;
 	}
+	/*
 	else
 	{
 		spark->size = size / 16;
 		spark->scalar = 4;
 	}
-
-	spark->dSize = size / 2;
+	*/
+	spark->dSize = size;
+	SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 }
 
 static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
@@ -153,7 +159,7 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	int yv;
 	int zv;
 
-	short effectNumber = CreateNewEffect(item->roomNumber,ID_FLAME_EMITTER,item->pos);
+	short effectNumber = CreateNewEffect(item->roomNumber,ID_FLAME,item->pos);
 	if (effectNumber != NO_ITEM)
 	{
 		ITEM_INFO* fx = &g_Level.Items[effectNumber];
@@ -168,7 +174,7 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		pos2.z = bite->z;
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 		fx->pos.xPos = pos1.x;
 		fx->pos.yPos = pos1.y;
@@ -182,8 +188,8 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		fx->speed = speed * 4;
 		fxInfo->counter = 20;
 		fxInfo->flag1 = 0;
-
-		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
+		//using new ID_FLAME projectile instead
+		//TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -194,15 +200,16 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 			yv = -speed * phd_sin(fx->pos.xRot);
 			zv = velocity * phd_cos(fx->pos.yRot);
 
-			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -1);
+			//TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -1);
 		}
 
 		velocity = (speed * 2) * phd_cos(fx->pos.xRot);
-		zv = velocity * phd_cos(fx->pos.yRot);
+		
 		xv = velocity * phd_sin(fx->pos.yRot);
 		yv = -(speed * 2) * phd_sin(fx->pos.xRot);
-
-		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -2);
+		zv = velocity * phd_cos(fx->pos.yRot);
+		fx->currentAnimState = FLAME_STATES::FLAME_PROJECTILE_STATE;
+		//TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -2);
 	}
 
 	return effectNumber;
@@ -231,7 +238,7 @@ void FlameThrowerControl(short itemNumber)
 	int random = GetRandomControl();
 	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
-		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
+ 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
 		TriggerPilotFlame(itemNumber);
 	}
 	else
