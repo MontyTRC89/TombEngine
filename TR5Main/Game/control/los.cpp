@@ -10,6 +10,7 @@
 #include "effects/debris.h"
 #include "Lara/lara_one_gun.h"
 #include "items.h"
+#include "setup.h"
 
 int NumberLosRooms;
 short LosRooms[20];
