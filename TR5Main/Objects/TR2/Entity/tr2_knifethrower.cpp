@@ -11,7 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "floordata.h"
 #include "collide.h"
-
+#include "missile.h"
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
 
@@ -70,8 +70,17 @@ void KnifeControl(short fxNum)
 
 static short ThrowKnife(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
-	short fx_number = 0;
+	PHD_3DPOS pos{ x,y,z };
+	short fx_number = CreateNewEffect(roomNumber,ID_KNIFETHROWER_KNIFE, pos);
+	if (fx_number != NO_ITEM) {
+		ITEM_INFO* fx = &g_Level.Items[fx_number];
+		FX_INFO* fxInfo = fx->data;
+		fxInfo->counter = 200;
+		fx->speed = speed + 200;
+		ShootAtLara(fx);
+	}
 	// TODO: add fx parameters
+
 	return fx_number;
 }
 
