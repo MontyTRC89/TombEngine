@@ -2,9 +2,9 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "spotcam.h"
-#include "lara.h"
+#include "setup.h"
 #include "control/control.h"
-#include "effects\weather.h"
+#include "effects/weather.h"
 
 using namespace TEN::Effects::Environment;
 

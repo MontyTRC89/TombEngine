@@ -2,6 +2,7 @@
 #include "tr5_expandingplatform.h"
 #include "items.h"
 #include "level.h"
+#include "setup.h"
 #include "control/control.h"
 #include "control/box.h"
 #include "animation.h"

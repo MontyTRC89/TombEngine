@@ -2,6 +2,7 @@
 #include "collide.h"
 #include "input.h"
 #include "level.h"
+#include "setup.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"

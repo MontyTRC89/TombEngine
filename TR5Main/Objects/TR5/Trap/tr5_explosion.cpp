@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr5_explosion.h"
 #include "level.h"
+#include "setup.h"
 #include "control/control.h"
 #include "Sound/sound.h"
 #include "effects/effects.h"
