@@ -10,6 +10,7 @@
 #include "Specific\trmath.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 #define NATLA_NEAR_DEATH 200
 
 enum natla_anims {

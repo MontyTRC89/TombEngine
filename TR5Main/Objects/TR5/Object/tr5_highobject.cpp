@@ -6,6 +6,7 @@
 #include "Sound/sound.h"
 #include "objectslist.h"
 #include "item.h"
+
 void InitialiseHighObject1(short itemNumber)
 {
 	int x = 0;

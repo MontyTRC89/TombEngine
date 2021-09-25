@@ -7,6 +7,7 @@
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 

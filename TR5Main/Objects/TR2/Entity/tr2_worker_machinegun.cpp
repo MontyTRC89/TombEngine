@@ -9,6 +9,7 @@
 #include "control/control.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 
 void InitialiseWorkerMachineGun(short itemNum)

@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "level.h"
 #include "item.h"
+
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
 /*normal hanging and shimmying*/

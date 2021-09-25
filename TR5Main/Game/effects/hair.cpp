@@ -11,6 +11,7 @@
 #include "effects\weather.h"
 #include "Renderer11.h"
 #include "item.h"
+
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
 

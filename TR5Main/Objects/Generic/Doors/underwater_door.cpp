@@ -19,6 +19,7 @@
 #include "collide.h"
 #include "item.h"
 
+
 namespace TEN::Entities::Doors
 {
 	PHD_VECTOR UnderwaterDoorPos(-251, -540, -46);

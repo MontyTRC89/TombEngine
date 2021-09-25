@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "biggun_info.h"
 #include "item.h"
+
 static long GunRotYAdd = 0;
 bool barrelRotating;
 

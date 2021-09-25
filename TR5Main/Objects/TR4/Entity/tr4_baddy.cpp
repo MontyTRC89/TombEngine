@@ -12,6 +12,7 @@
 #include "control/lot.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 /*
 ID_BADDY_1
 1 - Rolls to the right 1 square

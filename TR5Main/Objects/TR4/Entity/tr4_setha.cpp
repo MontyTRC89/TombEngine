@@ -11,6 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "animation.h"
 #include "item.h"
+
 BITE_INFO SethaBite1 = { 0,220,50,17 };
 BITE_INFO SethaBite2 = { 0,220,50,13 };
 BITE_INFO SethaAttack1 = { -16,200,32,13 };

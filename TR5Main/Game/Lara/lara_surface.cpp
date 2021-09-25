@@ -12,6 +12,7 @@
 #include "level.h"
 #include "input.h"
 #include "item.h"
+
 bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 

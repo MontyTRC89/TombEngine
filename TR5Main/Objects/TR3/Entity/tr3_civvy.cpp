@@ -9,6 +9,7 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 
 enum civvy_anims {

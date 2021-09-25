@@ -12,6 +12,7 @@
 #include <Specific\setup.h>
 #include "lara_fire.h"
 #include "item.h"
+
 using namespace TEN::Renderer;
 
 extern GameFlow *g_GameFlow;

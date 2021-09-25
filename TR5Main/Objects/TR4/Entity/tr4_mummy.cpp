@@ -11,6 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "item.h"
+
 enum MUMMY_STATES {
 	STATE_MUMMY_ARMS_CROSSED = 0,
 	STATE_MUMMY_STOP = 1,

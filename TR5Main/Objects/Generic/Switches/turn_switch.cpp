@@ -11,6 +11,7 @@
 #include "animation.h"
 #include "item.h"
 
+
 namespace TEN::Entities::Switches
 {
 	enum TurnSwitchDirection

@@ -8,6 +8,7 @@
 #include "effects/effects.h"
 #include "animation.h"
 #include "item.h"
+
 void ControlSpikyCeiling(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

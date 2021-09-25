@@ -32,6 +32,7 @@
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
 #include "item.h"
+
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar *g_MusicVolumeBar;

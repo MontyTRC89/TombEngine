@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "animation.h"
 #include "item.h"
+
 void InitialiseLaraDouble(short itemNum)
 {
 	ClearItem(itemNum);

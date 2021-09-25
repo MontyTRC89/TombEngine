@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "level.h"
 #include "item.h"
+
 int NoCheatCounter;
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)

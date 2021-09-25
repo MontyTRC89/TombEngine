@@ -10,6 +10,7 @@
 #include "animation.h"
 #include <Game\items.h>
 #include "item.h"
+
 int NextBat;
 BAT_STRUCT Bats[NUM_BATS];
 

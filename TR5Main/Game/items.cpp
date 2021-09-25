@@ -7,6 +7,7 @@
 #include "floordata.h"
 #include "effects/effects.h"
 #include "item.h"
+
 using namespace TEN::Floordata;
 
 void ClearItem(short itemNum)

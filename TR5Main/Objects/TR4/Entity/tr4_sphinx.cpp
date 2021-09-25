@@ -10,6 +10,7 @@
 #include "Sound\sound.h"
 #include "itemdata/creature_info.h"
 #include "item.h"
+
 enum SPHIX_STATES {
 	SPHINX_EMPTY,
 	SPHINX_SLEEPING,
