@@ -1917,40 +1917,39 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -(LARA_FAST_TURN >> 1))
-				Lara.turnRate = -(LARA_FAST_TURN >> 1);
+			if (Lara.turnRate < -LARA_SLOW_TURN)
+				Lara.turnRate = -LARA_SLOW_TURN;
 
 			if (TestLaraLean(item, coll))
+				item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 2) / 7;
+			else
+				item->pos.zRot -= (item->pos.zRot + (LARA_LEAN_MAX / 2) * 3 / 5) / 7;
+
+			// OLD sample
+			/*if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -(LARA_LEAN_MAX >> 1))
-					item->pos.zRot = -(LARA_LEAN_MAX >> 1);
+				if (item->pos.zRot < -(LARA_LEAN_MAX / 2))
+					item->pos.zRot = -(LARA_LEAN_MAX / 2);
 			}
 			else
 			{
 				item->pos.zRot -= LARA_LEAN_RATE;
 				if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)
 					item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
-			}
+			}*/
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > (LARA_FAST_TURN / 2))
-				Lara.turnRate = (LARA_FAST_TURN / 2);
+			if (Lara.turnRate > LARA_SLOW_TURN)
+				Lara.turnRate = LARA_SLOW_TURN;
 
 			if (TestLaraLean(item, coll))
-			{
-				item->pos.zRot += LARA_LEAN_RATE;
-				if (item->pos.zRot > (LARA_LEAN_MAX >> 1))
-					item->pos.zRot = (LARA_LEAN_MAX >> 1);
-			}
+				item->pos.zRot += (LARA_LEAN_MAX / 2 - item->pos.zRot) / 7;
+
 			else
-			{
-				item->pos.zRot += LARA_LEAN_RATE;
-				if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)
-					item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
-			}
+				item->pos.zRot += ((LARA_LEAN_MAX / 2) * 3 / 5 - item->pos.zRot) / 7;
 		}
 
 		if (TrInput & IN_FORWARD)
@@ -1967,17 +1966,9 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.turnRate = -LARA_FAST_TURN;
 
 			if (TestLaraLean(item, coll))
-			{
-				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -LARA_LEAN_MAX)
-					item->pos.zRot = -LARA_LEAN_MAX;
-			}
+				item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
 			else
-			{
-				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)
-					item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
-			}
+				item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 5) / 7;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
@@ -1986,6 +1977,12 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.turnRate = LARA_FAST_TURN;
 
 			if (TestLaraLean(item, coll))
+				item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+			else
+				item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
+
+			// OLD sample
+			/*if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot += LARA_LEAN_RATE;
 				if (item->pos.zRot > LARA_LEAN_MAX)
@@ -1996,7 +1993,7 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.zRot += LARA_LEAN_RATE;
 				if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)
 					item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
-			}
+			}*/
 		}
 
 		if (TrInput & IN_FORWARD)
