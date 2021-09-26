@@ -913,12 +913,30 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Handle current Lara status
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
+	// ISSUES:
+	// Continued lean when vaulting.
+	// Continued lean in sprint > run transition.
+	// TODO: These commented conditions result in more accurate behaviour, but I suppose this is what we would call "hardcoding". @Sezz 2021.09.26
+	/*if ((item->currentAnimState != LS_RUN_FORWARD && item->currentAnimState != LS_SPRINT)
+		|| ((item->currentAnimState == LS_RUN_FORWARD || item->currentAnimState == LS_SPRINT)
+			&& !((TrInput & IN_LEFT) || (TrInput & IN_RIGHT))))*/
+	if (!Lara.isMoving
+		&& !(TrInput & (IN_LEFT | IN_RIGHT)))
+	{
+		if (item->pos.zRot >= ANGLE(0.0f))
+			item->pos.zRot -= item->pos.zRot / 7;
+		else
+			item->pos.zRot += (ANGLE(360.0f) - item->pos.zRot) / 7;
+	}
+
+	// LEGACY
+	/*if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
 		item->pos.zRot = 0;
 	else if (item->pos.zRot < -ANGLE(1.0f))
 		item->pos.zRot += ANGLE(1.0f);
 	else
-		item->pos.zRot -= ANGLE(1.0f);
+		item->pos.zRot -= ANGLE(1.0f);*/
+
 
 	if (Lara.turnRate >= -ANGLE(2.0f) && Lara.turnRate <= ANGLE(2.0f))
 		Lara.turnRate = 0;
@@ -984,6 +1002,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
+	// TODO: Move turn rate clamps to swim state functions! Divesuit needs its own states first.  @Sezz 2021.09.26
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 	{
 		if (Lara.turnRate < -ANGLE(0.5))
@@ -1017,12 +1036,23 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 		UpdateSubsuitAngles();
 
-	if (item->pos.zRot < -ANGLE(2))
+	// TODO: Conditions seem fine, but test this thoroughly. @Sezz 2021.09.26
+	if (!Lara.isMoving
+		&& !(TrInput & (IN_LEFT | IN_RIGHT)))
+	{
+		if (item->pos.zRot >= ANGLE(0.0f))
+			item->pos.zRot -= item->pos.zRot / 7;
+		else
+			item->pos.zRot += (ANGLE(360.0f) - item->pos.zRot) / 7;
+	}
+
+	// LEGACY
+	/*if (item->pos.zRot < -ANGLE(2))
 		item->pos.zRot += ANGLE(2);
 	else if (item->pos.zRot > ANGLE(2))
 		item->pos.zRot -= ANGLE(2);
 	else
-		item->pos.zRot = 0;
+		item->pos.zRot = 0;*/
 
 	if (item->pos.xRot < -ANGLE(85))
 		item->pos.xRot = -ANGLE(85);

@@ -229,17 +229,17 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = -LARA_FAST_TURN;
 
 		if (TestLaraLean(item, coll))
-		{
-			item->pos.zRot -= LARA_LEAN_RATE;
-			if (item->pos.zRot < -LARA_LEAN_MAX)
-				item->pos.zRot = -LARA_LEAN_MAX;
-		}
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+
+			// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
+			// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle in contrast with original behaviour.
+			// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
+			// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
+			// Unfortunately I am terrible at mathematics and I don't know how to do this. 
+			// Would a library of easing functions be helpful here? @Sezz 2021.09.26
+			// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
 		else
-		{
-			item->pos.zRot -= LARA_LEAN_RATE;
-			if (item->pos.zRot < -LARA_LEAN_MAX * 3 / 5)//gives best results
-				item->pos.zRot = -LARA_LEAN_MAX * 3 / 5;
-		}
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -248,17 +248,9 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_FAST_TURN;
 
 		if (TestLaraLean(item, coll))
-		{
-			item->pos.zRot += LARA_LEAN_RATE;
-			if (item->pos.zRot > LARA_LEAN_MAX)
-				item->pos.zRot = LARA_LEAN_MAX;
-		}
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
 		else
-		{
-			item->pos.zRot += LARA_LEAN_RATE;
-			if (item->pos.zRot > LARA_LEAN_MAX * 3 / 5)//gives best results
-				item->pos.zRot = LARA_LEAN_MAX * 3 / 5;
-		}
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
 	}
 
 	static bool doJump = false;
@@ -2103,22 +2095,24 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -ANGLE(4.0f))
-			Lara.turnRate = -ANGLE(4.0f);
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
 
-		item->pos.zRot -= ANGLE(1.5f);
-		if (item->pos.zRot < -ANGLE(16.0f))
-			item->pos.zRot = -ANGLE(16.0f);
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX) / 7;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX * 3 / 6) / 7;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > ANGLE(4.0f))
-			Lara.turnRate = ANGLE(4.0f);
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
 
-		item->pos.zRot += ANGLE(1.5f);
-		if (item->pos.zRot > ANGLE(16.0f))
-			item->pos.zRot = ANGLE(16.0f);
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot) / 7;
+		else
+			item->pos.zRot += (LARA_LEAN_SPRINT_MAX * 3 / 6 - item->pos.zRot) / 7;
 	}
 
 	if (!(TrInput & IN_JUMP) || item->gravityStatus)

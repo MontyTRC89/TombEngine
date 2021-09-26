@@ -487,27 +487,38 @@ void SwimTurn(ITEM_INFO* item)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= 409;
-		if (Lara.turnRate < -ANGLE(6))
-			Lara.turnRate = -ANGLE(6);
-		item->pos.zRot -= ANGLE(3);
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
+
+		item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
 	}
 	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += 409;
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
+
+		item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+	}
+
+	// LEGACY sample:
+	/*else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += 409;
 		if (Lara.turnRate > ANGLE(6))
 			Lara.turnRate = ANGLE(6);
 		item->pos.zRot += ANGLE(3);
-	}
+	}*/
 }
 
 void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
+	auto oldX =	item->pos.xPos;
+	auto oldY = item->pos.yPos;
+	auto oldZ = item->pos.zPos;
+	auto oldXrot = item->pos.xRot;
+	auto oldYrot = item->pos.yRot;
+	auto oldZrot = item->pos.zRot;
 
 	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
@@ -520,7 +531,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.ForwardAngle = item->pos.yRot;
 	}
 
-	int height = LARA_HEIGHT * phd_sin(item->pos.xRot);
+	auto height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
