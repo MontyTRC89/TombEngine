@@ -12,10 +12,137 @@
 #include "camera.h"
 #include "control/control.h"
 
-/*this file has all the related functions to ducking and crawling*/
+// --------------------
+// CRAWLING & CROUCHING
+// --------------------
 
-/*crouch/duck start*/
+// Auxiliary Functions
+
+bool TestLaraCrawl(ITEM_INFO* item)
+{
+	if (Lara.gunStatus == LG_NO_ARMS
+		&& Lara.waterStatus != LW_WADE
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		&& (item->animNumber == LA_CROUCH_IDLE || item->animNumber == LA_STAND_TO_CROUCH_END)	// TODO: Un-hardcode anim condition. @Sezz 2021.09.26
+		&& !(TrInput & (IN_FLARE | IN_DRAW))
+		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < 900 && Lara.flareAge != 0)))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrouchTurn(ITEM_INFO* item)
+{
+	if (Lara.waterStatus != LW_WADE
+		|| item->animNumber != LA_CROUCH_IDLE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrouchRoll(ITEM_INFO* item)
+{
+	if ((Lara.gunStatus == LG_NO_ARMS && Lara.waterStatus != LW_WADE)
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		//&& (!LaraFloorFront(item, item->pos.yRot, 1024) >= 384					// 1 block away from hole in floor.
+			//|| TestLaraWall(item, WALL_SIZE / 2, 0, -256) != SPLAT_NONE)			// 1 block away from wall.
+		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)								// Avoids some flare spawning/wep stuff.
+		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < FLARE_AGE && Lara.flareAge != 0)))
+	{
+		// TODO: Commented lines above don't work, so keeping the check as it was for now. It doesn't function as intended anyway; Lara sometimes still vaults herself into walls. @Sezz 2021.09.26
+		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor
+			TestLaraWall(item, WALL_SIZE / 2, 0, -256))			//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
+			return false;
+
+		return true;
+	}
+
+	return false;
+}
+
+// ------------------------------
+// CROUCHING
+// Control & Collision Functions
+// ------------------------------
+
+// State:		LS_CROUCH_IDLE (71)
+// Collision:	lara_col_crouch()
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: What is the purpose of these two lines? @Sezz 2021.09.26
+	short roomNum = item->roomNumber;
+	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
+
+	Lara.isDucked = true;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	if (TrInput & IN_DUCK || Lara.keepDucked)
+	{
+		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
+		Lara.NewAnims.CrouchRoll = true;
+
+		if ((TrInput & IN_SPRINT)
+			&& Lara.NewAnims.CrouchRoll
+			&& TestLaraCrouchRoll(item))
+		{
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			item->goalAnimState = LS_CROUCH_ROLL;
+
+			return;
+		}
+
+		// TODO: Allow Lara to turn while pressing FORWARD or BACK. @Sezz 2021.09.26
+		if ((TrInput & (IN_FORWARD | IN_BACK))
+			&& TestLaraCrawl(item))
+		{
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
+		if ((TrInput & IN_LEFT)
+			&& TestLaraCrouchTurn(item))
+		{
+			item->goalAnimState = LS_CROUCH_TURN_LEFT;
+
+			return;
+		}
+		else if ((TrInput & IN_RIGHT)
+			&& TestLaraCrouchTurn(item))
+		{
+			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
+
+			return;
+		}
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*collision: lara_col_duck*/
@@ -85,7 +212,48 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CROUCH_IDLE (71)
+// State code:	lara_as_crouch()
 void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	GetCollisionInfo(coll, item);
+
+	Lara.keepDucked = TestLaraStandUp(coll);
+
+	if (TestLaraFall(coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS;
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(coll))
+	{
+		SetLaraSlideState(item, coll);
+	 
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (coll->Middle.Floor != NO_HEIGHT)
+	{
+		item->pos.yPos += coll->Middle.Floor;
+	}
+}
+
+// LEGACY
+void old_lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*state code: lara_as_duck*/
@@ -135,7 +303,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
+void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 72*/
 	/*collision: lara_col_crouch_roll*/
@@ -143,7 +311,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
-void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
+void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 72*/
 	/*state code: lara_as_crouch_roll*/
