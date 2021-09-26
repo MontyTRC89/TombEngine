@@ -184,7 +184,131 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_RUN_FORWARD (1)
+// Collision:	lara_col_run()
 void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+
+			// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
+			// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
+			// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
+			// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
+			// Unfortunately I am terrible at mathematics and I don't know how to do this. 
+			// Would a library of easing functions be helpful here? @Sezz 2021.09.26
+			// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+		else
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
+	}
+
+	static bool doJump = false;
+
+	if (item->animNumber == LA_STAND_TO_RUN)
+		doJump = false;
+	else if (item->animNumber == LA_RUN && item->frameNumber == 4)
+		doJump = true;
+	else
+		doJump = true;
+
+	// Pseudo action queue.
+	// This creates a committal lock to perform a 180 turn in mid-air when JUMP and ROLL are pressed in sequence,
+	// but JUMP isn't held down and doJump isn't true yet.
+	// TODO: Make this cleaner.
+	// TODO: There is a ONE FRAME window wherein if you let go of ROLL, Lara performs a regular jump forward. @Sezz 2021.09.26
+	static bool jumpWasPressed = false;
+	bool doJumpRoll = jumpWasPressed && (TrInput & IN_ROLL);
+
+	if ((TrInput & IN_JUMP && !item->gravityStatus)
+		|| doJumpRoll)
+	{
+		jumpWasPressed = true;
+
+		// Jump INPUT takes complete precedence to prevent unintentional rolling when JUMP and ROLL
+		// are pressed (intending to turn 180 in mid-air) and doJump isn't true yet.
+		if (doJump)
+		{
+			jumpWasPressed = false;
+			item->goalAnimState = LS_JUMP_FORWARD;
+		}
+
+		return;
+	}
+
+	if (TrInput & IN_SPRINT && DashTimer)
+	{
+		item->goalAnimState = LS_SPRINT;
+
+		return;
+	}
+
+	// TODO: State dispatch in WAD.
+	if (TrInput & IN_ROLL)
+	{
+		item->animNumber = LA_ROLL_180_START;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 2;
+		item->currentAnimState = LS_ROLL_FORWARD;
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// TODO: Simplify this check. Add mustStand bool to weapons in some way?
+	if (TrInput & IN_DUCK &&
+		Lara.waterStatus != LW_WADE &&
+		(Lara.gunStatus == LG_NO_ARMS ||
+			Lara.gunType == WEAPON_NONE ||
+			Lara.gunType == WEAPON_PISTOLS ||
+			Lara.gunType == WEAPON_REVOLVER ||
+			Lara.gunType == WEAPON_UZI ||
+			Lara.gunType == WEAPON_FLARE))
+	{
+		item->goalAnimState = LS_CROUCH_IDLE;
+
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		if (Lara.waterStatus == LW_WADE)
+			item->goalAnimState = LS_WADE_FORWARD;
+		else if (TrInput & IN_WALK)
+			item->goalAnimState = LS_WALK_FORWARD;
+		else [[likely]]
+			item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 1*/
 	/*collision: lara_col_run*/
@@ -230,14 +354,6 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TestLaraLean(item, coll))
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
-
-			// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-			// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle in contrast with original behaviour.
-			// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
-			// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
-			// Unfortunately I am terrible at mathematics and I don't know how to do this. 
-			// Would a library of easing functions be helpful here? @Sezz 2021.09.26
-			// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
 		else
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
 	}
