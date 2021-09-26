@@ -14,6 +14,7 @@
 #include "animation.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
+#include "missile.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -72,7 +73,17 @@ static void createBartoliLight(short ItemIndex, int type)
 static short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = NO_ITEM;
-	// TODO:: set correct fx parameters
+	PHD_3DPOS pos{x,y,z};
+	fx_number = CreateNewEffect(roomNumber, ID_FLAME, pos);
+	if (fx_number != NO_ITEM) {
+
+		ITEM_INFO* fx = &g_Level.Items[fx_number];
+		FX_INFO* fxInfo = fx->data;
+		fxInfo->counter = 60;
+		fx->speed = 256;
+		ShootAtLara(fx);
+		fx->currentAnimState = 1;
+	}
 	return fx_number;
 }
 
@@ -292,8 +303,9 @@ void DragonControl(short backNum)
 			}
 			else if (dragon->flags < -100)
 			{
-				item->pos.yPos += 10;
 				back->pos.yPos += 10;
+				item->pos.yPos += 10;
+
 			}
 
 			dragon->flags--;
@@ -473,10 +485,10 @@ void InitialiseBartoli(short itemNum)
 		back->pos.zPos = item->pos.zPos;
 		back->pos.yRot = item->pos.yRot;
 		back->roomNumber = item->roomNumber;
-		back->status = ITEM_INVISIBLE;
+		back->status = ITEM_NOT_ACTIVE | ITEM_INVISIBLE;
 		back->shade = -1;
 
-		InitialiseItem(back_item);
+		
 		back->meshBits = 0x1FFFFF;
 
 		item->data = back_item;
@@ -488,11 +500,11 @@ void InitialiseBartoli(short itemNum)
 		front->pos.zPos = item->pos.zPos;
 		front->pos.yRot = item->pos.yRot;
 		front->roomNumber = item->roomNumber;
-		front->status = ITEM_INVISIBLE;
+		front->status = ITEM_NOT_ACTIVE | ITEM_INVISIBLE;
 		front->shade = -1;
 
-		InitialiseItem(front_item);
-
+		//InitialiseItem(front_item);
+		//InitialiseItem(back_item);
 		back->data = front_item;
 
 		g_Level.NumItems += 2;
