@@ -35,3 +35,10 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);
 #endif // !NEW_TIGHTROPE
+
+// TODO: New, organise later.
+bool TestLaraFall(COLL_INFO* coll);
+void SetLaraFallState(ITEM_INFO* item);
+bool TestLaraSlide(COLL_INFO* coll);
+short GetLaraSlideDirection(COLL_INFO* coll);
+void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);

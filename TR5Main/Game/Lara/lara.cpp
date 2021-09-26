@@ -1034,8 +1034,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 		UpdateSubsuitAngles();
 
 	// TODO: Conditions seem fine, but test this thoroughly. @Sezz 2021.09.26
-	if (!Lara.isMoving
-		&& !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
 		if (item->pos.zRot >= ANGLE(0.0f))
 			item->pos.zRot -= item->pos.zRot / 7;
