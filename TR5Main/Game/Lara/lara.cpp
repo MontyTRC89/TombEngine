@@ -913,15 +913,12 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 	// Handle current Lara status
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	// ISSUES:
-	// Continued lean when vaulting.
-	// Continued lean in sprint > run transition.
-	// TODO: These commented conditions result in more accurate behaviour, but I suppose this is what we would call "hardcoding". @Sezz 2021.09.26
+	// TODO: These commented conditions result in more accurate behaviour, but I suppose this is what we would call "hardcoding".
+	// Leaving this for now in case something catastrophic is discovered with the simpler check. @Sezz 2021.09.26
 	/*if ((item->currentAnimState != LS_RUN_FORWARD && item->currentAnimState != LS_SPRINT)
 		|| ((item->currentAnimState == LS_RUN_FORWARD || item->currentAnimState == LS_SPRINT)
 			&& !((TrInput & IN_LEFT) || (TrInput & IN_RIGHT))))*/
-	if (!Lara.isMoving
-		&& !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (item->pos.zRot >= ANGLE(0.0f))
 			item->pos.zRot -= item->pos.zRot / 7;
