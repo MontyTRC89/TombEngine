@@ -409,7 +409,9 @@ namespace TEN::Renderer
 				{
 					// HACK: these objects must have nmeshes = 0 because engine will use them in a different way while drawing Effects.
 					// In Core's code this was done in SETUP.C but we must do it here because we need to create renderer's meshes.
-					obj->nmeshes = 0;
+					
+					// Keeping nmeshes intact, so we can properly shatter and render them
+					//obj->nmeshes = 0;
 				}
 				else
 				{

@@ -68,6 +68,8 @@ namespace TEN::entities::all
 			}
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
+			SparkSpriteSequence(spark, ID_FIRE_SPRITES);
+
 		}
 	}
 
@@ -115,6 +117,7 @@ namespace TEN::entities::all
 			spark->scalar = 2;
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
+			SparkSpriteSequence(spark,ID_FIRE_SPRITES);
 		}
 	}
 
@@ -175,20 +178,27 @@ namespace TEN::entities::all
 			spark->scalar = 2;
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
+			SparkSpriteSequence(spark, ID_FIRE_SPRITES);
 		}
 	}
 
 	void BubblesShatterFunction(ITEM_INFO* fx, int param1, int param2)
 	{
+		OBJECT_INFO* obj = &Objects[fx->objectNumber];
 		FX_INFO* fxInfo = fx->data;
-		ShatterItem.yRot = fx->pos.yRot;
-		ShatterItem.meshp = &g_Level.Meshes[fx->frameNumber];
-		ShatterItem.sphere.x = fx->pos.xPos;
-		ShatterItem.sphere.y = fx->pos.yPos;
-		ShatterItem.sphere.z = fx->pos.zPos;
-		ShatterItem.bit = 0;
-		ShatterItem.flags = fxInfo->flag2 & 0x400;
-		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
+		for (auto i = 0; i < obj->nmeshes; i++) {
+			if (!(fx->meshBits == (1<<i)))
+				continue;
+			ShatterItem.yRot = fx->pos.yRot;
+			ShatterItem.meshp = &g_Level.Meshes[obj->meshIndex + i];
+			ShatterItem.sphere.x = fx->pos.xPos;
+			ShatterItem.sphere.y = fx->pos.yPos;
+			ShatterItem.sphere.z = fx->pos.zPos;
+			ShatterItem.bit = 0;
+			ShatterItem.flags = fxInfo->flag2 & 0x400;
+			ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
+		}
+		
 	}
 
 	void ControlEnemyMissile(short fxNum)

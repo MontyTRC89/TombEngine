@@ -1426,11 +1426,11 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->scalar = 1;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
 		spark->dSize = spark->size / 4;
+		SparkSpriteSequence(spark, ID_DEFAULT_SPRITES, SPR_UNDERWATERDUST, SPR_UNDERWATERDUST);
 	}
 }
 
