@@ -21,6 +21,7 @@
 #include "animation.h"
 #include "Specific/prng.h"
 #include "motorbike_info.h"
+#include "items.h"
 
 using namespace TEN::Math::Random;
 

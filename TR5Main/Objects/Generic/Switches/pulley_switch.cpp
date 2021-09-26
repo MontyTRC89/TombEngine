@@ -8,6 +8,7 @@
 #include "pickup.h"
 #include "level.h"
 #include "collide.h"
+#include "items.h"
 
 namespace TEN::Entities::Switches
 {

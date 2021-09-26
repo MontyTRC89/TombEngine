@@ -12,6 +12,7 @@
 #include "Specific/trmath.h"
 #include "objectslist.h"
 #include "itemdata/creature_info.h"
+#include "items.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)

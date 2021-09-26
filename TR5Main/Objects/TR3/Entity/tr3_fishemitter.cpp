@@ -6,6 +6,7 @@
 #include "fish.h"
 #include "control/control.h"
 #include "effects\effects.h"
+#include "items.h"
 
 #define PIRAHNA_DAMAGE 4
 #define X 0

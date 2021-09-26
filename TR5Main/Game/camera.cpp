@@ -10,11 +10,13 @@
 #include "effects\weather.h"
 #include "sphere.h"
 #include "level.h"
+#include "setup.h"
 #include "collide.h"
 #include "Sound\sound.h"
 #include "control\los.h"
 #include "savegame.h"
 #include "input.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Environment;

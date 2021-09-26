@@ -5,8 +5,9 @@
 #include "effects\effects.h"
 #include "camera.h"
 #include "level.h"
+#include "items.h"
 #include "setup.h"
-#include "RenderView\RenderView.h"
+
 namespace TEN::Renderer
 {
 	using namespace TEN::Renderer;

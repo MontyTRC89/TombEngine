@@ -16,7 +16,9 @@
 #include "tr5_spider_emitter.h"
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 
 using std::string;

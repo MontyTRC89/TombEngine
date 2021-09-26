@@ -1,18 +1,21 @@
 #include "framework.h"
 #include "tr4_bubbles.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "items.h"
-#include "traps.h"
-#include "animation.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
+#include "effects/tomb4fx.h"
+#include "effects/effects.h"
 #include "level.h"
 #include "lara.h"
 #include "control/control.h"
 #include "tr4_mutant.h"
 #include "collide.h"
+#include "Game/effects/lara_burn.h"
 #include "tr5_hydra.h"
 #include "tr5_roman_statue.h"
+#include "setup.h"
+
+using namespace TEN::Effects::Fire;
+
 namespace TEN::entities::all
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)

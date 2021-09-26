@@ -8,6 +8,7 @@
 #include "people.h"
 #include "setup.h"
 #include "control/control.h"
+#include "items.h"
 
 #define BIG_RAT_RUN_TURN ANGLE(6.0f)
 #define BIG_RAT_SWIM_TURN ANGLE(3.0f)

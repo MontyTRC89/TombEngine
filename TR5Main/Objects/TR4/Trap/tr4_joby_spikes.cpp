@@ -6,12 +6,17 @@
 #include "Sound/sound.h"
 #include "lara.h"
 #include "effects/effects.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {
     void InitialiseJobySpikes(short itemNumber)
     {
         ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+		// Set bone mutators to 0 by default
+		for (int i = 0; i < item->mutator.size(); i++)
+			item->mutator[i].Scale.y = 0.0f;
 
         item->pos.yRot = GetRandomControl() * 1024;
         item->itemFlags[2] = GetRandomControl() & 1;
@@ -74,5 +79,12 @@ namespace TEN::Entities::TR4
             item->itemFlags[1] += 3;
 
         item->pos.yRot += item->itemFlags[0];
+
+		// Update bone mutators
+		if (item->itemFlags[1])
+		{
+			for (int i = 0; i < item->mutator.size(); i++)
+				item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
+		}
     }
 }

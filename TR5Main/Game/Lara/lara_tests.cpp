@@ -8,6 +8,7 @@
 #include "lara_collide.h"
 #include "control/control.h"
 #include "control\los.h"
+#include "items.h"
 
 using namespace TEN::Floordata;
 
@@ -383,7 +384,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (item->animNumber != LA_LADDER_TO_HANG_RIGHT && item->animNumber != LA_LADDER_TO_HANG_LEFT)
 				{
-					SnapLaraToEdgeOfBlock(item, coll, dir);
+					LaraSnapToEdgeOfBlock(item, coll, dir);
 					item->pos.yPos = coll->Setup.OldPosition.y;
 					item->currentAnimState = LS_HANG;
 					item->goalAnimState = LS_HANG;

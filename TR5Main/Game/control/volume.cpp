@@ -7,6 +7,8 @@
 #include "savegame.h"
 #include "RenderEnums.h"
 #include "Renderer11.h"
+#include "items.h"
+
 
 using TEN::Renderer::g_Renderer;
 

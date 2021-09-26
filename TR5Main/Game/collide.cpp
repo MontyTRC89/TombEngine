@@ -1,17 +1,16 @@
 #include "framework.h"
-#include "control.h"
-#include "control\los.h"
+#include "control/los.h"
 #include "collide.h"
 #include "animation.h"
 #include "Lara.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"
-#include "Sound\sound.h"
-#include "Specific\trmath.h"
-#include "Specific\prng.h"
+#include "Sound/sound.h"
+#include "Specific/trmath.h"
+#include "Specific/prng.h"
 #include "room.h"
 #include "Renderer11.h"
 
@@ -1275,7 +1274,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y - LARA_HEADROOM;
+	int yTop = y; // TODO: Make sure that -LARA_HEADROOM is not necessary for yTop anymore!
 	int z = zPos;
 
 	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
@@ -1680,7 +1679,7 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y - LARA_HEADROOM;
+	int yTop = y; // -LARA_HEADROOM;
 	int z = zPos;
 
 	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);

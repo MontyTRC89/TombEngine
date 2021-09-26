@@ -2,6 +2,7 @@
 #include "tr5_raisingblock.h"
 #include "items.h"
 #include "level.h"
+#include "setup.h"
 #include "animation.h"
 #include "control/control.h"
 #include "control/box.h"
@@ -17,6 +18,10 @@ void InitialiseRaisingBlock(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	if(floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
+
+	// Set mutators to 0 by default
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i].Scale.y = 0;
 
 	if (item->triggerFlags < 0)
 	{
@@ -135,6 +140,13 @@ void ControlRaisingBlock(short itemNumber)
 		}
 
 		item->itemFlags[1] -= 64;
+	}
+
+	// Update bone mutators
+	if (item->triggerFlags > -1)
+	{
+		for (int i = 0; i < item->mutator.size(); i++)
+			item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 

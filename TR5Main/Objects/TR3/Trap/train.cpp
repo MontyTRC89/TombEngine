@@ -3,6 +3,7 @@
 #include "floordata.h"
 #include "control/control.h"
 #include "level.h"
+#include "setup.h"
 #include "effects/effects.h"
 #include "Sound/sound.h"
 #include "camera.h"

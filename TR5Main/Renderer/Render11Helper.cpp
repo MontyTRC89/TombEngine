@@ -24,6 +24,7 @@
 #include "rubberboat_info.h"
 #include "upv_info.h"
 #include "biggun_info.h"
+#include "items.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
@@ -111,7 +112,10 @@ namespace TEN::Renderer
 
 	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
-		RendererBone *Bones[32];
+		static std::vector<int> boneIndexList;
+		boneIndexList.clear();
+		
+		RendererBone *Bones[32] = {};
 		int nextBone = 0;
 
 		Matrix rotation;
@@ -158,6 +162,8 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+					
+
 				if (useObjectWorldRotation)
 				{
 					Quaternion invertedQuat;
@@ -181,10 +187,29 @@ namespace TEN::Renderer
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
+			boneIndexList.push_back(bone->Index);
+
 			for (int i = 0; i < bone->Children.size(); i++)
 			{
 				// Push
 				Bones[nextBone++] = bone->Children[i];
+			}
+		}
+
+		// Apply mutations on top
+		if (item && item->Item->mutator.size() == boneIndexList.size()) // Paranoid
+		{
+			for (int i = 0; i < boneIndexList.size(); i++)
+			{
+				auto mutator = item->Item->mutator[boneIndexList[i]];
+				if (mutator.IsEmpty())
+					continue;
+
+				auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+				auto s = Matrix::CreateScale(mutator.Scale);
+				auto t = Matrix::CreateTranslation(mutator.Offset);
+
+				transforms[boneIndexList[i]] = m * s * t * transforms[boneIndexList[i]];
 			}
 		}
 	}

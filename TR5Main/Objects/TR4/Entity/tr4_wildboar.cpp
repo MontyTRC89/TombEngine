@@ -2,7 +2,7 @@
 #include "tr4_wildboar.h"
 #include "control/box.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "setup.h"
 #include "control/lot.h"
 #include "level.h"

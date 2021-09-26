@@ -18,6 +18,7 @@
 #include "input.h"
 #include "pickup.h"
 #include "Renderer11.h"
+#include "items.h"
 
 using namespace TEN::Renderer;
 bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;

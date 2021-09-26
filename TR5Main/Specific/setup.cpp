@@ -20,12 +20,14 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include <tr4_littlebeetle.h>
+#include "tr4_littlebeetle.h"
+#include "Objects/Generic/Traps/falling_block.h"
 /// register objects
 #include "object_helper.h"
 
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
+#include <Objects/Effects/effect_objects.h>
 
 using namespace TEN::Entities::Switches;
 
@@ -147,8 +149,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		//obj->floor = FallingBlockFloor;
-		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveMesh = true;
@@ -311,46 +311,6 @@ void TrapObjects()
 		obj->savePosition = true;
 	}
 
-	// Flame is always loaded
-	obj = &Objects[ID_FLAME];
-	{
-		obj->control = FlameControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseFlameEmitter;
-		obj->collision = FlameEmitterCollision;
-		obj->control = FlameEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseFlameEmitter2;
-		obj->collision = FlameEmitterCollision;
-		obj->control = FlameEmitter2Control;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER3];
-	if (obj->loaded)
-	{
-		obj->control = FlameEmitter3Control;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
 	obj = &Objects[ID_GEN_SLOT2];
 	if (obj->loaded)
 	{
@@ -495,6 +455,7 @@ void InitialiseObjects()
 		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
+	InitialiseEffectsObjects();
 	InitialiseGenericObjects(); // Generic objects
 	InitialiseTR1Objects(); // Standard TR1 objects
 	InitialiseTR2Objects(); // Standard TR2 objects

@@ -1,26 +1,28 @@
 #include "framework.h"
 #include "tr5_laser_head.h"
-#include "sphere.h"
 #include "items.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
-#include "control/box.h"
+#include "effects/tomb4fx.h"
+#include "effects/effects.h"
 #include "people.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "animation.h"
-#include "control\los.h"
-#include "traps.h"
+#include "control/los.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "tr5_laserhead_info.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lightning;
 
 struct LASER_HEAD_STRUCT
 {
 	PHD_VECTOR target;
-	ENERGY_ARC* fireArcs[2];
-	ENERGY_ARC* chargeArcs[4];
+	LIGHTNING_INFO* fireArcs[2];
+	LIGHTNING_INFO* chargeArcs[4];
 	bool LOS[2];
 	byte byte1;
 	byte byte2;
@@ -94,7 +96,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 	for (int i = 0; i < 4; i++)
 	{
-		ENERGY_ARC* arc = LaserHeadData.chargeArcs[i];
+		LIGHTNING_INFO* arc = LaserHeadData.chargeArcs[i];
 
 		if (item->itemFlags[3] & 0x0F && arc != NULL)
 		{
@@ -109,7 +111,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 			src.y = GuardianChargePositions[i].y;
 			src.z = GuardianChargePositions[i].z;
 			GetJointAbsPosition(&g_Level.Items[creature->baseItem], &src, 0);
-			LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
+			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 		}
 	}
 
@@ -135,7 +137,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 	if (!(GlobalCounter & 3))
 	{
-		TriggerEnergyArc(&dest, (PHD_VECTOR*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
+		//TriggerEnergyArc(&dest, (PHD_VECTOR*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
 		//TriggerEnergyArc(&dest, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
 	}
 
@@ -427,7 +429,7 @@ void LaserHeadControl(short itemNumber)
 					g = (GetRandomControl() & 0x1F) + 128;
 					b = (GetRandomControl() & 0x1F) + 64;
 
-					ENERGY_ARC* arc = LaserHeadData.fireArcs[0];
+					LIGHTNING_INFO* arc = LaserHeadData.fireArcs[0];
 					if (!LaserHeadData.fireArcs[0])
 						arc = LaserHeadData.fireArcs[1];
 
@@ -485,12 +487,12 @@ void LaserHeadControl(short itemNumber)
 									// Start firing from eye
 									src.roomNumber = item->roomNumber;
 									LaserHeadData.LOS[i] = LOS(&src, &dest);
-									LaserHeadData.fireArcs[i] = TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
+									//LaserHeadData.fireArcs[i] = TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->pos, 0);
 								}
 
-								ENERGY_ARC* currentArc = LaserHeadData.fireArcs[i];
+								LIGHTNING_INFO* currentArc = LaserHeadData.fireArcs[i];
 
 								if (GlobalCounter & 1) 
 								{

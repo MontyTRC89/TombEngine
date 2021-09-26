@@ -11,6 +11,7 @@
 #include "itemdata/creature_info.h"
 #include "control/control.h"
 #include "animation.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {
@@ -32,7 +33,7 @@ namespace TEN::Entities::TR4
             fx->pos.zRot = 0;
             fx->roomNumber = roomNumber;
             fxInfo->counter = 16 * counter + 15;
-            fx->meshBits = static_cast<unsigned>(BUBBLES_MESH::TR4_FIREBALL);
+            fx->meshBits = 1 << static_cast<unsigned>(BUBBLES_MESH::TR4_FIREBALL);
             fx->speed = (GetRandomControl() & 0x1F) + 96;
             fxInfo->flag1 = 6;
         }
@@ -89,6 +90,7 @@ namespace TEN::Entities::TR4
         sptr->size = size;
         sptr->sSize = size;
         sptr->dSize = size / 4;
+        SparkSpriteSequence(sptr, ID_FIRE_SPRITES);
     }
 
     static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short roomNumber, int timer)

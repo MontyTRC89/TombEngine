@@ -7,6 +7,7 @@
 #include "effects/effects.h"
 #include "Lara/lara.h"
 #include "animation.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

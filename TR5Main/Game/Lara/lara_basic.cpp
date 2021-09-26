@@ -7,6 +7,7 @@
 #include "lara_monkey.h"
 #include "input.h"
 #include "level.h"
+#include "setup.h"
 #include "health.h"
 #include "Sound/sound.h"
 #include "animation.h"
@@ -31,6 +32,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
 }
 
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
@@ -312,6 +314,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
 	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
 
 	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
 	{
@@ -504,8 +507,14 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_FORWARD)
 		{
 			auto cheight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
+			
+			// Don't try to move if there is slope in front
 			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
 				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
+
+			// Don't try to move if there is no headroom in front
+			if (coll->CollisionType == CT_FRONT)
+				return;
 
 			if (TrInput & IN_WALK)
 				lara_as_walk(item, coll);
@@ -752,7 +761,8 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_TURN_FAST;
 	}
 
-	if (!(TrInput & IN_FORWARD))
+	// Don't try to move forward if button isn't pressed or there's no headroom in front
+	if (!(TrInput & IN_FORWARD) || coll->CollisionType == CT_FRONT)
 	{
 		if (!(TrInput & IN_RIGHT))
 			item->goalAnimState = LS_STOP;
@@ -845,7 +855,8 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_TURN_FAST;
 	}
 
-	if (!(TrInput & IN_FORWARD))
+	// Don't try to move forward if button isn't pressed or there's no headroom in front
+	if (!(TrInput & IN_FORWARD) || coll->CollisionType == CT_FRONT)
 	{
 		if (!(TrInput & IN_LEFT))
 			item->goalAnimState = LS_STOP;

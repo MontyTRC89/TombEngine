@@ -2,8 +2,8 @@
 #include "control/control.h"
 #include "lara.h"
 #include "animation.h"
-#include "effects\groundfx.h"
-#include "effects\footprint.h"
+#include "effects/groundfx.h"
+#include "effects/footprint.h"
 #include "level.h"
 #include "items.h"
 
@@ -30,7 +30,6 @@ namespace Footprints {
 		}
 
 		int height = GetFloorHeight(floor, x, y, z);
-		int diff;
 		PHD_VECTOR pos;
 
 		pos.x = pos.z = 0;

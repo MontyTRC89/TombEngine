@@ -229,7 +229,6 @@ void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNu
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(int x, int y, int z, int angle);
-void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit);
 void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);

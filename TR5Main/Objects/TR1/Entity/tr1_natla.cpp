@@ -5,9 +5,9 @@
 #include "items.h"
 #include "missile.h"
 #include "level.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "Specific/trmath.h"
 #include "itemdata/creature_info.h"
 
 #define NATLA_NEAR_DEATH 200

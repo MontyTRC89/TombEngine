@@ -7,6 +7,7 @@
 #include "control/control.h"
 #include "Sound\sound.h"
 #include "camera.h"
+#include "items.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;

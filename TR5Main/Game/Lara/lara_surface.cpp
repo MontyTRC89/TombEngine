@@ -5,10 +5,7 @@
 #include "camera.h"
 #include "collide.h"
 #include "items.h"
-#include "control/box.h"
 #include "Lara.h"
-#include "lara_swim.h"
-#include "lara_fire.h"
 #include "level.h"
 #include "input.h"
 
