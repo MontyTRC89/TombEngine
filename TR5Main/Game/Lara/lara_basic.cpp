@@ -5,6 +5,7 @@
 #include "lara_collide.h"
 #include "lara_slide.h"
 #include "lara_monkey.h"
+#include "lara_helpers.h"
 #include "input.h"
 #include "level.h"
 #include "setup.h"
@@ -478,7 +479,231 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_STOP (2)
+// Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto fHeight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
+	auto cHeight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
+	auto rHeight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180)?
+
+	// TODO: Hardcoding. @Sezz 2021.09.28
+	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT && item->animNumber != LA_SPRINT_TO_STAND_LEFT)
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	// TODO: Hardcoding. @Sezz 2021.09.28
+	// Handles waterskin and clockwork beetle.
+	if (UseSpecialItem(item))
+		return;
+
+	// TODO: This is security to prevent locking actions, which should be caught in other states. Keeping this just in case. @Sezz 2021.09.28
+	// item->goalAnimState = LS_STOP;
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	// TODO: Refine this handling. Create LS_WADE_IDLE state? Might complicate things. @Sezz 2021.09.28
+	if (Lara.waterStatus == LW_WADE)
+	{
+		LaraWadeStop(item, coll, fHeight, rHeight);
+
+		return;
+	}
+
+	if (TrInput & IN_JUMP &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->goalAnimState = LS_JUMP_PREPARE;
+
+		return;
+	}
+
+	// TODO: Direct dispatch to LS_SPRINT. @Sezz 2021.06.28
+	if (TrInput & IN_SPRINT && TrInput & IN_FORWARD)
+	{
+		// item->goalAnimState = LS_SPRINT;
+		item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	// TODO: State dispatch. @Sezz 2021.06.28
+	if (TrInput & IN_ROLL)
+	{
+		item->animNumber = LA_ROLL_180_START;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->currentAnimState = LS_ROLL_FORWARD;
+		item->goalAnimState = LS_STOP;
+		// item->currentAnimState = LS_ROLL_FORWARD;
+
+		return;
+	}
+
+	// TODO: Test failsafe which automatically crouches Lara if the ceiling above her is too low.
+	// TODO: mustStand bool weapon attribute in place of all these weapon checks. @Sezz 2021.06.28
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll))
+		&& (Lara.gunStatus == LG_NO_ARMS
+			|| Lara.gunType == WEAPON_NONE
+			|| Lara.gunType == WEAPON_PISTOLS
+			|| Lara.gunType == WEAPON_REVOLVER
+			|| Lara.gunType == WEAPON_UZI
+			|| Lara.gunType == WEAPON_FLARE))
+	{
+		item->goalAnimState = LS_CROUCH_IDLE;
+
+		return;
+	}
+
+	if (TrInput & IN_FORWARD
+		&& !((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0))	// Slope in front.
+			|| coll->CollisionType == CT_FRONT))														// Wall/ceiling/object in front.
+	{
+		// TODO: Check if there's already a dispatch for LS_WADE_FORWARD. @Sezz 2021.06.28
+		if (Lara.waterStatus == LW_WADE)
+			item->goalAnimState = LS_WADE_FORWARD;
+		else if (TrInput & IN_WALK)
+			item->goalAnimState = LS_WALK_FORWARD;
+		else [[likely]]
+			item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	if (TrInput & IN_BACK)
+	{
+		// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back().
+		// TODO: Allow turning while holding BACK against a wall. @Sezz 2021.06.27
+		if (TrInput & IN_WALK
+			&& (rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
+			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+			&& !rHeight.Position.Slope)
+		{
+			item->goalAnimState = LS_WALK_BACK;
+		}
+		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1)) [[likely]]
+			item->goalAnimState = LS_HOP_BACK;
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		item->goalAnimState = LS_TURN_LEFT_SLOW;
+
+		return;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
+		return;
+	}
+
+	if (TrInput & IN_LSTEP)
+	{
+		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
+		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+		if ((collFloorResult.Position.Floor < 128
+			&& collFloorResult.Position.Floor > -128)
+			&& !collFloorResult.Position.Slope
+			&& collCeilingResult.Position.Ceiling <= 0)
+		{
+			item->goalAnimState = LS_STEP_LEFT;
+
+			return;
+		}
+	}
+	else if (TrInput & IN_RSTEP)
+	{
+		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
+		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+		if ((collFloorResult.Position.Floor < 128
+			&& collFloorResult.Position.Floor > -128)
+			&& !collFloorResult.Position.Slope
+			&& collCeilingResult.Position.Ceiling <= 0)
+		{
+			item->goalAnimState = LS_STEP_RIGHT;
+
+			return;
+		}
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Peripheral pseudo-state used while stopped and water status is LW_WADE. @Sezz 2021.06.28
+void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RESULT rHeight)
+{
+	if (TrInput & IN_JUMP &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->goalAnimState = LS_JUMP_PREPARE;
+
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		bool wade = false;
+
+		if (fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
+			&& g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			wade = true;
+			item->goalAnimState = LS_WADE_FORWARD;
+		}
+		else if (fHeight.Position.Floor < (STEPUP_HEIGHT - 1)
+			&& fHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+		{
+			wade = true;
+			item->goalAnimState = LS_WADE_FORWARD;
+		}
+
+		if (!wade)
+		{
+			Lara.moveAngle = item->pos.yRot;
+			coll->Setup.BadHeightDown = NO_BAD_POS;
+			coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+			coll->Setup.BadCeilingHeight = 0;
+			coll->Setup.SlopesAreWalls = true;
+			coll->Setup.Radius = LARA_RAD + 2;
+			coll->Setup.ForwardAngle = Lara.moveAngle;
+			GetCollisionInfo(coll, item);
+
+			if (TestLaraVault(item, coll))
+				return;
+
+			coll->Setup.Radius = LARA_RAD;
+		}
+
+		return;
+	}
+	
+	if (TrInput & IN_BACK)
+	{
+		if (rHeight.Position.Floor < (STEPUP_HEIGHT - 1)
+			&& rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+		{
+			item->goalAnimState = LS_WALK_BACK;
+
+			return;
+		}
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 2*/
 	/*collision: lara_col_stop*/
@@ -644,7 +869,61 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_STOP (2)
+// Control:		lara_as_stop()
+void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+{
+	Lara.moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	// TODO: Test if Lara can get stuck here. Presumably, falling and sliding should have precedence instead. @Sezz 2021.09.28
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlideNew(coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraVault(item, coll))
+		return;
+
+	ShiftItem(item, coll);
+
+#if 1
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
+#else
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
+		item->pos.yPos += SWAMP_GRAVITY;
+#endif
+}
+
+// LEGACY
+void old_lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 2*/
 	/*state code: lara_as_stop*/
@@ -710,15 +989,15 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
 
-		if (Lara.turnRate < -ANGLE(3.0f))
-			Lara.turnRate = -ANGLE(3.0f);
+		if (Lara.turnRate < -LARA_JUMP_TURN)
+			Lara.turnRate = -LARA_JUMP_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
 
-		if (Lara.turnRate > ANGLE(3.0f))
-			Lara.turnRate = ANGLE(3.0f);
+		if (Lara.turnRate > LARA_JUMP_TURN)
+			Lara.turnRate = LARA_JUMP_TURN;
 	}
 }
 
