@@ -539,6 +539,8 @@ GAME_STATUS DoTitle(int index)
 		// Initialise ponytails
 		InitialiseHair();
 
+		InitialiseItemBoxData();
+
 		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
@@ -687,6 +689,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	// Initialise ponytails
 	InitialiseHair();
+
+	InitialiseItemBoxData();
 
 	g_GameScript->OnStart();
 	if (loadFromSavegame)
