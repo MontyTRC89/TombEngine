@@ -192,8 +192,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
-	return std::optional{ height };
+	return GetFloorItemIntersect(item, x, y, z, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -203,6 +202,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
-	return std::optional{ height };
+	return GetFloorItemIntersect(item, x, y, z, true);
 }
