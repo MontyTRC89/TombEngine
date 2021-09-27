@@ -1,6 +1,8 @@
 #pragma once
 struct ITEM_INFO;
 struct COLL_INFO;
+struct COLL_RESULT;
+
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll);
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll);
@@ -16,6 +18,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_run(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll);
+void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RESULT rHeight);
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
