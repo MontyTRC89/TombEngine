@@ -317,6 +317,7 @@
     <ClCompile Include="Game\effects\lara_burn.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
+    <ClCompile Include="Game\Lara\lara_helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -710,6 +711,7 @@
     <ClInclude Include="Game\effects\lara_burn.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
+    <ClInclude Include="Game\Lara\lara_helpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

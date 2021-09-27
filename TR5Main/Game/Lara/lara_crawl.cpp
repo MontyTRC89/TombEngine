@@ -6,79 +6,22 @@
 #include "lara_collide.h"
 #include "animation.h"
 #include "control/los.h"
-#include "Lara/lara_flare.h"
+#include "lara_flare.h"
+#include "lara_helpers.h"
 #include "collide.h"
 #include "items.h"
 #include "camera.h"
 #include "control/control.h"
 
-// --------------------
+// -----------------------------
 // CRAWLING & CROUCHING
-// --------------------
-
-// Auxiliary Functions
-
-bool TestLaraCrawl(ITEM_INFO* item)
-{
-	if (Lara.gunStatus == LG_NO_ARMS
-		&& Lara.waterStatus != LW_WADE
-		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256)
-		&& (item->animNumber == LA_CROUCH_IDLE || item->animNumber == LA_STAND_TO_CROUCH_END)	// TODO: Un-hardcode anim condition. @Sezz 2021.09.26
-		&& !(TrInput & (IN_FLARE | IN_DRAW))
-		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < 900 && Lara.flareAge != 0)))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraCrouchTurn(ITEM_INFO* item)
-{
-	if (Lara.waterStatus != LW_WADE
-		|| item->animNumber != LA_CROUCH_IDLE)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraCrouchRoll(ITEM_INFO* item)
-{
-	if ((Lara.gunStatus == LG_NO_ARMS && Lara.waterStatus != LW_WADE)
-		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256)
-		//&& (!LaraFloorFront(item, item->pos.yRot, 1024) >= 384					// 1 block away from hole in floor.
-			//|| TestLaraWall(item, WALL_SIZE / 2, 0, -256) != SPLAT_NONE)			// 1 block away from wall.
-		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)								// Avoids some flare spawning/wep stuff.
-		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < FLARE_AGE && Lara.flareAge != 0)))
-	{
-		// TODO: Commented lines above don't work, so keeping the check as it was for now. It doesn't function as intended anyway; Lara sometimes still vaults herself into walls. @Sezz 2021.09.26
-		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor
-			TestLaraWall(item, WALL_SIZE / 2, 0, -256))			//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
-			return false;
-
-		return true;
-	}
-
-	return false;
-}
-
-// ------------------------------
-// CROUCHING
 // Control & Collision Functions
-// ------------------------------
+// -----------------------------
 
 // State:		LS_CROUCH_IDLE (71)
 // Collision:	lara_col_crouch()
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: What is the purpose of these two lines? @Sezz 2021.09.26
-	short roomNum = item->roomNumber;
-	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
-
 	Lara.isDucked = true;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -213,7 +156,7 @@ void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CROUCH_IDLE (71)
-// State code:	lara_as_crouch()
+// Control:		lara_as_crouch()
 void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
@@ -237,7 +180,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 	 
@@ -303,7 +246,45 @@ void old_lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CROUCH_ROLL (72)
+// Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	Camera.targetElevation = -ANGLE(20.0f);
+
+	if (TrInput & IN_LEFT
+		&& item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_CROUCH_ROLL_TURN)
+			Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
+	}
+	else if (TrInput & IN_RIGHT
+		&& item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_CROUCH_ROLL_TURN)
+			Lara.turnRate = LARA_CROUCH_ROLL_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+		else
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
+	}
+
+	item->goalAnimState = LS_CROUCH_IDLE;
+}
+
+// LEGACY
+void old_lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 72*/
 	/*collision: lara_col_crouch_roll*/
@@ -311,7 +292,67 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
+// State:		LS_CROUCH_ROLL (72)
+// Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	item->gravityStatus = 0;
+	item->fallspeed = 0;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraFall(coll))
+	{
+		item->speed /= 3;				// In case Lara falls, truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
+		Lara.gunStatus = LG_NO_ARMS;
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlideNew(coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	Lara.keepDucked = TestLaraStandUp(coll);
+
+	// Hit a wall or ledge.
+	if (coll->Middle.Floor < coll->Setup.BadHeightUp
+		|| coll->Middle.Floor > coll->Setup.BadHeightDown)
+	{
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (coll->Middle.Floor != NO_HEIGHT)
+	{
+		item->pos.yPos += coll->Middle.Floor;
+	}
+}
+
+// LEGACY
+void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 72*/
 	/*state code: lara_as_crouch_roll*/
