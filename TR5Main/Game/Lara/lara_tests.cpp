@@ -6,8 +6,9 @@
 #include "animation.h"
 #include "lara_climb.h"
 #include "lara_collide.h"
+#include "lara_flare.h"
 #include "control/control.h"
-#include "control\los.h"
+#include "control/los.h"
 #include "items.h"
 
 using namespace TEN::Floordata;
@@ -209,6 +210,8 @@ bool TestLaraStandUp(COLL_INFO* coll)
 	return (coll->Middle.Ceiling >= -362 || coll->ObjectHeadroom < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
 }
 
+// LEGACY
+// TODO: Gradually replace calls with new TestLaraSlide() (currently TestLaraSlideNew()) and SetLaraSlideState(). @Sezz 2021.09.27
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	static short oldAngle = 1;
@@ -1313,8 +1316,8 @@ bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraFall(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
-		Lara.waterStatus == LW_WADE)	// TODO: This causes an legacy floor snap BUG when lara wades off a ledge into a dry room. @Sezz 2021.09.26
+	if (coll->Middle.Floor <= STEPUP_HEIGHT
+		|| Lara.waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap BUG when lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
 	}
@@ -1322,19 +1325,8 @@ bool TestLaraFall(COLL_INFO* coll)
 	return true;
 }
 
-// TODO: State dispatch to a new LS_FALL state. The issue is that goal states set in collision functions are only actuated on the following
-// frame, resulting in an unacceptable delay. Changing the order in which routine functions are executed is not a viable solution. @Sezz 2021.09.26
-void SetLaraFallState(ITEM_INFO* item)
-{
-	item->animNumber = LA_FALL_START;
-	item->currentAnimState = LS_JUMP_FORWARD;
-	item->goalAnimState = LS_JUMP_FORWARD;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->fallspeed = 0;
-	item->gravityStatus = true;
-}
-
-bool TestLaraSlide(COLL_INFO* coll)
+// TODO: Remane when legacy TestLaraSlide() is removed.
+bool TestLaraSlideNew(COLL_INFO* coll)
 {
 	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
 		return false;
@@ -1342,54 +1334,50 @@ bool TestLaraSlide(COLL_INFO* coll)
 	return true;
 }
 
-// TODO: Get true slope direction for enhanced sliding mechanics.
-// Krys, I'd like to have a look at what you did in your TRNG script. @Sezz 2021.09.26
-short GetLaraSlideDirection(COLL_INFO* coll)
+bool TestLaraCrawl(ITEM_INFO* item)
 {
-	short laraAngle = ANGLE(0.0f);
+	if (Lara.gunStatus == LG_NO_ARMS
+		&& Lara.waterStatus != LW_WADE
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		&& (item->animNumber == LA_CROUCH_IDLE || item->animNumber == LA_STAND_TO_CROUCH_END)	// TODO: Un-hardcode anim condition. @Sezz 2021.09.26
+		&& !(TrInput & (IN_FLARE | IN_DRAW))
+		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < 900 && Lara.flareAge != 0)))
+	{
+		return true;
+	}
 
-	if (coll->TiltX > 2)
-		laraAngle = -ANGLE(90.0f);
-	else if (coll->TiltX < -2)
-		laraAngle = ANGLE(90.0f);
-
-	if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
-		laraAngle = ANGLE(180.0f);
-	else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
-		laraAngle = ANGLE(0.0f);
-
-	return laraAngle;
+	return false;
 }
 
-// TODO: State dispatches to slide states. Same issue as with SetLaraFallState().
-void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraCrouchTurn(ITEM_INFO* item)
 {
-	auto angle = GetLaraSlideDirection(coll);
-	auto polarity = angle - item->pos.yRot;
-
-	ShiftItem(item, coll);
-
-	// Slide back.
-	if (polarity < -ANGLE(90.0f) || polarity > ANGLE(90.0f))
+	if (Lara.waterStatus != LW_WADE
+		|| item->animNumber != LA_CROUCH_IDLE)
 	{
-		Lara.moveAngle = ANGLE(180);
-		item->pos.yRot = angle + ANGLE(180.0f);
-
-		item->animNumber = LA_SLIDE_BACK_START;
-		item->goalAnimState = LS_SLIDE_BACK;
-		item->currentAnimState = LS_SLIDE_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-
+		return true;
 	}
-	// Slide forward.
-	else [[likely]]
+
+	return false;
+}
+
+bool TestLaraCrouchRoll(ITEM_INFO* item)
+{
+	if ((Lara.gunStatus == LG_NO_ARMS && Lara.waterStatus != LW_WADE)
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		//&& (!LaraFloorFront(item, item->pos.yRot, 1024) >= 384					// 1 block away from hole in floor.
+			//|| TestLaraWall(item, WALL_SIZE / 2, 0, -256) != SPLAT_NONE)			// 1 block away from wall.
+		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)								// Avoids some flare spawning/wep stuff.
+		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < FLARE_AGE && Lara.flareAge != 0)))
 	{
-		Lara.moveAngle = 0;
-		item->pos.yRot = angle;
+		// TODO: Commented lines above don't work, so keeping the check as it was for now. It doesn't function as intended anyway; Lara sometimes still vaults herself into walls. @Sezz 2021.09.26
+		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384	//4 clicks away from holes in the floor
+			|| TestLaraWall(item, WALL_SIZE / 2, 0, -256))		//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
+			return false;
 
-		item->animNumber = LA_SLIDE_FORWARD;
-		item->goalAnimState = LS_SLIDE_FORWARD;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_SLIDE_FORWARD;
+		return true;
 	}
+
+	return false;
 }

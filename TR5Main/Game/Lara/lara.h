@@ -2,12 +2,16 @@
 #include "lara_struct.h"
 struct ITEM_INFO;
 struct COLL_INFO;
-#define FRONT_ARC ANGLE(90.0f)
-#define LARA_LEAN_RATE ANGLE(1.5f)
+
+// TODO: Rename these to be consistent and define state-specific rates.
+// State code seems to cherry-pick whatever is handy. @Sezz 2021.09.27
+#define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
+#define LARA_LEAN_RATE ANGLE(1.5f)	// lean rates
 #define LARA_LEAN_MAX ANGLE(11.0f)
 #define LARA_LEAN_SPRINT_MAX ANGLE(16.0f)
-#define LARA_TURN_RATE ANGLE(2.25f)
+#define LARA_TURN_RATE ANGLE(2.25f)	// turn rates
 #define LARA_JUMP_TURN ANGLE(3.0f)
+#define LARA_CROUCH_ROLL_TURN ANGLE(3.5f)
 #define LARA_SLOW_TURN ANGLE(4.0f)
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
