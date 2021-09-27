@@ -14,3 +14,7 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle);
 void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll);
 short GetDirOctant(int rot);
 void GetLaraDeadlyBounds();
+
+// TODO: Temporary placement.
+bool TestLaraHitCeiling(COLL_INFO* coll);
+void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);

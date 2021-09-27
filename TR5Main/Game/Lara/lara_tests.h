@@ -38,7 +38,7 @@ void GetTighRopeFallOff(int Regularity);
 
 // TODO: New, organise later.
 bool TestLaraFall(COLL_INFO* coll);
-void SetLaraFallState(ITEM_INFO* item);
-bool TestLaraSlide(COLL_INFO* coll);
-short GetLaraSlideDirection(COLL_INFO* coll);
-void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
+bool TestLaraCrawl(ITEM_INFO* item);
+bool TestLaraCrouchTurn(ITEM_INFO* item);
+bool TestLaraCrouchRoll(ITEM_INFO* item);

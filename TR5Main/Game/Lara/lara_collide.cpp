@@ -127,6 +127,39 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 	return 0;
 }
 
+// TODO: Move the following two functions to lara_tests.cpp and lara_helpers.cpp?
+// @Sezz 2021.09.26
+bool TestLaraHitCeiling(COLL_INFO* coll)
+{
+	if (coll->CollisionType == CT_TOP ||
+		coll->CollisionType == CT_CLAMP)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: Using LA_STAND_SOLID is a poor way of handling bad ceiling collision. @Sezz 2021.09.26
+void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->pos.xPos = coll->Setup.OldPosition.x;
+	item->pos.yPos = coll->Setup.OldPosition.y;
+	item->pos.zPos = coll->Setup.OldPosition.z;
+
+	item->goalAnimState = LS_STOP;
+	item->currentAnimState = LS_STOP;
+	item->animNumber = LA_STAND_SOLID;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+
+	item->speed = 0;
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+
+}
+
+// LEGACY
+// TODO: Gradually replace usage with TestLaraHitCeiling() and SetLaraHitCeiling(). @Sezz 2021.09.27
 int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_TOP || coll->CollisionType == CT_CLAMP)
@@ -162,17 +195,11 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
 		if (TrInput & IN_LEFT)
-		{
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
-		}
 		else if (TrInput & IN_RIGHT)
-		{
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
-		}
 		else
-		{
 			item->goalAnimState = LS_STOP;
-		}
 		AnimateLara(item);
 		break;
 	default:
