@@ -455,7 +455,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= 136;
+		Lara.turnRate -= LARA_SUBSUIT_TURN_RATE;
 
 		if (Lara.turnRate < -ANGLE(6))
 			Lara.turnRate = -ANGLE(6);
@@ -464,7 +464,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += 136;
+		Lara.turnRate += LARA_SUBSUIT_TURN_RATE;
 
 		if (Lara.turnRate > ANGLE(6))
 			Lara.turnRate = ANGLE(6);
@@ -476,17 +476,13 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 void SwimTurn(ITEM_INFO* item)
 {
 	if (TrInput & IN_FORWARD)
-	{
 		item->pos.xRot -= ANGLE(2);
-	}
 	else if (TrInput & IN_BACK)
-	{
 		item->pos.xRot += ANGLE(2);
-	}
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= 409;
+		Lara.turnRate -= LARA_TURN_RATE;
 		if (Lara.turnRate < -LARA_MED_TURN)
 			Lara.turnRate = -LARA_MED_TURN;
 
@@ -494,7 +490,7 @@ void SwimTurn(ITEM_INFO* item)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += 409;
+		Lara.turnRate += LARA_TURN_RATE;
 		if (Lara.turnRate > LARA_MED_TURN)
 			Lara.turnRate = LARA_MED_TURN;
 
