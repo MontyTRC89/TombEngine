@@ -664,14 +664,10 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 	{
 		bool wade = false;
 
-		if (fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
+		if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
 			&& g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-		{
-			wade = true;
-			item->goalAnimState = LS_WADE_FORWARD;
-		}
-		else if (fHeight.Position.Floor < (STEPUP_HEIGHT - 1)
-			&& fHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+			|| (fHeight.Position.Floor < (STEPUP_HEIGHT - 1)
+				&& fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)))
 		{
 			wade = true;
 			item->goalAnimState = LS_WADE_FORWARD;
