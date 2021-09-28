@@ -32,6 +32,9 @@
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
 #include "items.h"
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -1960,121 +1963,43 @@ namespace TEN::Renderer
     }
 
     void Renderer11::drawRopes(RenderView& view)
-{
-        for (int n = 0; n < NumRopes; n++)
+    {
+        for (int n = 0; n < Ropes.size(); n++)
         {
-            ROPE_STRUCT *rope = &Ropes[n];
+            ROPE_STRUCT* rope = &Ropes[n];
 
             if (rope->active)
             {
-                // Original algorithm:
-                // 1) Transform segment coordinates from 3D to 2D + depth
-                // 2) Get dx, dy and the segment length
-                // 3) Get sine and cosine from dx / length and dy / length
-                // 4) Calculate a scale factor
-                // 5) Get the coordinates of the 4 corners of each sprite iteratively
-                // 6) Last step only for us, unproject back to 3D coordinates
+                Matrix world = Matrix::CreateTranslation(
+                    rope->position.x,
+                    rope->position.y,
+                    rope->position.z
+                );
 
-                // Tranform rope points
-                Vector3 projected[24];
-                Matrix world = Matrix::Identity;
+                Vector3 absolute[24];
 
-                for (int i = 0; i < 24; i++)
+                for (int n = 0; n < ROPE_SEGMENTS; n++)
                 {
-                    Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
-                                                       rope->position.y + rope->segment[i].y / 65536.0f,
-                                                       rope->position.z + rope->segment[i].z / 65536.0f);
+                    PHD_VECTOR* s = &rope->meshSegment[n];
+                    Vector3 t;
+                    Vector3 output;
 
-                    projected[i] = m_viewportToolkit.Project(absolutePosition, Projection, View, world);
+                    t.x = s->x >> FP_SHIFT;
+                    t.y = s->y >> FP_SHIFT;
+                    t.z = s->z >> FP_SHIFT;
+
+                    output = Vector3::Transform(t, world);
+
+                    Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
+                    absolute[n] = absolutePosition;
                 }
 
-                // Now each rope point is transformed in screen X, Y and Z depth
-                // Let's calculate dx, dy corrections and scaling
-                float dx = projected[1].x - projected[0].x;
-                float dy = projected[1].y - projected[0].y;
-                float length = sqrt(dx * dx + dy * dy);
-                float s = 0;
-                float c = 0;
-
-                if (length != 0)
+                for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
                 {
-                    s = -dy / length;
-                    c = dx / length;
-                }
-
-                float w = 6.0f;
-                if (projected[0].z)
-                {
-                    w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
-                    if (w < 3)
-                        w = 3;
-                }
-
-                float sdx = s * w;
-                float sdy = c * w;
-
-                float x1 = projected[0].x - sdx;
-                float y1 = projected[0].y - sdy;
-
-                float x2 = projected[0].x + sdx;
-                float y2 = projected[0].y + sdy;
-
-                float depth = projected[0].z;
-
-                for (int j = 0; j < 24; j++)
-                {
-                    Vector3 p1 = m_viewportToolkit.Unproject(Vector3(x1, y1, depth), Projection, View, world);
-                    Vector3 p2 = m_viewportToolkit.Unproject(Vector3(x2, y2, depth), Projection, View, world);
-
-                    dx = projected[j].x - projected[j - 1].x;
-                    dy = projected[j].y - projected[j - 1].y;
-                    length = sqrt(dx * dx + dy * dy);
-                    s = 0;
-                    c = 0;
-
-                    if (length != 0)
-                    {
-                        s = -dy / length;
-                        c = dx / length;
-                    }
-
-                    w = 6.0f;
-                    if (projected[j].z)
-                    {
-                        w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
-                        if (w < 3)
-                            w = 3;
-                    }
-
-                    float sdx = s * w;
-                    float sdy = c * w;
-
-                    float x3 = projected[j].x - sdx;
-                    float y3 = projected[j].y - sdy;
-
-                    float x4 = projected[j].x + sdx;
-                    float y4 = projected[j].y + sdy;
-
-                    depth = projected[j].z;
-
-                    Vector3 p3 = m_viewportToolkit.Unproject(Vector3(x3, y3, depth), Projection, View, world);
-                    Vector3 p4 = m_viewportToolkit.Unproject(Vector3(x4, y4, depth), Projection, View, world);
-
-                    addSprite3D(&m_sprites[20],
-                                Vector3(p1.x, p1.y, p1.z),
-                                Vector3(p2.x, p2.y, p2.z),
-                                Vector3(p3.x, p3.y, p3.z),
-                                Vector3(p4.x, p4.y, p4.z),
-                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, { 0, 0 }, BLENDMODE_OPAQUE,view);
-
-                    x1 = x4;
-                    y1 = y4;
-                    x2 = x3;
-                    y2 = y3;
+                    addLine3D(absolute[n], absolute[n + 1], Vector4::One);
                 }
             }
         }
-
     }
 
     void Renderer11::drawLines2D()

@@ -56,3 +56,21 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BO
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index);
+
+constexpr auto FP_SHIFT = 16;
+constexpr auto FP_ONE = (1 << FP_SHIFT);
+constexpr auto W2V_SHIFT = 14;
+
+void FP_VectorMul(PHD_VECTOR* v, int scale, PHD_VECTOR* result);
+__int64 FP_Mul(__int64 a, __int64 b);
+__int64 FP_Div(__int64 a, __int64 b);
+int FP_DotProduct(PHD_VECTOR* a, PHD_VECTOR* b);
+void FP_CrossProduct(PHD_VECTOR* a, PHD_VECTOR* b, PHD_VECTOR* n);
+void FP_GetMatrixAngles(MATRIX3D* m, short* angles);
+__int64 FP_ToFixed(__int64 value);
+__int64 FP_FromFixed(__int64 value);
+PHD_VECTOR* FP_Normalise(PHD_VECTOR* v);
+
+
+#define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
+#define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
