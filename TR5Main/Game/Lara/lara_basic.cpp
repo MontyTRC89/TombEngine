@@ -509,6 +509,20 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
+	// Permit turning when Lara has landed.
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
+	}
+
 	// TODO: Refine this handling. Create LS_WADE_IDLE state? Might complicate things. @Sezz 2021.09.28
 	if (Lara.waterStatus == LW_WADE)
 	{
