@@ -1848,15 +1848,14 @@ void ResetLook()
 {
 	if (Camera.type != LOOK_CAMERA)
 	{
-		if (Lara.headXrot <= -ANGLE(2.0f) || Lara.headXrot >= ANGLE(2.0f))
-			Lara.headXrot = Lara.headXrot / -8 + Lara.headXrot;
-		else
-			Lara.headXrot = 0;
+		if (abs(Lara.headXrot) > ANGLE(0.0f))
+			Lara.headXrot += Lara.headXrot / -8;
 
-		if (Lara.headYrot <= -ANGLE(2.0f) || Lara.headYrot >= ANGLE(2.0f))
-			Lara.headYrot = Lara.headYrot / -8 + Lara.headYrot;
-		else
-			Lara.headYrot = 0;
+		if (abs(Lara.headYrot) > ANGLE(0.0f))
+			Lara.headYrot += Lara.headYrot / -8;
+
+		if (abs(Lara.headZrot) > ANGLE(0.0f))
+			Lara.headZrot += Lara.headZrot / -8;
 
 		if (Lara.gunStatus != LG_HANDS_BUSY 
 			&& !Lara.leftArm.lock 
@@ -1865,6 +1864,7 @@ void ResetLook()
 		{
 			Lara.torsoYrot = Lara.headYrot;
 			Lara.torsoXrot = Lara.headXrot;
+			Lara.torsoZrot = Lara.headZrot;
 		}
 		else
 		{
@@ -1872,6 +1872,8 @@ void ResetLook()
 				Lara.torsoXrot = 0;
 			if (!Lara.headYrot)
 				Lara.torsoYrot = 0;
+			if (!Lara.headZrot)
+				Lara.torsoZrot = 0;
 		}
 	}
 }
