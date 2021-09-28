@@ -227,33 +227,28 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
 	}
 
-	static bool doJump = false;
+	static bool allowJump = false;
 
 	if (item->animNumber == LA_STAND_TO_RUN)
-		doJump = false;
+		allowJump = false;
 	else if (item->animNumber == LA_RUN && item->frameNumber == 4)
-		doJump = true;
+		allowJump = true;
 	else
-		doJump = true;
+		allowJump = true;
 
-	// Pseudo action queue.
-	// This creates a committal lock to perform a 180 turn in mid-air when JUMP and ROLL are pressed in sequence,
-	// but JUMP isn't held down and doJump isn't true yet.
-	// TODO: Make this cleaner.
-	// TODO: There is a ONE FRAME window wherein if you let go of ROLL, Lara performs a regular jump forward. @Sezz 2021.09.26
-	static bool jumpWasPressed = false;
-	bool doJumpRoll = jumpWasPressed && (TrInput & IN_ROLL);
+	// Pseudo action queue which makes JUMP input take complete precedence.
+	// This creates a committal lock to perform a forward jump when JUMP is pressed and released while allowJump isn't true yet.
+	// TODO: Get others to try this out. @Sezz 2021.09.28
+	static bool commitToJump = false;
 
 	if ((TrInput & IN_JUMP && !item->gravityStatus)
-		|| doJumpRoll)
+		|| commitToJump)
 	{
-		jumpWasPressed = true;
+		commitToJump = TrInput & IN_FORWARD;
 
-		// Jump INPUT takes complete precedence to prevent unintentional rolling when JUMP and ROLL
-		// are pressed (intending to turn 180 in mid-air) and doJump isn't true yet.
-		if (doJump)
+		if (allowJump)
 		{
-			jumpWasPressed = false;
+			commitToJump = false;
 			item->goalAnimState = LS_JUMP_FORWARD;
 		}
 
