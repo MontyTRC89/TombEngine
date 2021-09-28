@@ -47,6 +47,9 @@
 #include "inventory.h"
 #endif
 
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
