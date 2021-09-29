@@ -471,9 +471,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->triggerFlags == 2 || item->triggerFlags == 4)
 					{
-						dest.x = item->pos.xPos + 512 * phd_sin(item->pos.yRot + ANGLE(180));
+						dest.x = item->pos.xPos + 2048 * phd_sin(item->pos.yRot + ANGLE(180));
 						dest.y = item->pos.yPos;
-						dest.z = item->pos.zPos + 512 * phd_cos(item->pos.yRot + ANGLE(180));
+						dest.z = item->pos.zPos + 2048 * phd_cos(item->pos.yRot + ANGLE(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -499,7 +499,7 @@ namespace TEN::Entities::Effects
 								g, 
 								b,
 								32,
-								1, 
+								LI_SPLINE,
 								32, 
 								3);
 						}
@@ -542,7 +542,7 @@ namespace TEN::Entities::Effects
 								g,
 								b,
 								32,
-								1,
+								LI_SPLINE,
 								32,
 								5);
 						}
@@ -569,7 +569,7 @@ namespace TEN::Entities::Effects
 						g,
 						b,
 						24, 
-						3,
+						LI_SPLINE | LI_MOVEEND,
 						32,
 						3);
 					TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
