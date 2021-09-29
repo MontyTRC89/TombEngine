@@ -787,8 +787,8 @@ namespace TEN::Floordata
 		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
 
 		// Run through all blocks enclosed in AABB
-		for (int x = 0; x < room->xSize; x++)
-			for (int z = 0; z < room->ySize; z++)
+		for (int x = 0; x < room->ySize; x++)
+			for (int z = 0; z < room->xSize; z++)
 			{
 				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
 				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
