@@ -4,6 +4,23 @@
 #include "level.h"
 #include "lara.h"
 
+bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
+{
+	if (gunType == WEAPON_SHOTGUN
+		|| gunType == WEAPON_HK
+		|| gunType == WEAPON_CROSSBOW
+		|| gunType == WEAPON_TORCH
+		|| gunType == WEAPON_GRENADE_LAUNCHER
+		|| gunType == WEAPON_HARPOON_GUN
+		|| gunType == WEAPON_ROCKET_LAUNCHER
+		|| gunType == WEAPON_SNOWMOBILE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // TODO: State dispatch to a new LS_FALL state. The issue is that goal states set in collision functions are only actuated on the following
 // frame, resulting in an unacceptable delay. Changing the order in which routine functions are executed is not a viable solution. @Sezz 2021.09.26
 void SetLaraFallState(ITEM_INFO* item)

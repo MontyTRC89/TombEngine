@@ -263,9 +263,9 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 8;
 		else
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
 	}
 	else if (TrInput & IN_RIGHT
 		&& item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
@@ -275,9 +275,9 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_CROUCH_ROLL_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 8;
 		else
-			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 8;
 	}
 
 	item->goalAnimState = LS_CROUCH_IDLE;
