@@ -803,17 +803,14 @@ namespace TEN::Floordata
 					continue;
 
 				// If block isn't in enclosed AABB space, ignore precise check
-				//if (x < minX || z < minZ || x >= maxX || z >= maxZ)
-				//	continue;
+				if (x < minX || z < minZ || x > maxX || z > maxZ)
+					continue;
 
 				// Block is in enclosed AABB space, do more precise test.
 				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
 				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(WALL_SIZE / 2), Vector4::UnitY);
-
-				if (!forceRemoval && dxBounds.Intersects(blockBox))
+				if (dxBounds.Intersects(blockBox))
 					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
-				else
-					RemoveBridge(itemNumber, offX, offZ); // Doesn't intersect, try to remove bridge.
 			}
 	}
 }
