@@ -2808,23 +2808,3 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 
 	return vect;
 }
-
-// New function which gets precise floor/ceiling collision from actual object bounding box.
-// Animated objects are also supported, although horizontal collision shift is unstable.
-// Method: get accurate bounds in world transform by converting to DirectX OBB, then do a
-// ray test on top or bottom (depending on test side) to determine if box is present at 
-// this particular point.
-
-std::optional<int> GetFloorItemIntersect(ITEM_INFO* item, int x, int y, int z, bool bottom)
-{
-	auto bounds = GetBoundsAccurate(item);
-	auto dxBounds = TO_DX_BBOX(item->pos, bounds);
-
-	Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
-
-	static float distance;
-	if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-		return std::optional{ item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1) };
-	else
-		return std::nullopt;
-}
