@@ -124,21 +124,6 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits)
 		return std::nullopt;
 
-	auto room = &g_Level.Rooms[item->roomNumber];
-	// Run through all blocks enclosed in AABB
-	for (int x = 0; x < room->xSize; x++)
-		for (int z = 0; z < room->ySize; z++)
-		{
-			auto floor = &room->floor[room->xSize * z + x];
-
-			if (floor->BridgeItem.count(itemNumber))
-			{
-				g_Renderer.addDebugSphere(Vector3(room->z + z * SECTOR(1) + 512, room->y - 256, room->x + x * SECTOR(1) + 512), 256, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-
-			}
-		}
-
-
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
