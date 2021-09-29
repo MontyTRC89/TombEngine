@@ -44,12 +44,12 @@ namespace TEN::Game::Rope
 	void RopeControl(short itemNumber);
 	void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 	void RopeDynamics(ROPE_STRUCT* rope);
-	int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int value);
+	int RopeNodeCollision(ROPE_STRUCT* rope, int x, int y, int z, int value);
 	void ApplyVelocityToRope(int node, short angle, short n);
 	void SetPendulumVelocity(int x, int y, int z);
-	void _0x0046E1C0(ROPE_STRUCT* rope, int node);
-	void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
-	void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
+	void SetPendulumPoint(ROPE_STRUCT* rope, int node);
+	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
+	void ModelRigid(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
 	void UpdateRopeSwing(ITEM_INFO* item);
 	void JumpOffRope(ITEM_INFO* item);
 	void FallFromRope(ITEM_INFO* item);
