@@ -920,10 +920,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			&& !((TrInput & IN_LEFT) || (TrInput & IN_RIGHT))))*/
 	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
-		if (item->pos.zRot >= ANGLE(0.0f))
-			item->pos.zRot -= item->pos.zRot / 7;
-		else
-			item->pos.zRot += (ANGLE(360.0f) - item->pos.zRot) / 7;
+		if (abs(item->pos.zRot) > ANGLE(0.0f))
+			item->pos.zRot += item->pos.zRot / -8;
 	}
 
 	// LEGACY
@@ -1033,13 +1031,11 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 		UpdateSubsuitAngles();
 
-	// TODO: Conditions seem fine, but test this thoroughly. @Sezz 2021.09.26
+	// TODO: Conditions seem fine, but test this thoroughly. Different from surface. @Sezz 2021.09.26
 	if (!Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
-		if (item->pos.zRot >= ANGLE(0.0f))
-			item->pos.zRot -= item->pos.zRot / 7;
-		else
-			item->pos.zRot += (ANGLE(360.0f) - item->pos.zRot) / 7;
+		if (abs(item->pos.zRot) > ANGLE(0.0f))
+			item->pos.zRot += item->pos.zRot / -8;
 	}
 
 	// LEGACY
@@ -1123,12 +1119,19 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
+	if (!Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	{
+		if (abs(item->pos.zRot) > ANGLE(0.0f))
+			item->pos.zRot += item->pos.zRot / -8;
+	}
+
+	// LEGACY
+	/*if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
 		item->pos.zRot = 0;
 	else if (item->pos.zRot < 0)
 		item->pos.zRot += ANGLE(2);
 	else
-		item->pos.zRot -= ANGLE(2);
+		item->pos.zRot -= ANGLE(2);*/
 
 	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
 		LaraWaterCurrent(coll);

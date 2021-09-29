@@ -203,7 +203,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = -LARA_FAST_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 8;
 
 			// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
 			// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
@@ -213,7 +213,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			// Would a library of easing functions be helpful here? @Sezz 2021.09.26
 			// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
 		else
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -222,9 +222,9 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_FAST_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 8;
 		else
-			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 8;
 	}
 
 	static bool allowJump = false;
@@ -2465,7 +2465,78 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += SWAMP_GRAVITY;
 }
 
+// State:		LS_SPRINT (73)
+// Collision:	lara_col_dash()
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
+{
+	DashTimer--; // TODO: Move global to LaraItem? health.cpp needs deglobalisation in general. @Sezz 2021.09.29
+
+	if (item->hitPoints <= 0)
+	{
+		// item->goalAnimState = LS_DEATH; // TODO: Direct state dispatch. @Sezz 2021.09.29
+		item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX) / 12;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX * 3 / 6) / 12;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot) / 12;
+		else
+			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot * 3 / 6) / 12;
+	}
+
+	if (TrInput & IN_JUMP)
+	{
+		item->goalAnimState = LS_SPRINT_ROLL;
+
+		return;
+	}
+
+	if (TrInput & IN_DUCK
+		&& (Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+	{
+		item->goalAnimState = LS_CROUCH_IDLE;
+		return;
+	}
+
+	// TODO: Supposedly there is a bug wherein sprinting into the boundary between shallow and deep water
+	// under some condition allows Lara to run around in the water room. Investigate. @Sezz 2021.09.29
+	if (TrInput & IN_FORWARD)
+	{
+		if (Lara.waterStatus == LW_WADE)
+			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state. @Sezz 2021.09.29
+		else if (TrInput & IN_WALK)
+			item->goalAnimState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT && DashTimer > 0) [[likely]]
+			item->goalAnimState = LS_SPRINT;
+		else
+			item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 73*/
 	/*collision: lara_col_dash*/
