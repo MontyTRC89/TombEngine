@@ -1,12 +1,17 @@
 #include "framework.h"
 #include "generic_trapdoor.h"
 #include "lara.h"
+#include "floordata.h"
 #include "input.h"
 #include "camera.h"
 #include "control/control.h"
 #include "level.h"
 #include "animation.h"
 #include "items.h"
+#include "Renderer11.h"
+using namespace TEN::Renderer;
+
+using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -18,7 +23,7 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 
@@ -176,14 +181,12 @@ void OpenTrapDoor(short itemNumber)
 
 int TrapDoorFloorBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int TrapDoorCeilingBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
+	return GetBridgeBorder(itemNumber, true);
 }
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
@@ -192,7 +195,21 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetFloorItemIntersect(item, x, y, z, false);
+	auto room = &g_Level.Rooms[item->roomNumber];
+	// Run through all blocks enclosed in AABB
+	for (int x = 0; x < room->xSize; x++)
+		for (int z = 0; z < room->ySize; z++)
+		{
+			auto floor = &room->floor[room->xSize * z + x];
+
+			if (floor->BridgeItem.count(itemNumber))
+			{
+				g_Renderer.addDebugSphere(Vector3(room->z + z * SECTOR(1) + 512, LaraItem->pos.yPos, room->x + x * SECTOR(1) + 512), 256, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+
+			}
+		}
+
+	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -202,5 +219,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetFloorItemIntersect(item, x, y, z, true);
+	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
 }
