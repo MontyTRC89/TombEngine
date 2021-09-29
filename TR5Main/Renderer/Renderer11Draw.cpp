@@ -2841,7 +2841,7 @@ namespace TEN::Renderer
         //drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
-        drawEnergyArcs(view);
+        drawLightning(view);
 
         drawRopes(view);
         drawSprites(view);
@@ -2956,6 +2956,11 @@ namespace TEN::Renderer
 				drawAnimatingItem(view,item, transparent, animated);
 				drawWraithExtra(view,item, transparent, animated);
 			}
+            else if (objectNumber == ID_DARTS)
+            {
+                //TODO: for now legacy way, in the future mesh
+                drawDarts(view, item, transparent, animated);
+            }
             else
             {
                 drawAnimatingItem(view,item, transparent, animated);
@@ -3023,6 +3028,23 @@ namespace TEN::Renderer
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			}
         }
+    }
+
+    void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
+    {
+        Vector3 start = Vector3(
+            item->Item->pos.xPos,
+            item->Item->pos.yPos,
+            item->Item->pos.zPos);
+
+        float speed = (-96 * phd_cos(TO_RAD(item->Item->pos.xRot)));
+
+        Vector3 end = Vector3(
+            item->Item->pos.xPos + speed * phd_sin(TO_RAD(item->Item->pos.yRot)),
+            item->Item->pos.yPos + 96 * phd_sin(TO_RAD(item->Item->pos.xRot)),
+            item->Item->pos.zPos + speed * phd_cos(TO_RAD(item->Item->pos.yRot)));
+
+        addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
