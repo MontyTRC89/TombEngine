@@ -49,7 +49,7 @@
 
 #include "Objects/Generic/Object/rope.h"
 
-using namespace TEN::Entities::Objects;
+using namespace TEN::Entities::Generic;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;

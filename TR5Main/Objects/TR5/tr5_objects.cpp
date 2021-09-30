@@ -58,7 +58,6 @@
 #include "lara_flare.h"
 #include "lara_initialise.h"
 #include "pickup.h"
-#include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"
 #include "objects.h"
@@ -882,7 +881,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 static void StartObject(OBJECT_INFO *obj)
 {
 	InitPickupItem(obj, FlareControl, ID_FLARE_ITEM);
-	InitPickupItem(obj, TorchControl, ID_BURNING_TORCH_ITEM, true);
 
 	for (int objNumber = ID_SEARCH_OBJECT1; objNumber <= ID_SEARCH_OBJECT4; objNumber++)
 		InitSearchObject(obj, objNumber);

@@ -9,7 +9,6 @@
 #include "effects/effects.h"
 #include "sphere.h"
 #include "animation.h"
-#include "effects/flmtorch.h"
 #include "level.h"
 #include "control/lot.h"
 #include "setup.h"
@@ -20,6 +19,9 @@
 #include "GameFlowScript.h"
 #include "lara_struct.h"
 #include "itemdata/creature_info.h"
+#include "Objects/Generic/Object/burning_torch.h"
+
+using namespace TEN::Entities::Generic;
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {

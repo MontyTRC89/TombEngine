@@ -34,7 +34,7 @@
 #include "items.h"
 #include "Objects/Generic/Object/rope.h"
 
-using namespace TEN::Entities::Objects;
+using namespace TEN::Entities::Generic;
 
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
