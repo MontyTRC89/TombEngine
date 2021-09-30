@@ -1,15 +1,20 @@
 #include "framework.h"
-#include "rope.h"
-#include "animation.h"
-#include "lara.h"
-#include "level.h"
-#include "input.h"
-#include "control/control.h"
-#include "Sound\sound.h"
-#include "camera.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/control/box.h"
+#include "Game/items.h"
+#include "Game/control/lot.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara.h"
+#include "Specific/trmath.h"
+#include "Game/collide.h"
+#include "Game/sphere.h"
+#include "Objects/Generic/Object/rope.h"
+#include "Sound/sound.h"
+#include "Game/camera.h"
 
-namespace TEN::Game::Rope
+namespace TEN::Entities::Objects
 {
 	PENDULUM CurrentPendulum;
 	PENDULUM AlternatePendulum;
@@ -39,7 +44,7 @@ namespace TEN::Game::Rope
 		PrepareRope(&rope, &itemPos, &pos, 128, item);
 
 		item->triggerFlags = Ropes.size();
-		
+
 		Ropes.push_back(rope);
 	}
 
@@ -180,10 +185,24 @@ namespace TEN::Game::Rope
 
 		item = &g_Level.Items[itemNumber];
 		rope = &Ropes[item->triggerFlags];
-		if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
+		
+		if (TrInput & IN_ACTION 
+			&& Lara.gunStatus == LG_NO_ARMS 
+			&& (l->currentAnimState == LS_REACH
+				|| l->currentAnimState == LS_JUMP_UP) 
+			&& l->gravityStatus 
+			&& l->fallspeed > 0
+			&& rope->active)
 		{
 			frame = GetBoundsAccurate(l);
-			segment = RopeNodeCollision(rope, l->pos.xPos, l->pos.yPos + frame->Y1 + 512, l->pos.zPos + frame->Z2 * phd_cos(l->pos.yRot), l->currentAnimState == LS_REACH ? 128 : 320);
+
+			segment = RopeNodeCollision(
+				rope,
+				l->pos.xPos,
+				l->pos.yPos + frame->Y1 + 512,
+				l->pos.zPos + frame->Z2 * phd_cos(l->pos.yRot),
+				l->currentAnimState == LS_REACH ? 128 : 320);
+
 			if (segment >= 0)
 			{
 				if (l->currentAnimState == LS_REACH)
@@ -198,17 +217,22 @@ namespace TEN::Game::Rope
 					l->animNumber = LA_JUMP_UP_TO_ROPE_START;
 					l->currentAnimState = LS_ROPE_IDLE;
 				}
+
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				l->gravityStatus = false;
 				l->fallspeed = 0;
+
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.ropePtr = item->triggerFlags;
 				Lara.ropeSegment = segment;
 				Lara.ropeY = l->pos.yRot;
+
 				DelAlignLaraToRope(l);
-				CurrentPendulum.Velocity.x = 0;
-				CurrentPendulum.Velocity.y = 0;
-				CurrentPendulum.Velocity.z = 0;
+
+				CurrentPendulum.velocity.x = 0;
+				CurrentPendulum.velocity.y = 0;
+				CurrentPendulum.velocity.z = 0;
+
 				ApplyVelocityToRope(segment, l->pos.yRot, 16 * LaraItem->speed);
 			}
 		}
@@ -242,31 +266,31 @@ namespace TEN::Game::Rope
 		else
 		{
 			pendulumPointer = &AlternatePendulum;
-			if (Lara.ropePtr == -1 && CurrentPendulum.Rope)
+			if (Lara.ropePtr == -1 && CurrentPendulum.rope)
 			{
-				for (i = 0; i < CurrentPendulum.node; ++i)
+				for (i = 0; i < CurrentPendulum.node; i++)
 				{
-					CurrentPendulum.Rope->velocity[i].x = CurrentPendulum.Rope->velocity[CurrentPendulum.node].x;
-					CurrentPendulum.Rope->velocity[i].y = CurrentPendulum.Rope->velocity[CurrentPendulum.node].y;
-					CurrentPendulum.Rope->velocity[i].z = CurrentPendulum.Rope->velocity[CurrentPendulum.node].z;
+					CurrentPendulum.rope->velocity[i].x = CurrentPendulum.rope->velocity[CurrentPendulum.node].x;
+					CurrentPendulum.rope->velocity[i].y = CurrentPendulum.rope->velocity[CurrentPendulum.node].y;
+					CurrentPendulum.rope->velocity[i].z = CurrentPendulum.rope->velocity[CurrentPendulum.node].z;
 				}
-				CurrentPendulum.Position.x = 0;
-				CurrentPendulum.Position.y = 0;
-				CurrentPendulum.Position.z = 0;
+				CurrentPendulum.position.x = 0;
+				CurrentPendulum.position.y = 0;
+				CurrentPendulum.position.z = 0;
 
-				CurrentPendulum.Velocity.x = 0;
-				CurrentPendulum.Velocity.y = 0;
-				CurrentPendulum.Velocity.z = 0;
+				CurrentPendulum.velocity.x = 0;
+				CurrentPendulum.velocity.y = 0;
+				CurrentPendulum.velocity.z = 0;
 
 				CurrentPendulum.node = -1;
-				CurrentPendulum.Rope = NULL;
+				CurrentPendulum.rope = NULL;
 			}
 		}
 		if (Lara.ropePtr != -1)
 		{
-			vec.x = pendulumPointer->Position.x - rope->segment[0].x;
-			vec.y = pendulumPointer->Position.y - rope->segment[0].y;
-			vec.z = pendulumPointer->Position.z - rope->segment[0].z;
+			vec.x = pendulumPointer->position.x - rope->segment[0].x;
+			vec.y = pendulumPointer->position.y - rope->segment[0].y;
+			vec.z = pendulumPointer->position.z - rope->segment[0].z;
 			NormaliseRopeVector(&vec);
 
 			for (i = pendulumPointer->node; i >= 0; --i)
@@ -282,35 +306,49 @@ namespace TEN::Game::Rope
 
 			if (flag)
 			{
-				vec2.x = pendulumPointer->Position.x - rope->segment[pendulumPointer->node].x;
-				vec2.y = pendulumPointer->Position.y - rope->segment[pendulumPointer->node].y;
-				vec2.z = pendulumPointer->Position.z - rope->segment[pendulumPointer->node].z;
+				vec2.x = pendulumPointer->position.x - rope->segment[pendulumPointer->node].x;
+				vec2.y = pendulumPointer->position.y - rope->segment[pendulumPointer->node].y;
+				vec2.z = pendulumPointer->position.z - rope->segment[pendulumPointer->node].z;
 
-				rope->segment[pendulumPointer->node].x = pendulumPointer->Position.x;
-				rope->segment[pendulumPointer->node].y = pendulumPointer->Position.y;
-				rope->segment[pendulumPointer->node].z = pendulumPointer->Position.z;
-
+				rope->segment[pendulumPointer->node].x = pendulumPointer->position.x;
+				rope->segment[pendulumPointer->node].y = pendulumPointer->position.y;
+				rope->segment[pendulumPointer->node].z = pendulumPointer->position.z;
+				
 				for (i = pendulumPointer->node; i < ROPE_SEGMENTS; ++i)
 				{
 					rope->segment[i].x -= vec2.x;
 					rope->segment[i].y -= vec2.y;
 					rope->segment[i].z -= vec2.z;
+
 					rope->velocity[i].x = 0;
 					rope->velocity[i].y = 0;
 					rope->velocity[i].z = 0;
 				}
 			}
-			ModelRigidRope(rope, pendulumPointer, &rope->velocity[0], &pendulumPointer->Velocity, rope->segmentLength * pendulumPointer->node);
-			pendulumPointer->Velocity.y += 393216;
-			pendulumPointer->Position.x += pendulumPointer->Velocity.x;
-			pendulumPointer->Position.y += pendulumPointer->Velocity.y;
-			pendulumPointer->Position.z += pendulumPointer->Velocity.z;
-			pendulumPointer->Velocity.x -= pendulumPointer->Velocity.x >> 8;
-			pendulumPointer->Velocity.z -= pendulumPointer->Velocity.z >> 8;
-		}
-		for (i = pendulumPointer->node; i < 23; ++i)
-			ModelRigid(&rope->segment[i], &rope->segment[i + 1], &rope->velocity[i], &rope->velocity[i + 1], rope->segmentLength);
+			ModelRigidRope(
+				rope, 
+				pendulumPointer,
+				&rope->velocity[0], 
+				&pendulumPointer->velocity,
+				rope->segmentLength * pendulumPointer->node);
 		
+			pendulumPointer->velocity.y += 6 << FP_SHIFT;
+
+			pendulumPointer->position.x += pendulumPointer->velocity.x;
+			pendulumPointer->position.y += pendulumPointer->velocity.y;
+			pendulumPointer->position.z += pendulumPointer->velocity.z;
+
+			pendulumPointer->velocity.x -= pendulumPointer->velocity.x >> 8;
+			pendulumPointer->velocity.z -= pendulumPointer->velocity.z >> 8;
+		}
+		for (i = pendulumPointer->node; i < ROPE_SEGMENTS - 1; ++i)
+			ModelRigid(
+				&rope->segment[i],
+				&rope->segment[i + 1],
+				&rope->velocity[i],
+				&rope->velocity[i + 1], 
+				rope->segmentLength);
+
 		for (i = 0; i < ROPE_SEGMENTS; ++i)
 		{
 			rope->segment[i].x += rope->velocity[i].x;
@@ -320,8 +358,9 @@ namespace TEN::Game::Rope
 
 		for (i = pendulumPointer->node; i < ROPE_SEGMENTS; ++i)
 		{
-			rope->velocity[i].y += 196608;
-			if (pendulumPointer->Rope)
+			rope->velocity[i].y += 3 << FP_SHIFT;
+
+			if (pendulumPointer->rope)
 			{
 				rope->velocity[i].x -= rope->velocity[i].x >> 4;
 				rope->velocity[i].z -= rope->velocity[i].z >> 4;
@@ -357,7 +396,7 @@ namespace TEN::Game::Rope
 			rope->meshSegment[1].x = rope->segment[0].x + ((int64_t)rope->segmentLength * rope->normalisedSegment[0].x >> FP_SHIFT);
 			rope->meshSegment[1].y = rope->segment[0].y + ((int64_t)rope->segmentLength * rope->normalisedSegment[0].y >> FP_SHIFT);
 			rope->meshSegment[1].z = rope->segment[0].z + ((int64_t)rope->segmentLength * rope->normalisedSegment[0].z >> FP_SHIFT);
-			
+
 			for (i = 2; i < ROPE_SEGMENTS; i++)
 			{
 				rope->meshSegment[i].x = rope->meshSegment[i - 1].x + ((int64_t)rope->segmentLength * rope->normalisedSegment[i - 1].x >> FP_SHIFT);
@@ -374,14 +413,14 @@ namespace TEN::Game::Rope
 			rope->meshSegment[pendulumPointer->node + 1].x = rope->segment[pendulumPointer->node].x + ((int64_t)rope->segmentLength * rope->normalisedSegment[pendulumPointer->node].x >> FP_SHIFT);
 			rope->meshSegment[pendulumPointer->node + 1].y = rope->segment[pendulumPointer->node].y + ((int64_t)rope->segmentLength * rope->normalisedSegment[pendulumPointer->node].y >> FP_SHIFT);
 			rope->meshSegment[pendulumPointer->node + 1].z = rope->segment[pendulumPointer->node].z + ((int64_t)rope->segmentLength * rope->normalisedSegment[pendulumPointer->node].z >> FP_SHIFT);
-			
+
 			for (i = pendulumPointer->node + 1; i < ROPE_SEGMENTS - 1; ++i)
 			{
 				rope->meshSegment[i + 1].x = rope->meshSegment[i].x + ((int64_t)rope->segmentLength * rope->normalisedSegment[i].x >> FP_SHIFT);
 				rope->meshSegment[i + 1].y = rope->meshSegment[i].y + ((int64_t)rope->segmentLength * rope->normalisedSegment[i].y >> FP_SHIFT);
 				rope->meshSegment[i + 1].z = rope->meshSegment[i].z + ((int64_t)rope->segmentLength * rope->normalisedSegment[i].z >> FP_SHIFT);
 			}
-			
+
 			for (i = 0; i < pendulumPointer->node; i++)
 			{
 				rope->meshSegment[i].x = rope->segment[i].x;
@@ -397,7 +436,7 @@ namespace TEN::Game::Rope
 
 		for (int i = 0; i < ROPE_SEGMENTS - 2; ++i)
 		{
-			if (y > rope->position.y + (rope->meshSegment[i].y >> FP_SHIFT) 
+			if (y > rope->position.y + (rope->meshSegment[i].y >> FP_SHIFT)
 				&& y < rope->position.y + (rope->meshSegment[i + 1].y >> FP_SHIFT))
 			{
 				dx = x - ((rope->meshSegment[i + 1].x + rope->meshSegment[i].x) >> (FP_SHIFT + 1)) - rope->position.x;
@@ -432,26 +471,26 @@ namespace TEN::Game::Rope
 			z = (int64_t)val * z >> FP_SHIFT;
 		}
 
-		CurrentPendulum.Velocity.x += x;
-		CurrentPendulum.Velocity.y += y;
-		CurrentPendulum.Velocity.z += z;
+		CurrentPendulum.velocity.x += x;
+		CurrentPendulum.velocity.y += y;
+		CurrentPendulum.velocity.z += z;
 	}
 
 	void SetPendulumPoint(ROPE_STRUCT* rope, int node)
 	{
-		CurrentPendulum.Position.x = rope->segment[node].x;
-		CurrentPendulum.Position.y = rope->segment[node].y;
-		CurrentPendulum.Position.z = rope->segment[node].z;
+		CurrentPendulum.position.x = rope->segment[node].x;
+		CurrentPendulum.position.y = rope->segment[node].y;
+		CurrentPendulum.position.z = rope->segment[node].z;
 
 		if (CurrentPendulum.node == -1)
 		{
-			CurrentPendulum.Velocity.x += rope->velocity[node].x;
-			CurrentPendulum.Velocity.y += rope->velocity[node].y;
-			CurrentPendulum.Velocity.z += rope->velocity[node].z;
+			CurrentPendulum.velocity.x += rope->velocity[node].x;
+			CurrentPendulum.velocity.y += rope->velocity[node].y;
+			CurrentPendulum.velocity.z += rope->velocity[node].z;
 		}
 
 		CurrentPendulum.node = node;
-		CurrentPendulum.Rope = rope;
+		CurrentPendulum.rope = rope;
 	}
 
 	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value)
@@ -459,13 +498,13 @@ namespace TEN::Game::Rope
 		PHD_VECTOR vec;
 		int result;
 
-		vec.x = pendulumPointer->Position.x + pendulumVelocity->x - rope->segment[0].x;
-		vec.y = pendulumPointer->Position.y + pendulumVelocity->y - rope->segment[0].y;
-		vec.z = pendulumPointer->Position.z + pendulumVelocity->z - rope->segment[0].z;
-		
+		vec.x = pendulumPointer->position.x + pendulumVelocity->x - rope->segment[0].x;
+		vec.y = pendulumPointer->position.y + pendulumVelocity->y - rope->segment[0].y;
+		vec.z = pendulumPointer->position.z + pendulumVelocity->z - rope->segment[0].z;
+
 		result = 65536 * sqrt(abs(SQUARE(vec.x >> FP_SHIFT) + SQUARE(vec.y >> FP_SHIFT) + SQUARE(vec.z >> FP_SHIFT))) - value;
 		NormaliseRopeVector(&vec);
-		
+
 		pendulumVelocity->x -= (int64_t)result * vec.x >> FP_SHIFT;
 		pendulumVelocity->y -= (int64_t)result * vec.y >> FP_SHIFT;
 		pendulumVelocity->z -= (int64_t)result * vec.z >> FP_SHIFT;
@@ -479,7 +518,7 @@ namespace TEN::Game::Rope
 		vec.x = nextSegment->x + nextVelocity->x - segment->x - velocity->x;
 		vec.y = nextSegment->y + nextVelocity->y - segment->y - velocity->y;
 		vec.z = nextSegment->z + nextVelocity->z - segment->z - velocity->z;
-		
+
 		result = (65536 * sqrt(abs(SQUARE(vec.x >> FP_SHIFT) + SQUARE(vec.y >> FP_SHIFT) + SQUARE(vec.z >> FP_SHIFT))) - length) / 2;
 		NormaliseRopeVector(&vec);
 
@@ -632,7 +671,7 @@ namespace TEN::Game::Rope
 
 	void FallFromRope(ITEM_INFO* item)
 	{
-		item->speed = abs(CurrentPendulum.Velocity.x >> FP_SHIFT) + abs(CurrentPendulum.Velocity.z >> FP_SHIFT) >> 1;
+		item->speed = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->pos.xRot = 0;
 		item->pos.yPos += 320;
 
@@ -791,8 +830,8 @@ namespace TEN::Game::Rope
 
 		rotMatrix = rotMatrix.Transpose();
 
-		item->pos.xPos += -112 * rotMatrix.m[0][2]; 
-		item->pos.yPos += -112 * rotMatrix.m[1][2]; 
+		item->pos.xPos += -112 * rotMatrix.m[0][2];
+		item->pos.yPos += -112 * rotMatrix.m[1][2];
 		item->pos.zPos += -112 * rotMatrix.m[2][2];
 
 		item->pos.xRot = angle[0];

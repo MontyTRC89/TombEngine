@@ -1,32 +1,34 @@
 #pragma once
 
-#include "collide.h"
+struct ITEM_INFO;
+struct COLL_INFO;
+struct PHD_VECTOR;
 
-namespace TEN::Game::Rope
+namespace TEN::Entities::Objects
 {
+	constexpr auto ROPE_SEGMENTS = 24;
+	constexpr auto ROPE_WIDTH = 24;
+
 	struct ROPE_STRUCT
 	{
-		PHD_VECTOR segment[24]; // size=288, offset=0
-		PHD_VECTOR velocity[24]; // size=288, offset=288
-		PHD_VECTOR normalisedSegment[24]; // size=288, offset=576
-		PHD_VECTOR meshSegment[24]; // size=288, offset=864
-		PHD_VECTOR position; // size=12, offset=1152
-		PHD_VECTOR coords[24];
-		int segmentLength; // size=0, offset=1164
-		short active; // size=0, offset=1168
-		short coiled; // size=0, offset=1170
+		PHD_VECTOR segment[ROPE_SEGMENTS];
+		PHD_VECTOR velocity[ROPE_SEGMENTS];
+		PHD_VECTOR normalisedSegment[ROPE_SEGMENTS];
+		PHD_VECTOR meshSegment[ROPE_SEGMENTS];
+		PHD_VECTOR position;
+		PHD_VECTOR coords[ROPE_SEGMENTS];
+		int segmentLength;
+		short active;
+		short coiled;
 	};
 
 	struct PENDULUM
 	{
-		PHD_VECTOR Position; // size=12, offset=0
-		PHD_VECTOR Velocity; // size=12, offset=12
-		int node; // size=0, offset=24
-		ROPE_STRUCT* Rope; // size=1172, offset=28
+		PHD_VECTOR position;
+		PHD_VECTOR velocity;
+		int node;
+		ROPE_STRUCT* rope;
 	};
-
-	constexpr auto ROPE_SEGMENTS = 24;
-	constexpr auto ROPE_WIDTH = 24;
 
 	extern PENDULUM CurrentPendulum;
 	extern PENDULUM AlternatePendulum;
@@ -50,9 +52,9 @@ namespace TEN::Game::Rope
 	void SetPendulumPoint(ROPE_STRUCT* rope, int node);
 	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
 	void ModelRigid(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
+	void DelAlignLaraToRope(ITEM_INFO* item);
 	void UpdateRopeSwing(ITEM_INFO* item);
 	void JumpOffRope(ITEM_INFO* item);
 	void FallFromRope(ITEM_INFO* item);
 	void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
-	void DelAlignLaraToRope(ITEM_INFO* item);
 }
