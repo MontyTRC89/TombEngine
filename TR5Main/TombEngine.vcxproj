@@ -151,6 +151,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
     <ClInclude Include="Game\roomvector.h" />
+    <ClInclude Include="Objects\Generic\Object\polerope.h" />
+    <ClInclude Include="Objects\Generic\Object\rope.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
@@ -500,7 +502,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\objects.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup\pickup.h" />
-    <ClInclude Include="Game\rope.h" />
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Game\sphere.h" />
@@ -563,6 +564,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
+    <ClCompile Include="Objects\Generic\Object\rope.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
@@ -803,7 +806,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup\pickup.cpp" />
-    <ClCompile Include="Game\rope.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Game\sphere.cpp" />

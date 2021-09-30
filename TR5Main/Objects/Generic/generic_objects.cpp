@@ -27,12 +27,16 @@
 // Traps
 #include "Objects/Generic/Traps/dart_emitter.h"
 
+#include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/rope.h"
+
 /// necessary import
 #include "setup.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Traps;
+using namespace TEN::Entities::Objects;
 
 static void StartObject()
 {
@@ -430,6 +434,24 @@ void StartTraps()
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_ROPE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRope;
+		obj->control = RopeControl;
+		obj->collision = RopeCollision;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_POLEROPE];
+	if (obj->loaded)
+	{
+		obj->collision = PoleCollision;
+		obj->saveFlags = true;
 	}
 }
 
