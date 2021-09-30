@@ -33,10 +33,13 @@
 /// necessary import
 #include "setup.h"
 
+#include "Game/pickup/pickup.h"
+#include "Objects/Generic/Object/burning_torch.h"
+
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Traps;
-using namespace TEN::Entities::Objects;
+using namespace TEN::Entities::Generic;
 
 static void StartObject()
 {
@@ -452,6 +455,16 @@ void StartTraps()
 	{
 		obj->collision = PoleCollision;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_BURNING_TORCH_ITEM];
+	if (obj->loaded)
+	{
+		obj->control = TorchControl;
+		obj->collision = PickupCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->usingDrawAnimatingItem = true;
 	}
 }
 

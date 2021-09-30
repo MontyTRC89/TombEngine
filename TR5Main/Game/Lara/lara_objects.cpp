@@ -11,7 +11,7 @@
 #include "control/control.h"
 #include "Objects/Generic/Object/rope.h"
 
-using namespace TEN::Entities::Objects;
+using namespace TEN::Entities::Generic;
 
 /*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
 
