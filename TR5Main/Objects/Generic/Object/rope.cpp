@@ -14,7 +14,7 @@
 #include "Sound/sound.h"
 #include "Game/camera.h"
 
-namespace TEN::Entities::Objects
+namespace TEN::Entities::Generic
 {
 	PENDULUM CurrentPendulum;
 	PENDULUM AlternatePendulum;

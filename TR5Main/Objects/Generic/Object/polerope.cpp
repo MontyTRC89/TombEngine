@@ -11,7 +11,7 @@
 #include "Game/collide.h"
 #include "Game/sphere.h"
 
-namespace TEN::Entities::Objects
+namespace TEN::Entities::Generic
 {
 	PHD_VECTOR PolePos = { 0, 0, -208 };
 	PHD_VECTOR PolePosR = { 0, 0, 0 };

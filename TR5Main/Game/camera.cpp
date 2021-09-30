@@ -6,7 +6,6 @@
 #include "effects\debris.h"
 #include "lara_fire.h"
 #include "lara.h"
-#include "effects\flmtorch.h"
 #include "effects\weather.h"
 #include "sphere.h"
 #include "level.h"
@@ -17,7 +16,9 @@
 #include "savegame.h"
 #include "input.h"
 #include "items.h"
+#include "Objects/Generic/Object/burning_torch.h"
 
+using namespace TEN::Entities::Generic;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Environment;
 

@@ -4,7 +4,7 @@ struct ITEM_INFO;
 struct COLL_INFO;
 struct PHD_VECTOR;
 
-namespace TEN::Entities::Objects
+namespace TEN::Entities::Generic
 {
 	constexpr auto ROPE_SEGMENTS = 24;
 	constexpr auto ROPE_WIDTH = 24;
