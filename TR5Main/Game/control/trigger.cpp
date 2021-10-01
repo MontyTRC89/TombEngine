@@ -206,8 +206,7 @@ short* GetTriggerIndex(ITEM_INFO* item)
 	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
-
-void TestTriggers(short* data, bool heavy, int heavyFlags)
+void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -219,6 +218,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
+
+	auto data = GetTriggerIndex(floor, x, y, z);
 
 	if (!data)
 		return;
@@ -325,7 +326,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (LaraItem->pos.yPos == LaraItem->floor)
+			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -649,7 +650,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+	TestTriggers(floor, x, y, z, heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ITEM_INFO* item)
