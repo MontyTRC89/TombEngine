@@ -2085,7 +2085,7 @@ void InitialiseItemBoxData()
 	{
 		auto item = &g_Level.Items[i];
 
-		if (item->data.is<PUSHABLE_INFO>())
+		if (item->active && item->data.is<PUSHABLE_INFO>())
 			ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	}
 
