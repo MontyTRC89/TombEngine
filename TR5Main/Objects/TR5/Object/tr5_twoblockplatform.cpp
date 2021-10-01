@@ -21,29 +21,6 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 	UpdateBridgeItem(itemNumber);
 }
 
-BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
-{
-	if (!item->meshBits)
-		return false;
-
-	short angle = item->pos.yRot;
-	int xb = x / SECTOR(1);
-	int zb = z / SECTOR(1);
-	int itemxb = item->pos.xPos / SECTOR(1);
-	int itemzb = item->pos.zPos / SECTOR(1);
-
-	if (!angle && (xb == itemxb || xb == itemxb - 1) && (zb == itemzb || zb == itemzb + 1))
-		return true;
-	if (angle == -ANGLE(180) && (xb == itemxb || xb == itemxb + 1) && (zb == itemzb || zb == itemzb - 1))
-		return true;
-	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb + 1) && (xb == itemxb || xb == itemxb + 1))
-		return true;
-	if (angle == -ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb - 1))
-		return true;
-
-	return false;
-}
-
 void TwoBlocksPlatformControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -73,7 +50,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			bool onObject = false;
 
 			int height = LaraItem->pos.yPos + 1;
-			if (IsOnTwoBlocksPlatform(item, LaraItem->pos.xPos, LaraItem->pos.zPos))
+			if (GetBridgeItemIntersect(itemNumber, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, false).has_value())
 			{
 				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
 				{
