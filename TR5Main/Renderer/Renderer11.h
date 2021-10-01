@@ -516,8 +516,6 @@ namespace TEN::Renderer
 		void drawBlood(RenderView& view);
 		void drawDrips(RenderView& view);
 		void drawBubbles(RenderView& view);
-		void drawEffects(RenderView& view,bool transparent);
-		void drawEffect(RenderView& view,RendererEffect* effect, bool transparent);
 		void drawSplahes(RenderView& view);
 		void drawSprites(RenderView& view);
 		void drawLines3D(RenderView& view);

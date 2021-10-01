@@ -169,94 +169,14 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 void EffectNewRoom(short fxNumber, short roomNumber)
 {
 	ItemNewRoom(fxNumber, roomNumber);
-	/*if (InItemControlLoop)
-	{
-		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber;
-		ItemNewRooms[2 * ItemNewRoomNo + 1] = roomNumber;
-		ItemNewRoomNo++;
-	}
-	else
-	{
-		FX_INFO* fx = &EffectList[fxNumber];
-		ROOM_INFO* r = &g_Level.Rooms[fx->roomNumber];
-
-		if (r->fxNumber == fxNumber)
-		{
-			r->fxNumber = fx->nextFx;
-		}
-		else
-		{
-			short linknum;
-			for (linknum = r->fxNumber; linknum != -1; linknum = EffectList[linknum].nextFx)
-			{
-				if (EffectList[linknum].nextFx == fxNumber)
-				{
-					EffectList[linknum].nextFx = fx->nextFx;
-					break;
-				}
-			}
-		}
-
-		fx->roomNumber = roomNumber;
-		fx->nextFx = g_Level.Rooms[roomNumber].fxNumber;
-		g_Level.Rooms[roomNumber].fxNumber = fxNumber;
-	}
-	*/
 }
 
 void KillEffect(short fxNumber)
 {
-	/*
-	if (InItemControlLoop)
-	{
-		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber | 0x8000;
-		ItemNewRoomNo++;
-	}
-	else
-	{
-		FX_INFO* fx = &EffectList[fxNumber];
-		DetatchSpark(fxNumber, SP_FX);
-
-		if (NextFxActive == fxNumber)
-		{
-			NextFxActive = fx->nextActive;
-		}
-		else
-		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
-			{
-				if (EffectList[linknum].nextActive == fxNumber)
-				{
-					EffectList[linknum].nextActive = fx->nextActive;
-					break;
-				}
-			}
-		}
-
-		if (g_Level.Rooms[fx->roomNumber].fxNumber == fxNumber)
-		{
-			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
-		}
-		else
-		{
-			for (short linknum = g_Level.Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
-			{
-				if (EffectList[linknum].nextFx == fxNumber)
-				{
-					EffectList[linknum].nextFx = fx->nextFx;
-					break;
-				}
-			}
-		}
-
-		fx->nextFx = NextFxFree;
-		NextFxFree = fxNumber;
-	}
-	*/
 	KillItem(fxNumber);
 }
 
-short CreateNewEffect(short roomNum,GAME_OBJECT_ID objectNum,PHD_3DPOS pos) 
+short CreateNewEffect(short roomNum, GAME_OBJECT_ID objectNum, PHD_3DPOS pos) 
 {
 	auto fxNumber = CreateItem();
 
@@ -271,22 +191,6 @@ short CreateNewEffect(short roomNum,GAME_OBJECT_ID objectNum,PHD_3DPOS pos)
 		AddActiveItem(fxNumber);
 	}
 	return fxNumber;
-}
-
-void InitialiseFXArray(int allocmem)
-{
-	/*
-	FX_INFO* fx;
-
-	NextFxActive = NO_ITEM;
-	NextFxFree = 0;
-	for (int i = 0; i < NUM_EFFECTS; i++)
-	{
-		fx = &EffectList[i];
-		fx->nextFx = i + 1;
-	}
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
-	*/
 }
 
 void RemoveDrawnItem(short itemNum) 

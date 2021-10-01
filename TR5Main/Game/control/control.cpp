@@ -324,20 +324,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		InItemControlLoop = false;
 		KillMoveItems();
 
-		// Update all effects
-		InItemControlLoop = true;
-		/*
-		short fxNum = NextFxActive;
-		while (fxNum != NO_ITEM)
-		{
-			short nextFx = EffectList[fxNum].nextActive;
-			FX_INFO *fx = &EffectList[fxNum];
-			if (Objects[fx->objectNumber].control)
-				Objects[fx->objectNumber].control(fxNum);
-			fxNum = nextFx;
-		}
-		*/
-		InItemControlLoop = false;
 		KillMoveEffects();
 
 		// Update some effect timers
@@ -495,7 +481,6 @@ GAME_STATUS DoTitle(int index)
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
 		// Initialise items, effects, lots, camera
-		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
 		Sound_Stop();
@@ -613,7 +598,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	S_LoadLevelFile(index);
 
 	// Initialise items, effects, lots, camera
-	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
 	Sound_Stop();

@@ -2872,7 +2872,6 @@ namespace TEN::Renderer
         drawLara(view,false, false);
         drawItems(false, false, view);
         drawItems(false, true, view);
-        drawEffects(view,false);
         drawGunFlashes(view);
         drawGunShells(view);
         drawBaddieGunflashes(view);
@@ -2893,7 +2892,6 @@ namespace TEN::Renderer
         drawLara(view, true, false);
         drawItems(true, false, view);
         drawItems(true, true, view);
-        drawEffects(view,true);
         drawDebris(view,true);
 
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
