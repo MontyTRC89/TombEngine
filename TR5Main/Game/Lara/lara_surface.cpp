@@ -230,7 +230,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	
-	GetCollisionInfo(coll, item, PHD_VECTOR(0, 700, 0));
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_SURFSWIM, 0));
 	ShiftItem(item, coll);
 	
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
@@ -284,8 +284,8 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->ObjectHeadroom < (EnableCrawlFlexWaterPullUp ? LARA_HEIGHT_CRAWL : LARA_HEIGHT))
 		return 0;
 
-	int frontFloor = coll->Front.Floor + 700;
-	int frontCeiling = coll->Front.Ceiling + 700;
+	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
+	int frontCeiling = coll->Front.Ceiling + LARA_HEIGHT_SURFSWIM;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
