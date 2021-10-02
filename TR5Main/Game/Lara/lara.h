@@ -5,10 +5,11 @@ struct COLL_INFO;
 #define FRONT_ARC ANGLE(90.0f)
 #define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)
+#define LARA_LEAN_DASH_MAX ANGLE(16.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_SLOW_TURN ANGLE(4.0f)
-#define LARA_MED_TURN ANGLE(6.0f)
+#define LARA_MED_TURN  ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
