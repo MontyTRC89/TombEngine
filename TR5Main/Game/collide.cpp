@@ -1354,6 +1354,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		topRoomNumber = item->roomNumber;
 	}
 
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
 	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 
 	tfLocation = GetRoom(tfLocation, x, y, z);
@@ -1400,6 +1402,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	x = xPos + xleft;
 	z = zPos + zleft;
+
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
@@ -1449,6 +1453,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	x = xPos + xright;
 	z = zPos + zright;
+
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
