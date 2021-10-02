@@ -1274,18 +1274,17 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y; // TODO: Make sure that -LARA_HEADROOM is not necessary for yTop anymore!
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room
 
-	ROOM_VECTOR tfLocation = GetRoom(item->location, x, yTop, z);
+	ROOM_VECTOR tfLocation = GetRoom(item->location, x, y, z);
 	int height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ROOM_VECTOR tcLocation = GetRoom(item->location, x, yTop - item->fallspeed, z);
+	ROOM_VECTOR tcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
 	int ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1303,39 +1302,39 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	switch (quadrant)
 	{
 	case 0:
-		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		zfront = coll->Setup.Radius;
+		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront =  coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
-		zleft  = coll->Setup.Radius;
-		xright = coll->Setup.Radius;
-		zright = coll->Setup.Radius;
+		zleft  =  coll->Setup.Radius;
+		xright =  coll->Setup.Radius;
+		zright =  coll->Setup.Radius;
 		break;
 
 	case 1:
-		xfront = coll->Setup.Radius;
-		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = coll->Setup.Radius;
-		zleft  = coll->Setup.Radius;
-		xright = coll->Setup.Radius;
+		xfront =  coll->Setup.Radius;
+		zfront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  =  coll->Setup.Radius;
+		zleft  =  coll->Setup.Radius;
+		xright =  coll->Setup.Radius;
 		zright = -coll->Setup.Radius;
 		break;
 
 	case 2:
-		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
-		xleft  = coll->Setup.Radius;
+		xleft  =  coll->Setup.Radius;
 		zleft  = -coll->Setup.Radius;
 		xright = -coll->Setup.Radius;
 		zright = -coll->Setup.Radius;
 		break;
 
 	case 3:
-		xfront = -(coll->Setup.Radius);
-		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xfront = -coll->Setup.Radius;
+		zfront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
 		zleft  = -coll->Setup.Radius;
 		xright = -coll->Setup.Radius;
-		zright = coll->Setup.Radius;
+		zright =  coll->Setup.Radius;
 		break;
 
 	default:
@@ -1355,14 +1354,14 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		topRoomNumber = item->roomNumber;
 	}
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
+	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
+	tfLocation = GetRoom(tfLocation, x, y, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	tcLocation = GetRoom(tcLocation, x, yTop - item->fallspeed, z);
+	tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1371,9 +1370,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
 
-	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
+	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
-	tfLocation = GetRoom(tfLocation, x + xfront, yTop, z + zfront);
+	tfLocation = GetRoom(tfLocation, x + xfront, y, z + zfront);
 	height = GetFloorHeight(tfLocation, x + xfront, z + zfront).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
@@ -1402,14 +1401,14 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	ROOM_VECTOR lrfLocation = GetRoom(item->location, x, yTop, z);
+	ROOM_VECTOR lrfLocation = GetRoom(item->location, x, y, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ROOM_VECTOR lrcLocation = GetRoom(item->location, x, yTop - item->fallspeed, z);
+	ROOM_VECTOR lrcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
 	ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1425,14 +1424,14 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
+	collResult = GetCollisionResult(x, y, z, topRoomNumber); // We use plain x/z values here, proposed by Choco
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
+	tfLocation = GetRoom(tfLocation, x, y, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	tcLocation = GetRoom(tcLocation, x, yTop - item->fallspeed, z);
+	tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1451,14 +1450,14 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	lrfLocation = GetRoom(item->location, x, yTop, z);
+	lrfLocation = GetRoom(item->location, x, y, z);
 	height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	lrcLocation = GetRoom(item->location, x, yTop - item->fallspeed, z);
+	lrcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
 	ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1474,14 +1473,14 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
+	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 
-	tfLocation = GetRoom(tfLocation, x, yTop, z);
+	tfLocation = GetRoom(tfLocation, x, y, z);
 	height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	tcLocation = GetRoom(tcLocation, x, yTop - item->fallspeed, z);
+	tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
 	ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
@@ -1679,16 +1678,15 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
-	int yTop = y; // -LARA_HEADROOM;
 	int z = zPos;
 
-	auto collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 	auto topRoomNumber = collResult.RoomNumber;
 
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	int ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	int ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1705,38 +1703,38 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	{
 	case 0:
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		zfront = coll->Setup.Radius;
-		xleft  = -(coll->Setup.Radius);
-		zleft  = coll->Setup.Radius;
-		xright = coll->Setup.Radius;
-		zright = coll->Setup.Radius;
+		zfront =  coll->Setup.Radius;
+		xleft  = -coll->Setup.Radius;
+		zleft  =  coll->Setup.Radius;
+		xright =  coll->Setup.Radius;
+		zright =  coll->Setup.Radius;
 		break;
 
 	case 1:
-		xfront = coll->Setup.Radius;
-		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = coll->Setup.Radius;
-		zleft  = coll->Setup.Radius;
-		xright = coll->Setup.Radius;
-		zright = -(coll->Setup.Radius);
+		xfront =  coll->Setup.Radius;
+		zfront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  =  coll->Setup.Radius;
+		zleft  =  coll->Setup.Radius;
+		xright =  coll->Setup.Radius;
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 2:
-		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
-		xleft  = coll->Setup.Radius;
-		zleft  = -(coll->Setup.Radius);
-		xright = -(coll->Setup.Radius);
-		zright = -(coll->Setup.Radius);
+		xleft  =  coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
+		zright = -coll->Setup.Radius;
 		break;
 
 	case 3:
-		xfront = -(coll->Setup.Radius);
+		xfront = -coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = -(coll->Setup.Radius);
-		zleft  = -(coll->Setup.Radius);
-		xright = -(coll->Setup.Radius);
-		zright = coll->Setup.Radius;
+		xleft  = -coll->Setup.Radius;
+		zleft  = -coll->Setup.Radius;
+		xright = -coll->Setup.Radius;
+		zright =  coll->Setup.Radius;
 		break;
 
 	default:
@@ -1749,18 +1747,18 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	x = xfront + xPos;
 	z = zfront + zPos;
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
+	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
 	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
 
-	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, topRoomNumber);
+	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
@@ -1788,11 +1786,11 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	collResult = GetCollisionResult(x + xfront, yTop, z + zfront, item->roomNumber);
+	collResult = GetCollisionResult(x + xfront, y, z + zfront, item->roomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1806,11 +1804,11 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleLeft.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleLeft.Floor = STOP_SIZE;
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
+	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1827,11 +1825,11 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	x = xPos + xright;
 	z = zPos + zright;
 
-	collResult = GetCollisionResult(x, yTop, z, item->roomNumber);
+	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1845,11 +1843,11 @@ void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset)
 	else if (coll->Setup.DeathFlagIsPit && coll->MiddleRight.Floor > 0 && collResult.BottomBlock->Flags.Death)
 		coll->MiddleRight.Floor = STOP_SIZE;
 
-	collResult = GetCollisionResult(x, yTop, z, topRoomNumber);
+	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 	if (collResult.Position.Floor != NO_HEIGHT)
 		collResult.Position.Floor -= yPos;
 
-	ceiling = GetCeiling(collResult.Block, x, yTop - item->fallspeed, z);
+	ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -2793,16 +2791,16 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	switch (dir)
 	{
 	case NORTH:
-		vect.y = (zPos | (WALL_SIZE - 1)) - radius;
+		vect.y = (zPos | (GRID_SNAP_SIZE - 1)) - radius;
 		break;
 	case EAST:
-		vect.x = (xPos | (WALL_SIZE - 1)) - radius;
+		vect.x = (xPos | (GRID_SNAP_SIZE - 1)) - radius;
 		break;
 	case SOUTH:
-		vect.y = (zPos & ~(WALL_SIZE - 1)) + radius;
+		vect.y = (zPos & ~(GRID_SNAP_SIZE - 1)) + radius;
 		break;
 	case WEST:
-		vect.x = (xPos & ~(WALL_SIZE - 1)) + radius;
+		vect.x = (xPos & ~(GRID_SNAP_SIZE - 1)) + radius;
 		break;
 	}
 

@@ -1,12 +1,17 @@
 #include "framework.h"
 #include "generic_trapdoor.h"
 #include "lara.h"
+#include "floordata.h"
 #include "input.h"
 #include "camera.h"
 #include "control/control.h"
 #include "level.h"
 #include "animation.h"
 #include "items.h"
+#include "Renderer11.h"
+using namespace TEN::Renderer;
+
+using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -18,7 +23,7 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 
@@ -176,14 +181,12 @@ void OpenTrapDoor(short itemNumber)
 
 int TrapDoorFloorBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int TrapDoorCeilingBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
+	return GetBridgeBorder(itemNumber, true);
 }
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
@@ -192,8 +195,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -203,6 +205,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
 }
