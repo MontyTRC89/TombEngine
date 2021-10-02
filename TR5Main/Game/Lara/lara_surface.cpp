@@ -275,14 +275,10 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	EnableCrawlFlexWaterPullUp = false;
 	EnableCrawlFlexSubmerged = false;
 
-
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
 
-	if (coll->Front.Ceiling > 0)
-		return 0;
-
-	if (coll->Middle.Ceiling > -384)
+	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return 0;
 
 	if (coll->ObjectHeadroom < LARA_HEIGHT)
