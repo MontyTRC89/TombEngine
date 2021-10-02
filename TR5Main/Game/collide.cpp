@@ -2791,16 +2791,16 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	switch (dir)
 	{
 	case NORTH:
-		vect.y = (zPos | (STEP_SIZE / 2 - 1)) - radius;
+		vect.y = (zPos | (GRID_SNAP_SIZE - 1)) - radius;
 		break;
 	case EAST:
-		vect.x = (xPos | (STEP_SIZE / 2 - 1)) - radius;
+		vect.x = (xPos | (GRID_SNAP_SIZE - 1)) - radius;
 		break;
 	case SOUTH:
-		vect.y = (zPos & ~(STEP_SIZE / 2 - 1)) + radius;
+		vect.y = (zPos & ~(GRID_SNAP_SIZE - 1)) + radius;
 		break;
 	case WEST:
-		vect.x = (xPos & ~(STEP_SIZE / 2 - 1)) + radius;
+		vect.x = (xPos & ~(GRID_SNAP_SIZE - 1)) + radius;
 		break;
 	}
 
