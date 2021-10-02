@@ -741,10 +741,14 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 
 	if (!obj->undead || grenade || item->hitPoints == NOT_TARGETABLE)
 	{
-		if (item->hitPoints > 0 && item->hitPoints <= damage)
+		if (item->hitPoints > 0)
 		{
 			Savegame.Level.AmmoHits++;
-			item->hitPoints -= damage;
+
+			if (item->hitPoints >= damage)
+				item->hitPoints -= damage;
+			else
+				item->hitPoints = 0;
 		}
 	}
 }
