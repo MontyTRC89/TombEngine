@@ -534,7 +534,7 @@ GAME_STATUS DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		S_CDPlay("083_horus", SOUND_TRACK_BGM);
+		PlaySoundTrack("083_horus", SOUND_TRACK_BGM);
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -685,7 +685,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitSpotCamSequences();
 
 	// Play background music
-	S_CDPlay(ambient, SOUND_TRACK_BGM);
+	PlaySoundTrack(ambient, SOUND_TRACK_BGM);
 
 	// Initialise ponytails
 	InitialiseHair();
