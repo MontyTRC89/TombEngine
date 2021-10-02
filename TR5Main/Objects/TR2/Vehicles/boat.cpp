@@ -874,9 +874,6 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 		AddActiveItem(itemNum);
 		g_Level.Items[itemNum].status = ITEM_ACTIVE;
 	}
-
-	// TODO: play a cd when starting ! (boat)
-	//S_CDPlay(12, SOUND_TRACK_ONESHOT);
  
 	Lara.Vehicle = itemNum;
 }

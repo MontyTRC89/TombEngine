@@ -313,10 +313,10 @@ void Sound_FreeSamples()
 
 void PlaySoundTrack(short track, short flags)
 {
-	S_CDPlayEx(track, flags, SOUND_TRACK_ONESHOT);
+	PlaySoundTrack(track, flags, SOUND_TRACK_ONESHOT);
 }
 
-void S_CDPlay(std::string track, unsigned int mode)
+void PlaySoundTrack(std::string track, unsigned int mode)
 {
 	bool crossfade = false;
 	DWORD crossfadeTime;
@@ -403,7 +403,7 @@ void S_CDPlay(std::string track, unsigned int mode)
 	BASS_Soundtrack[mode].track = track;
 }
 
-void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
+void PlaySoundTrack(std::string track, DWORD mask, DWORD unknown)
 {
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
@@ -416,20 +416,13 @@ void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
 		SoundTracks[track].Mask |= filteredMask;
 	}
 
-	S_CDPlay(track, SoundTracks[track].looped);
+	PlaySoundTrack(track, SoundTracks[track].looped);
 }
 
-// Legacy!
-void S_CDPlay(int index, unsigned int mode)
+void PlaySoundTrack(int index, DWORD mask, DWORD unknown)
 {
 	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
-	S_CDPlay(track.first, mode);
-}
-
-void S_CDPlayEx(int index, DWORD mask, DWORD unknown)
-{
-	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
-	S_CDPlayEx(track.first, mask, unknown);
+	PlaySoundTrack(track.first, mask, unknown);
 }
 
 void StopSoundTracks()
