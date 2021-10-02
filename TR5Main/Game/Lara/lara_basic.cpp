@@ -512,7 +512,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_JUMP)
 		{
-			if (coll->Middle.Ceiling <= -LARA_HEADROOM)
+			if (coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 				item->goalAnimState = LS_JUMP_PREPARE;
 		}
 		else if (TrInput & IN_FORWARD)
