@@ -135,33 +135,6 @@ int LoadItems()
 			InitialiseItem(i);
 	}
 
-	for (auto& r : g_Level.Rooms)
-	{
-		for (const auto& mesh : r.mesh)
-		{
-			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
-			 
-			if (floor->Box == NO_BOX)
-				continue;
-
-			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
-			{
-				int fl = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
-				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
-				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
-				{
-					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
-						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
-						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
-					{
-						floor->Stopper = true;
-					}
-				}
-			}
-		}
-	}
-
 	return true;
 }
 

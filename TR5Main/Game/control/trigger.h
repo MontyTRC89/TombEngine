@@ -68,7 +68,7 @@ int PickupTrigger(short itemNum);
 int TriggerActive(ITEM_INFO* item);
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
 short* GetTriggerIndex(ITEM_INFO* item);
-void TestTriggers(short* data, bool heavy, int heavyFlags = 0);
+void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags = 0);
 void ProcessSectorFlags(FLOOR_INFO* floor);

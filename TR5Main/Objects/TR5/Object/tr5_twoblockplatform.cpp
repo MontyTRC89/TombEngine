@@ -6,6 +6,11 @@
 #include "lara.h"
 #include "Sound/sound.h"
 #include "collide.h"
+#include "floordata.h"
+#include "Renderer11.h"
+using namespace TEN::Renderer;
+
+using namespace TEN::Floordata;
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
@@ -13,90 +18,7 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 
 	item->itemFlags[0] = item->pos.yPos;
 	item->itemFlags[1] = 1;
-	AddTwoBlocksPlatform(itemNumber);
-}
-
-void AddTwoBlocksPlatform(short itemNumber)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	TEN::Floordata::AddBridge(itemNumber);
-	switch (GetQuadrant(item->pos.yRot))
-	{
-	case NORTH:
-		TEN::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
-		TEN::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
-		TEN::Floordata::AddBridge(itemNumber, -SECTOR(1), SECTOR(1));
-		break;
-	case EAST:
-		TEN::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
-		TEN::Floordata::AddBridge(itemNumber, 0, SECTOR(1));
-		TEN::Floordata::AddBridge(itemNumber, SECTOR(1), SECTOR(1));
-		break;
-	case SOUTH:
-		TEN::Floordata::AddBridge(itemNumber, SECTOR(1), 0);
-		TEN::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
-		TEN::Floordata::AddBridge(itemNumber, SECTOR(1), -SECTOR(1));
-		break;
-	case WEST:
-		TEN::Floordata::AddBridge(itemNumber, -SECTOR(1), 0);
-		TEN::Floordata::AddBridge(itemNumber, 0, -SECTOR(1));
-		TEN::Floordata::AddBridge(itemNumber, -SECTOR(1), -SECTOR(1));
-		break;
-	}
-}
-
-void RemoveTwoBlocksPlatform(short itemNumber)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	TEN::Floordata::RemoveBridge(itemNumber);
-	switch (GetQuadrant(item->pos.yRot))
-	{
-	case NORTH:
-		TEN::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
-		TEN::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
-		TEN::Floordata::RemoveBridge(itemNumber, -SECTOR(1), SECTOR(1));
-		break;
-	case EAST:
-		TEN::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
-		TEN::Floordata::RemoveBridge(itemNumber, 0, SECTOR(1));
-		TEN::Floordata::RemoveBridge(itemNumber, SECTOR(1), SECTOR(1));
-		break;
-	case SOUTH:
-		TEN::Floordata::RemoveBridge(itemNumber, SECTOR(1), 0);
-		TEN::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
-		TEN::Floordata::RemoveBridge(itemNumber, SECTOR(1), -SECTOR(1));
-		break;
-	case WEST:
-		TEN::Floordata::RemoveBridge(itemNumber, -SECTOR(1), 0);
-		TEN::Floordata::RemoveBridge(itemNumber, 0, -SECTOR(1));
-		TEN::Floordata::RemoveBridge(itemNumber, -SECTOR(1), -SECTOR(1));
-		break;
-	}
-}
-
-BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
-{
-	if (!item->meshBits)
-		return false;
-
-	short angle = item->pos.yRot;
-	int xb = x / SECTOR(1);
-	int zb = z / SECTOR(1);
-	int itemxb = item->pos.xPos / SECTOR(1);
-	int itemzb = item->pos.zPos / SECTOR(1);
-
-	if (!angle && (xb == itemxb || xb == itemxb - 1) && (zb == itemzb || zb == itemzb + 1))
-		return true;
-	if (angle == -ANGLE(180) && (xb == itemxb || xb == itemxb + 1) && (zb == itemzb || zb == itemzb - 1))
-		return true;
-	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb + 1) && (xb == itemxb || xb == itemxb + 1))
-		return true;
-	if (angle == -ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb - 1))
-		return true;
-
-	return false;
+	UpdateBridgeItem(itemNumber);
 }
 
 void TwoBlocksPlatformControl(short itemNumber)
@@ -118,9 +40,9 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 			if (roomNumber != item->roomNumber)
 			{
-				RemoveTwoBlocksPlatform(itemNumber);
+				UpdateBridgeItem(itemNumber, true);
 				ItemNewRoom(itemNumber, roomNumber);
-				AddTwoBlocksPlatform(itemNumber);
+				UpdateBridgeItem(itemNumber);
 			}
 		}
 		else
@@ -128,7 +50,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			bool onObject = false;
 
 			int height = LaraItem->pos.yPos + 1;
-			if (IsOnTwoBlocksPlatform(item, LaraItem->pos.xPos, LaraItem->pos.zPos))
+			if (GetBridgeItemIntersect(itemNumber, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, false).has_value())
 			{
 				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
 				{
@@ -179,8 +101,7 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
 std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
@@ -190,18 +111,15 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 	if (!item->meshBits)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
 }
 
 int TwoBlocksPlatformFloorBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int TwoBlocksPlatformCeilingBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
+	return GetBridgeBorder(itemNumber, true);
 }
