@@ -1004,11 +1004,12 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
+	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.ForwardAngle = Lara.moveAngle;
+
 	GetCollisionInfo(coll, item);
 
 	short angle;
