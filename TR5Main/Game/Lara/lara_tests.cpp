@@ -1218,6 +1218,15 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
 	return collResult;
 }
 
+COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h)
+{
+	int x = item->pos.xPos + dist * phd_sin(ang);
+	int y = item->pos.yPos - h;
+	int z = item->pos.zPos + dist * phd_cos(ang);
+
+	return GetCollisionResult(x, y, z, GetCollisionResult(item->pos.xPos, y, item->pos.zPos, item->roomNumber).RoomNumber);
+}
+
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
 {
 	return LaraCeilingCollisionFront(item, ang, dist, h).Position.Ceiling;
