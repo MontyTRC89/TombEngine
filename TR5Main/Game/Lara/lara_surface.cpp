@@ -299,9 +299,12 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (!result)
 		return 0;
 
+	auto surface = LaraCollisionAboveFront(item, coll->Setup.ForwardAngle, STEP_SIZE * 2, STEP_SIZE);
+	auto headroom = surface.Position.Floor - surface.Position.Ceiling;
+
 	if (frontFloor <= -256)
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512)
+		if (headroom < LARA_HEIGHT)
 		{
 			if (EnableCrawlFlexWaterPullUp)
 			{
@@ -321,7 +324,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (frontFloor > 128)
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512)
+		if (headroom < LARA_HEIGHT)
 		{
 			if (EnableCrawlFlexSubmerged)
 			{
@@ -339,7 +342,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	else
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512)
+		if (headroom < LARA_HEIGHT)
 		{
 			if (EnableCrawlFlexWaterPullUp)
 			{
