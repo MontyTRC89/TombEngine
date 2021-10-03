@@ -28,7 +28,9 @@
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
 #include <Objects/Effects/effect_objects.h>
+#include "Game/rope.h"
 
+using namespace TEN::Game::Rope;
 using namespace TEN::Entities::Switches;
 
 OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
