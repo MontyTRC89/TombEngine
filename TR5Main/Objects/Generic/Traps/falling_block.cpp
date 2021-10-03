@@ -3,12 +3,14 @@
 #include "collide.h"
 #include "camera.h"
 #include "animation.h"
+#include "floordata.h"
 #include "level.h"
 #include "setup.h"
 #include "room.h"
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Math::Random;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED = 10;
@@ -24,7 +26,7 @@ void InitialiseFallingBlock(short itemNumber)
 	auto item = &g_Level.Items[itemNumber];
 
 	g_Level.Items[itemNumber].meshBits = 1;
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 
 	// Set mutators to 0 by default
 	for (int i = 0; i < item->mutator.size(); i++)
@@ -134,8 +136,7 @@ std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y1;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
 std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
@@ -145,18 +146,15 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	int height = item->pos.yPos + GetBoundsAccurate(item)->Y2;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
 }
 
 int FallingBlockFloorBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y1;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int FallingBlockCeilingBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos + GetBoundsAccurate(item)->Y2;
+	return GetBridgeBorder(itemNumber, true);
 }

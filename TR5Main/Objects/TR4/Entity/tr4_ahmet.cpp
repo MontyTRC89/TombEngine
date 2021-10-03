@@ -59,15 +59,16 @@ namespace TEN::Entities::TR4
 
     static void TriggerAhmetDeathEffect(ITEM_INFO* item)
     {
+		// HACK: Using CreatureSpheres here in release mode results in total mess-up
+		// of LaraSpheres, which looks in game as ghost Lara fire silhouette.
+		// Later both CreatureSpheres and LaraSpheres globals should be eradicated.
+
+		static SPHERE spheres[MAX_SPHERES] = {};
+
         if (!(Wibble & 7))
         {
-            SPHERE* sphere;
-            int meshCount;
-
-            // cant be FALSE here because else it will be local space not world
-            // because of that it cant be GetJointAbsPosition() !
-            meshCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-            sphere = &CreatureSpheres[(Wibble / 8) & 1];
+			int meshCount = GetSpheres(item, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+            auto sphere = &spheres[(Wibble / 8) & 1];
 
             for (int i = meshCount; i > 0; i--, sphere += 2)
                 TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);

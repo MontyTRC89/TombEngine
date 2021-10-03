@@ -179,7 +179,7 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->itemFlags[0] == 15)
 		{
-			//S_CDPlay("xa12_z_10", SOUND_TRACK_ONESHOT);
+			//PlaySoundTrack("xa12_z_10", SOUND_TRACK_ONESHOT);
 		}
 		else if (item->itemFlags[0] == 70)
 		{
