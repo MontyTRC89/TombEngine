@@ -1106,19 +1106,20 @@ int CreatureActive(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->flags & IFLAG_KILLED)
-	{
-		return false;
-	}
+	if (!Objects[item->objectNumber].intelligent)
+		return false; // Object is not a creature
 
-	if (item->status == ITEM_INVISIBLE)
+	if (item->flags & IFLAG_KILLED)
+		return false; // Object is already dead
+
+	if (item->status == ITEM_INVISIBLE || !item->data.is<CREATURE_INFO>())
 	{
 		if (!EnableBaddieAI(itemNumber, 0))
-		{
-			return false;
-		}
+			return false; // AI couldn't be activated
+
 		item->status = ITEM_ACTIVE;
 	}
+
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	creature->priority = GetCreatureLOTPriority(item);
