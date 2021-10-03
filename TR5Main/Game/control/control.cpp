@@ -534,10 +534,12 @@ GAME_STATUS DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		S_CDPlay("083_horus", SOUND_TRACK_BGM);
+		PlaySoundTrack("083_horus", SOUND_TRACK_BGM);
 
 		// Initialise ponytails
 		InitialiseHair();
+
+		InitialiseItemBoxData();
 
 		g_GameScript->OnStart();
 
@@ -683,10 +685,12 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitSpotCamSequences();
 
 	// Play background music
-	S_CDPlay(ambient, SOUND_TRACK_BGM);
+	PlaySoundTrack(ambient, SOUND_TRACK_BGM);
 
 	// Initialise ponytails
 	InitialiseHair();
+
+	InitialiseItemBoxData();
 
 	g_GameScript->OnStart();
 	if (loadFromSavegame)
@@ -837,17 +841,6 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
-
-	/*if (floor->AverageFloor == NO_HEIGHT / STEP_SIZE)
-	{
-		floor->AverageFloor = ceiling->ceiling + height / STEP_SIZE;
-	}
-	else
-	{
-		floor->AverageFloor += height / STEP_SIZE;
-		if (floor->AverageFloor == ceiling->ceiling && !flag)
-			floor->AverageFloor = NO_HEIGHT / STEP_SIZE;
-	}*/
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;

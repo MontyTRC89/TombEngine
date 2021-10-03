@@ -13,6 +13,7 @@
 #include "objectslist.h"
 #include "itemdata/creature_info.h"
 #include "items.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
@@ -2076,4 +2077,42 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 
 	floor = GetSector(r, x - r->x, z - r->z);
 	floor->Stopper = set;
+}
+
+void InitialiseItemBoxData()
+{
+	for (int i = 0; i < g_Level.Items.size(); i++)
+	{
+		auto item = &g_Level.Items[i];
+
+		if (item->active && item->data.is<PUSHABLE_INFO>())
+			ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	}
+
+	for (auto& r : g_Level.Rooms)
+	{
+		for (const auto& mesh : r.mesh)
+		{
+			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
+
+			if (floor->Box == NO_BOX)
+				continue;
+
+			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
+			{
+				int fl = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
+				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
+				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
+				{
+					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
+						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
+						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
+						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
+					{
+						floor->Stopper = true;
+					}
+				}
+			}
+		}
+	}
 }
