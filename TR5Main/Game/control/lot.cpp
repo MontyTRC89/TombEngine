@@ -105,6 +105,7 @@ void DisableBaddieAI(short itemNumber)
 	if (creature)
 	{
 		creature->itemNum = NO_ITEM;
+		KillItem(creature->aiTargetNum);
 		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
 		item->data = nullptr;
 
@@ -143,6 +144,13 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->enemy = NULL;
 	creature->LOT.fly = NO_FLYING;
 	creature->LOT.blockMask = BLOCKED;
+	creature->aiTargetNum = CreateItem();
+	if (creature->aiTargetNum != NO_ITEM) {
+		creature->aiTarget = &g_Level.Items[creature->aiTargetNum];
+	}
+	else {
+		creature->aiTarget = nullptr;
+	}
 
 	if (obj->intelligent)
 	{
