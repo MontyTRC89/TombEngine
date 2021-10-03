@@ -996,7 +996,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
 		//creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
-
+		/*
 		creature->aiTarget.objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.boxNumber = LEB128::ReadInt16(m_stream);
@@ -1007,7 +1007,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->aiTarget.pos.xRot = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.pos.yRot = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.pos.zRot = LEB128::ReadInt16(m_stream);
-
+		*/
 		creature->LOT.canJump = LEB128::ReadByte(m_stream);
 		creature->LOT.canMonkey = LEB128::ReadByte(m_stream);
 		creature->LOT.isAmphibious = LEB128::ReadByte(m_stream);
@@ -1124,7 +1124,7 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	LEB128::Write(m_stream, creature->monkeyAhead);
 	LEB128::Write(m_stream, creature->mood);
 	LEB128::Write(m_stream, (int)enemy);
-
+	/*
 	LEB128::Write(m_stream, creature->aiTarget.objectNumber);
 	LEB128::Write(m_stream, creature->aiTarget.roomNumber);
 	LEB128::Write(m_stream, creature->aiTarget.boxNumber);
@@ -1135,7 +1135,7 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	LEB128::Write(m_stream, creature->aiTarget.pos.xRot);
 	LEB128::Write(m_stream, creature->aiTarget.pos.yRot);
 	LEB128::Write(m_stream, creature->aiTarget.pos.zRot);
-
+	*/
 	LEB128::Write(m_stream, creature->LOT.canJump);
 	LEB128::Write(m_stream, creature->LOT.canMonkey);
 	LEB128::Write(m_stream, creature->LOT.isAmphibious);
