@@ -196,6 +196,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Look function needs complete evaluation.
+
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -205,13 +207,13 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLean(item, coll))
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 8;
 
-			// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-			// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
-			// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
-			// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
-			// Unfortunately I am terrible at mathematics and I don't know how to do this. 
-			// Would a library of easing functions be helpful here? @Sezz 2021.09.26
-			// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
+		// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
+		// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
+		// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
+		// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
+		// Unfortunately I am terrible at mathematics and I don't know how to do this. 
+		// Would a library of easing functions be helpful here? @Sezz 2021.09.26
+		// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
 		else
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
 	}
@@ -262,13 +264,9 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: State dispatch in WAD.
 	if (TrInput & IN_ROLL)
 	{
-		item->animNumber = LA_ROLL_180_START;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 2;
-		item->currentAnimState = LS_ROLL_FORWARD;
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_ROLL_FORWARD;
 
 		return;
 	}
@@ -276,12 +274,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Simplify this check. Add mustStand bool to weapons in some way?
 	if (TrInput & IN_DUCK &&
 		Lara.waterStatus != LW_WADE &&
-		(Lara.gunStatus == LG_NO_ARMS ||
-			Lara.gunType == WEAPON_NONE ||
-			Lara.gunType == WEAPON_PISTOLS ||
-			Lara.gunType == WEAPON_REVOLVER ||
-			Lara.gunType == WEAPON_UZI ||
-			Lara.gunType == WEAPON_FLARE))
+		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -480,7 +473,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto fHeight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
 	auto cHeight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
-	auto rHeight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180)?
+	auto rHeight = LaraCollisionFront(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD + 4);
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT && item->animNumber != LA_SPRINT_TO_STAND_LEFT)
@@ -505,13 +498,13 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	// Permit turning when Lara is stationary and cannot dispatch into a true turn.
-	if (TrInput & IN_LEFT)
+	if (TrInput & IN_LEFT && !(TrInput & IN_JUMP))
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
 		if (Lara.turnRate < -LARA_SLOW_TURN)
 			Lara.turnRate = -LARA_SLOW_TURN;
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (TrInput & IN_RIGHT && !(TrInput & IN_JUMP))
 	{
 		Lara.turnRate += LARA_TURN_RATE;
 		if (Lara.turnRate > LARA_SLOW_TURN)
@@ -534,33 +527,33 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Direct dispatch to LS_SPRINT. @Sezz 2021.06.28
+	// TODO: The way sprinting works is messy. Lara should be able to stop sooner if
+	// the state is set here. @ Sezz 2021.10.04
 	if (TrInput & IN_SPRINT && TrInput & IN_FORWARD)
 	{
-		// item->goalAnimState = LS_SPRINT;
-		item->goalAnimState = LS_RUN_FORWARD;
+		item->goalAnimState = LS_SPRINT;
 
 		return;
 	}
 
-	// TODO: State dispatch. @Sezz 2021.06.28
 	if (TrInput & IN_ROLL)
 	{
-		item->animNumber = LA_ROLL_180_START;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_ROLL_FORWARD;
-		item->goalAnimState = LS_STOP;
-		// item->currentAnimState = LS_ROLL_FORWARD;
+		item->goalAnimState = LS_ROLL_FORWARD;
 
 		return;
 	}
 
 	// TODO: Test failsafe which automatically crouches Lara if the ceiling above her is too low.
-	// TODO: mustStand bool weapon attribute in place of all these weapon checks. @Sezz 2021.06.28
 	if ((TrInput & IN_DUCK || TestLaraStandUp(coll))
 		&& (Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		if (Lara.gunType == WEAPON_REVOLVER)
+		{
+			if (!LaserSight)
+				item->goalAnimState = LS_CROUCH_IDLE;
+		}
+		else
+			item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
@@ -569,7 +562,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		&& !((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0))	// Slope in front.
 			|| coll->CollisionType == CT_FRONT))														// Wall/ceiling/object in front.
 	{
-		// TODO: Check if there's already a dispatch for LS_WADE_FORWARD. @Sezz 2021.06.28
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
@@ -586,7 +578,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Allow turning while holding BACK against a wall. @Sezz 2021.06.27
 		if (TrInput & IN_WALK
 			&& (rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
-			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))	// simplyfy.
 			&& !rHeight.Position.Slope)
 		{
 			item->goalAnimState = LS_WALK_BACK;
@@ -610,35 +602,19 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP)
+	if (TrInput & IN_LSTEP
+		&& TestLaraStepLeft(item))
 	{
-		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+		item->goalAnimState = LS_STEP_LEFT;
 
-		if ((collFloorResult.Position.Floor < 128
-			&& collFloorResult.Position.Floor > -128)
-			&& !collFloorResult.Position.Slope
-			&& collCeilingResult.Position.Ceiling <= 0)
-		{
-			item->goalAnimState = LS_STEP_LEFT;
-
-			return;
-		}
+		return;
 	}
-	else if (TrInput & IN_RSTEP)
+	else if (TrInput & IN_RSTEP
+		&& TestLaraStepRight(item))
 	{
-		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+		item->goalAnimState = LS_STEP_RIGHT;
 
-		if ((collFloorResult.Position.Floor < 128
-			&& collFloorResult.Position.Floor > -128)
-			&& !collFloorResult.Position.Slope
-			&& collCeilingResult.Position.Ceiling <= 0)
-		{
-			item->goalAnimState = LS_STEP_RIGHT;
-
-			return;
-		}
+		return;
 	}
 
 	item->goalAnimState = LS_STOP;
@@ -687,7 +663,7 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 
 		return;
 	}
-	
+
 	if (TrInput & IN_BACK)
 	{
 		// TODO: Check this thoroughly. @Sezz 2021.10.04
@@ -739,7 +715,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_DUCK
-		&&  Lara.waterStatus != LW_WADE
+		&& Lara.waterStatus != LW_WADE
 		&& item->currentAnimState == LS_STOP
 		&& (Lara.gunStatus == LG_NO_ARMS
 			|| Lara.gunType == WEAPON_NONE
@@ -762,7 +738,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
 		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_LEFT;
 	}
 	else if (TrInput & IN_RSTEP)
@@ -770,7 +746,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
 		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_RIGHT;
 	}
 	else if (TrInput & IN_LEFT)
@@ -857,7 +833,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_FORWARD)
 		{
 			auto cheight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
-			
+
 			// Don't try to move if there is slope in front
 			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
 				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
@@ -1440,7 +1416,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			if (!(!edgeCatch || edgeCatch < 0 && !TestLaraHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				
+
 				result = SnapToQuadrant(angle, 35);
 			}
 		}
