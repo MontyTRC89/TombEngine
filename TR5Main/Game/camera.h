@@ -87,3 +87,4 @@ void CalculateCamera();
 void LookLeftRight();
 void LookUpDown();
 void ResetLook();
+void RumbleScreen();
