@@ -2094,7 +2094,12 @@ void InitialiseItemBoxData()
 	{
 		for (const auto& mesh : r.mesh)
 		{
-			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
+			long index = ((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024);
+
+			if (index > r.floor.size())
+				continue;
+
+			FLOOR_INFO* floor = &r.floor[index];
 
 			if (floor->Box == NO_BOX)
 				continue;
