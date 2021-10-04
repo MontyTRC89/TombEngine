@@ -491,9 +491,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	// TODO: This is security to prevent locking actions, which should be caught in other states. Keeping this just in case. @Sezz 2021.09.28
-	// item->goalAnimState = LS_STOP;
-
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
