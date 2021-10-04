@@ -18,6 +18,10 @@
 // Control & Collision Functions
 // -----------------------------
 
+// ----------
+// CROUCHING:
+// ----------
+
 // State:		LS_CROUCH_IDLE (71)
 // Collision:	lara_col_crouch()
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
@@ -28,7 +32,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;  // Death dispatch
 
 		return;
 	}
@@ -36,7 +40,8 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	if (TrInput & IN_DUCK || Lara.keepDucked)
+	if (TrInput & IN_DUCK || Lara.keepDucked
+		&& Lara.waterStatus != LW_WADE)
 	{
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
 		Lara.NewAnims.CrouchRoll = true;
@@ -77,6 +82,8 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 			return;
 		}
+
+		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
@@ -309,8 +316,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(coll))
 	{
-		item->speed /= 3;				// In case Lara falls, truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
 		Lara.gunStatus = LG_NO_ARMS;
+		item->speed /= 3;				// In case Lara falls, truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
+		
 		SetLaraFallState(item);
 
 		return;
@@ -325,7 +333,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.keepDucked = TestLaraStandUp(coll);
 
-	// Hit a wall or ledge.
+	// Hit wall or ledge
 	if (coll->Middle.Floor < coll->Setup.BadHeightUp
 		|| coll->Middle.Floor > coll->Setup.BadHeightDown)
 	{
@@ -390,9 +398,219 @@ void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.yPos += coll->Middle.Floor;
 	}
 }
-/*crouch/duck end*/
-/*-*/
-/*crawl start*/
+
+// State:		LS_CROUCH_TURN_LEFT (105)
+// Collision:	lara_col_ducklr()
+void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CROUCH_IDLE; // TODO: Dispatch death state. @Sezz 2021.10.03
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why. @Sezz 2021.10.03
+	/*Lara.turnRate -= ANGLE(1.5f);
+	if (Lara.turnRate < -LARA_TURN_RATE)
+		Lara.turnRate = -LARA_TURN_RATE;*/
+	item->pos.yRot -= ANGLE(1.5f);
+
+	if (TrInput & IN_DUCK || Lara.keepDucked
+		&& Lara.waterStatus != LW_WADE)
+	{
+		if (TrInput & IN_SPRINT)
+		{
+			item->goalAnimState = LS_CROUCH_ROLL;
+
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_CROUCH_TURN_LEFT;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CROUCH_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;	// LS_CROUC_IDLE? Think about this.
+}
+
+// LEGACY
+void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 105*/
+	/*collision: lara_col_ducklr*/
+	coll->Setup.EnableSpaz = false;
+	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0)
+		item->goalAnimState = LS_CROUCH_IDLE;
+	item->pos.yRot -= ANGLE(1.5f);
+}
+
+// State:		LS_CROUCH_TURN_RIGHT (106)
+// Collision:	lara_col_ducklr()
+void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CROUCH_IDLE; // TODO: Dispatch death state. @Sezz 2021.10.03
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why. @Sezz 2021.10.03
+	/*Lara.turnRate -= ANGLE(1.5f);
+	if (Lara.turnRate < -LARA_TURN_RATE)
+		Lara.turnRate = -LARA_TURN_RATE;*/
+	item->pos.yRot += ANGLE(1.5f);
+
+	if ((TrInput & IN_DUCK || Lara.keepDucked)
+		&& Lara.waterStatus != LW_WADE)
+	{
+		if (TrInput & IN_SPRINT)
+		{
+			item->goalAnimState = LS_CROUCH_ROLL;
+
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
+		if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CROUCH_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP; //
+}
+
+// LEGACY
+void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 106*/
+	/*collision: lara_col_ducklr*/
+	coll->Setup.EnableSpaz = false;
+	if ((TrInput & (IN_DUCK | IN_RIGHT)) != (IN_DUCK | IN_RIGHT) || item->hitPoints <= 0)
+		item->goalAnimState = LS_CROUCH_IDLE;
+	item->pos.yRot += ANGLE(1.5f);
+}
+
+// State:		LS_CRAWL_TURN_LEFT (105), LS_CRAWL_TURN_RIGHT (106)
+// Control:		lara_as_duckl(), lara_as_duckr()
+void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraFall(coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS; // Necessary? Set in WAD. @Sezz 2021.10.03
+
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	Lara.keepDucked = TestLaraStandUp(coll);
+
+	ShiftItem(item, coll);
+
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
+}
+
+// LEGACY
+void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 105 and 106*/
+	/*state code: lara_as_duckl(105) and lara_col_ducklr(106)*/
+	// FIXED
+	Lara.isDucked = true;
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+
+	Lara.moveAngle = item->pos.yRot;
+
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+
+	GetCollisionInfo(coll, item);
+
+	if (LaraFallen(item, coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS;
+	}
+	else if (!TestLaraSlide(item, coll))
+	{
+		Lara.keepDucked = TestLaraStandUp(coll);
+		ShiftItem(item, coll);
+
+		if (coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
+	}
+}
+
+// ---------
+// CRAWLING:
+// ---------
+
 void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
@@ -955,63 +1173,6 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.yPos += coll->Middle.Floor;
 
 		Lara.moveAngle = item->pos.yRot;
-	}
-}
-
-void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 105*/
-	/*collision: lara_col_ducklr*/
-	coll->Setup.EnableSpaz = false;
-	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0)
-		item->goalAnimState = LS_CROUCH_IDLE;
-	item->pos.yRot -= ANGLE(1.5f);
-}
-
-void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 106*/
-	/*collision: lara_col_ducklr*/
-	coll->Setup.EnableSpaz = false;
-	if ((TrInput & (IN_DUCK | IN_RIGHT)) != (IN_DUCK | IN_RIGHT) || item->hitPoints <= 0)
-		item->goalAnimState = LS_CROUCH_IDLE;
-	item->pos.yRot += ANGLE(1.5f);
-}
-
-void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 105 and 106*/
-	/*state code: lara_as_duckl(105) and lara_col_ducklr(106)*/
-	// FIXED
-	Lara.isDucked = true;
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-
-	GetCollisionInfo(coll, item);
-
-	if (LaraFallen(item, coll))
-	{
-		Lara.gunStatus = LG_NO_ARMS;
-	}
-	else if (!TestLaraSlide(item, coll))
-	{
-		Lara.keepDucked = TestLaraStandUp(coll);
-		ShiftItem(item, coll);
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 /*crawling end*/
