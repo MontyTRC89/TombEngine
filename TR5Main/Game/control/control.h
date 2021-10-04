@@ -84,9 +84,6 @@ void KillMoveEffects();
 void UpdateShatters();
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
 
-void RumbleScreen();
-void RefreshCamera(short type, short* data);
-
 void CleanUp();
 
 void AlterFloorHeight(ITEM_INFO* item, int height);
