@@ -454,7 +454,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.BadHeightUp = -height;
 	coll->Setup.Height = height;
 
-	GetCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
+	GetObjectCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
 	ShiftItem(v, coll);
 
 	if (coll->CollisionType == CT_FRONT)
@@ -1032,10 +1032,6 @@ int SubControl(void)
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
-
-		// HACK: location is only updated for Lara! Never for other objects!
-		// This is a fundamental architectural overlook.
-		v->location = l->location;
 
 		AnimateItem(l);
 		BackgroundCollision(v, l, sub);
