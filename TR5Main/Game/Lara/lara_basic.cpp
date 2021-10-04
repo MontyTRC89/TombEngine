@@ -526,8 +526,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (TrInput & IN_JUMP
+		&& (coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -558,12 +558,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Test failsafe which automatically crouches Lara if the ceiling above her is too low.
 	// TODO: mustStand bool weapon attribute in place of all these weapon checks. @Sezz 2021.06.28
 	if ((TrInput & IN_DUCK || TestLaraStandUp(coll))
-		&& (Lara.gunStatus == LG_NO_ARMS
-			|| Lara.gunType == WEAPON_NONE
-			|| Lara.gunType == WEAPON_PISTOLS
-			|| Lara.gunType == WEAPON_REVOLVER
-			|| Lara.gunType == WEAPON_UZI
-			|| Lara.gunType == WEAPON_FLARE))
+		&& (Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -652,8 +647,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 // Peripheral pseudo-state used while stopped and water status is LW_WADE. @Sezz 2021.06.28
 void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RESULT rHeight)
 {
-	if (TrInput & IN_JUMP &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (TrInput & IN_JUMP
+		&& !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -695,12 +690,18 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 	
 	if (TrInput & IN_BACK)
 	{
-		if (rHeight.Position.Floor < (STEPUP_HEIGHT - 1)
-			&& rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+		// TODO: Check this thoroughly. @Sezz 2021.10.04
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if ((rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
+				&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+				&& !rHeight.Position.Slope)
 
-			return;
+				item->goalAnimState = LS_WALK_BACK;
+		}
+		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+		{
+			item->goalAnimState = LS_HOP_BACK;
 		}
 	}
 
@@ -890,7 +891,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_STOP (2)
 // Control:		lara_as_stop()
-void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
@@ -925,6 +926,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		return;
 	}
 
+	// TODO: Valuting originally took priority, but it may have been allowing Lara to vault on slopes with a well-timed input. Investigate. @Sezz 2021.10.04
 	if (TestLaraVault(item, coll))
 		return;
 
