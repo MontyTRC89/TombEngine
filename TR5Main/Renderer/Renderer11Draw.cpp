@@ -424,7 +424,7 @@ namespace TEN::Renderer
             m_swapChain->Present(0, 0);
         }
 
-        for (int i = 0; i < 30 * 1.5f; i++)
+        for (int i = 0; i < 20; i++)
         {
             drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();

@@ -87,7 +87,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
 
-void ResetGlobals();
+void CleanUp();
 
 void AlterFloorHeight(ITEM_INFO* item, int height);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
