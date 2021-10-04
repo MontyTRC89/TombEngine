@@ -2440,10 +2440,12 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		addSphere(center, radius, color);
+#endif _DEBUG
 	}
 
 	void Renderer11::addBox(Vector3* corners, Vector4 color)
@@ -2514,19 +2516,23 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		addBox(corners, color);
+#endif _DEBUG
 	}
 	
 	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		addBox(min, max, color);
+#endif _DEBUG
 	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
