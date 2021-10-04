@@ -958,9 +958,6 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -1146,7 +1143,62 @@ void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CRAWL_BACK(86)
+// Collision:	lara_col_crawlb()
 void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	Camera.targetElevation = -ANGLE(23.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CRAWL_IDLE;	// TODO: Dispatch death state. d
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		// TODO: Flexing.
+		/*Lara.headZrot -= (Lara.headZrot + LARA_CRAWL_FLEX) / 12;
+		Lara.torsoZrot = Lara.headZrot;*/
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		/*Lara.headZrot += (LARA_CRAWL_FLEX - Lara.headZrot) / 12;
+		Lara.torsoZrot = Lara.headZrot;*/
+	}
+
+	if ((TrInput & IN_DUCK || Lara.keepDucked)
+		&& Lara.waterStatus != LW_WADE)
+	{
+		if (TrInput & IN_BACK)
+		{
+			item->goalAnimState = LS_CRAWL_BACK;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_CRAWL_IDLE;
+}
+
+// LEGACY
+void old_lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 86*/
 	/*collision: lara_col_crawlb*/
