@@ -1294,24 +1294,10 @@ void GetTighRopeFallOff(int regularity) {
 
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 {
-#if 0
-	// TODO: make it more fine-tuned when new collision is done.
-	switch (coll->CollisionType)
-	{
-	case CT_RIGHT:
-		if (TrInput & IN_RIGHT)
-			return false;
-	case CT_LEFT:
-		if (TrInput & IN_LEFT)
-			return false;
-	}
-	return true;
-#else
 	if (coll->CollisionType == CT_RIGHT || coll->CollisionType == CT_LEFT)
 		return false;
 
 	return true;
-#endif
 }
 
 bool TestLaraFall(COLL_INFO* coll)
@@ -1332,6 +1318,38 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 		return false;
 
 	return true;
+}
+
+bool TestLaraStepLeft(ITEM_INFO* item)
+{
+	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
+	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+	if ((collFloorResult.Position.Floor < 128
+		&& collFloorResult.Position.Floor > -128)
+		&& !collFloorResult.Position.Slope
+		&& collCeilingResult.Position.Ceiling <= 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepRight(ITEM_INFO* item)
+{
+	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
+	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+
+	if ((collFloorResult.Position.Floor < 128
+		&& collFloorResult.Position.Floor > -128)
+		&& !collFloorResult.Position.Slope
+		&& collCeilingResult.Position.Ceiling <= 0)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestLaraCrawl(ITEM_INFO* item)
