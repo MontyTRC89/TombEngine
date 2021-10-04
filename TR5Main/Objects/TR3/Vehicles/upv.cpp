@@ -886,7 +886,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
 
-		if (Lara.waterStatus == LW_SURFACE)
+		if (l->currentAnimState == LS_ONWATER_STOP || l->currentAnimState == LS_ONWATER_FORWARD)
 		{
 			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETONSURF_A;
 			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, SUB_GETONSURF_A, 0);
@@ -1032,6 +1032,10 @@ int SubControl(void)
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
+
+		// HACK: location is only updated for Lara! Never for other objects!
+		// This is a fundamental architectural overlook.
+		v->location = l->location;
 
 		AnimateItem(l);
 		BackgroundCollision(v, l, sub);
