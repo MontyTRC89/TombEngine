@@ -36,18 +36,14 @@ namespace TEN::Control::Volumes
 			switch (volume->type)
 			{
 			case VOLUME_BOX:
-#ifdef _DEBUG
 				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-#endif
 				contains = volume->box.Intersects(bbox);
 				break;
 
 			case VOLUME_SPHERE:
-#ifdef _DEBUG
 				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-#endif
 				contains = volume->sphere.Intersects(bbox);
 				break;
 			}
