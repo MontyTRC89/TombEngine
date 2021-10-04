@@ -448,7 +448,7 @@ unsigned CALLBACK GameMain(void *)
 {
 	try 
 	{
-		printf("GameMain\n");
+		logD("Starting GameMain...");
 
 		TimeInit();
 
@@ -485,10 +485,10 @@ GAME_STATUS DoTitle(int index)
 	printf("DoTitle\n");
 
 	// Reset all the globals for the game which needs this
-	ResetGlobals();
+	CleanUp();
 
 	// Load the level
-	S_LoadLevelFile(index);
+	LoadLevelFile(index);
 
 	int inventoryResult;
 
@@ -609,10 +609,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 
 	// Reset all the globals for the game which needs this
-	ResetGlobals();
+	CleanUp();
 
 	// Load the level
-	S_LoadLevelFile(index);
+	LoadLevelFile(index);
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
@@ -723,8 +723,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			Sound_Stop();
 			StopSoundTracks();
-			DisableBubbles();
-			DisableDebris();
 
 			return result;
 		}
@@ -1089,7 +1087,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	return minHeight + item->pos.yPos - height;
 }
 
-void ResetGlobals()
+void CleanUp()
 {
 	// Reset oscillator seed
 	Wibble = 0;
@@ -1107,4 +1105,9 @@ void ResetGlobals()
 
 	// Clear spotcam array
 	ClearSpotCamSequences();
+
+	// Clear all kinds of particles
+	DisableSmokeParticles();
+	DisableBubbles();
+	DisableDebris();
 }
