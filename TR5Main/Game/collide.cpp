@@ -105,7 +105,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 					}
 
 					/*this is awful*/
-					/*if (item->objectNumber == ID_UPV && item->hitPoints == 1)
+					if (item->objectNumber == ID_UPV && item->hitPoints == 1)
 					{
 						itemNumber = item->nextItem;
 						continue;
@@ -114,7 +114,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 					{
 						itemNumber = item->nextItem;
 						continue;
-					}*/
+					}
 					/*we need a better system*/
 
 					int dx = collidingItem->pos.xPos - item->pos.xPos;
