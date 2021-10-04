@@ -8,7 +8,7 @@ struct COLL_INFO;
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
 #define LARA_LEAN_RATE ANGLE(1.5f)	// lean rates
 #define LARA_LEAN_MAX ANGLE(11.0f)
-#define LARA_LEAN_SPRINT_MAX ANGLE(16.0f)
+#define LARA_LEAN_SPRINT_MAX ANGLE(15.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)	// turn rates
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_CROUCH_ROLL_TURN ANGLE(3.0f)
@@ -16,6 +16,11 @@ struct COLL_INFO;
 #define LARA_SLOW_TURN ANGLE(4.0f)	// turn maxes
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
+
+// TODO: In the future, the player model should be probed for the number of bones between the hips (exclusive) and head (inclusive).
+// Divide the flex angle by the number of bones to be flexed, and apply the result to each bone.
+#define LARA_CRAWL_FLEX ANGLE(30.0f) / 2 // 2 = hardcoded number of bones to flex.
+#define LARA_SWIM_FLEX ANGLE(24.0f) / 2
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
 constexpr auto LARA_HEIGHT_CRAWL = 400;    // Size of Lara in crawl state
