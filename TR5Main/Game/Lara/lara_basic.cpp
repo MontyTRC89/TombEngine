@@ -243,8 +243,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Get others to try this out. @Sezz 2021.09.28
 	static bool commitToJump = false;
 
-	if ((TrInput & IN_JUMP && !item->gravityStatus)
-		|| commitToJump)
+	if ((TrInput & IN_JUMP || commitToJump)
+		&& !item->gravityStatus)
 	{
 		commitToJump = TrInput & IN_FORWARD;
 

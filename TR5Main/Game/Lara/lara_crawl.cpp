@@ -450,7 +450,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_STOP;	// LS_CROUC_IDLE? Think about this.
+	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
 // LEGACY
@@ -515,7 +515,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_STOP; //
+	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
 // LEGACY
@@ -978,6 +978,8 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
 
+	// TODO: If Lara is crawling and approaching a low-ceiling space,
+	// allow her to continue without having to hold DUCK. @Sezz 2021.10.05
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
@@ -1082,62 +1084,6 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
-			item->pos.yPos += coll->Middle.Floor;
-	}
-}
-
-void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 84*/
-	/*collision: lara_col_all4turnlr*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_CRAWL_IDLE;
-		return;
-	}
-
-	coll->Setup.EnableSpaz = false;
-	coll->Setup.EnableObjectPush = true;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	Camera.targetElevation = -ANGLE(23.0f);
-	item->pos.yRot -= ANGLE(1.5f);
-
-	if (!(TrInput & IN_LEFT))
-		item->goalAnimState = LS_CRAWL_IDLE;
-}
-
-void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 85*/
-	/*collision: lara_col_all4turnlr*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_CRAWL_IDLE;
-		return;
-	}
-
-	coll->Setup.EnableSpaz = false;
-	coll->Setup.EnableObjectPush = true;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	Camera.targetElevation = -ANGLE(23.0f);
-	item->pos.yRot += ANGLE(1.5f);
-
-	if (!(TrInput & IN_RIGHT))
-		item->goalAnimState = LS_CRAWL_IDLE;
-}
-
-void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*states 84 and 85*/
-	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	GetCollisionInfo(coll, item);
-
-	if (!TestLaraSlide(item, coll))
-	{
 		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
 			item->pos.yPos += coll->Middle.Floor;
 	}
@@ -1286,7 +1232,62 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 	}
 }
-/*crawling end*/
+
+void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 84*/
+	/*collision: lara_col_all4turnlr*/
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CRAWL_IDLE;
+		return;
+	}
+
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+	Lara.torsoYrot = 0;
+	Lara.torsoXrot = 0;
+	Camera.targetElevation = -ANGLE(23.0f);
+	item->pos.yRot -= ANGLE(1.5f);
+
+	if (!(TrInput & IN_LEFT))
+		item->goalAnimState = LS_CRAWL_IDLE;
+}
+
+void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 85*/
+	/*collision: lara_col_all4turnlr*/
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_CRAWL_IDLE;
+		return;
+	}
+
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+	Lara.torsoYrot = 0;
+	Lara.torsoXrot = 0;
+	Camera.targetElevation = -ANGLE(23.0f);
+	item->pos.yRot += ANGLE(1.5f);
+
+	if (!(TrInput & IN_RIGHT))
+		item->goalAnimState = LS_CRAWL_IDLE;
+}
+
+void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*states 84 and 85*/
+	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	GetCollisionInfo(coll, item);
+
+	if (!TestLaraSlide(item, coll))
+	{
+		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+			item->pos.yPos += coll->Middle.Floor;
+	}
+}
 
 void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 {
