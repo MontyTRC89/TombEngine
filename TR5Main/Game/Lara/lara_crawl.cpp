@@ -1107,9 +1107,9 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
 
 		// TODO: Flexing.
 		/*Lara.headZrot -= (Lara.headZrot + LARA_CRAWL_FLEX) / 12;
@@ -1117,9 +1117,9 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
 
 		/*Lara.headZrot += (LARA_CRAWL_FLEX - Lara.headZrot) / 12;
 		Lara.torsoZrot = Lara.headZrot;*/
