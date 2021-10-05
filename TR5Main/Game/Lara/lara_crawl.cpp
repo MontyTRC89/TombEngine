@@ -1233,7 +1233,66 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CRAWL_TURN_LEFT (84)
+// Collision:	lara_col_all4turnlr()
 void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	Camera.targetElevation = -ANGLE(23.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why.
+	/*Lara.turnRate -= ANGLE(1.5f);
+	if (Lara.turnRate < -LARA_TURN_RATE)
+		Lara.turnRate = -LARA_TURN_RATE;*/
+	item->pos.yRot -= ANGLE(1.5f);
+
+	if ((TrInput & IN_DUCK || Lara.keepDucked)
+		&& Lara.waterStatus != LW_WADE)
+	{
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_CRAWL_FORWARD;
+
+			return;
+		}
+
+		if (TrInput & IN_BACK)
+		{
+			item->goalAnimState = LS_CRAWL_BACK;
+
+			return;
+		}
+
+		// TODO: Allow for more granular turning. The animation needs to cancel, however.
+		/*Lara.turnRate -= ANGLE(1.5f);
+		if (Lara.turnRate < -LARA_TURN_RATE)
+			Lara.turnRate = -LARA_TURN_RATE;*/
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_CRAWL_IDLE;
+}
+
+// LEGACY
+void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 84*/
 	/*collision: lara_col_all4turnlr*/
@@ -1254,7 +1313,58 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
+// State:		LS_CRAWL_TURN_RIGHT (85)
+// Collision:	lara_col_all4turnlr()
 void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	Camera.targetElevation = -ANGLE(23.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	item->pos.yRot += ANGLE(1.5f);
+
+	if ((TrInput & IN_DUCK || Lara.keepDucked)
+		&& Lara.waterStatus != LW_WADE)
+	{
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_CRAWL_FORWARD;
+
+			return;
+		}
+
+		if (TrInput & IN_BACK)
+		{
+			item->goalAnimState = LS_CRAWL_BACK;
+
+			return;
+		}
+
+		if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_CRAWL_IDLE;
+}
+
+// LEGACY
+void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 85*/
 	/*collision: lara_col_all4turnlr*/
