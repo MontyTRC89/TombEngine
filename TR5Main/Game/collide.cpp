@@ -1296,6 +1296,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
+	coll->NearestAngle = GetNearestLedgeAngle(collResult.Block, x, collResult.Position.Floor, z, coll->Setup.ForwardAngle, coll->Setup.Radius);
+
+	g_Renderer.printDebugMessage("Nearest angle: %f", TO_DEGREES(coll->NearestAngle));
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
@@ -2818,46 +2821,66 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 	auto height = f->FloorHeight(x, z, y);
 	auto bridge = f->InsideBridge(x, z, y, false, y == height);
 
+	// Probe coords
+	int eX = x + (rad + 16) * phd_sin(ang);
+	int eZ = z + (rad + 16) * phd_cos(ang);
+
 	auto fY = y - 1;
 	auto cY = y + 1;
 
-	if (bridge >= 0)
-	{
-		// bridge code
-		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-	}
-	else
-	{
-		// block code
+	short result = 0;
 
-		// Block corners
-		auto fX = floor(x / WALL_SIZE) * WALL_SIZE - 1;
-		auto fZ = floor(z / WALL_SIZE) * WALL_SIZE - 1;
+	if (bridge >= 0) // Bridge code
+	{
+		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
+		return 0;
+	}
+	else // Block code
+	{
+		// Get block corners
+		auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
+		auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
 		auto cX = fX + WALL_SIZE + 1;
 		auto cZ = fZ + WALL_SIZE + 1;
 
-		// Block edge planes
-		Plane plane[4] =
+		g_Renderer.addDebugSphere(Vector3(fX, fY, fZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(Vector3(cX, fY, cZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(Vector3(fX, fY, cZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(Vector3(cX, fY, fZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+
+		// Get split angle coords
+		auto sX = fX + 1 + WALL_SIZE / 2;
+		auto sZ = fZ + 1 + WALL_SIZE / 2;
+		auto sShiftX = rad * sin(f->FloorCollision.SplitAngle);
+		auto sShiftZ = rad * cos(f->FloorCollision.SplitAngle);
+
+		g_Renderer.addDebugSphere(Vector3(sX, fY, sZ), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(Vector3(sX + sShiftX, fY, sZ + sShiftZ), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+
+		// Get block edge planes
+		Plane plane[5] =
 		{
 			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // south
 			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // north 
 			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // west
-			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ))  // east
+			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // east
+			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // split
 		};
 
-		//f->FloorCollision.SplitAngle
+		// Calculate ray direction
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang),0, 0);
+		auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
+		auto direction = (mxT * mxR).Translation();
 
-		// Ray end coords
-		int eX = x + rad * phd_sin(ang);
-		int eZ = z + rad * phd_cos(ang);
-		
-		auto ray = Ray(Vector3(x, cY, z), Vector3(eX, cY, eZ));
-
-		float closestDistance = FLT_MAX;
-		int closestPlane = -1;
+		// Make ray
+		auto ray = Ray(Vector3(x, cY, z), direction);
 
 		// Find closest block edge plane
-		for (int i = 0; i < 4; i++)
+
+		float closestDistance = FLT_MAX;
+		int   closestPlane = -1;
+
+		for (int i = 0; i < (f->FloorIsSplit() ? 5 : 4); i++)
 		{
 			float dist;
 			if (ray.Intersects(plane[i], dist))
@@ -2869,5 +2892,17 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 				}
 			}
 		}
+
+		// Return according rotation
+		switch (closestPlane)
+		{
+		case 0: result = ANGLE(180); break;
+		case 1: result = ANGLE(0);   break;
+		case 2: result = ANGLE(90);  break;
+		case 3: result = ANGLE(270); break;
+		case 4: result = FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f); break;
+		}
+
+		return result;
 	}
 }

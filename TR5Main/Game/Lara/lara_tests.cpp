@@ -40,6 +40,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		short angle = item->pos.yRot;
 
 		bool result = SnapToQuadrant(angle, 30);
+
 		if (!result)
 			return false;
 
