@@ -68,7 +68,7 @@ class FLOOR_INFO
 	Vector2 CeilingSlope(int x, int z) const;
 	bool IsWall(int plane) const;
 	bool IsWall(int x, int z) const;
-	bool InsideBridge(int x, int z, int y, bool floorBorder, bool ceilingBorder) const;
+	short InsideBridge(int x, int z, int y, bool floorBorder, bool ceilingBorder) const;
 	void AddItem(short itemNumber);
 	void RemoveItem(short itemNumber);
 };
