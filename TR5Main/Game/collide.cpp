@@ -2859,9 +2859,9 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		Vector3 planeVertices[4][3] =
 		{
 			{ corners[0], corners[1], corners[2] },
-			{ corners[0], corners[4], corners[3] },
+			{ corners[3], corners[4], corners[0] },
 			{ corners[7], corners[6], corners[5] },
-			{ corners[6], corners[5], corners[1] }
+			{ corners[1], corners[5], corners[6] }
 		};
 
 		Vector3 closestNormal = Vector3::Zero;
@@ -2885,6 +2885,10 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 					closestNormal = plane.Normal();
 				}
 			}
+
+		g_Renderer.addDebugSphere(planeVertices[closestPlane][0], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(planeVertices[closestPlane][1], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		g_Renderer.addDebugSphere(planeVertices[closestPlane][2], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
 		return FROM_RAD(atan2(closestNormal.x, closestNormal.z));
 	}
@@ -2941,7 +2945,7 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		case 1: result = ANGLE(0);   break;
 		case 2: result = ANGLE(90);  break;
 		case 3: result = ANGLE(270); break;
-		case 4: result = FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f); break;
+		case 4: result = FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90); break;
 		}
 
 		return result;
