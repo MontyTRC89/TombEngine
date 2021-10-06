@@ -1296,9 +1296,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
-	coll->NearestAngle = GetNearestLedgeAngle(collResult.Block, x, collResult.Position.Floor, z, coll->Setup.ForwardAngle, coll->Setup.Radius);
-
-	g_Renderer.printDebugMessage("Nearest angle: %f", TO_DEGREES(coll->NearestAngle));
 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
@@ -1374,6 +1371,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
+	coll->NearestAngle = GetNearestLedgeAngle(collResult.Block, x, collResult.Position.Floor, z, coll->Setup.ForwardAngle, coll->Setup.Radius);
+
+	g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestAngle);
 
 	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
@@ -2818,8 +2818,11 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 
 short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int rad)
 {
+	short result = 0;
+
+	// Get native surface height and possible bridge item number
 	auto height = f->FloorHeight(x, z, y);
-	auto bridge = f->InsideBridge(x, z, y, false, y == height);
+	auto bridge = f->InsideBridge(x, z, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
 	// Probe coords
 	int eX = x + (rad + 16) * phd_sin(ang);
@@ -2828,12 +2831,62 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 	auto fY = y - 1;
 	auto cY = y + 1;
 
-	short result = 0;
+	// Calculate ray direction
+	auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang), 0, 0);
+	auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
+	auto direction = (mxT * mxR).Translation();
+
+	// Make ray
+	auto ray = Ray(Vector3(x, cY, z), direction);
+
+	float distance = 0.0f;
+	float closestDistance = FLT_MAX;
+	int   closestPlane = -1;
 
 	if (bridge >= 0) // Bridge code
 	{
 		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-		return 0;
+
+		// Get and test DX item coll bounds
+		auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].pos, bounds);
+
+		// Draw item coll bounds
+		//g_Renderer.addDebugBox(dxBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+		// Decompose static bounds into plane vertices
+		Vector3 corners[8];
+		dxBounds.GetCorners(corners);
+		Vector3 planeVertices[4][3] =
+		{
+			{ corners[0], corners[1], corners[2] },
+			{ corners[0], corners[4], corners[3] },
+			{ corners[7], corners[6], corners[5] },
+			{ corners[6], corners[5], corners[1] }
+		};
+
+		Vector3 closestNormal = Vector3::Zero;
+
+		// Find closest bridge edge plane
+		for (int i = 0; i < 4; i++)
+			for (int p = 0; p < 4; p++)
+			{
+				auto plane = Plane(planeVertices[p][0], planeVertices[p][1], planeVertices[p][2]);
+
+				// No plane intersection, quickly discard
+				if (!ray.Intersects(plane, distance))
+					continue;
+
+				// Process plane intersection only if distance is smaller
+				// than already found minimum
+				if (distance < closestDistance)
+				{
+					closestPlane = p;
+					closestDistance = distance;
+					closestNormal = plane.Normal();
+				}
+			}
+
+		return FROM_RAD(atan2(closestNormal.x, closestNormal.z));
 	}
 	else // Block code
 	{
@@ -2867,29 +2920,17 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // split
 		};
 
-		// Calculate ray direction
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang),0, 0);
-		auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
-		auto direction = (mxT * mxR).Translation();
-
-		// Make ray
-		auto ray = Ray(Vector3(x, cY, z), direction);
-
 		// Find closest block edge plane
-
-		float closestDistance = FLT_MAX;
-		int   closestPlane = -1;
-
 		for (int i = 0; i < (f->FloorIsSplit() ? 5 : 4); i++)
 		{
-			float dist;
-			if (ray.Intersects(plane[i], dist))
+			// No plane intersection, quickly discard
+			if (!ray.Intersects(plane[i], distance))
+				continue;
+
+			if (distance < closestDistance)
 			{
-				if (dist < closestDistance)
-				{
-					closestDistance = dist;
-					closestPlane = i;
-				}
+				closestDistance = distance;
+				closestPlane = i;
 			}
 		}
 
