@@ -1373,8 +1373,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front.Floor = height;
 	coll->NearestAngle = GetNearestLedgeAngle(collResult.Block, x, collResult.Position.Floor, z, coll->Setup.ForwardAngle, coll->Setup.Radius);
 
-	g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestAngle);
-
 	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
 	tfLocation = GetRoom(tfLocation, x + xfront, y, z + zfront);
@@ -2816,25 +2814,22 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	return vect;
 }
 
+// Determines vertical surfaces and gets nearest ledge angle.
+// Allows to eventually use unconstrained vaults and shimmying.
+
 short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int rad)
 {
-	short result = 0;
-
 	// Get native surface height and possible bridge item number
 	auto height = f->FloorHeight(x, z, y);
 	auto bridge = f->InsideBridge(x, z, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
-	// Probe coords
-	int eX = x + (rad + 16) * phd_sin(ang);
-	int eZ = z + (rad + 16) * phd_cos(ang);
-
-	auto fY = y - 1;
-	auto cY = y + 1;
+	// Determine horizontal probe coordinates
+	int eX = x + rad * phd_sin(ang);
+	int eZ = z + rad * phd_cos(ang);
 
 	// Calculate ray direction
 	auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang), 0, 0);
-	auto mxT = Matrix::CreateTranslation(Vector3::UnitZ);
-	auto direction = (mxT * mxR).Translation();
+	auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
 	// Make ray
 	auto ray = Ray(Vector3(x, cY, z), direction);
@@ -2843,25 +2838,21 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 	float closestDistance = FLT_MAX;
 	int   closestPlane = -1;
 
-	if (bridge >= 0) // Bridge code
+	if (bridge >= 0) // Surface is inside bridge
 	{
-		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-
 		// Get and test DX item coll bounds
+		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
 		auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].pos, bounds);
 
-		// Draw item coll bounds
-		//g_Renderer.addDebugBox(dxBounds, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
-		// Decompose static bounds into plane vertices
+		// Decompose bounds into plane vertices
 		Vector3 corners[8];
 		dxBounds.GetCorners(corners);
 		Vector3 planeVertices[4][3] =
 		{
-			{ corners[0], corners[1], corners[2] },
-			{ corners[3], corners[4], corners[0] },
-			{ corners[7], corners[6], corners[5] },
-			{ corners[1], corners[5], corners[6] }
+			{ corners[2], corners[1], corners[0] },
+			{ corners[0], corners[4], corners[3] },
+			{ corners[5], corners[6], corners[7] },
+			{ corners[6], corners[5], corners[1] }
 		};
 
 		Vector3 closestNormal = Vector3::Zero;
@@ -2886,42 +2877,34 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 				}
 			}
 
-		g_Renderer.addDebugSphere(planeVertices[closestPlane][0], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(planeVertices[closestPlane][1], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(planeVertices[closestPlane][2], 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-
 		return FROM_RAD(atan2(closestNormal.x, closestNormal.z));
 	}
-	else // Block code
+	else // Surface is inside block
 	{
-		// Get block corners
+		// Get horizontal block corner coordinates
 		auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
 		auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
 		auto cX = fX + WALL_SIZE + 1;
 		auto cZ = fZ + WALL_SIZE + 1;
 
-		g_Renderer.addDebugSphere(Vector3(fX, fY, fZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(Vector3(cX, fY, cZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(Vector3(fX, fY, cZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(Vector3(cX, fY, fZ), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		// We don't need actual corner heights to build planes, so just use normalized value here
+		auto fY = height - 1;
+		auto cY = height + 1;
 
-		// Get split angle coords
+		// Get split angle coordinates
 		auto sX = fX + 1 + WALL_SIZE / 2;
 		auto sZ = fZ + 1 + WALL_SIZE / 2;
 		auto sShiftX = rad * sin(f->FloorCollision.SplitAngle);
 		auto sShiftZ = rad * cos(f->FloorCollision.SplitAngle);
 
-		g_Renderer.addDebugSphere(Vector3(sX, fY, sZ), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-		g_Renderer.addDebugSphere(Vector3(sX + sShiftX, fY, sZ + sShiftZ), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-
 		// Get block edge planes
 		Plane plane[5] =
 		{
-			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // south
-			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // north 
-			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // west
-			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // east
-			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // split
+			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // South
+			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
+			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
+			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // East
+			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
 		};
 
 		// Find closest block edge plane
@@ -2938,7 +2921,13 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 			}
 		}
 
-		// Return according rotation
+		// Return according rotation.
+		// For block edges (cases 0-3), constrained values are used which never change.
+		// For split angle, return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
+		// origin sector plane, which determines the direction of edge normal.
+
+		short result = 0;
+
 		switch (closestPlane)
 		{
 		case 0: result = ANGLE(180); break;

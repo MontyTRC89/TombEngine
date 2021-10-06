@@ -483,6 +483,7 @@ namespace TEN::Renderer
 		void buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
+		void printDebugMessage(LPCSTR message, ...);
 		void getVisibleObjects(int from, int to, RenderView& renderView);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal,const Matrix& viewProjection);
 		void collectRooms(RenderView& renderView);
@@ -590,7 +591,6 @@ namespace TEN::Renderer
 		void drawDebugInfo();
 		void switchDebugPage(bool back);
 		void drawPickup(short objectNum);
-		void printDebugMessage(LPCSTR message, ...);
 		int SyncRenderer();
 		void drawString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void clearDynamicLights();
