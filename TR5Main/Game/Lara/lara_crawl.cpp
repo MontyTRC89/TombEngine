@@ -1100,7 +1100,7 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CRAWL_IDLE;	// TODO: Dispatch death state. d
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
