@@ -509,7 +509,6 @@ namespace TEN::Renderer
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawLara(RenderView& view,bool transparent, bool shadowMap);
-		void printDebugMessage(LPCSTR message, ...);
 		void drawFires(RenderView& view);
 		void drawSparks(RenderView& view);
 		void drawSmokes(RenderView& view);
@@ -591,6 +590,7 @@ namespace TEN::Renderer
 		void drawDebugInfo();
 		void switchDebugPage(bool back);
 		void drawPickup(short objectNum);
+		void printDebugMessage(LPCSTR message, ...);
 		int SyncRenderer();
 		void drawString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void clearDynamicLights();
