@@ -623,8 +623,8 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 				else
 					l->goalAnimState = SUBS_GETOFF;
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
-				StopSoundEffect(346);
-				SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
+				StopSoundEffect(1574);
+				SoundEffect(1576, (PHD_3DPOS*)&v->pos.xPos, 2);
 			}
 		}
 
@@ -645,7 +645,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			v->pos.xRot += ANGLE(1);
 
 			if (frame == GETONSURF_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(1574, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETONSURF_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -654,7 +654,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		else if (anim == SUB_GETON_A)
 		{
 			if (frame == GETON_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(1574, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETON_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -1037,7 +1037,7 @@ int SubControl(void)
 		BackgroundCollision(v, l, sub);
 
 		if (sub->Flags & UPV_CONTROL)
-			SoundEffect(1807, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
+			SoundEffect(1574, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
