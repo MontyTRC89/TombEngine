@@ -2812,3 +2812,62 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 
 	return vect;
 }
+
+short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int rad)
+{
+	auto height = f->FloorHeight(x, z, y);
+	auto bridge = f->InsideBridge(x, z, y, false, y == height);
+
+	auto fY = y - 1;
+	auto cY = y + 1;
+
+	if (bridge >= 0)
+	{
+		// bridge code
+		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
+	}
+	else
+	{
+		// block code
+
+		// Block corners
+		auto fX = floor(x / WALL_SIZE) * WALL_SIZE - 1;
+		auto fZ = floor(z / WALL_SIZE) * WALL_SIZE - 1;
+		auto cX = fX + WALL_SIZE + 1;
+		auto cZ = fZ + WALL_SIZE + 1;
+
+		// Block edge planes
+		Plane plane[4] =
+		{
+			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // south
+			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // north 
+			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // west
+			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ))  // east
+		};
+
+		//f->FloorCollision.SplitAngle
+
+		// Ray end coords
+		int eX = x + rad * phd_sin(ang);
+		int eZ = z + rad * phd_cos(ang);
+		
+		auto ray = Ray(Vector3(x, cY, z), Vector3(eX, cY, eZ));
+
+		float closestDistance = FLT_MAX;
+		int closestPlane = -1;
+
+		// Find closest block edge plane
+		for (int i = 0; i < 4; i++)
+		{
+			float dist;
+			if (ray.Intersects(plane[i], dist))
+			{
+				if (dist < closestDistance)
+				{
+					closestDistance = dist;
+					closestPlane = i;
+				}
+			}
+		}
+	}
+}
