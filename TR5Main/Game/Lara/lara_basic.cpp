@@ -575,13 +575,16 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Allow turning while holding BACK against a wall. @Sezz 2021.06.27
 		if (TrInput & IN_WALK
 			&& (rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
-			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))	// simplyfy.
-			&& !rHeight.Position.Slope)
+			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
+			&& !rHeight.Position.Slope) // TODO: This works when walking at the side of a slope, but not the front.
 		{
 			item->goalAnimState = LS_WALK_BACK;
 		}
-		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1)) [[likely]]
+		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
+			&& !rHeight.Position.Slope) [[likely]]
+		{
 			item->goalAnimState = LS_HOP_BACK;
+		}
 
 		return;
 	}
@@ -1133,12 +1136,21 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_r()
 void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto fHeight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
+	auto cHeight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
+	auto rHeight = LaraCollisionFront(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD + 4);
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_STOP;	// Dispatch required. @Sezz 2021.10.05
 
 		return;
 	}
+
+	// TODO: Looking needs better handling.
+
+	// TODO: Why can't this be anywhere below the run dispatch?
+	Lara.turnRate += LARA_TURN_RATE; // TODO: Sometimes, she inappropriately gains speed when stationary. Stop state to blame? @Sezz 2021.10.06
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1171,8 +1183,10 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Collision checks don't seem to work? Investigate. @Sezz 2021.10.06
 	if (TrInput & IN_FORWARD
-		&& coll->CollisionType != CT_FRONT)
+		&& !((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0))	// Slope in front.
+			|| coll->CollisionType == CT_FRONT))														// Wall / ceiling / object in front.
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
@@ -1189,18 +1203,10 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WALK_BACK;
-		else if (TrInput & IN_WALK) // TODO: This is a frame-perfect input. Is sidestep right necessary? @Sezz 2021.10.05
+		else if (TrInput & IN_WALK) // TODO: This is a frame-perfect input. Somehow, Lara is able to sidestep from this state. @Sezz 2021.10.05
 			item->goalAnimState = LS_WALK_BACK;
 		else [[likely]]
 			item->goalAnimState = LS_HOP_BACK;
-
-		return;
-	}
-
-	if (TrInput & IN_RSTEP
-		&& TestLaraStepRight(item))
-	{
-		item->goalAnimState = LS_STEP_RIGHT;
 
 		return;
 	}
@@ -1209,8 +1215,6 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	// "pro strat" of pulling out pistols to turn fast won't be necessary. @Sezz 2021.10.05
 	if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE; // TODO: Sometimes, she inappropriately gains speed when stationary. Do something about it. @Sezz 2021.10.05
-
 		if (Lara.waterStatus == LW_WADE)
 		{
 			if (Lara.turnRate > LARA_SLOW_TURN)
@@ -1220,10 +1224,10 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (Lara.gunStatus == LG_READY)
 		{
-			Lara.turnRate = LARA_MED_TURN;	// TODO: Finetune starting turn rate. Or, dispatch directly to fast turn state. @Sezz 2021.10.05
+			//Lara.turnRate = LARA_MED_TURN;	// TODO: Finetune starting turn rate. Or, dispatch directly to fast turn state. @Sezz 2021.10.05
 			item->goalAnimState = LS_TURN_FAST;
 		}
-		else if (Lara.turnRate > LARA_SLOW_TURN && !Lara.waterStatus != LW_WADE)
+		else if (Lara.turnRate > LARA_SLOW_TURN)
 			item->goalAnimState = LS_TURN_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1264,7 +1268,7 @@ void old_lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Don't try to move forward if button isn't pressed or there's no headroom in front
-	if (!(TrInput & IN_FORWARD) || coll->CollisionType == CT_FRONT)
+	if (!(TrInput & IN_FORWARD))
 	{
 		if (!(TrInput & IN_RIGHT))
 			item->goalAnimState = LS_STOP;
