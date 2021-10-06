@@ -2844,38 +2844,35 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
 		auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].pos, bounds);
 
-		// Decompose bounds into plane vertices
+		// Decompose bounds into planes
 		Vector3 corners[8];
 		dxBounds.GetCorners(corners);
-		Vector3 planeVertices[4][3] =
+		Plane plane[4] =
 		{
-			{ corners[2], corners[1], corners[0] },
-			{ corners[0], corners[4], corners[3] },
-			{ corners[5], corners[6], corners[7] },
-			{ corners[6], corners[5], corners[1] }
-		};
+			Plane(corners[2], corners[1], corners[0]),
+			Plane(corners[0], corners[4], corners[3]),
+			Plane(corners[5], corners[6], corners[7]),
+			Plane(corners[6], corners[5], corners[1])
+		}
 
 		Vector3 closestNormal = Vector3::Zero;
 
 		// Find closest bridge edge plane
 		for (int i = 0; i < 4; i++)
-			for (int p = 0; p < 4; p++)
+		{
+			// No plane intersection, quickly discard
+			if (!ray.Intersects(plane[i], distance))
+				continue;
+
+			// Process plane intersection only if distance is smaller
+			// than already found minimum
+			if (distance < closestDistance)
 			{
-				auto plane = Plane(planeVertices[p][0], planeVertices[p][1], planeVertices[p][2]);
-
-				// No plane intersection, quickly discard
-				if (!ray.Intersects(plane, distance))
-					continue;
-
-				// Process plane intersection only if distance is smaller
-				// than already found minimum
-				if (distance < closestDistance)
-				{
-					closestPlane = p;
-					closestDistance = distance;
-					closestNormal = plane.Normal();
-				}
+				closestPlane = i;
+				closestDistance = distance;
+				closestNormal = plane[i].Normal();
 			}
+		}
 
 		return FROM_RAD(atan2(closestNormal.x, closestNormal.z));
 	}
@@ -2897,7 +2894,7 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		auto sShiftX = rad * sin(f->FloorCollision.SplitAngle);
 		auto sShiftZ = rad * cos(f->FloorCollision.SplitAngle);
 
-		// Get block edge planes
+		// Get block edge planes + split angle plane
 		Plane plane[5] =
 		{
 			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // South
