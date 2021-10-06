@@ -2897,9 +2897,9 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		// Get block edge planes + split angle plane
 		Plane plane[5] =
 		{
-			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // South
 			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
 			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
+			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // South
 			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // East
 			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
 		};
@@ -2920,20 +2920,12 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 
 		// Return according rotation.
 		// For block edges (cases 0-3), constrained values are used which never change.
-		// For split angle, return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
+		// For split angle (case 4), return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
 		// origin sector plane, which determines the direction of edge normal.
 
-		short result = 0;
-
-		switch (closestPlane)
-		{
-		case 0: result = ANGLE(180); break;
-		case 1: result = ANGLE(0);   break;
-		case 2: result = ANGLE(90);  break;
-		case 3: result = ANGLE(270); break;
-		case 4: result = FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90); break;
-		}
-
-		return result;
+		if (closestPlane == 4)
+			return FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90);
+		else
+			return ANGLE(closestPlane * 90.0f);
 	}
 }
