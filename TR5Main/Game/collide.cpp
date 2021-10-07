@@ -2638,6 +2638,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 	// Make ray
 	auto ray = Ray(Vector3(x, cY, z), direction);
 
+	// Prepare test data
 	float distance = 0.0f;
 	float closestDistance = FLT_MAX;
 	int   closestPlane = -1;
@@ -2675,7 +2676,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 
-		return FROM_RAD(atan2(plane[closestPlane].Normal().x, plane[closestPlane].Normal().z));
+		auto normal = plane[closestPlane].Normal();
+		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 	else // Surface is inside block
 	{
@@ -2716,13 +2718,16 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Return according rotation.
-		// For block edges (cases 0-3), constrained values are used which never change.
+		// For block edges (cases 0-3), return ordinary normal values.
 		// For split angle (case 4), return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
 		// origin sector plane, which determines the direction of edge normal.
 
 		if (closestPlane == 4)
 			return FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90);
 		else
-			return FROM_RAD(atan2(plane[closestPlane].Normal().x, plane[closestPlane].Normal().z));
+		{
+			auto normal = plane[closestPlane].Normal();
+			return FROM_RAD(atan2(normal.x, normal.z));
+		}
 	}
 }
