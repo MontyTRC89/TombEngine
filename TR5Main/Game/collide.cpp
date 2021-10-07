@@ -172,8 +172,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->HitTallBounds = false;
-	coll->ObjectHeadroom = INT_MAX;
+	coll->HitTallObject = false;
 
 	short roomsToCheck[128];
 	short numRoomsToCheck = 0;
@@ -337,8 +336,8 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 			result = true;
 		}
 
-		if (bottom && coll->ObjectHeadroom > abs(distanceToVerticalPlane))
-			coll->ObjectHeadroom = abs(distanceToVerticalPlane);
+		if (bottom && coll->Middle.Ceiling < distanceToVerticalPlane)
+			coll->Middle.Ceiling = distanceToVerticalPlane;
 	}
 
 	// If no actual intersection occured, stop testing.

@@ -63,8 +63,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			if (!slope &&
 				coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0 &&
-				coll->ObjectHeadroom >= LARA_HEIGHT)
+				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
@@ -97,8 +96,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			if (!slope &&
 				coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0 &&
-				coll->ObjectHeadroom >= LARA_HEIGHT)
+				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
@@ -126,7 +124,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				return false;
 			}
 		}
-		else if (!slope && coll->Front.Floor >= -1920 && coll->Front.Floor <= -896 && coll->ObjectHeadroom >= LARA_HEIGHT)
+		else if (!slope && coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
 		{
 #if 0
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
@@ -207,7 +205,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStandUp(COLL_INFO* coll)
 {
-	return (coll->Middle.Ceiling >= -362 || coll->ObjectHeadroom < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
+	return (coll->Middle.Ceiling >= -362);
 }
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
