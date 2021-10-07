@@ -692,13 +692,13 @@ GAME_OBJECT_ID WeaponObjectMesh(int weaponType) {
 }
 
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
-{
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	
+{	
 	item->hitStatus = true;
-	if (creature != nullptr && item != LaraItem)
-		creature->hurtByLara = true;
+
+	if (item->data.is<CREATURE_INFO>())
+		((CREATURE_INFO*)item->data)->hurtByLara = true;
+
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (hitPos != nullptr)
 	{
@@ -743,9 +743,15 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 
 	if (!obj->undead || grenade || item->hitPoints == NOT_TARGETABLE)
 	{
-		if (item->hitPoints > 0 && item->hitPoints <= damage)
+		if (item->hitPoints > 0)
+		{
 			Savegame.Level.AmmoHits++;
-		item->hitPoints -= damage;
+
+			if (item->hitPoints >= damage)
+				item->hitPoints -= damage;
+			else
+				item->hitPoints = 0;
+		}
 	}
 }
 

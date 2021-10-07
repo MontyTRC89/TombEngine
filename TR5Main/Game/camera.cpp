@@ -1876,3 +1876,36 @@ void ResetLook()
 		}
 	}
 }
+
+void RumbleScreen()
+{
+	if (!(GlobalCounter & 0x1FF))
+		SoundEffect(SFX_TR5_KLAXON, 0, 4104);
+
+	if (RumbleTimer >= 0)
+		RumbleTimer++;
+
+	if (RumbleTimer > 450)
+	{
+		if (!(GetRandomControl() & 0x1FF))
+		{
+			InGameCounter = 0;
+			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+			return;
+		}
+	}
+
+	if (RumbleTimer < 0)
+	{
+		if (InGameCounter >= abs(RumbleTimer))
+		{
+			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
+			RumbleTimer++;
+		}
+		else
+		{
+			InGameCounter++;
+			Camera.bounce = -(GetRandomControl() % InGameCounter);
+		}
+	}
+}
