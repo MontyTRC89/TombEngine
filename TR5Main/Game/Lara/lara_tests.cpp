@@ -193,13 +193,12 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
-		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-		item->pos.xPos = v.x;
-		item->pos.zPos = v.y;
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
 
 		return true;
 	}
-	else if (Lara.NewAnims.MonkeyVault)//gross
+	else if (Lara.NewAnims.MonkeyVault)
 	{
 		if (Lara.canMonkeySwing)
 		{
