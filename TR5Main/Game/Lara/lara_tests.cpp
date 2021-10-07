@@ -60,7 +60,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_VAULT_THRESHOLD)
+	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_GRAB_THRESHOLD)
 		return false; 
 	
 	auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
