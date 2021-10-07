@@ -7,7 +7,7 @@
 #include "lara_climb.h"
 #include "lara_collide.h"
 #include "control/control.h"
-#include "control\los.h"
+#include "control/los.h"
 #include "items.h"
 
 using namespace TEN::Floordata;
@@ -27,15 +27,15 @@ static short RightClimbTab[4] = // offset 0xA0640
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto xf = phd_sin(coll->NearestLedgeAngle) * coll->Setup.Radius;
-	auto zf = phd_cos(coll->NearestLedgeAngle) * coll->Setup.Radius;
-	auto xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	auto zl = zf + phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	auto xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
-	auto zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+	int xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int zl = zf + phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 
-	auto left   = GetCollisionResult(item->pos.xPos + xl, item->pos.yPos, item->pos.zPos + zl, item->roomNumber);
-	auto right  = GetCollisionResult(item->pos.xPos + xr, item->pos.yPos, item->pos.zPos + zr, item->roomNumber);
+	auto left   = GetCollisionResult(item->pos.xPos + xl, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zl, item->roomNumber);
+	auto right  = GetCollisionResult(item->pos.xPos + xr, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zr, item->roomNumber);
 
 	bool isPerpendicularSlope = abs(left.Position.Floor - right.Position.Floor) >= 60; // FIXME: Magic!
 	if (isPerpendicularSlope)
