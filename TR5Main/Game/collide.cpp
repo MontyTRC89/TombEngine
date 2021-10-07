@@ -2605,22 +2605,28 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
-short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int rad)
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto x = item->pos.xPos;
+	auto y = item->pos.yPos - coll->Setup.Radius;
+	auto z = item->pos.zPos;
+
+	// Determine horizontal probe coordinates
+	int eX = x + coll->Setup.Radius * phd_sin(coll->Setup.ForwardAngle);
+	int eZ = z + coll->Setup.Radius * phd_cos(coll->Setup.ForwardAngle);
+
+	auto f = GetCollisionResult(eX, y, eZ, item->roomNumber).Block;
+
 	// Get native surface height and possible bridge item number
 	auto height = f->FloorHeight(x, z, y);
 	auto bridge = f->InsideBridge(x, z, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
-
-	// Determine horizontal probe coordinates
-	int eX = x + rad * phd_sin(ang);
-	int eZ = z + rad * phd_cos(ang);
 
 	// We don't need actual corner heights to build planes, so just use normalized value here
 	auto fY = height - 1;
 	auto cY = height + 1;
 
 	// Calculate ray direction
-	auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang), 0, 0);
+	auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
 	auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
 	// Make ray
@@ -2679,8 +2685,8 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		// Get split angle coordinates
 		auto sX = fX + 1 + WALL_SIZE / 2;
 		auto sZ = fZ + 1 + WALL_SIZE / 2;
-		auto sShiftX = rad * sin(f->FloorCollision.SplitAngle);
-		auto sShiftZ = rad * cos(f->FloorCollision.SplitAngle);
+		auto sShiftX = coll->Setup.Radius * sin(f->FloorCollision.SplitAngle);
+		auto sShiftZ = coll->Setup.Radius * cos(f->FloorCollision.SplitAngle);
 
 		// Get block edge planes + split angle plane
 		Plane plane[5] =
