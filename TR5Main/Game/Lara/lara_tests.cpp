@@ -27,24 +27,35 @@ static short RightClimbTab[4] = // offset 0xA0640
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Determine probe base point.
+	// We use double-radius here for two purposes. First - we can't guarantee that
+	// shifts weren't already applied and misfire may occur. Second - it guarantees
+	// that Lara won't land on a very thin edge of diagonal geometry.
+
 	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
 	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+
+	// Determine probe left/right points
 	int xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
 	int zl = zf + phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
 	int xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 	int zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 
-	auto left   = GetCollisionResult(item->pos.xPos + xl, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zl, item->roomNumber);
-	auto right  = GetCollisionResult(item->pos.xPos + xr, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zr, item->roomNumber);
+	// Get floor heights at both points
+	auto left   = GetCollisionResult(item->pos.xPos + xl, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zl, item->roomNumber).Position.Floor;
+	auto right  = GetCollisionResult(item->pos.xPos + xr, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zr, item->roomNumber).Position.Floor;
 
-	bool isPerpendicularSlope = abs(left.Position.Floor - right.Position.Floor) >= 60; // FIXME: Magic!
-	if (isPerpendicularSlope)
+	// Determine allowed slope difference for a given collision radius
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+
+	// Discard if there is a slope beyond tolerance delta
+	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	bool isItemAngleSnapsToLedgeAngle = abs(coll->NearestLedgeAngle - coll->Setup.ForwardAngle) > ANGLE(30);
-	if (isItemAngleSnapsToLedgeAngle)
+	// Discard if item rotation is too far from ledge angle
+	if (abs(coll->NearestLedgeAngle - coll->Setup.ForwardAngle) > ANGLE(30))
 		return false;
-
+	
 	return (coll->CollisionType == CT_FRONT);
 }
 
