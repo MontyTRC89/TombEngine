@@ -26,12 +26,74 @@ namespace TEN::Entities::TR4
 		STATE_DEMIGOD_FLY = 6,
 		STATE_DEMIGOD_STOP_FLY = 7,
 		STATE_DEMIGOD_DEATH1 = 8,
+		STATE_DEMIGOD_CIRCLE_AIM = 9,
+		STATE_DEMIGOD_CIRCLE_ATTACK = 10,
 		STATE_DEMIGOD_GROUND_AIM = 11,
 		STATE_DEMIGOD_GROUND_ATTACK = 12,
 		STATE_DEMIGOD_HAMMER_AIM = 13,
 		STATE_DEMIGOD_HAMMER_ATTACK = 14,
 		STATE_DEMIGOD_DEATH2 = 15
 	};
+
+	void TriggerDemigodMissileFlame(short fxNum, short xVel, short yVel, short zVel)
+	{
+		FX_INFO* fx = &EffectList[fxNum];
+
+		int dx = LaraItem->pos.xPos - fx->pos.xPos;
+		int dz = LaraItem->pos.zPos - fx->pos.zPos;
+
+		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+		{
+			SPARKS* spark = &Sparks[GetFreeSpark()];
+
+			spark->on = 1;
+			if (fx->flag1 == 3 || fx->flag1 == 4)
+			{
+				spark->sR = 0;
+				spark->dR = 0;
+				spark->sB = (GetRandomControl() & 0x7F) + 32;
+				spark->sG = spark->sB + 64;
+				spark->dG = (GetRandomControl() & 0x7F) + 32;
+				spark->dB = spark->dG + 64;
+			}
+			else
+			{
+				spark->sR = (GetRandomControl() & 0x7F) + 32;
+				spark->sG = spark->sR - (GetRandomControl() & 0x1F);
+				spark->sB = 0;
+				spark->dR = (GetRandomControl() & 0x7F) + 32;
+				spark->dB = 0;
+				spark->dG = spark->dR - (GetRandomControl() & 0x1F);
+			}
+			spark->fadeToBlack = 8;
+			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+			spark->transType = COLADD;
+			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
+			spark->y = 0;
+			spark->x = (GetRandomControl() & 0xF) - 8;
+			spark->yVel = yVel;
+			spark->zVel = zVel;
+			spark->z = (GetRandomControl() & 0xF) - 8;
+			spark->xVel = xVel;
+			spark->friction = 68;
+			spark->flags = 602;
+			spark->rotAng = GetRandomControl() & 0xFFF;
+			if (GetRandomControl() & 1)
+			{
+				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			}
+			else
+			{
+				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+			}
+			spark->gravity = 0;
+			spark->maxYvel = 0;
+			spark->fxObj = fxNum;
+			spark->scalar = 2;
+			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
+			spark->dSize = spark->size / 32;
+		}
+	}
 
 	void TriggerDemigodMissile(PHD_3DPOS* pos, short roomNumber, int flags)
 	{
@@ -43,27 +105,20 @@ namespace TEN::Entities::TR4
 			fx->pos.xPos = pos->xPos;
 			fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.zPos = pos->zPos;
+
 			fx->pos.xRot = pos->xRot;
 			if (flags < 4)
-			{
 				fx->pos.yRot = pos->yRot;
-			}
 			else
-			{
 				fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
-			}
-
-			OBJECT_INFO* obj = &Objects[ID_ENERGY_BUBBLES];
-
 			fx->pos.zRot = 0;
+
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + -ANGLE(180);
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
-			if (flags >= 4)
-				flags--;
-			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
+			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + (flags >= 4, flags - 1, flags);
 		}
 	}
 
@@ -112,14 +167,9 @@ namespace TEN::Entities::TR4
 					TriggerDemigodMissile(&pos, item->roomNumber, 5);
 				}
 			}
-
-			return;
 		}
-
-		if (animIndex != 16)
+		else if (animIndex == 19)
 		{
-			if (animIndex != 19)
-				return;
 
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 			{
@@ -161,46 +211,48 @@ namespace TEN::Entities::TR4
 
 			return;
 		}
-
-		// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-		int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-
-		if (frameNumber >= 8 && frameNumber <= 64)
+		else if (animIndex == 16)
 		{
-			PHD_VECTOR pos1;
-			PHD_VECTOR pos2;
+			// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
+			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-			pos1.x = 0;
-			pos1.y = 0;
-			pos1.z = 192;
-
-			pos2.x = 0;
-			pos2.y = 0;
-			pos2.z = 384;
-
-			if (GlobalCounter & 1)
+			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				GetJointAbsPosition(item, &pos1, 18);
-				GetJointAbsPosition(item, &pos2, 18);
+				PHD_VECTOR pos1;
+				PHD_VECTOR pos2;
+
+				pos1.x = 0;
+				pos1.y = 0;
+				pos1.z = 192;
+
+				pos2.x = 0;
+				pos2.y = 0;
+				pos2.z = 384;
+
+				if (GlobalCounter & 1)
+				{
+					GetJointAbsPosition(item, &pos1, 18);
+					GetJointAbsPosition(item, &pos2, 18);
+				}
+				else
+				{
+					GetJointAbsPosition(item, &pos1, 17);
+					GetJointAbsPosition(item, &pos2, 17);
+				}
+
+				short angles[2];
+				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+				PHD_3DPOS pos;
+				pos.xPos = pos1.x;
+				pos.yPos = pos1.y;
+				pos.zPos = pos1.z;
+				pos.xRot = angles[1];
+				pos.yRot = angles[0];
+				pos.zRot = 0;
+
+				TriggerDemigodMissile(&pos, item->roomNumber, 4);
 			}
-			else
-			{
-				GetJointAbsPosition(item, &pos1, 17);
-				GetJointAbsPosition(item, &pos2, 17);
-			}
-
-			short angles[2];
-			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-			PHD_3DPOS pos;
-			pos.xPos = pos1.x;
-			pos.yPos = pos1.y;
-			pos.zPos = pos1.z;
-			pos.xRot = angles[1];
-			pos.yRot = angles[0];
-			pos.zRot = 0;
-
-			TriggerDemigodMissile(&pos, item->roomNumber, 4);
 		}
 	}
 
@@ -437,7 +489,7 @@ namespace TEN::Entities::TR4
 						}
 						if (!(GetRandomControl() & 3))
 						{
-							item->goalAnimState = 9;
+							item->goalAnimState = STATE_DEMIGOD_CIRCLE_AIM;
 							break;
 						}
 					}
@@ -572,16 +624,16 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case 9:
+			case STATE_DEMIGOD_CIRCLE_AIM:
 				creature->maximumTurn = ANGLE(7);
 				if (!Targetable(item, &info) && info.distance < SQUARE(5120))
 				{
-					item->goalAnimState = 10;
+					item->goalAnimState = STATE_DEMIGOD_CIRCLE_ATTACK;
 				}
 
 				break;
 
-			case 10:
+			case STATE_DEMIGOD_CIRCLE_ATTACK:
 				creature->maximumTurn = ANGLE(7);
 
 				DoDemigodEffects(itemNumber);
