@@ -194,7 +194,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
+	// TODO: Enable with lua!
 	Lara.NewAnims.Crawl1clickdown = 1;
 	Lara.NewAnims.Crawl1clickup = 1;
 	Lara.NewAnims.CrawlExit1click = 1;
