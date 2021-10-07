@@ -193,8 +193,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
-		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
-		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
 
 		return true;
 	}
