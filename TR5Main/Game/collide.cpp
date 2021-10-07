@@ -1330,11 +1330,12 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	// Parameter definition ends here, now process to actual collision tests...
 	
-	// TEST 1: TILT CALCULATION
+	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
 	auto collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
+	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll);
 
 	// TEST 2: CENTERPOINT PROBE
 
@@ -1396,8 +1397,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
-	coll->NearestAngle = GetNearestLedgeAngle(item, coll);
-	g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestAngle);
 
 	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
