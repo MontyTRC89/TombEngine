@@ -52,7 +52,11 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > ANGLE(30))
+	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_VAULT_THRESHOLD)
+		return false; 
+	
+	auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+	if (headroom < STEP_SIZE)
 		return false;
 	
 	return (coll->CollisionType == CT_FRONT);
