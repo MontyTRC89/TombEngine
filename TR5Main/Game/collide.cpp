@@ -2608,19 +2608,24 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto x = item->pos.xPos;
+	auto c = phd_cos(coll->Setup.ForwardAngle);
+	auto s = phd_sin(coll->Setup.ForwardAngle);
+
+	// Origin test position should be slightly in front of origin, because otherwise
+	// misfire may occur near block corners for split angles.
+	auto x = item->pos.xPos + (coll->Setup.Radius * 0.5f) * s;
 	auto y = item->pos.yPos - coll->Setup.Height;
-	auto z = item->pos.zPos;
+	auto z = item->pos.zPos + (coll->Setup.Radius * 0.5f) * c;
 
 	// Determine horizontal probe coordinates
-	int eX = x + (coll->Setup.Radius * 2) * phd_sin(coll->Setup.ForwardAngle);
-	int eZ = z + (coll->Setup.Radius * 2) * phd_cos(coll->Setup.ForwardAngle);
+	int eX = x + coll->Setup.Radius * s;
+	int eZ = z + coll->Setup.Radius * c;
 
 	auto f = GetCollisionResult(eX, y, eZ, item->roomNumber).Block;
 
 	// Get native surface height and possible bridge item number
-	auto height = f->FloorHeight(x, z, y);
-	auto bridge = f->InsideBridge(x, z, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+	auto height = f->FloorHeight(eX, eZ, y);
+	auto bridge = f->InsideBridge(eX, eZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
 	// We don't need actual corner heights to build planes, so just use normalized value here
 	auto fY = height - 1;
@@ -2654,8 +2659,6 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 			Plane(corners[6], corners[5], corners[1])
 		};
 
-		Vector3 closestNormal = Vector3::Zero;
-
 		// Find closest bridge edge plane
 		for (int i = 0; i < 4; i++)
 		{
@@ -2669,11 +2672,10 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				closestPlane = i;
 				closestDistance = distance;
-				closestNormal = plane[i].Normal();
 			}
 		}
 
-		return FROM_RAD(atan2(closestNormal.x, closestNormal.z));
+		return FROM_RAD(atan2(plane[closestPlane].Normal().x, plane[closestPlane].Normal().z));
 	}
 	else // Surface is inside block
 	{
@@ -2694,8 +2696,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
 			Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
-			Plane(Vector3(fX, cY, fZ), Vector3(cX, cY, fZ), Vector3(cX, fY, fZ)), // South
-			Plane(Vector3(cX, cY, fZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // East
+			Plane(Vector3(cX, fY, fZ), Vector3(cX, cY, fZ), Vector3(fX, cY, fZ)), // South
+			Plane(Vector3(cX, fY, cZ), Vector3(cX, cY, cZ), Vector3(cX, cY, fZ)), // East
 			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
 		};
 
@@ -2721,6 +2723,6 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 		if (closestPlane == 4)
 			return FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90);
 		else
-			return ANGLE(closestPlane * 90.0f);
+			return FROM_RAD(atan2(plane[closestPlane].Normal().x, plane[closestPlane].Normal().z));
 	}
 }
