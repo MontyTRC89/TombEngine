@@ -1396,7 +1396,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front = collResult.Position;
 	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
-	coll->NearestAngle = GetNearestLedgeAngle(collResult.Block, x, collResult.Position.Floor, z, coll->Setup.ForwardAngle, coll->Setup.Radius);
+	coll->NearestAngle = GetNearestLedgeAngle(item, coll);
+	g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestAngle);
 
 	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
@@ -2608,12 +2609,12 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto x = item->pos.xPos;
-	auto y = item->pos.yPos - coll->Setup.Radius;
+	auto y = item->pos.yPos - coll->Setup.Height;
 	auto z = item->pos.zPos;
 
 	// Determine horizontal probe coordinates
-	int eX = x + coll->Setup.Radius * phd_sin(coll->Setup.ForwardAngle);
-	int eZ = z + coll->Setup.Radius * phd_cos(coll->Setup.ForwardAngle);
+	int eX = x + (coll->Setup.Radius * 2) * phd_sin(coll->Setup.ForwardAngle);
+	int eZ = z + (coll->Setup.Radius * 2) * phd_cos(coll->Setup.ForwardAngle);
 
 	auto f = GetCollisionResult(eX, y, eZ, item->roomNumber).Block;
 
