@@ -150,6 +150,7 @@ int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
-short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int rad);
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
+bool SnapToAngle(short& source, short dest, short interval);
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
