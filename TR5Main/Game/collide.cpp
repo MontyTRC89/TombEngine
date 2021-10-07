@@ -1335,7 +1335,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	auto collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
-	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll);
+	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// TEST 2: CENTERPOINT PROBE
 
@@ -2605,7 +2605,7 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
-short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 {
 	auto c = phd_cos(coll->Setup.ForwardAngle);
 	auto s = phd_sin(coll->Setup.ForwardAngle);
@@ -2675,6 +2675,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 
+		dist = closestDistance;
 		auto normal = plane[closestPlane].Normal();
 		return FROM_RAD(atan2(normal.x, normal.z));
 	}
@@ -2720,6 +2721,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 		// For block edges (cases 0-3), return ordinary normal values.
 		// For split angle (case 4), return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
 		// origin sector plane, which determines the direction of edge normal.
+
+		dist = closestDistance;
 
 		if (closestPlane == 4)
 			return FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90);
