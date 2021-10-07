@@ -424,7 +424,7 @@ namespace TEN::Renderer
             m_swapChain->Present(0, 0);
         }
 
-        for (int i = 0; i < 30 * 1.5f; i++)
+        for (int i = 0; i < 20; i++)
         {
             drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
@@ -2169,8 +2169,8 @@ namespace TEN::Renderer
         }*/
     }
 
-    void Renderer11::drawRats(RenderView& view) {
-		/*
+    void Renderer11::drawRats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2195,7 +2195,7 @@ namespace TEN::Renderer
                 {
                     RendererMesh *mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-                    Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+                    Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot), TO_RAD(rat->pos.zRot));
                     Matrix world = rotation * translation;
 
                     m_stItem.World = world;
@@ -2203,24 +2203,23 @@ namespace TEN::Renderer
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem, m_context.Get());
 
-                    for (int b = 0; b < 2; b++)
-                    {
-                        RendererBucket *bucket = &mesh->Buckets[b];
+					for (int b = 0; b < mesh->buckets.size(); b++)
+					{
+						RendererBucket* bucket = &mesh->buckets[b];
 
-                        if (bucket->Vertices.size() == 0)
-                            continue;
+						if (bucket->Vertices.size() == 0)
+							continue;
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                        m_numDrawCalls++;
-                    }
+						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+						m_numDrawCalls++;
+					}
                 }
             }
         }
-		*/
     }
 
-    void Renderer11::drawBats(RenderView& view) {
-		/*
+    void Renderer11::drawBats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2238,9 +2237,9 @@ namespace TEN::Renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int b = 0; b < 2; b++)
+			for (int b = 0; b < mesh->buckets.size(); b++)
             {
-                RendererBucket *bucket = &mesh->Buckets[b];
+				RendererBucket* bucket = &mesh->buckets[b];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
@@ -2252,7 +2251,7 @@ namespace TEN::Renderer
                     if (bat->on)
                     {
                         Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
-                        Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+                        Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(bat->pos.yRot), TO_RAD(bat->pos.xRot), TO_RAD(bat->pos.zRot));
                         Matrix world = rotation * translation;
 
                         m_stItem.World = world;
@@ -2266,7 +2265,6 @@ namespace TEN::Renderer
                 }
             }
         }
-		*/
     }
 
     void Renderer11::drawScarabs(RenderView& view) {
@@ -2442,10 +2440,12 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		addSphere(center, radius, color);
+#endif _DEBUG
 	}
 
 	void Renderer11::addBox(Vector3* corners, Vector4 color)
@@ -2516,19 +2516,23 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		addBox(corners, color);
+#endif _DEBUG
 	}
 	
 	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		addBox(min, max, color);
+#endif _DEBUG
 	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)

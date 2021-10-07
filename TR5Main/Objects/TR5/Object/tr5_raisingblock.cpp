@@ -3,12 +3,16 @@
 #include "items.h"
 #include "level.h"
 #include "setup.h"
+#include "collide.h"
 #include "animation.h"
 #include "control/control.h"
 #include "control/box.h"
 #include "objectslist.h"
 #include "Sound/sound.h"
 #include "camera.h"
+#include "floordata.h"
+
+using namespace TEN::Floordata;
 
 void InitialiseRaisingBlock(short itemNumber)
 {
@@ -30,10 +34,7 @@ void InitialiseRaisingBlock(short itemNumber)
 		item->status = ITEM_ACTIVE;
 	}
 
-	// Get height from animations
-	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
-	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)
@@ -152,26 +153,38 @@ void ControlRaisingBlock(short itemNumber)
 
 std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	const auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
-	return std::optional{height};
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+
+	if (bboxHeight.has_value())
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		auto height = abs(bounds->Y2 - bounds->Y1);
+
+		auto currentHeight = item->pos.yPos - height * item->itemFlags[1] / 4096;
+		return std::optional{ currentHeight };
+	}
+
+	return bboxHeight;
 }
 
 std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	return std::optional{item.pos.yPos + 1};
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+
+	if (bboxHeight.has_value())
+		return std::optional{ bboxHeight.value() + 1 };
+	else 
+		return bboxHeight;
 }
 
 int RaisingBlockFloorBorder(short itemNumber)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	const auto height = item.pos.yPos - item.itemFlags[7];
-	return height;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int RaisingBlockCeilingBorder(short itemNumber)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	return item.pos.yPos + 1;
+	return GetBridgeBorder(itemNumber, true);
 }

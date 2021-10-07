@@ -5,15 +5,17 @@ struct COLL_INFO;
 #define FRONT_ARC ANGLE(90.0f)
 #define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)
+#define LARA_LEAN_DASH_MAX ANGLE(16.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_SLOW_TURN ANGLE(4.0f)
-#define LARA_MED_TURN ANGLE(6.0f)
+#define LARA_MED_TURN  ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
 constexpr auto LARA_HEIGHT_CRAWL = 400;    // Size of Lara in crawl state
 constexpr auto LARA_HEIGHT_MONKEY = 600;   // Size of Lara in monkey state
+constexpr auto LARA_HEIGHT_SURFSWIM = 700; // Size of Lara in surface swim state
 constexpr auto LARA_HEIGHT_STRETCH = 870;  // Size of Lara in jump-up or ledge hanging state
 constexpr auto LARA_HEIGHT_SURFACE = 800;  // Size of Lara when surfacing water
 constexpr auto LARA_HEADROOM = 160;        // Amount of reasonable space above Lara's head

@@ -189,6 +189,56 @@ int PickupTrigger(short itemNum)
 	return 1;
 }
 
+void RefreshCamera(short type, short* data)
+{
+	short trigger, value, targetOk;
+
+	targetOk = 2;
+
+	do
+	{
+		trigger = *(data++);
+		value = trigger & VALUE_BITS;
+
+		switch (TRIG_BITS(trigger))
+		{
+		case TO_CAMERA:
+			data++;
+
+			if (value == Camera.last)
+			{
+				Camera.number = value;
+
+				if ((Camera.timer < 0) || (Camera.type == LOOK_CAMERA) || (Camera.type == COMBAT_CAMERA))
+				{
+					Camera.timer = -1;
+					targetOk = 0;
+					break;
+				}
+				Camera.type = FIXED_CAMERA;
+				targetOk = 1;
+			}
+			else
+				targetOk = 0;
+			break;
+
+		case TO_TARGET:
+			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+				break;
+
+			Camera.item = &g_Level.Items[value];
+			break;
+		}
+	} while (!(trigger & END_BIT));
+
+	if (Camera.item)
+		if (!targetOk || (targetOk == 2 && Camera.item->lookedAt && Camera.item != Camera.lastItem))
+			Camera.item = NULL;
+
+	if (Camera.number == -1 && Camera.timer > 0)
+		Camera.timer = -1;
+}
+
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
 	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
@@ -206,8 +256,7 @@ short* GetTriggerIndex(ITEM_INFO* item)
 	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
-
-void TestTriggers(short* data, bool heavy, int heavyFlags)
+void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -219,6 +268,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
+
+	auto data = GetTriggerIndex(floor, x, y, z);
 
 	if (!data)
 		return;
@@ -325,7 +376,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (LaraItem->pos.yPos == LaraItem->floor)
+			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -659,7 +710,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+	TestTriggers(floor, x, y, z, heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ITEM_INFO* item)

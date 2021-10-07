@@ -123,10 +123,9 @@ void Sound_FreeSamples();
 void Sound_Stop();
 
 void PlaySoundTrack(short track, short flags);
-void S_CDPlay(std::string trackName, unsigned int mode);
-void S_CDPlayEx(std::string trackName, DWORD mask, DWORD unknown);
-void S_CDPlay(int index, unsigned int mode);
-void S_CDPlayEx(int index, DWORD mask, DWORD unknown);
+void PlaySoundTrack(std::string trackName, unsigned int mode);
+void PlaySoundTrack(std::string trackName, DWORD mask, DWORD unknown);
+void PlaySoundTrack(int index, DWORD mask, DWORD unknown);
 void StopSoundTracks();
 void SayNo();
 void PlaySoundSources();

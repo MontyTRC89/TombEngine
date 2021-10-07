@@ -17,15 +17,25 @@ using namespace TEN::Math::Random;
 namespace TEN {
 	namespace Effects {
 		namespace Smoke {
+
 			std::array<SmokeParticle, 128> SmokeParticles;
-			SmokeParticle& getFreeSmokeParticle()
+
+			SmokeParticle& GetFreeSmokeParticle()
 			{
-				for(int i = 0; i < SmokeParticles.size(); i++){
-					if(!SmokeParticles[i].active)
+				for (int i = 0; i < SmokeParticles.size(); i++)
+				{
+					if (!SmokeParticles[i].active)
 						return SmokeParticles[i];
 				}
 				return SmokeParticles[0];
 			}
+
+			void DisableSmokeParticles()
+			{
+				for (int i = 0; i < SmokeParticles.size(); i++)
+					SmokeParticles[i].active = false;
+			}
+
 			void UpdateSmokeParticles()
 			{
 				for (int i = 0; i < SmokeParticles.size(); i++) {
@@ -62,7 +72,7 @@ namespace TEN {
 
 			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room) {
 				using namespace DirectX::SimpleMath;
-				SmokeParticle & s = getFreeSmokeParticle();
+				SmokeParticle & s = GetFreeSmokeParticle();
 				s = {};
 				s.position = pos;
 				s.age = 0;
@@ -84,11 +94,12 @@ namespace TEN {
 				s.active = true;
 				s.room = room;
 			}
+
 			//TODO: add additional "Weapon Special" param or something. Currently initial == 2 means Rocket Launcher backwards smoke.
 			//TODO: Refactor different weapon types out of it
 			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count)
 			{
-				SmokeParticle& s = getFreeSmokeParticle();
+				SmokeParticle& s = GetFreeSmokeParticle();
 				s = {};
 				s.active = true;
 				s.position = Vector3(x, y, z);
@@ -102,7 +113,6 @@ namespace TEN {
 
 				if (initial)
 				{
-					
 					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
 						float size = GenerateFloat(48, 80);
 						s.sourceSize = size * 2;
@@ -163,7 +173,7 @@ namespace TEN {
 
 			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 			{
-				SmokeParticle& s = getFreeSmokeParticle();
+				SmokeParticle& s = GetFreeSmokeParticle();
 				s = {};
 				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
 				float xVel = std::sin(TO_RAD(angle))*speed;
@@ -184,7 +194,7 @@ namespace TEN {
 
 			void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 			{
-				SmokeParticle& s = getFreeSmokeParticle();
+				SmokeParticle& s = GetFreeSmokeParticle();
 				s = {};
 				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
 				s.sourceColor = Vector4(0.8, 0.8, 1, 1);

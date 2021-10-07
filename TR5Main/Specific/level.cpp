@@ -95,11 +95,13 @@ void ReadBytes(void* dest, int count)
 	LevelDataPtr += count;
 }
 
-int LoadItems()
+void LoadItems()
 {
 	g_Level.NumItems = ReadInt32();
+	logD("Num items: ", g_Level.NumItems);
+
 	if (g_Level.NumItems == 0)
-		return false;
+		return;
 
 	g_Level.Items.resize(NUM_ITEMS);
 
@@ -134,35 +136,6 @@ int LoadItems()
 		for (int i = 0; i < g_Level.NumItems; i++)
 			InitialiseItem(i);
 	}
-
-	for (auto& r : g_Level.Rooms)
-	{
-		for (const auto& mesh : r.mesh)
-		{
-			FLOOR_INFO* floor = &r.floor[((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024)];
-			 
-			if (floor->Box == NO_BOX)
-				continue;
-
-			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
-			{
-				int fl = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
-				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
-				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
-				{
-					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
-						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
-						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
-					{
-						floor->Stopper = true;
-					}
-				}
-			}
-		}
-	}
-
-	return true;
 }
 
 void LoadObjects()
@@ -171,6 +144,8 @@ void LoadObjects()
 	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
+	logD("Num meshes: ", numMeshes);
+
 	g_Level.Meshes.reserve(numMeshes);
 	for (int i = 0; i < numMeshes; i++)
 	{
@@ -249,6 +224,8 @@ void LoadObjects()
 	}
 
 	int numAnimations = ReadInt32();
+	logD("Num animations: ", numAnimations);
+
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
 	{
@@ -315,6 +292,8 @@ void LoadObjects()
 	//ReadBytes(g_Level.Frames.data(), sizeof(ANIM_FRAME) * numFrames);
 
 	int numModels = ReadInt32();
+	logD("Num models: ", numModels);
+
 	for (int i = 0; i < numModels; i++)
 	{
 		int objNum = ReadInt32();
@@ -332,9 +311,12 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
+	logD("Initializing objects...");
 	InitialiseObjects();
 
 	int numStatics = ReadInt32();
+	logD("Num statics: ", numStatics);
+
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
@@ -369,6 +351,8 @@ void LoadObjects()
 void LoadCameras()
 {
 	int numCameras = ReadInt32();
+	logD("Num cameras: ", numCameras);
+
 	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
@@ -396,6 +380,8 @@ void LoadCameras()
 	}
 
 	int numSinks = ReadInt32();
+	logD("Num sinks: ", numSinks);
+
 	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
@@ -417,11 +403,13 @@ void LoadCameras()
 
 void LoadTextures()
 {
-	printf("LoadTextures\n");
+	logD("Loading textures");
 
 	int size;
 
 	int numTextures = ReadInt32();
+	logD("Num room textures: ", numTextures);
+
 	g_Level.RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -446,6 +434,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num object textures: ", numTextures);
+
 	g_Level.MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -470,6 +460,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num static textures: ", numTextures);
+
 	g_Level.StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -494,6 +486,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num anim textures: ", numTextures);
+
 	g_Level.AnimatedTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -518,6 +512,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num sprite textures: ", numTextures);
+
 	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -543,7 +539,7 @@ void LoadTextures()
 void ReadRooms()
 {
 	int numRooms = ReadInt32();
-	printf("NumRooms: %d\n", numRooms);
+	logD("Num rooms: ", numRooms);
 
 	for (int i = 0; i < numRooms; i++)
 	{
@@ -797,7 +793,7 @@ void ReadRooms()
 
 void LoadRooms()
 {
-	printf("LoadRooms\n");
+	logD("Loading rooms...");
 	
 	Wibble = 0;
 	//RoomLightsCount = 0;
@@ -859,9 +855,11 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 	return result;
 }
 
-void LoadSoundEffects()
+void LoadSoundSources()
 {
 	int numSoundSources = ReadInt32();
+	logD("Num sound sources: ", numSoundSources);
+
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
@@ -885,6 +883,8 @@ void LoadSoundEffects()
 void LoadAnimatedTextures()
 {
 	int numAnimatedTextures = ReadInt32();
+	logD("Num anim textures: ", numAnimatedTextures);
+
 	for (int i = 0; i < numAnimatedTextures; i++)
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
@@ -915,6 +915,8 @@ void LoadTextureInfos()
 	ReadInt32(); // TEX/0
 
 	int numObjectTextures = ReadInt32();
+	logD("Num texinfos: ", numObjectTextures);
+
 	for (int i = 0; i < numObjectTextures; i++)
 	{
 		OBJECT_TEXTURE texture;
@@ -934,6 +936,8 @@ void LoadTextureInfos()
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
+	logD("Num AI objects: ", nAIObjects);
+
 	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
@@ -1002,9 +1006,9 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 
 unsigned CALLBACK LoadLevel(void* data)
 {
-	printf("LoadLevel\n");
-
 	char* filename = (char*)data;
+
+	logD("Loading Level flie: ", filename);
 
 	LevelDataPtr = NULL;
 	LevelFilePtr = NULL;
@@ -1051,7 +1055,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadSprites();
 		LoadCameras();
-		LoadSoundEffects();
+		LoadSoundSources();
 		g_Renderer.updateProgress(60);
 
 		LoadBoxes();
@@ -1171,10 +1175,9 @@ void LoadBoxes()
 	}
 }
 
-int S_LoadLevelFile(int levelIndex)
+int LoadLevelFile(int levelIndex)
 {
-	//DB_Log(2, "S_LoadLevelFile - DLL");
-	printf("S_LoadLevelFile\n");
+	logD("Loading level file...");
 	 
 	Sound_Stop();
 	Sound_FreeSamples();
