@@ -13,7 +13,7 @@ struct COLL_INFO;
 #define LARA_SLOW_TURN ANGLE(4.0f)
 #define LARA_MED_TURN  ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
-#define LARA_VAULT_THRESHOLD ANGLE(30.0f)
+#define LARA_GRAB_THRESHOLD ANGLE(30.0f)
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
 constexpr auto LARA_HEIGHT_CRAWL = 400;    // Size of Lara in crawl state
