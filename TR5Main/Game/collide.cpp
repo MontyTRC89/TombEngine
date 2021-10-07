@@ -2827,6 +2827,10 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 	int eX = x + rad * phd_sin(ang);
 	int eZ = z + rad * phd_cos(ang);
 
+	// We don't need actual corner heights to build planes, so just use normalized value here
+	auto fY = height - 1;
+	auto cY = height + 1;
+
 	// Calculate ray direction
 	auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(ang), 0, 0);
 	auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
@@ -2853,7 +2857,7 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 			Plane(corners[0], corners[4], corners[3]),
 			Plane(corners[5], corners[6], corners[7]),
 			Plane(corners[6], corners[5], corners[1])
-		}
+		};
 
 		Vector3 closestNormal = Vector3::Zero;
 
@@ -2883,10 +2887,6 @@ short GetNearestLedgeAngle(FLOOR_INFO* f, int x, int y, int z, short ang, int ra
 		auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
 		auto cX = fX + WALL_SIZE + 1;
 		auto cZ = fZ + WALL_SIZE + 1;
-
-		// We don't need actual corner heights to build planes, so just use normalized value here
-		auto fY = height - 1;
-		auto cY = height + 1;
 
 		// Get split angle coordinates
 		auto sX = fX + 1 + WALL_SIZE / 2;
