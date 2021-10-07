@@ -286,14 +286,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
-	short rot = item->pos.yRot;
-	int slope = 0;
-
-	if (abs(coll->FrontRight.Floor - coll->FrontLeft.Floor) >= 60)
-		return 0;
-
-	bool result = SnapToQuadrant(rot, 35);
-	if (!result)
+	if (!TestValidLedge(item, coll))
 		return 0;
 
 	auto surface = LaraCollisionAboveFront(item, coll->Setup.ForwardAngle, STEP_SIZE * 2, STEP_SIZE);
@@ -360,13 +353,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
-	Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
-
-	item->pos.xPos = v.x;
+	item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius);
 	item->pos.yPos += frontFloor - 5;
-	item->pos.zPos = v.y;
+	item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius);
 	item->pos.xRot = 0;
-	item->pos.yRot = rot;
+	item->pos.yRot = coll->NearestLedgeAngle;
 	item->pos.zRot = 0;
 	item->currentAnimState = LS_ONWATER_EXIT;
 	item->gravityStatus = false;
