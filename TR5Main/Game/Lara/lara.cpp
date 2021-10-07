@@ -838,7 +838,7 @@ void LaraControl(short itemNumber)
 		SQUARE(item->pos.zPos - oldZ));
 }
 
-void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
+void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
