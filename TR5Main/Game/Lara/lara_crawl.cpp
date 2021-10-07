@@ -195,11 +195,11 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
-//	Lara.NewAnims.Crawl1clickdown = 1;
-//	Lara.NewAnims.Crawl1clickup = 1;
-//	Lara.NewAnims.CrawlExit1click = 1;
-//	Lara.NewAnims.CrawlExit2click = 1;
-//	Lara.NewAnims.CrawlExit3click = 1;
+	Lara.NewAnims.Crawl1clickdown = 1;
+	Lara.NewAnims.Crawl1clickup = 1;
+	Lara.NewAnims.CrawlExit1click = 1;
+	Lara.NewAnims.CrawlExit2click = 1;
+	Lara.NewAnims.CrawlExit3click = 1;
 	Lara.NewAnims.CrawlExitJump = 1;
 
 	if (TrInput & IN_JUMP && Lara.NewAnims.CrawlExitJump)

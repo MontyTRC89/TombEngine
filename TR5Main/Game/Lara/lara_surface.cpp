@@ -9,8 +9,6 @@
 #include "level.h"
 #include "input.h"
 
-bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
-
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
 	if (item->goalAnimState == LS_UNDERWATER_FORWARD)
@@ -271,9 +269,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
-	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-	EnableCrawlFlexWaterPullUp = false;
-	EnableCrawlFlexSubmerged = false;
+	// TODO: Enable with lua!
+	Lara.NewAnims.CrawlFlexWaterPullUp = true;
+	Lara.NewAnims.CrawlFlexSubmerged = true;
 
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
@@ -296,7 +294,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexWaterPullUp)
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_1CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -316,7 +314,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexSubmerged)
+			if (Lara.NewAnims.CrawlFlexSubmerged)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_M1CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -334,7 +332,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexWaterPullUp)
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_0CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

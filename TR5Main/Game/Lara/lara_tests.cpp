@@ -75,11 +75,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	//##LUA debug etc.
-//	Lara.NewAnims.CrawlVault1click = 1;
-//	Lara.NewAnims.CrawlVault2click = 1;
-//	Lara.NewAnims.CrawlVault3click = 1;
-//	Lara.NewAnims.MonkeyVault = 1;
+	// TODO: Enable with lua!
+	Lara.NewAnims.CrawlVault1click = 1;
+	Lara.NewAnims.CrawlVault2click = 1;
+	Lara.NewAnims.CrawlVault3click = 1;
+	Lara.NewAnims.MonkeyVault = 1;
 
 	if (TestValidLedge(item, coll))
 	{
