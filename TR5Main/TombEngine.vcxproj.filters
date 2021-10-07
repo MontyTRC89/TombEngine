@@ -710,6 +710,8 @@
     <ClInclude Include="Game\effects\lara_burn.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
