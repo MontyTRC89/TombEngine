@@ -94,13 +94,12 @@ struct COLL_INFO
 
 	PHD_VECTOR Shift;
 	COLL_TYPE CollisionType;
+	short NearestAngle;
 	int TiltX;
 	int TiltZ;
-	short NearestAngle;
 
 	bool HitStatic;
-	bool HitTallBounds;
-	int ObjectHeadroom;
+	bool HitTallObject;
 
 	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
 	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }

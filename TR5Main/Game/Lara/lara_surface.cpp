@@ -281,9 +281,6 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return 0;
 
-	if (coll->ObjectHeadroom < (EnableCrawlFlexWaterPullUp ? LARA_HEIGHT_CRAWL : LARA_HEIGHT))
-		return 0;
-
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
 	int frontCeiling = coll->Front.Ceiling + LARA_HEIGHT_SURFSWIM;
 	if (frontFloor <= -512 || frontFloor > 316)
