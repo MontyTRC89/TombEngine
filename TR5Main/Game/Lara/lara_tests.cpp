@@ -55,6 +55,11 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	// Discard if item rotation is too far from ledge angle
 	if (abs(coll->NearestLedgeAngle - coll->Setup.ForwardAngle) > ANGLE(30))
 		return false;
+
+	// Don't try to vault if there's not enough space to perform it.
+	auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+	if (headroom < STEP_SIZE)
+		return false;
 	
 	return (coll->CollisionType == CT_FRONT);
 }
@@ -72,10 +77,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedge(item, coll))
 	{
-		// Don't try to vault if there's not enough space to perform it.
-		auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
-		if (headroom < STEP_SIZE)
-			return false;
 
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
