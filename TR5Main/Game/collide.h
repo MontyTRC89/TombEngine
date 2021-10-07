@@ -141,8 +141,6 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom = false);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
