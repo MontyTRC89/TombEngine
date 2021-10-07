@@ -265,7 +265,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Libs\zlib\zconf.h" />
     <ClInclude Include="Libs\zlib\zip.h" />
     <ClInclude Include="Libs\zlib\zlib.h" />
-    <ClInclude Include="Objects\Effects\tr4_bubbles.h" />
+    <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
@@ -855,7 +855,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Objects\Effects\tr4_bubbles.cpp" />
+    <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <None Include="Objects\Generic\Switches\rail_switch.h" />
     <None Include="packages.config" />
     <None Include="Resources.aps" />

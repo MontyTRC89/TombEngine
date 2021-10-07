@@ -36,7 +36,6 @@
 #include "tr5_bodypart.h"
 #include "tr5_teleporter.h"
 #include "tr5_highobject.h"
-#include "tr4_bubbles.h"
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
 /// traps
@@ -1207,7 +1206,6 @@ static void StartShatter(OBJECT_INFO *obj)
 
 static void StartProjectiles(OBJECT_INFO *obj)
 {
-	InitProjectile(obj, TEN::entities::all::ControlEnemyMissile, ID_ENERGY_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);
