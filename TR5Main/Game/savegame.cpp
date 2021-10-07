@@ -17,10 +17,10 @@
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
 #include "Game/effects/lara_burn.h"
-
+#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
-
+namespace Save = TEN::Save;
 using std::string;
 using std::vector;
 FileStream* SaveGame::m_stream;
@@ -414,38 +414,32 @@ void SaveGame::End()
 
 bool SaveGame::Save(char* fileName)
 {
-	m_stream = new FileStream(fileName, true, true);
-	m_writer = new ChunkWriter(0x4D355254, m_stream);
+	using namespace flatbuffers;
 
-	printf("Timer: %d\n", Savegame.Game.Timer);
 
-	// The header must be here, so no chunks
-	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
-	LEB128::Write(m_stream, (GameTimer / 30) / 86400);
-	LEB128::Write(m_stream, ((GameTimer / 30) % 86400) / 3600);
-	LEB128::Write(m_stream, ((GameTimer / 30) / 60) % 60);
-	LEB128::Write(m_stream, (GameTimer / 30) % 60);
-	LEB128::Write(m_stream, CurrentLevel);
-	LEB128::Write(m_stream, GameTimer);
-	LEB128::Write(m_stream, ++LastSaveGame);
+	ITEM_INFO itemToSerialize{};
+	FlatBufferBuilder fbb{};
+	Save::SaveGameBuilder sgb = Save::SaveGameBuilder(fbb);
+	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
 
-	// Now we write chunks
-	m_writer->WriteChunk(m_chunkStatistics.get(), &saveStatistics, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkGameStatus.get(), &saveGameStatus, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkLara.get(), &saveLara, 0, 0);
-	saveItems();
-	saveVariables();
-	
-	// EOF
-	m_stream->WriteInt32(0);
+	for (const auto& itemToSerialize : g_Level.Items) {
+		Save::ItemT serializedItem{};
+		serializedItem.anim_number = itemToSerialize.animNumber;
+		//serialize Items here
+		serializedItems.push_back(Save::CreateItem(fbb, &serializedItem));
+	}
+	sgb.add_ambient_track(4) // serialize single field
+	sgb.add_items(fbb.CreateVector(serializedItems));
+	auto serializedSave = sgb.Finish();
+	auto bufferToSerialize = fbb.GetBufferPointer();
+	auto bufferSize = fbb.GetSize();
 
-	m_stream->Close();
-
-	delete m_writer;
-	delete m_stream;
-
-	return true;
+	std::ofstream fileOut{};
+	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
+	fileOut.write((char*)bufferToSerialize, bufferSize);
+	fileOut.close();
 }
+
 
 bool SaveGame::readGameStatus()
 {
@@ -626,38 +620,32 @@ bool SaveGame::readSavegameChunks(ChunkId* chunkId, int maxSize, int arg)
 
 bool SaveGame::Load(char* fileName)
 {
-	m_luaVariables.clear();
+	std::ifstream file;
+	file.open(fileName, std::ios_base::app | std::ios_base::binary);
+	file.seekg(0, std::ios::end);
+	size_t length = file.tellg();
+	file.seekg(0, std::ios::beg);
+	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
+	file.read(buffer.get(), length);
+	file.close();
 
-	m_stream = new FileStream(fileName, true, false);
-	m_reader = new ChunkReader(0x4D355254, m_stream);
+	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
-	// Header must be here
-	char* levelName;
-	m_stream->ReadString(&levelName);
 
-	// Skip timer
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
+	//read stuff here like this:
 
-	CurrentLevel = LEB128::ReadByte(m_stream);
-	GameTimer = LEB128::ReadInt32(m_stream);
-	LastSaveGame = LEB128::ReadInt32(m_stream);
-
-	// Read chunks
-	m_reader->ReadChunks(&readSavegameChunks, 0);
-
-	// Close the stream
-	m_stream->Close();
-	//delete m_writer;
-	//delete m_stream;
-
-	//g_GameScript->SetVariables(&m_luaVariables);
-
-	JustLoaded = true;
-
-	return true;
+	//g_Level.Items.begin() -> replaces Items in g_Level with new ones until SaveGame Vector reaches and (possible out of bounds since g_Level Items has size of 1024, but logically impossible)
+	// std::back_inserter(g_Level.Items) would append!
+	std::transform(s->items()->begin(), s->items()->end(),g_Level.Items.begin(), [](const Save::Item& savedItem) {
+		
+		//transform savegame item into game item
+		ITEM_INFO i{};
+		i.hitPoints = savedItem.hit_points();
+		i.animNumber = savedItem.anim_number();
+		// and so on;
+		return i;
+		});
+	
 }
 
 bool SaveGame::LoadHeader(char* fileName, SaveGameHeader* header)
