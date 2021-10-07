@@ -52,8 +52,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	// Discard if item rotation is too far from ledge angle
-	if (abs(coll->NearestLedgeAngle - coll->Setup.ForwardAngle) > ANGLE(30))
+	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > ANGLE(30))
 		return false;
 	
 	return (coll->CollisionType == CT_FRONT);
