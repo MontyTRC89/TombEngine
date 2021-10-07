@@ -148,7 +148,6 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
-bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);

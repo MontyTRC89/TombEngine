@@ -2556,31 +2556,6 @@ int GetQuadrant(short angle)
 	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
 }
 
-bool SnapToDiagonal(short& angle, int interval)
-{
-	if (angle >= ANGLE(45 - interval) && angle <= ANGLE(interval + 45))
-	{
-		angle = ANGLE(45);
-		return true;
-	}
-	else if (angle >= ANGLE(135 - interval) && angle <= ANGLE(interval + 135))
-	{
-		angle = ANGLE(135);
-		return true;
-	}
-	else if (angle >= -ANGLE(interval + 135) && angle <= -ANGLE(135 - interval))
-	{
-		angle = -ANGLE(135);
-		return true;
-	}
-	else if (angle >= -ANGLE(interval + 45) && angle <= -ANGLE(45 - interval))
-	{
-		angle = -ANGLE(45);
-		return true;
-	}
-	return false;
-}
-
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 {
 	auto vect = Vector2(xPos, zPos);
