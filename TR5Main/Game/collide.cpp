@@ -1337,6 +1337,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->TiltZ = collResult.TiltZ;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
+	// Debug angle and distance
+	// g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
+	// g_Renderer.printDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
+
 	// TEST 2: CENTERPOINT PROBE
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
@@ -2622,8 +2626,21 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 	auto f = GetCollisionResult(eX, y, eZ, item->roomNumber).Block;
 
-	// Get native surface height and possible bridge item number
-	auto height = f->FloorHeight(eX, eZ, y);
+	// Get native surface heights
+	auto floorHeight = f->FloorHeight(eX, eZ, y);
+	auto ceilingHeight = f->CeilingHeight(eX, eZ, y);
+
+	// If ceiling height tests lower than Y value, it means ceiling
+	// ledge is in front and we should use it instead of floor.
+
+	int height;
+	bool useCeilingLedge = ceilingHeight > y;
+	if (useCeilingLedge)
+		height = ceilingHeight;
+	else
+		height = floorHeight;
+
+	// Determine if there is a bridge in front
 	auto bridge = f->InsideBridge(eX, eZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
 	// We don't need actual corner heights to build planes, so just use normalized value here
@@ -2681,6 +2698,9 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 	}
 	else // Surface is inside block
 	{
+		// Determine if we should use floor or ceiling split angle based on early tests.
+		auto splitAngle = (useCeilingLedge ? f->CeilingCollision.SplitAngle : f->FloorCollision.SplitAngle);
+
 		// Get horizontal block corner coordinates
 		auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
 		auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
@@ -2690,8 +2710,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 		// Get split angle coordinates
 		auto sX = fX + 1 + WALL_SIZE / 2;
 		auto sZ = fZ + 1 + WALL_SIZE / 2;
-		auto sShiftX = coll->Setup.Radius * sin(f->FloorCollision.SplitAngle);
-		auto sShiftZ = coll->Setup.Radius * cos(f->FloorCollision.SplitAngle);
+		auto sShiftX = coll->Setup.Radius * sin(splitAngle);
+		auto sShiftZ = coll->Setup.Radius * cos(splitAngle);
 
 		// Get block edge planes + split angle plane
 		Plane plane[5] =
@@ -2703,8 +2723,11 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
 		};
 
+		// If split angle exists, take split plane into account too.
+		auto useSplitAngle = (useCeilingLedge ? f->CeilingIsSplit() : f->FloorIsSplit());
+
 		// Find closest block edge plane
-		for (int i = 0; i < (f->FloorIsSplit() ? 5 : 4); i++)
+		for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 		{
 			// No plane intersection, quickly discard
 			if (!ray.Intersects(plane[i], distance))
@@ -2725,7 +2748,10 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 		dist = closestDistance;
 
 		if (closestPlane == 4)
-			return FROM_RAD(f->FloorCollision.SplitAngle) + ANGLE(f->SectorPlane(x, z) * 180.0f) + ANGLE(90);
+		{
+			auto usedSectorPlane = useCeilingLedge ? f->SectorPlaneCeiling(x, z) : f->SectorPlane(x, z);
+			return FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90);
+		}
 		else
 		{
 			auto normal = plane[closestPlane].Normal();
