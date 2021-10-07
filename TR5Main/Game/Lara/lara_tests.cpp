@@ -9,7 +9,9 @@
 #include "control/control.h"
 #include "control/los.h"
 #include "items.h"
+#include "Renderer11.h"
 
+using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
 static short LeftClimbTab[4] = // offset 0xA0638
@@ -41,9 +43,15 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	int xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 	int zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 
+	// Determine probe top point
+	int y = item->pos.yPos - coll->Setup.Height;
+
 	// Get floor heights at both points
-	auto left   = GetCollisionResult(item->pos.xPos + xl, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zl, item->roomNumber).Position.Floor;
-	auto right  = GetCollisionResult(item->pos.xPos + xr, item->pos.yPos - coll->Setup.Height, item->pos.zPos + zr, item->roomNumber).Position.Floor;
+	auto left  = GetCollisionResult(item->pos.xPos + xl, y, item->pos.zPos + zl, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+	auto right = GetCollisionResult(item->pos.xPos + xr, y, item->pos.zPos + zr, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+
+	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xl, left, item->pos.zPos + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xr, right, item->pos.zPos + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Determine allowed slope difference for a given collision radius
 	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
