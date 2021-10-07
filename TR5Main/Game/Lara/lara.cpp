@@ -47,6 +47,9 @@
 #include "inventory.h"
 #endif
 
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
@@ -858,6 +861,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 
 	Lara.look = true;
 
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+
 	// Process Vehicles
 	if (Lara.Vehicle != NO_ITEM)
 	{
@@ -940,8 +945,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 		if (Lara.Vehicle == NO_ITEM)
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
-
-	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;

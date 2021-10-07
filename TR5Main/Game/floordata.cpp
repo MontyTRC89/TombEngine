@@ -731,4 +731,86 @@ namespace TEN::Floordata
 			floor->RemoveItem(itemNumber);
 		}
 	}
+
+	// New function which gets precise floor/ceiling collision from actual object bounding box.
+	// Animated objects are also supported, although horizontal collision shift is unstable.
+	// Method: get accurate bounds in world transform by converting to DirectX OBB, then do a
+	// ray test on top or bottom (depending on test side) to determine if box is present at 
+	// this particular point.
+
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
+
+		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
+
+		static float distance;
+		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
+			return std::optional{ item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1) };
+		else
+			return std::nullopt;
+	}
+
+	// Gets bridge min or max height regardless of actual X/Z world position
+
+	int GetBridgeBorder(int itemNumber, bool bottom)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		return item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1);
+	}
+
+	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
+
+	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		// Get real OBB bounds of a bridge in world space
+		auto bounds = GetBoundsAccurate(item);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
+
+		// Get corners of a projected OBB
+		Vector3 corners[8];
+		dxBounds.GetCorners(corners); //corners[0], corners[1], corners[4] corners[5]
+
+		auto room = &g_Level.Rooms[item->roomNumber];
+
+		// Get min/max of a projected AABB
+		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
+		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
+		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
+		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
+
+		// Run through all blocks enclosed in AABB
+		for (int x = 0; x < room->ySize; x++)
+			for (int z = 0; z < room->xSize; z++)
+			{
+				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
+				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
+				auto offX = pX - item->pos.xPos;
+				auto offZ = pZ - item->pos.zPos;
+
+				// Clean previous bridge state
+				RemoveBridge(itemNumber, offX, offZ);
+
+				// If we're in sweeping mode, don't try to re-add block
+				if (forceRemoval)
+					continue;
+
+				// If block isn't in enclosed AABB space, ignore precise check
+				if (x < minX || z < minZ || x > maxX || z > maxZ)
+					continue;
+
+				// Block is in enclosed AABB space, do more precise test.
+				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
+				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(WALL_SIZE / 2), Vector4::UnitY);
+				if (dxBounds.Intersects(blockBox))
+					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
+			}
+	}
 }

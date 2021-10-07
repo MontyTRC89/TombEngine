@@ -32,6 +32,9 @@
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
 #include "items.h"
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -421,7 +424,7 @@ namespace TEN::Renderer
             m_swapChain->Present(0, 0);
         }
 
-        for (int i = 0; i < 30 * 1.5f; i++)
+        for (int i = 0; i < 20; i++)
         {
             drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
@@ -1960,121 +1963,43 @@ namespace TEN::Renderer
     }
 
     void Renderer11::drawRopes(RenderView& view)
-{
-        for (int n = 0; n < NumRopes; n++)
+    {
+        for (int n = 0; n < Ropes.size(); n++)
         {
-            ROPE_STRUCT *rope = &Ropes[n];
+            ROPE_STRUCT* rope = &Ropes[n];
 
             if (rope->active)
             {
-                // Original algorithm:
-                // 1) Transform segment coordinates from 3D to 2D + depth
-                // 2) Get dx, dy and the segment length
-                // 3) Get sine and cosine from dx / length and dy / length
-                // 4) Calculate a scale factor
-                // 5) Get the coordinates of the 4 corners of each sprite iteratively
-                // 6) Last step only for us, unproject back to 3D coordinates
+                Matrix world = Matrix::CreateTranslation(
+                    rope->position.x,
+                    rope->position.y,
+                    rope->position.z
+                );
 
-                // Tranform rope points
-                Vector3 projected[24];
-                Matrix world = Matrix::Identity;
+                Vector3 absolute[24];
 
-                for (int i = 0; i < 24; i++)
+                for (int n = 0; n < ROPE_SEGMENTS; n++)
                 {
-                    Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
-                                                       rope->position.y + rope->segment[i].y / 65536.0f,
-                                                       rope->position.z + rope->segment[i].z / 65536.0f);
+                    PHD_VECTOR* s = &rope->meshSegment[n];
+                    Vector3 t;
+                    Vector3 output;
 
-                    projected[i] = m_viewportToolkit.Project(absolutePosition, Projection, View, world);
+                    t.x = s->x >> FP_SHIFT;
+                    t.y = s->y >> FP_SHIFT;
+                    t.z = s->z >> FP_SHIFT;
+
+                    output = Vector3::Transform(t, world);
+
+                    Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
+                    absolute[n] = absolutePosition;
                 }
 
-                // Now each rope point is transformed in screen X, Y and Z depth
-                // Let's calculate dx, dy corrections and scaling
-                float dx = projected[1].x - projected[0].x;
-                float dy = projected[1].y - projected[0].y;
-                float length = sqrt(dx * dx + dy * dy);
-                float s = 0;
-                float c = 0;
-
-                if (length != 0)
+                for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
                 {
-                    s = -dy / length;
-                    c = dx / length;
-                }
-
-                float w = 6.0f;
-                if (projected[0].z)
-                {
-                    w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
-                    if (w < 3)
-                        w = 3;
-                }
-
-                float sdx = s * w;
-                float sdy = c * w;
-
-                float x1 = projected[0].x - sdx;
-                float y1 = projected[0].y - sdy;
-
-                float x2 = projected[0].x + sdx;
-                float y2 = projected[0].y + sdy;
-
-                float depth = projected[0].z;
-
-                for (int j = 0; j < 24; j++)
-                {
-                    Vector3 p1 = m_viewportToolkit.Unproject(Vector3(x1, y1, depth), Projection, View, world);
-                    Vector3 p2 = m_viewportToolkit.Unproject(Vector3(x2, y2, depth), Projection, View, world);
-
-                    dx = projected[j].x - projected[j - 1].x;
-                    dy = projected[j].y - projected[j - 1].y;
-                    length = sqrt(dx * dx + dy * dy);
-                    s = 0;
-                    c = 0;
-
-                    if (length != 0)
-                    {
-                        s = -dy / length;
-                        c = dx / length;
-                    }
-
-                    w = 6.0f;
-                    if (projected[j].z)
-                    {
-                        w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
-                        if (w < 3)
-                            w = 3;
-                    }
-
-                    float sdx = s * w;
-                    float sdy = c * w;
-
-                    float x3 = projected[j].x - sdx;
-                    float y3 = projected[j].y - sdy;
-
-                    float x4 = projected[j].x + sdx;
-                    float y4 = projected[j].y + sdy;
-
-                    depth = projected[j].z;
-
-                    Vector3 p3 = m_viewportToolkit.Unproject(Vector3(x3, y3, depth), Projection, View, world);
-                    Vector3 p4 = m_viewportToolkit.Unproject(Vector3(x4, y4, depth), Projection, View, world);
-
-                    addSprite3D(&m_sprites[20],
-                                Vector3(p1.x, p1.y, p1.z),
-                                Vector3(p2.x, p2.y, p2.z),
-                                Vector3(p3.x, p3.y, p3.z),
-                                Vector3(p4.x, p4.y, p4.z),
-                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, { 0, 0 }, BLENDMODE_OPAQUE,view);
-
-                    x1 = x4;
-                    y1 = y4;
-                    x2 = x3;
-                    y2 = y3;
+                    addLine3D(absolute[n], absolute[n + 1], Vector4::One);
                 }
             }
         }
-
     }
 
     void Renderer11::drawLines2D()
@@ -2244,8 +2169,8 @@ namespace TEN::Renderer
         }*/
     }
 
-    void Renderer11::drawRats(RenderView& view) {
-		/*
+    void Renderer11::drawRats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2270,7 +2195,7 @@ namespace TEN::Renderer
                 {
                     RendererMesh *mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-                    Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+                    Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot), TO_RAD(rat->pos.zRot));
                     Matrix world = rotation * translation;
 
                     m_stItem.World = world;
@@ -2278,24 +2203,23 @@ namespace TEN::Renderer
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem, m_context.Get());
 
-                    for (int b = 0; b < 2; b++)
-                    {
-                        RendererBucket *bucket = &mesh->Buckets[b];
+					for (int b = 0; b < mesh->buckets.size(); b++)
+					{
+						RendererBucket* bucket = &mesh->buckets[b];
 
-                        if (bucket->Vertices.size() == 0)
-                            continue;
+						if (bucket->Vertices.size() == 0)
+							continue;
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                        m_numDrawCalls++;
-                    }
+						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+						m_numDrawCalls++;
+					}
                 }
             }
         }
-		*/
     }
 
-    void Renderer11::drawBats(RenderView& view) {
-		/*
+    void Renderer11::drawBats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2313,9 +2237,9 @@ namespace TEN::Renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int b = 0; b < 2; b++)
+			for (int b = 0; b < mesh->buckets.size(); b++)
             {
-                RendererBucket *bucket = &mesh->Buckets[b];
+				RendererBucket* bucket = &mesh->buckets[b];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
@@ -2327,7 +2251,7 @@ namespace TEN::Renderer
                     if (bat->on)
                     {
                         Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
-                        Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+                        Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(bat->pos.yRot), TO_RAD(bat->pos.xRot), TO_RAD(bat->pos.zRot));
                         Matrix world = rotation * translation;
 
                         m_stItem.World = world;
@@ -2341,7 +2265,6 @@ namespace TEN::Renderer
                 }
             }
         }
-		*/
     }
 
     void Renderer11::drawScarabs(RenderView& view) {
@@ -2517,10 +2440,12 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		addSphere(center, radius, color);
+#endif _DEBUG
 	}
 
 	void Renderer11::addBox(Vector3* corners, Vector4 color)
@@ -2591,19 +2516,23 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		addBox(corners, color);
+#endif _DEBUG
 	}
 	
 	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		addBox(min, max, color);
+#endif _DEBUG
 	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
@@ -2914,7 +2843,7 @@ namespace TEN::Renderer
         //drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
-        drawEnergyArcs(view);
+        drawLightning(view);
 
         drawRopes(view);
         drawSprites(view);
@@ -3029,6 +2958,11 @@ namespace TEN::Renderer
 				drawAnimatingItem(view,item, transparent, animated);
 				drawWraithExtra(view,item, transparent, animated);
 			}
+            else if (objectNumber == ID_DARTS)
+            {
+                //TODO: for now legacy way, in the future mesh
+                drawDarts(view, item, transparent, animated);
+            }
             else
             {
                 drawAnimatingItem(view,item, transparent, animated);
@@ -3096,6 +3030,23 @@ namespace TEN::Renderer
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			}
         }
+    }
+
+    void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
+    {
+        Vector3 start = Vector3(
+            item->Item->pos.xPos,
+            item->Item->pos.yPos,
+            item->Item->pos.zPos);
+
+        float speed = (-96 * phd_cos(TO_RAD(item->Item->pos.xRot)));
+
+        Vector3 end = Vector3(
+            item->Item->pos.xPos + speed * phd_sin(TO_RAD(item->Item->pos.yRot)),
+            item->Item->pos.yPos + 96 * phd_sin(TO_RAD(item->Item->pos.xRot)),
+            item->Item->pos.zPos + speed * phd_cos(TO_RAD(item->Item->pos.yRot)));
+
+        addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)

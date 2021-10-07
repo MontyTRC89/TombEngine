@@ -1877,8 +1877,6 @@ int Inventory::DoTitleInventory()
 		UpdateSceneAndDrawInventory();
 	}
 
-	S_CDPlay(CDA_XA11_FLYBY1, SOUND_TRACK_BGM);
-
 	OpenRing(INV_RING_OPTIONS, true);
 
 	int result = INV_RESULT_NONE;
