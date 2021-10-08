@@ -83,7 +83,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedge(item, coll))
 	{
-
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
 			if (Lara.NewAnims.CrawlVault1click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
@@ -174,39 +173,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 		}
-		else
-		{
-			if (!Lara.climbStatus)
-				return 0;
-
-			if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
-			{
-				if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
-				{
-					ShiftItem(item, coll);
-
-					if (TestLaraClimbStance(item, coll))
-					{
-						item->animNumber = LA_STAND_SOLID;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = LS_LADDER_IDLE;
-						item->currentAnimState = LS_STOP;
-						AnimateLara(item);
-						item->pos.yRot = coll->NearestLedgeAngle;
-						Lara.gunStatus = LG_HANDS_BUSY;
-						return true;
-					}
-				}
-				return false;
-			}
-
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_STOP;
-			Lara.calcFallSpeed = -116;
-			AnimateLara(item);
-		}
 
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
@@ -216,23 +182,58 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		return true;
 	}
-	else if (Lara.NewAnims.MonkeyVault)
+	else if (Lara.climbStatus)
 	{
-		if (Lara.canMonkeySwing)
+		if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
 		{
-			short roomNum = item->roomNumber;
-			int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-				item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
+			if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
+			{
+				ShiftItem(item, coll);
 
-			if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
-				return false;
-
-			item->animNumber = LA_STAND_IDLE;
-			item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_TEST_1;
-			return true;
+				if (TestLaraClimbStance(item, coll))
+				{
+					item->animNumber = LA_STAND_SOLID;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->goalAnimState = LS_LADDER_IDLE;
+					item->currentAnimState = LS_STOP;
+					AnimateLara(item);
+					item->pos.yRot = coll->NearestLedgeAngle;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					return true;
+				}
+			}
+			return false;
 		}
+
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_STOP;
+		Lara.calcFallSpeed = -116;
+		AnimateLara(item);
+
+		item->pos.yRot = coll->NearestLedgeAngle;
+		ShiftItem(item, coll);
+
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+
+		return true;
+	}
+	else if (Lara.NewAnims.MonkeyVault && Lara.canMonkeySwing)
+	{
+		short roomNum = item->roomNumber;
+		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
+			item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
+
+		if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
+			return false;
+
+		item->animNumber = LA_STAND_IDLE;
+		item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_TEST_1;
+		return true;
 	}
 
 	return false;
