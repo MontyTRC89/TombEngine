@@ -507,12 +507,13 @@ namespace TEN::Renderer
 		void drawStatics(bool transparent, RenderView& view);
 		void renderShadowMap(RenderView& view);
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
+		void drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawLara(RenderView& view,bool transparent, bool shadowMap);
 		void printDebugMessage(LPCSTR message, ...);
 		void drawFires(RenderView& view);
 		void drawSparks(RenderView& view);
 		void drawSmokes(RenderView& view);
-		void drawEnergyArcs(RenderView& view);
+		void drawLightning(RenderView& view);
 		void drawBlood(RenderView& view);
 		void drawDrips(RenderView& view);
 		void drawBubbles(RenderView& view);

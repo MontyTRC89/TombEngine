@@ -7,7 +7,7 @@ using namespace TEN::Floordata;
 
 void InitialiseBridge(short itemNumber)
 {
-	AddBridge(itemNumber);
+	UpdateBridgeItem(itemNumber);
 }
 
 int GetOffset(short angle, int x, int z)
