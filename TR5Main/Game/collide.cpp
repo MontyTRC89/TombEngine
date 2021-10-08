@@ -2586,22 +2586,22 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 {
+	// Get item bounds and current rotation
+	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
 	auto s = phd_sin(coll->Setup.ForwardAngle);
 
-	auto bounds = GetBoundsAccurate(item);
-
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
-	auto x = item->pos.xPos + (coll->Setup.Radius * 0.5f) * s;
-	auto z = item->pos.zPos + (coll->Setup.Radius * 0.5f) * c;
+	auto x = item->pos.xPos + (coll->Setup.Radius * 0.2f) * s;
+	auto z = item->pos.zPos + (coll->Setup.Radius * 0.2f) * c;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
 
-	int headroom = abs(bounds->Y2 - bounds->Y1) / 10.0f;
-	int yB[2] = { item->pos.yPos + bounds->Y1 + headroom,
-				  item->pos.yPos + bounds->Y2 - headroom };
+	int headroom = abs(bounds->Y2 - bounds->Y1) / 20.0f;
+	int yPoints[2] = { item->pos.yPos + bounds->Y1 + headroom,
+					   item->pos.yPos + bounds->Y2 - headroom };
 
 	// Determine horizontal probe coordinates
 	int eX = x + coll->Setup.Radius * s;
@@ -2612,45 +2612,41 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 	float closestDistance = FLT_MAX;
 	int   closestPlane = -1;
 	short result = 0;
+	
+	// Do a two-pass surface test for all possible planes in a block.
+	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
 
-	for (int s = 0; s < 2; s++) // Top and bottom Y points
+	for (int s = 0; s < 2; s++)
 	{
 		// Use either bottom or top Y point to test
-		auto y = yB[s];
+		auto y = yPoints[s];
 
 		// Debug probe point
+		// g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 64, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-		g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 64, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-
+		// Get true room number and block, based on current Y position
 		auto room = GetRoom(item->location, eX, y, eZ).roomNumber;
-		auto f = GetCollisionResult(eX, y, eZ, room).Block;
+		auto block = GetCollisionResult(eX, y, eZ, room).Block;
 
 		// Get native surface heights
-		auto floorHeight = f->FloorHeight(eX, eZ, y);
-		auto ceilingHeight = f->CeilingHeight(eX, eZ, y);
+		auto floorHeight = block->FloorHeight(eX, eZ, y);
+		auto ceilingHeight = block->CeilingHeight(eX, eZ, y);
 
 		// If ceiling height tests lower than Y value, it means ceiling
 		// ledge is in front and we should use it instead of floor.
-
-		int height;
 		bool useCeilingLedge = ceilingHeight > y;
-		if (useCeilingLedge)
-			height = ceilingHeight;
-		else
-			height = floorHeight;
+		int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 		// Determine if there is a bridge in front
-		auto bridge = f->InsideBridge(eX, eZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+		auto bridge = block->InsideBridge(eX, eZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
 		// We don't need actual corner heights to build planes, so just use normalized value here
 		auto fY = height - 1;
 		auto cY = height + 1;
 
-		// Calculate ray direction
+		// Calculate ray
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
-
-		// Make ray
 		auto ray = Ray(Vector3(x, cY, z), direction);
 
 		if (bridge >= 0) // Surface is inside bridge
@@ -2670,6 +2666,9 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				Plane(corners[6], corners[5], corners[1])
 			};
 
+			// Mark if test succeeded (this flag is needed because we do two-pass test)
+			bool foundNearestPlane = false;
+
 			// Find closest bridge edge plane
 			for (int i = 0; i < 4; i++)
 			{
@@ -2683,16 +2682,25 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				{
 					closestPlane = i;
 					closestDistance = distance;
+					foundNearestPlane = true;
 				}
 			}
 
+			// Don't store result if no test succeeded
+			if (!foundNearestPlane)
+				continue;
+
 			auto normal = plane[closestPlane].Normal();
 			result = FROM_RAD(atan2(normal.x, normal.z));
+
+			// If a first pass is in progress, don't do second one because
+			// bottom point is most likely lower than the bridge itself and may interfere.
+			break;
 		}
 		else // Surface is inside block
 		{
 			// Determine if we should use floor or ceiling split angle based on early tests.
-			auto splitAngle = (useCeilingLedge ? f->CeilingCollision.SplitAngle : f->FloorCollision.SplitAngle);
+			auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
 
 			// Get horizontal block corner coordinates
 			auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
@@ -2717,7 +2725,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			};
 
 			// If split angle exists, take split plane into account too.
-			auto useSplitAngle = (useCeilingLedge ? f->CeilingIsSplit() : f->FloorIsSplit());
+			auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
 
 			// Mark if test succeeded (this flag is needed because we do two-pass test)
 			bool foundNearestPlane = false;
@@ -2729,6 +2737,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				if (!ray.Intersects(plane[i], distance))
 					continue;
 
+				// Process plane intersection only if distance is smaller
+				// than already found minimum
 				if (distance < closestDistance)
 				{
 					closestDistance = distance;
@@ -2743,12 +2753,12 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 			// Store according rotation.
 			// For block edges (cases 0-3), return ordinary normal values.
-			// For split angle (case 4), return axis perpendicular to split angle (hence +ANGLE(90)) and dependent on
+			// For split angle (case 4), return axis perpendicular to split angle (hence + ANGLE(90)) and dependent on
 			// origin sector plane, which determines the direction of edge normal.
 
 			if (closestPlane == 4)
 			{
-				auto usedSectorPlane = useCeilingLedge ? f->SectorPlaneCeiling(x, z) : f->SectorPlane(x, z);
+				auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(x, z) : block->SectorPlane(x, z);
 				result = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90);
 			}
 			else
