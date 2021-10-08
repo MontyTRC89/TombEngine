@@ -190,7 +190,8 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 	case LS_STOP:
 	case LS_TURN_RIGHT_SLOW:
 	case LS_TURN_LEFT_SLOW:
-	case LS_TURN_FAST:
+	case LS_TURN_RIGHT_FAST:
+	case LS_TURN_LEFT_FAST:
 		item->currentAnimState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
