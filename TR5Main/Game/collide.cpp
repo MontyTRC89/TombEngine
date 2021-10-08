@@ -1224,24 +1224,19 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Return probed bottom block into result.
 	result.BottomBlock = floor;
 
-	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
-	{
-		// Discard tilts if point is well above floor surface (e.g. bridge)
-		result.TiltZ = 0;
-		result.TiltX = 0;
-	}
-	else
-	{
-		// Get tilts from new floordata.
-		auto tilts = floor->TiltXZ(x, z);
-		result.TiltX = tilts.first;
-		result.TiltZ = tilts.second;
-	}
+	// Get tilts from new floordata.
+	auto tilts = floor->TiltXZ(x, z);
+	result.TiltX = tilts.first;
+	result.TiltZ = tilts.second;
 
 	// Split and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
-	result.Position.Slope = ((abs(result.TiltX)) > 2 || (abs(result.TiltZ)) > 2);
+	result.Position.Slope = ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
+
+	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
+	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
+		result.TiltZ = result.TiltX = 0;
 
 	return result;
 }
