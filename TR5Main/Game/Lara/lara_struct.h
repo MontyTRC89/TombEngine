@@ -44,7 +44,7 @@ enum LARA_STATE
 	LS_UNDERWATER_FORWARD = 17,
 	LS_UNDERWATER_INERTIA = 18,
 	LS_GRABBING = 19,
-	LS_TURN_FAST = 20,
+	LS_TURN_RIGHT_FAST = 20,
 	LS_STEP_RIGHT = 21,
 	LS_STEP_LEFT = 22,
 	LS_ROLL_BACK = 23,
@@ -172,7 +172,7 @@ enum LARA_STATE
 	LS_PICKUP_FROM_CHEST = 137,
 	LS_UNKNOWN_6 = 138,
 
-	// TR5Main
+	// TEN
 	LS_HANG_FEET = 139,
 	LS_SHIMMY_FEET_RIGHT = 140,
 	LS_SHIMMY_FEET_LEFT = 141,
@@ -186,6 +186,7 @@ enum LARA_STATE
 	LS_STEP_BACK_DOWN = 149,
 	LS_LADDER_DISMOUNT_LEFT = 150,
 	LS_LADDER_DISMOUNT_RIGHT = 151,
+	LS_TURN_LEFT_FAST = 152,
 	
 	NUM_LARA_STATES
 };
@@ -700,7 +701,7 @@ enum LARA_ANIM
 	LA_LOOT_CHEST = 472,									// Search chest on ground
 	LA_LADDER_TO_CROUCH = 473,								// Pull up from ladder > crouch
 
-	// TR5Main
+	// TEN
 	LA_VAULT_TO_CROUCH_1CLICK = 474, 						// Vault standing up 1-click > crouch
 	LA_VAULT_TO_CROUCH_2CLICK = 475,						// Vault standing up 2-click > crouch
 	LA_VAULT_TO_CROUCH_3CLICK = 476,						// Vault standing up 2-click > crouch
