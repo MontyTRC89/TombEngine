@@ -412,10 +412,7 @@ namespace TEN::Game::Rope
 
 	void ApplyVelocityToRope(int node, short angle, short n)
 	{
-		SetPendulumVelocity(
-			(unsigned short)n * phd_sin(angle) * 4096,
-			0,
-			(unsigned short)n * phd_cos(angle) * 4096); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
+		SetPendulumVelocity(n * phd_sin(angle) * 4096, 0, n * phd_cos(angle) * 4096);
 	}
 
 	void SetPendulumVelocity(int x, int y, int z)
