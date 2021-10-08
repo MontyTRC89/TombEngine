@@ -85,7 +85,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_swim,//17
 	lara_as_glide,//18
 	lara_as_null,//19
-	lara_as_fastturn,//20
+	lara_as_turn_right_fast,//20
 	lara_as_stepright,//21
 	lara_as_stepleft,//22
 	lara_void_func,
@@ -220,7 +220,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,
 	lara_as_null,
 	lara_as_stepoff_left,
-	lara_as_stepoff_right
+	lara_as_stepoff_right,
+	lara_as_turn_left_fast
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
@@ -244,7 +245,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_swim,
 	lara_col_glide,
 	lara_default_col,
-	lara_col_fastturn,
+	lara_col_turn_right_fast,
 	lara_col_stepright,
 	lara_col_stepleft,
 	lara_col_roll2,
@@ -375,7 +376,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
-	lara_default_col
+	lara_default_col,
+	lara_col_turn_left_fast
 };
 
 void LaraControl(short itemNumber)
