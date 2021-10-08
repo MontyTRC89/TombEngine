@@ -177,3 +177,88 @@ BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.xPos, pos.yPos, pos.zPos));
 	return result;
 }
+
+
+__int64 FP_Mul(__int64 a, __int64 b)
+{
+	return (int)((((__int64)a * (__int64)b)) >> FP_SHIFT);
+}
+
+__int64 FP_Div(__int64 a, __int64 b)
+{
+	return (int)(((a) / (b >> 8)) << 8);
+}
+
+void FP_VectorMul(PHD_VECTOR* v, int scale, PHD_VECTOR* result)
+{
+	result->x = FP_FromFixed(v->x * scale);
+	result->y = FP_FromFixed(v->y * scale);
+	result->z = FP_FromFixed(v->z * scale);
+}
+
+int FP_DotProduct(PHD_VECTOR* a, PHD_VECTOR* b)
+{
+	return ((a->x * b->x) + (a->y * b->y) + (a->z * b->z)) >> W2V_SHIFT;
+}
+
+void FP_CrossProduct(PHD_VECTOR* a, PHD_VECTOR* b, PHD_VECTOR* result)
+{
+	result->x = ((a->y * b->z) - (a->z * b->y)) >> W2V_SHIFT;
+	result->y = ((a->z * b->x) - (a->x * b->z)) >> W2V_SHIFT;
+	result->z = ((a->x * b->y) - (a->y * b->x)) >> W2V_SHIFT;
+}
+
+void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
+{
+	short yaw = phd_atan(m->m22, m->m02);
+	short pitch = phd_atan(sqrt((m->m22 * m->m22) + (m->m02 * m->m02)), m->m12);
+	
+	int sy = phd_sin(yaw);
+	int cy = phd_cos(yaw);
+	short roll = phd_atan(((cy * m->m00) - (sy * m->m20)), ((sy * m->m21) - (cy * m->m01)));
+
+	if (((m->m12 >= 0) && pitch > 0)
+		|| ((m->m12 < 0) && pitch < 0))
+		pitch = -pitch;
+
+	angles[0] = pitch;
+	angles[1] = yaw;
+	angles[2] = roll;
+}
+
+__int64 FP_ToFixed(__int64 value)
+{
+	return (value << FP_SHIFT);
+}
+
+__int64 FP_FromFixed(__int64 value)
+{
+	return (value >> FP_SHIFT);
+}
+
+PHD_VECTOR* FP_Normalise(PHD_VECTOR* v)
+{
+	long a = v->x >> FP_SHIFT;
+	long b = v->y >> FP_SHIFT;
+	long c = v->z >> FP_SHIFT;
+
+	if ((a == 0) && (b == 0) && (c == 0))	
+		return v;
+
+	a = a * a;
+	b = b * b;
+	c = c * c;
+	long d = (a + b + c);
+	long e = sqrt(abs(d));
+
+	e <<= FP_SHIFT;
+
+	long mod = FP_Div(FP_ONE << 8, e);
+	mod >>= 8;
+
+	v->x = FP_Mul(v->x, mod);
+	v->y = FP_Mul(v->y, mod);
+	v->z = FP_Mul(v->z, mod);
+
+	return v;
+}

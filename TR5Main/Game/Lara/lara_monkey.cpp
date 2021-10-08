@@ -524,15 +524,18 @@ void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void MonkeySwingFall(ITEM_INFO* item)
 {
-	item->goalAnimState = LS_JUMP_UP;
-	item->currentAnimState = LS_JUMP_UP;
-	item->animNumber = LA_JUMP_UP;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
+	if (item->currentAnimState != LS_MONKEYSWING_TURN_180)
+	{
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_JUMP_UP;
+		item->animNumber = LA_JUMP_UP;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
 
-	item->speed = 2;
-	item->gravityStatus = true;
-	item->fallspeed = 1;
-	item->pos.yPos += 256;
+		item->speed = 2;
+		item->gravityStatus = true;
+		item->fallspeed = 1;
+		item->pos.yPos += 256;
 
-	Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_NO_ARMS;
+	}
 }

@@ -66,8 +66,6 @@ void InitialisePushableBlock(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	item->itemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
-
-	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	
 	// allocate new pushable info
 	item->data = PUSHABLE_INFO();

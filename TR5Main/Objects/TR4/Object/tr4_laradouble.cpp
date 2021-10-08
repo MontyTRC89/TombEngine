@@ -22,10 +22,8 @@ void LaraDoubleControl(short itemNum)
 	{
 		if (item->hitStatus)
 		{
-			LaraItem->hitPoints += item->hitPoints - 1000;
+			LaraItem->hitPoints = item->hitPoints;
 		}
-
-		item->hitPoints = 1000;
 
 		AnimateItem(item);
 	}
