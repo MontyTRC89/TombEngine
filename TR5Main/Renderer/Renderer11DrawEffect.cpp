@@ -53,7 +53,7 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	void Renderer11::drawEnergyArcs(RenderView& view) {
+	void Renderer11::drawLightning(RenderView& view) {
 		for (int i = 0; i < Lightning.size(); i++)
 		{
 			LIGHTNING_INFO* arc = &Lightning[i];

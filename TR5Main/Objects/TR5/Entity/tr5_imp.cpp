@@ -4,12 +4,14 @@
 #include "lara.h"
 #include "animation.h"
 #include "effects/effects.h"
-#include "effects/flmtorch.h"
 #include "control/box.h"
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"
 #include "control/control.h"
+#include "Objects/Generic/Object/burning_torch.h"
+
+using namespace TEN::Entities::Generic;
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

@@ -89,6 +89,11 @@ namespace TEN::Floordata
 	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z);
 	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, int x, int y, int z);
 	ROOM_VECTOR GetRoom(ROOM_VECTOR location, int x, int y, int z);
+
 	void AddBridge(short itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(short itemNumber, int x = 0, int z = 0);
+
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
+	int GetBridgeBorder(int itemNumber, bool bottom);
+	void UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
 }

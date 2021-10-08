@@ -10,7 +10,7 @@ struct MESH_INFO;
 constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadHeightDown
 constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadHeightUp
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
-constexpr auto COLLISION_CHECK_DISTANCE = 6144;
+constexpr auto COLLISION_CHECK_DISTANCE = WALL_SIZE * 8;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
 extern BOUNDING_BOX GlobalCollisionBounds;

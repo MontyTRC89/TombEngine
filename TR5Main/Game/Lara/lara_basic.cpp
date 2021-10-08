@@ -86,14 +86,14 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -ANGLE(4.0f))
-				Lara.turnRate = -ANGLE(4.0f);
+			if (Lara.turnRate < -LARA_SLOW_TURN)
+				Lara.turnRate = -LARA_SLOW_TURN;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > ANGLE(4.0f))
-				Lara.turnRate = ANGLE(4.0f);
+			if (Lara.turnRate > LARA_SLOW_TURN)
+				Lara.turnRate = LARA_SLOW_TURN;
 		}
 
 		if (TrInput & IN_FORWARD)
@@ -436,10 +436,18 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_LEFT)
 	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
+
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 	}
 
@@ -455,23 +463,19 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
+			item->goalAnimState = LS_WADE_FORWARD;
+
 			bool wade = false;
 
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 			{
 				if (fheight.Position.Floor > -(STEPUP_HEIGHT - 1))
-				{
-					lara_as_wade(item, coll);
 					wade = true;
-				}
 			}
 			else
 			{
 				if ((fheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (fheight.Position.Floor > -(STEPUP_HEIGHT - 1)))
-				{
-					lara_as_wade(item, coll);
 					wade = true;
-				}
 			}
 
 			if (!wade)
@@ -493,15 +497,22 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)))
-				lara_as_back(item, coll);
+			if (TrInput & IN_WALK)
+			{
+				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
+					item->goalAnimState = LS_WALK_BACK;
+			}
+			else if (rheight.Position.Floor > -(STEPUP_HEIGHT - 1))
+			{
+				item->goalAnimState = LS_HOP_BACK;
+			}
 		}
 	}
 	else
 	{
 		if (TrInput & IN_JUMP)
 		{
-			if (coll->Middle.Ceiling <= -LARA_HEADROOM)
+			if (coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 				item->goalAnimState = LS_JUMP_PREPARE;
 		}
 		else if (TrInput & IN_FORWARD)
@@ -512,21 +523,24 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
 				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
 
+			if (TestLaraVault(item, coll))
+				return;
+
 			// Don't try to move if there is no headroom in front
 			if (coll->CollisionType == CT_FRONT)
 				return;
 
 			if (TrInput & IN_WALK)
-				lara_as_walk(item, coll);
+				item->goalAnimState = LS_WALK_FORWARD;
 			else
-				lara_as_run(item, coll);
+				item->goalAnimState = LS_RUN_FORWARD;
 		}
 		else if (TrInput & IN_BACK)
 		{
 			if (TrInput & IN_WALK)
 			{
 				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
-					lara_as_back(item, coll);
+					item->goalAnimState = LS_WALK_BACK;
 			}
 			else if (rheight.Position.Floor > -(STEPUP_HEIGHT - 1))
 			{
@@ -602,15 +616,15 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
 
-		if (Lara.turnRate < -ANGLE(3.0f))
-			Lara.turnRate = -ANGLE(3.0f);
+		if (Lara.turnRate < -LARA_JUMP_TURN)
+			Lara.turnRate = -LARA_JUMP_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
 
-		if (Lara.turnRate > ANGLE(3.0f))
-			Lara.turnRate = ANGLE(3.0f);
+		if (Lara.turnRate > LARA_JUMP_TURN)
+			Lara.turnRate = LARA_JUMP_TURN;
 	}
 }
 
@@ -679,14 +693,14 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -ANGLE(6.0f))
-			Lara.turnRate = -ANGLE(6.0f);
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > ANGLE(6.0f))
-			Lara.turnRate = ANGLE(6.0f);
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
 	}
 }
 
@@ -748,10 +762,10 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.gunStatus != LG_READY || Lara.waterStatus == LW_WADE)
 	{
-		if (Lara.turnRate > ANGLE(4.0f))
+		if (Lara.turnRate > LARA_SLOW_TURN)
 		{
 			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
-				Lara.turnRate = ANGLE(4.0f);
+				Lara.turnRate = LARA_SLOW_TURN;
 			else
 				item->goalAnimState = LS_TURN_FAST;
 		}
@@ -842,10 +856,10 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.gunStatus != LG_READY || Lara.waterStatus == LW_WADE)
 	{
-		if (Lara.turnRate < -ANGLE(4.0f))
+		if (Lara.turnRate < -LARA_SLOW_TURN)
 		{
 			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
-				Lara.turnRate = -ANGLE(4.0f);
+				Lara.turnRate = -LARA_SLOW_TURN;
 			else
 				item->goalAnimState = LS_TURN_FAST;
 		}
@@ -990,11 +1004,12 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.moveAngle = item->pos.yRot;
 
+	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.ForwardAngle = Lara.moveAngle;
+
 	GetCollisionInfo(coll, item);
 
 	short angle;
@@ -1251,14 +1266,14 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -ANGLE(4.0f))
-				Lara.turnRate = -ANGLE(4.0f);
+			if (Lara.turnRate < -LARA_SLOW_TURN)
+				Lara.turnRate = -LARA_SLOW_TURN;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > ANGLE(4.0f))
-				Lara.turnRate = ANGLE(4.0f);
+			if (Lara.turnRate > LARA_SLOW_TURN)
+				Lara.turnRate = LARA_SLOW_TURN;
 		}
 	}
 }
@@ -1366,14 +1381,14 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -ANGLE(4.0f))
-				Lara.turnRate = -ANGLE(4.0f);
+			if (Lara.turnRate < -LARA_SLOW_TURN)
+				Lara.turnRate = -LARA_SLOW_TURN;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > ANGLE(4.0f))
-				Lara.turnRate = ANGLE(4.0f);
+			if (Lara.turnRate > LARA_SLOW_TURN)
+				Lara.turnRate = LARA_SLOW_TURN;
 		}
 	}
 }
@@ -1925,14 +1940,14 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -(LARA_FAST_TURN >> 1))
-				Lara.turnRate = -(LARA_FAST_TURN >> 1);
+			if (Lara.turnRate < -(LARA_FAST_TURN / 2))
+				Lara.turnRate = -(LARA_FAST_TURN / 2);
 
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot -= LARA_LEAN_RATE;
-				if (item->pos.zRot < -(LARA_LEAN_MAX >> 1))
-					item->pos.zRot = -(LARA_LEAN_MAX >> 1);
+				if (item->pos.zRot < -(LARA_LEAN_MAX / 2))
+					item->pos.zRot = -(LARA_LEAN_MAX / 2);
 			}
 			else
 			{
@@ -1950,8 +1965,8 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraLean(item, coll))
 			{
 				item->pos.zRot += LARA_LEAN_RATE;
-				if (item->pos.zRot > (LARA_LEAN_MAX >> 1))
-					item->pos.zRot = (LARA_LEAN_MAX >> 1);
+				if (item->pos.zRot > (LARA_LEAN_MAX / 2))
+					item->pos.zRot = (LARA_LEAN_MAX / 2);
 			}
 			else
 			{
@@ -2103,22 +2118,22 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -ANGLE(4.0f))
-			Lara.turnRate = -ANGLE(4.0f);
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
 
-		item->pos.zRot -= ANGLE(1.5f);
-		if (item->pos.zRot < -ANGLE(16.0f))
-			item->pos.zRot = -ANGLE(16.0f);
+		item->pos.zRot -= LARA_LEAN_RATE;
+		if (item->pos.zRot < -LARA_LEAN_DASH_MAX)
+			item->pos.zRot = -LARA_LEAN_DASH_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > ANGLE(4.0f))
-			Lara.turnRate = ANGLE(4.0f);
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
 
-		item->pos.zRot += ANGLE(1.5f);
-		if (item->pos.zRot > ANGLE(16.0f))
-			item->pos.zRot = ANGLE(16.0f);
+		item->pos.zRot += LARA_LEAN_RATE;
+		if (item->pos.zRot > LARA_LEAN_DASH_MAX)
+			item->pos.zRot = LARA_LEAN_DASH_MAX;
 	}
 
 	if (!(TrInput & IN_JUMP) || item->gravityStatus)

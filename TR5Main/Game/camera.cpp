@@ -6,7 +6,6 @@
 #include "effects\debris.h"
 #include "lara_fire.h"
 #include "lara.h"
-#include "effects\flmtorch.h"
 #include "effects\weather.h"
 #include "sphere.h"
 #include "level.h"
@@ -17,7 +16,9 @@
 #include "savegame.h"
 #include "input.h"
 #include "items.h"
+#include "Objects/Generic/Object/burning_torch.h"
 
+using namespace TEN::Entities::Generic;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Environment;
 
@@ -1872,6 +1873,39 @@ void ResetLook()
 				Lara.torsoXrot = 0;
 			if (!Lara.headYrot)
 				Lara.torsoYrot = 0;
+		}
+	}
+}
+
+void RumbleScreen()
+{
+	if (!(GlobalCounter & 0x1FF))
+		SoundEffect(SFX_TR5_KLAXON, 0, 4104);
+
+	if (RumbleTimer >= 0)
+		RumbleTimer++;
+
+	if (RumbleTimer > 450)
+	{
+		if (!(GetRandomControl() & 0x1FF))
+		{
+			InGameCounter = 0;
+			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+			return;
+		}
+	}
+
+	if (RumbleTimer < 0)
+	{
+		if (InGameCounter >= abs(RumbleTimer))
+		{
+			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
+			RumbleTimer++;
+		}
+		else
+		{
+			InGameCounter++;
+			Camera.bounce = -(GetRandomControl() % InGameCounter);
 		}
 	}
 }

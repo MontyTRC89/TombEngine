@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "tr4_bubbles.h"
-#include "effects/debris.h"
-#include "items.h"
-#include "effects/tomb4fx.h"
-#include "effects/effects.h"
-#include "level.h"
-#include "lara.h"
-#include "control/control.h"
-#include "tr4_mutant.h"
-#include "collide.h"
+#include "Objects/Effects/enemy_missile.h"
+#include "Game/effects/debris.h"
+#include "Game/items.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/effects.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/Control/control.h"
+#include "Game/collide.h"
 #include "Game/effects/lara_burn.h"
 #include "tr5_hydra.h"
 #include "tr5_roman_statue.h"
 #include "setup.h"
+#include "Objects/TR4/Entity/tr4_mutant.h"
+#include "Objects/TR4/Entity/tr4_demigod.h"
 
 using namespace TEN::Effects::Fire;
+using namespace TEN::Entities::TR4;
 
-namespace TEN::entities::all
+namespace TEN::Entities::Effects
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
@@ -124,68 +126,7 @@ namespace TEN::entities::all
 		}
 	}
 
-	void TriggerDemigodMissileFlame(short fxNum, short xVel, short yVel, short zVel)
-	{
-		ITEM_INFO* fx = &g_Level.Items[fxNum];
-		FX_INFO* fxInfo = fx->data;
-		int dx = LaraItem->pos.xPos - fx->pos.xPos;
-		int dz = LaraItem->pos.zPos - fx->pos.zPos;
-
-		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
-		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
-
-			spark->on = 1;
-			if (fxInfo->flag1 == 3 || fxInfo->flag1 == 4)
-			{
-				spark->sR = 0;
-				spark->dR = 0;
-				spark->sB = (GetRandomControl() & 0x7F) + 32;
-				spark->sG = spark->sB + 64;
-				spark->dG = (GetRandomControl() & 0x7F) + 32;
-				spark->dB = spark->dG + 64;
-			}
-			else
-			{
-				spark->sR = (GetRandomControl() & 0x7F) + 32;
-				spark->sG = spark->sR - (GetRandomControl() & 0x1F);
-				spark->sB = 0;
-				spark->dR = (GetRandomControl() & 0x7F) + 32;
-				spark->dB = 0;
-				spark->dG = spark->dR - (GetRandomControl() & 0x1F);
-			}
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = COLADD;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
-			spark->y = 0;
-			spark->x = (GetRandomControl() & 0xF) - 8;
-			spark->yVel = yVel;
-			spark->zVel = zVel;
-			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = xVel;
-			spark->friction = 68;
-			spark->flags = 602;
-			spark->rotAng = GetRandomControl() & 0xFFF;
-			if (GetRandomControl() & 1)
-			{
-				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			}
-			else
-			{
-				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-			}
-			spark->gravity = 0;
-			spark->maxYvel = 0;
-			spark->fxObj = fxNum;
-			spark->scalar = 2;
-			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-			spark->dSize = spark->size / 32;
-			SparkSpriteSequence(spark, ID_FIRE_SPRITES);
-		}
-	}
-
-	void BubblesShatterFunction(ITEM_INFO* fx, int param1, int param2)
+	void BubblesShatterFunction(ITEM_INFO * fx, int param1, int param2)
 	{
 		OBJECT_INFO* obj = &Objects[fx->objectNumber];
 		FX_INFO* fxInfo = fx->data;
@@ -252,17 +193,17 @@ namespace TEN::entities::all
 			}
 
 			int dy = angles[0] - fx->pos.yRot;
-			if (abs(dy) <= ANGLE(180.0f))
+			if (abs(dy) > 0x8000)
 			{
 				dy = -dy;
 			}
 
 			int dx = angles[1] - fx->pos.xRot;
-			if (abs(dx) <= ANGLE(180.0f))
+			if (abs(dx) > 0x8000)
 				dx = -dx;
 
-			dy /= 8;
-			dx /= 8;
+			dy >>= 3;
+			dx >>= 3;
 
 			if (dy < -maxRotation)
 				dy = -maxRotation;
@@ -290,9 +231,9 @@ namespace TEN::entities::all
 		int oldZ = fx->pos.zPos;
 
 		int speed = (fx->speed * phd_cos(fx->pos.xRot));
-		fx->pos.zPos += (speed * phd_cos(fx->pos.yRot));
 		fx->pos.xPos += (speed * phd_sin(fx->pos.yRot));
 		fx->pos.yPos += -((fx->speed * phd_sin(fx->pos.xRot))) + fx->fallspeed;
+		fx->pos.zPos += (speed * phd_cos(fx->pos.yRot));
 
 		short roomNumber = fx->roomNumber;
 		FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
@@ -428,7 +369,7 @@ namespace TEN::entities::all
 					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				case 6:
-					TEN::Entities::TR4::TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				case 7:
 					{

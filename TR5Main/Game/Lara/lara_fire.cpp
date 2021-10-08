@@ -9,7 +9,6 @@
 #include "effects/effects.h"
 #include "sphere.h"
 #include "animation.h"
-#include "effects/flmtorch.h"
 #include "level.h"
 #include "control/lot.h"
 #include "setup.h"
@@ -20,6 +19,9 @@
 #include "GameFlowScript.h"
 #include "lara_struct.h"
 #include "itemdata/creature_info.h"
+#include "Objects/Generic/Object/burning_torch.h"
+
+using namespace TEN::Entities::Generic;
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -690,13 +692,13 @@ GAME_OBJECT_ID WeaponObjectMesh(int weaponType) {
 }
 
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
-{
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	
+{	
 	item->hitStatus = true;
-	if (creature != nullptr && item != LaraItem)
-		creature->hurtByLara = true;
+
+	if (item->data.is<CREATURE_INFO>())
+		((CREATURE_INFO*)item->data)->hurtByLara = true;
+
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (hitPos != nullptr)
 	{
@@ -741,9 +743,15 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 
 	if (!obj->undead || grenade || item->hitPoints == NOT_TARGETABLE)
 	{
-		if (item->hitPoints > 0 && item->hitPoints <= damage)
+		if (item->hitPoints > 0)
+		{
 			Savegame.Level.AmmoHits++;
-		item->hitPoints -= damage;
+
+			if (item->hitPoints >= damage)
+				item->hitPoints -= damage;
+			else
+				item->hitPoints = 0;
+		}
 	}
 }
 

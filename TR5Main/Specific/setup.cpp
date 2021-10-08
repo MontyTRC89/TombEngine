@@ -340,27 +340,6 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	//FIXME
-	//InitialiseRopeTrap();
-
-	obj = &Objects[ID_ROPE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRope;
-		obj->control = RopeControl;
-		obj->collision = RopeCollision;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_POLEROPE];
-	if (obj->loaded)
-	{
-		obj->collision = PoleCollision;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_WRECKING_BALL];
 	if (obj->loaded)
 	{

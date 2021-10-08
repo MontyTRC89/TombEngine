@@ -16,7 +16,6 @@
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
-#include "effects/flmtorch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
@@ -28,6 +27,10 @@
 #include "pickup/pickup_weapon.h"
 #include "pickup/pickup_consumable.h"
 #include "pickup/pickup_misc_items.h"
+#include "Objects/Generic/Object/burning_torch.h"
+#include "Game/collide.h"
+
+using namespace TEN::Entities::Generic;
 
 OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
