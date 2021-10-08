@@ -91,7 +91,7 @@ enum GAME_OBJECT_ID : short
 	ID_CROCODILE,			// TR4 - OK - We just need to fix land/water transition but it was bugged also in TR4
 	ID_BAT,					// TR4 - OK
 	ID_SPHINX,				// TR4 - OK
-	ID_WILD_BOAR,			// TR4 - OK
+	ID_WILD_BOAR,			// TR4 - BUGGED TURNS!
 	ID_HARPY,				// TR4 - OK
 	ID_BIG_SCORPION,		// TR4 - OK
 	ID_SMALL_SCORPION,		// TR4 - OK
@@ -104,7 +104,7 @@ enum GAME_OBJECT_ID : short
 	ID_HUSKIE,
 	ID_DOG,					// TR4 - OK
 	ID_BATS_EMITTER,
-	ID_RATS_EMITTER,
+	ID_RATS_EMITTER,		// TR5 - OK
 	ID_SPIDERS_EMITTER,
 	ID_LION,
 	ID_DOBERMAN,
@@ -290,17 +290,17 @@ enum GAME_OBJECT_ID : short
 	ID_DART_EMITTER,			// TR4 - OK	
 	ID_HOMING_DART_EMITTER,		// TR4 - OK	
 	ID_FALLING_CEILING,
-	ID_FALLING_BLOCK,
+	ID_FALLING_BLOCK,			// TR5 - OK
 	ID_FALLING_BLOCK2,
-	ID_CRUMBLING_FLOOR,
-	ID_TRAPDOOR1,
-	ID_TRAPDOOR2,
-	ID_TRAPDOOR3,
-	ID_FLOOR_TRAPDOOR1,
-	ID_FLOOR_TRAPDOOR2,
-	ID_CEILING_TRAPDOOR1,
-	ID_CEILING_TRAPDOOR2,
-	ID_SCALING_TRAPDOOR,
+	ID_CRUMBLING_FLOOR,			// Should be same as falling block or different behaviour?
+	ID_TRAPDOOR1,				// No floor/ceiling portal blockage applied
+	ID_TRAPDOOR2,				// No floor/ceiling portal blockage applied
+	ID_TRAPDOOR3,				// No floor/ceiling portal blockage applied
+	ID_FLOOR_TRAPDOOR1,			// No floor/ceiling portal blockage applied
+	ID_FLOOR_TRAPDOOR2,			// No floor/ceiling portal blockage applied
+	ID_CEILING_TRAPDOOR1,		// No floor/ceiling portal blockage applied	
+	ID_CEILING_TRAPDOOR2,		// No floor/ceiling portal blockage applied
+	ID_SCALING_TRAPDOOR,		// No floor/ceiling portal blockage applied
 	ID_ROLLINGBALL,				// TR4 - OK
 	ID_ROLLINGBARREL,
 	ID_PROPELLER_H,
@@ -963,9 +963,9 @@ enum GAME_OBJECT_ID : short
 	ID_LASERHEAD_BASE,
 	ID_LASERHEAD_TENTACLE,
 
-	ID_BRIDGE_FLAT = 1340,
-	ID_BRIDGE_TILT1,
-	ID_BRIDGE_TILT2,
+	ID_BRIDGE_FLAT = 1340,		// OK
+	ID_BRIDGE_TILT1,			// OK
+	ID_BRIDGE_TILT2,			// OK
 	ID_BRIDGE_TILT3,
 	ID_BRIDGE_TILT4,
 

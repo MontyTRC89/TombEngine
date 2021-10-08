@@ -43,6 +43,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (!result)
 			return false;
 
+		// Don't try to vault if there's not enough space to perform it.
+		auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+		if (headroom < STEP_SIZE)
+			return false;
+
 		int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60;
 
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)

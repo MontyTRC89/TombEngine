@@ -950,20 +950,27 @@ namespace TEN::Renderer
 		{
 		case BLENDMODE_ALPHABLEND:
 			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
 			break;
 		case BLENDMODE_ALPHATEST:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
 
 			break;
 		case BLENDMODE_OPAQUE:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_SUBTRACTIVE:
 			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_ADDITIVE:
 			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		}
 	}
