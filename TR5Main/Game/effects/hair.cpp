@@ -228,16 +228,20 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
 			Hairs[ponytail][i].pos.zPos += Hairs[ponytail][i].hvel.z * 3 / 4;
 
-			if (Lara.waterStatus == LW_ABOVE_WATER && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
-			{
-				Hairs[ponytail][i].pos.xPos += Weather.Wind().x * 2.0f;
-				Hairs[ponytail][i].pos.zPos += Weather.Wind().z * 2.0f;
-			}
+			// TR3 UPV uses a hack which forces Lara water status to dry. 
+			// Therefore, we can't directly use water status value to determine hair mode.
+			bool dryMode = (Lara.waterStatus == LW_ABOVE_WATER) && (Lara.Vehicle == -1 || g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV);
 
-			switch (Lara.waterStatus)
+			if (dryMode)
 			{
-			case LW_ABOVE_WATER:
+				if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
+				{
+					Hairs[ponytail][i].pos.xPos += Weather.Wind().x * 2.0f;
+					Hairs[ponytail][i].pos.zPos += Weather.Wind().z * 2.0f;
+				}
+
 				Hairs[ponytail][i].pos.yPos += 10;
+
 				if (wh != NO_HEIGHT && Hairs[ponytail][i].pos.yPos > wh)
 				{
 					Hairs[ponytail][i].pos.yPos = wh;
@@ -247,16 +251,13 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 					Hairs[ponytail][i].pos.xPos = Hairs[ponytail][0].hvel.x;
 					Hairs[ponytail][i].pos.zPos = Hairs[ponytail][0].hvel.z;
 				}
-				break;
-
-			case LW_UNDERWATER:
-			case LW_SURFACE:
-			case LW_WADE:
+			}
+			else
+			{
 				if (Hairs[ponytail][i].pos.yPos < wh)
 					Hairs[ponytail][i].pos.yPos = wh;
 				else if (Hairs[ponytail][i].pos.yPos > height)
 					Hairs[ponytail][i].pos.yPos = height;
-				break;
 			}
 
 			for (int j = 0; j < HAIR_SPHERE; j++)

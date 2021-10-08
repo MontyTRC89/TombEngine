@@ -53,7 +53,7 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	void Renderer11::drawEnergyArcs(RenderView& view) {
+	void Renderer11::drawLightning(RenderView& view) {
 		for (int i = 0; i < Lightning.size(); i++)
 		{
 			LIGHTNING_INFO* arc = &Lightning[i];
@@ -1119,20 +1119,27 @@ namespace TEN::Renderer
 		{
 		case BLENDMODE_ALPHABLEND:
 			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
 			break;
 		case BLENDMODE_ALPHATEST:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
 
 			break;
 		case BLENDMODE_OPAQUE:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_SUBTRACTIVE:
 			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_ADDITIVE:
 			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		}
 	}
