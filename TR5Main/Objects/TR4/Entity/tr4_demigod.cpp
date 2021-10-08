@@ -208,8 +208,6 @@ namespace TEN::Entities::TR4
 					TriggerDemigodMissile(&pos, item->roomNumber, 5);
 				}
 			}
-
-			return;
 		}
 		else if (animIndex == 16)
 		{
@@ -367,9 +365,11 @@ namespace TEN::Entities::TR4
 		if (item->hitPoints <= 0)
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != STATE_DEMIGOD_DEATH1 && item->currentAnimState != STATE_DEMIGOD_DEATH2)
+			if (item->currentAnimState != STATE_DEMIGOD_DEATH1 
+				&& item->currentAnimState != STATE_DEMIGOD_DEATH2)
 			{
-				if (item->currentAnimState == 1 || item->currentAnimState == 2)
+				if (item->currentAnimState == STATE_DEMIGOD_WALK 
+					|| item->currentAnimState == STATE_DEMIGOD_RUN)
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + 27;
 					item->currentAnimState = STATE_DEMIGOD_DEATH2;
@@ -419,9 +419,9 @@ namespace TEN::Entities::TR4
 				dz = abs(dz);
 
 				if (dx <= dz)
-					laraInfo.xAngle = phd_atan(dz + (dx / 2), dy);
+					laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
 				else
-					laraInfo.xAngle = phd_atan(dx + (dz / 2), dy);
+					laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
 			}
 
 			GetCreatureMood(item, &info, VIOLENT);
@@ -431,17 +431,17 @@ namespace TEN::Entities::TR4
 
 			if (laraInfo.ahead)
 			{
-				joint0 = laraInfo.angle / 2;
+				joint0 = laraInfo.angle >> 1;
 				joint1 = -laraInfo.xAngle;
-				joint2 = laraInfo.angle / 2;
-				joint3 = laraInfo.angle / 2;
+				joint2 = laraInfo.angle >> 1;
+				joint3 = laraInfo.angle >> 1;
 			}
 			else if (info.ahead)
 			{
-				joint0 = info.angle / 2;
+				joint0 = info.angle >> 1;
 				joint1 = -info.xAngle;
-				joint2 = info.angle / 2;
-				joint3 = info.angle / 2;
+				joint2 = info.angle >> 1;
+				joint3 = info.angle >> 1;
 			}
 
 			switch (item->currentAnimState)
@@ -598,7 +598,7 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &info) || creature->flags)
 				{
-					item->goalAnimState = 4;
+					item->goalAnimState = STATE_DEMIGOD_ATTACK;
 					creature->flags = 0;
 				}
 				else
