@@ -209,13 +209,13 @@ void RefreshCamera(short type, short* data)
 			{
 				Camera.number = value;
 
-				if ((Camera.timer < 0) || (Camera.type == LOOK_CAMERA) || (Camera.type == COMBAT_CAMERA))
+				if ((Camera.timer < 0) || (Camera.type == CAMERA_TYPE::LOOK_CAMERA) || (Camera.type == CAMERA_TYPE::COMBAT_CAMERA))
 				{
 					Camera.timer = -1;
 					targetOk = 0;
 					break;
 				}
-				Camera.type = FIXED_CAMERA;
+				Camera.type = CAMERA_TYPE::FIXED_CAMERA;
 				targetOk = 1;
 			}
 			else
@@ -223,7 +223,7 @@ void RefreshCamera(short type, short* data)
 			break;
 
 		case TO_TARGET:
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+			if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 				break;
 
 			Camera.item = &g_Level.Items[value];
