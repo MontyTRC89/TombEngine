@@ -208,7 +208,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 				angleLeft[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
 				angleLeft[1] = Lara.leftArm.xRot;
 
-				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft)!= FireWeaponType::FW_NOAMMO)
+				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft) != FireWeaponType::FW_NOAMMO)
 				{
 					if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_REVOLVER)
 					{
