@@ -21,7 +21,8 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor < -STEP_SIZE / 2 &&
 		coll->Front.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&
-		item->currentAnimState != LS_HOP_BACK)
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_SPRINT)
 	{
 		return true;
 	}
@@ -32,7 +33,10 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->Front.Floor <= STEPUP_HEIGHT &&
 		coll->Middle.Floor > STEP_SIZE / 2 &&
-		coll->Front.Floor != NO_HEIGHT)
+		coll->Front.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_SPRINT)
 	{
 		return true;
 	}

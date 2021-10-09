@@ -8,7 +8,6 @@ struct COLL_INFO;
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
 #define LARA_LEAN_RATE ANGLE(1.5f)	// lean rates
 #define LARA_LEAN_MAX ANGLE(11.0f)
-#define LARA_LEAN_SPRINT_MAX ANGLE(15.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)	// turn rates
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_CROUCH_ROLL_TURN ANGLE(3.0f)

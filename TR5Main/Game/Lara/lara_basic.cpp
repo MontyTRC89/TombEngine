@@ -100,6 +100,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.isMoving)
 		return;
 
+	// TODO: If stopping and not holding WALK, Lara won't turn. Change animation's state to LS_STOP to solve issue? @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -3398,9 +3399,9 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX) / 12;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 12;
 		else
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX * 3 / 6) / 12;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 12;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -3409,9 +3410,9 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_SLOW_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot) / 12;
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 12;
 		else
-			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot * 3 / 6) / 12;
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot * 3 / 6) / 12;
 	}
 
 	if (TrInput & IN_JUMP)
@@ -3479,9 +3480,9 @@ void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
 		else
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_SPRINT_MAX * 3 / 6) / 7;
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 7;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -3490,9 +3491,9 @@ void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_SLOW_TURN;
 
 		if (TestLaraLean(item, coll))
-			item->pos.zRot += (LARA_LEAN_SPRINT_MAX - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
 		else
-			item->pos.zRot += (LARA_LEAN_SPRINT_MAX * 3 / 6 - item->pos.zRot) / 7;
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 7;
 	}
 
 	if (!(TrInput & IN_JUMP) || item->gravityStatus)
@@ -3515,7 +3516,91 @@ void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+
+// State:		LS_SPRINT (73)
+// Control:		lara_as_dash()
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraVault(item, coll))
+		return;
+
+	if (LaraDeflectEdge(item, coll))
+	{
+		item->pos.zRot = 0;
+
+		if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
+		{
+			item->goalAnimState = LS_SPLAT;
+			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			{
+				item->currentAnimState = LS_SPLAT;
+				return;
+			}
+		}
+
+		LaraCollideStop(item, coll);
+	}
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	//if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
+	//{
+	//	item->goalAnimState = LS_STEP_UP;
+	//	GetChange(item, &g_Level.Anims[item->animNumber]);
+	//}
+	//
+	//if (coll->Middle.Floor < 50)
+	//{
+	//	if (coll->Middle.Floor != NO_HEIGHT)
+	//		item->pos.yPos += coll->Middle.Floor;
+	//}
+	//else
+	//{
+	//	item->goalAnimState = LS_STEP_DOWN; // for theoretical sprint stepdown anims, not in default anims
+	//	if (GetChange(item, &g_Level.Anims[item->animNumber]))
+	//		item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
+	//	else
+	//		item->pos.yPos += 50; // do the default aligment
+	//}
+}
+
+// LEGACY
+void old_lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 73*/
 	/*state code: lara_as_dash*/
