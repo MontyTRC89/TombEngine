@@ -19,10 +19,14 @@
 
 using namespace std;
 
-// -----------------------------
-// BASIC MOVEMENT
+// ------------------------------
+// BASIC MOVEMENT & MISCELLANEOUS
 // Control & Collision Functions
-// -----------------------------
+// ------------------------------
+
+// --------------
+// MISCELLANEOUS:
+// --------------
 
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -60,9 +64,11 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
+
 		if (UseForcedFixedCamera)
 			UseForcedFixedCamera = 0;
 	}
@@ -75,10 +81,61 @@ void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 }
 
-/*end generic functions*/
-/*-*/
-/*basic movement*/
+// ---------------
+// BASIC MOVEMENT:
+// ---------------
+
+// State:		LS_WALK_FORWARD (0)
+// Collision:	lara_col_walk()
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// TODO: What is this for? Investigate. @Sezz 2021.10.09
+	if (Lara.isMoving)
+		return;
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 3) / 12;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		if (Lara.waterStatus == LW_WADE)
+			item->goalAnimState = LS_WADE_FORWARD;
+		else if (TrInput & IN_WALK)
+			item->goalAnimState = LS_WALK_FORWARD;
+		else
+			item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 0*/
 	/*collision: lara_col_walk*/
@@ -125,7 +182,94 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LA_WALK_FORWARD (0)
+// Control:		lara_as_walk_forward()
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.DeathFlagIsPit = 1;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraVault(item, coll))
+		return;
+
+	if (LaraDeflectEdge(item, coll))
+	{
+		item->goalAnimState = LS_SPLAT;
+		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			return;
+
+		LaraCollideStop(item, coll);
+	}
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		// return;
+	}
+
+	// LEGACY step code. Keeping for now; I need to ensure my generic step function will work in other states. @Sezz 2021.10.09
+	/*if (coll->Middle.Floor > STEP_SIZE / 2)
+	{
+		if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor <= STEP_SIZE / 2)
+		{
+			coll->Middle.Floor = 0;
+		}
+		else
+		{
+			item->goalAnimState = LS_STEP_DOWN;
+			GetChange(item, &g_Level.Anims[item->animNumber]);
+		}
+	}
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
+	{
+		if (coll->Front.Floor == NO_HEIGHT ||
+			coll->Front.Floor < -STEPUP_HEIGHT ||
+			coll->Front.Floor >= -STEP_SIZE / 2)
+		{
+			coll->Middle.Floor = 0;
+		}
+		else
+		{
+			item->goalAnimState = LS_STEP_UP;
+			GetChange(item, &g_Level.Anims[item->animNumber]);
+		}
+	}*/
+
+	// TODO: See if moving this up has any consequences.  @Sezz 2021.10.09
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+}
+
+// LEGACY
+void old_lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 0*/
 	/*state code: lara_as_walk*/
@@ -249,8 +393,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Get others to try this out. @Sezz 2021.09.28
 	static bool commitToJump = false;
 
-	if ((TrInput & IN_JUMP || commitToJump)
-		&& !item->gravityStatus)
+	if ((TrInput & IN_JUMP || commitToJump) &&
+		!item->gravityStatus)
 	{
 		commitToJump = TrInput & IN_FORWARD;
 
@@ -263,7 +407,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT && DashTimer)
+	if (TrInput & IN_SPRINT &&
+		DashTimer)
 	{
 		item->goalAnimState = LS_SPRINT;
 
@@ -277,15 +422,16 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK
-		&& (Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType))
-		&& Lara.waterStatus != LW_WADE) // TODO: Check if this is required for other dispatches. @Sezz 2021.10.05
+	if (TrInput & IN_DUCK &&
+		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
+		Lara.waterStatus != LW_WADE) // TODO: Check if this is required for other dispatches. @Sezz 2021.10.05
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
 
+	// TODO: Probe for SPLAT dispatch.  @Sezz 2021.10.09
 	if (TrInput & IN_FORWARD)
 	{
 		if (Lara.waterStatus == LW_WADE)
