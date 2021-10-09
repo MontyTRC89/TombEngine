@@ -78,15 +78,14 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	else if (abs(coll->Middle.Floor) > STEPUP_HEIGHT / 2 &&
 		abs(coll->Middle.Floor) <= STEPUP_HEIGHT &&
 		abs(coll->Middle.Floor) >= div &&
-		abs(coll->Middle.Floor) >= 50 &&
 		coll->Middle.Floor != NO_HEIGHT)
 	{
-		if (item->pos.yPos < 0)
+		if (coll->Middle.Floor >= -50)
 			item->pos.yPos += 50;
-		else
+		else if (coll->Middle.Floor <= 50)
 			item->pos.yPos -= 50;
 	}
-	else
+	else if (coll->Middle.Floor != NO_HEIGHT)
 		item->pos.yPos += coll->Middle.Floor;
 }
 
