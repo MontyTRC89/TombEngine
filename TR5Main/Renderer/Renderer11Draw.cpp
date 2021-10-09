@@ -2415,27 +2415,36 @@ namespace TEN::Renderer
 
 	void Renderer11::addSphere(Vector3 center, float radius, Vector4 color)
 	{
-		if (m_nextLine3D >= MAX_LINES_3D)
-			return;
+		constexpr auto subdivisions = 10;
+		constexpr auto steps = 6;
+		constexpr auto step = PI / steps;
 
-		auto line1 = &m_lines3DBuffer[m_nextLine3D++];
-		line1->start = Vector3(center.x - radius, center.y, center.z); 
-		line1->end   = Vector3(center.x + radius, center.y, center.z);
-		line1->color = color;
+		std::array<Vector3, 3> prevPoint;
 
-		m_lines3DToDraw.push_back(line1);
+		for (int s = 0; s < steps; s++)
+		{
+			auto x = sin(step * (float)s) * radius;
+			auto z = cos(step * (float)s) * radius;
+			float currAngle = 0.0f;
 
-		auto line2 = &m_lines3DBuffer[m_nextLine3D++];
-		line2->start = Vector3(center.x, center.y - radius, center.z);
-		line2->end   = Vector3(center.x, center.y + radius, center.z);
-		line2->color = color;
-		m_lines3DToDraw.push_back(line2);
+			for (int i = 0; i < subdivisions; i++)
+			{
 
-		auto line3 = &m_lines3DBuffer[m_nextLine3D++];
-		line3->start = Vector3(center.x, center.y, center.z - radius);
-		line3->end   = Vector3(center.x, center.y, center.z + radius);
-		line3->color = color;
-		m_lines3DToDraw.push_back(line3);
+				std::array<Vector3, 3> point =
+				{
+					center + Vector3(sin(currAngle) * abs(x), z, cos(currAngle) * abs(x)),
+					center + Vector3(cos(currAngle) * abs(x), sin(currAngle) * abs(x), z),
+					center + Vector3(z, sin(currAngle) * abs(x), cos(currAngle) * abs(x))
+				};
+
+				if (i > 0)
+					for (int p = 0; p < 3; p++)
+						addLine3D(prevPoint[p], point[p], color);
+
+				prevPoint = point;
+				currAngle += ((PI * 2) / (subdivisions - 1));
+			}
+		}
 	}
 
 	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
