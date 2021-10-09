@@ -6,8 +6,8 @@
 
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (abs(coll->Middle.Floor) >= -STEPUP_HEIGHT &&
-		abs(coll->Middle.Floor) <= STEPUP_HEIGHT)
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
 		return true;
 	}
@@ -15,18 +15,20 @@ bool TestLaraStep(COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraStepUp(COLL_INFO* coll)
+bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->Front.Floor >= -STEPUP_HEIGHT &&
 		coll->Middle.Floor < -STEP_SIZE / 2 &&
-		coll->Front.Floor != NO_HEIGHT)
+		coll->Front.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_WALK_BACK &&
+		item->currentAnimState != LS_HOP_BACK)
 	{
 		return true;
 	}
 
 	return false;
 }
-bool TestLaraStepDown(COLL_INFO* coll)
+bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->Front.Floor <= STEPUP_HEIGHT &&
 		coll->Middle.Floor > STEP_SIZE / 2 &&
@@ -42,9 +44,7 @@ bool TestLaraStepDown(COLL_INFO* coll)
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TestLaraStepUp(coll) &&
-		item->currentAnimState != LS_WALK_BACK &&
-		item->currentAnimState != LS_HOP_BACK)
+	if (TestLaraStepUp(item, coll))
 	{
 		item->pos.yPos += coll->Middle.Floor;
 
@@ -53,30 +53,33 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-	else if (TestLaraStepDown(coll) &&
-		item->currentAnimState != LS_RUN_FORWARD &&
-		item->currentAnimState != LS_HOP_BACK)
+	else if (TestLaraStepDown(item, coll))
 	{
 		item->pos.yPos += coll->Middle.Floor;
 
-		item->goalAnimState = LS_STEP_DOWN;
+		if (item->currentAnimState == LS_WALK_BACK)
+			item->goalAnimState = LS_STEP_BACK_DOWN;
+		else
+			item->goalAnimState = LS_STEP_DOWN;
 		GetChange(item, &g_Level.Anims[item->animNumber]);
 
 		return;
 	}
 
-	// Height difference is below threshold; simply translate Lara to new floor height
+	// Height difference is below threshold for step dispatch; translate Lara to new floor height
 	// TODO: Follow cube root curve instead of doing this ugly thing.
+	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
+	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:
+	// comment everything EXCEPT the last two lines. Lara will simply snap to the surface as before (although LS_RUN state
+	// had a linear transition of 50 units per frame, so not all original behaviour can be restored from here). @Sezz 2021.10.09
 	int div = 3;
 	if (abs(coll->Middle.Floor) <= STEPUP_HEIGHT / 2 &&
-		abs(coll->Middle.Floor) <= STEPUP_HEIGHT &&  // TODO: As Lara approaches BLJ speeds, this failsafe may become less reliable. @Sezz 2021.10.09
 		abs(coll->Middle.Floor) >= div &&
 		coll->Middle.Floor != NO_HEIGHT)
 	{
 		item->pos.yPos += coll->Middle.Floor / div;
 	}
 	else if (abs(coll->Middle.Floor) > STEPUP_HEIGHT / 2 &&
-		abs(coll->Middle.Floor) <= STEPUP_HEIGHT &&
 		abs(coll->Middle.Floor) >= div &&
 		coll->Middle.Floor != NO_HEIGHT)
 	{
