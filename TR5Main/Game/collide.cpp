@@ -105,7 +105,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 					}
 
 					/*this is awful*/
-					/*if (item->objectNumber == ID_UPV && item->hitPoints == 1)
+					if (item->objectNumber == ID_UPV && item->hitPoints == 1)
 					{
 						itemNumber = item->nextItem;
 						continue;
@@ -114,7 +114,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 					{
 						itemNumber = item->nextItem;
 						continue;
-					}*/
+					}
 					/*we need a better system*/
 
 					int dx = collidingItem->pos.xPos - item->pos.xPos;
@@ -1354,7 +1354,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		topRoomNumber = item->roomNumber;
 	}
 
-	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 32, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	collResult = GetCollisionResult(x, y, z, topRoomNumber);
 
@@ -1403,7 +1403,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	x = xPos + xleft;
 	z = zPos + zleft;
 
-	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 32, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
@@ -1454,7 +1454,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	x = xPos + xright;
 	z = zPos + zright;
 
-	g_Renderer.addDebugSphere(Vector3(x, y, z), 64, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.addDebugSphere(Vector3(x, y, z), 32, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
