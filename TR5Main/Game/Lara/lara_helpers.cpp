@@ -4,16 +4,89 @@
 #include "level.h"
 #include "lara.h"
 
+bool TestLaraStep(COLL_INFO* coll)
+{
+	if (abs(coll->Middle.Floor) >= -STEPUP_HEIGHT &&
+		abs(coll->Middle.Floor) <= STEPUP_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepUp(COLL_INFO* coll)
+{
+	if (coll->Front.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor < -STEP_SIZE / 2 &&
+		coll->Front.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+bool TestLaraStepDown(COLL_INFO* coll)
+{
+	if (coll->Front.Floor <= STEPUP_HEIGHT &&
+		coll->Middle.Floor > STEP_SIZE / 2 &&
+		coll->Front.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: Some states can't make the most of this function due to missing step up/down animations.
+// Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
+void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TestLaraStepUp(coll) &&
+		item->currentAnimState != LS_WALK_BACK &&
+		item->currentAnimState != LS_HOP_BACK)
+	{
+		item->pos.yPos += coll->Middle.Floor;
+
+		item->goalAnimState = LS_STEP_UP;
+		GetChange(item, &g_Level.Anims[item->animNumber]);
+
+		return;
+	}
+	else if (TestLaraStepDown(coll) &&
+		item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_HOP_BACK)
+	{
+		item->pos.yPos += coll->Middle.Floor;
+
+		item->goalAnimState = LS_STEP_DOWN;
+		GetChange(item, &g_Level.Anims[item->animNumber]);
+
+		return;
+	}
+
+	// Height difference is below threshold; simply translate Lara to new floor height
+	int div = 3;
+	if (abs(coll->Middle.Floor) >= div &&
+		coll->Middle.Floor != NO_HEIGHT &&
+		abs(coll->Middle.Floor) <= STEPUP_HEIGHT) // TODO: As Lara approaches BLJ speeds, this failsafe may become less reliable. @Sezz 2021.10.09
+	{
+		item->pos.yPos += coll->Middle.Floor / div;
+	}
+	else
+		item->pos.yPos += coll->Middle.Floor;
+}
+
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 {
-	if (gunType == WEAPON_SHOTGUN
-		|| gunType == WEAPON_HK
-		|| gunType == WEAPON_CROSSBOW
-		|| gunType == WEAPON_TORCH
-		|| gunType == WEAPON_GRENADE_LAUNCHER
-		|| gunType == WEAPON_HARPOON_GUN
-		|| gunType == WEAPON_ROCKET_LAUNCHER
-		|| gunType == WEAPON_SNOWMOBILE)
+	if (gunType == WEAPON_SHOTGUN ||
+		gunType == WEAPON_HK ||
+		gunType == WEAPON_CROSSBOW ||
+		gunType == WEAPON_TORCH ||
+		gunType == WEAPON_GRENADE_LAUNCHER ||
+		gunType == WEAPON_HARPOON_GUN ||
+		gunType == WEAPON_ROCKET_LAUNCHER ||
+		gunType == WEAPON_SNOWMOBILE)
 	{
 		return true;
 	}
@@ -60,7 +133,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	// Slide back.
+	// Slide back
 	if (polarity < -ANGLE(90.0f) || polarity > ANGLE(90.0f))
 	{
 		Lara.moveAngle = ANGLE(180);
@@ -72,7 +145,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 	}
-	// Slide forward.
+	// Slide forward
 	else [[likely]]
 	{
 		Lara.moveAngle = 0;
