@@ -844,13 +844,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
+
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = true;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.OldAnimNumber = item->animNumber;
-	coll->Setup.OldFrameNumber = item->frameNumber;
+	coll->Setup.NoQuadrants = false;
+
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
@@ -971,9 +974,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.NoQuadrants = false;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1087,6 +1090,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.NoQuadrants = true;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
