@@ -238,7 +238,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// LEGACY step code. Keeping for now; I need to ensure my generic step function will work in other states. @Sezz 2021.10.09
+	// LEGACY step
 	/*if (coll->Middle.Floor > STEP_SIZE / 2)
 	{
 		if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor <= STEP_SIZE / 2)
@@ -609,6 +609,30 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
+
+	// LEGACY step
+	//if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor < -STEPUP_HEIGHT || coll->Front.Floor >= -STEP_SIZE / 2)
+	//{
+	//	coll->Middle.Floor = 0;
+	//}
+	//else
+	//{
+	//	item->goalAnimState = LS_STEP_UP;
+	//	GetChange(item, &g_Level.Anims[item->animNumber]);
+	//}
+	//if (coll->Middle.Floor < 50)
+	//{
+	//	if (coll->Middle.Floor != NO_HEIGHT)
+	//		item->pos.yPos += coll->Middle.Floor;
+	//}
+	//else
+	//{
+	//	item->goalAnimState = LS_STEP_DOWN; // for theoretical running stepdown anims, not in default anims
+	//	if (GetChange(item, &g_Level.Anims[item->animNumber]))
+	//		item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
+	//	else
+	//		item->pos.yPos += 50; // do the default aligment
+	//}
 }
 
 // LEGACY
@@ -1398,6 +1422,27 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor <= 200)
+	{
+		if (LaraDeflectEdge(item, coll))
+			LaraCollideStop(item, coll);
+
+		if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+			item->pos.yPos += coll->Middle.Floor;
+	}
+	else
+	{
+		item->fallspeed = 0;
+
+		item->animNumber = LA_FALL_BACK;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->currentAnimState = LS_FALL_BACK;
+		item->goalAnimState = LS_FALL_BACK;
+
+		item->gravityStatus = true;
+	}*/
 }
 
 // LEGACY
@@ -2165,7 +2210,55 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_WALK_BACK (16)
+// Collision:	lara_col_back()
 void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// ???
+	if (Lara.isMoving)
+		return;
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 3) / 12;
+		
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
+	}
+
+
+	if (TrInput & IN_BACK &&
+		(TrInput & IN_WALK || Lara.waterStatus == LW_WADE))
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 16*/
 	/*collision: lara_col_back*/
@@ -2197,7 +2290,73 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_WALK_BACK (16)
+// Control:		lara_as_back()
 void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = Lara.waterStatus == LW_WADE ? NO_BAD_POS : STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor > STEP_SIZE / 2 && coll->Middle.Floor < STEPUP_HEIGHT)
+	{
+		item->goalAnimState = LS_STEP_BACK_DOWN;
+		GetChange(item, &g_Level.Anims[item->animNumber]);
+	}*/
+
+	// TODO
+#if 0
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
+		item->pos.yPos += SWAMP_GRAVITY;
+#else
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
+#endif
+}
+
+// LEGACY
+void old_lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 16*/
 	/*state code: lara_as_back*/
