@@ -1241,12 +1241,12 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom, bool unconstrained)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom)
 {
 	GetCollisionInfo(coll, item, PHD_VECTOR(), resetRoom);
 }
 
-void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom, bool unconstrained)
+void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
@@ -1267,12 +1267,12 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	int x = xPos;
 	int y = yPos - coll->Setup.Height;
 	int z = zPos;
-	
-	// Get nearest 90-degree snapped angle (quadrant).
-	auto quadrant = unconstrained ? -1 : GetQuadrant(coll->Setup.ForwardAngle);
 
 	// Define side probe offsets.
 	int xfront, xright, xleft, zfront, zright, zleft;
+
+	// Get nearest 90-degree snapped angle (quadrant).
+	auto quadrant = coll->Setup.NoQuadrants ? -1 : GetQuadrant(coll->Setup.ForwardAngle);
 
 	// Get side probe offsets depending on quadrant.
 	switch (quadrant)
