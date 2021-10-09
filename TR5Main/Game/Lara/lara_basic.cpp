@@ -1302,7 +1302,34 @@ void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_stop(item, coll);
 }
 
+// State:		LS_HOP_BACK (5)
+// Collision:	lara_col_fastback()
 void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 2) / 12;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX / 2 - item->pos.zRot) / 12;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 5*/
 	/*collision: lara_col_fastback*/
@@ -1321,7 +1348,60 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_HOP_BACK (5)
+// Control:		lara_as_fastback()
 void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
+
+	if (coll->Middle.Floor > STEPUP_HEIGHT / 2)
+	{
+		item->animNumber = LA_FALL_BACK;
+		item->currentAnimState = LS_FALL_BACK;
+		item->goalAnimState = LS_FALL_BACK;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->fallspeed = 0;
+		item->gravityStatus = true;
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+}
+
+// LEGACY
+void old_lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 5*/
 	/*state code: lara_as_fastback*/
