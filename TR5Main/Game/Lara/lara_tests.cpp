@@ -44,6 +44,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (!result)
 			return false;
 
+		// Don't try to vault if there's not enough space to perform it.
+		auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+		if (headroom < STEP_SIZE)
+			return false;
+
 		int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60;
 
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
@@ -1219,6 +1224,15 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
 		collResult.Position.Floor -= item->pos.yPos;
 
 	return collResult;
+}
+
+COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h)
+{
+	int x = item->pos.xPos + dist * phd_sin(ang);
+	int y = item->pos.yPos - h;
+	int z = item->pos.zPos + dist * phd_cos(ang);
+
+	return GetCollisionResult(x, y, z, GetCollisionResult(item->pos.xPos, y, item->pos.zPos, item->roomNumber).RoomNumber);
 }
 
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
