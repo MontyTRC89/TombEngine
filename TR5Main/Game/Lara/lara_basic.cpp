@@ -1142,8 +1142,8 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = NO_BAD_POS;			// Was STEPUP_HEIGHT.	Hopefully changing these has no ill effects; it's required
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT / 2;	// Was -STEPUP_HEIGHT.	for the sprint-to-stand animation to work as it should. @Sezz 2021.10.10
 	coll->Setup.BadCeilingHeight = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
