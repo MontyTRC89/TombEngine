@@ -66,12 +66,25 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Height difference is below threshold; simply translate Lara to new floor height
+	// TODO: Follow cube root curve instead of doing this ugly thing.
 	int div = 3;
-	if (abs(coll->Middle.Floor) >= div &&
-		coll->Middle.Floor != NO_HEIGHT &&
-		abs(coll->Middle.Floor) <= STEPUP_HEIGHT) // TODO: As Lara approaches BLJ speeds, this failsafe may become less reliable. @Sezz 2021.10.09
+	if (abs(coll->Middle.Floor) <= STEPUP_HEIGHT / 2 &&
+		abs(coll->Middle.Floor) <= STEPUP_HEIGHT &&  // TODO: As Lara approaches BLJ speeds, this failsafe may become less reliable. @Sezz 2021.10.09
+		abs(coll->Middle.Floor) >= div &&
+		coll->Middle.Floor != NO_HEIGHT)
 	{
 		item->pos.yPos += coll->Middle.Floor / div;
+	}
+	else if (abs(coll->Middle.Floor) > STEPUP_HEIGHT / 2 &&
+		abs(coll->Middle.Floor) <= STEPUP_HEIGHT &&
+		abs(coll->Middle.Floor) >= div &&
+		abs(coll->Middle.Floor) >= 50 &&
+		coll->Middle.Floor != NO_HEIGHT)
+	{
+		if (item->pos.yPos < 0)
+			item->pos.yPos += 50;
+		else
+			item->pos.yPos -= 50;
 	}
 	else
 		item->pos.yPos += coll->Middle.Floor;

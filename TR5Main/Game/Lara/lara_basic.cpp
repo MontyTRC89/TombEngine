@@ -224,11 +224,18 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 
-		// return;
+		return;
 	}
 
 	// LEGACY step code. Keeping for now; I need to ensure my generic step function will work in other states. @Sezz 2021.10.09
@@ -258,14 +265,6 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 			GetChange(item, &g_Level.Anims[item->animNumber]);
 		}
 	}*/
-
-	// TODO: See if moving this up has any consequences.  @Sezz 2021.10.09
-	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-
-		return;
-	}
 }
 
 // LEGACY
@@ -549,7 +548,71 @@ void old_lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_RUN_FORWARD (1)
+// Control:		lara_as_run()
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraVault(item, coll))
+		return;
+
+	if (LaraDeflectEdge(item, coll))
+	{
+		item->pos.zRot = 0;
+
+		if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
+		{
+			item->goalAnimState = LS_SPLAT;
+			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			{
+				item->currentAnimState = LS_SPLAT;
+
+				return;
+			}
+		}
+
+		LaraCollideStop(item, coll);
+	}
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+}
+
+// LEGACY
+void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 1*/
 	/*state code: lara_col_run*/
