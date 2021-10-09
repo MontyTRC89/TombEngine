@@ -32,6 +32,7 @@ namespace TEN{
 			extern std::array<SmokeParticle, 128> SmokeParticles;
 
 			void UpdateSmokeParticles();
+			void DisableSmokeParticles();
 			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room);
 			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count);
 			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);

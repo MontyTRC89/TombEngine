@@ -448,7 +448,7 @@ unsigned CALLBACK GameMain(void *)
 {
 	try 
 	{
-		printf("GameMain\n");
+		logD("Starting GameMain...");
 
 		TimeInit();
 
@@ -485,10 +485,10 @@ GAME_STATUS DoTitle(int index)
 	printf("DoTitle\n");
 
 	// Reset all the globals for the game which needs this
-	ResetGlobals();
+	CleanUp();
 
 	// Load the level
-	S_LoadLevelFile(index);
+	LoadLevelFile(index);
 
 	int inventoryResult;
 
@@ -609,10 +609,10 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 
 	// Reset all the globals for the game which needs this
-	ResetGlobals();
+	CleanUp();
 
 	// Load the level
-	S_LoadLevelFile(index);
+	LoadLevelFile(index);
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
@@ -723,8 +723,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			Sound_Stop();
 			StopSoundTracks();
-			DisableBubbles();
-			DisableDebris();
 
 			return result;
 		}
@@ -882,89 +880,6 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
-void RumbleScreen()
-{
-	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, 0, 4104);
-
-	if (RumbleTimer >= 0)
-		RumbleTimer++;
-
-	if (RumbleTimer > 450)
-	{
-		if (!(GetRandomControl() & 0x1FF))
-		{
-			InGameCounter = 0;
-			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
-			return;
-		}
-	}
-
-	if (RumbleTimer < 0)
-	{
-		if (InGameCounter >= abs(RumbleTimer))
-		{
-			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
-			RumbleTimer++;
-		}
-		else
-		{
-			InGameCounter++;
-			Camera.bounce = -(GetRandomControl() % InGameCounter);
-		}
-	}
-}
-
-void RefreshCamera(short type, short *data)
-{
-	short trigger, value, targetOk;
-
-	targetOk = 2;
-
-	do
-	{
-		trigger = *(data++);
-		value = trigger & VALUE_BITS;
-
-		switch (TRIG_BITS(trigger))
-		{
-		case TO_CAMERA:
-			data++;
-
-			if (value == Camera.last)
-			{
-				Camera.number = value;
-
-				if ((Camera.timer < 0) || (Camera.type == LOOK_CAMERA) || (Camera.type == COMBAT_CAMERA))
-				{
-					Camera.timer = -1;
-					targetOk = 0;
-					break;
-				}
-				Camera.type = FIXED_CAMERA;
-				targetOk = 1;
-			}
-			else
-				targetOk = 0;
-			break;
-
-		case TO_TARGET:
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
-				break;
-
-			Camera.item = &g_Level.Items[value];
-			break;
-		}
-	} while (!(trigger & END_BIT));
-
-	if (Camera.item)
-		if (!targetOk || (targetOk == 2 && Camera.item->lookedAt && Camera.item != Camera.lastItem))
-			Camera.item = NULL;
-
-	if (Camera.number == -1 && Camera.timer > 0)
-		Camera.timer = -1;
-}
-
 int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 {
 	if (1 << Node & item->meshBits)
@@ -1089,7 +1004,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	return minHeight + item->pos.yPos - height;
 }
 
-void ResetGlobals()
+void CleanUp()
 {
 	// Reset oscillator seed
 	Wibble = 0;
@@ -1107,4 +1022,9 @@ void ResetGlobals()
 
 	// Clear spotcam array
 	ClearSpotCamSequences();
+
+	// Clear all kinds of particles
+	DisableSmokeParticles();
+	DisableBubbles();
+	DisableDebris();
 }
