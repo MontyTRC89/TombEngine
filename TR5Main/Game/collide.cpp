@@ -1272,10 +1272,11 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	int xfront, xright, xleft, zfront, zright, zleft;
 
 	// Get nearest 90-degree snapped angle (quadrant).
-	auto quadrant = coll->Setup.NoQuadrants ? -1 : GetQuadrant(coll->Setup.ForwardAngle);
+	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
 
 	// Get side probe offsets depending on quadrant.
-	switch (quadrant)
+	// If unconstrained mode is specified, don't use quadrant.
+	switch (coll->Setup.NoQuadrants ? -1 : quadrant)
 	{
 	case 0:
 		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
