@@ -1874,65 +1874,61 @@ void ResetLook()
 	}
 }
 
-long TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, long radius)
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
-	long x, z, dx, dz, sin, cos;
-
 	if (pos->yPos + bounds->Y2 > Camera.pos.y - radius && pos->yPos + bounds->Y1 < radius + Camera.pos.y)
 	{
-		dx = Camera.pos.x - pos->xPos;
-		dz = Camera.pos.z - pos->zPos;
-		sin = phd_sin(pos->yRot);
-		cos = phd_cos(pos->yRot);
-		x = cos * dx - sin * dz;
-		z = cos * dz + sin * dx;
+		auto dx = Camera.pos.x - pos->xPos;
+		auto dz = Camera.pos.z - pos->zPos;
+		auto sin = phd_sin(pos->yRot);
+		auto cos = phd_cos(pos->yRot);
+		auto x = cos * dx - sin * dz;
+		auto z = cos * dz + sin * dx;
 
 		if (x >= bounds->X1 - radius && x <= radius + bounds->X2 && z >= bounds->Z1 - radius && z <= radius + bounds->Z2)
-			return 1;
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short rad)
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
-	FLOOR_INFO* floor;
-	long x, z, dx, dz, sin, cos, left, right, top, bottom, h, c;
-	short xmin, xmax, zmin, zmax;
+	auto dx = Camera.pos.x - pos->xPos;
+	auto dz = Camera.pos.z - pos->zPos;
+	auto sin = phd_sin(pos->yRot);
+	auto cos = phd_cos(pos->yRot);
+	auto x = dx * cos - dz * sin;
+	auto z = dx * sin + dz * cos;
 
-	dx = Camera.pos.x - pos->xPos;
-	dz = Camera.pos.z - pos->zPos;
-	sin = phd_sin(pos->yRot);
-	cos = phd_cos(pos->yRot);
-	x = dx * cos - dz * sin;
-	z = dx * sin + dz * cos;
-	xmin = bounds->X1 - rad;
-	xmax = bounds->X2 + rad;
-	zmin = bounds->Z1 - rad;
-	zmax = bounds->Z2 + rad;
+	auto xmin = bounds->X1 - radius;
+	auto xmax = bounds->X2 + radius;
+	auto zmin = bounds->Z1 - radius;
+	auto zmax = bounds->Z2 + radius;
 
 	if (x <= xmin || x >= xmax || z <= zmin || z >= zmax)
 		return;
 
-	left = x - xmin;
-	right = xmax - x;
-	top = zmax - z;
-	bottom = z - zmin;
+	auto left = x - xmin;
+	auto right = xmax - x;
+	auto top = zmax - z;
+	auto bottom = z - zmin;
 
-	if (left <= right && left <= top && left <= bottom)//left is closest
+	if (left <= right && left <= top && left <= bottom) // Left is closest
 		x -= left;
-	else if (right <= left && right <= top && right <= bottom)//right is closest
+	else if (right <= left && right <= top && right <= bottom) // Right is closest
 		x += right;
-	else if (top <= left && top <= right && top <= bottom)//top is closest
+	else if (top <= left && top <= right && top <= bottom) // Top is closest
 		z += top;
 	else
-		z -= bottom;//bottom
+		z -= bottom; // Bottom
 
 	Camera.pos.x = pos->xPos + (cos * x + sin * z);
 	Camera.pos.z = pos->zPos + (cos * z - sin * x);
-	floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	h = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	c = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+	auto floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+	auto h = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	auto c = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 	if (h == NO_HEIGHT || Camera.pos.y > h || Camera.pos.y < c)
 	{
@@ -1945,22 +1941,19 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short rad)
 
 static bool CheckItemCollideCamera(short item_number)
 {
-	ITEM_INFO* item;
-	long dx, dy, dz;
-	bool close_enough;
+	auto item = &g_Level.Items[item_number];
+	auto dx = Camera.pos.x - item->pos.xPos;
+	auto dy = Camera.pos.y - item->pos.yPos;
+	auto dz = Camera.pos.z - item->pos.zPos;
 
-	item = &g_Level.Items[item_number];
-	dx = Camera.pos.x - item->pos.xPos;
-	dy = Camera.pos.y - item->pos.yPos;
-	dz = Camera.pos.z - item->pos.zPos;
-	close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+	bool close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
 
 	if (!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
 		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem &&
 		item->collidable && close_enough)
-		return 1;
+		return true;
 
-	return 0;
+	return false;
 }
 
 std::vector<short> FillCollideableItemList()
@@ -1978,15 +1971,12 @@ std::vector<short> FillCollideableItemList()
 
 static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	long dx, dy, dz;
-	bool close_enough;
+	auto dx = Camera.pos.x - mesh->x;
+	auto dy = Camera.pos.y - mesh->y;
+	auto dz = Camera.pos.z - mesh->z;
+	auto close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
 
-	dx = Camera.pos.x - mesh->x;
-	dy = Camera.pos.y - mesh->y;
-	dz = Camera.pos.z - mesh->z;
-	close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
-
-	if (close_enough)//literally anything else?
+	if (close_enough) // Literally anything else?
 		return 1;
 
 	return 0;
@@ -2002,10 +1992,13 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 	
 	roomNum = Camera.pos.roomNumber;
 	room = &g_Level.Rooms[roomNum];
-	roomList.push_back(roomNum);//definitely check camera room
 
+	// Definitely check camera room 
+	roomList.push_back(roomNum);
+
+	// And neighbouring rooms
 	for (short i = 0; i < room->doors.size(); i++)
-		roomList.push_back(room->doors[i].room);//and neighbouring rooms
+		roomList.push_back(room->doors[i].room);
 
 	for (short i = 0; i < roomList.size(); i++)
 	{
@@ -2020,52 +2013,42 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
-	ITEM_INFO* item;
-	std::vector<short> itemList;
-	STATIC_INFO* stat;
-	MESH_INFO* mesh;
-	std::vector<MESH_INFO*> staticList;
-	PHD_3DPOS pos;
-	BOUNDING_BOX* bounds;
-	long i, dx, dy, dz, xmin, xmax, ymin, ymax, zmin, zmax;
-	short rad;
+	auto rad = 128;
+	auto itemList = FillCollideableItemList();
 
-	itemList = FillCollideableItemList();
-	rad = 128;
-
-	for (i = 0; i < itemList.size(); i++)//collide with the items list
+	// Collide with the items list
+	for (int i = 0; i < itemList.size(); i++)
 	{
-		item = &g_Level.Items[itemList[i]];
+		auto item = &g_Level.Items[itemList[i]];
 
 		if (!item)
 			return;
 
-		dx = abs(LaraItem->pos.xPos - item->pos.xPos);
-		dy = abs(LaraItem->pos.yPos - item->pos.yPos);
-		dz = abs(LaraItem->pos.zPos - item->pos.zPos);
+		auto dx = abs(LaraItem->pos.xPos - item->pos.xPos);
+		auto dy = abs(LaraItem->pos.yPos - item->pos.yPos);
+		auto dz = abs(LaraItem->pos.zPos - item->pos.zPos);
 
-		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))//if camera is stuck behind some item, and Lara runs off somewhere
+		// If camera is stuck behind some item, and Lara runs off somewhere
+		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
 			continue;
 
-		bounds = GetBoundsAccurate(item);
-		xmin = bounds->X1 + item->pos.xPos - rad;
-		xmax = bounds->X2 + item->pos.xPos + rad;
-		ymin = bounds->Y1 + item->pos.yPos - rad;
-		ymax = bounds->Y2 + item->pos.yPos + rad;
-		zmin = bounds->Z1 + item->pos.zPos - rad;
-		zmax = bounds->Z2 + item->pos.zPos + rad;
+		auto bounds = GetBoundsAccurate(item);
+		auto xmin = bounds->X1 + item->pos.xPos - rad;
+		auto xmax = bounds->X2 + item->pos.xPos + rad;
+		auto ymin = bounds->Y1 + item->pos.yPos - rad;
+		auto ymax = bounds->Y2 + item->pos.yPos + rad;
+		auto zmin = bounds->Z1 + item->pos.zPos - rad;
+		auto zmax = bounds->Z2 + item->pos.zPos + rad;
 
+		// Camera stuck inside box?
 		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
-			Camera.pos.y > ymin && Camera.pos.y < ymax &&	//camera stuck inside box?
+			Camera.pos.y > ymin && Camera.pos.y < ymax &&	
 			Camera.pos.z > zmin && Camera.pos.z < zmax)
 			continue;
 
-		pos.xPos = item->pos.xPos;
-		pos.yPos = item->pos.yPos;
-		pos.zPos = item->pos.zPos;
-		pos.yRot = item->pos.yRot;
+		auto pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, item->pos.yRot, 0);
 
-		if (TestBoundsCollideCamera(bounds, &pos, 512))//voilà
+		if (TestBoundsCollideCamera(bounds, &pos, 512))
 			ItemPushCamera(bounds, &pos, rad);
 
 #ifdef _DEBUG
@@ -2074,48 +2057,43 @@ void ItemsCollideCamera()
 #endif
 	}
 
-	itemList.clear();//done
+	itemList.clear(); // Done
 
 	/*now statics*/
 
-	staticList = FillCollideableStaticsList();
+	auto staticList = FillCollideableStaticsList();
 
-	for (i = 0; i < staticList.size(); i++)
+	for (int i = 0; i < staticList.size(); i++)
 	{
-		mesh = staticList[i];
-		stat = &StaticObjects[mesh->staticNumber];
+		auto mesh = staticList[i];
+		auto stat = &StaticObjects[mesh->staticNumber];
 
 		if (!mesh || !stat)
 			return;
 
-		dx = abs(LaraItem->pos.xPos - mesh->x);
-		dy = abs(LaraItem->pos.yPos - mesh->y);
-		dz = abs(LaraItem->pos.zPos - mesh->z);
+		auto dx = abs(LaraItem->pos.xPos - mesh->x);
+		auto dy = abs(LaraItem->pos.yPos - mesh->y);
+		auto dz = abs(LaraItem->pos.zPos - mesh->z);
 
 		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
 			continue;
 
-		bounds = &stat->visibilityBox;//seems fine?
-		//still need to rotate it
-		pos.xPos = mesh->x;
-		pos.yPos = mesh->y;
-		pos.zPos = mesh->z;
-		pos.yRot = mesh->yRot;
-		pos.xRot = 0;
-		pos.zRot = 0;
-		xmin = bounds->X1 + mesh->x - rad;
-		xmax = bounds->X2 + mesh->x + rad;
-		ymin = bounds->Y1 + mesh->y - rad;
-		ymax = bounds->Y2 + mesh->y + rad;
-		zmin = bounds->Z1 + mesh->z - rad;
-		zmax = bounds->Z2 + mesh->z + rad;
+		auto bounds = &stat->visibilityBox;
+		auto pos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
+		auto xmin = bounds->X1 + mesh->x - rad;
+		auto xmax = bounds->X2 + mesh->x + rad;
+		auto ymin = bounds->Y1 + mesh->y - rad;
+		auto ymax = bounds->Y2 + mesh->y + rad;
+		auto zmin = bounds->Z1 + mesh->z - rad;
+		auto zmax = bounds->Z2 + mesh->z + rad;
 
+		// Camera stuck inside box?
 		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
-			Camera.pos.y > ymin && Camera.pos.y < ymax &&	//camera stuck inside box?
+			Camera.pos.y > ymin && Camera.pos.y < ymax &&
 			Camera.pos.z > zmin && Camera.pos.z < zmax)
 			continue;
 
-		if (TestBoundsCollideCamera(bounds, &pos, 512))//voilà
+		if (TestBoundsCollideCamera(bounds, &pos, 512))
 			ItemPushCamera(bounds, &pos, rad);
 
 #ifdef _DEBUG
@@ -2124,5 +2102,5 @@ void ItemsCollideCamera()
 #endif
 	}
 
-	staticList.clear();//done
+	staticList.clear(); // Done
 }
