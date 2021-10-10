@@ -2683,7 +2683,59 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_STEP_RIGHT (21)
+// Control:		lara_as_stepright()
 void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
+	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadCeilingHeight = 0;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;*/
+}
+
+// LEGACY
+void old_lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 21*/
 	/*state code: lara_as_stepright*/
@@ -2753,7 +2805,59 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_STEP_LEFT (22)
+// Control:		lara_as_stepleft()
 void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
+	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadCeilingHeight = 0;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;*/
+}
+
+// LEGACY
+void old_lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 22*/
 	/*state code: lara_as_stepleft*/
