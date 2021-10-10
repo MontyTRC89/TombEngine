@@ -995,6 +995,8 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
+
+		// TODO: Savegame will be rewritten.
 		//creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
 		/*
 		creature->aiTarget.objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
@@ -1124,6 +1126,8 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	LEB128::Write(m_stream, creature->monkeyAhead);
 	LEB128::Write(m_stream, creature->mood);
 	LEB128::Write(m_stream, (int)enemy);
+
+	// TODO: Savegames will be rewritten.
 	/*
 	LEB128::Write(m_stream, creature->aiTarget.objectNumber);
 	LEB128::Write(m_stream, creature->aiTarget.roomNumber);
@@ -1136,6 +1140,7 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	LEB128::Write(m_stream, creature->aiTarget.pos.yRot);
 	LEB128::Write(m_stream, creature->aiTarget.pos.zRot);
 	*/
+
 	LEB128::Write(m_stream, creature->LOT.canJump);
 	LEB128::Write(m_stream, creature->LOT.canMonkey);
 	LEB128::Write(m_stream, creature->LOT.isAmphibious);
