@@ -1364,8 +1364,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	if (ceiling != NO_HEIGHT) ceiling -= y;
 
 	coll->Middle = collResult.Position;
-	coll->Middle.Ceiling = ceiling;
 	coll->Middle.Floor = height;
+	coll->Middle.Ceiling = ceiling;
 
 	// TEST 3: FRONTAL PROBE
 
@@ -1400,8 +1400,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	if (ceiling != NO_HEIGHT) ceiling -= y;
 
 	coll->Front = collResult.Position;
-	coll->Front.Ceiling = ceiling;
 	coll->Front.Floor = height;
+	coll->Front.Ceiling = ceiling;
 
 	collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
 
