@@ -120,6 +120,15 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
 	}
 
+	// Crouch failsafe.
+	// TODO: Idle crouch state dispatch. @Sezz 2021.10.11
+	if (TestLaraStandUp(coll))
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
 	if (TrInput & IN_FORWARD)
 	{
 		if (Lara.waterStatus == LW_WADE)
@@ -422,7 +431,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK &&
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE) // TODO: Check if this is required for other dispatches. @Sezz 2021.10.05
 	{
@@ -817,6 +826,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back().
 		// TODO: Allow turning while holding BACK against a wall. @Sezz 2021.06.27
+		// TODO: Lara drops off ledges when holding WALK. My fault? @Sezz 2021.10.11
 		if (TrInput & IN_WALK
 			&& (rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
 			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
@@ -1533,7 +1543,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK &&
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -1736,7 +1746,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK &&
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -2440,7 +2450,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK &&
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -2580,7 +2590,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK &&
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -3526,8 +3536,8 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_DUCK
-		&& (Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
+		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 		return;
