@@ -1,23 +1,30 @@
 #include "framework.h"
+#include "animation.h"
 #include "level.h"
 #include "setup.h"
-#include "draw.h"
-#include "lot.h"
+#include "animation.h"
+#include "control/lot.h"
 #include "Lara.h"
 #include "savegame.h"
 #include "spotcam.h"
 #include "camera.h"
-#include "control.h"
-#include "pickup\pickup.h"
-#include "door.h"
-#include "box.h"
-#include "Sound\sound.h"
+#include "control/control.h"
+#include "pickup.h"
+#include "control/volume.h"
+#include "generic_doors.h"
+#include "control/box.h"
+#include "sound.h"
 #include "GameFlowScript.h"
 #include <process.h>
 #include <zlib.h>
+#include "Renderer11.h"
+#include "items.h"
+
+
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
@@ -29,9 +36,6 @@ vector<int> StaticObjectsIds;
 char* LevelDataPtr;
 ChunkReader* g_levelChunkIO;
 LEVEL g_Level;
-
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
 
 short ReadInt8()
 {
@@ -91,15 +95,16 @@ void ReadBytes(void* dest, int count)
 	LevelDataPtr += count;
 }
 
-int LoadItems()
+void LoadItems()
 {
 	g_Level.NumItems = ReadInt32();
+	logD("Num items: ", g_Level.NumItems);
+
 	if (g_Level.NumItems == 0)
-		return false;
+		return;
 
 	g_Level.Items.resize(NUM_ITEMS);
 
-	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -123,7 +128,7 @@ int LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameItem(item->luaName, i);
+			g_GameScript->AddName(item->luaName, i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -131,35 +136,6 @@ int LoadItems()
 		for (int i = 0; i < g_Level.NumItems; i++)
 			InitialiseItem(i);
 	}
-
-	for (auto& r : g_Level.Rooms)
-	{
-		for (const auto& mesh : r.mesh)
-		{
-			FLOOR_INFO* floor = &r.floor[((mesh.z - r.z) / 1024) + r.xSize * ((mesh.x - r.x) / 1024)];
-			 
-			if (floor->box == NO_BOX)
-				continue;
-
-			if (!(g_Level.Boxes[floor->box].flags & BLOCKED))
-			{
-				int fl = floor->floor * 4;
-				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
-				if (fl <= mesh.y - st->collisionBox.Y2 + 512 && fl < mesh.y - st->collisionBox.Y1)
-				{
-					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
-						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
-						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
-					{
-						floor->stopper = true;
-					}
-				}
-			}
-		}
-	}
-
-	return true;
 }
 
 void LoadObjects()
@@ -168,6 +144,8 @@ void LoadObjects()
 	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
+	logD("Num meshes: ", numMeshes);
+
 	g_Level.Meshes.reserve(numMeshes);
 	for (int i = 0; i < numMeshes; i++)
 	{
@@ -246,6 +224,8 @@ void LoadObjects()
 	}
 
 	int numAnimations = ReadInt32();
+	logD("Num animations: ", numAnimations);
+
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
 	{
@@ -312,6 +292,8 @@ void LoadObjects()
 	//ReadBytes(g_Level.Frames.data(), sizeof(ANIM_FRAME) * numFrames);
 
 	int numModels = ReadInt32();
+	logD("Num models: ", numModels);
+
 	for (int i = 0; i < numModels; i++)
 	{
 		int objNum = ReadInt32();
@@ -329,10 +311,12 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
+	logD("Initializing objects...");
 	InitialiseObjects();
-	InitialiseClosedDoors();
 
 	int numStatics = ReadInt32();
+	logD("Num statics: ", numStatics);
+
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
@@ -357,7 +341,6 @@ void LoadObjects()
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
 		StaticObjects[meshID].shatterType = (short)ReadInt16();
-		StaticObjects[meshID].shatterDamage = (short)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
@@ -368,6 +351,8 @@ void LoadObjects()
 void LoadCameras()
 {
 	int numCameras = ReadInt32();
+	logD("Num cameras: ", numCameras);
+
 	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
@@ -377,13 +362,14 @@ void LoadCameras()
 		camera.z = ReadInt32();
 		camera.roomNumber = ReadInt32();
 		camera.flags = ReadInt32();
+		camera.speed = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddLuaNameCamera(camera.luaName, camera);
+		g_GameScript->AddName(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -394,6 +380,8 @@ void LoadCameras()
 	}
 
 	int numSinks = ReadInt32();
+	logD("Num sinks: ", numSinks);
+
 	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
@@ -409,17 +397,19 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSink(sink.luaName, sink);
+		g_GameScript->AddName(sink.luaName, sink);
 	}
 }
 
 void LoadTextures()
 {
-	printf("LoadTextures\n");
+	logD("Loading textures");
 
 	int size;
 
 	int numTextures = ReadInt32();
+	logD("Num room textures: ", numTextures);
+
 	g_Level.RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -444,6 +434,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num object textures: ", numTextures);
+
 	g_Level.MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -468,6 +460,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num static textures: ", numTextures);
+
 	g_Level.StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -492,6 +486,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num anim textures: ", numTextures);
+
 	g_Level.AnimatedTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -516,6 +512,8 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
+	logD("Num sprite textures: ", numTextures);
+
 	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
@@ -531,17 +529,17 @@ void LoadTextures()
 		g_Level.SpritesTextures.push_back(texture);
 	}
 
-	g_Level.MiscTextures.width = ReadInt32();
-	g_Level.MiscTextures.height = ReadInt32();
+	g_Level.SkyTexture.width = ReadInt32();
+	g_Level.SkyTexture.height = ReadInt32();
 	size = ReadInt32();
-	g_Level.MiscTextures.colorMapData.resize(size);
-	ReadBytes(g_Level.MiscTextures.colorMapData.data(), size);
+	g_Level.SkyTexture.colorMapData.resize(size);
+	ReadBytes(g_Level.SkyTexture.colorMapData.data(), size);
 }
 
 void ReadRooms()
 {
 	int numRooms = ReadInt32();
-	printf("NumRooms: %d\n", numRooms);
+	logD("Num rooms: ", numRooms);
 
 	for (int i = 0; i < numRooms; i++)
 	{
@@ -642,14 +640,10 @@ void ReadRooms()
 		{
 			FLOOR_INFO floor;
 
-			floor.index = ReadInt32();
-			floor.box = ReadInt32();
-			floor.fx = ReadInt32();
-			floor.stopper = ReadInt32();
-			floor.pitRoom = ReadInt32();
-			floor.floor = ReadInt32();
-			floor.skyRoom = ReadInt32();
-			floor.ceiling = ReadInt32();
+			floor.TriggerIndex = ReadInt32();
+			floor.Box = ReadInt32();
+			floor.Material = ReadInt32();
+			floor.Stopper = ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
 			floor.FloorCollision.Portals[0] = ReadInt32();
@@ -721,10 +715,12 @@ void ReadRooms()
 		for (int j = 0; j < numStatics; j++)
 		{
 			auto & mesh = room.mesh.emplace_back();
-			mesh.x = ReadInt32();
-			mesh.y = ReadInt32();
-			mesh.z = ReadInt32();
-			mesh.yRot = ReadUInt16();
+			mesh.pos.xPos = ReadInt32();
+			mesh.pos.yPos = ReadInt32();
+			mesh.pos.zPos = ReadInt32();
+			mesh.pos.xRot = 0;
+			mesh.pos.yRot = ReadUInt16();
+			mesh.pos.zRot = 0;
 			mesh.flags = ReadUInt16();
 			Vector3 rgb = ReadVector3();
 			float a = ReadFloat();
@@ -737,7 +733,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddLuaNameMesh(mesh.luaName, mesh);
+			g_GameScript->AddName(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -797,7 +793,7 @@ void ReadRooms()
 
 void LoadRooms()
 {
-	printf("LoadRooms\n");
+	logD("Loading rooms...");
 	
 	Wibble = 0;
 	//RoomLightsCount = 0;
@@ -813,34 +809,32 @@ void LoadRooms()
 
 void FreeLevel()
 {
-	malloc_ptr = malloc_buffer;
-	malloc_free = malloc_size;
-	g_Level.RoomTextures.clear();
-	g_Level.MoveablesTextures.clear();
-	g_Level.StaticsTextures.clear();
-	g_Level.AnimatedTextures.clear();
-	g_Level.SpritesTextures.clear();
-	g_Level.AnimatedTexturesSequences.clear();
-	g_Level.Rooms.clear();
-	g_Level.ObjectTextures.clear();
-	g_Level.Bones.clear();
-	g_Level.Meshes.clear();
-	MoveablesIds.clear();
-	g_Level.Boxes.clear();
-	g_Level.Overlaps.clear();
-	g_Level.Anims.clear();
-	g_Level.Changes.clear();
-	g_Level.Ranges.clear();
-	g_Level.Commands.clear();
-	g_Level.Frames.clear();
-	g_Level.Sprites.clear();
-	g_Level.SoundDetails.clear();
-	g_Level.SoundMap.clear();
-	g_Level.FloorData.clear();
-	g_Level.Cameras.clear();
-	g_Level.Sinks.clear();
-	g_Level.SoundSources.clear();
-	g_Level.AIObjects.clear();
+	g_Level.RoomTextures.resize(0);
+	g_Level.MoveablesTextures.resize(0);
+	g_Level.StaticsTextures.resize(0);
+	g_Level.AnimatedTextures.resize(0);
+	g_Level.SpritesTextures.resize(0);
+	g_Level.AnimatedTexturesSequences.resize(0);
+	g_Level.Rooms.resize(0);
+	g_Level.ObjectTextures.resize(0);
+	g_Level.Bones.resize(0);
+	g_Level.Meshes.resize(0);
+	MoveablesIds.resize(0);
+	g_Level.Boxes.resize(0);
+	g_Level.Overlaps.resize(0);
+	g_Level.Anims.resize(0);
+	g_Level.Changes.resize(0);
+	g_Level.Ranges.resize(0);
+	g_Level.Commands.resize(0);
+	g_Level.Frames.resize(0);
+	g_Level.Sprites.resize(0);
+	g_Level.SoundDetails.resize(0);
+	g_Level.SoundMap.resize(0);
+	g_Level.FloorData.resize(0);
+	g_Level.Cameras.resize(0);
+	g_Level.Sinks.resize(0);
+	g_Level.SoundSources.resize(0);
+	g_Level.AIObjects.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -861,9 +855,11 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 	return result;
 }
 
-void LoadSoundEffects()
+void LoadSoundSources()
 {
 	int numSoundSources = ReadInt32();
+	logD("Num sound sources: ", numSoundSources);
+
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
@@ -880,14 +876,16 @@ void LoadSoundEffects()
 		ReadBytes(buffer, numBytes);
 		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameSoundSource(source.luaName, source);
+		g_GameScript->AddName(source.luaName, source);
 	}
 }
 
 void LoadAnimatedTextures()
 {
-	NumAnimatedTextures = ReadInt32();
-	for (int i = 0; i < NumAnimatedTextures; i++)
+	int numAnimatedTextures = ReadInt32();
+	logD("Num anim textures: ", numAnimatedTextures);
+
+	for (int i = 0; i < numAnimatedTextures; i++)
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
@@ -907,7 +905,9 @@ void LoadAnimatedTextures()
 		}
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-	nAnimUVRanges = ReadInt8();
+
+	// Unused for now
+	int nAnimUVRanges = ReadInt8();
 }
 
 void LoadTextureInfos()
@@ -915,6 +915,8 @@ void LoadTextureInfos()
 	ReadInt32(); // TEX/0
 
 	int numObjectTextures = ReadInt32();
+	logD("Num texinfos: ", numObjectTextures);
+
 	for (int i = 0; i < numObjectTextures; i++)
 	{
 		OBJECT_TEXTURE texture;
@@ -934,6 +936,8 @@ void LoadTextureInfos()
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
+	logD("Num AI objects: ", nAIObjects);
+
 	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
@@ -954,7 +958,7 @@ void LoadAIObjects()
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddLuaNameAIObject(obj.luaName, obj);
+		g_GameScript->AddName(obj.luaName, obj);
 	}
 }
 
@@ -1002,9 +1006,9 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 
 unsigned CALLBACK LoadLevel(void* data)
 {
-	printf("LoadLevel\n");
-
 	char* filename = (char*)data;
+
+	logD("Loading Level flie: ", filename);
 
 	LevelDataPtr = NULL;
 	LevelFilePtr = NULL;
@@ -1051,12 +1055,12 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadSprites();
 		LoadCameras();
-		LoadSoundEffects();
+		LoadSoundSources();
 		g_Renderer.updateProgress(60);
 
 		LoadBoxes();
 
-		InitialiseLOTarray(true);
+		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();
@@ -1082,8 +1086,6 @@ unsigned CALLBACK LoadLevel(void* data)
 	// Initialise the game
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	Wibble = 0;
-	TorchRoom = -1;
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();
@@ -1173,12 +1175,11 @@ void LoadBoxes()
 	}
 }
 
-int S_LoadLevelFile(int levelIndex)
+int LoadLevelFile(int levelIndex)
 {
-	//DB_Log(2, "S_LoadLevelFile - DLL");
-	printf("S_LoadLevelFile\n");
+	logD("Loading level file...");
 	 
-	SOUND_Stop();
+	Sound_Stop();
 	Sound_FreeSamples();
 	if (!g_FirstLevel)
 		FreeLevel();

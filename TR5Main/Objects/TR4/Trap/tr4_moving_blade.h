@@ -1,3 +1,6 @@
 #pragma once
 
-void MovingBladeControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void MovingBladeControl(short itemNumber);
+}

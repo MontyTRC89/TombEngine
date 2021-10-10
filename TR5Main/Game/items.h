@@ -1,5 +1,11 @@
 #pragma once
+#include <cstdint>
+#include <string>
+#include <vector>
 #include "Specific\phd_global.h"
+#include "animation.h"
+#include "itemdata\itemdata.h"
+#include "roomvector.h"
 
 enum GAME_OBJECT_ID : short;
 
@@ -32,23 +38,18 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-struct ROOM_VECTOR
-{
-	int roomNumber;
-	int yNumber;
-};
-
 struct ITEM_INFO
 {
 	int floor;
-	DWORD touchBits;
-	DWORD meshBits;
+	uint32_t touchBits;
+	uint32_t meshBits;
 	GAME_OBJECT_ID objectNumber;
 	short currentAnimState;
 	short goalAnimState;
 	short requiredAnimState;
 	short animNumber;
 	short frameNumber;
+	std::vector<BONE_MUTATOR> mutator;
 	short roomNumber;
 	ROOM_VECTOR location;
 	short nextItem;
@@ -58,14 +59,14 @@ struct ITEM_INFO
 	short hitPoints;
 	int boxNumber;
 	short timer;
-	unsigned short flags; // ItemFlags enum
+	uint16_t flags; // ItemFlags enum
 	short shade;
 	short triggerFlags;
 	short carriedItem;
 	short afterDeath;
 	short firedWeapon;
 	short itemFlags[8];
-	void* data;
+	ITEM_DATA data;
 	PHD_3DPOS pos;
 	bool active;
 	short status; // ItemStatus enum
@@ -75,11 +76,11 @@ struct ITEM_INFO
 	bool lookedAt;
 	bool dynamicLight;
 	bool poisoned;
-	byte aiBits; // AIObjectType enum
+	uint8_t aiBits; // AIObjectType enum
 	bool reallyActive;
 	bool inDrawRoom;
 	bool friendly;
-	int swapMeshFlags;
+	uint32_t swapMeshFlags;
 	short drawRoom;
 	short TOSSPAD;
 	PHD_3DPOS startPos;
@@ -96,8 +97,7 @@ struct ITEM_INFO
 constexpr auto NO_ITEM = -1;
 constexpr auto ALL_MESHBITS = -1;
 constexpr auto NOT_TARGETABLE = -16384;
-#define NUM_ITEMS 1024
-#define NUM_EFFECTS 1024
+constexpr auto NUM_ITEMS = 1024;
 
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNum, short roomNumber);
@@ -113,5 +113,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
-std::vector<int> FindItem(short objectNumber);
-ITEM_INFO* find_a_fucking_item(int object_number);
+void UpdateItemRoom(ITEM_INFO* item, int height);
+std::vector<int> FindAllItems(short objectNumber);
+ITEM_INFO* FindItem(int object_number);
+int FindItem(ITEM_INFO* item);

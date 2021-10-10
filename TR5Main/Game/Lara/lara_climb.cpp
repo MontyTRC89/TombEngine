@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "lara_climb.h"
 #include "Lara.h"
-#include "control.h"
-#include "draw.h"
+#include "control/control.h"
+#include "animation.h"
 #include "sphere.h"
 #include "camera.h"
 #include "level.h"
 #include "input.h"
+#include "items.h"
 
 CLIMB_DIRECTION LeftIntRightExtTab[4] =
 {
@@ -45,8 +46,8 @@ void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = -ANGLE(45);
@@ -85,8 +86,8 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 	int shiftLeft = 0;
 	int shiftRight = 0;
-	int resultRight = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shiftRight);
-	int resultLeft = LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shiftLeft);
+	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shiftRight);
+	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -512, 512, &shiftLeft);
 
 	item->pos.yPos -= 256;
 
@@ -135,8 +136,8 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetElevation = -ANGLE(45);
 }
@@ -170,8 +171,8 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->pos.yPos += yShift - 256;
 
-		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->radius, -(coll->radius + 120), &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), &shiftLeft, &ledgeLeft);
 
 		item->pos.yPos += 256;
 		 
@@ -215,8 +216,8 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetElevation = ANGLE(30);
 }
@@ -227,14 +228,14 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 		Lara.moveAngle = item->pos.yRot + ANGLE(90);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift), shift);
 	}
 }
 
 void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = ANGLE(30);
 	Camera.targetElevation = -ANGLE(15);
@@ -249,14 +250,14 @@ void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 		Lara.moveAngle = item->pos.yRot - ANGLE(90);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -512, 512, &shift), shift);
 	}
 }
 
 void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = -ANGLE(30);
 	Camera.targetElevation = -ANGLE(15);
@@ -286,8 +287,8 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_LADDER_IDLE;
 		item->pos.yPos += 256;
 		
-		resultRight = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &ledgeRight);
-		resultLeft = LaraTestClimbPos(item, coll->radius, -120 - coll->radius, -512, 512, &ledgeLeft);
+		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &ledgeRight);
+		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -120 - coll->Setup.Radius, -512, 512, &ledgeLeft);
 		
 		item->pos.yPos -= 256;
 		
@@ -317,8 +318,8 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->goalAnimState != LS_GRABBING)
 	{
 		item->goalAnimState = LS_LADDER_IDLE;
-		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->radius, -120 - coll->radius, &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -120 - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
 		if (!resultRight || !resultLeft)
 			return;
@@ -365,8 +366,8 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.isClimbing = true;
 
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 
 	Camera.targetElevation = -ANGLE(20);
 
@@ -403,8 +404,8 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = -ANGLE(60.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
@@ -414,8 +415,8 @@ void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_stepoff_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Camera.targetAngle = ANGLE(60.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
@@ -492,19 +493,19 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 			AnimateItem(item);
 		} while (item->currentAnimState != LS_HANG);
 
-		item->pos.xPos = coll->old.x;
-		item->pos.zPos = coll->old.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 
 		return;
 	}
 
-	item->pos.xPos = coll->old.x;
-	item->pos.zPos = coll->old.z;
+	item->pos.xPos = coll->Setup.OldPosition.x;
+	item->pos.zPos = coll->Setup.OldPosition.z;
 
 	item->goalAnimState = LS_LADDER_IDLE;
 	item->currentAnimState = LS_LADDER_IDLE;
 
-	if (coll->oldAnimState != LS_LADDER_IDLE)
+	if (coll->Setup.OldAnimState != LS_LADDER_IDLE)
 	{	
 		item->animNumber = LA_LADDER_IDLE;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -587,8 +588,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		}
 	}
 
-	item->animNumber = coll->oldAnimNumber;
-	item->frameNumber = coll->oldFrameNumber;
+	item->animNumber = coll->Setup.OldAnimNumber;
+	item->frameNumber = coll->Setup.OldFrameNumber;
 
 	AnimateLara(item);
 }
@@ -630,7 +631,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot += ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
-		result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift);
 	}
 
 	if (!result)
@@ -675,7 +676,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.cornerZ = newZ;
 			item->pos.yRot -= ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
-			result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift) != 0;
+			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift) != 0;
 		}
 	}
 	else
@@ -728,7 +729,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
-		result = LaraTestClimbPos(item, coll->radius, -coll->radius - 120, -512, 512, &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
 		item->itemFlags[3] = result;
 	}
 
@@ -774,7 +775,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.cornerZ = newZ;
 			item->pos.yRot += ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
-			item->itemFlags[3] = LaraTestClimbPos(item, coll->radius, -coll->radius - 120, -512, 512, &shift);
+			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
 			result = item->itemFlags[3] != 0;
 		}
 	}

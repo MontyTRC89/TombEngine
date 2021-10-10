@@ -3,14 +3,17 @@
 #include "items.h"
 #include "collide.h"
 #include "lara.h"
-#include "lot.h"
-#include "box.h"
+#include "control/lot.h"
+#include "control/box.h"
 #include "people.h"
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "snowmobile.h"
+#include "itemdata/creature_info.h"
+#include "skidoo_info.h"
+#include "animation.h"
 
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
@@ -44,7 +47,7 @@ void InitialiseSkidman(short itemNum)
 		InitialiseItem(skidoo_item);
 
 		// The skidman remembers his skidoo
-		item->data = (void*)skidoo_item;
+		item->data = skidoo_item;
 
 		g_Level.NumItems++;
 	}
@@ -59,15 +62,15 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNum];
-	if (!TestBoundsCollide(item, laraitem, coll->radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
 
-	if (coll->enableBaddiePush)
+	if (coll->Setup.EnableObjectPush)
 	{
 		if (item->speed > 0)
-			ItemPushItem(item, laraitem, coll, coll->enableSpaz, 0);
+			ItemPushItem(item, laraitem, coll, coll->Setup.EnableSpaz, 0);
 		else
 			ItemPushItem(item, laraitem, coll, 0, 0);
 	}

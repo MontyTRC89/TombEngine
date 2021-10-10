@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr4_wildboar.h"
-#include "box.h"
+#include "control/box.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 
@@ -53,12 +54,12 @@ void WildBoarControl(short itemNumber)
 		{
 			creature->enemy = LaraItem;
 
-			CREATURE_INFO* baddie = &BaddieSlots[0];
-			CREATURE_INFO* found = &BaddieSlots[0];
 			int minDistance = 0x7FFFFFFF;
 
-			for (int i = 0; i < NUM_SLOTS; i++, baddie++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
+				CREATURE_INFO* baddie = ActiveCreatures[i];
+
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 					continue;
 

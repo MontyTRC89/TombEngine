@@ -1,17 +1,21 @@
 #include "framework.h"
 #include "tr5_cyborg.h"
 #include "items.h"
-#include "sphere.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "people.h"
-#include "draw.h"
-#include "effects\tomb4fx.h"
+#include "animation.h"
+#include "effects/tomb4fx.h"
 #include "lara.h"
-#include "traps.h"
 #include "setup.h"
 #include "level.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lightning;
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2
@@ -577,7 +581,7 @@ void HitmanControl(short itemNumber)
 				TestTriggers(
 					creature->enemy->pos.xPos,
 					creature->enemy->pos.yPos,
-					creature->enemy->pos.zPos, roomNumber, true, NULL);
+					creature->enemy->pos.zPos, roomNumber, true);
 				
 				item->requiredAnimState = STATE_HITMAN_WALK;
 

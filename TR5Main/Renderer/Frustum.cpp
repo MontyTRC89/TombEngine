@@ -97,8 +97,8 @@ bool Frustum::AABBInFrustum(const Vector3& min, const Vector3& max) const
 		&&  m_frustum[i][0] * min.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f
 		&&  m_frustum[i][0] * max.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f)
 				return false;
-		return true;
 	}
+	return true;
 }
 
 void Frustum::NormalizePlane(int32_t side)

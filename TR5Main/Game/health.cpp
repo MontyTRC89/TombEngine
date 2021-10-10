@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "health.h"
-#include "draw.h"
-#include "pickup\pickup.h"
+#include "animation.h"
+#include "pickup.h"
 #include "lara.h"
 #include "camera.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
+#include "Renderer11.h"
+#include "items.h"
 
 using namespace TEN::Renderer;
 short PickupX;

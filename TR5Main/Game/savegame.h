@@ -58,8 +58,6 @@ struct SaveGameHeader
 	bool Present;
 };
 
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
 extern SAVEGAME_INFO Savegame;
 
 class SaveGame {

@@ -2,18 +2,25 @@
 #include "GameLogicScript.h"
 #include "ScriptAssert.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "lara.h"
 #include "savegame.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "newinv2.h"
 #include "ObjectIDs.h"
+#include "GameScriptDisplayString.h"
+#include "ReservedScriptNames.h"
+#include "camera.h"
+#include <Renderer/RenderEnums.h>
+#include "Game/effects/lightning.h"
+
+using namespace TEN::Effects::Lightning;
 
 /***
 Functions and callbacks for level-specific logic scripts.
@@ -21,11 +28,9 @@ Functions and callbacks for level-specific logic scripts.
 @pragma nostrip
 */
 
-extern GameFlow* g_GameFlow;
-
 static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> looped)
 {
-	S_CDPlay(trackName, looped.value_or(false));
+	PlaySoundTrack(trackName, looped.value_or(SOUND_TRACK_ONESHOT));
 }
 
 static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
@@ -49,8 +54,7 @@ static void PlaySoundEffect(int id, int flags)
 
 static void SetAmbientTrack(std::string const & trackName)
 {
-	CurrentAtmosphere = trackName;
-	S_CDPlay(CurrentAtmosphere, 1);
+	PlaySoundTrack(trackName, SOUND_TRACK_BGM);
 }
 
 static int FindRoomNumber(GameScriptPosition pos)
@@ -151,12 +155,6 @@ static int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScri
 	return static_cast<int>(round(result));
 }
 
-// Misc
-static void PrintString(std::string key, GameScriptPosition pos, GameScriptColor color, int lifetime, int flags)
-{
-
-}
-
 // A "special" table is essentially one that TEN reserves and does things with.
 template <typename funcIndex, typename funcNewindex, typename obj>
 static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
@@ -172,6 +170,26 @@ static void MakeSpecialTable(sol::state * state, std::string const & name, funcI
 	meta.set_function("__newindex", fni, objPtr);
 }
 
+static std::tuple<int, int> PercentToScreen(double x, double y)
+{
+	auto fWidth = static_cast<double>(g_Configuration.Width);
+	auto fHeight = static_cast<double>(g_Configuration.Height);
+	int resX = std::round(fWidth / 100.0 * x);
+	int resY = std::round(fHeight / 100.0 * y);
+	//todo this still assumes a resolution of 800/600. account for this somehow
+	return std::make_tuple(resX, resY);
+}
+
+static std::tuple<double, double> ScreenToPercent(int x, int y)
+{
+
+	auto fWidth = static_cast<double>(g_Configuration.Width);
+	auto fHeight = static_cast<double>(g_Configuration.Height);
+	double resX = x/fWidth * 100.0;
+	double resY = y/fHeight * 100.0;
+	return std::make_tuple(resX, resY);
+}
+
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 /*** Ambience and music
@@ -182,14 +200,15 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 @function SetAmbientTrack
 @tparam string name of track (without file extension) to play
 */
-	m_lua->set_function("SetAmbientTrack", &SetAmbientTrack);
+	m_lua->set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 /*** Play an audio track
 @function PlayAudioTrack
 @tparam string name of track (without file extension) to play
 @tparam bool loop if true, the track will loop; if false, it won't (default: false)
 */
-	m_lua->set_function("PlayAudioTrack", &PlayAudioTrack);
+	m_lua->set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+
 
 /*** Player inventory management
 @section Inventory
@@ -204,7 +223,7 @@ For example, giving "zero" crossbow ammo would give the player
 @tparam InvItem item the item to be added
 @tparam int count the number of items to add (default: 0)
 */
-	m_lua->set_function("GiveInvItem", &InventoryAdd);
+	m_lua->set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
 
 /***
 Remove x of a certain item from the inventory.
@@ -213,7 +232,7 @@ As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item
 @tparam InvItem item the item to be removed
 @tparam int count the number of items to remove (default: 0)
 */
-	m_lua->set_function("TakeInvItem", &InventoryRemove);
+	m_lua->set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
 
 /***
 Get the amount the player holds of an item.
@@ -221,16 +240,16 @@ Get the amount the player holds of an item.
 @tparam InvItem item the item to check
 @treturn int the amount of the item the player has in the inventory
 */
-	m_lua->set_function("GetInvItemCount", &InventoryGetCount);
+	m_lua->set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
 
 /***
 Set the amount of a certain item the player has in the inventory.
 Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
 @function SetInvItemCount
 @tparam @{InvItem} item the item to be set
-@tparam int count the number of items the player will have 
+@tparam int count the number of items the player will have
 */
-	m_lua->set_function("SetInvItemCount", &InventorySetCount);
+	m_lua->set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
 
 /*** Game entity getters.
 All Lua variables created with these functions will be non-owning.
@@ -246,7 +265,7 @@ Get an ItemInfo by its name.
 @tparam string name the unique name of the item as set in, or generated by, Tomb Editor
 @treturn ItemInfo a non-owning ItemInfo referencing the item.
 */
-	m_lua->set_function("GetItemByName", &GameScript::GetItemByName, this);
+	m_lua->set_function(ScriptReserved_GetItemByName, &GameScript::GetByName<GameScriptItemInfo, ScriptReserved_ItemInfo>, this);
 
 /***
 Get a MeshInfo by its name.
@@ -254,7 +273,7 @@ Get a MeshInfo by its name.
 @tparam string name the unique name of the mesh as set in, or generated by, Tomb Editor
 @treturn MeshInfo a non-owning MeshInfo referencing the mesh.
 */
-	m_lua->set_function("GetMeshByName", &GameScript::GetMeshByName, this);
+	m_lua->set_function(ScriptReserved_GetMeshByName, &GameScript::GetByName<GameScriptMeshInfo, ScriptReserved_MeshInfo>, this);
 
 /***
 Get a CameraInfo by its name.
@@ -262,7 +281,7 @@ Get a CameraInfo by its name.
 @tparam string name the unique name of the camera as set in, or generated by, Tomb Editor
 @treturn CameraInfo a non-owning CameraInfo referencing the camera.
 */
-	m_lua->set_function("GetCameraByName", &GameScript::GetCameraByName, this);
+	m_lua->set_function(ScriptReserved_GetCameraByName, &GameScript::GetByName<GameScriptCameraInfo, ScriptReserved_CameraInfo>, this);
 
 /***
 Get a SinkInfo by its name.
@@ -270,7 +289,7 @@ Get a SinkInfo by its name.
 @tparam string name the unique name of the sink as set in, or generated by, Tomb Editor
 @treturn SinkInfo a non-owning SinkInfo referencing the sink.
 */
-	m_lua->set_function("GetSinkByName", &GameScript::GetSinkByName, this);
+	m_lua->set_function(ScriptReserved_GetSinkByName, &GameScript::GetByName<GameScriptSinkInfo, ScriptReserved_SinkInfo>, this);
 
 /***
 Get a SoundSourceInfo by its name.
@@ -278,7 +297,7 @@ Get a SoundSourceInfo by its name.
 @tparam string name the unique name of the sink as set in, or generated by, Tomb Editor
 @treturn SoundSourceInfo a non-owning SoundSourceInfo referencing the sink.
 */
-	m_lua->set_function("GetSoundSourceByName", &GameScript::GetSoundSourceByName, this);
+	m_lua->set_function(ScriptReserved_GetSoundSourceByName, &GameScript::GetByName<GameScriptSoundSourceInfo, ScriptReserved_SoundSourceInfo>, this);
 
 /***
 Calculate the distance between two positions.
@@ -287,7 +306,7 @@ Calculate the distance between two positions.
 @tparam Position posB second position
 @treturn int the direct distance from one position to the other
 */
-	m_lua->set_function("CalculateDistance", &CalculateDistance);
+	m_lua->set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 /***
 Calculate the horizontal distance between two positions.
@@ -296,50 +315,98 @@ Calculate the horizontal distance between two positions.
 @tparam Position posB second position
 @treturn int the direct distance on the XZ plane from one position to the other
 */
-	m_lua->set_function("CalculateHorizontalDistance", &CalculateHorizontalDistance);
+	m_lua->set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 
-	MakeReadOnlyTable("ObjID", kObjIDs);
+/***
+Show some text on-screen.
+@function ShowString
+@tparam DisplayString str the string object to draw
+@tparam float time the time in seconds for which to show the string.
+If not given, the string will have an "infinite" life, and will show
+until @{HideString} is called or until the level is finished.
+Default: nil (i.e. infinite)
+*/
+
+	m_lua->set_function(ScriptReserved_ShowString, &GameScript::ShowString, this);
+
+/***
+Hide some on-screen text.
+@function HideString
+@tparam DisplayString str the string object to hide. Must previously have been shown
+with a call to @{ShowString}, or this function will have no effect.
+*/
+	m_lua->set_function(ScriptReserved_HideString, [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
+
+/***
+Translate a pair of percentages to screen-space pixel coordinates.
+To be used with @{DisplayString:SetPos} and @{DisplayString.new}.
+@function PercentToScreen
+@tparam float x percent value to translate to x-coordinate
+@tparam float y percent value to translate to y-coordinate
+@treturn int x x coordinate in pixels
+@treturn int y y coordinate in pixels
+*/
+	m_lua->set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+
+/***
+Translate a pair of coordinates to percentages of window dimensions.
+To be used with @{DisplayString:GetPos}.
+@function ScreenToPercent
+@tparam int x pixel value to translate to a percentage of the window width
+@tparam int y pixel value to translate to a percentage of the window height
+@treturn float x coordinate as percentage
+@treturn float y coordinate as percentage
+*/
+	m_lua->set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
+	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();
 
-	MakeSpecialTable(m_lua, "GameVars", &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
+	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
 
 	GameScriptItemInfo::Register(m_lua);
 	GameScriptItemInfo::SetNameCallbacks(
-		[this](std::string const& str, short num) {	return AddLuaNameItem(str, num); },
-		[this](std::string const& str) { return RemoveLuaNameItem(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
 	GameScriptMeshInfo::Register(m_lua);
 	GameScriptMeshInfo::SetNameCallbacks(
-		[this](std::string const& str, MESH_INFO & info) {	return AddLuaNameMesh(str, info); },
-		[this](std::string const& str) { return RemoveLuaNameMesh(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
 	GameScriptCameraInfo::Register(m_lua);
 	GameScriptCameraInfo::SetNameCallbacks(
-		[this](std::string const& str, LEVEL_CAMERA_INFO & info) {	return AddLuaNameCamera(str, info); },
-		[this](std::string const& str) { return RemoveLuaNameCamera(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
 	GameScriptSinkInfo::Register(m_lua);
 	GameScriptSinkInfo::SetNameCallbacks(
-		[this](std::string const& str, SINK_INFO & info) {	return AddLuaNameSink(str, info); },
-		[this](std::string const& str) { return RemoveLuaNameSink(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
 	GameScriptAIObject::Register(m_lua);
 	GameScriptAIObject::SetNameCallbacks(
-		[this](std::string const& str, AI_OBJECT & info) {	return AddLuaNameAIObject(str, info); },
-		[this](std::string const& str) { return RemoveLuaNameAIObject(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
 	GameScriptSoundSourceInfo::Register(m_lua);
 	GameScriptSoundSourceInfo::SetNameCallbacks(
-		[this](std::string const& str, SOUND_SOURCE_INFO & info) {	return AddLuaNameSoundSource(str, info); },
-		[this](std::string const& str) { return RemoveLuaNameSoundSource(str); }
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
+	GameScriptDisplayString::Register(m_lua);
+	GameScriptDisplayString::SetCallbacks(
+		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
+		);
 	GameScriptPosition::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
@@ -349,13 +416,16 @@ Calculate the horizontal distance between two positions.
 
 void GameScript::ResetLevelTables()
 {
-	MakeSpecialTable(m_lua, "LevelFuncs", &GameScript::GetLevelFunc, &GameScript::SetLevelFunc, this);
-	MakeSpecialTable(m_lua, "LevelVars", &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
+	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &GameScript::GetLevelFunc, &GameScript::SetLevelFunc, this);
+	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
 }
 
 sol::protected_function GameScript::GetLevelFunc(sol::table tab, std::string const& luaName)
 {
-	return tab.raw_get<sol::protected_function>(luaName);
+	if (m_levelFuncs.find(luaName) == m_levelFuncs.end())
+		return sol::lua_nil;
+
+	return m_levelFuncs.at(luaName);
 }
 
 bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
@@ -364,13 +434,15 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	{
 	case sol::type::lua_nil:
 		m_levelFuncs.erase(luaName);
-		tab.raw_set(luaName, value);
 		break;
 	case sol::type::function:
-		m_levelFuncs.insert(luaName);
-		tab.raw_set(luaName, value);
+		m_levelFuncs.insert_or_assign(luaName, value.as<sol::protected_function>());
 		break;
 	default:
+		//todo When we save the game, do we save the functions or just the names?
+		//todo It may be better just to save the names so that we can load the callbacks
+		//todo from the level script each time (vital if the builder updates their
+		//todo scripts after release -- squidshire, 31/08/2021
 		std::string error{ "Could not assign LevelFuncs." };
 		error += luaName + "; it must be a function (or nil).";
 		return ScriptAssert(false, error);
@@ -378,70 +450,47 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	return true;
 }
 
-bool GameScript::RemoveLuaNameItem(std::string const & luaName)
+std::optional<std::reference_wrapper<UserDisplayString>> GameScript::GetDisplayString(DisplayStringIDType id)
 {
-	return m_itemsMapName.erase(luaName);
+	auto it = m_userDisplayStrings.find(id);
+	if (std::cend(m_userDisplayStrings) == it)
+		return std::nullopt;
+	return std::ref(m_userDisplayStrings.at(id));
 }
 
-bool GameScript::AddLuaNameItem(std::string const & luaName, short itemNumber)
+bool GameScript::ScheduleRemoveDisplayString(DisplayStringIDType id)
 {
-	return m_itemsMapName.insert(std::pair<std::string, short>(luaName, itemNumber)).second;
+	auto it = m_userDisplayStrings.find(id);
+	if (std::cend(m_userDisplayStrings) == it)
+		return false;
+
+	it->second.m_deleteWhenZero = true;
+	return true;
 }
 
-bool GameScript::RemoveLuaNameMesh(std::string const & luaName)
+bool GameScript::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
 {
-	return m_meshesMapName.erase(luaName);
+	return m_userDisplayStrings.insert_or_assign(id, ds).second;
 }
 
-bool GameScript::AddLuaNameMesh(std::string const& luaName, MESH_INFO& infoRef)
-{
-	return m_meshesMapName.insert(std::pair<std::string, MESH_INFO&>(luaName, infoRef)).second;
-}
 
-bool GameScript::RemoveLuaNameCamera(std::string const & luaName)
+void GameScript::SetCallbackDrawString(CallbackDrawString cb)
 {
-	return m_camerasMapName.erase(luaName);
-}
-
-bool GameScript::AddLuaNameCamera(std::string const& luaName, LEVEL_CAMERA_INFO& infoRef)
-{
-	return m_camerasMapName.insert(std::pair<std::string, LEVEL_CAMERA_INFO&>(luaName, infoRef)).second;
-}
-
-bool GameScript::RemoveLuaNameSink(std::string const & luaName)
-{
-	return m_sinksMapName.erase(luaName);
-}
-
-bool GameScript::AddLuaNameSink(std::string const& luaName, SINK_INFO& infoRef)
-{
-	return m_sinksMapName.insert(std::pair<std::string, SINK_INFO&>(luaName, infoRef)).second;
-}
-bool GameScript::RemoveLuaNameSoundSource(std::string const & luaName)
-{
-	return m_soundSourcesMapName.erase(luaName);
-}
-
-bool GameScript::AddLuaNameSoundSource(std::string const& luaName, SOUND_SOURCE_INFO& infoRef)
-{
-	return m_soundSourcesMapName.insert(std::pair<std::string, SOUND_SOURCE_INFO&>(luaName, infoRef)).second;
-}
-
-bool GameScript::RemoveLuaNameAIObject(std::string const & luaName)
-{
-	return m_aiObjectsMapName.erase(luaName);
-}
-
-bool GameScript::AddLuaNameAIObject(std::string const& luaName, AI_OBJECT & ref)
-{
-	return m_aiObjectsMapName.insert(std::pair<std::string, AI_OBJECT&>(luaName, ref)).second;
+	m_callbackDrawSring = cb;
 }
 
 void GameScript::FreeLevelScripts()
 {
+	m_nameMap.clear();
 	m_levelFuncs.clear();
 	m_locals = LuaVariables{};
 	ResetLevelTables();
+	m_onStart = sol::nil;
+	m_onLoad = sol::nil;
+	m_onControlPhase = sol::nil;
+	m_onSave = sol::nil;
+	m_onEnd = sol::nil;
+	m_lua->collect_garbage();
 }
 
 void JumpToLevel(int levelNum)
@@ -468,7 +517,7 @@ void AddOneSecret()
 	if (Savegame.Level.Secrets >= 255)
 		return;
 	Savegame.Level.Secrets++;
-	S_CDPlay(TRACK_FOUND_SECRET, 0);
+	PlaySoundTrack(TRACK_FOUND_SECRET, SOUND_TRACK_ONESHOT);
 }
 
 /*
@@ -522,6 +571,7 @@ template void GameScript::GetVariables<std::string>(std::map<std::string, std::s
 template <typename T>
 void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
+	//TODO Look into serialising tables from these maps, too -- squidshire, 24/08/2021
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
@@ -537,43 +587,12 @@ template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals
 template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
 template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
-template <typename T, typename Stored>
-std::unique_ptr<T> GetTByName(std::string const & type, std::string const& name, std::unordered_map<std::string, Stored> const & map)
+template <typename R, char const * S, typename mapType>
+std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
 {
 	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ERROR_MODE::TERMINATE);
-	return std::make_unique<T>(map.at(name), false);
+	return std::make_unique<R>(map.at(name), false);
 }
-
-std::unique_ptr<GameScriptItemInfo> GameScript::GetItemByName(std::string const & name)
-{
-	return GetTByName<GameScriptItemInfo, short>("ItemInfo", name, m_itemsMapName);
-}
-
-std::unique_ptr<GameScriptMeshInfo> GameScript::GetMeshByName(std::string const & name)
-{
-	return GetTByName<GameScriptMeshInfo, MESH_INFO &>("MeshInfo", name, m_meshesMapName);
-}
-
-std::unique_ptr<GameScriptCameraInfo> GameScript::GetCameraByName(std::string const & name)
-{
-	return GetTByName<GameScriptCameraInfo, LEVEL_CAMERA_INFO &>("CameraInfo", name, m_camerasMapName);
-}
-
-std::unique_ptr<GameScriptSinkInfo> GameScript::GetSinkByName(std::string const & name)
-{
-	return GetTByName<GameScriptSinkInfo, SINK_INFO &>("SinkInfo", name, m_sinksMapName);
-}
-
-std::unique_ptr<GameScriptAIObject> GameScript::GetAIObjectByName(std::string const & name)
-{
-	return GetTByName<GameScriptAIObject, AI_OBJECT &>("AIObject", name, m_aiObjectsMapName);
-}
-
-std::unique_ptr<GameScriptSoundSourceInfo> GameScript::GetSoundSourceByName(std::string const & name)
-{
-	return GetTByName<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>("SoundSourceInfo", name, m_soundSourcesMapName);
-}
-
 
 void GameScript::AssignItemsAndLara()
 {
@@ -591,6 +610,48 @@ void GameScript::ResetVariables()
 {
 	(*m_lua)["Lara"] = NULL;
 }
+
+void GameScript::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
+{
+	auto it = m_userDisplayStrings.find(str.GetID());
+	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
+	it->second.m_isInfinite = !nSeconds.has_value();
+}
+
+void GameScript::ProcessDisplayStrings(float dt)
+{
+	auto it = std::begin(m_userDisplayStrings);
+	while (it != std::end(m_userDisplayStrings))
+	{
+		auto& str = it->second;
+		bool endOfLife = (0.0f >= str.m_timeRemaining);
+		if (str.m_deleteWhenZero && endOfLife)
+		{
+			ScriptAssertF(!str.m_isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str.m_key);
+			it = m_userDisplayStrings.erase(it);
+		}
+		else
+		{
+			if (!endOfLife || str.m_isInfinite)
+			{
+				char const* cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
+				int flags = 0;
+
+				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])
+					flags |= PRINTSTRING_CENTER;
+
+				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
+					flags |= PRINTSTRING_OUTLINE;
+
+				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
+
+				str.m_timeRemaining -= dt;
+			}
+			++it;
+		}
+	}
+}
+
 sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
 {
 	if (variables.find(key) == variables.end())

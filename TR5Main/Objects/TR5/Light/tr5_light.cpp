@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr5_light.h"
-#include "items.h"
 #include "level.h"
-#include "control.h"
-#include "effects\effects.h"
-#include "Sound\sound.h"
-#include "sphere.h"
-#include "Specific\trmath.h"
+#include "control/los.h"
+#include "effects/effects.h"
+#include "Sound/sound.h"
+#include "Specific/trmath.h"
+#include "animation.h"
+#include "items.h"
 
 void PulseLightControl(short itemNumber)
 {

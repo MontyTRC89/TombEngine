@@ -1,13 +1,15 @@
 #include "framework.h"
 #include "tr4_senet.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "items.h"
-#include "control.h"
+#include "control/control.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "lara.h"
 #include "lara_struct.h"
 #include "input.h"
+#include "level.h"
+#include "collide.h"
 
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
@@ -27,7 +29,8 @@ void InitialiseGameStix(short itemNumber)
 	
 	item = &g_Level.Items[itemNumber];
 	item->itemFlags[7] = -1;
-	item->data = &item->itemFlags;
+	//not needed
+	//item->data = &item->itemFlags;
 	ActivePiece = -1;
 	SenetDisplacement = 0;
 }

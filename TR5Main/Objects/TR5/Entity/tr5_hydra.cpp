@@ -1,15 +1,14 @@
 #include "framework.h"
 #include "tr5_hydra.h"
 #include "items.h"
-#include "sphere.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "setup.h"
-#include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1

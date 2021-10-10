@@ -1,14 +1,21 @@
 #include "framework.h"
 #include "tr4_wraith.h"
 #include "level.h"
-#include "effects\effects.h"
-#include "control.h"
+#include "effects/effects.h"
+#include "room.h"
+#include "flipeffect.h"
 #include "objectslist.h"
-#include "Specific\trmath.h"
-#include "Sound\sound.h"
-#include <lara.h>
-#include <traps.h>
-#include <effects\tomb4fx.h>
+#include "Specific/trmath.h"
+#include "Sound/sound.h"
+#include "lara.h"
+#include "traps.h"
+#include "people.h"
+#include "effects/tomb4fx.h"
+#include "tr4_wraith_info.h"
+#include "Game/effects/lara_burn.h"
+#include "items.h"
+
+using namespace TEN::Effects::Fire;
 
 constexpr auto WRAITH_COUNT = 8;
 
@@ -19,10 +26,10 @@ void InitialiseWraith(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	WRAITH_INFO* wraithData;
 	
-	wraithData = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
-	item->data = wraithData;
+	item->data = WRAITH_INFO();
+	WRAITH_INFO* wraithData = item->data;
+
 	item->itemFlags[0] = 0;
 	item->itemFlags[6] = 0;
 	item->speed = WraithSpeed;
@@ -74,7 +81,7 @@ void WraithControl(short itemNumber)
 		z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
 
 		distance = SQUARE(x) + SQUARE(z);
-		dy = abs((distance / 8192) - 768);
+		dy = abs((distance / MAX_VISIBILITY_DISTANCE) - 768);
 		y = room->y + ((room->minfloor - room->maxceiling) / 2);
 	}
 

@@ -1,20 +1,26 @@
 #include "framework.h"
 #include "tr4_plough.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
+#include "animation.h"
+#include "items.h"
 
-void PloughControl(short itemNum)
+namespace TEN::Entities::TR4
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	void PloughControl(short itemNum)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	item->itemFlags[3] = 50;
-	if (TriggerActive(item))
-	{
-		item->itemFlags[0] = 258048;
-		AnimateItem(item);
-	}
-	else
-	{
-		item->itemFlags[0] = 0;
+		item->itemFlags[3] = 50;
+
+		if (TriggerActive(item))
+		{
+			*((int*)&item->itemFlags) = 0x3F000;
+			AnimateItem(item);
+		}
+		else
+		{
+			*((int*)&item->itemFlags) = 0;
+		}
 	}
 }

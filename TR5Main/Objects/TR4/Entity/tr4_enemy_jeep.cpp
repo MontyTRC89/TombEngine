@@ -1,17 +1,21 @@
-#include <tr4_enemy_jeep.h>
-#include <framework.h>
-#include <items.h>
-#include <level.h>
-#include <Box.h>
-#include <Specific\trmath.h>
-#include <control.h>
-#include <lara.h>
-#include <sphere.h>
-#include <lot.h>
-#include "Sound\sound.h"
-#include <draw.h>
-#include <effects\effects.h>
-#include <effects\tomb4fx.h>
+#include "framework.h"
+#include "tr4_enemy_jeep.h"
+#include "items.h"
+#include "level.h"
+#include "control/box.h"
+#include "Specific/trmath.h"
+#include "control/control.h"
+#include "lara.h"
+#include "control/lot.h"
+#include "Sound/sound.h"
+#include "animation.h"
+#include "itemdata/creature_info.h"
+#include "setup.h"
+#include "control/trigger.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+
+ITEM_INFO jeepDummyTarget;
 
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
@@ -144,16 +148,10 @@ void EnemyJeepControl(short itemNumber)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		ITEM_INFO* target = &creature->aiTarget;
-		creature->enemy = target;
+		creature->enemy = &jeepDummyTarget;
+		CREATURE_TARGET* target = &creature->aiTarget;
 		short angle;
 		int distance;
-		if (target == LaraItem)
-		{
-			angle = info.angle;
-			distance = info.distance;
-		}
-		else
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -268,7 +266,7 @@ void EnemyJeepControl(short itemNumber)
 
 		if (creature->reachedGoal)
 		{
-			TestTriggers(target, true, NULL);
+			TestTriggers(target->pos.xPos,target->pos.yPos,target->pos.zPos,target->roomNumber, true);
 
 			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
 			{
@@ -309,8 +307,8 @@ void EnemyJeepControl(short itemNumber)
 				creature->reachedGoal = false;
 				item->itemFlags[3]++;
 
-				creature->enemy = NULL;
-				AI_OBJECT* aiObject = NULL;
+				creature->enemy = nullptr;
+				AI_OBJECT* aiObject = nullptr;
 
 				for (int i = 0; i < g_Level.AIObjects.size(); i++)
 				{ 
@@ -323,9 +321,9 @@ void EnemyJeepControl(short itemNumber)
 					}
 				}
 
-				if (aiObject != NULL)
+				if (aiObject != nullptr)
 				{
-					creature->enemy = target;
+					creature->enemy = nullptr;
 					target->objectNumber = aiObject->objectNumber;
 					target->roomNumber = aiObject->roomNumber;
 					target->pos.xPos = aiObject->x;

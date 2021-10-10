@@ -1,4 +1,5 @@
 #include "framework.h"
+
 #include "Lara.h"
 #include "lara_basic.h"
 #include "lara_tests.h"
@@ -7,11 +8,6 @@
 #include "lara_objects.h"
 #include "lara_hang.h"
 #include "lara_slide.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "lara_fire.h"
 #include "lara_surface.h"
 #include "lara_swim.h"
@@ -30,8 +26,8 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
-//#include "rubberboat.h"
 
+#include "animation.h"
 #include "GameFlowScript.h"
 #include "health.h"
 #include "flipeffect.h"
@@ -39,9 +35,21 @@
 #include "savegame.h"
 #include "rope.h"
 #include "rubberboat.h"
-#include <Game\misc.h>
-#include <control\volume.h>
+#include "misc.h"
+#include "control\volume.h"
+#include "Renderer11.h"
+#include "camera.h"
+#include "items.h"
 
+#ifdef NEW_INV
+#include "newinv2.h"
+#else
+#include "inventory.h"
+#endif
+
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
@@ -50,14 +58,13 @@ using namespace TEN::Control::Volumes;
 extern Inventory g_Inventory;
 #endif
 
-short Elevation = 57346;
-extern short FXType;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-COLL_INFO lara_coll = {};
+COLL_INFO LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
-function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
+function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
+{
 	lara_as_walk,
 	lara_as_run,
 	lara_as_stop,
@@ -215,6 +222,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_stepoff_left,
 	lara_as_stepoff_right
 };
+
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_walk,
 	lara_col_run,
@@ -376,6 +384,21 @@ void LaraControl(short itemNumber)
 
 	LaraCheatyBits();
 
+	if (Lara.hasFired)
+	{
+		AlertNearbyGuards(LaraItem);
+		Lara.hasFired = false;
+	}
+
+	if (Lara.poisoned)
+	{
+		if (Lara.poisoned > 4096)
+			Lara.poisoned = 4096;
+
+		if (Lara.poisoned >= 256 && !(Wibble & 0xFF))
+			LaraItem->hitPoints -= Lara.poisoned >> 8;
+	}
+
 	if (Lara.isMoving)
 	{
 		if (Lara.moveCount > 90)
@@ -386,7 +409,7 @@ void LaraControl(short itemNumber)
 		++Lara.moveCount;
 	}
 
-	if (!DisableLaraControl)
+	if (!Lara.uncontrollable)
 		Lara.locationPad = 128;
 
 	int oldX = LaraItem->pos.xPos;
@@ -429,28 +452,25 @@ void LaraControl(short itemNumber)
 		switch (Lara.waterStatus)
 		{
 		case LW_ABOVE_WATER:
-			if (hfw != NO_HEIGHT && hfw >= STEP_SIZE && Lara.Vehicle == NO_ITEM)
+			if (hfw != NO_HEIGHT && hfw >= WADE_DEPTH)
 			{
-				if (wd <= 474)
+				if (wd <= SWIM_DEPTH - STEP_SIZE)
 				{
-					if (hfw > 256)
+					Lara.waterStatus = LW_WADE;
+					if (!(item->gravityStatus))
 					{
-						Lara.waterStatus = LW_WADE;
-						if (!(item->gravityStatus))
-						{
-							item->goalAnimState = LS_STOP;
-						}
-						else if (isWater & ENV_FLAG_SWAMP)
-						{
-							if (item->currentAnimState == LS_SWANDIVE_START 
-								|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
-								item->pos.yPos = wh + 1000;
+						item->goalAnimState = LS_STOP;
+					}
+					else if (isWater & ENV_FLAG_SWAMP)
+					{
+						if (item->currentAnimState == LS_SWANDIVE_START 
+							|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
+							item->pos.yPos = wh + 1000;
 
-							item->goalAnimState = LS_WADE_FORWARD;
-							item->currentAnimState = LS_WADE_FORWARD;
-							item->animNumber = LA_WADE;
-							item->frameNumber = GF(LA_WADE, 0);
-						}
+						item->goalAnimState = LS_WADE_FORWARD;
+						item->currentAnimState = LS_WADE_FORWARD;
+						item->animNumber = LA_WADE;
+						item->frameNumber = GF(LA_WADE, 0);
 					}
 				}
 				else if (!(isWater & ENV_FLAG_SWAMP))
@@ -460,7 +480,7 @@ void LaraControl(short itemNumber)
 					item->gravityStatus = false;
 					item->pos.yPos += 100;
 
-					UpdateLaraRoom(LaraItem, 0);
+					UpdateItemRoom(LaraItem, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
 					if (item->currentAnimState == LS_SWANDIVE_START)
@@ -496,9 +516,10 @@ void LaraControl(short itemNumber)
 				}
 
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw > 256)
+
+				if (hfw >= WADE_DEPTH)
 				{
-					if (hfw > 730)
+					if (hfw > SWIM_DEPTH)
 					{
 						Lara.waterStatus = LW_SURFACE;
 						item->pos.yPos += 1 - hfw;
@@ -544,7 +565,7 @@ void LaraControl(short itemNumber)
 						Lara.headYrot = 0;
 						Lara.headXrot = 0;
 
-						UpdateLaraRoom(item, 0);
+						UpdateItemRoom(item, 0);
 					}
 				}
 				else
@@ -560,17 +581,17 @@ void LaraControl(short itemNumber)
 
 		case LW_UNDERWATER:
 			roomNumber = item->roomNumber;
-			GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+			GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, &roomNumber);
 
-			if (wd == NO_HEIGHT
-				|| abs(hfw) >= 256
+			if (wd == DEEP_WATER
+				|| abs(hfw) >= STEP_SIZE
 				|| g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER
 				|| item->animNumber == LA_UNDERWATER_RESURFACE
 				|| item->animNumber == LA_ONWATER_DIVE)
 			{
 				if (!isWater)
 				{
-					if (wd == NO_HEIGHT || abs(hfw) >= 256)
+					if (wd == DEEP_WATER || abs(hfw) >= STEP_SIZE)
 					{
 						Lara.waterStatus = LW_ABOVE_WATER;
 						item->animNumber = LA_FALL_START;
@@ -605,7 +626,7 @@ void LaraControl(short itemNumber)
 						Lara.headYrot = 0;
 						Lara.headXrot = 0;
 
-						UpdateLaraRoom(item, -381);
+						UpdateItemRoom(item, -381);
 						SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 					}
 				}
@@ -627,7 +648,7 @@ void LaraControl(short itemNumber)
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
 
-				UpdateLaraRoom(item, 0);
+				UpdateItemRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 			}
 			break;
@@ -635,7 +656,7 @@ void LaraControl(short itemNumber)
 		case LW_SURFACE:
 			if (!isWater)
 			{
-				if (hfw <= 256)
+				if (hfw <= WADE_DEPTH)
 				{
 					Lara.waterStatus = LW_ABOVE_WATER;
 					item->animNumber = LA_FALL_START;
@@ -668,9 +689,9 @@ void LaraControl(short itemNumber)
 
 		case LW_WADE:
 			Camera.targetElevation = -ANGLE(22);
-			if (hfw > 256)
+			if (hfw >= WADE_DEPTH)
 			{
-				if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
+				if (hfw > SWIM_DEPTH && !(isWater & ENV_FLAG_SWAMP))
 				{
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - hfw;
@@ -716,7 +737,7 @@ void LaraControl(short itemNumber)
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;
 
-					UpdateLaraRoom(item, 0);
+					UpdateItemRoom(item, 0);
 				}
 			}
 			else
@@ -734,7 +755,7 @@ void LaraControl(short itemNumber)
 		item->hitPoints = -1;
 
 		if (Lara.deathCount == 0)
-			S_CDStop();
+			StopSoundTracks();
 
 		Lara.deathCount++;
 		if ((LaraItem->flags & 0x100))
@@ -771,7 +792,7 @@ void LaraControl(short itemNumber)
 					Lara.air = 1800;
 			}
 		}
-		LaraAboveWater(item, &lara_coll);
+		LaraAboveWater(item, &LaraCollision);
 		break;
 
 	case LW_UNDERWATER:
@@ -793,7 +814,7 @@ void LaraControl(short itemNumber)
 				item->hitPoints -= 5;
 			}
 		}
-		LaraUnderWater(item, &lara_coll);
+		LaraUnderWater(item, &LaraCollision);
 		break;
 
 	case LW_SURFACE:
@@ -803,11 +824,11 @@ void LaraControl(short itemNumber)
 			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
-		LaraSurface(item, &lara_coll);
+		LaraSurface(item, &LaraCollision);
 		break;
 
 	case LW_FLYCHEAT:
-		LaraCheat(item, &lara_coll);
+		LaraCheat(item, &LaraCollision);
 		break;
 	}
 
@@ -819,18 +840,19 @@ void LaraControl(short itemNumber)
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 {
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
-	coll->oldAnimState = item->currentAnimState;
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = true;
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->oldAnimNumber = item->animNumber;
-	coll->oldFrameNumber = item->frameNumber;
-	coll->radius = LARA_RAD;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = true;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
@@ -838,6 +860,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 		ResetLook();
 
 	Lara.look = true;
+
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	// Process Vehicles
 	if (Lara.Vehicle != NO_ITEM)
@@ -922,8 +946,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
@@ -932,28 +954,29 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 
 	// Test for flags & triggers
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->badPos = 32512;
-	coll->badNeg = -400;
-	coll->badCeiling = 400;
+	coll->Setup.BadHeightDown = 32512;
+	coll->Setup.BadHeightUp = -400;
+	coll->Setup.BadCeilingHeight = 400;
 
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
 
-	coll->enableBaddiePush = true;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = false;
 
-	coll->radius = 300;
+	coll->Setup.Radius = LARA_RAD_UNDERWATER;
+	coll->Setup.Height = LARA_HEIGHT;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1038,12 +1061,12 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (/*Lara.ExtraAnim == -1 &&*/ Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
 
-	UpdateLaraRoom(item, 0);
+	UpdateItemRoom(item, 0);
 
 	LaraGun();
 
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 
@@ -1051,21 +1074,22 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.targetElevation = -ANGLE(22);
 
-	coll->badPos = 32512;
-	coll->badNeg = -128;
-	coll->badCeiling = 100;
+	coll->Setup.BadHeightDown = 32512;
+	coll->Setup.BadHeightUp = -128;
+	coll->Setup.BadCeilingHeight = 100;
 
-	coll->old.x = item->pos.xPos;
-	coll->old.y = item->pos.yPos;
-	coll->old.z = item->pos.zPos;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
-	coll->radius = 100;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -1096,12 +1120,12 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
 
-	UpdateLaraRoom(item, 100);
+	UpdateItemRoom(item, 100);
 
 	LaraGun();
 
 	ProcessSectorFlags(item);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 	TestVolumes(item);
 }
 
@@ -1165,7 +1189,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+					UpdateItemRoom(item, -LARA_HEIGHT / 2);
 					cmd += 3;
 					break;
 
@@ -1248,7 +1272,7 @@ void AnimateLara(ITEM_INFO* item)
 
 				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
-				effect_routines[effectID](item);
+				DoFlipEffect(effectID, item);
 
 				cmd += 2;
 				break;

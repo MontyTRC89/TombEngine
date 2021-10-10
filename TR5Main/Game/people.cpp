@@ -1,12 +1,14 @@
 #include "framework.h"
 #include "people.h"
 #include "effects\effects.h"
-#include "draw.h"
-#include "control.h"
+#include "animation.h"
+#include "control\los.h"
 #include "sphere.h"
 #include "effects\debris.h"
 #include "lara.h"
 #include "Sound\sound.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
@@ -16,13 +18,13 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 	int hit = 0;
 	int targetable = 0;
 
-	if (info->distance <= SQUARE(8192) && Targetable(item, info))
+	if (info->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(8192) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
 		distance = info->distance + SQUARE(distance);
-		if (distance <= SQUARE(8192))
+		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
-			int random = (SQUARE(8192) - info->distance) / (SQUARE(8192) / 0x5000) + 8192;
+			int random = (SQUARE(MAX_VISIBILITY_DISTANCE) - info->distance) / (SQUARE(MAX_VISIBILITY_DISTANCE) / 0x5000) + 8192;
 			hit = (GetRandomControl() < random);
 		}
 		else
@@ -120,30 +122,31 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
 
-	if (enemy != NULL && enemy->hitPoints > 0 && enemy->data != NULL && info->ahead && info->distance < SQUARE(8192))
-	{
-		GAME_VECTOR start, target;
+	if (enemy == NULL || enemy->hitPoints <= 0 || !info->ahead || info->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
+		return 0;
 
-		BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	if (!enemy->data.is<CREATURE_INFO>() && !enemy->data.is<LaraInfo*>())
+		return 0;
 
-		start.x = item->pos.xPos;
-		if (item->objectNumber == ID_SNIPER)
-			start.y = item->pos.yPos - 768;
-		else
-			start.y = item->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
-		start.z = item->pos.zPos;
-		start.roomNumber = item->roomNumber;
+	GAME_VECTOR start, target;
 
-		bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+	BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
-		target.x = enemy->pos.xPos;
-		target.y = enemy->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
-		target.z = enemy->pos.zPos;
+	start.x = item->pos.xPos;
+	if (item->objectNumber == ID_SNIPER)
+		start.y = item->pos.yPos - 768;
+	else
+		start.y = item->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
+	start.z = item->pos.zPos;
+	start.roomNumber = item->roomNumber;
 
-		return LOS(&start, &target);
-	}
+	bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 
-	return 0;
+	target.x = enemy->pos.xPos;
+	target.y = enemy->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
+	target.z = enemy->pos.zPos;
+
+	return LOS(&start, &target);
 }
 
 int TargetVisible(ITEM_INFO* item, AI_INFO* info) 
@@ -154,7 +157,7 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 	if (enemy != NULL)
 	{
 		short angle = info->angle - creature->jointRotation[2];
-		if (enemy->hitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(8192))
+		if (enemy->hitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
 			GAME_VECTOR start;
 			start.x = item->pos.xPos;

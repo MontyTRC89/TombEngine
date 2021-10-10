@@ -1,9 +1,13 @@
 #include "framework.h"
 #include "fullblock_switch.h"
-#include "control.h"
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
+#include "setup.h"
+#include "collide.h"
+#include "level.h"
+#include "animation.h"
+#include "items.h"
 
 namespace TEN::Entities::Switches
 {

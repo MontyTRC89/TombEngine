@@ -1,9 +1,8 @@
 #include "framework.h"
 #include "motorbike.h"
 #include "level.h"
-#include "sphere.h"
-#include "control.h"
-#include "effects\effects.h"
+#include "control/control.h"
+#include "effects/effects.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -14,12 +13,15 @@
 #include "lara_flare.h"
 #include "setup.h"
 #include "lara_one_gun.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "items.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "health.h"
 #include "camera.h"
-#include "Specific\prng.h"
+#include "animation.h"
+#include "Specific/prng.h"
+#include "motorbike_info.h"
+#include "items.h"
 
 using namespace TEN::Math::Random;
 
@@ -138,8 +140,8 @@ void InitialiseMotorbike(short itemNumber)
     MOTORBIKE_INFO* motorbike;
 
     item = &g_Level.Items[itemNumber];
-    motorbike = game_malloc<MOTORBIKE_INFO>();
-    item->data = (void*)motorbike;
+    item->data = ITEM_DATA(MOTORBIKE_INFO());
+    motorbike = item->data;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
     motorbike->pitch = 0;
@@ -303,7 +305,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && 
@@ -542,7 +544,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
     auto pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0);
-	TriggerShockwave(&pos, 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
+	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	ExplodingDeath(Lara.Vehicle, -2, 256);
 	ExplodingDeath(Lara.itemNumber, -2, 258); // enable blood
 	LaraItem->hitPoints = 0;
@@ -972,13 +974,13 @@ static BOOL MotorbikeCanGetOff(void)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-    if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
+    if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
         return false;
-    if (abs(collResult.FloorHeight - item->pos.yPos) > STEP_SIZE)
+    if (abs(collResult.Position.Floor - item->pos.yPos) > STEP_SIZE)
         return false;
-    if ((collResult.CeilingHeight - item->pos.yPos) > -LARA_HEIGHT)
+    if ((collResult.Position.Ceiling - item->pos.yPos) > -LARA_HEIGHT)
         return false;
-    if ((collResult.FloorHeight - collResult.CeilingHeight) < LARA_HEIGHT)
+    if ((collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
         return false;
 
     return true;
@@ -1419,8 +1421,8 @@ int MotorbikeControl(void)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	TestTriggers(item, true,  NULL);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, true);
+	TestTriggers(item, false);
 
     if (LaraItem->hitPoints <= 0)
     {

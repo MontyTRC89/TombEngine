@@ -1,16 +1,15 @@
 #include "framework.h"
-#include "tr4_guide.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "lot.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "control/box.h"
+#include "control/lot.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
-#include <Game\draw.h>
+#include "Sound/sound.h"
+#include "animation.h"
+#include "itemdata/creature_info.h"
 
 #define STATE_VON_CROY_STOP						1
 #define STATE_VON_CROY_WALK						2
@@ -156,11 +155,11 @@ void VonCroyControl(short itemNumber)
 	{
 		int minDistance = 0x7FFFFFFF;
 		int distance;
-		CREATURE_INFO* baddie = &BaddieSlots[0];
+		CREATURE_INFO* baddie = ActiveCreatures[0];
 
-		for (int i = 0; i < NUM_SLOTS; i++)
+		for (int i = 0; i < ActiveCreatures.size(); i++)
 		{
-			baddie = &BaddieSlots[i];
+			baddie = ActiveCreatures[i];
 
 			if (baddie->itemNum == NO_ITEM
 				|| baddie->itemNum == itemNumber
@@ -648,7 +647,7 @@ void VonCroyControl(short itemNumber)
 				creature->aiTarget.pos.yPos,
 				creature->aiTarget.pos.zPos,
 				creature->aiTarget.roomNumber,
-				true, NULL);
+				true);
 
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
@@ -771,7 +770,7 @@ void VonCroyControl(short itemNumber)
 			creature->aiTarget.pos.yPos,
 			creature->aiTarget.pos.zPos,
 			creature->aiTarget.roomNumber,
-			true, NULL);
+			true);
 
 		creature->reachedGoal = false;
 		creature->enemy = NULL;

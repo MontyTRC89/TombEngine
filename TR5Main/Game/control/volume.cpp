@@ -1,11 +1,14 @@
 #include "framework.h"
+#include "volume.h"
 #include "room.h"
 #include "setup.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "savegame.h"
 #include "RenderEnums.h"
 #include "Renderer11.h"
+#include "items.h"
+
 
 using TEN::Renderer::g_Renderer;
 
@@ -33,18 +36,14 @@ namespace TEN::Control::Volumes
 			switch (volume->type)
 			{
 			case VOLUME_BOX:
-#ifdef _DEBUG
 				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-#endif
 				contains = volume->box.Intersects(bbox);
 				break;
 
 			case VOLUME_SPHERE:
-#ifdef _DEBUG
 				if (roomNumber == Camera.pos.roomNumber)
 					g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-#endif
 				contains = volume->sphere.Intersects(bbox);
 				break;
 			}
@@ -91,22 +90,21 @@ namespace TEN::Control::Volumes
 		auto box = BOUNDING_BOX();
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
-		auto bbox = TO_DX_BBOX(&pos, &box);
+		auto bbox = TO_DX_BBOX(pos, &box);
 		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
-		auto pos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, mesh->yRot, 0, 0);
-		auto bbox = TO_DX_BBOX(&pos, &sinfo->collisionBox);
+		auto bbox = TO_DX_BBOX(mesh->pos, &sinfo->collisionBox);
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS);
 	}
 
 	void TestVolumes(ITEM_INFO* item)
 	{
-		auto bbox = TO_DX_BBOX(&item->pos, GetBoundsAccurate(item));
+		auto bbox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
 		g_Renderer.addDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);

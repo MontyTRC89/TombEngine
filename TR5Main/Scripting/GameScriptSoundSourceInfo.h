@@ -11,6 +11,7 @@ class GameScriptPosition;
 class GameScriptSoundSourceInfo : public GameScriptNamedBase<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>
 {
 public:
+	using IdentifierType = std::reference_wrapper<SOUND_SOURCE_INFO>;
 	GameScriptSoundSourceInfo(SOUND_SOURCE_INFO& ref, bool temp);
 	~GameScriptSoundSourceInfo();
 

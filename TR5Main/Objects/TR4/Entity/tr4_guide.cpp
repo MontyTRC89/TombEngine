@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "tr4_guide.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "lot.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "control/box.h"
+#include "control/lot.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 #define	STATE_GUIDE_STOP				1
 #define	STATE_GUIDE_WALK				2
@@ -133,11 +134,10 @@ void GuideControl(short itemNumber)
 			|| item->currentAnimState == STATE_GUIDE_TORCH_ATTACK)
 		{
 			int minDistance = 0x7FFFFFFF;
-			CREATURE_INFO* baddie = &BaddieSlots[0];
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddie = &BaddieSlots[i];
+				CREATURE_INFO* baddie = ActiveCreatures[i];
 
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 					continue;
@@ -630,7 +630,7 @@ void GuideControl(short itemNumber)
 			if (item->animNumber != obj->animIndex + 57
 				&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 20)
 			{
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -705,7 +705,7 @@ void GuideControl(short itemNumber)
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 				item->pos.yRot = enemy->pos.yRot;
 				
 				creature->reachedGoal = false;
@@ -740,7 +740,7 @@ void GuideControl(short itemNumber)
 			{
 				item->goalAnimState = STATE_GUIDE_STOP;
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
@@ -802,7 +802,7 @@ void GuideControl(short itemNumber)
 		}
 		if (enemy->flags == 42)
 		{
-			TestTriggers(item, true, NULL);
+			TestTriggers(item, true);
 			
 			creature->reachedGoal = false;
 			creature->enemy = NULL;

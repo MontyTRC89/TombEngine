@@ -1,20 +1,22 @@
 #include "framework.h"
 #include "quad.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
-#include "sphere.h"
 #include "collide.h"
 #include "camera.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "misc.h"
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include "Specific\prng.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
+#include "quad_info.h"
+
 using std::vector;
 using namespace TEN::Math::Random;
 enum QUAD_EFFECTS_POSITIONS {
@@ -152,7 +154,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
 	auto pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos, 0, item->pos.yRot, 0);
-	TriggerShockwave(&pos, 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
+	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
@@ -178,13 +180,13 @@ static int CanQuadbikeGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(collResult.FloorHeight - item->pos.yPos) > 512)
+	if (abs(collResult.Position.Floor - item->pos.yPos) > 512)
 		return false;
 
-	if ((collResult.CeilingHeight - item->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - item->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -1123,8 +1125,8 @@ void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	item->data = game_malloc<QUAD_INFO>();
-	QUAD_INFO* quad = (QUAD_INFO *)item->data;
+	item->data = QUAD_INFO();
+	QUAD_INFO* quad = item->data;
 
 	quad->velocity = 0;
 
@@ -1283,7 +1285,7 @@ int QuadBikeControl(void)
 	int hfl = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
 	int hfr = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
 
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, false);
 
 	if (LaraItem->hitPoints <= 0)
 	{
@@ -1319,9 +1321,9 @@ int QuadBikeControl(void)
 		quad->pitch = pitch;
 		if (quad->pitch < -0x8000)
 			quad->pitch = -0x8000;
-		else if (quad->pitch > 0xa000)
-			quad->pitch = 0xa000;
-		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, (PITCH_SHIFT + ((0x10000 + quad->pitch)) * 256));
+		else if (quad->pitch > 0xA000)
+			quad->pitch = 0xA000;
+		SoundEffect(SFX_TR3_QUAD_MOVE, &item->pos, 0, 0.5f + (float)abs(quad->pitch) / (float)MAX_VELOCITY);
 	}
 	else
 	{

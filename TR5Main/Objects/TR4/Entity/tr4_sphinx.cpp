@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "items.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 enum SPHIX_STATES {
 	SPHINX_EMPTY,
@@ -53,7 +54,7 @@ void SphinxControl(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, y, z);
 
-	if (item->currentAnimState == 5 && floor->stopper)
+	if (item->currentAnimState == 5 && floor->Stopper)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
@@ -61,15 +62,17 @@ void SphinxControl(short itemNumber)
 		{
 			MESH_INFO* mesh = &room->mesh[i];
 
-			if (((mesh->z / 1024) == (z / 1024)) && ((mesh->x / 1024) == (x / 1024)) && mesh->staticNumber >= 50)
+			if (((mesh->pos.zPos / 1024) == (z / 1024)) && 
+				((mesh->pos.xPos / 1024) == (x / 1024)) && 
+				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-				floor->stopper = false;
+				floor->Stopper = false;
 
-				TestTriggers(x, y, z, item->roomNumber, true, NULL);
+				TestTriggers(x, y, z, item->roomNumber, true);
 			}
 		}
 	}
@@ -202,7 +205,7 @@ void SphinxControl(short itemNumber)
 	case SPHINX_HIT:
 		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			TestTriggers(item, true, NULL);
+			TestTriggers(item, true);
 
 			if (item->touchBits & 0x40)
 			{

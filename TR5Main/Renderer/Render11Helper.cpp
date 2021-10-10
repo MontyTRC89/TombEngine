@@ -2,10 +2,10 @@
 #include "Renderer11.h"
 #include "configuration.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"
@@ -17,6 +17,14 @@
 #include "jeep.h"
 #include "motorbike.h"
 #include <algorithm>
+#include "itemdata/creature_info.h"
+#include "quad_info.h"
+#include "jeep_info.h"
+#include "motorbike_info.h"
+#include "rubberboat_info.h"
+#include "upv_info.h"
+#include "biggun_info.h"
+#include "items.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow *g_GameFlow;
@@ -102,7 +110,10 @@ namespace TEN::Renderer
 
 	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
-		RendererBone *Bones[32];
+		static std::vector<int> boneIndexList;
+		boneIndexList.clear();
+		
+		RendererBone *Bones[32] = {};
 		int nextBone = 0;
 
 		Matrix rotation;
@@ -149,13 +160,15 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+					
+
 				if (useObjectWorldRotation)
 				{
 					Quaternion invertedQuat;
 					auto scale = Vector3{};
 					auto translation = Vector3{};
 					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					rotation = extraRotation * rotation * Matrix::CreateFromQuaternion(invertedQuat);
+					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
 				}
 				else
 				{
@@ -172,10 +185,29 @@ namespace TEN::Renderer
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
+			boneIndexList.push_back(bone->Index);
+
 			for (int i = 0; i < bone->Children.size(); i++)
 			{
 				// Push
 				Bones[nextBone++] = bone->Children[i];
+			}
+		}
+
+		// Apply mutations on top
+		if (item && item->Item->mutator.size() == boneIndexList.size()) // Paranoid
+		{
+			for (int i = 0; i < boneIndexList.size(); i++)
+			{
+				auto mutator = item->Item->mutator[boneIndexList[i]];
+				if (mutator.IsEmpty())
+					continue;
+
+				auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+				auto s = Matrix::CreateScale(mutator.Scale);
+				auto t = Matrix::CreateTranslation(mutator.Offset);
+
+				transforms[boneIndexList[i]] = m * s * t * transforms[boneIndexList[i]];
 			}
 		}
 	}
@@ -186,7 +218,7 @@ namespace TEN::Renderer
 		item.animNumber = animation;
 		item.frameNumber = frame;
 
-		return GetFrame_D2(&item, framePtr, rate);
+		return GetFrame(&item, framePtr, rate);
 	}
 
 	void Renderer11::updateItemAnimations(int itemNumber, bool force)
@@ -217,96 +249,78 @@ namespace TEN::Renderer
 			{
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
-
-				if (item->objectNumber == ID_QUAD)
-				{
-					QUAD_INFO* quad = (QUAD_INFO*)item->data;
-					if (j == 3 || j == 4) {
-						currentBone->ExtraRotation.x = TO_RAD(quad->rearRot);
-					}
-					else if (j == 6 || j == 7) {
-						currentBone->ExtraRotation.x = TO_RAD(quad->frontRot);
-					}
+				
+				item->data.apply(
+				[&j, &currentBone](QUAD_INFO& quad) {
+				if(j == 3 || j == 4) {
+					currentBone->ExtraRotation.x = TO_RAD(quad.rearRot);
+				} else if(j == 6 || j == 7) {
+					currentBone->ExtraRotation.x = TO_RAD(quad.frontRot);
 				}
-				else if (item->objectNumber == ID_JEEP) {
-					JEEP_INFO* jeep = (JEEP_INFO*)item->data;
-					switch (j) {
-					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot1);
-						break;
-					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot2);
+				},
+				[&j, &currentBone](JEEP_INFO& jeep) {
+				switch(j) {
+				case 9:
+					currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
+					break;
+				case 10:
+					currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
 
-						break;
-					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot3);
+					break;
+				case 12:
+					currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
 
-						break;
-					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep->rot4);
+					break;
+				case 13:
+					currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
 
-						break;
-					}
+					break;
 				}
-				else if (item->objectNumber == ID_MOTORBIKE) {
-					MOTORBIKE_INFO* bike = (MOTORBIKE_INFO*)item->data;
-					switch (j) {
-					case 2:
-					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike->wheelRight);
-						break;
-					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(bike->wheelLeft);
-					}
+				},
+				[&j, &currentBone](MOTORBIKE_INFO& bike) {
+				switch(j) {
+				case 2:
+				case 4:
+					currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
+					break;
+				case 10:
+					currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
 				}
-				else if (item->objectNumber == ID_RUBBER_BOAT)
-				{
-					RUBBER_BOAT_INFO* boat = (RUBBER_BOAT_INFO*)item->data;
-					if (j == 2)
-						currentBone->ExtraRotation.z = TO_RAD(boat->propRot);
+				},
+				[&j, &currentBone](RUBBER_BOAT_INFO& boat) {
+				if(j == 2)
+					currentBone->ExtraRotation.z = TO_RAD(boat.propRot);
+				},
+				[&j, &currentBone](SUB_INFO& upv) {
+				if(j == 3)
+					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
+				},
+				[&j, &currentBone](BIGGUNINFO& biggun) {
+				if(j == 2)
+					currentBone->ExtraRotation.z = biggun.barrelZ;
+				},
+				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature) {
+				if(currentBone->ExtraRotationFlags & ROT_Y) {
+					currentBone->ExtraRotation.y = TO_RAD(creature.jointRotation[lastJoint]);
+					lastJoint++;
 				}
-				else if (item->objectNumber == ID_UPV)
-				{
-					SUB_INFO* upv = (SUB_INFO*)item->data;
-					if (j == 3)
-						currentBone->ExtraRotation.z = TO_RAD(upv->FanRot);
-				}
-				else if (item->objectNumber == ID_BIGGUN)
-				{
-					BIGGUNINFO* biggun = (BIGGUNINFO*)item->data;
-					if (j == 2)
-						currentBone->ExtraRotation.z = biggun->barrelZ;
-				}
-				else
-				{
-					CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-					if (creature != NULL)
-					{
-						if (currentBone->ExtraRotationFlags & ROT_Y)
-						{
-							currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
+				if(currentBone->ExtraRotationFlags & ROT_X) {
+					currentBone->ExtraRotation.x = TO_RAD(creature.jointRotation[lastJoint]);
+					lastJoint++;
+				}
 
-						if (currentBone->ExtraRotationFlags & ROT_X)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_Z)
-						{
-							currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
-							lastJoint++;
-						}
-					}
-				} 
+				if(currentBone->ExtraRotationFlags & ROT_Z) {
+					currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
+					lastJoint++;
+				}
+				}
+				);
 			}
 
 			ANIM_FRAME* framePtr[2];
 			int rate;
-			int frac = GetFrame_D2(item, framePtr, &rate);
+			int frac = GetFrame(item, framePtr, &rate);
 
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
@@ -325,7 +339,6 @@ namespace TEN::Renderer
 		{
 			RendererItem *itemToDraw = view.itemsToDraw[i];
 			ITEM_INFO *item = itemToDraw->Item;
-			CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
 			// Lara has her own routine
 			if (item->objectNumber == ID_LARA)

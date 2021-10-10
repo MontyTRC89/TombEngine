@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "tr2_dragon.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "collide.h"
-#include "box.h"
-#include "lot.h"
+#include "control/box.h"
+#include "control/lot.h"
 #include "sphere.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
-
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -156,7 +157,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	item = &g_Level.Items[itemNum];
 
-	if (!TestBoundsCollide(item, laraitem, coll->radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
@@ -478,7 +479,7 @@ void InitialiseBartoli(short itemNum)
 		InitialiseItem(back_item);
 		back->meshBits = 0x1FFFFF;
 
-		item->data = (void*)back_item;
+		item->data = back_item;
 
 		front = &g_Level.Items[front_item];
 		front->objectNumber = ID_DRAGON_FRONT;
@@ -492,7 +493,7 @@ void InitialiseBartoli(short itemNum)
 
 		InitialiseItem(front_item);
 
-		back->data = (void*)front_item;
+		back->data = front_item;
 
 		g_Level.NumItems += 2;
 	}

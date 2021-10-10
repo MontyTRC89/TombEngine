@@ -6,21 +6,21 @@
 #else
 #include "inventory.h"
 #endif
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "collide.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"
-#include "effects\tomb4fx.h"
-#include "sphere.h"
+#include "effects/tomb4fx.h"
 #include "lara_flare.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "setup.h"
 #include "level.h"
+#include "animation.h"
+#include "jeep_info.h"
 
 using std::vector;
-
 
 enum JEEP_STATES 
 {
@@ -296,7 +296,7 @@ static int JeepCanGetOff()
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return 0;
 
 	if (abs(height - item->pos.yPos) > WALL_SIZE / 2)
@@ -379,8 +379,9 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	JEEP_INFO* jeep = game_malloc<JEEP_INFO>();
-	item->data = jeep;
+	JEEP_INFO* jeep;
+	item->data = JEEP_INFO();
+	jeep = item->data;
 
 	jeep->velocity = 0;
 	jeep->revs = 0;
@@ -416,8 +417,7 @@ static int JeepCheckGetOff()
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
-			CurrentAtmosphere = 110;
-			S_CDPlay(110, 1);
+			CurrentLoopedSoundTrack = 110;
 			return false;
 		}
 	}
@@ -1604,8 +1604,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 			item->flags |= 0x20;
 
-			CurrentAtmosphere = 98;
-			S_CDPlay(98, 1);
+			CurrentLoopedSoundTrack = 98;
 		}
 		else
 			ObjectCollision(itemNumber, l, coll);
@@ -1642,8 +1641,8 @@ int JeepControl(void)
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	TestTriggers(item, true,  NULL);
-	TestTriggers(item, false, NULL);
+	TestTriggers(item, true);
+	TestTriggers(item, false);
 
 	if (LaraItem->hitPoints <= 0)
 	{

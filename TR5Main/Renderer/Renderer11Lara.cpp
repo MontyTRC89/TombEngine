@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "Renderer11.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\hair.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "spotcam.h"
 #include "camera.h"
 #include "sphere.h"
@@ -11,6 +11,8 @@
 #include "GameFlowScript.h"
 #include <Specific\setup.h>
 #include "lara_fire.h"
+#include "items.h"
+
 using namespace TEN::Renderer;
 
 extern GameFlow *g_GameFlow;
@@ -80,7 +82,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	ANIM_FRAME* framePtr[2];
 	int rate, frac;
 
-	frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	frac = GetFrame(LaraItem, framePtr, &rate);
 	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
@@ -88,7 +90,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-		frac = GetFrame_D2(LaraItem, framePtr, &rate);
+		frac = GetFrame(LaraItem, framePtr, &rate);
 		updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 	}
 	else
@@ -97,12 +99,13 @@ void Renderer11::updateLaraAnimations(bool force)
 
 		if (Lara.gunType == WEAPON_REVOLVER) // im so sorry but it's either this or crazy arms with the revolver
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 		else
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.yRot), TO_RAD(Lara.leftArm.zRot));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
 		}
 		// yRot still messed up in some situations but it's definitely better now!!
 
@@ -187,7 +190,7 @@ void Renderer11::updateLaraAnimations(bool force)
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frac = GetFrame_D2(LaraItem, framePtr, &rate);
+			frac = GetFrame(LaraItem, framePtr, &rate);
 			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 			break;
 		}

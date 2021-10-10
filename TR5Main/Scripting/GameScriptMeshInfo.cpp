@@ -63,24 +63,24 @@ void GameScriptMeshInfo::Register(sol::state* state)
 
 GameScriptPosition GameScriptMeshInfo::GetPos() const
 {
-	return GameScriptPosition{ m_mesh.x, m_mesh.y, m_mesh.z };
+	return GameScriptPosition{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
 }
 
 void GameScriptMeshInfo::SetPos(GameScriptPosition const& pos)
 {
-	m_mesh.x = pos.x;
-	m_mesh.y = pos.y;
-	m_mesh.z = pos.z;
+	m_mesh.pos.xPos = pos.x;
+	m_mesh.pos.yPos = pos.y;
+	m_mesh.pos.zPos = pos.z;
 }
 
 int GameScriptMeshInfo::GetRot() const
 {
-	return m_mesh.yRot;
+	return m_mesh.pos.yRot;
 }
 
 void GameScriptMeshInfo::SetRot(int yRot)
 {
-	m_mesh.yRot = yRot;
+	m_mesh.pos.yRot = yRot;
 }
 
 std::string GameScriptMeshInfo::GetName() const

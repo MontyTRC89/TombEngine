@@ -1,13 +1,20 @@
 #include "framework.h"
 #include "tr4_baboon.h"
-#include "Box.h"
-#include "lot.h"
+#include "control/box.h"
+#include "control/lot.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "misc.h"
 #include "Lara.h"
+#include "effects\effects.h"
+#include "effects\weather.h"
 #include "effects\tomb4fx.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
+
 using std::vector;
+using namespace TEN::Effects::Environment;
+
 BaboonRespawnClass BaboonRespawn;
 static BITE_INFO baboonBite = { 10, 10, 11, 4 };
 
@@ -95,10 +102,7 @@ void BaboonDieEffect(ITEM_INFO* item)
     TriggerBaboonShockwave(pos, ANGLE(135.0f));
 
     // trigger flash screen
-    FlashFadeR = 255;
-    FlashFadeG = 64;
-    FlashFadeB = 0;
-    FlashFader = 32;
+	Weather.Flash(255, 64, 0, 0.03f);
 }
 
 static void KillRespawnedBaboon(short itemNumber, bool remove = false)
@@ -287,7 +291,7 @@ void BaboonControl(short itemNumber)
                 item->currentAnimState = BABOON_ACTIVATE_SWITCH;
                 item->aiBits &= ~(FOLLOW);
 
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 
                 baboon->enemy = nullptr;
             }
@@ -530,7 +534,7 @@ void BaboonControl(short itemNumber)
                 floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
                 int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
                 item->floor = height;
-                TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE, NULL);
+                TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE);
                 item->triggerFlags = 1;
             }
             break;

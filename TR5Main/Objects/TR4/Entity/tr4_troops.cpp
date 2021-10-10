@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "tr4_troops.h"
-#include "box.h"
+#include "control/box.h"
 #include "items.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara.h"
 #include "people.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
-#include "control.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
+#include "animation.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
@@ -141,12 +142,12 @@ void TroopsControl(short itemNumber)
 		{
 			// Search for active troops
 			creature->enemy = NULL;
-			CREATURE_INFO* baddy = &BaddieSlots[0];
+			CREATURE_INFO* baddy = ActiveCreatures[0];
 			int minDistance = 0x7FFFFFFF;
 
-			for (int i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddy = &BaddieSlots[i];
+				baddy = ActiveCreatures[i];
 
 				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 				{

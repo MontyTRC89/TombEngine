@@ -2,6 +2,9 @@
 #include "lara.h"
 #include "lara_initialise.h"
 #include "health.h"
+#include "items.h"
+#include "setup.h"
+#include "level.h"
 
 void InitialiseLara(int restore)
 {
@@ -57,7 +60,6 @@ void InitialiseLara(int restore)
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = 1000;
 	Lara.gunStatus = LG_NO_ARMS;
-//	Lara.skelebob = 0;
 	memset(&Lara.NewAnims, 0, sizeof(AnimsNew));	//make sure script changes these AFTER Lara is initialized?
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;

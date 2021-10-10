@@ -6,18 +6,20 @@
 #include "lara_two_guns.h"
 #include "camera.h"
 #include "objects.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "sphere.h"
-#include "draw.h"
-#include "effects\flmtorch.h"
+#include "animation.h"
+#include "effects/flmtorch.h"
 #include "level.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "control/los.h"
 #include "savegame.h"
 #include "GameFlowScript.h"
 #include "lara_struct.h"
+#include "itemdata/creature_info.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -252,10 +254,9 @@ short HoldStates[] = {
 	-1
 };
 
-extern GameFlow* g_GameFlow;
 bool MonksAttackLara;
-ITEM_INFO* LastTargets[8];
-ITEM_INFO* TargetList[8];
+ITEM_INFO* LastTargets[MAX_TARGETS];
+ITEM_INFO* TargetList[MAX_TARGETS];
 
 GAME_OBJECT_ID WeaponObject(int weaponType)
 {
@@ -689,13 +690,13 @@ GAME_OBJECT_ID WeaponObjectMesh(int weaponType) {
 }
 
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
-{
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	
+{	
 	item->hitStatus = true;
-	if (creature != nullptr && item != LaraItem)
-		creature->hurtByLara = true;
+
+	if (item->data.is<CREATURE_INFO>())
+		((CREATURE_INFO*)item->data)->hurtByLara = true;
+
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (hitPos != nullptr)
 	{
@@ -740,9 +741,15 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 
 	if (!obj->undead || grenade || item->hitPoints == NOT_TARGETABLE)
 	{
-		if (item->hitPoints > 0 && item->hitPoints <= damage)
+		if (item->hitPoints > 0)
+		{
 			Savegame.Level.AmmoHits++;
-		item->hitPoints -= damage;
+
+			if (item->hitPoints >= damage)
+				item->hitPoints -= damage;
+			else
+				item->hitPoints = 0;
+		}
 	}
 }
 
@@ -1006,11 +1013,11 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	maxDistance = weapon->targetDist;
 	targets = 0;
 
-	for (slot = 0; slot < NUM_SLOTS; ++slot)
+	for (slot = 0; slot < ActiveCreatures.size(); ++slot)
 	{
-		if (BaddieSlots[slot].itemNum != NO_ITEM)
+		if (ActiveCreatures[slot]->itemNum != NO_ITEM)
 		{
-			item = &g_Level.Items[BaddieSlots[slot].itemNum];
+			item = &g_Level.Items[ActiveCreatures[slot]->itemNum];
 			if (item->hitPoints > 0)
 			{
 				x = item->pos.xPos - src.x;
@@ -1052,7 +1059,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	}
 	else
 	{
-		for (slot = 0; slot < 8; ++slot)
+		for (slot = 0; slot < MAX_TARGETS; ++slot)
 		{
 			if (!TargetList[slot])
 				Lara.target = NULL;
@@ -1070,10 +1077,10 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 			{
 				Lara.target = NULL;
 				flag = true;
-				for (match = 0; match < 8 && TargetList[match]; ++match)
+				for (match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
 				{
 					loop = false;
-					for (slot = 0; slot < 8 && LastTargets[slot]; ++slot)
+					for (slot = 0; slot < MAX_TARGETS && LastTargets[slot]; ++slot)
 					{
 						if (LastTargets[slot] == TargetList[match])
 						{

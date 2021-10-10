@@ -1,15 +1,19 @@
 #include "framework.h"
 #include "tr3_tribesman.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "items.h"
 #include "sphere.h"
 #include "lara.h"
 #include "Sound\sound.h"
 #include "people.h"
-#include "draw.h"
+#include "animation.h"
 #include "setup.h"
 #include "level.h"
+#include "itemdata/creature_info.h"
+#include "Objects/Generic/Traps/dart_emitter.h"
+
+using namespace TEN::Entities::Traps;
 
 BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };
 BITE_INFO tribesmanDartsBite1 = { 0, 0, -200, 13 };
@@ -395,11 +399,11 @@ void TribemanDartsControl(short itemNum)
 				else
 					item->goalAnimState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(512))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 4;
 			else if (creature->mood == BORED_MOOD)
 			{
@@ -432,11 +436,11 @@ void TribemanDartsControl(short itemNum)
 				else
 					item->goalAnimState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(512))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 6;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			else if (creature->mood == BORED_MOOD && GetRandomControl() < 0x200)
 				item->goalAnimState = 2;
@@ -447,11 +451,11 @@ void TribemanDartsControl(short itemNum)
 		case 2:
 			creature->maximumTurn = ANGLE(9);
 
-			if (info.bite && info.distance < SQUARE(512))
+			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (info.bite && info.distance < SQUARE(2048))
+			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
 				item->goalAnimState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 3;
@@ -473,9 +477,9 @@ void TribemanDartsControl(short itemNum)
 			creature->maximumTurn = ANGLE(6);
 			tilt = angle / 4;
 
-			if (info.bite && info.distance < SQUARE(512))
+			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->goalAnimState = 11;
-			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
+			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->goalAnimState = 1;
 			if (item->aiBits & GUARD)
 				item->goalAnimState = 11;

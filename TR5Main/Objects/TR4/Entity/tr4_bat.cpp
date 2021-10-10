@@ -1,13 +1,16 @@
 #include "framework.h"
 #include "tr4_bat.h"
-#include "box.h"
-#include "control.h"
+#include "control/box.h"
+#include "control/control.h"
 #include "effects\effects.h"
 #include "misc.h"
 #include "lara.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "setup.h"
 #include "Specific\trmath.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
+
 
 namespace TEN::Entities::TR4
 {

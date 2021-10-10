@@ -1,21 +1,27 @@
 #include "framework.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
 #include "effects\effects.h"
 #include "effects\debris.h"
 #include "lara_fire.h"
 #include "lara.h"
 #include "effects\flmtorch.h"
+#include "effects\weather.h"
 #include "sphere.h"
 #include "level.h"
+#include "setup.h"
 #include "collide.h"
 #include "Sound\sound.h"
+#include "control\los.h"
 #include "savegame.h"
 #include "input.h"
 #include "pickup/pickup.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
+using namespace TEN::Effects::Environment;
+
 struct OLD_CAMERA
 {
 	short currentAnimState;
@@ -479,11 +485,6 @@ void ChaseCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, 384, 1);
 
-	if (Camera.oldType == FIXED_CAMERA)
-	{
-		Camera.speed = 1;
-	}
-
 	MoveCamera(&ideal, Camera.speed);
 }
 
@@ -766,6 +767,14 @@ void FixedCamera(ITEM_INFO* item)
 {
 	GAME_VECTOR from, to;
 
+	// Fixed cameras before TR3 had optional "movement" effect. 
+	// Later for some reason it was forced to always be 1, and actual speed value
+	// from camera trigger was ignored. In TEN, we move speed value out of legacy
+	// floordata trigger to camera itself and make use of it again. Still, by default,
+	// value is 1 for UseForcedFixedCamera hack.
+
+	int moveSpeed = 1;
+
 	if (UseForcedFixedCamera)
 	{
 		from.x = ForcedFixedCamera.x;
@@ -782,13 +791,11 @@ void FixedCamera(ITEM_INFO* item)
 		from.z = camera->z;
 		from.roomNumber = camera->roomNumber;
 
+		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
+		moveSpeed = camera->speed * 8 + 1;
+
 		if (camera->flags & 2)
 		{
-			if (FlashFader > 2)
-			{
-				FlashFader = (FlashFader >> 1) & 0xFE;
-			}
-
 			SniperOverlay = 1;
 			
 			Camera.target.x = (Camera.target.x + 2 * LastTarget.x) / 3;
@@ -810,7 +817,7 @@ void FixedCamera(ITEM_INFO* item)
 
 				PHD_VECTOR pos;
 				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
-				objLos = (objLos != 999 && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
+				objLos = (objLos != NO_LOS_ITEM && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
 
 				if (!(GetRandomControl() & 0x3F)
 					|| !(GlobalCounter & 0x3F)
@@ -818,11 +825,11 @@ void FixedCamera(ITEM_INFO* item)
 				{
 					SoundEffect(SFX_TR4_EXPLOSION1, 0, 83886084);
 					SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
-					
-					FlashFadeR = 192;
-					FlashFadeB = 0;
-					FlashFader = 24;
-					FlashFadeG = (GetRandomControl() & 0x1F) + 160;
+
+					auto R = 192;
+					auto G = (GetRandomControl() & 0x1F) + 160;
+					auto B = 0;
+					Weather.Flash(R, G, B, 0.04f);
 					
 					SniperCount = 15;
 					
@@ -835,7 +842,7 @@ void FixedCamera(ITEM_INFO* item)
 					else if (objLos < 0)
 					{
 						MESH_INFO* mesh = CollidedMeshes[0];
-						if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+						if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 						{
 							ShatterObject(0, mesh, 128, to.roomNumber, 0);
 							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -857,7 +864,7 @@ void FixedCamera(ITEM_INFO* item)
 
 	Camera.fixedCamera = 1;
 
-	MoveCamera(&from, 1);
+	MoveCamera(&from, moveSpeed);
 
 	if (Camera.timer)
 	{
@@ -1443,7 +1450,7 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		GetTargetOnLOS(&Camera.pos, &Camera.target, 0, 0);
 
-		if (!(InputBusy & IN_ACTION) || Infrared)
+		if (!(InputBusy & IN_ACTION))
 		{
 			// Reimplement this mode?
 		}
@@ -1876,20 +1883,9 @@ void ResetLook()
 
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
-	if (pos->yPos + bounds->Y2 > Camera.pos.y - radius && pos->yPos + bounds->Y1 < radius + Camera.pos.y)
-	{
-		auto dx = Camera.pos.x - pos->xPos;
-		auto dz = Camera.pos.z - pos->zPos;
-		auto sin = phd_sin(pos->yRot);
-		auto cos = phd_cos(pos->yRot);
-		auto x = cos * dx - sin * dz;
-		auto z = cos * dz + sin * dx;
-
-		if (x >= bounds->X1 - radius && x <= radius + bounds->X2 && z >= bounds->Z1 - radius && z <= radius + bounds->Z2)
-			return true;
-	}
-
-	return false;
+	auto dxBox = TO_DX_BBOX(*pos, bounds);
+	auto sphere = BoundingSphere(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), radius);
+	return sphere.Intersects(dxBox);
 }
 
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
@@ -1971,9 +1967,9 @@ std::vector<short> FillCollideableItemList()
 
 static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	auto dx = Camera.pos.x - mesh->x;
-	auto dy = Camera.pos.y - mesh->y;
-	auto dz = Camera.pos.z - mesh->z;
+	auto dx = Camera.pos.x - mesh->pos.xPos;
+	auto dy = Camera.pos.y - mesh->pos.yPos;
+	auto dz = Camera.pos.z - mesh->pos.zPos;
 	auto close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
 
 	if (close_enough) // Literally anything else?
@@ -2033,26 +2029,11 @@ void ItemsCollideCamera()
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
-		auto xmin = bounds->X1 + item->pos.xPos - rad;
-		auto xmax = bounds->X2 + item->pos.xPos + rad;
-		auto ymin = bounds->Y1 + item->pos.yPos - rad;
-		auto ymax = bounds->Y2 + item->pos.yPos + rad;
-		auto zmin = bounds->Z1 + item->pos.zPos - rad;
-		auto zmax = bounds->Z2 + item->pos.zPos + rad;
-
-		// Camera stuck inside box?
-		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
-			Camera.pos.y > ymin && Camera.pos.y < ymax &&	
-			Camera.pos.z > zmin && Camera.pos.z < zmax)
-			continue;
-
-		auto pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, item->pos.yRot, 0);
-
-		if (TestBoundsCollideCamera(bounds, &pos, 512))
-			ItemPushCamera(bounds, &pos, rad);
+		if (TestBoundsCollideCamera(bounds, &item->pos, 1024))
+			ItemPushCamera(bounds, &item->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(Vector3(xmin, ymin, zmin), Vector3(xmax, ymax, zmax),
+		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->pos, bounds),
 			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
@@ -2071,36 +2052,55 @@ void ItemsCollideCamera()
 		if (!mesh || !stat)
 			return;
 
-		auto dx = abs(LaraItem->pos.xPos - mesh->x);
-		auto dy = abs(LaraItem->pos.yPos - mesh->y);
-		auto dz = abs(LaraItem->pos.zPos - mesh->z);
+		auto dx = abs(LaraItem->pos.xPos - mesh->pos.xPos);
+		auto dy = abs(LaraItem->pos.yPos - mesh->pos.yPos);
+		auto dz = abs(LaraItem->pos.zPos - mesh->pos.zPos);
 
 		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
 			continue;
 
 		auto bounds = &stat->visibilityBox;
-		auto pos = PHD_3DPOS(mesh->x, mesh->y, mesh->z, 0, mesh->yRot, 0);
-		auto xmin = bounds->X1 + mesh->x - rad;
-		auto xmax = bounds->X2 + mesh->x + rad;
-		auto ymin = bounds->Y1 + mesh->y - rad;
-		auto ymax = bounds->Y2 + mesh->y + rad;
-		auto zmin = bounds->Z1 + mesh->z - rad;
-		auto zmax = bounds->Z2 + mesh->z + rad;
-
-		// Camera stuck inside box?
-		if (Camera.pos.x > xmin && Camera.pos.x < xmax &&
-			Camera.pos.y > ymin && Camera.pos.y < ymax &&
-			Camera.pos.z > zmin && Camera.pos.z < zmax)
-			continue;
-
-		if (TestBoundsCollideCamera(bounds, &pos, 512))
-			ItemPushCamera(bounds, &pos, rad);
+		if (TestBoundsCollideCamera(bounds, &mesh->pos, 1024))
+			ItemPushCamera(bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(Vector3(xmin, ymin, zmin), Vector3(xmax, ymax, zmax),
+		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(mesh->pos, bounds),
 			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
 
 	staticList.clear(); // Done
+}
+
+void RumbleScreen()
+{
+	if (!(GlobalCounter & 0x1FF))
+		SoundEffect(SFX_TR5_KLAXON, 0, 4104);
+
+	if (RumbleTimer >= 0)
+		RumbleTimer++;
+
+	if (RumbleTimer > 450)
+	{
+		if (!(GetRandomControl() & 0x1FF))
+		{
+			InGameCounter = 0;
+			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+			return;
+		}
+	}
+
+	if (RumbleTimer < 0)
+	{
+		if (InGameCounter >= abs(RumbleTimer))
+		{
+			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
+			RumbleTimer++;
+		}
+		else
+		{
+			InGameCounter++;
+			Camera.bounce = -(GetRandomControl() % InGameCounter);
+		}
+	}
 }

@@ -2,16 +2,15 @@
 #include "lara_flare.h"
 #include "level.h"
 #include "setup.h"
-#include "Sound\sound.h"
-#include "draw.h"
+#include "Sound/sound.h"
+#include "animation.h"
 #include "items.h"
-#include "sphere.h"
 #include "lara_fire.h"
 #include "Lara.h"
 #include "collide.h"
-#include "effects\effects.h"
-#include "effects\chaffFX.h"
-#include "Specific\prng.h"
+#include "effects/effects.h"
+#include "effects/chaffFX.h"
+#include "Specific/prng.h"
 
 constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920,0.8020,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.84642,0.7896,0.817634,0.923424,0.7589,0.81399,0.92834,0.9978,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.74642 };
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
@@ -63,7 +62,8 @@ void FlareControl(short itemNumber)
 
 	DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
-	short age = (short)(item->data) & 0x7FFF;
+	short& age = item->data;
+	age &= 0x7FFF;
 	if (age >= FLARE_AGE)
 	{
 		if (!item->fallspeed && !item->speed)
@@ -84,8 +84,6 @@ void FlareControl(short itemNumber)
 
 		age |= 0x8000;
 	}
-
-	item->data = (void*)age;
 }
 
 void ready_flare()
@@ -362,10 +360,12 @@ void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 
 		if (objectNum == ID_FLARE_ITEM)
 		{
+			item->data = (short)0;
+			short& age = item->data;
 			if (DoFlareLight((PHD_VECTOR*)&item->pos, Lara.flareAge))
-				item->data = (void*)(Lara.flareAge | 0x8000);
+				age = (Lara.flareAge | 0x8000);
 			else
-				item->data = (void*)(Lara.flareAge & 0x7FFF);
+				age = (Lara.flareAge & 0x7FFF);
 		}
 		else
 		{
@@ -415,7 +415,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	int falloff;
 	if (age >= FLARE_AGE || age == 0)
 		return 0;
-	random = generateFloat();
+	random = GenerateFloat();
 
 	x = pos->x + (random* 120);
 	y = pos->y + (random * 120) - 256;

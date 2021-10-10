@@ -1,35 +1,35 @@
 #include "framework.h"
 #include "hair.h"
 
-#include "draw.h"
+#include "animation.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
 #include "GameFlowScript.h"
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
-using TEN::Renderer::g_Renderer;
-int FirstHair[HAIR_MAX];
-HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
-int WindAngle;
-int DWindAngle;
-int Wind;
+#include "effects\weather.h"
+#include "Renderer11.h"
+#include "items.h"
 
-extern GameFlow* g_GameFlow;
+using namespace TEN::Effects::Environment;
+using TEN::Renderer::g_Renderer;
+
+HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair()
 {
 	for (int h = 0; h < HAIR_MAX; h++)
 	{
-		FirstHair[h] = 1;
-
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
+		Hairs[h][0].initialized = true;
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
+			Hairs[h][i].initialized = true;
 			Hairs[h][i].pos.xPos = *(bone + 1);
 			Hairs[h][i].pos.yPos = *(bone + 2);
 			Hairs[h][i].pos.zPos = *(bone + 3);
@@ -40,7 +40,6 @@ void InitialiseHair()
 		}
 	}
 }
-
 
 void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 {
@@ -167,10 +166,9 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 
 	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-	if (FirstHair[ponytail])
+	if (Hairs[ponytail][0].initialized)
 	{
-		FirstHair[ponytail] = 0;
-
+		Hairs[ponytail][0].initialized = false;
 		Hairs[ponytail][0].pos.xPos = pos.x;
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
@@ -181,13 +179,11 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
+			Hairs[ponytail][i + 1].initialized = false;
 			Hairs[ponytail][i + 1].pos.xPos = world.Translation().x;
 			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y;
 			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z;
 		}
-
-		Wind = SmokeWindX = SmokeWindZ = 0;
-		WindAngle = DWindAngle = 2048;
 	}
 	else
 	{
@@ -209,24 +205,6 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 			wh = GetWaterHeight(x, y, z, roomNumber);
 		}
-
-		Wind += (GetRandomControl() & 7) - 3;
-		if (Wind <= -2)
-			Wind++;
-		else if (Wind >= 9)
-			Wind--;
-
-		DWindAngle = (DWindAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
-
-		if (DWindAngle < 1024)
-			DWindAngle = 2048 - DWindAngle;
-		else if (DWindAngle > 3072)
-			DWindAngle += 6144 - 2 * DWindAngle;
-
-		WindAngle = (WindAngle + ((DWindAngle - WindAngle) >> 3)) & 0x1FFE;
-
-		SmokeWindX = Wind * phd_sin(WindAngle << 3);
-		SmokeWindZ = Wind * phd_cos(WindAngle << 3);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
@@ -250,16 +228,20 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
 			Hairs[ponytail][i].pos.zPos += Hairs[ponytail][i].hvel.z * 3 / 4;
 
-			if (Lara.waterStatus == LW_ABOVE_WATER && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
-			{
-				Hairs[ponytail][i].pos.xPos += SmokeWindX;
-				Hairs[ponytail][i].pos.zPos += SmokeWindZ;
-			}
+			// TR3 UPV uses a hack which forces Lara water status to dry. 
+			// Therefore, we can't directly use water status value to determine hair mode.
+			bool dryMode = (Lara.waterStatus == LW_ABOVE_WATER) && (Lara.Vehicle == -1 || g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV);
 
-			switch (Lara.waterStatus)
+			if (dryMode)
 			{
-			case LW_ABOVE_WATER:
+				if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
+				{
+					Hairs[ponytail][i].pos.xPos += Weather.Wind().x * 2.0f;
+					Hairs[ponytail][i].pos.zPos += Weather.Wind().z * 2.0f;
+				}
+
 				Hairs[ponytail][i].pos.yPos += 10;
+
 				if (wh != NO_HEIGHT && Hairs[ponytail][i].pos.yPos > wh)
 				{
 					Hairs[ponytail][i].pos.yPos = wh;
@@ -269,16 +251,13 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 					Hairs[ponytail][i].pos.xPos = Hairs[ponytail][0].hvel.x;
 					Hairs[ponytail][i].pos.zPos = Hairs[ponytail][0].hvel.z;
 				}
-				break;
-
-			case LW_UNDERWATER:
-			case LW_SURFACE:
-			case LW_WADE:
+			}
+			else
+			{
 				if (Hairs[ponytail][i].pos.yPos < wh)
 					Hairs[ponytail][i].pos.yPos = wh;
 				else if (Hairs[ponytail][i].pos.yPos > height)
 					Hairs[ponytail][i].pos.yPos = height;
-				break;
 			}
 
 			for (int j = 0; j < HAIR_SPHERE; j++)

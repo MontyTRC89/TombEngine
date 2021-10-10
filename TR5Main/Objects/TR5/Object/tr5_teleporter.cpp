@@ -2,10 +2,13 @@
 #include "tr5_teleporter.h"
 #include "items.h"
 #include "level.h"
-#include "control.h"
-#include "Sound\sound.h"
+#include "control/control.h"
+#include "Sound/sound.h"
+#include "effects/weather.h"
 #include "lara.h"
 #include "camera.h"
+
+using namespace TEN::Effects::Environment;
 
 void InitialiseTeleporter(short itemNumber)
 {
@@ -13,7 +16,7 @@ void InitialiseTeleporter(short itemNumber)
 
 	if (item->triggerFlags == 512)
 	{
-		ITEM_INFO* puzzleHoleItem = find_a_fucking_item(ID_PUZZLE_HOLE2);
+		ITEM_INFO* puzzleHoleItem = FindItem(ID_PUZZLE_HOLE2);
 		v4 = (signed int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 9;
 		result = (unsigned int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 31;
 		item->itemFlags[1] = result + v4;
@@ -55,11 +58,6 @@ void ControlTeleporter(short itemNumber)
 				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
 				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
-				if (FlashFader > 4)
-				{
-					FlashFader = (FlashFader >> 1) & 0xFE;
-				}
-
 				if (GlobalCounter & 1)
 				{
 					PHD_VECTOR src;
@@ -93,10 +91,12 @@ void ControlTeleporter(short itemNumber)
 					v23 = item->itemFlags[0];
 					v24 = item->itemFlags[0];
 					v25 = GetRandomControl();
-					FlashFadeR = v23;
-					FlashFadeB = v24 >> 2;
-					FlashFader = 32;
-					FlashFadeG = v24 - v25 % (v24 >> 1);
+
+					auto R = v23;
+					auto G = v24 - v25 % (v24 >> 1);
+					auto B = v24 >> 2;
+					Weather.Flash(R, G, B, 0.03f);
+
 					LOBYTE(v3) = SoundEffect(399, 0, 0);
 				}
 				if (!(GlobalCounter & 3))
@@ -173,13 +173,13 @@ void ControlTeleporter(short itemNumber)
 		}
 	}*/
 
-	DisableLaraControl = false;
+	Lara.uncontrollable = false;
 
 	if (item->triggerFlags == 666)
 	{
 		if (item->itemFlags[0] == 15)
 		{
-			//S_CDPlay("xa12_z_10", 0);
+			//PlaySoundTrack("xa12_z_10", SOUND_TRACK_ONESHOT);
 		}
 		else if (item->itemFlags[0] == 70)
 		{

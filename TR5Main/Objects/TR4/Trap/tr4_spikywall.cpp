@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr4_spikywall.h"
 #include "level.h"
-#include "control.h"
-#include "Sound\sound.h"
+#include "control/control.h"
+#include "Sound/sound.h"
 #include "lara.h"
 #include "items.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 
 void ControlSpikyWall(short itemNum)
 {

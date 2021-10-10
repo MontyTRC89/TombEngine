@@ -1,31 +1,7 @@
 #pragma once
 #include "Specific\phd_global.h"
-#include "items.h"
 #include "lara_struct.h"
-
-struct ENERGY_ARC
-{
-	PHD_VECTOR pos1;
-	PHD_VECTOR pos2;
-	PHD_VECTOR pos3;
-	PHD_VECTOR pos4;
-	signed char interpolation[9];
-	byte r;
-	byte g;
-	byte b;
-	byte life;
-	byte amplitude;
-	byte flags;
-	byte width;
-	byte segments;
-
-	int sAmplitude;
-	int segmentSize;
-	int direction;
-	int rotation;
-	int type;
-	int sLife;
-};
+struct ITEM_INFO;
 
 struct SMOKE_SPARKS
 {
@@ -200,9 +176,6 @@ extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
-extern PHD_VECTOR LightningPos[6];
-extern short LightningBuffer[1024];
-
 #define MAX_SPARKS_FIRE 20
 #define MAX_FIRE_LIST 32
 #define MAX_SPARKS_SMOKE 32
@@ -211,7 +184,6 @@ extern short LightningBuffer[1024];
 #define MAX_GUNSHELL 24
 #define MAX_DRIPS 32
 #define MAX_SHOCKWAVE 16
-#define MAX_ENERGYARCS 32
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -221,7 +193,6 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
@@ -264,12 +235,3 @@ void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int ve
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 void SetFadeClip(short height, short speed);
-void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
-ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type);
-void UpdateEnergyArcs();
-
-void InitialiseFloatSinCosTable();
-void UpdateLightning();
-void TriggerLightning(PHD_VECTOR* src, PHD_VECTOR* dest, char amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
-void DrawLightning();
-void CalcLightningSpline(PHD_VECTOR* pos, short* buffer, ENERGY_ARC* arc);
