@@ -2,17 +2,17 @@
 #include "minecart.h"
 #include "lara.h"
 #include "collide.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "sphere.h"
-#include "draw.h"
-#include "misc.h"
+#include "animation.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "minecart_info.h"
 
 using std::vector;
 
@@ -119,7 +119,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
 		return 0;
 
-	if (!TestBoundsCollide(v, l, coll->radius))
+	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
 		return false;
 
 	if (!TestCollision(v, l))
@@ -157,13 +157,13 @@ static bool CanGetOut(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(collResult.FloorHeight - v->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.Position.Floor - v->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - v->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -213,7 +213,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 									if ((frame >= 12) && (frame <= 22))
 									{
 										SoundEffect(220, &item->pos, 2);
-										TestTriggers(item, true, NULL);
+										TestTriggers(item, true);
 										item->frameNumber++;
 									}
 								}
@@ -729,13 +729,11 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if ((l->currentAnimState != CART_DUCK) && (l->currentAnimState != CART_HIT))
 		{
 			COLL_INFO coll;
-
-			coll.quadrant = short((v->pos.yRot + 0x2000) / 0x4000);
-			coll.radius = CART_RADIUS;
+			coll.Setup.Radius = CART_RADIUS;
 
 			DoObjectCollision(v, &coll);
 
-			if (coll.hitStatic)
+			if (coll.HitStatic)
 			{
 				int hits;
 
@@ -766,8 +764,8 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &g_Level.Items[itemNum];
-	cart = game_malloc<CART_INFO>();
-	v->data = (void*)cart;
+	v->data = CART_INFO();
+	cart = v->data;
 	cart->Flags = NULL;
 	cart->Speed = 0;
 	cart->YVel = 0;
@@ -816,8 +814,6 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.xRot = v->pos.xRot;
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
-
-		//S_CDPlay(12, 0);
 	}
 	else
 	{
@@ -833,8 +829,8 @@ int MineCartControl(void)
 	short roomNumber;
 
 	v = &g_Level.Items[Lara.Vehicle];
-	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
-	cart = (CART_INFO*)v->data;
+	if (!v->data) { printf("v->data is nullptr !"); return 0; }
+	cart = v->data;
 
 	DoUserInput(v, LaraItem, cart);
 
@@ -860,7 +856,7 @@ int MineCartControl(void)
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
-	TestTriggers(v, false, NULL);
+	TestTriggers(v, false);
 
 	if (!(cart->Flags & CF_DEAD))
 	{

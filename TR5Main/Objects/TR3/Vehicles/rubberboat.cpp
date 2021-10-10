@@ -6,11 +6,12 @@
 #include "lara.h"
 #include "input.h"
 #include "sphere.h"
-#include "Sound\sound.h"
-#include "effects\bubble.h"
-#include "draw.h"
-
-
+#include "Sound/sound.h"
+#include "effects/bubble.h"
+#include "animation.h"
+#include "camera.h"
+#include "setup.h"
+#include "rubberboat_info.h"
 
 #define RUBBER_BOAT_FRONT			750
 #define RUBBER_BOAT_SIDE			300
@@ -46,12 +47,14 @@ enum BOAT_STATE
 
 void DrawRubberBoat(ITEM_INFO *item)
 {
+	/* TODO: WTF?
 	RUBBER_BOAT_INFO *b;
 
-	b = (RUBBER_BOAT_INFO*)item->data;
+	b = item->data;
 	item->data = &b->propRot;
 	DrawAnimatingItem(item);
-	item->data = (void *)b;
+	item->data = b;
+	*/
 }
 
 int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
@@ -107,7 +110,7 @@ int RubberBoatCheckGeton(short itemNum, COLL_INFO *coll)
 	if (!getOn)
 		return 0;
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
 		return 0;
 
 	if (!TestCollision(boat, LaraItem))
@@ -578,10 +581,9 @@ void InitialiseRubberBoat(short itemNum)
 	RUBBER_BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	
-	binfo = game_malloc<RUBBER_BOAT_INFO>();
-	boat->data = binfo;
-	
+	boat->data = RUBBER_BOAT_INFO();
+
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->tiltAngle = 0;
 	binfo->rightFallspeed = 0;
@@ -604,7 +606,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 
 	if (!getOn)
 	{
-		coll->enableBaddiePush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, lara, coll);
 		return;
 	}
@@ -662,13 +664,13 @@ static int CanGetOffRubberBoat(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, boat->roomNumber);
 
-	if (collResult.FloorHeight - boat->pos.yPos < -512)
+	if (collResult.Position.Floor - boat->pos.yPos < -512)
 		return 0;
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return 0;
 
-	if ((collResult.CeilingHeight - boat->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - boat->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return 0;
 
 	return 1;
@@ -889,8 +891,8 @@ void RubberBoatControl(short itemNum)
 
 	if (Lara.Vehicle == itemNum)
 	{
-		TestTriggers(boat, false, NULL);
-		TestTriggers(boat, true,  NULL);
+		TestTriggers(boat, false);
+		TestTriggers(boat, true);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
@@ -996,9 +998,9 @@ void RubberBoatControl(short itemNum)
 	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
 	if (boat->speed > 8)
-		SoundEffect(SFX_TR3_BOAT_MOVING, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) * 256));
+		SoundEffect(SFX_TR3_BOAT_MOVING, &boat->pos, 0, 0.5f + (float)abs(binfo->pitch) / (float)RUBBER_BOAT_MAX_SPEED);
 	else if (drive)
-		SoundEffect(SFX_TR3_BOAT_IDLE, &boat->pos, PITCH_SHIFT + ((0x10000 - (110 - binfo->pitch)) * 256));
+		SoundEffect(SFX_TR3_BOAT_IDLE, &boat->pos, 0, 0.5f + (float)abs(binfo->pitch) / (float)RUBBER_BOAT_MAX_SPEED);
 
 	if (Lara.Vehicle != itemNum)
 		return;

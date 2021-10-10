@@ -2,9 +2,10 @@
 #include "tr4_laradouble.h"
 #include "items.h"
 #include "level.h"
-#include "Sound\sound.h"
-#include "box.h"
+#include "Sound/sound.h"
+#include "control/box.h"
 #include "lara.h"
+#include "animation.h"
 
 void InitialiseLaraDouble(short itemNum)
 {
@@ -21,10 +22,8 @@ void LaraDoubleControl(short itemNum)
 	{
 		if (item->hitStatus)
 		{
-			LaraItem->hitPoints += item->hitPoints - 1000;
+			LaraItem->hitPoints = item->hitPoints;
 		}
-
-		item->hitPoints = 1000;
 
 		AnimateItem(item);
 	}

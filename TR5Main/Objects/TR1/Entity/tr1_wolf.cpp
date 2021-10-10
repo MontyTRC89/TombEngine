@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr1_wolf.h"
 #include "items.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "lara.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 

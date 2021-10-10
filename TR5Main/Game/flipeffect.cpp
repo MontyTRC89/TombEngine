@@ -1,31 +1,39 @@
 #include "framework.h"
 #include "flipeffect.h"
 #include "Lara.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "effects\hair.h"
-#include "draw.h"
+#include "animation.h"
 #include "sphere.h"
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
+#include "collide.h"
 #include "savegame.h"
 #include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "tr5_pushableblock.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "puzzles_keys.h"
 #include "lara_fire.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
+#include "effects\weather.h"
 #include "effects\footprint.h"
+#include "effects\groundfx.h"
 #include "effects\debris.h"
+#include "items.h"
 
 using std::function;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Environment;
 
-function<EffectFunction> effect_routines[59] =
+short FXType;
+int FlipEffect;
+
+function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 {
 	Turn180,					//0
 	FloorShake,					//1
@@ -47,7 +55,7 @@ function<EffectFunction> effect_routines[59] =
 	ShootLeftGun,				//17
 	PushLoop,					//18
 	PushEnd,					//19
-	VoidEffect,					//20
+	FlashOrange,				//20
 	InvisibilityOn,				//21
 	InvisibilityOff,			//22
 	VoidEffect,					//23
@@ -76,6 +84,12 @@ function<EffectFunction> effect_routines[59] =
 	KillActiveBaddies			//46
 };
 
+void FlashOrange(ITEM_INFO* item) 
+{
+	FlipEffect = -1;
+	Weather.Flash(255, 128, 0, 0.03f);
+}
+
 void MeshSwapToPour(ITEM_INFO* item)
 {
 	Lara.meshPtrs[LM_LHAND] = Objects[item->itemFlags[2]].meshIndex + LM_LHAND;
@@ -96,14 +110,95 @@ void Puzzle(ITEM_INFO* item)
 	do_puzzle();
 }
 
-// TODO: here are sound for lara footstep too !
 void AddFootprint(ITEM_INFO* item)
 {
 	if (item != LaraItem)
 		return;
 
+	PHD_VECTOR position;
+	if (FXType == SFX_LANDONLY)
+		GetLaraJointPosition(&position, LM_LFOOT);
+	else
+		GetLaraJointPosition(&position, LM_RFOOT);
+
+	auto fx = sound_effects::SFX_TR4_LARA_FEET;
+	auto floor = GetCollisionResult(position.x, position.y, position.z, item->roomNumber).BottomBlock;
+
+	switch (floor->Material)
+	{
+	case GroundMaterial::Concrete:
+		fx = sound_effects::SFX_TR4_LARA_FEET;
+		break;
+
+	case GroundMaterial::Grass:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+		break;
+
+	case GroundMaterial::Gravel:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_GRAVEL;
+		break;
+
+	case GroundMaterial::Ice:
+		fx = sound_effects::SFX_TR3_FOOTSTEPS_ICE;
+		break;
+
+	case GroundMaterial::Marble:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_MARBLE;
+		break;
+
+	case GroundMaterial::Metal:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+		break;
+
+	case GroundMaterial::Mud:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_MUD;
+		break;
+
+	case GroundMaterial::OldMetal:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+		break;
+
+	case GroundMaterial::OldWood:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+		break;
+
+	case GroundMaterial::Sand:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+		break;
+
+	case GroundMaterial::Snow:
+		fx = sound_effects::SFX_TR3_FOOTSTEPS_SNOW;
+		break;
+
+	case GroundMaterial::Stone:
+		fx = sound_effects::SFX_TR4_LARA_FEET;
+		break;
+
+	case GroundMaterial::Water:
+		fx = sound_effects::SFX_TR4_LARA_WET_FEET;
+		break;
+
+	case GroundMaterial::Wood:
+		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+		break;
+	}
+	
+	// HACK: must be here until reference wad2 is revised
+	if (fx != sound_effects::SFX_TR4_LARA_FEET)
+		SoundEffect(fx, &item->pos, 0);
+
 	FOOTPRINT_STRUCT footprint;
-	PHD_3DPOS footprintPosition;
+
+	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
+
+	auto x = Vector2(plane.x * WALL_SIZE, WALL_SIZE);
+	auto z = Vector2(WALL_SIZE, plane.y * WALL_SIZE);
+
+	auto xRot = FROM_RAD(atan2(0 - x.y, 0 - x.x));
+	auto yRot = item->pos.yRot;
+	auto zRot = FROM_RAD(atan2(0 - z.y, 0 - z.x));
+
+	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, xRot, yRot, zRot);
 
 	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
 	{
@@ -112,6 +207,7 @@ void AddFootprint(ITEM_INFO* item)
 		
 		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
+		footprint.foot = 0;
 		footprint.lifeStartFading = 30 * 10;
 		footprint.startOpacity = 64;
 		footprint.life = 30 * 20;
@@ -126,6 +222,7 @@ void AddFootprint(ITEM_INFO* item)
 
 		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
+		footprint.foot = 1;
 		footprint.lifeStartFading = 30*10;
 		footprint.startOpacity = 64;
 		footprint.life = 30 * 20;
@@ -277,7 +374,7 @@ void PoseidonSFX(ITEM_INFO* item)
 
 void RubbleFX(ITEM_INFO* item)
 {
-	const auto itemList = FindItem(ID_EARTHQUAKE);
+	const auto itemList = FindAllItems(ID_EARTHQUAKE);
 
 	if (itemList.size() > 0)
 	{
@@ -327,4 +424,10 @@ void FinishLevel(ITEM_INFO* item)
 void VoidEffect(ITEM_INFO* item)
 {
 
+}
+
+void DoFlipEffect(int number, ITEM_INFO* item)
+{
+	if (number != -1 && number < NUM_FLIPEFFECTS && effect_routines[number] != nullptr)
+		effect_routines[number](item);
 }

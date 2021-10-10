@@ -1,14 +1,17 @@
 #include "framework.h"
 #include "tr3_mpgun.h"
-#include "box.h"
+#include "control/box.h"
 #include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "people.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
 
 enum MPGUN_STATES
 {
@@ -115,9 +118,9 @@ void MPGunControl(short itemNumber)
 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 			
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
-			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
+			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[slot];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 

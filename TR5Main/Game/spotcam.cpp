@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "spotcam.h"
 #include "camera.h"
-#include "control.h"
-#include "draw.h"
+#include "control/control.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "lara.h"
 #include "input.h"
 #include "control\volume.h"
+#include "items.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
 
-
+int TrackCameraInit;
 int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
@@ -40,18 +41,26 @@ QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 int Unk_0051D024;
 short CurrentSplineCamera;
-byte SpotCamRemap[16];
-byte CameraCnt[16];
 int LastSpotCam;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
-SPOTCAM SpotCam[64];
+SPOTCAM SpotCam[MAX_SPOTCAMS];
+byte SpotCamRemap[MAX_SPOTCAMS];
+byte CameraCnt[MAX_SPOTCAMS];
 int NumberSpotcams;
 int CheckTrigger = 0;
 int UseSpotCam = 0;
 int SpotcamDontDrawLara;
 int SpotcamOverlay;
+
+void ClearSpotCamSequences()
+{
+	UseSpotCam = false;
+
+	for (int i = 0; i < MAX_SPOTCAMS; i++)
+		SpotCam[i] = {};
+}
 
 void InitSpotCamSequences() 
 {
@@ -129,7 +138,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
-	DisableLaraControl = 0;
+	Lara.uncontrollable = false;
 
 	LastFOV = CurrentFOV;
 	LaraAir = Lara.air;
@@ -169,7 +178,7 @@ void InitialiseSpotCam(short Sequence)
 
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		DisableLaraControl = 1;
+		Lara.uncontrollable = true;
 		g_Renderer.enableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
@@ -385,7 +394,7 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO Backup;
 
-	if (DisableLaraControl)
+	if (Lara.uncontrollable)
 	{
 		LaraItem->hitPoints = LaraHealth;
 		Lara.air = LaraAir;
@@ -555,13 +564,13 @@ void CalculateSpotCameras()
 			Camera.type = HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 				TestVolumes(&Camera);
 			}
 			Camera.type = oldType;
@@ -654,7 +663,7 @@ void CalculateSpotCameras()
 				{
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS))
 					{
-						DisableLaraControl = false;
+						Lara.uncontrollable = false;
 					}
 
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
@@ -662,7 +671,7 @@ void CalculateSpotCameras()
 						//SetFadeClip(16, 1);
 						if (CurrentLevel)
 							g_Renderer.enableCinematicBars(true);
-						DisableLaraControl = true;
+						Lara.uncontrollable = true;
 					}
 
 					int sp2 = 0;
@@ -751,13 +760,13 @@ void CalculateSpotCameras()
 						Camera.type = HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true, NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false, NULL);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true,  NULL);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 							TestVolumes(&Camera);
 						}
 						Camera.type = oldType;
@@ -768,7 +777,7 @@ void CalculateSpotCameras()
 					g_Renderer.enableCinematicBars(false);
 
 					UseSpotCam = 0;
-					DisableLaraControl = 0;
+					Lara.uncontrollable = false;
 					CheckTrigger = 0;
 					Camera.oldType = FIXED_CAMERA;
 					Camera.type = CHASE_CAMERA;
@@ -883,7 +892,7 @@ void CalculateSpotCameras()
 	{
 		g_Renderer.enableCinematicBars(false);
 		UseSpotCam = false;
-		DisableLaraControl = false;
+		Lara.uncontrollable = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera();

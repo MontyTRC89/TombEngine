@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr5_raisingcog.h"
 #include "level.h"
-#include "switch.h"
-#include "control.h"
+#include "control/control.h"
 #include "items.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "spotcam.h"
 #include "objectslist.h"
 #include "generic_switch.h"
+#include "animation.h"
 
 using namespace TEN::Entities::Switches;
 

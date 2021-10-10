@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr1_doppelganger.h"
-#include "box.h"
 #include "items.h"
 #include "lara_fire.h"
 #include "misc.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
+#include "control/control.h"
+#include "animation.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 
@@ -107,7 +107,7 @@ void DoppelgangerControl(short itemNum)
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 			item->speed = 0;
-			item->data = (void*)-1;
+			item->data = -1;
 			item->pos.yPos += 50;
 		}
 	}
@@ -122,11 +122,11 @@ void DoppelgangerControl(short itemNum)
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
 		item->floor = h;
-		TestTriggers(x, y, z, item->roomNumber, true, NULL);
+		TestTriggers(x, y, z, item->roomNumber, true);
 		if (item->pos.yPos >= h)
 		{
 			item->floor = item->pos.yPos = h;
-			TestTriggers(x, h, z, item->roomNumber, true, NULL);
+			TestTriggers(x, h, z, item->roomNumber, true);
 
 			item->gravityStatus = false;
 			item->fallspeed = 0;

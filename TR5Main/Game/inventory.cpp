@@ -1,8 +1,8 @@
 #include "framework.h"
 #ifndef NEW_INV
 #include "inventory.h"
-#include "draw.h"
-#include "control.h"
+#include "animation.h"
+#include "control/control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
 #include "Sound\sound.h"
@@ -20,7 +20,6 @@
 using namespace TEN::Renderer;
 using std::vector;
 Inventory g_Inventory;
-extern GameFlow* g_GameFlow;
 
 void CombinePuzzle(int action, short object)
 {
@@ -1508,7 +1507,7 @@ void Inventory::UseCurrentItem()
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{
-				OldLaraBusy = true;
+				Lara.oldBusy = true;
 				BinocularRange = 128;
 				if (Lara.gunStatus)
 					Lara.gunStatus = LG_UNDRAW_GUNS;
@@ -1878,9 +1877,6 @@ int Inventory::DoTitleInventory()
 		UpdateSceneAndDrawInventory();
 	}
 
-	CurrentAtmosphere = CDA_XA11_FLYBY1;
-	S_CDPlay(CurrentAtmosphere, 1);
-
 	OpenRing(INV_RING_OPTIONS, true);
 
 	int result = INV_RESULT_NONE;
@@ -1888,7 +1884,6 @@ int Inventory::DoTitleInventory()
 	while (true /*!ResetFlag*/)
 	{
 		SetDebounce = true;
-
 		S_UpdateInput();
 		SetDebounce = false;
 
@@ -2093,9 +2088,9 @@ int Inventory::DoPassport()
 			int selectedSavegame = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2165,9 +2160,9 @@ int Inventory::DoPassport()
 			int selectedSavegame = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2240,9 +2235,9 @@ int Inventory::DoPassport()
 			int selectedLevel = 0;
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2309,9 +2304,9 @@ int Inventory::DoPassport()
 			// New game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2363,9 +2358,9 @@ int Inventory::DoPassport()
 			// Exit game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)
@@ -2417,9 +2412,9 @@ int Inventory::DoPassport()
 			// Exit game
 			while (true)
 			{
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
-				SetDebounce = 0;
+				SetDebounce = false;
 
 				// Process input
 				if (DbInput & IN_DESELECT)

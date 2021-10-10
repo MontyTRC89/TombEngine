@@ -214,6 +214,8 @@ extern const char* g_KeyNames[];
 extern int TrInput;
 extern int DbInput;
 extern int InputBusy;
+extern bool SetDebounce;
+
 extern short KeyboardLayout[2][18];
 extern byte KeyMap[256];
 

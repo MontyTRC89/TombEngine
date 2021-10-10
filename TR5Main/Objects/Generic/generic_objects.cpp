@@ -14,11 +14,25 @@
 #include "underwater_switch.h"
 #include "pulley_switch.h"
 #include "fullblock_switch.h"
+#include "turn_switch.h"
+
+// Doors
+#include "generic_doors.h"
+#include "double_doors.h"
+#include "pushpull_kick_door.h"
+#include "sequence_door.h"
+#include "steel_door.h"
+#include "underwater_door.h"
+
+// Traps
+#include "Objects/Generic/Traps/dart_emitter.h"
 
 /// necessary import
 #include "setup.h"
 
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Doors;
+using namespace TEN::Entities::Traps;
 
 static void StartObject()
 {
@@ -231,7 +245,7 @@ void StartSwitches()
 		if (obj->loaded)
 		{
 			obj->control = SwitchControl;
-			obj->collision = objNum < ID_UNDERWATER_SWITCH3 ? UnderwaterSwitchCollision : CeilingUnderwaterSwitchCollision;
+			obj->collision = UnderwaterSwitchCollision;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 		}
@@ -243,6 +257,15 @@ void StartSwitches()
 		obj->initialise = InitialisePulleySwitch;
 		obj->control = SwitchControl;
 		obj->collision = PulleySwitchCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_TURN_SWITCH];
+	if (obj->loaded)
+	{
+		obj->control = TurnSwitchControl;
+		obj->collision = TurnSwitchCollision;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
@@ -275,8 +298,145 @@ void StartSwitches()
 	}
 }
 
+void StartDoors()
+{
+	OBJECT_INFO* obj;
+
+	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_DOOR_TYPE30; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->control = DoorControl;
+			obj->collision = DoorCollision;
+			obj->hitEffect = HIT_RICOCHET;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+			obj->saveMesh = true;
+		}
+	}
+
+	obj = &Objects[ID_LIFT_DOORS1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_LIFT_DOORS2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SEQUENCE_DOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->collision = DoorCollision;
+		obj->control = SequenceDoorControl;
+		obj->hitEffect = HIT_RICOCHET;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
+	{
+		obj = &Objects[i];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = DoubleDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
+	}
+
+	for (int i = ID_UNDERWATER_DOOR1; i <= ID_UNDERWATER_DOOR4; i++)
+	{
+		obj = &Objects[i];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = UnderwaterDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
+	}
+
+	for (int objNum = ID_PUSHPULL_DOOR1; objNum <= ID_KICK_DOOR4; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = PushPullKickDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->hitEffect = HIT_RICOCHET;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
+	}
+
+	obj = &Objects[ID_STEEL_DOOR];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSteelDoor;
+		obj->collision = SteelDoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+		obj->savePosition = true;
+	}
+}
+
+void StartTraps()
+{
+	OBJECT_INFO* obj;
+
+	obj = &Objects[ID_DARTS];
+	if (obj->loaded)
+	{
+		obj->shadowSize = UNIT_SHADOW / 2;
+		//obj->drawRoutine = DrawDart;
+		obj->collision = ObjectCollision;
+		obj->control = DartControl;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_HOMING_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+}
+
 void InitialiseGenericObjects()
 {
+	StartTraps();
 	StartObject();
 	StartSwitches();
+	StartDoors();
 }

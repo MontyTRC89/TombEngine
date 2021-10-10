@@ -6,6 +6,7 @@
 #include "newtypes.h"
 #include "items.h"
 #include "room.h"
+#include "animation.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
 #define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
@@ -113,15 +114,6 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
-struct ANIM_FRAME
-{
-	BOUNDING_BOX boundingBox;
-	short offsetX;
-	short offsetY;
-	short offsetZ;
-	std::vector<Quaternion> angles;
-};
-
 struct LEVEL
 {
 	std::vector<TEXTURE> RoomTextures;
@@ -129,7 +121,7 @@ struct LEVEL
 	std::vector<TEXTURE> StaticsTextures;
 	std::vector<TEXTURE> AnimatedTextures;
 	std::vector<TEXTURE> SpritesTextures;
-	TEXTURE MiscTextures;
+	TEXTURE SkyTexture;
 	std::vector<ROOM_INFO> Rooms;
 	std::vector<short> FloorData;
 	std::vector<MESH> Meshes;
@@ -162,27 +154,30 @@ extern char* LevelDataPtr;
 extern int IsLevelLoading;
 extern LEVEL g_Level;
 
-void LoadTextures();
-void LoadRooms();
-int LoadItems();
-void LoadObjects();
-int S_LoadLevelFile(int levelIndex);
-void FreeLevel();
-void LoadCameras();
-void InitialiseLara(int restore);
-void LoadSprites();
-void GetCarriedItems();
-void GetAIPickups();
-void LoadBoxes();
-void LoadSamples();
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream);
-void LoadSoundEffects();
-void LoadAnimatedTextures();
-void LoadTextureInfos();
-void LoadAIObjects();
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
 bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
+
+int LoadLevelFile(int levelIndex);
+void FreeLevel();
+
+void LoadTextures();
+void LoadRooms();
+void LoadItems();
+void LoadObjects();
+void LoadCameras();
+void LoadSprites();
+void LoadBoxes();
+void LoadSamples();
+void LoadSoundSources();
+void LoadAnimatedTextures();
+void LoadTextureInfos();
+void LoadAIObjects();
+
+void InitialiseLara(int restore);
+void GetCarriedItems();
+void GetAIPickups();
 void BuildOutsideRoomsTable();
 
 unsigned CALLBACK LoadLevel(void* data);

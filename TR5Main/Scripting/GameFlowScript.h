@@ -1,6 +1,7 @@
 #pragma once
 #include "LanguageScript.h"
 #include "LuaHandler.h"
+#include "GameLogicScript.h"
 #include "GameScriptColor.h"
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
@@ -37,7 +38,7 @@ public:
 	std::string						TitleScreenImagePath{};
 
 	// Selected language set
-	std::vector<GameScriptLevel*>			Levels;
+	std::vector<GameScriptLevel*>	Levels;
 
 	GameFlow(sol::state* lua);
 	~GameFlow();
@@ -57,3 +58,6 @@ public:
 	void							SetTitleScreenImagePath(std::string const& path);
 	void							SetGameFarView(byte val);
 };
+
+extern GameFlow* g_GameFlow;
+extern GameScript* g_GameScript;

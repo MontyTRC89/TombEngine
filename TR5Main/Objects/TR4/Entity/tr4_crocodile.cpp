@@ -1,15 +1,17 @@
 #include "framework.h"
 #include "tr4_crocodile.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "people.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "misc.h"
+#include "itemdata/creature_info.h"
+#include "collide.h"
 
 enum CROCODILE_STATE
 {

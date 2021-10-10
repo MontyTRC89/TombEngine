@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "tr5_bats_emitter.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "setup.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include <Game\items.h>
+#include "items.h"
 
 int NextBat;
-BAT_STRUCT* Bats;
+BAT_STRUCT Bats[NUM_BATS];
 
 void InitialiseLittleBats(short itemNumber)
 {

@@ -1,11 +1,13 @@
 #include "framework.h"
-#include "Sound\sound.h"
+#include <filesystem>
+#include "winmain.h"
+#include "Sound/sound.h"
 #include "lara.h"
 #include "camera.h"
+#include "room.h"
+#include "setup.h"
 #include "configuration.h"
 #include "level.h"
-#include "winmain.h"
-#include <filesystem>
 
 using std::vector;
 using std::unordered_map;
@@ -27,8 +29,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-unordered_map<string, AudioTrack> g_AudioTracks;
-char TrackNamePrefix;
+unordered_map<string, AudioTrack> SoundTracks;
+std::string CurrentLoopedSoundTrack;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -53,17 +55,17 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
+bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
-		printf("Sample index is larger than max. amount of samples (%d) \n", index);
+		logD("Sample index is larger than max. amount of samples (%d) \n", index);
 		return 0;
 	}
 
 	if (pointer == NULL || compSize <= 0)
 	{
-		printf("Sample size or memory address is incorrect \n", index);
+		logD("Sample size or memory address is incorrect \n", index);
 		return 0;
 	}
 
@@ -72,7 +74,7 @@ bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	//
 
 	if (!sample)
 	{
-		printf("Error loading sample %d \n", index);
+		logE("Error loading sample %d \n", index);
 		return false;
 	}
 
@@ -86,7 +88,7 @@ bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	//
 
 	if (info.freq != 22050 || info.chans != 1)
 	{
-		printf("Wrong sample parameters, must be 22050 Hz Mono \n");
+		logE("Wrong sample parameters, must be 22050 Hz Mono \n");
 		return false;
 	}
 
@@ -132,7 +134,7 @@ bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	//
 	return true;
 }
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
+long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier, float gainMultiplier)
 {
 	if (effectID >= g_Level.SoundMap.size())
 		return 0;
@@ -154,7 +156,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		printf("Non present effect %d \n", effectID);
+		logE("Non present effect %d \n", effectID);
 		g_Level.SoundMap[effectID] = -2;
 		return 0;
 	}
@@ -165,7 +167,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 
 	if (sampleInfo->number < 0)
 	{
-		printf("No valid samples count for effect %d", sampleIndex);
+		logD("No valid samples count for effect %d", sampleIndex);
 		return 0;
 	}
 
@@ -180,6 +182,32 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	if (position)
 		sampleFlags |= BASS_SAMPLE_3D;
 
+	// Set & randomize volume (if needed)
+	float gain = (static_cast<float>(sampleInfo->volume) / 255.0f) * gainMultiplier;
+	if ((sampleInfo->flags & SOUND_FLAG_RND_GAIN))
+		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
+
+	// Set and randomize pitch and additionally multiply by provided value (for vehicles etc)
+	float pitch = (1.0f + static_cast<float>(sampleInfo->pitch) / 127.0f) * pitchMultiplier;
+
+	// Randomize pitch (if needed)
+	if ((sampleInfo->flags & SOUND_FLAG_RND_PITCH))
+		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f)* SOUND_MAX_PITCH_CHANGE * 2.0f;
+
+	// Calculate sound radius and distance to sound
+	float radius = (float)(sampleInfo->radius) * 1024.0f;
+	float distance = Sound_DistanceToListener(position);
+
+	// Don't play sound if it's too far from listener's position.
+	if (distance > radius)
+		return 0;
+
+	// Get final volume of a sound.
+	float volume = Sound_Attenuate(gain, distance, radius);
+
+	// Get existing index, if any, of sound which is playing.
+	int existingChannel = Sound_EffectIsPlaying(effectID, position);
+
 	// Select behaviour based on effect playback type (bytes 0-1 of flags field)
 	int playType = sampleInfo->flags & 3;
 	switch (playType)
@@ -188,36 +216,25 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 		break;
 
 	case SOUND_WAIT:
-		if (Sound_EffectIsPlaying(effectID, position) != -1) return 0; // Don't play until stopped
+		if (existingChannel != -1) // Don't play until stopped
+			return 0; 
 		break;
 
 	case SOUND_RESTART:
-		Sound_FreeSlot(Sound_EffectIsPlaying(effectID, position), SOUND_XFADETIME_CUTSOUND); // Stop existing and continue
+		if (existingChannel != -1) // Stop existing and continue
+			Sound_FreeSlot(existingChannel, SOUND_XFADETIME_CUTSOUND); 
 		break;
 
 	case SOUND_LOOPED:
-		if (Sound_UpdateEffectPosition(Sound_EffectIsPlaying(effectID, position), position))
+		if (existingChannel != -1) // Just update parameters and return, if already playing
+		{
+			Sound_UpdateEffectPosition(existingChannel, position);
+			Sound_UpdateEffectAttributes(existingChannel, pitch, volume);
 			return 0;
+		}
 		sampleFlags |= BASS_SAMPLE_LOOP;
 		break;
 	}
-
-	float radius   = (float)(sampleInfo->radius) * 1024.0f;
-	float distance = Sound_DistanceToListener(position);
-
-	// Don't play sound if it's too far from listener's position.
-	if (distance > radius)
-		return 0;
-
-	// Set and randomize volume (if needed)
-	float gain = static_cast<float>(sampleInfo->volume) / 255.0f;
-	if ((sampleInfo->flags & SOUND_FLAG_RND_GAIN))
-		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) * SOUND_MAX_GAIN_CHANGE;
-
-	// Set and randomize pitch (if needed)
-	float pitch = 1.0f + static_cast<float>(sampleInfo->pitch) / 127.0f;
-	if ((sampleInfo->flags & SOUND_FLAG_RND_PITCH))
-		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f) * SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Randomly select arbitrary sample from the list, if more than one is present
 	int sampleToPlay = 0;
@@ -231,7 +248,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	int freeSlot = Sound_GetFreeSlot();
 	if (freeSlot == -1)
 	{
-		printf("No free channel slot available!");
+		logD("No free channel slot available!");
 		return 0;
 	}
 
@@ -241,35 +258,32 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	if (Sound_CheckBASSError("Trying to create channel for sample %d", false, sampleToPlay))
 		return 0;
 
-	// Set pitch/volume settings appropriately
-	BASS_ChannelSetAttribute(channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
-	BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, Sound_Attenuate(gain, distance, radius));
-
-	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
-		return 0;
-
 	// Finally ready to play sound, assign it to sound slot.
 	SoundSlot[freeSlot].state = SOUND_STATE_IDLE;
 	SoundSlot[freeSlot].effectID = effectID;
 	SoundSlot[freeSlot].channel = channel;
 	SoundSlot[freeSlot].gain = gain;
 	SoundSlot[freeSlot].origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
-	
-	// Set 3D attributes
-	BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
-	Sound_UpdateEffectPosition(freeSlot, position, true);
 
-	if (Sound_CheckBASSError("Applying 3D attribs on channel %x, sound %d", false, channel, effectID))
+	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
 		return 0;
 
 	// Set looped flag, if necessary
-	if(playType == SOUND_LOOPED)
+	if (playType == SOUND_LOOPED)
 		BASS_ChannelFlags(channel, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
 
 	// Play channel
 	BASS_ChannelPlay(channel, false);
 
 	if (Sound_CheckBASSError("Queuing channel %x on sample mixer", false, freeSlot))
+		return 0;
+
+	// Set attributes
+	BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
+	Sound_UpdateEffectPosition(freeSlot, position, true);
+	Sound_UpdateEffectAttributes(freeSlot, pitch, volume);
+
+	if (Sound_CheckBASSError("Applying 3D attribs on channel %x, sound %d", false, channel, effectID))
 		return 0;
 
 	return 1;
@@ -282,7 +296,7 @@ void StopSoundEffect(short effectID)
 			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 }
 
-void SOUND_Stop()
+void Sound_Stop()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel))
@@ -292,12 +306,17 @@ void SOUND_Stop()
 
 void Sound_FreeSamples()
 {
-	SOUND_Stop();
+	Sound_Stop();
 	for (int i = 0; i < SOUND_MAX_SAMPLES; i++)
 		Sound_FreeSample(i);
 }
 
-void S_CDPlay(std::string track, unsigned int mode)
+void PlaySoundTrack(short track, short flags)
+{
+	PlaySoundTrack(track, flags, SOUND_TRACK_ONESHOT);
+}
+
+void PlaySoundTrack(std::string track, unsigned int mode)
 {
 	bool crossfade = false;
 	DWORD crossfadeTime;
@@ -319,6 +338,7 @@ void S_CDPlay(std::string track, unsigned int mode)
 			crossfade = true;
 			crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
 			flags |= BASS_SAMPLE_LOOP;
+			CurrentLoopedSoundTrack = track;
 			break;
 	}
 
@@ -383,36 +403,29 @@ void S_CDPlay(std::string track, unsigned int mode)
 	BASS_Soundtrack[mode].track = track;
 }
 
-void S_CDPlayEx(std::string track, DWORD mask, DWORD unknown)
+void PlaySoundTrack(std::string track, DWORD mask, DWORD unknown)
 {
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
-	if (!g_AudioTracks[track].looped)
+	if (!SoundTracks[track].looped)
 	{
 		byte filteredMask = (mask >> 8) & 0x3F;
-		if ((g_AudioTracks[track].Mask & filteredMask) == filteredMask)
+		if ((SoundTracks[track].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
-		g_AudioTracks[track].Mask |= filteredMask;
+		SoundTracks[track].Mask |= filteredMask;
 	}
 
-	S_CDPlay(track, g_AudioTracks[track].looped);
+	PlaySoundTrack(track, SoundTracks[track].looped);
 }
 
-// Legacy!
-void S_CDPlay(int index, unsigned int mode)
+void PlaySoundTrack(int index, DWORD mask, DWORD unknown)
 {
-	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
-	S_CDPlay(track.first, mode);
+	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
+	PlaySoundTrack(track.first, mask, unknown);
 }
 
-void S_CDPlayEx(int index, DWORD mask, DWORD unknown)
-{
-	std::pair<const std::string, AudioTrack>& track = *std::next(g_AudioTracks.begin(), index);
-	S_CDPlayEx(track.first, mask, unknown);
-}
-
-void S_CDStop()
+void StopSoundTracks()
 {
 	// Do quick fadeouts.
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
@@ -468,7 +481,7 @@ int Sound_GetFreeSlot()
 		}
 	}
 
-	printf("Hijacking sound effect slot %d  \n", farSlot);
+	logD("Hijacking sound effect slot %d  \n", farSlot);
 	Sound_FreeSlot(farSlot, SOUND_XFADETIME_HIJACKSOUND);
 	return farSlot;
 }
@@ -498,8 +511,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
 				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
-				if (SoundSlot[i].origin == origin ||
-					Vector3(SoundSlot[i].origin - origin).Length() < SOUND_MAXVOL_RADIUS)
+				if (Vector3::Distance(origin, SoundSlot[i].origin) < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
 			else
@@ -558,11 +570,12 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(SoundSlot[index].channel, &info);
-		if ((info.flags & BASS_SAMPLE_3D) && 
-			!(!force && SoundSlot[index].origin.x == position->xPos &&
-						SoundSlot[index].origin.y == position->yPos &&
-						SoundSlot[index].origin.z == position->zPos))
+		if (info.flags & BASS_SAMPLE_3D)
 		{
+			SoundSlot[index].origin.x = position->xPos;
+			SoundSlot[index].origin.y = position->yPos;
+			SoundSlot[index].origin.z = position->zPos;
+
 			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
 			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
 			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &pos, &rot, NULL);
@@ -573,6 +586,18 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 	// Reset activity flag, important for looped samples
 	if (BASS_ChannelIsActive(SoundSlot[index].channel))
 		SoundSlot[index].state = SOUND_STATE_IDLE;
+
+	return true;
+}
+
+// Update gain and pitch.
+bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
+{
+	if (index > SOUND_MAX_CHANNELS || index < 0)
+		return false;
+
+	BASS_ChannelSetAttribute(SoundSlot[index].channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
+	BASS_ChannelSetAttribute(SoundSlot[index].channel, BASS_ATTRIB_VOL, gain);
 
 	return true;
 }
@@ -739,10 +764,34 @@ void SayNo()
 
 int GetShatterSound(int shatterID)
 {
-	// TODO: Add scripted procedure to get shatter sound here.
+	auto fxID = StaticObjects[shatterID].shatterSound;
+	if (fxID != -1 && fxID < NUM_SFX)
+		return fxID;
 
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;
 	else
 		return SFX_TR5_SMASH_GLASS;
+}
+
+void PlaySoundSources()
+{
+	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
+	{
+		SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+
+		short t = sound->flags & 31;
+		short group = t & 1;
+		group += t & 2;
+		group += ((t >> 2) & 1) * 3;
+		group += ((t >> 3) & 1) * 4;
+		group += ((t >> 4) & 1) * 5;
+
+		if (!FlipStats[group] && (sound->flags & 128) == 0)
+			continue;
+		else if (FlipStats[group] && (sound->flags & 128) == 0)
+			continue;
+
+		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
+	}
 }

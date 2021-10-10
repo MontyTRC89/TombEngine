@@ -1,15 +1,17 @@
 #include "framework.h"
 #include "tr5_rats_emitter.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
+#include "flipeffect.h"
 #include "setup.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
+#include "items.h"
 
 int NextRat;
-RAT_STRUCT* Rats;
+RAT_STRUCT Rats[NUM_RATS];
 
 short GetNextRat()
 {

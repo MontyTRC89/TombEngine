@@ -1,10 +1,17 @@
 #include "framework.h"
 #include "cog_switch.h"
-#include "control.h"
+#include "control/control.h"
 #include "input.h"
 #include "lara.h"
 #include "generic_switch.h"
-#include "door.h"
+#include "itemdata/door_data.h"
+#include "control/box.h"
+#include "generic_doors.h"
+#include "collide.h"
+#include "animation.h"
+#include "items.h"
+
+using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
@@ -24,22 +31,36 @@ namespace TEN::Entities::Switches
 		auto item = &g_Level.Items[itemNum];
 		auto triggerIndex = GetTriggerIndex(item);
 
-		if (!triggerIndex)
+		int targetItemNum;
+		ITEM_INFO* target = nullptr;
+		DOOR_DATA* door   = nullptr;
+
+		// Try to find first item in a trigger list, and if it is a door,
+		// attach it to cog. If no object found or object is not door,
+		// bypass further processing and do ordinary object collision.
+
+		if (triggerIndex)
+		{
+			short* trigger = triggerIndex;
+			targetItemNum = trigger[3] & VALUE_BITS;
+
+			if (targetItemNum < g_Level.Items.size())
+			{
+				target = &g_Level.Items[targetItemNum];
+				if (target->data.is<DOOR_DATA>())
+					door = (DOOR_DATA*)target->data;
+			}
+		}
+
+		// Door was not found, do ordinary collision and exit.
+
+		if (door == nullptr)
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
 		}
 
-		short* trigger = triggerIndex;
-		for (int i = *triggerIndex; (i & 0x1F) != 4; trigger++)
-		{
-			if (i < 0)
-				break;
-			i = trigger[1];
-		}
-		int targetItemNum = trigger[3] & 0x3FF;
-		ITEM_INFO* target = &g_Level.Items[targetItemNum];
-		DOOR_DATA* door = (DOOR_DATA*)target->data;
+		// Door is found, attach to it.
 
 		if (item->status == ITEM_NOT_ACTIVE)
 		{
@@ -77,7 +98,6 @@ namespace TEN::Entities::Switches
 							if (!door->opened)
 							{
 								AddActiveItem((target - g_Level.Items.data()));
-								target->itemFlags[2] = target->pos.yPos;
 								target->status = ITEM_ACTIVE;
 							}
 						}

@@ -1,35 +1,40 @@
 #include "framework.h"
 #include "tr4_chain.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
+#include "animation.h"
+#include "items.h"
 
-void ChainControl(short itemNum)
+namespace TEN::Entities::TR4
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (item->triggerFlags)
+	void ChainControl(short itemNum)
 	{
-		item->itemFlags[2] = 1;
-		item->itemFlags[3] = 75;
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (TriggerActive(item))
+		if (item->triggerFlags)
 		{
-			item->itemFlags[0] = 30846;
-			AnimateItem(item);
-			return;
-		}
-	}
-	else
-	{
-		item->itemFlags[3] = 25;
+			item->itemFlags[2] = 1;
+			item->itemFlags[3] = 75;
 
-		if (TriggerActive(item))
+			if (TriggerActive(item))
+			{
+				*((int*)&item->itemFlags[0]) = 0x787E;
+				AnimateItem(item);
+				return;
+			}
+		}
+		else
 		{
-			item->itemFlags[0] = 1920;
-			AnimateItem(item);
-			return;
-		}
-	}
+			item->itemFlags[3] = 25;
 
-	item->itemFlags[0] = 0;
+			if (TriggerActive(item))
+			{
+				*((int*)&item->itemFlags[0]) = 0x780;
+				AnimateItem(item);
+				return;
+			}
+		}
+
+		*((int*)&item->itemFlags[0]) = 0;
+	}
 }

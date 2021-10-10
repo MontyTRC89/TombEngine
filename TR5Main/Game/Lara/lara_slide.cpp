@@ -1,83 +1,36 @@
 #include "framework.h"
 #include "lara.h"
 #include "lara_collide.h"
+#include "lara_tests.h"
 #include "input.h"
 #include "Sound\sound.h"
-
-short OldAngle = 1;
+#include "collide.h"
+#include "camera.h"
+#include "level.h"
+#include "items.h"
 
 /*this file has all the related functions to sliding*/
 
-/*tests and others*/
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
-		return 0;
-
-	short angle = ANGLE(0.0f);
-	if (coll->tiltX > 2)
-		angle = -ANGLE(90.0f);
-	else if (coll->tiltX < -2)
-		angle = ANGLE(90.0f);
-
-	if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
-		angle = ANGLE(180.0f);
-	else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
-		angle = ANGLE(0.0f);
-
-	short delta = angle - item->pos.yRot;
-
-	ShiftItem(item, coll);
-
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
-	{
-		if (item->currentAnimState == LS_SLIDE_BACK && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_BACK_START;
-		item->goalAnimState = LS_SLIDE_BACK;
-		item->currentAnimState = LS_SLIDE_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->pos.yRot = angle + ANGLE(180.0f);
-	}
-	else
-	{
-		if (item->currentAnimState == LS_SLIDE_FORWARD && OldAngle == angle)
-			return 1;
-
-		item->animNumber = LA_SLIDE_FORWARD;
-		item->goalAnimState = LS_SLIDE_FORWARD;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_SLIDE_FORWARD;
-		item->pos.yRot = angle;
-	}
-
-	Lara.moveAngle = angle;
-	OldAngle = angle;
-
-	return 1;
-}
-
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -512;
-	coll->badCeiling = 0;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -512;
+	coll->Setup.BadCeilingHeight = 0;
 
-	coll->facing = Lara.moveAngle;
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, LARA_HEIGHT);
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
 
 	if (!LaraHitCeiling(item, coll))
 	{
 		LaraDeflectEdge(item, coll);
 
-		if (coll->middle.Floor <= 200)
+		if (coll->Middle.Floor <= 200)
 		{
 			TestLaraSlide(item, coll);
 
-			item->pos.yPos += coll->middle.Floor;
+			item->pos.yPos += coll->Middle.Floor;
 
-			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
+			if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
 			{
 				if (TrInput & IN_FORWARD && item->currentAnimState != LS_SLIDE_BACK)
 				{
@@ -119,7 +72,7 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ShiftItem(item, coll);
 
-	switch (coll->collType)
+	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
 		item->pos.yRot += ANGLE(5.0f);
@@ -136,12 +89,12 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 
 	case CT_CLAMP:
-		item->pos.zPos -= 400 * phd_cos(coll->facing);
-		item->pos.xPos -= 400 * phd_sin(coll->facing);
+		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
+		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
 
 		item->speed = 0;
 
-		coll->middle.Floor = 0;
+		coll->Middle.Floor = 0;
 
 		if (item->fallspeed <= 0)
 			item->fallspeed = 16;

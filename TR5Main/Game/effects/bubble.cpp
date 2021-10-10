@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "effects\bubble.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific\trmath.h"
 #include "objectslist.h"
 #include "setup.h"
@@ -95,20 +95,20 @@ void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags,
 		bubble->active = true;
 		bubble->size = 0;
 		bubble->age = 0;
-		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? generateFloat(8, 16) : generateFloat(8, 12);
+		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? GenerateFloat(8, 16) : GenerateFloat(8, 12);
 		bubble->sourceColor = Vector4(0, 0, 0, 1);
-		float shade = generateFloat(0.3, 0.8);
+		float shade = GenerateFloat(0.3, 0.8);
 		bubble->destinationColor = Vector4(shade, shade, shade, 1);
 		bubble->color = bubble->sourceColor;
-		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? generateFloat(256, 512) : generateFloat(32, 128);
+		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? GenerateFloat(256, 512) : GenerateFloat(32, 128);
 		bubble->spriteNum = flags & BUBBLE_FLAG_CLUMP ? SPR_UNKNOWN1 : SPR_BUBBLES;
 		bubble->rotation = 0;
 		bubble->worldPosition = Vector3(pos->x, pos->y, pos->z);
 		float maxAmplitude = flags & BUBBLE_FLAG_HIGH_AMPLITUDE ? 256 : 32;
-		bubble->amplitude = Vector3(generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude), generateFloat(-maxAmplitude, maxAmplitude));
+		bubble->amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
 		bubble->worldPositionCenter = bubble->worldPosition;
 		bubble->wavePeriod = Vector3::Zero;
-		bubble->waveSpeed = Vector3(1 / generateFloat(8, 16), 1 / generateFloat(8, 16), 1 / generateFloat(8, 16));
+		bubble->waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
 		bubble->roomNumber = roomNum;
 	}
 }

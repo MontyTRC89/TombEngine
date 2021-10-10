@@ -3,32 +3,29 @@
 #include "items.h"
 #include "Lara.h"
 #include "lara_fire.h"
-#include "draw.h"
-#include "box.h"
-#include "control.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "lot.h"
+#include "animation.h"
+#include "control/box.h"
+#include "control/control.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "collide.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
+#include "effects/weather.h"
 #include "lara_two_guns.h"
-#include "switch.h"
 #include "objects.h"
-#include "sphere.h"
-#include "traps.h"
 #include "camera.h"
-#include "GameFlowScript.h"
 #include "level.h"
 #include "setup.h"
 #include "input.h"
 #include "savegame.h"
-#include "Sound\sound.h"
-#include "effects\bubble.h"
+#include "Sound/sound.h"
+#include "effects/bubble.h"
 #include "generic_switch.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
-
-extern GameFlow* g_GameFlow;
+using namespace TEN::Effects::Environment;
 
 //int HKCounter = 0;
 //int HKTimer = 0;
@@ -262,10 +259,10 @@ void ControlHarpoonBolt(short itemNumber)
 				currentMesh->hitPoints -= Weapons[WEAPON_CROSSBOW].damage;
 				if (currentMesh->hitPoints <= 0)
 				{
-					TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-					auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+					TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+					auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-					ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
+					ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
 					SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 					SmashedMesh[SmashedMeshCount] = currentMesh;
 					SmashedMeshCount++;
@@ -392,20 +389,20 @@ void ControlGrenade(short itemNumber)
 			if (item->itemFlags[0] == GRENADE_FLASH)
 			{
 				// Flash grenades
+				int R, G, B;
 				if (item->itemFlags[1] == 1)
 				{
 					WeaponEnemyTimer = 120;
-					FlashFadeR = 255;
-					FlashFadeG = 255;
-					FlashFadeB = 255;
+					R = 255;
+					G = 255;
+					B = 255;
 				}
 				else
 				{
-					FlashFadeR = (GetRandomControl() & 0x1F) + 224;
-					FlashFadeG = FlashFadeB = FlashFadeR - GetRandomControl() & 0x1F;
+					R = (GetRandomControl() & 0x1F) + 224;
+					G = B = R - GetRandomControl() & 0x1F;
 				}
-
-				FlashFader = 32;
+				Weather.Flash(R, G, B, 0.03f);
 
 				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -701,10 +698,10 @@ void ControlGrenade(short itemNumber)
 							currentMesh->hitPoints -= Weapons[WEAPON_GRENADE_LAUNCHER].damage;
 							if (currentMesh->hitPoints <= 0)
 							{
-								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-								auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+								TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+								auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
+								ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
 								SmashedMeshCount++;
@@ -740,11 +737,7 @@ void ControlGrenade(short itemNumber)
 	{
 		if (item->itemFlags[0] == GRENADE_FLASH)
 		{
-			FlashFader = 32;
-			FlashFadeR = 255;
-			FlashFadeG = 255;
-			FlashFadeB = 255;
-
+			Weather.Flash(255, 255, 255, 0.03f);
 			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 		}
@@ -764,7 +757,7 @@ void ControlGrenade(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
@@ -944,10 +937,10 @@ void ControlRocket(short itemNumber)
 					currentMesh->hitPoints -= Weapons[WEAPON_ROCKET_LAUNCHER].damage;
 					if (currentMesh->hitPoints <= 0)
 					{
-						TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-						auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
+						TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+						auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 						TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
+						ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
@@ -981,7 +974,7 @@ void ControlRocket(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
@@ -1374,102 +1367,97 @@ void ControlCrossbowBolt(short itemNumber)
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != CROSSBOW_POISON || explode)
+		// If explosive ammos selected and item hit, then blast everything
+		if (item->itemFlags[0] == CROSSBOW_EXPLODE)
+			explode = true;
+
+		if (CollidedItems[0])
 		{
-			if (CollidedItems[0])
+			ITEM_INFO* currentItem = CollidedItems[0];
+			
+			int k = 0;
+			do
 			{
-				// If explosive ammos selected and item hit, then blast everything
-				if (item->itemFlags[0] == CROSSBOW_EXPLODE)
-					explode = true;
+				OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
 
-				ITEM_INFO* currentItem = CollidedItems[0];
-				
-				int k = 0;
-				do
+				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+					|| (currentItem->objectNumber == ID_LARA && explode)
+					|| (currentItem->flags & 0x40 &&
+					(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
-					OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
-
-					if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
-						|| (currentItem->objectNumber == ID_LARA && explode)
-						|| (currentItem->flags & 0x40 &&
-						(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
+					if (explode)
 					{
-						if (explode)
-						{
-							// All active intelligent creatures explode, if their HP is <= 0
-							// Explosion is handled by CreatureDie()
-							// Also Lara can be damaged
-							// HitTarget() is called inside this
-							DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
-						}
-						else if (currentItem->objectNumber != ID_LARA)
-						{
-							// Normal hit
-							HitTarget(currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
-
-							// Poisoned ammos
-							if (item->itemFlags[0] == CROSSBOW_POISON)
-								currentItem->poisoned = true;
-						}
+						// All active intelligent creatures explode, if their HP is <= 0
+						// Explosion is handled by CreatureDie()
+						// Also Lara can be damaged
+						// HitTarget() is called inside this
+						DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
 					}
-					else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
+					else if (currentItem->objectNumber != ID_LARA)
 					{
-						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
-						TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-						auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
-						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+						// Normal hit
+						HitTarget(currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
+
+						// Poisoned ammos
+						if (item->itemFlags[0] == CROSSBOW_POISON)
+							currentItem->poisoned = true;
+					}
+				}
+				else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
+				{
+					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
+
+					if (explode)
 						ExplodeItemNode(currentItem, 0, 0, 128);
-						short currentItemNumber = (currentItem - CollidedItems[0]);
-						SmashObject(currentItemNumber);
-						KillItem(currentItemNumber);
-					}
-					// TODO_LUA: we need to handle it with an event like OnDestroy
-					/*else if (currentObj->hitEffect == HIT_SPECIAL)
-					{
-						// Some objects need a custom behaviour
-						//HitSpecial(item, currentItem, 1);
-					}*/
 
-					// All other items (like puzzles) don't explode
+					short currentItemNumber = (currentItem - CollidedItems[0]);
+					SmashObject(currentItemNumber);
+					KillItem(currentItemNumber);
+				}
 
-					k++;
-					currentItem = CollidedItems[k];
-
-				} while (currentItem);
-			}
-
-			if (CollidedMeshes[0])
-			{
-				MESH_INFO* currentMesh = CollidedMeshes[0];
-				int k = 0;
-
-				do
+				// TODO_LUA: we need to handle it with an event like OnDestroy
+				/*else if (currentObj->hitEffect == HIT_SPECIAL)
 				{
-					STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
-					if (s->shatterType != SHT_NONE)
-					{
-						currentMesh->hitPoints -= Weapons[WEAPON_CROSSBOW].damage;
-						if (currentMesh->hitPoints <= 0)
-						{
-							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-							auto pos = PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0);
-							TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-							ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
-							SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
-							SmashedMesh[SmashedMeshCount] = currentMesh;
-							SmashedMeshCount++;
-							currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-						}
-					}
+					// Some objects need a custom behaviour
+					//HitSpecial(item, currentItem, 1);
+				}*/
 
-					k++;
-					currentMesh = CollidedMeshes[k];
+				// All other items (like puzzles) don't explode
 
-				} while (currentMesh);
-			}
+				k++;
+				currentItem = CollidedItems[k];
 
-			break;
+			} while (currentItem);
 		}
+
+		if (CollidedMeshes[0])
+		{
+			MESH_INFO* currentMesh = CollidedMeshes[0];
+			int k = 0;
+
+			do
+			{
+				STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
+				if (s->shatterType != SHT_NONE)
+				{
+					currentMesh->hitPoints -= Weapons[WEAPON_CROSSBOW].damage;
+					if (currentMesh->hitPoints <= 0)
+					{
+						ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
+						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+						SmashedMesh[SmashedMeshCount] = currentMesh;
+						SmashedMeshCount++;
+						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+					}
+				}
+
+				k++;
+				currentMesh = CollidedMeshes[k];
+
+			} while (currentMesh);
+		}
+
+		break;
 
 		explode = true;
 		radius = CROSSBOW_EXPLODE_RADIUS;
@@ -1502,7 +1490,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
@@ -1647,6 +1635,29 @@ void FireCrossbow(PHD_3DPOS* pos)
 			Savegame.Game.AmmoUsed++;
 		}
 	}
+}
+
+void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
+{
+	short angles[2];
+	PHD_3DPOS pos;
+
+	/* this part makes arrows fire at bad angles
+	target->x &= ~1023;
+	target->z &= ~1023;
+	target->x |= 512;
+	target->z |= 512;*/
+
+	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
+
+	pos.xPos = src->x;
+	pos.yPos = src->y;
+	pos.zPos = src->z;
+	pos.xRot = angles[1];
+	pos.yRot = angles[0];
+	pos.zRot = 0;
+
+	FireCrossbow(&pos);
 }
 
 void FireRocket()

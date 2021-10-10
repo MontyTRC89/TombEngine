@@ -1,19 +1,19 @@
 #include "framework.h"
 #include "tr5_missile.h"
 #include "items.h"
-#include "box.h"
-#include "people.h"
 #include "sphere.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
-#include "draw.h"
-#include "traps.h"
+#include "effects/tomb4fx.h"
+#include "effects/effects.h"
 #include "level.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
+#include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 int DebrisFlags;
 

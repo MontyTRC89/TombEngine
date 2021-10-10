@@ -11,7 +11,6 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <sol.hpp>
-#include "memory/malloc.h"
 #include "Game/debug/debug.h"
 #include <algorithm>
 #include <set>

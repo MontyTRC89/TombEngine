@@ -2,17 +2,20 @@
 #include "tr5_rollingball.h"
 #include "sphere.h"
 #include "camera.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "setup.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "level.h"
+#include "animation.h"
+#include "items.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, l, coll->radius))
+	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
 		if (TestCollision(item, l))
 		{
@@ -292,7 +295,7 @@ void RollingBallControl(short itemNumber)
 
 	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) / 2;
 
-	TestTriggers(item, true, NULL);
+	TestTriggers(item, true);
 }
 
 void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
@@ -305,14 +308,14 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (!TestBoundsCollide(item, lara, coll->radius))
+		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
 		if (!TestCollision(item, lara))
 			return;
 		if (lara->gravityStatus)
 		{
-			if (coll->enableBaddiePush)
-				ItemPushItem(item, lara, coll, coll->enableSpaz, 1);
+			if (coll->Setup.EnableObjectPush)
+				ItemPushItem(item, lara, coll, coll->Setup.EnableSpaz, 1);
 			lara->hitPoints -= 100;
 			x = lara->pos.xPos - item->pos.xPos;
 			y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);
@@ -398,7 +401,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum, true, NULL);
+		TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum, true);
 
 		if (item->pos.yPos >= (int)floor - 256)
 		{
@@ -485,9 +488,8 @@ void InitialiseClassicRollingBall(short itemNum)
 	GAME_VECTOR* old;
 
 	item = &g_Level.Items[itemNum];
-	old = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
-	item->data = (GAME_VECTOR *)malloc(sizeof(GAME_VECTOR));
-
+	item->data = GAME_VECTOR{ };
+	old = item->data;
 	old->x = item->pos.xPos;
 	old->y = item->pos.yPos;
 	old->z = item->pos.zPos;

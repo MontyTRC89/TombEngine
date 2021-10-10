@@ -1,13 +1,16 @@
 #include "framework.h"
 #include "items.h"
 #include "floordata.h"
-#include "control.h"
+#include "control/control.h"
 #include "level.h"
-#include "effects\effects.h"
-#include "Sound\sound.h"
+#include "setup.h"
+#include "effects/effects.h"
+#include "Sound/sound.h"
 #include "camera.h"
 #include "sphere.h"
 #include "lara.h"
+#include "collide.h"
+#include "animation.h"
 
 #define TRAIN_VEL	260
 #define LARA_TRAIN_DEATH_ANIM 3;
@@ -104,7 +107,7 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 
 	train = &g_Level.Items[trainNum];
 
-	if (!TestBoundsCollide(train, larA, coll->radius))
+	if (!TestBoundsCollide(train, larA, coll->Setup.Radius))
 		return;
 	if (!TestCollision(train, larA))
 		return;

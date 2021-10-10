@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "kayak.h"
-#include "effects\effects.h"
-#include "draw.h"
+#include "effects/effects.h"
+#include "animation.h"
 #include "camera.h"
 #include "Lara.h"
 #include "collide.h"
@@ -10,7 +10,8 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-#include "control.h"
+#include "control/control.h"
+#include "kayak_info.h"
 
 using std::vector;
 
@@ -1168,9 +1169,9 @@ void KayakLaraRapidsDrown()
 void InitialiseKayak(short itemNumber)
 {
 	ITEM_INFO* v = &g_Level.Items[itemNumber];
-
-	KAYAK_INFO* kayak = game_malloc<KAYAK_INFO>();
-	v->data = kayak;
+	KAYAK_INFO* kayak;
+	v->data = KAYAK_INFO();
+	kayak = v->data;
 
 	kayak->Vel = kayak->Rot = kayak->Flags = 0;
 	kayak->FallSpeedF = kayak->FallSpeedL = kayak->FallSpeedR = 0;
@@ -1239,7 +1240,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		coll->enableBaddiePush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNumber, l, coll);
 	}
 }
@@ -1263,7 +1264,7 @@ int KayakControl()
 	FLOOR_INFO* floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	int h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 
-	TestTriggers(v, false, NULL);
+	TestTriggers(v, false);
 
 	int water;
 	if ((kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber)) == NO_HEIGHT)

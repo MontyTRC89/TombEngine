@@ -1,13 +1,16 @@
 #include "framework.h"
 #include "tr2_knifethrower.h"
 #include "items.h"
-#include "effects\effects.h"
-#include "box.h"
+#include "effects/effects.h"
+#include "control/box.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "floordata.h"
+#include "collide.h"
 
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };

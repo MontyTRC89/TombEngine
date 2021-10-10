@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "Specific\trmath.h"
 #include "floordata.h"
+#include "Specific\trmath.h"
 #include "room.h"
 #include "level.h"
 #include "setup.h"
+#include "items.h"
 
 using namespace TEN::Floordata;
 
@@ -25,6 +26,51 @@ int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
 	Vector2::Transform(vector, matrix, vector);
 
 	return vector.x < 0 ? 0 : 1;
+}
+
+std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
+{
+	auto plane = FloorCollision.Planes[SectorPlane(x, z)];
+	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
+	auto tiltZ = (int)-(plane.y * WALL_SIZE / STEP_SIZE);
+
+	return std::make_pair(tiltX, tiltZ);
+}
+
+bool FLOOR_INFO::FloorIsSplit() const
+{
+	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
+	return differentPlanes || FloorHasSplitPortal();
+}
+
+bool FLOOR_INFO::FloorIsDiagonalStep() const
+{
+	return FloorIsSplit() && 
+		   round(FloorCollision.Planes[0].z) != round(FloorCollision.Planes[1].z) &&
+		   (FloorCollision.SplitAngle == 45.0f * RADIAN || FloorCollision.SplitAngle == 135.0f * RADIAN);
+}
+
+bool FLOOR_INFO::CeilingIsDiagonalStep() const
+{
+	return CeilingIsSplit() &&
+		round(CeilingCollision.Planes[0].z) != round(CeilingCollision.Planes[1].z) &&
+		(CeilingCollision.SplitAngle == 45.0f * RADIAN || CeilingCollision.SplitAngle == 135.0f * RADIAN);
+}
+
+bool FLOOR_INFO::CeilingIsSplit() const
+{
+	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
+	return differentPlanes || CeilingHasSplitPortal();
+}
+
+bool FLOOR_INFO::FloorHasSplitPortal() const
+{
+	return FloorCollision.Portals[0] != FloorCollision.Portals[1];
+}
+
+bool FLOOR_INFO::CeilingHasSplitPortal() const
+{
+	return CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
 }
 
 std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
@@ -404,7 +450,7 @@ namespace TEN::Floordata
 		const auto floorHeight = floor->FloorHeight(x, z, y);
 		const auto ceilingHeight = floor->CeilingHeight(x, z, y);
 
-		y = std::clamp(y, ceilingHeight, floorHeight);
+		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, y, y == ceilingHeight, y == floorHeight))
 		{
@@ -460,7 +506,7 @@ namespace TEN::Floordata
 		const auto floorHeight = floor->FloorHeight(x, z, y);
 		const auto ceilingHeight = floor->CeilingHeight(x, z, y);
 
-		y = std::clamp(y, ceilingHeight, floorHeight);
+		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, y, y == ceilingHeight, y == floorHeight))
 		{
@@ -502,7 +548,7 @@ namespace TEN::Floordata
 		auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 		auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		location.yNumber = std::clamp(location.yNumber, ceilingHeight, floorHeight);
+		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
@@ -564,7 +610,7 @@ namespace TEN::Floordata
 		auto floorHeight = floor->FloorHeight(x, z, location.yNumber);
 		auto ceilingHeight = floor->CeilingHeight(x, z, location.yNumber);
 
-		location.yNumber = std::clamp(location.yNumber, ceilingHeight, floorHeight);
+		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
 		if (floor->InsideBridge(x, z, location.yNumber, location.yNumber == ceilingHeight, location.yNumber == floorHeight))
 		{
@@ -684,5 +730,87 @@ namespace TEN::Floordata
 			floor = &GetFloorSide(*roomBelow, x, z);
 			floor->RemoveItem(itemNumber);
 		}
+	}
+
+	// New function which gets precise floor/ceiling collision from actual object bounding box.
+	// Animated objects are also supported, although horizontal collision shift is unstable.
+	// Method: get accurate bounds in world transform by converting to DirectX OBB, then do a
+	// ray test on top or bottom (depending on test side) to determine if box is present at 
+	// this particular point.
+
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
+
+		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
+
+		static float distance;
+		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
+			return std::optional{ item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1) };
+		else
+			return std::nullopt;
+	}
+
+	// Gets bridge min or max height regardless of actual X/Z world position
+
+	int GetBridgeBorder(int itemNumber, bool bottom)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		return item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1);
+	}
+
+	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
+
+	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		// Get real OBB bounds of a bridge in world space
+		auto bounds = GetBoundsAccurate(item);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
+
+		// Get corners of a projected OBB
+		Vector3 corners[8];
+		dxBounds.GetCorners(corners); //corners[0], corners[1], corners[4] corners[5]
+
+		auto room = &g_Level.Rooms[item->roomNumber];
+
+		// Get min/max of a projected AABB
+		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
+		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
+		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
+		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
+
+		// Run through all blocks enclosed in AABB
+		for (int x = 0; x < room->ySize; x++)
+			for (int z = 0; z < room->xSize; z++)
+			{
+				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
+				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
+				auto offX = pX - item->pos.xPos;
+				auto offZ = pZ - item->pos.zPos;
+
+				// Clean previous bridge state
+				RemoveBridge(itemNumber, offX, offZ);
+
+				// If we're in sweeping mode, don't try to re-add block
+				if (forceRemoval)
+					continue;
+
+				// If block isn't in enclosed AABB space, ignore precise check
+				if (x < minX || z < minZ || x > maxX || z > maxZ)
+					continue;
+
+				// Block is in enclosed AABB space, do more precise test.
+				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
+				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(WALL_SIZE / 2), Vector4::UnitY);
+				if (dxBounds.Intersects(blockBox))
+					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
+			}
 	}
 }

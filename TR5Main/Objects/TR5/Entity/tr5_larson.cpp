@@ -1,15 +1,15 @@
 #include "framework.h"
 #include "tr5_larson.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "people.h"
-#include "lot.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
+#include "animation.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2
@@ -375,7 +375,7 @@ void LarsonControl(short itemNumber)
 			int y = r->minfloor + floorHeight;
 			int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
 
-			TestTriggers(x, y, z, roomNumber, true, NULL);
+			TestTriggers(x, y, z, roomNumber, true);
 
 			joint0 = 0;
 		}

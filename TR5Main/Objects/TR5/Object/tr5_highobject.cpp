@@ -2,8 +2,8 @@
 #include "tr5_highobject.h"
 #include "items.h"
 #include "level.h"
-#include "control.h"
-#include "Sound\sound.h"
+#include "room.h"
+#include "Sound/sound.h"
 #include "objectslist.h"
 
 void InitialiseHighObject1(short itemNumber)
@@ -82,7 +82,7 @@ void ControlHighObject1(short itemNumber)
 				targetItem->flags = (item->flags & 0xC1FF) | 0x20;
 				item->itemFlags[0] = 6;
 				item->itemFlags[1] = 768;
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 			}
 
 			return;

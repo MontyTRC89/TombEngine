@@ -5,6 +5,8 @@
 #include "camera.h"
 #include "Sound\sound.h"
 #include "savegame.h"
+#include "Renderer11.h"
+#include "items.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -52,10 +54,12 @@ const char* g_KeyNames[] = {
 int TrInput;
 int DbInput;
 int InputBusy;
+bool SetDebounce = false;
 
 short MouseX;
 short MouseY;
 int MouseKeys;
+
 byte KeyMap[256];
 int ConflictingKeys[18];
 short KeyboardLayout[2][18] =
@@ -63,6 +67,7 @@ short KeyboardLayout[2][18] =
 	{ DIK_UP, DIK_DOWN, DIK_LEFT, DIK_RIGHT, DIK_PERIOD, DIK_SLASH, DIK_RSHIFT, DIK_RMENU, DIK_RCONTROL, DIK_SPACE, DIK_COMMA, DIK_NUMPAD0, DIK_END, DIK_ESCAPE, DIK_DELETE, DIK_NEXT, DIK_P, DIK_RETURN },
 	{ DIK_UP, DIK_DOWN, DIK_LEFT, DIK_RIGHT, DIK_PERIOD, DIK_SLASH, DIK_RSHIFT, DIK_RMENU, DIK_RCONTROL, DIK_SPACE, DIK_COMMA, DIK_NUMPAD0, DIK_END, DIK_ESCAPE, DIK_DELETE, DIK_NEXT, DIK_P, DIK_RETURN }
 };
+
 int joy_x;
 int joy_y;
 int joy_fire;

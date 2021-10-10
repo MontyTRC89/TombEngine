@@ -8,23 +8,11 @@
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include <effects\effects.h>
-#include <Game\particle\SimpleParticle.h>
-
-
-
-struct BOAT_INFO
-{
-	int boatTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	int water;
-	int pitch;
-	short tiltAngle;
-	short extraRotation;
-	short propRot;
-};
+#include "animation.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "particle/SimpleParticle.h"
+#include "boat_info.h"
 
 enum BOAT_STATE
 {
@@ -214,13 +202,13 @@ bool SpeedBoatCanGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if ((collResult.FloorHeight - v->pos.yPos) < -(WALL_SIZE / 2))
+	if ((collResult.Position.Floor - v->pos.yPos) < -(WALL_SIZE / 2))
 		return false;
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if ((collResult.CeilingHeight - v->pos.yPos > -LARA_HEIGHT) || (collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT))
+	if ((collResult.Position.Ceiling - v->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
 		return false;
 
 	return true;
@@ -235,7 +223,7 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
-	if (!TestBoundsCollide(boat, LaraItem, coll->radius))
+	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
 		return BOAT_GETON::NONE;
 
 	if (!TestCollision(boat, LaraItem))
@@ -506,7 +494,7 @@ int SpeedBoatDynamics(short itemNum)
 	int newspeed;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = (BOAT_INFO*)boat->data;
+	binfo = boat->data;
 
 	boat->pos.zRot -= binfo->tiltAngle;
 
@@ -826,8 +814,8 @@ void InitialiseSpeedBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &g_Level.Items[itemNum];
-	binfo = game_malloc<BOAT_INFO>();
-	boat->data = (void*)binfo;
+	boat->data = BOAT_INFO();
+	binfo = boat->data;
 	binfo->boatTurn = 0;
 	binfo->leftFallspeed = 0;
 	binfo->rightFallspeed = 0;
@@ -850,7 +838,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	geton = SpeedBoatCheckGeton(itemNum, coll);
 	if (!geton)
 	{
-		coll->enableBaddiePush = true;
+		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, litem, coll);
 		return;
 	}
@@ -886,9 +874,6 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 		AddActiveItem(itemNum);
 		g_Level.Items[itemNum].status = ITEM_ACTIVE;
 	}
-
-	// TODO: play a cd when starting ! (boat)
-	//S_CDPlay(12, 0);
  
 	Lara.Vehicle = itemNum;
 }
@@ -917,8 +902,8 @@ void SpeedBoatControl(short itemNumber)
 
 	if (Lara.Vehicle == itemNumber)
 	{
-		TestTriggers(boat, true, NULL);
-		TestTriggers(boat, false, NULL);
+		TestTriggers(boat, true);
+		TestTriggers(boat, false);
 	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
@@ -1026,10 +1011,8 @@ void SpeedBoatControl(short itemNumber)
 	pitch = boat->speed;
 	binfo->pitch += ((pitch - binfo->pitch) / 4);
 
-	if (boat->speed > 8)
-		SoundEffect(SFX_TR2_BOAT_ACCELERATE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
-	else if (drive)
-		SoundEffect(SFX_TR2_BOAT_IDLE, &boat->pos, 4 + ((0x10000 - (BOAT_MAX_SPEED - binfo->pitch) * 100) * 256));
+	int fx = (boat->speed > 8) ? SFX_TR2_BOAT_MOVING : (drive ? SFX_TR2_BOAT_IDLE : SFX_TR2_BOAT_ACCELERATE);
+	SoundEffect(fx, &boat->pos, 0, binfo->pitch / (float)BOAT_MAX_SPEED);
 
 	if (boat->speed && water - 5 == boat->pos.yPos)
 		DoBoatWakeEffect(boat);

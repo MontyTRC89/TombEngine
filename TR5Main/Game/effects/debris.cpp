@@ -2,7 +2,7 @@
 #include "effects\debris.h"
 #include "level.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific\trmath.h"
 #include "Specific\prng.h"
 
@@ -27,20 +27,22 @@ DebrisFragment* GetFreeDebrisFragment()
 	return nullptr;
 }
 
-void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
+void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
 	MESH* meshPtr = nullptr;
 	RendererMesh* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
 	bool isStatic;
-	if (mesh) {
+	if (mesh) 
+	{
 		isStatic = false;
 		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
-		yRot = mesh->yRot;
-		pos = Vector3(mesh->x, mesh->y, mesh->z);
+		yRot = mesh->pos.yRot;
+		pos = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 	}
-	else {
+	else 
+	{
 		isStatic = true;
 		meshPtr = item->meshp;
 		yRot = item->yRot;
@@ -52,19 +54,23 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
 		{
 			DebrisFragment* fragment = GetFreeDebrisFragment();
-			if (!fragment) {
+			if (!fragment) 
+			{
 				break;
 			}
-			if (!fragment->active) {
+			if (!fragment->active) 
+			{
 				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
 				RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
 				RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
 				RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
+
 				//Take the average of all 3 local positions
 				Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
 				vtx0.Position -= localPos;
 				vtx1.Position -= localPos;
 				vtx2.Position -= localPos;
+
 				Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
 				fragment->worldPosition = worldPos + pos;
 				fragment->mesh.vertices[0] = vtx0;
@@ -79,8 +85,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->restitution = 0.6f;
 				fragment->friction = 0.6f;
 				fragment->linearDrag = .99f;
-				fragment->angularVelocity = Vector3(generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39, generateFloat(-1, 1) * 0.39);
-				fragment->angularDrag = generateFloat(0.9f, 0.999f);
+				fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
+				fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
@@ -97,10 +103,10 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 	radiusNormVec.Normalize();
 	float radiusStrenght =  1-((fragmentWorldPosition - impactLocation).Length() / 1024);
 	radiusStrenght = fmax(radiusStrenght, 0);
-	Vector3 radiusRandomVector = Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f)) + radiusNormVec;
+	Vector3 radiusRandomVector = Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
 	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
-	Vector3 impactDirectionVelocity = (impactDirection + Vector3(generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f), generateFloat(-0.2, 0.2f))) * 80 ;
+	Vector3 impactDirectionVelocity = (impactDirection + Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }
 
@@ -124,23 +130,25 @@ void UpdateDebris()
 			deb.velocity *= deb.linearDrag;
 			deb.velocity += deb.gravity;
 			deb.velocity = XMVector3ClampLength(deb.velocity, 0, deb.terminalVelocity);
-			deb.rotation *= Quaternion::CreateFromYawPitchRoll(deb.angularVelocity.x,deb.angularVelocity.y,deb.angularVelocity.z);
+			deb.rotation *= Quaternion::CreateFromYawPitchRoll(deb.angularVelocity.x, deb.angularVelocity.y, deb.angularVelocity.z);
 			deb.worldPosition += deb.velocity;
 			deb.angularVelocity *= deb.angularDrag;
 
 			roomNumber = deb.roomNumber;
-			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z,&roomNumber);
+			floor = GetFloor(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z, &roomNumber);
 
-			if (deb.worldPosition.y < floor->ceiling*256)
+			if (deb.worldPosition.y < floor->CeilingHeight(deb.worldPosition.x, deb.worldPosition.z))
 			{
-				if (floor->skyRoom != NO_ROOM)
-					deb.roomNumber = floor->skyRoom;
+				auto roomNumber = floor->RoomAbove(deb.worldPosition.x, deb.worldPosition.z, deb.worldPosition.y).value_or(NO_ROOM);
+				if (roomNumber != NO_ROOM)
+					deb.roomNumber = roomNumber;
 			}
 
-			if (deb.worldPosition.y > floor->floor*256)
+			if (deb.worldPosition.y > floor->FloorHeight(deb.worldPosition.x, deb.worldPosition.z))
 			{
-				if (floor->pitRoom != NO_ROOM)
-					deb.roomNumber = floor->pitRoom;
+				auto roomNumber = floor->RoomBelow(deb.worldPosition.x, deb.worldPosition.z, deb.worldPosition.y).value_or(NO_ROOM);
+				if (roomNumber != NO_ROOM)
+					deb.roomNumber = roomNumber;
 
 				if (deb.numBounces > 3)
 				{

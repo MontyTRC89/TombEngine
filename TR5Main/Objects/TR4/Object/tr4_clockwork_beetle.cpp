@@ -3,8 +3,9 @@
 #include "items.h"
 #include "level.h"
 #include "lara.h"
-#include "draw.h"
-#include "Sound\sound.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "collide.h"
 
 void ClockworkBeetleControl(short item_number)
 {
@@ -78,7 +79,7 @@ void ClockworkBeetleControl(short item_number)
 		flag = 1;
 	}
 
-	TestTriggers(beetle, false, NULL);
+	TestTriggers(beetle, false);
 
 	if (roomNum != beetle->roomNumber)
 		ItemNewRoom(item_number, roomNum);

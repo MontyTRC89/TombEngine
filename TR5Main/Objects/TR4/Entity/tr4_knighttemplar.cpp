@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "tr4_knighttemplar.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "effects\effects.h"
-#include "effects\debris.h"
+#include "control/box.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
@@ -167,23 +168,23 @@ void KnightTemplarControl(short itemNumber)
 
 			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->xSize];
 
-			if (currentFloor->stopper)
+			if (currentFloor->Stopper)
 			{
 				for (int i = 0; i < room->mesh.size(); i++)
 				{
 					MESH_INFO* mesh = &room->mesh[i];
 
-					if (floor(pos.x) == floor(mesh->x) &&
-						floor(pos.z) == floor(mesh->z) &&
-						mesh->staticNumber >= 50)
+					if (floor(pos.x) == floor(mesh->pos.xPos) &&
+						floor(pos.z) == floor(mesh->pos.zPos) &&
+						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-						currentFloor->stopper = false;
+						currentFloor->Stopper = false;
 
-						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 					}
 
 					mesh++;

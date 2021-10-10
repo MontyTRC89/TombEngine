@@ -1,8 +1,8 @@
 #include "framework.h"
 #ifdef NEW_INV
 #include "newinv2.h"
-#include "draw.h"
-#include "control.h"
+#include "animation.h"
+#include "control/control.h"
 #include "lara_fire.h"
 #include "gameflow.h"
 #include "Sound\sound.h"
@@ -16,7 +16,9 @@
 #include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
+#include "Renderer11.h"
+#include "items.h"
 
 using namespace TEN::Renderer;
 bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
@@ -29,7 +31,6 @@ int pause_menu_to_display = 0;
 __int64 pause_selected_option = 1;
 int pause_flag;
 int GLOBAL_invMode;
-extern GameFlow* g_GameFlow;
 titleSettings CurrentSettings;
 /*inventory*/
 RINGME pcring1;//items ring
@@ -1231,9 +1232,9 @@ int DoPauseMenu()
 	}
 
 	clear_input_vars(1);
-	SetDebounce = 1;
+	SetDebounce = true;
 	S_UpdateInput();
-	SetDebounce = 0;
+	SetDebounce = false;
 	do_debounced_input();
 
 	if (pause_menu_to_display <= pause_options_menu)
@@ -2374,6 +2375,8 @@ int convert_obj_to_invobj(short obj)
 		if (inventry_objects_list[i].object_number == obj)
 			return i;
 	}
+
+	return -1;
 }
 
 int convert_invobj_to_obj(int obj)
@@ -2415,7 +2418,7 @@ void use_current_item()
 	long OldBinocular;
 
 	OldBinocular = BinocularRange;
-	OldLaraBusy = 0;
+	Lara.oldBusy = false;
 	BinocularRange = 0;
 	LaraItem->meshBits = -1;
 	invobject = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
@@ -2488,7 +2491,7 @@ void use_current_item()
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
-				OldLaraBusy = 1;
+				Lara.oldBusy = true;
 				BinocularRange = 128;
 
 				if (Lara.gunStatus != LG_NO_ARMS)
@@ -3579,7 +3582,7 @@ int S_CallInventory2()
 {
 	int return_value;
 
-	OldLaraBusy = Lara.busy;
+	Lara.oldBusy = Lara.busy;
 
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
@@ -3600,7 +3603,7 @@ int S_CallInventory2()
 		if (compassNeedleAngle != 1024)
 			compassNeedleAngle -= 32;
 
-		SetDebounce = 1;
+		SetDebounce = true;
 		S_UpdateInput();
 		TrInput = InputBusy;
 		GameTimer++;
@@ -3643,7 +3646,7 @@ int S_CallInventory2()
 		/*	do
 			{
 				S_InitialisePolyList();
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
 				input = inputBusy;
 				UpdatePulseColour();
@@ -3678,7 +3681,7 @@ int S_CallInventory2()
 	if (useItem)
 		use_current_item();
 
-	Lara.busy = OldLaraBusy;
+	Lara.busy = Lara.oldBusy;
 	GLOBAL_invMode = IM_NONE;
 
 	return return_value;

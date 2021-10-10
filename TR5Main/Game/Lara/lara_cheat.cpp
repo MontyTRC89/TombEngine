@@ -6,11 +6,13 @@
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "effects\effects.h"
-#include "Sound\sound.h"
+#include "effects/effects.h"
+#include "Sound/sound.h"
+#include "collide.h"
+#include "items.h"
+#include "setup.h"
+#include "level.h"
 
-
-extern GameFlow* g_GameFlow;
 int NoCheatCounter;
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
@@ -91,6 +93,7 @@ void LaraCheatyBits()
 					LaraItem->pos.xRot = ANGLE(30);
 					LaraItem->fallspeed = 30;
 					LaraItem->hitPoints = 1000;
+					Lara.poisoned = 0;
 					Lara.air = 1800;
 					Lara.deathCount = 0;
 					Lara.torsoYrot = 0;

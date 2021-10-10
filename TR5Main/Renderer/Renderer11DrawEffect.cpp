@@ -1,24 +1,28 @@
 #include "framework.h"
 #include "Renderer11.h"
-#include "effects\footprint.h"
-#include "effects\effects.h"
-#include "sphere.h"
-#include "effects\tomb4fx.h"
+#include "effects/footprint.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "lara.h"
-#include "draw.h"
+#include "animation.h"
 #include "camera.h"
-#include "control.h"
-#include "effects\debris.h"
+#include "control/control.h"
+#include "effects/debris.h"
 #include "setup.h"
-#include "effects\bubble.h"
+#include "effects/bubble.h"
 #include "level.h"
-#include "effects\smoke.h"
-#include "effects\spark.h"
-#include "effects\drip.h"
-#include "effects\explosion.h"
+#include "control/box.h"
+#include "effects/smoke.h"
+#include "effects/spark.h"
+#include "effects/drip.h"
+#include "effects/explosion.h"
 #include "Quad/RenderQuad.h"
-#include <Game\particle\SimpleParticle.h>
-#include <Renderer\RendererSprites.h>
+#include "particle/SimpleParticle.h"
+#include "Renderer/RendererSprites.h"
+#include "Game/effects/lightning.h"
+#include "items.h"
+
+using namespace TEN::Effects::Lightning;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -30,16 +34,29 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
-namespace TEN::Renderer {
+BITE_INFO EnemyBites[9] =
+{
+	{ 20, -95, 240, 13 },
+	{ 48, 0, 180, -11 },
+	{ -48, 0, 180, 14 },
+	{ -48, 5, 225, 14 },
+	{ 15, -60, 195, 13 },
+	{ -30, -65, 250, 18 },
+	{ 0, -110, 480, 13 },
+	{ -20, -80, 190, -10 },
+	{ 10, -60, 200, 13 }
+};
+
+namespace TEN::Renderer 
+{
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	void Renderer11::drawEnergyArcs(RenderView& view) {
-		for (int i = 0; i < 16; i++)
+	void Renderer11::drawLightning(RenderView& view) {
+		for (int i = 0; i < Lightning.size(); i++)
 		{
-			ENERGY_ARC* arc = &EnergyArcs[i];
+			LIGHTNING_INFO* arc = &Lightning[i];
 
 			if (arc->life)
 			{
@@ -585,30 +602,31 @@ namespace TEN::Renderer {
 		return Texture2D(m_device.Get(),1,1,data.data());
 	}
 
-	void Renderer11::drawFootprints(RenderView& view) {
-		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-		if (g_Level.Sprites.size() > spriteIndex) {
-			for (auto i = footprints.begin(); i != footprints.end(); i++) {
-				FOOTPRINT_STRUCT& footprint = *i;
-				if (footprint.active) {
-					Matrix rot = Matrix::CreateRotationY(TO_RAD(footprint.pos.yRot) + PI);
-					Vector3 p1 = Vector3(-64, 0, -64);
-					Vector3 p2 = Vector3(64, 0, -64);
-					Vector3 p3 = Vector3(64, 0, 64);
-					Vector3 p4 = Vector3(-64, 0, 64);
-					p1 = XMVector3Transform(p1, rot);
-					p2 = XMVector3Transform(p2, rot);
-					p3 = XMVector3Transform(p3, rot);
-					p4 = XMVector3Transform(p4, rot);
-					p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-					p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-					p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-					p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-					addSprite3D(&m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, {1,1}, BLENDMODE_SUBTRACTIVE,view);
-				}
+	void Renderer11::drawFootprints(RenderView& view) 
+	{
+		for (auto i = footprints.begin(); i != footprints.end(); i++) 
+		{
+			FOOTPRINT_STRUCT& footprint = *i;
+			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + footprint.foot;
+
+			if (footprint.active && g_Level.Sprites.size() > spriteIndex)
+			{
+				Matrix rot = Matrix::CreateRotationY(TO_RAD(footprint.pos.yRot) + PI);
+				Vector3 p1 = Vector3(-64, 0, -64);
+				Vector3 p2 = Vector3(64, 0, -64);
+				Vector3 p3 = Vector3(64, 0, 64);
+				Vector3 p4 = Vector3(-64, 0, 64);
+				p1 = XMVector3Transform(p1, rot);
+				p2 = XMVector3Transform(p2, rot);
+				p3 = XMVector3Transform(p3, rot);
+				p4 = XMVector3Transform(p4, rot);
+				p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				addSprite3D(&m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, {1,1}, BLENDMODE_SUBTRACTIVE, view);
 			}
 		}
-
 	}
 
 	void Renderer11::drawUnderwaterDust(RenderView& view) {
@@ -656,26 +674,10 @@ namespace TEN::Renderer {
 
 	void Renderer11::drawSprites(RenderView& view)
 	{
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
-		for (int i = 0; i < numSpritesToDraw; i++) {
+		for (auto& spr : view.spritesToDraw) {
 			Matrix billboardMatrix;
-			RendererSpriteToDraw& spr = view.spritesToDraw[i];
 			if(spr.BlendMode != currentBlendMode)
 			{
 				currentBlendMode = spr.BlendMode;
@@ -686,10 +688,25 @@ namespace TEN::Renderer {
 			m_context->PSSetSamplers(0, 1, &sampler);
 			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				Matrix billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
@@ -697,7 +714,22 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-				//Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
 				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
@@ -713,6 +745,21 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				Matrix translation = Matrix::CreateTranslation(spr.pos);
 				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
 
@@ -724,7 +771,21 @@ namespace TEN::Renderer {
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
 				m_context->Draw(4, 0);
 			}else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
-				m_primitiveBatch->Begin();
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->RSSetState(m_states->CullNone());
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				Vector3 p0t = spr.vtx1;
 				Vector3 p1t = spr.vtx2;
 				Vector3 p2t = spr.vtx3;
@@ -765,14 +826,15 @@ namespace TEN::Renderer {
 				m_stSprite.isBillboard = false;
 				m_cbSprite.updateData(m_stSprite, m_context.Get());
 				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-
+				m_primitiveBatch->Begin();
+				m_primitiveBatch->DrawTriangle(v0, v1, v3);
+				m_primitiveBatch->DrawTriangle(v1, v2, v3);
 				m_primitiveBatch->End();
 			}
 			m_numDrawCalls++;
 		}
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		//m_context->RSSetState(m_states->CullCounterClockwise());
+		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	}
 
@@ -1057,20 +1119,27 @@ namespace TEN::Renderer {
 		{
 		case BLENDMODE_ALPHABLEND:
 			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
 			break;
 		case BLENDMODE_ALPHATEST:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
 
 			break;
 		case BLENDMODE_OPAQUE:
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_SUBTRACTIVE:
 			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		case BLENDMODE_ADDITIVE:
 			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
 			break;
 		}
 	}

@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr1_natla.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "items.h"
 #include "missile.h"
 #include "level.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "Specific/trmath.h"
+#include "itemdata/creature_info.h"
 
 #define NATLA_NEAR_DEATH 200
 
@@ -132,7 +133,6 @@ void NatlaControl(short itemNum)
 				natla->flags = 0;
 				timer = 0;
 				item->hitPoints = NATLA_NEAR_DEATH;
-				//S_CDPlay(54, 0);
 			}
 			else
 				item->hitPoints = -16384;
