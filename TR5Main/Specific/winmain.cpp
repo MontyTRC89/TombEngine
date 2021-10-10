@@ -1,27 +1,28 @@
 #include "framework.h"
 #include "winmain.h"
 #include "resource.h"
-#include "draw.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
-#include "control.h"
+#include "control/control.h"
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
 #include "configuration.h"
 #include "Renderer11.h"
+#include "Scripting/GameFlowScript.h"
+#include "Scripting/GameLogicScript.h"
 #include <CommCtrl.h>
-#include <fcntl.h>
 #include <process.h>
-#include <corecrt_io.h>
 #include <iostream>
+
 using namespace TEN::Renderer;
 using std::exception;
 using std::string;
 using std::cout;
 using std::endl;
+
 WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;
@@ -29,11 +30,6 @@ HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
 HWND WindowsHandle;
-int App_Unk00D9ABFD;
-extern int IsLevelLoading;
-extern GameFlow* g_GameFlow;
-GameScript* g_GameScript;
-extern GameConfiguration g_Configuration;
 DWORD MainThreadID;
 
 #if _DEBUG
@@ -124,7 +120,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
-			App_Unk00D9ABFD = 0;
 			return 0;
 		}
 	}
@@ -132,8 +127,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		App_Unk00D9ABFD = 1;
-
 		if (!Debug)
 			SuspendThread((HANDLE)ThreadHandle);
 	}
@@ -141,7 +134,8 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-int main() {
+int main() 
+{
 	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLine(), SW_SHOW);
 }
 
@@ -173,7 +167,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Initialise the new scripting system
 	sol::state luaState;
-	luaState.open_libraries(sol::lib::base);
+	luaState.open_libraries(sol::lib::base, sol::lib::math);
 	luaState.set_exception_handler(lua_exception_handler);
 
 	try {

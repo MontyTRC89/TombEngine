@@ -1,6 +1,8 @@
 #pragma once
 #include "Specific\phd_global.h"
 
+constexpr auto MAX_SPOTCAMS = 256;
+
 struct QUAKE_CAMERA
 {
 	GAME_VECTOR spos;
@@ -46,15 +48,17 @@ enum spotcam_flags
 	SCF_CAMERA_ONE_SHOT = (1 << 15),		 // 0x8000
 };
 
-extern byte SpotCamRemap[16];
-extern byte CameraCnt[16];
+extern SPOTCAM SpotCam[MAX_SPOTCAMS];
+extern byte SpotCamRemap[MAX_SPOTCAMS];
+extern byte CameraCnt[MAX_SPOTCAMS];
 extern int LastSpotCam;
-extern SPOTCAM SpotCam[64];
 extern int NumberSpotcams;
 extern int UseSpotCam;
 extern int SpotcamDontDrawLara;
 extern int SpotcamOverlay;
+extern int TrackCameraInit;
 
+void ClearSpotCamSequences();
 void InitSpotCamSequences();
 void InitialiseSpotCam(short sequence);
 void CalculateSpotCameras();

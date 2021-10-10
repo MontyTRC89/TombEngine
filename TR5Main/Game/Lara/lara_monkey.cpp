@@ -1,10 +1,15 @@
 #include "framework.h"
 #include "lara.h"
 #include "input.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara_collide.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
+#include "floordata.h"
+#include "collide.h"
+#include "items.h"
+#include "camera.h"
+#include "level.h"
 
 using namespace TEN::Floordata;
 
@@ -21,8 +26,8 @@ void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	Lara.torsoYrot = 0;
 	Lara.torsoXrot = 0;
@@ -49,23 +54,24 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.canMonkeySwing)
 	{
-		coll->badPos = NO_BAD_POS;
-		coll->badNeg = NO_HEIGHT;
-		coll->badCeiling = 0;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = NO_HEIGHT;
+		coll->Setup.BadCeilingHeight = 0;
 
-		coll->slopesAreWalls = false;
-		coll->facing = Lara.moveAngle;
-		coll->radius = 100;
+		coll->Setup.SlopesAreWalls = false;
+		coll->Setup.ForwardAngle = Lara.moveAngle;
+		coll->Setup.Radius = LARA_RAD;
+		coll->Setup.Height = LARA_HEIGHT_MONKEY;
 
 		Lara.moveAngle = item->pos.yRot;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item);
 
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
 		Lara.NewAnims.Monkey180Roll = 1;
 
 
-		if (TrInput & IN_FORWARD && coll->collType != CT_FRONT && abs(coll->middle.Ceiling - coll->front.Ceiling) < 50)
+		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
 		{
 			item->goalAnimState = LS_MONKEYSWING_FORWARD;
 		}
@@ -90,32 +96,32 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
 
-		if (abs(coll->middle.Ceiling - coll->front.Ceiling) < 50)
+		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
 			MonkeySwingSnap(item, coll);
 	}
 	else
 	{
-		LaraHangTest(item, coll);
+		TestLaraHang(item, coll);
 
 		if (item->goalAnimState == LS_MONKEYSWING_IDLE)
 		{
 			TestForObjectOnLedge(item, coll);
 
 			if (!(TrInput & IN_FORWARD) ||
-				coll->front.Floor <= -850 ||
-				coll->front.Floor >= -650 ||
-				coll->front.Floor < coll->front.Ceiling ||
-				coll->frontLeft.Floor < coll->frontLeft.Ceiling ||
-				coll->frontRight.Floor < coll->frontRight.Ceiling ||
-				coll->hitStatic)
+				coll->Front.Floor <= -850 ||
+				coll->Front.Floor >= -650 ||
+				coll->Front.Floor < coll->Front.Ceiling ||
+				coll->FrontLeft.Floor < coll->FrontLeft.Ceiling ||
+				coll->FrontRight.Floor < coll->FrontRight.Ceiling ||
+				coll->HitStatic)
 			{
 				if (!(TrInput & IN_FORWARD) ||
-					coll->front.Floor <= -850 ||
-					coll->front.Floor >= -650 ||
-					coll->front.Floor - coll->front.Ceiling < -256 ||
-					coll->frontLeft.Floor - coll->frontLeft.Ceiling < -256 ||
-					coll->frontRight.Floor - coll->frontRight.Ceiling < -256 ||
-					coll->hitStatic)
+					coll->Front.Floor <= -850 ||
+					coll->Front.Floor >= -650 ||
+					coll->Front.Floor - coll->Front.Ceiling < -256 ||
+					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling < -256 ||
+					coll->FrontRight.Floor - coll->FrontRight.Ceiling < -256 ||
+					coll->HitStatic)
 				{
 					if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 					{
@@ -159,8 +165,8 @@ void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 
 	Lara.torsoYrot = 0;
 	Lara.torsoXrot = 0;
@@ -195,22 +201,23 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_monkeyswing*/
 	if (TrInput & IN_ACTION && Lara.canMonkeySwing)
 	{
-		coll->badPos = NO_BAD_POS;
-		coll->badNeg = NO_HEIGHT;
-		coll->badCeiling = 0;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = NO_HEIGHT;
+		coll->Setup.BadCeilingHeight = 0;
 
 		Lara.moveAngle = item->pos.yRot;
 
-		coll->enableSpaz = false;
-		coll->enableBaddiePush = false;
+		coll->Setup.EnableSpaz = false;
+		coll->Setup.EnableObjectPush = false;
 
-		coll->facing = Lara.moveAngle;
-		coll->radius = 100;
+		coll->Setup.ForwardAngle = Lara.moveAngle;
+		coll->Setup.Radius = LARA_RAD;
+		coll->Setup.Height = LARA_HEIGHT_MONKEY;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item);
 
-		if (coll->collType == CT_FRONT
-			|| abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
+		if (coll->CollisionType == CT_FRONT
+			|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		{
 			item->animNumber = LA_MONKEYSWING_IDLE;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -219,9 +226,9 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			if (abs(coll->middle.Ceiling - coll->frontLeft.Ceiling) <= 50)
+			if (abs(coll->Middle.Ceiling - coll->FrontLeft.Ceiling) <= 50)
 			{
-				if (abs(coll->middle.Ceiling - coll->frontRight.Ceiling) > 50)
+				if (abs(coll->Middle.Ceiling - coll->FrontRight.Ceiling) > 50)
 				{
 					ShiftItem(item, coll);
 					item->pos.yRot -= ANGLE(5.0f);
@@ -256,8 +263,8 @@ void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.torsoYrot = 0;
 	Lara.torsoXrot = 0;
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	if (TrInput & IN_RSTEP)
 	{
@@ -309,8 +316,8 @@ void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.torsoYrot = 0;
 	Lara.torsoXrot = 0;
 
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 
 	if (TrInput & IN_LSTEP)
 	{
@@ -352,8 +359,8 @@ void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 79*/
 	/*collision: lara_col_monkey180*/
-	coll->enableBaddiePush = false;
-	coll->enableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 	item->goalAnimState = LS_MONKEYSWING_IDLE;
 }
 
@@ -408,17 +415,18 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_hangturnr(83), lara_as_hangturnl(82)*/
 	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
 	{
-		coll->badPos = NO_BAD_POS;
-		coll->badNeg = -STEPUP_HEIGHT;
-		coll->badCeiling = 0;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+		coll->Setup.BadCeilingHeight = 0;
 
 		Lara.moveAngle = item->pos.yRot;
 
-		coll->facing = item->pos.yRot;
-		coll->radius = 100;
-		coll->slopesAreWalls = true;
+		coll->Setup.ForwardAngle = item->pos.yRot;
+		coll->Setup.Radius = LARA_RAD;
+		coll->Setup.Height = LARA_HEIGHT_MONKEY;
+		coll->Setup.SlopesAreWalls = true;
 
-		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+		GetCollisionInfo(coll, item);
 		MonkeySwingSnap(item, coll);
 	}
 	else
@@ -433,20 +441,22 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short oct;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -STEPUP_HEIGHT;
-	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	coll->slopesAreWalls = false;
-	coll->facing = Lara.moveAngle;
-	coll->radius = 100;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 
-	if (abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
+	GetCollisionInfo(coll, item);
+
+	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->collType)
+	if (!coll->CollisionType)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
@@ -454,10 +464,10 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (oct != 1)
 			return 1;
-		if (coll->collType != CT_FRONT && coll->collType != CT_RIGHT && coll->collType != CT_LEFT)
+		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
 			return 1;
 	}
-	else if (coll->collType != CT_FRONT)
+	else if (coll->CollisionType != CT_FRONT)
 	{
 		return 1;
 	}
@@ -469,20 +479,22 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short oct;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = NO_HEIGHT;
-	coll->badCeiling = 0;
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-	coll->slopesAreWalls = false;
-	coll->facing = Lara.moveAngle;
-	coll->radius = 100;
 
-	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 
-	if (abs(coll->middle.Ceiling - coll->front.Ceiling) > 50)
+	GetCollisionInfo(coll, item);
+
+	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->collType)
+	if (!coll->CollisionType)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
@@ -490,12 +502,12 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (oct != 1)
 			return 1;
-		if (coll->collType != CT_RIGHT && coll->collType != CT_LEFT)
+		if (coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
 			return 1;
 	}
 	else
 	{
-		if (coll->collType != CT_FRONT && coll->collType != CT_LEFT)
+		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_LEFT)
 			return 1;
 	}
 
@@ -512,15 +524,18 @@ void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void MonkeySwingFall(ITEM_INFO* item)
 {
-	item->goalAnimState = LS_JUMP_UP;
-	item->currentAnimState = LS_JUMP_UP;
-	item->animNumber = LA_JUMP_UP;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
+	if (item->currentAnimState != LS_MONKEYSWING_TURN_180)
+	{
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_JUMP_UP;
+		item->animNumber = LA_JUMP_UP;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
 
-	item->speed = 2;
-	item->gravityStatus = true;
-	item->fallspeed = 1;
-	item->pos.yPos += 256;
+		item->speed = 2;
+		item->gravityStatus = true;
+		item->fallspeed = 1;
+		item->pos.yPos += 256;
 
-	Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_NO_ARMS;
+	}
 }

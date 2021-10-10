@@ -13,6 +13,7 @@ class GameScriptColor;
 class GameScriptMeshInfo : public GameScriptNamedBase<GameScriptMeshInfo, MESH_INFO &>
 {
 public:
+	using IdentifierType = std::reference_wrapper<MESH_INFO>;
 	GameScriptMeshInfo(MESH_INFO & id, bool temporary);
 	~GameScriptMeshInfo();
 	GameScriptMeshInfo& operator=(GameScriptMeshInfo const& other) = delete;

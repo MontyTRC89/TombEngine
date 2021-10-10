@@ -1,17 +1,20 @@
 #include "framework.h"
 #include "tr3_tony.h"
-#include "effects\effects.h"
-#include "sphere.h"
+#include "effects/effects.h"
 #include "items.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "boss.h"
-#include "box.h"
-#include "draw.h"
+#include "control/box.h"
+#include "animation.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
-#include "traps.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "collide.h"
+#include "Game/effects/lara_burn.h"
+
+using namespace TEN::Effects::Fire;
 
 enum TonyFlameType
 {
@@ -49,7 +52,7 @@ enum TONY_STATE
 
 static BOSS_STRUCT BossData;
 #define TONYBOSS_TURN ANGLE(2.0f)
-#define TONYBOSS_HITS 100
+#define TONYBOSS_HITS 1 //Tony Harder To Kill, was 100 (6 shotgun shots)
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 static void TriggerTonyEffect(const TONY_FLAME flame)
@@ -425,7 +428,7 @@ void ControlTonyFireBall(short fxNumber)
 			LaraItem->hitStatus = true;
 			KillEffect(fxNumber);
 			LaraItem->hitPoints -= 200;
-			LaraBurn();
+			//LaraBurn();
 			return;
 		}
 	}
@@ -491,8 +494,6 @@ static void ExplodeTonyBoss(ITEM_INFO* item)
 		TriggerExplosionSparks(x, y, z, 3, -2, 0, item->roomNumber);
 		for (int i = 0; i < 2; i++)
 			TriggerExplosionSparks(x, y, z, 3, -1, 0, item->roomNumber);
-
-		SoundEffect(SFX_TR3_BLAST_CIRCLE, &item->pos, PITCH_SHIFT | 0x800000);
 	}
 
 	if (BossData.DrawExplode)

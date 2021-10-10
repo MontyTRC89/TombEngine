@@ -6,12 +6,14 @@
 #include "input.h"
 #include "lara.h"
 #include "lara_flare.h"
-#include "Sound\sound.h"
-#include "sphere.h"
-#include "effects\effects.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
 #include "lara_struct.h"
-#include "effects\tomb4fx.h"
-#include "draw.h"
+#include "effects/tomb4fx.h"
+#include "animation.h"
+#include "setup.h"
+#include "camera.h"
+#include "biggun_info.h"
 
 static long GunRotYAdd = 0;
 bool barrelRotating;
@@ -119,10 +121,9 @@ void BigGunInitialise(short itemNum)
 	BIGGUNINFO *gun;
 
 	obj = &g_Level.Items[itemNum];
+	obj->data = BIGGUNINFO();
 
-	gun = (BIGGUNINFO*)malloc(sizeof(BIGGUNINFO));
-	obj->data = malloc(sizeof(BIGGUNINFO));
-
+	gun = obj->data;
 	gun->flags = 0;
 	gun->fireCount = 0;
 	gun->xRot = GETOFF_FRAME;
@@ -300,8 +301,8 @@ int BigGunControl(COLL_INFO *coll)
 	
 	lara->pos.yRot = obj->pos.yRot = gun->startYRot + (gun->yRot * (ANGLE(1) / 4));
 
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 	DoObjectCollision(lara, coll);
 	
 	Camera.targetElevation = -ANGLE(15);

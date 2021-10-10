@@ -1,11 +1,14 @@
 #include "framework.h"
 #include "tr1_bear.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
+#include "items.h"
 
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 

@@ -1,20 +1,26 @@
 #include "framework.h"
 #include "items.h"
-#include "control.h"
+#include "room.h"
+#include "setup.h"
 #include "floordata.h"
+#include "flipeffect.h"
 #include "objectslist.h"
-#include "box.h"
+#include "control/box.h"
 #include "camera.h"
-#include "puzzles_keys.h"
-#include "pickup\pickup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "spotcam.h"
-#include "traps.h"
+#include "Sound/sound.h"
 #include "lara.h"
-#include "Lara\lara_climb.h"
-#include "Objects\Generic\Switches\generic_switch.h"
+#include "Lara/lara_climb.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Game/effects/lara_burn.h"
 
+
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
+
+int TriggerTimer;
+int KeyTriggerActive;
 
 int TriggerActive(ITEM_INFO* item)
 {
@@ -48,66 +54,59 @@ int TriggerActive(ITEM_INFO* item)
 	return flag;
 }
 
-int GetKeyTrigger(ITEM_INFO* item)
+bool GetKeyTrigger(ITEM_INFO* item)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex)
+	if (triggerIndex == 0)
+		return false;
+
+	short* trigger = triggerIndex;
+
+	if (*trigger & END_BIT)
+		return false;
+
+	for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & VALUE_BITS]; j++)
 	{
-		short* trigger = triggerIndex;
-		for (short i = *triggerIndex; (i & 0x1F) != 4; trigger++)
-		{
-			if (i < 0)
-				break;
-			i = trigger[1];
-		}
-		if (*trigger & 4)
-		{
-			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & 0x3FF]; j++)
-			{
-				if (*j & 0x8000)
-					return 0;
-			}
-			return 1;
-		}
+		if (*j & END_BIT)
+			return false;
 	}
 
-	return 0;
+	return true;
 }
 
-int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
+int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex)
+	if (triggerIndex == 0)
+		return 0;
+
+	short* trigger = triggerIndex;
+
+	if (*trigger & END_BIT)
+		return 0;
+
+	trigger += 2;
+	short* current = itemNos;
+	int k = 0;
+
+	do
 	{
-		short* trigger;
-		for (trigger = triggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
+		if (TRIG_BITS(*trigger) == TO_OBJECT && item != &g_Level.Items[*trigger & VALUE_BITS])
 		{
-			if (*trigger & END_BIT)
-				break;
+			current[k] = *trigger & VALUE_BITS;
+			++k;
 		}
 
-		if (*trigger & 4)
-		{
-			trigger += 2;
-			short* current = itemNos;
-			int k = 0;
-			do
-			{
-				if (TRIG_BITS(*trigger) == TO_OBJECT && item != &g_Level.Items[*trigger & VALUE_BITS])
-				{
-					current[k] = *trigger & VALUE_BITS;
-					++k;
-				}
-				if (*trigger & END_BIT)
-					break;
-				++trigger;
-			} while (true);
+		if (*trigger & END_BIT)
+			break;
 
-			return k;
-		}
-	}
+		++trigger;
+
+	} while (true);
+
+	return k;
 
 	return 0;
 }
@@ -131,7 +130,7 @@ int SwitchTrigger(short itemNum, short timer)
 
 			item->status = ITEM_NOT_ACTIVE;
 			if (!item->itemFlags[0] == 0)
-				item->flags |= 0x100;
+				item->flags |= ONESHOT;
 			if (item->currentAnimState != 1)
 				return 1;
 			if (item->triggerFlags != 5 && item->triggerFlags != 6)
@@ -145,7 +144,7 @@ int SwitchTrigger(short itemNum, short timer)
 	}
 	else if (item->status)
 	{
-		return (item->flags & 0x100u) >> 8;
+		return (item->flags & ONESHOT) >> 8;
 	}
 	else
 	{
@@ -155,82 +154,99 @@ int SwitchTrigger(short itemNum, short timer)
 	return 0;
 }
 
-short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+int KeyTrigger(short itemNum)
 {
-	ROOM_INFO* r;
-	while (floor->pitRoom != NO_ROOM)
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	int oldkey;
+
+	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
+		return -1;
+
+	oldkey = KeyTriggerActive;
+
+	if (!oldkey)
+		item->status = ITEM_DEACTIVATED;
+
+	KeyTriggerActive = false;
+
+	return oldkey;
+}
+
+int PickupTrigger(short itemNum)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+
+	if (item->flags & IFLAG_KILLED
+		|| (item->status != ITEM_INVISIBLE
+			|| item->itemFlags[3] != 1
+			|| item->triggerFlags & 0x80))
 	{
-		if (CheckNoColFloorTriangle(floor, x, z) == 1)
-			break;
-		r = &g_Level.Rooms[floor->pitRoom];
-		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		return 0;
 	}
 
-	if ((floor->floor * 256) == NO_HEIGHT || floor->index == 0)
-		return NULL;
+	KillItem(itemNum);
 
-	short* triggerIndex = NULL;
+	return 1;
+}
 
-	short* data = &g_Level.FloorData[floor->index];
-	short type;
-	int trigger;
+void RefreshCamera(short type, short* data)
+{
+	short trigger, value, targetOk;
+
+	targetOk = 2;
+
 	do
 	{
-		type = *(data++);
+		trigger = *(data++);
+		value = trigger & VALUE_BITS;
 
-		switch (type & DATA_TYPE)
+		switch (TRIG_BITS(trigger))
 		{
-		case DOOR_TYPE:
-		case TILT_TYPE:
-		case ROOF_TYPE:
-		case SPLIT1:
-		case SPLIT2:
-		case SPLIT3:
-		case SPLIT4:
-		case NOCOLF1T:
-		case NOCOLF1B:
-		case NOCOLF2T:
-		case NOCOLF2B:
-		case NOCOLC1T:
-		case NOCOLC1B:
-		case NOCOLC2T:
-		case NOCOLC2B:
-			data++;
-			break;
-
-		case LAVA_TYPE:
-		case CLIMB_TYPE:
-		case MONKEY_TYPE:
-		case TRIGTRIGGER_TYPE:
-		case MINER_TYPE:
-			break;
-
-		case TRIGGER_TYPE:
-			triggerIndex = data - 1;
+		case TO_CAMERA:
 			data++;
 
-			do
+			if (value == Camera.last)
 			{
-				trigger = *(data++);
+				Camera.number = value;
 
-				if (TRIG_BITS(trigger) != TO_OBJECT)
+				if ((Camera.timer < 0) || (Camera.type == LOOK_CAMERA) || (Camera.type == COMBAT_CAMERA))
 				{
-					if (TRIG_BITS(trigger) == TO_CAMERA ||
-						TRIG_BITS(trigger) == TO_FLYBY)
-					{
-						trigger = *(data++);
-					}
+					Camera.timer = -1;
+					targetOk = 0;
+					break;
 				}
-
-			} while (!(trigger & END_BIT));
+				Camera.type = FIXED_CAMERA;
+				targetOk = 1;
+			}
+			else
+				targetOk = 0;
 			break;
 
-		default:
+		case TO_TARGET:
+			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+				break;
+
+			Camera.item = &g_Level.Items[value];
 			break;
 		}
-	} while (!(type & END_BIT));
+	} while (!(trigger & END_BIT));
 
-	return triggerIndex;
+	if (Camera.item)
+		if (!targetOk || (targetOk == 2 && Camera.item->lookedAt && Camera.item != Camera.lastItem))
+			Camera.item = NULL;
+
+	if (Camera.number == -1 && Camera.timer > 0)
+		Camera.timer = -1;
+}
+
+short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+{
+	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
+
+	if (bottomBlock->TriggerIndex == -1)
+		return nullptr;
+
+	return &g_Level.FloorData[bottomBlock->TriggerIndex];
 }
 
 short* GetTriggerIndex(ITEM_INFO* item)
@@ -240,8 +256,7 @@ short* GetTriggerIndex(ITEM_INFO* item)
 	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
-
-void TestTriggers(short* data, bool heavy, int heavyFlags)
+void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -253,6 +268,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 	short cameraFlags = 0;
 	short cameraTimer = 0;
 	int spotCamIndex = 0;
+
+	auto data = GetTriggerIndex(floor, x, y, z);
 
 	if (!data)
 		return;
@@ -359,7 +376,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (LaraItem->pos.yPos == LaraItem->floor)
+			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -380,10 +397,6 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Lara.gunStatus == LG_READY)
 				break;
 			return;
-
-			//	case TRIGGER_TYPES::SKELETON_T:	//NO.
-			//		Lara.skelebob = 2;
-			//		break;
 
 		case TRIGGER_TYPES::HEAVY:
 		case TRIGGER_TYPES::DUMMY:
@@ -420,10 +433,20 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 				item->flags & ATONESHOT)
 				break;
 
-			if (triggerType == TRIGGER_TYPES::SWITCH)
+			if (triggerType == TRIGGER_TYPES::SWITCH && item->flags & SWONESHOT)
+				break;
+
+			if (triggerType != TRIGGER_TYPES::SWITCH
+				&& triggerType != TRIGGER_TYPES::ANTIPAD
+				&& triggerType != TRIGGER_TYPES::ANTITRIGGER
+				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER
+				&& (item->flags & ONESHOT))
+				break;
+
+			if (triggerType != TRIGGER_TYPES::ANTIPAD 
+				&& triggerType != TRIGGER_TYPES::ANTITRIGGER 
+				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->flags & SWONESHOT)
-					break;
 				if (item->objectNumber == ID_DART_EMITTER && item->active)
 					break;
 			}
@@ -551,12 +574,9 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
-
+				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
-
-				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
-				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 			}
 			break;
 
@@ -608,7 +628,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 		case TO_FLIPMAP:
 			flipAvailable = true;
 
-			if (FlipMap[value] & 0x100)
+			if (FlipMap[value] & ONESHOT)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH)
@@ -619,8 +639,8 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
 			{
 
-				if (flags & 0x100)
-					FlipMap[value] |= 0x100;
+				if (flags & ONESHOT)
+					FlipMap[value] |= ONESHOT;
 				if (!FlipStats[value])
 					flip = value;
 			}
@@ -673,10 +693,7 @@ void TestTriggers(short* data, bool heavy, int heavyFlags)
 		DoFlipMap(flip);
 
 	if (newEffect != -1 && (flip || !flipAvailable))
-	{
 		FlipEffect = newEffect;
-		FlipTimer = 0;
-	}
 }
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
@@ -693,7 +710,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(GetTriggerIndex(floor, x, y, z), heavy, heavyFlags);
+	TestTriggers(floor, x, y, z, heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ITEM_INFO* item)

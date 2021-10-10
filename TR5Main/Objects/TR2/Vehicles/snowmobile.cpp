@@ -5,17 +5,19 @@
 #include "collide.h"
 #include "lara_fire.h"
 #include "lara_one_gun.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "lara_flare.h"
-#include "lot.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "sphere.h"
 #include "setup.h"
 #include "level.h"
 #include "input.h"
-#include "Sound\sound.h"
-#include <Game\particle\SimpleParticle.h>
-#include "Specific\prng.h"
+#include "animation.h"
+#include "Sound/sound.h"
+#include "particle/SimpleParticle.h"
+#include "Specific/prng.h"
+#include "camera.h"
+#include "skidoo_info.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -37,8 +39,6 @@ enum SKIDOO_STATE
 	STATE_SKIDOO_FALLOFF
 };
 
-#define SWIM_DEPTH 730
-#define WADE_DEPTH STEP_SIZE
 #define DAMAGE_START 140
 #define DAMAGE_LENGTH 14
 #define SKIDOO_GETON_ANIM 1
@@ -77,9 +77,8 @@ enum SKIDOO_STATE
 void InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo = &g_Level.Items[itemNum];
-
-	SKIDOO_INFO* skinfo = game_malloc<SKIDOO_INFO>();
-	skidoo->data = (void*)skinfo;
+	skidoo->data = SKIDOO_INFO();
+	SKIDOO_INFO* skinfo = skidoo->data;
 	
 	skinfo->alreadyCdPlayed = false;
 
@@ -206,7 +205,7 @@ void SkidooExplode(ITEM_INFO* skidoo)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 	auto pos = PHD_3DPOS(skidoo->pos.xPos, skidoo->pos.yPos - 128, skidoo->pos.zPos, 0, skidoo->pos.yRot, 0);
-	TriggerShockwave(&pos, 50, 180, 40, generateFloat(160, 200), 60, 60, 64, generateFloat(0, 359), 0);
+	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 //	ExplodingDeath(Lara.Vehicle, -1, 256);
 //	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;
@@ -233,13 +232,13 @@ bool SkidooCheckGetOffOK(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
-	if (collResult.HeightType == BIG_SLOPE || collResult.HeightType == DIAGONAL || collResult.FloorHeight == NO_HEIGHT)
+	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(collResult.FloorHeight - skidoo->pos.yPos) > WALL_SIZE / 2)
+	if (abs(collResult.Position.Floor - skidoo->pos.yPos) > WALL_SIZE / 2)
 		return false;
 
-	if (collResult.CeilingHeight - skidoo->pos.yPos > -LARA_HEIGHT || collResult.FloorHeight - collResult.CeilingHeight < LARA_HEIGHT)
+	if (collResult.Position.Ceiling - skidoo->pos.yPos > -LARA_HEIGHT || collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT)
 		return false;
 
 	return true;
@@ -613,7 +612,7 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	else
 		return 0;
 
-	if (!TestBoundsCollide(skidoo, LaraItem, coll->radius))
+	if (!TestBoundsCollide(skidoo, LaraItem, coll->Setup.Radius))
 		return 0;
 
 	if (!TestCollision(skidoo, LaraItem))
@@ -937,8 +936,8 @@ bool SkidooControl()
 	FLOOR_INFO* floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	int height = GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos);
 
-	TestTriggers(skidoo, true,  NULL);
-	TestTriggers(skidoo, false, NULL);
+	TestTriggers(skidoo, true);
+	TestTriggers(skidoo, false);
 
 	bool dead = false;
 	int drive = 0;
@@ -985,7 +984,7 @@ bool SkidooControl()
 		skinfo->trackMesh = ((skinfo->trackMesh & 3) == 1) ? 2 : 1;
 
 		skinfo->pitch += (pitch - skinfo->pitch) / 4;
-		SoundEffect(SFX_TR2_SKIDOO_ACCELERATE, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) * 256));
+		SoundEffect(skinfo->pitch ? SFX_TR2_SKIDOO_MOVING : SFX_TR2_SKIDOO_ACCELERATE, &skidoo->pos, 0, 0.5f + skinfo->pitch / (float)SKIDOO_MAX_SPEED);
 	}
 	else
 	{

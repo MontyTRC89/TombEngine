@@ -2,11 +2,17 @@
 #include "tr5_raisingblock.h"
 #include "items.h"
 #include "level.h"
-#include "control.h"
-#include "box.h"
+#include "setup.h"
+#include "collide.h"
+#include "animation.h"
+#include "control/control.h"
+#include "control/box.h"
 #include "objectslist.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "camera.h"
+#include "floordata.h"
+
+using namespace TEN::Floordata;
 
 void InitialiseRaisingBlock(short itemNumber)
 {
@@ -14,8 +20,12 @@ void InitialiseRaisingBlock(short itemNumber)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if(floor->box != NO_BOX)
-		g_Level.Boxes[floor->box].flags &= ~BLOCKED;
+	if(floor->Box != NO_BOX)
+		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
+
+	// Set mutators to 0 by default
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i].Scale.y = 0;
 
 	if (item->triggerFlags < 0)
 	{
@@ -24,10 +34,7 @@ void InitialiseRaisingBlock(short itemNumber)
 		item->status = ITEM_ACTIVE;
 	}
 
-	// Get height from animations
-	ANIM_FRAME* frame = &g_Level.Frames[g_Level.Anims[Objects[item->objectNumber].animIndex].framePtr];
-	item->itemFlags[7] = (short)abs(frame->boundingBox.Y1 - frame->boundingBox.Y2);
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)
@@ -135,30 +142,49 @@ void ControlRaisingBlock(short itemNumber)
 
 		item->itemFlags[1] -= 64;
 	}
+
+	// Update bone mutators
+	if (item->triggerFlags > -1)
+	{
+		for (int i = 0; i < item->mutator.size(); i++)
+			item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
+	}
 }
 
 std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	const auto height = item.pos.yPos - item.itemFlags[7] * item.itemFlags[1] / 4096;
-	return std::optional{height};
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+
+	if (bboxHeight.has_value())
+	{
+		auto item = &g_Level.Items[itemNumber];
+
+		auto bounds = GetBoundsAccurate(item);
+		auto height = abs(bounds->Y2 - bounds->Y1);
+
+		auto currentHeight = item->pos.yPos - height * item->itemFlags[1] / 4096;
+		return std::optional{ currentHeight };
+	}
+
+	return bboxHeight;
 }
 
 std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	return std::optional{item.pos.yPos + 1};
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+
+	if (bboxHeight.has_value())
+		return std::optional{ bboxHeight.value() + 1 };
+	else 
+		return bboxHeight;
 }
 
 int RaisingBlockFloorBorder(short itemNumber)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	const auto height = item.pos.yPos - item.itemFlags[7];
-	return height;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int RaisingBlockCeilingBorder(short itemNumber)
 {
-	const auto& item = g_Level.Items[itemNumber];
-	return item.pos.yPos + 1;
+	return GetBridgeBorder(itemNumber, true);
 }

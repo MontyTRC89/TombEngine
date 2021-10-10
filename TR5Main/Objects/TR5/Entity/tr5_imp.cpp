@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "tr5_imp.h"
 #include "items.h"
-#include "sphere.h"
 #include "lara.h"
-#include "draw.h"
-#include "effects\effects.h"
-#include "box.h"
+#include "animation.h"
+#include "effects/effects.h"
+#include "effects/flmtorch.h"
+#include "control/box.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1
@@ -250,8 +251,6 @@ void ImpControl(short itemNumber)
 
 			case STATE_IMP_SCARED:
 				creature->maximumTurn = ANGLE(7);
-				if (TorchRoom != 11)
-					item->goalAnimState = STATE_IMP_STOP;
 				break;
 
 			case STATE_IMP_START_CLIMB:
@@ -296,9 +295,6 @@ void ImpControl(short itemNumber)
 				item->pos.yRot += angle2;
 			}
 		}
-
-		if (TorchRoom == 11)
-			item->goalAnimState = STATE_IMP_SCARED;
 
 		CreatureTilt(item, 0);
 		CreatureJoint(item, 1, joint1);

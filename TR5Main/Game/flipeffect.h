@@ -1,8 +1,13 @@
 #pragma once
 #include "items.h"
-#include "control.h"
+#include "control/control.h"
 
 #define EffectFunction void(ITEM_INFO* item)
+
+constexpr auto NUM_FLIPEFFECTS = 47;
+
+extern int FlipEffect;
+extern short FXType;
 
 extern std::function<EffectFunction> effect_routines[];
 
@@ -33,4 +38,7 @@ void Puzzle(ITEM_INFO* item);
 void DrawRightPistol(ITEM_INFO* item);
 void DrawLeftPistol(ITEM_INFO* item);
 void MeshSwapToPour(ITEM_INFO* item);
-void MeshSwapFromPour(ITEM_INFO* item);
+void MeshSwapFromPour(ITEM_INFO* item); 
+void FlashOrange(ITEM_INFO* item);
+
+void DoFlipEffect(int number, ITEM_INFO* item = NULL);

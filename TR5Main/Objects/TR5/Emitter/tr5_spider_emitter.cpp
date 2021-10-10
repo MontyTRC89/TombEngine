@@ -1,15 +1,17 @@
 #include "framework.h"
 #include "tr5_spider_emitter.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
+#include "flipeffect.h"
 #include "setup.h"
 #include "effects\effects.h"
 #include "effects\tomb4fx.h"
 #include "Sound\sound.h"
 #include "lara.h"
+#include "items.h"
 
 int NextSpider;
-SPIDER_STRUCT* Spiders;
+SPIDER_STRUCT Spiders[NUM_SPIDERS];
 
 short GetNextSpider()
 {

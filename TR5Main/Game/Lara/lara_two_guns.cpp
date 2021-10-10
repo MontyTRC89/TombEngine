@@ -3,7 +3,7 @@
 #include "lara_fire.h"
 #include "lara.h"
 #include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects\tomb4fx.h"
 #include "level.h"
 #include "setup.h"
@@ -12,6 +12,8 @@
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "Specific\prng.h"
+#include "items.h"
+
 using namespace TEN::Math::Random;
 struct PISTOL_DEF
 {
@@ -126,7 +128,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 
 						Lara.rightArm.flash_gun = weapon->flashTime;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
+						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 0, 0.9f, 0.5f);
 						SoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
 						soundPlayed = true;
 
@@ -224,7 +226,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 
 					if (!soundPlayed)
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, PITCH_SHIFT | 0x2000000);
+						SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 0, 0.9f, 0.5f);
 						SoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
 					}
 
@@ -336,7 +338,7 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LM_LHAND : LM_RHAND);
-			TriggerDynamicLight(pos.x+generateFloat(-128,128), pos.y + generateFloat(-128, 128), pos.z + generateFloat(-128, 128), generateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+			TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
 

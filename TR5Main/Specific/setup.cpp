@@ -1,24 +1,18 @@
 #include "framework.h"
 #include "setup.h"
-#include "draw.h"
+#include "animation.h"
 #include "collide.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "flipeffect.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "switch.h"
-#include "missile.h"
-#include "control.h"
-#include "pickup\pickup.h"
+#include "room.h"
+#include "pickup.h"
 #include "camera.h"
-#include "lara_one_gun.h"
-#include "lara_flare.h"
-#include "lara_fire.h"
 #include "objects.h"
-#include "door.h"
 #include "rope.h"
 #include "traps.h"
-#include "effects\flmtorch.h"
 #include "level.h"
-#include "tr4_bubbles.h"
 /// objects initializer
 #include "generic_objects.h"
 #include "tr1_objects.h"
@@ -26,13 +20,17 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include <tr4_littlebeetle.h>
+#include "tr4_littlebeetle.h"
+#include "Objects/Generic/Traps/falling_block.h"
 /// register objects
 #include "object_helper.h"
 
-#include "generic_switch.h"
 #include "fullblock_switch.h"
+#include "itemdata/creature_info.h"
+#include <Objects/Effects/effect_objects.h>
+#include "Game/rope.h"
 
+using namespace TEN::Game::Rope;
 using namespace TEN::Entities::Switches;
 
 OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
@@ -153,8 +151,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		//obj->floor = FallingBlockFloor;
-		//obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveMesh = true;
@@ -168,92 +164,6 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}*/
-
-	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_CLOSED_DOOR6; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-	}
-
-	obj = &Objects[ID_LIFT_DOORS1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_LIFT_DOORS2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SEQUENCE_DOOR1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = DoorCollision;
-		obj->control = SequenceDoorControl;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
-	{
-		obj = &Objects[i];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = DoubleDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
-
-	for (int i = ID_UNDERWATER_DOOR1; i <= ID_UNDERWATER_DOOR4; i++)
-	{
-		obj = &Objects[i];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = UnderwaterDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
-
-	for (int objNum = ID_PUSHPULL_DOOR1; objNum <= ID_KICK_DOOR4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-	}
 
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
@@ -292,18 +202,6 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->collision = ParallelBarsCollision;
-	}
-
-	obj = &Objects[ID_STEEL_DOOR];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSteelDoor;
-		obj->collision = SteelDoorCollision;
-		//obj->control = Legacy_SteelDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_EARTHQUAKE];
@@ -413,46 +311,6 @@ void TrapObjects()
 		obj->ceilingBorder = FallingBlockCeilingBorder;
 		obj->saveFlags = true;
 		obj->savePosition = true;
-	}
-
-	// Flame is always loaded
-	obj = &Objects[ID_FLAME];
-	{
-		obj->control = FlameControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseFlameEmitter;
-		obj->collision = FlameEmitterCollision;
-		obj->control = FlameEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseFlameEmitter2;
-		obj->collision = FlameEmitterCollision;
-		obj->control = FlameEmitter2Control;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FLAME_EMITTER3];
-	if (obj->loaded)
-	{
-		obj->control = FlameEmitter3Control;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_GEN_SLOT2];
@@ -599,6 +457,7 @@ void InitialiseObjects()
 		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
+	InitialiseEffectsObjects();
 	InitialiseGenericObjects(); // Generic objects
 	InitialiseTR1Objects(); // Standard TR1 objects
 	InitialiseTR2Objects(); // Standard TR2 objects

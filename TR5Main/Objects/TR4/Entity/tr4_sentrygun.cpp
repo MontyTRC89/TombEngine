@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_sentrygun.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "items.h"
 #ifdef NEW_INV
 #include "newinv2.h"
@@ -9,99 +9,103 @@
 #include "inventory.h"
 #endif
 #include "level.h"
-#include "lot.h"
-#include "effects\tomb4fx.h"
-#include "sphere.h"
+#include "control/lot.h"
+#include "effects/tomb4fx.h"
 #include "people.h"
-#include "Sound\sound.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "Specific/trmath.h"
 #include "objectslist.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
+namespace TEN::Entities::TR4
+{
 #ifndef NEW_INV
-extern Inventory g_Inventory;
+	extern Inventory g_Inventory;
 #endif
-BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
+	BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
-static void SentryGunThrowFire(ITEM_INFO* item)
-{
-	for (int i = 0; i < 3; i++)
+	static void SentryGunThrowFire(ITEM_INFO* item)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		for (int i = 0; i < 3; i++)
+		{
+			SPARKS* spark = &Sparks[GetFreeSpark()];
 
-		spark->on = 1;
-		spark->sR = (GetRandomControl() & 0x1F) + 48;
-		spark->sG = 48;
-		spark->sB = 255;
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->dB = 32;
-		spark->colFadeSpeed = 12;
-		spark->fadeToBlack = 8;
-		spark->transType = COLADD;
+			spark->on = 1;
+			spark->sR = (GetRandomControl() & 0x1F) + 48;
+			spark->sG = 48;
+			spark->sB = 255;
+			spark->dR = (GetRandomControl() & 0x3F) - 64;
+			spark->dG = (GetRandomControl() & 0x3F) + -128;
+			spark->dB = 32;
+			spark->colFadeSpeed = 12;
+			spark->fadeToBlack = 8;
+			spark->transType = TransTypeEnum::COLADD;
 
-		PHD_VECTOR pos1;
-		pos1.x = -140;
-		pos1.y = -30;
-		pos1.z = -4;
+			PHD_VECTOR pos1;
+			pos1.x = -140;
+			pos1.y = -30;
+			pos1.z = -4;
 
-		GetJointAbsPosition(item, &pos1, 7);
+			GetJointAbsPosition(item, &pos1, 7);
 
-		spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
-		spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
-		spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
+			spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
+			spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
+			spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-		PHD_VECTOR pos2;
-		pos2.x = -280;
-		pos2.y = -30;
-		pos2.z = -4;
+			PHD_VECTOR pos2;
+			pos2.x = -280;
+			pos2.y = -30;
+			pos2.z = -4;
 
-		GetJointAbsPosition(item, &pos2, 7);
+			GetJointAbsPosition(item, &pos2, 7);
 
-		int v = (GetRandomControl() & 0x3F) + 192;
+			int v = (GetRandomControl() & 0x3F) + 192;
 
-		spark->life = spark->sLife = v / 6;
+			spark->life = spark->sLife = v / 6;
 
-		spark->xVel = v * (pos2.x - pos1.x) / 10;
-		spark->yVel = v * (pos2.y - pos1.y) / 10;
-		spark->zVel = v * (pos2.z - pos1.z) / 10;
+			spark->xVel = v * (pos2.x - pos1.x) / 10;
+			spark->yVel = v * (pos2.y - pos1.y) / 10;
+			spark->zVel = v * (pos2.z - pos1.z) / 10;
 
-		spark->friction = 85;
-		spark->gravity = -16 - (GetRandomControl() & 0x1F);
-		spark->maxYvel = 0;
-		spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			spark->friction = 85;
+			spark->gravity = -16 - (GetRandomControl() & 0x1F);
+			spark->maxYvel = 0;
+			spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		spark->scalar = 3;
-		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
-		spark->sSize = spark->dSize / 4;
-		spark->size = spark->dSize / 2;
+			spark->scalar = 3;
+			spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+			spark->sSize = spark->dSize / 4;
+			spark->size = spark->dSize / 2;
+		}
 	}
-}
 
-void InitialiseSentryGun(short itemNum)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	ClearItem(itemNum);
-
-	item->itemFlags[0] = 0;
-	item->itemFlags[1] = 768;
-	item->itemFlags[2] = 0;
-}
-
-void SentryGunControl(short itemNum)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (!CreatureActive(itemNum))
-		return;
-
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-	AI_INFO info;
-	int c = 0;
-
-	if (creature)
+	void InitialiseSentryGun(short itemNum)
 	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
+
+		ClearItem(itemNum);
+
+		item->itemFlags[0] = 0;
+		item->itemFlags[1] = 768;
+		item->itemFlags[2] = 0;
+	}
+
+	void SentryGunControl(short itemNum)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
+
+		if (!CreatureActive(itemNum))
+			return;
+
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+		AI_INFO info = {};
+		int c = 0;
+
+		if (!creature)
+			return;
+
 		// Flags set by the ID_MINE object?
 		if (item->meshBits & 0x40)
 		{
@@ -132,7 +136,7 @@ void SentryGunControl(short itemNum)
 				item->pos.yPos += 512;
 
 				int deltaAngle = info.angle - creature->jointRotation[0];
-				
+
 				info.ahead = true;
 				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
 					info.ahead = false;

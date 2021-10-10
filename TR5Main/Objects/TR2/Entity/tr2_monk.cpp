@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "tr2_monk.h"
-#include "box.h"
+#include "control/box.h"
 #include "effects\effects.h"
 #include "lara.h"
 #include "Sound\sound.h"
 #include "setup.h"
 #include "level.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
 
 BITE_INFO monkBite = { -23,16,265, 14 };
 

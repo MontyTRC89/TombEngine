@@ -1,19 +1,24 @@
 #include "framework.h"
 #include "tr5_explosion.h"
 #include "level.h"
-#include "control.h"
-#include "Sound\sound.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "draw.h"
+#include "setup.h"
+#include "control/control.h"
+#include "Sound/sound.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "animation.h"
 #include "traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"
 #include "lara_one_gun.h"
-#include "switch.h"
-#include "effects\debris.h"
+#include "effects/debris.h"
 #include "generic_switch.h"
+#include "collide.h"
+#include "control/box.h"
+#include "Game/effects/lara_burn.h"
+#include "items.h"
 
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
@@ -139,13 +144,13 @@ void ExplosionControl(short itemNumber)
 				i = 0;
 				while (CollidedMeshes[i])
 				{
-					if (CollidedMeshes[i]->staticNumber >= 50 && CollidedMeshes[i]->staticNumber < 58)
+					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != SHT_NONE)
 					{
-						TriggerExplosionSparks(CollidedMeshes[i]->x, CollidedMeshes[i]->y, CollidedMeshes[i]->z, 3, -2, 0, item->roomNumber);
-						CollidedMeshes[i]->y -= 128;
-						TriggerShockwave((PHD_3DPOS *) &CollidedMeshes[i]->x, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-						CollidedMeshes[i]->y += 128;
-						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), (PHD_3DPOS *) &CollidedMeshes[i]->x, 0);
+						TriggerExplosionSparks(CollidedMeshes[i]->pos.xPos, CollidedMeshes[i]->pos.yPos, CollidedMeshes[i]->pos.zPos, 3, -2, 0, item->roomNumber);
+						CollidedMeshes[i]->pos.yPos -= 128;
+						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
+						CollidedMeshes[i]->pos.yPos += 128;
+						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos, 0);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];

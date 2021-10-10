@@ -1,9 +1,12 @@
 #pragma once
 #include <framework.h>
-#include <newtypes.h>
+#include "newtypes.h"
 #include "floordata.h"
+#include "Specific\phd_global.h"
 
-struct ANIM_FRAME;
+struct TRIGGER_VOLUME;
+
+constexpr auto MAX_FLIPMAP = 255;
 
 struct ROOM_VERTEX
 {
@@ -38,10 +41,7 @@ struct ROOM_LIGHT
 
 struct MESH_INFO
 {
-	int x;
-	int y;
-	int z;
-	short yRot;
+	PHD_3DPOS pos;
 	short staticNumber;
 	short flags;
 	Vector4 color;
@@ -89,51 +89,6 @@ enum StaticMeshFlags : short
 	SM_SOLID = 2
 };
 
-enum TriggerStatus 
-{
-	TS_OUTSIDE = 0,
-	TS_ENTERING = 1,
-	TS_INSIDE = 2,
-	TS_LEAVING = 3
-};
-
-enum TriggerVolumeType
-{
-	VOLUME_BOX = 0,
-	VOLUME_SPHERE = 1,
-	VOLUME_PRISM = 2 // Unsupported as of now
-};
-
-enum TriggerVolumeActivators
-{
-	PLAYER = 1,
-	NPC = 2,
-	MOVEABLES = 4,
-	STATICS = 8,
-	FLYBYS = 16,
-	PHYSICALOBJECTS = 32 // Future-proofness for Bullet
-};
-
-struct TRIGGER_VOLUME
-{
-	TriggerVolumeType type;
-
-	Vector3 position;
-	Quaternion rotation;
-	Vector3 scale; // X used as radius if type is VOLUME_SPHERE
-
-	std::string onEnter;
-	std::string onInside;
-	std::string onLeave;
-
-	int activators;
-	bool oneShot;
-
-	TriggerStatus status;
-	BoundingOrientedBox box;
-	BoundingSphere sphere;
-};
-
 struct ROOM_INFO
 {
 	int x;
@@ -164,24 +119,19 @@ struct ROOM_INFO
 	std::vector<TRIGGER_VOLUME> triggerVolumes;
 };
 
-struct ANIM_STRUCT
-{
-	int framePtr;
-	short interpolation;
-	short currentAnimState;
-	int velocity;
-	int acceleration;
-	int Xvelocity;
-	int Xacceleration;
-	short frameBase;
-	short frameEnd;
-	short jumpAnimNum;
-	short jumpFrameNum;
-	short numberChanges;
-	short changeIndex;
-	short numberCommands;
-	short commandIndex;
-};
-
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
+constexpr auto OUTSIDE_Z = 64;
+constexpr auto OUTSIDE_SIZE = 108;
+
+extern byte FlipStatus;
+extern int FlipStats[MAX_FLIPMAP];
+extern int FlipMap[MAX_FLIPMAP];
+
+void DoFlipMap(short group);
+void AddRoomFlipItems(ROOM_INFO* r);
+void RemoveRoomFlipItems(ROOM_INFO* r);
+int IsObjectInRoom(short roomNumber, short objectNumber);
+int IsRoomOutside(int x, int y, int z);
+
+FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

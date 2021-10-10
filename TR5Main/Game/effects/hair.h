@@ -13,6 +13,8 @@ struct HAIR_STRUCT
 	PHD_3DPOS pos;
 	PHD_VECTOR hvel;
 	PHD_VECTOR unknown;
+
+	bool initialized = false;
 };
 extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 

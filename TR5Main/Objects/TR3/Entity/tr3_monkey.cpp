@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr3_monkey.h"
-#include "box.h"
+#include "control/box.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "setup.h"
-#include "lot.h"
+#include "control/lot.h"
 #include "level.h"
-#include "control.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 
@@ -62,10 +63,11 @@ void MonkeyControl(short itemNumber)
 		{
 			int minDistance = 0x7FFFFFFF;
 			creature->enemy = NULL;
-			CREATURE_INFO* currentCreature = BaddieSlots.data();
+			
 
-			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
@@ -291,9 +293,10 @@ void MonkeyControl(short itemNumber)
 					creature->enemy->roomNumber = NO_ROOM;
 					creature->enemy->carriedItem = NO_ITEM;
 
-					CREATURE_INFO* currentCreature = BaddieSlots.data();
-					for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
+
+					for (int i = 0; i < ActiveCreatures.size(); i++)
 					{
+						CREATURE_INFO* currentCreature = ActiveCreatures[i];
 						if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 							continue;
 

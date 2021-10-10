@@ -1,16 +1,17 @@
 #include "framework.h"
 #include "tr5_guard.h"
 #include "items.h"
-#include "sphere.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
 #include "people.h"
-#include "effects\tomb4fx.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "control/los.h"
 #include "setup.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO SwatGun = { 80, 200, 13, 0 };
 BITE_INFO SniperGun = { 0, 480, 110, 13 };
@@ -612,7 +613,7 @@ void GuardControl(short itemNum)
 			else
 			{
 				item->triggerFlags = 0;
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->pos, 0);
 			}
 			if (abs(info.angle) >= 364)
@@ -636,7 +637,7 @@ void GuardControl(short itemNum)
 		case 18:
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 			{
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 				break;
 			}
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 44)
@@ -696,7 +697,7 @@ void GuardControl(short itemNum)
 		case STATE_GUARD_INSERT_CODE:
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 39)
 			{
-				TestTriggers(item, true, NULL);
+				TestTriggers(item, true);
 			}
 			break;
 		case STATE_GUARD_START_USE_COMPUTER:
@@ -740,7 +741,7 @@ void GuardControl(short itemNum)
 				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + g_Level.Anims[item->animNumber].frameEnd)
 				{
 					currentItem->meshBits = 0x1FFF;
-					TestTriggers(item, true, NULL);
+					TestTriggers(item, true);
 					item->requiredAnimState = STATE_GUARD_WALK;
 					item->swapMeshFlags = 0;
 				}
@@ -777,7 +778,7 @@ void GuardControl(short itemNum)
 			}
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 39)
 			{
-				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, enemy->roomNumber, true, NULL);
+				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, enemy->roomNumber, true);
 			}
 			break;
 		default:
@@ -810,7 +811,7 @@ void GuardControl(short itemNum)
 				}
 				else
 				{
-					TestTriggers(creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos, enemy->roomNumber, true, NULL);
+					TestTriggers(creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos, enemy->roomNumber, true);
 
 					item->requiredAnimState = STATE_GUARD_WALK;
 					if (creature->enemy->flags & 2)

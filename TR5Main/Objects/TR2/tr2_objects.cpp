@@ -31,9 +31,10 @@
 #include "snowmobile.h"
 /// necessary import
 #include "collide.h"
-#include "box.h"
+#include "control/box.h"
 #include "setup.h"
 #include "level.h"
+#include "itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {

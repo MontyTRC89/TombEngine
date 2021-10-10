@@ -25,7 +25,6 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-#include "tr5_dart_emitter.h"
 #include "tr5_smoke_emitter.h"
 /// objects
 #include "tr5_pushableblock.h"
@@ -41,7 +40,6 @@
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
 /// traps
-#include "tr5_teethspike.h"
 #include "tr5_ventilator.h"
 #include "tr5_deathslide.h"
 #include "tr5_electricity.h"
@@ -59,7 +57,7 @@
 #include "lara_one_gun.h"
 #include "lara_flare.h"
 #include "lara_initialise.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 #include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"
@@ -67,7 +65,8 @@
 #include "level.h"
 /// register objects
 #include "object_helper.h"
-
+#include "itemdata/creature_info.h"
+#include "control/box.h"
 using namespace TEN::Entities::TR5;
 
 static void StartBaddy(OBJECT_INFO *obj)
@@ -1082,14 +1081,6 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->control = VentilatorControl;
 	}
 
-	obj = &Objects[ID_TEETH_SPIKES];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTeethSpikes;
-		obj->control = ControlTeethSpikes;
-		obj->saveFlags = 1;
-	}
-
 	obj = &Objects[ID_ELECTRICAL_CABLES];
 	if (obj->loaded)
 	{
@@ -1151,34 +1142,6 @@ static void StartTrap(OBJECT_INFO *obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_DARTS];
-	if (obj->loaded)
-	{
-		obj->shadowSize = UNIT_SHADOW / 2;
-		//obj->drawRoutine = DrawDart;
-		obj->collision = ObjectCollision;
-		obj->control = DartControl;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_HOMING_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
@@ -1314,12 +1277,7 @@ void InitialiseTR5Objects()
 
 void AllocTR5Objects()
 {
-	Bats = game_malloc<BAT_STRUCT>(NUM_BATS);
 	ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
-
-	Spiders = game_malloc<SPIDER_STRUCT>(NUM_SPIDERS);
 	ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
-
-	Rats = game_malloc<RAT_STRUCT>(NUM_RATS);
 	ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
 }

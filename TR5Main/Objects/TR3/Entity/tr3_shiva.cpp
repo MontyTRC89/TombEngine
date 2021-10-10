@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr3_shiva.h"
-#include "effects\effects.h"
-#include "box.h"
-#include "sphere.h"
+#include "animation.h"
+#include "effects/effects.h"
+#include "control/box.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
@@ -241,7 +242,7 @@ void ShivaControl(short itemNum)
 				z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + 0x8000);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
-				if (!shiva->flags && floor->box != NO_BOX && !(g_Level.Boxes[floor->box].flags & BLOCKABLE))
+				if (!shiva->flags && floor->Box != NO_BOX && !(g_Level.Boxes[floor->Box].flags & BLOCKABLE))
 					item->goalAnimState = 8;
 				else
 					item->goalAnimState = 2;

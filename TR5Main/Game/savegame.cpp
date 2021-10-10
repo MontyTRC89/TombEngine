@@ -2,23 +2,23 @@
 #include "savegame.h"
 #include "Lara.h"
 #include "items.h"
-#include "box.h"
-#include "pickup\pickup.h"
-#include "lot.h"
-#include "switch.h"
+#include "control/box.h"
+#include "control/lot.h"
 #include "spotcam.h"
 #include "traps.h"
-#include "Sound\sound.h"
+#include "room.h"
+#include "sound/sound.h"
 #include "level.h"
 #include "setup.h"
-#include "camera.h"
-#include "quad.h"
+#include "flipeffect.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-#include "generic_switch.h"
 #include "fullblock_switch.h"
+#include "itemdata/creature_info.h"
+#include "Game/effects/lara_burn.h"
 
+using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 
 using std::string;
@@ -72,7 +72,7 @@ std::unique_ptr<ChunkId> SaveGame::m_chunkExamineCombo;
 std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
 
 SAVEGAME_INFO Savegame;
-//extern vector<AudioTrack> g_AudioTracks;
+//extern vector<AudioTrack> SoundTracks;
 
 void SaveGame::saveItems()
 {
@@ -184,7 +184,7 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 #endif
 	LEB128::Write(m_stream, FlipEffect);
 	LEB128::Write(m_stream, FlipTimer);
-	//LEB128::Write(m_stream, CurrentAtmosphere);
+	//LEB128::Write(m_stream, CurrentLoopedSoundTrack);
 	LEB128::Write(m_stream, CurrentSequence);
 
 	// Now the sub-chunks
@@ -198,8 +198,8 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 	for (int i = 0; i < NumberSpotcams; i++)
 		m_writer->WriteChunk(m_chunkFlybyFlags.get(), &saveFlybyFlags, i, SpotCam[i].flags);
 
-	for (int i = 0; i < g_AudioTracks.size(); i++)
-		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, g_AudioTracks[i].Mask);
+	for (int i = 0; i < SoundTracks.size(); i++)
+		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, SoundTracks[i].Mask);
 
 	for (int i = 0; i < NumberCameras; i++)
 		m_writer->WriteChunk(m_chunkCamera.get(), &saveCamera, i, FixedCameras[i].flags);
@@ -454,8 +454,7 @@ bool SaveGame::readGameStatus()
 	LastInventoryItem = LEB128::ReadInt32(m_stream);
 #endif
 	FlipEffect = LEB128::ReadInt32(m_stream);
-	FlipTimer = LEB128::ReadInt32(m_stream);
-	CurrentAtmosphere = LEB128::ReadByte(m_stream);
+	CurrentLoopedSoundTrack = LEB128::ReadByte(m_stream);
 	CurrentSequence = LEB128::ReadByte(m_stream);
 
 	m_reader->ReadChunks(&readGameStatusChunks, 0);
@@ -808,16 +807,16 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		if (!flags)
 		{
-			FLOOR_INFO* floor = GetFloor(g_Level.Rooms[roomIndex].mesh[staticIndex].x,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].y,
-				g_Level.Rooms[roomIndex].mesh[staticIndex].z,
-				&roomIndex);
+			FLOOR_INFO* floor = GetFloor(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
+										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
+										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos,
+										 &roomIndex);
 
-			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].x,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].y,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].z, roomIndex, true, NULL);
+			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
+						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos, roomIndex, true);
 
-			floor->stopper = false;
+			floor->Stopper = false;
 		}
 
 		return true;
@@ -843,8 +842,8 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 		short index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
 		short value = LEB128::ReadInt16(m_stream);
-		if (index < g_AudioTracks.size())
-			g_AudioTracks[index].Mask = value;
+		if (index < SoundTracks.size())
+			SoundTracks[index].Mask = value;
 		return true;
 	}*/
 	else if (chunkId->EqualsTo(m_chunkCamera.get()))
@@ -996,7 +995,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
-		creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
+		//creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
 
 		creature->aiTarget.objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);
@@ -1019,10 +1018,10 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 	}
 	else if (chunkId->EqualsTo(m_chunkItemQuadInfo.get()))
 	{
-		QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
-		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
-		if (item->objectNumber == ID_QUAD)
-			item->data = (void*)quadInfo;
+		//QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
+		//m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
+		//if (item->objectNumber == ID_QUAD)
+		//	item->data = quadInfo;
 
 		return true;
 	}
@@ -1107,7 +1106,7 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy - (ptrdiff_t)malloc_buffer);
+	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy);
 
 	LEB128::Write(m_stream, creature->jointRotation[0]);
 	LEB128::Write(m_stream, creature->jointRotation[1]);
@@ -1418,7 +1417,7 @@ bool SaveGame::readFlare()
 	AddActiveItem(itemNumber);
 
 	// Flare age
-	item->data = (void*)LEB128::ReadInt32(m_stream);
+	item->data = LEB128::ReadInt32(m_stream);
 
 	return true;
 }
@@ -1465,7 +1464,8 @@ bool SaveGame::readTorpedo()
 
 void SaveGame::saveItemQuadInfo(int itemNumber, int arg2)
 {
-	m_stream->WriteBytes(reinterpret_cast<byte*>(g_Level.Items[itemNumber].data), sizeof(QUAD_INFO));
+
+	//m_stream->WriteBytes(reinterpret_cast<byte*>(g_Level.Items[itemNumber].data), sizeof(QUAD_INFO));
 }
 
 void SaveGame::saveRats(int arg1, int arg2)

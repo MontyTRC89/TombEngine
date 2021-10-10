@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "tr4_sas.h"
-#include "sphere.h"
-#include "box.h"
+#include "control/box.h"
 #include "items.h"
 #include "people.h"
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include <Specific/input.h>
-#include <Game/Lara/lara_one_gun.h>
+#include "control/control.h"
+#include "animation.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "Specific/input.h"
+#include "Lara/lara_one_gun.h"
+#include "itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4
 {
@@ -703,7 +704,7 @@ namespace TEN::Entities::TR4
 					int y = l->pos.yPos;
 					int z = l->pos.zPos - 512 * phd_cos(l->pos.yRot);
 
-					TestTriggers(x, y, z, l->roomNumber, true, NULL);
+					TestTriggers(x, y, z, l->roomNumber, true);
 
 					RemoveActiveItem(itemNumber);
 					item->status = ITEM_NOT_ACTIVE;

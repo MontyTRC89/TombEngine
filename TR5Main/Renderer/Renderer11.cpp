@@ -1,28 +1,17 @@
 #include "framework.h"
 #include "Renderer11.h"
-#include "input.h"
-#include "winmain.h"
-#include "level.h"
-#include "configuration.h"
-#include "draw.h"
-#include "health.h"
-#include "pickup\pickup.h"
 #ifndef NEW_INV
 #include "inventory.h"
 #endif
 #include "gameflow.h"
-#include "Lara.h"
-#include "effects\effects.h"
-#include "rope.h"
 #include "camera.h"
-#include "effects\tomb4fx.h"
-#include "Specific\trmath.h"
-#include "misc.h"
-#include "effects\footprint.h"
-#include "setup.h"
+#include "effects/tomb4fx.h"
+#include "Specific/clock.h"
+#include "Specific/trmath.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
+
 using std::vector;
 
 namespace TEN::Renderer 
@@ -60,6 +49,7 @@ namespace TEN::Renderer
 	void Renderer11::clearSceneItems() {
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
+		m_rects2DToDraw.clear();
 		gameCamera.clear();
 	}
 

@@ -12,6 +12,7 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "items.h"
+#include "animation.h"
 #include "effects\effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
@@ -29,6 +30,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+
 struct CAMERA_INFO;
 namespace TEN::Renderer
 {
@@ -131,8 +133,6 @@ namespace TEN::Renderer
 		int NumTextures;
 		std::vector<RendererAnimatedTexture> Textures;
 	};
-	
-
 	
 	struct RendererStatic
 	{
@@ -290,6 +290,12 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector2 Vertices[2];
 		DirectX::SimpleMath::Vector4 Color;
 	};
+
+	struct RendererRect2D
+	{
+		RECT Rectangle;
+		DirectX::SimpleMath::Vector4 Color;
+	};
 	
 	class Renderer11
 	{
@@ -409,12 +415,15 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> m_dynamicLights;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
+		std::vector<RendererRect2D*> m_rects2DToDraw;
 		std::vector<RendererBucket*> m_bucketsToDraw;
 		int m_nextSprite;
 		RendererLine3D* m_lines3DBuffer;
 		int m_nextLine3D;
 		RendererLine2D* m_lines2DBuffer;
 		int m_nextLine2D;
+		RendererRect2D* m_rects2DBuffer;
+		int m_nextRect2D;
 		RendererLight* m_shadowLight;
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
@@ -465,7 +474,7 @@ namespace TEN::Renderer
 		int m_progress;
 		bool m_enableCinematicBars = false;
 		int m_pickupRotation = 0;
-	
+
 		// Private functions
 		int getAnimatedTextureInfo(short textureId);
 		void drawAllStrings();
@@ -490,22 +499,21 @@ namespace TEN::Renderer
 		int	getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
 		bool drawAmbientCubeMap(short roomNumber);
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
-		void drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
+		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
-		void drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated);
-		void drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawStatics(bool transparent, RenderView& view);
 		void renderShadowMap(RenderView& view);
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
+		void drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawLara(RenderView& view,bool transparent, bool shadowMap);
 		void printDebugMessage(LPCSTR message, ...);
 		void drawFires(RenderView& view);
 		void drawSparks(RenderView& view);
 		void drawSmokes(RenderView& view);
-		void drawEnergyArcs(RenderView& view);
+		void drawLightning(RenderView& view);
 		void drawBlood(RenderView& view);
 		void drawDrips(RenderView& view);
 		void drawBubbles(RenderView& view);
@@ -514,7 +522,8 @@ namespace TEN::Renderer
 		void drawSplahes(RenderView& view);
 		void drawSprites(RenderView& view);
 		void drawLines3D(RenderView& view);
-		void drawLines2D(RenderView& view);
+		void drawLines2D();
+		void drawRects2D();
 		void drawOverlays(RenderView& view);
 		void drawRopes(RenderView& view);
 		void drawBats(RenderView& view);
@@ -599,6 +608,7 @@ namespace TEN::Renderer
 		std::vector<RendererVideoAdapter>* getAdapters();
 		void renderTitleImage();
 		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
+		void addQuad2D(RECT rect, byte r, byte g, byte b, byte a);
 		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		void addBox(Vector3 min, Vector3 max, Vector4 color); 
 		void addBox(Vector3* corners, Vector4 color);

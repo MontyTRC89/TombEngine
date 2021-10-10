@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr5_gunship.h"
 #include "level.h"
-#include "control.h"
-#include "Sound\sound.h"
-#include "draw.h"
+#include "setup.h"
+#include "control/los.h"
+#include "Sound/sound.h"
+#include "animation.h"
 #include "camera.h"
-#include "effects\effects.h"
-#include "effects\debris.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
 #include "objects.h"
 #include "items.h"
 #include "lara.h"
@@ -86,7 +87,7 @@ void ControlGunShip(short itemNumber)
 
 		GetLaraOnLOS = 0;
 
-		if (objOnLos == 999 || objOnLos < 0)
+		if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 		{
 			if (GunShipCounter >= 15)
 				return AnimateItem(item);
@@ -105,12 +106,12 @@ void ControlGunShip(short itemNumber)
 
 			if (objOnLos < 0 && GetRandomControl() & 1)
 			{
-				if (hitMesh->staticNumber >= 50 && hitMesh->staticNumber < 59)
+				if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-					TestTriggers(hitMesh->x, hitMesh->y, hitMesh->z, end.roomNumber, true, NULL);
-					SoundEffect(GetShatterSound(hitMesh->staticNumber), (PHD_3DPOS*)hitMesh, 0);
+					TestTriggers(hitMesh->pos.xPos, hitMesh->pos.yPos, hitMesh->pos.zPos, end.roomNumber, true);
+					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos, 0);
 				}
 
 				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);

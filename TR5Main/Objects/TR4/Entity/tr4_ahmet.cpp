@@ -1,17 +1,21 @@
 #include "framework.h"
 #include "tr4_ahmet.h"
-#include "control.h"
+#include "control/control.h"
 #include "sphere.h"
-#include "effects\effects.h"
-#include "Sound\sound.h"
+#include "effects/effects.h"
+#include "effects/weather.h"
+#include "Sound/sound.h"
 #include "setup.h"
-#include "box.h"
+#include "control/box.h"
 #include "level.h"
 #include "misc.h"
 #include "lara.h"
 #include "people.h"
 #include "items.h"
-#include "lot.h"
+#include "control/lot.h"
+#include "itemdata/creature_info.h"
+
+using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
 {
@@ -50,20 +54,21 @@ namespace TEN::Entities::TR4
 
     static void AhmetHeavyTriggers(ITEM_INFO* item)
     {
-        TestTriggers(item, true, NULL);
+        TestTriggers(item, true);
     }
 
     static void TriggerAhmetDeathEffect(ITEM_INFO* item)
     {
+		// HACK: Using CreatureSpheres here in release mode results in total mess-up
+		// of LaraSpheres, which looks in game as ghost Lara fire silhouette.
+		// Later both CreatureSpheres and LaraSpheres globals should be eradicated.
+
+		static SPHERE spheres[MAX_SPHERES] = {};
+
         if (!(Wibble & 7))
         {
-            SPHERE* sphere;
-            int meshCount;
-
-            // cant be FALSE here because else it will be local space not world
-            // because of that it cant be GetJointAbsPosition() !
-            meshCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-            sphere = &CreatureSpheres[(Wibble / 8) & 1];
+			int meshCount = GetSpheres(item, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+            auto sphere = &spheres[(Wibble / 8) & 1];
 
             for (int i = meshCount; i > 0; i--, sphere += 2)
                 TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
@@ -365,10 +370,7 @@ namespace TEN::Entities::TR4
         if (item->currentAnimState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
             return false;
 
-        FlashFadeR = 255;
-        FlashFadeG = 64;
-        FlashFadeB = 0;
-        FlashFader = 32;
+		Weather.Flash(255, 64, 0, 0.03f);
 
         item->pos.xPos = (item->itemFlags[0] * 1024) + 512;
         item->pos.yPos = (item->itemFlags[1] * 256);

@@ -1,18 +1,21 @@
 #include "framework.h"
 #include "collide.h"
 #include "input.h"
+#include "level.h"
+#include "setup.h"
 #include "lara.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
 #include "inventory.h"
 #endif
-#include "switch.h"
-#include "pickup\pickup.h"
-#include "draw.h"
-#include "control.h"
+#include "pickup.h"
+#include "animation.h"
+#include "control/control.h"
 #include "puzzles_keys.h"
 #include "generic_switch.h"
+#include "camera.h"
+#include "items.h"
 
 using namespace TEN::Entities::Switches;
 
@@ -382,21 +385,4 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 
 	return;
-}
-int KeyTrigger(short itemNum)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	int oldkey;
-
-	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
-		return -1;
-
-	oldkey = KeyTriggerActive;
-
-	if (!oldkey)
-		item->status = ITEM_DEACTIVATED;
-
-	KeyTriggerActive = false;
-
-	return oldkey;
 }

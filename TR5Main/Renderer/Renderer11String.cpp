@@ -4,8 +4,8 @@ namespace TEN::Renderer {
 	void Renderer11::drawString(int x, int y, const char* string, D3DCOLOR color, int flags) {
 		int realX = x;
 		int realY = y;
-		float factorX = ScreenWidth / 800.0f;
-		float factorY = ScreenHeight / 600.0f;
+		float factorX = ScreenWidth / ASSUMED_WIDTH_FOR_TEXT_DRAWING;
+		float factorY = ScreenHeight / ASSUMED_HEIGHT_FOR_TEXT_DRAWING;
 
 		RECT rect = { 0, 0, 0, 0 };
 
@@ -58,7 +58,6 @@ namespace TEN::Renderer {
 		}
 
 		m_strings.push_back(str);
-
 	}
 
 	void Renderer11::drawAllStrings()

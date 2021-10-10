@@ -1,31 +1,65 @@
 #include "framework.h"
 #include "tr4_cog.h"
 #include "level.h"
-#include "control.h"
-#include "sphere.h"
-#include "Sound\sound.h"
+#include "control/control.h"
+#include "Sound/sound.h"
+#include "collide.h"
+#include "effects/effects.h"
+#include "Lara/lara.h"
+#include "animation.h"
+#include "items.h"
 
-void CogControl(short itemNum)
+namespace TEN::Entities::TR4
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+    void CogControl(short itemNum)
+    {
+        ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (TriggerActive(item))
-	{
-		item->status = ITEM_ACTIVE;
-		AnimateItem(item);
+        if (TriggerActive(item))
+        {
+            item->status = ITEM_ACTIVE;
+            AnimateItem(item);
 
-		if (item->triggerFlags == 666)
-		{
-			PHD_VECTOR pos;
-			GetJointAbsPosition(item, &pos, 0);
-			SoundEffect(65, (PHD_3DPOS*)&pos, 0);
+            if (item->triggerFlags == 666)
+            {
+                PHD_VECTOR pos;
+                GetJointAbsPosition(item, &pos, 0);
+                SoundEffect(65, (PHD_3DPOS*)&pos, 0);
 
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-				item->flags &= 0xC1;
-		}
-	}
-	else if (item->triggerFlags == 2)
-	{
-		item->status |= ITEM_INVISIBLE;
-	}
+                if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+                    item->flags &= 0xC1;
+            }
+        }
+        else if (item->triggerFlags == 2)
+        {
+            item->status |= ITEM_INVISIBLE;
+        }
+    }
+
+    void CogCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+    {
+        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        
+        if (item->status != ITEM_INVISIBLE)
+        {
+            if (TestBoundsCollide(item, l, coll->Setup.Radius))
+            {
+                if (TriggerActive(item))
+                {
+                    DoBloodSplat(
+                        (GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
+                        (GetRandomControl() & 0x1F) + item->pos.yPos - 16, 
+                        (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
+                        (GetRandomControl() & 3) + 2, 
+                        2 * GetRandomControl(),
+                        l->roomNumber);
+                    LaraItem->hitPoints -= 10;
+                }
+                else if (coll->Setup.EnableObjectPush)
+                {
+                    ItemPushItem(item, l, coll, 0, 0);
+                }
+            }
+        }
+    }
 }

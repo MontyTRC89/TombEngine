@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr5_ventilator.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "lara.h"
 #include "camera.h"
 #include "effects\effects.h"
+#include "items.h"
 
 static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
 {
@@ -149,7 +150,7 @@ void VentilatorControl(short itemNumber)
 	else
 	{
 		xChange = 1;
-		TestTriggers(item, true, NULL);
+		TestTriggers(item, true);
 		if (item->currentAnimState == 1)
 		{
 			//result = 5 * item->animNumber;

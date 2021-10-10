@@ -1,16 +1,10 @@
 #include "framework.h"
 #include "GameFlowScript.h"
-#include "items.h"
-#include "box.h"
-#include "lot.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "savegame.h"
-#include "draw.h"
-#include "AudioTracks.h"
 #include "GameScriptInventoryObject.h"
 #include "InventorySlots.h"
-#include <Objects/objectslist.h>
-#include <Game/newinv2.h>
+#include "Game/newinv2.h"
 
 /***
 Scripts that will be run on game startup.
@@ -22,7 +16,8 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-extern unordered_map<string, AudioTrack> g_AudioTracks;
+GameFlow* g_GameFlow;
+GameScript* g_GameScript;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
@@ -182,7 +177,7 @@ void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>
 		track.Name = t.trackName;
 		track.Mask = 0;
 		track.looped = t.looped;
-		g_AudioTracks.insert_or_assign(track.Name, track);
+		SoundTracks.insert_or_assign(track.Name, track);
 	}
 }
 
@@ -238,29 +233,7 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentAtmosphere = level->AmbientTrack;
-
-		if (level->Horizon)
-		{
-			SkyColor1.r = level->Layer1.R;
-			SkyColor1.g = level->Layer1.G;
-			SkyColor1.b = level->Layer1.B;
-
-			SkyColor2.r = level->Layer2.R;
-			SkyColor2.g = level->Layer2.G;
-			SkyColor2.b = level->Layer2.B;
-		}
-
-		if (level->Storm)
-		{
-			SkyStormColor[0] = level->Layer1.R;
-			SkyStormColor[1] = level->Layer1.G;
-			SkyStormColor[2] = level->Layer1.B;
-
-			SkyStormColor2[0] = level->Layer1.R;
-			SkyStormColor2[1] = level->Layer1.G;
-			SkyStormColor2[2] = level->Layer1.B;
-		}
+		CurrentLoopedSoundTrack = level->AmbientTrack;
 
 		GAME_STATUS status;
 
@@ -290,7 +263,7 @@ bool GameFlow::DoGameflow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, CurrentAtmosphere, loadFromSavegame);
+			status = DoLevel(CurrentLevel, CurrentLoopedSoundTrack, loadFromSavegame);
 			loadFromSavegame = false;
 		}
 
@@ -331,5 +304,3 @@ bool GameFlow::DoGameflow()
 
 	return true;
 }
-
-GameFlow* g_GameFlow;

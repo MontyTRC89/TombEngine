@@ -1,11 +1,14 @@
 #include "framework.h"
-#include "control.h"
 #include "input.h"
 #include "lara.h"
 #include "underwater_switch.h"
-#include "newinv2.h"
-#include "Sound\sound.h"
 #include "generic_switch.h"
+#include "camera.h"
+#include "collide.h"
+#include "level.h"
+#include "animation.h"
+#include "items.h"
+
 
 namespace TEN::Entities::Switches
 { 
@@ -46,6 +49,20 @@ namespace TEN::Entities::Switches
 	PHD_VECTOR CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
 	void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	{
+		ITEM_INFO* item = &g_Level.Items[itemNum];
+
+		if (item->triggerFlags == 0)
+		{
+			WallUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+		else
+		{
+			CeilingUnderwaterSwitchCollision(itemNum, l, coll);
+		}
+	}
+
+	void WallUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 

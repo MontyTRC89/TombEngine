@@ -1,13 +1,15 @@
 #include "framework.h"
-#include "box.h"
-#include "effects\effects.h"
+#include "control/box.h"
+#include "effects/effects.h"
 #include "items.h"
 #include "camera.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
@@ -210,7 +212,7 @@ void AbortionControl(short itemNum)
 		SoundEffect(171, &item->pos, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
 
-		TestTriggers(item, true, NULL);
+		TestTriggers(item, true);
 
 		KillItem(itemNum);
 		item->status = ITEM_DEACTIVATED;

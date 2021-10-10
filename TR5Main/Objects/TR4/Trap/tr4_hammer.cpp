@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "tr4_element_puzzle.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
-#include <draw.h>
+#include "animation.h"
 #include <lara.h>
 #include <sphere.h>
 #include <effects\effects.h>
@@ -13,32 +13,41 @@
 
 void HammerControl(short itemNumber)
 {
- /*   ITEM_INFO* item = &g_Level.Items[itemNumber];
+    /*ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+    item->itemFlags[3] = 150;
 
     if (!TriggerActive(item))
     {
-        item->itemFlags[0] = 0;
-        item->itemFlags[1] = 0;
+        *((int*)&item->itemFlags[0]) = 0;
     }
 
-    int df = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+    int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
    
-    v4 = item->triggerFlags;
-    v5 = 0;
     if (!item->triggerFlags)
     {
-        item->itemFlags[1] = (df >= 52 ? 0 : 224);
-        return AnimateItem((int)item);
+        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0xE0);
+        AnimateItem((int)item);
     }
     else if (item->currentAnimState != 1 || item->goalAnimState != 1)
     {
         item->goalAnimState = 1;
-        item->itemFlags[1] = (df >= 52 ? 0 : 2016);
+        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0x7E0);
 
-        if (df == 8)
+        if (frameNumber == 8)
         {
             if (item->triggerFlags == 2)
             {
+                ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+
+                for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+                {
+                    ITEM_INFO* currentItem = &g_Level.Items[linknum];
+
+                    if (currentItem->objectNumber==ID_OBELISK 
+                        && )
+                }
+
                 linkNum = *(signed __int16*)(Rooms + 148 * (signed __int16)item->roomNumber + 72);
                 if (linkNum != -1)
                 {

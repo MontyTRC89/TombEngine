@@ -1,17 +1,20 @@
 #include "framework.h"
 #include "tr4_skeleton.h"
 #include "items.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
-#include "effects\effects.h"
-#include "sphere.h"
-#include "effects\debris.h"
-#include "lot.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
+#include "control/lot.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "setup.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "level.h"
+#include "animation.h"
+#include "itemdata/creature_info.h"
+#include "floordata.h"
+#include "collide.h"
 
 namespace TEN::Entities::TR4
 {
@@ -635,18 +638,20 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, 16);
 
 					auto floor = GetCollisionResult(x, y, z, item->roomNumber).Block;
-					if (floor->stopper)
+					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
 						{
 							MESH_INFO* staticMesh = &room->mesh[i];
-							if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
+							if (abs(pos.x - staticMesh->pos.xPos) < 1024 && 
+								abs(pos.z - staticMesh->pos.zPos) < 1024 && 
+								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-								floor->stopper = 0;
-								TestTriggers(item, true, NULL);
+								floor->Stopper = 0;
+								TestTriggers(item, true);
 								break;
 							}
 						}

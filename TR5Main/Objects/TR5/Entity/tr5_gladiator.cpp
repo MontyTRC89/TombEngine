@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "tr5_gladiator.h"
 #include "items.h"
-#include "box.h"
-#include "sphere.h"
-#include "effects\debris.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
+#include "control/box.h"
+#include "effects/debris.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "itemdata/creature_info.h"
+#include "animation.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 
@@ -313,24 +314,24 @@ void ControlGladiator(short itemNumber)
 					pos.z = 0;
 					GetJointAbsPosition(item, &pos, 16);
 
-					floor = &XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
-					if (floor->stopper)
+					floor = GetSector(r, pos.x - r->x, pos.z - r->z);
+					if (floor->Stopper)
 					{
 						for (i = 0; i < r->mesh.size(); i++)
 						{
 							mesh = &r->mesh[i];
 
-							if (!((pos.z ^ mesh->z) & 0xFFFFFC00))
+							if (!((pos.z ^ mesh->pos.zPos) & 0xFFFFFC00))
 							{
-								if (!((pos.x ^ mesh->x) & 0xFFFFFC00))
+								if (!((pos.x ^ mesh->pos.xPos) & 0xFFFFFC00))
 								{
-									if (mesh->staticNumber >= 50 && mesh->staticNumber <= 59)
+									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
 										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
-										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true, NULL);
+										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 									}
 								}
 							}

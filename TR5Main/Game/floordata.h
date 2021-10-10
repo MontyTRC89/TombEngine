@@ -1,6 +1,9 @@
 #pragma once
+#include <optional>
 #include "Specific\trmath.h"
-#include "items.h"
+#include "roomvector.h"
+
+constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
 struct SECTOR_COLLISION_INFO
 {
@@ -25,15 +28,11 @@ struct SECTOR_FLAGS
 
 class FLOOR_INFO
 {
-public:
-	int index;
-	int box;
-	int fx;
-	int stopper;
-	int pitRoom;
-	int floor;
-	int skyRoom;
-	int ceiling;
+	public:
+	int TriggerIndex;
+	int Box;
+	int Material;
+	int Stopper;
 	SECTOR_COLLISION_INFO FloorCollision;
 	SECTOR_COLLISION_INFO CeilingCollision;
 	SECTOR_FLAGS Flags;
@@ -43,6 +42,13 @@ public:
 
 	int SectorPlane(int x, int z) const;
 	int SectorPlaneCeiling(int x, int z) const;
+	std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
+	bool FloorIsSplit() const;
+	bool FloorIsDiagonalStep() const;
+	bool CeilingIsDiagonalStep() const;
+	bool CeilingIsSplit() const;
+	bool FloorHasSplitPortal() const;
+	bool CeilingHasSplitPortal() const;
 	std::optional<int> RoomBelow(int plane) const;
 	std::optional<int> RoomBelow(int x, int z) const;
 	std::optional<int> RoomBelow(int x, int z, int y) const;
@@ -83,6 +89,11 @@ namespace TEN::Floordata
 	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z);
 	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, int x, int y, int z);
 	ROOM_VECTOR GetRoom(ROOM_VECTOR location, int x, int y, int z);
+
 	void AddBridge(short itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(short itemNumber, int x = 0, int z = 0);
+
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
+	int GetBridgeBorder(int itemNumber, bool bottom);
+	void UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
 }

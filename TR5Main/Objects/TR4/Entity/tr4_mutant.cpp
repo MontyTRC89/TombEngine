@@ -1,14 +1,17 @@
 #include "framework.h"
 #include "tr4_mutant.h"
 #include "tr4_locusts.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "misc.h"
 #include "lara.h"
 #include "setup.h"
 #include "sphere.h"
 #include "objectslist.h"
-#include "Specific\trmath.h"
-#include "control.h"
+#include "Specific/trmath.h"
+#include "itemdata/creature_info.h"
+#include "control/control.h"
+#include "animation.h"
+#include "items.h"
 
 namespace TEN::Entities::TR4
 {

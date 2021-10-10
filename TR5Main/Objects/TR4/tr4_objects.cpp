@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_objects.h"
-#include "pickup\pickup.h"
+#include "pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
@@ -38,6 +38,8 @@
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
 #include "tr4_clockwork_beetle.h"
+#include "tr4_obelisk.h"
+
 /// puzzle
 #include "tr4_scales.h"
 /// switch
@@ -60,6 +62,8 @@
 #include "tr4_cog.h"
 #include "tr4_laradouble.h"
 #include "tr4_setha.h"
+#include "tr4_teethspike.h"
+
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
@@ -69,6 +73,8 @@
 #include "setup.h"
 #include "level.h"
 #include "tr4_enemy_jeep.h"
+#include "itemdata/creature_info.h"
+#include "control/box.h"
 
 using namespace TEN::Entities::TR4;
 
@@ -940,6 +946,16 @@ static void StartObject(OBJECT_INFO* obj)
 	{
 		obj->collision = PickupCollision;
 	}
+
+	obj = &Objects[ID_OBELISK];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseObelisk;
+		obj->control = ObeliskControl;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
 }
 
 static void StartTrap(OBJECT_INFO* obj)
@@ -958,26 +974,6 @@ static void StartTrap(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->control = PloughControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_FLOOR_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_CEILING_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
@@ -1079,6 +1075,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1088,6 +1085,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	{
 		obj->control = FourBladesControl;
 		obj->collision = GenericSphereBoxCollision;
+		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
@@ -1147,7 +1145,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		obj->control = CogControl;
-		obj->collision = GenericSphereBoxCollision;
+		obj->collision = CogCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -1170,6 +1168,14 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_TEETH_SPIKES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTeethSpikes;
+		obj->control = ControlTeethSpikes;
+		obj->saveFlags = 1;
 	}
 }
 
@@ -1217,6 +1223,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	TEN::Entities::TR4::Scarabs = game_malloc<SCARAB_INFO>(TEN::Entities::TR4::NUM_LITTLE_BETTLES);
 	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
 }

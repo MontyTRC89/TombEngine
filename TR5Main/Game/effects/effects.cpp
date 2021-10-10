@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "draw.h"
+#include "animation.h"
 #include "effects.h"
 #include "lara.h"
 #include "effects\tomb4fx.h"
@@ -12,18 +12,23 @@
 #include "GameFlowScript.h"
 #include "spark.h"
 #include "explosion.h"
-#include <Game\effects\drip.h>
-#include <Game\effects\bubble.h>
+#include "effects\drip.h"
+#include "effects\bubble.h"
+#include "effects\weather.h"
 #include "smoke.h"
 #include "Specific\prng.h"
+#include "Renderer11.h"
+#include "Game/effects/lara_burn.h"
+#include "items.h"
 
+using namespace TEN::Effects::Fire;
 using TEN::Renderer::g_Renderer;
 using TEN::Effects::Explosion::TriggerExplosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
-short FXType;
-FX_INFO* EffectList;
+FX_INFO EffectList[NUM_EFFECTS];
 
 int NextSpark;
 int DeadlyBounds[6];
@@ -63,8 +68,6 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
 	{ 0, 0, 0, 0, false }, // TR3 offset 12
 	{ 0, 0, 0, 0, false }, // Empty
 };
-
-extern GameFlow* g_GameFlow;
 
 void DetatchSpark(int num, SpriteEnumFlag type)
 {
@@ -280,8 +283,8 @@ void UpdateSparks()
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ >> 1;
+				spark->x += Weather.Wind().x;
+				spark->z += Weather.Wind().z;
 			}
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
@@ -772,7 +775,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	}
 	else
 	{
-		spark->sSize = generateFloat(128, 156);
+		spark->sSize = GenerateFloat(128, 156);
 		spark->dSize = spark->sSize / 16;
 		if (type == 7)
 		{
@@ -884,7 +887,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = generateFloat(64,128);
+				float thickness = GenerateFloat(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -892,10 +895,10 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 				splash.isRipple = true;
 				float vel;
 				if (numSplashesSetup == 2) {
-					vel = (splashVelocity / 16) + generateFloat(2, 4);
+					vel = (splashVelocity / 16) + GenerateFloat(2, 4);
 				}
 				else {
-					vel = (splashVelocity / 7) + generateFloat(3, 7);
+					vel = (splashVelocity / 7) + GenerateFloat(3, 7);
 				}
 				
 				float innerRadius = 0;
@@ -1039,12 +1042,12 @@ void SetupRipple(int x, int y, int z, float size, char flags,unsigned int sprite
 				ripple->initialColor *= 0.6f;
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
-				ripple->worldPos.x += generateFloat(-32, 32);
-				ripple->worldPos.z += generateFloat(-32, 32);
+				ripple->worldPos.x += GenerateFloat(-32, 32);
+				ripple->worldPos.z += GenerateFloat(-32, 32);
 			}
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
-				ripple->rotation += generateFloat(-PI, PI);
+				ripple->rotation += GenerateFloat(-PI, PI);
 			}
 			break;
 		}
@@ -1195,81 +1198,6 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->maxYvel = 0;
 	spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
 	spark->dSize = spark->size * 2;
-}
-
-void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
-{
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
-	
-	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
-		return;
-
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-	spark->on = 1;
-	spark->sR = 16;
-	spark->sG = 8;
-	spark->sB = 4;
-	spark->dR = 64;
-	spark->dG = 48;
-	spark->dB = 32;
-	spark->colFadeSpeed = 8;
-	spark->fadeToBlack = 4;
-	spark->transType = COLADD;
-	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	if (hit)
-	{
-		spark->xVel = GetRandomControl() - xv - 128;
-		spark->yVel = -4 - (GetRandomControl() & 3);
-		spark->zVel = GetRandomControl() - zv - 128;
-	}
-	else
-	{
-		if (xv)
-			spark->xVel = -xv;
-		else
-			spark->xVel = GetRandomControl() - 128;
-		spark->yVel = -4 - (GetRandomControl() & 3);
-		if (!zv)
-		{
-			spark->zVel = GetRandomControl();
-		}
-		else
-			spark->zVel = -zv;
-	}
-
-	spark->friction = 3;
-	if (GetRandomControl() & 1)
-	{
-		spark->flags = 538;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-		else
-			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-	}
-	else
-	{
-		spark->flags = 522;
-	}
-	spark->scalar = 1;
-	int size = (GetRandomControl() & 0x3F) + 72;
-	if (hit)
-	{
-		spark->maxYvel = 0;
-		spark->sSize = spark->size = spark->dSize = size >> 3;
-		spark->gravity = 0;
-	}
-	else
-	{
-		spark->sSize = spark->size = size >> 4;
-		spark->gravity = -4 - (GetRandomControl() & 3);
-		spark->dSize = size;
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-	}
 }
 
 void KillAllCurrentItems(short itemNumber)

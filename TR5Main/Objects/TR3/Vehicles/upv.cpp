@@ -3,20 +3,20 @@
 #include "lara.h"
 #include "items.h"
 #include "sphere.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "collide.h"
-#include "box.h"
+#include "control/box.h"
 #include "lara_flare.h"
-#include "draw.h"
-#include "effects\tomb4fx.h"
-#include "misc.h"
+#include "animation.h"
 #include "camera.h"
 #include "setup.h"
-#include "effects\bubble.h"
+#include "effects/bubble.h"
 #include "level.h"
 #include "input.h"
 #include "savegame.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
+#include "upv_info.h"
+#include "control/los.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
@@ -427,23 +427,23 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
 
-	coll->badPos = NO_BAD_POS;
-	coll->badNeg = -SUB_HEIGHT;
-	coll->badCeiling = SUB_HEIGHT;
-	coll->old.x = v->pos.xPos;
-	coll->old.y = v->pos.yPos;
-	coll->old.z = v->pos.zPos;
-	coll->radius = SUB_RADIUS;
-	coll->slopesAreWalls = false;
-	coll->slopesArePits = false;
-	coll->lavaIsPit = false;
-	coll->enableSpaz = false;
-	coll->enableBaddiePush = true;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -SUB_HEIGHT;
+	coll->Setup.BadCeilingHeight = SUB_HEIGHT;
+	coll->Setup.OldPosition.x = v->pos.xPos;
+	coll->Setup.OldPosition.y = v->pos.yPos;
+	coll->Setup.OldPosition.z = v->pos.zPos;
+	coll->Setup.Radius = SUB_RADIUS;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
-		coll->facing = Lara.moveAngle = v->pos.yRot;
+		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;
 	else
-		coll->facing = Lara.moveAngle = v->pos.yRot - ANGLE(180);
+		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot - ANGLE(180);
 
 	height = phd_sin(v->pos.xRot) * SUB_LENGTH;
 	if (height < 0)
@@ -451,12 +451,13 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	if (height < 200)
 		height = 200;
 
-	coll->badNeg = -height;
+	coll->Setup.BadHeightUp = -height;
+	coll->Setup.Height = height;
 
-	GetCollisionInfo(coll, v->pos.xPos, v->pos.yPos + height / 2, v->pos.zPos, v->roomNumber, height);
+	GetObjectCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
 	ShiftItem(v, coll);
 
-	if (coll->collType == CT_FRONT)
+	if (coll->CollisionType == CT_FRONT)
 	{
 		if (sub->RotX > FRONT_TOLERANCE)
 			sub->RotX += WALLDEFLECT;
@@ -473,29 +474,29 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			sub->Vel = 0;
 		}
 	}
-	else if (coll->collType == CT_TOP)
+	else if (coll->CollisionType == CT_TOP)
 	{
 		if (sub->RotX >= -TOP_TOLERANCE)
 			sub->RotX -= WALLDEFLECT;
 	}
-	else if (coll->collType == CT_TOP_FRONT)
+	else if (coll->CollisionType == CT_TOP_FRONT)
 		sub->Vel = 0;
-	else if (coll->collType == CT_LEFT)
+	else if (coll->CollisionType == CT_LEFT)
 		v->pos.yRot += ANGLE(5);
-	else if (coll->collType == CT_RIGHT)
+	else if (coll->CollisionType == CT_RIGHT)
 		v->pos.yRot -= ANGLE(5);
-	else if (coll->collType == CT_CLAMP)
+	else if (coll->CollisionType == CT_CLAMP)
 	{
-		v->pos.xPos = coll->old.x;
-		v->pos.yPos = coll->old.y;
-		v->pos.zPos = coll->old.z;
+		v->pos.xPos = coll->Setup.OldPosition.x;
+		v->pos.yPos = coll->Setup.OldPosition.y;
+		v->pos.zPos = coll->Setup.OldPosition.z;
 		sub->Vel = 0;
 		return;
 	}
 
-	if (coll->middle.Floor < 0)
+	if (coll->Middle.Floor < 0)
 	{
-		v->pos.yPos += coll->middle.Floor;
+		v->pos.yPos += coll->Middle.Floor;
 		sub->RotX += WALLDEFLECT;
 	}
 }
@@ -621,9 +622,11 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 					l->goalAnimState = SUBS_GETOFFS;
 				else
 					l->goalAnimState = SUBS_GETOFF;
+
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
-				StopSoundEffect(346);
-				SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
+
+				StopSoundEffect(SFX_TR3_LITTLE_SUB_LOOP);
+				SoundEffect(SFX_TR3_LITTLE_SUB_STOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 			}
 		}
 
@@ -644,7 +647,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			v->pos.xRot += ANGLE(1);
 
 			if (frame == GETONSURF_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETONSURF_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -653,7 +656,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		else if (anim == SUB_GETON_A)
 		{
 			if (frame == GETON_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETON_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -691,7 +694,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->gravityStatus = false;
 			l->pos.xRot = l->pos.zRot = 0;
 
-			UpdateLaraRoom(l, 0);
+			UpdateItemRoom(l, 0);
 
 			Lara.waterStatus = LW_UNDERWATER;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -731,7 +734,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->gravityStatus = false;
 			l->pos.xRot = l->pos.zRot = 0;
 
-			UpdateLaraRoom(l, -LARA_HEIGHT / 2);
+			UpdateItemRoom(l, -LARA_HEIGHT / 2);
 
 			Lara.waterStatus = LW_SURFACE;
 			Lara.waterSurfaceDist = -hfw;
@@ -830,11 +833,10 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 void SubInitialise(short itemNum)
 {
 	ITEM_INFO* v;
-	SUB_INFO* sub;
 
 	v = &g_Level.Items[itemNum];
-	sub = game_malloc<SUB_INFO>();
-	v->data = (void*)sub;
+	v->data = SUB_INFO();
+	SUB_INFO* sub = v->data;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
 	sub->WeaponTimer = 0;
@@ -845,7 +847,7 @@ void NoGetOnCollision(short item_num, ITEM_INFO *laraitem, COLL_INFO *coll)
 	ITEM_INFO	*item;
 
 	item = &g_Level.Items[item_num];
-	if (!TestBoundsCollide(item, laraitem, coll->radius))
+	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
 		return;
 	if (!TestCollision(item, laraitem))
 		return;
@@ -886,7 +888,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->pos.yRot = v->pos.yRot;
 		l->pos.zRot = v->pos.zRot;
 
-		if (Lara.waterStatus == LW_SURFACE)
+		if (l->currentAnimState == LS_ONWATER_STOP || l->currentAnimState == LS_ONWATER_FORWARD)
 		{
 			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETONSURF_A;
 			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, SUB_GETONSURF_A, 0);
@@ -956,7 +958,7 @@ int SubControl(void)
 
 			if (!(sub->Flags & UPV_SURFACE))
 			{
-				SoundEffect(36, &LaraItem->pos, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 				sub->Flags &= ~UPV_DIVE;
 			}
 
@@ -969,7 +971,7 @@ int SubControl(void)
 
 			if (!(sub->Flags & UPV_SURFACE))
 			{
-				SoundEffect(36, &LaraItem->pos, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 				sub->Flags &= ~UPV_DIVE;
 			}
 
@@ -1004,7 +1006,7 @@ int SubControl(void)
 		}
 	}
 
-	TestTriggers(v, false, NULL);
+	TestTriggers(v, false);
 	SubEffects(Lara.Vehicle);
 
 	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))
@@ -1037,7 +1039,7 @@ int SubControl(void)
 		BackgroundCollision(v, l, sub);
 
 		if (sub->Flags & UPV_CONTROL)
-			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
+			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);

@@ -3,8 +3,11 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "control.h"
-#include "effects\effects.h"
+#include "control/control.h"
+#include "floordata.h"
+#include "effects/effects.h"
+
+using namespace TEN::Floordata;
 
 void ClearItem(short itemNum)
 {
@@ -12,7 +15,7 @@ void ClearItem(short itemNum)
 	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 	item->collidable = true;
-	item->data = NULL;
+	item->data = nullptr;
 	item->startPos = item->pos;
 }
 
@@ -270,8 +273,6 @@ short CreateNewEffect(short roomNum)
 
 void InitialiseFXArray(int allocmem)
 {
-	if (allocmem)
-		EffectList = game_malloc<FX_INFO>(NUM_EFFECTS);
 
 	FX_INFO* fx;
 
@@ -382,7 +383,6 @@ void InitialiseItem(short itemNum)
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
-	item->data = NULL;
 	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)
@@ -408,14 +408,16 @@ void InitialiseItem(short itemNum)
 	item->nextItem = r->itemNumber;
 	r->itemNumber = itemNum;
 
-	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	item->floor = floor->floor * 256;
-	item->boxNumber = floor->box;
+	FLOOR_INFO* floor = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	item->floor = floor->FloorHeight(item->pos.xPos, item->pos.zPos);
+	item->boxNumber = floor->Box;
+
+	item->mutator.resize(Objects[item->objectNumber].nmeshes);
+	for (int i = 0; i < item->mutator.size(); i++)
+		item->mutator[i] = {};
 
 	if (Objects[item->objectNumber].initialise != NULL)
-	{
 		Objects[item->objectNumber].initialise(itemNum);
-	}
 }
 
 short CreateItem()
@@ -490,7 +492,19 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-std::vector<int> FindItem(short objectNumber)
+void UpdateItemRoom(ITEM_INFO* item, int height)
+{
+	int x = item->pos.xPos;
+	int y = height + item->pos.yPos;
+	int z = item->pos.zPos;
+	item->location = GetRoom(item->location, x, y, z);
+	item->floor = GetFloorHeight(item->location, x, z).value_or(NO_HEIGHT);
+
+	if (item->roomNumber != item->location.roomNumber)
+		ItemNewRoom(FindItem(item), item->location.roomNumber);
+}
+
+std::vector<int> FindAllItems(short objectNumber)
 {
 	std::vector<int> itemList;
 
@@ -503,7 +517,7 @@ std::vector<int> FindItem(short objectNumber)
 	return itemList;
 }
 
-ITEM_INFO* find_a_fucking_item(int object_number)
+ITEM_INFO* FindItem(int object_number)
 {
 	ITEM_INFO* item;
 
@@ -516,4 +530,16 @@ ITEM_INFO* find_a_fucking_item(int object_number)
 	}
 
 	return 0;
+}
+
+int FindItem(ITEM_INFO* item)
+{
+	if (item == LaraItem)
+		return Lara.itemNumber;
+
+	for (int i = 0; i < g_Level.NumItems; i++)
+		if (item == &g_Level.Items[i])
+			return i;
+
+	return -1;
 }

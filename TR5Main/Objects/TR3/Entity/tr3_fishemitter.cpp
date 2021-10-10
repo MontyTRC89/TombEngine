@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr3_fishemitter.h"
-#include "effects\effects.h"
-#include "draw.h"
+#include "animation.h"
 #include "level.h"
 #include "lara.h"
 #include "fish.h"
-#include "control.h"
+#include "control/control.h"
+#include "effects\effects.h"
+#include "items.h"
 
 #define PIRAHNA_DAMAGE 4
 #define X 0

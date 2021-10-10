@@ -1,7 +1,17 @@
 #include "framework.h"
 #include "generic_trapdoor.h"
 #include "lara.h"
+#include "floordata.h"
 #include "input.h"
+#include "camera.h"
+#include "control/control.h"
+#include "level.h"
+#include "animation.h"
+#include "items.h"
+#include "Renderer11.h"
+using namespace TEN::Renderer;
+
+using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -13,7 +23,7 @@ void InitialiseTrapDoor(short itemNumber)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	TEN::Floordata::AddBridge(itemNumber);
+	TEN::Floordata::UpdateBridgeItem(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 
@@ -28,15 +38,14 @@ void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item;
-	int result, result2;
+	auto item = &g_Level.Items[itemNumber];
+	bool itemIsAbove = item->pos.yPos <= l->pos.yPos - LARA_HEIGHT + LARA_HEADROOM;
+	bool result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
+	l->pos.yRot += ANGLE(180);
+	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
+	l->pos.yRot += ANGLE(180);
 
-	item = &g_Level.Items[itemNumber];
-	result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
-	result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && itemIsAbove && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -76,7 +85,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
@@ -172,14 +181,12 @@ void OpenTrapDoor(short itemNumber)
 
 int TrapDoorFloorBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return item->pos.yPos;
+	return GetBridgeBorder(itemNumber, false);
 }
 
 int TrapDoorCeilingBorder(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	return (item->pos.yPos + 128);
+	return GetBridgeBorder(itemNumber, true);
 }
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
@@ -188,8 +195,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -199,6 +205,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!item->meshBits || item->itemFlags[2] == 0)
 		return std::nullopt;
 
-	int height = item->pos.yPos + 32;
-	return std::optional{ height };
+	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
 }

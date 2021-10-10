@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "tr2_mercenary.h"
-#include "box.h"
+#include "control/box.h"
 #include "people.h"
 #include "setup.h"
 #include "level.h"
-#include "control.h"
+#include "control/control.h"
 #include "Specific\trmath.h"
+#include "itemdata/creature_info.h"
+#include "items.h"
 
 BITE_INFO mercUziBite = { 0, 150, 19, 17 };
 BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };

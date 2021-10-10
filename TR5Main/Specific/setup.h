@@ -1,7 +1,18 @@
 #pragma once
-#include "box.h"
-#include "collide.h"
+
 #include "objectslist.h"
+#include "phd_global.h"
+
+struct ITEM_INFO;
+struct COLL_INFO;
+enum ZoneType : char;
+
+constexpr auto UNIT_SHADOW = 256;
+constexpr auto NO_SHADOW = 0;
+constexpr auto DEFAULT_RADIUS = 10;
+constexpr auto ROT_X = 0x0004;
+constexpr auto ROT_Y = 0x0008;
+constexpr auto ROT_Z = 0x0010;
 
 enum HitEffectEnum
 {
@@ -11,6 +22,13 @@ enum HitEffectEnum
     HIT_RICOCHET,
 	HIT_SPECIAL,
     MAX_HIT_EFFECT
+};
+
+enum ShatterType
+{
+	SHT_NONE,
+	SHT_FRAGMENT,
+	SHT_EXPLODE
 };
 
 struct OBJECT_INFO
@@ -63,7 +81,6 @@ struct STATIC_INFO
 	BOUNDING_BOX visibilityBox;
 	BOUNDING_BOX collisionBox;
 	int shatterType;
-	int shatterDamage;
 	int shatterSound;
 };
 
@@ -72,9 +89,6 @@ constexpr auto SF_NO_COLLISION = 0x01;
 constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6;
 constexpr auto SWAMP_GRAVITY = 2;
-constexpr auto SHT_NONE = 0;
-constexpr auto SHT_EXPLODE = 1;
-constexpr auto SHT_FRAGMENT = 2;
 
 extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];

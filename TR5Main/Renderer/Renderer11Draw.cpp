@@ -4,7 +4,7 @@
 #include "savegame.h"
 #include "health.h"
 #include "camera.h"
-#include "draw.h"
+#include "animation.h"
 #ifdef NEW_INV
 #include "newinv2.h"
 #else
@@ -14,10 +14,9 @@
 #include "gameflow.h"
 #include "rope.h"
 #include "effects\tomb4fx.h"
-#include "door.h"
 #include "level.h"
 #include "setup.h"
-#include "control.h"
+#include "control/control.h"
 #include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
@@ -27,10 +26,15 @@
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 #include "effects\hair.h"
+#include "effects\weather.h"
 #include "winmain.h"
 #include <chrono>
 #include <Objects/Effects/tr4_locusts.h>
 #include <control\volume.h>
+#include "items.h"
+#include "Game/rope.h"
+
+using namespace TEN::Game::Rope;
 
 extern TEN::Renderer::RendererHUDBar *g_DashBar;
 extern TEN::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -64,13 +68,16 @@ namespace TEN::Renderer
         y *= (ScreenHeight / 600.0f);
 
 #ifdef NEW_INV
-        INVOBJ* objme;
+		auto index = convert_obj_to_invobj(objectNum);
 
-        objme = &inventry_objects_list[convert_obj_to_invobj(objectNum)];
-        y += objme->yoff;
-        rotX += objme->xrot;
-        rotY += objme->yrot;
-        rotZ += objme->zrot;
+		if (index != -1)
+		{
+			auto objme = &inventry_objects_list[index];
+			y    += objme->yoff;
+			rotX += objme->xrot;
+			rotY += objme->yrot;
+			rotZ += objme->zrot;
+		}
 #endif
 
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
@@ -417,7 +424,7 @@ namespace TEN::Renderer
             m_swapChain->Present(0, 0);
         }
 
-        for (int i = 0; i < 30 * 1.5f; i++)
+        for (int i = 0; i < 20; i++)
         {
             drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
@@ -985,6 +992,8 @@ namespace TEN::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | ((pause_selected_option & (1 << 4)) ? PRINTSTRING_BLINK : 0));
             break;
         }
+		drawLines2D();
+		drawRects2D();
         drawAllStrings();
     }
 
@@ -1112,9 +1121,11 @@ namespace TEN::Renderer
         rect.bottom = ScreenHeight;
 
         m_lines2DToDraw.clear();
+		m_rects2DToDraw.clear();
         m_strings.clear();
 
         m_nextLine2D = 0;
+		m_nextRect2D = 0;
 
         // Set basic render states
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
@@ -1218,19 +1229,13 @@ namespace TEN::Renderer
 
         if (GLOBAL_invMode == IM_PAUSE)
         {
-            bool drawThing;
             if (pause_menu_to_display == pause_main_menu || pause_menu_to_display == pause_options_menu)
-                drawThing = 1;
-            else
-                drawThing = 0;
-
-            if (drawThing)
             {
-                guiRect.left = 345;
-                guiRect.right = 115;
+                guiRect.left  = pause_menu_to_display == pause_main_menu ? 335 : 295;
+                guiRect.right = pause_menu_to_display == pause_main_menu ? 135 : 215;
                 guiRect.top = 265;
                 guiRect.bottom = 100;
-                drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
+                addQuad2D(guiRect, 0, 0, 64, 180);
             }
 
             renderPauseMenu();
@@ -1958,125 +1963,47 @@ namespace TEN::Renderer
     }
 
     void Renderer11::drawRopes(RenderView& view)
-{
-        for (int n = 0; n < NumRopes; n++)
+    {
+        for (int n = 0; n < Ropes.size(); n++)
         {
-            ROPE_STRUCT *rope = &Ropes[n];
+            ROPE_STRUCT* rope = &Ropes[n];
 
             if (rope->active)
             {
-                // Original algorithm:
-                // 1) Transform segment coordinates from 3D to 2D + depth
-                // 2) Get dx, dy and the segment length
-                // 3) Get sine and cosine from dx / length and dy / length
-                // 4) Calculate a scale factor
-                // 5) Get the coordinates of the 4 corners of each sprite iteratively
-                // 6) Last step only for us, unproject back to 3D coordinates
+                Matrix world = Matrix::CreateTranslation(
+                    rope->position.x,
+                    rope->position.y,
+                    rope->position.z
+                );
 
-                // Tranform rope points
-                Vector3 projected[24];
-                Matrix world = Matrix::Identity;
+                Vector3 absolute[24];
 
-                for (int i = 0; i < 24; i++)
+                for (int n = 0; n < ROPE_SEGMENTS; n++)
                 {
-                    Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
-                                                       rope->position.y + rope->segment[i].y / 65536.0f,
-                                                       rope->position.z + rope->segment[i].z / 65536.0f);
+                    PHD_VECTOR* s = &rope->meshSegment[n];
+                    Vector3 t;
+                    Vector3 output;
 
-                    projected[i] = m_viewportToolkit.Project(absolutePosition, Projection, View, world);
+                    t.x = s->x >> FP_SHIFT;
+                    t.y = s->y >> FP_SHIFT;
+                    t.z = s->z >> FP_SHIFT;
+
+                    output = Vector3::Transform(t, world);
+
+                    Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
+                    absolute[n] = absolutePosition;
                 }
 
-                // Now each rope point is transformed in screen X, Y and Z depth
-                // Let's calculate dx, dy corrections and scaling
-                float dx = projected[1].x - projected[0].x;
-                float dy = projected[1].y - projected[0].y;
-                float length = sqrt(dx * dx + dy * dy);
-                float s = 0;
-                float c = 0;
-
-                if (length != 0)
+                for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
                 {
-                    s = -dy / length;
-                    c = dx / length;
-                }
-
-                float w = 6.0f;
-                if (projected[0].z)
-                {
-                    w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
-                    if (w < 3)
-                        w = 3;
-                }
-
-                float sdx = s * w;
-                float sdy = c * w;
-
-                float x1 = projected[0].x - sdx;
-                float y1 = projected[0].y - sdy;
-
-                float x2 = projected[0].x + sdx;
-                float y2 = projected[0].y + sdy;
-
-                float depth = projected[0].z;
-
-                for (int j = 0; j < 24; j++)
-                {
-                    Vector3 p1 = m_viewportToolkit.Unproject(Vector3(x1, y1, depth), Projection, View, world);
-                    Vector3 p2 = m_viewportToolkit.Unproject(Vector3(x2, y2, depth), Projection, View, world);
-
-                    dx = projected[j].x - projected[j - 1].x;
-                    dy = projected[j].y - projected[j - 1].y;
-                    length = sqrt(dx * dx + dy * dy);
-                    s = 0;
-                    c = 0;
-
-                    if (length != 0)
-                    {
-                        s = -dy / length;
-                        c = dx / length;
-                    }
-
-                    w = 6.0f;
-                    if (projected[j].z)
-                    {
-                        w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
-                        if (w < 3)
-                            w = 3;
-                    }
-
-                    float sdx = s * w;
-                    float sdy = c * w;
-
-                    float x3 = projected[j].x - sdx;
-                    float y3 = projected[j].y - sdy;
-
-                    float x4 = projected[j].x + sdx;
-                    float y4 = projected[j].y + sdy;
-
-                    depth = projected[j].z;
-
-                    Vector3 p3 = m_viewportToolkit.Unproject(Vector3(x3, y3, depth), Projection, View, world);
-                    Vector3 p4 = m_viewportToolkit.Unproject(Vector3(x4, y4, depth), Projection, View, world);
-
-                    addSprite3D(&m_sprites[20],
-                                Vector3(p1.x, p1.y, p1.z),
-                                Vector3(p2.x, p2.y, p2.z),
-                                Vector3(p3.x, p3.y, p3.z),
-                                Vector3(p4.x, p4.y, p4.z),
-                                Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0, 1, { 0, 0 }, BLENDMODE_OPAQUE,view);
-
-                    x1 = x4;
-                    y1 = y4;
-                    x2 = x3;
-                    y2 = y3;
+                    addLine3D(absolute[n], absolute[n + 1], Vector4::One);
                 }
             }
         }
-
     }
 
-    void Renderer11::drawLines2D(RenderView& view)
-{
+    void Renderer11::drawLines2D()
+	{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -2126,8 +2053,55 @@ namespace TEN::Renderer
         m_context->RSSetState(m_states->CullCounterClockwise());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
     }
+	
+	void Renderer11::drawRects2D()
+	{
+		m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
+
+		m_context->RSSetState(m_states->CullNone());
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+		float factorW = ScreenWidth / 800.0f;
+		float factorH = ScreenHeight / 600.0f;
+		int shiftW = 4 * factorW;
+		int shiftH = 4 * factorH;
+
+		m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->AlphaBlend(), NULL, m_states->DepthRead());
+
+		for (int i = 0; i < m_rects2DToDraw.size(); i++)
+		{
+			auto rawRect = m_rects2DToDraw[i]->Rectangle;
+			auto color = m_rects2DToDraw[i]->Color / 255.0f;
+
+			RECT rect;
+			rect.top = rawRect.top * factorH;
+			rect.left = rawRect.left * factorW;
+			rect.bottom = (rawRect.top + rawRect.bottom) * factorH;
+			rect.right = (rawRect.left + rawRect.right) * factorW;
+
+
+			m_spriteBatch->Draw(m_whiteTexture.ShaderResourceView.Get(), rect, color);
+
+			auto r = m_rects2DToDraw[i]->Color.x * 0.5f;
+			auto g = m_rects2DToDraw[i]->Color.y * 0.5f;
+			auto b = m_rects2DToDraw[i]->Color.z * 0.5f;
+			auto a = m_rects2DToDraw[i]->Color.w;
+
+			addLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, r, g, b, a);
+			addLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, r, g, b, a);
+			addLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, r, g, b, a);
+			addLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, r, g, b, a);
+		}
+
+		m_spriteBatch->End();
+
+		m_context->RSSetState(m_states->CullCounterClockwise());
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+	}
 
     void Renderer11::drawSpiders(RenderView& view)
 {
@@ -2195,8 +2169,8 @@ namespace TEN::Renderer
         }*/
     }
 
-    void Renderer11::drawRats(RenderView& view) {
-		/*
+    void Renderer11::drawRats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2221,7 +2195,7 @@ namespace TEN::Renderer
                 {
                     RendererMesh *mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-                    Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+                    Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot), TO_RAD(rat->pos.zRot));
                     Matrix world = rotation * translation;
 
                     m_stItem.World = world;
@@ -2229,24 +2203,23 @@ namespace TEN::Renderer
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem, m_context.Get());
 
-                    for (int b = 0; b < 2; b++)
-                    {
-                        RendererBucket *bucket = &mesh->Buckets[b];
+					for (int b = 0; b < mesh->buckets.size(); b++)
+					{
+						RendererBucket* bucket = &mesh->buckets[b];
 
-                        if (bucket->Vertices.size() == 0)
-                            continue;
+						if (bucket->Vertices.size() == 0)
+							continue;
 
-                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                        m_numDrawCalls++;
-                    }
+						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+						m_numDrawCalls++;
+					}
                 }
             }
         }
-		*/
     }
 
-    void Renderer11::drawBats(RenderView& view) {
-		/*
+    void Renderer11::drawBats(RenderView& view) 
+	{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2264,9 +2237,9 @@ namespace TEN::Renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int b = 0; b < 2; b++)
+			for (int b = 0; b < mesh->buckets.size(); b++)
             {
-                RendererBucket *bucket = &mesh->Buckets[b];
+				RendererBucket* bucket = &mesh->buckets[b];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
@@ -2278,7 +2251,7 @@ namespace TEN::Renderer
                     if (bat->on)
                     {
                         Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
-                        Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+                        Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(bat->pos.yRot), TO_RAD(bat->pos.xRot), TO_RAD(bat->pos.zRot));
                         Matrix world = rotation * translation;
 
                         m_stItem.World = world;
@@ -2292,7 +2265,6 @@ namespace TEN::Renderer
                 }
             }
         }
-		*/
     }
 
     void Renderer11::drawScarabs(RenderView& view) {
@@ -2443,35 +2415,46 @@ namespace TEN::Renderer
 
 	void Renderer11::addSphere(Vector3 center, float radius, Vector4 color)
 	{
-		if (m_nextLine3D >= MAX_LINES_3D)
-			return;
+		constexpr auto subdivisions = 10;
+		constexpr auto steps = 6;
+		constexpr auto step = PI / steps;
 
-		auto line1 = &m_lines3DBuffer[m_nextLine3D++];
-		line1->start = Vector3(center.x - radius, center.y, center.z); 
-		line1->end   = Vector3(center.x + radius, center.y, center.z);
-		line1->color = color;
+		std::array<Vector3, 3> prevPoint;
 
-		m_lines3DToDraw.push_back(line1);
+		for (int s = 0; s < steps; s++)
+		{
+			auto x = sin(step * (float)s) * radius;
+			auto z = cos(step * (float)s) * radius;
+			float currAngle = 0.0f;
 
-		auto line2 = &m_lines3DBuffer[m_nextLine3D++];
-		line2->start = Vector3(center.x, center.y - radius, center.z);
-		line2->end   = Vector3(center.x, center.y + radius, center.z);
-		line2->color = color;
-		m_lines3DToDraw.push_back(line2);
+			for (int i = 0; i < subdivisions; i++)
+			{
 
-		auto line3 = &m_lines3DBuffer[m_nextLine3D++];
-		line3->start = Vector3(center.x, center.y, center.z - radius);
-		line3->end   = Vector3(center.x, center.y, center.z + radius);
-		line3->color = color;
-		m_lines3DToDraw.push_back(line3);
+				std::array<Vector3, 3> point =
+				{
+					center + Vector3(sin(currAngle) * abs(x), z, cos(currAngle) * abs(x)),
+					center + Vector3(cos(currAngle) * abs(x), sin(currAngle) * abs(x), z),
+					center + Vector3(z, sin(currAngle) * abs(x), cos(currAngle) * abs(x))
+				};
+
+				if (i > 0)
+					for (int p = 0; p < 3; p++)
+						addLine3D(prevPoint[p], point[p], color);
+
+				prevPoint = point;
+				currAngle += ((PI * 2) / (subdivisions - 1));
+			}
+		}
 	}
 
 	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		addSphere(center, radius, color);
+#endif _DEBUG
 	}
 
 	void Renderer11::addBox(Vector3* corners, Vector4 color)
@@ -2542,19 +2525,23 @@ namespace TEN::Renderer
 
 	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		addBox(corners, color);
+#endif _DEBUG
 	}
 	
 	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
+#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		addBox(min, max, color);
+#endif _DEBUG
 	}
 
     void Renderer11::renderLoadingScreen(std::wstring& fileName)
@@ -2767,6 +2754,7 @@ namespace TEN::Renderer
 		m_nextSprite = 0;
 		m_nextLine3D = 0;
 		m_nextLine2D = 0;
+		m_nextRect2D = 0;
 
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
@@ -2813,7 +2801,7 @@ namespace TEN::Renderer
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
-        drawHorizonAndSky(depthTarget);
+        drawHorizonAndSky(view, depthTarget);
 		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
 
         drawRooms(false, false, view);
@@ -2866,12 +2854,13 @@ namespace TEN::Renderer
         //drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
-        drawEnergyArcs(view);
+        drawLightning(view);
 
         drawRopes(view);
         drawSprites(view);
         drawLines3D(view);
-		drawLines2D(view);
+		drawRects2D();
+		drawLines2D();
 
         // Bars
         int flash = FlashIt();
@@ -2919,7 +2908,7 @@ namespace TEN::Renderer
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
-        drawHorizonAndSky(depthTarget);
+        drawHorizonAndSky(view, depthTarget);
         drawRooms(false, false, view);
     }
 
@@ -2964,23 +2953,12 @@ namespace TEN::Renderer
             RendererRoom &const room = m_rooms[item->Item->roomNumber];
             RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
-            short objectNumber = item->Item->objectNumber;
-            if (moveableObj.DoNotDraw)
-            {
-                continue;
-            }
-            else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2 
-                || objectNumber == ID_JOBY_SPIKES)
-            {
-                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
-                drawScaledSpikes(view,item, transparent, animated);
-            }
-            else if (objectNumber == ID_EXPANDING_PLATFORM)
-            {
-                // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
-                drawExpandingPlatform(view, item, transparent, animated);
-            }
-            else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+			if (moveableObj.DoNotDraw)
+				continue;
+            
+			short objectNumber = item->Item->objectNumber;
+
+            if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
             {
                 // We'll draw waterfalls later
                 continue;
@@ -2991,6 +2969,11 @@ namespace TEN::Renderer
 				drawAnimatingItem(view,item, transparent, animated);
 				drawWraithExtra(view,item, transparent, animated);
 			}
+            else if (objectNumber == ID_DARTS)
+            {
+                //TODO: for now legacy way, in the future mesh
+                drawDarts(view, item, transparent, animated);
+            }
             else
             {
                 drawAnimatingItem(view,item, transparent, animated);
@@ -3058,30 +3041,23 @@ namespace TEN::Renderer
 				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
 			}
         }
-
     }
 
-    void Renderer11::drawScaledSpikes(RenderView& view,RendererItem* item, bool transparent, bool animated)
+    void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
     {
-        short objectNumber = item->Item->objectNumber;
-        if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
-        {
-            item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
-            item->World = item->Scale * item->Rotation * item->Translation;
+        Vector3 start = Vector3(
+            item->Item->pos.xPos,
+            item->Item->pos.yPos,
+            item->Item->pos.zPos);
 
-            return drawAnimatingItem(view,item, transparent, animated);
-        }
-    }
+        float speed = (-96 * phd_cos(TO_RAD(item->Item->pos.xRot)));
 
-    void Renderer11::drawExpandingPlatform(RenderView& view, RendererItem* item, bool transparent, bool animated)
-    {
-        short objectNumber = item->Item->objectNumber;
-        float xTranslate = item->Item->pos.yRot == ANGLE(90) ? CLICK(2) : item->Item->pos.yRot == ANGLE(270) ? -CLICK(2) : 0.0f;
-        float zTranslate = item->Item->pos.yRot == 0 ? CLICK(2) : item->Item->pos.yRot == ANGLE(180) ? -CLICK(2) : 0.0f;
-        item->Translation *=  Matrix::CreateTranslation(xTranslate, 0.0f, zTranslate);
-        item->Scale = Matrix::CreateScale(1.0f, 1.0f, item->Item->itemFlags[1] / 4096.0f);
-        item->World = item->Scale * item->Rotation * item->Translation;
-        return drawAnimatingItem(view, item, transparent, animated);
+        Vector3 end = Vector3(
+            item->Item->pos.xPos + speed * phd_sin(TO_RAD(item->Item->pos.yRot)),
+            item->Item->pos.yPos + 96 * phd_sin(TO_RAD(item->Item->pos.xRot)),
+            item->Item->pos.zPos + speed * phd_cos(TO_RAD(item->Item->pos.yRot)));
+
+        addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
@@ -3167,19 +3143,20 @@ namespace TEN::Renderer
         {
             MESH_INFO *msh = view.staticsToDraw[i]->Mesh;
 
-            /*if (!(msh->flags & 1))
-                continue;*/
+            if (!(msh->flags & 1))
+                continue;
 
             RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
-
+            if(!m_staticObjects[msh->staticNumber])
+                continue;
             RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
 
             if (staticObj.ObjectMeshes.size() > 0)
             {
                 RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-                m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-                m_stStatic.Position = Vector4(msh->x,msh->y,msh->z,1);
+                m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->pos.yRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+                m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
                 m_stStatic.Color = msh->color;
                 m_cbStatic.updateData(m_stStatic, m_context.Get());
                 m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
@@ -3312,38 +3289,27 @@ namespace TEN::Renderer
         }
     }
 
-    void Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget)
-    {
-        // Update the sky
-        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
-        Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
-		if (!level->Horizon || !(m_rooms[Camera.pos.roomNumber].Room->flags & ENV_FLAG_OUTSIDE))
+    void Renderer11::drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
+    {
+        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+
+		bool anyOutsideRooms = false;
+		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
+		{
+			auto room = renderView.roomsToDraw[k]->Room;
+			if (room->flags & ENV_FLAG_OUTSIDE)
+			{
+				anyOutsideRooms = true;
+				break;
+			}
+		}
+
+		if (!level->Horizon || !anyOutsideRooms)
             return ;
 
         if (BinocularRange)
             AlterFOV(14560 - BinocularRange);
-
-        // Storm
-        if (level->Storm)
-        {
-            if (LightningCount || LightningRand)
-            {
-                UpdateStorm();
-                if (StormTimer > -1)
-                    StormTimer--;
-                if (!StormTimer)
-                    SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL, 0);
-            }
-            else if (!(rand() & 0x7F))
-            {
-                LightningCount = (rand() & 0x1F) + 16;
-                dLightningRand = rand() + 256;
-                StormTimer = (rand() & 3) + 12;
-            }
-
-            color = Vector4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
-        }
 
         ID3D11SamplerState *sampler;
         UINT stride = sizeof(RendererVertex);
@@ -3408,13 +3374,18 @@ namespace TEN::Renderer
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
+
+		setBlendMode(BLEND_MODES::BLENDMODE_ADDITIVE);
+
         for (int i = 0; i < 2; i++)
         {
-            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+			auto weather = TEN::Effects::Environment::Weather;
+
+            Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyLayer1Position() - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
             Matrix world = rotation * translation;
 
             m_stStatic.World = (rotation * translation);
-            m_stStatic.Color = color;
+            m_stStatic.Color = weather.SkyColor();
             m_cbStatic.updateData(m_stStatic, m_context.Get());
             m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
             m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
@@ -3424,6 +3395,7 @@ namespace TEN::Renderer
             m_primitiveBatch->End();
         }
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+
         // Draw horizon
         if (m_moveableObjects[ID_HORIZON].has_value())
         {
@@ -3473,8 +3445,7 @@ namespace TEN::Renderer
     }
 
     void Renderer11::Draw()
-{
-
+	{
         renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
         renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
