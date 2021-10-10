@@ -88,6 +88,6 @@ void CalculateCamera();
 void LookLeftRight();
 void LookUpDown();
 void ResetLook();
-long TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, long radius);
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short rad);
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemsCollideCamera();
