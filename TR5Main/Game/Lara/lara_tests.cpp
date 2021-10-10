@@ -51,7 +51,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60;
 
-		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
+		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256 && Lara.NewAnims.CrawlVault1click)
 		{
 			if (!slope && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256) && Lara.NewAnims.CrawlVault1click)
 			{
