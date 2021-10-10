@@ -17,9 +17,9 @@ bool TestLaraStep(COLL_INFO* coll)
 
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Front.Floor >= -STEPUP_HEIGHT &&
-		coll->Middle.Floor < -STEP_SIZE / 2 &&
-		coll->Front.Floor != NO_HEIGHT &&
+	if (coll->Middle.Floor < -STEP_SIZE / 2 &&
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&
 		item->currentAnimState != LS_HOP_BACK &&
 		item->currentAnimState != LS_SPRINT)
@@ -31,9 +31,9 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 }
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Front.Floor <= STEPUP_HEIGHT &&
-		coll->Middle.Floor > STEP_SIZE / 2 &&
-		coll->Front.Floor != NO_HEIGHT &&
+	if (coll->Middle.Floor > STEP_SIZE / 2 &&
+		coll->Middle.Floor <= STEPUP_HEIGHT &&
+		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_RUN_FORWARD &&
 		item->currentAnimState != LS_HOP_BACK &&
 		item->currentAnimState != LS_SPRINT)
@@ -50,24 +50,29 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TestLaraStepUp(item, coll))
 	{
-		item->pos.yPos += coll->Middle.Floor;
-
 		item->goalAnimState = LS_STEP_UP;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
 
-		return;
+		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+		{
+			item->pos.yPos += coll->Middle.Floor;
+
+			return;
+		}
+
 	}
 	else if (TestLaraStepDown(item, coll))
 	{
-		item->pos.yPos += coll->Middle.Floor;
-
 		if (item->currentAnimState == LS_WALK_BACK)
 			item->goalAnimState = LS_STEP_BACK_DOWN;
 		else
 			item->goalAnimState = LS_STEP_DOWN;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
 
-		return;
+		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+		{
+			item->pos.yPos += coll->Middle.Floor;
+
+			return;
+		}
 	}
 
 	// Height difference is below threshold for step dispatch; translate Lara to new floor height
