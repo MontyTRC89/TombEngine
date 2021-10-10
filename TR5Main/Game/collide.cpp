@@ -1528,9 +1528,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->CollisionType = CT_TOP;
 	}
 
-	if ((coll->Front.Floor > coll->Setup.BadHeightDown)
-		|| (coll->Front.Floor < coll->Setup.BadHeightUp)
-		|| (coll->Front.Ceiling > coll->Setup.BadCeilingHeight))
+	if (coll->Front.Floor > coll->Setup.BadHeightDown ||
+		coll->Front.Floor < coll->Setup.BadHeightUp ||
+		coll->Front.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->Front.Floor - coll->Front.Ceiling <= 0)
 	{
 		if (coll->Front.HasDiagonalSplit())
 		{
@@ -1570,7 +1571,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightDown ||
 		coll->MiddleLeft.Floor < coll->Setup.BadHeightUp ||
-		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
+		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->MiddleLeft.Floor - coll->MiddleLeft.Ceiling <= 0)
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
@@ -1617,7 +1619,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	if (coll->MiddleRight.Floor > coll->Setup.BadHeightDown ||
 		coll->MiddleRight.Floor < coll->Setup.BadHeightUp ||
-		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
+		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->MiddleRight.Floor - coll->MiddleRight.Ceiling <= 0)
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
