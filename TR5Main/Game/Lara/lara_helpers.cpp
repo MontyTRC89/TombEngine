@@ -4,6 +4,8 @@
 #include "level.h"
 #include "lara.h"
 
+
+// TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
 	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
