@@ -84,7 +84,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedge(item, coll))
 	{
-		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256 && Lara.NewAnims.CrawlVault1click)
 		{
 			if (Lara.NewAnims.CrawlVault1click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
