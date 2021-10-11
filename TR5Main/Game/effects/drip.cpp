@@ -23,7 +23,13 @@ namespace Drip
 	std::array<DripParticle, NUM_DRIPS> dripParticles;
 	constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
 
-	void UpdateDrips()
+	void DisableDripParticles()
+	{
+		for (int i = 0; i < dripParticles.size(); i++)
+			dripParticles[i].active = false;
+	}
+
+	void UpdateDripParticles()
 	{
 		for (int i = 0; i < dripParticles.size(); i++) 
 		{

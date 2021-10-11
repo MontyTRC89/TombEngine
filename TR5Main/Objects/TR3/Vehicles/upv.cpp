@@ -439,6 +439,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
+	coll->Setup.NoQuadrants = false;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
 		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;
@@ -454,7 +455,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.BadHeightUp = -height;
 	coll->Setup.Height = height;
 
-	GetObjectCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
+	GetCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
 	ShiftItem(v, coll);
 
 	if (coll->CollisionType == CT_FRONT)

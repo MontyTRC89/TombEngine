@@ -64,15 +64,16 @@ struct COLL_SETUP
 {
 	bool SlopesAreWalls;    // Treat steep slopes as walls
 	bool SlopesArePits;     // Treat steep slopes as pits
-	bool DeathFlagIsPit;        // Treat death sectors as pits
+	bool DeathFlagIsPit;    // Treat death sectors as pits
 	bool EnableObjectPush;  // Can be pushed by objects
 	bool EnableSpaz;        // Push is treated as hurt
+	bool NoQuadrants;       // Use unconstrained probe rotation not bound to quadrants
 						    
 	int   Radius;           // Collision bounds horizontal size
 	int   Height;			// Collision bounds vertical size
 	short ForwardAngle;     // Forward angle direction
-	int   BadHeightDown;      // Borderline step-up height 
-	int   BadHeightUp;    // Borderline step-down height
+	int   BadHeightDown;    // Borderline step-up height 
+	int   BadHeightUp;      // Borderline step-down height
 	int   BadCeilingHeight; // Borderline ceiling height
 
 	PHD_VECTOR OldPosition; // Preserve old parameters to restore later
@@ -94,12 +95,13 @@ struct COLL_INFO
 
 	PHD_VECTOR Shift;
 	COLL_TYPE CollisionType;
+	short NearestLedgeAngle;
+	float NearestLedgeDistance;
 	int TiltX;
 	int TiltZ;
 
 	bool HitStatic;
-	bool HitTallBounds;
-	int ObjectHeadroom;
+	bool HitTallObject;
 
 	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
 	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
@@ -141,16 +143,14 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
 void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom = false);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset);
-void GetObjectCollisionInfo(COLL_INFO* coll, ITEM_INFO* item);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
-bool SnapToDiagonal(short& angle, int interval);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);

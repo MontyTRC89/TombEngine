@@ -667,7 +667,7 @@ void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
+			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -3735,7 +3735,7 @@ void old_lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallBounds || TestLaraWall(item, 256, 0, -640))
+			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640))
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
