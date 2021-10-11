@@ -184,9 +184,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		throw;
 	}
 
-	// Initialise chunks for savegames
-	SaveGame::Start();
-
 	INITCOMMONCONTROLSEX commCtrlInit;
 	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
@@ -303,6 +300,4 @@ void WinClose()
 	delete g_GameFlow;
 
 	ShutdownTENLog();
-
-	SaveGame::End();
 }
