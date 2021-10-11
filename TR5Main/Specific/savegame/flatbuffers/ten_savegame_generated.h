@@ -73,6 +73,14 @@ struct BatInfo;
 struct BatInfoBuilder;
 struct BatInfoT;
 
+struct SaveGameHeader;
+struct SaveGameHeaderBuilder;
+struct SaveGameHeaderT;
+
+struct SaveGameStatistics;
+struct SaveGameStatisticsBuilder;
+struct SaveGameStatisticsT;
+
 struct SaveGame;
 struct SaveGameBuilder;
 struct SaveGameT;
@@ -3477,8 +3485,294 @@ struct BatInfo::Traits {
 
 flatbuffers::Offset<BatInfo> CreateBatInfo(flatbuffers::FlatBufferBuilder &_fbb, const BatInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SaveGameHeaderT : public flatbuffers::NativeTable {
+  typedef SaveGameHeader TableType;
+  std::string level_name{};
+  int32_t days = 0;
+  int32_t hours = 0;
+  int32_t minutes = 0;
+  int32_t seconds = 0;
+  int32_t level = 0;
+  int32_t timer = 0;
+  int32_t count = 0;
+};
+
+struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SaveGameHeaderT NativeTableType;
+  typedef SaveGameHeaderBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LEVEL_NAME = 4,
+    VT_DAYS = 6,
+    VT_HOURS = 8,
+    VT_MINUTES = 10,
+    VT_SECONDS = 12,
+    VT_LEVEL = 14,
+    VT_TIMER = 16,
+    VT_COUNT = 18
+  };
+  const flatbuffers::String *level_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LEVEL_NAME);
+  }
+  int32_t days() const {
+    return GetField<int32_t>(VT_DAYS, 0);
+  }
+  int32_t hours() const {
+    return GetField<int32_t>(VT_HOURS, 0);
+  }
+  int32_t minutes() const {
+    return GetField<int32_t>(VT_MINUTES, 0);
+  }
+  int32_t seconds() const {
+    return GetField<int32_t>(VT_SECONDS, 0);
+  }
+  int32_t level() const {
+    return GetField<int32_t>(VT_LEVEL, 0);
+  }
+  int32_t timer() const {
+    return GetField<int32_t>(VT_TIMER, 0);
+  }
+  int32_t count() const {
+    return GetField<int32_t>(VT_COUNT, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_LEVEL_NAME) &&
+           verifier.VerifyString(level_name()) &&
+           VerifyField<int32_t>(verifier, VT_DAYS) &&
+           VerifyField<int32_t>(verifier, VT_HOURS) &&
+           VerifyField<int32_t>(verifier, VT_MINUTES) &&
+           VerifyField<int32_t>(verifier, VT_SECONDS) &&
+           VerifyField<int32_t>(verifier, VT_LEVEL) &&
+           VerifyField<int32_t>(verifier, VT_TIMER) &&
+           VerifyField<int32_t>(verifier, VT_COUNT) &&
+           verifier.EndTable();
+  }
+  SaveGameHeaderT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SaveGameHeaderT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<SaveGameHeader> Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SaveGameHeaderBuilder {
+  typedef SaveGameHeader Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_level_name(flatbuffers::Offset<flatbuffers::String> level_name) {
+    fbb_.AddOffset(SaveGameHeader::VT_LEVEL_NAME, level_name);
+  }
+  void add_days(int32_t days) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_DAYS, days, 0);
+  }
+  void add_hours(int32_t hours) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_HOURS, hours, 0);
+  }
+  void add_minutes(int32_t minutes) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_MINUTES, minutes, 0);
+  }
+  void add_seconds(int32_t seconds) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_SECONDS, seconds, 0);
+  }
+  void add_level(int32_t level) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_LEVEL, level, 0);
+  }
+  void add_timer(int32_t timer) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_TIMER, timer, 0);
+  }
+  void add_count(int32_t count) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_COUNT, count, 0);
+  }
+  explicit SaveGameHeaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<SaveGameHeader> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<SaveGameHeader>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> level_name = 0,
+    int32_t days = 0,
+    int32_t hours = 0,
+    int32_t minutes = 0,
+    int32_t seconds = 0,
+    int32_t level = 0,
+    int32_t timer = 0,
+    int32_t count = 0) {
+  SaveGameHeaderBuilder builder_(_fbb);
+  builder_.add_count(count);
+  builder_.add_timer(timer);
+  builder_.add_level(level);
+  builder_.add_seconds(seconds);
+  builder_.add_minutes(minutes);
+  builder_.add_hours(hours);
+  builder_.add_days(days);
+  builder_.add_level_name(level_name);
+  return builder_.Finish();
+}
+
+struct SaveGameHeader::Traits {
+  using type = SaveGameHeader;
+  static auto constexpr Create = CreateSaveGameHeader;
+};
+
+inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *level_name = nullptr,
+    int32_t days = 0,
+    int32_t hours = 0,
+    int32_t minutes = 0,
+    int32_t seconds = 0,
+    int32_t level = 0,
+    int32_t timer = 0,
+    int32_t count = 0) {
+  auto level_name__ = level_name ? _fbb.CreateString(level_name) : 0;
+  return TEN::Save::CreateSaveGameHeader(
+      _fbb,
+      level_name__,
+      days,
+      hours,
+      minutes,
+      seconds,
+      level,
+      timer,
+      count);
+}
+
+flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SaveGameStatisticsT : public flatbuffers::NativeTable {
+  typedef SaveGameStatistics TableType;
+  int32_t ammo_hits = 0;
+  int32_t ammo_used = 0;
+  int32_t medipacks_used = 0;
+  int32_t distance = 0;
+  int32_t kills = 0;
+  int32_t secrets = 0;
+  int32_t timer = 0;
+};
+
+struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SaveGameStatisticsT NativeTableType;
+  typedef SaveGameStatisticsBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_AMMO_HITS = 4,
+    VT_AMMO_USED = 6,
+    VT_MEDIPACKS_USED = 8,
+    VT_DISTANCE = 10,
+    VT_KILLS = 12,
+    VT_SECRETS = 14,
+    VT_TIMER = 16
+  };
+  int32_t ammo_hits() const {
+    return GetField<int32_t>(VT_AMMO_HITS, 0);
+  }
+  int32_t ammo_used() const {
+    return GetField<int32_t>(VT_AMMO_USED, 0);
+  }
+  int32_t medipacks_used() const {
+    return GetField<int32_t>(VT_MEDIPACKS_USED, 0);
+  }
+  int32_t distance() const {
+    return GetField<int32_t>(VT_DISTANCE, 0);
+  }
+  int32_t kills() const {
+    return GetField<int32_t>(VT_KILLS, 0);
+  }
+  int32_t secrets() const {
+    return GetField<int32_t>(VT_SECRETS, 0);
+  }
+  int32_t timer() const {
+    return GetField<int32_t>(VT_TIMER, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_AMMO_HITS) &&
+           VerifyField<int32_t>(verifier, VT_AMMO_USED) &&
+           VerifyField<int32_t>(verifier, VT_MEDIPACKS_USED) &&
+           VerifyField<int32_t>(verifier, VT_DISTANCE) &&
+           VerifyField<int32_t>(verifier, VT_KILLS) &&
+           VerifyField<int32_t>(verifier, VT_SECRETS) &&
+           VerifyField<int32_t>(verifier, VT_TIMER) &&
+           verifier.EndTable();
+  }
+  SaveGameStatisticsT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SaveGameStatisticsT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<SaveGameStatistics> Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameStatisticsT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SaveGameStatisticsBuilder {
+  typedef SaveGameStatistics Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_ammo_hits(int32_t ammo_hits) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_AMMO_HITS, ammo_hits, 0);
+  }
+  void add_ammo_used(int32_t ammo_used) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_AMMO_USED, ammo_used, 0);
+  }
+  void add_medipacks_used(int32_t medipacks_used) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_MEDIPACKS_USED, medipacks_used, 0);
+  }
+  void add_distance(int32_t distance) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_DISTANCE, distance, 0);
+  }
+  void add_kills(int32_t kills) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_KILLS, kills, 0);
+  }
+  void add_secrets(int32_t secrets) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_SECRETS, secrets, 0);
+  }
+  void add_timer(int32_t timer) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_TIMER, timer, 0);
+  }
+  explicit SaveGameStatisticsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<SaveGameStatistics> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<SaveGameStatistics>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t ammo_hits = 0,
+    int32_t ammo_used = 0,
+    int32_t medipacks_used = 0,
+    int32_t distance = 0,
+    int32_t kills = 0,
+    int32_t secrets = 0,
+    int32_t timer = 0) {
+  SaveGameStatisticsBuilder builder_(_fbb);
+  builder_.add_timer(timer);
+  builder_.add_secrets(secrets);
+  builder_.add_kills(kills);
+  builder_.add_distance(distance);
+  builder_.add_medipacks_used(medipacks_used);
+  builder_.add_ammo_used(ammo_used);
+  builder_.add_ammo_hits(ammo_hits);
+  return builder_.Finish();
+}
+
+struct SaveGameStatistics::Traits {
+  using type = SaveGameStatistics;
+  static auto constexpr Create = CreateSaveGameStatistics;
+};
+
+flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameStatisticsT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SaveGameT : public flatbuffers::NativeTable {
   typedef SaveGame TableType;
+  std::unique_ptr<TEN::Save::SaveGameHeaderT> header{};
+  std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
+  std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
   std::unique_ptr<TEN::Save::WeaponInfoT> active_weapon{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
@@ -3502,23 +3796,35 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef SaveGameBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_LARA = 4,
-    VT_ACTIVE_WEAPON = 6,
-    VT_ITEMS = 8,
-    VT_FIXED_CAMERAS = 10,
-    VT_SINKS = 12,
-    VT_STATIC_MESHES = 14,
-    VT_RATS = 16,
-    VT_SPIDERS = 18,
-    VT_SCARABS = 20,
-    VT_BATS = 22,
-    VT_FLIP_MAPS = 24,
-    VT_FLIP_EFFECT = 26,
-    VT_FLIP_TIMER = 28,
-    VT_FLIP_STATUS = 30,
-    VT_AMBIENT_TRACK = 32,
-    VT_CD_FLAGS = 34
+    VT_HEADER = 4,
+    VT_GAME = 6,
+    VT_LEVEL = 8,
+    VT_LARA = 10,
+    VT_ACTIVE_WEAPON = 12,
+    VT_ITEMS = 14,
+    VT_FIXED_CAMERAS = 16,
+    VT_SINKS = 18,
+    VT_STATIC_MESHES = 20,
+    VT_RATS = 22,
+    VT_SPIDERS = 24,
+    VT_SCARABS = 26,
+    VT_BATS = 28,
+    VT_FLIP_MAPS = 30,
+    VT_FLIP_EFFECT = 32,
+    VT_FLIP_TIMER = 34,
+    VT_FLIP_STATUS = 36,
+    VT_AMBIENT_TRACK = 38,
+    VT_CD_FLAGS = 40
   };
+  const TEN::Save::SaveGameHeader *header() const {
+    return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
+  }
+  const TEN::Save::SaveGameStatistics *game() const {
+    return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_GAME);
+  }
+  const TEN::Save::SaveGameStatistics *level() const {
+    return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_LEVEL);
+  }
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
   }
@@ -3569,6 +3875,12 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_HEADER) &&
+           verifier.VerifyTable(header()) &&
+           VerifyOffset(verifier, VT_GAME) &&
+           verifier.VerifyTable(game()) &&
+           VerifyOffset(verifier, VT_LEVEL) &&
+           verifier.VerifyTable(level()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
            VerifyOffset(verifier, VT_ACTIVE_WEAPON) &&
@@ -3616,6 +3928,15 @@ struct SaveGameBuilder {
   typedef SaveGame Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_header(flatbuffers::Offset<TEN::Save::SaveGameHeader> header) {
+    fbb_.AddOffset(SaveGame::VT_HEADER, header);
+  }
+  void add_game(flatbuffers::Offset<TEN::Save::SaveGameStatistics> game) {
+    fbb_.AddOffset(SaveGame::VT_GAME, game);
+  }
+  void add_level(flatbuffers::Offset<TEN::Save::SaveGameStatistics> level) {
+    fbb_.AddOffset(SaveGame::VT_LEVEL, level);
+  }
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
   }
@@ -3677,6 +3998,9 @@ struct SaveGameBuilder {
 
 inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
+    flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
+    flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
@@ -3710,6 +4034,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_items(items);
   builder_.add_active_weapon(active_weapon);
   builder_.add_lara(lara);
+  builder_.add_level(level);
+  builder_.add_game(game);
+  builder_.add_header(header);
   return builder_.Finish();
 }
 
@@ -3720,6 +4047,9 @@ struct SaveGame::Traits {
 
 inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
+    flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
+    flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
@@ -3748,6 +4078,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
+      header,
+      game,
+      level,
       lara,
       active_weapon,
       items__,
@@ -4710,6 +5043,97 @@ inline flatbuffers::Offset<BatInfo> CreateBatInfo(flatbuffers::FlatBufferBuilder
       _counter);
 }
 
+inline SaveGameHeaderT *SaveGameHeader::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<SaveGameHeaderT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SaveGameHeader::UnPackTo(SaveGameHeaderT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = level_name(); if (_e) _o->level_name = _e->str(); }
+  { auto _e = days(); _o->days = _e; }
+  { auto _e = hours(); _o->hours = _e; }
+  { auto _e = minutes(); _o->minutes = _e; }
+  { auto _e = seconds(); _o->seconds = _e; }
+  { auto _e = level(); _o->level = _e; }
+  { auto _e = timer(); _o->timer = _e; }
+  { auto _e = count(); _o->count = _e; }
+}
+
+inline flatbuffers::Offset<SaveGameHeader> SaveGameHeader::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSaveGameHeader(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _level_name = _o->level_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->level_name);
+  auto _days = _o->days;
+  auto _hours = _o->hours;
+  auto _minutes = _o->minutes;
+  auto _seconds = _o->seconds;
+  auto _level = _o->level;
+  auto _timer = _o->timer;
+  auto _count = _o->count;
+  return TEN::Save::CreateSaveGameHeader(
+      _fbb,
+      _level_name,
+      _days,
+      _hours,
+      _minutes,
+      _seconds,
+      _level,
+      _timer,
+      _count);
+}
+
+inline SaveGameStatisticsT *SaveGameStatistics::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<SaveGameStatisticsT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SaveGameStatistics::UnPackTo(SaveGameStatisticsT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = ammo_hits(); _o->ammo_hits = _e; }
+  { auto _e = ammo_used(); _o->ammo_used = _e; }
+  { auto _e = medipacks_used(); _o->medipacks_used = _e; }
+  { auto _e = distance(); _o->distance = _e; }
+  { auto _e = kills(); _o->kills = _e; }
+  { auto _e = secrets(); _o->secrets = _e; }
+  { auto _e = timer(); _o->timer = _e; }
+}
+
+inline flatbuffers::Offset<SaveGameStatistics> SaveGameStatistics::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameStatisticsT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSaveGameStatistics(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameStatisticsT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameStatisticsT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _ammo_hits = _o->ammo_hits;
+  auto _ammo_used = _o->ammo_used;
+  auto _medipacks_used = _o->medipacks_used;
+  auto _distance = _o->distance;
+  auto _kills = _o->kills;
+  auto _secrets = _o->secrets;
+  auto _timer = _o->timer;
+  return TEN::Save::CreateSaveGameStatistics(
+      _fbb,
+      _ammo_hits,
+      _ammo_used,
+      _medipacks_used,
+      _distance,
+      _kills,
+      _secrets,
+      _timer);
+}
+
 inline SaveGameT *SaveGame::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<SaveGameT>();
   UnPackTo(_o.get(), _resolver);
@@ -4719,6 +5143,9 @@ inline SaveGameT *SaveGame::UnPack(const flatbuffers::resolver_function_t *_reso
 inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<TEN::Save::SaveGameHeaderT>(_e->UnPack(_resolver)); }
+  { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
+  { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
   { auto _e = active_weapon(); if (_e) _o->active_weapon = std::unique_ptr<TEN::Save::WeaponInfoT>(_e->UnPack(_resolver)); }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -4745,6 +5172,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _header = _o->header ? CreateSaveGameHeader(_fbb, _o->header.get(), _rehasher) : 0;
+  auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
+  auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
   auto _active_weapon = _o->active_weapon ? CreateWeaponInfo(_fbb, _o->active_weapon.get(), _rehasher) : 0;
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
@@ -4763,6 +5193,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
   return TEN::Save::CreateSaveGame(
       _fbb,
+      _header,
+      _game,
+      _level,
       _lara,
       _active_weapon,
       _items,
