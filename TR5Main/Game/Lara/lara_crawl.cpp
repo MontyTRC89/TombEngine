@@ -26,7 +26,6 @@
 // Collision:	lara_col_crouch()
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.isDucked = true;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -57,7 +56,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		// TODO: Allow Lara to turn while pressing FORWARD or BACK. @Sezz 2021.09.26
+		// TODO: Allow Lara to go when pressing FORWARD or BACK. @Sezz 2021.09.26
 		if ((TrInput & (IN_FORWARD | IN_BACK))
 			&& TestLaraCrawl(item))
 		{
@@ -167,6 +166,8 @@ void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -176,8 +177,6 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
-
-	Lara.keepDucked = TestLaraStandUp(coll);
 
 	if (TestLaraFall(coll))
 	{
@@ -304,6 +303,8 @@ void old_lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -318,7 +319,6 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 		item->speed /= 3;				// In case Lara falls, truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
-		
 		SetLaraFallState(item);
 
 		return;
@@ -330,8 +330,6 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	Lara.keepDucked = TestLaraStandUp(coll);
 
 	// Hit wall or ledge
 	if (coll->Middle.Floor < coll->Setup.BadHeightUp
@@ -533,8 +531,9 @@ void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_duckl(), lara_as_duckr()
 void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -548,7 +547,6 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(coll))
 	{
 		Lara.gunStatus = LG_NO_ARMS; // Necessary? Set in WAD. @Sezz 2021.10.03
-
 		SetLaraFallState(item);
 
 		return;
@@ -560,8 +558,6 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	Lara.keepDucked = TestLaraStandUp(coll);
 
 	ShiftItem(item, coll);
 
@@ -1045,7 +1041,75 @@ void old_lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CRAWL_FORWARD (81)
+// Control:		lara_as_crawl()
 void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	//coll->Setup.BadHeightDown = STEP_SIZE / 2;
+	//coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1; // 1 required or she will crawl up steps. TODO: Height tolerance for up/down anims. @Sezz 2021.10.11
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item, true);
+
+	// TODO: Cannot crawl up low step when facing it directly.
+
+	// TODO: Generic deflect.
+	if (LaraDeflectEdgeDuck(item, coll))
+	{
+		item->currentAnimState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		if (item->animNumber != LA_CRAWL_IDLE)
+		{
+			item->animNumber = LA_CRAWL_IDLE;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		}
+
+		return;
+	}
+	
+	if (TestLaraFall(coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS;
+		SetLaraFallState(item);
+
+		return;
+	}
+	
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step.
+	/*if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+		item->pos.yPos += coll->Middle.Floor;*/
+}
+
+// LEGACY
+void old_lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*state code: lara_as_crawl*/
@@ -1089,7 +1153,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_CRAWL_BACK(86)
+// State:		LS_CRAWL_BACK (86)
 // Collision:	lara_col_crawlb()
 void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -1143,50 +1207,76 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
-// LEGACY
-void old_lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_CRAWL_BACK (86)
+// Control:		lara_as_crawlb()
+void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 86*/
-	/*collision: lara_col_crawlb*/
-	if (item->hitPoints <= 0 || Lara.waterStatus == 4)
+	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	/*coll->Setup.BadHeightDown = STEP_SIZE / 2;
+	coll->Setup.BadHeightUp = -STEP_SIZE / 2;*/
+	coll->Setup.BadHeightDown = STEP_SIZE - 1; // 1 required or she will crawl up steps. TODO: Height tolerance for up/down anims. @Sezz 2021.10.11
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item, true);
+
+	// TODO: Binoculars?
+
+	// TODO: Generic deflect.
+	if (LaraDeflectEdgeDuck(item, coll))
 	{
+		item->currentAnimState = LS_CRAWL_IDLE;
 		item->goalAnimState = LS_CRAWL_IDLE;
+
+		if (item->animNumber != LA_CRAWL_IDLE)
+		{
+			item->animNumber = LA_CRAWL_IDLE;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		}
+
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	coll->Setup.EnableSpaz = false;
-	coll->Setup.EnableObjectPush = true;
-
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-
-	Camera.targetElevation = -ANGLE(23.0f);
-
-	if (TrInput & IN_BACK)
+	if (TestLaraFall(coll))
 	{
-		if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -ANGLE(3.0f))
-				Lara.turnRate = -ANGLE(3.0f);
-		}
-		else if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > ANGLE(3.0f))
-				Lara.turnRate = ANGLE(3.0f);
-		}
+		Lara.gunStatus = LG_NO_ARMS;
+		SetLaraFallState(item);
+
+		return;
 	}
-	else
+
+	if (TestLaraSlide(item, coll))
 	{
-		item->goalAnimState = LS_CRAWL_IDLE;
+		SetLaraSlideState(item, coll);
+
+		return;
 	}
+
+	ShiftItem(item, coll);
+
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -STEP_SIZE)
+		item->pos.yPos += coll->Middle.Floor;*/
 }
 
-void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+// LEGACY
+void old_lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 86*/
 	/*state code: lara_as_crawlb*/
@@ -1385,7 +1475,26 @@ void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
+// State:		LS_CRAWL_TURN_LEFT (84), LS_CRAWL_TURN_RIGHT (85)
+// Control:		lara_as_all4turnl(), lara_as_all4turnl()
 void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	GetCollisionInfo(coll, item);
+
+	// TODO: Take out the trash. @Sezz 2021.10.11
+
+	if (!TestLaraSlide(item, coll))
+	{
+		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+			item->pos.yPos += coll->Middle.Floor;
+	}
+}
+
+// LEGACY
+void old_lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 84 and 85*/
 	/*state code: lara_as_all4turnl(84) and lara_as_all4turnr(85)*/
