@@ -970,22 +970,25 @@ struct LARA_ARM
 
 struct AnimsNew
 {
-	bool CrouchRoll;				//crouch roll
-	bool Monkey180Roll;				//the 180� roll on monkeybars
-	bool Crawl1clickup;				//going 1 click up in crawlspaces
-	bool Crawl1clickdown;			//going 1 click down in crawlspaces
-	bool CrawlExit1click;			//crawlspace exit at 1 click
-	bool CrawlExit2click;			//crawlspace exit at 2 clicks
-	bool CrawlExit3click;			//crawlspace exit at 3 clicks
-	bool CrawlVault1click;			//vault into crawlspace at 1 click
-	bool CrawlVault2click;			//vault into crawlspace at 2 clicks
-	bool CrawlVault3click;			//vault into crawlspace at 3 clicks
-	bool MonkeyVault;				//vault up to monkeybars when pressing up + action underneath them. super annoying :)
-	bool CrawlExitJump;				//TR5 crawlspace exit with jump!
-	bool SwandiveRollRun;			//the transition from swandive roll to run
-	bool OscillateHanging;			//the thin ledge grab animation from TR1 and 2
-	bool FeetHanging;				//Daniel's super awesome feet hanging
+	bool CrouchRoll;				// crouch roll
+	bool Monkey180Roll;				// the 180� roll on monkeybars
+	bool Crawl1clickup;				// going 1 click up in crawlspaces
+	bool Crawl1clickdown;			// going 1 click down in crawlspaces
+	bool CrawlExit1click;			// crawlspace exit at 1 click
+	bool CrawlExit2click;			// crawlspace exit at 2 clicks
+	bool CrawlExit3click;			// crawlspace exit at 3 clicks
+	bool CrawlVault1click;			// vault into crawlspace at 1 click
+	bool CrawlVault2click;			// vault into crawlspace at 2 clicks
+	bool CrawlVault3click;			// vault into crawlspace at 3 clicks
+	bool MonkeyVault;				// vault up to monkeybars when pressing up + action underneath them. super annoying :)
+	bool CrawlExitJump;				// TR5 crawlspace exit with jump!
+	bool SwandiveRollRun;			// the transition from swandive roll to run
+	bool OscillateHanging;			// the thin ledge grab animation from TR1 and 2
+	bool FeetHanging;				// Daniel's super awesome feet hanging
+	bool CrawlFlexWaterPullUp;
+	bool CrawlFlexSubmerged;
 };
+
 #ifdef NEW_TIGHTROPE
 struct LaraTightrope
 {

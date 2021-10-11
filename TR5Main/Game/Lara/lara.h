@@ -1,5 +1,6 @@
 #pragma once
 #include "lara_struct.h"
+
 struct ITEM_INFO;
 struct COLL_INFO;
 
@@ -15,6 +16,7 @@ struct COLL_INFO;
 #define LARA_SLOW_TURN ANGLE(4.0f)	// turn maxes
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
+#define LARA_GRAB_THRESHOLD ANGLE(30.0f)
 
 // TODO: In the future, the player model should be probed for the number of bones between the hips (exclusive) and head (inclusive).
 // Divide the flex angle by the number of bones to be flexed, and apply the result to each bone.
