@@ -2,9 +2,6 @@
 #include "winmain.h"
 #include "resource.h"
 #include "Sound/sound.h"
-#ifndef NEW_INV
-#include "inventory.h"
-#endif
 #include "control/control.h"
 #include "gameflow.h"
 #include "savegame.h"
