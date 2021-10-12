@@ -60,7 +60,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = PUZZLETYPE_SPECIFIC;
 
-	if (((TrInput & IN_ACTION || GLOBAL_inventoryitemchosen != NO_ITEM)
+	if (((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
@@ -84,18 +84,18 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			if (!Lara.isMoving)//TROYE INVENTORY FIX ME
+			if (!Lara.isMoving)
 			{
-				if (GLOBAL_inventoryitemchosen == NO_ITEM)
+				if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 				{
-					if (have_i_got_object(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
-						GLOBAL_enterinventory = item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1);
+					if (g_Inventory.have_i_got_object(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
+						g_Inventory.Set_enterInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
 					item->pos.yRot = oldYrot;
 					return;
 				}
 
-				if (GLOBAL_inventoryitemchosen != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
+				if (g_Inventory.Get_inventoryItemChosen() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
 					item->pos.yRot = oldYrot;
 					return;
@@ -109,7 +109,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (!MoveLaraPosition(&pos, item, l))
 				{
 					Lara.interactedItem = itemNum;
-					GLOBAL_inventoryitemchosen = NO_ITEM;
+					g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					item->pos.yRot = oldYrot;
 					return;
 				}
@@ -140,7 +140,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->flags |= 0x20;
 			Lara.interactedItem = itemNum;
-			GLOBAL_inventoryitemchosen = NO_ITEM;
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			item->pos.yRot = oldYrot;
 			return;
 		}
@@ -254,7 +254,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 
-	if (!((TrInput & IN_ACTION || GLOBAL_inventoryitemchosen != NO_ITEM)
+	if (!((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
@@ -273,14 +273,15 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->status != ITEM_NOT_ACTIVE)
 					return;
 
-				if (GLOBAL_inventoryitemchosen == NO_ITEM)
+				if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 				{
-					if (have_i_got_object(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
-						GLOBAL_enterinventory = item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1);
+					if (g_Inventory.have_i_got_object(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
+						g_Inventory.Set_enterInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
+
 					return;
 				}
 
-				if (GLOBAL_inventoryitemchosen != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
+				if (g_Inventory.Get_inventoryItemChosen() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
 			}
 
@@ -307,7 +308,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 				{
 					item->itemFlags[3] = 92;
-					GLOBAL_inventoryitemchosen = NO_ITEM;
+					g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					return;
 				}
 			}
@@ -316,7 +317,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.interactedItem = itemNum;
 			}
 
-			GLOBAL_inventoryitemchosen = NO_ITEM;
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			return;
 		}
 

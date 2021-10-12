@@ -143,30 +143,32 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
+			
+
+			if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				Sound_Stop();
 				g_Renderer.DumpGameScene();
-				GLOBAL_invMode = IM_PAUSE;
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
+				g_Inventory.Set_invMode(IM_PAUSE);
+				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
+				g_Inventory.Set_pause_selected_option(1);
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				Sound_Stop();
 
-				if (S_CallInventory2())
+				if (g_Inventory.S_CallInventory2())
 					return GAME_STATUS_LOAD_GAME;
 			}
 		}
 
-		while (GLOBAL_invMode == IM_PAUSE)
+		while (g_Inventory.Get_invMode() == IM_PAUSE)
 		{
-			DrawInv();
+			g_Inventory.DrawInv();
 			g_Renderer.SyncRenderer();
 
-			int z = DoPauseMenu();
+			int z = g_Inventory.DoPauseMenu();
 
 			if (z == INV_RESULT_EXIT_TO_TILE)
 				return GAME_STATUS_EXIT_TO_TITLE;
@@ -323,10 +325,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
-			if (GLOBAL_inventoryitemchosen != -1)
+			if (g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 			{
 				SayNo();
-				GLOBAL_inventoryitemchosen = -1;
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			}
 
 			// Update Lara's ponytails
@@ -510,7 +512,7 @@ GAME_STATUS DoTitle(int index)
 			S_UpdateInput();
 			SetDebounce = false;
 
-			status = TitleOptions();
+			status = g_Inventory.TitleOptions();
 
 			if (status)
 				break;
@@ -523,7 +525,7 @@ GAME_STATUS DoTitle(int index)
 		inventoryResult = status;
 	}
 	else
-		inventoryResult = TitleOptions();
+		inventoryResult = g_Inventory.TitleOptions();
 
 	StopSoundTracks();
 
@@ -617,8 +619,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			Savegame.TLCount = 0;
 	}
 
-	GLOBAL_inventoryitemchosen = NO_ITEM;
-	GLOBAL_enterinventory = NO_ITEM;
+	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+	g_Inventory.Set_enterInventory(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
