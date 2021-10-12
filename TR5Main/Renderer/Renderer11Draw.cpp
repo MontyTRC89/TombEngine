@@ -992,6 +992,49 @@ namespace TEN::Renderer
         drawAllStrings();
     }
 
+    void Renderer11::renderLoadSaveMenu()
+    {
+        if (!g_GameFlow->EnableLoadSave)
+        {
+            g_Inventory.Set_invMode(IM_INGAME);
+            return;
+        }
+        
+        short selection = g_Inventory.Get_LoadSaveSelection();
+        char stringBuffer[255];
+        long y = 70;
+        LoadSavegameInfos();
+
+        if (g_Inventory.Get_invMode() == IM_LOAD)
+            drawString(400, 40, "Load Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+        else
+            drawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+
+        for (int n = 1; n < MAX_SAVEGAMES + 1; n++)
+        {
+            int n2 = n - 1;
+
+            if (!g_NewSavegameInfos[n - 1].Present)
+                drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
+                    PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
+            else
+            {
+                sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n - 1].Count);
+                drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+                drawString(250, y, (char*)g_NewSavegameInfos[n - 1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+                sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n - 1].Days, g_NewSavegameInfos[n - 1].Hours, g_NewSavegameInfos[n - 1].Minutes, g_NewSavegameInfos[n - 1].Seconds);
+                drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+                    PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
+            }
+
+            y += 30;
+        }
+
+        drawAllStrings();
+    }
+
     void Renderer11::renderNewInventory()
     {
         g_Inventory.draw_current_object_list(RING_INVENTORY);
@@ -1190,6 +1233,12 @@ namespace TEN::Renderer
         }
         
         inv_modes mode = g_Inventory.Get_invMode();
+
+        if (mode == IM_LOAD || mode == IM_SAVE)
+        {
+            renderLoadSaveMenu();
+            return;
+        }
 
         if (mode == IM_INGAME)
         {

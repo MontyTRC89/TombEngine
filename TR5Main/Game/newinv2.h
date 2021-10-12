@@ -9,7 +9,9 @@ enum inv_modes
 	IM_PAUSE,
 	IM_STATS,
 	IM_EXAMINE,
-	IM_DIARY
+	IM_DIARY,
+	IM_LOAD,
+	IM_SAVE
 };
 
 enum pause_menus
@@ -392,7 +394,7 @@ struct INVOBJ
 class InventoryClass
 {
 public:
-	int S_CallInventory2();	//the mother(fucker) of all
+	int S_CallInventory2(bool reset_mode);	//the mother(fucker) of all
 	int TitleOptions();
 	int DoPauseMenu();
 	void handle_inventry_menu();
@@ -417,6 +419,7 @@ public:
 	int Get_enterInventory();
 	int Get_lastInvItem();
 	titleSettings Get_CurrentSettings();
+	short Get_LoadSaveSelection();
 
 	//setters
 	void Set_pause_selected_option(__int64 menu);
@@ -455,8 +458,10 @@ private:
 	void do_stats_mode();
 	void do_examine_mode();
 	void do_diary();
+	void do_load();
+	void do_save();
 	void construct_combine_object_list();
-
+	
 	/*vars*/
 	//input
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
@@ -468,7 +473,6 @@ private:
 	//inventory
 	short combine_obj1;
 	short combine_obj2;
-	char loading_or_saving;
 	char useItem;
 	char seperate_type_flag;
 	char combine_type_flag;
@@ -542,6 +546,9 @@ private:
 	int settings_flag;
 
 	titleSettings CurrentSettings;
+
+	//loadsave
+	short selected_slot;
 };
 
 /*inventory*/
