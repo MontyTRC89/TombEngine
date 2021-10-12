@@ -2073,10 +2073,10 @@ void InventoryClass::construct_object_list()
 		{
 			insert_object_into_list(INV_OBJECT_GRENADE_LAUNCHER);
 
-			if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO2)
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO2)
 				CurrentGrenadeGunAmmoType = 1;
 
-			if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO3)
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO3)
 				CurrentGrenadeGunAmmoType = 2;
 		}
 		else
@@ -2272,15 +2272,14 @@ void InventoryClass::init_inventry()
 	Lara.busy = 0;
 	inventoryItemChosen = NO_ITEM;
 	clear_input_vars(0);
-	loading_or_saving = 0;
 	useItem = 0;
 
-	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].getCount() == -1)
+	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].hasInfinite())
 		AmountShotGunAmmo1 = -1;
 	else
 		AmountShotGunAmmo1 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].getCount() / 6;
 
-	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].getCount() == -1)
+	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].hasInfinite())
 		AmountShotGunAmmo2 = -1;
 	else
 		AmountShotGunAmmo2 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].getCount() / 6;
@@ -2936,11 +2935,15 @@ void InventoryClass::handle_inventry_menu()
 					break;
 
 				case MENU_TYPE_LOAD:
-					loading_or_saving = 1;
+					//fill_up_savegames_array//or maybe not?
+					invMode = IM_LOAD;
+					selected_slot = 0;
 					break;
 
 				case MENU_TYPE_SAVE:
-					loading_or_saving = 2;
+					//fill_up_savegames_array
+					invMode = IM_SAVE;
+					selected_slot = 0;
 					break;
 
 				case MENU_TYPE_EXAMINE:
@@ -3577,7 +3580,7 @@ void InventoryClass::draw_current_object_list(int ringnum)
 	}
 }
 
-int InventoryClass::S_CallInventory2()
+int InventoryClass::S_CallInventory2(bool reset_mode)
 {
 	int return_value;
 
@@ -3589,7 +3592,10 @@ int InventoryClass::S_CallInventory2()
 	rings[RING_INVENTORY] = &pcring1;
 	rings[RING_AMMO] = &pcring2;
 	g_Renderer.DumpGameScene();
-	invMode = IM_INGAME;
+
+	if (reset_mode)
+		invMode = IM_INGAME;
+
 	init_inventry();
 	Camera.numberFrames = 2;
 
@@ -3629,46 +3635,19 @@ int InventoryClass::S_CallInventory2()
 		if (invMode == IM_DIARY)
 			do_diary();
 
+		if (invMode == IM_LOAD)
+			do_load();
+
+		if (invMode == IM_SAVE)
+			do_save();
+
 		DrawInv();
 		draw_compass();
 
-		if (useItem & !TrInput)
+		if (useItem && !TrInput)
 			val = 1;
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();
-
-		if (loading_or_saving)
-		{
-			loading_or_saving = 0;//fix meeeeeeeeeeeee
-			stop_killing_me_you_dumb_input_system2 = 1;
-			stop_killing_me_you_dumb_input_system = 1;
-		/*	do
-			{
-				S_InitialisePolyList();
-				SetDebounce = true;
-				S_UpdateInput();
-				input = inputBusy;
-				UpdatePulseColour();
-
-				if (loading_or_saving == 1)
-					val = go_and_load_game();
-				else if (go_and_save_game())
-					val = 1;
-
-			} while (!val);
-
-			if (val == 1 && loading_or_saving == val)
-			{
-				return_value = 1;
-				val = 1;
-			}
-
-			stop_killing_me_you_dumb_input_system2 = 1;
-			stop_killing_me_you_dumb_input_system = 1;
-			deselect_debounce = 0;
-			go_deselect = 0;
-			loading_or_saving = 0;*/
-		}
 
 		if (val)
 			break;
@@ -3682,6 +3661,7 @@ int InventoryClass::S_CallInventory2()
 
 	Lara.busy = Lara.oldBusy;
 	invMode = IM_NONE;
+	clear_input_vars(0);
 
 	return return_value;
 }
@@ -3740,7 +3720,81 @@ void InventoryClass::do_diary()
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
 		invMode = IM_NONE;
-		invMode = IM_NONE;
+	}
+}
+
+short InventoryClass::Get_LoadSaveSelection()
+{
+	return selected_slot;
+}
+
+void InventoryClass::do_load()
+{
+	invMode = IM_LOAD;
+
+	if (goDown && selected_slot < MAX_SAVEGAMES - 1)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		selected_slot++;
+	}
+
+	if (goUp && selected_slot > 0)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		selected_slot--;
+	}
+
+	if (goSelect)
+	{
+		if (!g_NewSavegameInfos[selected_slot].Present)
+			SayNo();
+		else
+		{
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			//LoadSelectedSlot(selected_slot);
+			selected_slot = 0;
+			return;
+		}
+	}
+
+	if (goDeselect)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		goDeselect = 0;
+		invMode = IM_INGAME;
+		selected_slot = 0;
+	}
+}
+
+void InventoryClass::do_save()
+{
+	invMode = IM_SAVE;
+
+	if (goDown && selected_slot < MAX_SAVEGAMES - 1)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		selected_slot++;
+	}
+
+	if (goUp && selected_slot > 0)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		selected_slot--;
+	}
+
+	if (goSelect)
+	{
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		//SaveSelectedSlot(selected_slot);
+		return;
+	}
+
+	if (goDeselect)
+	{
+		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		goDeselect = 0;
+		invMode = IM_INGAME;
+		selected_slot = 0;
 	}
 }
 
