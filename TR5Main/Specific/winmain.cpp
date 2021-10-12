@@ -260,9 +260,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
 		Sound_Init();
-
-	// Initialise the new inventory
-	//g_Inventory = Inventory();
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
