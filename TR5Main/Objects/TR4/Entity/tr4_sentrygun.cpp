@@ -3,11 +3,7 @@
 #include "control/box.h"
 #include "effects/effects.h"
 #include "items.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "level.h"
 #include "control/lot.h"
 #include "effects/tomb4fx.h"
@@ -20,9 +16,6 @@
 
 namespace TEN::Entities::TR4
 {
-#ifndef NEW_INV
-	extern Inventory g_Inventory;
-#endif
 	BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
 	static void SentryGunThrowFire(ITEM_INFO* item)
@@ -145,11 +138,7 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
-#ifdef NEW_INV
 						if (!have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
-#else
-						if (!g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
-#endif
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{

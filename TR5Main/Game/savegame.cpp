@@ -179,9 +179,6 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 void SaveGame::saveGameStatus(int arg1, int arg2)
 {
 	/*LEB128::Write(m_stream, FlipStatus);
-#ifndef NEW_INV
-	LEB128::Write(m_stream, LastInventoryItem);
-#endif
 	LEB128::Write(m_stream, FlipEffect);
 	LEB128::Write(m_stream, FlipTimer);
 	//LEB128::Write(m_stream, CurrentLoopedSoundTrack);
@@ -450,9 +447,6 @@ bool SaveGame::Save(char* fileName)
 bool SaveGame::readGameStatus()
 {
 	FlipStatus = LEB128::ReadInt32(m_stream);
-#ifndef NEW_INV
-	LastInventoryItem = LEB128::ReadInt32(m_stream);
-#endif
 	FlipEffect = LEB128::ReadInt32(m_stream);
 	CurrentLoopedSoundTrack = LEB128::ReadByte(m_stream);
 	CurrentSequence = LEB128::ReadByte(m_stream);

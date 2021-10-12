@@ -1,5 +1,4 @@
 #include "framework.h"
-#ifdef NEW_INV
 #include "newinv2.h"
 #include "animation.h"
 #include "control/control.h"
@@ -4261,4 +4260,3 @@ int do_special_waterskin_combine_bullshit(int flag)
 
 	return 0;
 }
-#endif
