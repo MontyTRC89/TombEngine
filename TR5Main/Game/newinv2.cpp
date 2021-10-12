@@ -20,83 +20,7 @@
 #include "items.h"
 
 using namespace TEN::Renderer;
-bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
-bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
-long rptRight, rptLeft;
-__int64 title_selected_option = 1;
-int title_menu_to_display = 0;
-int settings_flag;
-int pause_menu_to_display = 0;
-__int64 pause_selected_option = 1;
-int pause_flag;
-int GLOBAL_invMode;
-titleSettings CurrentSettings;
-/*inventory*/
-RINGME pcring1;//items ring
-RINGME pcring2;//other ring
-RINGME* rings[2];
-int current_selected_option;
-int menu_active;
-char ammo_selector_flag;
-char num_ammo_slots;
-char *current_ammo_type;
-AMMOLIST ammo_object_list[3];
-short ammo_selector_fade_val;
-short ammo_selector_fade_dir;
-short combine_ring_fade_val;
-short combine_ring_fade_dir;
-short normal_ring_fade_val;
-short normal_ring_fade_dir;
-unsigned char ammo_active;
-#define font_height 25
-int OBJLIST_SPACING;
-static unsigned short AmountShotGunAmmo1;
-static unsigned short AmountShotGunAmmo2;
-static unsigned short AmountHKAmmo1;
-static unsigned short AmountCrossBowAmmo1;
-static unsigned short AmountCrossBowAmmo2;
-static unsigned short AmountCrossBowAmmo3;
-static unsigned short AmountGrenadeAmmo1;
-static unsigned short AmountGrenadeAmmo2;
-static unsigned short AmountGrenadeAmmo3;
-static unsigned short AmountRocketsAmmo;
-static unsigned short AmountHarpoonAmmo;
-static unsigned short AmountUziAmmo;
-static unsigned short AmountRevolverAmmo;
-static unsigned short AmountPistolsAmmo;
-static char CurrentPistolsAmmoType;
-static char CurrentUziAmmoType;
-static char CurrentRevolverAmmoType;
-static char CurrentShotGunAmmoType;
-static char CurrentHKAmmoType;
-static char CurrentGrenadeGunAmmoType;
-static char CurrentCrossBowAmmoType;
-static char CurrentHarpoonAmmoType;
-static char CurrentRocketAmmoType;
-static char StashedCurrentPistolsAmmoType;
-static char StashedCurrentUziAmmoType;
-static char StashedCurrentRevolverAmmoType;
-static char StashedCurrentShotGunAmmoType;
-static char StashedCurrentGrenadeGunAmmoType;
-static char StashedCurrentCrossBowAmmoType;
-static char Stashedcurrent_selected_option;
-static char StashedCurrentHKAmmoType;
-static char StashedCurrentHarpoonAmmoType;
-static char StashedCurrentRocketAmmoType;
-int GLOBAL_inventoryitemchosen = NO_ITEM;
-int GLOBAL_enterinventory = NO_ITEM;
-int GLOBAL_lastinvitem = NO_ITEM;
-char useItem;
-char loading_or_saving;
-char seperate_type_flag;
-char combine_type_flag;
-short combine_obj1;
-short combine_obj2;
-bool stop_killing_me_you_dumb_input_system;
-bool stop_killing_me_you_dumb_input_system2;
-int compassNeedleAngle;
-
-uhmG current_options[3];
+InventoryClass g_Inventory;
 
 const char* optmessages[] =
 {
@@ -135,11 +59,12 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_STEP_RIGHT
 };
 
+#define font_height 25
+#define max_combines	60
 #define phd_winxmax g_Configuration.Width
 #define phd_winymax g_Configuration.Height
 #define phd_centerx 400
 #define phd_centery phd_winymax / 2
-#define max_combines	60
 
 /*
 if you wanna add an object to the inventory, edit the inv_objects array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
@@ -468,12 +393,87 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, -1, INV_ROT_Y},
 };
 
-void DrawInv()
+titleSettings InventoryClass::Get_CurrentSettings()
+{
+	return CurrentSettings;
+}
+
+RINGME* InventoryClass::GetRings(char num)
+{
+	return rings[num];
+}
+
+__int64 InventoryClass::Get_title_selected_option()
+{
+	return title_selected_option;
+}
+
+title_menus InventoryClass::Get_title_menu_to_display()
+{
+	return title_menu_to_display;
+}
+
+void InventoryClass::Set_pause_selected_option(__int64 menu)
+{
+	pause_selected_option = menu;
+}
+
+__int64 InventoryClass::Get_pause_selected_option()
+{
+	return pause_selected_option;
+}
+
+void InventoryClass::Set_pause_menu_to_display(pause_menus menu)
+{
+	pause_menu_to_display = menu;
+}
+
+pause_menus InventoryClass::Get_pause_menu_to_display()
+{
+	return pause_menu_to_display;
+}
+
+inv_modes InventoryClass::Get_invMode()
+{
+	return invMode;
+}
+
+void InventoryClass::Set_invMode(inv_modes mode)
+{
+	invMode = mode;
+}
+
+void InventoryClass::Set_inventoryItemChosen(int num)
+{
+	inventoryItemChosen = num;
+}
+
+int InventoryClass::Get_inventoryItemChosen()
+{
+	return inventoryItemChosen;
+}
+
+void InventoryClass::Set_enterInventory(int num)
+{
+	enterInventory = num;
+}
+
+int InventoryClass::Get_enterInventory()
+{
+	return enterInventory;
+}
+
+int InventoryClass::Get_lastInvItem()
+{
+	return lastInvItem;
+}
+
+void InventoryClass::DrawInv()
 {
 	g_Renderer.renderInventory();
 }
 
-void clear_input_vars(bool flag)
+void InventoryClass::clear_input_vars(bool flag)
 {
 	goUp = goDown = goRight = goLeft = goSelect = goDeselect = 0;
 	if (flag)
@@ -485,7 +485,7 @@ void clear_input_vars(bool flag)
 	}
 }
 
-void do_debounced_input()
+void InventoryClass::do_debounced_input()
 {
 	clear_input_vars(1);
 
@@ -568,7 +568,7 @@ void do_debounced_input()
 	}
 }
 
-int TitleOptions()
+int InventoryClass::TitleOptions()
 {
 	int ret, ret2, i, n, n2, load, flag;
 
@@ -753,7 +753,7 @@ int TitleOptions()
 	return ret;
 }
 
-void FillDisplayOptions()
+void InventoryClass::FillDisplayOptions()
 {
 	// Copy configuration to a temporary object
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
@@ -774,7 +774,7 @@ void FillDisplayOptions()
 	}
 }
 
-void handle_display_setting_input()
+void InventoryClass::handle_display_setting_input()
 {
 	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
@@ -904,7 +904,7 @@ void handle_display_setting_input()
 	}
 }
 
-void handle_control_settings_input()
+void InventoryClass::handle_control_settings_input()
 {
 	CurrentSettings.waitingForkey = 0;
 
@@ -1042,12 +1042,12 @@ void handle_control_settings_input()
 	}
 }
 
-void fillSound()
+void InventoryClass::fillSound()
 {
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
 
-void handle_sound_settings_input()
+void InventoryClass::handle_sound_settings_input()
 {
 	SetDebounce = true;
 	S_UpdateInput();
@@ -1196,7 +1196,7 @@ void handle_sound_settings_input()
 	}
 }
 
-int DoPauseMenu()
+int InventoryClass::DoPauseMenu()
 {
 	//basically mini title
 
@@ -1259,7 +1259,7 @@ int DoPauseMenu()
 	{
 		if (pause_menu_to_display == pause_main_menu)
 		{
-			GLOBAL_invMode = IM_NONE;
+			invMode = IM_NONE;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 			return INV_RESULT_NONE;
 		}
@@ -1289,7 +1289,7 @@ int DoPauseMenu()
 				break;
 
 			case 4:
-				GLOBAL_invMode = IM_NONE;
+				invMode = IM_NONE;
 				return INV_RESULT_EXIT_TO_TILE;
 			}
 		}
@@ -1319,7 +1319,7 @@ int DoPauseMenu()
 	return INV_RESULT_NONE;
 }
 
-void handle_display_setting_input_pause()
+void InventoryClass::handle_display_setting_input_pause()
 {
 	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
@@ -1443,7 +1443,7 @@ void handle_display_setting_input_pause()
 	}
 }
 
-void handle_control_settings_input_pause()
+void InventoryClass::handle_control_settings_input_pause()
 {
 	CurrentSettings.waitingForkey = 0;
 
@@ -1573,7 +1573,7 @@ void handle_control_settings_input_pause()
 	}
 }
 
-void handle_sound_settings_input_pause()
+void InventoryClass::handle_sound_settings_input_pause()
 {
 	if (goDeselect)
 	{
@@ -1719,7 +1719,7 @@ void handle_sound_settings_input_pause()
 
 /*inventory*/
 
-int do_these_objects_combine(int obj1, int obj2)
+bool InventoryClass::do_these_objects_combine(int obj1, int obj2)
 {
 	for (int n = 0; n < max_combines; n++)
 	{
@@ -1735,7 +1735,7 @@ int do_these_objects_combine(int obj1, int obj2)
 	return 0;
 }
 
-int is_item_currently_combinable(short obj)
+bool InventoryClass::is_item_currently_combinable(short obj)
 {
 	if (obj < INV_OBJECT_SMOL_WATERSKIN || obj > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
@@ -1770,7 +1770,7 @@ int is_item_currently_combinable(short obj)
 	return 0;
 }
 
-int have_i_got_item(short obj)
+bool InventoryClass::have_i_got_item(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (rings[RING_INVENTORY]->current_object_list[i].invitem == obj)
@@ -1779,7 +1779,7 @@ int have_i_got_item(short obj)
 	return 0;
 }
 
-void combine_these_two_objects(short obj1, short obj2)
+void InventoryClass::combine_these_two_objects(short obj1, short obj2)
 {
 	int n;
 
@@ -1800,7 +1800,7 @@ void combine_these_two_objects(short obj1, short obj2)
 	handle_object_changeover(RING_INVENTORY);
 }
 
-void seperate_object(short obj)
+void InventoryClass::seperate_object(short obj)
 {
 	int n;
 
@@ -1813,21 +1813,21 @@ void seperate_object(short obj)
 	setup_objectlist_startposition(combine_table[n].item1);
 }
 
-void setup_objectlist_startposition(short newobj)
+void InventoryClass::setup_objectlist_startposition(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (rings[RING_INVENTORY]->current_object_list[i].invitem == newobj)
 			rings[RING_INVENTORY]->curobjinlist = i;
 }
 
-void handle_object_changeover(int ringnum)
+void InventoryClass::handle_object_changeover(int ringnum)
 {
 	current_selected_option = 0;
 	menu_active = 1;
 	setup_ammo_selector();
 }
 
-void setup_ammo_selector()
+void InventoryClass::setup_ammo_selector()
 {
 	int num;
 	unsigned __int64 opts;
@@ -1955,7 +1955,7 @@ void setup_ammo_selector()
 	}
 }
 
-void insert_object_into_list(int num)
+void InventoryClass::insert_object_into_list(int num)
 {
 	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].invitem = num;
 	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].xrot = 0;
@@ -1965,7 +1965,7 @@ void insert_object_into_list(int num)
 	rings[RING_INVENTORY]->numobjectsinlist++;
 }
 
-void insert_object_into_list_v2(int num)
+void InventoryClass::insert_object_into_list_v2(int num)
 {
 	unsigned __int64 opts = inventry_objects_list[num].opts;
 
@@ -1982,7 +1982,7 @@ void insert_object_into_list_v2(int num)
 	}
 }
 
-void construct_object_list()
+void InventoryClass::construct_object_list()
 {
 	rings[RING_INVENTORY]->numobjectsinlist = 0;
 
@@ -2194,7 +2194,7 @@ void construct_object_list()
 	ammo_active = 0;
 }
 
-void construct_combine_object_list()
+void InventoryClass::construct_combine_object_list()
 {
 	rings[RING_AMMO]->numobjectsinlist = 0;
 
@@ -2265,12 +2265,12 @@ void construct_combine_object_list()
 	rings[RING_AMMO]->ringactive = 0;
 }
 
-void init_inventry()
+void InventoryClass::init_inventry()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(14560);
 	Lara.busy = 0;
-	GLOBAL_inventoryitemchosen = NO_ITEM;
+	inventoryItemChosen = NO_ITEM;
 	clear_input_vars(0);
 	loading_or_saving = 0;
 	useItem = 0;
@@ -2299,15 +2299,15 @@ void init_inventry()
 	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
 	construct_object_list();
 
-	if (GLOBAL_enterinventory == NO_ITEM)
+	if (enterInventory == NO_ITEM)
 	{
-		if (GLOBAL_lastinvitem != NO_ITEM)
+		if (lastInvItem != NO_ITEM)
 		{
-			if (have_i_got_item(GLOBAL_lastinvitem))
-				setup_objectlist_startposition(GLOBAL_lastinvitem);
+			if (have_i_got_item(lastInvItem))
+				setup_objectlist_startposition(lastInvItem);
 			else//son of a bitch
 			{
-				if (GLOBAL_lastinvitem >= INV_OBJECT_SMOL_WATERSKIN && GLOBAL_lastinvitem <= INV_OBJECT_SMOL_WATERSKIN3L)
+				if (lastInvItem >= INV_OBJECT_SMOL_WATERSKIN && lastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
 				{
 					for (int i = INV_OBJECT_SMOL_WATERSKIN; i <= INV_OBJECT_SMOL_WATERSKIN3L; i++)
 					{
@@ -2318,7 +2318,7 @@ void init_inventry()
 						}
 					}
 				}
-				else if (GLOBAL_lastinvitem >= INV_OBJECT_BIG_WATERSKIN && GLOBAL_lastinvitem <= INV_OBJECT_BIG_WATERSKIN5L)
+				else if (lastInvItem >= INV_OBJECT_BIG_WATERSKIN && lastInvItem <= INV_OBJECT_BIG_WATERSKIN5L)
 				{
 					for (int i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
 					{
@@ -2331,15 +2331,15 @@ void init_inventry()
 				}
 			}
 
-			GLOBAL_lastinvitem = NO_ITEM;
+			lastInvItem = NO_ITEM;
 		}
 	}
 	else
 	{
-		if (have_i_got_object(GLOBAL_enterinventory))
-			setup_objectlist_startposition2(GLOBAL_enterinventory);
+		if (have_i_got_object(enterInventory))
+			setup_objectlist_startposition2(enterInventory);
 
-		GLOBAL_enterinventory = NO_ITEM;
+		enterInventory = NO_ITEM;
 	}
 
 	ammo_selector_fade_val = 0;
@@ -2355,19 +2355,19 @@ void init_inventry()
 	handle_object_changeover(RING_INVENTORY);
 }
 
-int have_i_got_object(short object_number)
+int InventoryClass::have_i_got_object(short object_number)
 {
 	return GetInventoryCount(from_underlying(object_number));
 }
 
-void setup_objectlist_startposition2(short newobj)
+void InventoryClass::setup_objectlist_startposition2(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (inventry_objects_list[rings[RING_INVENTORY]->current_object_list[i].invitem].object_number == newobj)
 			rings[RING_INVENTORY]->curobjinlist = i;
 }
 
-int convert_obj_to_invobj(short obj)
+int InventoryClass::convert_obj_to_invobj(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
@@ -2378,12 +2378,12 @@ int convert_obj_to_invobj(short obj)
 	return -1;
 }
 
-int convert_invobj_to_obj(int obj)
+int InventoryClass::convert_invobj_to_obj(int obj)
 {
 	return inventry_objects_list[obj].object_number;
 }
 
-void fade_ammo_selector()
+void InventoryClass::fade_ammo_selector()
 {
 	if (rings[RING_INVENTORY]->ringactive && (rptLeft >= 8 || rptRight >= 8))
 		ammo_selector_fade_val = 0;
@@ -2411,7 +2411,7 @@ void fade_ammo_selector()
 	}
 }
 
-void use_current_item()
+void InventoryClass::use_current_item()
 {
 	short invobject, gmeobject;
 	long OldBinocular;
@@ -2556,7 +2556,7 @@ void use_current_item()
 			return;
 
 		default:
-			GLOBAL_inventoryitemchosen = gmeobject;
+			inventoryItemChosen = gmeobject;
 			return;
 		}
 
@@ -2670,7 +2670,7 @@ void use_current_item()
 	}
 }
 
-void handle_inventry_menu()
+void InventoryClass::handle_inventry_menu()
 {
 	int n;
 	unsigned __int64 opts;
@@ -2944,11 +2944,11 @@ void handle_inventry_menu()
 					break;
 
 				case MENU_TYPE_EXAMINE:
-					GLOBAL_invMode = IM_EXAMINE;
+					invMode = IM_EXAMINE;
 					break;
 
 				case MENU_TYPE_STATS:
-					GLOBAL_invMode = IM_STATS;
+					invMode = IM_STATS;
 					break;
 
 				case MENU_TYPE_AMMO1:
@@ -2980,7 +2980,7 @@ void handle_inventry_menu()
 					break;
 
 				case MENU_TYPE_DIARY:
-					GLOBAL_invMode = IM_DIARY;
+					invMode = IM_DIARY;
 					Lara.Diary.currentPage = 1;
 					break;
 				}
@@ -3008,7 +3008,7 @@ void handle_inventry_menu()
 }
 
 //this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
-void update_laras_weapons_status()
+void InventoryClass::update_laras_weapons_status()
 {
 	if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
@@ -3039,7 +3039,7 @@ void update_laras_weapons_status()
 	}
 }
 
-void spinback(unsigned short* angle)
+void InventoryClass::spinback(unsigned short* angle)
 {
 	unsigned short val;
 	unsigned short val2;
@@ -3081,7 +3081,7 @@ void spinback(unsigned short* angle)
 	}
 }
 
-void draw_ammo_selector()
+void InventoryClass::draw_ammo_selector()
 {
 	int n;
 	int xpos;
@@ -3156,7 +3156,7 @@ void draw_ammo_selector()
 	}
 }
 
-void draw_current_object_list(int ringnum)
+void InventoryClass::draw_current_object_list(int ringnum)
 {
 	int n;
 	int maxobj;
@@ -3577,7 +3577,7 @@ void draw_current_object_list(int ringnum)
 	}
 }
 
-int S_CallInventory2()
+int InventoryClass::S_CallInventory2()
 {
 	int return_value;
 
@@ -3589,7 +3589,7 @@ int S_CallInventory2()
 	rings[RING_INVENTORY] = &pcring1;
 	rings[RING_AMMO] = &pcring2;
 	g_Renderer.DumpGameScene();
-	GLOBAL_invMode = IM_INGAME;
+	invMode = IM_INGAME;
 	init_inventry();
 	Camera.numberFrames = 2;
 
@@ -3620,13 +3620,13 @@ int S_CallInventory2()
 
 		do_debounced_input();
 
-		if (GLOBAL_invMode == IM_STATS)
+		if (invMode == IM_STATS)
 			do_stats_mode();
 		
-		if (GLOBAL_invMode == IM_EXAMINE)
+		if (invMode == IM_EXAMINE)
 			do_examine_mode();
 
-		if (GLOBAL_invMode == IM_DIARY)
+		if (invMode == IM_DIARY)
 			do_diary();
 
 		DrawInv();
@@ -3674,43 +3674,43 @@ int S_CallInventory2()
 			break;
 	}
 
-	GLOBAL_lastinvitem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+	lastInvItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
 	update_laras_weapons_status();
 
 	if (useItem)
 		use_current_item();
 
 	Lara.busy = Lara.oldBusy;
-	GLOBAL_invMode = IM_NONE;
+	invMode = IM_NONE;
 
 	return return_value;
 }
 
-void do_stats_mode()
+void InventoryClass::do_stats_mode()
 {
-	GLOBAL_invMode = IM_STATS;
+	invMode = IM_STATS;
 
 	if (goDeselect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		GLOBAL_invMode = IM_NONE;
+		invMode = IM_NONE;
 	}
 }
 
-void do_examine_mode()
+void InventoryClass::do_examine_mode()
 {
-	GLOBAL_invMode = IM_EXAMINE;
+	invMode = IM_EXAMINE;
 
 	if (goDeselect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		GLOBAL_invMode = IM_NONE;
+		invMode = IM_NONE;
 	}
 }
 
-void draw_compass()
+void InventoryClass::draw_compass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[ID_COMPASS_ITEM].scale1);
@@ -3719,9 +3719,9 @@ void draw_compass()
 	Matrix::CreateRotationY(compass_angle);
 }
 
-void do_diary()
+void InventoryClass::do_diary()
 {
-	GLOBAL_invMode = IM_DIARY;
+	invMode = IM_DIARY;
 
 	if (goRight && Lara.Diary.currentPage < Lara.Diary.numPages)
 	{
@@ -3739,7 +3739,8 @@ void do_diary()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		GLOBAL_invMode = IM_NONE;
+		invMode = IM_NONE;
+		invMode = IM_NONE;
 	}
 }
 
@@ -4197,7 +4198,7 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings |= 1;//get beetle
 }
 
-int do_special_waterskin_combine_bullshit(int flag)
+bool InventoryClass::do_special_waterskin_combine_bullshit(int flag)
 {
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
