@@ -37,7 +37,6 @@ bool SaveGame::Save(char* fileName)
 {
 	ITEM_INFO itemToSerialize{};
 	FlatBufferBuilder fbb{};
-	Save::SaveGameBuilder sgb = Save::SaveGameBuilder(fbb);
 	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
 
 	// Serialize Lara
@@ -191,6 +190,7 @@ bool SaveGame::Save(char* fileName)
 	Save::SaveGameT sg;
 
 	// Create the savegame header
+	sg.header = std::make_unique<Save::SaveGameHeaderT>();
 	Save::SaveGameHeaderT* header = sg.header.get();
 	header->level_name = g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str());
 	header->days = (GameTimer / 30) / 86400;
@@ -198,9 +198,10 @@ bool SaveGame::Save(char* fileName)
 	header->minutes = ((GameTimer / 30) / 60) % 6;
 	header->seconds = (GameTimer / 30) % 60;
 	header->level = CurrentLevel;
-	header->level = GameTimer;
-	header->level = ++LastSaveGame;
+	header->timer = GameTimer;
+	header->count = ++LastSaveGame;
 
+	sg.level = std::make_unique<Save::SaveGameStatisticsT>();
 	Save::SaveGameStatisticsT* levelStatistics = sg.level.get();
 	levelStatistics->ammo_hits = Savegame.Level.AmmoHits;
 	levelStatistics->ammo_used = Savegame.Level.AmmoUsed;
@@ -210,6 +211,7 @@ bool SaveGame::Save(char* fileName)
 	levelStatistics->secrets = Savegame.Level.Secrets;
 	levelStatistics->timer = Savegame.Level.Timer;
 
+	sg.game = std::make_unique<Save::SaveGameStatisticsT>();
 	Save::SaveGameStatisticsT* gameStatistics = sg.game.get();
 	gameStatistics->ammo_hits = Savegame.Game.AmmoHits;
 	gameStatistics->ammo_used = Savegame.Game.AmmoUsed;
@@ -253,6 +255,7 @@ bool SaveGame::Save(char* fileName)
 	//sgb.add_items(fbb.CreateVector(serializedItems));
 
 	//auto serializedSave = sgb.Finish();
+	//Save::SaveGameBuilder sgb = Save::SaveGameBuilder(fbb);
 	fbb.Finish(Save::SaveGame::Pack(fbb, &sg));
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
