@@ -143,9 +143,25 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			
+			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
+			{
+				Sound_Stop();
 
-			if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
+				g_Inventory.Set_invMode(IM_SAVE);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS_LOAD_GAME;
+			}
+			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
+			{
+				Sound_Stop();
+
+				g_Inventory.Set_invMode(IM_LOAD);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS_LOAD_GAME;
+			}
+			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				Sound_Stop();
 				g_Renderer.DumpGameScene();
@@ -158,7 +174,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				// Stop all sounds
 				Sound_Stop();
 
-				if (g_Inventory.S_CallInventory2())
+				if (g_Inventory.S_CallInventory2(1))
 					return GAME_STATUS_LOAD_GAME;
 			}
 		}
