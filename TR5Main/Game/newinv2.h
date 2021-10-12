@@ -1,4 +1,3 @@
-#ifdef NEW_INV
 #pragma once
 #include "configuration.h"
 #include <Scripting/LanguageScript.h>
@@ -516,4 +515,3 @@ extern int GLOBAL_lastinvitem;
 extern int GLOBAL_enterinventory;
 extern RINGME* rings[2];
 extern INVOBJ inventry_objects_list[];
-#endif

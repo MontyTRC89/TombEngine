@@ -4,11 +4,7 @@
 #include "control/box.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
@@ -20,10 +16,6 @@
 #define STATE_LAGOON_WITCH_DEATH		5
 
 #define ANIMATION_LAGOON_WITCH_DEATH	7
-
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
 
 BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
@@ -66,11 +58,7 @@ void LagoonWitchControl(short itemNumber)
 	}
 	else
 	{
-#ifdef NEW_INV
 		if (have_i_got_object(ID_PUZZLE_ITEM2))
-#else
-		if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM2))
-#endif
 		{
 			item->aiBits = 0;
 			creature->enemy = LaraItem;

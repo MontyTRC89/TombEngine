@@ -9,11 +9,7 @@
 #include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
@@ -93,11 +89,6 @@ int LaraDrawType;
 int WeaponDelay;
 int WeaponEnemyTimer;
 
-#ifndef NEW_INV
-int LastInventoryItem;
-extern Inventory g_Inventory;
-#endif
-
 int DrawPhase()
 {
 	g_Renderer.Draw();
@@ -150,7 +141,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
-#ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
 			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
@@ -181,24 +171,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if (z == INV_RESULT_EXIT_TO_TILE)
 				return GAME_STATUS_EXIT_TO_TITLE;
 		}
-#else
-		if (CurrentLevel != 0 && !g_Renderer.isFading())
-		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
-			{
-				// Stop all sounds
-				Sound_Stop();
-				int inventoryResult = g_Inventory.DoInventory();
-				switch (inventoryResult)
-				{
-				case INV_RESULT_LOAD_GAME:
-					return GAME_STATUS_LOAD_GAME;
-				case INV_RESULT_EXIT_TO_TILE:
-					return GAME_STATUS_EXIT_TO_TITLE;
-				}
-			}
-		}
-#endif
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
@@ -209,20 +181,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-#ifdef NEW_INV
 			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
-#else
-			int inventoryResult = g_Inventory.DoInventory();
-			switch (inventoryResult)
-			{
-			case INV_RESULT_NEW_GAME:
-				return GAME_STATUS_NEW_GAME;
-			case INV_RESULT_LOAD_GAME:
-				return GAME_STATUS_LOAD_GAME;
-			case INV_RESULT_EXIT_TO_TILE:
-				return GAME_STATUS_EXIT_TO_TITLE;
-			}
-#endif
 		}
 
 		if (demoMode && TrInput == -1)
@@ -364,13 +323,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
-#ifdef NEW_INV
 			if (GLOBAL_inventoryitemchosen != -1)
 			{
 				SayNo();
 				GLOBAL_inventoryitemchosen = -1;
 			}
-#endif
+
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
 			if (level->LaraType == LARA_TYPE::YOUNG)
@@ -525,9 +483,6 @@ GAME_STATUS DoTitle(int index)
 		Savegame.Level.Timer = 0;
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
-#ifndef NEW_INV
-		LastInventoryItem = -1;
-#endif
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -545,7 +500,7 @@ GAME_STATUS DoTitle(int index)
 		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
-#ifdef NEW_INV
+
 		int status = 0, frames;
 		while (!status)
 		{
@@ -566,18 +521,9 @@ GAME_STATUS DoTitle(int index)
 		}
 
 		inventoryResult = status;
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
 	}
 	else
-	{
-#ifdef NEW_INV
 		inventoryResult = TitleOptions();
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
-	}
 
 	StopSoundTracks();
 
@@ -670,17 +616,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
 	}
-#ifndef NEW_INV
-	LastInventoryItem = -1;
-#endif
 
-#ifdef NEW_INV
 	GLOBAL_inventoryitemchosen = NO_ITEM;
 	GLOBAL_enterinventory = NO_ITEM;
-#else
-	g_Inventory.SetEnterObject(NO_ITEM);
-	g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
