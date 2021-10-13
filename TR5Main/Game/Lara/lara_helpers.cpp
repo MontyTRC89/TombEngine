@@ -77,7 +77,8 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	// Height difference is below threshold for step dispatch; translate Lara to new floor height
+	// Height difference is below threshold for step dispatch; translate Lara to new floor height.
+	// TODO: Try using bad heights native to each state.
 	// TODO: Follow cube root curve instead of doing this ugly thing.
 	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
 	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:

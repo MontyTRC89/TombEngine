@@ -1346,8 +1346,8 @@ bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraFall(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor <= STEPUP_HEIGHT
-		|| Lara.waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap BUG when lara wades off a ledge into a dry room. @Sezz 2021.09.26
+	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
+		Lara.waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap BUG when lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
 	}
@@ -1369,10 +1369,9 @@ bool TestLaraStepLeft(ITEM_INFO* item)
 	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
 	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-	if ((collFloorResult.Position.Floor < 128
-		&& collFloorResult.Position.Floor > -128)
-		&& !collFloorResult.Position.Slope
-		&& collCeilingResult.Position.Ceiling <= 0)
+	if ((collFloorResult.Position.Floor < STEP_SIZE / 2 && collFloorResult.Position.Floor > -STEP_SIZE / 2) &&
+		collCeilingResult.Position.Ceiling <= 0 &&
+		!collFloorResult.Position.Slope)
 	{
 		return true;
 	}
@@ -1385,10 +1384,9 @@ bool TestLaraStepRight(ITEM_INFO* item)
 	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
 	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-	if ((collFloorResult.Position.Floor < 128
-		&& collFloorResult.Position.Floor > -128)
-		&& !collFloorResult.Position.Slope
-		&& collCeilingResult.Position.Ceiling <= 0)
+	if ((collFloorResult.Position.Floor < STEP_SIZE / 2 && collFloorResult.Position.Floor > -STEP_SIZE / 2) &&
+		collCeilingResult.Position.Ceiling <= 0 &&
+		!collFloorResult.Position.Slope)
 	{
 		return true;
 	}
@@ -1396,14 +1394,12 @@ bool TestLaraStepRight(ITEM_INFO* item)
 	return false;
 }
 
-// TODO: Clean this mess. It shouldn't be like this.
 bool TestLaraCrawl(ITEM_INFO* item)
 {
-	if (Lara.gunStatus == LG_NO_ARMS
-		&& Lara.waterStatus != LW_WADE // redundant at this point
-		&& Lara.waterSurfaceDist >= -256
-		&& !(TrInput & (IN_FLARE | IN_DRAW))
-		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < 900 && Lara.flareAge != 0)))
+	if (Lara.gunStatus == LG_NO_ARMS &&
+		/*Lara.waterSurfaceDist >= -STEP_SIZE &&*/
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Flare is not being handled.
 	{
 		return true;
 	}
@@ -1411,21 +1407,28 @@ bool TestLaraCrawl(ITEM_INFO* item)
 	return false;
 }
 
-bool TestLaraCrouchRoll(ITEM_INFO* item)
+bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if ((Lara.gunStatus == LG_NO_ARMS && Lara.waterStatus != LW_WADE)
-		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256)
-		//&& (!LaraFloorFront(item, item->pos.yRot, 1024) >= 384					// 1 block away from hole in floor.
-			//|| TestLaraWall(item, WALL_SIZE / 2, 0, -256) != SPLAT_NONE)			// 1 block away from wall.
-		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)								// Avoids some flare spawning/wep stuff.
-		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < FLARE_AGE && Lara.flareAge != 0)))
-	{
-		// TODO: Commented lines above don't work, so keeping the check as it was for now. It doesn't function as intended anyway; Lara sometimes still vaults herself into walls. @Sezz 2021.09.26
-		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384	//4 clicks away from holes in the floor
-			|| TestLaraWall(item, WALL_SIZE / 2, 0, -256))		//2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
-			return false;
+	// This is a discrete probe and fails in many cases. Perhaps we need a ray for these kinds of tests. @Sezz 2021.10.14
+	// Instances of failure:
+	// - Facing thin geometry
+	// - Facing drop at the top of an incline
+	// - Facing small step to the side of the bottom of an incline
+	// - Facing step from an incline, beyond which is a flat descent of one step
 
+	auto x = item->pos.xPos + WALL_SIZE * phd_sin(coll->Setup.ForwardAngle);
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + WALL_SIZE * phd_cos(coll->Setup.ForwardAngle);
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	if (Lara.gunStatus == LG_NO_ARMS &&
+		Lara.waterSurfaceDist >= -STEP_SIZE &&					// Water depth is optically feasible for action.
+		(probe.Position.Floor - y) < STEP_SIZE &&				// No drop.
+		(probe.Position.Floor - y) > -STEP_SIZE &&				// No wall.
+		!probe.Position.Slope &&								// No slope.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Flare is not being handled.
+	{
 		return true;
 	}
 
