@@ -44,6 +44,11 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
+	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace.
+	// Otherwise, a collision bugfix causes her to stand for one frame.
+	// See if setting Lara.keepDucked can be done before she is in the crawlspace. @Sezz 2021.10.14
+	Lara.keepDucked = TestLaraStandUp(coll);
+
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
