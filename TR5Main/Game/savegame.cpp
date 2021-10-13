@@ -37,190 +37,238 @@ bool SaveGame::Save(char* fileName)
 {
 	ITEM_INFO itemToSerialize{};
 	FlatBufferBuilder fbb{};
+
 	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
 
-	// Serialize Lara
-	/*Save::LaraT serializedLara;
+	// Savegame header
+	auto levelNameOffset = fbb.CreateString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
 
+	Save::SaveGameHeaderBuilder sghb{ fbb };
+	sghb.add_level_name(levelNameOffset);
+	sghb.add_days((GameTimer / 30) / 8640);
+	sghb.add_hours(((GameTimer / 30) % 86400) / 3600);
+	sghb.add_minutes(((GameTimer / 30) / 60) % 6);
+	sghb.add_seconds((GameTimer / 30) % 60);
+	sghb.add_level(CurrentLevel);
+	sghb.add_timer(GameTimer);
+	sghb.add_count(++LastSaveGame);
+	auto headerOffset = sghb.Finish();
+
+	Save::SaveGameStatisticsBuilder sgLevelStatisticsBuilder{ fbb };
+	sgLevelStatisticsBuilder.add_ammo_hits(Savegame.Level.AmmoHits);
+	sgLevelStatisticsBuilder.add_ammo_used(Savegame.Level.AmmoUsed);
+	sgLevelStatisticsBuilder.add_kills(Savegame.Level.Kills);
+	sgLevelStatisticsBuilder.add_medipacks_used(Savegame.Level.HealthUsed);
+	sgLevelStatisticsBuilder.add_distance(Savegame.Level.Distance);
+	sgLevelStatisticsBuilder.add_secrets(Savegame.Level.Secrets);
+	sgLevelStatisticsBuilder.add_timer(Savegame.Level.Timer);
+	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
+
+	Save::SaveGameStatisticsBuilder sgGameStatisticsBuilder{ fbb };
+	sgGameStatisticsBuilder.add_ammo_hits(Savegame.Game.AmmoHits);
+	sgGameStatisticsBuilder.add_ammo_used(Savegame.Game.AmmoUsed);
+	sgGameStatisticsBuilder.add_kills(Savegame.Game.Kills);
+	sgGameStatisticsBuilder.add_medipacks_used(Savegame.Game.HealthUsed);
+	sgGameStatisticsBuilder.add_distance(Savegame.Game.Distance);
+	sgGameStatisticsBuilder.add_secrets(Savegame.Game.Secrets);
+	sgGameStatisticsBuilder.add_timer(Savegame.Game.Timer);
+	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
+
+	// Lara
+	std::vector<int> puzzles;
 	for (int i = 0; i < NUM_PUZZLES; i++)
-		serializedLara.puzzles.push_back(Lara.Puzzles[i]);
+		puzzles.push_back(Lara.Puzzles[i]);
+	auto puzzlesOffset = fbb.CreateVector(puzzles);
 
+	std::vector<int> puzzlesCombo;
 	for (int i = 0; i < NUM_PUZZLES * 2; i++)
-		serializedLara.puzzles_combo.push_back(Lara.PuzzlesCombo[i]);
+		puzzlesCombo.push_back(Lara.PuzzlesCombo[i]);
+	auto puzzlesComboOffset = fbb.CreateVector(puzzlesCombo);
 
+	std::vector<int> keys;
 	for (int i = 0; i < NUM_KEYS; i++)
-		serializedLara.keys.push_back(Lara.Keys[i]);
+		keys.push_back(Lara.Keys[i]);
+	auto keysOffset = fbb.CreateVector(keys);
 
+	std::vector<int> keysCombo;
 	for (int i = 0; i < NUM_KEYS * 2; i++)
-		serializedLara.keys_combo.push_back(Lara.KeysCombo[i]);
+		keysCombo.push_back(Lara.KeysCombo[i]);
+	auto keysComboOffset = fbb.CreateVector(keysCombo);
 
+	std::vector<int> pickups;
 	for (int i = 0; i < NUM_PICKUPS; i++)
-		serializedLara.pickups.push_back(Lara.Pickups[i]);
+		pickups.push_back(Lara.Pickups[i]);
+	auto pickupsOffset = fbb.CreateVector(pickups);
 
+	std::vector<int> pickupsCombo;
 	for (int i = 0; i < NUM_PICKUPS * 2; i++)
-		serializedLara.pickups_combo.push_back(Lara.PickupsCombo[i]);
+		pickupsCombo.push_back(Lara.PickupsCombo[i]);
+	auto pickupsComboOffset = fbb.CreateVector(pickupsCombo);
 
+	std::vector<int> examines;
+	for (int i = 0; i < NUM_EXAMINES; i++)
+		examines.push_back(Lara.Examines[i]);
+	auto examinesOffset = fbb.CreateVector(examines);
+
+	std::vector<int> examinesCombo;
+	for (int i = 0; i < NUM_EXAMINES * 2; i++)
+		examinesCombo.push_back(Lara.ExaminesCombo[i]);
+	auto examinesComboOffset = fbb.CreateVector(examinesCombo);
+
+	std::vector<int> meshPtrs;
 	for (int i = 0; i < 15; i++)
-		serializedLara.mesh_ptrs.push_back(Lara.meshPtrs[i]);
+		meshPtrs.push_back(Lara.meshPtrs[i]);
+	auto meshPtrsOffset = fbb.CreateVector(meshPtrs);
 
+	std::vector<byte> wet;
 	for (int i = 0; i < 15; i++)
-		serializedLara.wet.push_back(Lara.wet[i] == 1);
+		wet.push_back(Lara.wet[i] == 1);
+	auto wetOffset = fbb.CreateVector(wet);
 
-	auto arm = Save::CreateLaraArmInfo(fbb, 0, 0, 0, 0, 0, 0, 0, 0);
+	Save::LaraArmInfoBuilder leftArm{ fbb };
+	leftArm.add_anim_number(Lara.leftArm.animNumber);
+	leftArm.add_flash_gun(Lara.leftArm.flash_gun);
+	leftArm.add_frame_base(Lara.leftArm.frameBase);
+	leftArm.add_frame_number(Lara.leftArm.frameNumber);
+	leftArm.add_lock(Lara.leftArm.lock);
+	leftArm.add_x_rot(Lara.leftArm.xRot);
+	leftArm.add_y_rot(Lara.leftArm.yRot);
+	leftArm.add_z_rot(Lara.leftArm.zRot);
+	auto leftArmOffset = leftArm.Finish();
 
-	serializedLara.left_arm = std::make_unique<Save::LaraArmInfoT>(new Save::LaraArmInfoT());
-	Save::LaraArmInfoT* leftArm = serializedLara.left_arm.get();
-	leftArm->anim_number = Lara.leftArm.animNumber;
-	leftArm->flash_gun = Lara.leftArm.flash_gun;
-	leftArm->frame_base = Lara.leftArm.frameBase;
-	leftArm->frame_number = Lara.leftArm.frameNumber;
-	leftArm->lock = Lara.leftArm.lock;
-	leftArm->x_rot = Lara.leftArm.xRot;
-	leftArm->y_rot = Lara.leftArm.yRot;
-	leftArm->z_rot = Lara.leftArm.zRot;
+	Save::LaraArmInfoBuilder rightArm{ fbb };
+	rightArm.add_anim_number(Lara.rightArm.animNumber);
+	rightArm.add_flash_gun(Lara.rightArm.flash_gun);
+	rightArm.add_frame_base(Lara.rightArm.frameBase);
+	rightArm.add_frame_number(Lara.rightArm.frameNumber);
+	rightArm.add_lock(Lara.rightArm.lock);
+	rightArm.add_x_rot(Lara.rightArm.xRot);
+	rightArm.add_y_rot(Lara.rightArm.yRot);
+	rightArm.add_z_rot(Lara.rightArm.zRot);
+	auto rightArmOffset = rightArm.Finish();
 
-	serializedLara.right_arm = std::make_unique<Save::LaraArmInfoT>(new Save::LaraArmInfoT());
-	Save::LaraArmInfoT* rightArm = serializedLara.right_arm.get();
-	rightArm->anim_number = Lara.rightArm.animNumber;
-	rightArm->flash_gun = Lara.rightArm.flash_gun;
-	rightArm->frame_base = Lara.rightArm.frameBase;
-	rightArm->frame_number = Lara.rightArm.frameNumber;
-	rightArm->lock = Lara.rightArm.lock;
-	rightArm->x_rot = Lara.rightArm.xRot;
-	rightArm->y_rot = Lara.rightArm.yRot;
-	rightArm->z_rot = Lara.rightArm.zRot;
-	
-	serializedLara.air = Lara.air;
-	serializedLara.beetle_life = Lara.BeetleLife;
-	serializedLara.big_waterskin = Lara.big_waterskin;
-	serializedLara.binoculars = Lara.Binoculars;
-	serializedLara.burn = Lara.burn;
-	serializedLara.burn_blue = Lara.burnBlue;
-	serializedLara.burn_count = Lara.burnCount;
-	serializedLara.burn_smoke = Lara.burnSmoke;
-	serializedLara.busy = Lara.busy;
-	serializedLara.calc_fall_speed = Lara.calcFallSpeed;
-	serializedLara.can_monkey_swing = Lara.canMonkeySwing;
-	serializedLara.climb_status = Lara.climbStatus;
-	serializedLara.corner_x = Lara.cornerX;
-	serializedLara.corner_z = Lara.cornerZ;
-	serializedLara.crowbar = Lara.Crowbar;
-	serializedLara.current_active = Lara.currentActive;
-	serializedLara.current_x_vel = Lara.currentXvel;
-	serializedLara.current_y_vel = Lara.currentYvel;
-	serializedLara.current_z_vel = Lara.currentZvel;
-	serializedLara.death_count = Lara.deathCount;
-	serializedLara.dive_count = Lara.diveCount;
-	serializedLara.extra_anim = Lara.ExtraAnim;
-	//serializedLara.fall_speed = Lara.fallSpeed;
-	serializedLara.fired = Lara.fired;
-	serializedLara.flare_age = Lara.flareAge;
-	serializedLara.flare_control_left = Lara.flareControlLeft;
-	serializedLara.flare_frame = Lara.flareFrame;
-	serializedLara.gun_status = Lara.gunStatus;
-	serializedLara.gun_type = Lara.gunType;
-	serializedLara.has_beetle_things = Lara.hasBeetleThings;
-	serializedLara.has_fired = Lara.hasFired;
-	serializedLara.head_x_rot = Lara.headXrot;
-	serializedLara.head_y_rot = Lara.headYrot;
-	serializedLara.head_z_rot = Lara.headZrot;
-	serializedLara.highest_location = Lara.highestLocation;
-	serializedLara.hit_direction = Lara.hitDirection;
-	serializedLara.hit_frame = Lara.hitFrame;
-	serializedLara.interacted_item = Lara.interactedItem;
-	serializedLara.is_climbing = Lara.isClimbing;
-	serializedLara.is_ducked = Lara.isDucked;
-	serializedLara.is_moving = Lara.isMoving;
-	serializedLara.item_number = Lara.itemNumber;
-	serializedLara.keep_ducked = Lara.keepDucked;
-	serializedLara.lasersight = Lara.Lasersight;
-	serializedLara.last_gun_type = Lara.lastGunType;
 	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
-	serializedLara.last_position = std::make_unique<Save::Vector3>(&lastPos);
-	serializedLara.lit_torch = Lara.litTorch;
-	serializedLara.location = Lara.location;
-	serializedLara.location_pad  = Lara.locationPad;
-	serializedLara.look = Lara.look;
-	serializedLara.mine_l = Lara.mineL;
-	serializedLara.mine_r = Lara.mineR;
-	serializedLara.move_angle = Lara.moveAngle;
-	serializedLara.move_count = Lara.moveCount;
-	serializedLara.num_flares = Lara.NumFlares;
-	serializedLara.num_small_medipacks = Lara.NumSmallMedipacks;
-	serializedLara.num_large_medipacks = Lara.NumLargeMedipacks;
-	serializedLara.old_busy = Lara.oldBusy;
-	serializedLara.poisoned = Lara.poisoned;
-	serializedLara.pose_count = Lara.poseCount;
-	serializedLara.request_gun_type = Lara.requestGunType;
-	serializedLara.rope_arc_back = Lara.ropeArcBack;
-	serializedLara.rope_arc_front = Lara.ropeArcFront;
-	serializedLara.rope_dframe = Lara.ropeDFrame;
-	serializedLara.rope_direction = Lara.ropeDirection;
-	serializedLara.rope_down_vel = Lara.ropeDownVel;
-	serializedLara.rope_flag = Lara.ropeFlag;
-	serializedLara.rope_framerate = Lara.ropeFrameRate;
-	serializedLara.rope_frame = Lara.ropeFrame;
-	serializedLara.rope_last_x = Lara.ropeLastX;
-	serializedLara.rope_max_x_backward = Lara.ropeMaxXBackward;
-	serializedLara.rope_max_x_forward = Lara.ropeMaxXForward;
-	serializedLara.rope_offset = Lara.ropeOffset;
-	serializedLara.rope_ptr = Lara.ropePtr;
-	serializedLara.rope_segment = Lara.ropeSegment;
-	serializedLara.rope_y = Lara.ropeY;
-	serializedLara.secrets = Lara.Secrets;
-	serializedLara.silencer = Lara.Silencer;
-	serializedLara.small_waterskin = Lara.small_waterskin;
-	serializedLara.spaz_effect_count = Lara.spazEffectCount;
-	serializedLara.target_angles.push_back(Lara.targetAngles[0]);
-	serializedLara.target_angles.push_back(Lara.targetAngles[1]);
-	serializedLara.target_item_number = Lara.target - g_Level.Items.data();
-	//serializedLara.tightrope = Lara.air;
-	serializedLara.torch = Lara.Torch;
-	serializedLara.torso_x_rot = Lara.torsoXrot;
-	serializedLara.torso_y_rot = Lara.torsoYrot;
-	serializedLara.torso_z_rot = Lara.torsoZrot;
-	serializedLara.turn_rate = Lara.turnRate;
-	serializedLara.uncontrollable = Lara.uncontrollable;
-	serializedLara.vehicle = Lara.Vehicle;
-	serializedLara.water_status = Lara.waterStatus;
-	serializedLara.water_surface_dist = Lara.waterSurfaceDist;
-	serializedLara.weapon_item = Lara.weaponItem;
+
+	std::vector<int> laraTargetAngles{};
+	laraTargetAngles.push_back(Lara.targetAngles[0]);
+	laraTargetAngles.push_back(Lara.targetAngles[1]);
+	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
+
+	Save::LaraBuilder lara{ fbb };
+	lara.add_air(Lara.air);
+	lara.add_beetle_life(Lara.BeetleLife);
+	lara.add_big_waterskin(Lara.big_waterskin);
+	lara.add_binoculars(Lara.Binoculars);
+	lara.add_burn(Lara.burn);
+	lara.add_burn_blue(Lara.burnBlue);
+	lara.add_burn_count(Lara.burnCount);
+	lara.add_burn_smoke(Lara.burnSmoke);
+	lara.add_busy(Lara.busy);
+	lara.add_calc_fall_speed(Lara.calcFallSpeed);
+	lara.add_can_monkey_swing(Lara.canMonkeySwing);
+	lara.add_climb_status(Lara.climbStatus);
+	lara.add_corner_x(Lara.cornerX);
+	lara.add_corner_z(Lara.cornerZ);
+	lara.add_crowbar(Lara.Crowbar);
+	lara.add_current_active(Lara.currentActive);
+	lara.add_current_x_vel(Lara.currentXvel);
+	lara.add_current_y_vel(Lara.currentYvel);
+	lara.add_current_z_vel(Lara.currentZvel);
+	lara.add_death_count(Lara.deathCount);
+	lara.add_dive_count(Lara.diveCount);
+	lara.add_extra_anim(Lara.ExtraAnim);
+	lara.add_examines(examinesOffset);
+	lara.add_examines_combo(examinesComboOffset);
+	lara.add_fired(Lara.fired);
+	lara.add_flare_age(Lara.flareAge);
+	lara.add_flare_control_left(Lara.flareControlLeft);
+	lara.add_flare_frame(Lara.flareFrame);
+	lara.add_gun_status(Lara.gunStatus);
+	lara.add_gun_type(Lara.gunType);
+	lara.add_has_beetle_things(Lara.hasBeetleThings);
+	lara.add_has_fired(Lara.hasFired);
+	lara.add_head_x_rot(Lara.headXrot);
+	lara.add_head_y_rot(Lara.headYrot);
+	lara.add_head_z_rot(Lara.headZrot);
+	lara.add_highest_location(Lara.highestLocation);
+	lara.add_hit_direction(Lara.hitDirection);
+	lara.add_hit_frame(Lara.hitFrame);
+	lara.add_interacted_item(Lara.interactedItem);
+	lara.add_is_climbing(Lara.isClimbing);
+	lara.add_is_ducked(Lara.isDucked);
+	lara.add_is_moving(Lara.isMoving);
+	lara.add_item_number(Lara.itemNumber);
+	lara.add_keep_ducked(Lara.keepDucked);
+	lara.add_keys(keysOffset);
+	lara.add_keys_combo(keysComboOffset);
+	lara.add_lasersight(Lara.Lasersight);
+	lara.add_last_gun_type(Lara.lastGunType);
+	lara.add_last_position(&lastPos);
+	lara.add_left_arm(leftArmOffset);
+	lara.add_lit_torch(Lara.litTorch);
+	lara.add_location(Lara.location);
+	lara.add_location_pad(Lara.locationPad);
+	lara.add_look(Lara.look);
+	lara.add_mesh_ptrs(meshPtrsOffset);
+	lara.add_mine_l(Lara.mineL);
+	lara.add_mine_r(Lara.mineR);
+	lara.add_move_angle(Lara.moveAngle);
+	lara.add_move_count(Lara.moveCount);
+	lara.add_num_flares(Lara.NumFlares);
+	lara.add_num_small_medipacks(Lara.NumSmallMedipacks);
+	lara.add_num_large_medipacks(Lara.NumLargeMedipacks);
+	lara.add_old_busy(Lara.oldBusy);
+	lara.add_puzzles(puzzlesOffset);
+	lara.add_puzzles_combo(puzzlesComboOffset);
+	lara.add_poisoned(Lara.poisoned);
+	lara.add_pose_count(Lara.poseCount);
+	lara.add_pickups(pickupsOffset);
+	lara.add_pickups_combo(pickupsComboOffset);
+	lara.add_request_gun_type(Lara.requestGunType);
+	lara.add_right_arm(rightArmOffset);
+	lara.add_rope_arc_back(Lara.ropeArcBack);
+	lara.add_rope_arc_front(Lara.ropeArcFront);
+	lara.add_rope_dframe(Lara.ropeDFrame);
+	lara.add_rope_direction(Lara.ropeDirection);
+	lara.add_rope_down_vel(Lara.ropeDownVel);
+	lara.add_rope_flag(Lara.ropeFlag);
+	lara.add_rope_framerate(Lara.ropeFrameRate);
+	lara.add_rope_frame(Lara.ropeFrame);
+	lara.add_rope_last_x(Lara.ropeLastX);
+	lara.add_rope_max_x_backward(Lara.ropeMaxXBackward);
+	lara.add_rope_max_x_forward(Lara.ropeMaxXForward);
+	lara.add_rope_offset(Lara.ropeOffset);
+	lara.add_rope_ptr(Lara.ropePtr);
+	lara.add_rope_segment(Lara.ropeSegment);
+	lara.add_rope_y(Lara.ropeY);
+	lara.add_secrets(Lara.Secrets);
+	lara.add_silencer(Lara.Silencer);
+	lara.add_small_waterskin(Lara.small_waterskin);
+	lara.add_spaz_effect_count(Lara.spazEffectCount);
+	lara.add_target_angles(laraTargetAnglesOffset);
+	lara.add_target_item_number(Lara.target - g_Level.Items.data());
+	lara.add_torch(Lara.Torch);
+	lara.add_torso_x_rot(Lara.torsoXrot);
+	lara.add_torso_y_rot(Lara.torsoYrot);
+	lara.add_torso_z_rot(Lara.torsoZrot);
+	lara.add_turn_rate(Lara.turnRate);
+	lara.add_uncontrollable(Lara.uncontrollable);
+	lara.add_vehicle(Lara.Vehicle);
+	lara.add_water_status(Lara.waterStatus);
+	lara.add_water_surface_dist(Lara.waterSurfaceDist);
+	lara.add_weapon_item(Lara.weaponItem);
+	lara.add_wet(wetOffset);
+	auto laraOffset = lara.Finish();
+
+	// Weapon info
+	/*
+		std::vector
+	LARA_WEAPON_TYPE::NUM_WEAPONS
+	Save::CarriedWeaponInfoBuilder carriedWeaponInfo{ fbb };
+	carriedWeaponInfo.add_ammo(Lara.Weapons)
 	*/
 
-	Save::SaveGameT sg;
-
-	// Create the savegame header
-	sg.header = std::make_unique<Save::SaveGameHeaderT>();
-	Save::SaveGameHeaderT* header = sg.header.get();
-	header->level_name = g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str());
-	header->days = (GameTimer / 30) / 86400;
-	header->hours = ((GameTimer / 30) % 86400) / 3600;
-	header->minutes = ((GameTimer / 30) / 60) % 6;
-	header->seconds = (GameTimer / 30) % 60;
-	header->level = CurrentLevel;
-	header->timer = GameTimer;
-	header->count = ++LastSaveGame;
-
-	sg.level = std::make_unique<Save::SaveGameStatisticsT>();
-	Save::SaveGameStatisticsT* levelStatistics = sg.level.get();
-	levelStatistics->ammo_hits = Savegame.Level.AmmoHits;
-	levelStatistics->ammo_used = Savegame.Level.AmmoUsed;
-	levelStatistics->kills = Savegame.Level.Kills;
-	levelStatistics->medipacks_used = Savegame.Level.HealthUsed;
-	levelStatistics->distance = Savegame.Level.Distance;
-	levelStatistics->secrets = Savegame.Level.Secrets;
-	levelStatistics->timer = Savegame.Level.Timer;
-
-	sg.game = std::make_unique<Save::SaveGameStatisticsT>();
-	Save::SaveGameStatisticsT* gameStatistics = sg.game.get();
-	gameStatistics->ammo_hits = Savegame.Game.AmmoHits;
-	gameStatistics->ammo_used = Savegame.Game.AmmoUsed;
-	gameStatistics->kills = Savegame.Game.Kills;
-	gameStatistics->medipacks_used = Savegame.Game.HealthUsed;
-	gameStatistics->distance = Savegame.Game.Distance;
-	gameStatistics->secrets = Savegame.Game.Secrets;
-	gameStatistics->timer = Savegame.Game.Timer;
-
+	/*
 	for (const auto& itemToSerialize : g_Level.Items) {
 		Save::ItemT serializedItem{};
 
@@ -250,13 +298,15 @@ bool SaveGame::Save(char* fileName)
 		//serialize Items here
 		serializedItems.push_back(Save::CreateItem(fbb, &serializedItem));
 	}
+*/
+	Save::SaveGameBuilder sgb{ fbb };
+	sgb.add_header(headerOffset);
+	sgb.add_level(levelStatisticsOffset);
+	sgb.add_game(gameStatisticsOffset);
+	sgb.add_lara(laraOffset);
+	auto sg = sgb.Finish();
+	fbb.Finish(sg);
 
-	//sgb.add_ambient_track(4);
-	//sgb.add_items(fbb.CreateVector(serializedItems));
-
-	//auto serializedSave = sgb.Finish();
-	//Save::SaveGameBuilder sgb = Save::SaveGameBuilder(fbb);
-	fbb.Finish(Save::SaveGame::Pack(fbb, &sg));
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
@@ -281,6 +331,8 @@ bool SaveGame::Load(char* fileName)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
+	int ammoUsed1 = s->game()->ammo_used();
+	int ammoUsed2 = s->level()->ammo_used();
 
 	//read stuff here like this:
 
