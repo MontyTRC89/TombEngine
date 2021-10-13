@@ -31,7 +31,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CRAWL_IDLE;  // Death dispatch
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
@@ -39,15 +39,15 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	if (TrInput & IN_DUCK || Lara.keepDucked
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+		Lara.waterStatus != LW_WADE)
 	{
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
 		Lara.NewAnims.CrouchRoll = true;
 
-		if ((TrInput & IN_SPRINT)
-			&& Lara.NewAnims.CrouchRoll
-			&& TestLaraCrouchRoll(item))
+		if ((TrInput & IN_SPRINT) &&
+			TestLaraCrouchRoll(item) &&
+			Lara.NewAnims.CrouchRoll)
 		{
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
@@ -57,8 +57,8 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// TODO: Allow Lara to go when pressing FORWARD or BACK. @Sezz 2021.09.26
-		if ((TrInput & (IN_FORWARD | IN_BACK))
-			&& TestLaraCrawl(item))
+		if (TrInput & (IN_FORWARD | IN_BACK) &&
+			TestLaraCrawl(item))  // TODO: Crouching in wade-height water shouldn't even be possible. @Sezz 2021.10.13
 		{
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
@@ -67,15 +67,13 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if ((TrInput & IN_LEFT)
-			&& TestLaraCrouchTurn(item))
+		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_LEFT;
 
 			return;
 		}
-		else if ((TrInput & IN_RIGHT)
-			&& TestLaraCrouchTurn(item))
+		else if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
 
@@ -196,9 +194,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	ShiftItem(item, coll);
 
 	if (coll->Middle.Floor != NO_HEIGHT)
-	{
 		item->pos.yPos += coll->Middle.Floor;
-	}
 }
 
 // LEGACY
@@ -261,24 +257,20 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(20.0f);
 
-	if (TrInput & IN_LEFT
-		&& item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+	if (TrInput & IN_LEFT &&
+		item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_CROUCH_ROLL_TURN)
-			Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
+		Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
 
 		if (TestLaraLean(item, coll))
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 8;
 		else
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
 	}
-	else if (TrInput & IN_RIGHT
-		&& item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+	else if (TrInput & IN_RIGHT &&
+		item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_CROUCH_ROLL_TURN)
-			Lara.turnRate = LARA_CROUCH_ROLL_TURN;
+		Lara.turnRate = LARA_CROUCH_ROLL_TURN;
 
 		if (TestLaraLean(item, coll))
 			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 8;
@@ -331,9 +323,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// Hit wall or ledge
-	if (coll->Middle.Floor < coll->Setup.BadHeightUp
-		|| coll->Middle.Floor > coll->Setup.BadHeightDown)
+	// Hit wall or ledge.
+	if (coll->Middle.Floor < coll->Setup.BadHeightUp ||
+		coll->Middle.Floor > coll->Setup.BadHeightDown)
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
 		item->pos.yPos = coll->Setup.OldPosition.y;
@@ -352,9 +344,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (coll->Middle.Floor != NO_HEIGHT)
-	{
 		item->pos.yPos += coll->Middle.Floor;
-	}
 }
 
 // LEGACY
@@ -405,7 +395,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CROUCH_IDLE; // TODO: Dispatch death state. @Sezz 2021.10.03
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
@@ -419,8 +409,8 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate = -LARA_TURN_RATE;*/
 	item->pos.yRot -= ANGLE(1.5f);
 
-	if (TrInput & IN_DUCK || Lara.keepDucked
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+		Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT)
 		{
@@ -479,13 +469,13 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why. @Sezz 2021.10.03
-	/*Lara.turnRate -= ANGLE(1.5f);
-	if (Lara.turnRate < -LARA_TURN_RATE)
-		Lara.turnRate = -LARA_TURN_RATE;*/
+	/*Lara.turnRate += ANGLE(1.5f);
+	if (Lara.turnRate > LARA_TURN_RATE)
+		Lara.turnRate = LARA_TURN_RATE;*/
 	item->pos.yRot += ANGLE(1.5f);
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked)
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+		Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT)
 		{
@@ -976,8 +966,8 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: If Lara is crawling and approaching a low-ceiling space,
 	// allow her to continue without having to hold DUCK. @Sezz 2021.10.05
-	if ((TrInput & IN_DUCK || Lara.keepDucked)
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+		Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_FORWARD)
 		{
