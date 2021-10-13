@@ -26,6 +26,11 @@
 // Collision:	lara_col_crouch()
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
+	// wade depth where Lara couldn't crouch at all, and if the player forcibly forced her into the crouched state by
+	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
+	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.13.21
+
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -46,22 +51,17 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.NewAnims.CrouchRoll = true;
 
 		if ((TrInput & IN_SPRINT) &&
-			TestLaraCrouchRoll(item) &&
+			TestLaraCrouchRoll(item, coll) &&
 			Lara.NewAnims.CrouchRoll)
 		{
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
 			item->goalAnimState = LS_CROUCH_ROLL;
 
 			return;
 		}
 
-		// TODO: Allow Lara to go when pressing FORWARD or BACK. @Sezz 2021.09.26
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrawl(item))  // TODO: Crouching in wade-height water shouldn't even be possible. @Sezz 2021.10.13
+			TestLaraCrawl(item))
 		{
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -258,7 +258,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(20.0f);
 
 	if (TrInput & IN_LEFT &&
-		item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+		item->speed)
 	{
 		Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
 
@@ -268,7 +268,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
 	}
 	else if (TrInput & IN_RIGHT &&
-		item->animNumber != LA_CROUCH_ROLL_FORWARD_END)
+		item->speed)
 	{
 		Lara.turnRate = LARA_CROUCH_ROLL_TURN;
 
@@ -300,17 +300,26 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEP_SIZE;		// Was STEPUP_HEIGHT. High tolerances seemed inappropriate. @Sezz 2021.10.14
+	coll->Setup.BadHeightUp = -STEP_SIZE;		// Was -STEPUP_HEIGHT.
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
+	// Hit wall or ledge.
+	if (coll->Middle.Floor <= coll->Setup.BadHeightUp ||
+		coll->Middle.Floor >= coll->Setup.BadHeightDown)
+	{
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+	}
+
 	if (TestLaraFall(coll))
 	{
 		Lara.gunStatus = LG_NO_ARMS;
-		item->speed /= 3;				// In case Lara falls, truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
+		item->speed /= 3;				// Truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
 		SetLaraFallState(item);
 
 		return;
@@ -319,17 +328,6 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
-
-		return;
-	}
-
-	// Hit wall or ledge.
-	if (coll->Middle.Floor < coll->Setup.BadHeightUp ||
-		coll->Middle.Floor > coll->Setup.BadHeightDown)
-	{
-		item->pos.xPos = coll->Setup.OldPosition.x;
-		item->pos.yPos = coll->Setup.OldPosition.y;
-		item->pos.zPos = coll->Setup.OldPosition.z;
 
 		return;
 	}
@@ -343,8 +341,16 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;*/
 }
 
 // LEGACY
@@ -412,14 +418,17 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT)
+		if ((TrInput & IN_SPRINT) &&
+			TestLaraCrouchRoll(item, coll) &&
+			Lara.NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & (IN_FORWARD | IN_BACK) &&
+			TestLaraCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
 
@@ -465,6 +474,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO?
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
@@ -477,14 +487,17 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT)
+		if ((TrInput & IN_SPRINT) &&
+			TestLaraCrouchRoll(item, coll) &&
+			Lara.NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & (IN_FORWARD | IN_BACK) &&
+			TestLaraCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
 
