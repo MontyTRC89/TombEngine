@@ -743,7 +743,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: Slight speed advantage when intention is to turn. Check how significant.
 	// Permit turning when Lara is stationary and cannot dispatch into a true turn.
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_JUMP))	// Temp solution: JUMP locks y rotation.
@@ -776,16 +775,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: The way sprinting works is messy. Lara should be able to stop sooner if
-	// the state is set here. @ Sezz 2021.10.04
-	if (TrInput & IN_SPRINT &&
-		TrInput & IN_FORWARD)
-	{
-		item->goalAnimState = LS_SPRINT;
-
-		return;
-	}
-
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
@@ -797,7 +786,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
-		if (Lara.gunType == WEAPON_REVOLVER)
+		if (Lara.gunType == WEAPON_REVOLVER) // TODO: Cleaner handling. @Sezz 2021.10.13
 		{
 			if (!LaserSight)
 				item->goalAnimState = LS_CROUCH_IDLE;
@@ -812,10 +801,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		!((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0)) ||	// Slope in front.
 			coll->CollisionType == CT_FRONT))														// Wall/ceiling/object in front.
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK)					// TODO: Make sprinting from walk commit to sprint, and walking from sprint commit to walk, when both inputs are registered. @Sezz 2021.10.13
 			item->goalAnimState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT)
+			item->goalAnimState = LS_SPRINT;
 		else [[likely]]
 			item->goalAnimState = LS_RUN_FORWARD;
 
@@ -843,15 +832,15 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP
-		&& TestLaraStepLeft(item))
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeft(item))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
-	else if (TrInput & IN_RSTEP
-		&& TestLaraStepRight(item))
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRight(item))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -888,26 +877,28 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// TODO: This is all wrong. Check over it. @Sezz 2021.10.05
-// Peripheral pseudo-state used while stopped and water status is LW_WADE. @Sezz 2021.06.28
+// TODO: Future-proof for raising water.
+// TODO: See if making these into true states would be beneficial. @Sezz 2021.10.13
+// Pseudo-state for idling in wade-height water.
 void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RESULT rHeight)
 {
-	if (TrInput & IN_JUMP
-		&& !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (TrInput & IN_JUMP &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
 		return;
 	}
 
+	// TODO: Clean this.
 	if (TrInput & IN_FORWARD)
 	{
 		bool wade = false;
 
-		if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
-			&& g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-			|| (fHeight.Position.Floor < (STEPUP_HEIGHT - 1)
-				&& fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)))
+		if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1) &&
+			g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) ||
+			(fHeight.Position.Floor < (STEPUP_HEIGHT - 1) &&
+				fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)))
 		{
 			wade = true;
 			item->goalAnimState = LS_WADE_FORWARD;
@@ -935,19 +926,9 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 
 	if (TrInput & IN_BACK)
 	{
-		// TODO: Check this thoroughly. @Sezz 2021.10.04
-		if (TrInput & IN_WALK)
-		{
-			if ((rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
-				&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
-				&& !rHeight.Position.Slope)
+		item->goalAnimState = LS_WALK_BACK;
 
-				item->goalAnimState = LS_WALK_BACK;
-		}
-		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
-		{
-			item->goalAnimState = LS_HOP_BACK;
-		}
+		return;
 	}
 
 	if (TrInput & IN_LEFT)
@@ -1330,10 +1311,10 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_POSE (4)
+// Control:		lara_void_func()
 void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 4*/
-	/*state code: lara_void_func*/
 	lara_col_stop(item, coll);
 }
 
@@ -1500,13 +1481,10 @@ void old_lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// TODO: Wading pseudo-state. @Sezz 2021.10.05
 // State:		LS_TURN_RIGHT_SLOW (6)
 // Collision:	lara_col_turn_r()
 void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Tests for forward/back movement dispatches.
-
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1514,10 +1492,15 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Looking needs better handling.
-
 	// TODO: This can't be anywhere below the run dispatch because tests to prevent forward/back movement currently don't exist.
 	Lara.turnRate += LARA_TURN_RATE;
+
+	if (Lara.waterStatus == LW_WADE)
+	{
+		LaraWadeTurnRight(item, coll);
+
+		return;
+	}
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1526,17 +1509,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT &&
-		TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
-	{
-		item->goalAnimState = LS_SPRINT;
-
-		return;
-	}
-
-	if (TrInput & IN_ROLL &&
-		Lara.waterStatus != LW_WADE)
+	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -1544,21 +1517,19 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE)
+		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
+	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD; // TODO: This is a frame-perfect input.
+		else if (TrInput & IN_SPRINT)
+			item->goalAnimState = LS_SPRINT;
 		else [[likely]]
 			item->goalAnimState = LS_RUN_FORWARD;
 
@@ -1567,9 +1538,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_BACK)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WALK_BACK;
-		else if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_BACK;
 		else [[likely]]
 			item->goalAnimState = LS_HOP_BACK;
@@ -1594,8 +1563,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (TrInput & IN_WALK ||	// TODO: This doesn't work since TR1.
-			Lara.waterStatus == LW_WADE)
+		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
 			if (Lara.turnRate > LARA_SLOW_TURN)
 				Lara.turnRate = LARA_SLOW_TURN;
@@ -1606,6 +1574,59 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for turning right in wade-height water.
+void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_JUMP &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->goalAnimState = LS_JUMP_PREPARE;
+
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+
+	if (TrInput & IN_BACK)
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeft(item))
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRight(item))
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
+	if (TrInput & IN_RIGHT)
+	{
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
@@ -1722,6 +1743,13 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.turnRate -= LARA_TURN_RATE;
 
+	if (Lara.waterStatus == LW_WADE)
+	{
+		LaraWadeTurnLeft(item, coll);
+
+		return;
+	}
+
 	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
@@ -1729,17 +1757,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT &&
-		TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
-	{
-		item->goalAnimState = LS_SPRINT;
-
-		return;
-	}
-
-	if (TrInput & IN_ROLL &&
-		Lara.waterStatus != LW_WADE)
+	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -1747,21 +1765,19 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK || TestLaraStandUp(coll)) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE)
+		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
+	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT)
+			item->goalAnimState = LS_SPRINT;
 		else [[likely]]
 			item->goalAnimState = LS_RUN_FORWARD;
 
@@ -1770,9 +1786,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_BACK)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WALK_BACK;
-		else if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_BACK;
 		else [[likely]]
 			item->goalAnimState = LS_HOP_BACK;
@@ -1797,8 +1811,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (TrInput & IN_WALK ||
-			Lara.waterStatus == LW_WADE)
+		if (TrInput & IN_WALK)
 		{
 			if (Lara.turnRate < -LARA_SLOW_TURN)
 				Lara.turnRate = -LARA_SLOW_TURN;
@@ -1809,6 +1822,59 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for turning left in wade-height water.
+void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_JUMP &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->goalAnimState = LS_JUMP_PREPARE;
+
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+
+	if (TrInput & IN_BACK)
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeft(item))
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRight(item))
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
 		return;
 	}
@@ -1836,12 +1902,12 @@ void old_lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
 				Lara.turnRate = -LARA_SLOW_TURN;
 			else
-				item->goalAnimState;// = LS_TURN_FAST;
+				item->goalAnimState;// = LS_TURN_FAST; // Dead state.
 		}
 	}
 	else
 	{
-		item->goalAnimState;// = LS_TURN_FAST;
+		item->goalAnimState;// = LS_TURN_FAST; // Dead state.
 	}
 
 	// Don't try to move forward if button isn't pressed or there's no headroom in front
@@ -2232,9 +2298,9 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// ???
-	if (Lara.isMoving)
-		return;
+	// TODO: This seems unnecessary, but I'm leaving it in case something breaks. @Sezz 2021.10.13
+	/*if (Lara.isMoving)
+		return;*/
 
 	if (TrInput & IN_LEFT)
 	{
@@ -2256,11 +2322,9 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
 	}
 
-
-	if (TrInput & IN_BACK &&
-		(TrInput & IN_WALK || Lara.waterStatus == LW_WADE))
+	if (TrInput & IN_BACK)
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->goalAnimState = LS_HOP_BACK;
 
 		return;
 	}
@@ -2426,14 +2490,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT &&
-		TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
-	{
-		item->goalAnimState = LS_SPRINT;
-
-		return;
-	}
+	// TODO: Wade handling. @Sezz 2021.10.13
 
 	if (TrInput & IN_JUMP)
 	{
@@ -2466,6 +2523,8 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT)
+			item->goalAnimState = LS_SPRINT;
 		else [[likely]]
 			item->goalAnimState = LS_RUN_FORWARD;
 
@@ -2566,15 +2625,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT &&
-		TrInput & IN_FORWARD &&
-		Lara.waterStatus != LW_WADE)
-	{
-		item->goalAnimState = LS_SPRINT;
-
-		return;
-	}
-
 	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
@@ -2606,6 +2656,8 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT)
+			item->goalAnimState = LS_SPRINT;
 		else [[likely]]
 			item->goalAnimState = LS_RUN_FORWARD;
 
@@ -3347,10 +3399,11 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 			if (Lara.turnRate < -LARA_SLOW_TURN)
 				Lara.turnRate = -LARA_SLOW_TURN;
 
+			// TODO: Some other state makes her lean?
 			if (TestLaraLean(item, coll))
-				item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 2) / 7;
+				item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 2) / 16;
 			else
-				item->pos.zRot -= (item->pos.zRot + (LARA_LEAN_MAX / 2) * 3 / 5) / 7;
+				item->pos.zRot -= (item->pos.zRot + (LARA_LEAN_MAX / 2) * 3 / 5) / 16;
 
 			// OLD sample
 			/*if (TestLaraLean(item, coll))
@@ -3373,10 +3426,10 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.turnRate = LARA_SLOW_TURN;
 
 			if (TestLaraLean(item, coll))
-				item->pos.zRot += (LARA_LEAN_MAX / 2 - item->pos.zRot) / 7;
+				item->pos.zRot += (LARA_LEAN_MAX / 2 - item->pos.zRot) / 16;
 
 			else
-				item->pos.zRot += ((LARA_LEAN_MAX / 2) * 3 / 5 - item->pos.zRot) / 7;
+				item->pos.zRot += ((LARA_LEAN_MAX / 2) * 3 / 5 - item->pos.zRot) / 16;
 		}
 
 		if (TrInput & IN_FORWARD)
@@ -3500,8 +3553,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		// item->goalAnimState = LS_DEATH; // TODO: Direct state dispatch. @Sezz 2021.09.29
-		item->goalAnimState = LS_RUN_FORWARD;
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
@@ -3540,6 +3592,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
+
 		return;
 	}
 
