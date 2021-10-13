@@ -971,6 +971,8 @@ void InventoryClass::handle_display_setting_input(bool pause)
 				g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
 					CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
 
+				pause_menu_to_display = pause_main_menu;
+				pause_selected_option = 1;
 			}
 			else if (pause_selected_option == 6)
 			{
