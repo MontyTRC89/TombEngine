@@ -923,11 +923,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Handle current Lara status
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	// TODO: These commented conditions result in more accurate behaviour, but I suppose this is what we would call "hardcoding".
-	// Leaving this for now in case something catastrophic is discovered with the simpler check. @Sezz 2021.09.26
-	/*if ((item->currentAnimState != LS_RUN_FORWARD && item->currentAnimState != LS_SPRINT)
-		|| ((item->currentAnimState == LS_RUN_FORWARD || item->currentAnimState == LS_SPRINT)
-			&& !((TrInput & IN_LEFT) || (TrInput & IN_RIGHT))))*/
+	// Could replace Lara.isMoving with item->speed if anything fails. @Sezz 2021.10.14
 	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (abs(item->pos.zRot) > ANGLE(0.0f))
