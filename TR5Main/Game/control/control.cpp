@@ -167,7 +167,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Renderer.DumpGameScene();
 				g_Inventory.Set_invMode(IM_PAUSE);
 				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
-				g_Inventory.Set_pause_selected_option(1);
+				g_Inventory.Set_pause_selected_option(0);
 			}
 			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
