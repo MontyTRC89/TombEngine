@@ -3732,16 +3732,24 @@ void InventoryClass::do_load()
 {
 	invMode = IM_LOAD;
 
-	if (goDown && selected_slot < MAX_SAVEGAMES - 1)
+	if (goDown)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-		selected_slot++;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+
+		if (selected_slot == MAX_SAVEGAMES - 1)
+			selected_slot -= MAX_SAVEGAMES - 1;	//go back up
+		else
+			selected_slot++;
 	}
 
-	if (goUp && selected_slot > 0)
+	if (goUp)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-		selected_slot--;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+
+		if (selected_slot== 0)
+			selected_slot += MAX_SAVEGAMES - 1;	//go back down
+		else
+			selected_slot--;
 	}
 
 	if (goSelect)
@@ -3770,16 +3778,24 @@ void InventoryClass::do_save()
 {
 	invMode = IM_SAVE;
 
-	if (goDown && selected_slot < MAX_SAVEGAMES - 1)
+	if (goDown)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-		selected_slot++;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+
+		if (selected_slot == MAX_SAVEGAMES - 1)
+			selected_slot -= MAX_SAVEGAMES - 1;	//go back up
+		else
+			selected_slot++;
 	}
 
-	if (goUp && selected_slot > 0)
+	if (goUp)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-		selected_slot--;
+		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+
+		if (selected_slot == 0)
+			selected_slot += MAX_SAVEGAMES - 1;	//go back down
+		else
+			selected_slot--;
 	}
 
 	if (goSelect)
