@@ -18,6 +18,7 @@
 #include "itemdata/creature_info.h"
 #include "Game/effects/lara_burn.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include <Game/misc.h>
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
@@ -268,37 +269,84 @@ bool SaveGame::Save(char* fileName)
 	carriedWeaponInfo.add_ammo(Lara.Weapons)
 	*/
 
-	/*
-	for (const auto& itemToSerialize : g_Level.Items) {
-		Save::ItemT serializedItem{};
-
-		serializedItem.anim_number = itemToSerialize.animNumber;
-		serializedItem.after_death = itemToSerialize.afterDeath;
-		serializedItem.box_number = itemToSerialize.boxNumber;
-		serializedItem.carried_item = itemToSerialize.carriedItem;
-		serializedItem.current_anim_state = itemToSerialize.currentAnimState;
-		serializedItem.fall_speed = itemToSerialize.fallspeed;
-		serializedItem.fired_weapon = itemToSerialize.firedWeapon;
-		serializedItem.flags = itemToSerialize.flags;
-		serializedItem.floor = itemToSerialize.floor;
-		serializedItem.frame_number = itemToSerialize.frameNumber;
-		serializedItem.goal_anim_state = itemToSerialize.goalAnimState;
-		serializedItem.hit_points = itemToSerialize.hitPoints;
+	for (auto& itemToSerialize : g_Level.Items) 
+	{
+		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
-			serializedItem.item_flags.push_back(itemToSerialize.itemFlags[i]);
-		serializedItem.mesh_bits = itemToSerialize.meshBits;
-		serializedItem.object_id = itemToSerialize.objectNumber;
-		serializedItem.required_anim_state = itemToSerialize.requiredAnimState;
-		serializedItem.room_number = itemToSerialize.roomNumber;
-		serializedItem.speed = itemToSerialize.speed;
-		serializedItem.timer = itemToSerialize.timer;
-		serializedItem.touch_bits = itemToSerialize.touchBits;
-		serializedItem.trigger_flags = itemToSerialize.triggerFlags;
+			itemFlags.push_back(itemToSerialize.itemFlags[i]);
+		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
+				
+		flatbuffers::Offset<Save::Creature> creatureOffset;
+
+		if (Objects[itemToSerialize.objectNumber].intelligent)
+		{
+			auto creature = GetCreatureInfo(&itemToSerialize);
+
+			std::vector<int> jointRotations;
+			for (int i = 0; i < 4; i++)
+				jointRotations.push_back(creature->jointRotation[i]);
+			auto jointRotationsOffset = fbb.CreateVector(jointRotations);
+
+			Save::CreatureBuilder creatureBuilder{ fbb };
+
+			creatureBuilder.add_alerted(creature->alerted);
+			creatureBuilder.add_can_jump(creature->LOT.canJump);
+			creatureBuilder.add_can_monkey(creature->LOT.canMonkey);
+			creatureBuilder.add_enemy(creature->enemy - g_Level.Items.data());
+			creatureBuilder.add_flags(creature->flags);
+			creatureBuilder.add_head_left(creature->headLeft);
+			creatureBuilder.add_head_right(creature->headRight);
+			creatureBuilder.add_hurt_by_lara(creature->hurtByLara);
+			creatureBuilder.add_is_amphibious(creature->LOT.isAmphibious);
+			creatureBuilder.add_is_jumping(creature->LOT.isJumping);
+			creatureBuilder.add_is_monkeying(creature->LOT.isMonkeying);
+			creatureBuilder.add_joint_rotation(jointRotationsOffset);
+			creatureBuilder.add_jump_ahead(creature->jumpAhead);
+			creatureBuilder.add_maximum_turn(creature->maximumTurn);
+			creatureBuilder.add_monkey_ahead(creature->monkeyAhead);
+			creatureBuilder.add_mood(creature->mood);
+			creatureBuilder.add_patrol2(creature->patrol2);
+			creatureBuilder.add_reached_goal(creature->reachedGoal);
+
+			creatureOffset = creatureBuilder.Finish();
+		}
+
+		Save::ItemBuilder serializedItem{ fbb };
+
+		serializedItem.add_anim_number(itemToSerialize.animNumber);
+		serializedItem.add_after_death(itemToSerialize.afterDeath);
+		serializedItem.add_box_number(itemToSerialize.boxNumber);
+		serializedItem.add_carried_item(itemToSerialize.carriedItem);
+		serializedItem.add_current_anim_state(itemToSerialize.currentAnimState);
+		serializedItem.add_fall_speed(itemToSerialize.fallspeed);
+		serializedItem.add_fired_weapon(itemToSerialize.firedWeapon);
+		serializedItem.add_flags(itemToSerialize.flags);
+		serializedItem.add_floor(itemToSerialize.floor);
+		serializedItem.add_frame_number(itemToSerialize.frameNumber);
+		serializedItem.add_goal_anim_state(itemToSerialize.goalAnimState);
+		serializedItem.add_hit_points(itemToSerialize.hitPoints);
+		serializedItem.add_item_flags(itemFlagsOffset);
+		serializedItem.add_mesh_bits(itemToSerialize.meshBits);
+		serializedItem.add_object_id(itemToSerialize.objectNumber);
+		serializedItem.add_required_anim_state(itemToSerialize.requiredAnimState);
+		serializedItem.add_room_number(itemToSerialize.roomNumber);
+		serializedItem.add_speed(itemToSerialize.speed);
+		serializedItem.add_timer(itemToSerialize.timer);
+		serializedItem.add_touch_bits(itemToSerialize.touchBits);
+		serializedItem.add_trigger_flags(itemToSerialize.triggerFlags);
+
+		if (Objects[itemToSerialize.objectNumber].intelligent)
+		{
+			serializedItem.add_data(creatureOffset);
+		}
+
+		auto serializedItemOffset = serializedItem.Finish();
+		serializedItems.push_back(serializedItemOffset);
 
 		//serialize Items here
-		serializedItems.push_back(Save::CreateItem(fbb, &serializedItem));
+		//serializedItems.push_back(Save::CreateItem(fbb, &serializedItem));
 	}
-*/
+
 	Save::SaveGameBuilder sgb{ fbb };
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
