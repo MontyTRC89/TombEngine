@@ -410,9 +410,9 @@ public:
 
 	//getters
 	RINGME* GetRings(char num);
-	__int64 Get_title_selected_option();
+	short Get_title_selected_option();
 	title_menus Get_title_menu_to_display();
-	__int64 Get_pause_selected_option();
+	short Get_pause_selected_option();
 	pause_menus Get_pause_menu_to_display();
 	inv_modes Get_invMode();
 	int Get_inventoryItemChosen();
@@ -422,7 +422,7 @@ public:
 	short Get_LoadSaveSelection();
 
 	//setters
-	void Set_pause_selected_option(__int64 menu);
+	void Set_pause_selected_option(short menu);
 	void Set_pause_menu_to_display(pause_menus menu);
 	void Set_invMode(inv_modes mode);
 	void Set_enterInventory(int num);
@@ -431,16 +431,13 @@ public:
 private:
 	void do_debounced_input();
 	void clear_input_vars(bool flag);
-	void handle_display_setting_input();
-	void handle_control_settings_input();
-	void handle_sound_settings_input();
+	void handle_display_setting_input(bool pause);
+	void handle_control_settings_input(bool pause);
+	void handle_sound_settings_input(bool pause);
 	void fillSound();
 	bool do_these_objects_combine(int obj1, int obj2);
 	void init_inventry();
 	void FillDisplayOptions();
-	void handle_display_setting_input_pause();
-	void handle_control_settings_input_pause();
-	void handle_sound_settings_input_pause();
 	bool is_item_currently_combinable(short obj);
 	bool have_i_got_item(short obj);
 	void combine_these_two_objects(short obj1, short obj2);
@@ -538,10 +535,10 @@ private:
 	//pause
 	int pause_flag;
 	pause_menus pause_menu_to_display = pause_main_menu;
-	__int64 pause_selected_option = 1;
+	short pause_selected_option = 0;
 
 	//title
-	__int64 title_selected_option = 1;
+	short title_selected_option = 0;
 	title_menus title_menu_to_display = title_main_menu;
 	int settings_flag;
 
