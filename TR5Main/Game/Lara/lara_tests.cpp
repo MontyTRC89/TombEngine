@@ -1396,26 +1396,14 @@ bool TestLaraStepRight(ITEM_INFO* item)
 	return false;
 }
 
+// TODO: Clean this mess. It shouldn't be like this.
 bool TestLaraCrawl(ITEM_INFO* item)
 {
 	if (Lara.gunStatus == LG_NO_ARMS
-		&& Lara.waterStatus != LW_WADE
-		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256)
-		&& (item->animNumber == LA_CROUCH_IDLE || item->animNumber == LA_STAND_TO_CROUCH_END)	// TODO: Un-hardcode anim condition. @Sezz 2021.09.26
+		&& Lara.waterStatus != LW_WADE // redundant at this point
+		&& Lara.waterSurfaceDist >= -256
 		&& !(TrInput & (IN_FLARE | IN_DRAW))
 		&& (Lara.gunType != WEAPON_FLARE || (Lara.flareAge < 900 && Lara.flareAge != 0)))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraCrouchTurn(ITEM_INFO* item)
-{
-	if (Lara.waterStatus != LW_WADE
-		|| item->animNumber != LA_CROUCH_IDLE)
 	{
 		return true;
 	}

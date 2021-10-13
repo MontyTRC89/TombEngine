@@ -11,7 +11,7 @@ struct COLL_INFO;
 #define LARA_LEAN_MAX ANGLE(11.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)	// turn rates
 #define LARA_JUMP_TURN ANGLE(3.0f)
-#define LARA_CROUCH_ROLL_TURN ANGLE(3.0f)
+#define LARA_CROUCH_ROLL_TURN ANGLE(2.75f)
 #define LARA_SUBSUIT_TURN_RATE ANGLE(0.75f)
 #define LARA_SLOW_TURN ANGLE(4.0f)	// turn maxes
 #define LARA_MED_TURN ANGLE(6.0f)
