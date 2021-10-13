@@ -2322,9 +2322,10 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
 	}
 
-	if (TrInput & IN_BACK)
+	if (TrInput & IN_BACK &&
+		(TrInput & IN_WALK || Lara.waterStatus == LW_WADE))
 	{
-		item->goalAnimState = LS_HOP_BACK;
+		item->goalAnimState = LS_WALK_BACK;
 
 		return;
 	}
