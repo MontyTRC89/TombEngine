@@ -453,7 +453,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_CROUCH_IDLE;
+	item->goalAnimState = LS_STOP;
 }
 
 // LEGACY
@@ -522,7 +522,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_CROUCH_IDLE;
+	item->goalAnimState = LS_STOP;
 }
 
 // LEGACY
