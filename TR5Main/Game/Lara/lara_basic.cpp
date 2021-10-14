@@ -2712,7 +2712,48 @@ void lara_col_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_stop(item, coll);
 }
 
+// State:		LS_SIDESTEP_RIGHT (21)
+// Collision:	lara_col_stepright()
 void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.look = false;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// TODO: Check
+	/*if (Lara.isMoving)
+		return;*/
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+	}
+
+	if (TrInput & IN_RSTEP)
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 21*/
 	/*collision: lara_col_stepright*/
@@ -2778,7 +2819,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -2834,7 +2875,48 @@ void old_lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_SIDESTEP_LEFT (22)
+// Collision:	lara_col_stepleft()
 void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.look = false;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// TODO: Check
+	/*if (Lara.isMoving)
+		return;*/
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+	}
+
+	if (TrInput & IN_LSTEP)
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 22*/
 	/*collision: lara_col_stepleft*/
@@ -2900,7 +2982,7 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
