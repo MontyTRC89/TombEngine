@@ -10,8 +10,6 @@ namespace TEN {
 namespace Save {
 
 struct Position;
-struct PositionBuilder;
-struct PositionT;
 
 struct CreatureTarget;
 struct CreatureTargetBuilder;
@@ -486,6 +484,58 @@ struct ItemDataUnion {
 bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, ItemData type);
 bool VerifyItemDataVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t x_pos_;
+  int32_t y_pos_;
+  int32_t z_pos_;
+  int32_t x_rot_;
+  int32_t y_rot_;
+  int32_t z_rot_;
+
+ public:
+  struct Traits;
+  Position()
+      : x_pos_(0),
+        y_pos_(0),
+        z_pos_(0),
+        x_rot_(0),
+        y_rot_(0),
+        z_rot_(0) {
+  }
+  Position(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
+      : x_pos_(flatbuffers::EndianScalar(_x_pos)),
+        y_pos_(flatbuffers::EndianScalar(_y_pos)),
+        z_pos_(flatbuffers::EndianScalar(_z_pos)),
+        x_rot_(flatbuffers::EndianScalar(_x_rot)),
+        y_rot_(flatbuffers::EndianScalar(_y_rot)),
+        z_rot_(flatbuffers::EndianScalar(_z_rot)) {
+  }
+  int32_t x_pos() const {
+    return flatbuffers::EndianScalar(x_pos_);
+  }
+  int32_t y_pos() const {
+    return flatbuffers::EndianScalar(y_pos_);
+  }
+  int32_t z_pos() const {
+    return flatbuffers::EndianScalar(z_pos_);
+  }
+  int32_t x_rot() const {
+    return flatbuffers::EndianScalar(x_rot_);
+  }
+  int32_t y_rot() const {
+    return flatbuffers::EndianScalar(y_rot_);
+  }
+  int32_t z_rot() const {
+    return flatbuffers::EndianScalar(z_rot_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Position, 24);
+
+struct Position::Traits {
+  using type = Position;
+};
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {
  private:
   int32_t x_;
@@ -520,119 +570,6 @@ struct Vector3::Traits {
   using type = Vector3;
 };
 
-struct PositionT : public flatbuffers::NativeTable {
-  typedef Position TableType;
-  int32_t x_pos = 0;
-  int32_t y_pos = 0;
-  int32_t z_pos = 0;
-  int32_t x_rot = 0;
-  int32_t y_rot = 0;
-  int32_t z_rot = 0;
-};
-
-struct Position FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef PositionT NativeTableType;
-  typedef PositionBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_X_POS = 4,
-    VT_Y_POS = 6,
-    VT_Z_POS = 8,
-    VT_X_ROT = 10,
-    VT_Y_ROT = 12,
-    VT_Z_ROT = 14
-  };
-  int32_t x_pos() const {
-    return GetField<int32_t>(VT_X_POS, 0);
-  }
-  int32_t y_pos() const {
-    return GetField<int32_t>(VT_Y_POS, 0);
-  }
-  int32_t z_pos() const {
-    return GetField<int32_t>(VT_Z_POS, 0);
-  }
-  int32_t x_rot() const {
-    return GetField<int32_t>(VT_X_ROT, 0);
-  }
-  int32_t y_rot() const {
-    return GetField<int32_t>(VT_Y_ROT, 0);
-  }
-  int32_t z_rot() const {
-    return GetField<int32_t>(VT_Z_ROT, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_X_POS) &&
-           VerifyField<int32_t>(verifier, VT_Y_POS) &&
-           VerifyField<int32_t>(verifier, VT_Z_POS) &&
-           VerifyField<int32_t>(verifier, VT_X_ROT) &&
-           VerifyField<int32_t>(verifier, VT_Y_ROT) &&
-           VerifyField<int32_t>(verifier, VT_Z_ROT) &&
-           verifier.EndTable();
-  }
-  PositionT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(PositionT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<Position> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PositionT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct PositionBuilder {
-  typedef Position Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_x_pos(int32_t x_pos) {
-    fbb_.AddElement<int32_t>(Position::VT_X_POS, x_pos, 0);
-  }
-  void add_y_pos(int32_t y_pos) {
-    fbb_.AddElement<int32_t>(Position::VT_Y_POS, y_pos, 0);
-  }
-  void add_z_pos(int32_t z_pos) {
-    fbb_.AddElement<int32_t>(Position::VT_Z_POS, z_pos, 0);
-  }
-  void add_x_rot(int32_t x_rot) {
-    fbb_.AddElement<int32_t>(Position::VT_X_ROT, x_rot, 0);
-  }
-  void add_y_rot(int32_t y_rot) {
-    fbb_.AddElement<int32_t>(Position::VT_Y_ROT, y_rot, 0);
-  }
-  void add_z_rot(int32_t z_rot) {
-    fbb_.AddElement<int32_t>(Position::VT_Z_ROT, z_rot, 0);
-  }
-  explicit PositionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<Position> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<Position>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<Position> CreatePosition(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t x_pos = 0,
-    int32_t y_pos = 0,
-    int32_t z_pos = 0,
-    int32_t x_rot = 0,
-    int32_t y_rot = 0,
-    int32_t z_rot = 0) {
-  PositionBuilder builder_(_fbb);
-  builder_.add_z_rot(z_rot);
-  builder_.add_y_rot(y_rot);
-  builder_.add_x_rot(x_rot);
-  builder_.add_z_pos(z_pos);
-  builder_.add_y_pos(y_pos);
-  builder_.add_x_pos(x_pos);
-  return builder_.Finish();
-}
-
-struct Position::Traits {
-  using type = Position;
-  static auto constexpr Create = CreatePosition;
-};
-
-flatbuffers::Offset<Position> CreatePosition(flatbuffers::FlatBufferBuilder &_fbb, const PositionT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct CreatureTargetT : public flatbuffers::NativeTable {
   typedef CreatureTarget TableType;
   int32_t object_number = 0;
@@ -640,7 +577,7 @@ struct CreatureTargetT : public flatbuffers::NativeTable {
   int32_t box_number = 0;
   int32_t flags = 0;
   int32_t trigger_flags = 0;
-  std::unique_ptr<TEN::Save::PositionT> position{};
+  std::unique_ptr<TEN::Save::Position> position{};
 };
 
 struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -671,7 +608,7 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return GetField<int32_t>(VT_TRIGGER_FLAGS, 0);
   }
   const TEN::Save::Position *position() const {
-    return GetPointer<const TEN::Save::Position *>(VT_POSITION);
+    return GetStruct<const TEN::Save::Position *>(VT_POSITION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -680,8 +617,7 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_TRIGGER_FLAGS) &&
-           VerifyOffset(verifier, VT_POSITION) &&
-           verifier.VerifyTable(position()) &&
+           VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
            verifier.EndTable();
   }
   CreatureTargetT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -708,8 +644,8 @@ struct CreatureTargetBuilder {
   void add_trigger_flags(int32_t trigger_flags) {
     fbb_.AddElement<int32_t>(CreatureTarget::VT_TRIGGER_FLAGS, trigger_flags, 0);
   }
-  void add_position(flatbuffers::Offset<TEN::Save::Position> position) {
-    fbb_.AddOffset(CreatureTarget::VT_POSITION, position);
+  void add_position(const TEN::Save::Position *position) {
+    fbb_.AddStruct(CreatureTarget::VT_POSITION, position);
   }
   explicit CreatureTargetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -729,7 +665,7 @@ inline flatbuffers::Offset<CreatureTarget> CreateCreatureTarget(
     int32_t box_number = 0,
     int32_t flags = 0,
     int32_t trigger_flags = 0,
-    flatbuffers::Offset<TEN::Save::Position> position = 0) {
+    const TEN::Save::Position *position = 0) {
   CreatureTargetBuilder builder_(_fbb);
   builder_.add_position(position);
   builder_.add_trigger_flags(trigger_flags);
@@ -2012,47 +1948,6 @@ inline flatbuffers::Offset<ShortArray> CreateShortArrayDirect(
 
 flatbuffers::Offset<ShortArray> CreateShortArray(flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-inline PositionT *Position::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<PositionT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void Position::UnPackTo(PositionT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = x_pos(); _o->x_pos = _e; }
-  { auto _e = y_pos(); _o->y_pos = _e; }
-  { auto _e = z_pos(); _o->z_pos = _e; }
-  { auto _e = x_rot(); _o->x_rot = _e; }
-  { auto _e = y_rot(); _o->y_rot = _e; }
-  { auto _e = z_rot(); _o->z_rot = _e; }
-}
-
-inline flatbuffers::Offset<Position> Position::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PositionT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreatePosition(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<Position> CreatePosition(flatbuffers::FlatBufferBuilder &_fbb, const PositionT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PositionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _x_pos = _o->x_pos;
-  auto _y_pos = _o->y_pos;
-  auto _z_pos = _o->z_pos;
-  auto _x_rot = _o->x_rot;
-  auto _y_rot = _o->y_rot;
-  auto _z_rot = _o->z_rot;
-  return TEN::Save::CreatePosition(
-      _fbb,
-      _x_pos,
-      _y_pos,
-      _z_pos,
-      _x_rot,
-      _y_rot,
-      _z_rot);
-}
-
 inline CreatureTargetT *CreatureTarget::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<CreatureTargetT>();
   UnPackTo(_o.get(), _resolver);
@@ -2067,7 +1962,7 @@ inline void CreatureTarget::UnPackTo(CreatureTargetT *_o, const flatbuffers::res
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = trigger_flags(); _o->trigger_flags = _e; }
-  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::PositionT>(_e->UnPack(_resolver)); }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
 }
 
 inline flatbuffers::Offset<CreatureTarget> CreatureTarget::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CreatureTargetT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2083,7 +1978,7 @@ inline flatbuffers::Offset<CreatureTarget> CreateCreatureTarget(flatbuffers::Fla
   auto _box_number = _o->box_number;
   auto _flags = _o->flags;
   auto _trigger_flags = _o->trigger_flags;
-  auto _position = _o->position ? CreatePosition(_fbb, _o->position.get(), _rehasher) : 0;
+  auto _position = _o->position ? _o->position.get() : 0;
   return TEN::Save::CreateCreatureTarget(
       _fbb,
       _object_number,

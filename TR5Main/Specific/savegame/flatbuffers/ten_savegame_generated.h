@@ -136,6 +136,18 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t after_death = 0;
   int32_t fired_weapon = 0;
   std::vector<int32_t> item_flags{};
+  std::unique_ptr<TEN::Save::Position> position{};
+  bool triggered = false;
+  bool active = false;
+  int32_t status = 0;
+  bool gravity_status = false;
+  bool hit_stauts = false;
+  bool collidable = false;
+  bool looked_at = false;
+  bool poisoned = false;
+  int32_t ai_bits = 0;
+  bool really_active = false;
+  int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
 };
 
@@ -165,8 +177,20 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_AFTER_DEATH = 40,
     VT_FIRED_WEAPON = 42,
     VT_ITEM_FLAGS = 44,
-    VT_DATA_TYPE = 46,
-    VT_DATA = 48
+    VT_POSITION = 46,
+    VT_TRIGGERED = 48,
+    VT_ACTIVE = 50,
+    VT_STATUS = 52,
+    VT_GRAVITY_STATUS = 54,
+    VT_HIT_STAUTS = 56,
+    VT_COLLIDABLE = 58,
+    VT_LOOKED_AT = 60,
+    VT_POISONED = 62,
+    VT_AI_BITS = 64,
+    VT_REALLY_ACTIVE = 66,
+    VT_SWAP_MESH_FLAGS = 68,
+    VT_DATA_TYPE = 70,
+    VT_DATA = 72
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -230,6 +254,42 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *item_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ITEM_FLAGS);
+  }
+  const TEN::Save::Position *position() const {
+    return GetStruct<const TEN::Save::Position *>(VT_POSITION);
+  }
+  bool triggered() const {
+    return GetField<uint8_t>(VT_TRIGGERED, 0) != 0;
+  }
+  bool active() const {
+    return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
+  }
+  int32_t status() const {
+    return GetField<int32_t>(VT_STATUS, 0);
+  }
+  bool gravity_status() const {
+    return GetField<uint8_t>(VT_GRAVITY_STATUS, 0) != 0;
+  }
+  bool hit_stauts() const {
+    return GetField<uint8_t>(VT_HIT_STAUTS, 0) != 0;
+  }
+  bool collidable() const {
+    return GetField<uint8_t>(VT_COLLIDABLE, 0) != 0;
+  }
+  bool looked_at() const {
+    return GetField<uint8_t>(VT_LOOKED_AT, 0) != 0;
+  }
+  bool poisoned() const {
+    return GetField<uint8_t>(VT_POISONED, 0) != 0;
+  }
+  int32_t ai_bits() const {
+    return GetField<int32_t>(VT_AI_BITS, 0);
+  }
+  bool really_active() const {
+    return GetField<uint8_t>(VT_REALLY_ACTIVE, 0) != 0;
+  }
+  int32_t swap_mesh_flags() const {
+    return GetField<int32_t>(VT_SWAP_MESH_FLAGS, 0);
   }
   TEN::Save::ItemData data_type() const {
     return static_cast<TEN::Save::ItemData>(GetField<uint8_t>(VT_DATA_TYPE, 0));
@@ -325,6 +385,18 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
            VerifyOffset(verifier, VT_ITEM_FLAGS) &&
            verifier.VerifyVector(item_flags()) &&
+           VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
+           VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
+           VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
+           VerifyField<int32_t>(verifier, VT_STATUS) &&
+           VerifyField<uint8_t>(verifier, VT_GRAVITY_STATUS) &&
+           VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
+           VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
+           VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
+           VerifyField<uint8_t>(verifier, VT_POISONED) &&
+           VerifyField<int32_t>(verifier, VT_AI_BITS) &&
+           VerifyField<uint8_t>(verifier, VT_REALLY_ACTIVE) &&
+           VerifyField<int32_t>(verifier, VT_SWAP_MESH_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
            VerifyItemData(verifier, data(), data_type()) &&
@@ -486,6 +558,42 @@ struct ItemBuilder {
   void add_item_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> item_flags) {
     fbb_.AddOffset(Item::VT_ITEM_FLAGS, item_flags);
   }
+  void add_position(const TEN::Save::Position *position) {
+    fbb_.AddStruct(Item::VT_POSITION, position);
+  }
+  void add_triggered(bool triggered) {
+    fbb_.AddElement<uint8_t>(Item::VT_TRIGGERED, static_cast<uint8_t>(triggered), 0);
+  }
+  void add_active(bool active) {
+    fbb_.AddElement<uint8_t>(Item::VT_ACTIVE, static_cast<uint8_t>(active), 0);
+  }
+  void add_status(int32_t status) {
+    fbb_.AddElement<int32_t>(Item::VT_STATUS, status, 0);
+  }
+  void add_gravity_status(bool gravity_status) {
+    fbb_.AddElement<uint8_t>(Item::VT_GRAVITY_STATUS, static_cast<uint8_t>(gravity_status), 0);
+  }
+  void add_hit_stauts(bool hit_stauts) {
+    fbb_.AddElement<uint8_t>(Item::VT_HIT_STAUTS, static_cast<uint8_t>(hit_stauts), 0);
+  }
+  void add_collidable(bool collidable) {
+    fbb_.AddElement<uint8_t>(Item::VT_COLLIDABLE, static_cast<uint8_t>(collidable), 0);
+  }
+  void add_looked_at(bool looked_at) {
+    fbb_.AddElement<uint8_t>(Item::VT_LOOKED_AT, static_cast<uint8_t>(looked_at), 0);
+  }
+  void add_poisoned(bool poisoned) {
+    fbb_.AddElement<uint8_t>(Item::VT_POISONED, static_cast<uint8_t>(poisoned), 0);
+  }
+  void add_ai_bits(int32_t ai_bits) {
+    fbb_.AddElement<int32_t>(Item::VT_AI_BITS, ai_bits, 0);
+  }
+  void add_really_active(bool really_active) {
+    fbb_.AddElement<uint8_t>(Item::VT_REALLY_ACTIVE, static_cast<uint8_t>(really_active), 0);
+  }
+  void add_swap_mesh_flags(int32_t swap_mesh_flags) {
+    fbb_.AddElement<int32_t>(Item::VT_SWAP_MESH_FLAGS, swap_mesh_flags, 0);
+  }
   void add_data_type(TEN::Save::ItemData data_type) {
     fbb_.AddElement<uint8_t>(Item::VT_DATA_TYPE, static_cast<uint8_t>(data_type), 0);
   }
@@ -526,10 +634,26 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t after_death = 0,
     int32_t fired_weapon = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> item_flags = 0,
+    const TEN::Save::Position *position = 0,
+    bool triggered = false,
+    bool active = false,
+    int32_t status = 0,
+    bool gravity_status = false,
+    bool hit_stauts = false,
+    bool collidable = false,
+    bool looked_at = false,
+    bool poisoned = false,
+    int32_t ai_bits = 0,
+    bool really_active = false,
+    int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0) {
   ItemBuilder builder_(_fbb);
   builder_.add_data(data);
+  builder_.add_swap_mesh_flags(swap_mesh_flags);
+  builder_.add_ai_bits(ai_bits);
+  builder_.add_status(status);
+  builder_.add_position(position);
   builder_.add_item_flags(item_flags);
   builder_.add_fired_weapon(fired_weapon);
   builder_.add_after_death(after_death);
@@ -552,6 +676,14 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_touch_bits(touch_bits);
   builder_.add_floor(floor);
   builder_.add_data_type(data_type);
+  builder_.add_really_active(really_active);
+  builder_.add_poisoned(poisoned);
+  builder_.add_looked_at(looked_at);
+  builder_.add_collidable(collidable);
+  builder_.add_hit_stauts(hit_stauts);
+  builder_.add_gravity_status(gravity_status);
+  builder_.add_active(active);
+  builder_.add_triggered(triggered);
   return builder_.Finish();
 }
 
@@ -583,6 +715,18 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t after_death = 0,
     int32_t fired_weapon = 0,
     const std::vector<int32_t> *item_flags = nullptr,
+    const TEN::Save::Position *position = 0,
+    bool triggered = false,
+    bool active = false,
+    int32_t status = 0,
+    bool gravity_status = false,
+    bool hit_stauts = false,
+    bool collidable = false,
+    bool looked_at = false,
+    bool poisoned = false,
+    int32_t ai_bits = 0,
+    bool really_active = false,
+    int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
@@ -609,6 +753,18 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       after_death,
       fired_weapon,
       item_flags__,
+      position,
+      triggered,
+      active,
+      status,
+      gravity_status,
+      hit_stauts,
+      collidable,
+      looked_at,
+      poisoned,
+      ai_bits,
+      really_active,
+      swap_mesh_flags,
       data_type,
       data);
 }
@@ -1220,7 +1376,6 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t gun_type = 0;
   int32_t request_gun_type = 0;
   int32_t last_gun_type = 0;
-  std::vector<int32_t> mesh_pointers{};
   int32_t hit_points = 0;
   int32_t speed = 0;
   int32_t fall_speed = 0;
@@ -1293,6 +1448,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t rope_offset = 0;
   int32_t rope_down_vel = 0;
   int32_t rope_flag = 0;
+  int32_t rope_count = 0;
   int32_t move_count = 0;
   int32_t location = 0;
   int32_t highest_location = 0;
@@ -1337,79 +1493,79 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GUN_TYPE = 8,
     VT_REQUEST_GUN_TYPE = 10,
     VT_LAST_GUN_TYPE = 12,
-    VT_MESH_POINTERS = 14,
-    VT_HIT_POINTS = 16,
-    VT_SPEED = 18,
-    VT_FALL_SPEED = 20,
-    VT_CALC_FALL_SPEED = 22,
-    VT_WATER_STATUS = 24,
-    VT_CLIMB_STATUS = 26,
-    VT_POSE_COUNT = 28,
-    VT_HIT_FRAME = 30,
-    VT_HIT_DIRECTION = 32,
-    VT_AIR = 34,
-    VT_DIVE_COUNT = 36,
-    VT_DEATH_COUNT = 38,
-    VT_CURRENT_ACTIVE = 40,
-    VT_CURRENT_X_VEL = 42,
-    VT_CURRENT_Y_VEL = 44,
-    VT_CURRENT_Z_VEL = 46,
-    VT_SPAZ_EFFECT_COUNT = 48,
-    VT_FLARE_AGE = 50,
-    VT_BURN_COUNT = 52,
-    VT_WEAPON_ITEM = 54,
-    VT_HOLSTER_INFO = 56,
-    VT_FLARE_FRAME = 58,
-    VT_POISONED = 60,
-    VT_WET = 62,
-    VT_FLARE_CONTROL_LEFT = 64,
-    VT_LOOK = 66,
-    VT_BURN = 68,
-    VT_KEEP_DUCKED = 70,
-    VT_IS_MOVING = 72,
-    VT_CAN_MONKEY_SWING = 74,
-    VT_BURN_BLUE = 76,
-    VT_BURN_SMOKE = 78,
-    VT_IS_DUCKED = 80,
-    VT_HAS_FIRED = 82,
-    VT_BUSY = 84,
-    VT_OLD_BUSY = 86,
-    VT_UNCONTROLLABLE = 88,
-    VT_LIT_TORCH = 90,
-    VT_IS_CLIMBING = 92,
-    VT_FIRED = 94,
-    VT_WATER_SURFACE_DIST = 96,
-    VT_LAST_POSITION = 98,
-    VT_MESH_PTRS = 100,
-    VT_TARGET_ANGLES = 102,
-    VT_TURN_RATE = 104,
-    VT_MOVE_ANGLE = 106,
-    VT_HEAD_X_ROT = 108,
-    VT_HEAD_Y_ROT = 110,
-    VT_HEAD_Z_ROT = 112,
-    VT_TORSO_X_ROT = 114,
-    VT_TORSO_Y_ROT = 116,
-    VT_TORSO_Z_ROT = 118,
-    VT_LEFT_ARM = 120,
-    VT_RIGHT_ARM = 122,
-    VT_CORNER_X = 124,
-    VT_CORNER_Z = 126,
-    VT_ROPE_SEGMENT = 128,
-    VT_ROPE_DIRECTION = 130,
-    VT_ROPE_ARC_FRONT = 132,
-    VT_ROPE_ARC_BACK = 134,
-    VT_ROPE_LAST_X = 136,
-    VT_ROPE_MAX_X_FORWARD = 138,
-    VT_ROPE_MAX_X_BACKWARD = 140,
-    VT_ROPE_DFRAME = 142,
-    VT_ROPE_FRAME = 144,
-    VT_ROPE_FRAMERATE = 146,
-    VT_ROPE_Y = 148,
-    VT_ROPE_PTR = 150,
-    VT_INTERACTED_ITEM = 152,
-    VT_ROPE_OFFSET = 154,
-    VT_ROPE_DOWN_VEL = 156,
-    VT_ROPE_FLAG = 158,
+    VT_HIT_POINTS = 14,
+    VT_SPEED = 16,
+    VT_FALL_SPEED = 18,
+    VT_CALC_FALL_SPEED = 20,
+    VT_WATER_STATUS = 22,
+    VT_CLIMB_STATUS = 24,
+    VT_POSE_COUNT = 26,
+    VT_HIT_FRAME = 28,
+    VT_HIT_DIRECTION = 30,
+    VT_AIR = 32,
+    VT_DIVE_COUNT = 34,
+    VT_DEATH_COUNT = 36,
+    VT_CURRENT_ACTIVE = 38,
+    VT_CURRENT_X_VEL = 40,
+    VT_CURRENT_Y_VEL = 42,
+    VT_CURRENT_Z_VEL = 44,
+    VT_SPAZ_EFFECT_COUNT = 46,
+    VT_FLARE_AGE = 48,
+    VT_BURN_COUNT = 50,
+    VT_WEAPON_ITEM = 52,
+    VT_HOLSTER_INFO = 54,
+    VT_FLARE_FRAME = 56,
+    VT_POISONED = 58,
+    VT_WET = 60,
+    VT_FLARE_CONTROL_LEFT = 62,
+    VT_LOOK = 64,
+    VT_BURN = 66,
+    VT_KEEP_DUCKED = 68,
+    VT_IS_MOVING = 70,
+    VT_CAN_MONKEY_SWING = 72,
+    VT_BURN_BLUE = 74,
+    VT_BURN_SMOKE = 76,
+    VT_IS_DUCKED = 78,
+    VT_HAS_FIRED = 80,
+    VT_BUSY = 82,
+    VT_OLD_BUSY = 84,
+    VT_UNCONTROLLABLE = 86,
+    VT_LIT_TORCH = 88,
+    VT_IS_CLIMBING = 90,
+    VT_FIRED = 92,
+    VT_WATER_SURFACE_DIST = 94,
+    VT_LAST_POSITION = 96,
+    VT_MESH_PTRS = 98,
+    VT_TARGET_ANGLES = 100,
+    VT_TURN_RATE = 102,
+    VT_MOVE_ANGLE = 104,
+    VT_HEAD_X_ROT = 106,
+    VT_HEAD_Y_ROT = 108,
+    VT_HEAD_Z_ROT = 110,
+    VT_TORSO_X_ROT = 112,
+    VT_TORSO_Y_ROT = 114,
+    VT_TORSO_Z_ROT = 116,
+    VT_LEFT_ARM = 118,
+    VT_RIGHT_ARM = 120,
+    VT_CORNER_X = 122,
+    VT_CORNER_Z = 124,
+    VT_ROPE_SEGMENT = 126,
+    VT_ROPE_DIRECTION = 128,
+    VT_ROPE_ARC_FRONT = 130,
+    VT_ROPE_ARC_BACK = 132,
+    VT_ROPE_LAST_X = 134,
+    VT_ROPE_MAX_X_FORWARD = 136,
+    VT_ROPE_MAX_X_BACKWARD = 138,
+    VT_ROPE_DFRAME = 140,
+    VT_ROPE_FRAME = 142,
+    VT_ROPE_FRAMERATE = 144,
+    VT_ROPE_Y = 146,
+    VT_ROPE_PTR = 148,
+    VT_INTERACTED_ITEM = 150,
+    VT_ROPE_OFFSET = 152,
+    VT_ROPE_DOWN_VEL = 154,
+    VT_ROPE_FLAG = 156,
+    VT_ROPE_COUNT = 158,
     VT_MOVE_COUNT = 160,
     VT_LOCATION = 162,
     VT_HIGHEST_LOCATION = 164,
@@ -1457,9 +1613,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t last_gun_type() const {
     return GetField<int32_t>(VT_LAST_GUN_TYPE, 0);
-  }
-  const flatbuffers::Vector<int32_t> *mesh_pointers() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_POINTERS);
   }
   int32_t hit_points() const {
     return GetField<int32_t>(VT_HIT_POINTS, 0);
@@ -1677,6 +1830,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t rope_flag() const {
     return GetField<int32_t>(VT_ROPE_FLAG, 0);
   }
+  int32_t rope_count() const {
+    return GetField<int32_t>(VT_ROPE_COUNT, 0);
+  }
   int32_t move_count() const {
     return GetField<int32_t>(VT_MOVE_COUNT, 0);
   }
@@ -1780,8 +1936,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_GUN_TYPE) &&
            VerifyField<int32_t>(verifier, VT_REQUEST_GUN_TYPE) &&
            VerifyField<int32_t>(verifier, VT_LAST_GUN_TYPE) &&
-           VerifyOffset(verifier, VT_MESH_POINTERS) &&
-           verifier.VerifyVector(mesh_pointers()) &&
            VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_SPEED) &&
            VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
@@ -1860,6 +2014,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_ROPE_OFFSET) &&
            VerifyField<int32_t>(verifier, VT_ROPE_DOWN_VEL) &&
            VerifyField<int32_t>(verifier, VT_ROPE_FLAG) &&
+           VerifyField<int32_t>(verifier, VT_ROPE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_MOVE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_HIGHEST_LOCATION) &&
@@ -1928,9 +2083,6 @@ struct LaraBuilder {
   }
   void add_last_gun_type(int32_t last_gun_type) {
     fbb_.AddElement<int32_t>(Lara::VT_LAST_GUN_TYPE, last_gun_type, 0);
-  }
-  void add_mesh_pointers(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers) {
-    fbb_.AddOffset(Lara::VT_MESH_POINTERS, mesh_pointers);
   }
   void add_hit_points(int32_t hit_points) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_POINTS, hit_points, 0);
@@ -2148,6 +2300,9 @@ struct LaraBuilder {
   void add_rope_flag(int32_t rope_flag) {
     fbb_.AddElement<int32_t>(Lara::VT_ROPE_FLAG, rope_flag, 0);
   }
+  void add_rope_count(int32_t rope_count) {
+    fbb_.AddElement<int32_t>(Lara::VT_ROPE_COUNT, rope_count, 0);
+  }
   void add_move_count(int32_t move_count) {
     fbb_.AddElement<int32_t>(Lara::VT_MOVE_COUNT, move_count, 0);
   }
@@ -2262,7 +2417,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t gun_type = 0,
     int32_t request_gun_type = 0,
     int32_t last_gun_type = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers = 0,
     int32_t hit_points = 0,
     int32_t speed = 0,
     int32_t fall_speed = 0,
@@ -2335,6 +2489,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t rope_offset = 0,
     int32_t rope_down_vel = 0,
     int32_t rope_flag = 0,
+    int32_t rope_count = 0,
     int32_t move_count = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
@@ -2393,6 +2548,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_highest_location(highest_location);
   builder_.add_location(location);
   builder_.add_move_count(move_count);
+  builder_.add_rope_count(rope_count);
   builder_.add_rope_flag(rope_flag);
   builder_.add_rope_down_vel(rope_down_vel);
   builder_.add_rope_offset(rope_offset);
@@ -2451,7 +2607,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_fall_speed(fall_speed);
   builder_.add_speed(speed);
   builder_.add_hit_points(hit_points);
-  builder_.add_mesh_pointers(mesh_pointers);
   builder_.add_last_gun_type(last_gun_type);
   builder_.add_request_gun_type(request_gun_type);
   builder_.add_gun_type(gun_type);
@@ -2493,7 +2648,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t gun_type = 0,
     int32_t request_gun_type = 0,
     int32_t last_gun_type = 0,
-    const std::vector<int32_t> *mesh_pointers = nullptr,
     int32_t hit_points = 0,
     int32_t speed = 0,
     int32_t fall_speed = 0,
@@ -2566,6 +2720,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t rope_offset = 0,
     int32_t rope_down_vel = 0,
     int32_t rope_flag = 0,
+    int32_t rope_count = 0,
     int32_t move_count = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
@@ -2598,7 +2753,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t num_small_medipacks = 0,
     int32_t num_flares = 0,
     int32_t target_item_number = 0) {
-  auto mesh_pointers__ = mesh_pointers ? _fbb.CreateVector<int32_t>(*mesh_pointers) : 0;
   auto wet__ = wet ? _fbb.CreateVector<uint8_t>(*wet) : 0;
   auto mesh_ptrs__ = mesh_ptrs ? _fbb.CreateVector<int32_t>(*mesh_ptrs) : 0;
   auto target_angles__ = target_angles ? _fbb.CreateVector<int32_t>(*target_angles) : 0;
@@ -2618,7 +2772,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       gun_type,
       request_gun_type,
       last_gun_type,
-      mesh_pointers__,
       hit_points,
       speed,
       fall_speed,
@@ -2691,6 +2844,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       rope_offset,
       rope_down_vel,
       rope_flag,
+      rope_count,
       move_count,
       location,
       highest_location,
@@ -2845,6 +2999,7 @@ flatbuffers::Offset<Sink> CreateSink(flatbuffers::FlatBufferBuilder &_fbb, const
 
 struct StaticMeshInfoT : public flatbuffers::NativeTable {
   typedef StaticMeshInfo TableType;
+  int32_t room_number = 0;
   int32_t flags = 0;
 };
 
@@ -2853,13 +3008,18 @@ struct StaticMeshInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef StaticMeshInfoBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FLAGS = 4
+    VT_ROOM_NUMBER = 4,
+    VT_FLAGS = 6
   };
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
@@ -2872,6 +3032,9 @@ struct StaticMeshInfoBuilder {
   typedef StaticMeshInfo Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(StaticMeshInfo::VT_ROOM_NUMBER, room_number, 0);
+  }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(StaticMeshInfo::VT_FLAGS, flags, 0);
   }
@@ -2888,9 +3051,11 @@ struct StaticMeshInfoBuilder {
 
 inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t room_number = 0,
     int32_t flags = 0) {
   StaticMeshInfoBuilder builder_(_fbb);
   builder_.add_flags(flags);
+  builder_.add_room_number(room_number);
   return builder_.Finish();
 }
 
@@ -3787,7 +3952,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t flip_effect = 0;
   int32_t flip_timer = 0;
   int32_t flip_status = 0;
-  int32_t ambient_track = 0;
+  std::string ambient_track{};
   std::vector<int32_t> cd_flags{};
 };
 
@@ -3867,8 +4032,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t flip_status() const {
     return GetField<int32_t>(VT_FLIP_STATUS, 0);
   }
-  int32_t ambient_track() const {
-    return GetField<int32_t>(VT_AMBIENT_TRACK, 0);
+  const flatbuffers::String *ambient_track() const {
+    return GetPointer<const flatbuffers::String *>(VT_AMBIENT_TRACK);
   }
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
@@ -3914,7 +4079,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLIP_EFFECT) &&
            VerifyField<int32_t>(verifier, VT_FLIP_TIMER) &&
            VerifyField<int32_t>(verifier, VT_FLIP_STATUS) &&
-           VerifyField<int32_t>(verifier, VT_AMBIENT_TRACK) &&
+           VerifyOffset(verifier, VT_AMBIENT_TRACK) &&
+           verifier.VerifyString(ambient_track()) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
            verifier.EndTable();
@@ -3979,8 +4145,8 @@ struct SaveGameBuilder {
   void add_flip_status(int32_t flip_status) {
     fbb_.AddElement<int32_t>(SaveGame::VT_FLIP_STATUS, flip_status, 0);
   }
-  void add_ambient_track(int32_t ambient_track) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_AMBIENT_TRACK, ambient_track, 0);
+  void add_ambient_track(flatbuffers::Offset<flatbuffers::String> ambient_track) {
+    fbb_.AddOffset(SaveGame::VT_AMBIENT_TRACK, ambient_track);
   }
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
@@ -4015,7 +4181,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
-    int32_t ambient_track = 0,
+    flatbuffers::Offset<flatbuffers::String> ambient_track = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0) {
   SaveGameBuilder builder_(_fbb);
   builder_.add_cd_flags(cd_flags);
@@ -4064,7 +4230,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
-    int32_t ambient_track = 0,
+    const char *ambient_track = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
@@ -4075,6 +4241,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto scarabs__ = scarabs ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>>(*scarabs) : 0;
   auto bats__ = bats ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::BatInfo>>(*bats) : 0;
   auto flip_maps__ = flip_maps ? _fbb.CreateVector<int32_t>(*flip_maps) : 0;
+  auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
@@ -4095,7 +4262,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       flip_effect,
       flip_timer,
       flip_status,
-      ambient_track,
+      ambient_track__,
       cd_flags__);
 }
 
@@ -4131,6 +4298,18 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = after_death(); _o->after_death = _e; }
   { auto _e = fired_weapon(); _o->fired_weapon = _e; }
   { auto _e = item_flags(); if (_e) { _o->item_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->item_flags[_i] = _e->Get(_i); } } }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = triggered(); _o->triggered = _e; }
+  { auto _e = active(); _o->active = _e; }
+  { auto _e = status(); _o->status = _e; }
+  { auto _e = gravity_status(); _o->gravity_status = _e; }
+  { auto _e = hit_stauts(); _o->hit_stauts = _e; }
+  { auto _e = collidable(); _o->collidable = _e; }
+  { auto _e = looked_at(); _o->looked_at = _e; }
+  { auto _e = poisoned(); _o->poisoned = _e; }
+  { auto _e = ai_bits(); _o->ai_bits = _e; }
+  { auto _e = really_active(); _o->really_active = _e; }
+  { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
 }
@@ -4164,6 +4343,18 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _after_death = _o->after_death;
   auto _fired_weapon = _o->fired_weapon;
   auto _item_flags = _fbb.CreateVector(_o->item_flags);
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _triggered = _o->triggered;
+  auto _active = _o->active;
+  auto _status = _o->status;
+  auto _gravity_status = _o->gravity_status;
+  auto _hit_stauts = _o->hit_stauts;
+  auto _collidable = _o->collidable;
+  auto _looked_at = _o->looked_at;
+  auto _poisoned = _o->poisoned;
+  auto _ai_bits = _o->ai_bits;
+  auto _really_active = _o->really_active;
+  auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
   return TEN::Save::CreateItem(
@@ -4189,6 +4380,18 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _after_death,
       _fired_weapon,
       _item_flags,
+      _position,
+      _triggered,
+      _active,
+      _status,
+      _gravity_status,
+      _hit_stauts,
+      _collidable,
+      _looked_at,
+      _poisoned,
+      _ai_bits,
+      _really_active,
+      _swap_mesh_flags,
       _data_type,
       _data);
 }
@@ -4426,7 +4629,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = gun_type(); _o->gun_type = _e; }
   { auto _e = request_gun_type(); _o->request_gun_type = _e; }
   { auto _e = last_gun_type(); _o->last_gun_type = _e; }
-  { auto _e = mesh_pointers(); if (_e) { _o->mesh_pointers.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_pointers[_i] = _e->Get(_i); } } }
   { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = speed(); _o->speed = _e; }
   { auto _e = fall_speed(); _o->fall_speed = _e; }
@@ -4499,6 +4701,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = rope_offset(); _o->rope_offset = _e; }
   { auto _e = rope_down_vel(); _o->rope_down_vel = _e; }
   { auto _e = rope_flag(); _o->rope_flag = _e; }
+  { auto _e = rope_count(); _o->rope_count = _e; }
   { auto _e = move_count(); _o->move_count = _e; }
   { auto _e = location(); _o->location = _e; }
   { auto _e = highest_location(); _o->highest_location = _e; }
@@ -4546,7 +4749,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _gun_type = _o->gun_type;
   auto _request_gun_type = _o->request_gun_type;
   auto _last_gun_type = _o->last_gun_type;
-  auto _mesh_pointers = _fbb.CreateVector(_o->mesh_pointers);
   auto _hit_points = _o->hit_points;
   auto _speed = _o->speed;
   auto _fall_speed = _o->fall_speed;
@@ -4619,6 +4821,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _rope_offset = _o->rope_offset;
   auto _rope_down_vel = _o->rope_down_vel;
   auto _rope_flag = _o->rope_flag;
+  auto _rope_count = _o->rope_count;
   auto _move_count = _o->move_count;
   auto _location = _o->location;
   auto _highest_location = _o->highest_location;
@@ -4658,7 +4861,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _gun_type,
       _request_gun_type,
       _last_gun_type,
-      _mesh_pointers,
       _hit_points,
       _speed,
       _fall_speed,
@@ -4731,6 +4933,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _rope_offset,
       _rope_down_vel,
       _rope_flag,
+      _rope_count,
       _move_count,
       _location,
       _highest_location,
@@ -4826,6 +5029,7 @@ inline StaticMeshInfoT *StaticMeshInfo::UnPack(const flatbuffers::resolver_funct
 inline void StaticMeshInfo::UnPackTo(StaticMeshInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = room_number(); _o->room_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
 }
 
@@ -4837,9 +5041,11 @@ inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::Fla
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const StaticMeshInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _room_number = _o->room_number;
   auto _flags = _o->flags;
   return TEN::Save::CreateStaticMeshInfo(
       _fbb,
+      _room_number,
       _flags);
 }
 
@@ -5160,7 +5366,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = flip_effect(); _o->flip_effect = _e; }
   { auto _e = flip_timer(); _o->flip_timer = _e; }
   { auto _e = flip_status(); _o->flip_status = _e; }
-  { auto _e = ambient_track(); _o->ambient_track = _e; }
+  { auto _e = ambient_track(); if (_e) _o->ambient_track = _e->str(); }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
 }
 
@@ -5189,7 +5395,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _flip_effect = _o->flip_effect;
   auto _flip_timer = _o->flip_timer;
   auto _flip_status = _o->flip_status;
-  auto _ambient_track = _o->ambient_track;
+  auto _ambient_track = _o->ambient_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->ambient_track);
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
   return TEN::Save::CreateSaveGame(
       _fbb,
