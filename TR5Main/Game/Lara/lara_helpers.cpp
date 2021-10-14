@@ -4,7 +4,6 @@
 #include "level.h"
 #include "lara.h"
 
-
 // TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
@@ -66,7 +65,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (item->currentAnimState == LS_WALK_BACK)
 			item->goalAnimState = LS_STEP_BACK_DOWN;
-		else
+		else [[likely]]
 			item->goalAnimState = LS_STEP_DOWN;
 
 		if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -170,7 +169,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	// Slide back
+	// Slide back.
 	if (polarity < -ANGLE(90.0f) || polarity > ANGLE(90.0f))
 	{
 		Lara.moveAngle = ANGLE(180);
@@ -182,7 +181,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 	}
-	// Slide forward
+	// Slide forward.
 	else [[likely]]
 	{
 		Lara.moveAngle = 0;
