@@ -2844,13 +2844,11 @@ void InventoryClass::handle_inventry_menu()
 				case MENU_TYPE_LOAD:
 					//fill_up_savegames_array//or maybe not?
 					invMode = IM_LOAD;
-					selected_slot = 0;
 					break;
 
 				case MENU_TYPE_SAVE:
 					//fill_up_savegames_array
 					invMode = IM_SAVE;
-					selected_slot = 0;
 					break;
 
 				case MENU_TYPE_EXAMINE:
@@ -3554,6 +3552,12 @@ int InventoryClass::S_CallInventory2(bool reset_mode)
 		if (useItem && !TrInput)
 			val = 1;
 
+		if (ExitInvLoop)
+		{
+			ExitInvLoop = 0;
+			val = 1;
+		}
+
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		if (val)
@@ -3709,7 +3713,7 @@ void InventoryClass::do_save()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		//SaveSelectedSlot(selected_slot);
-		return;
+		ExitInvLoop = 1;	//exit inv if the user has saved
 	}
 
 	if (goDeselect)

@@ -496,6 +496,7 @@ private:
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
+	bool ExitInvLoop;
 
 	//ammo vars
 	unsigned short AmountShotGunAmmo1;
@@ -535,10 +536,10 @@ private:
 	//pause
 	int pause_flag;
 	pause_menus pause_menu_to_display = pause_main_menu;
-	short pause_selected_option = 0;
+	short pause_selected_option;
 
 	//title
-	short title_selected_option = 0;
+	short title_selected_option;
 	title_menus title_menu_to_display = title_main_menu;
 	int settings_flag;
 
