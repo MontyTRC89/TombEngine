@@ -400,7 +400,7 @@ void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CROUCH_TURN_LEFT (105)
-// Collision:	lara_col_ducklr()
+// Collision:	lara_col_duckl()
 void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
@@ -467,8 +467,46 @@ void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot -= ANGLE(1.5f);
 }
 
+// State:		LS_CRAWL_TURN_LEFT (105)
+// Control:		lara_as_duckl()
+void lara_col_duckl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraFall(coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS; // Necessary? Set in WAD. @Sezz 2021.10.03
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
+}
+
 // State:		LS_CROUCH_TURN_RIGHT (106)
-// Collision:	lara_col_ducklr()
+// Collision:	lara_col_duckr()
 void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
@@ -536,42 +574,11 @@ void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot += ANGLE(1.5f);
 }
 
-// State:		LS_CRAWL_TURN_LEFT (105), LS_CRAWL_TURN_RIGHT (106)
-// Control:		lara_as_duckl(), lara_as_duckr()
-void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_CRAWL_TURN_RIGHT (106)
+// Control:		lara_as_duckr()
+void lara_col_duckr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = TestLaraStandUp(coll);
-	Lara.isDucked = true;
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-	GetCollisionInfo(coll, item);
-
-	if (TestLaraFall(coll))
-	{
-		Lara.gunStatus = LG_NO_ARMS; // Necessary? Set in WAD. @Sezz 2021.10.03
-		SetLaraFallState(item);
-
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-
-		return;
-	}
-
-	ShiftItem(item, coll);
-
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
+	lara_col_duckl(item, coll);
 }
 
 // LEGACY
@@ -1333,7 +1340,7 @@ void old_lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
-// Collision:	lara_col_all4turnlr()
+// Collision:	lara_col_all4turnl()
 void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
@@ -1412,8 +1419,26 @@ void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
+// State:		LS_CRAWL_TURN_LEFT (84)
+// Control:		lara_as_all4turnl()
+void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	GetCollisionInfo(coll, item);
+
+	// TODO: Take out the trash. @Sezz 2021.10.11
+
+	if (!TestLaraSlide(item, coll))
+	{
+		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+			item->pos.yPos += coll->Middle.Floor;
+	}
+}
+
 // State:		LS_CRAWL_TURN_RIGHT (85)
-// Collision:	lara_col_all4turnlr()
+// Collision:	lara_col_all4turnr()
 void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
@@ -1484,22 +1509,11 @@ void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_CRAWL_IDLE;
 }
 
-// State:		LS_CRAWL_TURN_LEFT (84), LS_CRAWL_TURN_RIGHT (85)
-// Control:		lara_as_all4turnl(), lara_as_all4turnl()
-void lara_col_all4turnlr(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_CRAWL_TURN_RIGHT (85)
+// Control:		lara_as_all4turnr()
+void lara_col_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraStandUp(coll);
-	Lara.isDucked = true;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	GetCollisionInfo(coll, item);
-
-	// TODO: Take out the trash. @Sezz 2021.10.11
-
-	if (!TestLaraSlide(item, coll))
-	{
-		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
-			item->pos.yPos += coll->Middle.Floor;
-	}
+	lara_col_all4turnl(item, coll);
 }
 
 // LEGACY
