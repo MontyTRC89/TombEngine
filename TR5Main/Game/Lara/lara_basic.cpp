@@ -931,6 +931,21 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 		return;
 	}
 
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeft(item))
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRight(item))
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
