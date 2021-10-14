@@ -1391,12 +1391,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor > STEPUP_HEIGHT / 2)
 	{
-		item->animNumber = LA_FALL_BACK;
-		item->currentAnimState = LS_FALL_BACK;
-		item->goalAnimState = LS_FALL_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->fallspeed = 0;
-		item->gravityStatus = true;
+		SetLaraFallBackState(item);
 
 		return;
 	}
@@ -3009,7 +3004,58 @@ void old_lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_stepright(item, coll);
 }
 
+// State:		LS_ROLL_FORWARD (23)
+// Control:		lara_void_func()
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.laraNode = 0;
+	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraSlideNew(coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	if (coll->Middle.Floor > STEPUP_HEIGHT / 2) // Was 200.
+	{
+		SetLaraFallBackState(item);
+
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;*/
+}
+
+// LEGACY
+void old_lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 23*/
 	/*state code: lara_void_func*/
@@ -3860,7 +3906,6 @@ void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-
 // State:		LS_SPRINT (73)
 // Control:		lara_as_dash()
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
@@ -4006,7 +4051,43 @@ void old_lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_SPRINT_ROLL (74)
+// Collision:	lara_col_dashdive()
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 12;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 12;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 12;
+		else
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot * 3 / 6) / 12;
+	}
+
+	// TODO: What?
+	if (item->goalAnimState != LS_DEATH &&
+		item->goalAnimState != LS_STOP &&
+		item->goalAnimState != LS_RUN_FORWARD &&
+		item->fallspeed > LARA_FREEFALL_SPEED)
+		item->goalAnimState = LS_FREEFALL;
+}
+
+// LEGACY
+void old_lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 74*/
 	/*collision: lara_col_dashdive*/

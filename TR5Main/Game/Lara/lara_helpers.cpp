@@ -133,6 +133,16 @@ void SetLaraFallState(ITEM_INFO* item)
 	item->gravityStatus = true;
 }
 
+void SetLaraFallBackState(ITEM_INFO* item)
+{
+	item->animNumber = LA_FALL_BACK;
+	item->currentAnimState = LS_FALL_BACK;
+	item->goalAnimState = LS_FALL_BACK;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->fallspeed = 0;
+	item->gravityStatus = true;
+}
+
 // TODO: Get true slope direction for enhanced sliding mechanics.
 // Krys, I'd like to have a look at what you did in your TRNG script. @Sezz 2021.09.26
 short GetLaraSlideDirection(COLL_INFO* coll)
