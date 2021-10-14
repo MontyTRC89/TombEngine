@@ -312,9 +312,10 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
-	// Hit wall or ledge.
+	// Hit wall, ledge, or slope.
 	if (coll->Middle.Floor <= coll->Setup.BadHeightUp ||
-		coll->Middle.Floor >= coll->Setup.BadHeightDown)
+		coll->Middle.Floor >= coll->Setup.BadHeightDown ||
+		coll->Middle.Slope)
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
 		item->pos.yPos = coll->Setup.OldPosition.y;
