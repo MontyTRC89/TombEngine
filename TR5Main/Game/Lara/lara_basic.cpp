@@ -3462,7 +3462,101 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 }
 
+// State:		LS_WADE_FORWARD (65)
+// Collision:	lara_col_wade()
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.targetElevation = -ANGLE(22.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	{
+		LaraWadeSwamp(item, coll);
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 16;
+		else
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 5) / 16;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 16;
+		else
+			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 16;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		if (Lara.waterStatus == LW_ABOVE_WATER)
+			item->goalAnimState = LS_RUN_FORWARD;
+		else [[likely]]
+			item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for wading in a swamp.
+void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX / 2) / 24;
+		else
+			item->pos.zRot -= (item->pos.zRot + (LARA_LEAN_MAX / 2) * 3 / 5) / 24;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		if (TestLaraLean(item, coll))
+			item->pos.zRot += (LARA_LEAN_MAX / 2 - item->pos.zRot) / 24;
+
+		else
+			item->pos.zRot += ((LARA_LEAN_MAX / 2) * 3 / 5 - item->pos.zRot) / 24;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// LEGACY
+void old_lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 65*/
 	/*collision: lara_col_wade*/
@@ -3813,7 +3907,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
