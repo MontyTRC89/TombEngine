@@ -71,6 +71,7 @@ void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll);
+void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
