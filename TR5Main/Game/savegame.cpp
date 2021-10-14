@@ -18,7 +18,8 @@
 #include "itemdata/creature_info.h"
 #include "Game/effects/lara_burn.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
-#include <Game/misc.h>
+#include "Game/misc.h"
+#include "Game/puzzles_keys.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
@@ -155,6 +156,47 @@ bool SaveGame::Save(char* fileName)
 	laraTargetAngles.push_back(Lara.targetAngles[1]);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
+	Save::LaraTightropeInfoBuilder tightRope{ fbb };
+	tightRope.add_balance(Lara.tightrope.balance);
+	tightRope.add_can_go_off(Lara.tightrope.canGoOff);
+	tightRope.add_tightrope_item(Lara.tightrope.tightropeItem);
+	tightRope.add_time_on_tightrope(Lara.tightrope.timeOnTightrope);
+	auto tightRopeOffset = tightRope.Finish();
+
+	Save::HolsterInfoBuilder holsterInfo{ fbb };
+	holsterInfo.add_back_holster((int)Lara.holsterInfo.backHolster);
+	holsterInfo.add_left_holster((int)Lara.holsterInfo.leftHolster);
+	holsterInfo.add_right_holster((int)Lara.holsterInfo.rightHolster);
+	auto holsterInfoOffset = holsterInfo.Finish();
+
+	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
+	for (int i = 0; i < NUM_WEAPONS; i++)
+	{
+		CarriedWeaponInfo* info = &Lara.Weapons[i];
+		
+		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
+		for (int j = 0; j < MAX_AMMOTYPE; j++)
+		{
+			Save::AmmoInfoBuilder ammo{ fbb };
+			ammo.add_count(info->Ammo[j].getCount());
+			ammo.add_is_infinite(info->Ammo[j].hasInfinite());
+			auto ammoOffset = ammo.Finish();
+			ammos.push_back(ammoOffset);
+		}
+		auto ammosOffset = fbb.CreateVector(ammos);
+		
+		Save::CarriedWeaponInfoBuilder serializedInfo{ fbb };
+		serializedInfo.add_ammo(ammosOffset);
+		serializedInfo.add_has_lasersight(info->HasLasersight);
+		serializedInfo.add_has_silencer(info->HasSilencer);
+		serializedInfo.add_present(info->Present);
+		serializedInfo.add_selected_ammo(info->SelectedAmmo);
+		auto serializedInfoOffset = serializedInfo.Finish();
+
+		carriedWeapons.push_back(serializedInfoOffset);
+	}
+	auto carriedWeaponsOffset = fbb.CreateVector(carriedWeapons);
+
 	Save::LaraBuilder lara{ fbb };
 	lara.add_air(Lara.air);
 	lara.add_beetle_life(Lara.BeetleLife);
@@ -229,6 +271,7 @@ bool SaveGame::Save(char* fileName)
 	lara.add_right_arm(rightArmOffset);
 	lara.add_rope_arc_back(Lara.ropeArcBack);
 	lara.add_rope_arc_front(Lara.ropeArcFront);
+	lara.add_rope_count(Lara.ropeCount);
 	lara.add_rope_dframe(Lara.ropeDFrame);
 	lara.add_rope_direction(Lara.ropeDirection);
 	lara.add_rope_down_vel(Lara.ropeDownVel);
@@ -259,18 +302,16 @@ bool SaveGame::Save(char* fileName)
 	lara.add_water_surface_dist(Lara.waterSurfaceDist);
 	lara.add_weapon_item(Lara.weaponItem);
 	lara.add_wet(wetOffset);
-	auto laraOffset = lara.Finish();
+	lara.add_tightrope(tightRopeOffset);
+	lara.add_holster_info(holsterInfoOffset);
+	lara.add_weapons(carriedWeaponsOffset);
 
-	// Weapon info
-	/*
-		std::vector
-	LARA_WEAPON_TYPE::NUM_WEAPONS
-	Save::CarriedWeaponInfoBuilder carriedWeaponInfo{ fbb };
-	carriedWeaponInfo.add_ammo(Lara.Weapons)
-	*/
+	auto laraOffset = lara.Finish();
 
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
+		OBJECT_INFO* obj = &Objects[itemToSerialize.objectNumber];
+
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
 			itemFlags.push_back(itemToSerialize.itemFlags[i]);
@@ -278,7 +319,8 @@ bool SaveGame::Save(char* fileName)
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 
-		if (Objects[itemToSerialize.objectNumber].intelligent)
+		if (Objects[itemToSerialize.objectNumber].intelligent 
+			&& itemToSerialize.data.is<CREATURE_INFO>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
@@ -311,9 +353,17 @@ bool SaveGame::Save(char* fileName)
 			creatureOffset = creatureBuilder.Finish();
 		}
 
+		Save::Position position = Save::Position(
+			(int32_t)itemToSerialize.pos.xPos,
+			(int32_t)itemToSerialize.pos.yPos,
+			(int32_t)itemToSerialize.pos.zPos,
+			(int32_t)itemToSerialize.pos.xRot,
+			(int32_t)itemToSerialize.pos.yRot,
+			(int32_t)itemToSerialize.pos.zRot);
+
 		Save::ItemBuilder serializedItem{ fbb };
 
-		serializedItem.add_anim_number(itemToSerialize.animNumber);
+		serializedItem.add_anim_number(itemToSerialize.animNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.afterDeath);
 		serializedItem.add_box_number(itemToSerialize.boxNumber);
 		serializedItem.add_carried_item(itemToSerialize.carriedItem);
@@ -328,30 +378,56 @@ bool SaveGame::Save(char* fileName)
 		serializedItem.add_item_flags(itemFlagsOffset);
 		serializedItem.add_mesh_bits(itemToSerialize.meshBits);
 		serializedItem.add_object_id(itemToSerialize.objectNumber);
+		serializedItem.add_position(&position);
 		serializedItem.add_required_anim_state(itemToSerialize.requiredAnimState);
 		serializedItem.add_room_number(itemToSerialize.roomNumber);
 		serializedItem.add_speed(itemToSerialize.speed);
 		serializedItem.add_timer(itemToSerialize.timer);
 		serializedItem.add_touch_bits(itemToSerialize.touchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.triggerFlags);
+		serializedItem.add_triggered((itemToSerialize.flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
+		serializedItem.add_active(itemToSerialize.active);
+		serializedItem.add_status(itemToSerialize.status);
+		serializedItem.add_gravity_status(itemToSerialize.gravityStatus);
+		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
+		serializedItem.add_poisoned(itemToSerialize.poisoned);
+		serializedItem.add_ai_bits(itemToSerialize.aiBits);
+		serializedItem.add_really_active(itemToSerialize.reallyActive);
+		serializedItem.add_collidable(itemToSerialize.collidable);
+		serializedItem.add_looked_at(itemToSerialize.lookedAt);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.swapMeshFlags);
 
-		if (Objects[itemToSerialize.objectNumber].intelligent)
+		if (Objects[itemToSerialize.objectNumber].intelligent 
+			&& itemToSerialize.data.is<CREATURE_INFO>())
 		{
-			serializedItem.add_data(creatureOffset);
+			serializedItem.add_data_type(Save::ItemData::Creature);
+			serializedItem.add_data(creatureOffset.Union());
 		}
 
 		auto serializedItemOffset = serializedItem.Finish();
 		serializedItems.push_back(serializedItemOffset);
-
-		//serialize Items here
-		//serializedItems.push_back(Save::CreateItem(fbb, &serializedItem));
 	}
+
+	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
+	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+
+	// Flipmaps
+	std::vector<int> flipMaps;
+	for (int i = 0; i < 255; i++)
+		flipMaps.push_back(FlipMap[i]);
+	auto flipMapsOffset = fbb.CreateVector(flipMaps);
 
 	Save::SaveGameBuilder sgb{ fbb };
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_items(serializedItemsOffset);
+	sgb.add_ambient_track(ambientTrackOffset);
+	sgb.add_flip_maps(flipMapsOffset);
+	sgb.add_flip_effect(FlipEffect);
+	sgb.add_flip_status(FlipStatus);
+	sgb.add_flip_timer(0);
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
 
@@ -379,22 +455,384 @@ bool SaveGame::Load(char* fileName)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
-	int ammoUsed1 = s->game()->ammo_used();
-	int ammoUsed2 = s->level()->ammo_used();
+	// Flipmaps
+	for (int i = 0; i < s->flip_maps()->size(); i++)
+	{
+		FlipMap[i] = s->flip_maps()->Get(i);
+	}
 
-	//read stuff here like this:
+	// Effects
+	FlipEffect = s->flip_effect();
+	FlipStatus = s->flip_status();
+	//FlipTimer = s->flip_timer();
 
-	//g_Level.Items.begin() -> replaces Items in g_Level with new ones until SaveGame Vector reaches and (possible out of bounds since g_Level Items has size of 1024, but logically impossible)
-	// std::back_inserter(g_Level.Items) would append!
-	/*std::transform(s->items()->begin(), s->items()->end(), g_Level.Items.begin(), [](const Save::Item& savedItem) {
+	CurrentLoopedSoundTrack = s->ambient_track()->str();
 
-		//transform savegame item into game item
-		ITEM_INFO i{};
-		i.hitPoints = savedItem.hit_points();
-		i.animNumber = savedItem.anim_number();
-		// and so on;
-		return i;
-		});*/
+	// Static objects
+	/*for (int i = 0; i < s->static_meshes()->size(); i++)
+	{
+		auto staticMesh = s->static_meshes()->Get(i);
+		auto room = &g_Level.Rooms[staticMesh->room_number()];
+		if (i >= room->mesh.size())
+			break;
+		room->mesh[i].flags = staticMesh->flags();
+		if (!room->mesh[i].flags)
+		{
+			short roomNumber = staticMesh->room_number();
+			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, &roomNumber);
+			TestTriggers(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, staticMesh->room_number(), true, 0);
+			floor->Stopper = 0;
+		}
+	}
+
+	// Cameras, sinks...
+	for (int i = 0; i < g_Level.Cameras.size(); i++)
+	{
+		g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+	}*/
+
+	// Items
+	for (int i = 0; i < s->items()->size(); i++)
+	{
+		if (i >= g_Level.Items.size())
+			break;
+
+		const Save::Item* savedItem = s->items()->Get(i);
+		ITEM_INFO* item = &g_Level.Items[i];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+		// Kill immediately item if already killed and continue
+		if (savedItem->flags() & IFLAG_KILLED)
+		{
+			KillItem(i);
+			item->status = ITEM_DEACTIVATED;
+			item->flags |= ONESHOT;
+			continue;
+		}
+
+		// If not triggered, don't load remaining data
+		if (!(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+			continue;
+
+		item->pos.xPos = savedItem->position()->x_pos();
+		item->pos.yPos = savedItem->position()->y_pos();
+		item->pos.zPos = savedItem->position()->z_pos();
+		item->pos.xRot = savedItem->position()->x_rot();
+		item->pos.yRot = savedItem->position()->y_rot();
+		item->pos.zRot = savedItem->position()->z_rot();
+
+		item->speed = savedItem->speed();
+		item->fallspeed = savedItem->fall_speed();
+
+		// Do the correct way for assigning new room number
+		short roomNumber = savedItem->room_number();
+		if (item->roomNumber != roomNumber)
+			ItemNewRoom(i, roomNumber);
+		
+		if (obj->shadowSize)
+		{
+			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		}
+
+		// Animations
+		item->currentAnimState = savedItem->current_anim_state();
+		item->requiredAnimState = savedItem->required_anim_state();
+		item->goalAnimState = savedItem->goal_anim_state();
+		item->animNumber = obj->animIndex + savedItem->anim_number();
+		item->frameNumber = savedItem->frame_number();
+
+		// Hit points
+		item->hitPoints = savedItem->hit_points();
+
+		// Flags and timers
+		for (int j = 0; j < 7; j++)
+			item->itemFlags[j] = savedItem->item_flags()->Get(j);
+		item->timer = savedItem->timer();
+		item->triggerFlags = savedItem->trigger_flags();
+		item->flags = savedItem->flags();
+
+		// Carried item
+		item->carriedItem = savedItem->carried_item();
+
+		// Activate item if needed
+		if (savedItem->active() && !item->active)
+			AddActiveItem(i);
+
+		item->active = savedItem->active();
+		item->reallyActive = savedItem->really_active();
+		item->hitStatus = savedItem->hit_stauts();
+		item->status = savedItem->status();
+		item->aiBits = savedItem->ai_bits();
+		item->gravityStatus = savedItem->gravity_status();
+		item->collidable = savedItem->collidable();
+		item->lookedAt = savedItem->looked_at();
+		item->poisoned = savedItem->poisoned();
+
+		// Creature data for intelligent items
+		if (obj->intelligent)
+		{
+			EnableBaddieAI(i, true);
+
+			auto creature = GetCreatureInfo(item);
+			auto data = savedItem->data();
+			auto savedCreature = (Save::Creature*)data;
+
+			if (savedCreature == nullptr)
+				continue;
+
+			creature->alerted = savedCreature->alerted();
+			creature->LOT.canJump = savedCreature->can_jump();
+			creature->LOT.canMonkey = savedCreature->can_monkey();
+			if (savedCreature->enemy() >= 0)
+				creature->enemy = &g_Level.Items[savedCreature->enemy()];
+			creature->flags = savedCreature->flags();
+			creature->headLeft = savedCreature->head_left();
+			creature->headRight = savedCreature->head_right();
+			creature->hurtByLara = savedCreature->hurt_by_lara();
+			creature->LOT.isAmphibious = savedCreature->is_amphibious();
+			creature->LOT.isJumping = savedCreature->is_jumping();
+			creature->LOT.isMonkeying = savedCreature->is_monkeying();
+			for (int j = 0; j < 4; j++)
+				creature->jointRotation[j] = savedCreature->joint_rotation()->Get(j);
+			creature->jumpAhead = savedCreature->jump_ahead();
+			creature->maximumTurn = savedCreature->maximum_turn();
+			creature->monkeyAhead = savedCreature->monkey_ahead();
+			creature->mood = (MOOD_TYPE)savedCreature->mood();
+			creature->patrol2 = savedCreature->patrol2();
+			creature->reachedGoal = savedCreature->reached_goal();
+		}
+
+		// Mesh stuff
+		item->meshBits = savedItem->mesh_bits();
+		item->swapMeshFlags = savedItem->swap_mesh_flags();
+
+		// Now some post-load specific hacks for objects
+		if (item->objectNumber >= ID_PUZZLE_HOLE1 
+			&& item->objectNumber <= ID_PUZZLE_HOLE16 
+			&& (item->status == ITEM_ACTIVE
+				|| item->status == ITEM_DEACTIVATED))
+		{
+			item->objectNumber = (GAME_OBJECT_ID)((int)item->objectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+			item->animNumber = Objects[item->objectNumber].animIndex + savedItem->anim_number();
+		}
+
+		if ((item->objectNumber >= ID_SMASH_OBJECT1)
+			&& (item->objectNumber <= ID_SMASH_OBJECT8)
+			&& (item->flags & ONESHOT))
+			item->meshBits = 0x00100;
+
+		// TODO: specific RAISING_BLOCK hacks
+	}
+
+	JustLoaded = 1;	
+
+	// Lara
+	ZeroMemory(Lara.Puzzles, NUM_PUZZLES * sizeof(int));
+	for (int i = 0; i < s->lara()->puzzles()->size(); i++)
+	{
+		Lara.Puzzles[i] = s->lara()->puzzles()->Get(i);
+	}
+
+	ZeroMemory(Lara.PuzzlesCombo, NUM_PUZZLES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->puzzles_combo()->size(); i++)
+	{
+		Lara.PuzzlesCombo[i] = s->lara()->puzzles_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Keys, NUM_KEYS * sizeof(int));
+	for (int i = 0; i < s->lara()->keys()->size(); i++)
+	{
+		Lara.Keys[i] = s->lara()->keys()->Get(i);
+	}
+
+	ZeroMemory(Lara.KeysCombo, NUM_KEYS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->keys_combo()->size(); i++)
+	{
+		Lara.KeysCombo[i] = s->lara()->keys_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Pickups, NUM_PICKUPS * sizeof(int));
+	for (int i = 0; i < s->lara()->pickups()->size(); i++)
+	{
+		Lara.Pickups[i] = s->lara()->pickups()->Get(i);
+	}
+
+	ZeroMemory(Lara.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->pickups_combo()->size(); i++)
+	{
+		Lara.Pickups[i] = s->lara()->pickups_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Examines, NUM_EXAMINES * sizeof(int));
+	for (int i = 0; i < s->lara()->examines()->size(); i++)
+	{
+		Lara.Examines[i] = s->lara()->examines()->Get(i);
+	}
+
+	ZeroMemory(Lara.ExaminesCombo, NUM_EXAMINES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->examines_combo()->size(); i++)
+	{
+		Lara.ExaminesCombo[i] = s->lara()->examines_combo()->Get(i);
+	}
+
+	for (int i = 0; i < s->lara()->mesh_ptrs()->size(); i++)
+	{
+		Lara.meshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
+	}
+
+	for (int i = 0; i < 15; i++)
+	{
+		Lara.wet[i] = s->lara()->wet()->Get(i);
+	}
+
+	Lara.air = s->lara()->air();
+	Lara.BeetleLife = s->lara()->beetle_life();
+	Lara.big_waterskin = s->lara()->big_waterskin();
+	Lara.Binoculars = s->lara()->binoculars();
+	Lara.burn = s->lara()->burn();
+	Lara.burnBlue = s->lara()->burn_blue();
+	Lara.burnCount = s->lara()->burn_count();
+	Lara.burnSmoke = s->lara()->burn_smoke();
+	Lara.busy = s->lara()->busy();
+	Lara.calcFallSpeed = s->lara()->calc_fall_speed();
+	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
+	Lara.climbStatus = s->lara()->climb_status();
+	Lara.cornerX = s->lara()->corner_x();
+	Lara.cornerZ = s->lara()->corner_z();
+	Lara.Crowbar = s->lara()->crowbar();
+	Lara.currentActive = s->lara()->current_active();
+	Lara.currentXvel = s->lara()->current_x_vel();
+	Lara.currentYvel = s->lara()->current_y_vel();
+	Lara.currentZvel = s->lara()->current_z_vel();
+	Lara.deathCount = s->lara()->death_count();
+	Lara.diveCount = s->lara()->dive_count();
+	Lara.ExtraAnim = s->lara()->extra_anim();
+	Lara.fired = s->lara()->fired();
+	Lara.flareAge = s->lara()->flare_age();
+	Lara.flareControlLeft = s->lara()->flare_control_left();
+	Lara.flareFrame = s->lara()->flare_frame();
+	Lara.gunStatus = (LARA_GUN_STATUS)s->lara()->gun_status();
+	Lara.gunType = (LARA_WEAPON_TYPE)s->lara()->gun_type();
+	Lara.hasBeetleThings = s->lara()->has_beetle_things();
+	Lara.hasFired = s->lara()->has_fired();
+	Lara.headXrot = s->lara()->head_x_rot();
+	Lara.headYrot = s->lara()->head_y_rot();
+	Lara.headZrot = s->lara()->head_z_rot();
+	Lara.highestLocation = s->lara()->highest_location();
+	Lara.hitDirection = s->lara()->hit_direction();
+	Lara.hitFrame = s->lara()->hit_frame();
+	Lara.interactedItem = s->lara()->interacted_item();
+	Lara.isClimbing = s->lara()->is_climbing();
+	Lara.isDucked = s->lara()->is_ducked();
+	Lara.isMoving = s->lara()->is_moving();
+	Lara.itemNumber = s->lara()->item_number();
+	Lara.keepDucked = s->lara()->keep_ducked();
+	Lara.Lasersight = s->lara()->lasersight();
+	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
+	Lara.lastPos = PHD_VECTOR(
+		s->lara()->last_position()->x(), 
+		s->lara()->last_position()->y(),
+		s->lara()->last_position()->z());
+	Lara.leftArm.animNumber = s->lara()->left_arm()->anim_number();
+	Lara.leftArm.flash_gun = s->lara()->left_arm()->flash_gun();
+	Lara.leftArm.frameBase = s->lara()->left_arm()->frame_base();
+	Lara.leftArm.frameNumber = s->lara()->left_arm()->frame_number();
+	Lara.leftArm.lock = s->lara()->left_arm()->lock();
+	Lara.leftArm.xRot = s->lara()->left_arm()->x_rot();
+	Lara.leftArm.yRot = s->lara()->left_arm()->y_rot();
+	Lara.leftArm.zRot = s->lara()->left_arm()->z_rot();
+	Lara.litTorch = s->lara()->lit_torch();
+	Lara.location = s->lara()->location();
+	Lara.locationPad = s->lara()->location_pad();
+	Lara.look = s->lara()->look();
+	Lara.mineL = s->lara()->mine_l();
+	Lara.mineR = s->lara()->mine_r();
+	Lara.moveAngle = s->lara()->move_angle();
+	Lara.moveCount = s->lara()->move_count();
+	Lara.NumFlares = s->lara()->num_flares();
+	Lara.NumLargeMedipacks = s->lara()->num_large_medipacks();
+	Lara.NumSmallMedipacks = s->lara()->num_small_medipacks();
+	Lara.oldBusy = s->lara()->old_busy();
+	Lara.poisoned = s->lara()->poisoned();
+	Lara.poseCount = s->lara()->pose_count();
+	Lara.requestGunType = (LARA_WEAPON_TYPE)s->lara()->request_gun_type();
+	Lara.rightArm.animNumber = s->lara()->right_arm()->anim_number();
+	Lara.rightArm.flash_gun = s->lara()->right_arm()->flash_gun();
+	Lara.rightArm.frameBase = s->lara()->right_arm()->frame_base();
+	Lara.rightArm.frameNumber = s->lara()->right_arm()->frame_number();
+	Lara.rightArm.lock = s->lara()->right_arm()->lock();
+	Lara.rightArm.xRot = s->lara()->right_arm()->x_rot();
+	Lara.rightArm.yRot = s->lara()->right_arm()->y_rot();
+	Lara.rightArm.zRot = s->lara()->right_arm()->z_rot();
+	Lara.ropeArcBack = s->lara()->rope_arc_back();
+	Lara.ropeArcFront = s->lara()->rope_arc_front();
+	Lara.ropeCount = s->lara()->rope_count();
+	Lara.ropeDFrame = s->lara()->rope_dframe();
+	Lara.ropeDirection = s->lara()->rope_direction();
+	Lara.ropeDownVel = s->lara()->rope_down_vel();
+	Lara.ropeFlag = s->lara()->rope_flag();
+	Lara.ropeFrame = s->lara()->rope_frame();
+	Lara.ropeFrameRate = s->lara()->rope_framerate();
+	Lara.ropeLastX = s->lara()->rope_last_x();
+	Lara.ropeMaxXBackward = s->lara()->rope_max_x_backward();
+	Lara.ropeMaxXForward = s->lara()->rope_max_x_forward();
+	Lara.ropeOffset = s->lara()->rope_offset();
+	Lara.ropePtr = s->lara()->rope_ptr();
+	Lara.ropeSegment = s->lara()->rope_segment();
+	Lara.ropeY = s->lara()->rope_y();
+	Lara.Secrets = s->lara()->secrets();
+	Lara.Silencer = s->lara()->silencer();
+	Lara.small_waterskin = s->lara()->small_waterskin();
+	Lara.spazEffectCount = s->lara()->spaz_effect_count();
+	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
+	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
+	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
+	Lara.Torch = s->lara()->torch();
+	Lara.torsoXrot = s->lara()->torso_x_rot();
+	Lara.torsoYrot = s->lara()->torso_y_rot();
+	Lara.torsoZrot = s->lara()->torso_z_rot();
+	Lara.turnRate = s->lara()->turn_rate();
+	Lara.uncontrollable = s->lara()->uncontrollable();
+	Lara.Vehicle = s->lara()->vehicle();
+	Lara.waterStatus = (LARA_WATER_STATUS)s->lara()->water_status();
+	Lara.waterSurfaceDist = s->lara()->water_surface_dist();
+	Lara.holsterInfo.backHolster = (HOLSTER_SLOT)s->lara()->holster_info()->back_holster();
+	Lara.holsterInfo.leftHolster = (HOLSTER_SLOT)s->lara()->holster_info()->left_holster();
+	Lara.holsterInfo.rightHolster = (HOLSTER_SLOT)s->lara()->holster_info()->right_holster();
+	Lara.tightrope.balance = s->lara()->tightrope()->balance();
+	Lara.tightrope.canGoOff = s->lara()->tightrope()->can_go_off();
+	Lara.tightrope.tightropeItem = s->lara()->tightrope()->tightrope_item();
+	Lara.tightrope.timeOnTightrope = s->lara()->tightrope()->time_on_tightrope();
+
+	for (int i = 0; i < s->lara()->weapons()->size(); i++)
+	{
+		auto info = s->lara()->weapons()->Get(i);
+
+		for (int j = 0; j < info->ammo()->size(); j++)
+		{
+			Lara.Weapons[i].Ammo[j].setInfinite(info->ammo()->Get(j)->is_infinite());
+			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
+		}
+		Lara.Weapons[i].HasLasersight = info->has_lasersight();
+		Lara.Weapons[i].HasSilencer = info->has_silencer();
+		Lara.Weapons[i].Present = info->present();
+		Lara.Weapons[i].SelectedAmmo = info->selected_ammo();
+	}
+
+	if (Lara.burn)
+	{
+		char flag = 0;
+		Lara.burn = 0;
+		if (Lara.burnSmoke)
+		{
+			flag = 1;
+			Lara.burnSmoke = 0;
+		}
+		LaraBurn();
+		if (flag)
+			Lara.burnSmoke = 1;
+	}
 
 	return true;
 }
@@ -412,6 +850,7 @@ bool SaveGame::LoadHeader(char* fileName, SaveGameHeader* header)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
+	header->level = s->header()->level();
 	header->levelName = s->header()->level_name()->str();
 	header->days = s->header()->days();
 	header->hours = s->header()->hours();
