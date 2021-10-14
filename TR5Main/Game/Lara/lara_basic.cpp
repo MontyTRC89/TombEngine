@@ -1180,11 +1180,11 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	ShiftItem(item, coll);
+
 	// TODO: Valuting originally took priority, but it may have been allowing Lara to vault on slopes with a well-timed input. Investigate. @Sezz 2021.10.04
 	if (TestLaraVault(item, coll))
 		return;
-
-	ShiftItem(item, coll);
 
 #if 1
 	if (coll->Middle.Floor != NO_HEIGHT)
@@ -1696,7 +1696,15 @@ void old_lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_TURN_RIGHT_SLOW (6)
+// Control:		lara_as_turn_r()
 void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
+{
+	lara_col_stop(item, coll);
+}
+
+// LEGACY
+void old_lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state: 6*/
 	/*state code: lara_as_turn_r*/
@@ -1943,10 +1951,10 @@ void old_lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_TURN_LEFT_SLOW (7)
+// Control:		lara_as_turn_l()
 void lara_col_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 7*/
-	/*state code: lara_as_turn_l*/
 	lara_col_turn_r(item, coll);
 }
 
