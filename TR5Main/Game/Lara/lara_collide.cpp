@@ -196,13 +196,12 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		AnimateLara(item);
 		break;
 	default:
-		// TODO: Temp comment, see what happens.
-		/*item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_STOP;
 		if (item->animNumber != LA_STAND_SOLID)
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = g_Level.Anims[LA_STAND_SOLID].frameBase;
-		}*/
+		}
 		break;
 	}
 }
