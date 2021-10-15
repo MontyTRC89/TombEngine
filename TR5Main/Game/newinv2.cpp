@@ -546,7 +546,28 @@ void InventoryClass::do_debounced_input()
 		dbDown = 0;
 
 	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
+	{
 		dbSelect = 1;
+
+		if (invMode == IM_SAVE)
+		{
+			if (!stop_killing_me_you_dumb_input_system)
+			{
+				goSelect = TrInput & IN_SAVE ? 0 : 1;
+				dbSelect = !goSelect;
+				stop_killing_me_you_dumb_input_system = dbSelect;
+			}
+		}
+		else if (invMode == IM_LOAD)
+		{
+			if (!stop_killing_me_you_dumb_input_system)
+			{
+				goSelect = TrInput & IN_LOAD ? 0 : 1;
+				dbSelect = !goSelect;
+				stop_killing_me_you_dumb_input_system = dbSelect;
+			}
+		}
+	}
 	else
 	{
 		if (dbSelect == 1 && !stop_killing_me_you_dumb_input_system)
@@ -3673,7 +3694,6 @@ int InventoryClass::do_load()
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 			g_GameFlow->SelectedSaveGame = selected_slot;
 			ExitInvLoop = 1;
-			selected_slot = 0;
 			return 1;
 		}
 	}
@@ -3683,7 +3703,6 @@ int InventoryClass::do_load()
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
 		invMode = IM_INGAME;
-		selected_slot = 0;
 	}
 
 	return 0;
@@ -3725,7 +3744,6 @@ void InventoryClass::do_save()
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
 		invMode = IM_INGAME;
-		selected_slot = 0;
 	}
 }
 
