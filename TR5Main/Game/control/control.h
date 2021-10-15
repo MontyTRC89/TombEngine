@@ -63,10 +63,6 @@ extern int LaraDrawType;
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
 
-#ifndef NEW_INV
-extern int LastInventoryItem;
-#endif
-
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
 

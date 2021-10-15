@@ -7,9 +7,11 @@
 #include "lara_climb.h"
 #include "lara_collide.h"
 #include "control/control.h"
-#include "control\los.h"
+#include "control/los.h"
 #include "items.h"
+#include "Renderer11.h"
 
+using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
 static short LeftClimbTab[4] = // offset 0xA0638
@@ -24,30 +26,66 @@ static short RightClimbTab[4] = // offset 0xA0640
 
 /*this file has all the generic test functions called in lara's state code*/
 
+// Test if a ledge in front of item is valid to climb.
+bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// Determine probe base point.
+	// We use double-radius here for two purposes. First - we can't guarantee that
+	// shifts weren't already applied and misfire may occur. Second - it guarantees
+	// that Lara won't land on a very thin edge of diagonal geometry.
+
+	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+
+	// Determine probe left/right points
+	int xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int zl = zf + phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+
+	// Determine probe top point
+	int y = item->pos.yPos - coll->Setup.Height;
+
+	// Get floor heights at both points
+	auto left  = GetCollisionResult(item->pos.xPos + xl, y, item->pos.zPos + zl, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+	auto right = GetCollisionResult(item->pos.xPos + xr, y, item->pos.zPos + zr, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+
+	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xl, left, item->pos.zPos + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xr, right, item->pos.zPos + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+	// Determine allowed slope difference for a given collision radius
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+
+	// Discard if there is a slope beyond tolerance delta
+	if (abs(left - right) >= slopeDelta)
+		return false;
+
+	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_GRAB_THRESHOLD)
+		return false; 
+	
+	auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+	if (headroom < STEP_SIZE)
+		return false;
+	
+	return (coll->CollisionType == CT_FRONT);
+}
+
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	//##LUA debug etc.
-//	Lara.NewAnims.CrawlVault1click = 1;
-//	Lara.NewAnims.CrawlVault2click = 1;
-//	Lara.NewAnims.CrawlVault3click = 1;
-//	Lara.NewAnims.MonkeyVault = 1;
+	// TODO: Enable with lua!
+	Lara.NewAnims.CrawlVault1click = 1;
+	Lara.NewAnims.CrawlVault2click = 1;
+	Lara.NewAnims.CrawlVault3click = 1;
+	Lara.NewAnims.MonkeyVault = 1;
 
-	if (coll->CollisionType == CT_FRONT)
+	if (TestValidLedge(item, coll))
 	{
-		short angle = item->pos.yRot;
-
-		bool result = SnapToQuadrant(angle, 30);
-		if (!result)
-			return false;
-
-		int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60;
-
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
-			if (!slope && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256) && Lara.NewAnims.CrawlVault1click)
+			if (Lara.NewAnims.CrawlVault1click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
@@ -59,11 +97,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (coll->Front.Floor >= -640 && coll->Front.Floor <= -384)
 		{
-			if (!slope &&
-				coll->Front.Floor - coll->Front.Ceiling >= 0 &&
+			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0 &&
-				coll->ObjectHeadroom >= LARA_HEIGHT)
+				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
@@ -77,7 +113,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->Front.Floor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
-			else if ((!slope && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256)) && Lara.NewAnims.CrawlVault2click)
+			else if (Lara.NewAnims.CrawlVault2click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -93,11 +129,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (coll->Front.Floor >= -896 && coll->Front.Floor <= -640)
 		{
-			if (!slope &&
-				coll->Front.Floor - coll->Front.Ceiling >= 0 &&
+			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0 &&
-				coll->ObjectHeadroom >= LARA_HEIGHT)
+				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
@@ -111,7 +145,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->Front.Floor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
-			else if ((!slope && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256)) && Lara.NewAnims.CrawlVault3click)
+			else if (Lara.NewAnims.CrawlVault3click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -125,7 +159,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				return false;
 			}
 		}
-		else if (!slope && coll->Front.Floor >= -1920 && coll->Front.Floor <= -896 && coll->ObjectHeadroom >= LARA_HEIGHT)
+		else if (coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
 		{
 #if 0
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
@@ -139,66 +173,67 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 		}
-		else
-		{
-			if (!Lara.climbStatus)
-				return 0;
 
-			if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
-			{
-				if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
-				{
-					ShiftItem(item, coll);
-
-					if (TestLaraClimbStance(item, coll))
-					{
-						item->animNumber = LA_STAND_SOLID;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = LS_LADDER_IDLE;
-						item->currentAnimState = LS_STOP;
-						AnimateLara(item);
-						item->pos.yRot = angle;
-						Lara.gunStatus = LG_HANDS_BUSY;
-						return true;
-					}
-				}
-				return false;
-			}
-
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_STOP;
-			Lara.calcFallSpeed = -116;
-			AnimateLara(item);
-		}
-
-		item->pos.yRot = angle;
+		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
-		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-		item->pos.xPos = v.x;
-		item->pos.zPos = v.y;
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
 
 		return true;
 	}
-	else if (Lara.NewAnims.MonkeyVault)//gross
+	else if (Lara.climbStatus)
 	{
-		if (Lara.canMonkeySwing)
+		if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
 		{
-			short roomNum = item->roomNumber;
-			int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-				item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
+			if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
+			{
+				ShiftItem(item, coll);
 
-			if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
-				return false;
-
-			item->animNumber = LA_STAND_IDLE;
-			item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_TEST_1;
-			return true;
+				if (TestLaraClimbStance(item, coll))
+				{
+					item->animNumber = LA_STAND_SOLID;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->goalAnimState = LS_LADDER_IDLE;
+					item->currentAnimState = LS_STOP;
+					AnimateLara(item);
+					item->pos.yRot = coll->NearestLedgeAngle;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					return true;
+				}
+			}
+			return false;
 		}
+
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_STOP;
+		Lara.calcFallSpeed = -116;
+		AnimateLara(item);
+
+		item->pos.yRot = coll->NearestLedgeAngle;
+		ShiftItem(item, coll);
+
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+
+		return true;
+	}
+	else if (Lara.NewAnims.MonkeyVault && Lara.canMonkeySwing)
+	{
+		short roomNum = item->roomNumber;
+		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
+			item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
+
+		if (ceiling > 1792 || ceiling < -1792 || abs(ceiling) == 768)
+			return false;
+
+		item->animNumber = LA_STAND_IDLE;
+		item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_TEST_1;
+		return true;
 	}
 
 	return false;
@@ -206,7 +241,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStandUp(COLL_INFO* coll)
 {
-	return (coll->Middle.Ceiling >= -362 || coll->ObjectHeadroom < (LARA_HEIGHT - LARA_HEIGHT_CRAWL) + LARA_HEADROOM);
+	return (coll->Middle.Ceiling >= -362);
 }
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)

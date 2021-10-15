@@ -42,12 +42,7 @@ namespace TEN::Entities::Switches
 		int doSwitch = 0;
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if ((((TrInput & IN_ACTION) ||
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM)
-#else
-			g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
-#endif
+		if ((((TrInput & IN_ACTION) || g_Inventory.Get_inventoryItemChosen() == ID_CROWBAR_ITEM)
 			&& l->currentAnimState == LS_STOP
 			&& l->animNumber == LA_STAND_IDLE
 			&& Lara.gunStatus == LG_NO_ARMS
@@ -60,13 +55,7 @@ namespace TEN::Entities::Switches
 
 				if (TestLaraPosition(&CrowbarBounds2, item, l))
 				{
-					if (Lara.isMoving ||
-#ifdef NEW_INV
-						GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
-#else
-						g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
-#endif
-						)
+					if (Lara.isMoving || g_Inventory.Get_inventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
 						if (MoveLaraPosition(&CrowbarPos2, item, l))
 						{
@@ -79,11 +68,8 @@ namespace TEN::Entities::Switches
 						{
 							Lara.interactedItem = itemNum;
 						}
-#ifdef NEW_INV
-						GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-						g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+
+						g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					}
 					else
 					{
@@ -101,13 +87,7 @@ namespace TEN::Entities::Switches
 			{
 				if (TestLaraPosition(&CrowbarBounds, item, l))
 				{
-					if (Lara.isMoving ||
-#ifdef NEW_INV
-						GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
-#else
-						g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
-#endif
-						)
+					if (Lara.isMoving || g_Inventory.Get_inventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
 						if (MoveLaraPosition(&CrowbarPos, item, l))
 						{
@@ -120,11 +100,8 @@ namespace TEN::Entities::Switches
 						{
 							Lara.interactedItem = itemNum;
 						}
-#ifdef NEW_INV
-						GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-						g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+
+						g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					}
 					else
 					{
@@ -144,11 +121,7 @@ namespace TEN::Entities::Switches
 			if (doSwitch == -1)
 			{
 				if (Lara.Crowbar)
-#ifdef NEW_INV
-					GLOBAL_enterinventory = ID_CROWBAR_ITEM;
-#else
-					g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
-#endif
+					g_Inventory.Set_enterInventory(ID_CROWBAR_ITEM);
 				else
 				{
 					if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)

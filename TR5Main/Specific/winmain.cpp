@@ -2,9 +2,6 @@
 #include "winmain.h"
 #include "resource.h"
 #include "Sound/sound.h"
-#ifndef NEW_INV
-#include "inventory.h"
-#endif
 #include "control/control.h"
 #include "gameflow.h"
 #include "savegame.h"
@@ -260,9 +257,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
 		Sound_Init();
-
-	// Initialise the new inventory
-	//g_Inventory = Inventory();
 	
 	App.bNoFocus = false;
 	App.isInScene = false;

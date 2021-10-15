@@ -439,6 +439,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
+	coll->Setup.NoQuadrants = false;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
 		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;
@@ -454,7 +455,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.BadHeightUp = -height;
 	coll->Setup.Height = height;
 
-	GetObjectCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
+	GetCollisionInfo(coll, v, PHD_VECTOR(0, height / 2, 0));
 	ShiftItem(v, coll);
 
 	if (coll->CollisionType == CT_FRONT)
@@ -622,9 +623,11 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 					l->goalAnimState = SUBS_GETOFFS;
 				else
 					l->goalAnimState = SUBS_GETOFF;
+
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
-				StopSoundEffect(346);
-				SoundEffect(348, (PHD_3DPOS*)&v->pos.xPos, 2);
+
+				StopSoundEffect(SFX_TR3_LITTLE_SUB_LOOP);
+				SoundEffect(SFX_TR3_LITTLE_SUB_STOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 			}
 		}
 
@@ -645,7 +648,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			v->pos.xRot += ANGLE(1);
 
 			if (frame == GETONSURF_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETONSURF_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -654,7 +657,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		else if (anim == SUB_GETON_A)
 		{
 			if (frame == GETON_SOUND_FRAME)
-				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2);
 
 			if (frame == GETON_CONTROL_FRAME)
 				sub->Flags |= UPV_CONTROL;
@@ -956,7 +959,7 @@ int SubControl(void)
 
 			if (!(sub->Flags & UPV_SURFACE))
 			{
-				SoundEffect(36, &LaraItem->pos, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 				sub->Flags &= ~UPV_DIVE;
 			}
 
@@ -969,7 +972,7 @@ int SubControl(void)
 
 			if (!(sub->Flags & UPV_SURFACE))
 			{
-				SoundEffect(36, &LaraItem->pos, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->pos, 2);
 				sub->Flags &= ~UPV_DIVE;
 			}
 
@@ -1037,7 +1040,7 @@ int SubControl(void)
 		BackgroundCollision(v, l, sub);
 
 		if (sub->Flags & UPV_CONTROL)
-			SoundEffect(1807, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
+			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed * 65536));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);

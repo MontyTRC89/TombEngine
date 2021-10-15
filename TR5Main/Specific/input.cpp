@@ -424,13 +424,11 @@ int S_UpdateInput()
 	if (SetDebounce)
 		DbInput = InputBusy;
 
-	//if (gfGameMode == 0 && Gameflow->LoadSaveEnabled)
-	{
-		if (KeyMap[DIK_F5])
-			linput |= IN_SAVE;
-		if (KeyMap[DIK_F6])
-			linput |= IN_LOAD;
-	}
+	if (KeyMap[DIK_F5])
+		linput |= IN_SAVE;
+
+	if (KeyMap[DIK_F6])
+		linput |= IN_LOAD;
 
 	/*if (Gameflow->CheatEnabled)
 	{

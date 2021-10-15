@@ -21,7 +21,8 @@ namespace TEN {
 				bool active;
 			};
 			extern std::array<DripParticle, NUM_DRIPS> dripParticles;
-			void UpdateDrips();
+			void UpdateDripParticles();
+			void DisableDripParticles();
 			DripParticle& getFreeDrip();
 			void SpawnWetnessDrip(DirectX::SimpleMath::Vector3 pos, int room);
 			void SpawnSplashDrips(Vector3 const & pos, int num, int room);
