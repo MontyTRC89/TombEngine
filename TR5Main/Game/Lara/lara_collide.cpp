@@ -140,22 +140,15 @@ bool TestLaraHitCeiling(COLL_INFO* coll)
 	return false;
 }
 
-// TODO: Using LA_STAND_SOLID is a poor way of handling bad ceiling collision. @Sezz 2021.09.26
 void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->pos.xPos = coll->Setup.OldPosition.x;
 	item->pos.yPos = coll->Setup.OldPosition.y;
 	item->pos.zPos = coll->Setup.OldPosition.z;
 
-	item->goalAnimState = LS_STOP;
-	item->currentAnimState = LS_STOP;
-	item->animNumber = LA_STAND_SOLID;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-
 	item->speed = 0;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-
 }
 
 // LEGACY
@@ -170,7 +163,6 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->goalAnimState = LS_STOP;
 		item->currentAnimState = LS_STOP;
-
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
@@ -204,12 +196,13 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		AnimateLara(item);
 		break;
 	default:
-		item->goalAnimState = LS_STOP;
+		// TODO: Temp comment, see what happens.
+		/*item->goalAnimState = LS_STOP;
 		if (item->animNumber != LA_STAND_SOLID)
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = g_Level.Anims[LA_STAND_SOLID].frameBase;
-		}
+		}*/
 		break;
 	}
 }
