@@ -989,6 +989,7 @@ bool SaveGame::Load(int slot)
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.waterStatus = (LARA_WATER_STATUS)s->lara()->water_status();
 	Lara.waterSurfaceDist = s->lara()->water_surface_dist();
+	Lara.weaponItem = s->lara()->weapon_item();
 	Lara.holsterInfo.backHolster = (HOLSTER_SLOT)s->lara()->holster_info()->back_holster();
 	Lara.holsterInfo.leftHolster = (HOLSTER_SLOT)s->lara()->holster_info()->left_holster();
 	Lara.holsterInfo.rightHolster = (HOLSTER_SLOT)s->lara()->holster_info()->right_holster();
