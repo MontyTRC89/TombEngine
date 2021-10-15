@@ -509,7 +509,6 @@ namespace TEN::Renderer
 		void drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated);
 		void drawLara(RenderView& view,bool transparent, bool shadowMap);
-		void printDebugMessage(LPCSTR message, ...);
 		void drawFires(RenderView& view);
 		void drawSparks(RenderView& view);
 		void drawSmokes(RenderView& view);
@@ -536,6 +535,7 @@ namespace TEN::Renderer
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
 		void renderTitleMenu();
 		void renderPauseMenu();
+		void renderLoadSaveMenu();
 		void renderNewInventory();
 		void drawStatistics();
 		void drawExamines();
@@ -588,6 +588,7 @@ namespace TEN::Renderer
 		void renderTitle();
 		void renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void clearScene();
+		void printDebugMessage(LPCSTR message, ...);
 		void drawDebugInfo();
 		void switchDebugPage(bool back);
 		void drawPickup(short objectNum);

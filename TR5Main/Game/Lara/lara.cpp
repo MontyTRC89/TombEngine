@@ -40,12 +40,7 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
-
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 
 #include "Game/rope.h"
 
@@ -53,10 +48,6 @@ using namespace TEN::Game::Rope;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
-
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
@@ -838,19 +829,22 @@ void LaraControl(short itemNumber)
 		SQUARE(item->pos.zPos - oldZ));
 }
 
-void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
+void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
+
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = true;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.OldAnimNumber = item->animNumber;
-	coll->Setup.OldFrameNumber = item->frameNumber;
+	coll->Setup.NoQuadrants = false;
+
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
@@ -971,9 +965,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.NoQuadrants = false;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1087,6 +1081,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.NoQuadrants = true;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;

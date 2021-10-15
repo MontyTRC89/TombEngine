@@ -9,11 +9,7 @@
 #include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
@@ -57,6 +53,7 @@ using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
 using namespace TEN::Entities::Switches;
@@ -92,11 +89,6 @@ int LaraDrawType;
 
 int WeaponDelay;
 int WeaponEnemyTimer;
-
-#ifndef NEW_INV
-int LastInventoryItem;
-extern Inventory g_Inventory;
-#endif
 
 int DrawPhase()
 {
@@ -150,55 +142,54 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
-#ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
+			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
+			{
+				Sound_Stop();
+
+				g_Inventory.Set_invMode(IM_SAVE);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS_LOAD_GAME;
+			}
+			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
+			{
+				Sound_Stop();
+
+				g_Inventory.Set_invMode(IM_LOAD);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS_LOAD_GAME;
+			}
+			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
 				Sound_Stop();
 				g_Renderer.DumpGameScene();
-				GLOBAL_invMode = IM_PAUSE;
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
+				g_Inventory.Set_invMode(IM_PAUSE);
+				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
+				g_Inventory.Set_pause_selected_option(0);
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				Sound_Stop();
 
-				if (S_CallInventory2())
+				if (g_Inventory.S_CallInventory2(1))
 					return GAME_STATUS_LOAD_GAME;
 			}
 		}
 
-		while (GLOBAL_invMode == IM_PAUSE)
+		while (g_Inventory.Get_invMode() == IM_PAUSE)
 		{
-			DrawInv();
+			g_Inventory.DrawInv();
 			g_Renderer.SyncRenderer();
 
-			int z = DoPauseMenu();
+			int z = g_Inventory.DoPauseMenu();
 
 			if (z == INV_RESULT_EXIT_TO_TILE)
 				return GAME_STATUS_EXIT_TO_TITLE;
 		}
-#else
-		if (CurrentLevel != 0 && !g_Renderer.isFading())
-		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
-			{
-				// Stop all sounds
-				Sound_Stop();
-				int inventoryResult = g_Inventory.DoInventory();
-				switch (inventoryResult)
-				{
-				case INV_RESULT_LOAD_GAME:
-					return GAME_STATUS_LOAD_GAME;
-				case INV_RESULT_EXIT_TO_TILE:
-					return GAME_STATUS_EXIT_TO_TITLE;
-				}
-			}
-		}
-#endif
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
@@ -209,20 +200,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-#ifdef NEW_INV
 			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
-#else
-			int inventoryResult = g_Inventory.DoInventory();
-			switch (inventoryResult)
-			{
-			case INV_RESULT_NEW_GAME:
-				return GAME_STATUS_NEW_GAME;
-			case INV_RESULT_LOAD_GAME:
-				return GAME_STATUS_LOAD_GAME;
-			case INV_RESULT_EXIT_TO_TILE:
-				return GAME_STATUS_EXIT_TO_TITLE;
-			}
-#endif
 		}
 
 		if (demoMode && TrInput == -1)
@@ -381,13 +359,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen != -1)
+			if (g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 			{
 				SayNo();
-				GLOBAL_inventoryitemchosen = -1;
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			}
-#endif
+
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
 			if (level->LaraType == LARA_TYPE::YOUNG)
@@ -437,7 +414,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		TEN::Effects::Drip::UpdateDrips();
+		TEN::Effects::Drip::UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
@@ -542,9 +519,6 @@ GAME_STATUS DoTitle(int index)
 		Savegame.Level.Timer = 0;
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
-#ifndef NEW_INV
-		LastInventoryItem = -1;
-#endif
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -562,7 +536,7 @@ GAME_STATUS DoTitle(int index)
 		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
-#ifdef NEW_INV
+
 		int status = 0, frames;
 		while (!status)
 		{
@@ -572,7 +546,7 @@ GAME_STATUS DoTitle(int index)
 			S_UpdateInput();
 			SetDebounce = false;
 
-			status = TitleOptions();
+			status = g_Inventory.TitleOptions();
 
 			if (status)
 				break;
@@ -583,18 +557,9 @@ GAME_STATUS DoTitle(int index)
 		}
 
 		inventoryResult = status;
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
 	}
 	else
-	{
-#ifdef NEW_INV
-		inventoryResult = TitleOptions();
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
-	}
+		inventoryResult = g_Inventory.TitleOptions();
 
 	StopSoundTracks();
 
@@ -687,17 +652,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
 	}
-#ifndef NEW_INV
-	LastInventoryItem = -1;
-#endif
 
-#ifdef NEW_INV
-	GLOBAL_inventoryitemchosen = NO_ITEM;
-	GLOBAL_enterinventory = NO_ITEM;
-#else
-	g_Inventory.SetEnterObject(NO_ITEM);
-	g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+	g_Inventory.Set_enterInventory(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
@@ -1043,6 +1000,7 @@ void CleanUp()
 
 	// Clear all kinds of particles
 	DisableSmokeParticles();
+	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
 }
