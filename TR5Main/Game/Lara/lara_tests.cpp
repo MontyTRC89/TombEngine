@@ -242,7 +242,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStandUp(COLL_INFO* coll)
 {
-	return (coll->Middle.Ceiling >= -362);
+	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
+	if (coll->Middle.Ceiling < -362)
+		return true;
+
+	return false;
 }
 
 // LEGACY
