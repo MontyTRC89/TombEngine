@@ -176,7 +176,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\newinv2.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
-    <ClInclude Include="Specific\LoadSave.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
@@ -570,7 +569,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_burn.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
-    <ClCompile Include="Specific\LoadSave.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
