@@ -68,7 +68,7 @@ private:
 public:
 	static int LastSaveGame;
 
-	static bool Load(char* fileName);
-	static bool LoadHeader(char* fileName, SaveGameHeader* header);
-	static bool Save(char* fileName);
+	static bool Load(int slot);
+	static bool LoadHeader(int slot, SaveGameHeader* header);
+	static bool Save(int slot);
 };

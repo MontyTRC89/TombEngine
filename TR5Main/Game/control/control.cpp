@@ -619,10 +619,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// Restore the game?
 	if (loadFromSavegame)
 	{
-		char fileName[255];
-		ZeroMemory(fileName, 255);
-		sprintf(fileName, "savegame.%d", g_GameFlow->SelectedSaveGame);
-		SaveGame::Load(fileName);
+		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
 		Camera.pos.x = LaraItem->pos.xPos + 256;
 		Camera.pos.y = LaraItem->pos.yPos + 256;
