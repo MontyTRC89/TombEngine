@@ -2244,7 +2244,69 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_stop(item, coll);
 }
 
+// State:		LS_JUMP_PREPARE (15)
+// Collision:	lara_col_compress()
 void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: dispatch
+	/*if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}*/
+
+	if (Lara.waterStatus == LW_WADE)
+	{
+		item->goalAnimState = LS_JUMP_UP;
+
+		return;
+	}
+
+	// TODO: New probes. @Sezz 2021.10.15
+	if (TrInput & IN_FORWARD &&
+		!LaraFacingCorner(item, item->pos.yRot, STEP_SIZE) &&
+		LaraFloorFront(item, item->pos.yRot, STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+	{
+		item->goalAnimState = LS_JUMP_FORWARD;
+		Lara.moveAngle = item->pos.yRot;
+
+		return;
+	}
+	else if (TrInput & IN_BACK &&
+		!LaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) &&
+		LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+	{
+		item->goalAnimState = LS_JUMP_BACK;
+		Lara.moveAngle = item->pos.yRot + ANGLE(180);
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT &&
+		!LaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) &&
+		LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+	{
+		item->goalAnimState = LS_JUMP_LEFT;
+		Lara.moveAngle = item->pos.yRot - ANGLE(90);
+
+		return;
+	}
+	else if (TrInput & IN_RIGHT &&
+		!LaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) &&
+		LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+	{
+		item->goalAnimState = LS_JUMP_RIGHT;
+		Lara.moveAngle = item->pos.yRot + ANGLE(90);
+
+		return;
+	}
+
+	item->goalAnimState = LS_JUMP_UP;
+}
+
+// LEGACY
+void old_lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 15*/
 	/*collision: lara_col_compress*/
@@ -2276,7 +2338,55 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 }
 
+// State:		LS_JUMP_PREPARE (15)
+// Collision:	lara_as_compress()
 void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	// TODO: Better handling.
+	if (coll->Middle.Ceiling > -100)
+	{
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_STOP;
+		item->currentAnimState = LS_STOP;
+
+		item->speed = 0;
+		item->fallspeed = 0;
+		item->gravityStatus = false;
+
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+	}
+
+	if (coll->Middle.Floor > -STEP_SIZE && coll->Middle.Floor < STEP_SIZE)
+		item->pos.yPos += coll->Middle.Floor;
+}
+
+// LEGACY
+void old_lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 15*/
 	/*state code: lara_as_compress*/
@@ -2319,7 +2429,7 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_STOP; // TODO dispatch
 
 		return;
 	}
