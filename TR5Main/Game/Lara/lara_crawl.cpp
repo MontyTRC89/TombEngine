@@ -27,7 +27,7 @@
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
-	// wade depth where Lara couldn't crouch at all, and if the player forcibly forced her into the crouched state by
+	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.13.21
 
