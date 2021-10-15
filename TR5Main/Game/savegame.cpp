@@ -35,8 +35,12 @@ int SaveGame::LastSaveGame;
 
 SAVEGAME_INFO Savegame;
 
-bool SaveGame::Save(char* fileName)
+bool SaveGame::Save(int slot)
 {
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
+
 	ITEM_INFO itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
@@ -442,8 +446,12 @@ bool SaveGame::Save(char* fileName)
 	return true;
 }
 
-bool SaveGame::Load(char* fileName)
+bool SaveGame::Load(int slot)
 {
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
+
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
 	file.seekg(0, std::ios::end);
@@ -837,8 +845,12 @@ bool SaveGame::Load(char* fileName)
 	return true;
 }
 
-bool SaveGame::LoadHeader(char* fileName, SaveGameHeader* header)
+bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
+
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
 	file.seekg(0, std::ios::end);
