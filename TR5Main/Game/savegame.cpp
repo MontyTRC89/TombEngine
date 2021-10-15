@@ -519,7 +519,7 @@ bool SaveGame::Load(int slot)
 		}
 
 		// If not triggered, don't load remaining data
-		if (!(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+		if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 			continue;
 
 		item->pos.xPos = savedItem->position()->x_pos();
@@ -578,7 +578,7 @@ bool SaveGame::Load(int slot)
 		item->poisoned = savedItem->poisoned();
 
 		// Creature data for intelligent items
-		if (obj->intelligent)
+		if (item->objectNumber != ID_LARA && obj->intelligent)
 		{
 			EnableBaddieAI(i, true);
 
