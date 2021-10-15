@@ -120,7 +120,6 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += (LARA_LEAN_MAX / 3 - item->pos.zRot) / 12;
 	}
 
-	// Crouch failsafe.
 	// TODO: Idle crouch state dispatch. @Sezz 2021.10.11
 	if (TestLaraStandUp(coll))
 	{
@@ -798,6 +797,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_TOP_FRONT &&
 		!((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0)) ||	// Slope in front.
 			coll->CollisionType == CT_FRONT))														// Wall/ceiling/object in front.
 	{
@@ -1534,7 +1534,9 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD; // TODO: This is a frame-perfect input.
@@ -1602,7 +1604,9 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 
@@ -1790,7 +1794,9 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
@@ -1858,7 +1864,9 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 
@@ -2536,7 +2544,8 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT)
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
@@ -2669,7 +2678,8 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT)
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
@@ -3409,7 +3419,70 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_ROLL_FORWARD (45)
+// Control:		lara_void_func()
 void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraFall(coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlideNew(coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	// TODO: Do NOT give builders such a silly level of granular control over new anims.
+	// 1) Eventually, there could be hundreds of them.
+	// 2) Builders will deliberately hurt the player for the sake of "faithfulness to the originals",
+	// and that's a terrible reason to make this an option. Let's not even remotely suggest that bad design is acceptable.
+	// TODO: Control function. @Sezz 2021.10.15
+	Lara.NewAnims.SwandiveRollRun = true;
+
+	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && Lara.NewAnims.SwandiveRollRun)
+	{
+		item->goalAnimState = LS_RUN_FORWARD;
+	}
+
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;*/
+}
+
+// LEGACY
+void old_lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 45*/
 	/*state code: lara_void_func*/
