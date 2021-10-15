@@ -15,7 +15,7 @@
     <ProjectGuid>{15AB0220-541C-4DA1-94EB-ED3C47E4582E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TR5Main</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>TombEngine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -64,7 +64,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_INV;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -95,7 +95,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_INV;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -485,7 +485,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
-    <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_one_gun.h" />
@@ -792,7 +791,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
-    <ClCompile Include="Game\inventory.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_one_gun.cpp" />
