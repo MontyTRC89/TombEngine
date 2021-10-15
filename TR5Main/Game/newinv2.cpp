@@ -697,8 +697,9 @@ int InventoryClass::TitleOptions()
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-				//LoadSelectedSlot(title_selected_option);
+				g_GameFlow->SelectedSaveGame = title_selected_option;
 				title_selected_option = 0;
+				ret = INV_RESULT_LOAD_GAME;
 			}
 		}
 		else if (title_menu_to_display == 3)
@@ -3541,7 +3542,7 @@ int InventoryClass::S_CallInventory2(bool reset_mode)
 			do_diary();
 
 		if (invMode == IM_LOAD)
-			do_load();
+			return_value = do_load();
 
 		if (invMode == IM_SAVE)
 			do_save();
@@ -3639,7 +3640,7 @@ short InventoryClass::Get_LoadSaveSelection()
 	return selected_slot;
 }
 
-void InventoryClass::do_load()
+int InventoryClass::do_load()
 {
 	invMode = IM_LOAD;
 
@@ -3670,9 +3671,10 @@ void InventoryClass::do_load()
 		else
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-			//LoadSelectedSlot(selected_slot);
+			g_GameFlow->SelectedSaveGame = selected_slot;
+			ExitInvLoop = 1;
 			selected_slot = 0;
-			return;
+			return 1;
 		}
 	}
 
@@ -3683,6 +3685,8 @@ void InventoryClass::do_load()
 		invMode = IM_INGAME;
 		selected_slot = 0;
 	}
+
+	return 0;
 }
 
 void InventoryClass::do_save()
@@ -3712,7 +3716,7 @@ void InventoryClass::do_save()
 	if (goSelect)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-		//SaveSelectedSlot(selected_slot);
+		SaveGame::Save(selected_slot);
 		ExitInvLoop = 1;	//exit inv if the user has saved
 	}
 

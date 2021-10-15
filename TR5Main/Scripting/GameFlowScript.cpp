@@ -281,10 +281,7 @@ bool GameFlow::DoGameflow()
 			break;
 		case GAME_STATUS_LOAD_GAME:
 			// Load the header of the savegame for getting the level to load
-			char fileName[255];
-			ZeroMemory(fileName, 255);
-			sprintf(fileName, "savegame.%d", SelectedSaveGame);
-			SaveGame::LoadHeader(fileName, &header);
+			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
 			// Load level
 			CurrentLevel = header.level;
