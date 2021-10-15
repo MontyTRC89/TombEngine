@@ -1685,9 +1685,9 @@ namespace TEN::Renderer
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < TEN::Entities::TR4::NUM_LITTLE_BETTLES; i++)
+            for (int i = 0; i < TEN::Entities::TR4::NUM_SCARABS; i++)
             {
-                SCARAB_INFO* beetle = &TEN::Entities::TR4::Scarabs[i];
+                SCARAB_STRUCT* beetle = &TEN::Entities::TR4::Scarabs[i];
 
                 if (beetle->on)
                 {

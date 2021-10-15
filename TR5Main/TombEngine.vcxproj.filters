@@ -316,7 +316,6 @@
     <ClCompile Include="Game\effects\lara_burn.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
-    <ClCompile Include="Specific\LoadSave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -711,7 +710,6 @@
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
-    <ClInclude Include="Specific\LoadSave.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

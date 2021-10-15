@@ -43,7 +43,6 @@
 #include "generic_switch.h"
 #include "Scripting/GameFlowScript.h"
 #include "Game/effects/lightning.h"
-#include "Specific/LoadSave.h"
 
 using std::vector;
 using std::unordered_map;
@@ -211,23 +210,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel == 0)
 			TrInput = 0;
-
-		if (!Lara.deathCount && !g_Renderer.isFading())
-		{
-			if (TrInput & IN_SAVE)
-				S_LoadSave(IN_SAVE);
-			else if (TrInput & IN_LOAD)
-			{
-				if (S_LoadSave(IN_LOAD) >= 0)
-					return GAME_STATUS_LOAD_GAME;
-			}
-
-			if (TrInput & IN_PAUSE && CurrentLevel != 0)
-			{
-				//if (S_PauseMenu() == PM_EXIT)
-				//	return GAME_STATUS_EXIT_TO_TITLE;
-			}
-		}
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)

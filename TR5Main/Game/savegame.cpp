@@ -20,9 +20,11 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Game/misc.h"
 #include "Game/puzzles_keys.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -415,6 +417,116 @@ bool SaveGame::Save(int slot)
 	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
+	// Cameras
+	std::vector<flatbuffers::Offset<Save::FixedCamera>> cameras;
+	for (int i = 0; i < g_Level.Cameras.size(); i++)
+	{
+		Save::FixedCameraBuilder camera{ fbb };
+		camera.add_flags(g_Level.Cameras[i].flags);
+		cameras.push_back(camera.Finish());
+	}
+	auto camerasOffset = fbb.CreateVector(cameras);
+
+	// Static meshes
+	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
+	{
+		ROOM_INFO* room = &g_Level.Rooms[i];
+		for (int j = 0; j < room->mesh.size(); j++)
+		{
+			Save::StaticMeshInfoBuilder staticMesh{ fbb };
+			staticMesh.add_flags(room->mesh[j].flags);
+			staticMesh.add_room_number(i);
+			staticMeshes.push_back(staticMesh.Finish());
+		}
+	}
+	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
+
+	// Particle enemies
+	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
+	for (int i = 0; i < NUM_BATS; i++)
+	{
+		BAT_STRUCT* bat = &Bats[i];
+
+		Save::BatInfoBuilder batInfo{ fbb };
+
+		batInfo.add_counter(bat->counter);
+		batInfo.add_on(bat->on);
+		batInfo.add_room_number(bat->roomNumber);
+		batInfo.add_x(bat->pos.xPos);
+		batInfo.add_y(bat->pos.yPos);
+		batInfo.add_z(bat->pos.zPos);
+		batInfo.add_x_rot(bat->pos.xRot);
+		batInfo.add_y_rot(bat->pos.yRot);
+		batInfo.add_z_rot(bat->pos.zRot);
+
+		bats.push_back(batInfo.Finish());
+	}
+	auto batsOffset = fbb.CreateVector(bats);
+
+	std::vector<flatbuffers::Offset<Save::SpiderInfo>> spiders;
+	for (int i = 0; i < NUM_SPIDERS; i++)
+	{
+		SPIDER_STRUCT* spider = &Spiders[i];
+
+		Save::SpiderInfoBuilder spiderInfo{ fbb };
+
+		spiderInfo.add_flags(spider->flags);
+		spiderInfo.add_on(spider->on);
+		spiderInfo.add_room_number(spider->roomNumber);
+		spiderInfo.add_x(spider->pos.xPos);
+		spiderInfo.add_y(spider->pos.yPos);
+		spiderInfo.add_z(spider->pos.zPos);
+		spiderInfo.add_x_rot(spider->pos.xRot);
+		spiderInfo.add_y_rot(spider->pos.yRot);
+		spiderInfo.add_z_rot(spider->pos.zRot);
+
+		spiders.push_back(spiderInfo.Finish());
+	}
+	auto spidersOffset = fbb.CreateVector(spiders);
+
+	std::vector<flatbuffers::Offset<Save::RatInfo>> rats;
+	for (int i = 0; i < NUM_RATS; i++)
+	{
+		RAT_STRUCT* rat = &Rats[i];
+
+		Save::RatInfoBuilder ratInfo{ fbb };
+
+		ratInfo.add_flags(rat->flags);
+		ratInfo.add_on(rat->on);
+		ratInfo.add_room_number(rat->roomNumber);
+		ratInfo.add_x(rat->pos.xPos);
+		ratInfo.add_y(rat->pos.yPos);
+		ratInfo.add_z(rat->pos.zPos);
+		ratInfo.add_x_rot(rat->pos.xRot);
+		ratInfo.add_y_rot(rat->pos.yRot);
+		ratInfo.add_z_rot(rat->pos.zRot);
+
+		rats.push_back(ratInfo.Finish());
+	}
+	auto ratsOffset = fbb.CreateVector(rats);
+
+	std::vector<flatbuffers::Offset<Save::ScarabInfo>> scarabs;
+	for (int i = 0; i < NUM_BATS; i++)
+	{
+		SCARAB_STRUCT* scarab = &Scarabs[i];
+
+		Save::ScarabInfoBuilder scarabInfo{ fbb };
+
+		scarabInfo.add_flags(scarab->flags);
+		scarabInfo.add_on(scarab->on);
+		scarabInfo.add_room_number(scarab->roomNumber);
+		scarabInfo.add_x(scarab->pos.xPos);
+		scarabInfo.add_y(scarab->pos.yPos);
+		scarabInfo.add_z(scarab->pos.zPos);
+		scarabInfo.add_x_rot(scarab->pos.xRot);
+		scarabInfo.add_y_rot(scarab->pos.yRot);
+		scarabInfo.add_z_rot(scarab->pos.zRot);
+
+		scarabs.push_back(scarabInfo.Finish());
+	}
+	auto scarabsOffset = fbb.CreateVector(scarabs);
+
 	// Flipmaps
 	std::vector<int> flipMaps;
 	for (int i = 0; i < 255; i++)
@@ -422,6 +534,7 @@ bool SaveGame::Save(int slot)
 	auto flipMapsOffset = fbb.CreateVector(flipMaps);
 
 	Save::SaveGameBuilder sgb{ fbb };
+
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
@@ -432,6 +545,13 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_flip_timer(0);
+	sgb.add_static_meshes(staticMeshesOffset);
+	sgb.add_fixed_cameras(camerasOffset);
+	sgb.add_bats(batsOffset);
+	sgb.add_rats(ratsOffset);
+	sgb.add_spiders(spidersOffset);
+	sgb.add_scarabs(scarabsOffset);
+
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
 
@@ -477,7 +597,7 @@ bool SaveGame::Load(int slot)
 	CurrentLoopedSoundTrack = s->ambient_track()->str();
 
 	// Static objects
-	/*for (int i = 0; i < s->static_meshes()->size(); i++)
+	for (int i = 0; i < s->static_meshes()->size(); i++)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
@@ -497,7 +617,7 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < g_Level.Cameras.size(); i++)
 	{
 		g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
-	}*/
+	}
 
 	// Items
 	for (int i = 0; i < s->items()->size(); i++)
@@ -631,6 +751,70 @@ bool SaveGame::Load(int slot)
 			item->meshBits = 0x00100;
 
 		// TODO: specific RAISING_BLOCK hacks
+	}
+
+	for (int i = 0; i < s->bats()->size(); i++)
+	{
+		auto batInfo = s->bats()->Get(i);
+		BAT_STRUCT* bat = &Bats[i];
+
+		bat->on = batInfo->on();
+		bat->counter = batInfo->counter();
+		bat->roomNumber = batInfo->room_number();
+		bat->pos.xPos = batInfo->x();
+		bat->pos.yPos = batInfo->y();
+		bat->pos.zPos = batInfo->z();
+		bat->pos.xRot = batInfo->x_rot();
+		bat->pos.yRot = batInfo->y_rot();
+		bat->pos.zRot = batInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->rats()->size(); i++)
+	{
+		auto ratInfo = s->rats()->Get(i);
+		RAT_STRUCT* rat = &Rats[i];
+
+		rat->on = ratInfo->on();
+		rat->flags = ratInfo->flags();
+		rat->roomNumber = ratInfo->room_number();
+		rat->pos.xPos = ratInfo->x();
+		rat->pos.yPos = ratInfo->y();
+		rat->pos.zPos = ratInfo->z();
+		rat->pos.xRot = ratInfo->x_rot();
+		rat->pos.yRot = ratInfo->y_rot();
+		rat->pos.zRot = ratInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->spiders()->size(); i++)
+	{
+		auto spiderInfo = s->spiders()->Get(i);
+		SPIDER_STRUCT* spider = &Spiders[i];
+
+		spider->on = spiderInfo->on();
+		spider->flags = spiderInfo->flags();
+		spider->roomNumber = spiderInfo->room_number();
+		spider->pos.xPos = spiderInfo->x();
+		spider->pos.yPos = spiderInfo->y();
+		spider->pos.zPos = spiderInfo->z();
+		spider->pos.xRot = spiderInfo->x_rot();
+		spider->pos.yRot = spiderInfo->y_rot();
+		spider->pos.zRot = spiderInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->scarabs()->size(); i++)
+	{
+		auto scarabInfo = s->scarabs()->Get(i);
+		SCARAB_STRUCT* scarab = &Scarabs[i];
+
+		scarab->on = scarabInfo->on();
+		scarab->flags = scarabInfo->flags();
+		scarab->roomNumber = scarabInfo->room_number();
+		scarab->pos.xPos = scarabInfo->x();
+		scarab->pos.yPos = scarabInfo->y();
+		scarab->pos.zPos = scarabInfo->z();
+		scarab->pos.xRot = scarabInfo->x_rot();
+		scarab->pos.yRot = scarabInfo->y_rot();
+		scarab->pos.zRot = scarabInfo->z_rot();
 	}
 
 	JustLoaded = 1;	
@@ -841,6 +1025,8 @@ bool SaveGame::Load(int slot)
 		if (flag)
 			Lara.burnSmoke = 1;
 	}
+
+	//
 
 	return true;
 }
