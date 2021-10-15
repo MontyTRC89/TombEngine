@@ -32,7 +32,7 @@ int LoadSavegameInfos()
 		fclose(savegamePtr);
 
 		g_NewSavegameInfos[i].present = true;
-		SaveGame::LoadHeader(fileName, &g_NewSavegameInfos[i]);
+		SaveGame::LoadHeader(i, &g_NewSavegameInfos[i]);
 
 		fclose(savegamePtr);
 	}

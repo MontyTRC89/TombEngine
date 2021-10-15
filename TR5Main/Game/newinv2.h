@@ -455,7 +455,7 @@ private:
 	void do_stats_mode();
 	void do_examine_mode();
 	void do_diary();
-	void do_load();
+	int do_load();
 	void do_save();
 	void construct_combine_object_list();
 	
