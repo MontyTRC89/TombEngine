@@ -243,7 +243,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraStandUp(COLL_INFO* coll)
 {
 	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
-	if (coll->Middle.Ceiling < -362)
+	if (coll->Middle.Ceiling < -LARA_HEIGHT_CRAWL) // Was -362.
 		return true;
 
 	return false;
@@ -1224,14 +1224,14 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	auto angleA = ang + ANGLE(15.0f);
 	auto angleB = ang - ANGLE(15.0f);
 
-	int xA = x + phd_sin(angleA) * dist;
-	int yA = y;
-	int zA = z + phd_cos(angleA) * dist;
+	auto xA = x + phd_sin(angleA) * dist;
+	auto yA = y;
+	auto zA = z + phd_cos(angleA) * dist;
 	auto probeA = GetCollisionResult(xA, yA, zA, GetRoom(item->location, xA, yA, zA).roomNumber);
 	
-	int xB = x + phd_sin(angleB) * dist;
-	int yB = y;
-	int zB = z + phd_cos(angleB) * dist;
+	auto xB = x + phd_sin(angleB) * dist;
+	auto yB = y;
+	auto zB = z + phd_cos(angleB) * dist;
 	auto probeB = GetCollisionResult(xB, yB, zB, GetRoom(item->location, xB, yB, zB).roomNumber);
 
 	if (probeA.Position.Floor - y < -STEPUP_HEIGHT ||
@@ -1347,7 +1347,66 @@ bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType == CT_RIGHT || coll->CollisionType == CT_LEFT)
 		return false;
 
-	return true;
+return true;
+}
+
+bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
+{
+	if (gunType == WEAPON_SHOTGUN ||
+		gunType == WEAPON_HK ||
+		gunType == WEAPON_CROSSBOW ||
+		gunType == WEAPON_TORCH ||
+		gunType == WEAPON_GRENADE_LAUNCHER ||
+		gunType == WEAPON_HARPOON_GUN ||
+		gunType == WEAPON_ROCKET_LAUNCHER ||
+		gunType == WEAPON_SNOWMOBILE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
+bool TestLaraStep(COLL_INFO* coll)
+{
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor <= STEPUP_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->Middle.Floor < -STEP_SIZE / 2 &&
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_WALK_BACK &&
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_SPRINT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->Middle.Floor > STEP_SIZE / 2 &&
+		coll->Middle.Floor <= STEPUP_HEIGHT &&
+		coll->Middle.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_SPRINT)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestLaraFall(COLL_INFO* coll)
@@ -1422,21 +1481,126 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	// - Facing small step to the side of the bottom of an incline
 	// - Facing step from an incline, beyond which is a flat descent of one step
 
-	auto x = item->pos.xPos + WALL_SIZE * phd_sin(coll->Setup.ForwardAngle);
+	// Ceiling?
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * WALL_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + WALL_SIZE * phd_cos(coll->Setup.ForwardAngle);
+	auto z = item->pos.zPos + phd_cos(angle) * WALL_SIZE;
 	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
 
 	if (Lara.gunStatus == LG_NO_ARMS &&
 		Lara.waterSurfaceDist >= -STEP_SIZE &&					// Water depth is optically feasible for action.
-		(probe.Position.Floor - y) < STEP_SIZE &&				// No drop.
-		(probe.Position.Floor - y) > -STEP_SIZE &&				// No wall.
+		probe.Position.Floor - y < STEP_SIZE &&					// No drop.
+		probe.Position.Floor - y > -STEP_SIZE &&				// No wall.
 		!probe.Position.Slope &&								// No slope.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Flare is not being handled.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Not handling flare.
 	{
 		return true;
 	}
+
+	return false;
+}
+
+bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	if (probe.Position.Floor - y == -STEP_SIZE &&										// TODO: floor boundary
+		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT_CRAWL &&		// Space is not a clamp. TODO: coll->Setup.Height not working?
+		probe.Position.Ceiling - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
+		probe.Position.Ceiling - y <= -(STEP_SIZE / 2) &&								// Ceiling lower boundary.
+		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT_CRAWL &&		// Space is not a clamp. TODO: coll->Setup.Height not working?
+		probe.Position.Ceiling - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	// TODO: Consider height of ceiling directly above. Lara could potentially exit where a very, very steep ceiling meets the crawlspace exit at a slant.
+	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
+		probe.Position.Ceiling - y <= STEP_SIZE &&										// Ceiling lower boundary. Necessary?
+		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT &&			// Space is not a clamp. TODO: Consider headroom?
+		probe.Position.Ceiling - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	if (probe.Position.Floor - y > STEPUP_HEIGHT && // TODO: Harmonise with 1 step exit.
+		probe.Position.Ceiling - y < LARA_HEIGHT && // Consider headroom?
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto angle = coll->Setup.ForwardAngle;
+	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
+	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+
+	if (abs(probe.Position.Floor - y) >= STEP_SIZE &&		// Upper/lower floor boundary.
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// Entirely temporary. @Sezz 2021.10.16
+bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
+{
+	if (item->animNumber == LA_CRAWL_IDLE ||
+		(item->animNumber == LA_CROUCH_TO_CRAWL_START &&
+			item->frameNumber >= g_Level.Anims[item->animNumber].frameBase + 8))
+		return true;
 
 	return false;
 }

@@ -732,6 +732,9 @@ enum LARA_ANIM
 	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
 
 	NUM_LARA_ANIMS
+
+	// TRASHED ANIMS: 245, 264, 265, 273, 274
+	// @Sezz
 };
 #pragma endregion
 
