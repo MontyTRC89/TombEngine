@@ -1217,6 +1217,9 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 
 bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 {
+	// TODO: Objects? Lara will attempt to jump against them.
+	// TODO: Check for ceilings! @Sezz 2021.10.16
+
 	auto x = item->pos.xPos;
 	auto y = item->pos.yPos;
 	auto z = item->pos.zPos;
@@ -1224,15 +1227,8 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	auto angleA = ang + ANGLE(15.0f);
 	auto angleB = ang - ANGLE(15.0f);
 
-	auto xA = x + phd_sin(angleA) * dist;
-	auto yA = y;
-	auto zA = z + phd_cos(angleA) * dist;
-	auto probeA = GetCollisionResult(xA, yA, zA, GetRoom(item->location, xA, yA, zA).roomNumber);
-	
-	auto xB = x + phd_sin(angleB) * dist;
-	auto yB = y;
-	auto zB = z + phd_cos(angleB) * dist;
-	auto probeB = GetCollisionResult(xB, yB, zB, GetRoom(item->location, xB, yB, zB).roomNumber);
+	auto probeA = GetCollisionResult(item, angleA, dist, 0);
+	auto probeB = GetCollisionResult(item, angleB, dist, 0);
 
 	if (probeA.Position.Floor - y < -STEPUP_HEIGHT ||
 		probeB.Position.Floor - y < -STEPUP_HEIGHT)
@@ -1482,11 +1478,9 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	// - Facing step from an incline, beyond which is a flat descent of one step
 
 	// Ceiling?
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * WALL_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * WALL_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, WALL_SIZE, 0);
 
 	if (Lara.gunStatus == LG_NO_ARMS &&
 		Lara.waterSurfaceDist >= -STEP_SIZE &&					// Water depth is optically feasible for action.
@@ -1502,13 +1496,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+// BUG: If Lara crawls up/down into a lower area under a slanted ceiling, she will sometimes teleport back. @Sezz 2021.10.16
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	if (probe.Position.Floor - y == -STEP_SIZE &&										// TODO: floor boundary
 		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT_CRAWL &&		// Space is not a clamp. TODO: coll->Setup.Height not working?
@@ -1522,11 +1515,9 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
 		probe.Position.Ceiling - y <= -(STEP_SIZE / 2) &&								// Ceiling lower boundary.
@@ -1541,11 +1532,9 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	// TODO: Consider height of ceiling directly above. Lara could potentially exit where a very, very steep ceiling meets the crawlspace exit at a slant.
 	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
@@ -1561,11 +1550,9 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	if (probe.Position.Floor - y > STEPUP_HEIGHT && // TODO: Harmonise with 1 step exit.
 		probe.Position.Ceiling - y < LARA_HEIGHT && // Consider headroom?
@@ -1579,11 +1566,9 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto angle = coll->Setup.ForwardAngle;
-	auto x = item->pos.xPos + phd_sin(angle) * STEP_SIZE;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos + phd_cos(angle) * STEP_SIZE;
-	auto probe = GetCollisionResult(x, y, z, GetRoom(item->location, x, y, z).roomNumber);
+	auto angle = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	if (abs(probe.Position.Floor - y) >= STEP_SIZE &&		// Upper/lower floor boundary.
 		probe.Position.Floor - y != NO_HEIGHT)
