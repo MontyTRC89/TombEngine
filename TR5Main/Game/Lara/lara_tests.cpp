@@ -1215,30 +1215,32 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
-bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
+bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 {
-	auto angle1 = ang + ANGLE(15);
-	auto angle2 = ang - ANGLE(15);
+	auto x = item->pos.xPos;
+	auto y = item->pos.yPos;
+	auto z = item->pos.zPos;
 
-	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle1), 
-							item->roomNumber);
+	auto angleA = ang + ANGLE(15.0f);
+	auto angleB = ang - ANGLE(15.0f);
 
-	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle2),
-							item->roomNumber);
+	int xA = x + phd_sin(angleA) * dist;
+	int yA = y;
+	int zA = z + phd_cos(angleA) * dist;
+	auto probeA = GetCollisionResult(xA, yA, zA, GetRoom(item->location, xA, yA, zA).roomNumber);
+	
+	int xB = x + phd_sin(angleB) * dist;
+	int yB = y;
+	int zB = z + phd_cos(angleB) * dist;
+	auto probeB = GetCollisionResult(xB, yB, zB, GetRoom(item->location, xB, yB, zB).roomNumber);
 
-	auto pos  = GAME_VECTOR(item->pos.xPos,
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos,
-							item->roomNumber);
+	if (probeA.Position.Floor - y > STEPUP_HEIGHT ||
+		probeB.Position.Floor - y > STEPUP_HEIGHT)
+	{
+		return true;
+	}
 
-	auto result1 = LOS(&pos, &vec1);
-	auto result2 = LOS(&pos, &vec2);
-
-	return (result1 == 0 && result2 == 0);
+	return false;
 }
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
