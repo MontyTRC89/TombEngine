@@ -2265,40 +2265,51 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		!TestLaraFacingCorner(item, item->pos.yRot, STEP_SIZE) &&
-		LaraFloorFront(item, item->pos.yRot, STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+	if (TrInput & IN_LEFT &&
+		TrInput & (IN_FORWARD | IN_BACK))
 	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+	}
+	else if (TrInput & IN_RIGHT &&
+		TrInput & (IN_FORWARD | IN_BACK))
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+	}
+
+	if (TrInput & IN_FORWARD &&
+		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle))
+	{
+		Lara.moveAngle = coll->Setup.ForwardAngle;
 		item->goalAnimState = LS_JUMP_FORWARD;
-		Lara.moveAngle = item->pos.yRot;
 
 		return;
 	}
 	else if (TrInput & IN_BACK &&
-		!TestLaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) &&
-		LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f)))
 	{
+		Lara.moveAngle = coll->Setup.ForwardAngle + ANGLE(180.0f);
 		item->goalAnimState = LS_JUMP_BACK;
-		Lara.moveAngle = item->pos.yRot + ANGLE(180);
 
 		return;
 	}
 
 	if (TrInput & IN_LEFT &&
-		!TestLaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) &&
-		LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f)))
 	{
+		Lara.moveAngle = coll->Setup.ForwardAngle - ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_LEFT;
-		Lara.moveAngle = item->pos.yRot - ANGLE(90);
 
 		return;
 	}
 	else if (TrInput & IN_RIGHT &&
-		!TestLaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) &&
-		LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
+		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f)))
 	{
+		Lara.moveAngle = coll->Setup.ForwardAngle + ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_RIGHT;
-		Lara.moveAngle = item->pos.yRot + ANGLE(90);
 
 		return;
 	}
