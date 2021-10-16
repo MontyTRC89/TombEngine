@@ -2265,7 +2265,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: New probes. @Sezz 2021.10.15
 	if (TrInput & IN_FORWARD &&
-		!LaraFacingCorner(item, item->pos.yRot, STEP_SIZE) &&
+		!TestLaraFacingCorner(item, item->pos.yRot, STEP_SIZE) &&
 		LaraFloorFront(item, item->pos.yRot, STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
@@ -2274,7 +2274,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if (TrInput & IN_BACK &&
-		!LaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) &&
+		!TestLaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) &&
 		LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
 	{
 		item->goalAnimState = LS_JUMP_BACK;
@@ -2284,7 +2284,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LEFT &&
-		!LaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) &&
+		!TestLaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) &&
 		LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
@@ -2293,7 +2293,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if (TrInput & IN_RIGHT &&
-		!LaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) &&
+		!TestLaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) &&
 		LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))
 	{
 		item->goalAnimState = LS_JUMP_RIGHT;
@@ -2312,22 +2312,22 @@ void old_lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_compress*/
 	if (Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_FORWARD && !LaraFacingCorner(item, item->pos.yRot, 256) && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
+		if (TrInput & IN_FORWARD && !TestLaraFacingCorner(item, item->pos.yRot, 256) && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
 			Lara.moveAngle = item->pos.yRot;
 		}
-		else if (TrInput & IN_LEFT && !LaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
+		else if (TrInput & IN_LEFT && !TestLaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_LEFT;
 			Lara.moveAngle = item->pos.yRot - ANGLE(90);
 		}
-		else if (TrInput & IN_RIGHT && !LaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
+		else if (TrInput & IN_RIGHT && !TestLaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_RIGHT;
 			Lara.moveAngle = item->pos.yRot + ANGLE(90);
 		}
-		else if (TrInput & IN_BACK && !LaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
+		else if (TrInput & IN_BACK && !TestLaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
 			Lara.moveAngle = item->pos.yRot + ANGLE(180);
