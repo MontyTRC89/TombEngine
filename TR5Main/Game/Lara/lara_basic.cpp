@@ -1573,6 +1573,8 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Lara can get locked in the turn right/left animation when, holding forward against a wall,
+	// the player presses and holds the button to turn the opposite way. @Sezz 2021.10.16
 	if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.

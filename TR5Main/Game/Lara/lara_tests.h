@@ -1,5 +1,6 @@
 #pragma once
 #include "collide.h"
+#include "lara_struct.h"
 
 struct ITEM_INFO;
 struct COLL_INFO;
@@ -39,9 +40,19 @@ void GetTighRopeFallOff(int Regularity);
 #endif // !NEW_TIGHTROPE
 
 // TODO: New, organise later.
+bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
+bool TestLaraStep(COLL_INFO* coll);
+bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraFall(COLL_INFO* coll);
 bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
 bool TestLaraStepLeft(ITEM_INFO* item);
 bool TestLaraStepRight(ITEM_INFO* item);
 bool TestLaraCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item);
