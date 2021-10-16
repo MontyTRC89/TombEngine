@@ -34,6 +34,9 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
+	// TEMP
+	Lara.gunStatus = LG_NO_ARMS;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -64,9 +67,12 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
+		// TODO: This will lock Lara if the dispatch can't happen.
+		// Maybe rejoining that split animation wasn't such a good idea... @Sezz 2021.10.16
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
 			TestLaraCrawl(item))
 		{
+			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -436,6 +442,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
 			TestLaraCrawl(item))
 		{
+			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -543,6 +550,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
 			TestLaraCrawl(item))
 		{
+			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -623,7 +631,104 @@ void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 // CRAWLING:
 // ---------
 
+// State:		LS_CRAWL_IDLE (80)
+// Collision:	lara_col_all4s()
 void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = true;
+
+	Lara.gunStatus = LG_HANDS_BUSY;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	// TODO: Enable with lua!
+	Lara.NewAnims.Crawl1clickdown = 1;
+	Lara.NewAnims.Crawl1clickup = 1;
+	Lara.NewAnims.CrawlExit1click = 1;
+	Lara.NewAnims.CrawlExit2click = 1;
+	Lara.NewAnims.CrawlExit3click = 1;
+	Lara.NewAnims.CrawlExitJump = 1;
+
+	// TEMP
+	Lara.keepDucked = !TestLaraStandUp(coll);
+
+	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+		Lara.waterStatus != LW_WADE)
+	{
+		// TODO: Not all weapons are classified as standing weapons??
+		// TODO: Allow standing vault up 2 steps when spawning flare while standing. @Sezz 2021.10.16
+
+		if (TrInput & IN_JUMP)
+		{
+			Lara.gunStatus = LG_NO_ARMS;
+			item->goalAnimState = LS_CROUCH_IDLE;
+
+			return;
+		}
+
+		// TODO: Flare not working.
+		if (TrInput & (IN_DRAW | IN_FLARE) &&
+			!IsStandingWeapon(Lara.gunType) && // TODO: From here or from crouch, it needs to be consistent.
+			TestLaraDrawWeaponsFromCrawlIdle(item))
+		{
+			Lara.gunStatus = LG_NO_ARMS;
+			item->goalAnimState = LS_CROUCH_IDLE;
+
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
+		{
+			if (TrInput & IN_ACTION &&
+				TestLaraCrawlVault(item, coll))
+			{
+				DoLaraCrawlVault(item, coll);
+			}
+			else [[likely]]
+				item->goalAnimState = LS_CRAWL_FORWARD;
+
+			return;
+		}
+		else if (TrInput & IN_BACK)
+		{
+			item->goalAnimState = LS_CRAWL_BACK;
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+
+			return;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+
+			return;
+		}
+
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		return;
+	}
+
+	Lara.gunStatus = LG_NO_ARMS;
+	item->goalAnimState = LS_CROUCH_IDLE;
+}
+
+// LEGACY
+void old_lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*collision: lara_col_all4s*/
@@ -794,7 +899,58 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_CRAWL_IDLE (80)
+// Control:		lara_as_all4s()
 void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.isDucked = true;
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE / 2 - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = true;
+	GetCollisionInfo(coll, item);
+
+	Camera.targetElevation = -ANGLE(23.0f);
+
+	if (TestLaraFall(coll))
+	{
+		Lara.gunStatus = LG_NO_ARMS;
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	// TODO: Make crawl step up/down automatic? @Sezz 2021.10.16
+	/*if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}*/
+
+	if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
+		item->pos.yPos += coll->Middle.Floor;
+}
+
+// LEGACY
+void old_lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*state code: lara_as_all4s*/
@@ -961,6 +1117,9 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
+	// TEMP
+	Lara.gunStatus = LG_HANDS_BUSY;
+
 	Camera.targetElevation = -ANGLE(23.0f);
 
 	if (item->hitPoints <= 0)
@@ -989,6 +1148,9 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 		/*Lara.headZrot += (LARA_CRAWL_FLEX - Lara.headZrot) / 12;
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
+
+	// TEMP
+	Lara.keepDucked = !TestLaraStandUp(coll);
 
 	// TODO: If Lara is crawling and approaching a low-ceiling space,
 	// allow her to continue without having to hold DUCK. @Sezz 2021.10.05

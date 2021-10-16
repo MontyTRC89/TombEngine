@@ -1,49 +1,10 @@
 #include "framework.h"
 #include "collide.h"
+#include "input.h"
 #include "items.h"
 #include "level.h"
 #include "lara.h"
-
-// TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
-bool TestLaraStep(COLL_INFO* coll)
-{
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
-		coll->Middle.Floor <= STEPUP_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->Middle.Floor < -STEP_SIZE / 2 &&
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&
-		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WALK_BACK &&
-		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT)
-	{
-		return true;
-	}
-
-	return false;
-}
-bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->Middle.Floor > STEP_SIZE / 2 &&
-		coll->Middle.Floor <= STEPUP_HEIGHT &&
-		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_RUN_FORWARD &&
-		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT)
-	{
-		return true;
-	}
-
-	return false;
-}
+#include "lara_tests.h"
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
@@ -103,21 +64,67 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += coll->Middle.Floor;
 }
 
-bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
+// TODO: Already better, but more can be done. @Sezz 2021.10.16
+// - Create states
+// - Create dispatches
+void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (gunType == WEAPON_SHOTGUN ||
-		gunType == WEAPON_HK ||
-		gunType == WEAPON_CROSSBOW ||
-		gunType == WEAPON_TORCH ||
-		gunType == WEAPON_GRENADE_LAUNCHER ||
-		gunType == WEAPON_HARPOON_GUN ||
-		gunType == WEAPON_ROCKET_LAUNCHER ||
-		gunType == WEAPON_SNOWMOBILE)
+	if (TestLaraCrawlExitJump(item, coll))
 	{
-		return true;
+		if (TrInput & IN_WALK)
+		{
+			item->animNumber = LA_CRAWL_JUMP_FLIP_DOWN;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_MISC_CONTROL;
+			item->currentAnimState = LS_MISC_CONTROL;
+			Lara.gunStatus = LG_HANDS_BUSY;
+		}
+		else
+		{
+			item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_MISC_CONTROL;
+			item->currentAnimState = LS_MISC_CONTROL;
+			Lara.gunStatus = LG_HANDS_BUSY;
+		}
+
+		return;
 	}
 
-	return false;
+	if (TestLaraCrawlExitDownStep(item, coll))
+	{
+		if (TrInput & IN_DUCK)
+		{
+			item->goalAnimState = LS_STEP_DOWN;
+			Lara.gunStatus = LG_HANDS_BUSY;
+		}
+		else
+		{
+			item->animNumber = LA_CRAWL_JUMP_DOWN_1CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_MISC_CONTROL;
+			item->currentAnimState = LS_MISC_CONTROL;
+			Lara.gunStatus = LG_HANDS_BUSY;
+		}
+
+		return;
+	}
+
+	if (TestLaraCrawlUpStep(item, coll))
+	{
+		item->goalAnimState = LS_STEP_UP;
+		Lara.gunStatus = LG_HANDS_BUSY;
+
+		return;
+	}
+
+	if (TestLaraCrawlDownStep(item, coll))
+	{
+		item->goalAnimState = LS_STEP_DOWN;
+		Lara.gunStatus = LG_HANDS_BUSY;
+
+		return;
+	}
 }
 
 // TODO: State dispatch to a new LS_FALL state. The issue is that goal states set in collision functions are only actuated on the following
