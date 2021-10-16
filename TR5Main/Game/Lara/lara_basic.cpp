@@ -121,7 +121,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Idle crouch state dispatch. @Sezz 2021.10.11
-	/*if (!TestLaraStandUp(coll))
+	/*if (TestLaraKeepDucked(coll))
 	{
 		item->goalAnimState = LS_STOP;
 
@@ -430,7 +430,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE) // TODO: Check if this is required for other dispatches. @Sezz 2021.10.05
 	{
@@ -781,7 +781,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		// TODO: Reholster weapon if it is a standing one and Lara is forced to crouch. @Sezz 2021.10.15
@@ -1526,7 +1526,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -1788,7 +1788,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -2645,7 +2645,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -2779,7 +2779,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -4018,7 +4018,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || !TestLaraStandUp(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
