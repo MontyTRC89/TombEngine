@@ -50,7 +50,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace.
 	// Otherwise, a collision bugfix causes her to stand for one frame.
 	// See if setting Lara.keepDucked can be done before she is in the crawlspace. @Sezz 2021.10.14
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -175,7 +175,7 @@ void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -233,7 +233,7 @@ void old_lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = !TestLaraStandUp(coll);
+		Lara.keepDucked = TestLaraKeepDucked(coll);
 		ShiftItem(item, coll);
 
 		if (coll->Middle.Floor != NO_HEIGHT)
@@ -306,7 +306,7 @@ void old_lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
@@ -388,7 +388,7 @@ void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.gunStatus = LG_NO_ARMS;
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = !TestLaraStandUp(coll);
+		Lara.keepDucked = TestLaraKeepDucked(coll);
 
 		if (coll->Middle.Floor < coll->Setup.BadHeightUp)//hit a wall, stop
 		{
@@ -479,7 +479,7 @@ void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_duckl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -619,7 +619,7 @@ void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = !TestLaraStandUp(coll);
+		Lara.keepDucked = TestLaraKeepDucked(coll);
 		ShiftItem(item, coll);
 
 		if (coll->Middle.Floor != NO_HEIGHT)
@@ -659,7 +659,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.NewAnims.CrawlExitJump = 1;
 
 	// TEMP
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -904,7 +904,7 @@ void old_lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
@@ -980,7 +980,7 @@ void old_lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor);
 
-			Lara.keepDucked = !TestLaraStandUp(coll);
+			Lara.keepDucked = TestLaraKeepDucked(coll);
 			ShiftItem(item, coll);
 
 			if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
@@ -1150,7 +1150,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TEMP
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 
 	// TODO: If Lara is crawling and approaching a low-ceiling space,
 	// allow her to continue without having to hold DUCK. @Sezz 2021.10.05
@@ -1224,7 +1224,7 @@ void old_lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -1390,7 +1390,7 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -1585,7 +1585,7 @@ void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_all4turnl()
 void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = !TestLaraStandUp(coll);
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	GetCollisionInfo(coll, item);

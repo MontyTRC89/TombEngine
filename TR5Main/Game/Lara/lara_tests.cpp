@@ -240,10 +240,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraStandUp(COLL_INFO* coll)
+bool TestLaraKeepDucked(COLL_INFO* coll)
 {
 	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
-	if (coll->Middle.Ceiling < -LARA_HEIGHT_CRAWL) // Was -362.
+	if (coll->Middle.Ceiling >= -LARA_HEIGHT_CRAWL) // Was -362.
 		return true;
 
 	return false;
