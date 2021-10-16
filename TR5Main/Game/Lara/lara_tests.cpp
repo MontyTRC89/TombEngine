@@ -1221,17 +1221,17 @@ bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	auto angle2 = ang - ANGLE(15);
 
 	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-							item->pos.yPos - (LARA_HEIGHT / 2),
+							item->pos.yPos - STEPUP_HEIGHT,
 							item->pos.zPos + dist * phd_cos(angle1), 
 							item->roomNumber);
 
 	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-							item->pos.yPos - (LARA_HEIGHT / 2),
+							item->pos.yPos - STEPUP_HEIGHT,
 							item->pos.zPos + dist * phd_cos(angle2),
 							item->roomNumber);
 
 	auto pos  = GAME_VECTOR(item->pos.xPos,
-							item->pos.yPos,
+							item->pos.yPos - STEPUP_HEIGHT,
 							item->pos.zPos,
 							item->roomNumber);
 
