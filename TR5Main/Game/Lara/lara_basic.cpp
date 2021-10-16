@@ -2263,7 +2263,6 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: New probes. @Sezz 2021.10.15
 	if (TrInput & IN_FORWARD &&
 		!TestLaraFacingCorner(item, item->pos.yRot, STEP_SIZE) &&
 		LaraFloorFront(item, item->pos.yRot, STEP_SIZE) >= -(STEP_SIZE + STEP_SIZE / 2))

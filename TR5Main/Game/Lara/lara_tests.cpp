@@ -1234,8 +1234,8 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	int zB = z + phd_cos(angleB) * dist;
 	auto probeB = GetCollisionResult(xB, yB, zB, GetRoom(item->location, xB, yB, zB).roomNumber);
 
-	if (probeA.Position.Floor - y > STEPUP_HEIGHT ||
-		probeB.Position.Floor - y > STEPUP_HEIGHT)
+	if (probeA.Position.Floor - y < -STEPUP_HEIGHT ||
+		probeB.Position.Floor - y < -STEPUP_HEIGHT)
 	{
 		return true;
 	}
