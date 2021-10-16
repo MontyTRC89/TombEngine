@@ -21,7 +21,8 @@ int  TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
 bool TestHangSwingIn(ITEM_INFO* item, short angle);
 bool TestHangFeet(ITEM_INFO* item, short angle);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
-bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist);
+bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
+bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle);
 
 int  LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 int  LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);

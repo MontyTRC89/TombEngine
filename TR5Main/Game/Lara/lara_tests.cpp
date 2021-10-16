@@ -1215,7 +1215,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
-bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
+bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 {
 	// TODO: Objects? Lara will attempt to jump against them.
 	// TODO: Check for ceilings! @Sezz 2021.10.16
@@ -1224,14 +1224,29 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	auto y = item->pos.yPos;
 	auto z = item->pos.zPos;
 
-	auto angleA = ang + ANGLE(15.0f);
-	auto angleB = ang - ANGLE(15.0f);
+	auto angleA = angle + ANGLE(15.0f);
+	auto angleB = angle - ANGLE(15.0f);
 
 	auto probeA = GetCollisionResult(item, angleA, dist, 0);
 	auto probeB = GetCollisionResult(item, angleB, dist, 0);
 
-	if (probeA.Position.Floor - y < -STEPUP_HEIGHT ||
+	if (probeA.Position.Floor - y < -STEPUP_HEIGHT &&
 		probeB.Position.Floor - y < -STEPUP_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
+
+	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
+		probe.Position.Floor - y >= -(STEP_SIZE + STEP_SIZE / 2) &&
+		probe.Position.Ceiling - y <= 0)
 	{
 		return true;
 	}
