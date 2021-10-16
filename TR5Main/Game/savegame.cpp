@@ -21,10 +21,12 @@
 #include "Game/misc.h"
 #include "Game/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Game/rope.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
+using namespace TEN::Game::Rope;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -533,6 +535,85 @@ bool SaveGame::Save(int slot)
 		flipMaps.push_back(FlipMap[i]);
 	auto flipMapsOffset = fbb.CreateVector(flipMaps);
 
+	// Rope
+	flatbuffers::Offset<Save::Rope> ropeOffset;
+	flatbuffers::Offset<Save::Pendulum> pendulumOffset;
+
+	if (Lara.ropePtr != -1)
+	{
+		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+
+		std::vector<const Save::Vector3*> segments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			segments.push_back(&Save::Vector3(
+				rope->segment[i].x, 
+				rope->segment[i].y, 
+				rope->segment[i].z));
+		auto segmentsOffset = fbb.CreateVector(segments);
+
+		std::vector<const Save::Vector3*> velocities;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			velocities.push_back(&Save::Vector3(
+				rope->velocity[i].x,
+				rope->velocity[i].y,
+				rope->velocity[i].z));
+		auto velocitiesOffset = fbb.CreateVector(velocities);
+
+		std::vector<const Save::Vector3*> normalisedSegments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			normalisedSegments.push_back(&Save::Vector3(
+				rope->normalisedSegment[i].x,
+				rope->normalisedSegment[i].y,
+				rope->normalisedSegment[i].z));
+		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
+
+		std::vector<const Save::Vector3*> meshSegments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			meshSegments.push_back(&Save::Vector3(
+				rope->meshSegment[i].x,
+				rope->meshSegment[i].y,
+				rope->meshSegment[i].z));
+		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
+
+		std::vector<const Save::Vector3*> coords;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			coords.push_back(&Save::Vector3(
+				rope->coords[i].x,
+				rope->coords[i].y,
+				rope->coords[i].z));
+		auto coordsOffset = fbb.CreateVector(coords);
+
+		Save::RopeBuilder ropeInfo{ fbb };
+
+		ropeInfo.add_segments(segmentsOffset);
+		ropeInfo.add_velocities(velocitiesOffset);
+		ropeInfo.add_mesh_segments(meshSegmentsOffset);
+		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
+		ropeInfo.add_coords(coordsOffset);
+		ropeInfo.add_coiled(rope->coiled);
+		ropeInfo.add_position(&Save::Vector3(
+			rope->position.x,
+			rope->position.y,
+			rope->position.z));
+		ropeInfo.add_segment_length(rope->segmentLength);
+
+		ropeOffset = ropeInfo.Finish();
+
+		Save::PendulumBuilder pendulumInfo{ fbb };
+
+		pendulumInfo.add_node(CurrentPendulum.node);
+		pendulumInfo.add_position(&Save::Vector3(
+			CurrentPendulum.Position.x,
+			CurrentPendulum.Position.y,
+			CurrentPendulum.Position.z));
+		pendulumInfo.add_velocity(&Save::Vector3(
+			CurrentPendulum.Velocity.x,
+			CurrentPendulum.Velocity.y,
+			CurrentPendulum.Velocity.z));
+
+		pendulumOffset = pendulumInfo.Finish();
+	}
+
 	Save::SaveGameBuilder sgb{ fbb };
 
 	sgb.add_header(headerOffset);
@@ -551,6 +632,12 @@ bool SaveGame::Save(int slot)
 	sgb.add_rats(ratsOffset);
 	sgb.add_spiders(spidersOffset);
 	sgb.add_scarabs(scarabsOffset);
+	
+	if (Lara.ropePtr != -1)
+	{
+		sgb.add_rope(ropeOffset);
+		sgb.add_pendulum(pendulumOffset);
+	}
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1027,7 +1114,59 @@ bool SaveGame::Load(int slot)
 			Lara.burnSmoke = 1;
 	}
 
-	//
+	// Rope
+	if (Lara.ropePtr >= 0)
+	{
+		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+		
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+		{
+			rope->segment[i] = PHD_VECTOR(
+				s->rope()->segments()->Get(i)->x(),
+				s->rope()->segments()->Get(i)->y(),
+				s->rope()->segments()->Get(i)->z());
+
+			rope->normalisedSegment[i] = PHD_VECTOR(
+				s->rope()->normalised_segments()->Get(i)->x(),
+				s->rope()->normalised_segments()->Get(i)->y(),
+				s->rope()->normalised_segments()->Get(i)->z());
+
+			rope->meshSegment[i] = PHD_VECTOR(
+				s->rope()->mesh_segments()->Get(i)->x(),
+				s->rope()->mesh_segments()->Get(i)->y(),
+				s->rope()->mesh_segments()->Get(i)->z());
+
+			rope->coords[i] = PHD_VECTOR(
+				s->rope()->coords()->Get(i)->x(),
+				s->rope()->coords()->Get(i)->y(),
+				s->rope()->coords()->Get(i)->z());
+
+			rope->velocity[i] = PHD_VECTOR(
+				s->rope()->velocities()->Get(i)->x(),
+				s->rope()->velocities()->Get(i)->y(),
+				s->rope()->velocities()->Get(i)->z());
+		}
+
+		rope->coiled = s->rope()->coiled();
+		rope->active = s->rope()->active();
+		rope->position = PHD_VECTOR(
+			s->rope()->position()->x(),
+			s->rope()->position()->y(),
+			s->rope()->position()->z());
+
+		CurrentPendulum.Position = PHD_VECTOR(
+			s->pendulum()->position()->x(),
+			s->pendulum()->position()->y(),
+			s->pendulum()->position()->z());
+
+		CurrentPendulum.Velocity = PHD_VECTOR(
+			s->pendulum()->velocity()->x(),
+			s->pendulum()->velocity()->y(),
+			s->pendulum()->velocity()->z());
+
+		CurrentPendulum.node = s->pendulum()->node();
+		CurrentPendulum.Rope = rope;
+	}
 
 	return true;
 }
