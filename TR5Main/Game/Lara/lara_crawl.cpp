@@ -59,7 +59,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.NewAnims.CrouchRoll = true;
 
 		if ((TrInput & IN_SPRINT) &&
-			!TestLaraCrouchRoll(item, coll) &&
+			TestLaraCrouchRoll(item, coll) &&
 			Lara.NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
