@@ -203,7 +203,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
-	coll->Setup.DeathFlagIsPit = 1;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -213,9 +213,6 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TestLaraVault(item, coll))
-		return;
 
 	if (LaraDeflectEdge(item, coll))
 	{
@@ -239,6 +236,9 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
+
+	if (TestLaraVault(item, coll))
+		return;
 
 	if (TestLaraStep(coll))
 	{
@@ -354,8 +354,6 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Look function needs complete evaluation.
-
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -396,13 +394,15 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		allowJump = true;
 
+	// TODO: Do something about wade checks. @Sezz 2021.10.17
+
 	// Pseudo action queue which makes JUMP input take complete precedence.
 	// This creates a committal lock to perform a forward jump when JUMP is pressed and released while allowJump isn't true yet.
-	// TODO: Get others to try this out. @Sezz 2021.09.28
 	static bool commitToJump = false;
 
 	if ((TrInput & IN_JUMP || commitToJump) &&
-		!item->gravityStatus)
+		!item->gravityStatus &&
+		Lara.waterStatus != LW_WADE)
 	{
 		commitToJump = TrInput & IN_FORWARD;
 
@@ -416,14 +416,16 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_SPRINT &&
-		DashTimer)
+		DashTimer &&
+		Lara.waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_SPRINT;
 
 		return;
 	}
 
-	if (TrInput & IN_ROLL)
+	if (TrInput & IN_ROLL &&
+		Lara.waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -432,14 +434,13 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE) // TODO: Check if this is required for other dispatches. @Sezz 2021.10.05
+		Lara.waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
 
-	// TODO: Probe for SPLAT dispatch.  @Sezz 2021.10.09
 	if (TrInput & IN_FORWARD)
 	{
 		if (Lara.waterStatus == LW_WADE)
@@ -724,7 +725,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	auto rHeight = LaraCollisionFront(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD + 4);
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
-	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT && item->animNumber != LA_SPRINT_TO_STAND_LEFT)
+	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
+		item->animNumber != LA_SPRINT_TO_STAND_LEFT)
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 
 	if (item->hitPoints <= 0)
@@ -744,7 +746,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Permit turning when Lara is stationary and cannot dispatch into a true turn.
 	if (TrInput & IN_LEFT &&
-		!(TrInput & IN_JUMP))	// Temp solution: JUMP locks y rotation.
+		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
 		if (Lara.turnRate < -LARA_SLOW_TURN)
@@ -767,7 +769,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_JUMP &&
-		(coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f))
+		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -785,10 +787,10 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		// TODO: Reholster weapon if it is a standing one and Lara is forced to crouch. @Sezz 2021.10.15
-		if (Lara.gunType == WEAPON_REVOLVER) // TODO: Cleaner handling. @Sezz 2021.10.13
+		if (Lara.gunType == WEAPON_REVOLVER
+			&& !LaserSight)
 		{
-			if (!LaserSight)
-				item->goalAnimState = LS_CROUCH_IDLE;
+			item->goalAnimState = LS_CROUCH_IDLE;
 		}
 		else
 			item->goalAnimState = LS_CROUCH_IDLE;
@@ -1512,7 +1514,8 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP &&
+		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -1774,7 +1777,8 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP &&
+		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -2641,7 +2645,8 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Wade handling. @Sezz 2021.10.13
 
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP &&
+		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -2775,7 +2780,8 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP &&
+		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
