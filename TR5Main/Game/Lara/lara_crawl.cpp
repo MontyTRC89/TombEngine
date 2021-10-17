@@ -525,7 +525,6 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO?
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
