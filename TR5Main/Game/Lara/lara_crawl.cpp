@@ -699,7 +699,34 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			item->goalAnimState = LS_CRAWL_BACK;
+			if (TrInput & IN_ACTION &&
+				TestLaraCrawlToHang(item, coll))
+			{
+				// TODO: Keeping legacy quadrant snaps for now. @Sezz 2021.10.16
+				switch (GetQuadrant(item->pos.yRot))
+				{
+				case 0:
+					item->pos.yRot = 0;
+					item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 225;
+					break;
+				case 1:
+					item->pos.yRot = ANGLE(90.0f);
+					item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 225;
+					break;
+				case 2:
+					item->pos.yRot = -ANGLE(180.0f);
+					item->pos.zPos = (item->pos.zPos | 0x3FF) - 225;
+					break;
+				case 3:
+					item->pos.yRot = -ANGLE(90.0f);
+					item->pos.xPos = (item->pos.xPos | 0x3FF) - 225;
+					break;
+				}
+
+				item->goalAnimState = LS_CRAWL_TO_HANG;
+			}
+			else [[likely]]
+				item->goalAnimState = LS_CRAWL_BACK;
 
 			return;
 		}
