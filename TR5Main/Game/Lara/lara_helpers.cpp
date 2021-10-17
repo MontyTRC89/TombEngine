@@ -24,10 +24,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TestLaraStepDown(item, coll))
 	{
-		if (item->currentAnimState == LS_WALK_BACK)
-			item->goalAnimState = LS_STEP_BACK_DOWN;
-		else [[likely]]
-			item->goalAnimState = LS_STEP_DOWN;
+		item->goalAnimState = LS_STEP_DOWN;
 
 		if (GetChange(item, &g_Level.Anims[item->animNumber]))
 		{
@@ -64,29 +61,14 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += coll->Middle.Floor;
 }
 
-// TODO: Already better, but more can be done. @Sezz 2021.10.16
-// - Create states
-// - Create dispatches
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TestLaraCrawlExitJump(item, coll))
 	{
 		if (TrInput & IN_WALK)
-		{
-			item->animNumber = LA_CRAWL_JUMP_FLIP_DOWN;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_MISC_CONTROL;
-			item->currentAnimState = LS_MISC_CONTROL;
-			Lara.gunStatus = LG_HANDS_BUSY;
-		}
-		else
-		{
-			item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_MISC_CONTROL;
-			item->currentAnimState = LS_MISC_CONTROL;
-			Lara.gunStatus = LG_HANDS_BUSY;
-		}
+			item->goalAnimState = LS_CRAWL_EXIT_FLIP;
+		else [[likely]]
+			item->goalAnimState = LS_CRAWL_EXIT_JUMP;
 
 		return;
 	}
@@ -94,18 +76,9 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
 		if (TrInput & IN_DUCK)
-		{
 			item->goalAnimState = LS_STEP_DOWN;
-			Lara.gunStatus = LG_HANDS_BUSY;
-		}
-		else
-		{
-			item->animNumber = LA_CRAWL_JUMP_DOWN_1CLICK;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_MISC_CONTROL;
-			item->currentAnimState = LS_MISC_CONTROL;
-			Lara.gunStatus = LG_HANDS_BUSY;
-		}
+		else [[likely]]
+			item->goalAnimState = LS_CRAWL_EXIT_DOWN_STEP;
 
 		return;
 	}
@@ -113,7 +86,6 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlUpStep(item, coll))
 	{
 		item->goalAnimState = LS_STEP_UP;
-		Lara.gunStatus = LG_HANDS_BUSY;
 
 		return;
 	}
@@ -121,7 +93,6 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlDownStep(item, coll))
 	{
 		item->goalAnimState = LS_STEP_DOWN;
-		Lara.gunStatus = LG_HANDS_BUSY;
 
 		return;
 	}
