@@ -1593,6 +1593,28 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: Probe for objects.
+	// TODO: If Lara is crawling on a very steep slope, don't allow her to descend.
+	// TODO: Ceiling tolerance.
+
+	auto y = item->pos.yPos;
+	auto probeBack = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
+	auto probeBackL = GetCollisionResult(item, coll->Setup.ForwardAngle - ANGLE(135.0f), coll->Setup.Radius + STEP_SIZE , 0);
+	auto probeBackR = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(135.0f), coll->Setup.Radius + STEP_SIZE , 0);
+
+	if (probeBack.Position.Floor - y >= LARA_HEIGHT_STRETCH &&/*
+		probeBackL.Position.Floor - y >= LARA_HEIGHT_STRETCH &&		// Are these side probes are really necessary? Angle tolerance should be done another way. @Sezz 2021.10.16
+		probeBackR.Position.Floor - y >= LARA_HEIGHT_STRETCH*/
+		probeBack.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // Entirely temporary. @Sezz 2021.10.16
 bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
 {
