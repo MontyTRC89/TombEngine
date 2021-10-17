@@ -1511,16 +1511,18 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// BUG: If Lara crawls up/down into a lower area under a slanted ceiling, she will sometimes teleport back. @Sezz 2021.10.16
+// BUG: If Lara crawls up/down into an area under a slanted ceiling, she will sometimes teleport back.
+// I'm unable to reproduce this every time so I'm not sure what the exact conditions for it are. @Sezz 2021.10.17
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
 	auto angle = coll->Setup.ForwardAngle;
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y == -STEP_SIZE &&										// TODO: floor boundary
+	if (probe.Position.Floor - y <= -STEP_SIZE &&										// Lower floor boundary.
+		probe.Position.Floor - y >= -STEPUP_HEIGHT &&									// Upper floor boundary.
 		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT_CRAWL &&		// Space is not a clamp. TODO: coll->Setup.Height not working?
-		probe.Position.Ceiling - y != NO_HEIGHT)
+		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1534,10 +1536,11 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto angle = coll->Setup.ForwardAngle;
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
+	if (probe.Position.Floor - y <= STEPUP_HEIGHT &&									// Lower floor boundary.
+		probe.Position.Floor - y >= STEP_SIZE &&										// Upper floor boundary.
 		probe.Position.Ceiling - y <= -(STEP_SIZE / 2) &&								// Ceiling lower boundary.
 		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT_CRAWL &&		// Space is not a clamp. TODO: coll->Setup.Height not working?
-		probe.Position.Ceiling - y != NO_HEIGHT)
+		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1552,10 +1555,11 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
 	// TODO: Consider height of ceiling directly above. Lara could potentially exit where a very, very steep ceiling meets the crawlspace exit at a slant.
-	if (probe.Position.Floor - y == STEP_SIZE &&										// TODO: floor boundary.
+	if (probe.Position.Floor - y <= STEPUP_HEIGHT &&									// Lower floor boundary.
+		probe.Position.Floor - y >= STEP_SIZE &&										// Upper floor boundary.
 		probe.Position.Ceiling - y <= STEP_SIZE &&										// Ceiling lower boundary. Necessary?
 		abs(probe.Position.Ceiling - probe.Position.Floor) >= LARA_HEIGHT &&			// Space is not a clamp. TODO: Consider headroom?
-		probe.Position.Ceiling - y != NO_HEIGHT)
+		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1569,7 +1573,7 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto angle = coll->Setup.ForwardAngle;
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y > STEPUP_HEIGHT && // TODO: Harmonise with 1 step exit.
+	if (probe.Position.Floor - y > STEPUP_HEIGHT &&
 		probe.Position.Ceiling - y < LARA_HEIGHT && // Consider headroom?
 		probe.Position.Floor - y != NO_HEIGHT)
 	{
