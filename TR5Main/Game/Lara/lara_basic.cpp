@@ -2285,7 +2285,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
-		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle))
+		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
 		Lara.moveAngle = coll->Setup.ForwardAngle;
 		item->goalAnimState = LS_JUMP_FORWARD;
@@ -2293,7 +2293,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if (TrInput & IN_BACK &&
-		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f)))
+		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
 	{
 		Lara.moveAngle = coll->Setup.ForwardAngle + ANGLE(180.0f);
 		item->goalAnimState = LS_JUMP_BACK;
@@ -2302,7 +2302,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LEFT &&
-		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f)))
+		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
 		Lara.moveAngle = coll->Setup.ForwardAngle - ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_LEFT;
@@ -2310,7 +2310,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if (TrInput & IN_RIGHT &&
-		TestLaraStandingJump(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f)))
+		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
 	{
 		Lara.moveAngle = coll->Setup.ForwardAngle + ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_RIGHT;
