@@ -221,7 +221,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,
 	lara_as_stepoff_left,
 	lara_as_stepoff_right,
-	lara_as_turn_left_fast
+	lara_as_turn_left_fast,
+	lara_as_controlled,
+	lara_as_controlled,
+	lara_as_controlled
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
@@ -377,7 +380,10 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_default_col,
 	lara_default_col,
-	lara_col_turn_left_fast
+	lara_col_turn_left_fast,
+	lara_default_col,
+	lara_default_col,
+	lara_default_col
 };
 
 void LaraControl(short itemNumber)
