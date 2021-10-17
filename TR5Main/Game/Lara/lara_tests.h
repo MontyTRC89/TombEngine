@@ -56,4 +56,5 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item);
