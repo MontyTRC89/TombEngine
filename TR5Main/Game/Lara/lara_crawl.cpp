@@ -311,8 +311,8 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE;		// Was STEPUP_HEIGHT. High tolerances seemed inappropriate. @Sezz 2021.10.14
-	coll->Setup.BadHeightUp = -STEP_SIZE;		// Was -STEPUP_HEIGHT.
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Was STEPUP_HEIGHT. High tolerances seemed inappropriate. @Sezz 2021.10.14
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// Was -STEPUP_HEIGHT.
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;

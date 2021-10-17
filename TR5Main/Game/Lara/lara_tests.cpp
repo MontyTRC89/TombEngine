@@ -1486,11 +1486,6 @@ bool TestLaraCrawl(ITEM_INFO* item)
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// This is a discrete probe and fails in many cases. Perhaps we need a ray for these kinds of tests. @Sezz 2021.10.14
-	// Instances of failure:
-	// - Facing thin geometry
-	// - Facing drop at the top of an incline
-	// - Facing small step to the side of the bottom of an incline
-	// - Facing step from an incline, beyond which is a flat descent of one step
 
 	// Ceiling?
 	auto y = item->pos.yPos;
@@ -1568,8 +1563,8 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y > STEPUP_HEIGHT &&
-		probe.Position.Ceiling - y < LARA_HEIGHT && // Consider headroom?
+	if (probe.Position.Floor - y > STEPUP_HEIGHT &&		// Upper floor boundary.
+		probe.Position.Ceiling - y < LARA_HEIGHT &&		// TODO: Check this. Consider headroom?
 		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
