@@ -1583,6 +1583,7 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
+	// TODO: False positive at all times. Why??
 	if (abs(probe.Position.Floor - y) >= STEP_SIZE &&		// Upper/lower floor boundary.
 		probe.Position.Floor - y != NO_HEIGHT)
 	{
