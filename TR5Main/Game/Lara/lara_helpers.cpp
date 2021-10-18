@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "collide.h"
+#include "control/control.h"
 #include "input.h"
 #include "items.h"
 #include "level.h"
@@ -95,6 +96,30 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STEP_DOWN;
 
 		return;
+	}
+}
+
+// TODO: Keeping legacy quadrant snaps for now. @Sezz 2021.10.16
+void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
+{
+	switch (GetQuadrant(item->pos.yRot))
+	{
+	case NORTH:
+		item->pos.yRot = 0;
+		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 225;
+		break;
+	case EAST:
+		item->pos.yRot = ANGLE(90.0f);
+		item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 225;
+		break;
+	case SOUTH:
+		item->pos.yRot = -ANGLE(180.0f);
+		item->pos.zPos = (item->pos.zPos | 0x3FF) - 225;
+		break;
+	case WEST:
+		item->pos.yRot = -ANGLE(90.0f);
+		item->pos.xPos = (item->pos.xPos | 0x3FF) - 225;
+		break;
 	}
 }
 
