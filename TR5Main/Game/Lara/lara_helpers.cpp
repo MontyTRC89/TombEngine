@@ -7,6 +7,11 @@
 #include "lara.h"
 #include "lara_tests.h"
 
+// -----------------------------
+// HELPER FUNCTIONS
+// For State Control & Collision
+// -----------------------------
+
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
@@ -21,7 +26,6 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 			return;
 		}
-
 	}
 	else if (TestLaraStepDown(item, coll))
 	{
@@ -35,13 +39,14 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	// Height difference is below threshold for step dispatch; translate Lara to new floor height.
+	// Height difference is below threshold for step dispatch or step animation doesn't exist; translate Lara to new floor height.
 	// TODO: Try using bad heights native to each state.
 	// TODO: Follow cube root curve instead of doing this ugly thing.
 	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
 	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:
-	// comment everything EXCEPT the last two lines. Lara will simply snap to the surface as before (although LS_RUN state
-	// had a linear transition of 50 units per frame, so not all original behaviour can be restored from here). @Sezz 2021.10.09
+	// comment everything EXCEPT the last two lines. Lara will simply snap to the surface as before (although the LS_RUN and LS_WADE_FORWARD
+	// states had a linear transition of 50 units per frame, so not all original behaviour can be restored from here;
+	// as that is so, I have left commented legacy step code in their respective col functions). @Sezz 2021.10.09
 	int div = 3;
 	if (abs(coll->Middle.Floor) <= STEPUP_HEIGHT / 2 &&
 		abs(coll->Middle.Floor) >= div &&
