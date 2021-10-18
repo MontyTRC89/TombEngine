@@ -15,17 +15,14 @@
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-static short LeftClimbTab[4] = // offset 0xA0638
-{
-	0x0200, 0x0400, 0x0800, 0x0100
-};
+// -----------------------------
+// TEST FUNCTIONS
+// For State Control & Collision
+// -----------------------------
 
-static short RightClimbTab[4] = // offset 0xA0640
-{
-	0x0800, 0x0100, 0x0200, 0x0400
-};
+static short LeftClimbTab[4] = { 0x0200, 0x0400, 0x0800, 0x0100 };
 
-/*this file has all the generic test functions called in lara's state code*/
+static short RightClimbTab[4] = { 0x0800, 0x0100, 0x0200, 0x0400 };
 
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
@@ -242,6 +239,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraKeepDucked(COLL_INFO* coll)
 {
+	// TODO: If there is a low ceiling ahead, allow Lara to continue without having to hold DUCK. @Sezz 2021.10.05
 	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
 	if (coll->Middle.Ceiling >= -LARA_HEIGHT_CRAWL) // Was -362.
 		return true;
@@ -1381,8 +1379,8 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 // TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
-		coll->Middle.Floor <= STEPUP_HEIGHT)
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&		// Upper floor boundary.
+		coll->Middle.Floor <= STEPUP_HEIGHT)		// Lower floor boundary.
 	{
 		return true;
 	}
@@ -1392,12 +1390,14 @@ bool TestLaraStep(COLL_INFO* coll)
 
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Middle.Floor < -STEP_SIZE / 2 &&
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&
+	if (coll->Middle.Floor < -STEP_SIZE / 2 &&			// Lower floor boundary.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor boundary.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WALK_BACK &&
+		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
 		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT)
+		item->currentAnimState != LS_SPRINT &&
+		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
+		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
 		return true;
 	}
@@ -1407,12 +1407,14 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Middle.Floor > STEP_SIZE / 2 &&
-		coll->Middle.Floor <= STEPUP_HEIGHT &&
+	if (coll->Middle.Floor > STEP_SIZE / 2 &&			// Upper floor boundary.
+		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor boundary.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
 		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT)
+		item->currentAnimState != LS_SPRINT &&
+		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
+		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
 		return true;
 	}

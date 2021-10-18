@@ -47,8 +47,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace.
-	// Otherwise, a collision bugfix causes her to stand for one frame.
+	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. Otherwise, Lara will stand up.
 	// See if setting Lara.keepDucked can be done before she is in the crawlspace. @Sezz 2021.10.14
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 
@@ -311,8 +310,8 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Was STEPUP_HEIGHT. High tolerances seemed inappropriate. @Sezz 2021.10.14
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// Was -STEPUP_HEIGHT.
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
@@ -478,38 +477,7 @@ void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_duckl()
 void lara_col_duckl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
-	Lara.keepDucked = TestLaraKeepDucked(coll);
-	Lara.isDucked = true;
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-	GetCollisionInfo(coll, item);
-
-	if (TestLaraFall(coll))
-	{
-		Lara.gunStatus = LG_NO_ARMS; // Necessary? Set in WAD. @Sezz 2021.10.03
-		SetLaraFallState(item);
-
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-
-		return;
-	}
-
-	ShiftItem(item, coll);
-
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
+	lara_col_duck(item, coll);
 }
 
 // State:		LS_CROUCH_TURN_RIGHT (106)
@@ -585,7 +553,7 @@ void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_duckr()
 void lara_col_duckr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_duckl(item, coll);
+	lara_col_duck(item, coll);
 }
 
 // LEGACY
@@ -918,7 +886,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadHeightUp = -(STEP_SIZE / 2 - 1);
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
@@ -1130,7 +1098,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CRAWL_IDLE;	// TODO: Death state dispatch. 
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
@@ -1158,8 +1126,6 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	// TEMP
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 
-	// TODO: If Lara is crawling and approaching a low-ceiling space,
-	// allow her to continue without having to hold DUCK. @Sezz 2021.10.05
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -1236,17 +1202,13 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	//coll->Setup.BadHeightDown = STEP_SIZE / 2;
-	//coll->Setup.BadHeightUp = -STEP_SIZE / 2;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1; // 1 required or she will crawl up steps. TODO: Height tolerance for up/down anims. @Sezz 2021.10.11
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, true);
-
-	// TODO: Cannot crawl up low step when facing it directly.
 
 	// TODO: Generic deflect.
 	if (LaraDeflectEdgeDuck(item, coll))
@@ -1410,9 +1372,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	/*coll->Setup.BadHeightDown = STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;*/
-	coll->Setup.BadHeightDown = STEP_SIZE - 1; // 1 required or she will crawl up steps. TODO: Height tolerance for up/down anims. @Sezz 2021.10.11
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
@@ -1570,7 +1530,7 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE;
+	item->goalAnimState = LS_CRAWL_IDLE; // TODO: In the future, with animation blending, dispatch directly to LS_CRAWL_STOP. @Sezz 2021.10.18
 }
 
 // LEGACY
@@ -1599,18 +1559,7 @@ void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_all4turnl()
 void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(coll);
-	Lara.isDucked = true;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	GetCollisionInfo(coll, item);
-
-	// TODO: Take out the trash. @Sezz 2021.10.11
-
-	if (!TestLaraSlide(item, coll))
-	{
-		if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
-			item->pos.yPos += coll->Middle.Floor;
-	}
+	lara_col_all4s(item, coll);
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
@@ -1689,7 +1638,7 @@ void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_all4turnr()
 void lara_col_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_all4turnl(item, coll);
+	lara_col_all4s(item, coll);
 }
 
 // LEGACY
