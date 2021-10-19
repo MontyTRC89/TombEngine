@@ -34,9 +34,6 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	// TEMP
-	Lara.gunStatus = LG_NO_ARMS;
-
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1669,8 +1666,8 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		int edgeCatch;
 		int edge;
 
-		item->fallspeed = 512;
-		item->pos.yPos += 255;
+		item->fallspeed = STEP_SIZE * 2;
+		item->pos.yPos += STEP_SIZE - 1;
 
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -1709,14 +1706,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 						if (TestHangFeet(item, angle))
 						{
 							item->animNumber = LA_REACH_TO_HANG;
-							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG_FEET;
 						}
 						else
 						{
 							item->animNumber = LA_REACH_TO_HANG;
-							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
 							item->currentAnimState = LS_HANG;
 							item->goalAnimState = LS_HANG;
 						}
