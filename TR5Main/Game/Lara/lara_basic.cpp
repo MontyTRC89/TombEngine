@@ -97,8 +97,8 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: What is this for? Investigate. @Sezz 2021.10.09
-	if (Lara.isMoving)
-		return;
+	/*if (Lara.isMoving)
+		return;*/
 
 	// TODO: If stopping and not holding WALK, Lara won't turn. Change animation's state to LS_STOP to solve issue? @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
@@ -578,9 +578,6 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
-		return;
-
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->pos.zRot = 0;
@@ -612,6 +609,9 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
+
+	if (TestLaraVault(item, coll))
+		return;
 
 	if (TestLaraStep(coll))
 	{
@@ -719,10 +719,13 @@ void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: New probe.
-	auto fHeight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
-	auto cHeight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
-	auto rHeight = LaraCollisionFront(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD + 4);
+	// TODO: Probes will not necessarily work when Lara is angled near the 45 degree boundary to a wall, as she is
+	// always pushed beyond resting contact. This will result in inappropriate dispatch attempts in edge cases.
+	// To alleviate this problem, either:
+	// a) Account for the MAXIMUM possible distance of this gap and ADD it to the radius.
+	// b) Trash FindGridShift() and always push Lara in the direction opposite her facing angle to a location of PRECISE resting contact.
+	// This would also resolve for correct collision with low, slanted ceilings and geometry not aligned cardinally once and for all.
+	// Collision bugs will forever persist if this isn't done. @Sezz 2021.10.18
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
@@ -763,7 +766,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Refine this handling. Create LS_WADE_IDLE state? Might complicate things. @Sezz 2021.09.28
 	if (Lara.waterStatus == LW_WADE)
 	{
-		LaraWadeStop(item, coll, fHeight, rHeight);
+		LaraWadeStop(item, coll);
 
 		return;
 	}
@@ -776,6 +779,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Allowing Lara to roll at ledges is silly @Sezz 2021.10.18
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
@@ -799,9 +803,9 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_TOP_FRONT &&
-		!((fHeight.Position.Slope && (fHeight.Position.Floor < 0 || cHeight.Position.Ceiling > 0)) ||	// Slope in front.
-			coll->CollisionType == CT_FRONT))														// Wall/ceiling/object in front.
+		//coll->CollisionType != CT_FRONT &&			// TODO: This check is useless as Lara can never make resting contact with walls. @Sezz 2021.10.18
+		//coll->CollisionType != CT_TOP_FRONT &&		// Not sure about this one, though.
+		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT))
 	{
 		if (TrInput & IN_WALK)					// TODO: Make sprinting from walk commit to sprint, and walking from sprint commit to walk, when both inputs are registered. @Sezz 2021.10.13
 			item->goalAnimState = LS_WALK_FORWARD;
@@ -813,36 +817,33 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back(). @Sezz 2021.06.27
 	if (TrInput & IN_BACK)
 	{
-		// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back().
-		// TODO: Allow turning while holding BACK against a wall. @Sezz 2021.06.27
-		// TODO: Lara drops off ledges when holding WALK. My fault? @Sezz 2021.10.11
-		if (TrInput & IN_WALK
-			&& (rHeight.Position.Floor < (STEPUP_HEIGHT - 1))
-			&& (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1))
-			&& !rHeight.Position.Slope)
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if (TestLaraMoveBack(item, coll, STEPUP_HEIGHT, -STEPUP_HEIGHT))
+				item->goalAnimState = LS_WALK_BACK;
+
+			return;
 		}
-		else if (rHeight.Position.Floor > -(STEPUP_HEIGHT - 1)
-			&& !rHeight.Position.Slope) [[likely]]
+		else if (TestLaraMoveBack(item, coll, NO_BAD_POS, -STEPUP_HEIGHT)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
-		}
 
-		return;
+			return;
+		}
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -882,7 +883,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Future-proof for raising water.
 // TODO: See if making these into true states would be beneficial. @Sezz 2021.10.13
 // Pseudo-state for idling in wade-height water.
-void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RESULT rHeight)
+void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_JUMP &&
 		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
@@ -893,18 +894,19 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 	}
 
 	// TODO: Clean this.
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_FORWARD &&
+		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT))
 	{
 		bool wade = false;
 
-		if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1) &&
+		/*if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1) &&
 			g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) ||
 			(fHeight.Position.Floor < (STEPUP_HEIGHT - 1) &&
 				fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)))
 		{
-			wade = true;
+			wade = true;*/
 			item->goalAnimState = LS_WADE_FORWARD;
-		}
+		/*}
 
 		if (!wade)
 		{
@@ -921,7 +923,7 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 				return;
 
 			coll->Setup.Radius = LARA_RAD;
-		}
+		}*/
 
 		return;
 	}
@@ -934,14 +936,14 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll, COLL_RESULT fHeight, COLL_RE
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -1562,14 +1564,14 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -1626,14 +1628,14 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -1825,14 +1827,14 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP && // TODO: This fails. Lara steps left. Why?? @Sezz 2021.10.08
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -1887,14 +1889,14 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -2699,14 +2701,14 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP && // TODO: This fails and Lara steps left. Why? @Sezz 2021.10.08
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -2834,14 +2836,14 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item))
+		TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
 
 		return;
 	}
 	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item))
+		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 

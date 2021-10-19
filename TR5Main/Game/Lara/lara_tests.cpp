@@ -1442,14 +1442,15 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 	return true;
 }
 
-bool TestLaraStepLeft(ITEM_INFO* item)
+bool TestLaraMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
 {
-	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2), 0);
 
-	if ((collFloorResult.Position.Floor < STEP_SIZE / 2 && collFloorResult.Position.Floor > -STEP_SIZE / 2) &&
-		collCeilingResult.Position.Ceiling <= 0 &&
-		!collFloorResult.Position.Slope)
+	if (probe.Position.Floor - y <= lowerBound &&
+		probe.Position.Floor - y >= upperBound &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1457,14 +1458,47 @@ bool TestLaraStepLeft(ITEM_INFO* item)
 	return false;
 }
 
-bool TestLaraStepRight(ITEM_INFO* item)
+bool TestLaraMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
 {
-	auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-	auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius * sqrt(2), 0);
 
-	if ((collFloorResult.Position.Floor < STEP_SIZE / 2 && collFloorResult.Position.Floor > -STEP_SIZE / 2) &&
-		collCeilingResult.Position.Ceiling <= 0 &&
-		!collFloorResult.Position.Slope)
+	if (probe.Position.Floor - y <= lowerBound &&
+		probe.Position.Floor - y >= upperBound &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle - ANGLE(90.0f), coll->Setup.Radius * sqrt(2), 0);
+
+	if (probe.Position.Floor - y <= STEP_SIZE / 2 &&
+		probe.Position.Floor - y >= -STEP_SIZE / 2 &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(90.0f), coll->Setup.Radius * sqrt(2), 0);
+
+	if (probe.Position.Floor - y <= STEP_SIZE / 2 &&
+		probe.Position.Floor - y >= -STEP_SIZE / 2 &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
 	{
 		return true;
 	}
