@@ -47,11 +47,13 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraFall(COLL_INFO* coll);
 bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
+bool TestLaraCrawlMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound);
+bool TestLaraCrawlMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound);
 bool TestLaraMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound);
 bool TestLaraMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound);
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraCrawl(ITEM_INFO* item);
+bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
