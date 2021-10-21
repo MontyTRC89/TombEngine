@@ -128,6 +128,27 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
+// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
+// Ideally, lean rate should be on a curve, approaching leanMax faster at Lara.turnRate values near zero
+// and falling off as Lara.turnRate approaches LARA_FAST_TURN (i.e. max turn rate).
+// Unfortunately I am terrible at mathematics and I don't know how to do this. 
+// Would a library of easing functions be helpful here? @Sezz 2021.09.26
+// item->pos.zRot += (item->pos.zRot -maxLean / LARA_FAST_TURN * Lara.turnRate) / 3;
+void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxLean, int divisor)
+{
+	if (item->speed)
+	{
+		if (coll->CollisionType == CT_LEFT ||
+			coll->CollisionType == CT_RIGHT)
+		{
+			item->pos.zRot += (maxLean / 2 - item->pos.zRot) / divisor;
+		}
+		else
+			item->pos.zRot += (maxLean - item->pos.zRot) / divisor;
+	}
+}
+
 // TODO: State dispatch to a new LS_FALL state. The issue is that goal states set in collision functions are only actuated on the following
 // frame, resulting in an unacceptable delay. Changing the order in which routine functions are executed is not a viable solution. @Sezz 2021.09.26
 void SetLaraFallState(ITEM_INFO* item)

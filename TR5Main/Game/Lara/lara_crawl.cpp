@@ -65,8 +65,18 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 
 		// TODO: This will lock Lara if the dispatch can't happen.
 		// Maybe rejoining that split animation wasn't such a good idea... @Sezz 2021.10.16
-		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrawl(item))
+		if (TrInput & IN_FORWARD &&
+			coll->CollisionType != CT_FRONT &&
+			coll->CollisionType != CT_TOP_FRONT &&
+			TestLaraCrouchToCrawl(item))
+		{
+			Lara.gunStatus = LG_HANDS_BUSY;
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+		else if (TrInput & IN_BACK &&
+			TestLaraCrouchToCrawl(item))
 		{
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
@@ -177,8 +187,8 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1; // Was STEPUP_HEIGHT; crouching onto a step-high ledge from a run was unsightly. @Sezz 2021.10.22
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1); // Was -STEPUP_HEIGHT.
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
@@ -436,7 +446,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrawl(item))
+			TestLaraCrouchToCrawl(item))
 		{
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
@@ -512,7 +522,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrawl(item))
+			TestLaraCrouchToCrawl(item))
 		{
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
@@ -615,12 +625,12 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	// TODO: Enable with lua!
-	Lara.NewAnims.Crawl1clickdown = 1;
-	Lara.NewAnims.Crawl1clickup = 1;
-	Lara.NewAnims.CrawlExit1click = 1;
-	Lara.NewAnims.CrawlExit2click = 1;
-	Lara.NewAnims.CrawlExit3click = 1;
-	Lara.NewAnims.CrawlExitJump = 1;
+	Lara.NewAnims.Crawl1clickdown = true;
+	Lara.NewAnims.Crawl1clickup = true;
+	Lara.NewAnims.CrawlExit1click = true;
+	Lara.NewAnims.CrawlExit2click = true;
+	Lara.NewAnims.CrawlExit3click = true;
+	Lara.NewAnims.CrawlExitJump = true;
 
 	// TEMP
 	Lara.keepDucked = TestLaraKeepDucked(coll);
@@ -650,17 +660,23 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			coll->CollisionType != CT_FRONT &&
+			coll->CollisionType != CT_TOP_FRONT)
 		{
 			if (TrInput & IN_ACTION &&
 				TestLaraCrawlVault(item, coll))
 			{
 				DoLaraCrawlVault(item, coll);
+
+				return;
 			}
-			else [[likely]]
+			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
-			return;
+				return;
+			}
 		}
 		else if (TrInput & IN_BACK)
 		{
@@ -669,11 +685,17 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				DoLaraCrawlToHangSnap(item, coll);
 				item->goalAnimState = LS_CRAWL_TO_HANG;
+
+				return;
 			}
-			else [[likely]]
+			// BUG: If Lara is stopped while crawling back, this test will fail.
+			// I'm certain it's not due to shifts or the use of BadHeightUp/Down. @Sezz 2021.10.22
+			else if (TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			{
 				item->goalAnimState = LS_CRAWL_BACK;
 
-			return;
+				return;
+			}
 		}
 
 		if (TrInput & IN_LEFT)
@@ -1123,6 +1145,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	// TEMP
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 
+	// TODO: Probe ahead please.
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -1497,14 +1520,27 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			coll->CollisionType != CT_FRONT &&
+			coll->CollisionType != CT_TOP_FRONT)
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			if (TrInput & IN_ACTION &&
+				TestLaraCrawlVault(item, coll))
+			{
+				DoLaraCrawlVault(item, coll);
 
-			return;
+				return;
+			}
+			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			{
+				item->goalAnimState = LS_CRAWL_FORWARD;
+
+				return;
+			}
 		}
 
-		if (TrInput & IN_BACK)
+		if (TrInput & IN_BACK &&
+			TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
 
@@ -1580,14 +1616,27 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			coll->CollisionType != CT_FRONT &&
+			coll->CollisionType != CT_TOP_FRONT)
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			if (TrInput & IN_ACTION &&
+				TestLaraCrawlVault(item, coll))
+			{
+				DoLaraCrawlVault(item, coll);
 
-			return;
+				return;
+			}
+			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			{
+				item->goalAnimState = LS_CRAWL_FORWARD;
+
+				return;
+			}
 		}
 
-		if (TrInput & IN_BACK)
+		if (TrInput & IN_BACK &&
+			TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
 
