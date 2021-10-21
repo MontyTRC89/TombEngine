@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "lara_helpers.h"
 #include "lara_swim.h"
 #include "control/control.h"
 #include "camera.h"
@@ -274,7 +275,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		if (LaraDrawType == LARA_TYPE::DIVESUIT)
 			SwimTurnSubsuit(item);
 		else
-			SwimTurn(item);
+			SwimTurn(item, coll);
 
 		if (TrInput & IN_JUMP)
 			item->goalAnimState = LS_UNDERWATER_FORWARD;
@@ -309,7 +310,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		SwimTurn(item);
+		SwimTurn(item, coll);
 	}
 	else
 	{
@@ -347,7 +348,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		SwimTurn(item);
+		SwimTurn(item, coll);
 	}
 	else
 	{
@@ -473,7 +474,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 	}
 }
 
-void SwimTurn(ITEM_INFO* item)
+void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD)
 		item->pos.xRot -= ANGLE(2);
@@ -486,7 +487,7 @@ void SwimTurn(ITEM_INFO* item)
 		if (Lara.turnRate < -LARA_MED_TURN)
 			Lara.turnRate = -LARA_MED_TURN;
 
-		item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 7;
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, 8);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -494,7 +495,7 @@ void SwimTurn(ITEM_INFO* item)
 		if (Lara.turnRate > LARA_MED_TURN)
 			Lara.turnRate = LARA_MED_TURN;
 
-		item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 7;
+		DoLaraLean(item, coll, LARA_LEAN_MAX, 8);
 	}
 
 	// LEGACY sample:
