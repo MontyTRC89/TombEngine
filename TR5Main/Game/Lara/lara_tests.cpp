@@ -186,6 +186,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
+		// TODO: Is this necessary? Lara snaps to the wall in quite an unsightly manner.
+		// Additionally, Lara will oscillate against a low ceiling with a 0-height floor. @Sezz 2021.10.22
 		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
 		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
 
@@ -1376,12 +1378,13 @@ void GetTighRopeFallOff(int regularity) {
 }
 #endif // !NEW_TIGHTROPE
 
+// TODO: This is obsolete and can be removed soon. @Sezz 2021.10.22
 bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_RIGHT || coll->CollisionType == CT_LEFT)
 		return false;
 
-return true;
+	return true;
 }
 
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
@@ -1404,8 +1407,8 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 // TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&		// Upper floor boundary.
-		coll->Middle.Floor <= STEPUP_HEIGHT)		// Lower floor boundary.
+	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor boundary.
+		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor boundary.
 	{
 		return true;
 	}
@@ -1467,10 +1470,46 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 	return true;
 }
 
+// TODO: A unified function for the six below. Currently there are strange bugs and unpredictable behaviours
+// that prevent me from doing it. @Sezz 2021.10.22
+bool TestLaraCrawlMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, LARA_RAD_CRAWL * sqrt(2), 0);
+
+	// TODO: ceilings.
+	if (probe.Position.Floor - y <= lowerBound &&
+		probe.Position.Floor - y >= upperBound &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraCrawlMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), LARA_RAD_CRAWL * sqrt(2), 0);
+
+	if (probe.Position.Floor - y <= lowerBound &&
+		probe.Position.Floor - y >= upperBound &&
+		!probe.Position.Slope &&
+		probe.Position.Floor - y != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: Not useful yet; Lara will not climb if I use this as resting contact with walls is not possible. @Sezz 2021.10.22
 bool TestLaraMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
 {
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2), 0);
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2), 0); // TODO: coll->Setup.Radius doesn't seem to work for crawl idle state.
 
 	if (probe.Position.Floor - y <= lowerBound &&
 		probe.Position.Floor - y >= upperBound &&
@@ -1531,7 +1570,7 @@ bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraCrawl(ITEM_INFO* item)
+bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	if (Lara.gunStatus == LG_NO_ARMS &&
 		/*Lara.waterSurfaceDist >= -STEP_SIZE &&*/
@@ -1553,12 +1592,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, WALL_SIZE, 0);
 
 	if (Lara.gunStatus == LG_NO_ARMS &&
-		Lara.waterSurfaceDist >= -STEP_SIZE &&					// Water depth is optically feasible for action.
-		probe.Position.Floor - y < STEP_SIZE &&					// No drop.
-		probe.Position.Floor - y > -STEP_SIZE &&				// No wall.
-		!probe.Position.Slope &&								// No slope.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Not handling flare.
+		Lara.waterSurfaceDist >= -STEP_SIZE &&						// Water depth is optically feasible for action.
+		probe.Position.Floor - y <= STEP_SIZE - 1 &&				// No drop.
+		probe.Position.Floor - y >= -STEP_SIZE - 1 &&				// No wall.
+		!probe.Position.Slope &&									// No slope.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Not handling flare.
 	{
 		return true;
 	}

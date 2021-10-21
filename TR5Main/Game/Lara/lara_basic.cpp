@@ -360,18 +360,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_FAST_TURN)
 			Lara.turnRate = -LARA_FAST_TURN;
 
-		if (TestLaraLean(item, coll))
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX) / 8;
-
-		// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-		// The following commented line makes the lean rate LINEARLY proportional, but it's visually much too subtle.
-		// Ideally, lean rate should be on a curve, approaching LARA_LEAN_MAX faster at Lara.turnRate values near zero
-		// and falling off as Lara.turnRate approaches LARA_FAST_TURN.
-		// Unfortunately I am terrible at mathematics and I don't know how to do this. 
-		// Would a library of easing functions be helpful here? @Sezz 2021.09.26
-		// item->pos.zRot -= (item->pos.zRot - LARA_LEAN_MAX / LARA_FAST_TURN * Lara.turnRate) / 3;
-		else
-			item->pos.zRot -= (item->pos.zRot + LARA_LEAN_MAX * 3 / 6) / 8;
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, 8);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -379,10 +368,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_FAST_TURN)
 			Lara.turnRate = LARA_FAST_TURN;
 
-		if (TestLaraLean(item, coll))
-			item->pos.zRot += (LARA_LEAN_MAX - item->pos.zRot) / 8;
-		else
-			item->pos.zRot += (LARA_LEAN_MAX * 3 / 6 - item->pos.zRot) / 8;
+		DoLaraLean(item, coll, LARA_LEAN_MAX, 8);
 	}
 
 	static bool allowJump = false;
@@ -803,9 +789,9 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_FORWARD &&
-		//coll->CollisionType != CT_FRONT &&			// TODO: This check is useless as Lara can never make resting contact with walls. @Sezz 2021.10.18
-		//coll->CollisionType != CT_TOP_FRONT &&		// Not sure about this one, though.
-		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT))
+		coll->CollisionType != CT_FRONT && // TODO: This check is only useful for low, slanted ceilings, as Lara cannot make resting contact with walls. @Sezz 2021.10.21
+		coll->CollisionType != CT_TOP_FRONT/* &&
+		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT)*/) // TODO:
 	{
 		if (TrInput & IN_WALK)					// TODO: Make sprinting from walk commit to sprint, and walking from sprint commit to walk, when both inputs are registered. @Sezz 2021.10.13
 			item->goalAnimState = LS_WALK_FORWARD;
@@ -816,9 +802,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
 	// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back(). @Sezz 2021.06.27
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK)
 	{
 		if (TrInput & IN_WALK)
 		{
@@ -895,7 +880,8 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Clean this.
 	if (TrInput & IN_FORWARD &&
-		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT))
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
 		bool wade = false;
 
@@ -1152,7 +1138,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT; // TODO: Probe left/right floor instead for drop? Sprint-to-stop slide animation will not work as it should otherwise. @Sezz 2021.10.10
+	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	item->gravityStatus = false;
@@ -1552,8 +1538,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK)
 	{
 		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_BACK;
@@ -1815,8 +1800,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK)
 	{
 		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_BACK;
@@ -2687,8 +2671,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WALK_BACK;
@@ -2822,8 +2805,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WALK_BACK;
