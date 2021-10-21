@@ -1378,15 +1378,6 @@ void GetTighRopeFallOff(int regularity) {
 }
 #endif // !NEW_TIGHTROPE
 
-// TODO: This is obsolete and can be removed soon. @Sezz 2021.10.22
-bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->CollisionType == CT_RIGHT || coll->CollisionType == CT_LEFT)
-		return false;
-
-	return true;
-}
-
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 {
 	if (gunType == WEAPON_SHOTGUN ||
