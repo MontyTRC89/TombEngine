@@ -10,7 +10,6 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraKeepDucked(COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll);
