@@ -351,9 +351,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
-	item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius);
+	item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 1.7f);
 	item->pos.yPos += frontFloor - 5;
-	item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius);
+	item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 1.7f);
 	item->pos.xRot = 0;
 	item->pos.yRot = coll->NearestLedgeAngle;
 	item->pos.zRot = 0;
