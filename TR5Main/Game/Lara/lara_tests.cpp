@@ -173,6 +173,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 		}
+		else
+		{
+			return false;
+		}
 
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
