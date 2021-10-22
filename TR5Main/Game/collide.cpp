@@ -2594,8 +2594,9 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
-	auto x = item->pos.xPos + (coll->Setup.Radius * 0.2f) * s;
-	auto z = item->pos.zPos + (coll->Setup.Radius * 0.2f) * c;
+	auto frontalOffset = coll->Setup.Radius * 0.2f;
+	auto x = item->pos.xPos + frontalOffset * s;
+	auto z = item->pos.zPos + frontalOffset * c;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
@@ -2770,6 +2771,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 		}
 	}
 
-	dist = closestDistance;
+	// Return distance closest to probe contact point, not ray origin point.
+	dist = closestDistance - (coll->Setup.Radius - frontalOffset);
 	return result;
 }
