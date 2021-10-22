@@ -65,9 +65,7 @@ using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
 
 int GameTimer       = 0;
-int RumbleTimer     = 0;
-int InGameCounter   = 0;
-short GlobalCounter = 0;
+int GlobalCounter   = 0;
 int Wibble          = 0;
 
 bool InitialiseGame;
