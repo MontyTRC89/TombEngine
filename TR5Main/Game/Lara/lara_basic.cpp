@@ -350,7 +350,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (!TestLaraSlide(item, coll))
+			if (!TestLaraSlide(item, coll) && coll->CollisionType != CT_FRONT)
 			{
 				if (coll->Middle.Floor < 50)
 				{
