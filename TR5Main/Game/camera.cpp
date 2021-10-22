@@ -68,6 +68,9 @@ short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
 
+int RumbleTimer = 0;
+int RumbleCounter = 0;
+
 void LookAt(CAMERA_INFO* cam, short roll)
 {
 	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
@@ -1888,7 +1891,7 @@ void RumbleScreen()
 	{
 		if (!(GetRandomControl() & 0x1FF))
 		{
-			InGameCounter = 0;
+			RumbleCounter = 0;
 			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
 			return;
 		}
@@ -1896,15 +1899,15 @@ void RumbleScreen()
 
 	if (RumbleTimer < 0)
 	{
-		if (InGameCounter >= abs(RumbleTimer))
+		if (RumbleCounter >= abs(RumbleTimer))
 		{
 			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
 			RumbleTimer++;
 		}
 		else
 		{
-			InGameCounter++;
-			Camera.bounce = -(GetRandomControl() % InGameCounter);
+			RumbleCounter++;
+			Camera.bounce = -(GetRandomControl() % RumbleCounter);
 		}
 	}
 }
