@@ -178,7 +178,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT && coll->CollisionType != CT_FRONT)
 				item->pos.yPos += coll->Middle.Floor;
 		}
 	}
