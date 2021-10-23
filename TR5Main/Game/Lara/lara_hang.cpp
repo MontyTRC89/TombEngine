@@ -98,7 +98,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
 					coll->Front.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
+					if (TestValidLedge(item, coll) && !coll->HitStatic)
 					{
 						if (TrInput & IN_WALK)
 						{
