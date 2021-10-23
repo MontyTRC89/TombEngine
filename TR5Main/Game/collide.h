@@ -103,8 +103,8 @@ struct COLL_INFO
 	bool HitStatic;
 	bool HitTallObject;
 
-	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
-	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
+	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle && (NearestLedgeAngle % ANGLE(90)); }
+	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle && (NearestLedgeAngle % ANGLE(90)); }
 	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight(); }
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft(); }
 };
