@@ -5,7 +5,7 @@ struct ITEM_INFO;
 struct COLL_INFO;
 
 SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
-bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll);
+bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStandUp(COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
