@@ -1130,16 +1130,13 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		if (edgeCatch <= 0)
 		{
 			item->pos.yPos = edge - bounds->Y1 - 22;
+			item->pos.yRot = coll->NearestLedgeAngle;
 		}
 		else
 		{
 			item->pos.yPos += coll->Front.Floor - bounds->Y1;
-
-			item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
-			item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+			SnapItemToLedge(item, coll);
 		}
-
-		item->pos.yRot = coll->NearestLedgeAngle;
 
 		item->gravityStatus = true;
 		item->speed = 2;
@@ -1704,9 +1701,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						else
 							item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-						item->pos.yRot = coll->NearestLedgeAngle;
-						item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
-						item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+						SnapItemToLedge(item, coll);
 
 						item->gravityStatus = false;
 						item->speed = 0;
