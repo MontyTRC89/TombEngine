@@ -30,12 +30,12 @@ static short RightClimbTab[4] = // offset 0xA0640
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 {
 	// Determine probe base point.
-	// We use double-radius here for two purposes. First - we can't guarantee that
+	// We use 1/3 radius extents here for two purposes. First - we can't guarantee that
 	// shifts weren't already applied and misfire may occur. Second - it guarantees
 	// that Lara won't land on a very thin edge of diagonal geometry.
 
-	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
-	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 2);
+	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.3f);
+	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.3f);
 
 	// Determine probe left/right points
 	int xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
