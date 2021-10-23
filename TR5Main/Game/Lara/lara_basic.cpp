@@ -1013,6 +1013,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.NoQuadrants = true;
 
 	GetCollisionInfo(coll, item);
 
@@ -1051,8 +1052,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 			if (!(!edgeCatch || edgeCatch < 0 && !TestLaraHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				
-				result = SnapToQuadrant(angle, 35);
+				result = TestValidLedge(item, coll, true);
 			}
 		}
 	}
@@ -1135,12 +1135,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, angle);
-			item->pos.xPos = v.x;
-			item->pos.zPos = v.y;
+			item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+			item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
 		}
 
-		item->pos.yRot = angle;
+		item->pos.yRot = coll->NearestLedgeAngle;
 
 		item->gravityStatus = true;
 		item->speed = 2;
