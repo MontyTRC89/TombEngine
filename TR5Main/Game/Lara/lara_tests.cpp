@@ -181,11 +181,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			return false;
 		}
 
-		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
-
-		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
-		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
+		SnapItemToLedge(item, coll, 0.7f);
 
 		return true;
 	}
@@ -219,11 +216,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.calcFallSpeed = -116;
 		AnimateLara(item);
 
-		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
-
-		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
-		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
+		SnapItemToLedge(item, coll, 0.3f);
 
 		return true;
 	}
