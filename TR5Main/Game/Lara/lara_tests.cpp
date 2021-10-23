@@ -27,7 +27,7 @@ static short RightClimbTab[4] = // offset 0xA0640
 /*this file has all the generic test functions called in lara's state code*/
 
 // Test if a ledge in front of item is valid to climb.
-bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
+bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 {
 	// Determine probe base point.
 	// We use double-radius here for two purposes. First - we can't guarantee that
@@ -63,9 +63,12 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_GRAB_THRESHOLD)
 		return false; 
 	
-	auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
-	if (headroom < STEP_SIZE)
-		return false;
+	if (!ignoreHeadroom)
+	{
+		auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+		if (headroom < STEP_SIZE)
+			return false;
+	}
 	
 	return (coll->CollisionType == CT_FRONT);
 }
@@ -1015,7 +1018,7 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 		return 0;
 	}
 
-	if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= SLOPE_DIFFERENCE)
+	if (!TestValidLedge(item, coll, true))
 		return 0;
 
 	return 1;
