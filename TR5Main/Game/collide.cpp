@@ -2557,31 +2557,6 @@ int GetQuadrant(short angle)
 	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
 }
 
-Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
-{
-	auto vect = Vector2(xPos, zPos);
-
-	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
-
-	switch (dir)
-	{
-	case NORTH:
-		vect.y = (zPos | (GRID_SNAP_SIZE - 1)) - radius;
-		break;
-	case EAST:
-		vect.x = (xPos | (GRID_SNAP_SIZE - 1)) - radius;
-		break;
-	case SOUTH:
-		vect.y = (zPos & ~(GRID_SNAP_SIZE - 1)) + radius;
-		break;
-	case WEST:
-		vect.x = (xPos & ~(GRID_SNAP_SIZE - 1)) + radius;
-		break;
-	}
-
-	return vect;
-}
-
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
