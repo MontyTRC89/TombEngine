@@ -1668,9 +1668,8 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 				if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
 				{
 					short angle = item->pos.yRot;
-					bool result = SnapToQuadrant(angle, 35);
 
-					if (result)
+					if (TestValidLedge(item, coll, true))
 					{
 						BOUNDING_BOX* bounds;
 
@@ -1706,10 +1705,9 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 						else
 							item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-						Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
-						item->pos.xPos = v.x;
-						item->pos.zPos = v.y;
-						item->pos.yRot = angle;
+						item->pos.yRot = coll->NearestLedgeAngle;
+						item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
+						item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance);
 
 						item->gravityStatus = false;
 						item->speed = 0;
