@@ -359,7 +359,7 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	return SPLAT_COLL::SPLAT_NONE;
 }
 
-bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll, int distance)
 {
 	ANIM_FRAME* frame;
 
@@ -369,36 +369,26 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (angle == (short) (item->pos.yRot - ANGLE(90)))
 	{
-		delta = -100;
+		delta = -distance;
 	}
 	else if (angle == (short) (item->pos.yRot + ANGLE(90)))
 	{
-		delta = 100;
+		delta = distance;
 	}
 
-	auto hdif = LaraFloorFront(item, angle, 100);
+	auto s = phd_sin(Lara.moveAngle);
+	auto c = phd_cos(Lara.moveAngle);
+	auto testShift = Vector2(s * delta, c * delta);
 
+	auto hdif = LaraFloorFront(item, angle, distance);
 	if (hdif < 200)
 		flag = 1;
 
-	auto cdif = LaraCeilingFront(item, angle, 100, 0);
+	auto cdif = LaraCeilingFront(item, angle, distance, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
-	switch (dir)
-	{
-	case NORTH:
-		item->pos.zPos += 4;
-		break;
-	case EAST:
-		item->pos.xPos += 4;
-		break;
-	case SOUTH:
-		item->pos.zPos -= 4;
-		break;
-	case WEST:
-		item->pos.xPos -= 4;
-		break;
-	}
+	item->pos.xPos += phd_sin(item->pos.yRot) * 4;
+	item->pos.zPos += phd_cos(item->pos.yRot) * 4;
 
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -462,20 +452,10 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			auto x = item->pos.xPos;
 			auto z = item->pos.zPos;
 
-			switch (dir)
+			if (delta != 0)
 			{
-			case NORTH:
-				x += delta;
-				break;
-			case EAST:
-				z -= delta;
-				break;
-			case SOUTH:
-				x -= delta;
-				break;
-			case WEST:
-				z += delta;
-				break;
+				x += testShift.x;
+				z += testShift.y;
 			}
 
 			Lara.moveAngle = angle;
@@ -485,7 +465,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				if (!TestLaraHangOnClimbWall(item, coll))
 					dfront = 0;
 			}
-			else if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) >= 60)
+			else if (!TestValidLedge(item, coll, true))
 			{
 				if (delta < 0 && coll->FrontLeft.Floor != coll->Front.Floor || delta > 0 && coll->FrontRight.Floor != coll->Front.Floor)
 					flag2 = 1;
@@ -495,17 +475,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!flag2 && coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !flag && !coll->HitStatic && cdif <= -950 && dfront >= -60 && dfront <= 60)
 			{
-				switch (dir)
-				{
-				case NORTH:
-				case SOUTH:
-					item->pos.zPos += coll->Shift.z;
-					break;
-				case EAST:
-				case WEST:
-					item->pos.xPos += coll->Shift.x;
-					break;
-				}
+				if (item->speed != 0)
+					SnapItemToLedge(item, coll);
 
 				item->pos.yPos += dfront;
 			}
