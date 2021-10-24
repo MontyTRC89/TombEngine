@@ -662,7 +662,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -681,7 +681,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			// BUG: If Lara is stopped while crawling back, this test will fail.
 			// I'm certain it's not due to shifts or the use of BadHeightUp/Down. @Sezz 2021.10.22
-			else if (TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_BACK;
 
@@ -1140,7 +1140,13 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_FORWARD)
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			if (TrInput & IN_ACTION &&
+				TestLaraCrawlVault(item, coll))
+			{
+				DoLaraCrawlVault(item, coll);
+			}
+			else [[likely]]
+				item->goalAnimState = LS_CRAWL_FORWARD;
 
 			return;
 		}
@@ -1522,7 +1528,7 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -1531,7 +1537,7 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & IN_BACK &&
-			TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp))
+			TestLaraCrawlBack(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
 
@@ -1619,7 +1625,7 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlMoveForward(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -1628,7 +1634,7 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & IN_BACK &&
-			TestLaraCrawlMoveBack(item, coll, coll->Setup.BadHeightDown, coll->Setup.BadHeightUp))
+			TestLaraCrawlBack(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
 

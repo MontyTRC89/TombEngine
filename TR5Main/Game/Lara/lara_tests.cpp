@@ -1461,18 +1461,21 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 	return true;
 }
 
-// TODO: A unified function for the six below. Currently there are strange bugs and unpredictable behaviours
-// that prevent me from doing it. @Sezz 2021.10.22
-bool TestLaraCrawlMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+// TODO: This function should become obsolete in the future with more accurate and accessible collision detection.
+// For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
+bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
 {
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, LARA_RAD_CRAWL * sqrt(2), 0);
+	auto radius = coll->Setup.Height == LARA_HEIGHT ? coll->Setup.Radius : LARA_RAD_CRAWL; // TODO: coll->Setup.radius doesn't work here for crawl states. Why?
+	auto probe = GetCollisionResult(item, angle, radius * sqrt(2) + 4, 0); // Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
-	// TODO: ceilings.
-	if (probe.Position.Floor - y <= lowerBound &&
-		probe.Position.Floor - y >= upperBound &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
+	// TODO: Radius overshoot.
+
+	// TODO: Ceilings.
+	if (probe.Position.Floor - y <= lowerBound &&		// Lower floor boundary.
+		probe.Position.Floor - y >= upperBound &&		// Upper floor boundary.
+		!probe.Position.Slope &&						// No slope.
+		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1480,93 +1483,48 @@ bool TestLaraCrawlMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, 
 	return false;
 }
 
-bool TestLaraCrawlMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
+bool TestLaraWalkRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), LARA_RAD_CRAWL * sqrt(2), 0);
-
-	if (probe.Position.Floor - y <= lowerBound &&
-		probe.Position.Floor - y >= upperBound &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
 }
 
-// TODO: Not useful yet; Lara will not climb if I use this as resting contact with walls is not possible. @Sezz 2021.10.22
-bool TestLaraMoveForward(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2), 0); // TODO: coll->Setup.Radius doesn't seem to work for crawl idle state.
-
-	if (probe.Position.Floor - y <= lowerBound &&
-		probe.Position.Floor - y >= upperBound &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk back state collision function.
 }
 
-bool TestLaraMoveBack(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound)
+bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius * sqrt(2), 0);
-
-	if (probe.Position.Floor - y <= lowerBound &&
-		probe.Position.Floor - y >= upperBound &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using bad heights defined in hop back state collision function.
 }
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle - ANGLE(90.0f), coll->Setup.Radius * sqrt(2), 0);
-
-	if (probe.Position.Floor - y <= STEP_SIZE / 2 &&
-		probe.Position.Floor - y >= -STEP_SIZE / 2 &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using unique height tolerances.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(90.0f), coll->Setup.Radius * sqrt(2), 0);
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using unique height tolerances.
+}
 
-	if (probe.Position.Floor - y <= STEP_SIZE / 2 &&
-		probe.Position.Floor - y >= -STEP_SIZE / 2 &&
-		!probe.Position.Slope &&
-		probe.Position.Floor - y != NO_HEIGHT)
-	{
-		return true;
-	}
+bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using bad heights defined in crawl state collision functions.
+}
 
-	return false;
+bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using bad heights defined in crawl state collision functions.
 }
 
 bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	if (Lara.gunStatus == LG_NO_ARMS &&
 		/*Lara.waterSurfaceDist >= -STEP_SIZE &&*/
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))	// Flare is not being handled.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Flare is not being handled.
 	{
 		return true;
 	}
@@ -1576,17 +1534,9 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// This is a discrete probe and fails in many cases. Perhaps we need a ray for these kinds of tests. @Sezz 2021.10.14
-
-	// Ceiling?
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, WALL_SIZE, 0);
-
-	if (Lara.gunStatus == LG_NO_ARMS &&
+	if (TestLaraCrawlForward(item, coll) &&
+		Lara.gunStatus == LG_NO_ARMS &&
 		Lara.waterSurfaceDist >= -STEP_SIZE &&						// Water depth is optically feasible for action.
-		probe.Position.Floor - y <= STEP_SIZE - 1 &&				// No drop.
-		probe.Position.Floor - y >= -STEP_SIZE - 1 &&				// No wall.
-		!probe.Position.Slope &&									// No slope.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Not handling flare.
 	{

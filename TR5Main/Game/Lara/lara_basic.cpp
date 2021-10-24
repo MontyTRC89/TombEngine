@@ -91,7 +91,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
@@ -697,14 +697,6 @@ void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Probes will not necessarily work when Lara is angled near the 45 degree boundary to a wall, as she is
-	// always pushed beyond resting contact. This will result in inappropriate dispatch attempts in edge cases.
-	// To alleviate this problem, either:
-	// a) Account for the MAXIMUM possible distance of this gap and ADD it to the radius.
-	// b) Trash FindGridShift() and always push Lara in the direction opposite her facing angle to a location of PRECISE resting contact.
-	// This would also resolve for correct collision with low, slanted ceilings and geometry not aligned cardinally once and for all.
-	// Collision bugs will forever persist if this isn't done. @Sezz 2021.10.18
-
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
 		item->animNumber != LA_SPRINT_TO_STAND_LEFT)
@@ -768,24 +760,16 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
-		// TODO: Reholster weapon if it is a standing one and Lara is forced to crouch. @Sezz 2021.10.15
-		if (Lara.gunType == WEAPON_REVOLVER
-			&& !LaserSight)
-		{
-			item->goalAnimState = LS_CROUCH_IDLE;
-		}
-		else
-			item->goalAnimState = LS_CROUCH_IDLE;
+		item->goalAnimState = LS_CROUCH_IDLE;
 
 		return;
 	}
 
 	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT && // TODO: This check is only useful for low, slanted ceilings, as Lara cannot make resting contact with walls. @Sezz 2021.10.21
-		coll->CollisionType != CT_TOP_FRONT/* &&
-		TestLaraMoveForward(item, coll, NO_BAD_POS, -STEPUP_HEIGHT)*/) // TODO:
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
 	{
-		if (TrInput & IN_WALK)					// TODO: Make sprinting from walk commit to sprint, and walking from sprint commit to walk, when both inputs are registered. @Sezz 2021.10.13
+		if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
 		else if (TrInput & IN_SPRINT)
 			item->goalAnimState = LS_SPRINT;
@@ -797,14 +781,15 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back(). @Sezz 2021.06.27
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK &&
+			TestLaraWalkBack(item, coll))
 		{
-			if (TestLaraMoveBack(item, coll, STEPUP_HEIGHT, -STEPUP_HEIGHT))
-				item->goalAnimState = LS_WALK_BACK;
+			item->goalAnimState = LS_WALK_BACK;
 
 			return;
 		}
-		else if (TestLaraMoveBack(item, coll, NO_BAD_POS, -STEPUP_HEIGHT)) [[likely]]
+		else if (!(TrInput & IN_WALK) &&
+			TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -1164,9 +1149,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	// TODO: Valuting originally took priority, but it may have been allowing Lara to vault on slopes with a well-timed input. Investigate. @Sezz 2021.10.04
-	if (TestLaraVault(item, coll))
-		return;
+	// TODO: Vaulting from this state.
 
 #if 1
 	if (coll->Middle.Floor != NO_HEIGHT)
@@ -1530,12 +1513,20 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK &&
+			TestLaraWalkBack(item, coll))
+		{
 			item->goalAnimState = LS_WALK_BACK;
-		else [[likely]]
+
+			return;
+		}
+		else if (!(TrInput & IN_WALK) &&
+			TestLaraHopBack(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_HOP_BACK;
 
-		return;
+			return;
+		}
 	}
 
 	if (TrInput & IN_LSTEP &&
@@ -1792,12 +1783,20 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK)
+		if (TrInput & IN_WALK &&
+			TestLaraWalkBack(item, coll))
+		{
 			item->goalAnimState = LS_WALK_BACK;
-		else [[likely]]
+
+			return;
+		}
+		else if (!(TrInput & IN_WALK) &&
+			TestLaraHopBack(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_HOP_BACK;
 
-		return;
+			return;
+		}
 	}
 
 	if (TrInput & IN_LSTEP &&
@@ -1807,7 +1806,8 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-	else if (TrInput & IN_RSTEP && // TODO: This fails. Lara steps left. Why?? @Sezz 2021.10.08
+	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
+	else if (TrInput & IN_RSTEP &&
 		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
@@ -2661,14 +2661,20 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (Lara.waterStatus == LW_WADE)
+		if (TrInput & IN_WALK &&
+			TestLaraWalkBack(item, coll))
+		{
 			item->goalAnimState = LS_WALK_BACK;
-		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_BACK;
-		else [[likely]]
+
+			return;
+		}
+		else if (!(TrInput & IN_WALK) &&
+			TestLaraHopBack(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_HOP_BACK;
 
-		return;
+			return;
+		}
 	}
 
 	if (TrInput & IN_LSTEP &&
@@ -2678,7 +2684,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-	else if (TrInput & IN_RSTEP && // TODO: This fails and Lara steps left. Why? @Sezz 2021.10.08
+	else if (TrInput & IN_RSTEP &&
 		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
@@ -2690,7 +2696,10 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-		Lara.turnRate = clamp(Lara.turnRate, LARA_MED_TURN, LARA_FAST_TURN);
+		if (Lara.turnRate < LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
+		else if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
 
 		item->goalAnimState = LS_TURN_RIGHT_FAST;
 
@@ -2796,13 +2805,25 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_BACK)
 	{
 		if (Lara.waterStatus == LW_WADE)
+		{
+			item->goalAnimState = LS_WADE_FORWARD;
+
+			return;
+		}
+		else if (TrInput & IN_WALK &&
+			TestLaraWalkBack(item, coll))
+		{
 			item->goalAnimState = LS_WALK_BACK;
-		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_BACK;
-		else [[likely]]
+
+			return;
+		}
+		else if (!(TrInput & IN_WALK) &&
+			TestLaraHopBack(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_HOP_BACK;
 
-		return;
+			return;
+		}
 	}
 
 	if (TrInput & IN_LSTEP &&
@@ -2812,6 +2833,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
+	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
 	else if (TrInput & IN_RSTEP &&
 		TestLaraStepRight(item, coll))
 	{
@@ -2823,7 +2845,10 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		Lara.turnRate = clamp(Lara.turnRate, (short) -LARA_FAST_TURN, (short) -LARA_MED_TURN); // TODO: When rotations become floats, remove casts. @Sezz 2021.10.08
+		if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+		else if (Lara.turnRate > -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_FAST;
 
