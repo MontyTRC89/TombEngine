@@ -189,8 +189,8 @@ void AnimateItem(ITEM_INFO* item)
 
 	if (lateral != 0)
 	{
-		item->pos.xPos += round(lateral * phd_sin(item->pos.yRot + ANGLE(90));
-		item->pos.zPos += round(lateral * phd_cos(item->pos.yRot + ANGLE(90));
+		item->pos.xPos += round(lateral * phd_sin(item->pos.yRot + ANGLE(90)));
+		item->pos.zPos += round(lateral * phd_cos(item->pos.yRot + ANGLE(90)));
 	}
 
 	// Update matrices
