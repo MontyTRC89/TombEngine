@@ -1285,7 +1285,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	// Get side probe offsets depending on quadrant.
 	// If unconstrained mode is specified, don't use quadrant.
-	switch (coll->Setup.NoQuadrants ? -1 : quadrant)
+	switch (coll->Setup.Mode ? -1 : quadrant)
 	{
 	case 0:
 		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -1327,10 +1327,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		// No valid quadrant, return true probe offsets from object rotation.
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = (xfront * 0.5f) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		zleft  = (zfront * 0.5f) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		xright = (xfront * 0.5f) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
-		zright = (zfront * 0.5f) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		xleft  = (xfront * (coll->Setup.Mode == CP_FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		zleft  = (zfront * (coll->Setup.Mode == CP_FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		xright = (xfront * (coll->Setup.Mode == CP_FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		zright = (zfront * (coll->Setup.Mode == CP_FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
 		break;
 	}
 
@@ -1348,8 +1348,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
-	// g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
-	// g_Renderer.printDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
+	 g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
+	 g_Renderer.printDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
 
 	// TEST 2: CENTERPOINT PROBE
 

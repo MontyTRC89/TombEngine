@@ -439,7 +439,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_QUADRANTS;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
 		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;
