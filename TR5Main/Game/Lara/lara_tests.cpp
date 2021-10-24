@@ -1255,6 +1255,7 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	auto probeA = GetCollisionResult(item, angleA, dist, 0);
 	auto probeB = GetCollisionResult(item, angleB, dist, 0);
 
+	// TODO: Ceilings.
 	if (probeA.Position.Floor - y < -STEPUP_HEIGHT &&
 		probeB.Position.Floor - y < -STEPUP_HEIGHT)
 	{
@@ -1271,7 +1272,7 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
 		probe.Position.Floor - y >= -(STEP_SIZE + STEP_SIZE / 2) &&
-		probe.Position.Ceiling - y <= 0)
+		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))
 	{
 		return true;
 	}
@@ -1466,10 +1467,10 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
 {
 	auto y = item->pos.yPos;
-	auto radius = coll->Setup.Height == LARA_HEIGHT ? coll->Setup.Radius : LARA_RAD_CRAWL; // TODO: coll->Setup.radius doesn't work here for crawl states. Why?
-	auto probe = GetCollisionResult(item, angle, radius * sqrt(2) + 4, 0); // Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	// TODO: coll->Setup.Radius not working in crawl states.
+	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0); // Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
-	// TODO: Radius overshoot.
+	// TODO: Radius overshoot. Probe for nearest ledge angle in a given direction.
 
 	// TODO: Ceilings.
 	if (probe.Position.Floor - y <= lowerBound &&		// Lower floor boundary.
