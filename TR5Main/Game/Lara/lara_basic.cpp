@@ -228,7 +228,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -581,7 +581,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -1374,7 +1374,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -2349,7 +2349,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -2524,7 +2524,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (TestLaraSlideNew(coll))
 	{
 		SetLaraSlideState(item, coll);
 
@@ -3879,7 +3879,66 @@ void old_lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_WADE_FORWARD (65)
+// Control:		lara_as_wade()
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+
+		return;
+	}
+
+	if (TestLaraVault(item, coll))
+		return;
+
+	if (LaraDeflectEdge(item, coll))
+	{
+		item->pos.zRot = 0;
+
+		if (!coll->Front.Slope && coll->Front.Floor < -(STEP_SIZE * 2 + STEP_SIZE / 2) &&
+			!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		{
+			item->goalAnimState = LS_SPLAT;
+			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+				return;
+		}
+
+		LaraCollideStop(item, coll);
+	}
+
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
+		coll->Middle.Floor < -(STEP_SIZE / 2) &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->goalAnimState = LS_STEP_UP;
+		GetChange(item, &g_Level.Anims[item->animNumber]);
+	}
+
+	if (coll->Middle.Floor >= 50 &&
+		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		item->pos.yPos += 50;
+		return;
+	}
+
+	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
+		item->pos.yPos += SWAMP_GRAVITY;
+}
+
+// LEGACY
+void old_lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 65*/
 	/*state code: lara_as_wade*/
