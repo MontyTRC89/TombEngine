@@ -268,7 +268,8 @@ bool TestLaraKeepDucked(COLL_INFO* coll)
 {
 	// TODO: If there is a low ceiling ahead, allow Lara to continue without having to hold DUCK. @Sezz 2021.10.05
 	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
-	if (coll->Middle.Ceiling >= -LARA_HEIGHT_CRAWL) // Was -362.
+	if (coll->Middle.Ceiling >= -LARA_HEIGHT_CRAWL || // Was -362.
+		coll->Front.Ceiling >= -LARA_HEIGHT_CRAWL)
 		return true;
 
 	return false;
