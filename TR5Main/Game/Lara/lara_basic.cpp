@@ -1013,7 +1013,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.NoQuadrants = true;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 
 	GetCollisionInfo(coll, item);
 
@@ -1632,6 +1632,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 
 	GetCollisionInfo(coll, item);
 
