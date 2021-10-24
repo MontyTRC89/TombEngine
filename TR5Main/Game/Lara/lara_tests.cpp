@@ -1067,22 +1067,9 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	int z = item->pos.zPos;
 
 	Lara.moveAngle = item->pos.yRot + angle;
-
-	switch (GetQuadrant(Lara.moveAngle))
-	{
-	case 0:
-		z += 16;
-		break;
-	case 1:
-		x += 16;
-		break;
-	case 2:
-		z -= 16;
-		break;
-	case 3:
-		x -= 16;
-		break;
-	}
+	
+	z += phd_cos(angle) * 16 + phd_cos(item->pos.yRot) * 4;
+	x += phd_sin(angle) * 16 + phd_sin(item->pos.yRot) * 4;
 
 	item->pos.xPos = x;
 	item->pos.zPos = z;
