@@ -28,6 +28,13 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
+enum COLL_PROBE_MODE
+{
+	CP_QUADRANTS,
+	CP_FREE_FORWARD,
+	CP_FREE_FLAT
+};
+
 enum SPLAT_COLL
 {
 	SPLAT_NONE,
@@ -62,12 +69,13 @@ struct COLL_RESULT
 
 struct COLL_SETUP
 {
+	COLL_PROBE_MODE Mode;   // Probe rotation mode
+
 	bool SlopesAreWalls;    // Treat steep slopes as walls
 	bool SlopesArePits;     // Treat steep slopes as pits
 	bool DeathFlagIsPit;    // Treat death sectors as pits
 	bool EnableObjectPush;  // Can be pushed by objects
 	bool EnableSpaz;        // Push is treated as hurt
-	bool NoQuadrants;       // Use unconstrained probe rotation not bound to quadrants
 						    
 	int   Radius;           // Collision bounds horizontal size
 	int   Height;			// Collision bounds vertical size
@@ -103,10 +111,10 @@ struct COLL_INFO
 	bool HitStatic;
 	bool HitTallObject;
 
-	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle && (NearestLedgeAngle % ANGLE(90)); }
-	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle && (NearestLedgeAngle % ANGLE(90)); }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight(); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft(); }
+	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
+	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90)); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
 struct OBJECT_COLLISION_BOUNDS

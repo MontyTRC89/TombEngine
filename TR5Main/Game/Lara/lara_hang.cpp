@@ -27,6 +27,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -179,6 +180,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangleft*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -201,6 +203,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangright*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))

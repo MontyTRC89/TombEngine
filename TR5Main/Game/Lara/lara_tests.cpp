@@ -387,8 +387,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll, int distance)
 	auto cdif = LaraCeilingFront(item, angle, distance, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
-	item->pos.xPos += phd_sin(item->pos.yRot) * 4;
-	item->pos.zPos += phd_cos(item->pos.yRot) * 4;
+	item->pos.xPos += phd_sin(item->pos.yRot) * 16;
+	item->pos.zPos += phd_cos(item->pos.yRot) * 16;
 
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -1001,8 +1001,8 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 	//debug till scripting be ready
 	Lara.NewAnims.OscillateHanging = 0;
 
-	z += phd_cos(angle) * STEP_SIZE;
-	x += phd_sin(angle) * STEP_SIZE;
+	z += phd_cos(angle) * (STEP_SIZE / 2);
+	x += phd_sin(angle) * (STEP_SIZE / 2);
 
 	floor = GetFloor(x, y, z, &roomNum);
 	h = GetFloorHeight(floor, x, y, z);
@@ -1040,8 +1040,8 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	FLOOR_INFO* floor;
 	int h, c, g, m, j;
 
-	z += phd_cos(angle) * STEP_SIZE;
-	x += phd_sin(angle) * STEP_SIZE;
+	z += phd_cos(angle) * (STEP_SIZE / 2);
+	x += phd_sin(angle) * (STEP_SIZE / 2);
 
 	floor = GetFloor(x, y, z, &roomNum);
 	h = GetFloorHeight(floor, x, y, z);
