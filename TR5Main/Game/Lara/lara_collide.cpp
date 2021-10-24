@@ -48,9 +48,9 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	case CT_TOP_FRONT:
 		if (!Lara.climbStatus || item->speed != 2)
 		{
-			if (coll->Middle.Floor <= 512)
+			if (coll->Middle.Floor <= STOP_SIZE)
 			{
-				if (coll->Middle.Floor <= 128)
+				if (coll->Middle.Floor <= STEP_SIZE / 2)
 				{
 					item->goalAnimState = LS_GRAB_TO_FALL;
 					item->currentAnimState = LS_GRAB_TO_FALL;
@@ -69,7 +69,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 			}
 
 			item->speed /= 4;
-			Lara.moveAngle += ANGLE(180);
+			Lara.moveAngle += ANGLE(180.0f);
 
 			if (item->fallspeed <= 0)
 				item->fallspeed = 1;
