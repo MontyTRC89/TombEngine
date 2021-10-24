@@ -1354,8 +1354,8 @@ void AnimateLara(ITEM_INFO* item)
 
 		if (lateral != 0)
 		{
-			item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
-			item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
+			item->pos.xPos += round(lateral * phd_sin(Lara.moveAngle + ANGLE(90)));
+			item->pos.zPos += round(lateral * phd_cos(Lara.moveAngle + ANGLE(90)));
 		}
 	}
 

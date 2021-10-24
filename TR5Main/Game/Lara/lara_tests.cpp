@@ -359,7 +359,7 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	return SPLAT_COLL::SPLAT_NONE;
 }
 
-bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll, int distance)
+bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ANIM_FRAME* frame;
 
@@ -369,26 +369,31 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll, int distance)
 
 	if (angle == (short) (item->pos.yRot - ANGLE(90)))
 	{
-		delta = -distance;
+		delta = -coll->Setup.Radius;
 	}
 	else if (angle == (short) (item->pos.yRot + ANGLE(90)))
 	{
-		delta = distance;
+		delta = coll->Setup.Radius;
 	}
 
 	auto s = phd_sin(Lara.moveAngle);
 	auto c = phd_cos(Lara.moveAngle);
 	auto testShift = Vector2(s * delta, c * delta);
 
-	auto hdif = LaraFloorFront(item, angle, distance);
+	auto hdif = LaraFloorFront(item, angle, coll->Setup.Radius);
 	if (hdif < 200)
 		flag = 1;
 
-	auto cdif = LaraCeilingFront(item, angle, distance, 0);
+	auto cdif = LaraCeilingFront(item, angle, coll->Setup.Radius, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
-	item->pos.xPos += phd_sin(item->pos.yRot) * 16;
-	item->pos.zPos += phd_cos(item->pos.yRot) * 16;
+	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
+	auto embedOffset = 4;
+	if ((TrInput & IN_LEFT) || (TrInput & IN_RIGHT))
+		embedOffset = 16;
+
+	item->pos.xPos += phd_sin(item->pos.yRot) * embedOffset;
+	item->pos.zPos += phd_cos(item->pos.yRot) * embedOffset;
 
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -1068,8 +1073,8 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 	Lara.moveAngle = item->pos.yRot + angle;
 	
-	z += phd_cos(angle) * 16 + phd_cos(item->pos.yRot) * 4;
-	x += phd_sin(angle) * 16 + phd_sin(item->pos.yRot) * 4;
+	z += phd_cos(angle) * 16;
+	x += phd_sin(angle) * 16;
 
 	item->pos.xPos = x;
 	item->pos.zPos = z;
