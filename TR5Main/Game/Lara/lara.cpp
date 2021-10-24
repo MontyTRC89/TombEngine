@@ -1342,13 +1342,21 @@ void AnimateLara(ITEM_INFO* item)
 	if (Lara.ropePtr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
+	if (!Lara.isMoving)
 	{
-		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle);
-		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle);
+		if (item->speed != 0)
+		{
+			auto s = phd_sin(Lara.moveAngle);
+			auto c = phd_cos(Lara.moveAngle);
+			item->pos.xPos += round(item->speed * phd_sin(Lara.moveAngle));
+			item->pos.zPos += round(item->speed * phd_cos(Lara.moveAngle));
+		}
 
-		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
-		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
+		if (lateral != 0)
+		{
+			item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
+			item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
+		}
 	}
 
 	// Update matrices
