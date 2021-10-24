@@ -9,7 +9,10 @@
 #include "lara_collide.h"
 #include "items.h"
 
-/*this file has all the generic **collision** test functions called in lara's state code*/
+// -----------------------------
+// COLLISION TEST FUNCTIONS
+// For State Control & Collision
+// -----------------------------
 
 int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -116,12 +119,12 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->pos.yRot += ANGLE(2.0f);
+		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->pos.yRot -= ANGLE(2.0f);
+		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
 	}
 
 	return 0;
