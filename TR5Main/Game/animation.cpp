@@ -181,11 +181,17 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
+	if (item->speed != 0)
+	{
+		item->pos.xPos += round(item->speed * phd_sin(item->pos.yRot));
+		item->pos.zPos += round(item->speed * phd_cos(item->pos.yRot));
+	}
 
-	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90));
-	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90));
+	if (lateral != 0)
+	{
+		item->pos.xPos += round(lateral * phd_sin(item->pos.yRot + ANGLE(90));
+		item->pos.zPos += round(lateral * phd_cos(item->pos.yRot + ANGLE(90));
+	}
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();
