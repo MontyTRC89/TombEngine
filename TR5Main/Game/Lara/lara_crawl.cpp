@@ -70,7 +70,6 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 			coll->CollisionType != CT_TOP_FRONT &&
 			TestLaraCrouchToCrawl(item))
 		{
-			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -78,7 +77,6 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_BACK &&
 			TestLaraCrouchToCrawl(item))
 		{
-			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -444,7 +442,6 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
 			TestLaraCrouchToCrawl(item))
 		{
-			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -520,7 +517,6 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & (IN_FORWARD | IN_BACK) &&
 			TestLaraCrouchToCrawl(item))
 		{
-			Lara.gunStatus = LG_HANDS_BUSY;
 			item->goalAnimState = LS_CRAWL_IDLE;
 
 			return;
@@ -605,10 +601,9 @@ void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_all4s()
 void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
-	Lara.gunStatus = LG_HANDS_BUSY;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1103,11 +1098,9 @@ void old_lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl()
 void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
-	// TEMP
-	Lara.gunStatus = LG_HANDS_BUSY;
 
 	Camera.targetElevation = -ANGLE(23.0f);
 
@@ -1319,6 +1312,7 @@ void old_lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawlb()
 void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -1495,6 +1489,7 @@ void old_lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_all4turnl()
 void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -1595,6 +1590,7 @@ void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_all4turnr()
 void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
