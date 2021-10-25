@@ -1013,7 +1013,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FORWARD;
 
 	GetCollisionInfo(coll, item);
 
