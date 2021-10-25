@@ -1432,6 +1432,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor boundary.
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
+		item->currentAnimState != LS_WADE_FORWARD &&
 		item->currentAnimState != LS_HOP_BACK &&
 		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
