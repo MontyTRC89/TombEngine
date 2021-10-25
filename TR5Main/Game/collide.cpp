@@ -2645,29 +2645,25 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				auto c2 = phd_cos(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90) : ANGLE(-90)));
 
 				// Slightly extend width beyond coll radius to hit adjacent blocks for sure
-				eX += s2 * (coll->Setup.Radius * 1.7f);
-				eZ += c2 * (coll->Setup.Radius * 1.7f);
+				eX += s2 * (coll->Setup.Radius * 2);
+				eZ += c2 * (coll->Setup.Radius * 2);
 			}
 
 			// Debug probe point
 			// g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-			// Determine floor probe offset.
-			// This must be in front of own coll radius so no bridge misfires occur.
-			auto floorProbeOffset = coll->Setup.Radius * 0.5f;
-			auto fpX = eX + floorProbeOffset * s;
-			auto fpZ = eZ + floorProbeOffset * c;
+			// Determine bridge probe offset.
+			auto bridgeProbeOffset = coll->Setup.Radius * 1.5f;
+			auto bpX = eX + bridgeProbeOffset * s;
+			auto bpZ = eZ + bridgeProbeOffset * c;
 
-			// Debug probe point
-			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+			// Get bridge block
+			auto room = GetRoom(item->location, bpX, y, bpZ).roomNumber;
+			auto block = GetCollisionResult(bpX, y, bpZ, room).Block;
 
-			// Get true room number and block, based on current Y position
-			auto room = GetRoom(item->location, fpX, y, fpZ).roomNumber;
-			auto block = GetCollisionResult(fpX, y, fpZ, room).Block;
-
-			// Get native surface heights
-			auto floorHeight = block->FloorHeight(fpX, fpZ, y);
-			auto ceilingHeight = block->CeilingHeight(fpX, fpZ, y);
+			// Get bridge surface heights
+			auto floorHeight = block->BridgeFloorHeight(bpX, bpZ, y); // HACK? FloorHeight never returns real bridge height!
+			auto ceilingHeight = block->CeilingHeight(bpX, bpZ, y);
 
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
@@ -2675,7 +2671,29 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(fpX, fpZ, height + 4, false, y == height); // Submerge 1 unit to detect possible bridge
+			auto bridge = block->InsideBridge(bpX, bpZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+
+			// Determine floor probe offset.
+			// This must be in front of own coll radius so no bridge misfires occur.
+			auto floorProbeOffset = coll->Setup.Radius * (bridge >= 0 ? 1.5f : -0.1f);
+			auto fpX = eX + floorProbeOffset * s;
+			auto fpZ = eZ + floorProbeOffset * c;
+
+			// Debug probe point
+			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+			// Get true room number and block, based on current Y position
+			room = GetRoom(item->location, fpX, y, fpZ).roomNumber;
+			block = GetCollisionResult(fpX, y, fpZ, room).Block;
+
+			// Get native surface heights
+			floorHeight = block->FloorHeight(fpX, fpZ, y);
+			ceilingHeight = block->CeilingHeight(fpX, fpZ, y);
+
+			// If ceiling height tests lower than Y value, it means ceiling
+			// ledge is in front and we should use it instead of floor.
+			useCeilingLedge = ceilingHeight > y;
+			height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here
 			auto fY = height - 1;
@@ -2808,10 +2826,11 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			if (!angles.insert(result[p]).second)
 			{
 				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
-				float dist1, dist2;
-				originRay.Intersects(closestPlane[p], dist1);
-				originRay.Intersects(closestPlane[firstEqualAngle], dist2);
-				finalDistance[h] = (dist1 > dist2) ? dist2 : dist1;
+				float dist1 = FLT_MAX;
+				float dist2 = FLT_MAX;
+				auto r1 = originRay.Intersects(closestPlane[p], dist1);
+				auto r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
+				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : dist1;
 
 				finalResult[h] = result[p];
 				break;
