@@ -1343,21 +1343,7 @@ void AnimateLara(ITEM_INFO* item)
 		DelAlignLaraToRope(item);
 
 	if (!Lara.isMoving)
-	{
-		if (item->speed != 0)
-		{
-			auto s = phd_sin(Lara.moveAngle);
-			auto c = phd_cos(Lara.moveAngle);
-			item->pos.xPos += round(item->speed * phd_sin(Lara.moveAngle));
-			item->pos.zPos += round(item->speed * phd_cos(Lara.moveAngle));
-		}
-
-		if (lateral != 0)
-		{
-			item->pos.xPos += round(lateral * phd_sin(Lara.moveAngle + ANGLE(90)));
-			item->pos.zPos += round(lateral * phd_cos(Lara.moveAngle + ANGLE(90)));
-		}
-	}
+		MoveItem(item, Lara.moveAngle, item->speed, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

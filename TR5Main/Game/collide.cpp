@@ -595,6 +595,24 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Shift.x = 0;
 }
 
+void MoveItem(ITEM_INFO* item, short angle, int x, int y)
+{
+	auto s = phd_sin(angle);
+	auto c = phd_cos(angle);
+
+	if (x != 0)
+	{
+		item->pos.xPos += round(x * s);
+		item->pos.zPos += round(x * c);
+	}
+
+	if (y != 0)
+	{
+		item->pos.xPos += round(y * s);
+		item->pos.zPos += round(y * c);
+	}
+}
+
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier)
 {
 	item->pos.xRot = 0;
