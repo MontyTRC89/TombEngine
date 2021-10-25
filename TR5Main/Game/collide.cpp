@@ -2654,9 +2654,12 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 			// Determine floor probe offset.
 			// This must be in front of own coll radius so no bridge misfires occur.
-			auto floorProbeOffset = coll->Setup.Radius * 1.5f;
-			auto fpX = x + floorProbeOffset * s;
-			auto fpZ = z + floorProbeOffset * c;
+			auto floorProbeOffset = coll->Setup.Radius * 0.5f;
+			auto fpX = eX + floorProbeOffset * s;
+			auto fpZ = eZ + floorProbeOffset * c;
+
+			// Debug probe point
+			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 			// Get true room number and block, based on current Y position
 			auto room = GetRoom(item->location, fpX, y, fpZ).roomNumber;
@@ -2672,7 +2675,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(fpX, fpZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+			auto bridge = block->InsideBridge(fpX, fpZ, height + 4, false, y == height); // Submerge 1 unit to detect possible bridge
 
 			// We don't need actual corner heights to build planes, so just use normalized value here
 			auto fY = height - 1;
@@ -2798,14 +2801,24 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 		// on the near-zero thickness edges of diagonal geometry which probes tend to tunnel through.
 
 		std::set<short> angles;
+		int firstEqualAngle = -1;
 		for (int p = 0; p < 3; p++)
 		{
 			// Prioritize ledge angle which was twice recognized
 			if (!angles.insert(result[p]).second)
 			{
-				originRay.Intersects(closestPlane[p], finalDistance[h]);
+				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
+				float dist1, dist2;
+				originRay.Intersects(closestPlane[p], dist1);
+				originRay.Intersects(closestPlane[firstEqualAngle], dist2);
+				finalDistance[h] = (dist1 > dist2) ? dist2 : dist1;
+
 				finalResult[h] = result[p];
 				break;
+			}
+			else
+			{
+				firstEqualAngle = p;
 			}
 		}
 
@@ -2818,7 +2831,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 	}
 
 	// Return upper probe result in case it returned lower distance or has hit a bridge.
-	auto usedProbe = (finalDistance[0] < finalDistance[1] || hitBridge) ? 0 : 1;
+	auto usedProbe = ((finalDistance[0] < finalDistance[1]) || hitBridge) ? 0 : 1;
 	dist = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
 	return finalResult[usedProbe];
 }
