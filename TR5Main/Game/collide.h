@@ -160,5 +160,6 @@ bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
+short GetNearestLedgeAngleAccurate(ITEM_INFO* item, COLL_INFO* coll, float& dist);
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
