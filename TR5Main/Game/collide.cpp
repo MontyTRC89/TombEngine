@@ -1345,7 +1345,12 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	auto collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
 	coll->TiltX = collResult.TiltX;
 	coll->TiltZ = collResult.TiltZ;
-	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
+
+	// If no quadrants are used, do more precise calculation of nearest ledge
+	if (coll->Setup.Mode == CP_QUADRANTS)
+		coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
+	else
+		coll->NearestLedgeAngle = GetNearestLedgeAngleAccurate(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
 	 g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
@@ -2564,6 +2569,46 @@ bool SnapToQuadrant(short& angle, int interval)
 int GetQuadrant(short angle)
 {
 	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
+}
+
+short GetNearestLedgeAngleAccurate(ITEM_INFO* item, COLL_INFO* coll, float& dist)
+{
+	std::set<short> angles;
+	float distances[3] = {};
+
+	for (int i = 0; i < 3; i++)
+	{
+		int xOff = 0;
+		int zOff = 0;
+		auto oldPos = item->pos;
+
+		if (i > 0)
+		{
+			auto c = phd_cos(coll->Setup.ForwardAngle + (i == 1 ? ANGLE(90) : ANGLE(-90)));
+			auto s = phd_sin(coll->Setup.ForwardAngle + (i == 1 ? ANGLE(90) : ANGLE(-90)));
+
+			xOff = s * (coll->Setup.Radius * 1.5f);
+			zOff = c * (coll->Setup.Radius * 1.5f);
+		}
+
+		item->pos.xPos += xOff;
+		item->pos.zPos += zOff;
+
+		auto angle = GetNearestLedgeAngle(item, coll, distances[i]);
+
+		item->pos.xPos = oldPos.xPos;
+		item->pos.zPos = oldPos.zPos;
+
+
+		if (!angles.insert(angle).second)
+		{
+			dist = distances[i];
+			return angle;
+		}
+	}
+
+	dist = distances[0];
+	return *angles.begin();
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
