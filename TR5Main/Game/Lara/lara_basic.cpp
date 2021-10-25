@@ -1349,7 +1349,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot + ANGLE(180);
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;

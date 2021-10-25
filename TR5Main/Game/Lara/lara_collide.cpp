@@ -116,7 +116,8 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 		return 1;
 	}
 
-	if (coll->CollisionType == CT_LEFT)
+	// Lara's wide radius, slow speed, and slow turn rate make crawl deflection extremely annoying. Disabled (hopefully forever). @Sezz 2021.10.25
+	/*if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
@@ -125,7 +126,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
-	}
+	}*/
 
 	return 0;
 }
