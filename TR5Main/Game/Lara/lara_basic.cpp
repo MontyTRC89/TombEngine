@@ -3916,24 +3916,18 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT &&
-		coll->Middle.Floor < -(STEP_SIZE / 2) &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (TestLaraStep(coll)
+		&& !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 	{
-		item->goalAnimState = LS_STEP_UP;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
-	}
+		DoLaraStep(item, coll);
 
-	if (coll->Middle.Floor >= 50 &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
-	{
-		item->pos.yPos += 50;
 		return;
 	}
 
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
+	// Swamp step. TODO: Test it when swamps work again. @Sezz 2021.10.25
+	if (coll->Middle.Floor < 0)
 		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
+	else if (coll->Middle.Floor)
 		item->pos.yPos += SWAMP_GRAVITY;
 }
 
