@@ -2841,8 +2841,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			}
 		}
 
-		// Store first result in case all 3 results are different (no priority)
-		if (finalDistance[h] == FLT_MAX)
+		// Store first result in case all 3 results are different (no priority) or long-distance misfire occured
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
 		{
 			finalDistance[h] = closestDistance[0];
 			finalResult[h] = result[0];
