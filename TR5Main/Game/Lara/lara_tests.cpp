@@ -644,11 +644,14 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 			item->pos = oldPos;
 			Lara.moveAngle = oldPos.yRot;
 
-			if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
-				return CORNER_RESULT::NONE;
+			if (front != NO_HEIGHT && coll->Front.Floor != NO_HEIGHT)
+			{
+				if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
+					return CORNER_RESULT::NONE;
 
-			if (front < -(STEP_SIZE * 3))
-				return CORNER_RESULT::NONE;
+				if (front < -(STEP_SIZE * 3))
+					return CORNER_RESULT::NONE;
+			}
 
 			return CORNER_RESULT::OUTER;
 		}
