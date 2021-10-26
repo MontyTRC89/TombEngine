@@ -622,6 +622,23 @@ void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier)
 	item->pos.zPos += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier)
+{
+	auto backup = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = angle;
+
+	float dist;
+	auto ang = GetNearestLedgeAngle(item, coll, dist);
+
+	coll->Setup.ForwardAngle = backup;
+
+	item->pos.xRot = 0;
+	item->pos.yRot = ang;
+	item->pos.zRot = 0;
+	item->pos.xPos += round(phd_sin(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+	item->pos.zPos += round(phd_cos(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+}
+
 int FindGridShift(int x, int z)
 {
 	if ((x / SECTOR(1)) == (z / SECTOR(1)))
