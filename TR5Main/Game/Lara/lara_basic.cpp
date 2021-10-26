@@ -1664,61 +1664,54 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 			int edge;
 			int edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 
-			if (edgeCatch)
+			if ((TestLaraHangOnClimbWall(item, coll) && edgeCatch) || 
+				(TestValidLedge(item, coll, true) && edgeCatch > 0))
 			{
-				if (edgeCatch >= 0 || TestLaraHangOnClimbWall(item, coll))
+				short angle = item->pos.yRot;
+
+				if (TestHangSwingIn(item, angle))
 				{
-					short angle = item->pos.yRot;
-
-					if (TestValidLedge(item, coll, true))
+					item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->goalAnimState = LS_MONKEYSWING_IDLE;
+					item->currentAnimState = LS_MONKEYSWING_IDLE;
+				}
+				else
+				{
+					if (TestHangFeet(item, angle))
 					{
-						BOUNDING_BOX* bounds;
-
-						if (TestHangSwingIn(item, angle))
-						{
-							item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-							item->goalAnimState = LS_MONKEYSWING_IDLE;
-							item->currentAnimState = LS_MONKEYSWING_IDLE;
-						}
-						else
-						{
-							if (TestHangFeet(item, angle))
-							{
-								item->animNumber = LA_REACH_TO_HANG;
-								item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
-								item->currentAnimState = LS_HANG;
-								item->goalAnimState = LS_HANG_FEET;
-							}
-							else
-							{
-								item->animNumber = LA_REACH_TO_HANG;
-								item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
-								item->currentAnimState = LS_HANG;
-								item->goalAnimState = LS_HANG;
-							}
-						}
-
-						bounds = GetBoundsAccurate(item);
-
-						if (edgeCatch <= 0)
-							item->pos.yPos = edge - bounds->Y1 + 4;
-						else
-							item->pos.yPos += coll->Front.Floor - bounds->Y1;
-
-						SnapItemToLedge(item, coll);
-
-						item->gravityStatus = false;
-						item->speed = 0;
-						item->fallspeed = 0;
-
-						Lara.gunStatus = LG_HANDS_BUSY;
-						Lara.torsoYrot = 0;
-						Lara.torsoXrot = 0;
-
-						return;
+						item->animNumber = LA_REACH_TO_HANG;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
+						item->currentAnimState = LS_HANG;
+						item->goalAnimState = LS_HANG_FEET;
+					}
+					else
+					{
+						item->animNumber = LA_REACH_TO_HANG;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
+						item->currentAnimState = LS_HANG;
+						item->goalAnimState = LS_HANG;
 					}
 				}
+
+				auto bounds = GetBoundsAccurate(item);
+
+				if (edgeCatch <= 0)
+					item->pos.yPos = edge - bounds->Y1 + 4;
+				else
+					item->pos.yPos += coll->Front.Floor - bounds->Y1;
+
+				SnapItemToLedge(item, coll);
+
+				item->gravityStatus = false;
+				item->speed = 0;
+				item->fallspeed = 0;
+
+				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+
+				return;
 			}
 		}
 	}
