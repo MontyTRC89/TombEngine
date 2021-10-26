@@ -534,18 +534,15 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
+CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
 {
-	// Define test angles, depending on the movement direction
-	auto testDegree = left ? -90.0f : 90.0f;
-
 	// Lara isn't in stop state yet, bypass test
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
-		return 0;
+		return CORNER_RESULT::NONE;
 
 	// Static is in the way, bypass test
 	if (coll->HitStatic)
-		return 0;
+		return CORNER_RESULT::NONE;
 
 	// INNER CORNER TESTS
 
@@ -557,12 +554,12 @@ int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 	auto quadrant = GetQuadrant(item->pos.yRot);
 
 	// Virtually rotate Lara 90 degrees to the right and snap to nearest ledge, if any.
-	item->pos.yRot += ANGLE(testDegree);
+	item->pos.yRot += ANGLE(testAngle);
 	SnapItemToLedge(item, coll, item->pos.yRot);
 
 	// Push Lara further to the right to avoid false floor hits on the left side
-	auto c = phd_cos(item->pos.yRot + ANGLE(testDegree));
-	auto s = phd_sin(item->pos.yRot + ANGLE(testDegree));
+	auto c = phd_cos(item->pos.yRot + ANGLE(testAngle));
+	auto s = phd_sin(item->pos.yRot + ANGLE(testAngle));
 	item->pos.xPos += s * coll->Setup.Radius / 2;
 	item->pos.zPos += c * coll->Setup.Radius / 2;
 
@@ -570,7 +567,7 @@ int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 	Lara.cornerX = item->pos.xPos;
 	Lara.cornerZ = item->pos.zPos;
 
-	auto result = -TestLaraValidHangPos(item, coll);
+	auto result = TestLaraValidHangPos(item, coll);
 
 	// Restore original item positions
 	item->pos = oldPos;
@@ -581,34 +578,31 @@ int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 		if (Lara.climbStatus)
 		{
 			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & LeftClimbTab[quadrant])
-				return result;
+				return CORNER_RESULT::INNER;
 		}
 		else
 		{
 			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
-				return result;
+				return CORNER_RESULT::INNER;
 		}
 	}
 
 	// OUTER CORNER TESTS
 
 	// Test if there's a material obstacles blocking outer corner pathway
-	auto floorFront = LaraFloorFront(item, item->pos.yRot + ANGLE(testDegree), coll->Setup.Radius + STEP_SIZE);
-	if (floorFront < 0)
-		return 0;
+	if (LaraFloorFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE) < 0)
+		return CORNER_RESULT::NONE;
+	if (LaraCeilingFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height) > 0)
+		return CORNER_RESULT::NONE;
 
-	auto ceilingFront = LaraCeilingFront(item, item->pos.yRot + ANGLE(testDegree), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height);
-	if (ceilingFront > 0)
-		return 0;
-
-	// Push Lara diagonally to other side of corner at distance of 1/3 wall size
-	c = phd_cos(item->pos.yRot + ANGLE(testDegree / 2));
-	s = phd_sin(item->pos.yRot + ANGLE(testDegree / 2));
+	// Push Lara diagonally to other side of corner at distance of 1/2 wall size
+	c = phd_cos(item->pos.yRot + ANGLE(testAngle / 2));
+	s = phd_sin(item->pos.yRot + ANGLE(testAngle / 2));
 	item->pos.xPos += s * WALL_SIZE / 3;
 	item->pos.zPos += c * WALL_SIZE / 3;
 
 	// Virtually rotate Lara 90 degrees to the left and snap to nearest ledge, if any.
-	item->pos.yRot -= ANGLE(testDegree);
+	item->pos.yRot -= ANGLE(testAngle);
 	Lara.moveAngle = item->pos.yRot;
 	SnapItemToLedge(item, coll, item->pos.yRot);
 
@@ -621,37 +615,38 @@ int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 	// Restore original item positions
 	item->pos = oldPos;
 	Lara.moveAngle = oldPos.yRot;
+	return CORNER_RESULT::NONE;
 
 	// If no valid hang position was found, end further testing and exit
 	if (!result)
-		return 0;
+		return CORNER_RESULT::NONE;
 
 	if (Lara.climbStatus)
 	{
 		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & RightClimbTab[quadrant])
-			return result;
+			return CORNER_RESULT::OUTER;
 
 		short front = LaraFloorFront(item, item->pos.yRot, coll->Setup.Radius);
 		if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
-			return 0;
+			return CORNER_RESULT::NONE;
 
 		if (front < -(STEP_SIZE * 3))
-			return 0;
+			return CORNER_RESULT::NONE;
 
-		return result;
+		return CORNER_RESULT::OUTER;
 	}
 	else
 	{
 		if (abs(oldFrontFloor - coll->Front.Floor) > SLOPE_DIFFERENCE)
-			return 0;
+			return CORNER_RESULT::NONE;
 		else
-			return result;
+			return CORNER_RESULT::OUTER;
 	}
 
-	return 0; // Paranoid
+	return CORNER_RESULT::NONE; // Paranoid
 }
 
-int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
@@ -661,7 +656,7 @@ int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 
 	// If difference is above 1/2 click, return false (ledge is out of reach).
 	if (abs(frontFloor - laraUpperBound) > STEP_SIZE / 2)
-		return 0;
+ 		return false;
 
 	// Embed Lara into wall to make collision test succeed
 	item->pos.xPos += phd_sin(item->pos.yRot) * 8;
@@ -679,7 +674,7 @@ int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Filter out narrow ceiling spaces, no collision cases and statics in front.
 	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CT_FRONT || coll->HitStatic)
-		return 0;
+		return false;
 
 	// Finally, do ordinary ledge checks (slope difference etc.)
 	return TestValidLedge(item, coll);
