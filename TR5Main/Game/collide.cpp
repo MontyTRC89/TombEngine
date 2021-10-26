@@ -2596,7 +2596,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
-	auto frontalOffset = coll->Setup.Radius * 0.1f;
+	auto frontalOffset = coll->Setup.Radius * 0.3f;
 	auto x = item->pos.xPos + frontalOffset * s;
 	auto z = item->pos.zPos + frontalOffset * c;
 
@@ -2652,18 +2652,19 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			// Debug probe point
 			// g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-			// Determine bridge probe offset.
-			auto bridgeProbeOffset = coll->Setup.Radius * 1.5f;
-			auto bpX = eX + bridgeProbeOffset * s;
-			auto bpZ = eZ + bridgeProbeOffset * c;
+			// Determine front floor probe offset.
+			// It is needed to identify if there is bridge or ceiling split in front.
+			auto frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
+			auto ffpX = eX + frontFloorProbeOffset * s;
+			auto ffpZ = eZ + frontFloorProbeOffset * c;
 
-			// Get bridge block
-			auto room = GetRoom(item->location, bpX, y, bpZ).roomNumber;
-			auto block = GetCollisionResult(bpX, y, bpZ, room).Block;
+			// Get front floor block
+			auto room = GetRoom(item->location, ffpX, y, ffpZ).roomNumber;
+			auto block = GetCollisionResult(ffpX, y, ffpZ, room).Block;
 
-			// Get bridge surface heights
-			auto floorHeight = block->BridgeFloorHeight(bpX, bpZ, y); // HACK? FloorHeight never returns real bridge height!
-			auto ceilingHeight = block->CeilingHeight(bpX, bpZ, y);
+			// Get front floor surface heights
+			auto floorHeight = block->BridgeFloorHeight(ffpX, ffpZ, y); // HACK? FloorHeight never returns real bridge height!
+			auto ceilingHeight = block->CeilingHeight(ffpX, ffpZ, y);
 
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
@@ -2671,11 +2672,11 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(bpX, bpZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+			auto bridge = block->InsideBridge(ffpX, ffpZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
 
 			// Determine floor probe offset.
-			// This must be in front of own coll radius so no bridge misfires occur.
-			auto floorProbeOffset = coll->Setup.Radius * (bridge >= 0 ? 1.5f : -0.1f);
+			// This must be slightly in front of own coll radius so no bridge misfires occur.
+			auto floorProbeOffset = coll->Setup.Radius * 0.3f;
 			auto fpX = eX + floorProbeOffset * s;
 			auto fpZ = eZ + floorProbeOffset * c;
 
@@ -2685,15 +2686,6 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			// Get true room number and block, based on current Y position
 			room = GetRoom(item->location, fpX, y, fpZ).roomNumber;
 			block = GetCollisionResult(fpX, y, fpZ, room).Block;
-
-			// Get native surface heights
-			floorHeight = block->FloorHeight(fpX, fpZ, y);
-			ceilingHeight = block->CeilingHeight(fpX, fpZ, y);
-
-			// If ceiling height tests lower than Y value, it means ceiling
-			// ledge is in front and we should use it instead of floor.
-			useCeilingLedge = ceilingHeight > y;
-			height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here
 			auto fY = height - 1;
@@ -2707,7 +2699,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			// Debug ray direction
 			// g_Renderer.addLine3D(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
-			// Keep origin ray
+			// Keep origin ray to calculate true centerpoint distance to ledge later
 			if (p == 0)
 				originRay = Ray(Vector3(eX, cY, eZ), direction);
 
