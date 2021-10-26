@@ -1347,7 +1347,7 @@ void old_lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_fastback()
 void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.SlopesAreWalls = false;
