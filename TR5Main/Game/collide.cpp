@@ -2683,7 +2683,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			// Debug probe point
 			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-			// Get true room number and block, based on current Y position
+			// Get true room number and block, based on derived height
 			room = GetRoom(item->location, fpX, height, fpZ).roomNumber;
 			block = GetCollisionResult(fpX, height, fpZ, room).Block;
 
