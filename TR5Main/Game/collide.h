@@ -42,6 +42,13 @@ enum SPLAT_COLL
 	SPLAT_STEP
 };
 
+enum class CORNER_RESULT
+{
+	NONE,
+	INNER,
+	OUTER
+};
+
 struct COLL_POSITION
 {
 	int Floor;
