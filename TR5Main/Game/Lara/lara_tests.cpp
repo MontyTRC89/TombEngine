@@ -207,6 +207,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_LADDER_IDLE;
 					item->currentAnimState = LS_STOP;
 					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.turnRate = 0;
 
 					AnimateLara(item);
 					ShiftItem(item, coll);
@@ -223,6 +224,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_STOP;
 		Lara.calcFallSpeed = -116;
+		Lara.turnRate = 0;
 
 		AnimateLara(item);
 		ShiftItem(item, coll);
