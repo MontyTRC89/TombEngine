@@ -597,6 +597,9 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 
 void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 {
+	if (!x && !y)
+		return;
+
 	auto s = phd_sin(angle);
 	auto c = phd_cos(angle);
 

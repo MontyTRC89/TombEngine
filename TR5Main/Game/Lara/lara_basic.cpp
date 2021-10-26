@@ -1006,6 +1006,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.ropePtr == -1)
 		item->gravityStatus = true;
 
+	// Extend collision radius by fixed multiplier to avoid tunneling on high velocities.
+	constexpr auto collRadiusMult = 0.2f;
+
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -1013,7 +1016,8 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FORWARD;
+	coll->Setup.Radius += coll->Setup.Radius * collRadiusMult;
+	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
 
 	GetCollisionInfo(coll, item);
 
@@ -1129,13 +1133,13 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (edgeCatch <= 0)
 		{
-			item->pos.yPos = edge - bounds->Y1 - 22;
+			item->pos.yPos = edge - bounds->Y1 - 20;
 			item->pos.yRot = coll->NearestLedgeAngle;
 		}
 		else
 		{
-			item->pos.yPos += coll->Front.Floor - bounds->Y1;
-			SnapItemToLedge(item, coll);
+			item->pos.yPos += coll->Front.Floor - bounds->Y1 - 20;
+			SnapItemToLedge(item, coll, collRadiusMult);
 		}
 
 		item->gravityStatus = true;
