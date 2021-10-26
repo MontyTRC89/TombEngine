@@ -2839,7 +2839,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				float dist2 = FLT_MAX;
 				auto r1 = originRay.Intersects(closestPlane[p], dist1);
 				auto r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
-				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : dist1;
+				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : (r1 ? dist1 : dist2);
 
 				finalResult[h] = result[p];
 				break;
