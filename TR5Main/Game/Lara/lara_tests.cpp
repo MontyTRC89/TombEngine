@@ -638,20 +638,9 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		auto angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
 		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
 		{
-			short front = LaraFloorFront(item, item->pos.yRot, coll->Setup.Radius);
-
 			// Restore original item positions
 			item->pos = oldPos;
 			Lara.moveAngle = oldPos.yRot;
-
-			if (front != NO_HEIGHT && coll->Front.Floor != NO_HEIGHT)
-			{
-				if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
-					return CORNER_RESULT::NONE;
-
-				if (front < -(STEP_SIZE * 3))
-					return CORNER_RESULT::NONE;
-			}
 
 			return CORNER_RESULT::OUTER;
 		}
