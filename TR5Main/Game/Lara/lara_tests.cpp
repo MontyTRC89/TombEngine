@@ -178,7 +178,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_STOP;
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
-			pushOffset = 0.2f;
+			pushOffset = item->speed ? 0.5f : 0.15f; // While on the run, Lara tends to embed less
 			AnimateLara(item);
 		}
 		else
