@@ -51,7 +51,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_LEFT;
 				return;
 			}
-			flag = TestLaraHangLeftCorner(item, coll);
+			flag = TestLaraHangCorner(item, coll, true);
 			if (flag != 0)
 			{
 				if (flag <= 0)
@@ -69,7 +69,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_RIGHT;
 				return;
 			}
-			flag = TestLaraHangRightCorner(item, coll);
+			flag = TestLaraHangCorner(item, coll, false);
 			if (flag != 0)
 			{
 				if (flag <= 0)
@@ -322,7 +322,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_FEET_LEFT;
 				return;
 			}
-			flag = TestLaraHangLeftCorner(item, coll);
+			flag = TestLaraHangCorner(item, coll, true);
 			if (flag != 0)
 			{
 				if (flag <= 0)
@@ -340,7 +340,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_FEET_RIGHT;
 				return;
 			}
-			flag = TestLaraHangRightCorner(item, coll);
+			flag = TestLaraHangCorner(item, coll, false);
 			if (flag != 0)
 			{
 				if (flag <= 0)

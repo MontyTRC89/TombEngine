@@ -534,353 +534,150 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-int TestLaraHangLeftCorner(ITEM_INFO* item, COLL_INFO* coll)
+int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 {
+	// Define test angles, depending on the movement direction
+	auto testDegree = left ? -90.0f : 90.0f;
+
+	// Lara isn't in stop state yet, bypass test
 	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
 
+	// Static is in the way, bypass test
 	if (coll->HitStatic)
 		return 0;
 
-	int x;
-	int z;
+	// INNER CORNER TESTS
 
-	int oldXpos = item->pos.xPos;
-	int oldZpos = item->pos.zPos;
-	short oldYrot = item->pos.yRot;
+	// Backup old Lara position and frontal collision
+	auto oldPos = item->pos;
 	int oldFrontFloor = coll->Front.Floor;
 
-	short angle = GetQuadrant(item->pos.yRot);
-	if (angle != NORTH && angle != SOUTH)
-	{
-		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-	}
-	else
-	{
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + SECTOR(1);
-	}
+	// Quadrant is only used for ladder checks
+	auto quadrant = GetQuadrant(item->pos.yRot);
 
-	item->pos.xPos = x;
-	Lara.cornerX = x;
-	item->pos.zPos = z;
-	Lara.cornerZ = z;
-	item->pos.yRot -= ANGLE(90.0f);
+	// Virtually rotate Lara 90 degrees to the right and snap to nearest ledge, if any.
+	item->pos.yRot += ANGLE(testDegree);
+	SnapItemToLedge(item, coll, item->pos.yRot);
+
+	// Push Lara further to the right to avoid false floor hits on the left side
+	auto c = phd_cos(item->pos.yRot + ANGLE(testDegree));
+	auto s = phd_sin(item->pos.yRot + ANGLE(testDegree));
+	item->pos.xPos += s * coll->Setup.Radius / 2;
+	item->pos.zPos += c * coll->Setup.Radius / 2;
+
+	// FIXME? Those hacky fields are still used somewhere to align her...
+	Lara.cornerX = item->pos.xPos;
+	Lara.cornerZ = item->pos.zPos;
 
 	auto result = -TestLaraValidHangPos(item, coll);
+
+	// Restore original item positions
+	item->pos = oldPos;
+	Lara.moveAngle = oldPos.yRot;
+
 	if (result)
 	{
 		if (Lara.climbStatus)
 		{
-			if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
-			{
-				item->pos.xPos = oldXpos;
-				item->pos.zPos = oldZpos;
-				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & LeftClimbTab[quadrant])
 				return result;
-			}
 		}
 		else
 		{
-			if (abs(oldFrontFloor - coll->Front.Floor) <= 60)
-			{
-				item->pos.xPos = oldXpos;
-				item->pos.zPos = oldZpos;
-				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
 				return result;
-			}
 		}
 	}
 
-	item->pos.xPos = oldXpos;
-	item->pos.zPos = oldZpos;
-	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
+	// OUTER CORNER TESTS
 
-	if (LaraFloorFront(item, oldYrot - ANGLE(90.0f), 116) < 0)
+	// Test if there's a material obstacle blocking outer corner pathway
+	if (LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), coll->Setup.Radius) < 0)
 		return 0;
 
-	switch (angle)
-	{
-	case NORTH:
-		x = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ item->pos.xPos - SECTOR(1);
-		z = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ item->pos.zPos + SECTOR(1);
-		break;
+	// Push Lara diagonally to other side of corner at distance of 1/3 wall size
+	c = phd_cos(item->pos.yRot + ANGLE(testDegree / 2));
+	s = phd_sin(item->pos.yRot + ANGLE(testDegree / 2));
+	item->pos.xPos += s * WALL_SIZE / 3;
+	item->pos.zPos += c * WALL_SIZE / 3;
 
-	case SOUTH:
-		x = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ (item->pos.xPos + SECTOR(1));
-		z = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ (item->pos.zPos - SECTOR(1));
-		break;
+	// Virtually rotate Lara 90 degrees to the left and snap to nearest ledge, if any.
+	item->pos.yRot -= ANGLE(testDegree);
+	Lara.moveAngle = item->pos.yRot;
+	SnapItemToLedge(item, coll, item->pos.yRot);
 
-	case WEST:
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF);
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF);
-		break;
-
-	default:
-		x = ((item->pos.xPos + SECTOR(1)) & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
-		z = ((item->pos.zPos + SECTOR(1)) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + SECTOR(1);
-		break;
-
-	}
-
-	item->pos.xPos = x;
-	Lara.cornerX = x;
-	item->pos.zPos = z;
-	Lara.cornerZ = z;
-	item->pos.yRot += ANGLE(90.0f);
+	// FIXME? Those hacky fields are still used somewhere to align her...
+	Lara.cornerX = item->pos.xPos;
+	Lara.cornerZ = item->pos.zPos;
 
 	result = TestLaraValidHangPos(item, coll);
+
+	// Restore original item positions
+	item->pos = oldPos;
+	Lara.moveAngle = oldPos.yRot;
+
+	// If no valid hang position was found, end further testing and exit
 	if (!result)
-	{
-		item->pos.xPos = oldXpos;
-		item->pos.zPos = oldZpos;
-		item->pos.yRot = oldYrot;
-		Lara.moveAngle = oldYrot;
-		return result;
-	}
+		return 0;
 
-	item->pos.xPos = oldXpos;
-	item->pos.zPos = oldZpos;
-	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
-
-	if (!Lara.climbStatus)
+	if (Lara.climbStatus)
 	{
-		if (abs(oldFrontFloor - coll->Front.Floor) <= 60)
-		{
-			switch (angle)
-			{
-			case NORTH:
-				if ((oldXpos & 0x3FF) > 512)
-					result = 0;
-				break;
-			case EAST:
-				if ((oldZpos & 0x3FF) < 512)
-					result = 0;
-				break;
-			case SOUTH:
-				if ((oldXpos & 0x3FF) < 512)
-					result = 0;
-				break;
-			case WEST:
-				if ((oldZpos & 0x3FF) > 512)
-					result = 0;
-				break;
-			}
+		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & RightClimbTab[quadrant])
 			return result;
-		}
-		return 0;
-	}
 
-	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
+		short front = LaraFloorFront(item, item->pos.yRot, coll->Setup.Radius);
+		if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
+			return 0;
+
+		if (front < -(STEP_SIZE * 3))
+			return 0;
+
 		return result;
-
-	short front = LaraFloorFront(item, item->pos.yRot, 116);
-	if (abs(front - coll->Front.Floor) > 60)
-		return 0;
-
-	if (front < -768)
-		return 0;
-
-	return result;
-}
-
-int TestLaraHangRightCorner(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
-		return 0;
-
-	if (coll->HitStatic)
-		return 0;
-
-	int x;
-	int z;
-
-	int oldXpos = item->pos.xPos;
-	int oldZpos = item->pos.zPos;
-	short oldYrot = item->pos.yRot;
-	int oldFrontFloor = coll->Front.Floor;
-
-	short angle = GetQuadrant(item->pos.yRot);
-	if (angle != NORTH && angle != SOUTH)
-	{
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + SECTOR(1);
 	}
 	else
 	{
-		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-	}
-
-	item->pos.xPos = x;
-	Lara.cornerX = x;
-	item->pos.zPos = z;
-	Lara.cornerZ = z;
-	item->pos.yRot += ANGLE(90.0f);
-
-	auto result = -TestLaraValidHangPos(item, coll);
-	if (result)
-	{
-		if (Lara.climbStatus)
-		{
-			if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & LeftClimbTab[angle])
-			{
-				item->pos.xPos = oldXpos;
-				item->pos.zPos = oldZpos;
-				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
-				return result;
-			}
-		}
+		if (abs(oldFrontFloor - coll->Front.Floor) > SLOPE_DIFFERENCE)
+			return 0;
 		else
-		{
-			if (abs(oldFrontFloor - coll->Front.Floor) <= 60)
-			{
-				item->pos.xPos = oldXpos;
-				item->pos.zPos = oldZpos;
-				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
-				return result;
-			}
-		}
-	}
-
-	item->pos.xPos = oldXpos;
-	item->pos.zPos = oldZpos;
-	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
-
-	if (LaraFloorFront(item, oldYrot + ANGLE(90.0f), 116) < 0)
-		return 0;
-
-	switch (angle)
-	{
-	case NORTH:
-		x = ((item->pos.xPos + SECTOR(1)) & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
-		z = ((item->pos.zPos + SECTOR(1)) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + SECTOR(1);
-		break;
-
-	case SOUTH:
-		x = ((item->pos.xPos - SECTOR(1)) & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
-		z = ((item->pos.zPos - SECTOR(1)) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + SECTOR(1);
-		break;
-
-	case WEST:
-		x = (item->pos.xPos ^ item->pos.zPos) & 0x3FF ^ (item->pos.xPos - SECTOR(1));
-		z = (item->pos.xPos ^ item->pos.zPos) & 0x3FF ^ (item->pos.zPos + SECTOR(1));
-		break;
-
-	default:
-		x = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ (item->pos.xPos + SECTOR(1));
-		z = ((item->pos.xPos ^ item->pos.zPos) & 0x3FF) ^ (item->pos.zPos - SECTOR(1));
-		break;
-
-	}
-
-	item->pos.xPos = x;
-	Lara.cornerX = x;
-	item->pos.zPos = z;
-	Lara.cornerZ = z;
-	item->pos.yRot -= ANGLE(90.0f);
-
-	result = TestLaraValidHangPos(item, coll);
-	if (!result)
-	{
-		item->pos.xPos = oldXpos;
-		item->pos.zPos = oldZpos;
-		item->pos.yRot = oldYrot;
-		Lara.moveAngle = oldYrot;
-		return result;
-	}
-
-	item->pos.xPos = oldXpos;
-	item->pos.zPos = oldZpos;
-	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
-
-	if (!Lara.climbStatus)
-	{
-		if (abs(oldFrontFloor - coll->Front.Floor) <= 60)
-		{
-			switch (angle)
-			{
-			case NORTH:
-				if ((oldXpos & 0x3FF) < 512)
-					result = 0;
-				break;
-			case EAST:
-				if ((oldZpos & 0x3FF) > 512)
-					result = 0;
-				break;
-			case SOUTH:
-				if ((oldXpos & 0x3FF) > 512)
-					result = 0;
-				break;
-			case WEST:
-				if ((oldZpos & 0x3FF) < 512)
-					result = 0;
-				break;
-			}
 			return result;
-		}
-		return false;
 	}
 
-	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & RightClimbTab[angle])
-		return result;
-
-	short front = LaraFloorFront(item, item->pos.yRot, 116);
-	if (abs(front - coll->Front.Floor) > 60)
-		return 0;
-
-	if (front < -768)
-		return 0;
-
-	return result;
+	return 0; // Paranoid
 }
 
 int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
+	// Get incoming ledge height and own Lara's upper bound.
+	// First one will be negative while first one is positive.
+	// Difference between two indicates difference in height between ledges.
+	auto frontFloor = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius + STEP_SIZE / 2);
+	auto laraUpperBound = item->pos.yPos - coll->Setup.Height;
+
+	// If difference is above 1/2 click, return false (ledge is out of reach).
+	if (abs(frontFloor + laraUpperBound) > STEP_SIZE / 2)
 		return 0;
 
-	short angle = GetQuadrant(item->pos.yRot);
-	switch (angle)
-	{
-	case NORTH:
-		item->pos.zPos += 4;
-		break;
-	case EAST:
-		item->pos.xPos += 4;
-		break;
-	case SOUTH:
-		item->pos.zPos -= 4;
-		break;
-	case WEST:
-		item->pos.xPos -= 4;
-		break;
-	default:
-		break;
-	}
+	// Embed Lara into wall to make collision test succeed
+	item->pos.xPos += phd_sin(item->pos.yRot) * 8;
+	item->pos.zPos += phd_cos(item->pos.yRot) * 8;
 
+	// Setup new GCI call
+	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -512;
 	coll->Setup.BadCeilingHeight = 0;
-
-	Lara.moveAngle = item->pos.yRot;
-
+	coll->Setup.Mode == COLL_PROBE_MODE::CP_FREE_FLAT;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
+
 	GetCollisionInfo(coll, item);
 
+	// Filter out narrow ceiling spaces, no collision cases and statics in front.
 	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CT_FRONT || coll->HitStatic)
 		return 0;
 
-	return abs(coll->Front.Floor - coll->FrontRight.Floor) < 60;
+	// Finally, do ordinary ledge checks (slope difference etc.)
+	return TestValidLedge(item, coll);
 }
 
 bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
