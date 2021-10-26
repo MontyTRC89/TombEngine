@@ -60,7 +60,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	if (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) > LARA_GRAB_THRESHOLD)
+	if (!TestValidLedgeAngle(coll))
 		return false; 
 	
 	if (!ignoreHeadroom)
@@ -71,6 +71,11 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 	}
 	
 	return (coll->CollisionType == CT_FRONT);
+}
+
+bool TestValidLedgeAngle(COLL_INFO* coll)
+{
+	return (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
@@ -88,6 +93,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedge(item, coll))
 	{
+		bool success = false;
+
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
 			if (Lara.NewAnims.CrawlVault1click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
@@ -98,6 +105,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + 256;
 				Lara.gunStatus = LG_HANDS_BUSY;
+				success = true;
 			}
 		}
 		else if (coll->Front.Floor >= -640 && coll->Front.Floor <= -384)
@@ -118,6 +126,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->Front.Floor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				pushOffset = 0.7f;
+				success = true;
 			}
 			else if (Lara.NewAnims.CrawlVault2click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
@@ -127,10 +136,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else
-			{
-				return false;
+				success = true;
 			}
 		}
 		else if (coll->Front.Floor >= -896 && coll->Front.Floor <= -640)
@@ -151,6 +157,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos += coll->Front.Floor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				pushOffset = 0.7f;
+				success = true;
 			}
 			else if (Lara.NewAnims.CrawlVault3click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
@@ -160,10 +167,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else
-			{
-				return false;
+				success = true;
 			}
 		}
 		else if (coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
@@ -178,36 +182,36 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_STOP;
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
-			pushOffset = item->speed ? 0.5f : 0.15f; // While on the run, Lara tends to embed less
 			AnimateLara(item);
+			pushOffset = item->speed ? 0.5f : 0.15f; // While on the run, Lara tends to embed less
+			success = true;
 		}
-		else
+
+		if (success)
 		{
-			return false;
+			ShiftItem(item, coll);
+			SnapItemToLedge(item, coll, pushOffset);
 		}
-
-		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll, pushOffset);
-
-		return true;
 	}
-	else if (Lara.climbStatus)
+
+	if (TestValidLedgeAngle(coll) && Lara.climbStatus)
 	{
 		if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
 		{
 			if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
 			{
-				ShiftItem(item, coll);
-
 				if (TestLaraClimbStance(item, coll))
 				{
 					item->animNumber = LA_STAND_SOLID;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = LS_LADDER_IDLE;
 					item->currentAnimState = LS_STOP;
-					AnimateLara(item);
-					item->pos.yRot = coll->NearestLedgeAngle;
 					Lara.gunStatus = LG_HANDS_BUSY;
+
+					AnimateLara(item);
+					ShiftItem(item, coll);
+					SnapItemToLedge(item, coll, 0.1f);
+
 					return true;
 				}
 			}
@@ -219,14 +223,15 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_STOP;
 		Lara.calcFallSpeed = -116;
-		AnimateLara(item);
 
+		AnimateLara(item);
 		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll, 0.3f);
+		SnapItemToLedge(item, coll, 0.1f);
 
 		return true;
 	}
-	else if (Lara.NewAnims.MonkeyVault && Lara.canMonkeySwing)
+
+	if (Lara.canMonkeySwing && Lara.NewAnims.MonkeyVault)
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
@@ -239,6 +244,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_TEST_1;
+
 		return true;
 	}
 
