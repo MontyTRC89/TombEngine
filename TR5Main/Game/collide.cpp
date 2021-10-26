@@ -2684,8 +2684,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 			// Get true room number and block, based on current Y position
-			room = GetRoom(item->location, fpX, y, fpZ).roomNumber;
-			block = GetCollisionResult(fpX, y, fpZ, room).Block;
+			room = GetRoom(item->location, fpX, height, fpZ).roomNumber;
+			block = GetCollisionResult(fpX, height, fpZ, room).Block;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here
 			auto fY = height - 1;
