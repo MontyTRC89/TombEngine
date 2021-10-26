@@ -592,8 +592,13 @@ int TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, bool left)
 
 	// OUTER CORNER TESTS
 
-	// Test if there's a material obstacle blocking outer corner pathway
-	if (LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), coll->Setup.Radius) < 0)
+	// Test if there's a material obstacles blocking outer corner pathway
+	auto floorFront = LaraFloorFront(item, item->pos.yRot + ANGLE(testDegree), coll->Setup.Radius + STEP_SIZE);
+	if (floorFront < 0)
+		return 0;
+
+	auto ceilingFront = LaraCeilingFront(item, item->pos.yRot + ANGLE(testDegree), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height);
+	if (ceilingFront > 0)
 		return 0;
 
 	// Push Lara diagonally to other side of corner at distance of 1/3 wall size
@@ -651,11 +656,11 @@ int TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
 	// Difference between two indicates difference in height between ledges.
-	auto frontFloor = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius + STEP_SIZE / 2);
+	auto frontFloor = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius + STEP_SIZE / 2) + item->pos.yPos;
 	auto laraUpperBound = item->pos.yPos - coll->Setup.Height;
 
 	// If difference is above 1/2 click, return false (ledge is out of reach).
-	if (abs(frontFloor + laraUpperBound) > STEP_SIZE / 2)
+	if (abs(frontFloor - laraUpperBound) > STEP_SIZE / 2)
 		return 0;
 
 	// Embed Lara into wall to make collision test succeed
