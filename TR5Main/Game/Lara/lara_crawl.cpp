@@ -1225,7 +1225,6 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, true);
 
-	// TODO: Generic deflect.
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
 		item->currentAnimState = LS_CRAWL_IDLE;
