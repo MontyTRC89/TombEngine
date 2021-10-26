@@ -615,7 +615,6 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	// Restore original item positions
 	item->pos = oldPos;
 	Lara.moveAngle = oldPos.yRot;
-	return CORNER_RESULT::NONE;
 
 	// If no valid hang position was found, end further testing and exit
 	if (!result)
