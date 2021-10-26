@@ -891,7 +891,8 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_BACK)
+	if (TrInput & IN_BACK &&
+		TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
 
@@ -1585,8 +1586,8 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK &&
+		TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
 
@@ -1854,8 +1855,8 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	if (TrInput & IN_BACK)
+	else if (TrInput & IN_BACK &&
+		TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
 
@@ -3898,14 +3899,11 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
-		return;
-
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->pos.zRot = 0;
 
-		if (!coll->Front.Slope && coll->Front.Floor < -(STEP_SIZE * 2 + STEP_SIZE / 2) &&
+		if (!coll->Front.Slope && coll->Front.Floor < -(STEPUP_HEIGHT) &&
 			!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
 		{
 			item->goalAnimState = LS_SPLAT;
@@ -3915,6 +3913,9 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 		LaraCollideStop(item, coll);
 	}
+
+	if (TestLaraVault(item, coll))
+		return;
 
 	if (TestLaraStep(coll)
 		&& !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
