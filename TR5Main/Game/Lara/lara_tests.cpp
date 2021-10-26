@@ -84,6 +84,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.NewAnims.CrawlVault3click = 1;
 	Lara.NewAnims.MonkeyVault = 1;
 
+	float pushOffset = 0.5f;
+
 	if (TestValidLedge(item, coll))
 	{
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
@@ -115,6 +117,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_STOP;
 				item->pos.yPos += coll->Front.Floor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
+				pushOffset = 0.7f;
 			}
 			else if (Lara.NewAnims.CrawlVault2click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
@@ -147,6 +150,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_STOP;
 				item->pos.yPos += coll->Front.Floor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
+				pushOffset = 0.7f;
 			}
 			else if (Lara.NewAnims.CrawlVault3click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
@@ -174,6 +178,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_STOP;
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
+			pushOffset = 0.2f;
 			AnimateLara(item);
 		}
 		else
@@ -182,7 +187,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll, 0.7f);
+		SnapItemToLedge(item, coll, pushOffset);
 
 		return true;
 	}
