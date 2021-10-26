@@ -9,15 +9,6 @@
 #include "input.h"
 #include "items.h"
 
-CLIMB_DIRECTION LeftIntRightExtTab[4] =
-{
-	CLIMB_DIRECTION::West, CLIMB_DIRECTION::North, CLIMB_DIRECTION::East, CLIMB_DIRECTION::South
-};
-CLIMB_DIRECTION LeftExtRightIntTab[4] =
-{
-	CLIMB_DIRECTION::East, CLIMB_DIRECTION::South, CLIMB_DIRECTION::West, CLIMB_DIRECTION::North
-};
-
 short GetClimbFlags(int x, int y, int z, short roomNumber)
 {
 	return GetClimbFlags(GetFloor(x, y, z, &roomNumber));
