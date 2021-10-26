@@ -14,16 +14,6 @@
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-static short LeftClimbTab[4] = // offset 0xA0638
-{
-	0x0200, 0x0400, 0x0800, 0x0100
-};
-
-static short RightClimbTab[4] = // offset 0xA0640
-{
-	0x0800, 0x0100, 0x0200, 0x0400
-};
-
 /*this file has all the generic test functions called in lara's state code*/
 
 // Test if a ledge in front of item is valid to climb.
@@ -577,23 +567,34 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 	auto result = TestLaraValidHangPos(item, coll);
 
+	if (result)
+	{
+		if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
+		{
+			// Restore original item positions
+			item->pos = oldPos;
+			Lara.moveAngle = oldPos.yRot;
+
+			return CORNER_RESULT::INNER;
+		}
+	}
+
+	if (Lara.climbStatus)
+	{
+		auto angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
+		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
+		{
+			// Restore original item positions
+			item->pos = oldPos;
+			Lara.moveAngle = oldPos.yRot;
+
+			return CORNER_RESULT::INNER;
+		}
+	}
+
 	// Restore original item positions
 	item->pos = oldPos;
 	Lara.moveAngle = oldPos.yRot;
-
-	if (result)
-	{
-		if (Lara.climbStatus)
-		{
-			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & LeftClimbTab[quadrant])
-				return CORNER_RESULT::INNER;
-		}
-		else
-		{
-			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
-				return CORNER_RESULT::INNER;
-		}
-	}
 
 	// OUTER CORNER TESTS
 
@@ -619,38 +620,45 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	Lara.cornerZ = item->pos.zPos;
 
 	result = TestLaraValidHangPos(item, coll);
+	
+	if (result)
+	{
+		if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
+		{
+			// Restore original item positions
+			item->pos = oldPos;
+			Lara.moveAngle = oldPos.yRot;
+
+			return CORNER_RESULT::OUTER;
+		}
+	}
+	
+	if (Lara.climbStatus)
+	{
+		auto angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
+		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
+		{
+			short front = LaraFloorFront(item, item->pos.yRot, coll->Setup.Radius);
+
+			// Restore original item positions
+			item->pos = oldPos;
+			Lara.moveAngle = oldPos.yRot;
+
+			if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
+				return CORNER_RESULT::NONE;
+
+			if (front < -(STEP_SIZE * 3))
+				return CORNER_RESULT::NONE;
+
+			return CORNER_RESULT::OUTER;
+		}
+	}
 
 	// Restore original item positions
 	item->pos = oldPos;
 	Lara.moveAngle = oldPos.yRot;
 
-	// If no valid hang position was found, end further testing and exit
-	if (!result)
-		return CORNER_RESULT::NONE;
-
-	if (Lara.climbStatus)
-	{
-		if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & RightClimbTab[quadrant])
-			return CORNER_RESULT::OUTER;
-
-		short front = LaraFloorFront(item, item->pos.yRot, coll->Setup.Radius);
-		if (abs(front - coll->Front.Floor) > SLOPE_DIFFERENCE)
-			return CORNER_RESULT::NONE;
-
-		if (front < -(STEP_SIZE * 3))
-			return CORNER_RESULT::NONE;
-
-		return CORNER_RESULT::OUTER;
-	}
-	else
-	{
-		if (abs(oldFrontFloor - coll->Front.Floor) > SLOPE_DIFFERENCE)
-			return CORNER_RESULT::NONE;
-		else
-			return CORNER_RESULT::OUTER;
-	}
-
-	return CORNER_RESULT::NONE; // Paranoid
+	return CORNER_RESULT::NONE;
 }
 
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
