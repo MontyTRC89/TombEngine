@@ -501,7 +501,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 			spark->dShade = 64;
 	}
 
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->x = x + (GetRandomControl() & 31) - 16;
 	spark->y = y + (GetRandomControl() & 31) - 16;
 	spark->z = z + (GetRandomControl() & 31) - 16;
@@ -584,7 +584,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->colFadeSpeed = 4;
 	spark->dShade = (GetRandomControl() & 0x1F) + 64;
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1015,7 +1015,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->fadeToBlack = 8;
 		spark->life = 24;
 		spark->sLife = 24;
-		spark->transType = COLADD;	
+		spark->transType = TransTypeEnum::COLADD;	
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -640 - GetRandomControl();
@@ -1359,7 +1359,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->dR = r;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
@@ -1467,7 +1467,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -1524,7 +1524,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 	spark->fadeToBlack = 64;
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
 	if (unk)
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 	else
 		spark->transType = 3;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
@@ -1594,7 +1594,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 
 	spark->life = (GetRandomControl() & 7) + 24;
 	spark->sLife = (GetRandomControl() & 7) + 24;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->dynamic = -1;
 
 	spark->x = x;
@@ -1644,7 +1644,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->life = 24;
 		sptr->sLife = 24;
 
-		sptr->transType = COLADD;
+		sptr->transType = TransTypeEnum::COLADD;
 
 		angle = GetRandomControl() << 3;
 

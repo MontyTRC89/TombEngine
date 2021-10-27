@@ -8,12 +8,9 @@
 #include "setup.h"
 #include "health.h"
 
-OBJECT_COLLISION_BOUNDS SarcophagusBounds =
-{
-	(short)0xFE00, 512, (short)0xFF9C, 100, (short)0xFE00, 0,
-	(short)0xF8E4, (short)1820, (short)0xEAAC, (short)5460, 0, 0
-};
 static PHD_VECTOR SarcophagusPosition(0, 0, -300);
+OBJECT_COLLISION_BOUNDS SarcophagusBounds =
+{ -512, 512, -100, 100, -512, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
 void InitialiseSarcophagus(short itemNum)
 {

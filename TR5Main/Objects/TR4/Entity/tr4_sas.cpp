@@ -74,8 +74,9 @@ namespace TEN::Entities::TR4
 
 	BITE_INFO sasGun = { 0, 300, 64, 7 };
 
-	OBJECT_COLLISION_BOUNDS SasDragBlokeBounds = { (short)0xFF00, 0x100, (short)0xFF9C, 0x0064, (short)0xFE00, (short)0xFE34, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554, 0x0000, 0x0000 };
 	PHD_VECTOR SasDragBlokePosition = { 0, 0, -460 };
+	OBJECT_COLLISION_BOUNDS SasDragBlokeBounds = 
+	{ -256, 256, -64, 100, -200, -460, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
 	void InitialiseSas(short itemNumber)
 	{

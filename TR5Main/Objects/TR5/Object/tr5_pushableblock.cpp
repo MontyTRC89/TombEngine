@@ -12,13 +12,10 @@
 #include "setup.h"
 #include "tr5_pushableblock_info.h"
 
-static OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
-	0x0000, 0x0000, (short)0xFFC0, 0x0000,
-	0x0000, 0x0000, (short)0xF8E4, 0x071C,
-	(short)0xEAAC, 0x1554, (short)0xF8E4, 0x071C
-};
-
 PHD_VECTOR PushableBlockPos = { 0, 0, 0 };
+static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
+{ 0, 0, -64, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+
 int DoPushPull = 0;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
