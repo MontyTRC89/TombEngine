@@ -200,7 +200,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.turnRate = 0;
 
-					ShiftItem(item, coll);
+					ShiftItem(item, coll); 
+					item->pos.yRot = coll->NearestLedgeAngle; // HACK: we can't use snap until ladder states are refactored, currently they are too fragile.
 					AnimateLara(item);
 
 					return true;
@@ -215,10 +216,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState = LS_STOP;
 		Lara.calcFallSpeed = -116;
 		Lara.turnRate = 0;
-
-		AnimateLara(item);
+		
 		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll, 0.1f);
+		SnapItemToLedge(item, coll, -0.2f); // HACK: push Lara away from the ledge a bit, because ladder states are too fragile.
+		AnimateLara(item);
 
 		return true;
 	}
