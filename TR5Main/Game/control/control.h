@@ -36,8 +36,7 @@ enum HEADINGS
 
 extern int GameTimer;
 extern int RumbleTimer;
-extern int InGameCounter;
-extern short GlobalCounter;
+extern int GlobalCounter;
 extern int Wibble;
 
 extern bool InitialiseGame;
