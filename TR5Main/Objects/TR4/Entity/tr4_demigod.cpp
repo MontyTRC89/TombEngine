@@ -202,7 +202,7 @@ static void DemigodHammerAttack(int x, int y, int z, int something)
 			spark->colFadeSpeed = 4;
 			spark->dShade = (GetRandomControl() & 0x1F) + 96;
 			spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-			spark->transType = COLADD;
+			spark->transType = TransTypeEnum::COLADD;
 			spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;

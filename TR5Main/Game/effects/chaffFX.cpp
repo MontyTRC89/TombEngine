@@ -118,7 +118,7 @@ void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int 
 	sparkle->colFadeSpeed = 3;
 	sparkle->fadeToBlack = 5;
 	sparkle->sLife = sparkle->life = 10;
-	sparkle->transType = COLADD;
+	sparkle->transType = TransTypeEnum::COLADD;
 	sparkle->dynamic = true;
 
 	sparkle->x = pos->x + (GetRandomDraw() & 7) - 3;
