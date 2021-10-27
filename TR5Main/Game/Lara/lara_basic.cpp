@@ -1006,9 +1006,6 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.ropePtr == -1)
 		item->gravityStatus = true;
 
-	// Extend collision radius by fixed multiplier to avoid tunneling on high velocities.
-	constexpr auto collRadiusMult = 0.2f;
-
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -1016,137 +1013,33 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius += coll->Setup.Radius * collRadiusMult;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FORWARD;
+	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	GetCollisionInfo(coll, item);
 
-	short angle;
-	bool result = false;
-	int edge = 0;
-	int edgeCatch = 0;
+	if (TestLaraHangJump(item, coll))
+		return;
 
-	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
+	LaraSlideEdgeJump(item, coll);
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+	GetCollisionInfo(coll, item);
+	ShiftItem(item, coll);
+
+	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
-		if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
+		if (LaraLandedBad(item, coll))
 		{
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
-			Lara.gunStatus = LG_HANDS_BUSY;
-
-			item->animNumber = LA_REACH_TO_MONKEYSWING;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->gravityStatus = false;
-			item->speed = 0;
+			item->goalAnimState = LS_DEATH;
+		}
+		else
+		{
+			item->goalAnimState = LS_STOP;
 			item->fallspeed = 0;
-
-			return;
+			item->gravityStatus = false;
+			if (coll->Middle.Floor != NO_HEIGHT)
+				item->pos.yPos += coll->Middle.Floor;
 		}
-
-		if (coll->Middle.Ceiling <= -384 &&
-			coll->Middle.Floor >= 200 &&
-			coll->CollisionType == CT_FRONT)
-		{
-			edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
-
-			if (!(!edgeCatch || edgeCatch < 0 && !TestLaraHangOnClimbWall(item, coll)))
-			{
-				angle = item->pos.yRot;
-				result = TestValidLedge(item, coll, true);
-			}
-		}
-	}
-
-	if (!result)
-	{
-		LaraSlideEdgeJump(item, coll);
-		coll->Setup.ForwardAngle = Lara.moveAngle;
-		GetCollisionInfo(coll, item);
-		ShiftItem(item, coll);
-
-		if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
-		{
-			if (LaraLandedBad(item, coll))
-			{
-				item->goalAnimState = LS_DEATH;
-			}
-			else
-			{
-				item->goalAnimState = LS_STOP;
-				item->fallspeed = 0;
-				item->gravityStatus = false;
-				if (coll->Middle.Floor != NO_HEIGHT)
-					item->pos.yPos += coll->Middle.Floor;
-			}
-		}
-	}
-	else
-	{
-		if (TestHangSwingIn(item, angle))
-		{
-			if (Lara.NewAnims.OscillateHanging)
-			{
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				item->animNumber = LA_REACH_TO_HANG_OSCILLATE;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
-				item->goalAnimState = LS_HANG;
-			}
-			else
-			{
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				item->animNumber = LA_REACH_TO_MONKEYSWING;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_MONKEYSWING_IDLE;
-				item->goalAnimState = LS_MONKEYSWING_IDLE;
-			}
-		}
-		else
-		{
-			if (TestHangFeet(item, angle))
-			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
-				item->goalAnimState = LS_HANG_FEET;
-			}
-			else
-			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
-				item->goalAnimState = LS_HANG;
-			}
-		}
-
-		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-
-		if (edgeCatch <= 0)
-		{
-			item->pos.yPos = edge - bounds->Y1 - 20;
-			item->pos.yRot = coll->NearestLedgeAngle;
-		}
-		else
-		{
-			item->pos.yPos += coll->Front.Floor - bounds->Y1 - 20;
-			SnapItemToLedge(item, coll, collRadiusMult);
-		}
-
-		item->gravityStatus = true;
-		item->speed = 2;
-		item->fallspeed = 1;
-
-		Lara.gunStatus = LG_HANDS_BUSY;
 	}
 }
 
