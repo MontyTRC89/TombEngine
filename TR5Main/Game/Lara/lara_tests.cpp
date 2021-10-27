@@ -430,7 +430,6 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-	ShiftItem(item, coll);
 	SnapItemToLedge(item, coll);
 
 	item->gravityStatus = false;
