@@ -201,7 +201,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.turnRate = 0;
 
 					ShiftItem(item, coll);
-					SnapItemToLedge(item, coll);
+					SnapItemToGrid(item, coll);
 					AnimateLara(item);
 
 					return true;
@@ -218,7 +218,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate = 0;
 		
 		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll);
+		SnapItemToGrid(item, coll);
 		AnimateLara(item);
 
 		return true;
