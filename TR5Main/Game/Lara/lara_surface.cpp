@@ -9,8 +9,6 @@
 #include "level.h"
 #include "input.h"
 
-bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
-
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
 	if (item->goalAnimState == LS_UNDERWATER_FORWARD)
@@ -271,9 +269,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
-	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-	EnableCrawlFlexWaterPullUp = false;
-	EnableCrawlFlexSubmerged = false;
+	// TODO: Enable with lua!
+	Lara.NewAnims.CrawlFlexWaterPullUp = true;
+	Lara.NewAnims.CrawlFlexSubmerged = true;
 
 	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
@@ -281,22 +279,12 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return 0;
 
-	if (coll->ObjectHeadroom < (EnableCrawlFlexWaterPullUp ? LARA_HEIGHT_CRAWL : LARA_HEIGHT))
-		return 0;
-
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
 	int frontCeiling = coll->Front.Ceiling + LARA_HEIGHT_SURFSWIM;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
-	short rot = item->pos.yRot;
-	int slope = 0;
-
-	if (abs(coll->FrontRight.Floor - coll->FrontLeft.Floor) >= 60)
-		return 0;
-
-	bool result = SnapToQuadrant(rot, 35);
-	if (!result)
+	if (!TestValidLedge(item, coll))
 		return 0;
 
 	auto surface = LaraCollisionAboveFront(item, coll->Setup.ForwardAngle, STEP_SIZE * 2, STEP_SIZE);
@@ -306,7 +294,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexWaterPullUp)
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_1CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -326,7 +314,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexSubmerged)
+			if (Lara.NewAnims.CrawlFlexSubmerged)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_M1CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -344,7 +332,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (EnableCrawlFlexWaterPullUp)
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
 			{
 				item->animNumber = LA_ONWATER_TO_CROUCH_0CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -363,13 +351,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
-	Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
-
-	item->pos.xPos = v.x;
+	item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 1.7f);
 	item->pos.yPos += frontFloor - 5;
-	item->pos.zPos = v.y;
+	item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 1.7f);
 	item->pos.xRot = 0;
-	item->pos.yRot = rot;
+	item->pos.yRot = coll->NearestLedgeAngle;
 	item->pos.zRot = 0;
 	item->currentAnimState = LS_ONWATER_EXIT;
 	item->gravityStatus = false;

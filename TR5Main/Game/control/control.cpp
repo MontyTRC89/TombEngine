@@ -56,6 +56,7 @@ using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
 using namespace TEN::Entities::Switches;
@@ -64,9 +65,7 @@ using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
 
 int GameTimer       = 0;
-int RumbleTimer     = 0;
-int InGameCounter   = 0;
-short GlobalCounter = 0;
+int GlobalCounter   = 0;
 int Wibble          = 0;
 
 bool InitialiseGame;
@@ -419,7 +418,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		TEN::Effects::Drip::UpdateDrips();
+		TEN::Effects::Drip::UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		TEN::Entities::TR4::UpdateScarabs();
@@ -1025,6 +1024,7 @@ void CleanUp()
 
 	// Clear all kinds of particles
 	DisableSmokeParticles();
+	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
 }
