@@ -929,6 +929,13 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->fallspeed < 0)
 		return false;
+	   
+	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
+	// Until climb wall tests are fully refactored, we need to recalculate COLL_INFO.
+
+	auto backup = coll->Setup.Mode;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
+	GetCollisionInfo(coll, item);
 
 	switch (GetQuadrant(item->pos.yRot))
 	{
@@ -945,6 +952,9 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	default:
 		break;
 	}
+
+	coll->Setup.Mode = backup;
+	GetCollisionInfo(coll, item);
 
 	auto bounds = GetBoundsAccurate(item);
 
