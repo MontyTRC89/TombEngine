@@ -5,6 +5,7 @@
 #include "level.h"
 #include "animation.h"
 #include "lara_climb.h"
+#include "lara_monkey.h"
 #include "lara_collide.h"
 #include "control/control.h"
 #include "control/los.h"
@@ -362,6 +363,88 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	return SPLAT_COLL::NONE;
 }
 
+bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_NO_ARMS) || (coll->HitStatic))
+		return false;
+
+	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
+	{
+		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->currentAnimState = LS_MONKEYSWING_IDLE;
+		item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->gravityStatus = false;
+		item->speed = 0;
+		item->fallspeed = 0;
+
+		Lara.gunStatus = LG_HANDS_BUSY;
+
+		MonkeySwingSnap(item, coll);
+
+		return true;
+	}
+
+	if ((coll->CollisionType != CT_FRONT) && (coll->Middle.Ceiling > -STEPUP_HEIGHT))
+		return false;
+
+	int edge;
+	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
+	if (!edgeCatch)
+		return false;
+
+	if (!(TestLaraHangOnClimbWall(item, coll) && edgeCatch) &&
+		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
+		return false;
+
+	auto angle = item->pos.yRot;
+
+	if (TestHangSwingIn(item, angle))
+	{
+		item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->currentAnimState = LS_MONKEYSWING_IDLE;
+	}
+	else
+	{
+		if (TestHangFeet(item, angle))
+		{
+			item->animNumber = LA_REACH_TO_HANG;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
+			item->currentAnimState = LS_HANG;
+			item->goalAnimState = LS_HANG_FEET;
+		}
+		else
+		{
+			item->animNumber = LA_REACH_TO_HANG;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
+			item->currentAnimState = LS_HANG;
+			item->goalAnimState = LS_HANG;
+		}
+	}
+
+	auto bounds = GetBoundsAccurate(item);
+
+	if (edgeCatch <= 0)
+		item->pos.yPos = edge - bounds->Y1 + 4;
+	else
+		item->pos.yPos += coll->Front.Floor - bounds->Y1;
+
+	ShiftItem(item, coll);
+	SnapItemToLedge(item, coll);
+
+	item->gravityStatus = false;
+	item->speed = 0;
+	item->fallspeed = 0;
+
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.torsoYrot = 0;
+	Lara.torsoXrot = 0;
+
+	return true;
+}
+
 bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_NO_ARMS) || (coll->HitStatic))
@@ -391,7 +474,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		(coll->CollisionType != CT_FRONT))
 		return false;
 
-	int edge = 0;
+	int edge;
 	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
 	if (!edgeCatch)
 		return false;
