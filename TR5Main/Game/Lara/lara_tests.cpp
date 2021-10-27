@@ -201,7 +201,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.turnRate = 0;
 
 					ShiftItem(item, coll);
-					SnapItemToGrid(item, coll);
+					SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 					AnimateLara(item);
 
 					return true;
@@ -218,7 +218,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate = 0;
 		
 		ShiftItem(item, coll);
-		SnapItemToGrid(item, coll);
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		AnimateLara(item);
 
 		return true;
@@ -933,28 +933,25 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
 	// Until climb wall tests are fully refactored, we need to recalculate COLL_INFO.
 
-	auto backup = coll->Setup.Mode;
-	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
-	GetCollisionInfo(coll, item);
+	auto coll2 = *coll;
+	coll2.Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
+	GetCollisionInfo(&coll2, item);
 
 	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
 	case SOUTH:
-		item->pos.zPos += coll->Shift.z;
+		item->pos.zPos += coll2.Shift.z;
 		break;
 
 	case EAST:
 	case WEST:
-		item->pos.xPos += coll->Shift.x;
+		item->pos.xPos += coll2.Shift.x;
 		break;
 
 	default:
 		break;
 	}
-
-	coll->Setup.Mode = backup;
-	GetCollisionInfo(coll, item);
 
 	auto bounds = GetBoundsAccurate(item);
 
