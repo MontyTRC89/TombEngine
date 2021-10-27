@@ -642,6 +642,29 @@ void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offset
 	item->pos.zPos += round(phd_cos(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
 }
 
+void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll)
+{
+	SnapItemToLedge(item, coll);
+
+	int dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
+
+	switch (dir)
+	{
+	case NORTH:
+		item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		break;
+	case EAST:
+		item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		break;
+	case SOUTH:
+		item->pos.zPos = (item->pos.zPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		break;
+	case WEST:
+		item->pos.xPos = (item->pos.xPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		break;
+	}
+}
+
 int FindGridShift(int x, int z)
 {
 	if ((x / SECTOR(1)) == (z / SECTOR(1)))
