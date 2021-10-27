@@ -200,8 +200,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.turnRate = 0;
 
-					ShiftItem(item, coll); 
-					item->pos.yRot = coll->NearestLedgeAngle; // HACK: we can't use snap until ladder states are refactored, currently they are too fragile.
+					ShiftItem(item, coll);
+					SnapItemToLedge(item, coll);
 					AnimateLara(item);
 
 					return true;
@@ -218,7 +218,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate = 0;
 		
 		ShiftItem(item, coll);
-		SnapItemToLedge(item, coll, -0.2f); // HACK: push Lara away from the ledge a bit, because ladder states are too fragile.
+		SnapItemToLedge(item, coll);
 		AnimateLara(item);
 
 		return true;
@@ -393,7 +393,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (!edgeCatch)
 		return false;
 
-	if (!(TestLaraHangOnClimbWall(item, coll) && edgeCatch) &&
+	bool ladder = TestLaraHangOnClimbWall(item, coll);
+
+	if (!(ladder && edgeCatch) &&
 		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
 		return false;
 
@@ -431,7 +433,10 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		item->pos.yPos += coll->Front.Floor - bounds->Y1;
 
-	SnapItemToLedge(item, coll);
+	if (ladder)
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	else
+		SnapItemToLedge(item, coll);
 
 	item->gravityStatus = false;
 	item->speed = 0;
@@ -478,7 +483,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	if (!edgeCatch)
 		return false;
 
-	if (!(TestLaraHangOnClimbWall(item, coll) && edgeCatch) &&
+	bool ladder = TestLaraHangOnClimbWall(item, coll);
+
+	if (!(ladder && edgeCatch) &&
 		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
 		return false;
 
@@ -537,8 +544,12 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		item->pos.yPos += coll->Front.Floor - bounds->Y1 - 20;
-		SnapItemToLedge(item, coll, 0.2f);
 	}
+
+	if (ladder)
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	else
+		SnapItemToLedge(item, coll, 0.2f);
 
 	item->gravityStatus = true;
 	item->speed = 2;
@@ -911,7 +922,6 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	BOUNDING_BOX* bounds;
 	int shift, result;
 
 	if (Lara.climbStatus == 0)
@@ -936,14 +946,14 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	bounds = GetBoundsAccurate(item);
+	auto bounds = GetBoundsAccurate(item);
 
 	if (Lara.moveAngle != item->pos.yRot)
 	{
 		short l = LaraCeilingFront(item, item->pos.yRot, 0, 0);
 		short r = LaraCeilingFront(item, Lara.moveAngle, 128, 0);
 
-		if (abs(l - r) > 60)
+		if (abs(l - r) > SLOPE_DIFFERENCE)
 			return false;
 	}
 
