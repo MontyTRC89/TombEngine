@@ -15,10 +15,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
-{
-	(short)0xFA80, (short)0xFA80, 0x0000, 0x0000, (short)0xFE00, 0x0200,
-	(short)0xF8E4, (short)0x071C, (short)0xEAAC, (short)0x1554, (short)0xF8E4, (short)0x071C
-};
+{ -1408, -1408, 0, 0, -512, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 void ScalesControl(short itemNum)
 {

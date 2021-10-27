@@ -29,65 +29,40 @@
 #include "pickup/pickup_consumable.h"
 #include "pickup/pickup_misc_items.h"
 
-OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
-{
-	(short)0xFF00, 0x0100, (short)0xFF38, 0x00C8, (short)0xFF00, 0x0100, (short)0xF8E4, 0x071C, 0x0000, 0x0000,
-	0x0000, 0x0000
-};
-static PHD_VECTOR PickUpPosition(0, 0, -100); // offset 0xA1350
-OBJECT_COLLISION_BOUNDS HiddenPickUpBounds = // offset 0xA135C
-{
-	(short)0xFF00, 0x0100, (short)0xFF9C, 0x0064, (short)0xFCE0, (short)0xFF00, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR HiddenPickUpPosition(0, 0, -690); // offset 0xA1374
-OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds = // offset 0xA1380
-{
-	(short)0xFF00, 0x0100, (short)0xFF9C, 0x0064, 0x00C8, 0x0200, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215); // offset 0xA1398
-OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds = // offset 0xA13A4
-{
-	(short)0xFE00, 0x0000, (short)0xFF9C, 0x0064, 0x0000, 0x0200, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240); // offset 0xA13BC
-OBJECT_COLLISION_BOUNDS PlinthPickUpBounds = // offset 0xA13C8
-{
-	(short)0xFF00, 0x0100, (short)0xFD80, 0x0280, (short)0xFE01, 0x0000, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR PlinthPickUpPosition(0, 0, -460); // offset 0xA13E0
-OBJECT_COLLISION_BOUNDS PickUpBoundsUW = // offset 0xA13EC
-{
-	(short)0xFE00, 0x0200, (short)0xFE00, 0x0200, (short)0xFE00, 0x0200, (short)0xE002, 0x1FFE, (short)0xE002, 0x1FFE,
-	(short)0xE002, 0x1FFE
-};
-static PHD_VECTOR PickUpPositionUW(0, -200, -350); // offset 0xA1404
-OBJECT_COLLISION_BOUNDS SOBounds = // offset 0xA144C
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	(short)0xF8E4, 0x071C
-};
-static PHD_VECTOR SOPos(0, 0, 0); // offset 0xA1464
-short SearchCollectFrames[4] =
-{
-	0x00B4, 0x0064, 0x0099, 0x0053
-};
-short SearchAnims[4] =
-{
-	0x01D0, 0x01D1, 0x01D2, 0x01D8
-};
-short SearchOffsets[4] =
-{
-	0x00A0, 0x0060, 0x00A0, 0x0070
-};
-OBJECT_COLLISION_BOUNDS MSBounds = // offset 0xA1488
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, (short)0xF8E4, 0x071C, (short)0xEAAC, 0x1554,
-	(short)0xF8E4, 0x071C
-};
+static PHD_VECTOR PickUpPosition(0, 0, -100);
+OBJECT_COLLISION_BOUNDS PickUpBounds = 
+{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), 0, 0, 0, 0 };
+
+static PHD_VECTOR HiddenPickUpPosition(0, 0, -690);
+OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
+{ -256, 256, -100, 100, -800, -256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215);
+OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
+{ -256, 256, -100, 100, 200, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240);
+OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
+{ -512, 0, -100, 100, 0, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR PlinthPickUpPosition(0, 0, -460);
+OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
+{ -256, 256, -640, 640, -511, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR PickUpPositionUW(0, -200, -350);
+OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
+{ -512, 512, -512, 512, -512, 512, ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45) };
+
+static PHD_VECTOR SOPos(0, 0, 0);
+OBJECT_COLLISION_BOUNDS SOBounds =
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+
+short SearchCollectFrames[4] = { 180, 100, 153, 83 };
+short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
+short SearchOffsets[4] = { 160, 96, 160, 112 };
+
+OBJECT_COLLISION_BOUNDS MSBounds =
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 int NumRPickups;
 short RPickups[16];
@@ -96,8 +71,6 @@ PHD_VECTOR OldPickupPos;
 #ifndef NEW_INV
 extern Inventory g_Inventory;
 #endif
-
-
 
 void PickedUpObject(GAME_OBJECT_ID objID, int count)
 {

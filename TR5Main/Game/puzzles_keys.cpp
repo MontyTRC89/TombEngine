@@ -30,20 +30,11 @@ enum PuzzleType {
 short puzzleItem;
 /*bounds*/
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
-{
-	0, 0,
-	-256, 256,
-	0, 0,
-	-ANGLE(10), ANGLE(10),
-	-ANGLE(30), ANGLE(30),
-	-ANGLE(10), ANGLE(10)
-};
-OBJECT_COLLISION_BOUNDS KeyHoleBounds =
-{
-	(short)0xFF00, 0x0100, 0x0000, 0x0000, 0x0000, 0x019C, (short)0xF8E4,(short)0x071C,(short)0xEAAC, (short)0x1554,
-	(short)0xF8E4,(short)0x071C
-};
+{ 0, 0, -256, 256, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+
 static PHD_VECTOR KeyHolePosition(0, 0, 312);
+OBJECT_COLLISION_BOUNDS KeyHoleBounds =
+{ -256, 256, 0, 0, 0, 412, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 /*puzzles*/
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)

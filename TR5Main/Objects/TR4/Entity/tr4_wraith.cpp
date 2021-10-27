@@ -474,7 +474,7 @@ void DrawWraith(int x, int y, int z, short xVel, short yVel, short zVel, int obj
 
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 7;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	life = (GetRandomControl() & 7) + 12;
 	spark->life = life;
 	spark->sLife = life;
@@ -539,7 +539,7 @@ void WraithWallsEffect(int x, int y, int z, short yrot, short objNumber)
 		spark->dB = dB;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 7;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		short life = (GetRandomControl() & 7) + 32;
 		spark->life = life;
 		spark->sLife = life;

@@ -25,7 +25,7 @@ void TriggerTorchFlame(char fxObj, char node)
 	spark->dG = (GetRandomControl() & 0x3F) + -128;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 	spark->y = 0;
 	spark->x = (GetRandomControl() & 0xF) - 8;
