@@ -852,7 +852,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_QUADRANTS;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -976,7 +976,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_QUADRANTS;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1090,7 +1090,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FORWARD;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;

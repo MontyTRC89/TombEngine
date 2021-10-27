@@ -322,7 +322,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640))
+			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -1636,7 +1636,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
-	coll->Setup.Mode = COLL_PROBE_MODE::CP_FREE_FLAT;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 
 	GetCollisionInfo(coll, item);
 
@@ -2171,7 +2171,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.zRot = 0;
 
-			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640))
+			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
 			{
 				item->goalAnimState = LS_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
