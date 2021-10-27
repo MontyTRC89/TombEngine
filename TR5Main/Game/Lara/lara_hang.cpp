@@ -93,7 +93,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	TestLaraHang(item, coll);
 
-	if (TestLastFrame(item, LA_REACH_TO_HANG))
+	if (item->animNumber == LA_REACH_TO_HANG)
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -149,7 +149,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					item->goalAnimState = LS_LADDER_IDLE;
 				}
-				else
+				else if (TestLastFrame(item))
 				{
 					item->animNumber = LA_LADDER_SHIMMY_UP;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -170,7 +170,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				item->goalAnimState = LS_LADDER_IDLE;
 			}
-			else
+			else if (TestLastFrame(item))
 			{
 				item->animNumber = LA_LADDER_SHIMMY_DOWN;
 				item->goalAnimState = LS_HANG;
