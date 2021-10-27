@@ -13,26 +13,23 @@
 #include "lara.h"
 #include "gameflow.h"
 #include "rope.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "level.h"
 #include "setup.h"
 #include "control/control.h"
-#include "Sound\sound.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
-#include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include <Objects\TR4\Entity\tr4_wraith.h>
-#include <Objects\TR4\Entity\tr4_littlebeetle.h>
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "RenderView/RenderView.h"
-#include "effects\hair.h"
-#include "effects\weather.h"
+#include "effects/hair.h"
+#include "effects/weather.h"
 #include "winmain.h"
-#include <chrono>
-#include <Objects/Effects/tr4_locusts.h>
-#include <control\volume.h>
+#include "Objects/Effects/tr4_locusts.h"
+#include "control/volume.h"
 #include "items.h"
-#include "Game/rope.h"
+
+#include <chrono>
 
 using namespace TEN::Game::Rope;
 
