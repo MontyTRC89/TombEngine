@@ -794,7 +794,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	if (LaraCeilingFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height) > 0)
 		return CORNER_RESULT::NONE;
 
-	// Last chance for possible diagonal vs.diagonal cases: ray test
+	// Last chance for possible diagonal vs. non-diagonal cases: ray test
 	if (!LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE))
 		return CORNER_RESULT::NONE;
 
