@@ -321,6 +321,15 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
 	}
 }
 
+bool TestLastFrame(ITEM_INFO* item, short animNumber)
+{
+	if (item->animNumber != animNumber)
+		return false;
+
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	return (item->frameNumber >= anim->frameEnd);
+}
+
 short GF(short animIndex, short frameToStart)
 {
 	return g_Level.Anims[animIndex].frameBase + frameToStart;
