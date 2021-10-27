@@ -39,7 +39,7 @@ int CameraFOV[MAX_CAMERA];
 int CameraSpeed[MAX_CAMERA];
 QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
-int Unk_0051D024;
+bool SpotCamFirstLook;
 short CurrentSplineCamera;
 int LastSpotCam;
 int LaraHealth;
@@ -369,7 +369,6 @@ void CalculateSpotCameras()
 	short spline_cnt; // $s3
 	int next_spline_camera; // $s0
 	int n; // $s5
-	static int bFirstLook; // offset 0x18 dword_A0AC4?
 	int dx; // $v1
 	int dy; // $s0
 	int dz; // $s1
@@ -498,7 +497,7 @@ void CalculateSpotCameras()
 
 	if (!(TrInput & IN_LOOK))
 	{
-		Unk_0051D024 = 0;
+		SpotCamFirstLook = false;
 	}
 
 	if (s->flags & SCF_DISABLE_BREAKOUT
@@ -880,10 +879,10 @@ void CalculateSpotCameras()
 	}
 	else if (s->flags & SCF_TRACKING_CAM)
 	{
-		if (!Unk_0051D024)
+		if (!SpotCamFirstLook)
 		{
 			Camera.oldType = FIXED_CAMERA;
-			Unk_0051D024 = true;
+			SpotCamFirstLook = true;
 		}
 
 		CalculateCamera();
