@@ -62,7 +62,7 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
 void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint);
 void ClampRotation(PHD_3DPOS* pos, short angle, short rot); 
-bool TestLastFrame(ITEM_INFO* item, short animNumber);
+bool TestLastFrame(ITEM_INFO* item, short animNumber = -1);
 
 void DrawAnimatingItem(ITEM_INFO* item);
 
