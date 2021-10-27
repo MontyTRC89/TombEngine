@@ -1747,7 +1747,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 			}
 		}
-		coll->CollisionType = CT_FRONT;
+		coll->CollisionType = (coll->CollisionType == CT_TOP ? CT_TOP_FRONT : CT_FRONT);
 		return;
 	}
 
