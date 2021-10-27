@@ -2831,12 +2831,17 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 		// on the near-zero thickness edges of diagonal geometry which probes tend to tunnel through.
 
 		std::set<short> angles;
-		int firstEqualAngle = -1;
 		for (int p = 0; p < 3; p++)
 		{
 			// Prioritize ledge angle which was twice recognized
 			if (!angles.insert(result[p]).second)
 			{
+				// Find existing angle in results
+				int firstEqualAngle;
+				for (firstEqualAngle = 0; firstEqualAngle < 3; firstEqualAngle++)
+					if (result[firstEqualAngle] == result[p])
+						break;
+				
 				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
 				float dist1 = FLT_MAX;
 				float dist2 = FLT_MAX;
@@ -2846,10 +2851,6 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 				finalResult[h] = result[p];
 				break;
-			}
-			else
-			{
-				firstEqualAngle = p;
 			}
 		}
 
