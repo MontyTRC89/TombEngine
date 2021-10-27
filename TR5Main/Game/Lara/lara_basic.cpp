@@ -17,8 +17,6 @@
 #include "items.h"
 #include "camera.h"
 
-using namespace std;
-
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
 // Control & Collision Functions
