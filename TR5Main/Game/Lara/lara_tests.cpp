@@ -362,6 +362,111 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	return SPLAT_COLL::NONE;
 }
 
+bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_NO_ARMS) || (coll->HitStatic))
+		return false;
+
+	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
+	{
+		Lara.headYrot  = 0;
+		Lara.headXrot  = 0;
+		Lara.torsoYrot = 0;
+		Lara.torsoXrot = 0;
+		Lara.gunStatus = LG_HANDS_BUSY;
+
+		item->animNumber = LA_REACH_TO_MONKEYSWING;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->currentAnimState = LS_MONKEYSWING_IDLE;
+		item->gravityStatus = false;
+		item->speed = 0;
+		item->fallspeed = 0;
+
+		return true;
+	}
+
+	if ((coll->Middle.Ceiling > -STEPUP_HEIGHT) ||
+		(coll->Middle.Floor < 200) ||
+		(coll->CollisionType != CT_FRONT))
+		return false;
+
+	int edge = 0;
+	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
+	if (!edgeCatch)
+		return false;
+
+	if (!(TestLaraHangOnClimbWall(item, coll) && edgeCatch) &&
+		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
+		return false;
+
+	auto angle = item->pos.yRot;
+
+	if (TestHangSwingIn(item, angle))
+	{
+		if (Lara.NewAnims.OscillateHanging)
+		{
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			item->animNumber = LA_REACH_TO_HANG_OSCILLATE;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = LS_HANG;
+			item->goalAnimState = LS_HANG;
+		}
+		else
+		{
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			item->animNumber = LA_REACH_TO_MONKEYSWING;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = LS_MONKEYSWING_IDLE;
+			item->goalAnimState = LS_MONKEYSWING_IDLE;
+		}
+	}
+	else
+	{
+		if (TestHangFeet(item, angle))
+		{
+			item->animNumber = LA_REACH_TO_HANG;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = LS_HANG;
+			item->goalAnimState = LS_HANG_FEET;
+		}
+		else
+		{
+			item->animNumber = LA_REACH_TO_HANG;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = LS_HANG;
+			item->goalAnimState = LS_HANG;
+		}
+	}
+
+	auto bounds = GetBoundsAccurate(item);
+
+	if (edgeCatch <= 0)
+	{
+		item->pos.yPos = edge - bounds->Y1 - 20;
+		item->pos.yRot = coll->NearestLedgeAngle;
+	}
+	else
+	{
+		item->pos.yPos += coll->Front.Floor - bounds->Y1 - 20;
+		SnapItemToLedge(item, coll, 0.2f);
+	}
+
+	item->gravityStatus = true;
+	item->speed = 2;
+	item->fallspeed = 1;
+
+	Lara.gunStatus = LG_HANDS_BUSY;
+
+	return true;
+}
+
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ANIM_FRAME* frame;
