@@ -785,7 +785,6 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)
 {
-
 	*shift = 0;
 	int hang = 1;
 	if (!Lara.climbStatus)
