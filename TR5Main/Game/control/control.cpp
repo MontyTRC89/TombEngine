@@ -77,7 +77,7 @@ int LevelComplete;
 
 bool  InItemControlLoop;
 short ItemNewRoomNo;
-short ItemNewRooms[512];
+short ItemNewRooms[MAX_ROOMS];
 short NextItemActive;
 short NextItemFree;
 short NextFxActive;

@@ -34,6 +34,8 @@ enum HEADINGS
 	WEST
 };
 
+constexpr int MAX_ROOMS = 1024;
+
 extern int GameTimer;
 extern int RumbleTimer;
 extern int InGameCounter;
@@ -51,7 +53,7 @@ extern int LevelComplete;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
-extern short ItemNewRooms[512];
+extern short ItemNewRooms[MAX_ROOMS];
 extern short NextItemActive;
 extern short NextItemFree;
 extern short NextFxActive;
