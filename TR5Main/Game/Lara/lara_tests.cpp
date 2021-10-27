@@ -794,6 +794,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	if (LaraCeilingFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height) > 0)
 		return CORNER_RESULT::NONE;
 
+	// Last chance for possible diagonal vs.diagonal cases: ray test
+	if (!LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE))
+		return CORNER_RESULT::NONE;
+
 	// Push Lara diagonally to other side of corner at distance of 1/2 wall size
 	c = phd_cos(item->pos.yRot + ANGLE(testAngle / 2));
 	s = phd_sin(item->pos.yRot + ANGLE(testAngle / 2));
@@ -1201,6 +1205,34 @@ bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 	auto result2 = LOS(&pos, &vec2);
 
 	return (result1 == 0 && result2 == 0);
+}
+
+bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
+{
+	auto pos1 = GAME_VECTOR(item->pos.xPos,
+						    item->pos.yPos - LARA_HEADROOM,
+						    item->pos.zPos,
+						    item->roomNumber);
+
+	auto pos2 = GAME_VECTOR(item->pos.xPos,
+						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
+						    item->pos.zPos,
+						    item->roomNumber);
+	
+	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
+						    item->pos.yPos - LARA_HEADROOM,
+						    item->pos.zPos + dist * phd_cos(ang),
+						    item->roomNumber);
+
+	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
+						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
+						    item->pos.zPos + dist * phd_cos(ang),
+						    item->roomNumber);
+
+	auto result1 = LOS(&pos1, &vec1);
+	auto result2 = LOS(&pos2, &vec2);
+
+	return (result1 != 0 && result2 != 0);
 }
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
