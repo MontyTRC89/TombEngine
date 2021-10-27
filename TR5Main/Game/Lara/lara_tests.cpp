@@ -354,12 +354,12 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	c = GetCeiling(floor, x, y, z);
 
 	if (h == NO_HEIGHT)
-		return SPLAT_COLL::SPLAT_WALL;
+		return SPLAT_COLL::WALL;
 
 	if (y >= h || y <= c)
-		return SPLAT_COLL::SPLAT_STEP;
+		return SPLAT_COLL::STEP;
 
-	return SPLAT_COLL::SPLAT_NONE;
+	return SPLAT_COLL::NONE;
 }
 
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
@@ -674,7 +674,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -512;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.Mode == COLL_PROBE_MODE::CP_FREE_FLAT;
+	coll->Setup.Mode == COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 
 	GetCollisionInfo(coll, item);
