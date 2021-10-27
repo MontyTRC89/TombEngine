@@ -93,7 +93,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	TestLaraHang(item, coll);
 
-	if (item->animNumber == LA_REACH_TO_HANG)
+	if (TestLastFrame(item, LA_REACH_TO_HANG))
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -143,7 +143,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (Lara.climbStatus != 0 &&
 				coll->Middle.Ceiling <= -256 &&
-				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < 60)
+				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
