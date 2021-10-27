@@ -1252,8 +1252,8 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	auto y = item->pos.yPos;
 	auto z = item->pos.zPos;
 
-	auto angleA = angle + ANGLE(15.0f);
-	auto angleB = angle - ANGLE(15.0f);
+	auto angleA = angle - ANGLE(15.0f);
+	auto angleB = angle + ANGLE(15.0f);
 
 	auto probeA = GetCollisionResult(item, angleA, dist, 0);
 	auto probeB = GetCollisionResult(item, angleB, dist, 0);
