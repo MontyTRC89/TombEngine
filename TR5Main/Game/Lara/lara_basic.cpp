@@ -1533,83 +1533,8 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item);
 
-	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && !coll->HitStatic)
-	{
-		if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
-		{
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->gravityStatus = false;
-			item->speed = 0;
-			item->fallspeed = 0;
-
-			Lara.gunStatus = LG_HANDS_BUSY;
-
-			MonkeySwingSnap(item, coll);
-
-			return;
-		}
-
-		if (coll->CollisionType == CT_FRONT && coll->Middle.Ceiling <= -STEPUP_HEIGHT)
-		{
-			int edge;
-			int edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
-
-			if ((TestLaraHangOnClimbWall(item, coll) && edgeCatch) || 
-				(TestValidLedge(item, coll, true) && edgeCatch > 0))
-			{
-				short angle = item->pos.yRot;
-
-				if (TestHangSwingIn(item, angle))
-				{
-					item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->goalAnimState = LS_MONKEYSWING_IDLE;
-					item->currentAnimState = LS_MONKEYSWING_IDLE;
-				}
-				else
-				{
-					if (TestHangFeet(item, angle))
-					{
-						item->animNumber = LA_REACH_TO_HANG;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
-						item->currentAnimState = LS_HANG;
-						item->goalAnimState = LS_HANG_FEET;
-					}
-					else
-					{
-						item->animNumber = LA_REACH_TO_HANG;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 12;
-						item->currentAnimState = LS_HANG;
-						item->goalAnimState = LS_HANG;
-					}
-				}
-
-				auto bounds = GetBoundsAccurate(item);
-
-				if (edgeCatch <= 0)
-					item->pos.yPos = edge - bounds->Y1 + 4;
-				else
-					item->pos.yPos += coll->Front.Floor - bounds->Y1;
-
-				SnapItemToLedge(item, coll);
-
-				item->gravityStatus = false;
-				item->speed = 0;
-				item->fallspeed = 0;
-
-				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-
-				return;
-			}
-		}
-	}
-
-	ShiftItem(item, coll);
+	if (TestLaraHangJumpUp(item, coll))
+		return;
 
 	if (coll->CollisionType == CT_CLAMP ||
 		coll->CollisionType == CT_TOP ||
