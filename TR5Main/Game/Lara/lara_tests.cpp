@@ -377,7 +377,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		return true;
 	}
 
-	if ((coll->CollisionType != CT_FRONT) && (coll->Middle.Ceiling > -STEPUP_HEIGHT))
+	if ((coll->CollisionType != CT_FRONT) || (coll->Middle.Ceiling > -STEPUP_HEIGHT))
 		return false;
 
 	int edge;
