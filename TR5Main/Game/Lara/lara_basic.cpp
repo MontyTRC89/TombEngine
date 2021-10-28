@@ -1541,6 +1541,8 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 		coll->CollisionType == CT_TOP_FRONT)
 		item->fallspeed = 1;
 
+	ShiftItem(item, coll);
+
 	if (coll->CollisionType == CT_NONE)
 	{
 		if (item->fallspeed < -70)
