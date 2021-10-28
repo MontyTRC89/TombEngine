@@ -105,6 +105,7 @@ void DisableBaddieAI(short itemNumber)
 	if (creature)
 	{
 		creature->itemNum = NO_ITEM;
+		KillItem(creature->aiTargetNum);
 		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
 		item->data = nullptr;
 
@@ -143,11 +144,19 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->enemy = NULL;
 	creature->LOT.fly = NO_FLYING;
 	creature->LOT.blockMask = BLOCKED;
+	creature->aiTargetNum = CreateItem();
+
+	if (creature->aiTargetNum != NO_ITEM)
+		creature->aiTarget = &g_Level.Items[creature->aiTargetNum];
+	else
+		creature->aiTarget = nullptr;
 
 	if (obj->intelligent)
 	{
-		// simple check to set hitEffect to blood or smoke by default if intelligent enabled and no value assigned to hitEffect and the entity have HP !
+		// simple check to set hitEffect to blood or smoke by default if intelligent enabled 
+		// and no value assigned to hitEffect and the entity have HP !
 		// undead have smoke instead of blood !
+
 		if (obj->hitEffect == HIT_NONE)
 		{
 			if (obj->undead)

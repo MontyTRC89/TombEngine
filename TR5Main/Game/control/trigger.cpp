@@ -638,7 +638,6 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
 			{
-
 				if (flags & ONESHOT)
 					FlipMap[value] |= ONESHOT;
 				if (!FlipStats[value])
@@ -650,15 +649,13 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			FlipMap[value] |= CODE_BITS;
-			if (!FlipStats[value])
+			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			FlipMap[value] &= ~CODE_BITS;
-			if (FlipStats[value])
+			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStats[value])
 				flip = value;
 			break;
 

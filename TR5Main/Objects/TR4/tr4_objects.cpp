@@ -1223,5 +1223,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
+	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_SCARABS * sizeof(SCARAB_STRUCT));
 }
