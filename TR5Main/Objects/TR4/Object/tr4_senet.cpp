@@ -16,12 +16,9 @@ char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
-OBJECT_COLLISION_BOUNDS GameStixBounds =
-{
-	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0x0, 0x0
-};
-
 static PHD_VECTOR GameStixPosition = { 0, 0, -100 };
+OBJECT_COLLISION_BOUNDS GameStixBounds =
+{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
 void InitialiseGameStix(short itemNumber)
 {

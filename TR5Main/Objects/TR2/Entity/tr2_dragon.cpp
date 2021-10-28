@@ -211,7 +211,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
-				Camera.type = CINEMATIC_CAMERA;
+				Camera.type = CAMERA_TYPE::CINEMATIC_CAMERA;
 				
 				((CREATURE_INFO*)g_Level.Items[(short)item->data].data)->flags = -1;
 

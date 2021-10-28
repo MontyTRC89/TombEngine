@@ -125,7 +125,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (S_UpdateInput() == -1)
-				return GAME_STATUS_NONE;
+				return GAME_STATUS::GAME_STATUS_NONE;
 		}
 
 		// Has Lara control been disabled?
@@ -148,7 +148,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Inventory.Set_invMode(IM_SAVE);
 
 				if (g_Inventory.S_CallInventory2(0))
-					return GAME_STATUS_LOAD_GAME;
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
 			{
@@ -157,7 +157,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Inventory.Set_invMode(IM_LOAD);
 
 				if (g_Inventory.S_CallInventory2(0))
-					return GAME_STATUS_LOAD_GAME;
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
@@ -173,7 +173,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				Sound_Stop();
 
 				if (g_Inventory.S_CallInventory2(1))
-					return GAME_STATUS_LOAD_GAME;
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 		}
 
@@ -185,19 +185,19 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			int z = g_Inventory.DoPauseMenu();
 
 			if (z == INV_RESULT_EXIT_TO_TILE)
-				return GAME_STATUS_EXIT_TO_TITLE;
+				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
-			return GAME_STATUS_LEVEL_COMPLETED;
+			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
 
 		int oldInput = TrInput;
 
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
+			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
 		}
 
 		if (demoMode && TrInput == -1)
@@ -416,7 +416,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
-	return GAME_STATUS_NONE;
+	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -549,14 +549,14 @@ GAME_STATUS DoTitle(int index)
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
-		return GAME_STATUS_NEW_GAME;
+		return GAME_STATUS::GAME_STATUS_NEW_GAME;
 	case INV_RESULT_LOAD_GAME:
-		return GAME_STATUS_LOAD_GAME;
+		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 	case INV_RESULT_EXIT_GAME:
-		return GAME_STATUS_EXIT_GAME;
+		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
-	return GAME_STATUS_NEW_GAME;
+	return GAME_STATUS::GAME_STATUS_NEW_GAME;
 }
 
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
@@ -666,9 +666,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		nframes = DrawPhase();
 		Sound_UpdateScene();
 
-		if (result == GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
+			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
+			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();

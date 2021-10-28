@@ -161,7 +161,7 @@ void SmokeEmitterControl(short itemNumber)
 		spark->dR = 48;
 		spark->dG = 48;
 		spark->dB = 48;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->x = (GetRandomControl() & 0x3F) + item->pos.xPos - 32;
 		spark->y = (GetRandomControl() & 0x3F) + item->pos.yPos - 32;
 		spark->z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;
@@ -269,9 +269,9 @@ void SmokeEmitterControl(short itemNumber)
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 28;
 				if (item->objectNumber == ID_SMOKE_EMITTER_WHITE)
-					spark->transType = COLSUB;
+					spark->transType = TransTypeEnum::COLSUB;
 				else
-					spark->transType = COLADD;
+					spark->transType = TransTypeEnum::COLADD;
 				spark->x = (GetRandomControl() & 0x3F) + item->pos.xPos - 32;
 				spark->y = (GetRandomControl() & 0x3F) + item->pos.yPos - 32;
 				spark->z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;

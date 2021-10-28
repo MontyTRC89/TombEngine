@@ -256,7 +256,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	Lara.air = -1;
 
 	Camera.pos.roomNumber = LaraItem->roomNumber; 
-	Camera.type = CHASE_CAMERA;
+	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = -ANGLE(25.0f);

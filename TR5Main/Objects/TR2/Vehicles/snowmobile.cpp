@@ -321,7 +321,7 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 	spark->dG = 64;
 	spark->dB = 64;
 	spark->colFadeSpeed = 1;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 4;
 	spark->x = (GetRandomControl() & 255) + skidoo->pos.xPos - 8;

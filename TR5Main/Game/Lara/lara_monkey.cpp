@@ -456,7 +456,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->CollisionType)
+	if (coll->CollisionType == CT_NONE)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
@@ -494,7 +494,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->CollisionType)
+	if (coll->CollisionType == CT_NONE)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
