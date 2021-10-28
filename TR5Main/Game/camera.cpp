@@ -180,7 +180,7 @@ void InitialiseCamera()
 	Camera.targetDistance = 1536;
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
-	Camera.type = CHASE_CAMERA;
+	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 	Camera.speed = 1;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.bounce = 0;
@@ -672,7 +672,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, 384, 1);
 
-	if (Camera.oldType == FIXED_CAMERA)
+	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
 	{
 		Camera.speed = 1;
 	}
@@ -1004,7 +1004,7 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.zPos == LaraItem->pos.zPos &&
 		OldCam.currentAnimState == LaraItem->currentAnimState &&
 		OldCam.goalAnimState == LaraItem->goalAnimState &&
-		Camera.oldType == LOOK_CAMERA)
+		Camera.oldType == CAMERA_TYPE::LOOK_CAMERA)
 	{
 		ideal.x = LookCamPosition.x;
 		ideal.y = LookCamPosition.y;
@@ -1034,7 +1034,7 @@ void LookCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, 224, 1);
 
-	if (Camera.oldType == FIXED_CAMERA)
+	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
 	{
 		Camera.pos.x = ideal.x;
 		Camera.pos.y = ideal.y;
@@ -1230,7 +1230,7 @@ void BinocularCamera(ITEM_INFO* item)
 	int ty = y - 20736 * phd_sin(headXrot);
 	int tz = z + l * phd_cos(LaraItem->pos.yRot + headYrot);
 
-	if (Camera.oldType == FIXED_CAMERA)
+	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
 	{
 		Camera.target.x = tx;
 		Camera.target.y = ty;
@@ -1554,8 +1554,8 @@ void CalculateCamera()
 
 	if (UseForcedFixedCamera != 0)
 	{
-		Camera.type = FIXED_CAMERA;
-		if (Camera.oldType != FIXED_CAMERA)
+		Camera.type = CAMERA_TYPE::FIXED_CAMERA;
+		if (Camera.oldType != CAMERA_TYPE::FIXED_CAMERA)
 		{
 			Camera.speed = 1;
 		}
@@ -1583,7 +1583,7 @@ void CalculateCamera()
 			}
 		}
 
-	if (Camera.type == CINEMATIC_CAMERA)
+	if (Camera.type == CAMERA_TYPE::CINEMATIC_CAMERA)
 	{
 		//Legacy_do_new_cutscene_camera();
 		return;
@@ -1591,7 +1591,7 @@ void CalculateCamera()
 
 	ITEM_INFO* item;
 	int fixedCamera = 0;
-	if (Camera.item != NULL && (Camera.type == FIXED_CAMERA || Camera.type == HEAVY_CAMERA))
+	if (Camera.item != NULL && (Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
 	{
 		item = Camera.item;
 		fixedCamera = 1;
@@ -1641,15 +1641,15 @@ void CalculateCamera()
 					Lara.headXrot += change;
 				Lara.torsoXrot = Lara.headXrot;
 
-				Camera.type = LOOK_CAMERA;
+				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 				Camera.item->lookedAt = 1;
 			}
 		}
 	}
 
-	if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+	if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 	{
-		if (Camera.type == COMBAT_CAMERA)
+		if (Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 		{
 			LastTarget.x = Camera.target.x;
 			LastTarget.y = Camera.target.y;
@@ -1667,11 +1667,11 @@ void CalculateCamera()
 		else
 		{
 			Camera.target.y += (y - Camera.target.y) >> 2;
-			Camera.speed = Camera.type != LOOK_CAMERA ? 8 : 4;
+			Camera.speed = Camera.type != CAMERA_TYPE::LOOK_CAMERA ? 8 : 4;
 		}
 
 		Camera.fixedCamera = 0;
-		if (Camera.type == LOOK_CAMERA)
+		if (Camera.type == CAMERA_TYPE::LOOK_CAMERA)
 			LookCamera(item);
 		else
 			CombatCamera(item);
@@ -1686,7 +1686,7 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->roomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type
+		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA
 			&& Camera.flags != CF_CHASE_OBJECT
 			&& (Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
@@ -1725,7 +1725,7 @@ void CalculateCamera()
 		if (fixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = 0;
-			if (Camera.speed != 1 && Camera.oldType != LOOK_CAMERA && BinocularOn >= 0)
+			if (Camera.speed != 1 && Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && BinocularOn >= 0)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1760,7 +1760,7 @@ void CalculateCamera()
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type && Camera.flags != CF_CHASE_OBJECT)
+		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA && Camera.flags != CF_CHASE_OBJECT)
 			FixedCamera(item);
 		else
 			ChaseCamera(item);
@@ -1769,9 +1769,9 @@ void CalculateCamera()
 	Camera.fixedCamera = fixedCamera;
 	Camera.last = Camera.number;
 
-	if (Camera.type != HEAVY_CAMERA || Camera.timer == -1)
+	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA || Camera.timer == -1)
 	{
-		Camera.type = CHASE_CAMERA;
+		Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 		Camera.speed = 10;
 		Camera.number = -1;
 		Camera.lastItem = Camera.item;
@@ -1786,7 +1786,7 @@ void CalculateCamera()
 
 void LookLeftRight()
 {
-	Camera.type = LOOK_CAMERA;
+	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
@@ -1818,7 +1818,7 @@ void LookLeftRight()
 
 void LookUpDown()
 {
-	Camera.type = LOOK_CAMERA;
+	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
@@ -1850,7 +1850,7 @@ void LookUpDown()
 
 void ResetLook()
 {
-	if (Camera.type != LOOK_CAMERA)
+	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
 	{
 		if (Lara.headXrot <= -ANGLE(2.0f) || Lara.headXrot >= ANGLE(2.0f))
 			Lara.headXrot = Lara.headXrot / -8 + Lara.headXrot;

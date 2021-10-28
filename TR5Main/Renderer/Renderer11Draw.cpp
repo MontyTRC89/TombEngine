@@ -300,9 +300,9 @@ namespace TEN::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        RendererObject &laraObj = *m_moveableObjects[ID_LARA];
-        RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-        RendererRoom &const room = m_rooms[LaraItem->roomNumber];
+        RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+        RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+        RendererRoom& room = m_rooms[LaraItem->roomNumber];
 
         m_stItem.World = m_LaraWorldMatrix;
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
@@ -434,8 +434,8 @@ namespace TEN::Renderer
 
     void Renderer11::drawGunShells(RenderView& view)
 {
-        RendererRoom &const room = m_rooms[LaraItem->roomNumber];
-        RendererItem *item = &m_items[Lara.itemNumber];
+        RendererRoom& room = m_rooms[LaraItem->roomNumber];
+        RendererItem* item = &m_items[Lara.itemNumber];
 
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -2350,9 +2350,9 @@ namespace TEN::Renderer
 
         for (int i = 0; i < view.itemsToDraw.size(); i++)
         {
-            RendererItem *item = view.itemsToDraw[i];
-            RendererRoom &const room = m_rooms[item->Item->roomNumber];
-            RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
+            RendererItem* item = view.itemsToDraw[i];
+            RendererRoom& room = m_rooms[item->Item->roomNumber];
+            RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
 			if (moveableObj.DoNotDraw)
 				continue;
@@ -2393,9 +2393,9 @@ namespace TEN::Renderer
         if (m_rooms.size() <= item->Item->roomNumber){
             return;
         }
-        RendererRoom &const room = m_rooms[item->Item->roomNumber];
-        RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
-        OBJECT_INFO *obj = &Objects[item->Item->objectNumber];
+        RendererRoom& room = m_rooms[item->Item->roomNumber];
+        RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
+        OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
 
         m_stItem.World = item->World;
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
@@ -2547,10 +2547,10 @@ namespace TEN::Renderer
             if (!(msh->flags & 1))
                 continue;
 
-            RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
+            RendererRoom& room = m_rooms[view.staticsToDraw[i]->RoomIndex];
             if(!m_staticObjects[msh->staticNumber])
                 continue;
-            RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
+            RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
             if (staticObj.ObjectMeshes.size() > 0)
             {
