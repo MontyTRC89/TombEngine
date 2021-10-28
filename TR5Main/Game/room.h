@@ -6,7 +6,7 @@
 
 struct TRIGGER_VOLUME;
 
-constexpr auto MAX_FLIPMAP = 1024;
+constexpr auto MAX_FLIPMAP = 256;
 
 struct ROOM_VERTEX
 {
