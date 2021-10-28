@@ -166,13 +166,7 @@ namespace TEN::Entities::Doors
 
 		if (item->triggerFlags == 2
 			&& item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
-			&& ((TrInput & IN_ACTION ||
-#ifdef NEW_INV
-				GLOBAL_inventoryitemchosen == ID_CROWBAR_ITEM
-#else
-				g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM
-#endif
-				)
+			&& ((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() == ID_CROWBAR_ITEM)
 				&& l->currentAnimState == LS_STOP
 				&& l->animNumber == LA_STAND_IDLE
 				&& !l->hitStatus
@@ -184,25 +178,13 @@ namespace TEN::Entities::Doors
 			{
 				if (!Lara.isMoving)
 				{
-#ifdef NEW_INV
-					if (GLOBAL_inventoryitemchosen == NO_ITEM)
-#else
-					if (g_Inventory.GetSelectedObject() == NO_ITEM)
-#endif
+					if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 					{
-#ifdef NEW_INV
-						if (have_i_got_object(ID_CROWBAR_ITEM))
+						if (g_Inventory.have_i_got_object(ID_CROWBAR_ITEM))
 						{
-							GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+							g_Inventory.Set_enterInventory(ID_CROWBAR_ITEM);
 							item->pos.yRot ^= ANGLE(180);
 						}
-#else
-						if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
-						{
-							g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
-							item->pos.yRot ^= ANGLE(180);
-						}
-#endif
 						else
 						{
 							if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
@@ -216,21 +198,16 @@ namespace TEN::Entities::Doors
 						}
 						return;
 					}
-#ifdef NEW_INV
-					if (GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
-#else
-					if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
-#endif
+
+					if (g_Inventory.Get_inventoryItemChosen() != ID_CROWBAR_ITEM)
 					{
 						item->pos.yRot ^= ANGLE(180);
 						return;
 					}
 				}
-#ifdef NEW_INV
-				GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-				g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+
 				if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 				{
 					l->animNumber = LA_DOOR_OPEN_CROWBAR;
