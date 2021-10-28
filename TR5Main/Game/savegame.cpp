@@ -21,12 +21,12 @@
 #include "Game/misc.h"
 #include "Game/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_littlebeetle.h"
-#include "Game/rope.h"
+#include "Objects/Generic/Object/rope.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Game::Rope;
+using namespace TEN::Entities::Generic;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -628,25 +628,25 @@ bool SaveGame::Save(int slot)
 		Save::PendulumBuilder pendulumInfo{ fbb };
 		pendulumInfo.add_node(CurrentPendulum.node);
 		pendulumInfo.add_position(&Save::Vector3(
-			CurrentPendulum.Position.x,
-			CurrentPendulum.Position.y,
-			CurrentPendulum.Position.z));
+			CurrentPendulum.position.x,
+			CurrentPendulum.position.y,
+			CurrentPendulum.position.z));
 		pendulumInfo.add_velocity(&Save::Vector3(
-			CurrentPendulum.Velocity.x,
-			CurrentPendulum.Velocity.y,
-			CurrentPendulum.Velocity.z));
+			CurrentPendulum.velocity.x,
+			CurrentPendulum.velocity.y,
+			CurrentPendulum.velocity.z));
 		pendulumOffset = pendulumInfo.Finish();
 
 		Save::PendulumBuilder alternatePendulumInfo{ fbb };
 		alternatePendulumInfo.add_node(AlternatePendulum.node);
 		alternatePendulumInfo.add_position(&Save::Vector3(
-			AlternatePendulum.Position.x,
-			AlternatePendulum.Position.y,
-			AlternatePendulum.Position.z));
+			AlternatePendulum.position.x,
+			AlternatePendulum.position.y,
+			AlternatePendulum.position.z));
 		alternatePendulumInfo.add_velocity(&Save::Vector3(
-			AlternatePendulum.Velocity.x,
-			AlternatePendulum.Velocity.y,
-			AlternatePendulum.Velocity.z));
+			AlternatePendulum.velocity.x,
+			AlternatePendulum.velocity.y,
+			AlternatePendulum.velocity.z));
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
@@ -1226,31 +1226,31 @@ bool SaveGame::Load(int slot)
 			s->rope()->position()->y(),
 			s->rope()->position()->z());
 
-		CurrentPendulum.Position = PHD_VECTOR(
+		CurrentPendulum.position = PHD_VECTOR(
 			s->pendulum()->position()->x(),
 			s->pendulum()->position()->y(),
 			s->pendulum()->position()->z());
 
-		CurrentPendulum.Velocity = PHD_VECTOR(
+		CurrentPendulum.velocity = PHD_VECTOR(
 			s->pendulum()->velocity()->x(),
 			s->pendulum()->velocity()->y(),
 			s->pendulum()->velocity()->z());
 
 		CurrentPendulum.node = s->pendulum()->node();
-		CurrentPendulum.Rope = rope;
+		CurrentPendulum.rope = rope;
 
-		AlternatePendulum.Position = PHD_VECTOR(
+		AlternatePendulum.position = PHD_VECTOR(
 			s->alternate_pendulum()->position()->x(),
 			s->alternate_pendulum()->position()->y(),
 			s->alternate_pendulum()->position()->z());
 
-		AlternatePendulum.Velocity = PHD_VECTOR(
+		AlternatePendulum.velocity = PHD_VECTOR(
 			s->alternate_pendulum()->velocity()->x(),
 			s->alternate_pendulum()->velocity()->y(),
 			s->alternate_pendulum()->velocity()->z());
 
 		AlternatePendulum.node = s->alternate_pendulum()->node();
-		AlternatePendulum.Rope = rope;
+		AlternatePendulum.rope = rope;
 	}
 
 	return true;
