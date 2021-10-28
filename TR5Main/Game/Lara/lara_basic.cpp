@@ -236,7 +236,8 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) &&
+		coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 
@@ -589,7 +590,8 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) &&
+		coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 
@@ -763,18 +765,30 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
+	if (TrInput & IN_FORWARD)
 	{
 		if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT)
+		{
+			if (TestLaraWalkForward(item, coll))
+			{
+				item->goalAnimState = LS_WALK_FORWARD;
+
+				return;
+			}
+		}
+		else if (TrInput & IN_SPRINT &&
+			TestLaraRunForward(item, coll))
+		{
 			item->goalAnimState = LS_SPRINT;
-		else [[likely]]
+
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		return;
+			return;
+		}
 	}
 	// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back(). @Sezz 2021.06.27
 	else if (TrInput & IN_BACK)
@@ -1497,18 +1511,30 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
+	if (TrInput & IN_FORWARD)
 	{
 		if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD; // TODO: This is a frame-perfect input.
-		else if (TrInput & IN_SPRINT)
+		{
+			if (TestLaraWalkForward(item, coll))
+			{
+				item->goalAnimState = LS_WALK_FORWARD;
+
+				return;
+			}
+		}
+		else if (TrInput & IN_SPRINT &&
+			TestLaraRunForward(item, coll))
+		{
 			item->goalAnimState = LS_SPRINT;
-		else [[likely]]
+
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK)
 	{
@@ -1767,18 +1793,30 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
+	if (TrInput & IN_FORWARD)
 	{
 		if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT)
+		{
+			if (TestLaraWalkForward(item, coll))
+			{
+				item->goalAnimState = LS_WALK_FORWARD;
+
+				return;
+			}
+		}
+		else if (TrInput & IN_SPRINT &&
+			TestLaraRunForward(item, coll))
+		{
 			item->goalAnimState = LS_SPRINT;
-		else [[likely]]
+
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK)
 	{
@@ -2643,20 +2681,39 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
+	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
+		if (Lara.waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		{
+			if (TestLaraRunForward(item, coll))
+			{
+				item->goalAnimState = LS_WADE_FORWARD;
+
+				return;
+			}
+		}
 		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT)
+		{
+			if (TestLaraWalkForward(item, coll))
+			{
+				item->goalAnimState = LS_WALK_FORWARD;
+
+				return;
+			}
+		}
+		else if (TrInput & IN_SPRINT &&
+			TestLaraRunForward(item, coll))
+		{
 			item->goalAnimState = LS_SPRINT;
-		else [[likely]]
+
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK)
 	{
@@ -2786,20 +2843,39 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
+	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
+		if (Lara.waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		{
+			if (TestLaraRunForward(item, coll))
+			{
+				item->goalAnimState = LS_WADE_FORWARD;
+
+				return;
+			}
+		}
 		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT)
+		{
+			if (TestLaraWalkForward(item, coll))
+			{
+				item->goalAnimState = LS_WALK_FORWARD;
+
+				return;
+			}
+		}
+		else if (TrInput & IN_SPRINT &&
+			TestLaraRunForward(item, coll))
+		{
 			item->goalAnimState = LS_SPRINT;
-		else [[likely]]
+
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK)
 	{

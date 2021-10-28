@@ -182,14 +182,16 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 		}
+		else
+		{
+			return false;
+		}
 
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
-		// TODO: Is this necessary? Lara snaps to the wall in quite an unsightly manner.
-		// Additionally, Lara will oscillate against a low ceiling with a 0-height floor. @Sezz 2021.10.22
-		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
-		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
 
 		return true;
 	}
@@ -233,8 +235,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
 
-		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
-		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * coll->NearestLedgeDistance;
+		item->pos.xPos += phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
+		item->pos.zPos += phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + coll->Setup.Radius * 0.3f);
 
 		return true;
 	}
@@ -1505,10 +1507,34 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 	return false;
 }
 
-// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
-bool TestLaraWalkRunForward(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
+	auto y = item->pos.yPos - coll->Setup.Height;
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2) + 4, 0);
+
+	if (probe.Position.Ceiling - y < 0)
+		return true;
+
+	return false;
+
+	// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
+	// Additionally, run forward test needs to incorporate a unique ceiling check. @Sezz 2021.10.28
+	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
+}
+
+bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
+	{
+		return true;
+
+		return false;
+	}
+
+	// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
+	// Additionally, unique front collision checks are required. @Sezz 2021.10.28
+	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)

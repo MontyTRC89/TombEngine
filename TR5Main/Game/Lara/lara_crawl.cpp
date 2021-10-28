@@ -639,9 +639,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD &&
-			coll->CollisionType != CT_FRONT &&
-			coll->CollisionType != CT_TOP_FRONT)
+		if (TrInput & IN_FORWARD)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll))
@@ -650,7 +648,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll) &&
+				coll->CollisionType != CT_FRONT &&
+				coll->CollisionType != CT_TOP_FRONT) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -1139,11 +1139,17 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 				TestLaraCrawlVault(item, coll))
 			{
 				DoLaraCrawlVault(item, coll);
+
+				return;
 			}
-			else [[likely]]
+			else if (TestLaraCrawlForward(item, coll) &&
+				coll->CollisionType != CT_FRONT &&
+				coll->CollisionType != CT_TOP_FRONT) [[likely]]
+			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
-			return;
+				return;
+			}
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
