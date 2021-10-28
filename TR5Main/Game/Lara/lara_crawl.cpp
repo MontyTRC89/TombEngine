@@ -632,18 +632,11 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Not all weapons are classified as standing weapons??
 		// TODO: Allow standing vault up 2 steps when spawning flare while standing. @Sezz 2021.10.16
 
-		if (TrInput & IN_JUMP)
-		{
-			Lara.gunStatus = LG_NO_ARMS;
-			item->goalAnimState = LS_CROUCH_IDLE;
-
-			return;
-		}
-
 		// TODO: Flare not working.
-		if (TrInput & (IN_DRAW | IN_FLARE) &&
+		if (TrInput & IN_SPRINT ||
+			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(Lara.gunType) && // TODO: From here or from crouch, it needs to be consistent.
-			TestLaraDrawWeaponsFromCrawlIdle(item))
+			TestLaraDrawWeaponsFromCrawlIdle(item)))
 		{
 			Lara.gunStatus = LG_NO_ARMS;
 			item->goalAnimState = LS_CROUCH_IDLE;
@@ -655,7 +648,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			coll->CollisionType != CT_FRONT &&
 			coll->CollisionType != CT_TOP_FRONT)
 		{
-			if (TrInput & IN_ACTION &&
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll))
 			{
 				DoLaraCrawlVault(item, coll);
@@ -671,7 +664,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TrInput & IN_ACTION &&
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
 				DoLaraCrawlToHangSnap(item, coll);
@@ -1138,9 +1131,16 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
+		if (TrInput & IN_SPRINT)
+		{
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
 		if (TrInput & IN_FORWARD)
 		{
-			if (TrInput & IN_ACTION &&
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll))
 			{
 				DoLaraCrawlVault(item, coll);
@@ -1356,7 +1356,7 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_BACK)
 		{
 			// TODO: Not quite working.
-			if (TrInput & IN_ACTION &&
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
 				DoLaraCrawlToHangSnap(item, coll);
@@ -1516,23 +1516,21 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
+		if (TrInput & IN_SPRINT)
+		{
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
 		if (TrInput & IN_FORWARD &&
 			coll->CollisionType != CT_FRONT &&
-			coll->CollisionType != CT_TOP_FRONT)
+			coll->CollisionType != CT_TOP_FRONT &&
+			TestLaraCrawlForward(item, coll))
 		{
-			if (TrInput & IN_ACTION &&
-				TestLaraCrawlVault(item, coll))
-			{
-				DoLaraCrawlVault(item, coll);
+			item->goalAnimState = LS_CRAWL_FORWARD;
 
-				return;
-			}
-			else if (TestLaraCrawlForward(item, coll)) [[likely]]
-			{
-				item->goalAnimState = LS_CRAWL_FORWARD;
-
-				return;
-			}
+			return;
 		}
 
 		if (TrInput & IN_BACK &&
@@ -1613,23 +1611,21 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
+		if (TrInput & IN_SPRINT)
+		{
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+			return;
+		}
+
 		if (TrInput & IN_FORWARD &&
 			coll->CollisionType != CT_FRONT &&
-			coll->CollisionType != CT_TOP_FRONT)
+			coll->CollisionType != CT_TOP_FRONT &&
+			TestLaraCrawlForward(item, coll))
 		{
-			if (TrInput & IN_ACTION &&
-				TestLaraCrawlVault(item, coll))
-			{
-				DoLaraCrawlVault(item, coll);
+			item->goalAnimState = LS_CRAWL_FORWARD;
 
-				return;
-			}
-			else if (TestLaraCrawlForward(item, coll)) [[likely]]
-			{
-				item->goalAnimState = LS_CRAWL_FORWARD;
-
-				return;
-			}
+			return;
 		}
 
 		if (TrInput & IN_BACK &&
