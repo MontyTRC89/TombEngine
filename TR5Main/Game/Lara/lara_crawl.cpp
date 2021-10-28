@@ -878,6 +878,8 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.torsoXrot = 0; // TODO: More pleasing reset. @Sezz 2021.10.28
+	Lara.torsoYrot = 0;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -1214,6 +1216,8 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.torsoXrot = 0;
+	Lara.torsoYrot = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
