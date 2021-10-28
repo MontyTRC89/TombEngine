@@ -1,7 +1,8 @@
 #include "framework.h"
-#include "effect_objects.h"
+#include "Objects/Effects/effect_objects.h"
 #include "Specific/setup.h"
 #include "Objects/Effects/flame_emitters.h"
+#include "Objects/Effects/enemy_missile.h"
 
 using namespace TEN::Entities::Effects;
 
@@ -48,5 +49,15 @@ void InitialiseEffectsObjects()
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_ENERGY_BUBBLES];
+	{
+		obj->initialise = nullptr;
+		obj->collision = nullptr;
+		obj->control = ControlEnemyMissile;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 }
