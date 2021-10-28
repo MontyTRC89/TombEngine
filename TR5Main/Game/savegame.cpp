@@ -419,6 +419,17 @@ bool SaveGame::Save(int slot)
 	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
+	// Flipmaps
+	std::vector<int> flipMaps;
+	for (int i = 0; i < MAX_FLIPMAP; i++)
+		flipMaps.push_back(FlipMap[i] >> 8);
+	auto flipMapsOffset = fbb.CreateVector(flipMaps);
+
+	std::vector<int> flipStats;
+	for (int i = 0; i < MAX_FLIPMAP; i++)
+		flipStats.push_back(FlipStats[i]);
+	auto flipStatsOffset = fbb.CreateVector(flipStats);
+
 	// Cameras
 	std::vector<flatbuffers::Offset<Save::FixedCamera>> cameras;
 	for (int i = 0; i < g_Level.Cameras.size(); i++)
@@ -428,6 +439,26 @@ bool SaveGame::Save(int slot)
 		cameras.push_back(camera.Finish());
 	}
 	auto camerasOffset = fbb.CreateVector(cameras);
+
+	// Sinks
+	std::vector<flatbuffers::Offset<Save::Sink>> sinks;
+	for (int i = 0; i < g_Level.Sinks.size(); i++)
+	{
+		Save::SinkBuilder sink{ fbb };
+		sink.add_flags(g_Level.Sinks[i].strength);
+		sinks.push_back(sink.Finish());
+	}
+	auto sinksOffset = fbb.CreateVector(sinks);
+
+	// Flyby cameras
+	std::vector<flatbuffers::Offset<Save::FlyByCamera>> flybyCameras;
+	for (int i = 0; i < NumberSpotcams; i++)
+	{
+		Save::FlyByCameraBuilder flyby{ fbb };
+		flyby.add_flags(SpotCam[i].flags);
+		flybyCameras.push_back(flyby.Finish());
+	}
+	auto flybyCamerasOffset = fbb.CreateVector(flybyCameras);
 
 	// Static meshes
 	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
@@ -529,15 +560,10 @@ bool SaveGame::Save(int slot)
 	}
 	auto scarabsOffset = fbb.CreateVector(scarabs);
 
-	// Flipmaps
-	std::vector<int> flipMaps;
-	for (int i = 0; i < 255; i++)
-		flipMaps.push_back(FlipMap[i]);
-	auto flipMapsOffset = fbb.CreateVector(flipMaps);
-
 	// Rope
 	flatbuffers::Offset<Save::Rope> ropeOffset;
 	flatbuffers::Offset<Save::Pendulum> pendulumOffset;
+	flatbuffers::Offset<Save::Pendulum> alternatePendulumOffset;
 
 	if (Lara.ropePtr != -1)
 	{
@@ -600,7 +626,6 @@ bool SaveGame::Save(int slot)
 		ropeOffset = ropeInfo.Finish();
 
 		Save::PendulumBuilder pendulumInfo{ fbb };
-
 		pendulumInfo.add_node(CurrentPendulum.node);
 		pendulumInfo.add_position(&Save::Vector3(
 			CurrentPendulum.Position.x,
@@ -610,8 +635,19 @@ bool SaveGame::Save(int slot)
 			CurrentPendulum.Velocity.x,
 			CurrentPendulum.Velocity.y,
 			CurrentPendulum.Velocity.z));
-
 		pendulumOffset = pendulumInfo.Finish();
+
+		Save::PendulumBuilder alternatePendulumInfo{ fbb };
+		alternatePendulumInfo.add_node(AlternatePendulum.node);
+		alternatePendulumInfo.add_position(&Save::Vector3(
+			AlternatePendulum.Position.x,
+			AlternatePendulum.Position.y,
+			AlternatePendulum.Position.z));
+		alternatePendulumInfo.add_velocity(&Save::Vector3(
+			AlternatePendulum.Velocity.x,
+			AlternatePendulum.Velocity.y,
+			AlternatePendulum.Velocity.z));
+		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
 	Save::SaveGameBuilder sgb{ fbb };
@@ -623,6 +659,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_items(serializedItemsOffset);
 	sgb.add_ambient_track(ambientTrackOffset);
 	sgb.add_flip_maps(flipMapsOffset);
+	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_flip_timer(0);
@@ -632,11 +669,14 @@ bool SaveGame::Save(int slot)
 	sgb.add_rats(ratsOffset);
 	sgb.add_spiders(spidersOffset);
 	sgb.add_scarabs(scarabsOffset);
-	
+	sgb.add_sinks(sinksOffset);
+	sgb.add_flyby_cameras(flybyCamerasOffset);
+
 	if (Lara.ropePtr != -1)
 	{
 		sgb.add_rope(ropeOffset);
 		sgb.add_pendulum(pendulumOffset);
+		sgb.add_alternate_pendulum(alternatePendulumOffset);
 	}
 
 	auto sg = sgb.Finish();
@@ -671,9 +711,12 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Flipmaps
-	for (int i = 0; i < s->flip_maps()->size(); i++)
+	for (int i = 0; i < s->flip_stats()->size(); i++)
 	{
-		FlipMap[i] = s->flip_maps()->Get(i);
+		if (s->flip_stats()->Get(i) != 0)
+			DoFlipMap(i);
+
+		FlipMap[i] = s->flip_maps()->Get(i) << 8;
 	}
 
 	// Effects
@@ -700,10 +743,25 @@ bool SaveGame::Load(int slot)
 		}
 	}
 
-	// Cameras, sinks...
-	for (int i = 0; i < g_Level.Cameras.size(); i++)
+	// Cameras 
+	for (int i = 0; i < s->fixed_cameras()->size(); i++)
 	{
-		g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+		if (i < g_Level.Cameras.size())
+			g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+	}
+
+	// Sinks 
+	for (int i = 0; i < s->sinks()->size(); i++)
+	{
+		if (i < g_Level.Sinks.size())
+			g_Level.Sinks[i].strength = s->sinks()->Get(i)->flags();
+	}
+
+	// Flyby cameras 
+	for (int i = 0; i < s->flyby_cameras()->size(); i++)
+	{
+		if (i < NumberSpotcams)
+			SpotCam[i].flags = s->flyby_cameras()->Get(i)->flags();
 	}
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
@@ -1180,6 +1238,19 @@ bool SaveGame::Load(int slot)
 
 		CurrentPendulum.node = s->pendulum()->node();
 		CurrentPendulum.Rope = rope;
+
+		AlternatePendulum.Position = PHD_VECTOR(
+			s->alternate_pendulum()->position()->x(),
+			s->alternate_pendulum()->position()->y(),
+			s->alternate_pendulum()->position()->z());
+
+		AlternatePendulum.Velocity = PHD_VECTOR(
+			s->alternate_pendulum()->velocity()->x(),
+			s->alternate_pendulum()->velocity()->y(),
+			s->alternate_pendulum()->velocity()->z());
+
+		AlternatePendulum.node = s->alternate_pendulum()->node();
+		AlternatePendulum.Rope = rope;
 	}
 
 	return true;
