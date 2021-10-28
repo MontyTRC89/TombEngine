@@ -3,11 +3,7 @@
 #include "Specific/phd_global.h"
 #include "lara.h"
 #include "animation.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "room.h"
 #include "effects/debris.h"
 #include "health.h"
@@ -93,11 +89,6 @@ int NumRPickups;
 short RPickups[16];
 short getThisItemPlease = NO_ITEM;
 PHD_VECTOR OldPickupPos;
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
-
-
 
 void PickedUpObject(GAME_OBJECT_ID objID, int count)
 {
@@ -110,9 +101,6 @@ void PickedUpObject(GAME_OBJECT_ID objID, int count)
 	{
 		// item isn't any of the above; do nothing
 	}
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 }
 
 int GetInventoryCount(GAME_OBJECT_ID objID)
@@ -160,9 +148,6 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objID, int count)
 		{
 			// item isn't any of the above; do nothing
 		}
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 }
 
 void CollectCarriedItems(ITEM_INFO* item) 
@@ -376,13 +361,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (
-#ifdef NEW_INV
-		GLOBAL_inventoryitemchosen == NO_ITEM
-#else
-		g_Inventory.GetSelectedObject() == NO_ITEM 
-#endif
-		|| triggerFlags != 2)
+	if (!(TrInput & IN_ACTION) && 
+		(g_Inventory.Get_inventoryItemChosen() == NO_ITEM || triggerFlags != 2)
 		|| BinocularRange
 		|| (l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || Lara.gunStatus)
 		&& (l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || Lara.gunStatus)
@@ -477,11 +457,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		if (!Lara.isMoving)
 		{
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen == NO_ITEM)
+			if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 			{
-				if (have_i_got_object(ID_CROWBAR_ITEM))
-					GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+				if (g_Inventory.have_i_got_object(ID_CROWBAR_ITEM))
+					g_Inventory.Set_enterInventory(ID_CROWBAR_ITEM);
 
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -489,7 +468,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if (GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+			if (g_Inventory.Get_inventoryItemChosen() != ID_CROWBAR_ITEM)
 			{
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -497,28 +476,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			GLOBAL_inventoryitemchosen = -1;
-#else
-			if (g_Inventory.GetSelectedObject() == NO_ITEM)
-			{
-				if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
-					g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
-				item->pos.xRot = oldXrot;
-				item->pos.yRot = oldYrot;
-				item->pos.zRot = oldZrot;
-				return;
-			}
-
-			if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
-			{
-				item->pos.xRot = oldXrot;
-				item->pos.yRot = oldYrot;
-				item->pos.zRot = oldZrot;
-				return;
-			}
-
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 		}
 		if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
 		{
@@ -1104,11 +1062,7 @@ void SearchObjectControl(short itemNumber)
 int UseSpecialItem(ITEM_INFO* item)
 {
 	int flag = 0;
-#ifdef NEW_INV
-	int use = GLOBAL_inventoryitemchosen;
-#else
-	int use = g_Inventory.GetSelectedObject();
-#endif
+	int use = g_Inventory.Get_inventoryItemChosen();
 
 	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS && use != NO_ITEM)
 	{
@@ -1166,11 +1120,7 @@ int UseSpecialItem(ITEM_INFO* item)
 			item->currentAnimState = LS_MISC_CONTROL;
 			Lara.gunStatus = LG_HANDS_BUSY;
 
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 
 			return 1;
 		}

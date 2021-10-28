@@ -40,12 +40,7 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
-
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 
 #include "Game/rope.h"
 
@@ -53,10 +48,6 @@ using namespace TEN::Game::Rope;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
-
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;

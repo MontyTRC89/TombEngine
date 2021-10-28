@@ -17,1519 +17,1271 @@
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
 #include "Game/effects/lara_burn.h"
+#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Game/misc.h"
+#include "Game/puzzles_keys.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Game/rope.h"
 
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
+using namespace TEN::Game::Rope;
+using namespace flatbuffers;
 
+namespace Save = TEN::Save;
 using std::string;
 using std::vector;
+
 FileStream* SaveGame::m_stream;
-ChunkReader* SaveGame::m_reader;
-ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
 
-std::unique_ptr<ChunkId> SaveGame::m_chunkGameStatus;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItems;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItem;
-std::unique_ptr<ChunkId> SaveGame::m_chunkLara;
-std::unique_ptr<ChunkId> SaveGame::m_chunkLuaVariable;
-std::unique_ptr<ChunkId> SaveGame::m_chunkStaticFlags;
-std::unique_ptr<ChunkId> SaveGame::m_chunkVehicle;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSequenceSwitch;
-std::unique_ptr<ChunkId> SaveGame::m_chunkFlybyFlags;
-std::unique_ptr<ChunkId> SaveGame::m_chunkCdFlags;
-std::unique_ptr<ChunkId> SaveGame::m_chunkCamera;
-std::unique_ptr<ChunkId> SaveGame::m_chunkFlipStats;
-std::unique_ptr<ChunkId> SaveGame::m_chunkFlipMap;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemDummy;
-std::unique_ptr<ChunkId> SaveGame::m_chunkStatistics;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemAnims;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemMeshes;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemFlags;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemHitPoints;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemPosition;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemIntelligentData;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemBurningTorch;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemChaff;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemTorpedo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemCrossbowBolt;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpecialItemFlare;
-std::unique_ptr<ChunkId> SaveGame::m_chunkItemQuadInfo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkBats;
-std::unique_ptr<ChunkId> SaveGame::m_chunkRats;
-std::unique_ptr<ChunkId> SaveGame::m_chunkSpiders;
-std::unique_ptr<ChunkId> SaveGame::m_chunkLaraExtraInfo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponInfo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkPuzzle;
-std::unique_ptr<ChunkId> SaveGame::m_chunkKey;
-std::unique_ptr<ChunkId> SaveGame::m_chunkPickup;
-std::unique_ptr<ChunkId> SaveGame::m_chunkExamine;
-std::unique_ptr<ChunkId> SaveGame::m_chunkPuzzleCombo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkKeyCombo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkPickupCombo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkExamineCombo;
-std::unique_ptr<ChunkId> SaveGame::m_chunkWeaponItem;
-
 SAVEGAME_INFO Savegame;
-//extern vector<AudioTrack> SoundTracks;
 
-void SaveGame::saveItems()
+bool SaveGame::Save(int slot)
 {
-	// Save level items
-	for (int i = 0; i < g_Level.NumItems; i++)
-		m_writer->WriteChunkWithChildren(m_chunkItem.get(), &saveItem, i, 0);
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
 
-	// Save items created at runtime (flares, missiles...)
-	for (int i = g_Level.NumItems; i < NUM_ITEMS; i++)
-	{
-		ITEM_INFO* item = &g_Level.Items[i];
-		if (item->active)
-		{
-			// Some items are very special and are saved in specific functions, all the others use the general function
-			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-				m_writer->WriteChunk(m_chunkSpecialItemBurningTorch.get(), &saveBurningTorch, i, 1);
-			else if (item->objectNumber == ID_CHAFF)
-				m_writer->WriteChunk(m_chunkSpecialItemChaff.get(), &saveChaff, i, 1);
-			else if (item->objectNumber == ID_TORPEDO)
-				m_writer->WriteChunk(m_chunkSpecialItemTorpedo.get(), &saveTorpedo, i, 1);
-			else if (item->objectNumber == ID_CROSSBOW_BOLT)
-				m_writer->WriteChunk(m_chunkSpecialItemCrossbowBolt.get(), &saveCrossbowBolt, i, 1);
-			else if (item->objectNumber == ID_FLARE_ITEM)
-				m_writer->WriteChunk(m_chunkSpecialItemFlare.get(), &saveFlare, i, 1);
-			else
-				m_writer->WriteChunkWithChildren(m_chunkItem.get(), &saveItem, i, 1);
-		}
-	}
+	ITEM_INFO itemToSerialize{};
+	FlatBufferBuilder fbb{};
 
-	// Save special items
-	if (Objects[ID_BATS_EMITTER].loaded)
-		for (int i = 0; i < NUM_BATS; i++)
-			if (Bats[i].on)
-				m_writer->WriteChunk(m_chunkBats.get(), &saveBats, i, 0);
+	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
 
-	if (Objects[ID_RATS_EMITTER].loaded)
-		for (int i = 0; i < NUM_RATS; i++)
-			if (Rats[i].on)
-				m_writer->WriteChunk(m_chunkRats.get(), &saveRats, i, 0);
+	// Savegame header
+	auto levelNameOffset = fbb.CreateString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
 
-	if (Objects[ID_SPIDERS_EMITTER].loaded)
-		for (int i = 0; i < NUM_SPIDERS; i++)
-			if (Spiders[i].on)
-				m_writer->WriteChunk(m_chunkSpiders.get(), &saveSpiders, i, 0);
-}
+	Save::SaveGameHeaderBuilder sghb{ fbb };
+	sghb.add_level_name(levelNameOffset);
+	sghb.add_days((GameTimer / 30) / 8640);
+	sghb.add_hours(((GameTimer / 30) % 86400) / 3600);
+	sghb.add_minutes(((GameTimer / 30) / 60) % 6);
+	sghb.add_seconds((GameTimer / 30) % 60);
+	sghb.add_level(CurrentLevel);
+	sghb.add_timer(GameTimer);
+	sghb.add_count(++LastSaveGame);
+	auto headerOffset = sghb.Finish();
 
-void SaveGame::saveItem(int itemNumber, int runtimeItem)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	Save::SaveGameStatisticsBuilder sgLevelStatisticsBuilder{ fbb };
+	sgLevelStatisticsBuilder.add_ammo_hits(Savegame.Level.AmmoHits);
+	sgLevelStatisticsBuilder.add_ammo_used(Savegame.Level.AmmoUsed);
+	sgLevelStatisticsBuilder.add_kills(Savegame.Level.Kills);
+	sgLevelStatisticsBuilder.add_medipacks_used(Savegame.Level.HealthUsed);
+	sgLevelStatisticsBuilder.add_distance(Savegame.Level.Distance);
+	sgLevelStatisticsBuilder.add_secrets(Savegame.Level.Secrets);
+	sgLevelStatisticsBuilder.add_timer(Savegame.Level.Timer);
+	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
 
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, runtimeItem);
+	Save::SaveGameStatisticsBuilder sgGameStatisticsBuilder{ fbb };
+	sgGameStatisticsBuilder.add_ammo_hits(Savegame.Game.AmmoHits);
+	sgGameStatisticsBuilder.add_ammo_used(Savegame.Game.AmmoUsed);
+	sgGameStatisticsBuilder.add_kills(Savegame.Game.Kills);
+	sgGameStatisticsBuilder.add_medipacks_used(Savegame.Game.HealthUsed);
+	sgGameStatisticsBuilder.add_distance(Savegame.Game.Distance);
+	sgGameStatisticsBuilder.add_secrets(Savegame.Game.Secrets);
+	sgGameStatisticsBuilder.add_timer(Savegame.Game.Timer);
+	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
 
-	bool hasData = true;
+	// Lara
+	std::vector<int> puzzles;
+	for (int i = 0; i < NUM_PUZZLES; i++)
+		puzzles.push_back(Lara.Puzzles[i]);
+	auto puzzlesOffset = fbb.CreateVector(puzzles);
 
-	if (item->flags & IFLAG_KILLED)
-	{
-		LEB128::Write(m_stream, 0x2000);
-		hasData = false;
-	}
-	else if (item->flags & (IFLAG_ACTIVATION_MASK | IFLAG_INVISIBLE | 0x20) 
-		|| item->objectNumber == ID_LARA)
-	{
-		LEB128::Write(m_stream, 0x8000);
-		hasData = true;
-	}
-	else
-	{
-		LEB128::Write(m_stream, 0x0000);
-		hasData = false;
-	}
+	std::vector<int> puzzlesCombo;
+	for (int i = 0; i < NUM_PUZZLES * 2; i++)
+		puzzlesCombo.push_back(Lara.PuzzlesCombo[i]);
+	auto puzzlesComboOffset = fbb.CreateVector(puzzlesCombo);
 
-	LEB128::Write(m_stream, item->objectNumber);
+	std::vector<int> keys;
+	for (int i = 0; i < NUM_KEYS; i++)
+		keys.push_back(Lara.Keys[i]);
+	auto keysOffset = fbb.CreateVector(keys);
 
-	if (hasData)
-	{
-		m_writer->WriteChunkInt(m_chunkItemDummy.get(), 1);
+	std::vector<int> keysCombo;
+	for (int i = 0; i < NUM_KEYS * 2; i++)
+		keysCombo.push_back(Lara.KeysCombo[i]);
+	auto keysComboOffset = fbb.CreateVector(keysCombo);
 
-		if (obj->saveAnim)
-			m_writer->WriteChunk(m_chunkItemAnims.get(), &saveItemAnims, itemNumber, 0);
+	std::vector<int> pickups;
+	for (int i = 0; i < NUM_PICKUPS; i++)
+		pickups.push_back(Lara.Pickups[i]);
+	auto pickupsOffset = fbb.CreateVector(pickups);
 
-		if (obj->savePosition)
-			m_writer->WriteChunk(m_chunkItemPosition.get(), &saveItemPosition, itemNumber, 0);
+	std::vector<int> pickupsCombo;
+	for (int i = 0; i < NUM_PICKUPS * 2; i++)
+		pickupsCombo.push_back(Lara.PickupsCombo[i]);
+	auto pickupsComboOffset = fbb.CreateVector(pickupsCombo);
 
-		if (obj->saveHitpoints)
-			m_writer->WriteChunk(m_chunkItemHitPoints.get(), &saveItemHitPoints, itemNumber, 0);
+	std::vector<int> examines;
+	for (int i = 0; i < NUM_EXAMINES; i++)
+		examines.push_back(Lara.Examines[i]);
+	auto examinesOffset = fbb.CreateVector(examines);
 
-		if (obj->saveFlags)
-			m_writer->WriteChunkWithChildren(m_chunkItemFlags.get(), &saveItemFlags, itemNumber, 0);
+	std::vector<int> examinesCombo;
+	for (int i = 0; i < NUM_EXAMINES * 2; i++)
+		examinesCombo.push_back(Lara.ExaminesCombo[i]);
+	auto examinesComboOffset = fbb.CreateVector(examinesCombo);
 
-		if (obj->saveMesh)
-			m_writer->WriteChunk(m_chunkItemMeshes.get(), &saveItemMesh, itemNumber, 0);
+	std::vector<int> meshPtrs;
+	for (int i = 0; i < 15; i++)
+		meshPtrs.push_back(Lara.meshPtrs[i]);
+	auto meshPtrsOffset = fbb.CreateVector(meshPtrs);
 
-		if (obj->intelligent && item->data != NULL)
-			m_writer->WriteChunk(m_chunkItemIntelligentData.get(), &saveItemIntelligentData, itemNumber, 0);
-	}
-	else
-	{
-		m_writer->WriteChunkInt(m_chunkItemDummy.get(), 1);
-	}
-}
+	std::vector<byte> wet;
+	for (int i = 0; i < 15; i++)
+		wet.push_back(Lara.wet[i] == 1);
+	auto wetOffset = fbb.CreateVector(wet);
 
-void SaveGame::saveGameStatus(int arg1, int arg2)
-{
-	/*LEB128::Write(m_stream, FlipStatus);
-#ifndef NEW_INV
-	LEB128::Write(m_stream, LastInventoryItem);
-#endif
-	LEB128::Write(m_stream, FlipEffect);
-	LEB128::Write(m_stream, FlipTimer);
-	//LEB128::Write(m_stream, CurrentLoopedSoundTrack);
-	LEB128::Write(m_stream, CurrentSequence);
+	Save::LaraArmInfoBuilder leftArm{ fbb };
+	leftArm.add_anim_number(Lara.leftArm.animNumber);
+	leftArm.add_flash_gun(Lara.leftArm.flash_gun);
+	leftArm.add_frame_base(Lara.leftArm.frameBase);
+	leftArm.add_frame_number(Lara.leftArm.frameNumber);
+	leftArm.add_lock(Lara.leftArm.lock);
+	leftArm.add_x_rot(Lara.leftArm.xRot);
+	leftArm.add_y_rot(Lara.leftArm.yRot);
+	leftArm.add_z_rot(Lara.leftArm.zRot);
+	auto leftArmOffset = leftArm.Finish();
 
-	// Now the sub-chunks
-	for (int i = 0; i < g_Level.Rooms.size(); i++)
-		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
-			m_writer->WriteChunk(m_chunkStaticFlags.get(), &saveStaticFlag, i, j);
+	Save::LaraArmInfoBuilder rightArm{ fbb };
+	rightArm.add_anim_number(Lara.rightArm.animNumber);
+	rightArm.add_flash_gun(Lara.rightArm.flash_gun);
+	rightArm.add_frame_base(Lara.rightArm.frameBase);
+	rightArm.add_frame_number(Lara.rightArm.frameNumber);
+	rightArm.add_lock(Lara.rightArm.lock);
+	rightArm.add_x_rot(Lara.rightArm.xRot);
+	rightArm.add_y_rot(Lara.rightArm.yRot);
+	rightArm.add_z_rot(Lara.rightArm.zRot);
+	auto rightArmOffset = rightArm.Finish();
 
-	for (int i = 0; i < 6; i++)
-		m_writer->WriteChunk(m_chunkSequenceSwitch.get(), &saveSequenceSwitch, i, SequenceUsed[i]);
+	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
 
-	for (int i = 0; i < NumberSpotcams; i++)
-		m_writer->WriteChunk(m_chunkFlybyFlags.get(), &saveFlybyFlags, i, SpotCam[i].flags);
+	std::vector<int> laraTargetAngles{};
+	laraTargetAngles.push_back(Lara.targetAngles[0]);
+	laraTargetAngles.push_back(Lara.targetAngles[1]);
+	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
-	for (int i = 0; i < SoundTracks.size(); i++)
-		m_writer->WriteChunk(m_chunkCdFlags.get(), &saveCdFlags, i, SoundTracks[i].Mask);
+	Save::LaraTightropeInfoBuilder tightRope{ fbb };
+	tightRope.add_balance(Lara.tightrope.balance);
+	tightRope.add_can_go_off(Lara.tightrope.canGoOff);
+	tightRope.add_tightrope_item(Lara.tightrope.tightropeItem);
+	tightRope.add_time_on_tightrope(Lara.tightrope.timeOnTightrope);
+	auto tightRopeOffset = tightRope.Finish();
 
-	for (int i = 0; i < NumberCameras; i++)
-		m_writer->WriteChunk(m_chunkCamera.get(), &saveCamera, i, FixedCameras[i].flags);
+	Save::HolsterInfoBuilder holsterInfo{ fbb };
+	holsterInfo.add_back_holster((int)Lara.holsterInfo.backHolster);
+	holsterInfo.add_left_holster((int)Lara.holsterInfo.leftHolster);
+	holsterInfo.add_right_holster((int)Lara.holsterInfo.rightHolster);
+	auto holsterInfoOffset = holsterInfo.Finish();
 
-	for (int i = 0; i < 255; i++)
-		m_writer->WriteChunk(m_chunkFlipStats.get(), &saveFlipStats, i, FlipStats[i]);
-
-	for (int i = 0; i < 255; i++)
-		m_writer->WriteChunk(m_chunkFlipMap.get(), &saveFlipMap, i, FlipMap[i]);*/
-}
-
-void SaveGame::saveLara(int arg1, int arg2)
-{
-	// LARA_INFO struct dumped to savegame
-	LaraInfo lara;
-	memcpy(&lara, &Lara, sizeof(Lara));
-
-	//lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
-	//lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
-	//lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
-
-	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
-	
-	// Lara weapon data
-	if (Lara.weaponItem != NO_ITEM)
-		m_writer->WriteChunk(m_chunkWeaponItem.get(), &saveWeaponItem, Lara.weaponItem, 0);
-	
-	// Save Lara extra info
-	m_writer->WriteChunk(m_chunkLaraExtraInfo.get(), &saveLaraExtraInfo, 0, 0);
-	
-	// Save carried weapons
+	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < NUM_WEAPONS; i++)
 	{
-		m_writer->WriteChunk(m_chunkWeaponInfo.get(), &saveWeaponInfo, i, 0);
-	}
+		CarriedWeaponInfo* info = &Lara.Weapons[i];
+		
+		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
+		for (int j = 0; j < MAX_AMMOTYPE; j++)
+		{
+			Save::AmmoInfoBuilder ammo{ fbb };
+			ammo.add_count(info->Ammo[j].getCount());
+			ammo.add_is_infinite(info->Ammo[j].hasInfinite());
+			auto ammoOffset = ammo.Finish();
+			ammos.push_back(ammoOffset);
+		}
+		auto ammosOffset = fbb.CreateVector(ammos);
+		
+		Save::CarriedWeaponInfoBuilder serializedInfo{ fbb };
+		serializedInfo.add_ammo(ammosOffset);
+		serializedInfo.add_has_lasersight(info->HasLasersight);
+		serializedInfo.add_has_silencer(info->HasSilencer);
+		serializedInfo.add_present(info->Present);
+		serializedInfo.add_selected_ammo(info->SelectedAmmo);
+		auto serializedInfoOffset = serializedInfo.Finish();
 
-	// Save carried puzzles, keys, pickups and examines
-	for (int i = 0; i < NUM_PUZZLES; i++)
+		carriedWeapons.push_back(serializedInfoOffset);
+	}
+	auto carriedWeaponsOffset = fbb.CreateVector(carriedWeapons);
+
+	Save::LaraBuilder lara{ fbb };
+	lara.add_air(Lara.air);
+	lara.add_beetle_life(Lara.BeetleLife);
+	lara.add_big_waterskin(Lara.big_waterskin);
+	lara.add_binoculars(Lara.Binoculars);
+	lara.add_burn(Lara.burn);
+	lara.add_burn_blue(Lara.burnBlue);
+	lara.add_burn_count(Lara.burnCount);
+	lara.add_burn_smoke(Lara.burnSmoke);
+	lara.add_busy(Lara.busy);
+	lara.add_calc_fall_speed(Lara.calcFallSpeed);
+	lara.add_can_monkey_swing(Lara.canMonkeySwing);
+	lara.add_climb_status(Lara.climbStatus);
+	lara.add_corner_x(Lara.cornerX);
+	lara.add_corner_z(Lara.cornerZ);
+	lara.add_crowbar(Lara.Crowbar);
+	lara.add_current_active(Lara.currentActive);
+	lara.add_current_x_vel(Lara.currentXvel);
+	lara.add_current_y_vel(Lara.currentYvel);
+	lara.add_current_z_vel(Lara.currentZvel);
+	lara.add_death_count(Lara.deathCount);
+	lara.add_dive_count(Lara.diveCount);
+	lara.add_extra_anim(Lara.ExtraAnim);
+	lara.add_examines(examinesOffset);
+	lara.add_examines_combo(examinesComboOffset);
+	lara.add_fired(Lara.fired);
+	lara.add_flare_age(Lara.flareAge);
+	lara.add_flare_control_left(Lara.flareControlLeft);
+	lara.add_flare_frame(Lara.flareFrame);
+	lara.add_gun_status(Lara.gunStatus);
+	lara.add_gun_type(Lara.gunType);
+	lara.add_has_beetle_things(Lara.hasBeetleThings);
+	lara.add_has_fired(Lara.hasFired);
+	lara.add_head_x_rot(Lara.headXrot);
+	lara.add_head_y_rot(Lara.headYrot);
+	lara.add_head_z_rot(Lara.headZrot);
+	lara.add_highest_location(Lara.highestLocation);
+	lara.add_hit_direction(Lara.hitDirection);
+	lara.add_hit_frame(Lara.hitFrame);
+	lara.add_interacted_item(Lara.interactedItem);
+	lara.add_is_climbing(Lara.isClimbing);
+	lara.add_is_ducked(Lara.isDucked);
+	lara.add_is_moving(Lara.isMoving);
+	lara.add_item_number(Lara.itemNumber);
+	lara.add_keep_ducked(Lara.keepDucked);
+	lara.add_keys(keysOffset);
+	lara.add_keys_combo(keysComboOffset);
+	lara.add_lasersight(Lara.Lasersight);
+	lara.add_last_gun_type(Lara.lastGunType);
+	lara.add_last_position(&lastPos);
+	lara.add_left_arm(leftArmOffset);
+	lara.add_lit_torch(Lara.litTorch);
+	lara.add_location(Lara.location);
+	lara.add_location_pad(Lara.locationPad);
+	lara.add_look(Lara.look);
+	lara.add_mesh_ptrs(meshPtrsOffset);
+	lara.add_mine_l(Lara.mineL);
+	lara.add_mine_r(Lara.mineR);
+	lara.add_move_angle(Lara.moveAngle);
+	lara.add_move_count(Lara.moveCount);
+	lara.add_num_flares(Lara.NumFlares);
+	lara.add_num_small_medipacks(Lara.NumSmallMedipacks);
+	lara.add_num_large_medipacks(Lara.NumLargeMedipacks);
+	lara.add_old_busy(Lara.oldBusy);
+	lara.add_puzzles(puzzlesOffset);
+	lara.add_puzzles_combo(puzzlesComboOffset);
+	lara.add_poisoned(Lara.poisoned);
+	lara.add_pose_count(Lara.poseCount);
+	lara.add_pickups(pickupsOffset);
+	lara.add_pickups_combo(pickupsComboOffset);
+	lara.add_request_gun_type(Lara.requestGunType);
+	lara.add_right_arm(rightArmOffset);
+	lara.add_rope_arc_back(Lara.ropeArcBack);
+	lara.add_rope_arc_front(Lara.ropeArcFront);
+	lara.add_rope_count(Lara.ropeCount);
+	lara.add_rope_dframe(Lara.ropeDFrame);
+	lara.add_rope_direction(Lara.ropeDirection);
+	lara.add_rope_down_vel(Lara.ropeDownVel);
+	lara.add_rope_flag(Lara.ropeFlag);
+	lara.add_rope_framerate(Lara.ropeFrameRate);
+	lara.add_rope_frame(Lara.ropeFrame);
+	lara.add_rope_last_x(Lara.ropeLastX);
+	lara.add_rope_max_x_backward(Lara.ropeMaxXBackward);
+	lara.add_rope_max_x_forward(Lara.ropeMaxXForward);
+	lara.add_rope_offset(Lara.ropeOffset);
+	lara.add_rope_ptr(Lara.ropePtr);
+	lara.add_rope_segment(Lara.ropeSegment);
+	lara.add_rope_y(Lara.ropeY);
+	lara.add_secrets(Lara.Secrets);
+	lara.add_silencer(Lara.Silencer);
+	lara.add_small_waterskin(Lara.small_waterskin);
+	lara.add_spaz_effect_count(Lara.spazEffectCount);
+	lara.add_target_angles(laraTargetAnglesOffset);
+	lara.add_target_item_number(Lara.target - g_Level.Items.data());
+	lara.add_torch(Lara.Torch);
+	lara.add_torso_x_rot(Lara.torsoXrot);
+	lara.add_torso_y_rot(Lara.torsoYrot);
+	lara.add_torso_z_rot(Lara.torsoZrot);
+	lara.add_turn_rate(Lara.turnRate);
+	lara.add_uncontrollable(Lara.uncontrollable);
+	lara.add_vehicle(Lara.Vehicle);
+	lara.add_water_status(Lara.waterStatus);
+	lara.add_water_surface_dist(Lara.waterSurfaceDist);
+	lara.add_weapon_item(Lara.weaponItem);
+	lara.add_wet(wetOffset);
+	lara.add_tightrope(tightRopeOffset);
+	lara.add_holster_info(holsterInfoOffset);
+	lara.add_weapons(carriedWeaponsOffset);
+
+	auto laraOffset = lara.Finish();
+
+	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		if (Lara.Puzzles[i] > 0)
-			m_writer->WriteChunk(m_chunkPuzzle.get(), &savePuzzle, i, Lara.Puzzles[i]);
+		OBJECT_INFO* obj = &Objects[itemToSerialize.objectNumber];
+
+		std::vector<int> itemFlags;
+		for (int i = 0; i < 7; i++)
+			itemFlags.push_back(itemToSerialize.itemFlags[i]);
+		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
+				
+		flatbuffers::Offset<Save::Creature> creatureOffset;
+
+		if (Objects[itemToSerialize.objectNumber].intelligent 
+			&& itemToSerialize.data.is<CREATURE_INFO>())
+		{
+			auto creature = GetCreatureInfo(&itemToSerialize);
+
+			std::vector<int> jointRotations;
+			for (int i = 0; i < 4; i++)
+				jointRotations.push_back(creature->jointRotation[i]);
+			auto jointRotationsOffset = fbb.CreateVector(jointRotations);
+
+			Save::CreatureBuilder creatureBuilder{ fbb };
+
+			creatureBuilder.add_alerted(creature->alerted);
+			creatureBuilder.add_can_jump(creature->LOT.canJump);
+			creatureBuilder.add_can_monkey(creature->LOT.canMonkey);
+			creatureBuilder.add_enemy(creature->enemy - g_Level.Items.data());
+			creatureBuilder.add_flags(creature->flags);
+			creatureBuilder.add_head_left(creature->headLeft);
+			creatureBuilder.add_head_right(creature->headRight);
+			creatureBuilder.add_hurt_by_lara(creature->hurtByLara);
+			creatureBuilder.add_is_amphibious(creature->LOT.isAmphibious);
+			creatureBuilder.add_is_jumping(creature->LOT.isJumping);
+			creatureBuilder.add_is_monkeying(creature->LOT.isMonkeying);
+			creatureBuilder.add_joint_rotation(jointRotationsOffset);
+			creatureBuilder.add_jump_ahead(creature->jumpAhead);
+			creatureBuilder.add_maximum_turn(creature->maximumTurn);
+			creatureBuilder.add_monkey_ahead(creature->monkeyAhead);
+			creatureBuilder.add_mood(creature->mood);
+			creatureBuilder.add_patrol2(creature->patrol2);
+			creatureBuilder.add_reached_goal(creature->reachedGoal);
+
+			creatureOffset = creatureBuilder.Finish();
+		}
+
+		Save::Position position = Save::Position(
+			(int32_t)itemToSerialize.pos.xPos,
+			(int32_t)itemToSerialize.pos.yPos,
+			(int32_t)itemToSerialize.pos.zPos,
+			(int32_t)itemToSerialize.pos.xRot,
+			(int32_t)itemToSerialize.pos.yRot,
+			(int32_t)itemToSerialize.pos.zRot);
+
+		Save::ItemBuilder serializedItem{ fbb };
+
+		serializedItem.add_anim_number(itemToSerialize.animNumber - obj->animIndex);
+		serializedItem.add_after_death(itemToSerialize.afterDeath);
+		serializedItem.add_box_number(itemToSerialize.boxNumber);
+		serializedItem.add_carried_item(itemToSerialize.carriedItem);
+		serializedItem.add_current_anim_state(itemToSerialize.currentAnimState);
+		serializedItem.add_fall_speed(itemToSerialize.fallspeed);
+		serializedItem.add_fired_weapon(itemToSerialize.firedWeapon);
+		serializedItem.add_flags(itemToSerialize.flags);
+		serializedItem.add_floor(itemToSerialize.floor);
+		serializedItem.add_frame_number(itemToSerialize.frameNumber);
+		serializedItem.add_goal_anim_state(itemToSerialize.goalAnimState);
+		serializedItem.add_hit_points(itemToSerialize.hitPoints);
+		serializedItem.add_item_flags(itemFlagsOffset);
+		serializedItem.add_mesh_bits(itemToSerialize.meshBits);
+		serializedItem.add_object_id(itemToSerialize.objectNumber);
+		serializedItem.add_position(&position);
+		serializedItem.add_required_anim_state(itemToSerialize.requiredAnimState);
+		serializedItem.add_room_number(itemToSerialize.roomNumber);
+		serializedItem.add_speed(itemToSerialize.speed);
+		serializedItem.add_timer(itemToSerialize.timer);
+		serializedItem.add_touch_bits(itemToSerialize.touchBits);
+		serializedItem.add_trigger_flags(itemToSerialize.triggerFlags);
+		serializedItem.add_triggered((itemToSerialize.flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
+		serializedItem.add_active(itemToSerialize.active);
+		serializedItem.add_status(itemToSerialize.status);
+		serializedItem.add_gravity_status(itemToSerialize.gravityStatus);
+		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
+		serializedItem.add_poisoned(itemToSerialize.poisoned);
+		serializedItem.add_ai_bits(itemToSerialize.aiBits);
+		serializedItem.add_really_active(itemToSerialize.reallyActive);
+		serializedItem.add_collidable(itemToSerialize.collidable);
+		serializedItem.add_looked_at(itemToSerialize.lookedAt);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.swapMeshFlags);
+
+		if (Objects[itemToSerialize.objectNumber].intelligent 
+			&& itemToSerialize.data.is<CREATURE_INFO>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Creature);
+			serializedItem.add_data(creatureOffset.Union());
+		}
+
+		auto serializedItemOffset = serializedItem.Finish();
+		serializedItems.push_back(serializedItemOffset);
 	}
 
-	for (int i = 0; i < NUM_PUZZLES * 2; i++)
+	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
+	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+
+	// Flipmaps
+	std::vector<int> flipMaps;
+	for (int i = 0; i < MAX_FLIPMAP; i++)
+		flipMaps.push_back(FlipMap[i] >> 8);
+	auto flipMapsOffset = fbb.CreateVector(flipMaps);
+
+	std::vector<int> flipStats;
+	for (int i = 0; i < MAX_FLIPMAP; i++)
+		flipStats.push_back(FlipStats[i]);
+	auto flipStatsOffset = fbb.CreateVector(flipStats);
+
+	// Cameras
+	std::vector<flatbuffers::Offset<Save::FixedCamera>> cameras;
+	for (int i = 0; i < g_Level.Cameras.size(); i++)
 	{
-		if (Lara.PuzzlesCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkPuzzleCombo.get(), &savePuzzle, i, Lara.PuzzlesCombo[i]);
+		Save::FixedCameraBuilder camera{ fbb };
+		camera.add_flags(g_Level.Cameras[i].flags);
+		cameras.push_back(camera.Finish());
 	}
+	auto camerasOffset = fbb.CreateVector(cameras);
 
-	for (int i = 0; i < NUM_KEYS; i++)
+	// Sinks
+	std::vector<flatbuffers::Offset<Save::Sink>> sinks;
+	for (int i = 0; i < g_Level.Sinks.size(); i++)
 	{
-		if (Lara.Keys[i] > 0)
-			m_writer->WriteChunk(m_chunkKey.get(), &savePuzzle, i, Lara.Keys[i]);
+		Save::SinkBuilder sink{ fbb };
+		sink.add_flags(g_Level.Sinks[i].strength);
+		sinks.push_back(sink.Finish());
 	}
+	auto sinksOffset = fbb.CreateVector(sinks);
 
-	for (int i = 0; i < NUM_KEYS * 2; i++)
+	// Flyby cameras
+	std::vector<flatbuffers::Offset<Save::FlyByCamera>> flybyCameras;
+	for (int i = 0; i < NumberSpotcams; i++)
 	{
-		if (Lara.KeysCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkKeyCombo.get(), &savePuzzle, i, Lara.KeysCombo[i]);
+		Save::FlyByCameraBuilder flyby{ fbb };
+		flyby.add_flags(SpotCam[i].flags);
+		flybyCameras.push_back(flyby.Finish());
 	}
+	auto flybyCamerasOffset = fbb.CreateVector(flybyCameras);
 
-	for (int i = 0; i < NUM_PICKUPS; i++)
+	// Static meshes
+	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		if (Lara.Pickups[i] > 0)
-			m_writer->WriteChunk(m_chunkPickup.get(), &savePuzzle, i, Lara.Pickups[i]);
+		ROOM_INFO* room = &g_Level.Rooms[i];
+		for (int j = 0; j < room->mesh.size(); j++)
+		{
+			Save::StaticMeshInfoBuilder staticMesh{ fbb };
+			staticMesh.add_flags(room->mesh[j].flags);
+			staticMesh.add_room_number(i);
+			staticMeshes.push_back(staticMesh.Finish());
+		}
 	}
+	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 
-	for (int i = 0; i < NUM_PICKUPS * 2; i++)
+	// Particle enemies
+	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
+	for (int i = 0; i < NUM_BATS; i++)
 	{
-		if (Lara.PickupsCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkPickupCombo.get(), &savePuzzle, i, Lara.PickupsCombo[i]);
-	}
+		BAT_STRUCT* bat = &Bats[i];
 
-	for (int i = 0; i < NUM_EXAMINES; i++)
+		Save::BatInfoBuilder batInfo{ fbb };
+
+		batInfo.add_counter(bat->counter);
+		batInfo.add_on(bat->on);
+		batInfo.add_room_number(bat->roomNumber);
+		batInfo.add_x(bat->pos.xPos);
+		batInfo.add_y(bat->pos.yPos);
+		batInfo.add_z(bat->pos.zPos);
+		batInfo.add_x_rot(bat->pos.xRot);
+		batInfo.add_y_rot(bat->pos.yRot);
+		batInfo.add_z_rot(bat->pos.zRot);
+
+		bats.push_back(batInfo.Finish());
+	}
+	auto batsOffset = fbb.CreateVector(bats);
+
+	std::vector<flatbuffers::Offset<Save::SpiderInfo>> spiders;
+	for (int i = 0; i < NUM_SPIDERS; i++)
 	{
-		if (Lara.Examines[i] > 0)
-			m_writer->WriteChunk(m_chunkExamine.get(), &savePuzzle, i, Lara.Examines[i]);
-	}
+		SPIDER_STRUCT* spider = &Spiders[i];
 
-	for (int i = 0; i < NUM_EXAMINES * 2; i++)
+		Save::SpiderInfoBuilder spiderInfo{ fbb };
+
+		spiderInfo.add_flags(spider->flags);
+		spiderInfo.add_on(spider->on);
+		spiderInfo.add_room_number(spider->roomNumber);
+		spiderInfo.add_x(spider->pos.xPos);
+		spiderInfo.add_y(spider->pos.yPos);
+		spiderInfo.add_z(spider->pos.zPos);
+		spiderInfo.add_x_rot(spider->pos.xRot);
+		spiderInfo.add_y_rot(spider->pos.yRot);
+		spiderInfo.add_z_rot(spider->pos.zRot);
+
+		spiders.push_back(spiderInfo.Finish());
+	}
+	auto spidersOffset = fbb.CreateVector(spiders);
+
+	std::vector<flatbuffers::Offset<Save::RatInfo>> rats;
+	for (int i = 0; i < NUM_RATS; i++)
 	{
-		if (Lara.ExaminesCombo[i] > 0)
-			m_writer->WriteChunk(m_chunkExamineCombo.get(), &savePuzzle, i, Lara.ExaminesCombo[i]);
+		RAT_STRUCT* rat = &Rats[i];
+
+		Save::RatInfoBuilder ratInfo{ fbb };
+
+		ratInfo.add_flags(rat->flags);
+		ratInfo.add_on(rat->on);
+		ratInfo.add_room_number(rat->roomNumber);
+		ratInfo.add_x(rat->pos.xPos);
+		ratInfo.add_y(rat->pos.yPos);
+		ratInfo.add_z(rat->pos.zPos);
+		ratInfo.add_x_rot(rat->pos.xRot);
+		ratInfo.add_y_rot(rat->pos.yRot);
+		ratInfo.add_z_rot(rat->pos.zRot);
+
+		rats.push_back(ratInfo.Finish());
 	}
-}
+	auto ratsOffset = fbb.CreateVector(rats);
 
-void SaveGame::saveWeaponItem(int arg1, int arg2)
-{
-	ITEM_INFO* weaponItem = &g_Level.Items[arg1];
-	
-	LEB128::Write(m_stream, weaponItem->objectNumber);
-	LEB128::Write(m_stream, weaponItem->animNumber);
-	LEB128::Write(m_stream, weaponItem->frameNumber);
-	LEB128::Write(m_stream, weaponItem->currentAnimState);
-	LEB128::Write(m_stream, weaponItem->goalAnimState);
-	LEB128::Write(m_stream, weaponItem->requiredAnimState);
-}
+	std::vector<flatbuffers::Offset<Save::ScarabInfo>> scarabs;
+	for (int i = 0; i < NUM_BATS; i++)
+	{
+		SCARAB_STRUCT* scarab = &Scarabs[i];
 
-void SaveGame::saveLaraExtraInfo(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, (Lara.Binoculars ? 1 : 0));
-	LEB128::Write(m_stream, (Lara.Lasersight ? 1 : 0));
-	LEB128::Write(m_stream, (Lara.Crowbar ? 1 : 0));
-	LEB128::Write(m_stream, (Lara.Silencer ? 1 : 0));
-	LEB128::Write(m_stream, (Lara.Torch ? 1 : 0));
-	LEB128::Write(m_stream, Lara.Secrets);
-	LEB128::Write(m_stream, Lara.ExtraAnim);
-	LEB128::Write(m_stream, Lara.Vehicle);
-	LEB128::Write(m_stream, Lara.mineL);
-	LEB128::Write(m_stream, Lara.mineR);
-	LEB128::Write(m_stream, Lara.NumFlares);
-	LEB128::Write(m_stream, Lara.NumLargeMedipacks);
-	LEB128::Write(m_stream, Lara.NumSmallMedipacks);
-}
+		Save::ScarabInfoBuilder scarabInfo{ fbb };
 
-void SaveGame::savePuzzle(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1); // ID
-	LEB128::Write(m_stream, arg2); // Quantity
-}
+		scarabInfo.add_flags(scarab->flags);
+		scarabInfo.add_on(scarab->on);
+		scarabInfo.add_room_number(scarab->roomNumber);
+		scarabInfo.add_x(scarab->pos.xPos);
+		scarabInfo.add_y(scarab->pos.yPos);
+		scarabInfo.add_z(scarab->pos.zPos);
+		scarabInfo.add_x_rot(scarab->pos.xRot);
+		scarabInfo.add_y_rot(scarab->pos.yRot);
+		scarabInfo.add_z_rot(scarab->pos.zRot);
 
-void SaveGame::saveWeaponInfo(int arg1, int arg2)
-{
-	CarriedWeaponInfo* weapon = &Lara.Weapons[arg1];
+		scarabs.push_back(scarabInfo.Finish());
+	}
+	auto scarabsOffset = fbb.CreateVector(scarabs);
 
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, weapon->Present);
-	LEB128::Write(m_stream, weapon->SelectedAmmo);
-	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO1]);
-	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO2]);
-	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO3]);
-	LEB128::Write(m_stream, weapon->HasSilencer);
-	LEB128::Write(m_stream, weapon->HasLasersight);
-}
+	// Rope
+	flatbuffers::Offset<Save::Rope> ropeOffset;
+	flatbuffers::Offset<Save::Pendulum> pendulumOffset;
+	flatbuffers::Offset<Save::Pendulum> alternatePendulumOffset;
 
-void SaveGame::saveVariables()
-{
-	m_luaVariables.clear();
-	//g_GameScript->GetVariables(&m_luaVariables);
-	for (int i = 0; i < m_luaVariables.size(); i++)
-		m_writer->WriteChunk(m_chunkLuaVariable.get(), &saveVariable, i, 0);
-}
+	if (Lara.ropePtr != -1)
+	{
+		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
 
-void SaveGame::saveVariable(int arg1, int arg2)
-{
-	LuaVariable variable = m_luaVariables[arg1];
-	
-	LEB128::Write(m_stream, variable.IsGlobal == 1);
-	LEB128::Write(m_stream, variable.Type);
-	m_stream->WriteString((char*)variable.Name.c_str());
+		std::vector<const Save::Vector3*> segments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			segments.push_back(&Save::Vector3(
+				rope->segment[i].x, 
+				rope->segment[i].y, 
+				rope->segment[i].z));
+		auto segmentsOffset = fbb.CreateVector(segments);
 
-	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
-		m_stream->WriteBool(variable.BoolValue);
-	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
-		m_stream->WriteInt32(variable.IntValue);
-	else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
-		m_stream->WriteString((char*)variable.StringValue.c_str());
-	else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-		m_stream->WriteFloat(variable.FloatValue);*/
-}
+		std::vector<const Save::Vector3*> velocities;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			velocities.push_back(&Save::Vector3(
+				rope->velocity[i].x,
+				rope->velocity[i].y,
+				rope->velocity[i].z));
+		auto velocitiesOffset = fbb.CreateVector(velocities);
 
-void SaveGame::Start()
-{
-	m_chunkGameStatus = ChunkId::FromString("TR5MSgGameStatus");
-	m_chunkItems = ChunkId::FromString("TR5MSgItems");
-	m_chunkItem = ChunkId::FromString("TR5MSgItem");
-	m_chunkLara = ChunkId::FromString("TR5MSgLara");
-	m_chunkLuaVariable = ChunkId::FromString("TR5MSgLuaVar");
-	m_chunkStaticFlags = ChunkId::FromString("TR5MSgStFl");
-	m_chunkVehicle = ChunkId::FromString("TR5MSgLaraVeh");
-	m_chunkSequenceSwitch = ChunkId::FromString("TR5MSgSeqSw");
-	m_chunkFlybyFlags = ChunkId::FromString("TR5MSgFlybyF");
-	m_chunkCdFlags = ChunkId::FromString("TR5MSgCdF");
-	m_chunkCamera = ChunkId::FromString("TR5MSgCam");
-	m_chunkFlipStats = ChunkId::FromString("TR5MSgFlS");
-	m_chunkFlipMap = ChunkId::FromString("TR5MSgFlM");
-	m_chunkItemDummy = ChunkId::FromString("TR5MSgItemDummy");
-	m_chunkStatistics = ChunkId::FromString("TR5MSgStats");
-	m_chunkItemAnims = ChunkId::FromString("TR5MSgItAnms");
-	m_chunkItemMeshes = ChunkId::FromString("TR5MSgItMsh");
-	m_chunkItemFlags = ChunkId::FromString("TR5MSgItFl");
-	m_chunkItemHitPoints = ChunkId::FromString("TR5MSgItHP");
-	m_chunkItemPosition = ChunkId::FromString("TR5MSgItPos");
-	m_chunkItemIntelligentData = ChunkId::FromString("TR5MSgItIntell");
-	m_chunkSpecialItemBurningTorch = ChunkId::FromString("TR5MSgItTorch");
-	m_chunkSpecialItemChaff = ChunkId::FromString("TR5MSgItChaff");
-	m_chunkSpecialItemTorpedo = ChunkId::FromString("TR5MSgItTorpedo");
-	m_chunkSpecialItemCrossbowBolt = ChunkId::FromString("TR5MSgItBolt");
-	m_chunkSpecialItemFlare = ChunkId::FromString("TR5MSgItFlare");
-	m_chunkItemQuadInfo = ChunkId::FromString("TR5MSgQuadInfo");
-	m_chunkBats = ChunkId::FromString("TR5MSgBats");
-	m_chunkRats = ChunkId::FromString("TR5MSgRats");
-	m_chunkSpiders = ChunkId::FromString("TR5MSgSpiders");
-	m_chunkLaraExtraInfo = ChunkId::FromString("TR5MSgLaraExtraInfo");
-	m_chunkWeaponInfo = ChunkId::FromString("TR5MSgWeapon");
-	m_chunkPuzzle = ChunkId::FromString("TR5MSgPuzzle");
-	m_chunkPuzzleCombo = ChunkId::FromString("TR5MSgPuzzleC");
-	m_chunkKey = ChunkId::FromString("TR5MSgKey");
-	m_chunkKeyCombo = ChunkId::FromString("TR5MSgKeyC");
-	m_chunkPickup = ChunkId::FromString("TR5MSgPickup");
-	m_chunkPickupCombo = ChunkId::FromString("TR5MSgPickupC");
-	m_chunkExamine = ChunkId::FromString("TR5MSgExamine");
-	m_chunkExamineCombo = ChunkId::FromString("TR5MSgExamineC");
-	m_chunkWeaponItem = ChunkId::FromString("TR5MSgWeaponItem");
+		std::vector<const Save::Vector3*> normalisedSegments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			normalisedSegments.push_back(&Save::Vector3(
+				rope->normalisedSegment[i].x,
+				rope->normalisedSegment[i].y,
+				rope->normalisedSegment[i].z));
+		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
 
-	LastSaveGame = 0;
-}
+		std::vector<const Save::Vector3*> meshSegments;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			meshSegments.push_back(&Save::Vector3(
+				rope->meshSegment[i].x,
+				rope->meshSegment[i].y,
+				rope->meshSegment[i].z));
+		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
 
-void SaveGame::End()
-{
-}
+		std::vector<const Save::Vector3*> coords;
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+			coords.push_back(&Save::Vector3(
+				rope->coords[i].x,
+				rope->coords[i].y,
+				rope->coords[i].z));
+		auto coordsOffset = fbb.CreateVector(coords);
 
-bool SaveGame::Save(char* fileName)
-{
-	m_stream = new FileStream(fileName, true, true);
-	m_writer = new ChunkWriter(0x4D355254, m_stream);
+		Save::RopeBuilder ropeInfo{ fbb };
 
-	printf("Timer: %d\n", Savegame.Game.Timer);
+		ropeInfo.add_segments(segmentsOffset);
+		ropeInfo.add_velocities(velocitiesOffset);
+		ropeInfo.add_mesh_segments(meshSegmentsOffset);
+		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
+		ropeInfo.add_coords(coordsOffset);
+		ropeInfo.add_coiled(rope->coiled);
+		ropeInfo.add_position(&Save::Vector3(
+			rope->position.x,
+			rope->position.y,
+			rope->position.z));
+		ropeInfo.add_segment_length(rope->segmentLength);
 
-	// The header must be here, so no chunks
-	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
-	LEB128::Write(m_stream, (GameTimer / 30) / 86400);
-	LEB128::Write(m_stream, ((GameTimer / 30) % 86400) / 3600);
-	LEB128::Write(m_stream, ((GameTimer / 30) / 60) % 60);
-	LEB128::Write(m_stream, (GameTimer / 30) % 60);
-	LEB128::Write(m_stream, CurrentLevel);
-	LEB128::Write(m_stream, GameTimer);
-	LEB128::Write(m_stream, ++LastSaveGame);
+		ropeOffset = ropeInfo.Finish();
 
-	// Now we write chunks
-	m_writer->WriteChunk(m_chunkStatistics.get(), &saveStatistics, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkGameStatus.get(), &saveGameStatus, 0, 0);
-	m_writer->WriteChunkWithChildren(m_chunkLara.get(), &saveLara, 0, 0);
-	saveItems();
-	saveVariables();
-	
-	// EOF
-	m_stream->WriteInt32(0);
+		Save::PendulumBuilder pendulumInfo{ fbb };
+		pendulumInfo.add_node(CurrentPendulum.node);
+		pendulumInfo.add_position(&Save::Vector3(
+			CurrentPendulum.Position.x,
+			CurrentPendulum.Position.y,
+			CurrentPendulum.Position.z));
+		pendulumInfo.add_velocity(&Save::Vector3(
+			CurrentPendulum.Velocity.x,
+			CurrentPendulum.Velocity.y,
+			CurrentPendulum.Velocity.z));
+		pendulumOffset = pendulumInfo.Finish();
 
-	m_stream->Close();
+		Save::PendulumBuilder alternatePendulumInfo{ fbb };
+		alternatePendulumInfo.add_node(AlternatePendulum.node);
+		alternatePendulumInfo.add_position(&Save::Vector3(
+			AlternatePendulum.Position.x,
+			AlternatePendulum.Position.y,
+			AlternatePendulum.Position.z));
+		alternatePendulumInfo.add_velocity(&Save::Vector3(
+			AlternatePendulum.Velocity.x,
+			AlternatePendulum.Velocity.y,
+			AlternatePendulum.Velocity.z));
+		alternatePendulumOffset = alternatePendulumInfo.Finish();
+	}
 
-	delete m_writer;
-	delete m_stream;
+	Save::SaveGameBuilder sgb{ fbb };
+
+	sgb.add_header(headerOffset);
+	sgb.add_level(levelStatisticsOffset);
+	sgb.add_game(gameStatisticsOffset);
+	sgb.add_lara(laraOffset);
+	sgb.add_items(serializedItemsOffset);
+	sgb.add_ambient_track(ambientTrackOffset);
+	sgb.add_flip_maps(flipMapsOffset);
+	sgb.add_flip_stats(flipStatsOffset);
+	sgb.add_flip_effect(FlipEffect);
+	sgb.add_flip_status(FlipStatus);
+	sgb.add_flip_timer(0);
+	sgb.add_static_meshes(staticMeshesOffset);
+	sgb.add_fixed_cameras(camerasOffset);
+	sgb.add_bats(batsOffset);
+	sgb.add_rats(ratsOffset);
+	sgb.add_spiders(spidersOffset);
+	sgb.add_scarabs(scarabsOffset);
+	sgb.add_sinks(sinksOffset);
+	sgb.add_flyby_cameras(flybyCamerasOffset);
+
+	if (Lara.ropePtr != -1)
+	{
+		sgb.add_rope(ropeOffset);
+		sgb.add_pendulum(pendulumOffset);
+		sgb.add_alternate_pendulum(alternatePendulumOffset);
+	}
+
+	auto sg = sgb.Finish();
+	fbb.Finish(sg);
+
+	auto bufferToSerialize = fbb.GetBufferPointer();
+	auto bufferSize = fbb.GetSize();
+
+	std::ofstream fileOut{};
+	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
+	fileOut.write((char*)bufferToSerialize, bufferSize);
+	fileOut.close();
 
 	return true;
 }
 
-bool SaveGame::readGameStatus()
+bool SaveGame::Load(int slot)
 {
-	FlipStatus = LEB128::ReadInt32(m_stream);
-#ifndef NEW_INV
-	LastInventoryItem = LEB128::ReadInt32(m_stream);
-#endif
-	FlipEffect = LEB128::ReadInt32(m_stream);
-	CurrentLoopedSoundTrack = LEB128::ReadByte(m_stream);
-	CurrentSequence = LEB128::ReadByte(m_stream);
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
 
-	m_reader->ReadChunks(&readGameStatusChunks, 0);
+	std::ifstream file;
+	file.open(fileName, std::ios_base::app | std::ios_base::binary);
+	file.seekg(0, std::ios::end);
+	size_t length = file.tellg();
+	file.seekg(0, std::ios::beg);
+	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
+	file.read(buffer.get(), length);
+	file.close();
 
-	return true;
-}
+	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
-bool SaveGame::readLara()
-{
-	// Read dumped LARA_INFO struct
-	char* buffer = (char*)malloc(sizeof(LaraInfo));
-	m_stream->Read(buffer, sizeof(LaraInfo));
-	LaraInfo* lara = reinterpret_cast<LaraInfo*>(buffer);
-	memcpy(&Lara, lara, sizeof(LaraInfo));
-	free(buffer);
+	// Flipmaps
+	for (int i = 0; i < s->flip_stats()->size(); i++)
+	{
+		if (s->flip_stats()->Get(i) != 0)
+			DoFlipMap(i);
 
-	//Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
-	//Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
-	
-	Lara.target = NULL;
-	Lara.spazEffect = NULL;
-	//Lara.generalPtr = AddPtr(Lara.generalPtr, char, malloc_buffer);
-	Lara.weaponItem = NO_ITEM;
+		FlipMap[i] = s->flip_maps()->Get(i) << 8;
+	}
 
-	// Is Lara burning?
+	// Effects
+	FlipEffect = s->flip_effect();
+	FlipStatus = s->flip_status();
+	//FlipTimer = s->flip_timer();
+
+	CurrentLoopedSoundTrack = s->ambient_track()->str();
+
+	// Static objects
+	for (int i = 0; i < s->static_meshes()->size(); i++)
+	{
+		auto staticMesh = s->static_meshes()->Get(i);
+		auto room = &g_Level.Rooms[staticMesh->room_number()];
+		if (i >= room->mesh.size())
+			break;
+		room->mesh[i].flags = staticMesh->flags();
+		if (!room->mesh[i].flags)
+		{
+			short roomNumber = staticMesh->room_number();
+			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, &roomNumber);
+			TestTriggers(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, staticMesh->room_number(), true, 0);
+			floor->Stopper = 0;
+		}
+	}
+
+	// Cameras 
+	for (int i = 0; i < s->fixed_cameras()->size(); i++)
+	{
+		if (i < g_Level.Cameras.size())
+			g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+	}
+
+	// Sinks 
+	for (int i = 0; i < s->sinks()->size(); i++)
+	{
+		if (i < g_Level.Sinks.size())
+			g_Level.Sinks[i].strength = s->sinks()->Get(i)->flags();
+	}
+
+	// Flyby cameras 
+	for (int i = 0; i < s->flyby_cameras()->size(); i++)
+	{
+		if (i < NumberSpotcams)
+			SpotCam[i].flags = s->flyby_cameras()->Get(i)->flags();
+	}
+
+	ZeroMemory(&Lara, sizeof(LaraInfo));
+
+	// Items
+	for (int i = 0; i < s->items()->size(); i++)
+	{
+		if (i >= g_Level.NumItems)
+			break;
+
+		const Save::Item* savedItem = s->items()->Get(i);
+		ITEM_INFO* item = &g_Level.Items[i];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+		// Kill immediately item if already killed and continue
+		if (savedItem->flags() & IFLAG_KILLED)
+		{
+			KillItem(i);
+			item->status = ITEM_DEACTIVATED;
+			item->flags |= ONESHOT;
+			continue;
+		}
+
+		// If not triggered, don't load remaining data
+		if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+			continue;
+
+		item->pos.xPos = savedItem->position()->x_pos();
+		item->pos.yPos = savedItem->position()->y_pos();
+		item->pos.zPos = savedItem->position()->z_pos();
+		item->pos.xRot = savedItem->position()->x_rot();
+		item->pos.yRot = savedItem->position()->y_rot();
+		item->pos.zRot = savedItem->position()->z_rot();
+
+		item->speed = savedItem->speed();
+		item->fallspeed = savedItem->fall_speed();
+
+		// Do the correct way for assigning new room number
+		short roomNumber = savedItem->room_number();
+		if (item->objectNumber == ID_LARA)
+		{
+			LaraItem->location.roomNumber = roomNumber;
+			LaraItem->location.yNumber = item->pos.yPos;
+			item->roomNumber = roomNumber;
+			Lara.itemNumber = i;
+			LaraItem = item;
+			UpdateItemRoom(item, -LARA_HEIGHT / 2);
+		}
+		else
+		{
+			if (item->roomNumber != roomNumber)
+				ItemNewRoom(i, roomNumber);
+
+			if (obj->shadowSize)
+			{
+				FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+				item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			}
+		}
+
+		// Animations
+		item->currentAnimState = savedItem->current_anim_state();
+		item->requiredAnimState = savedItem->required_anim_state();
+		item->goalAnimState = savedItem->goal_anim_state();
+		item->animNumber = obj->animIndex + savedItem->anim_number();
+		item->frameNumber = savedItem->frame_number();
+
+		// Hit points
+		item->hitPoints = savedItem->hit_points();
+
+		// Flags and timers
+		for (int j = 0; j < 7; j++)
+			item->itemFlags[j] = savedItem->item_flags()->Get(j);
+		item->timer = savedItem->timer();
+		item->triggerFlags = savedItem->trigger_flags();
+		item->flags = savedItem->flags();
+
+		// Carried item
+		item->carriedItem = savedItem->carried_item();
+
+		// Activate item if needed
+		if (savedItem->active() && !item->active)
+			AddActiveItem(i);
+
+		item->active = savedItem->active();
+		item->reallyActive = savedItem->really_active();
+		item->hitStatus = savedItem->hit_stauts();
+		item->status = savedItem->status();
+		item->aiBits = savedItem->ai_bits();
+		item->gravityStatus = savedItem->gravity_status();
+		item->collidable = savedItem->collidable();
+		item->lookedAt = savedItem->looked_at();
+		item->poisoned = savedItem->poisoned();
+
+		// Creature data for intelligent items
+		if (item->objectNumber != ID_LARA && obj->intelligent)
+		{
+			EnableBaddieAI(i, true);
+
+			auto creature = GetCreatureInfo(item);
+			auto data = savedItem->data();
+			auto savedCreature = (Save::Creature*)data;
+
+			if (savedCreature == nullptr)
+				continue;
+
+			creature->alerted = savedCreature->alerted();
+			creature->LOT.canJump = savedCreature->can_jump();
+			creature->LOT.canMonkey = savedCreature->can_monkey();
+			if (savedCreature->enemy() >= 0)
+				creature->enemy = &g_Level.Items[savedCreature->enemy()];
+			creature->flags = savedCreature->flags();
+			creature->headLeft = savedCreature->head_left();
+			creature->headRight = savedCreature->head_right();
+			creature->hurtByLara = savedCreature->hurt_by_lara();
+			creature->LOT.isAmphibious = savedCreature->is_amphibious();
+			creature->LOT.isJumping = savedCreature->is_jumping();
+			creature->LOT.isMonkeying = savedCreature->is_monkeying();
+			for (int j = 0; j < 4; j++)
+				creature->jointRotation[j] = savedCreature->joint_rotation()->Get(j);
+			creature->jumpAhead = savedCreature->jump_ahead();
+			creature->maximumTurn = savedCreature->maximum_turn();
+			creature->monkeyAhead = savedCreature->monkey_ahead();
+			creature->mood = (MOOD_TYPE)savedCreature->mood();
+			creature->patrol2 = savedCreature->patrol2();
+			creature->reachedGoal = savedCreature->reached_goal();
+		}
+
+		// Mesh stuff
+		item->meshBits = savedItem->mesh_bits();
+		item->swapMeshFlags = savedItem->swap_mesh_flags();
+
+		// Now some post-load specific hacks for objects
+		if (item->objectNumber >= ID_PUZZLE_HOLE1 
+			&& item->objectNumber <= ID_PUZZLE_HOLE16 
+			&& (item->status == ITEM_ACTIVE
+				|| item->status == ITEM_DEACTIVATED))
+		{
+			item->objectNumber = (GAME_OBJECT_ID)((int)item->objectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+			item->animNumber = Objects[item->objectNumber].animIndex + savedItem->anim_number();
+		}
+
+		if ((item->objectNumber >= ID_SMASH_OBJECT1)
+			&& (item->objectNumber <= ID_SMASH_OBJECT8)
+			&& (item->flags & ONESHOT))
+			item->meshBits = 0x00100;
+
+		// TODO: specific RAISING_BLOCK hacks
+	}
+
+	for (int i = 0; i < s->bats()->size(); i++)
+	{
+		auto batInfo = s->bats()->Get(i);
+		BAT_STRUCT* bat = &Bats[i];
+
+		bat->on = batInfo->on();
+		bat->counter = batInfo->counter();
+		bat->roomNumber = batInfo->room_number();
+		bat->pos.xPos = batInfo->x();
+		bat->pos.yPos = batInfo->y();
+		bat->pos.zPos = batInfo->z();
+		bat->pos.xRot = batInfo->x_rot();
+		bat->pos.yRot = batInfo->y_rot();
+		bat->pos.zRot = batInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->rats()->size(); i++)
+	{
+		auto ratInfo = s->rats()->Get(i);
+		RAT_STRUCT* rat = &Rats[i];
+
+		rat->on = ratInfo->on();
+		rat->flags = ratInfo->flags();
+		rat->roomNumber = ratInfo->room_number();
+		rat->pos.xPos = ratInfo->x();
+		rat->pos.yPos = ratInfo->y();
+		rat->pos.zPos = ratInfo->z();
+		rat->pos.xRot = ratInfo->x_rot();
+		rat->pos.yRot = ratInfo->y_rot();
+		rat->pos.zRot = ratInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->spiders()->size(); i++)
+	{
+		auto spiderInfo = s->spiders()->Get(i);
+		SPIDER_STRUCT* spider = &Spiders[i];
+
+		spider->on = spiderInfo->on();
+		spider->flags = spiderInfo->flags();
+		spider->roomNumber = spiderInfo->room_number();
+		spider->pos.xPos = spiderInfo->x();
+		spider->pos.yPos = spiderInfo->y();
+		spider->pos.zPos = spiderInfo->z();
+		spider->pos.xRot = spiderInfo->x_rot();
+		spider->pos.yRot = spiderInfo->y_rot();
+		spider->pos.zRot = spiderInfo->z_rot();
+	}
+
+	for (int i = 0; i < s->scarabs()->size(); i++)
+	{
+		auto scarabInfo = s->scarabs()->Get(i);
+		SCARAB_STRUCT* scarab = &Scarabs[i];
+
+		scarab->on = scarabInfo->on();
+		scarab->flags = scarabInfo->flags();
+		scarab->roomNumber = scarabInfo->room_number();
+		scarab->pos.xPos = scarabInfo->x();
+		scarab->pos.yPos = scarabInfo->y();
+		scarab->pos.zPos = scarabInfo->z();
+		scarab->pos.xRot = scarabInfo->x_rot();
+		scarab->pos.yRot = scarabInfo->y_rot();
+		scarab->pos.zRot = scarabInfo->z_rot();
+	}
+
+	JustLoaded = 1;	
+
+	// Lara
+	ZeroMemory(Lara.Puzzles, NUM_PUZZLES * sizeof(int));
+	for (int i = 0; i < s->lara()->puzzles()->size(); i++)
+	{
+		Lara.Puzzles[i] = s->lara()->puzzles()->Get(i);
+	}
+
+	ZeroMemory(Lara.PuzzlesCombo, NUM_PUZZLES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->puzzles_combo()->size(); i++)
+	{
+		Lara.PuzzlesCombo[i] = s->lara()->puzzles_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Keys, NUM_KEYS * sizeof(int));
+	for (int i = 0; i < s->lara()->keys()->size(); i++)
+	{
+		Lara.Keys[i] = s->lara()->keys()->Get(i);
+	}
+
+	ZeroMemory(Lara.KeysCombo, NUM_KEYS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->keys_combo()->size(); i++)
+	{
+		Lara.KeysCombo[i] = s->lara()->keys_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Pickups, NUM_PICKUPS * sizeof(int));
+	for (int i = 0; i < s->lara()->pickups()->size(); i++)
+	{
+		Lara.Pickups[i] = s->lara()->pickups()->Get(i);
+	}
+
+	ZeroMemory(Lara.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->pickups_combo()->size(); i++)
+	{
+		Lara.Pickups[i] = s->lara()->pickups_combo()->Get(i);
+	}
+
+	ZeroMemory(Lara.Examines, NUM_EXAMINES * sizeof(int));
+	for (int i = 0; i < s->lara()->examines()->size(); i++)
+	{
+		Lara.Examines[i] = s->lara()->examines()->Get(i);
+	}
+
+	ZeroMemory(Lara.ExaminesCombo, NUM_EXAMINES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->examines_combo()->size(); i++)
+	{
+		Lara.ExaminesCombo[i] = s->lara()->examines_combo()->Get(i);
+	}
+
+	for (int i = 0; i < s->lara()->mesh_ptrs()->size(); i++)
+	{
+		Lara.meshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
+	}
+
+	for (int i = 0; i < 15; i++)
+	{
+		Lara.wet[i] = s->lara()->wet()->Get(i);
+	}
+
+	Lara.air = s->lara()->air();
+	Lara.BeetleLife = s->lara()->beetle_life();
+	Lara.big_waterskin = s->lara()->big_waterskin();
+	Lara.Binoculars = s->lara()->binoculars();
+	Lara.burn = s->lara()->burn();
+	Lara.burnBlue = s->lara()->burn_blue();
+	Lara.burnCount = s->lara()->burn_count();
+	Lara.burnSmoke = s->lara()->burn_smoke();
+	Lara.busy = s->lara()->busy();
+	Lara.calcFallSpeed = s->lara()->calc_fall_speed();
+	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
+	Lara.climbStatus = s->lara()->climb_status();
+	Lara.cornerX = s->lara()->corner_x();
+	Lara.cornerZ = s->lara()->corner_z();
+	Lara.Crowbar = s->lara()->crowbar();
+	Lara.currentActive = s->lara()->current_active();
+	Lara.currentXvel = s->lara()->current_x_vel();
+	Lara.currentYvel = s->lara()->current_y_vel();
+	Lara.currentZvel = s->lara()->current_z_vel();
+	Lara.deathCount = s->lara()->death_count();
+	Lara.diveCount = s->lara()->dive_count();
+	Lara.ExtraAnim = s->lara()->extra_anim();
+	Lara.fired = s->lara()->fired();
+	Lara.flareAge = s->lara()->flare_age();
+	Lara.flareControlLeft = s->lara()->flare_control_left();
+	Lara.flareFrame = s->lara()->flare_frame();
+	Lara.gunStatus = (LARA_GUN_STATUS)s->lara()->gun_status();
+	Lara.gunType = (LARA_WEAPON_TYPE)s->lara()->gun_type();
+	Lara.hasBeetleThings = s->lara()->has_beetle_things();
+	Lara.hasFired = s->lara()->has_fired();
+	Lara.headXrot = s->lara()->head_x_rot();
+	Lara.headYrot = s->lara()->head_y_rot();
+	Lara.headZrot = s->lara()->head_z_rot();
+	Lara.highestLocation = s->lara()->highest_location();
+	Lara.hitDirection = s->lara()->hit_direction();
+	Lara.hitFrame = s->lara()->hit_frame();
+	Lara.interactedItem = s->lara()->interacted_item();
+	Lara.isClimbing = s->lara()->is_climbing();
+	Lara.isDucked = s->lara()->is_ducked();
+	Lara.isMoving = s->lara()->is_moving();
+	Lara.itemNumber = s->lara()->item_number();
+	Lara.keepDucked = s->lara()->keep_ducked();
+	Lara.Lasersight = s->lara()->lasersight();
+	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
+	Lara.lastPos = PHD_VECTOR(
+		s->lara()->last_position()->x(), 
+		s->lara()->last_position()->y(),
+		s->lara()->last_position()->z());
+	Lara.leftArm.animNumber = s->lara()->left_arm()->anim_number();
+	Lara.leftArm.flash_gun = s->lara()->left_arm()->flash_gun();
+	Lara.leftArm.frameBase = s->lara()->left_arm()->frame_base();
+	Lara.leftArm.frameNumber = s->lara()->left_arm()->frame_number();
+	Lara.leftArm.lock = s->lara()->left_arm()->lock();
+	Lara.leftArm.xRot = s->lara()->left_arm()->x_rot();
+	Lara.leftArm.yRot = s->lara()->left_arm()->y_rot();
+	Lara.leftArm.zRot = s->lara()->left_arm()->z_rot();
+	Lara.litTorch = s->lara()->lit_torch();
+	Lara.location = s->lara()->location();
+	Lara.locationPad = s->lara()->location_pad();
+	Lara.look = s->lara()->look();
+	Lara.mineL = s->lara()->mine_l();
+	Lara.mineR = s->lara()->mine_r();
+	Lara.moveAngle = s->lara()->move_angle();
+	Lara.moveCount = s->lara()->move_count();
+	Lara.NumFlares = s->lara()->num_flares();
+	Lara.NumLargeMedipacks = s->lara()->num_large_medipacks();
+	Lara.NumSmallMedipacks = s->lara()->num_small_medipacks();
+	Lara.oldBusy = s->lara()->old_busy();
+	Lara.poisoned = s->lara()->poisoned();
+	Lara.poseCount = s->lara()->pose_count();
+	Lara.requestGunType = (LARA_WEAPON_TYPE)s->lara()->request_gun_type();
+	Lara.rightArm.animNumber = s->lara()->right_arm()->anim_number();
+	Lara.rightArm.flash_gun = s->lara()->right_arm()->flash_gun();
+	Lara.rightArm.frameBase = s->lara()->right_arm()->frame_base();
+	Lara.rightArm.frameNumber = s->lara()->right_arm()->frame_number();
+	Lara.rightArm.lock = s->lara()->right_arm()->lock();
+	Lara.rightArm.xRot = s->lara()->right_arm()->x_rot();
+	Lara.rightArm.yRot = s->lara()->right_arm()->y_rot();
+	Lara.rightArm.zRot = s->lara()->right_arm()->z_rot();
+	Lara.ropeArcBack = s->lara()->rope_arc_back();
+	Lara.ropeArcFront = s->lara()->rope_arc_front();
+	Lara.ropeCount = s->lara()->rope_count();
+	Lara.ropeDFrame = s->lara()->rope_dframe();
+	Lara.ropeDirection = s->lara()->rope_direction();
+	Lara.ropeDownVel = s->lara()->rope_down_vel();
+	Lara.ropeFlag = s->lara()->rope_flag();
+	Lara.ropeFrame = s->lara()->rope_frame();
+	Lara.ropeFrameRate = s->lara()->rope_framerate();
+	Lara.ropeLastX = s->lara()->rope_last_x();
+	Lara.ropeMaxXBackward = s->lara()->rope_max_x_backward();
+	Lara.ropeMaxXForward = s->lara()->rope_max_x_forward();
+	Lara.ropeOffset = s->lara()->rope_offset();
+	Lara.ropePtr = s->lara()->rope_ptr();
+	Lara.ropeSegment = s->lara()->rope_segment();
+	Lara.ropeY = s->lara()->rope_y();
+	Lara.Secrets = s->lara()->secrets();
+	Lara.Silencer = s->lara()->silencer();
+	Lara.small_waterskin = s->lara()->small_waterskin();
+	Lara.spazEffectCount = s->lara()->spaz_effect_count();
+	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
+	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
+	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
+	Lara.Torch = s->lara()->torch();
+	Lara.torsoXrot = s->lara()->torso_x_rot();
+	Lara.torsoYrot = s->lara()->torso_y_rot();
+	Lara.torsoZrot = s->lara()->torso_z_rot();
+	Lara.turnRate = s->lara()->turn_rate();
+	Lara.uncontrollable = s->lara()->uncontrollable();
+	Lara.Vehicle = s->lara()->vehicle();
+	Lara.waterStatus = (LARA_WATER_STATUS)s->lara()->water_status();
+	Lara.waterSurfaceDist = s->lara()->water_surface_dist();
+	Lara.weaponItem = s->lara()->weapon_item();
+	Lara.holsterInfo.backHolster = (HOLSTER_SLOT)s->lara()->holster_info()->back_holster();
+	Lara.holsterInfo.leftHolster = (HOLSTER_SLOT)s->lara()->holster_info()->left_holster();
+	Lara.holsterInfo.rightHolster = (HOLSTER_SLOT)s->lara()->holster_info()->right_holster();
+	Lara.tightrope.balance = s->lara()->tightrope()->balance();
+	Lara.tightrope.canGoOff = s->lara()->tightrope()->can_go_off();
+	Lara.tightrope.tightropeItem = s->lara()->tightrope()->tightrope_item();
+	Lara.tightrope.timeOnTightrope = s->lara()->tightrope()->time_on_tightrope();
+
+	for (int i = 0; i < s->lara()->weapons()->size(); i++)
+	{
+		auto info = s->lara()->weapons()->Get(i);
+
+		for (int j = 0; j < info->ammo()->size(); j++)
+		{
+			Lara.Weapons[i].Ammo[j].setInfinite(info->ammo()->Get(j)->is_infinite());
+			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
+		}
+		Lara.Weapons[i].HasLasersight = info->has_lasersight();
+		Lara.Weapons[i].HasSilencer = info->has_silencer();
+		Lara.Weapons[i].Present = info->present();
+		Lara.Weapons[i].SelectedAmmo = info->selected_ammo();
+	}
+
 	if (Lara.burn)
 	{
-		Lara.burn = false;
-		bool smokeFlag = false;
+		char flag = 0;
+		Lara.burn = 0;
 		if (Lara.burnSmoke)
 		{
-			Lara.burnSmoke = false;
-			smokeFlag = true;
+			flag = 1;
+			Lara.burnSmoke = 0;
 		}
-		
 		LaraBurn();
-		if (smokeFlag)
-			Lara.burnSmoke = true;
-	}
-	
-	m_reader->ReadChunks(&readLaraChunks, 0);
-	return true;
-}
-
-bool SaveGame::readItem()
-{
-	short itemNumber = LEB128::ReadInt16(m_stream);
-	short runtimeItem = LEB128::ReadByte(m_stream);
-	short itemKind = LEB128::ReadInt16(m_stream);
-
-	// Runtime items must be allocated dynamically
-	if (runtimeItem)
-		itemNumber = CreateItem();
-	
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
-
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-
-	// Runtime items must be initialised
-	// TODO: test test test!!!
-	if (runtimeItem)
-	{
-		InitialiseItem(itemNumber);
-		AddActiveItem(itemNumber);
+		if (flag)
+			Lara.burnSmoke = 1;
 	}
 
-	if (itemKind == 0x2000)
+	// Rope
+	if (Lara.ropePtr >= 0)
 	{
-		m_reader->ReadChunks(&readItemChunks, itemNumber);
-		DisableBaddieAI(itemNumber);
-		KillItem(itemNumber);
-		item->status = ITEM_DEACTIVATED;
-		item->flags |= ONESHOT;
-		item->afterDeath = 128;
-	}
-	else if (itemKind == 0x8000)
-	{
-		m_reader->ReadChunks(&readItemChunks, itemNumber);
-	}
-	else
-	{
-		m_reader->ReadChunks(&readItemChunks, itemNumber);
-	}
-
-	// Some post-processing things
-	if (obj->isPuzzleHole && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
-		item->objectNumber += GAME_OBJECT_ID{ NUM_PUZZLES };
-
-	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))
-		item->meshBits = 0x100;
-
-	if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
-	{
-		//if (item->triggerFlags == -1)
-		//	AlterFloorHeight(item, -255);
-		//else if (item->triggerFlags == -3)
-		//	AlterFloorHeight(item, -1023);
-		//else
-		//	AlterFloorHeight(item, -1024);
-	}
-
-	//if (item->objectNumber == ID_RAISING_BLOCK2 && item->itemFlags[1])
-	//	AlterFloorHeight(item, -2048);
-	   
-	return true;
-}
-
-bool SaveGame::readVariable()
-{
-	LuaVariable variable;
-	
-	variable.IsGlobal = LEB128::ReadByte(m_stream) == 1;
-	variable.Type = LEB128::ReadInt32(m_stream);
-
-	char* variableName;
-	m_stream->ReadString(&variableName);
-	variable.Name = string(variableName);
-	free(variableName);
-
-	/*if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
-		m_stream->ReadBool(&variable.BoolValue);
-	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
-		m_stream->ReadInt32(&variable.IntValue);
-	else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-		m_stream->ReadFloat(&variable.FloatValue);
-	else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
-	{
-		char* variableValue;
-		m_stream->ReadString(&variableValue);
-		variable.StringValue = string(variableValue);
-		free(variableValue);
-	}*/
-
-	return true;
-}
-
-bool SaveGame::readSavegameChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(m_chunkGameStatus.get()))
-		return readGameStatus();
-	else if (chunkId->EqualsTo(m_chunkLara.get()))
-		return readLara();
-	else if (chunkId->EqualsTo(m_chunkItem.get()))
-		return readItem();
-	else if (chunkId->EqualsTo(m_chunkLuaVariable.get()))
-		return readVariable();
-	else if (chunkId->EqualsTo(m_chunkStatistics.get()))
-		return readStatistics();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemBurningTorch.get()))
-		return readBurningTorch();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemChaff.get()))
-		return readChaff();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemTorpedo.get()))
-		return readTorpedo();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemCrossbowBolt.get()))
-		return readCrossbowBolt();
-	else if (chunkId->EqualsTo(m_chunkSpecialItemFlare.get()))
-		return readFlare();
-	else if (chunkId->EqualsTo(m_chunkBats.get()))
-		return readBats();
-	else if (chunkId->EqualsTo(m_chunkRats.get()))
-		return readRats();
-	else if (chunkId->EqualsTo(m_chunkSpiders.get()))
-		return readSpiders();
-
-	return false;
-}
-
-bool SaveGame::Load(char* fileName)
-{
-	m_luaVariables.clear();
-
-	m_stream = new FileStream(fileName, true, false);
-	m_reader = new ChunkReader(0x4D355254, m_stream);
-
-	// Header must be here
-	char* levelName;
-	m_stream->ReadString(&levelName);
-
-	// Skip timer
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
-	LEB128::ReadInt32(m_stream);
-
-	CurrentLevel = LEB128::ReadByte(m_stream);
-	GameTimer = LEB128::ReadInt32(m_stream);
-	LastSaveGame = LEB128::ReadInt32(m_stream);
-
-	// Read chunks
-	m_reader->ReadChunks(&readSavegameChunks, 0);
-
-	// Close the stream
-	m_stream->Close();
-	//delete m_writer;
-	//delete m_stream;
-
-	//g_GameScript->SetVariables(&m_luaVariables);
-
-	JustLoaded = true;
-
-	return true;
-}
-
-bool SaveGame::LoadHeader(char* fileName, SaveGameHeader* header)
-{
-	m_stream = new FileStream(fileName, true, false);
-	m_reader = new ChunkReader(0x4D355254, m_stream);
-
-	// Header must be here
-	char* levelName;
-	m_stream->ReadString(&levelName);
-	header->LevelName = string(levelName);
-	free(levelName);
-
-	// Skip timer
-	header->Days = LEB128::ReadInt32(m_stream);
-	header->Hours = LEB128::ReadInt32(m_stream);
-	header->Minutes = LEB128::ReadInt32(m_stream);
-	header->Seconds = LEB128::ReadInt32(m_stream);
-	
-	header->Level = LEB128::ReadByte(m_stream);
-	header->Timer = LEB128::ReadInt32(m_stream);
-	header->Count = LEB128::ReadInt32(m_stream);
-
-	// Close the stream
-	m_stream->Close();
-	//delete m_writer;
-	//delete m_stream;
-
-	return true;
-}
-
-void SaveGame::saveStaticFlag(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-	LEB128::Write(m_stream, g_Level.Rooms[arg1].mesh[arg2].flags);
-}
-
-bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(m_chunkLaraExtraInfo.get()))
-	{
-		Lara.Binoculars = LEB128::ReadByte(m_stream);
-		Lara.Lasersight = LEB128::ReadByte(m_stream);
-		Lara.Crowbar = LEB128::ReadByte(m_stream);
-		Lara.Silencer = LEB128::ReadByte(m_stream);
-		Lara.Torch = LEB128::ReadByte(m_stream);
-		Lara.Secrets = LEB128::ReadInt32(m_stream);
-		Lara.ExtraAnim = LEB128::ReadInt16(m_stream);
-		Lara.Vehicle = LEB128::ReadInt16(m_stream);
-		Lara.mineL = LEB128::ReadByte(m_stream);
-		Lara.mineR = LEB128::ReadByte(m_stream);
-		Lara.NumFlares = LEB128::ReadInt32(m_stream);
-		Lara.NumLargeMedipacks = LEB128::ReadInt32(m_stream);
-		Lara.NumSmallMedipacks = LEB128::ReadInt32(m_stream);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkWeaponInfo.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		CarriedWeaponInfo* weapon = &Lara.Weapons[id];
-
-		weapon->Present = LEB128::ReadByte(m_stream);
-		weapon->SelectedAmmo = LEB128::ReadByte(m_stream);
-		weapon->Ammo[WEAPON_AMMO1] = LEB128::ReadInt16(m_stream);
-		weapon->Ammo[WEAPON_AMMO2] = LEB128::ReadInt16(m_stream);
-		weapon->Ammo[WEAPON_AMMO3] = LEB128::ReadInt16(m_stream);
-		weapon->HasSilencer = LEB128::ReadByte(m_stream);
-		weapon->HasLasersight = LEB128::ReadByte(m_stream);
-	}
-	else if (chunkId->EqualsTo(m_chunkPuzzle.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.Puzzles[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkPuzzleCombo.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.PuzzlesCombo[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkKey.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.Keys[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkKeyCombo.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.KeysCombo[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkPickup.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.Pickups[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkPickupCombo.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.PickupsCombo[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkExamine.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.Examines[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkExamineCombo.get()))
-	{
-		int id = LEB128::ReadInt32(m_stream);
-		int quantity = LEB128::ReadInt32(m_stream);
-		Lara.ExaminesCombo[id] = quantity;
-	}
-	else if (chunkId->EqualsTo(m_chunkWeaponItem.get()))
-	{
-		short weaponItemNum = CreateItem();
-		Lara.weaponItem = weaponItemNum;
-
-		ITEM_INFO* weaponItem = &g_Level.Items[Lara.weaponItem];
-
-		weaponItem->objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
-		weaponItem->animNumber = LEB128::ReadInt16(m_stream);
-		weaponItem->frameNumber = LEB128::ReadInt16(m_stream);
-		weaponItem->currentAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->goalAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->requiredAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->roomNumber = 255;
-	}
-
-	return false;
-}
-
-bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(m_chunkStaticFlags.get()))
-	{
-		short roomIndex = LEB128::ReadInt16(m_stream);
-		short staticIndex = LEB128::ReadInt16(m_stream);
-		short flags = LEB128::ReadInt16(m_stream);
-		g_Level.Rooms[roomIndex].mesh[staticIndex].flags = flags;
-
-		if (!flags)
+		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+		
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{
-			FLOOR_INFO* floor = GetFloor(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
-										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
-										 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos,
-										 &roomIndex);
+			rope->segment[i] = PHD_VECTOR(
+				s->rope()->segments()->Get(i)->x(),
+				s->rope()->segments()->Get(i)->y(),
+				s->rope()->segments()->Get(i)->z());
 
-			TestTriggers(g_Level.Rooms[roomIndex].mesh[staticIndex].pos.xPos,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.yPos,
-						 g_Level.Rooms[roomIndex].mesh[staticIndex].pos.zPos, roomIndex, true);
+			rope->normalisedSegment[i] = PHD_VECTOR(
+				s->rope()->normalised_segments()->Get(i)->x(),
+				s->rope()->normalised_segments()->Get(i)->y(),
+				s->rope()->normalised_segments()->Get(i)->z());
 
-			floor->Stopper = false;
+			rope->meshSegment[i] = PHD_VECTOR(
+				s->rope()->mesh_segments()->Get(i)->x(),
+				s->rope()->mesh_segments()->Get(i)->y(),
+				s->rope()->mesh_segments()->Get(i)->z());
+
+			rope->coords[i] = PHD_VECTOR(
+				s->rope()->coords()->Get(i)->x(),
+				s->rope()->coords()->Get(i)->y(),
+				s->rope()->coords()->Get(i)->z());
+
+			rope->velocity[i] = PHD_VECTOR(
+				s->rope()->velocities()->Get(i)->x(),
+				s->rope()->velocities()->Get(i)->y(),
+				s->rope()->velocities()->Get(i)->z());
 		}
 
-		return true;
+		rope->coiled = s->rope()->coiled();
+		rope->active = s->rope()->active();
+		rope->position = PHD_VECTOR(
+			s->rope()->position()->x(),
+			s->rope()->position()->y(),
+			s->rope()->position()->z());
+
+		CurrentPendulum.Position = PHD_VECTOR(
+			s->pendulum()->position()->x(),
+			s->pendulum()->position()->y(),
+			s->pendulum()->position()->z());
+
+		CurrentPendulum.Velocity = PHD_VECTOR(
+			s->pendulum()->velocity()->x(),
+			s->pendulum()->velocity()->y(),
+			s->pendulum()->velocity()->z());
+
+		CurrentPendulum.node = s->pendulum()->node();
+		CurrentPendulum.Rope = rope;
+
+		AlternatePendulum.Position = PHD_VECTOR(
+			s->alternate_pendulum()->position()->x(),
+			s->alternate_pendulum()->position()->y(),
+			s->alternate_pendulum()->position()->z());
+
+		AlternatePendulum.Velocity = PHD_VECTOR(
+			s->alternate_pendulum()->velocity()->x(),
+			s->alternate_pendulum()->velocity()->y(),
+			s->alternate_pendulum()->velocity()->z());
+
+		AlternatePendulum.node = s->alternate_pendulum()->node();
+		AlternatePendulum.Rope = rope;
 	}
-	else if (chunkId->EqualsTo(m_chunkFlipStats.get()))
-	{
-		short index = LEB128::ReadInt16(m_stream);
-		short value = LEB128::ReadInt16(m_stream);
-		//FlipStats[index] = value;
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkFlipMap.get()))
-	{
-		short index = LEB128::ReadInt16(m_stream);
-		short value = LEB128::ReadInt16(m_stream);
-		FlipMap[index] = value;
-		if ((value & 0x3E00) == 0x3E00)
-			DoFlipMap(index);
-		return true;
-	}
-	/*else if (chunkId->EqualsTo(m_chunkCdFlags.get()))
-	{
-		short index = LEB128::ReadInt16(m_stream);
-		printf("Index: %d\n", index);
-		short value = LEB128::ReadInt16(m_stream);
-		if (index < SoundTracks.size())
-			SoundTracks[index].Mask = value;
-		return true;
-	}*/
-	else if (chunkId->EqualsTo(m_chunkCamera.get()))
-	{
-		short index = LEB128::ReadInt16(m_stream);
-		short value = LEB128::ReadInt16(m_stream);
-		g_Level.Cameras[index].flags = value;
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkSequenceSwitch.get()))
-	{
-		short index = LEB128::ReadInt16(m_stream);
-		short value = LEB128::ReadInt16(m_stream);
-		SequenceUsed[index] = value;
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkFlybyFlags.get()))
-	{
-		int index = LEB128::ReadInt16(m_stream);
-		int value = LEB128::ReadInt16(m_stream);
-		SpotCam[index].flags = value;
-		return true;
-	}
-	return false;
-}
-
-void SaveGame::saveCamera(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-void SaveGame::saveSequenceSwitch(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-void SaveGame::saveFlybyFlags(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-void SaveGame::saveFlipMap(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-void SaveGame::saveFlipStats(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-void SaveGame::saveCdFlags(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, arg1);
-	LEB128::Write(m_stream, arg2);
-}
-
-bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	if (chunkId->EqualsTo(m_chunkItemDummy.get()))
-		return m_reader->ReadChunkInt32(maxSize);
-	else if (chunkId->EqualsTo(m_chunkItemAnims.get()))
-	{
-		item->currentAnimState = LEB128::ReadInt16(m_stream);
-		item->goalAnimState = LEB128::ReadInt16(m_stream);
-		item->requiredAnimState = LEB128::ReadInt16(m_stream);
-		item->animNumber = LEB128::ReadInt16(m_stream);
-		item->frameNumber = LEB128::ReadInt16(m_stream);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemPosition.get()))
-	{
-		item->pos.xPos = LEB128::ReadInt32(m_stream);
-		item->pos.yPos = LEB128::ReadInt32(m_stream);
-		item->pos.zPos = LEB128::ReadInt32(m_stream);
-		item->pos.xRot = LEB128::ReadInt16(m_stream);
-		item->pos.yRot = LEB128::ReadInt16(m_stream);
-		item->pos.zRot = LEB128::ReadInt16(m_stream);
-
-		short roomNumber = LEB128::ReadInt16(m_stream);
-		if (item->roomNumber != roomNumber)
-			ItemNewRoom(itemNumber, roomNumber);
-
-		item->speed = LEB128::ReadInt16(m_stream);
-		item->fallspeed = LEB128::ReadInt16(m_stream);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemHitPoints.get()))
-	{
-		item->hitPoints = LEB128::ReadInt16(m_stream);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemFlags.get()))
-	{
-		item->flags = LEB128::ReadInt16(m_stream);
-		byte active = LEB128::ReadByte(m_stream);
-		item->status = LEB128::ReadByte(m_stream);
-		item->gravityStatus = LEB128::ReadByte(m_stream);
-		item->hitStatus = LEB128::ReadByte(m_stream);
-		item->collidable = LEB128::ReadByte(m_stream);
-		item->lookedAt = LEB128::ReadByte(m_stream);
-		item->dynamicLight = LEB128::ReadByte(m_stream);
-		item->poisoned = LEB128::ReadByte(m_stream);
-		item->aiBits = LEB128::ReadByte(m_stream);
-		item->reallyActive = LEB128::ReadByte(m_stream);
-		item->triggerFlags = LEB128::ReadInt16(m_stream);
-		item->timer = LEB128::ReadByte(m_stream);
-		item->itemFlags[0] = LEB128::ReadInt16(m_stream);
-		item->itemFlags[1] = LEB128::ReadInt16(m_stream);
-		item->itemFlags[2] = LEB128::ReadInt16(m_stream);
-		item->itemFlags[3] = LEB128::ReadInt16(m_stream);
-
-		if (active && !item->active)
-			AddActiveItem(itemNumber);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemIntelligentData.get()))
-	{
-		EnableBaddieAI(itemNumber, 1);
-
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-		creature->jointRotation[0] = LEB128::ReadInt16(m_stream);
-		creature->jointRotation[1] = LEB128::ReadInt16(m_stream);
-		creature->jointRotation[2] = LEB128::ReadInt16(m_stream);
-		creature->jointRotation[3] = LEB128::ReadInt16(m_stream);
-		creature->maximumTurn = LEB128::ReadInt16(m_stream);
-		creature->flags = LEB128::ReadInt16(m_stream);
-		creature->alerted = LEB128::ReadByte(m_stream);
-		creature->headLeft = LEB128::ReadByte(m_stream);
-		creature->headRight = LEB128::ReadByte(m_stream);
-		creature->reachedGoal = LEB128::ReadByte(m_stream);
-		creature->hurtByLara = LEB128::ReadByte(m_stream);
-		creature->patrol2 = LEB128::ReadByte(m_stream);
-		creature->jumpAhead = LEB128::ReadByte(m_stream);
-		creature->monkeyAhead = LEB128::ReadByte(m_stream);
-		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
-
-		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
-		//creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
-
-		creature->aiTarget.objectNumber = from_underlying(LEB128::ReadInt16(m_stream));
-		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);
-		creature->aiTarget.boxNumber = LEB128::ReadInt16(m_stream);
-		creature->aiTarget.flags = LEB128::ReadInt16(m_stream);
-		creature->aiTarget.pos.xPos = LEB128::ReadInt32(m_stream);
-		creature->aiTarget.pos.yPos = LEB128::ReadInt32(m_stream);
-		creature->aiTarget.pos.zPos = LEB128::ReadInt32(m_stream);
-		creature->aiTarget.pos.xRot = LEB128::ReadInt16(m_stream);
-		creature->aiTarget.pos.yRot = LEB128::ReadInt16(m_stream);
-		creature->aiTarget.pos.zRot = LEB128::ReadInt16(m_stream);
-
-		creature->LOT.canJump = LEB128::ReadByte(m_stream);
-		creature->LOT.canMonkey = LEB128::ReadByte(m_stream);
-		creature->LOT.isAmphibious = LEB128::ReadByte(m_stream);
-		creature->LOT.isJumping = LEB128::ReadByte(m_stream);
-		creature->LOT.isMonkeying = LEB128::ReadByte(m_stream);
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemQuadInfo.get()))
-	{
-		//QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
-		//m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
-		//if (item->objectNumber == ID_QUAD)
-		//	item->data = quadInfo;
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(m_chunkItemMeshes.get()))
-	{
-		item->meshBits = LEB128::ReadInt32(m_stream);
-		item->swapMeshFlags = LEB128::ReadInt32(m_stream);
-
-		return true;
-	}
-
-	return false;
-}
-
-void SaveGame::saveStatistics(int arg1, int arg2)
-{
-	LEB128::Write(m_stream, Savegame.Game.AmmoHits);
-	LEB128::Write(m_stream, Savegame.Game.AmmoUsed);
-	LEB128::Write(m_stream, Savegame.Game.Distance);
-	LEB128::Write(m_stream, Savegame.Game.HealthUsed);
-	LEB128::Write(m_stream, Savegame.Game.Kills);
-	LEB128::Write(m_stream, Savegame.Game.Secrets);
-	LEB128::Write(m_stream, Savegame.Game.Timer);
-
-	LEB128::Write(m_stream, Savegame.Level.AmmoHits);
-	LEB128::Write(m_stream, Savegame.Level.AmmoUsed);
-	LEB128::Write(m_stream, Savegame.Level.Distance);
-	LEB128::Write(m_stream, Savegame.Level.HealthUsed);
-	LEB128::Write(m_stream, Savegame.Level.Kills);
-	LEB128::Write(m_stream, Savegame.Level.Secrets);
-	LEB128::Write(m_stream, Savegame.Level.Timer);
-}
-
-bool SaveGame::readStatistics()
-{
-	Savegame.Game.AmmoHits = LEB128::ReadInt32(m_stream);
-	Savegame.Game.AmmoUsed = LEB128::ReadInt32(m_stream);
-	Savegame.Game.Distance = LEB128::ReadInt32(m_stream);
-	Savegame.Game.HealthUsed = LEB128::ReadByte(m_stream);
-	Savegame.Game.Kills = LEB128::ReadInt16(m_stream);
-	Savegame.Game.Secrets = LEB128::ReadByte(m_stream);
-	Savegame.Game.Timer = LEB128::ReadInt32(m_stream);
-
-	Savegame.Level.AmmoHits = LEB128::ReadInt32(m_stream);
-	Savegame.Level.AmmoUsed = LEB128::ReadInt32(m_stream);
-	Savegame.Level.Distance = LEB128::ReadInt32(m_stream);
-	Savegame.Level.HealthUsed = LEB128::ReadByte(m_stream);
-	Savegame.Level.Kills = LEB128::ReadInt16(m_stream);
-	Savegame.Level.Secrets = LEB128::ReadByte(m_stream);
-	Savegame.Level.Timer = LEB128::ReadInt32(m_stream);
 
 	return true;
 }
 
-void SaveGame::saveItemFlags(int arg1, int arg2)
+bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	ITEM_INFO* item = &g_Level.Items[arg1];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-
-	LEB128::Write(m_stream, item->flags);
-	LEB128::Write(m_stream, item->active);
-	LEB128::Write(m_stream, item->status);
-	LEB128::Write(m_stream, item->gravityStatus);
-	LEB128::Write(m_stream, item->hitStatus);
-	LEB128::Write(m_stream, item->collidable);
-	LEB128::Write(m_stream, item->lookedAt);
-	LEB128::Write(m_stream, item->dynamicLight);
-	LEB128::Write(m_stream, item->poisoned);
-	LEB128::Write(m_stream, item->aiBits);
-	LEB128::Write(m_stream, item->reallyActive);
-	LEB128::Write(m_stream, item->triggerFlags);
-	LEB128::Write(m_stream, item->timer);
-	LEB128::Write(m_stream, item->itemFlags[0]);
-	LEB128::Write(m_stream, item->itemFlags[1]);
-	LEB128::Write(m_stream, item->itemFlags[2]);
-	LEB128::Write(m_stream, item->itemFlags[3]);
-}
-
-void SaveGame::saveItemIntelligentData(int arg1, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[arg1];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy);
-
-	LEB128::Write(m_stream, creature->jointRotation[0]);
-	LEB128::Write(m_stream, creature->jointRotation[1]);
-	LEB128::Write(m_stream, creature->jointRotation[2]);
-	LEB128::Write(m_stream, creature->jointRotation[3]);
-	LEB128::Write(m_stream, creature->maximumTurn);
-	LEB128::Write(m_stream, creature->flags);
-	LEB128::Write(m_stream, creature->alerted);
-	LEB128::Write(m_stream, creature->headLeft);
-	LEB128::Write(m_stream, creature->headRight);
-	LEB128::Write(m_stream, creature->reachedGoal);
-	LEB128::Write(m_stream, creature->hurtByLara);
-	LEB128::Write(m_stream, creature->patrol2);
-	LEB128::Write(m_stream, creature->jumpAhead);
-	LEB128::Write(m_stream, creature->monkeyAhead);
-	LEB128::Write(m_stream, creature->mood);
-	LEB128::Write(m_stream, (int)enemy);
-
-	LEB128::Write(m_stream, creature->aiTarget.objectNumber);
-	LEB128::Write(m_stream, creature->aiTarget.roomNumber);
-	LEB128::Write(m_stream, creature->aiTarget.boxNumber);
-	LEB128::Write(m_stream, creature->aiTarget.flags);
-	LEB128::Write(m_stream, creature->aiTarget.pos.xPos);
-	LEB128::Write(m_stream, creature->aiTarget.pos.yPos);
-	LEB128::Write(m_stream, creature->aiTarget.pos.zPos);
-	LEB128::Write(m_stream, creature->aiTarget.pos.xRot);
-	LEB128::Write(m_stream, creature->aiTarget.pos.yRot);
-	LEB128::Write(m_stream, creature->aiTarget.pos.zRot);
-
-	LEB128::Write(m_stream, creature->LOT.canJump);
-	LEB128::Write(m_stream, creature->LOT.canMonkey);
-	LEB128::Write(m_stream, creature->LOT.isAmphibious);
-	LEB128::Write(m_stream, creature->LOT.isJumping);
-	LEB128::Write(m_stream, creature->LOT.isMonkeying);
-}
-
-void SaveGame::saveItemHitPoints(int arg1, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[arg1];
-
-	LEB128::Write(m_stream, item->hitPoints);
-}
-
-void SaveGame::saveItemPosition(int arg1, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[arg1];
-
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-}
-
-void SaveGame::saveItemMesh(int arg1, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[arg1];
-
-	LEB128::Write(m_stream, item->meshBits);
-	LEB128::Write(m_stream, item->swapMeshFlags);
-}
-
-void SaveGame::saveItemAnims(int arg1, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[arg1];
-
-	LEB128::Write(m_stream, item->currentAnimState);
-	LEB128::Write(m_stream, item->goalAnimState);
-	LEB128::Write(m_stream, item->requiredAnimState);
-	LEB128::Write(m_stream, item->animNumber);
-	LEB128::Write(m_stream, item->frameNumber);
-}
-
-void SaveGame::saveBurningTorch(int itemNumber, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-
-	LEB128::Write(m_stream, item->itemFlags[2]);
-}
-
-void SaveGame::saveChaff(int itemNumber, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-
-	LEB128::Write(m_stream, item->itemFlags[0]);
-	LEB128::Write(m_stream, item->itemFlags[1]);
-}
-
-void SaveGame::saveTorpedo(int itemNumber, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-
-	LEB128::Write(m_stream, item->itemFlags[0]);
-	LEB128::Write(m_stream, item->itemFlags[1]);
-	LEB128::Write(m_stream, item->currentAnimState);
-	LEB128::Write(m_stream, item->goalAnimState);
-	LEB128::Write(m_stream, item->requiredAnimState);
-}
-
-void SaveGame::saveCrossbowBolt(int itemNumber, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-}
-
-void SaveGame::saveFlare(int itemNumber, int arg2)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	LEB128::Write(m_stream, itemNumber);
-	LEB128::Write(m_stream, item->pos.xPos);
-	LEB128::Write(m_stream, item->pos.yPos);
-	LEB128::Write(m_stream, item->pos.zPos);
-	LEB128::Write(m_stream, item->pos.xRot);
-	LEB128::Write(m_stream, item->pos.yRot);
-	LEB128::Write(m_stream, item->pos.zRot);
-	LEB128::Write(m_stream, item->roomNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
-
-	// Flare age
-	LEB128::Write(m_stream, (int)item->data);
-}
-
-bool SaveGame::readBurningTorch()
-{
-	LEB128::ReadInt16(m_stream);
-	
-	short itemNumber = CreateItem();
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	item->objectNumber = ID_BURNING_TORCH_ITEM;
-	item->pos.xPos = LEB128::ReadInt32(m_stream);
-	item->pos.yPos = LEB128::ReadInt32(m_stream);
-	item->pos.zPos = LEB128::ReadInt32(m_stream);
-	item->pos.xRot = LEB128::ReadInt16(m_stream);
-	item->pos.yRot = LEB128::ReadInt16(m_stream);
-	item->pos.zRot = LEB128::ReadInt16(m_stream);
-	item->roomNumber = LEB128::ReadInt16(m_stream);
-
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
-
-	InitialiseItem(itemNumber);
-
-	item->pos.xRot = oldXrot;
-	item->pos.yRot = oldYrot;
-	item->pos.zRot = oldZrot;
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
-
-	AddActiveItem(itemNumber);
-
-	item->itemFlags[2] = LEB128::ReadInt16(m_stream);
-
-	return true;
-}
-
-bool SaveGame::readChaff()
-{
-	LEB128::ReadInt16(m_stream);
-
-	short itemNumber = CreateItem();
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	item->objectNumber = ID_CHAFF;
-	item->pos.xPos = LEB128::ReadInt32(m_stream);
-	item->pos.yPos = LEB128::ReadInt32(m_stream);
-	item->pos.zPos = LEB128::ReadInt32(m_stream);
-	item->pos.xRot = LEB128::ReadInt16(m_stream);
-	item->pos.yRot = LEB128::ReadInt16(m_stream);
-	item->pos.zRot = LEB128::ReadInt16(m_stream);
-	item->roomNumber = LEB128::ReadInt16(m_stream);
-
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
-
-	InitialiseItem(itemNumber);
-
-	item->pos.xRot = oldXrot;
-	item->pos.yRot = oldYrot;
-	item->pos.zRot = oldZrot;
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
-
-	AddActiveItem(itemNumber);
-
-	item->itemFlags[0] = LEB128::ReadInt16(m_stream);
-	item->itemFlags[1] = LEB128::ReadInt16(m_stream);
-
-	return true;
-}
-
-bool SaveGame::readCrossbowBolt()
-{
-	LEB128::ReadInt16(m_stream);
-
-	short itemNumber = CreateItem();
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	item->objectNumber = ID_CROSSBOW_BOLT;
-	item->pos.xPos = LEB128::ReadInt32(m_stream);
-	item->pos.yPos = LEB128::ReadInt32(m_stream);
-	item->pos.zPos = LEB128::ReadInt32(m_stream);
-	item->pos.xRot = LEB128::ReadInt16(m_stream);
-	item->pos.yRot = LEB128::ReadInt16(m_stream);
-	item->pos.zRot = LEB128::ReadInt16(m_stream);
-	item->roomNumber = LEB128::ReadInt16(m_stream);
-
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
-
-	InitialiseItem(itemNumber);
-
-	item->pos.xRot = oldXrot;
-	item->pos.yRot = oldYrot;
-	item->pos.zRot = oldZrot;
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
-
-	AddActiveItem(itemNumber);
-
-	return true;
-}
-
-bool SaveGame::readFlare()
-{
-	LEB128::ReadInt16(m_stream);
-
-	short itemNumber = CreateItem();
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	item->objectNumber = ID_FLARE_ITEM;
-	item->pos.xPos = LEB128::ReadInt32(m_stream);
-	item->pos.yPos = LEB128::ReadInt32(m_stream);
-	item->pos.zPos = LEB128::ReadInt32(m_stream);
-	item->pos.xRot = LEB128::ReadInt16(m_stream);
-	item->pos.yRot = LEB128::ReadInt16(m_stream);
-	item->pos.zRot = LEB128::ReadInt16(m_stream);
-	item->roomNumber = LEB128::ReadInt16(m_stream);
-
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
-
-	InitialiseItem(itemNumber);
-
-	item->pos.xRot = oldXrot;
-	item->pos.yRot = oldYrot;
-	item->pos.zRot = oldZrot;
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
-
-	AddActiveItem(itemNumber);
-
-	// Flare age
-	item->data = LEB128::ReadInt32(m_stream);
-
-	return true;
-}
-
-bool SaveGame::readTorpedo()
-{
-	LEB128::ReadInt16(m_stream);
-
-	short itemNumber = CreateItem();
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	item->objectNumber = ID_TORPEDO;
-	item->pos.xPos = LEB128::ReadInt32(m_stream);
-	item->pos.yPos = LEB128::ReadInt32(m_stream);
-	item->pos.zPos = LEB128::ReadInt32(m_stream);
-	item->pos.xRot = LEB128::ReadInt16(m_stream);
-	item->pos.yRot = LEB128::ReadInt16(m_stream);
-	item->pos.zRot = LEB128::ReadInt16(m_stream);
-	item->roomNumber = LEB128::ReadInt16(m_stream);
-
-	short oldXrot = item->pos.xRot;
-	short oldYrot = item->pos.yRot;
-	short oldZrot = item->pos.zRot;
-
-	InitialiseItem(itemNumber);
-
-	item->pos.xRot = oldXrot;
-	item->pos.yRot = oldYrot;
-	item->pos.zRot = oldZrot;
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
-
-	AddActiveItem(itemNumber);
-
-	item->itemFlags[0] = LEB128::ReadInt16(m_stream);
-	item->itemFlags[1] = LEB128::ReadInt16(m_stream);
-	item->currentAnimState = LEB128::ReadInt16(m_stream);
-	item->goalAnimState = LEB128::ReadInt16(m_stream);
-	item->requiredAnimState = LEB128::ReadInt16(m_stream);
-
-	return true;
-}
-
-void SaveGame::saveItemQuadInfo(int itemNumber, int arg2)
-{
-
-	//m_stream->WriteBytes(reinterpret_cast<byte*>(g_Level.Items[itemNumber].data), sizeof(QUAD_INFO));
-}
-
-void SaveGame::saveRats(int arg1, int arg2)
-{
-	RAT_STRUCT buffer;
-	memcpy(&buffer, &Rats[arg1], sizeof(RAT_STRUCT));
-	LEB128::Write(m_stream, arg1);
-	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(RAT_STRUCT));
-}
-
-void SaveGame::saveBats(int arg1, int arg2)
-{
-	BAT_STRUCT buffer;
-	memcpy(&buffer, &Bats[arg1], sizeof(BAT_STRUCT));
-	LEB128::Write(m_stream, arg1);
-	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(BAT_STRUCT));
-}
-
-void SaveGame::saveSpiders(int arg1, int arg2)
-{
-	SPIDER_STRUCT buffer;
-	memcpy(&buffer, &Spiders[arg1], sizeof(SPIDER_STRUCT));
-	LEB128::Write(m_stream, arg1);
-	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(SPIDER_STRUCT));
-}
-
-bool SaveGame::readBats()
-{
-	int index = LEB128::ReadInt16(m_stream);
-
-	BAT_STRUCT* bats = &Bats[index];
-
-	char* buffer = (char*)malloc(sizeof(BAT_STRUCT));
-	m_stream->Read(buffer, sizeof(BAT_STRUCT));
-	memcpy(bats, buffer, sizeof(BAT_STRUCT));
-	free(buffer);
-
-	return true;
-}
-
-bool SaveGame::readRats()
-{
-	int index = LEB128::ReadInt16(m_stream);
-
-	RAT_STRUCT* rats = &Rats[index];
-
-	char* buffer = (char*)malloc(sizeof(RAT_STRUCT));
-	m_stream->Read(buffer, sizeof(RAT_STRUCT));
-	memcpy(rats, buffer, sizeof(RAT_STRUCT));
-	free(buffer);
-
-	return true;
-}
-
-bool SaveGame::readSpiders()
-{
-	int index = LEB128::ReadInt16(m_stream);
-
-	SPIDER_STRUCT* spiders = &Spiders[index];
-
-	char* buffer = (char*)malloc(sizeof(SPIDER_STRUCT));
-	m_stream->Read(buffer, sizeof(SPIDER_STRUCT));
-	memcpy(spiders, buffer, sizeof(SPIDER_STRUCT));
-	free(buffer);
+	char fileName[255];
+	ZeroMemory(fileName, 255);
+	sprintf(fileName, "savegame.%d", slot);
+
+	std::ifstream file;
+	file.open(fileName, std::ios_base::app | std::ios_base::binary);
+	file.seekg(0, std::ios::end);
+	size_t length = file.tellg();
+	file.seekg(0, std::ios::beg);
+	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
+	file.read(buffer.get(), length);
+	file.close();
+
+	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+
+	header->level = s->header()->level();
+	header->levelName = s->header()->level_name()->str();
+	header->days = s->header()->days();
+	header->hours = s->header()->hours();
+	header->minutes = s->header()->minutes();
+	header->seconds = s->header()->seconds();
+	header->level = s->header()->level();
+	header->timer = s->header()->timer();
+	header->count = s->header()->count();
 
 	return true;
 }

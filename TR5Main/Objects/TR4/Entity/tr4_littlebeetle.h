@@ -1,7 +1,7 @@
 #pragma once
 #include <items.h>
 
-struct SCARAB_INFO
+struct SCARAB_STRUCT
 {
 	PHD_3DPOS pos;
 	short roomNumber;
@@ -13,9 +13,9 @@ struct SCARAB_INFO
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto NUM_LITTLE_BETTLES = 256;
+	constexpr auto NUM_SCARABS = 256;
 
-	extern SCARAB_INFO Scarabs[NUM_LITTLE_BETTLES];
+	extern SCARAB_STRUCT Scarabs[NUM_SCARABS];
 	extern int NextScarab;
 
 	void InitialiseScarabs(short itemNumber);

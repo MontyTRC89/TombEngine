@@ -56,16 +56,6 @@ enum MOOD_TYPE {
 	STALK_MOOD
 };
 
-struct CREATURE_TARGET {
-	GAME_OBJECT_ID objectNumber;
-	int boxNumber;
-	PHD_3DPOS pos;
-	uint16_t flags; // ItemFlags enum
-	uint16_t triggerFlags;
-	short roomNumber;
-
-};
-
 enum class CREATURE_AI_PRIORITY {
 	HIGH,
 	MEDIUM,
@@ -87,7 +77,8 @@ struct CREATURE_INFO {
 	bool monkeyAhead;
 	MOOD_TYPE mood;
 	ITEM_INFO* enemy;
-	CREATURE_TARGET aiTarget;
+	short aiTargetNum;
+	ITEM_INFO* aiTarget;
 	short pad;
 	short itemNum;
 	PHD_VECTOR target;
