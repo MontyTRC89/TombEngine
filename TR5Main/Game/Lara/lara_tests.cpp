@@ -51,7 +51,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
-	if (!TestValidLedgeAngle(coll))
+	if (!TestValidLedgeAngle(item, coll))
 		return false; 
 	
 	if (!ignoreHeadroom)
@@ -64,9 +64,9 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 	return (coll->CollisionType == CT_FRONT);
 }
 
-bool TestValidLedgeAngle(COLL_INFO* coll)
+bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return (abs((short)(coll->NearestLedgeAngle - coll->Setup.ForwardAngle)) <= LARA_GRAB_THRESHOLD);
+	return (abs((short)(coll->NearestLedgeAngle - item->pos.yRot)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
@@ -177,7 +177,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			SnapItemToLedge(item, coll, 0.1f);
 	}
 
-	if (TestValidLedgeAngle(coll) && Lara.climbStatus)
+	if (TestValidLedgeAngle(item, coll) && Lara.climbStatus)
 	{
 		if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
 		{
@@ -671,7 +671,15 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 			coll->Front.Floor = front;
 
-			if (!flag2 && coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !flag && !coll->HitStatic && cdif <= -950 && dfront >= -60 && dfront <= 60)
+			if (!flag2 && 
+				coll->Middle.Ceiling < 0 && 
+				coll->CollisionType == CT_FRONT && 
+				!flag && 
+				!coll->HitStatic && 
+				cdif <= -950 && 
+				dfront >= -60 &&
+				dfront <= 60 &&
+				TestValidLedgeAngle(item, coll))
 			{
 				if (item->speed != 0)
 					SnapItemToLedge(item, coll);
