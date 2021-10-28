@@ -356,7 +356,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_FAST_TURN)
 			Lara.turnRate = -LARA_FAST_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 8);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, 12);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -364,7 +364,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_FAST_TURN)
 			Lara.turnRate = LARA_FAST_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 8);
+		DoLaraLean(item, coll, LARA_LEAN_MAX, 12);
 	}
 
 	static bool allowJump = false;
@@ -4005,7 +4005,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_SLOW_TURN)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 6);
+		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 8);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -4013,7 +4013,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_SLOW_TURN)
 			Lara.turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 6);
+		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 8);
 	}
 
 	if (TrInput & IN_JUMP)
