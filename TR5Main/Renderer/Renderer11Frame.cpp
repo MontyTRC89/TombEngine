@@ -30,16 +30,16 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber) {
 			return;
 		}
-		RendererRoom &const room = m_rooms[roomNumber];
+		RendererRoom& room = m_rooms[roomNumber];
 
-		ROOM_INFO *r = room.Room;
+		ROOM_INFO* r = room.Room;
 
 		short itemNum = NO_ITEM;
 		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
 		{
 			//printf("ItemNum: %d, NextItem: %d\n", itemNum, g_Level.Items[itemNum].nextItem);
 
-			ITEM_INFO *item = &g_Level.Items[itemNum];
+			ITEM_INFO* item = &g_Level.Items[itemNum];
 
 			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
 				break;
@@ -52,7 +52,7 @@ namespace TEN::Renderer
 
 			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
-			RendererItem *newItem = &m_items[itemNum];
+			RendererItem* newItem = &m_items[itemNum];
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 			Vector3 min = (Vector3(bounds->X1, bounds->Y1, bounds->Z1)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			Vector3 max = (Vector3(bounds->X2, bounds->Y2, bounds->Z2)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -77,14 +77,14 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber) {
 			return;
 		}
-		RendererRoom &const room = m_rooms[roomNumber];
-		ROOM_INFO *r = room.Room;
+		RendererRoom& room = m_rooms[roomNumber];
+		ROOM_INFO* r = room.Room;
 		if (r->mesh.size() <= 0)
 			return;
 		int numStatics = r->mesh.size();
 		for (int i = 0; i < numStatics; i++)
 		{
-			MESH_INFO *mesh = &r->mesh[i];
+			MESH_INFO* mesh = &r->mesh[i];
 			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 			{
 				RendererStatic* newStatic = &room.Statics[i];
@@ -111,9 +111,9 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber) {
 			return;
 		}
-		RendererRoom &const room = m_rooms[roomNumber];
+		RendererRoom& room = m_rooms[roomNumber];
 
-		ROOM_INFO *r = room.Room;
+		ROOM_INFO* r = room.Room;
 
 		if (r->lights.size() <= 0)
 			return;
@@ -138,7 +138,7 @@ namespace TEN::Renderer
 		int numLights = room.Lights.size();
 
 		m_shadowLight = NULL;
-		RendererLight *brightestLight = NULL;
+		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
 
 		for (int j = 0; j < numLights; j++)
@@ -213,9 +213,9 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber){
 			return;
 		}
-		RendererRoom &const room = m_rooms[roomNumber];
+		RendererRoom& room = m_rooms[roomNumber];
 
-		ROOM_INFO *r = room.Room;
+		ROOM_INFO* r = room.Room;
 		LinearArrayBuffer<RendererLight*, 8> tempLights;
 
 		Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
@@ -328,8 +328,8 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber){
 			return;
 		}
-		RendererRoom &const room = m_rooms[roomNumber];
-		ROOM_INFO *r = &g_Level.Rooms[roomNumber];
+		RendererRoom& room = m_rooms[roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		int numLights = room.Lights.size();
 
@@ -364,10 +364,10 @@ namespace TEN::Renderer
 		//	m_lightsToDraw.resize(32);
 
 		// Now try to search for a shadow caster, using Lara as reference
-		RendererRoom &const room = m_rooms[LaraItem->roomNumber];
+		RendererRoom& room = m_rooms[LaraItem->roomNumber];
 
 		// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
-		RendererLight *brightestLight = NULL;
+		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
 
 		// Try room lights
@@ -431,9 +431,9 @@ namespace TEN::Renderer
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
-		RendererRoom &const room = m_rooms[roomNumber];
+		RendererRoom& room = m_rooms[roomNumber];
 
-		ROOM_INFO *r = room.Room;
+		ROOM_INFO* r = room.Room;
 
 		short fxNum = NO_ITEM;
 		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)

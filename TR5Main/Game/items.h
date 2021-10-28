@@ -9,6 +9,8 @@
 
 enum GAME_OBJECT_ID : short;
 
+constexpr unsigned int NO_MESH_BITS = UINT_MAX;
+
 enum AIObjectType
 {
 	NO_AI = 0x0000,

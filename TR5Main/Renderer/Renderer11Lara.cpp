@@ -248,9 +248,9 @@ void TEN::Renderer::Renderer11::drawLara(RenderView& view, bool transparent, boo
 	m_cbMisc.updateData(m_stMisc, m_context.Get());
 	m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-	RendererObject &laraObj = *m_moveableObjects[ID_LARA];
-	RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-	RendererRoom &const room = m_rooms[LaraItem->roomNumber];
+	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+	RendererRoom& room = m_rooms[LaraItem->roomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);

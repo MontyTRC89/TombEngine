@@ -31,7 +31,7 @@ namespace TEN::Entities::Generic
 
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 
 		spark->x = (GetRandomControl() & 0xF) - 8;
