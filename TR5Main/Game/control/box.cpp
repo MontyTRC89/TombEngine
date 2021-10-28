@@ -1448,9 +1448,9 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 		if (foundObject != NULL)
 		{
-			CREATURE_TARGET* aiItem = &creature->aiTarget;
+			ITEM_INFO* aiItem = creature->aiTarget;
 
-			creature->enemy = nullptr;
+			creature->enemy = aiItem;
 
 			aiItem->objectNumber = foundObject->objectNumber;
 			aiItem->roomNumber = foundObject->roomNumber;
@@ -1462,10 +1462,10 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 			aiItem->triggerFlags = foundObject->triggerFlags;
 			aiItem->boxNumber = foundObject->boxNumber;
 
-			if (!(creature->aiTarget.flags & 32))
+			if (!(creature->aiTarget->flags & 32))
 			{
-				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) * 256;
-				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) * 256;
+				creature->aiTarget->pos.xPos += phd_sin(creature->aiTarget->pos.yRot) * 256;
+				creature->aiTarget->pos.zPos += phd_cos(creature->aiTarget->pos.yRot) * 256;
 			}
 		}
 	}
