@@ -202,7 +202,8 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), tempLights.size()); i++)
 		{
-			renderView.lightsToDraw.push_back(tempLights[i]);
+			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1)
+				renderView.lightsToDraw.push_back(tempLights[i]);
 		}
 	}
 
@@ -341,7 +342,8 @@ namespace TEN::Renderer
 			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->ySize * WALL_SIZE);
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
-			if (sphereBoxIntersection(boxMin, boxMax, center, light->Out))
+			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1
+				&& sphereBoxIntersection(boxMin, boxMax, center, light->Out))
 				renderView.lightsToDraw.push_back(light);
 		}
 	}
@@ -350,7 +352,8 @@ namespace TEN::Renderer
 	{
 		// Add dynamic lights
 		for (int i = 0; i < m_dynamicLights.size(); i++)
-			view.lightsToDraw.push_back(m_dynamicLights[i]);
+			if (view.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1)
+				view.lightsToDraw.push_back(m_dynamicLights[i]);
 
 		// Now I have a list full of draw. Let's sort them.
 		//std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);

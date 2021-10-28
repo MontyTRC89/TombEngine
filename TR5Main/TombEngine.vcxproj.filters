@@ -248,7 +248,6 @@
     <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
-    <ClCompile Include="Game\inventory.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_one_gun.cpp" />
@@ -663,7 +662,6 @@
     <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
-    <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_one_gun.h" />
@@ -710,6 +708,8 @@
     <ClInclude Include="Game\effects\lara_burn.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
