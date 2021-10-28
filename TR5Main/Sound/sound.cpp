@@ -9,17 +9,13 @@
 #include "configuration.h"
 #include "level.h"
 
-using std::vector;
-using std::unordered_map;
-using std::string;
-
 HSTREAM BASS_3D_Mixdown;
-HFX BASS_FXHandler[NUM_SOUND_FILTERS];
-SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];
+HFX BASS_FXHandler[(int)SOUND_FILTER::Count];
+SoundTrackSlot BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::Count];
 HSAMPLE SamplePointer[SOUND_MAX_SAMPLES];
 SoundEffectSlot SoundSlot[SOUND_MAX_CHANNELS];
 
-const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb presets
+const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)REVERB_TYPE::Count] =    // Reverb presets
 
 { // Dry Mix | Wet Mix |  Size   |  Damp   |  Width  |  Mode  | Channel
   {  1.0f,     0.20f,     0.05f,    0.90f,    0.7f,     0,      -1     },	// 0 = Outside
@@ -29,7 +25,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-unordered_map<string, AudioTrack> SoundTracks;
+std::map<std::string, int> SoundTrackMap;
+std::vector<SoundTrackInfo> SoundTracks;
 std::string CurrentLoopedSoundTrack;
 
 static int GlobalMusicVolume;
@@ -40,13 +37,13 @@ void SetVolumeMusic(int vol)
 	GlobalMusicVolume = vol;
 
 	float fVol = static_cast<float>(vol) / 100.0f;
-	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
+	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel))
 	{
-		BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, fVol);
+		BASS_ChannelSetAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL, fVol);
 	}
-	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel))
+	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel))
 	{
-		BASS_ChannelSetAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL, fVol);
+		BASS_ChannelSetAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel, BASS_ATTRIB_VOL, fVol);
 	}
 }
 
@@ -55,7 +52,7 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)
+bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -163,9 +160,9 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	else if (sampleIndex == -2)
 		return 0;
 
-	SAMPLE_INFO *sampleInfo = &g_Level.SoundDetails[sampleIndex];
+	SampleInfo* sampleInfo = &g_Level.SoundDetails[sampleIndex];
 
-	if (sampleInfo->number < 0)
+	if (sampleInfo->Number < 0)
 	{
 		logD("No valid samples count for effect %d", sampleIndex);
 		return 0;
@@ -175,7 +172,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	DWORD sampleFlags = SOUND_SAMPLE_FLAGS;
 
 	// Effect's chance to play.
-	if ((sampleInfo->randomness) && ((GetRandomControl() & 127) > sampleInfo->randomness))
+	if ((sampleInfo->Randomness) && ((GetRandomControl() & 127) > sampleInfo->Randomness))
 		return 0;
 
 	// Apply 3D attrib only to sound with position property
@@ -183,19 +180,19 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 		sampleFlags |= BASS_SAMPLE_3D;
 
 	// Set & randomize volume (if needed)
-	float gain = (static_cast<float>(sampleInfo->volume) / 255.0f) * gainMultiplier;
-	if ((sampleInfo->flags & SOUND_FLAG_RND_GAIN))
+	float gain = (static_cast<float>(sampleInfo->Volume) / 255.0f) * gainMultiplier;
+	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
 		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
 
 	// Set and randomize pitch and additionally multiply by provided value (for vehicles etc)
-	float pitch = (1.0f + static_cast<float>(sampleInfo->pitch) / 127.0f) * pitchMultiplier;
+	float pitch = (1.0f + static_cast<float>(sampleInfo->Pitch) / 127.0f) * pitchMultiplier;
 
 	// Randomize pitch (if needed)
-	if ((sampleInfo->flags & SOUND_FLAG_RND_PITCH))
+	if ((sampleInfo->Flags & SOUND_FLAG_RND_PITCH))
 		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f)* SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
-	float radius = (float)(sampleInfo->radius) * 1024.0f;
+	float radius = (float)(sampleInfo->Radius) * 1024.0f;
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.
@@ -209,23 +206,23 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	int existingChannel = Sound_EffectIsPlaying(effectID, position);
 
 	// Select behaviour based on effect playback type (bytes 0-1 of flags field)
-	int playType = sampleInfo->flags & 3;
+	auto playType = (SOUND_PLAYTYPE)(sampleInfo->Flags & 3);
 	switch (playType)
 	{
-	case SOUND_NORMAL:
+	case SOUND_PLAYTYPE::Normal:
 		break;
 
-	case SOUND_WAIT:
+	case SOUND_PLAYTYPE::Wait:
 		if (existingChannel != -1) // Don't play until stopped
 			return 0; 
 		break;
 
-	case SOUND_RESTART:
+	case SOUND_PLAYTYPE::Restart:
 		if (existingChannel != -1) // Stop existing and continue
 			Sound_FreeSlot(existingChannel, SOUND_XFADETIME_CUTSOUND); 
 		break;
 
-	case SOUND_LOOPED:
+	case SOUND_PLAYTYPE::Looped:
 		if (existingChannel != -1) // Just update parameters and return, if already playing
 		{
 			Sound_UpdateEffectPosition(existingChannel, position);
@@ -238,11 +235,11 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 
 	// Randomly select arbitrary sample from the list, if more than one is present
 	int sampleToPlay = 0;
-	int numSamples = (sampleInfo->flags >> 2) & 15;
+	int numSamples = (sampleInfo->Flags >> 2) & 15;
 	if (numSamples == 1)
-		sampleToPlay = sampleInfo->number;
+		sampleToPlay = sampleInfo->Number;
 	else
-		sampleToPlay = sampleInfo->number + (int)((GetRandomControl() * numSamples) >> 15);
+		sampleToPlay = sampleInfo->Number + (int)((GetRandomControl() * numSamples) >> 15);
 
 	// Get free channel to play sample
 	int freeSlot = Sound_GetFreeSlot();
@@ -259,17 +256,17 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 		return 0;
 
 	// Finally ready to play sound, assign it to sound slot.
-	SoundSlot[freeSlot].state = SOUND_STATE_IDLE;
-	SoundSlot[freeSlot].effectID = effectID;
-	SoundSlot[freeSlot].channel = channel;
-	SoundSlot[freeSlot].gain = gain;
-	SoundSlot[freeSlot].origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
+	SoundSlot[freeSlot].State = SOUND_STATE::Idle;
+	SoundSlot[freeSlot].EffectID = effectID;
+	SoundSlot[freeSlot].Channel = channel;
+	SoundSlot[freeSlot].Gain = gain;
+	SoundSlot[freeSlot].Origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
 
 	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
 		return 0;
 
 	// Set looped flag, if necessary
-	if (playType == SOUND_LOOPED)
+	if (playType == SOUND_PLAYTYPE::Looped)
 		BASS_ChannelFlags(channel, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
 
 	// Play channel
@@ -292,58 +289,51 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 void StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
+		if (SoundSlot[i].EffectID == effectID && SoundSlot[i].Channel != NULL && BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PLAYING)
 			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 }
 
-void Sound_Stop()
+void StopAllSounds()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel))
-			BASS_ChannelStop(SoundSlot[i].channel);
+		if (SoundSlot[i].Channel != NULL && BASS_ChannelIsActive(SoundSlot[i].Channel))
+			BASS_ChannelStop(SoundSlot[i].Channel);
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 }
 
-void Sound_FreeSamples()
+void FreeSamples()
 {
-	Sound_Stop();
+	StopAllSounds();
 	for (int i = 0; i < SOUND_MAX_SAMPLES; i++)
 		Sound_FreeSample(i);
 }
 
-void PlaySoundTrack(short track, short flags)
-{
-	PlaySoundTrack(track, flags, SOUND_TRACK_ONESHOT);
-}
-
-void PlaySoundTrack(std::string track, unsigned int mode)
+void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode)
 {
 	bool crossfade = false;
-	DWORD crossfadeTime;
+	DWORD crossfadeTime = 0;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
-	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BGM : mode;
-
-	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[mode].channel);
-	if (channelActive && BASS_Soundtrack[mode].track.compare(track) == 0)
+	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[(int)mode].Channel);
+	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0)
 		return;
 
 	switch (mode)
 	{
-		case SOUND_TRACK_ONESHOT:
-			crossfadeTime = SOUND_XFADETIME_ONESHOT;
-			break;
+	case SOUNDTRACK_PLAYTYPE::OneShot:
+		crossfadeTime = SOUND_XFADETIME_ONESHOT;
+		break;
 
-		case SOUND_TRACK_BGM:
-			crossfade = true;
-			crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
-			flags |= BASS_SAMPLE_LOOP;
-			CurrentLoopedSoundTrack = track;
-			break;
+	case SOUNDTRACK_PLAYTYPE::BGM:
+		crossfade = true;
+		crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
+		flags |= BASS_SAMPLE_LOOP;
+		CurrentLoopedSoundTrack = track;
+		break;
 	}
 
-	if(channelActive)
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[mode].channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
+	if (channelActive)
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 	
 	static char fullTrackName[1024];
 	char const* name = track.c_str();
@@ -371,10 +361,10 @@ void PlaySoundTrack(std::string track, unsigned int mode)
 
 	// Damp BGM track in case one-shot track is about to play.
 
-	if (mode == SOUND_TRACK_ONESHOT)
+	if (mode == SOUNDTRACK_PLAYTYPE::OneShot)
 	{
-		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
-			BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, masterVolume * SOUND_BGM_DAMP_COEFFICIENT, SOUND_XFADETIME_BGM_START);
+		if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel))
+			BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL, masterVolume * SOUND_BGM_DAMP_COEFFICIENT, SOUND_XFADETIME_BGM_START);
 		BASS_ChannelSetSync(stream, BASS_SYNC_FREE | BASS_SYNC_ONETIME | BASS_SYNC_MIXTIME, 0, Sound_FinishOneshotTrack, NULL);
 	}
 
@@ -399,51 +389,56 @@ void PlaySoundTrack(std::string track, unsigned int mode)
 	if (Sound_CheckBASSError("Playing soundtrack %s", false, fullTrackName))
 		return;
 
-	BASS_Soundtrack[mode].channel = stream;
-	BASS_Soundtrack[mode].track = track;
+	BASS_Soundtrack[(int)mode].Channel = stream;
+	BASS_Soundtrack[(int)mode].Track = track;
 }
 
-void PlaySoundTrack(std::string track, DWORD mask, DWORD unknown)
+void PlaySoundTrack(std::string track, short mask)
+{
+	PlaySoundTrack(SoundTrackMap[track], mask);
+}
+
+void PlaySoundTrack(int index, short mask)
 {
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
-	if (!SoundTracks[track].looped)
+
+	if (!(SoundTracks[index].Mode == SOUNDTRACK_PLAYTYPE::BGM))
 	{
-		byte filteredMask = (mask >> 8) & 0x3F;
-		if ((SoundTracks[track].Mask & filteredMask) == filteredMask)
+		short filteredMask = (mask >> 8) & 0x3F;
+		if ((SoundTracks[index].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
-		SoundTracks[track].Mask |= filteredMask;
+		SoundTracks[index].Mask |= filteredMask;
 	}
 
-	PlaySoundTrack(track, SoundTracks[track].looped);
-}
-
-void PlaySoundTrack(int index, DWORD mask, DWORD unknown)
-{
-	std::pair<const std::string, AudioTrack>& track = *std::next(SoundTracks.begin(), index);
-	PlaySoundTrack(track.first, mask, unknown);
+	PlaySoundTrack(SoundTracks[index].Name, SoundTracks[index].Mode);
 }
 
 void StopSoundTracks()
 {
 	// Do quick fadeouts.
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].track = "";
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
-	BASS_Soundtrack[SOUND_TRACK_BGM].track = "";
-	BASS_Soundtrack[SOUND_TRACK_BGM].channel = NULL;
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel = NULL;
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel = NULL;
+}
+
+void ClearSoundTrackMasks()
+{
+	for (auto& track : SoundTracks) { track.Mask = 0; }
 }
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData)
 {
-	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
+	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel))
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
 	
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].track = "";
-	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel = NULL;
 }
 
 void Sound_FreeSample(int index)
@@ -462,7 +457,7 @@ int Sound_GetFreeSlot()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		if (SoundSlot[i].channel == NULL || !BASS_ChannelIsActive(SoundSlot[i].channel))
+		if (SoundSlot[i].Channel == NULL || !BASS_ChannelIsActive(SoundSlot[i].Channel))
 			return i;
 	}
 
@@ -473,7 +468,7 @@ int Sound_GetFreeSlot()
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		float distance = Vector3(SoundSlot[i].origin - Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z)).Length();
+		float distance = Vector3(SoundSlot[i].Origin - Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z)).Length();
 		if (distance > minDistance)
 		{
 			minDistance = distance;
@@ -494,28 +489,28 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		if (SoundSlot[i].effectID == effectID)
+		if (SoundSlot[i].EffectID == effectID)
 		{
-			if (SoundSlot[i].channel == NULL)	// Free channel
+			if (SoundSlot[i].Channel == NULL)	// Free channel
 				continue;
 
-			if (BASS_ChannelIsActive(SoundSlot[i].channel))
+			if (BASS_ChannelIsActive(SoundSlot[i].Channel))
 			{
 				// Only check position on 3D samples. 2D samples stop immediately.
 
 				BASS_CHANNELINFO info;
-				BASS_ChannelGetInfo(SoundSlot[i].channel, &info);
+				BASS_ChannelGetInfo(SoundSlot[i].Channel, &info);
 				if (!(info.flags & BASS_SAMPLE_3D) || !position)
 					return i;
 
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
 				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
-				if (Vector3::Distance(origin, SoundSlot[i].origin) < SOUND_MAXVOL_RADIUS)
+				if (Vector3::Distance(origin, SoundSlot[i].Origin) < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
 			else
-				SoundSlot[i].channel = NULL; // WTF, let's clean this up
+				SoundSlot[i].Channel = NULL; // WTF, let's clean this up
 		}
 	}
 	return -1;
@@ -550,13 +545,13 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 		return;
 
 	if (fadeout > 0)
-		BASS_ChannelSlideAttribute(SoundSlot[index].channel, BASS_ATTRIB_VOL, -1.0f, fadeout);
+		BASS_ChannelSlideAttribute(SoundSlot[index].Channel, BASS_ATTRIB_VOL, -1.0f, fadeout);
 	else
-		BASS_ChannelStop(SoundSlot[index].channel);
+		BASS_ChannelStop(SoundSlot[index].Channel);
 
-	SoundSlot[index].channel = NULL;
-	SoundSlot[index].state = SOUND_STATE_IDLE;
-	SoundSlot[index].effectID = -1;
+	SoundSlot[index].Channel = NULL;
+	SoundSlot[index].State = SOUND_STATE::Idle;
+	SoundSlot[index].EffectID = -1;
 }
 
 // Update sound position in a level.
@@ -569,23 +564,23 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 	if (position)
 	{
 		BASS_CHANNELINFO info;
-		BASS_ChannelGetInfo(SoundSlot[index].channel, &info);
+		BASS_ChannelGetInfo(SoundSlot[index].Channel, &info);
 		if (info.flags & BASS_SAMPLE_3D)
 		{
-			SoundSlot[index].origin.x = position->xPos;
-			SoundSlot[index].origin.y = position->yPos;
-			SoundSlot[index].origin.z = position->zPos;
+			SoundSlot[index].Origin.x = position->xPos;
+			SoundSlot[index].Origin.y = position->yPos;
+			SoundSlot[index].Origin.z = position->zPos;
 
 			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
 			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
-			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &pos, &rot, NULL);
+			BASS_ChannelSet3DPosition(SoundSlot[index].Channel, &pos, &rot, NULL);
 			BASS_Apply3D();
 		}
 	}
 
 	// Reset activity flag, important for looped samples
-	if (BASS_ChannelIsActive(SoundSlot[index].channel))
-		SoundSlot[index].state = SOUND_STATE_IDLE;
+	if (BASS_ChannelIsActive(SoundSlot[index].Channel))
+		SoundSlot[index].State = SOUND_STATE::Idle;
 
 	return true;
 }
@@ -596,8 +591,8 @@ bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
 
-	BASS_ChannelSetAttribute(SoundSlot[index].channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
-	BASS_ChannelSetAttribute(SoundSlot[index].channel, BASS_ATTRIB_VOL, gain);
+	BASS_ChannelSetAttribute(SoundSlot[index].Channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
+	BASS_ChannelSetAttribute(SoundSlot[index].Channel, BASS_ATTRIB_VOL, gain);
 
 	return true;
 }
@@ -614,34 +609,34 @@ void Sound_UpdateScene()
 	if (currentReverb == -1 || g_Level.Rooms[Camera.pos.roomNumber].reverbType != currentReverb)
 	{
 		currentReverb = g_Level.Rooms[Camera.pos.roomNumber].reverbType;
-		if (currentReverb < NUM_REVERB_TYPES)
-			BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
+		if (currentReverb < (int)REVERB_TYPE::Count)
+			BASS_FXSetParameters(BASS_FXHandler[(int)SOUND_FILTER::Reverb], &BASS_ReverbTypes[currentReverb]);
 	}
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		if ((SoundSlot[i].channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING))
+		if ((SoundSlot[i].Channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PLAYING))
 		{
-			SAMPLE_INFO *sampleInfo = &g_Level.SoundDetails[g_Level.SoundMap[SoundSlot[i].effectID]];
+			SampleInfo* sampleInfo = &g_Level.SoundDetails[g_Level.SoundMap[SoundSlot[i].EffectID]];
 
 			// Stop and clean up sounds which were in ending state in previous frame.
 			// In case sound is looping, make it ending unless they are re-fired in next frame.
 
-			if (SoundSlot[i].state == SOUND_STATE_ENDING)
+			if (SoundSlot[i].State == SOUND_STATE::Ending)
 			{
-				SoundSlot[i].state = SOUND_STATE_ENDED;
+				SoundSlot[i].State = SOUND_STATE::Ended;
 				Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 				continue;
 			}
-			else if (sampleInfo->flags & 3 == SOUND_LOOPED)
-				SoundSlot[i].state = SOUND_STATE_ENDING;
+			else if ((SOUND_PLAYTYPE)(sampleInfo->Flags & 3) == SOUND_PLAYTYPE::Looped)
+				SoundSlot[i].State = SOUND_STATE::Ending;
 
 			// Calculate attenuation and clean up sounds which are out of listener range (only for 3D sounds).
 
-			if (SoundSlot[i].origin != SOUND_OMNIPRESENT_ORIGIN)
+			if (SoundSlot[i].Origin != SOUND_OMNIPRESENT_ORIGIN)
 			{
-				float radius = (float)(sampleInfo->radius) * 1024.0f;
-				float distance = Sound_DistanceToListener(SoundSlot[i].origin);
+				float radius = (float)(sampleInfo->Radius) * 1024.0f;
+				float distance = Sound_DistanceToListener(SoundSlot[i].Origin);
 
 				if (distance > radius)
 				{
@@ -649,7 +644,7 @@ void Sound_UpdateScene()
 					continue;
 				}
 				else
-					BASS_ChannelSetAttribute(SoundSlot[i].channel, BASS_ATTRIB_VOL, Sound_Attenuate(SoundSlot[i].gain, distance, radius));
+					BASS_ChannelSetAttribute(SoundSlot[i].Channel, BASS_ATTRIB_VOL, Sound_Attenuate(SoundSlot[i].Gain, distance, radius));
 			}
 		}
 	}
@@ -711,20 +706,20 @@ void Sound_Init()
 		return;
 
 	// Initialize channels and tracks array
-	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * NUM_SOUND_TRACK_TYPES));
+	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SOUNDTRACK_PLAYTYPE::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
 	// Attach reverb effect to 3D channel
- 	BASS_FXHandler[SOUND_FILTER_REVERB] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_FREEVERB, 0);
-	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[RVB_OUTSIDE]);
+ 	BASS_FXHandler[(int)SOUND_FILTER::Reverb] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_FREEVERB, 0);
+	BASS_FXSetParameters(BASS_FXHandler[(int)SOUND_FILTER::Reverb], &BASS_ReverbTypes[(int)REVERB_TYPE::Outside]);
 
 	if (Sound_CheckBASSError("Attaching environmental FX", true))
 		return;
 
 	// Apply slight compression to 3D channel
-	BASS_FXHandler[SOUND_FILTER_COMPRESSOR] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_COMPRESSOR2, 1);
+	BASS_FXHandler[(int)SOUND_FILTER::Compressor] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_COMPRESSOR2, 1);
 	auto comp = BASS_BFX_COMPRESSOR2{ 4.0f, -18.0f, 1.5f, 10.0f, 100.0f, -1 };
-	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_COMPRESSOR], &comp);
+	BASS_FXSetParameters(BASS_FXHandler[(int)SOUND_FILTER::Compressor], &comp);
 
 	if (Sound_CheckBASSError("Attaching compressor", true))
 		return;
@@ -760,6 +755,11 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 void SayNo()
 {
 	SoundEffect(SFX_TR4_LARA_NO, NULL, SFX_ALWAYS);
+}
+
+void PlaySecretTrack()
+{
+	PlaySoundTrack(SoundTracks.size());
 }
 
 int GetShatterSound(int shatterID)

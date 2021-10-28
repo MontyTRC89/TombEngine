@@ -15,7 +15,7 @@
 
 struct ChunkId;
 struct LEB128;
-struct SAMPLE_INFO;
+struct SampleInfo;
 struct BOX_INFO;
 struct OVERLAP;
 
@@ -142,7 +142,7 @@ struct LEVEL
 	std::vector<OVERLAP> Overlaps;
 	std::vector<int> Zones[MAX_ZONES][2];
 	std::vector<short> SoundMap;
-	std::vector<SAMPLE_INFO> SoundDetails;
+	std::vector<SampleInfo> SoundDetails;
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
 	int NumItems;
 	int NumSpritesSequences;

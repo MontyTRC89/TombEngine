@@ -172,12 +172,14 @@ void GameFlow::SetGameFarView(byte val)
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
 {
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
+	SoundTracks.clear();
+
 	for (auto t : tracks) {
-		AudioTrack track;
+		SoundTrackInfo track;
 		track.Name = t.trackName;
 		track.Mask = 0;
-		track.looped = t.looped;
-		SoundTracks.insert_or_assign(track.Name, track);
+		track.Mode = t.looped ? SOUNDTRACK_PLAYTYPE::BGM : SOUNDTRACK_PLAYTYPE::OneShot;
+		SoundTracks.push_back(track);
 	}
 }
 
