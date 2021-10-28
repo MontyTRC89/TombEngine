@@ -4,11 +4,7 @@
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "pickup.h"
 #include "animation.h"
 #include "control/control.h"
@@ -30,20 +26,11 @@ enum PuzzleType {
 short puzzleItem;
 /*bounds*/
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
-{
-	0, 0,
-	-256, 256,
-	0, 0,
-	-ANGLE(10), ANGLE(10),
-	-ANGLE(30), ANGLE(30),
-	-ANGLE(10), ANGLE(10)
-};
-OBJECT_COLLISION_BOUNDS KeyHoleBounds =
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0x0000, 0x019C, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+{ 0, 0, -256, 256, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+
 static PHD_VECTOR KeyHolePosition(0, 0, 312);
+OBJECT_COLLISION_BOUNDS KeyHoleBounds =
+{ -256, 256, 0, 0, 0, 412, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 /*puzzles*/
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
@@ -64,13 +51,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = PUZZLETYPE_SPECIFIC;
 
-	if (((TrInput & IN_ACTION ||
-#ifdef NEW_INV
-		GLOBAL_inventoryitemchosen != NO_ITEM
-#else
-		g_Inventory.GetSelectedObject() != NO_ITEM
-#endif
-		)
+	if (((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
@@ -94,37 +75,22 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			if (!Lara.isMoving)//TROYE INVENTORY FIX ME
+			if (!Lara.isMoving)
 			{
-#ifdef NEW_INV
-				if (GLOBAL_inventoryitemchosen == NO_ITEM)
+				if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 				{
-					if (have_i_got_object(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
-						GLOBAL_enterinventory = item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1);
+					if (g_Inventory.have_i_got_object(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
+						g_Inventory.Set_enterInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
 					item->pos.yRot = oldYrot;
 					return;
 				}
 
-				if (GLOBAL_inventoryitemchosen != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
+				if (g_Inventory.Get_inventoryItemChosen() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
 					item->pos.yRot = oldYrot;
 					return;
 				}
-#else
-				if (g_Inventory.GetSelectedObject() == NO_ITEM)
-				{
-					if (g_Inventory.IsObjectPresentInInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
-						g_Inventory.SetEnterObject(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
-					item->pos.yRot = oldYrot;
-					return;
-				}
-				if (g_Inventory.GetSelectedObject() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
-				{
-					item->pos.yRot = oldYrot;
-					return;
-				}
-#endif
 			}
 
 			pos.z = bounds->Z1 - 100;
@@ -134,11 +100,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (!MoveLaraPosition(&pos, item, l))
 				{
 					Lara.interactedItem = itemNum;
-#ifdef NEW_INV
-					GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-					g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+					g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					item->pos.yRot = oldYrot;
 					return;
 				}
@@ -169,11 +131,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->flags |= 0x20;
 			Lara.interactedItem = itemNum;
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			item->pos.yRot = oldYrot;
 			return;
 		}
@@ -287,13 +245,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 
-	if (!((TrInput & IN_ACTION ||
-#ifdef NEW_INV
-		GLOBAL_inventoryitemchosen != NO_ITEM
-#else
-		g_Inventory.GetSelectedObject() != NO_ITEM
-#endif
-		)
+	if (!((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
 		&& l->currentAnimState == LS_STOP
@@ -311,26 +263,17 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (item->status != ITEM_NOT_ACTIVE)
 					return;
-#ifdef NEW_INV
-				if (GLOBAL_inventoryitemchosen == NO_ITEM)
+
+				if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 				{
-					if (have_i_got_object(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
-						GLOBAL_enterinventory = item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1);
+					if (g_Inventory.have_i_got_object(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
+						g_Inventory.Set_enterInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
+
 					return;
 				}
 
-				if (GLOBAL_inventoryitemchosen != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
+				if (g_Inventory.Get_inventoryItemChosen() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
-#else
-				if (g_Inventory.GetSelectedObject() == NO_ITEM)
-				{
-					if (g_Inventory.IsObjectPresentInInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
-						g_Inventory.SetEnterObject(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
-					return;
-				}
-				if (g_Inventory.GetSelectedObject() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
-					return;
-#endif
 			}
 
 			if (MoveLaraPosition(&KeyHolePosition, item, l))
@@ -356,11 +299,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 				{
 					item->itemFlags[3] = 92;
-#ifdef NEW_INV
-					GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-					g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+					g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 					return;
 				}
 			}
@@ -369,11 +308,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.interactedItem = itemNum;
 			}
 
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			return;
 		}
 

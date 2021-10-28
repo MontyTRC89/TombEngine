@@ -2,7 +2,7 @@
 #include "Specific/phd_global.h"
 #include "items.h"
 
-enum CAMERA_TYPE
+enum class CAMERA_TYPE
 {
 	CHASE_CAMERA,
 	FIXED_CAMERA,

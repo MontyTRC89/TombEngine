@@ -58,7 +58,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				spark->colFadeSpeed = 4;
 				spark->fadeToBlack = 8;
 				spark->dB = (speed * ((GetRandomControl() & 8) + 48)) / 128;
-				spark->transType = COLADD;
+				spark->transType = TransTypeEnum::COLADD;
 				spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 
 				if (abs(intensity) == 1)

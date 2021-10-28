@@ -28,9 +28,7 @@
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
 #include <Objects/Effects/effect_objects.h>
-#include "Game/rope.h"
 
-using namespace TEN::Game::Rope;
 using namespace TEN::Entities::Switches;
 
 OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
@@ -340,27 +338,6 @@ void TrapObjects()
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
-	}
-
-	//FIXME
-	//InitialiseRopeTrap();
-
-	obj = &Objects[ID_ROPE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRope;
-		obj->control = RopeControl;
-		obj->collision = RopeCollision;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_POLEROPE];
-	if (obj->loaded)
-	{
-		obj->collision = PoleCollision;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_WRECKING_BALL];
