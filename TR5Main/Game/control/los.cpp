@@ -369,9 +369,9 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
 {
 	// Ray
-	FXMVECTOR rayStart = { start->x, start->y, start->z };
-	FXMVECTOR rayEnd = { end->x, end->y, end->z };
-	FXMVECTOR rayDir = { end->x - start->x, end->y - start->y, end->z - start->z };
+	FXMVECTOR rayStart = { (float)start->x, (float)start->y, (float)start->z };
+	FXMVECTOR rayEnd = { (float)end->x, (float)end->y, (float)end->z };
+	FXMVECTOR rayDir = { (float)(end->x - start->x), (float)(end->y - start->y), (float)(end->z - start->z) };
 	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
 
 	// Create the bounding box for raw collision detection
