@@ -52,9 +52,9 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->sLife = sptr->life = (GetRandomControl() & 31) + 96;
 
 	if (uw)
-		sptr->transType = COLADD;
+		sptr->transType = TransTypeEnum::COLADD;
 	else
-		sptr->transType = COLADD;
+		sptr->transType = TransTypeEnum::COLADD;
 
 	sptr->extras = 0;
 	sptr->dynamic = -1;

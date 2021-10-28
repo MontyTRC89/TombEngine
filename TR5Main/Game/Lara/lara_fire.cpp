@@ -9,7 +9,6 @@
 #include "effects/effects.h"
 #include "sphere.h"
 #include "animation.h"
-#include "effects/flmtorch.h"
 #include "level.h"
 #include "control/lot.h"
 #include "setup.h"
@@ -20,6 +19,9 @@
 #include "GameFlowScript.h"
 #include "lara_struct.h"
 #include "itemdata/creature_info.h"
+#include "Objects/Generic/Object/burning_torch.h"
+
+using namespace TEN::Entities::Generic;
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -453,10 +455,10 @@ void LaraGun()
 		case WEAPON_PISTOLS:
 		case WEAPON_REVOLVER:
 		case WEAPON_UZI:
-			if (Camera.type != CINEMATIC_CAMERA 
-				&& Camera.type != LOOK_CAMERA 
-				&& Camera.type != HEAVY_CAMERA)
-				Camera.type = COMBAT_CAMERA;
+			if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA
+				&& Camera.type != CAMERA_TYPE::LOOK_CAMERA
+				&& Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
+				Camera.type = CAMERA_TYPE::COMBAT_CAMERA;
 			draw_pistols(Lara.gunType);
 			break;
 
@@ -466,10 +468,10 @@ void LaraGun()
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
-			if (Camera.type != CINEMATIC_CAMERA 
-				&& Camera.type != LOOK_CAMERA
-				&& Camera.type != HEAVY_CAMERA)
-				Camera.type = COMBAT_CAMERA;
+			if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA
+				&& Camera.type != CAMERA_TYPE::LOOK_CAMERA
+				&& Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
+				Camera.type = CAMERA_TYPE::COMBAT_CAMERA;
 			draw_shotgun(Lara.gunType);
 			break;
 
@@ -522,10 +524,10 @@ void LaraGun()
 		else
 			Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 
-		if (Camera.type != CINEMATIC_CAMERA 
-			&& Camera.type != LOOK_CAMERA 
-			&& Camera.type != HEAVY_CAMERA)
-			Camera.type = COMBAT_CAMERA;
+		if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA
+			&& Camera.type != CAMERA_TYPE::LOOK_CAMERA
+			&& Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
+			Camera.type = CAMERA_TYPE::COMBAT_CAMERA;
 
 		if (TrInput & IN_ACTION)
 		{

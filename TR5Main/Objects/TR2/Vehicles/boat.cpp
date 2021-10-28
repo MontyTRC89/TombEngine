@@ -96,7 +96,7 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 		spark->dG = 64;
 		spark->dB = 64;
 		spark->colFadeSpeed = 1;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		spark->x = (BOAT_SIDE * phd_sin(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;
@@ -124,7 +124,7 @@ void DoBoatWakeEffect(ITEM_INFO* boat)
 		spark->dG = 64;
 		spark->dB = 64;
 		spark->colFadeSpeed = 1;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;		
 		spark->x = (BOAT_SIDE * phd_sin(boat->pos.yRot) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;

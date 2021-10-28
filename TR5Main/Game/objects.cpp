@@ -15,25 +15,13 @@
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
-OBJECT_COLLISION_BOUNDS TightRopeBounds =
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+
 PHD_VECTOR TightRopePos = { 0, 0, 0 };
+OBJECT_COLLISION_BOUNDS TightRopeBounds =
+{ -256, 256, 0, 0, -256, 256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
-{
-	0xFD80, 0x0280, 0x02C0, 0x0340, 0xFFA0, 0x0060, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
-};
-
-PHD_VECTOR PolePos = { 0, 0, -208 }; 
-PHD_VECTOR PolePosR = { 0, 0, 0 }; 
-OBJECT_COLLISION_BOUNDS PoleBounds = // offset 0xA1250
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+{ -640, 640, 704, 832, -96, 96, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 void ControlAnimatingSlots(short itemNumber)
 {
@@ -42,84 +30,6 @@ void ControlAnimatingSlots(short itemNumber)
 
 	if (TriggerActive(item))
 		AnimateItem(item);
-}
-
-void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
-{
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == LS_STOP && 
-		l->animNumber == LA_STAND_IDLE
-		|| Lara.isMoving && Lara.interactedItem == itemNumber)
-	{
-		short rot = item->pos.yRot;
-		item->pos.yRot = l->pos.yRot;
-		if (TestLaraPosition(&PoleBounds, item, l))
-		{
-			if (MoveLaraPosition(&PolePos, item, l))
-			{
-				l->animNumber = LA_STAND_TO_POLE;
-				l->currentAnimState = LS_POLE_IDLE;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				Lara.isMoving = false;
-				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else
-			{
-				Lara.interactedItem = itemNumber;
-			}
-			item->pos.yRot = rot;
-		}
-		else
-		{
-			if (Lara.isMoving && Lara.interactedItem == itemNumber)
-			{
-				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
-			}
-			item->pos.yRot = rot;
-		}
-	}
-	else if (TrInput & IN_ACTION
-		&& !Lara.gunStatus
-		&& l->gravityStatus
-		&& l->fallspeed > Lara.gunStatus
-		&& (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP))
-	{
-		if (TestBoundsCollide(item, l, 100))
-		{
-			if (TestCollision(item, l))
-			{
-				short rot = item->pos.yRot;
-				item->pos.yRot = l->pos.yRot;
-				if (l->currentAnimState == LS_REACH)
-				{
-					PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
-					AlignLaraPosition(&PolePosR, item, l);
-					l->animNumber = LA_REACH_TO_POLE;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				}
-				else
-				{
-					PolePosR.y = l->pos.yPos - item->pos.yPos + 66;
-					AlignLaraPosition(&PolePosR, item, l);
-					l->animNumber = LA_JUMP_UP_TO_POLE;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				}
-				l->gravityStatus = false;
-				l->fallspeed = false;
-				l->currentAnimState = LS_POLE_IDLE;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				item->pos.yRot = rot;
-			}
-		}
-	}
-	else
-	{
-		if ((l->currentAnimState < LS_POLE_IDLE || l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE) && 
-			l->currentAnimState != LS_JUMP_BACK)
-			ObjectCollision(itemNumber, l, coll);
-	}
 }
 
 void ControlTriggerTriggerer(short itemNumber)
@@ -465,7 +375,7 @@ void HighObject2Control(short itemNumber)
 		spark->dG = (GetRandomControl() & 0x3F) + -128;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
 		spark->x = item->itemFlags[1] + (GetRandomControl() & 0x3F) + item->pos.xPos - 544;
 		spark->y = item->pos.yPos;

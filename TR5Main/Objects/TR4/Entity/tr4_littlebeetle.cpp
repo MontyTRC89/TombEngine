@@ -10,7 +10,7 @@
 
 namespace TEN::Entities::TR4
 {
-	SCARAB_INFO Scarabs[NUM_LITTLE_BETTLES];
+	SCARAB_STRUCT Scarabs[NUM_SCARABS];
 	int NextScarab;
 
 	void InitialiseScarabs(short itemNumber)
@@ -69,7 +69,7 @@ namespace TEN::Entities::TR4
 				short beetleNum = GetFreeScarab();
 				if (beetleNum != NO_ITEM)
 				{
-					SCARAB_INFO* beetle = &Scarabs[beetleNum];
+					SCARAB_STRUCT* beetle = &Scarabs[beetleNum];
 					beetle->pos.xPos = item->pos.xPos;
 					beetle->pos.yPos = item->pos.yPos;
 					beetle->pos.zPos = item->pos.zPos;
@@ -98,7 +98,7 @@ namespace TEN::Entities::TR4
 	{
 		if (Objects[ID_LITTLE_BEETLE].loaded)
 		{
-			ZeroMemory(Scarabs, NUM_LITTLE_BETTLES * sizeof(SCARAB_INFO));
+			ZeroMemory(Scarabs, NUM_SCARABS * sizeof(SCARAB_STRUCT));
 			NextScarab = 0;
 			FlipEffect = -1;
 		}
@@ -107,12 +107,12 @@ namespace TEN::Entities::TR4
 	short GetFreeScarab()
 	{
 		short result = NextScarab;
-		SCARAB_INFO* beetle = &Scarabs[NextScarab];
+		SCARAB_STRUCT* beetle = &Scarabs[NextScarab];
 
 		int i = 0;
 		while (beetle->on)
 		{
-			if (result == NUM_LITTLE_BETTLES - 1)
+			if (result == NUM_SCARABS - 1)
 			{
 				beetle = &Scarabs[0];
 				result = 0;
@@ -122,22 +122,22 @@ namespace TEN::Entities::TR4
 				result++;
 				beetle++;
 			}
-			if (++i >= NUM_LITTLE_BETTLES)
+			if (++i >= NUM_SCARABS)
 			{
 				return NO_ITEM;
 			}
 		}
 
-		NextScarab = (result + 1) & (NUM_LITTLE_BETTLES - 1);
+		NextScarab = (result + 1) & (NUM_SCARABS - 1);
 
 		return result;
 	}
 
 	void UpdateScarabs()
 	{
-		for (int i = 0; i < NUM_LITTLE_BETTLES; i++)
+		for (int i = 0; i < NUM_SCARABS; i++)
 		{
-			SCARAB_INFO* beetle = &Scarabs[i];
+			SCARAB_STRUCT* beetle = &Scarabs[i];
 
 			if (beetle->on)
 			{
