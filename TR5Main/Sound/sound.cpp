@@ -395,7 +395,13 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode)
 
 void PlaySoundTrack(std::string track, short mask)
 {
-	PlaySoundTrack(SoundTrackMap[track], mask);
+	// If track name was included in script, play it as registered track and take mask into account.
+	// Otherwise, play it once without registering anywhere.
+
+	if (SoundTrackMap.count(track))
+		PlaySoundTrack(SoundTrackMap[track], mask);
+	else
+		PlaySoundTrack(track, SOUNDTRACK_PLAYTYPE::OneShot);
 }
 
 void PlaySoundTrack(int index, short mask)
