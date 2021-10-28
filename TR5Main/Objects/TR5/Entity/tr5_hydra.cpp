@@ -76,7 +76,7 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -120,7 +120,7 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->x = (GetRandomControl() & 0xF) - 8;

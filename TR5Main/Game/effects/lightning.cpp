@@ -391,7 +391,7 @@ namespace TEN::Effects::Lightning
 		spark->dR = r;
 		spark->sR = r;
 		spark->colFadeSpeed = 2;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->on = 1;
 		spark->dB = b;
 		spark->sB = b;

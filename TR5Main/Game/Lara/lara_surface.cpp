@@ -366,7 +366,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->CollisionType == CT_FRONT 
+	if (coll->CollisionType == CT_FRONT
 		|| coll->Middle.Slope  
 		|| coll->Middle.Floor >= 0)
 	{

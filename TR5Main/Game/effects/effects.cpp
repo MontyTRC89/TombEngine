@@ -416,7 +416,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 		spark->dB = -64 - ((random & 0x7F) + 64);
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->x = (random & 7) + x - 3;
@@ -458,7 +458,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -513,9 +513,9 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 	spark->fadeToBlack = 64;
 	spark->life = spark->sLife= (GetRandomControl() & 0x1F) + 96;
 	if (uw)
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 	else
-		spark->transType = COLSUB;
+		spark->transType = TransTypeEnum::COLSUB;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + z - 16;
@@ -571,7 +571,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->dB = 64;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->transType = COLSUB;
+		spark->transType = TransTypeEnum::COLSUB;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 10;
 		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
 		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
@@ -680,7 +680,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 		spark->sLife = spark->life = (GetRandomControl() & 3) + 28;
 	}
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	if (fxObj == -1)
 	{
 		if (type && type != 1)
@@ -808,7 +808,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->dB = 32;
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 8;
-		sptr->transType = COLADD;
+		sptr->transType = TransTypeEnum::COLADD;
 		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
 		sptr->x = (GetRandomControl() & 0x1F) + item->pos.xPos - 16;
 		sptr->y = (GetRandomControl() & 0x1F) + item->pos.yPos - 16;
@@ -1146,7 +1146,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->dG = 64;
 		spark->dB = 64;
 		spark->colFadeSpeed = 1;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
@@ -1180,7 +1180,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->dG = 96;
 	spark->dB = 96;
 	spark->colFadeSpeed = 1;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
@@ -1296,7 +1296,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 28;
-	sptr->transType = COLADD;
+	sptr->transType = TransTypeEnum::COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1351,7 +1351,7 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = COLADD;
+	sptr->transType = TransTypeEnum::COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1403,7 +1403,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = COLADD;
+	sptr->transType = TransTypeEnum::COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1457,7 +1457,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->dShade = -128;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 16;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1563,7 +1563,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 18;
 		}
 
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 
 		if (fxObj != -1)
 		{
@@ -1735,7 +1735,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
 		spark->y = ((r >> 3) & 7) + y - 3;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->z = ((r >> 6) & 7) + z - 3;
@@ -1757,7 +1757,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->sR = spark->dR >> 1;
 			spark->sG = spark->dG >> 1;
 			spark->fadeToBlack = 4;
-			spark->transType = COLADD;
+			spark->transType = TransTypeEnum::COLADD;
 			spark->colFadeSpeed = (r & 3) + 8;
 			spark->sB = spark->dB >> 1;
 			spark->dR = 32;

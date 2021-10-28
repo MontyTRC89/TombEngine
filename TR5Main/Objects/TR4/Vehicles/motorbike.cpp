@@ -439,7 +439,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
         sptr->sLife = rnd;
     }
 
-    sptr->transType = COLADD;
+    sptr->transType = TransTypeEnum::COLADD;
     sptr->x = x + (GetRandomControl() & 0xF) - 8;
     sptr->y = y + (GetRandomControl() & 0xF) - 8;
     sptr->z = z + (GetRandomControl() & 0xF) - 8;
