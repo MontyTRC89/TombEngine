@@ -4274,11 +4274,13 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<std::unique_ptr<TEN::Save::FixedCameraT>> fixed_cameras{};
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
+  std::vector<std::unique_ptr<TEN::Save::FlyByCameraT>> flyby_cameras{};
   std::vector<std::unique_ptr<TEN::Save::RatInfoT>> rats{};
   std::vector<std::unique_ptr<TEN::Save::SpiderInfoT>> spiders{};
   std::vector<std::unique_ptr<TEN::Save::ScarabInfoT>> scarabs{};
   std::vector<std::unique_ptr<TEN::Save::BatInfoT>> bats{};
   std::vector<int32_t> flip_maps{};
+  std::vector<int32_t> flip_stats{};
   int32_t flip_effect = 0;
   int32_t flip_timer = 0;
   int32_t flip_status = 0;
@@ -4286,6 +4288,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<int32_t> cd_flags{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
+  std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
 };
 
 struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4302,18 +4305,21 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FIXED_CAMERAS = 16,
     VT_SINKS = 18,
     VT_STATIC_MESHES = 20,
-    VT_RATS = 22,
-    VT_SPIDERS = 24,
-    VT_SCARABS = 26,
-    VT_BATS = 28,
-    VT_FLIP_MAPS = 30,
-    VT_FLIP_EFFECT = 32,
-    VT_FLIP_TIMER = 34,
-    VT_FLIP_STATUS = 36,
-    VT_AMBIENT_TRACK = 38,
-    VT_CD_FLAGS = 40,
-    VT_ROPE = 42,
-    VT_PENDULUM = 44
+    VT_FLYBY_CAMERAS = 22,
+    VT_RATS = 24,
+    VT_SPIDERS = 26,
+    VT_SCARABS = 28,
+    VT_BATS = 30,
+    VT_FLIP_MAPS = 32,
+    VT_FLIP_STATS = 34,
+    VT_FLIP_EFFECT = 36,
+    VT_FLIP_TIMER = 38,
+    VT_FLIP_STATUS = 40,
+    VT_AMBIENT_TRACK = 42,
+    VT_CD_FLAGS = 44,
+    VT_ROPE = 46,
+    VT_PENDULUM = 48,
+    VT_ALTERNATE_PENDULUM = 50
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -4342,6 +4348,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *>(VT_STATIC_MESHES);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *>(VT_FLYBY_CAMERAS);
+  }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *>(VT_RATS);
   }
@@ -4356,6 +4365,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *flip_maps() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_FLIP_MAPS);
+  }
+  const flatbuffers::Vector<int32_t> *flip_stats() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_FLIP_STATS);
   }
   int32_t flip_effect() const {
     return GetField<int32_t>(VT_FLIP_EFFECT, 0);
@@ -4377,6 +4389,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Pendulum *pendulum() const {
     return GetPointer<const TEN::Save::Pendulum *>(VT_PENDULUM);
+  }
+  const TEN::Save::Pendulum *alternate_pendulum() const {
+    return GetPointer<const TEN::Save::Pendulum *>(VT_ALTERNATE_PENDULUM);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -4402,6 +4417,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_STATIC_MESHES) &&
            verifier.VerifyVector(static_meshes()) &&
            verifier.VerifyVectorOfTables(static_meshes()) &&
+           VerifyOffset(verifier, VT_FLYBY_CAMERAS) &&
+           verifier.VerifyVector(flyby_cameras()) &&
+           verifier.VerifyVectorOfTables(flyby_cameras()) &&
            VerifyOffset(verifier, VT_RATS) &&
            verifier.VerifyVector(rats()) &&
            verifier.VerifyVectorOfTables(rats()) &&
@@ -4416,6 +4434,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(bats()) &&
            VerifyOffset(verifier, VT_FLIP_MAPS) &&
            verifier.VerifyVector(flip_maps()) &&
+           VerifyOffset(verifier, VT_FLIP_STATS) &&
+           verifier.VerifyVector(flip_stats()) &&
            VerifyField<int32_t>(verifier, VT_FLIP_EFFECT) &&
            VerifyField<int32_t>(verifier, VT_FLIP_TIMER) &&
            VerifyField<int32_t>(verifier, VT_FLIP_STATUS) &&
@@ -4427,6 +4447,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_PENDULUM) &&
            verifier.VerifyTable(pendulum()) &&
+           VerifyOffset(verifier, VT_ALTERNATE_PENDULUM) &&
+           verifier.VerifyTable(alternate_pendulum()) &&
            verifier.EndTable();
   }
   SaveGameT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -4465,6 +4487,9 @@ struct SaveGameBuilder {
   void add_static_meshes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes) {
     fbb_.AddOffset(SaveGame::VT_STATIC_MESHES, static_meshes);
   }
+  void add_flyby_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras) {
+    fbb_.AddOffset(SaveGame::VT_FLYBY_CAMERAS, flyby_cameras);
+  }
   void add_rats(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats) {
     fbb_.AddOffset(SaveGame::VT_RATS, rats);
   }
@@ -4479,6 +4504,9 @@ struct SaveGameBuilder {
   }
   void add_flip_maps(flatbuffers::Offset<flatbuffers::Vector<int32_t>> flip_maps) {
     fbb_.AddOffset(SaveGame::VT_FLIP_MAPS, flip_maps);
+  }
+  void add_flip_stats(flatbuffers::Offset<flatbuffers::Vector<int32_t>> flip_stats) {
+    fbb_.AddOffset(SaveGame::VT_FLIP_STATS, flip_stats);
   }
   void add_flip_effect(int32_t flip_effect) {
     fbb_.AddElement<int32_t>(SaveGame::VT_FLIP_EFFECT, flip_effect, 0);
@@ -4500,6 +4528,9 @@ struct SaveGameBuilder {
   }
   void add_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> pendulum) {
     fbb_.AddOffset(SaveGame::VT_PENDULUM, pendulum);
+  }
+  void add_alternate_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum) {
+    fbb_.AddOffset(SaveGame::VT_ALTERNATE_PENDULUM, alternate_pendulum);
   }
   explicit SaveGameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -4523,19 +4554,23 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SpiderInfo>>> spiders = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScarabInfo>>> scarabs = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::BatInfo>>> bats = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> flip_maps = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> flip_stats = 0,
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     flatbuffers::Offset<flatbuffers::String> ambient_track = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
   SaveGameBuilder builder_(_fbb);
+  builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
   builder_.add_cd_flags(cd_flags);
@@ -4543,11 +4578,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_flip_status(flip_status);
   builder_.add_flip_timer(flip_timer);
   builder_.add_flip_effect(flip_effect);
+  builder_.add_flip_stats(flip_stats);
   builder_.add_flip_maps(flip_maps);
   builder_.add_bats(bats);
   builder_.add_scarabs(scarabs);
   builder_.add_spiders(spiders);
   builder_.add_rats(rats);
+  builder_.add_flyby_cameras(flyby_cameras);
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
   builder_.add_fixed_cameras(fixed_cameras);
@@ -4576,27 +4613,32 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::SpiderInfo>> *spiders = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::ScarabInfo>> *scarabs = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::BatInfo>> *bats = nullptr,
     const std::vector<int32_t> *flip_maps = nullptr,
+    const std::vector<int32_t> *flip_stats = nullptr,
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     const char *ambient_track = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
+  auto flyby_cameras__ = flyby_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>>(*flyby_cameras) : 0;
   auto rats__ = rats ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>>(*rats) : 0;
   auto spiders__ = spiders ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>>(*spiders) : 0;
   auto scarabs__ = scarabs ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>>(*scarabs) : 0;
   auto bats__ = bats ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::BatInfo>>(*bats) : 0;
   auto flip_maps__ = flip_maps ? _fbb.CreateVector<int32_t>(*flip_maps) : 0;
+  auto flip_stats__ = flip_stats ? _fbb.CreateVector<int32_t>(*flip_stats) : 0;
   auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   return TEN::Save::CreateSaveGame(
@@ -4610,18 +4652,21 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       fixed_cameras__,
       sinks__,
       static_meshes__,
+      flyby_cameras__,
       rats__,
       spiders__,
       scarabs__,
       bats__,
       flip_maps__,
+      flip_stats__,
       flip_effect,
       flip_timer,
       flip_status,
       ambient_track__,
       cd_flags__,
       rope,
-      pendulum);
+      pendulum,
+      alternate_pendulum);
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5824,11 +5869,13 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = fixed_cameras(); if (_e) { _o->fixed_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fixed_cameras[_i] = std::unique_ptr<TEN::Save::FixedCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = flyby_cameras(); if (_e) { _o->flyby_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->flyby_cameras[_i] = std::unique_ptr<TEN::Save::FlyByCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = rats(); if (_e) { _o->rats.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rats[_i] = std::unique_ptr<TEN::Save::RatInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = spiders(); if (_e) { _o->spiders.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->spiders[_i] = std::unique_ptr<TEN::Save::SpiderInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = scarabs(); if (_e) { _o->scarabs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->scarabs[_i] = std::unique_ptr<TEN::Save::ScarabInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = bats(); if (_e) { _o->bats.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->bats[_i] = std::unique_ptr<TEN::Save::BatInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = flip_maps(); if (_e) { _o->flip_maps.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->flip_maps[_i] = _e->Get(_i); } } }
+  { auto _e = flip_stats(); if (_e) { _o->flip_stats.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->flip_stats[_i] = _e->Get(_i); } } }
   { auto _e = flip_effect(); _o->flip_effect = _e; }
   { auto _e = flip_timer(); _o->flip_timer = _e; }
   { auto _e = flip_status(); _o->flip_status = _e; }
@@ -5836,6 +5883,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
+  { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<SaveGame> SaveGame::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5855,11 +5903,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _fixed_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>> (_o->fixed_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFixedCamera(*__va->__fbb, __va->__o->fixed_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
+  auto _flyby_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>> (_o->flyby_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFlyByCamera(*__va->__fbb, __va->__o->flyby_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _rats = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>> (_o->rats.size(), [](size_t i, _VectorArgs *__va) { return CreateRatInfo(*__va->__fbb, __va->__o->rats[i].get(), __va->__rehasher); }, &_va );
   auto _spiders = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>> (_o->spiders.size(), [](size_t i, _VectorArgs *__va) { return CreateSpiderInfo(*__va->__fbb, __va->__o->spiders[i].get(), __va->__rehasher); }, &_va );
   auto _scarabs = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>> (_o->scarabs.size(), [](size_t i, _VectorArgs *__va) { return CreateScarabInfo(*__va->__fbb, __va->__o->scarabs[i].get(), __va->__rehasher); }, &_va );
   auto _bats = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::BatInfo>> (_o->bats.size(), [](size_t i, _VectorArgs *__va) { return CreateBatInfo(*__va->__fbb, __va->__o->bats[i].get(), __va->__rehasher); }, &_va );
   auto _flip_maps = _fbb.CreateVector(_o->flip_maps);
+  auto _flip_stats = _fbb.CreateVector(_o->flip_stats);
   auto _flip_effect = _o->flip_effect;
   auto _flip_timer = _o->flip_timer;
   auto _flip_status = _o->flip_status;
@@ -5867,6 +5917,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
+  auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       _header,
@@ -5878,18 +5929,21 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _fixed_cameras,
       _sinks,
       _static_meshes,
+      _flyby_cameras,
       _rats,
       _spiders,
       _scarabs,
       _bats,
       _flip_maps,
+      _flip_stats,
       _flip_effect,
       _flip_timer,
       _flip_status,
       _ambient_track,
       _cd_flags,
       _rope,
-      _pendulum);
+      _pendulum,
+      _alternate_pendulum);
 }
 
 inline const TEN::Save::SaveGame *GetSaveGame(const void *buf) {
