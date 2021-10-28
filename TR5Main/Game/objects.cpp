@@ -15,17 +15,13 @@
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
-OBJECT_COLLISION_BOUNDS TightRopeBounds =
-{
-	0xFF00, 0x0100, 0x0000, 0x0000, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+
 PHD_VECTOR TightRopePos = { 0, 0, 0 };
+OBJECT_COLLISION_BOUNDS TightRopeBounds =
+{ -256, 256, 0, 0, -256, 256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
-{
-	0xFD80, 0x0280, 0x02C0, 0x0340, 0xFFA0, 0x0060, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
-};
+{ -640, 640, 704, 832, -96, 96, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 void ControlAnimatingSlots(short itemNumber)
 {
@@ -379,7 +375,7 @@ void HighObject2Control(short itemNumber)
 		spark->dG = (GetRandomControl() & 0x3F) + -128;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
 		spark->x = item->itemFlags[1] + (GetRandomControl() & 0x3F) + item->pos.xPos - 544;
 		spark->y = item->pos.yPos;

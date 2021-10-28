@@ -482,7 +482,7 @@ static int DoRubberBoatDynamics(int height, int fallspeed, int *y)
 	{
 		fallspeed += ((height - *y - fallspeed) / 8);
 		if (fallspeed < -20)
-			fallspeed - 20;
+			fallspeed = -20;
 
 		if (*y > height)
 			*y = height;
@@ -787,7 +787,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long speed, short angl
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12 - (snow * 8);
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = COLADD;
+	sptr->transType = TransTypeEnum::COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 

@@ -52,7 +52,7 @@ enum GAME_OBJECT_ID : short
 	ID_KAYAK_LARA_ANIMS,
 	ID_KAYAK,
 	ID_UPV_LARA_ANIMS,
-	ID_UPV,											// TR3 - 90% (Need new render) (lara cant enter)
+	ID_UPV,											// TR3 - 90% (Need new render)
 	ID_MINECART_LARA_ANIMS,
 	ID_MINECART,
 	ID_JEEP_LARA_ANIMS,
@@ -98,7 +98,7 @@ enum GAME_OBJECT_ID : short
 	ID_BABOON_NORMAL,
 	ID_BABOON_INV,
 	ID_BABOON_SILENT,
-	ID_LITTLE_BEETLE,		// TR4 - 
+	ID_LITTLE_BEETLE,		// TR4 - OK
 	ID_LOCUSTS,				// TR4 - OK
 	ID_SHARK,				// DEPRECATED?
 	ID_HUSKIE,

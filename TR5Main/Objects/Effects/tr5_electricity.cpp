@@ -40,7 +40,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	}
 
 	spark->fxObj = objNum;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
@@ -98,7 +98,7 @@ void TriggerLaraElectricitySparks(int flame)
 	spark->sG = color;
 	spark->dB = color;
 	spark->dG = color / 2;
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
 	spark->sLife = 12;
