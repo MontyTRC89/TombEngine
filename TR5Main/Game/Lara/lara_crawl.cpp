@@ -272,15 +272,13 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(20.0f);
 
-	if (TrInput & IN_LEFT &&
-		item->speed)
+	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 6);
 	}
-	else if (TrInput & IN_RIGHT &&
-		item->speed)
+	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate = LARA_CROUCH_ROLL_TURN;
 
@@ -318,10 +316,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
-	// Hit wall, ledge, or slope.
-	if (coll->Middle.Floor <= coll->Setup.BadHeightUp ||
-		coll->Middle.Floor >= coll->Setup.BadHeightDown ||
-		coll->Middle.Slope)
+	if (LaraDeflectEdgeDuck(item, coll))
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
 		item->pos.yPos = coll->Setup.OldPosition.y;
