@@ -15,8 +15,6 @@
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 
-ITEM_INFO jeepDummyTarget;
-
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
 	short grenadeItemNumber = CreateItem();
@@ -148,8 +146,8 @@ void EnemyJeepControl(short itemNumber)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		creature->enemy = &jeepDummyTarget;
-		CREATURE_TARGET* target = &creature->aiTarget;
+		creature->enemy = creature->aiTarget;
+		ITEM_INFO* target = creature->aiTarget;
 		short angle;
 		int distance;
 		{

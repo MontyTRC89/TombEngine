@@ -17,7 +17,7 @@ int LoadSavegameInfos()
 
 	for (int i = 0; i < MAX_SAVEGAMES; i++)
 	{
-		g_NewSavegameInfos[i].Present = false;
+		g_NewSavegameInfos[i].present = false;
 	}
 
 	// try to load the savegame
@@ -31,8 +31,8 @@ int LoadSavegameInfos()
 			continue;
 		fclose(savegamePtr);
 
-		g_NewSavegameInfos[i].Present = true;
-		SaveGame::LoadHeader(fileName, &g_NewSavegameInfos[i]);
+		g_NewSavegameInfos[i].present = true;
+		SaveGame::LoadHeader(i, &g_NewSavegameInfos[i]);
 
 		fclose(savegamePtr);
 	}

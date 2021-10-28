@@ -334,7 +334,7 @@ void old_lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
+			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT && coll->CollisionType != CT_FRONT)
 				item->pos.yPos += coll->Middle.Floor;
 		}
 	}
@@ -673,7 +673,7 @@ void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (!TestLaraSlide(item, coll))
+			if (!TestLaraSlide(item, coll) && coll->CollisionType != CT_FRONT)
 			{
 				if (coll->Middle.Floor < 50)
 				{
@@ -1099,14 +1099,18 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraVault(item, coll))
 				return;
 
-			// Don't try to move if there is no headroom in front
-			if (coll->CollisionType == CT_FRONT)
-				return;
-
 			if (TrInput & IN_WALK)
+			{
+				if (coll->CollisionType == CT_FRONT) // Never try to walk if there's collision in front
+					return;
 				item->goalAnimState = LS_WALK_FORWARD;
+			}
 			else
+			{
+				if (cheight.Position.Ceiling > 0) // Only try to run if there's no overhang ceiling in front
+					return;
 				item->goalAnimState = LS_RUN_FORWARD;
+			}
 		}
 		else if (TrInput & IN_BACK)
 		{
