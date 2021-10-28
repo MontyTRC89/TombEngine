@@ -1420,7 +1420,6 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
 		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
