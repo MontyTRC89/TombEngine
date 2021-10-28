@@ -99,31 +99,28 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->Front.Floor > -850)
+			if (coll->Front.Floor > -850 && TestValidLedge(item, coll) && !coll->HitStatic)
 			{
 				if (coll->Front.Floor < -650 &&
 					coll->Front.Floor >= coll->Front.Ceiling &&
 					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
 					coll->Front.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (TestValidLedge(item, coll) && !coll->HitStatic)
+					if (TrInput & IN_WALK)
 					{
-						if (TrInput & IN_WALK)
-						{
-							item->goalAnimState = LS_HANDSTAND;
-						}
-						else if (TrInput & IN_DUCK)
-						{
-							item->goalAnimState = LS_HANG_TO_CRAWL;
-							item->requiredAnimState = LS_CROUCH_IDLE;
-						}
-						else
-						{
-							item->goalAnimState = LS_GRABBING;
-						}
-
-						return;
+						item->goalAnimState = LS_HANDSTAND;
 					}
+					else if (TrInput & IN_DUCK)
+					{
+						item->goalAnimState = LS_HANG_TO_CRAWL;
+						item->requiredAnimState = LS_CROUCH_IDLE;
+					}
+					else
+					{
+						item->goalAnimState = LS_GRABBING;
+					}
+
+					return;
 				}
 
 				if (coll->Front.Floor < -650 &&
@@ -131,14 +128,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->Front.Floor - coll->FrontLeft.Ceiling >= -256 &&
 					coll->Front.Floor - coll->FrontRight.Ceiling >= -256)
 				{
-					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
-					{
-						item->goalAnimState = LS_HANG_TO_CRAWL;
-						item->requiredAnimState = LS_CROUCH_IDLE;
+					item->goalAnimState = LS_HANG_TO_CRAWL;
+					item->requiredAnimState = LS_CROUCH_IDLE;
 
-						return;
-					}
-				}
+					return;
+			}
 			}
 
 			if (Lara.climbStatus != 0 &&
