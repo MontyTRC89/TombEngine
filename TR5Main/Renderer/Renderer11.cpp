@@ -1,8 +1,5 @@
 #include "framework.h"
 #include "Renderer11.h"
-#ifndef NEW_INV
-#include "inventory.h"
-#endif
 #include "gameflow.h"
 #include "camera.h"
 #include "effects/tomb4fx.h"

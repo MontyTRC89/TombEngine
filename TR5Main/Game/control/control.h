@@ -34,6 +34,8 @@ enum HEADINGS
 	WEST
 };
 
+constexpr int MAX_ROOMS = 1024;
+
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
@@ -50,7 +52,7 @@ extern int LevelComplete;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
-extern short ItemNewRooms[512];
+extern short ItemNewRooms[MAX_ROOMS];
 extern short NextItemActive;
 extern short NextItemFree;
 extern short NextFxActive;
@@ -61,10 +63,6 @@ extern int LaraDrawType;
 
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
-
-#ifndef NEW_INV
-extern int LastInventoryItem;
-#endif
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 extern short IsRoomOutsideNo;
