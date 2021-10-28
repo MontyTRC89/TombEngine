@@ -3,9 +3,6 @@
 #include "lara_cheat.h"
 #include "input.h"
 #include "GameFlowScript.h"
-#ifndef NEW_INV
-#include "inventory.h"
-#endif
 #include "effects/effects.h"
 #include "Sound/sound.h"
 #include "collide.h"
@@ -208,10 +205,6 @@ void LaraCheatGetStuff()
 		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].setInfinite(true);
 		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
 	}
-
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 }
 
 void DelsGiveLaraItemsCheat()
@@ -239,9 +232,5 @@ void DelsGiveLaraItemsCheat()
 		Lara.PickupsCombo[2 * i] = false;
 		Lara.PickupsCombo[2 * i + 1] = false;
 	}
-
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 	/* Hardcoded code */
 }

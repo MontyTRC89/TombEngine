@@ -535,6 +535,7 @@ namespace TEN::Renderer
 		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
 		void renderTitleMenu();
 		void renderPauseMenu();
+		void renderLoadSaveMenu();
 		void renderNewInventory();
 		void drawStatistics();
 		void drawExamines();
