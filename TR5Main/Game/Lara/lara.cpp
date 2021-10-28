@@ -42,9 +42,9 @@
 #include "items.h"
 #include "newinv2.h"
 
-#include "Game/rope.h"
+#include "Objects/Generic/Object/rope.h"
 
-using namespace TEN::Game::Rope;
+using namespace TEN::Entities::Generic;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::entities::all
+namespace TEN::Entities::Effects
 {
 	void ControlEnemyMissile(short fxNum);
 }
