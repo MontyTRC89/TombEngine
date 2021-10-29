@@ -911,14 +911,6 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	// TODO: Make crawl step up/down automatic? @Sezz 2021.10.16
-	/*if (TestLaraStep(coll))
-	{
-		DoLaraStep(item, coll);
-
-		return;
-	}*/
-
 	if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
 		item->pos.yPos += coll->Middle.Floor;
 }
