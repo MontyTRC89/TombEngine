@@ -87,6 +87,10 @@ struct ItemNumber;
 struct ItemNumberBuilder;
 struct ItemNumberT;
 
+struct Short;
+struct ShortBuilder;
+struct ShortT;
+
 struct Int;
 struct IntBuilder;
 struct IntT;
@@ -104,34 +108,36 @@ struct Vector3;
 enum class ItemData : uint8_t {
   NONE = 0,
   Int = 1,
-  Float = 2,
-  ShortArray = 3,
-  ItemNumber = 4,
-  Creature = 5,
-  LaserHead = 6,
-  QuadBike = 7,
-  BigGun = 8,
-  Motorbike = 9,
-  Jeep = 10,
-  LaraInfo = 11,
-  Kayak = 12,
-  Door = 13,
-  Skidoo = 14,
-  UPV = 15,
-  Motorboat = 16,
-  GameVector = 17,
-  Wraith = 18,
-  Rubberboat = 19,
-  Pushable = 20,
-  Minecart = 21,
+  Short = 2,
+  Float = 3,
+  ShortArray = 4,
+  ItemNumber = 5,
+  Creature = 6,
+  LaserHead = 7,
+  QuadBike = 8,
+  BigGun = 9,
+  Motorbike = 10,
+  Jeep = 11,
+  LaraInfo = 12,
+  Kayak = 13,
+  Door = 14,
+  Skidoo = 15,
+  UPV = 16,
+  Motorboat = 17,
+  GameVector = 18,
+  Wraith = 19,
+  Rubberboat = 20,
+  Pushable = 21,
+  Minecart = 22,
   MIN = NONE,
   MAX = Minecart
 };
 
-inline const ItemData (&EnumValuesItemData())[22] {
+inline const ItemData (&EnumValuesItemData())[23] {
   static const ItemData values[] = {
     ItemData::NONE,
     ItemData::Int,
+    ItemData::Short,
     ItemData::Float,
     ItemData::ShortArray,
     ItemData::ItemNumber,
@@ -157,9 +163,10 @@ inline const ItemData (&EnumValuesItemData())[22] {
 }
 
 inline const char * const *EnumNamesItemData() {
-  static const char * const names[23] = {
+  static const char * const names[24] = {
     "NONE",
     "Int",
+    "Short",
     "Float",
     "ShortArray",
     "ItemNumber",
@@ -197,6 +204,10 @@ template<typename T> struct ItemDataTraits {
 
 template<> struct ItemDataTraits<TEN::Save::Int> {
   static const ItemData enum_value = ItemData::Int;
+};
+
+template<> struct ItemDataTraits<TEN::Save::Short> {
+  static const ItemData enum_value = ItemData::Short;
 };
 
 template<> struct ItemDataTraits<TEN::Save::Float> {
@@ -318,6 +329,14 @@ struct ItemDataUnion {
   const TEN::Save::IntT *AsInt() const {
     return type == ItemData::Int ?
       reinterpret_cast<const TEN::Save::IntT *>(value) : nullptr;
+  }
+  TEN::Save::ShortT *AsShort() {
+    return type == ItemData::Short ?
+      reinterpret_cast<TEN::Save::ShortT *>(value) : nullptr;
+  }
+  const TEN::Save::ShortT *AsShort() const {
+    return type == ItemData::Short ?
+      reinterpret_cast<const TEN::Save::ShortT *>(value) : nullptr;
   }
   TEN::Save::FloatT *AsFloat() {
     return type == ItemData::Float ?
@@ -1764,6 +1783,64 @@ struct ItemNumber::Traits {
 
 flatbuffers::Offset<ItemNumber> CreateItemNumber(flatbuffers::FlatBufferBuilder &_fbb, const ItemNumberT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct ShortT : public flatbuffers::NativeTable {
+  typedef Short TableType;
+  int16_t scalar = 0;
+};
+
+struct Short FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ShortT NativeTableType;
+  typedef ShortBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  int16_t scalar() const {
+    return GetField<int16_t>(VT_SCALAR, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int16_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  ShortT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ShortT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Short> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ShortBuilder {
+  typedef Short Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(int16_t scalar) {
+    fbb_.AddElement<int16_t>(Short::VT_SCALAR, scalar, 0);
+  }
+  explicit ShortBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Short> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Short>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Short> CreateShort(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int16_t scalar = 0) {
+  ShortBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct Short::Traits {
+  using type = Short;
+  static auto constexpr Create = CreateShort;
+};
+
+flatbuffers::Offset<Short> CreateShort(flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct IntT : public flatbuffers::NativeTable {
   typedef Int TableType;
   uint64_t scalar = 0;
@@ -2463,6 +2540,32 @@ inline flatbuffers::Offset<ItemNumber> CreateItemNumber(flatbuffers::FlatBufferB
       _num);
 }
 
+inline ShortT *Short::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ShortT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Short::UnPackTo(ShortT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<Short> Short::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateShort(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Short> CreateShort(flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ShortT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateShort(
+      _fbb,
+      _scalar);
+}
+
 inline IntT *Int::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<IntT>();
   UnPackTo(_o.get(), _resolver);
@@ -2548,6 +2651,10 @@ inline bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, Ite
     }
     case ItemData::Int: {
       auto ptr = reinterpret_cast<const TEN::Save::Int *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ItemData::Short: {
+      auto ptr = reinterpret_cast<const TEN::Save::Short *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case ItemData::Float: {
@@ -2652,6 +2759,10 @@ inline void *ItemDataUnion::UnPack(const void *obj, ItemData type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::Int *>(obj);
       return ptr->UnPack(resolver);
     }
+    case ItemData::Short: {
+      auto ptr = reinterpret_cast<const TEN::Save::Short *>(obj);
+      return ptr->UnPack(resolver);
+    }
     case ItemData::Float: {
       auto ptr = reinterpret_cast<const TEN::Save::Float *>(obj);
       return ptr->UnPack(resolver);
@@ -2741,6 +2852,10 @@ inline flatbuffers::Offset<void> ItemDataUnion::Pack(flatbuffers::FlatBufferBuil
     case ItemData::Int: {
       auto ptr = reinterpret_cast<const TEN::Save::IntT *>(value);
       return CreateInt(_fbb, ptr, _rehasher).Union();
+    }
+    case ItemData::Short: {
+      auto ptr = reinterpret_cast<const TEN::Save::ShortT *>(value);
+      return CreateShort(_fbb, ptr, _rehasher).Union();
     }
     case ItemData::Float: {
       auto ptr = reinterpret_cast<const TEN::Save::FloatT *>(value);
@@ -2832,6 +2947,10 @@ inline ItemDataUnion::ItemDataUnion(const ItemDataUnion &u) : type(u.type), valu
       value = new TEN::Save::IntT(*reinterpret_cast<TEN::Save::IntT *>(u.value));
       break;
     }
+    case ItemData::Short: {
+      value = new TEN::Save::ShortT(*reinterpret_cast<TEN::Save::ShortT *>(u.value));
+      break;
+    }
     case ItemData::Float: {
       value = new TEN::Save::FloatT(*reinterpret_cast<TEN::Save::FloatT *>(u.value));
       break;
@@ -2921,6 +3040,11 @@ inline void ItemDataUnion::Reset() {
   switch (type) {
     case ItemData::Int: {
       auto ptr = reinterpret_cast<TEN::Save::IntT *>(value);
+      delete ptr;
+      break;
+    }
+    case ItemData::Short: {
+      auto ptr = reinterpret_cast<TEN::Save::ShortT *>(value);
       delete ptr;
       break;
     }
