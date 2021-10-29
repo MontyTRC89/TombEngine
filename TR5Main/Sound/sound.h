@@ -1,15 +1,9 @@
 #pragma once
+
 #include <bass.h>
 #include <bass_fx.h>
 #include "control/control.h"
 #include "sound_effects.h"
-
-enum SFX_TYPES
-{
-	SFX_LANDANDWATER = 0,
-	SFX_LANDONLY = (1 << 14),
-	SFX_WATERONLY = (2 << 14)
-};
 
 #define SFX_ALWAYS 2
 
@@ -35,101 +29,107 @@ enum SFX_TYPES
 #define SOUND_XFADETIME_HIJACKSOUND	 50
 #define SOUND_BGM_DAMP_COEFFICIENT	 0.6f
 
-#define TRACK_FOUND_SECRET			"073_Secret"
 #define TRACKS_PREFIX				"Audio\\%s.%s"
+
+enum class SOUNDTRACK_PLAYTYPE
+{
+	OneShot,
+	BGM,
+	Count
+};
+
+enum class SOUND_PLAYCONDITION
+{
+	LandAndWater = 0,
+	Land  = (1 << 14),
+	Water = (2 << 14)
+};
+
+enum class SOUND_PLAYTYPE
+{
+	Normal,
+	Wait,
+	Restart,
+	Looped
+};
+
+enum class REVERB_TYPE
+{
+	Outside,  // 0x00   no reverberation
+	Small,	  // 0x01   little reverberation
+	Medium,   // 0x02
+	Large,	  // 0x03
+	Pipe,	  // 0x04   highest reverberation, almost never used
+	Count
+};
+
+enum class SOUND_STATE
+{
+	Idle,
+	Ending,
+	Ended
+};
+
+enum class SOUND_FILTER
+{
+	Reverb,
+	Compressor,
+	Lowpass,
+	Count
+};
 
 struct SoundEffectSlot
 {
-	short state;
-	short effectID;
-	float gain;
-	HCHANNEL channel;
-	Vector3 origin;
+	SOUND_STATE State;
+	short EffectID;
+	float Gain;
+	HCHANNEL Channel;
+	Vector3 Origin;
 };
 
 struct SoundTrackSlot
 {
-	HSTREAM channel;
-	std::string track;
+	HSTREAM Channel;
+	std::string Track;
 };
 
-enum sound_track_types
+struct SampleInfo
 {
-	SOUND_TRACK_ONESHOT,
-	SOUND_TRACK_BGM,
-
-	NUM_SOUND_TRACK_TYPES
+	short Number;
+	byte Volume;
+	byte Radius;
+	byte Randomness;
+	signed char Pitch;
+	short Flags;
 };
 
-enum sound_filters
-{
-	SOUND_FILTER_REVERB,
-	SOUND_FILTER_COMPRESSOR,
-	SOUND_FILTER_LOWPASS,
-
-	NUM_SOUND_FILTERS
-};
-
-enum sound_states
-{
-	SOUND_STATE_IDLE,
-	SOUND_STATE_ENDING,
-	SOUND_STATE_ENDED
-};
-
-enum sound_flags
-{ 
-	SOUND_NORMAL, 
-	SOUND_WAIT, 
-	SOUND_RESTART, 
-	SOUND_LOOPED 
-};
-
-enum reverb_type
-{
-	RVB_OUTSIDE,	   // 0x00   no reverberation
-	RVB_SMALL_ROOM,	   // 0x01   little reverberation
-	RVB_MEDIUM_ROOM,   // 0x02
-	RVB_LARGE_ROOM,	   // 0x03
-	RVB_PIPE,		   // 0x04   highest reverberation, almost never used
-
-	NUM_REVERB_TYPES
-};
-
-struct SAMPLE_INFO
-{
-	short number;
-	byte volume;
-	byte radius;
-	byte randomness;
-	signed char pitch;
-	short flags;
-};
-
-struct AudioTrack
+struct SoundTrackInfo
 {
 	std::string Name;
-	byte Mask;
-	bool looped;
+	SOUNDTRACK_PLAYTYPE Mode;
+	short Mask;
 };
 
-extern std::unordered_map<std::string, AudioTrack> SoundTracks;
-extern std::string CurrentLoopedSoundTrack;
+extern std::map<std::string, int> SoundTrackMap;
+extern std::vector<SoundTrackInfo> SoundTracks;
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
-bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
-void Sound_FreeSamples();
-void Sound_Stop();
+bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
+void FreeSamples();
+void StopAllSounds();
 
-void PlaySoundTrack(short track, short flags);
-void PlaySoundTrack(std::string trackName, unsigned int mode);
-void PlaySoundTrack(std::string trackName, DWORD mask, DWORD unknown);
-void PlaySoundTrack(int index, DWORD mask, DWORD unknown);
+void PlaySoundTrack(std::string trackName, SOUNDTRACK_PLAYTYPE mode, QWORD position = 0);
+void PlaySoundTrack(std::string trackName, short mask = 0);
+void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTracks();
+void ClearSoundTrackMasks();
+void PlaySecretTrack();
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
+
+std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 

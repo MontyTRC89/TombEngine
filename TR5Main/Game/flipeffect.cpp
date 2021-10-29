@@ -116,7 +116,7 @@ void AddFootprint(ITEM_INFO* item)
 		return;
 
 	PHD_VECTOR position;
-	if (FXType == SFX_LANDONLY)
+	if (FXType == (int)SOUND_PLAYCONDITION::Land)
 		GetLaraJointPosition(&position, LM_LFOOT);
 	else
 		GetLaraJointPosition(&position, LM_RFOOT);
