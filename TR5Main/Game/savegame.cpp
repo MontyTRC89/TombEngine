@@ -360,7 +360,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_reached_goal(creature->reachedGoal);
 
 			creatureOffset = creatureBuilder.Finish();
-		}
+		} 
 
 		Save::Position position = Save::Position(
 			(int32_t)itemToSerialize.pos.xPos,
@@ -411,6 +411,18 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
+		}
+		else if (itemToSerialize.data.is<short>())
+		{
+			short& data = itemToSerialize.data;
+			serializedItem.add_data_type(Save::ItemData::Short);
+			serializedItem.add_data(data);
+		}
+		else if (itemToSerialize.data.is<int>())
+		{
+			int& data = itemToSerialize.data;
+			serializedItem.add_data_type(Save::ItemData::Int);
+			serializedItem.add_data(data);
 		}
 
 		auto serializedItemOffset = serializedItem.Finish();
@@ -771,25 +783,42 @@ bool SaveGame::Load(int slot)
 	// Items
 	for (int i = 0; i < s->items()->size(); i++)
 	{
-		if (i >= g_Level.NumItems)
-			break;
-
 		const Save::Item* savedItem = s->items()->Get(i);
-		ITEM_INFO* item = &g_Level.Items[i];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-		// Kill immediately item if already killed and continue
-		if (savedItem->flags() & IFLAG_KILLED)
+		short itemNumber = i;
+		bool dynamicItem = false;
+
+		if (i >= g_Level.NumItems)
 		{
-			KillItem(i);
-			item->status = ITEM_DEACTIVATED;
-			item->flags |= ONESHOT;
-			continue;
+			// Items beyond items level space must be active
+			if (!savedItem->active())
+				continue;
+
+			// Items beyond items level space must be initialised differently
+			itemNumber = CreateItem();
+			if (itemNumber == NO_ITEM)
+				continue;
+			dynamicItem = true;
 		}
 
-		// If not triggered, don't load remaining data
-		if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
-			continue;
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+		if (!dynamicItem)
+		{
+			// Kill immediately item if already killed and continue
+			if (savedItem->flags() & IFLAG_KILLED)
+			{
+				KillItem(i);
+				item->status = ITEM_DEACTIVATED;
+				item->flags |= ONESHOT;
+				continue;
+			}
+
+			// If not triggered, don't load remaining data
+			if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+				continue;
+		}
 
 		item->pos.xPos = savedItem->position()->x_pos();
 		item->pos.yPos = savedItem->position()->y_pos();
@@ -798,11 +827,27 @@ bool SaveGame::Load(int slot)
 		item->pos.yRot = savedItem->position()->y_rot();
 		item->pos.zRot = savedItem->position()->z_rot();
 
+		short roomNumber = savedItem->room_number();
+
+		if (dynamicItem)
+		{
+			item->roomNumber = roomNumber;
+
+			InitialiseItem(itemNumber);
+			
+			// InitialiseItem could overwrite position so restore it
+			item->pos.xPos = savedItem->position()->x_pos();
+			item->pos.yPos = savedItem->position()->y_pos();
+			item->pos.zPos = savedItem->position()->z_pos();
+			item->pos.xRot = savedItem->position()->x_rot();
+			item->pos.yRot = savedItem->position()->y_rot();
+			item->pos.zRot = savedItem->position()->z_rot();
+		}
+
 		item->speed = savedItem->speed();
 		item->fallspeed = savedItem->fall_speed();
 
 		// Do the correct way for assigning new room number
-		short roomNumber = savedItem->room_number();
 		if (item->objectNumber == ID_LARA)
 		{
 			LaraItem->location.roomNumber = roomNumber;
@@ -890,6 +935,12 @@ bool SaveGame::Load(int slot)
 			creature->mood = (MOOD_TYPE)savedCreature->mood();
 			creature->patrol2 = savedCreature->patrol2();
 			creature->reachedGoal = savedCreature->reached_goal();
+		}
+		else if (savedItem->data_type() == Save::ItemData::Short)
+		{
+			auto data = savedItem->data();
+			auto savedData = (Save::Short*)data;
+			item->data = savedData->scalar();
 		}
 
 		// Mesh stuff

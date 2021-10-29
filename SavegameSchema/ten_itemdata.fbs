@@ -108,6 +108,10 @@ table ItemNumber {
     num: short;
 }
 
+table Short {
+    scalar: short;
+}
+
 table Int {
     scalar: ulong;
 }
@@ -139,6 +143,7 @@ union ItemData {
     ulong,
     double,*/
     Int,
+	Short,
     Float,
     ShortArray,
     ItemNumber,

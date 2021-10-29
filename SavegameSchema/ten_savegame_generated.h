@@ -313,6 +313,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Int *data_as_Int() const {
     return data_type() == TEN::Save::ItemData::Int ? static_cast<const TEN::Save::Int *>(data()) : nullptr;
   }
+  const TEN::Save::Short *data_as_Short() const {
+    return data_type() == TEN::Save::ItemData::Short ? static_cast<const TEN::Save::Short *>(data()) : nullptr;
+  }
   const TEN::Save::Float *data_as_Float() const {
     return data_type() == TEN::Save::ItemData::Float ? static_cast<const TEN::Save::Float *>(data()) : nullptr;
   }
@@ -421,6 +424,10 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 
 template<> inline const TEN::Save::Int *Item::data_as<TEN::Save::Int>() const {
   return data_as_Int();
+}
+
+template<> inline const TEN::Save::Short *Item::data_as<TEN::Save::Short>() const {
+  return data_as_Short();
 }
 
 template<> inline const TEN::Save::Float *Item::data_as<TEN::Save::Float>() const {
