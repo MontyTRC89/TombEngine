@@ -179,7 +179,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (success)
 		{
-			SnapItemToLedge(item, coll, 0.1f);
+			SnapItemToLedge(item, coll, 0.2f);
 			return true;
 		}
 	}
