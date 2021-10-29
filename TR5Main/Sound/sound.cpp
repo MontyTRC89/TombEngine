@@ -444,11 +444,11 @@ void ClearSoundTrackMasks()
 	for (auto& track : SoundTracks) { track.Mask = 0; }
 }
 
+// Returns specified soundtrack type's stem name and playhead position.
+// To be used with savegames. To restore soundtrack, use PlaySoundtrack function with playhead position passed as 3rd argument.
+
 std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type)
 {
-	// Returns specified soundtrack type's stem name and playhead position.
-	// To be used with savegames. To restore soundtrack, use PlaySoundtrack function with playhead position passed as 3rd argument.
-
 	auto track = BASS_Soundtrack[(int)type];
 
 	if (track.Track.empty() || !BASS_ChannelIsActive(track.Channel))
