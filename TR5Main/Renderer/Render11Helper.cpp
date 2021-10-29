@@ -598,7 +598,6 @@ namespace TEN::Renderer
 					continue;
 
 				adapter.DisplayModes.push_back(newMode);
-				logD("W: ", newMode.Width,"H: ", newMode.Height," ", newMode.RefreshRate, "Hz");
 			}
 
 			m_adapters.push_back(adapter);
