@@ -353,7 +353,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName, 0, 0, flags);
 
-	if (Sound_CheckBASSError("Opening soundtrack %s", false, fullTrackName))
+	if (Sound_CheckBASSError("Opening soundtrack %s", true, fullTrackName))
 		return;
 
 	float masterVolume = (float)GlobalMusicVolume / 100.0f;
