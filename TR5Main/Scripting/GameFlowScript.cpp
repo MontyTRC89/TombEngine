@@ -235,8 +235,6 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentLoopedSoundTrack = level->AmbientTrack;
-
 		GAME_STATUS status;
 
 		if (CurrentLevel == 0)
@@ -265,7 +263,7 @@ bool GameFlow::DoGameflow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, CurrentLoopedSoundTrack, loadFromSavegame);
+			status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
 			loadFromSavegame = false;
 		}
 
