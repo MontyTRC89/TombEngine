@@ -345,6 +345,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 			snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "wav");
 			if (!std::filesystem::exists(fullTrackName))
 			{
+				logE("No any sound files with such name were found: ", track);
 				return;
 			}
 		}
@@ -421,7 +422,7 @@ void PlaySoundTrack(int index, short mask)
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
 
-	if (!(SoundTracks[index].Mode == SOUNDTRACK_PLAYTYPE::BGM))
+	if (mask && !(SoundTracks[index].Mode == SOUNDTRACK_PLAYTYPE::BGM))
 	{
 		short filteredMask = (mask >> 8) & 0x3F;
 		if ((SoundTracks[index].Mask & filteredMask) == filteredMask)
