@@ -30,7 +30,8 @@ Functions and callbacks for level-specific logic scripts.
 
 static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> looped)
 {
-	PlaySoundTrack(trackName, looped.value_or(SOUND_TRACK_ONESHOT));
+	auto mode = looped.value_or(false) ? SOUNDTRACK_PLAYTYPE::OneShot : SOUNDTRACK_PLAYTYPE::BGM;
+	PlaySoundTrack(trackName, mode);
 }
 
 static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
@@ -54,7 +55,7 @@ static void PlaySoundEffect(int id, int flags)
 
 static void SetAmbientTrack(std::string const & trackName)
 {
-	PlaySoundTrack(trackName, SOUND_TRACK_BGM);
+	PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
 }
 
 static int FindRoomNumber(GameScriptPosition pos)
@@ -516,8 +517,8 @@ void AddOneSecret()
 {
 	if (Savegame.Level.Secrets >= 255)
 		return;
-	Savegame.Level.Secrets++;
-	PlaySoundTrack(TRACK_FOUND_SECRET, SOUND_TRACK_ONESHOT);
+	Savegame.Level.Secrets++; 
+	PlaySecretTrack();
 }
 
 /*

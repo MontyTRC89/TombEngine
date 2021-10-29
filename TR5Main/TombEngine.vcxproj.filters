@@ -34,6 +34,14 @@
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
+    <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
+    <ClCompile Include="Objects\Generic\Object\rope.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
+    <ClCompile Include="Objects\Effects\effect_objects.cpp" />
+    <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
+    <ClCompile Include="Game\effects\lara_burn.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
@@ -309,14 +317,6 @@
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
-    <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
-    <ClCompile Include="Objects\Effects\effect_objects.cpp" />
-    <ClCompile Include="Game\effects\lara_burn.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
-    <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
-    <ClCompile Include="Objects\Generic\Object\rope.cpp" />
-    <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -327,6 +327,7 @@
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
+    <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
@@ -335,6 +336,14 @@
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\effects\groundfx.h" />
     <ClInclude Include="Game\roomvector.h" />
+    <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
+    <ClInclude Include="Objects\Generic\Object\polerope.h" />
+    <ClInclude Include="Objects\Generic\Object\rope.h" />
+    <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
+    <ClInclude Include="Objects\Effects\effect_objects.h" />
+    <ClInclude Include="Objects\Effects\flame_emitters.h" />
+    <ClInclude Include="Game\effects\lara_burn.h" />
+    <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
@@ -693,6 +702,8 @@
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
     <ClInclude Include="Specific\newtypes.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
+    <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\clock.h" />
     <ClInclude Include="Specific\trmath.h" />
@@ -701,17 +712,6 @@
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
-    <ClInclude Include="Objects\Effects\flame_emitters.h" />
-    <ClInclude Include="Game\effects\lightning.h" />
-    <ClInclude Include="Objects\Effects\effect_objects.h" />
-    <ClInclude Include="Game\effects\lara_burn.h" />
-    <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
-    <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
-    <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
-    <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
-    <ClInclude Include="Objects\Generic\Object\polerope.h" />
-    <ClInclude Include="Objects\Generic\Object\rope.h" />
-    <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
