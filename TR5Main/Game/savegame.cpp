@@ -10,6 +10,7 @@
 #include "sound/sound.h"
 #include "level.h"
 #include "setup.h"
+#include "sound.h"
 #include "flipeffect.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
@@ -416,7 +417,7 @@ bool SaveGame::Save(int slot)
 		serializedItems.push_back(serializedItemOffset);
 	}
 
-	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
+	auto ambientTrackOffset = fbb.CreateString(GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM).first);
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// Flipmaps
@@ -724,7 +725,8 @@ bool SaveGame::Load(int slot)
 	FlipStatus = s->flip_status();
 	//FlipTimer = s->flip_timer();
 
-	CurrentLoopedSoundTrack = s->ambient_track()->str();
+	// TODO: Save and restore playhead, and also oneshot track too!
+	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM);
 
 	// Static objects
 	for (int i = 0; i < s->static_meshes()->size(); i++)

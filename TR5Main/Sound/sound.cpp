@@ -27,7 +27,6 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)REVERB_TYPE::Count] =    // Reverb
 
 std::map<std::string, int> SoundTrackMap;
 std::vector<SoundTrackInfo> SoundTracks;
-std::string CurrentLoopedSoundTrack;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -308,7 +307,7 @@ void FreeSamples()
 		Sound_FreeSample(i);
 }
 
-void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode)
+void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 {
 	bool crossfade = false;
 	DWORD crossfadeTime = 0;
@@ -328,7 +327,6 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode)
 		crossfade = true;
 		crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
 		flags |= BASS_SAMPLE_LOOP;
-		CurrentLoopedSoundTrack = track;
 		break;
 	}
 
@@ -378,13 +376,21 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode)
 		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, masterVolume, crossfadeTime);
 
 		// Shuffle...
-		QWORD newPos = BASS_ChannelGetLength(stream, BASS_POS_BYTE) * (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX));
-		BASS_ChannelSetPosition(stream, newPos, BASS_POS_BYTE);
+		// Only activates if no custom position is passed as argument.
+		if (!position)
+		{
+			QWORD newPos = BASS_ChannelGetLength(stream, BASS_POS_BYTE) * (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX));
+			BASS_ChannelSetPosition(stream, newPos, BASS_POS_BYTE);
+		}
 	}
 	else
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, masterVolume);
 
 	BASS_ChannelPlay(stream, false);
+
+	// Try to restore position, if specified.
+	if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
+		BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
 
 	if (Sound_CheckBASSError("Playing soundtrack %s", false, fullTrackName))
 		return;
@@ -436,6 +442,20 @@ void StopSoundTracks()
 void ClearSoundTrackMasks()
 {
 	for (auto& track : SoundTracks) { track.Mask = 0; }
+}
+
+std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type)
+{
+	// Returns specified soundtrack type's stem name and playhead position.
+	// To be used with savegames. To restore soundtrack, use PlaySoundtrack function with playhead position passed as 3rd argument.
+
+	auto track = BASS_Soundtrack[(int)type];
+
+	if (track.Track.empty() || !BASS_ChannelIsActive(track.Channel))
+		return std::pair<std::string, QWORD>();
+
+	std::filesystem::path path = track.Track;
+	return std::pair<std::string, QWORD>(path.stem().string(), BASS_ChannelGetPosition(track.Channel, BASS_POS_BYTE));
 }
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData)
