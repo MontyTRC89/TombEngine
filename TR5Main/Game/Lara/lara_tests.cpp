@@ -47,14 +47,9 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 	// Determine allowed slope difference for a given collision radius
 	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
 
-	if (heightLimit)
-	{
-		if ((left - y) < -STEP_SIZE / 2)
-			return false;
-
-		if ((right - y) < -STEP_SIZE / 2)
-			return false;
-	}
+	// If specified, limit vertical search zone only to nearest height
+	if (heightLimit && (abs(left - y) > (STEP_SIZE / 2) || abs(right - y) > (STEP_SIZE / 2)))
+		return false;
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
