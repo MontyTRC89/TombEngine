@@ -152,7 +152,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		logE("Non present effect %d \n", effectID);
+		logE("Non present effect ", effectID);
 		g_Level.SoundMap[effectID] = -2;
 		return 0;
 	}
@@ -163,7 +163,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 
 	if (sampleInfo->Number < 0)
 	{
-		logD("No valid samples count for effect %d", sampleIndex);
+		logD("No valid samples count for effect ", sampleIndex);
 		return 0;
 	}
 
