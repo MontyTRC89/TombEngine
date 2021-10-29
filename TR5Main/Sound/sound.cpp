@@ -448,9 +448,9 @@ void StopSoundTracks()
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 
-	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = {};
 	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel = NULL;
-	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Track = {};
 	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel = NULL;
 }
 
@@ -478,7 +478,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel))
 		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::BGM].Channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
 	
-	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = "";
+	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Track = {};
 	BASS_Soundtrack[(int)SOUNDTRACK_PLAYTYPE::OneShot].Channel = NULL;
 }
 
