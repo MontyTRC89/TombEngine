@@ -786,7 +786,7 @@ void SayNo()
 void PlaySecretTrack()
 {
 	// Secret soundtrack should be always last one on a list.	
-	PlaySoundTrack(SoundTracks.size() - 1);
+	PlaySoundTrack(SoundTracks.back().Name, SOUNDTRACK_PLAYTYPE::OneShot);
 }
 
 int GetShatterSound(int shatterID)
