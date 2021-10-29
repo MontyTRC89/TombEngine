@@ -415,7 +415,12 @@ void PlaySoundTrack(int index, short mask)
 {
 	if (SoundTracks.size() <= index)
 	{
-		TENLog("No track registered with index " + std::to_string(index), LogLevel::Error);
+		static int lastAttemptedIndex = -1;
+		if (lastAttemptedIndex != index)
+		{
+			TENLog("No track registered with index " + std::to_string(index), LogLevel::Error);
+			lastAttemptedIndex = index;
+		}
 		return;
 	}
 	
