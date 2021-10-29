@@ -412,6 +412,12 @@ void PlaySoundTrack(std::string track, short mask)
 
 void PlaySoundTrack(int index, short mask)
 {
+	if (SoundTracks.size() <= index)
+	{
+		logE("No track registered with index ", index);
+		return;
+	}
+	
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
 
