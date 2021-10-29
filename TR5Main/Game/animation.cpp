@@ -121,12 +121,12 @@ void AnimateItem(ITEM_INFO* item)
 					}
 					else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 					{
-						if (!flags || flags == SFX_WATERONLY && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
+						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
 						{
 							SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 						}
 					}
-					else if (!flags || flags == SFX_LANDONLY && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 					{
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 					}

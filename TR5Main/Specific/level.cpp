@@ -1112,7 +1112,7 @@ void LoadSamples()
 	if (numSamplesInfos)
 	{
 		g_Level.SoundDetails.resize(numSamplesInfos);
-		ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SAMPLE_INFO));
+		ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
 
 		int numSamples = ReadInt32();
 		if (numSamples <= 0)
@@ -1127,7 +1127,7 @@ void LoadSamples()
 			uncompressedSize = ReadInt32();
 			compressedSize = ReadInt32();
 			ReadBytes(buffer, compressedSize);
-			Sound_LoadSample(buffer, compressedSize, uncompressedSize, i);
+			LoadSample(buffer, compressedSize, uncompressedSize, i);
 		}
 
 		free(buffer);
@@ -1179,8 +1179,8 @@ int LoadLevelFile(int levelIndex)
 {
 	logD("Loading level file...");
 	 
-	Sound_Stop();
-	Sound_FreeSamples();
+	StopAllSounds();
+	FreeSamples();
 	if (!g_FirstLevel)
 		FreeLevel();
 	g_FirstLevel = false;
