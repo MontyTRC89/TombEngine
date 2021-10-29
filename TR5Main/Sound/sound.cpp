@@ -785,7 +785,8 @@ void SayNo()
 
 void PlaySecretTrack()
 {
-	PlaySoundTrack(SoundTracks.size());
+	// Secret soundtrack should be always last one on a list.	
+	PlaySoundTrack(SoundTracks.size() - 1);
 }
 
 int GetShatterSound(int shatterID)
