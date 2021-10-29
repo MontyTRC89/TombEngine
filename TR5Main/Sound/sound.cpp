@@ -55,13 +55,13 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
-		logD("Sample index is larger than max. amount of samples (%d) \n", index);
+		TENLog("Sample index " + std::to_string(index) + " is larger than max. amount of samples", LogLevel::Warning);
 		return 0;
 	}
 
 	if (pointer == NULL || compSize <= 0)
 	{
-		logD("Sample size or memory address is incorrect \n", index);
+		TENLog("Sample size or memory address is incorrect for index " + std::to_string(index), LogLevel::Warning);
 		return 0;
 	}
 
@@ -70,7 +70,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 
 	if (!sample)
 	{
-		logE("Error loading sample %d \n", index);
+		TENLog("Error loading sample " + std::to_string(index), LogLevel::Error);
 		return false;
 	}
 
@@ -84,7 +84,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 
 	if (info.freq != 22050 || info.chans != 1)
 	{
-		logE("Wrong sample parameters, must be 22050 Hz Mono \n");
+		TENLog("Wrong sample parameters, must be 22050 Hz Mono", LogLevel::Error);
 		return false;
 	}
 
@@ -152,7 +152,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		logE("Non present effect ", effectID);
+		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Error);
 		g_Level.SoundMap[effectID] = -2;
 		return 0;
 	}
@@ -163,7 +163,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 
 	if (sampleInfo->Number < 0)
 	{
-		logD("No valid samples count for effect ", sampleIndex);
+		TENLog("No valid samples count for effect " + std::to_string(sampleIndex), LogLevel::Warning);
 		return 0;
 	}
 
@@ -244,7 +244,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	int freeSlot = Sound_GetFreeSlot();
 	if (freeSlot == -1)
 	{
-		logD("No free channel slot available!");
+		TENLog("No free channel slot available!", LogLevel::Warning);
 		return 0;
 	}
 
@@ -345,7 +345,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 			snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "wav");
 			if (!std::filesystem::exists(fullTrackName))
 			{
-				logE("No any sound files with such name were found: ", track);
+				TENLog("No any sound files with name '" + track + "' were found", LogLevel::Error);
 				return;
 			}
 		}
@@ -415,7 +415,7 @@ void PlaySoundTrack(int index, short mask)
 {
 	if (SoundTracks.size() <= index)
 	{
-		logE("No track registered with index ", index);
+		TENLog("No track registered with index " + std::to_string(index), LogLevel::Error);
 		return;
 	}
 	
@@ -509,7 +509,7 @@ int Sound_GetFreeSlot()
 		}
 	}
 
-	logD("Hijacking sound effect slot %d  \n", farSlot);
+	TENLog("Hijacking sound effect slot " + std::to_string(farSlot), LogLevel::Info);
 	Sound_FreeSlot(farSlot, SOUND_XFADETIME_HIJACKSOUND);
 	return farSlot;
 }
