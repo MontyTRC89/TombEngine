@@ -309,6 +309,9 @@ void FreeSamples()
 
 void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 {
+	if (track.empty())
+		return;
+
 	bool crossfade = false;
 	DWORD crossfadeTime = 0;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
