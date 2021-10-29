@@ -429,7 +429,11 @@ bool SaveGame::Save(int slot)
 		serializedItems.push_back(serializedItemOffset);
 	}
 
-	auto ambientTrackOffset = fbb.CreateString(GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM).first);
+	auto bgmTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM);
+	auto oneshotTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::OneShot);
+	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
+	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
+
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// Flipmaps
@@ -670,7 +674,10 @@ bool SaveGame::Save(int slot)
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_items(serializedItemsOffset);
-	sgb.add_ambient_track(ambientTrackOffset);
+	sgb.add_ambient_track(bgmTrackOffset);
+	sgb.add_ambient_position(bgmTrackData.second);
+	sgb.add_oneshot_track(oneshotTrackOffset);
+	sgb.add_oneshot_position(oneshotTrackData.second);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_flip_effect(FlipEffect);
@@ -737,8 +744,9 @@ bool SaveGame::Load(int slot)
 	FlipStatus = s->flip_status();
 	//FlipTimer = s->flip_timer();
 
-	// TODO: Save and restore playhead, and also oneshot track too!
-	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM);
+	// Restore soundtracks
+	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM, s->ambient_position());
+	PlaySoundTrack(s->oneshot_track()->str(), SOUNDTRACK_PLAYTYPE::OneShot, s->oneshot_position());
 
 	// Static objects
 	for (int i = 0; i < s->static_meshes()->size(); i++)
