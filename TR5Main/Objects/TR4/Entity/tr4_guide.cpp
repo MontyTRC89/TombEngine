@@ -94,6 +94,7 @@ void GuideControl(short itemNumber)
 	}
 
 	item->aiBits = FOLLOW;
+	item->hitPoints = NOT_TARGETABLE;
 
 	GetAITarget(creature);
 
@@ -610,15 +611,10 @@ void GuideControl(short itemNumber)
 		if (enemy)
 		{
 			short deltaAngle = enemy->pos.yRot - item->pos.yRot;
-			if (deltaAngle <= ANGLE(2))
-			{
-				if (deltaAngle < -ANGLE(2))
-					item->pos.yRot -= ANGLE(2);
-			}
-			else
-			{
-				item->pos.yRot += ANGLE(2);
-			}
+			if (deltaAngle < -ANGLE(2))
+				item->pos.yRot -= ANGLE(2);
+			else if (deltaAngle > ANGLE(2))
+				item->pos.yRot = ANGLE(2);
 		}
 
 		if (item->requiredAnimState == 43)
@@ -636,6 +632,7 @@ void GuideControl(short itemNumber)
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
 				item->itemFlags[3]++;
+				item->goalAnimState = STATE_GUIDE_STOP;
 
 				break;
 			}
