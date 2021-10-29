@@ -4292,6 +4292,9 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t flip_timer = 0;
   int32_t flip_status = 0;
   std::string ambient_track{};
+  uint64_t ambient_position = 0;
+  std::string oneshot_track{};
+  uint64_t oneshot_position = 0;
   std::vector<int32_t> cd_flags{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
@@ -4323,10 +4326,13 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FLIP_TIMER = 38,
     VT_FLIP_STATUS = 40,
     VT_AMBIENT_TRACK = 42,
-    VT_CD_FLAGS = 44,
-    VT_ROPE = 46,
-    VT_PENDULUM = 48,
-    VT_ALTERNATE_PENDULUM = 50
+    VT_AMBIENT_POSITION = 44,
+    VT_ONESHOT_TRACK = 46,
+    VT_ONESHOT_POSITION = 48,
+    VT_CD_FLAGS = 50,
+    VT_ROPE = 52,
+    VT_PENDULUM = 54,
+    VT_ALTERNATE_PENDULUM = 56
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -4388,6 +4394,15 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *ambient_track() const {
     return GetPointer<const flatbuffers::String *>(VT_AMBIENT_TRACK);
   }
+  uint64_t ambient_position() const {
+    return GetField<uint64_t>(VT_AMBIENT_POSITION, 0);
+  }
+  const flatbuffers::String *oneshot_track() const {
+    return GetPointer<const flatbuffers::String *>(VT_ONESHOT_TRACK);
+  }
+  uint64_t oneshot_position() const {
+    return GetField<uint64_t>(VT_ONESHOT_POSITION, 0);
+  }
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
   }
@@ -4448,6 +4463,10 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLIP_STATUS) &&
            VerifyOffset(verifier, VT_AMBIENT_TRACK) &&
            verifier.VerifyString(ambient_track()) &&
+           VerifyField<uint64_t>(verifier, VT_AMBIENT_POSITION) &&
+           VerifyOffset(verifier, VT_ONESHOT_TRACK) &&
+           verifier.VerifyString(oneshot_track()) &&
+           VerifyField<uint64_t>(verifier, VT_ONESHOT_POSITION) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
            VerifyOffset(verifier, VT_ROPE) &&
@@ -4527,6 +4546,15 @@ struct SaveGameBuilder {
   void add_ambient_track(flatbuffers::Offset<flatbuffers::String> ambient_track) {
     fbb_.AddOffset(SaveGame::VT_AMBIENT_TRACK, ambient_track);
   }
+  void add_ambient_position(uint64_t ambient_position) {
+    fbb_.AddElement<uint64_t>(SaveGame::VT_AMBIENT_POSITION, ambient_position, 0);
+  }
+  void add_oneshot_track(flatbuffers::Offset<flatbuffers::String> oneshot_track) {
+    fbb_.AddOffset(SaveGame::VT_ONESHOT_TRACK, oneshot_track);
+  }
+  void add_oneshot_position(uint64_t oneshot_position) {
+    fbb_.AddElement<uint64_t>(SaveGame::VT_ONESHOT_POSITION, oneshot_position, 0);
+  }
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
   }
@@ -4572,15 +4600,21 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     flatbuffers::Offset<flatbuffers::String> ambient_track = 0,
+    uint64_t ambient_position = 0,
+    flatbuffers::Offset<flatbuffers::String> oneshot_track = 0,
+    uint64_t oneshot_position = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
   SaveGameBuilder builder_(_fbb);
+  builder_.add_oneshot_position(oneshot_position);
+  builder_.add_ambient_position(ambient_position);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
   builder_.add_cd_flags(cd_flags);
+  builder_.add_oneshot_track(oneshot_track);
   builder_.add_ambient_track(ambient_track);
   builder_.add_flip_status(flip_status);
   builder_.add_flip_timer(flip_timer);
@@ -4631,6 +4665,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     const char *ambient_track = nullptr,
+    uint64_t ambient_position = 0,
+    const char *oneshot_track = nullptr,
+    uint64_t oneshot_position = 0,
     const std::vector<int32_t> *cd_flags = nullptr,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
@@ -4647,6 +4684,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto flip_maps__ = flip_maps ? _fbb.CreateVector<int32_t>(*flip_maps) : 0;
   auto flip_stats__ = flip_stats ? _fbb.CreateVector<int32_t>(*flip_stats) : 0;
   auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
+  auto oneshot_track__ = oneshot_track ? _fbb.CreateString(oneshot_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
@@ -4670,6 +4708,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       flip_timer,
       flip_status,
       ambient_track__,
+      ambient_position,
+      oneshot_track__,
+      oneshot_position,
       cd_flags__,
       rope,
       pendulum,
@@ -5887,6 +5928,9 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = flip_timer(); _o->flip_timer = _e; }
   { auto _e = flip_status(); _o->flip_status = _e; }
   { auto _e = ambient_track(); if (_e) _o->ambient_track = _e->str(); }
+  { auto _e = ambient_position(); _o->ambient_position = _e; }
+  { auto _e = oneshot_track(); if (_e) _o->oneshot_track = _e->str(); }
+  { auto _e = oneshot_position(); _o->oneshot_position = _e; }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
@@ -5921,6 +5965,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _flip_timer = _o->flip_timer;
   auto _flip_status = _o->flip_status;
   auto _ambient_track = _o->ambient_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->ambient_track);
+  auto _ambient_position = _o->ambient_position;
+  auto _oneshot_track = _o->oneshot_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->oneshot_track);
+  auto _oneshot_position = _o->oneshot_position;
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
@@ -5947,6 +5994,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _flip_timer,
       _flip_status,
       _ambient_track,
+      _ambient_position,
+      _oneshot_track,
+      _oneshot_position,
       _cd_flags,
       _rope,
       _pendulum,
