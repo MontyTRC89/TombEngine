@@ -596,6 +596,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		});
 	}
 
+	// Play default background music
+	PlaySoundTrack(ambient, SOUNDTRACK_PLAYTYPE::BGM);
+
 	// Restore the game?
 	if (loadFromSavegame)
 	{
@@ -635,9 +638,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
-
-	// Play background music
-	PlaySoundTrack(ambient, SOUNDTRACK_PLAYTYPE::BGM);
 
 	// Initialise ponytails
 	InitialiseHair();

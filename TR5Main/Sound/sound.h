@@ -113,15 +113,13 @@ struct SoundTrackInfo
 extern std::map<std::string, int> SoundTrackMap;
 extern std::vector<SoundTrackInfo> SoundTracks;
 
-extern std::string CurrentLoopedSoundTrack;
-
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
 void StopAllSounds();
 
-void PlaySoundTrack(std::string trackName, SOUNDTRACK_PLAYTYPE mode);
+void PlaySoundTrack(std::string trackName, SOUNDTRACK_PLAYTYPE mode, QWORD position = 0);
 void PlaySoundTrack(std::string trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTracks();
@@ -130,6 +128,8 @@ void PlaySecretTrack();
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
+
+std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 
