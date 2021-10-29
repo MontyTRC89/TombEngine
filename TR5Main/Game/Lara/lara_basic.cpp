@@ -372,8 +372,11 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->animNumber == LA_STAND_TO_RUN)
 		allowJump = false;
-	else if (item->animNumber == LA_RUN && item->frameNumber == 4)
-		allowJump = true;
+	else if (item->animNumber == LA_RUN)
+	{
+		if (item->frameNumber == 4)
+			allowJump = true;
+	}
 	else
 		allowJump = true;
 
