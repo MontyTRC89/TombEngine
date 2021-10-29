@@ -18,7 +18,7 @@ using namespace TEN::Floordata;
 /*this file has all the generic test functions called in lara's state code*/
 
 // Test if a ledge in front of item is valid to climb.
-bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
+bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	// Determine probe base point.
 	// We use 1/3 radius extents here for two purposes. First - we can't guarantee that
@@ -46,6 +46,15 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom)
 
 	// Determine allowed slope difference for a given collision radius
 	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+
+	if (heightLimit)
+	{
+		if ((left - y) < -STEP_SIZE / 2)
+			return false;
+
+		if ((right - y) < -STEP_SIZE / 2)
+			return false;
+	}
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
@@ -391,7 +400,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	bool ladder = TestLaraHangOnClimbWall(item, coll);
 
 	if (!(ladder && edgeCatch) &&
-		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
+		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
 		return false;
 
 	auto angle = item->pos.yRot;
@@ -481,7 +490,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	bool ladder = TestLaraHangOnClimbWall(item, coll);
 
 	if (!(ladder && edgeCatch) &&
-		!(TestValidLedge(item, coll, true) && edgeCatch > 0))
+		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
 		return false;
 
 	auto angle = item->pos.yRot;
