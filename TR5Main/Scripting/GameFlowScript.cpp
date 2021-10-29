@@ -172,12 +172,14 @@ void GameFlow::SetGameFarView(byte val)
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
 {
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
+	SoundTracks.clear();
+
 	for (auto t : tracks) {
-		AudioTrack track;
+		SoundTrackInfo track;
 		track.Name = t.trackName;
 		track.Mask = 0;
-		track.looped = t.looped;
-		SoundTracks.insert_or_assign(track.Name, track);
+		track.Mode = t.looped ? SOUNDTRACK_PLAYTYPE::BGM : SOUNDTRACK_PLAYTYPE::OneShot;
+		SoundTracks.push_back(track);
 	}
 }
 
@@ -233,8 +235,6 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentLoopedSoundTrack = level->AmbientTrack;
-
 		GAME_STATUS status;
 
 		if (CurrentLevel == 0)
@@ -263,7 +263,7 @@ bool GameFlow::DoGameflow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, CurrentLoopedSoundTrack, loadFromSavegame);
+			status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
 			loadFromSavegame = false;
 		}
 
