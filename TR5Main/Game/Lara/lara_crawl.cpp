@@ -23,8 +23,8 @@
 // ----------
 
 // State:		LS_CROUCH_IDLE (71)
-// Collision:	lara_col_crouch()
-void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crouch_idle()
+void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
 	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
@@ -104,7 +104,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*collision: lara_col_duck*/
@@ -175,8 +175,8 @@ void old_lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CROUCH_IDLE (71)
-// Control:		lara_as_crouch()
-void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crouch_idle()
+void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
@@ -213,7 +213,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 71*/
 	/*state code: lara_as_duck*/
@@ -401,8 +401,8 @@ void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CROUCH_TURN_LEFT (105)
-// Collision:	lara_col_duckl()
-void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crouch_turn_left()
+void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
 
@@ -458,7 +458,7 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 105*/
 	/*collision: lara_col_ducklr*/
@@ -469,15 +469,15 @@ void old_lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_LEFT (105)
-// Control:		lara_as_duckl()
-void lara_col_duckl(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crouch_turn_left()
+void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_duck(item, coll);
+	lara_col_crouch_idle(item, coll);
 }
 
 // State:		LS_CROUCH_TURN_RIGHT (106)
-// Collision:	lara_col_duckr()
-void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crouch_turn_right()
+void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
 
@@ -533,7 +533,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 106*/
 	/*collision: lara_col_ducklr*/
@@ -544,14 +544,14 @@ void old_lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
-// Control:		lara_as_duckr()
-void lara_col_duckr(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crouch_turn_right()
+void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_duck(item, coll);
+	lara_col_crouch_idle(item, coll);
 }
 
 // LEGACY
-void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 105 and 106*/
 	/*state code: lara_as_duckl(105) and lara_col_ducklr(106)*/
@@ -593,8 +593,8 @@ void old_lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)
 // ---------
 
 // State:		LS_CRAWL_IDLE (80)
-// Collision:	lara_col_all4s()
-void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crawl_idle()
+void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -700,7 +700,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*collision: lara_col_all4s*/
@@ -872,8 +872,8 @@ void old_lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_IDLE (80)
-// Control:		lara_as_all4s()
-void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crawl_idle()
+void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
@@ -916,7 +916,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 80*/
 	/*state code: lara_as_all4s*/
@@ -1075,10 +1075,9 @@ void old_lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// WIP state.
 // State:		LS_CRAWL_FORWARD (81)
-// Collision:	lara_col_crawl()
-void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crawl_forward()
+void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -1155,7 +1154,7 @@ void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*collision: lara_col_crawl*/
@@ -1202,8 +1201,8 @@ void old_lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_FORWARD (81)
-// Control:		lara_as_crawl()
-void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crawl_forward()
+void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
@@ -1266,7 +1265,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 81*/
 	/*state code: lara_as_crawl*/
@@ -1311,8 +1310,8 @@ void old_lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_BACK (86)
-// Collision:	lara_col_crawlb()
-void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crawl_back()
+void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -1374,8 +1373,8 @@ void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_BACK (86)
-// Control:		lara_as_crawlb()
-void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crawl_back()
+void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
 	Lara.keepDucked = TestLaraKeepDucked(coll);
@@ -1440,7 +1439,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 86*/
 	/*state code: lara_as_crawlb*/
@@ -1488,8 +1487,8 @@ void old_lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
-// Collision:	lara_col_all4turnl()
-void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crawl_turn_left()
+void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -1558,7 +1557,7 @@ void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 84*/
 	/*collision: lara_col_all4turnlr*/
@@ -1580,15 +1579,15 @@ void old_lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
-// Control:		lara_as_all4turnl()
-void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crawl_turn_left()
+void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_all4s(item, coll);
+	lara_col_crawl_idle(item, coll);
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
-// Collision:	lara_col_all4turnr()
-void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_crawl_turn_right()
+void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -1649,7 +1648,7 @@ void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // LEGACY
-void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
+void old_lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 85*/
 	/*collision: lara_col_all4turnlr*/
@@ -1671,10 +1670,10 @@ void old_lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
-// Control:		lara_as_all4turnr()
-void lara_col_all4turnr(ITEM_INFO* item, COLL_INFO* coll)
+// Control:		lara_as_crawl_turn_right()
+void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_all4s(item, coll);
+	lara_col_crawl_idle(item, coll);
 }
 
 // LEGACY
