@@ -127,7 +127,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//68
 	lara_void_func,//69
 	lara_as_deathslide,//70
-	lara_as_duck,//71
+	lara_as_crouch_idle,//71
 	lara_as_crouch_roll,//72
 	lara_as_dash,
 	lara_as_dashdive,
@@ -136,13 +136,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_monkeyl,
 	lara_as_monkeyr,
 	lara_as_monkey180,
-	lara_as_all4s,//80
-	lara_as_crawl,//81
+	lara_as_crawl_idle,//80
+	lara_as_crawl_forward,//81
 	lara_as_hangturnl,
 	lara_as_hangturnr,
-	lara_as_all4turnl,//84
-	lara_as_all4turnr,//85
-	lara_as_crawlb,//86
+	lara_as_crawl_turn_left,//84
+	lara_as_crawl_turn_right,//85
+	lara_as_crawl_back,//86
 	lara_as_null,
 	lara_as_null,
 	lara_as_controlled,
@@ -161,8 +161,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_poleleft,//102
 	lara_as_poleright,//103
 	lara_as_pulley,//104
-	lara_as_duckl,//105
-	lara_as_duckr,//106
+	lara_as_crouch_turn_left,//105
+	lara_as_crouch_turn_right,//106
 	lara_as_extcornerl,//107
 	lara_as_extcornerr,//108
 	lara_as_intcornerl,//109
@@ -290,7 +290,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_duck,
+	lara_col_crouch_idle,
 	lara_col_crouch_roll,
 	lara_col_dash,
 	lara_col_dashdive,
@@ -299,13 +299,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_monkeyl,
 	lara_col_monkeyr,
 	lara_col_monkey180,
-	lara_col_all4s,
-	lara_col_crawl,
+	lara_col_crawl_idle,
+	lara_col_crawl_forward,
 	lara_col_hangturnlr,
 	lara_col_hangturnlr,
-	lara_col_all4turnl,
-	lara_col_all4turnr,
-	lara_col_crawlb,
+	lara_col_crawl_turn_left,
+	lara_col_crawl_turn_right,
+	lara_col_crawl_back,
 	lara_void_func,
 	lara_col_crawl2hang,
 	lara_default_col,
@@ -324,8 +324,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
-	lara_col_duckl,
-	lara_col_duckr,
+	lara_col_crouch_turn_left,
+	lara_col_crouch_turn_right,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
