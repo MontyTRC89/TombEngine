@@ -44,6 +44,12 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
+	// TODO: Do this properly with Lara.turnRate. Must harmonise with crouch turn states. @Sezz 2021.10.30
+	if (TrInput & IN_LEFT)
+		item->pos.yRot -= ANGLE(1.5f);
+	else if (TrInput & IN_RIGHT)
+		item->pos.yRot += ANGLE(1.5f);
+
 	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. Otherwise, Lara will stand up.
 	// See if setting Lara.keepDucked can be done before she is in the crawlspace. @Sezz 2021.10.14
 	Lara.keepDucked = TestLaraKeepDucked(coll);

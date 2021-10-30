@@ -3891,7 +3891,7 @@ void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-
+		
 		return;
 	}
 
@@ -4357,7 +4357,7 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_SLOW_TURN)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 6);
+		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 8);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -4365,7 +4365,7 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_SLOW_TURN)
 			Lara.turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 6);
+		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 8);
 	}
 
 	// TODO: What?
@@ -4373,7 +4373,9 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState != LS_STOP &&
 		item->goalAnimState != LS_RUN_FORWARD &&
 		item->fallspeed > LARA_FREEFALL_SPEED)
+	{
 		item->goalAnimState = LS_FREEFALL;
+	}
 }
 
 // LEGACY
