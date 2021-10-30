@@ -98,7 +98,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	/*if (Lara.isMoving)
 		return;*/
 
-	// TODO: If stopping and not holding WALK, Lara won't turn. Change animation's state to LS_STOP to solve issue? @Sezz 2021.10.09
+	// TODO: If stopping and not holding WALK, Lara won't turn. @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -3741,6 +3741,21 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_swandive*/
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
+	if (TrInput & IN_LEFT)
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+
+		if (Lara.turnRate < -LARA_JUMP_TURN)
+			Lara.turnRate = -LARA_JUMP_TURN;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+
+		if (Lara.turnRate > LARA_JUMP_TURN)
+			Lara.turnRate = LARA_JUMP_TURN;
+	}
+
 	if (item->fallspeed > LARA_FREEFALL_SPEED && item->goalAnimState != LS_DIVE)
 		item->goalAnimState = LS_SWANDIVE_END;
 }
