@@ -132,8 +132,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				return false;
 		}
 		// Vault up three steps.
-		else if (coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE / 2) &&			// Lower floor boundary.
-			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE + STEP_SIZE / 2))		// Upper floor boundary.
+		else if (coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE / 2) &&		// Lower floor boundary.
+			coll->Front.Floor >= -(WALL_SIZE - STEP_SIZE / 2))				// Upper floor boundary.
 		{
 			// Vault to stand up three steps.
 			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&				// Front clamp buffer.
@@ -141,7 +141,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)		// Right clamp buffer.
 			{
 #if 0
-				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
+				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
 					return 0;
 #endif
 
@@ -167,8 +167,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				return false;
 		}
 		// Auto jump.
-		else if (coll->Front.Floor >= -(WALL_SIZE + STOP_SIZE + STEP_SIZE + STEP_SIZE / 2) &&
-			coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE + STEP_SIZE / 2))
+		else if (coll->Front.Floor >= -(WALL_SIZE * 2 - STEP_SIZE / 2) &&		// Upper floor boundary.
+			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2))					// Lower floor boundary.
 		{
 #if 0
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
@@ -198,10 +198,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Begin ladder climb.
 	else if (Lara.climbStatus)
 	{
-		if (coll->Front.Floor > -(WALL_SIZE + STOP_SIZE + STEP_SIZE + STEP_SIZE / 2) ||			// Upper front floor boundary.
-			coll->FrontLeft.Floor > -(WALL_SIZE + STOP_SIZE + STEP_SIZE + STEP_SIZE / 2) ||		// Upper left floor boundary.
-			coll->FrontRight.Floor > -STOP_SIZE ||												// Upper right floor boundary.
-			coll->Middle.Ceiling > -(WALL_SIZE + STEP_SIZE / 2 + 6) ||							// Upper ceiling boundary.
+		if (coll->Front.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||			// Upper front floor boundary.
+			coll->FrontLeft.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||		// Upper left floor boundary.
+			coll->FrontRight.Floor > -STOP_SIZE ||							// Upper right floor boundary.
+			coll->Middle.Ceiling > -(WALL_SIZE + STEP_SIZE / 2 + 6) ||		// Upper ceiling boundary.
 			Lara.waterStatus == LW_WADE)
 		{
 			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (STOP_SIZE - 6)) &&
@@ -248,8 +248,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
 			item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
 
-		if (ceiling > (WALL_SIZE + STOP_SIZE + STEP_SIZE) ||
-			ceiling < -(WALL_SIZE + STOP_SIZE + STEP_SIZE) ||
+		if (ceiling > (WALL_SIZE * 2 - STEP_SIZE) ||
+			ceiling < -(WALL_SIZE * 2 - STEP_SIZE) ||
 			abs(ceiling) == (STOP_SIZE + STEP_SIZE))
 		{
 			return false;
