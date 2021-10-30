@@ -1339,6 +1339,13 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 2, 12);
 	}
 
+	if (TrInput & IN_ROLL)
+	{
+		item->goalAnimState = LS_ROLL_FORWARD;
+
+		return;
+	}
+
 	item->goalAnimState = LS_STOP;
 }
 
