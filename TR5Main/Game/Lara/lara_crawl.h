@@ -1,24 +1,36 @@
 #pragma once
 #include "lara_struct.h"
 
-void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll);
+// -----------------------------
+// CRAWLING & CROUCHING
+// Control & Collision Functions
+// -----------------------------
+
+// ----------
+// CROUCHING:
+// ----------
+
+void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 
-void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_crawl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_all4turnl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_all4turnl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_all4turnr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_all4turnr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_crawlb(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_duckl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_duckr(ITEM_INFO* item, COLL_INFO* coll);
+// ---------
+// CRAWLING:
+// ---------
 
+void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll);
