@@ -105,7 +105,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_SLOW_TURN)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, 12);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, 16);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -113,7 +113,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_SLOW_TURN)
 			Lara.turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, 12);
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, 16);
 	}
 
 	// TODO: Idle crouch state dispatch. @Sezz 2021.10.11
