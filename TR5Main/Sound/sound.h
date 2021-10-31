@@ -107,7 +107,7 @@ struct SoundTrackInfo
 {
 	std::string Name;
 	SOUNDTRACK_PLAYTYPE Mode;
-	short Mask;
+	int Mask;
 };
 
 extern std::map<std::string, int> SoundTrackMap;
