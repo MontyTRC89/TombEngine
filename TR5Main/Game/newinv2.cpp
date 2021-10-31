@@ -611,7 +611,7 @@ int InventoryClass::TitleOptions()
 		break;
 
 	case title_load_game:
-		settings_flag = MAX_SAVEGAMES - 1;
+		settings_flag = SAVEGAME_MAX - 1;
 		break;
 
 	case title_options_menu:
@@ -2453,7 +2453,7 @@ void InventoryClass::use_current_item()
 					LaraItem->hitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
-				Savegame.Game.HealthUsed++;
+				Statistics.Game.HealthUsed++;
 			}
 			else
 				SayNo();
@@ -2477,7 +2477,7 @@ void InventoryClass::use_current_item()
 				LaraItem->hitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
-				Savegame.Game.HealthUsed++;
+				Statistics.Game.HealthUsed++;
 			}
 			else
 				SayNo();
@@ -3670,8 +3670,8 @@ int InventoryClass::do_load()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
-		if (selected_slot == MAX_SAVEGAMES - 1)
-			selected_slot -= MAX_SAVEGAMES - 1;	//go back up
+		if (selected_slot == SAVEGAME_MAX - 1)
+			selected_slot -= SAVEGAME_MAX - 1;	//go back up
 		else
 			selected_slot++;
 	}
@@ -3681,7 +3681,7 @@ int InventoryClass::do_load()
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
 		if (selected_slot== 0)
-			selected_slot += MAX_SAVEGAMES - 1;	//go back down
+			selected_slot += SAVEGAME_MAX - 1;	//go back down
 		else
 			selected_slot--;
 	}
@@ -3717,8 +3717,8 @@ void InventoryClass::do_save()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
-		if (selected_slot == MAX_SAVEGAMES - 1)
-			selected_slot -= MAX_SAVEGAMES - 1;	//go back up
+		if (selected_slot == SAVEGAME_MAX - 1)
+			selected_slot -= SAVEGAME_MAX - 1;	//go back up
 		else
 			selected_slot++;
 	}
@@ -3728,7 +3728,7 @@ void InventoryClass::do_save()
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
 		if (selected_slot == 0)
-			selected_slot += MAX_SAVEGAMES - 1;	//go back down
+			selected_slot += SAVEGAME_MAX - 1;	//go back down
 		else
 			selected_slot--;
 	}

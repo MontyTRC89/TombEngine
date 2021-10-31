@@ -789,7 +789,6 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\flipeffect.cpp" />
-    <ClCompile Include="Game\gameflow.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\items.cpp" />

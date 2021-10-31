@@ -503,21 +503,21 @@ void JumpToLevel(int levelNum)
 
 int GetSecretsCount()
 {
-	return Savegame.Level.Secrets;
+	return Statistics.Level.Secrets;
 }
 
 void SetSecretsCount(int secretsNum)
 {
 	if (secretsNum > 255)
 		return;
-	Savegame.Level.Secrets = secretsNum;
+	Statistics.Level.Secrets = secretsNum;
 }
 
 void AddOneSecret()
 {
-	if (Savegame.Level.Secrets >= 255)
+	if (Statistics.Level.Secrets >= 255)
 		return;
-	Savegame.Level.Secrets++; 
+	Statistics.Level.Secrets++;
 	PlaySecretTrack();
 }
 
