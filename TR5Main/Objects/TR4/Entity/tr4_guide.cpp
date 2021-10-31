@@ -193,7 +193,7 @@ void GuideControl(short itemNumber)
 	short frameNumber;
 	short random;
 
-	printf("Guide state: %d\n", item->currentAnimState);
+	TENLog("Guide state:" + std::to_string(item->currentAnimState), LogLevel::Info);
 
 	switch (item->currentAnimState)
 	{
