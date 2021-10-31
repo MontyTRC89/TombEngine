@@ -379,7 +379,7 @@ void CreateFlare(GAME_OBJECT_ID objectNum, int thrown)
 
 void DrawFlareInAir(ITEM_INFO* item)
 {
-	printf("DrawFlareInAir() not implemented !");
+	TENLog("DrawFlareInAir() not implemented!", LogLevel::Warning);
 }
 
 void DoFlareInHand(int flare_age)

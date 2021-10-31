@@ -289,7 +289,7 @@ void VonCroyControl(short itemNumber)
 	short rot = 0;
 	int dy, height, ceiling, flags;
 
-	printf("State: %d\n", item->currentAnimState);
+	TENLog("State:" + std::to_string(item->currentAnimState), LogLevel::Info);
 	
 	switch (item->currentAnimState)
 	{
