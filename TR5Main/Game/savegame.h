@@ -7,7 +7,6 @@
 #include "GameFlowScript.h"
 #include "GameLogicScript.h"	
 
-__declspec( selectany ) extern const std::string SAVEGAME_PATH = "Save//";
 constexpr auto SAVEGAME_MAX = 16;
 
 struct Stats
@@ -27,35 +26,21 @@ struct GameStats
 	Stats Level;
 };
 
-struct SavegameInfo
-{
-	bool present;
-	char levelName[75];
-	int saveNumber;
-	short days;
-	short hours;
-	short minutes;
-	short seconds;
-	char fileName[255];
-};
-
 struct SaveGameHeader
 {
-	std::string levelName;
-	int days;
-	int hours;
-	int minutes;
-	int seconds;
-	int level;
-	int timer;
-	int count;
-	bool present;
+	std::string LevelName;
+	int Days;
+	int Hours;
+	int Minutes;
+	int Seconds;
+	int Level;
+	int Timer;
+	int Count;
+	bool Present;
 };
 
-extern SavegameInfo g_SavegameInfos[SAVEGAME_MAX];
-extern std::vector<std::string> g_NewStrings;
-extern SaveGameHeader g_NewSavegameInfos[SAVEGAME_MAX];
 extern GameStats Statistics;
+extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 class SaveGame 
 {
