@@ -1343,7 +1343,7 @@ void BinocularCamera(ITEM_INFO* item)
 			{
 				firing = 1;
 				WeaponDelay = 16;
-				Savegame.Game.AmmoUsed++;
+				Statistics.Game.AmmoUsed++;
 				if (!ammo.hasInfinite())
 					(ammo)--;
 
