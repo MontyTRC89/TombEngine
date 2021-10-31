@@ -1400,6 +1400,19 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 	return false;
 }
 
+bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
+		Lara.Vehicle == NO_ITEM &&									// Not in a vehicle.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge <= 0))		// Flare is not being handled.
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {

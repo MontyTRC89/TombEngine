@@ -744,6 +744,21 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: LUA.
+	// TODO: Without animation blending, the AFK pose animation's
+	// movement lock will be rather obnoxious.
+	// TODO: Adding some idle breathing would be nice. @Sezz 2021.10.31
+	Lara.NewAnims.Pose = false;
+
+	if (Lara.poseCount >= LARA_POSE_TIME &&
+		TestLaraPose(item, coll) &&
+		Lara.NewAnims.Pose)
+	{
+		item->goalAnimState = LS_POSE;
+
+		return;
+	}
+
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
@@ -1312,7 +1327,45 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_POSE (4)
-// Control:		lara_void_func()
+// Control:		lara_col_pose()
+void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH;
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	if (TestLaraPose(item, coll))
+	{
+		if (TrInput & IN_ROLL)
+		{
+			item->goalAnimState = LS_ROLL_FORWARD;
+
+			return;
+		}
+
+		if (TrInput & IN_WAKE)
+		{
+			item->goalAnimState = LS_STOP;
+
+			return;
+		}
+
+		item->goalAnimState = LS_POSE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// State:		LS_POSE (4)
+// Control:		lara_as_pose()
 void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_stop(item, coll);

@@ -20,22 +20,23 @@ struct COLL_INFO;
 
 // TODO: In the future, the player model should be probed for the number of bones between the hips (exclusive) and head (inclusive).
 // Divide the flex angle by the number of bones to be flexed, and apply the result to each bone.
-#define LARA_CRAWL_FLEX ANGLE(30.0f) / 2 // 2 = hardcoded number of bones to flex.
+#define LARA_CRAWL_FLEX ANGLE(30.0f) / 2		// 2 = hardcoded number of bones to flex.
 #define LARA_SWIM_FLEX ANGLE(24.0f) / 2
 
-constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
-constexpr auto LARA_HEIGHT_CRAWL = 400;    // Size of Lara in crawl state
-constexpr auto LARA_HEIGHT_MONKEY = 600;   // Size of Lara in monkey state
-constexpr auto LARA_HEIGHT_SURFSWIM = 700; // Size of Lara in surface swim state
-constexpr auto LARA_HEIGHT_STRETCH = 870;  // Size of Lara in jump-up or ledge hanging state
-constexpr auto LARA_HEIGHT_SURFACE = 800;  // Size of Lara when surfacing water
-constexpr auto LARA_HEADROOM = 160;        // Amount of reasonable space above Lara's head
+constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
+constexpr auto LARA_HEIGHT_CRAWL = 400;			// Lara height in crawl states.
+constexpr auto LARA_HEIGHT_MONKEY = 600;		// Lara height in monkey swing states.
+constexpr auto LARA_HEIGHT_SURFSWIM = 700;		// Lara height in water treading states.
+constexpr auto LARA_HEIGHT_STRETCH = 870;		// Lara height in jump-up and ledge hanging states.
+constexpr auto LARA_HEIGHT_SURFACE = 800;		// Lara height when surfacing water.
+constexpr auto LARA_HEADROOM = 160;				// Amount of reasonable space above Lara's head.
 constexpr auto LARA_RAD = 100;
 constexpr auto LARA_RAD_CRAWL = 200;
 constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_VELOCITY = 12;
+constexpr auto LARA_POSE_TIME = 30 * 30;		// 30 frames * 30 = 30 seconds to AFK pose.
 
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;

@@ -733,6 +733,9 @@ enum LARA_ANIM
 	LA_LADDER_DISMOUNT_RIGHT_START = 499,					// Ladder dismount right (1/2)
 	LA_LADDER_DISMOUNT_RIGHT_END = 500,						// Ladder dismount right (2/2)
 	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
+	LA_POSE_START = 502,									// Stand > AFK pose
+	LA_POSE_CONTINUE = 503,									// AFK pose (looped)
+	LA_POSE_END = 504,										// ADK pose > stand
 
 	NUM_LARA_ANIMS
 
@@ -976,21 +979,23 @@ struct LARA_ARM
 
 struct AnimsNew
 {
-	bool CrouchRoll;				// crouch roll
-	bool Monkey180Roll;				// the 180� roll on monkeybars
-	bool Crawl1clickup;				// going 1 click up in crawlspaces
-	bool Crawl1clickdown;			// going 1 click down in crawlspaces
-	bool CrawlExit1click;			// crawlspace exit at 1 click
-	bool CrawlExit2click;			// crawlspace exit at 2 clicks
-	bool CrawlExit3click;			// crawlspace exit at 3 clicks
-	bool CrawlVault1click;			// vault into crawlspace at 1 click
-	bool CrawlVault2click;			// vault into crawlspace at 2 clicks
-	bool CrawlVault3click;			// vault into crawlspace at 3 clicks
-	bool MonkeyVault;				// vault up to monkeybars when pressing up + action underneath them. super annoying :)
-	bool CrawlExitJump;				// TR5 crawlspace exit with jump!
-	bool SwandiveRollRun;			// the transition from swandive roll to run
-	bool OscillateHanging;			// the thin ledge grab animation from TR1 and 2
-	bool FeetHanging;				// Daniel's super awesome feet hanging
+	bool Pose;						// Crossed arms AFK
+	bool CrouchRoll;				// Crouch roll
+	bool Monkey180Roll;				// Monkey swing 180 turn
+
+	bool Crawl1clickup;				// Crawl step-up
+	bool Crawl1clickdown;			// Crawl step-down
+	bool CrawlExit1click;			// Crawl exit down step
+	bool CrawlExit2click;			// Crawl exit jump (two steps)
+	bool CrawlExit3click;			// Crawl exit jump (three steps)
+	bool CrawlVault1click;			// Standing vault to crouch (one step)
+	bool CrawlVault2click;			// Standing vault to crouch (two steps)
+	bool CrawlVault3click;			// Standing vault to crouch (three steps)
+	bool MonkeyVault;				// Auto jump to monkey swing
+	bool CrawlExitJump;				// TR5 crawl exit flip
+	bool SwandiveRollRun;			// Swandive roll > run transition
+	bool OscillateHanging;			// TR1/2 hang on thin ledge
+	bool FeetHanging;				// LAU-style ledge hanging with legs
 	bool CrawlFlexWaterPullUp;
 	bool CrawlFlexSubmerged;
 };

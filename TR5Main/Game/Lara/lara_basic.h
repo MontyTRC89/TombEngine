@@ -3,16 +3,26 @@ struct ITEM_INFO;
 struct COLL_INFO;
 struct COLL_RESULT;
 
-/*generic functions*/
+// ------------------------------
+// BASIC MOVEMENT & MISCELLANEOUS
+// Control & Collision Functions
+// ------------------------------
+
+// --------------
+// MISCELLANEOUS:
+// --------------
+
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll);
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_null(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll);
-/*end generic functions*/
-/*-*/
-/*basic movement*/
+
+// ---------------
+// BASIC MOVEMENT:
+// ---------------
+
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_run(ITEM_INFO* item, COLL_INFO* coll);
@@ -22,6 +32,7 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll);
