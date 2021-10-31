@@ -25,6 +25,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)REVERB_TYPE::Count] =    // Reverb
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
+const std::string TRACKS_PATH = "Audio\\";
+
 std::map<std::string, int> SoundTrackMap;
 std::vector<SoundTrackInfo> SoundTracks;
 
@@ -336,16 +338,13 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 	if (channelActive)
 		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 	
-	static char fullTrackName[1024];
-	char const* name = track.c_str();
-
-	snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "ogg");
+	auto fullTrackName = TRACKS_PATH + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
-		snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "mp3");
+		fullTrackName = TRACKS_PATH + track + ".mp3";
 		if (!std::filesystem::exists(fullTrackName))
 		{
-			snprintf(fullTrackName, sizeof(fullTrackName), TRACKS_PREFIX, name, "wav");
+			fullTrackName = TRACKS_PATH + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
 				TENLog("No any soundtrack files with name '" + track + "' were found", LogLevel::Error);
@@ -354,7 +353,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 		}
 	}
 
-	auto stream = BASS_StreamCreateFile(false, fullTrackName, 0, 0, flags);
+	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
 	if (Sound_CheckBASSError("Opening soundtrack '%s'", false, fullTrackName))
 		return;

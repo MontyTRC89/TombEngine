@@ -714,7 +714,7 @@ int InventoryClass::TitleOptions()
 		}
 		else if (title_menu_to_display == title_load_game)
 		{
-			if (!g_NewSavegameInfos[title_selected_option].present)
+			if (!SavegameInfos[title_selected_option].Present)
 				SayNo();
 			else
 			{
@@ -3688,7 +3688,7 @@ int InventoryClass::do_load()
 
 	if (goSelect)
 	{
-		if (!g_NewSavegameInfos[selected_slot].present)
+		if (!SavegameInfos[selected_slot].Present)
 			SayNo();
 		else
 		{
