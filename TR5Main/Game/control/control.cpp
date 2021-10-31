@@ -423,7 +423,7 @@ unsigned CALLBACK GameMain(void *)
 {
 	try 
 	{
-		logD("Starting GameMain...");
+		TENLog("Starting GameMain...", LogLevel::Info);
 
 		TimeInit();
 
@@ -456,8 +456,7 @@ unsigned CALLBACK GameMain(void *)
 
 GAME_STATUS DoTitle(int index)
 {
-	//DB_Log(2, "DoTitle - DLL");
-	printf("DoTitle\n");
+	TENLog("DoTitle", LogLevel::Info);
 
 	// Reset all the globals for the game which needs this
 	CleanUp();

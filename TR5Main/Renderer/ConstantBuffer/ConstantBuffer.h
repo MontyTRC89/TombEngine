@@ -21,7 +21,7 @@ namespace TEN::Renderer {
 		ID3D11Buffer** get() {
 			return buffer.GetAddressOf();
 		}
-		void updateData(CBuff& data,ID3D11DeviceContext* ctx) {
+		void updateData(CBuff& data, ID3D11DeviceContext* ctx) {
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
 			HRESULT res = ctx->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 			if (SUCCEEDED(res)) {
@@ -29,7 +29,7 @@ namespace TEN::Renderer {
 				memcpy(dataPtr, &data, sizeof(CBuff));
 				ctx->Unmap(buffer.Get(), 0);
 			} else
-				logD("Could not update constant buffer ", this);
+				TENLog("Could not update constant buffer!", LogLevel::Error);
 		}
 	};
 }
