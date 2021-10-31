@@ -33,22 +33,20 @@ using namespace TEN::Entities::Generic;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
-using std::string;
-using std::vector;
 
-SavegameInfo g_SavegameInfos[SAVEGAME_MAX];
-SaveGameHeader g_NewSavegameInfos[SAVEGAME_MAX];
-vector<string> g_NewStrings;
+const std::string SAVEGAME_PATH = "Save//";
+
+GameStats Statistics;
+SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::m_stream;
-vector<LuaVariable> SaveGame::m_luaVariables;
+std::vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
-GameStats Statistics;
 
 void LoadSavegameInfos()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
-		g_NewSavegameInfos[i].present = false;
+		SavegameInfos[i].Present = false;
 
 	if (!std::filesystem::exists(SAVEGAME_PATH))
 		return;
@@ -64,8 +62,8 @@ void LoadSavegameInfos()
 
 		fclose(savegamePtr);
 
-		g_NewSavegameInfos[i].present = true;
-		SaveGame::LoadHeader(i, &g_NewSavegameInfos[i]);
+		SavegameInfos[i].Present = true;
+		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
 		fclose(savegamePtr);
 	}
@@ -1383,15 +1381,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
-	header->level = s->header()->level();
-	header->levelName = s->header()->level_name()->str();
-	header->days = s->header()->days();
-	header->hours = s->header()->hours();
-	header->minutes = s->header()->minutes();
-	header->seconds = s->header()->seconds();
-	header->level = s->header()->level();
-	header->timer = s->header()->timer();
-	header->count = s->header()->count();
+	header->Level = s->header()->level();
+	header->LevelName = s->header()->level_name()->str();
+	header->Days = s->header()->days();
+	header->Hours = s->header()->hours();
+	header->Minutes = s->header()->minutes();
+	header->Seconds = s->header()->seconds();
+	header->Level = s->header()->level();
+	header->Timer = s->header()->timer();
+	header->Count = s->header()->count();
 
 	return true;
 }

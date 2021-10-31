@@ -549,17 +549,17 @@ namespace TEN::Renderer
 
                 for (int n = 1; n < SAVEGAME_MAX + 1; n++)
                 {
-                    if (!g_NewSavegameInfos[n - 1].present)
+                    if (!SavegameInfos[n - 1].Present)
                         drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK : 0));
                     else
                     {
-                        sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n-1].count);
+                        sprintf(stringBuffer, "%05d", SavegameInfos[n-1].Count);
                         drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                        drawString(250, y, (char*)g_NewSavegameInfos[n-1].levelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                        drawString(250, y, (char*)SavegameInfos[n-1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                        sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n-1].days, g_NewSavegameInfos[n-1].hours, g_NewSavegameInfos[n-1].minutes, g_NewSavegameInfos[n-1].seconds);
+                        sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), SavegameInfos[n-1].Days, SavegameInfos[n-1].Hours, SavegameInfos[n-1].Minutes, SavegameInfos[n-1].Seconds);
                         drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK : 0));
                     }
@@ -1012,17 +1012,17 @@ namespace TEN::Renderer
         {
             int n2 = n - 1;
 
-            if (!g_NewSavegameInfos[n - 1].present)
+            if (!SavegameInfos[n - 1].Present)
                 drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
             else
             {
-                sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n - 1].count);
+                sprintf(stringBuffer, "%05d", SavegameInfos[n - 1].Count);
                 drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                drawString(250, y, (char*)g_NewSavegameInfos[n - 1].levelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                drawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n - 1].days, g_NewSavegameInfos[n - 1].hours, g_NewSavegameInfos[n - 1].minutes, g_NewSavegameInfos[n - 1].seconds);
+                sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), SavegameInfos[n - 1].Days, SavegameInfos[n - 1].Hours, SavegameInfos[n - 1].Minutes, SavegameInfos[n - 1].Seconds);
                 drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
             }
