@@ -82,8 +82,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestValidLedge(item, coll))
 	{
 		// Vault to crouch up one step.
-		if (coll->Front.Floor < 0 &&				// Lower floor boundary.
-			coll->Front.Floor >= -STEP_SIZE &&		// Upper floor boundary. Use LARA_CRAWL_HEIGHT?
+		if (coll->Front.Floor < -STEP_SIZE &&			// Lower floor boundary.
+			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor boundary.
 			Lara.NewAnims.CrawlVault1click)
 		{
 			if (abs(coll->Front.Ceiling - coll->Front.Floor) < STEP_SIZE)		// Clamp buffer.
@@ -97,8 +97,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		// Vault up two steps.
-		else if (coll->Front.Floor <= -(STEP_SIZE + STEP_SIZE / 2) &&		// Lower floor boundary.
-			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE / 2))				// Upper floor boundary.
+		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&				// Lower floor boundary.
+			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE / 2))		// Upper floor boundary.
 		{
 			// Vault to stand up two steps.
 			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&				// Front clamp buffer.
@@ -1489,10 +1489,10 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 
 	// TODO: Radius overshoot. Probe for nearest ledge angle in a given direction.
 
-	if (probe.Position.Floor - y <= lowerBound &&				// Lower floor boundary.
-		probe.Position.Floor - y >= upperBound &&				// Upper floor boundary.
-		probe.Position.Ceiling - y < -coll->Setup.Height &&		// Lower ceiling boundary.
-		!probe.Position.Slope &&								// No slope.
+	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor boundary.
+		(probe.Position.Floor - y) >= upperBound &&					// Upper floor boundary.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&		// Lower ceiling boundary.
+		!probe.Position.Slope &&									// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1506,10 +1506,10 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4, 0);
 
-	if (probe.Position.Floor - y <= lowerBound &&				// Lower floor boundary.
-		probe.Position.Floor - y >= upperBound &&				// Upper floor boundary.
-		probe.Position.Ceiling - y < -LARA_HEIGHT_CRAWL &&		// Lower ceiling boundary.
-		!probe.Position.Slope &&								// No slope.
+	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor boundary.
+		(probe.Position.Floor - y) >= upperBound &&					// Upper floor boundary.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lower ceiling boundary.
+		!probe.Position.Slope &&									// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1523,7 +1523,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2) + 4, 0);
 
-	if (probe.Position.Ceiling - y < 0)
+	if ((probe.Position.Ceiling - y) < 0)
 		return true;
 
 	return false;
@@ -1612,9 +1612,9 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y <= -STEP_SIZE &&																			// Lower floor boundary. Synced with highest crawl snap tolerance.
-		probe.Position.Floor - y >= -STEPUP_HEIGHT &&																		// Upper floor boundary. Synced with bad height up.
-		(coll->Middle.Ceiling + probe.Position.Floor + y) - LARA_HEIGHT_CRAWL <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary. TODO: Simplify.
+	if ((probe.Position.Floor - y) <= -STEP_SIZE &&																			// Lower floor boundary. Synced with highest crawl snap tolerance.
+		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&																		// Upper floor boundary. Synced with bad height up.
+		(coll->Middle.Ceiling + probe.Position.Floor + y - LARA_HEIGHT_CRAWL) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary. TODO: Simplify.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1629,9 +1629,9 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y <= STEPUP_HEIGHT &&									// Lower floor boundary. Synced with crawl exit jump.
-		probe.Position.Floor - y >= STEP_SIZE &&										// Upper floor boundary. Synced with lowest crawl snap tolerance.
-		probe.Position.Ceiling - y <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Check this. Lara gets pushed around a lot.
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&									// Lower floor boundary. Synced with crawl exit jump.
+		(probe.Position.Floor - y) >= STEP_SIZE &&										// Upper floor boundary. Synced with lowest crawl snap tolerance.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Check this. Lara gets pushed around a lot.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1646,9 +1646,9 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y <= STEPUP_HEIGHT &&								// Lower floor boundary. Synced with crawl exit jump.
-		probe.Position.Floor - y >= STEP_SIZE &&									// Upper floor boundary. Synced with lowest crawl snap tolerance.
-		probe.Position.Ceiling - y <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Not detected at corners?
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor boundary. Synced with crawl exit jump.
+		(probe.Position.Floor - y) >= STEP_SIZE &&									// Upper floor boundary. Synced with lowest crawl snap tolerance.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Not detected at corners?
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&			// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1663,8 +1663,8 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if (probe.Position.Floor - y > STEPUP_HEIGHT &&								// Highest floor boundary. Synced with crawl down step and crawl exit down step.
-		probe.Position.Ceiling - y <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Lowest ceiling boundary.
+	if ((probe.Position.Floor - y) > STEPUP_HEIGHT &&							// Highest floor boundary. Synced with crawl down step and crawl exit down step.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Lowest ceiling boundary.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1685,17 +1685,6 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
-
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
-
-	if (abs(probe.Position.Floor - y) >= STEP_SIZE &&		// Upper/lower floor boundary.
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
@@ -1706,8 +1695,8 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
 
-	if (probe.Position.Floor - y >= LARA_HEIGHT_STRETCH &&						// Highest floor boundary.
-		probe.Position.Ceiling - y <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
+	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Lowest floor boundary.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
