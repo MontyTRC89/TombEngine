@@ -643,7 +643,6 @@
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
-    <ClInclude Include="Sound\sound_tracks.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
