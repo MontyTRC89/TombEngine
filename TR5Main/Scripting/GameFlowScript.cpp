@@ -284,7 +284,7 @@ bool GameFlow::DoGameflow()
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
 			// Load level
-			CurrentLevel = header.level;
+			CurrentLevel = header.Level;
 			loadFromSavegame = true;
 
 			break;
