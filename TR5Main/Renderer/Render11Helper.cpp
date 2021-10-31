@@ -552,8 +552,10 @@ namespace TEN::Renderer
 
 			adapter.Index = i;
 			adapter.Name = videoCardDescription;
-			logD("Adapter %d", i);
-			logD("Device Name : ", videoCardDescription);
+
+			TENLog("Adapter " + std::to_string(i), LogLevel::Info);
+			TENLog("Device Name: " + adapter.Name, LogLevel::Info);
+
 			ComPtr<IDXGIOutput> output;
 			if(FAILED(dxgiAdapter->EnumOutputs(0, output.GetAddressOf())))
 				continue;

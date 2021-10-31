@@ -167,10 +167,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	luaState.open_libraries(sol::lib::base, sol::lib::math);
 	luaState.set_exception_handler(lua_exception_handler);
 
-	try {
+	try 
+	{
 		g_GameFlow = new GameFlow(&luaState);
 		g_GameFlow->LoadGameFlowScript();
-
 		g_GameScript = new GameScript(&luaState);
 	}
 	catch (TENScriptException const& e)
@@ -178,7 +178,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
 		ShutdownTENLog();
-		throw;
+		return 0;
 	}
 
 	INITCOMMONCONTROLSEX commCtrlInit;
@@ -201,8 +201,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (!RegisterClass(&App.WindowClass))
 	{
-		printf("Unable To Register Window Class\n");
-		return false;
+		TENLog("Unable To Register Window Class", LogLevel::Error);
+		return 0;
 	}
 
 	// Create the renderer and enumerate adapters and video modes
@@ -246,7 +246,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (!App.WindowHandle)
 	{
-		printf("Unable To Create Window: %d\n", GetLastError());
+		TENLog("Unable To Create Window" + std::to_string(GetLastError()), LogLevel::Error);
 		return false;
 	}
 

@@ -829,7 +829,12 @@ int MineCartControl(void)
 	short roomNumber;
 
 	v = &g_Level.Items[Lara.Vehicle];
-	if (!v->data) { printf("v->data is nullptr !"); return 0; }
+
+	if (!v->data) 
+	{
+		TENLog("Minecart data is nullptr!", LogLevel::Error);
+		return 0; 
+	}
 	cart = v->data;
 
 	DoUserInput(v, LaraItem, cart);

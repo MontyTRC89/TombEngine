@@ -53,7 +53,7 @@ void InitialiseSkidman(short itemNum)
 	}
 	else
 	{
-		printf("FATAL: cannot create skidoo for SKIDMAN !");
+		TENLog("Can't create skidoo for rider!", LogLevel::Error);
 	}
 }
 
@@ -93,7 +93,7 @@ void SkidManControl(short riderNum)
 	rider = &g_Level.Items[riderNum];
 	if (rider->data == NULL)
 	{
-		printf("FATAL: rider data not contains the skidoo itemNumber !");
+		TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
 		return;
 	}
 
