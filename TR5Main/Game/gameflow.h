@@ -1,19 +1,4 @@
 #pragma once
-#include "savegame.h"
-
-struct SavegameInfo
-{
-	bool present;
-	char levelName[75];
-	int saveNumber;
-	short days;
-	short hours;
-	short minutes;
-	short seconds;
-	char fileName[255];
-};
-
-#define MAX_SAVEGAMES 16
 
 struct GAMEFLOW
 {
@@ -32,9 +17,3 @@ struct GAMEFLOW
 	unsigned short FileNameLen;
 	unsigned short ScriptLen;
 };
-
-extern SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
-extern std::vector<std::string> g_NewStrings;
-extern SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
-
-int LoadSavegameInfos();

@@ -356,7 +356,7 @@ int S_UpdateInput()
 					{
 						LaraItem->hitPoints = 1000;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
-						Savegame.Game.HealthUsed++;
+						Statistics.Game.HealthUsed++;
 					}
 				}
 
@@ -382,7 +382,7 @@ int S_UpdateInput()
 					{
 						LaraItem->hitPoints = 1000;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
-						Savegame.Game.HealthUsed++;
+						Statistics.Game.HealthUsed++;
 					}
 				}
 

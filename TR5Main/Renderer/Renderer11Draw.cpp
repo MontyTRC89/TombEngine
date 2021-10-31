@@ -547,7 +547,7 @@ namespace TEN::Renderer
                 y = 44;
                 LoadSavegameInfos();
 
-                for (int n = 1; n < MAX_SAVEGAMES + 1; n++)
+                for (int n = 1; n < SAVEGAME_MAX + 1; n++)
                 {
                     if (!g_NewSavegameInfos[n - 1].present)
                         drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
@@ -1008,7 +1008,7 @@ namespace TEN::Renderer
         else
             drawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-        for (int n = 1; n < MAX_SAVEGAMES + 1; n++)
+        for (int n = 1; n < SAVEGAME_MAX + 1; n++)
         {
             int n2 = n - 1;
 
@@ -1073,13 +1073,13 @@ namespace TEN::Renderer
 
         sprintf(buffer, "%02d:%02d:%02d", (Days * 24) + Hours, Min, Sec);
         drawString(500, ypos + 3 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%dm", Savegame.Game.Distance / 419);
+        sprintf(buffer, "%dm", Statistics.Game.Distance / 419);
         drawString(500, ypos + 4 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d", Savegame.Game.AmmoUsed);
+        sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
         drawString(500, ypos + 5 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d", Savegame.Game.HealthUsed);
+        sprintf(buffer, "%d", Statistics.Game.HealthUsed);
         drawString(500, ypos + 6 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d / 36", Savegame.Game.Secrets);
+        sprintf(buffer, "%d / 36", Statistics.Game.Secrets);
         drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 
         drawAllStrings();

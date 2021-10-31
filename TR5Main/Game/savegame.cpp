@@ -24,6 +24,8 @@
 #include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "Objects/Generic/Object/rope.h"
 
+#include <filesystem>
+
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -34,17 +36,46 @@ namespace Save = TEN::Save;
 using std::string;
 using std::vector;
 
+SavegameInfo g_SavegameInfos[SAVEGAME_MAX];
+SaveGameHeader g_NewSavegameInfos[SAVEGAME_MAX];
+vector<string> g_NewStrings;
+
 FileStream* SaveGame::m_stream;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
+GameStats Statistics;
 
-SAVEGAME_INFO Savegame;
+void LoadSavegameInfos()
+{
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+		g_NewSavegameInfos[i].present = false;
+
+	if (!std::filesystem::exists(SAVEGAME_PATH))
+		return;
+
+	// try to load the savegame
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
+		auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(i);
+		auto savegamePtr = fopen(fileName.c_str(), "rb");
+
+		if (savegamePtr == NULL)
+			continue;
+
+		fclose(savegamePtr);
+
+		g_NewSavegameInfos[i].present = true;
+		SaveGame::LoadHeader(i, &g_NewSavegameInfos[i]);
+
+		fclose(savegamePtr);
+	}
+
+	return;
+}
 
 bool SaveGame::Save(int slot)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
 
 	ITEM_INFO itemToSerialize{};
 	FlatBufferBuilder fbb{};
@@ -66,23 +97,23 @@ bool SaveGame::Save(int slot)
 	auto headerOffset = sghb.Finish();
 
 	Save::SaveGameStatisticsBuilder sgLevelStatisticsBuilder{ fbb };
-	sgLevelStatisticsBuilder.add_ammo_hits(Savegame.Level.AmmoHits);
-	sgLevelStatisticsBuilder.add_ammo_used(Savegame.Level.AmmoUsed);
-	sgLevelStatisticsBuilder.add_kills(Savegame.Level.Kills);
-	sgLevelStatisticsBuilder.add_medipacks_used(Savegame.Level.HealthUsed);
-	sgLevelStatisticsBuilder.add_distance(Savegame.Level.Distance);
-	sgLevelStatisticsBuilder.add_secrets(Savegame.Level.Secrets);
-	sgLevelStatisticsBuilder.add_timer(Savegame.Level.Timer);
+	sgLevelStatisticsBuilder.add_ammo_hits(Statistics.Level.AmmoHits);
+	sgLevelStatisticsBuilder.add_ammo_used(Statistics.Level.AmmoUsed);
+	sgLevelStatisticsBuilder.add_kills(Statistics.Level.Kills);
+	sgLevelStatisticsBuilder.add_medipacks_used(Statistics.Level.HealthUsed);
+	sgLevelStatisticsBuilder.add_distance(Statistics.Level.Distance);
+	sgLevelStatisticsBuilder.add_secrets(Statistics.Level.Secrets);
+	sgLevelStatisticsBuilder.add_timer(Statistics.Level.Timer);
 	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
 
 	Save::SaveGameStatisticsBuilder sgGameStatisticsBuilder{ fbb };
-	sgGameStatisticsBuilder.add_ammo_hits(Savegame.Game.AmmoHits);
-	sgGameStatisticsBuilder.add_ammo_used(Savegame.Game.AmmoUsed);
-	sgGameStatisticsBuilder.add_kills(Savegame.Game.Kills);
-	sgGameStatisticsBuilder.add_medipacks_used(Savegame.Game.HealthUsed);
-	sgGameStatisticsBuilder.add_distance(Savegame.Game.Distance);
-	sgGameStatisticsBuilder.add_secrets(Savegame.Game.Secrets);
-	sgGameStatisticsBuilder.add_timer(Savegame.Game.Timer);
+	sgGameStatisticsBuilder.add_ammo_hits(Statistics.Game.AmmoHits);
+	sgGameStatisticsBuilder.add_ammo_used(Statistics.Game.AmmoUsed);
+	sgGameStatisticsBuilder.add_kills(Statistics.Game.Kills);
+	sgGameStatisticsBuilder.add_medipacks_used(Statistics.Game.HealthUsed);
+	sgGameStatisticsBuilder.add_distance(Statistics.Game.Distance);
+	sgGameStatisticsBuilder.add_secrets(Statistics.Game.Secrets);
+	sgGameStatisticsBuilder.add_timer(Statistics.Game.Timer);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
 
 	// Lara
@@ -712,6 +743,9 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
+	if (!std::filesystem::exists(SAVEGAME_PATH))
+		std::filesystem::create_directory(SAVEGAME_PATH);
+
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
 	fileOut.write((char*)bufferToSerialize, bufferSize);
@@ -722,9 +756,7 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
