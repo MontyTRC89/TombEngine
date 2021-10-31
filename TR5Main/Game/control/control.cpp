@@ -495,9 +495,7 @@ GAME_STATUS DoTitle(int index)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
+		Statistics.Level.Timer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -563,11 +561,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
-		Savegame.Level.Timer = 0;
-		Savegame.Level.Distance = 0;
-		Savegame.Level.AmmoUsed = 0;
-		Savegame.Level.AmmoHits = 0;
-		Savegame.Level.Kills = 0;
+		Statistics.Level.Timer = 0;
+		Statistics.Level.Distance = 0;
+		Statistics.Level.AmmoUsed = 0;
+		Statistics.Level.AmmoHits = 0;
+		Statistics.Level.Kills = 0;
 	}
 
 	// Reset all the globals for the game which needs this
@@ -627,9 +625,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
+		Statistics.Level.Timer = 0;
 	}
 
 	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
