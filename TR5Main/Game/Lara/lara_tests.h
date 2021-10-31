@@ -41,6 +41,7 @@ void GetTighRopeFallOff(int Regularity);
 
 // TODO: New, organise later.
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
+bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);

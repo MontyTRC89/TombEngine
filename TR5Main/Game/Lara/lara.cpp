@@ -60,7 +60,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_run,
 	lara_as_stop,
 	lara_as_forwardjump,
-	lara_void_func,//4
+	lara_as_pose,//4
 	lara_as_fastback,//5
 	lara_as_turn_r,//6
 	lara_as_turn_l,//7
@@ -918,6 +918,15 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
+	if (Lara.poseCount < LARA_POSE_TIME &&
+		TestLaraPose(item, coll) &&
+		!(TrInput & (IN_WAKE | IN_LOOK)))
+	{
+		Lara.poseCount++;
+	}
+	else
+		Lara.poseCount = 0;
+
 	// Handle current Lara status
 	lara_control_routines[item->currentAnimState](item, coll);
 
@@ -996,6 +1005,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 		ResetLook();
 
 	Lara.look = true;
+	Lara.poseCount = 0;
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
@@ -1119,6 +1129,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 		ResetLook();
 
 	Lara.look = true;
+	Lara.poseCount = 0;
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
