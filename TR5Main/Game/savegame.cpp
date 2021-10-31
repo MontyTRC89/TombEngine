@@ -429,12 +429,18 @@ bool SaveGame::Save(int slot)
 		serializedItems.push_back(serializedItemOffset);
 	}
 
+	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+
+	// Soundtrack playheads
 	auto bgmTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM);
 	auto oneshotTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::OneShot);
 	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
 	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
 
-	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+	// Legacy soundtrack map
+	std::vector<int> soundTrackMap;
+	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.Mask); }
+	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
 	std::vector<int> flipMaps;
@@ -678,6 +684,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_ambient_position(bgmTrackData.second);
 	sgb.add_oneshot_track(oneshotTrackOffset);
 	sgb.add_oneshot_position(oneshotTrackData.second);
+	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_flip_effect(FlipEffect);
@@ -747,6 +754,16 @@ bool SaveGame::Load(int slot)
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM, s->ambient_position());
 	PlaySoundTrack(s->oneshot_track()->str(), SOUNDTRACK_PLAYTYPE::OneShot, s->oneshot_position());
+
+	// Legacy soundtrack map
+	for (int i = 0; i < s->cd_flags()->size(); i++)
+	{
+		// Safety check for cases when soundtrack map was externally modified and became smaller
+		if (i >= SoundTracks.size())
+			break;
+
+		SoundTracks[i].Mask = s->cd_flags()->Get(i);
+	}
 
 	// Static objects
 	for (int i = 0; i < s->static_meshes()->size(); i++)
