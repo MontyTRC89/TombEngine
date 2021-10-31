@@ -432,7 +432,7 @@ void PlaySoundTrack(int index, short mask)
 
 	if (mask && !(SoundTracks[index].Mode == SOUNDTRACK_PLAYTYPE::BGM))
 	{
-		short filteredMask = (mask >> 8) & 0x3F;
+		int filteredMask = (mask >> 8) & 0x3F;
 		if ((SoundTracks[index].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
