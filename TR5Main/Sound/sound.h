@@ -5,31 +5,28 @@
 #include "control/control.h"
 #include "sound_effects.h"
 
-#define SFX_ALWAYS 2
-
-#define SOUND_BASS_UNITS			 1.0f / 1024.0f	// TR->BASS distance unit coefficient
-#define SOUND_MAXVOL_RADIUS			 1024.0f		// Max. volume hearing distance
-#define SOUND_OMNIPRESENT_ORIGIN     Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
-#define SOUND_MAX_SAMPLES			 8192 // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
-#define SOUND_MAX_CHANNELS			 32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
-#define SOUND_LEGACY_SOUNDMAP_SIZE	 450
-#define SOUND_NEW_SOUNDMAP_MAX_SIZE	 4096
-#define SOUND_LEGACY_TRACKTABLE_SIZE 136
-#define SOUND_FLAG_NO_PAN			 (1<<12)	// Unused flag
-#define SOUND_FLAG_RND_PITCH		 (1<<13)
-#define SOUND_FLAG_RND_GAIN			 (1<<14)
-#define SOUND_MAX_PITCH_CHANGE		 0.09f
-#define SOUND_MAX_GAIN_CHANGE		 0.0625f
-#define SOUND_32BIT_SILENCE_LEVEL	 4.9e-04f
-#define SOUND_SAMPLE_FLAGS			 (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT)
-#define SOUND_XFADETIME_BGM			 5000
-#define SOUND_XFADETIME_BGM_START	 1500
-#define SOUND_XFADETIME_ONESHOT		 200
-#define SOUND_XFADETIME_CUTSOUND	 100
-#define SOUND_XFADETIME_HIJACKSOUND	 50
-#define SOUND_BGM_DAMP_COEFFICIENT	 0.5f
-
-#define TRACKS_PREFIX				"Audio\\%s.%s"
+constexpr auto SFX_ALWAYS                    = 2;
+constexpr auto SOUND_BASS_UNITS              = 1.0f / 1024.0f;	// TR->BASS distance unit coefficient
+constexpr auto SOUND_MAXVOL_RADIUS           = 1024.0f;		// Max. volume hearing distance
+constexpr auto SOUND_OMNIPRESENT_ORIGIN      = Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f);
+constexpr auto SOUND_MAX_SAMPLES             = 8192; // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
+constexpr auto SOUND_MAX_CHANNELS            = 32; // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
+constexpr auto SOUND_LEGACY_SOUNDMAP_SIZE    = 450;
+constexpr auto SOUND_NEW_SOUNDMAP_MAX_SIZE   = 4096;
+constexpr auto SOUND_LEGACY_TRACKTABLE_SIZE  = 136;
+constexpr auto SOUND_FLAG_NO_PAN             = (1<<12);	// Unused flag
+constexpr auto SOUND_FLAG_RND_PITCH          = (1<<13);
+constexpr auto SOUND_FLAG_RND_GAIN           = (1<<14);
+constexpr auto SOUND_MAX_PITCH_CHANGE        = 0.09f;
+constexpr auto SOUND_MAX_GAIN_CHANGE         = 0.0625f;
+constexpr auto SOUND_32BIT_SILENCE_LEVEL     = 4.9e-04f;
+constexpr auto SOUND_SAMPLE_FLAGS            = (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT);
+constexpr auto SOUND_XFADETIME_BGM           = 5000;
+constexpr auto SOUND_XFADETIME_BGM_START     = 1500;
+constexpr auto SOUND_XFADETIME_ONESHOT       = 200;
+constexpr auto SOUND_XFADETIME_CUTSOUND      = 100;
+constexpr auto SOUND_XFADETIME_HIJACKSOUND   = 50;
+constexpr auto SOUND_BGM_DAMP_COEFFICIENT    = 0.5f;
 
 enum class SOUNDTRACK_PLAYTYPE
 {
