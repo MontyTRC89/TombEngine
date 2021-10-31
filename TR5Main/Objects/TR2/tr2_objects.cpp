@@ -187,7 +187,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -218,7 +218,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -452,7 +452,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_MERCENARY_AUTOPISTOLS1 not found !", NULL, MB_OK);
+			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
