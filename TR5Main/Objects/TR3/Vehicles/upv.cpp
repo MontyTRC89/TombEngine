@@ -154,7 +154,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
 			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
-		Savegame.Game.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 
 		lr ^= 1;
 	}
