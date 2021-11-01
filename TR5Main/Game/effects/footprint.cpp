@@ -29,18 +29,18 @@ namespace Footprints {
 			return false;
 		}
 
-		int height = GetFloorHeight(floor, x, y, z);
 		PHD_VECTOR pos;
 
 		pos.x = pos.z = 0;
 		pos.y = FOOT_HEIGHT_OFFSET;
 
 		GetLaraJointPosition(&pos, mesh);
+		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
 
 		outFootprintPosition.xPos = pos.x;
 		outFootprintPosition.zPos = pos.z;
-		outFootprintPosition.yPos = height - 1;
-		outFootprintPosition.yRot = item.pos.yRot;
+		outFootprintPosition.yPos = height - 8;
+		outFootprintPosition.yRot = item.pos.yRot + ANGLE(180);
 
 		return abs(pos.y - height) < 32;
 	}
