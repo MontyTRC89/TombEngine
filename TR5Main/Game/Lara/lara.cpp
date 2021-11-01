@@ -930,7 +930,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Handle current Lara status
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	// Could replace Lara.isMoving with item->speed if anything fails. @Sezz 2021.10.14
 	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (abs(item->pos.zRot) > ANGLE(0.0f))
@@ -945,13 +944,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		item->pos.zRot -= ANGLE(1.0f);*/
 
-
-	if (Lara.turnRate >= -ANGLE(2.0f) && Lara.turnRate <= ANGLE(2.0f))
-		Lara.turnRate = 0;
-	else if (Lara.turnRate < -ANGLE(2.0f))
+	if (Lara.turnRate < -ANGLE(2.0f))
 		Lara.turnRate += ANGLE(2.0f);
-	else
+	else if (Lara.turnRate > ANGLE(2.0f))
 		Lara.turnRate -= ANGLE(2.0f);
+	else if (Lara.turnRate < -ANGLE(0.5f))
+		Lara.turnRate += ANGLE(0.5f);
+	else if (Lara.turnRate > ANGLE(0.5f))
+		Lara.turnRate -= ANGLE(0.5f);
+	else
+		Lara.turnRate = 0;
 	item->pos.yRot += Lara.turnRate;
 
 	// Animate Lara
