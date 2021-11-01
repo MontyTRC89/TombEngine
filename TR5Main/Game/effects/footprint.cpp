@@ -13,7 +13,7 @@ namespace Footprints {
 
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, PHD_3DPOS& outFootprintPosition) 
+	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition) 
 	{
 		int x = item.pos.xPos;
 		int y = item.pos.yPos;
@@ -37,10 +37,9 @@ namespace Footprints {
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
 
-		outFootprintPosition.xPos = pos.x;
-		outFootprintPosition.zPos = pos.z;
-		outFootprintPosition.yPos = height - 8;
-		outFootprintPosition.yRot = item.pos.yRot + ANGLE(180);
+		outFootprintPosition.x = pos.x;
+		outFootprintPosition.y = height - 8;
+		outFootprintPosition.z = pos.z;
 
 		return abs(pos.y - height) < 32;
 	}
@@ -55,22 +54,22 @@ namespace Footprints {
 		for (auto i = footprints.begin(); i != footprints.end(); i++) 
 		{
 			FOOTPRINT_STRUCT& footprint = *i;
-			footprint.life--;
+			footprint.Life--;
 
-			if (footprint.life <= 0) 
+			if (footprint.Life <= 0) 
 			{
 				numInvalidFootprints++;
 				continue;
 			}
 
-			if (footprint.life > footprint.lifeStartFading) 
+			if (footprint.Life > footprint.LifeStartFading) 
 			{
-				footprint.opacity = footprint.startOpacity;
+				footprint.Opacity = footprint.StartOpacity;
 			}
 			else 
 			{
-				float opacity = lerp(0, footprint.startOpacity, fmax(0, fmin(1, footprint.life / (float)footprint.lifeStartFading)));
-				footprint.opacity = opacity;
+				float opacity = lerp(0, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				footprint.Opacity = opacity;
 			}
 		}
 
