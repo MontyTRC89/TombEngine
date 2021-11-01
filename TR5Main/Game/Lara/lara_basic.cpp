@@ -94,9 +94,9 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: What is this for? Investigate. @Sezz 2021.10.09
-	/*if (Lara.isMoving)
-		return;*/
+	// TODO: Implement item alignment properly. @Sezz 2021.11.01
+	if (Lara.isMoving)
+		return;
 
 	// TODO: If stopping and not holding WALK, Lara won't turn. @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
@@ -750,7 +750,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Adding some idle breathing would be nice. @Sezz 2021.10.31
 	Lara.NewAnims.Pose = false;
 
-	if (Lara.poseCount >= LARA_POSE_TIME &&
+	if (Lara.poseCount == LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		Lara.NewAnims.Pose)
 	{
@@ -2530,9 +2530,8 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: This seems unnecessary, but I'm leaving it in case something breaks. @Sezz 2021.10.13
-	/*if (Lara.isMoving)
-		return;*/
+	if (Lara.isMoving)
+		return;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -3020,9 +3019,8 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Check
-	/*if (Lara.isMoving)
-		return;*/
+	if (Lara.isMoving)
+		return;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -3183,9 +3181,8 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Check
-	/*if (Lara.isMoving)
-		return;*/
+	if (Lara.isMoving)
+		return;
 
 	if (TrInput & IN_LEFT)
 	{
