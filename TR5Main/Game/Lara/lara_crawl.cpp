@@ -31,6 +31,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.13.21
 
+	Lara.keepDucked = TestLaraKeepDucked(coll); // TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. @Sezz 2021.10.14
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -44,20 +45,15 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: Do this properly with Lara.turnRate. Must harmonise with crouch turn states. @Sezz 2021.10.30
 	if (TrInput & IN_LEFT)
-		item->pos.yRot -= ANGLE(1.5f);
+		Lara.turnRate = -LARA_CRAWL_TURN;
 	else if (TrInput & IN_RIGHT)
-		item->pos.yRot += ANGLE(1.5f);
-
-	// TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. Otherwise, Lara will stand up.
-	// See if setting Lara.keepDucked can be done before she is in the crawlspace. @Sezz 2021.10.14
-	Lara.keepDucked = TestLaraKeepDucked(coll);
+		Lara.turnRate = LARA_CRAWL_TURN;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
-		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
+		// TODO: LUA
 		Lara.NewAnims.CrouchRoll = true;
 
 		if ((TrInput & IN_SPRINT) &&
@@ -72,8 +68,6 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: This will lock Lara if the dispatch can't happen.
 		// Maybe rejoining that split animation wasn't such a good idea... @Sezz 2021.10.16
 		if (TrInput & IN_FORWARD &&
-			coll->CollisionType != CT_FRONT &&
-			coll->CollisionType != CT_TOP_FRONT &&
 			TestLaraCrouchToCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
@@ -422,11 +416,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why. @Sezz 2021.10.03
-	/*Lara.turnRate -= ANGLE(1.5f);
-	if (Lara.turnRate < -LARA_TURN_RATE)
-		Lara.turnRate = -LARA_TURN_RATE;*/
-	item->pos.yRot -= ANGLE(1.5f);
+	Lara.turnRate = -LARA_CRAWL_TURN;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -497,11 +487,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why. @Sezz 2021.10.03
-	/*Lara.turnRate += ANGLE(1.5f);
-	if (Lara.turnRate > LARA_TURN_RATE)
-		Lara.turnRate = LARA_TURN_RATE;*/
-	item->pos.yRot += ANGLE(1.5f);
+	Lara.turnRate = LARA_CRAWL_TURN;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -602,6 +588,7 @@ void old_lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -616,16 +603,18 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// TODO: Enable with lua!
+	if (TrInput & IN_LEFT)
+		Lara.turnRate = -LARA_CRAWL_TURN;
+	else if (TrInput & IN_RIGHT)
+		Lara.turnRate = LARA_CRAWL_TURN;
+
+	// TODO: LUA
 	Lara.NewAnims.Crawl1clickdown = true;
 	Lara.NewAnims.Crawl1clickup = true;
 	Lara.NewAnims.CrawlExit1click = true;
 	Lara.NewAnims.CrawlExit2click = true;
 	Lara.NewAnims.CrawlExit3click = true;
 	Lara.NewAnims.CrawlExitJump = true;
-
-	// TEMP
-	Lara.keepDucked = TestLaraKeepDucked(coll);
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -654,9 +643,10 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll) &&
-				coll->CollisionType != CT_FRONT &&
-				coll->CollisionType != CT_TOP_FRONT) [[likely]]
+			// TODO: Diagonal issues.
+			else if (coll->CollisionType != CT_FRONT &&
+				coll->CollisionType != CT_TOP_FRONT &&
+				TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -1509,11 +1499,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Changing Lara.turnRate doesn't work in this state. Find out why.
-	/*Lara.turnRate -= ANGLE(1.5f);
-	if (Lara.turnRate < -LARA_TURN_RATE)
-		Lara.turnRate = -LARA_TURN_RATE;*/
-	item->pos.yRot -= ANGLE(1.5f);
+	Lara.turnRate = -LARA_CRAWL_TURN;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
@@ -1543,10 +1529,6 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		// TODO: Allow for more granular turning. The animation needs to cancel, however.
-		/*Lara.turnRate -= ANGLE(1.5f);
-		if (Lara.turnRate < -LARA_TURN_RATE)
-			Lara.turnRate = -LARA_TURN_RATE;*/
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CRAWL_TURN_LEFT;
@@ -1559,7 +1541,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE; // TODO: In the future, with animation blending, dispatch directly to LS_CRAWL_STOP. @Sezz 2021.10.18
+	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
 // LEGACY
@@ -1608,7 +1590,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->pos.yRot += ANGLE(1.5f);
+	Lara.turnRate = LARA_CRAWL_TURN;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
