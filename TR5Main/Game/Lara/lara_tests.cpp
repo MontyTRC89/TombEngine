@@ -842,9 +842,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		Lara.cornerX = item->pos.xPos;
 		Lara.cornerZ = item->pos.zPos;
 
-		auto result = TestLaraValidHangPos(item, coll);
-
-		if (result)
+		if (TestLaraValidHangPos(item, coll))
 		{
 			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
 			{
