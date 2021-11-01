@@ -122,7 +122,10 @@ void AddFootprint(ITEM_INFO* item)
 		GetLaraJointPosition(&position, LM_RFOOT);
 
 	auto fx = sound_effects::SFX_TR4_LARA_FEET;
-	auto floor = GetCollisionResult(position.x, position.y, position.z, item->roomNumber).BottomBlock;
+	auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
+	auto floor = result.BottomBlock;
+
+	position.y = result.Position.Floor - 4;
 
 	switch (floor->Material)
 	{
@@ -191,12 +194,11 @@ void AddFootprint(ITEM_INFO* item)
 
 	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
 
-	auto x = Vector2(plane.x * WALL_SIZE, WALL_SIZE);
-	auto z = Vector2(WALL_SIZE, plane.y * WALL_SIZE);
-
-	auto xRot = FROM_RAD(atan2(0 - x.y, 0 - x.x));
 	auto yRot = item->pos.yRot;
-	auto zRot = FROM_RAD(atan2(0 - z.y, 0 - z.x));
+	auto c = phd_cos(yRot);
+	auto s = phd_sin(yRot);
+	auto xRot = FROM_RAD(plane.x * s + plane.y * c);
+	auto zRot = FROM_RAD(plane.y * s - plane.x * c);
 
 	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, xRot, yRot, zRot);
 
