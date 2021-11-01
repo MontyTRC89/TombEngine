@@ -73,7 +73,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	// TODO: Enable with lua!
+	// TODO: LUA
 	Lara.NewAnims.CrawlVault1click = true;
 	Lara.NewAnims.CrawlVault2click = true;
 	Lara.NewAnims.CrawlVault3click = true;
@@ -82,15 +82,15 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestValidLedge(item, coll))
 	{
 		// Vault to crouch up one step.
-		if (coll->Front.Floor < -STEP_SIZE &&			// Lower floor boundary.
-			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor boundary.
+		if (coll->Front.Floor < 0 &&				// Lower floor boundary.
+			coll->Front.Floor >= -STEP_SIZE &&		// Upper floor boundary.
 			Lara.NewAnims.CrawlVault1click)
 		{
 			if (abs(coll->Front.Ceiling - coll->Front.Floor) < STEP_SIZE)		// Clamp buffer.
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->frameNumber = GF(LA_VAULT_TO_CROUCH_1CLICK, 0);
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + STEP_SIZE;
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -112,7 +112,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 				item->currentAnimState = LS_GRABBING;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->frameNumber = GF(LA_VAULT_TO_STAND_2CLICK_START, 0);
 				item->goalAnimState = LS_STOP;
 				item->pos.yPos += coll->Front.Floor + STOP_SIZE;
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -122,7 +122,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.NewAnims.CrawlVault2click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->frameNumber = GF(LA_VAULT_TO_CROUCH_2CLICK, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + STOP_SIZE;
@@ -147,7 +147,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 				item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 				item->currentAnimState = LS_GRABBING;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->frameNumber = GF(LA_VAULT_TO_STAND_3CLICK, 0);
 				item->goalAnimState = LS_STOP;
 				item->pos.yPos += coll->Front.Floor + (STOP_SIZE + STEP_SIZE);
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -157,7 +157,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.NewAnims.CrawlVault3click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->frameNumber = GF(LA_VAULT_TO_CROUCH_3CLICK, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
 				item->pos.yPos += coll->Front.Floor + (STOP_SIZE + STEP_SIZE);
@@ -176,16 +176,14 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 #endif
 
 			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->frameNumber = GF(LA_STAND_SOLID, 0);
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_STOP;
 			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 		}
 		else
-		{
 			return false;
-		}
 
 		item->pos.yRot = coll->NearestLedgeAngle;
 		ShiftItem(item, coll);
@@ -212,21 +210,23 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				if (TestLaraClimbStance(item, coll))
 				{
 					item->animNumber = LA_STAND_SOLID;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->frameNumber = GF(LA_STAND_SOLID, 0);
 					item->goalAnimState = LS_LADDER_IDLE;
 					item->currentAnimState = LS_STOP;
 					AnimateLara(item);
 					item->pos.yRot = coll->NearestLedgeAngle;
 					Lara.gunStatus = LG_HANDS_BUSY;
+
 					return true;
 				}
 			}
+
 			return false;
 		}
 
 		// Auto jump to ladder.
 		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->frameNumber = GF(LA_STAND_SOLID, 0);
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_STOP;
 		Lara.calcFallSpeed = -116;
@@ -256,7 +256,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		item->animNumber = LA_STAND_IDLE;
-		item->frameNumber = g_Level.Anims[LA_STAND_IDLE].frameBase;
+		item->frameNumber = GF(LA_STAND_IDLE, 0);
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_TEST_1;
 
