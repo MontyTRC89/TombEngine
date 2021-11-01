@@ -10,19 +10,20 @@ namespace Footprints {
 
 	struct FOOTPRINT_STRUCT 
 	{
-		PHD_3DPOS pos;
-		int foot;
-		int life;
-		int lifeStartFading;
-		byte startOpacity;
-		byte opacity;
-		bool active;
+		Vector3 Position;
+		Vector3 Rotation;
+		bool RightFoot;
+		int Life;
+		int LifeStartFading;
+		float StartOpacity;
+		float Opacity;
+		bool Active;
 	};
 
 	extern std::deque<FOOTPRINT_STRUCT> footprints;
 	constexpr int FOOT_HEIGHT_OFFSET = 64;
 
-	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, PHD_3DPOS& outFootprintPosition);
+	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition);
 	void UpdateFootprints();
 
 }}}
