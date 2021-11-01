@@ -762,7 +762,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	auto quadrant = GetQuadrant(item->pos.yRot);
 
 	// Virtually rotate Lara 90 degrees to the right and snap to nearest ledge, if any.
-	auto newAngle = item->pos.yRot + ANGLE(testAngle);
+	short newAngle = item->pos.yRot + ANGLE(testAngle);
 	item->pos.yRot = newAngle;
 	SnapItemToLedge(item, coll, item->pos.yRot);
 
