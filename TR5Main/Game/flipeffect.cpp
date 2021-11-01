@@ -190,45 +190,40 @@ void AddFootprint(ITEM_INFO* item)
 	if (fx != sound_effects::SFX_TR4_LARA_FEET)
 		SoundEffect(fx, &item->pos, 0);
 
-	FOOTPRINT_STRUCT footprint;
-
 	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
 
-	auto yRot = item->pos.yRot;
-	auto c = phd_cos(yRot);
-	auto s = phd_sin(yRot);
-	auto xRot = FROM_RAD(plane.x * s + plane.y * c);
-	auto zRot = FROM_RAD(plane.y * s - plane.x * c);
+	auto c = phd_cos(item->pos.yRot + ANGLE(180));
+	auto s = phd_sin(item->pos.yRot + ANGLE(180));
+	auto yRot = TO_RAD(item->pos.yRot);
+	auto xRot = plane.x * s + plane.y * c;
+	auto zRot = plane.y * s - plane.x * c;
 
-	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, xRot, yRot, zRot);
+	FOOTPRINT_STRUCT footprint = {};
+	auto preciseFootPosition = Vector3();
 
-	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
+	footprint.Rotation = Vector3(xRot, yRot, zRot);
+	footprint.LifeStartFading = 30 * 10;
+	footprint.StartOpacity = 0.25f;
+	footprint.Life = 30 * 20;
+	footprint.Active = true;
+
+	if (CheckFootOnFloor(*item, LM_LFOOT, preciseFootPosition))
 	{
 		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
 		
-		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
-		footprint.pos = footprintPosition;
-		footprint.foot = 0;
-		footprint.lifeStartFading = 30 * 10;
-		footprint.startOpacity = 64;
-		footprint.life = 30 * 20;
-		footprint.active = true;
+		footprint.Position = preciseFootPosition;
+		footprint.RightFoot = false;
 		footprints.push_front(footprint);
 	}
 
-	if (CheckFootOnFloor(*item, LM_RFOOT, footprintPosition))
+	if (CheckFootOnFloor(*item, LM_RFOOT, preciseFootPosition))
 	{
 		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
 
-		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
-		footprint.pos = footprintPosition;
-		footprint.foot = 1;
-		footprint.lifeStartFading = 30*10;
-		footprint.startOpacity = 64;
-		footprint.life = 30 * 20;
-		footprint.active = true;
+		footprint.Position = preciseFootPosition;
+		footprint.RightFoot = true;
 		footprints.push_front(footprint);
 	}
 }
