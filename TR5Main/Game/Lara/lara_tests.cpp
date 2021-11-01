@@ -1405,7 +1405,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
 		Lara.Vehicle == NO_ITEM &&									// Not in a vehicle.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge <= 0))		// Flare is not being handled.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Flare is not being handled.
 	{
 		return true;
 	}
@@ -1614,7 +1614,7 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	if ((probe.Position.Floor - y) <= -STEP_SIZE &&																			// Lower floor boundary. Synced with highest crawl snap tolerance.
 		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&																		// Upper floor boundary. Synced with bad height up.
-		(coll->Middle.Ceiling + probe.Position.Floor + y - LARA_HEIGHT_CRAWL) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary. TODO: Simplify.
+		(coll->Middle.Ceiling + probe.Position.Floor + y - LARA_HEIGHT_CRAWL) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1690,7 +1690,6 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Probe for objects.
-	// TODO: If Lara is crawling on a very steep slope, don't allow her to descend.
 
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
@@ -1710,7 +1709,7 @@ bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
 {
 	if (item->animNumber == LA_CRAWL_IDLE ||
 		(item->animNumber == LA_CROUCH_TO_CRAWL_START &&
-			item->frameNumber >= g_Level.Anims[item->animNumber].frameBase + 8))
+			item->frameNumber >= GF(LA_CROUCH_TO_CRAWL_START, 8)))
 		return true;
 
 	return false;

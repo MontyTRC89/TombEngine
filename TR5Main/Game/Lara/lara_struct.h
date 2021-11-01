@@ -190,7 +190,7 @@ enum LARA_STATE
 	LS_CRAWL_EXIT_DOWN_STEP = 153,
 	LS_CRAWL_EXIT_JUMP = 154,
 	LS_CRAWL_EXIT_FLIP = 155,
-	
+
 	NUM_LARA_STATES
 };
 
@@ -735,7 +735,7 @@ enum LARA_ANIM
 	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
 	LA_POSE_START = 502,									// Stand > AFK pose
 	LA_POSE_CONTINUE = 503,									// AFK pose (looped)
-	LA_POSE_END = 504,										// ADK pose > stand
+	LA_POSE_END = 504,										// AFK pose > stand
 
 	NUM_LARA_ANIMS
 
