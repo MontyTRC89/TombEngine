@@ -55,6 +55,11 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 	if (abs(left - right) >= slopeDelta)
 		return false;
 
+	// Discard if ledge is not within distance threshold
+	if (abs(coll->NearestLedgeDistance) > coll->Setup.Radius)
+		return false;
+
+	// Discard if ledge is not within angle threshold
 	if (!TestValidLedgeAngle(item, coll))
 		return false; 
 	
