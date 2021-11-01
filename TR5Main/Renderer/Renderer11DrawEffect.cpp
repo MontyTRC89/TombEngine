@@ -611,7 +611,7 @@ namespace TEN::Renderer
 
 			if (footprint.active && g_Level.Sprites.size() > spriteIndex)
 			{
-				Matrix rot = Matrix::CreateRotationY(TO_RAD(footprint.pos.yRot) + PI);
+				Matrix rot = Matrix::CreateFromYawPitchRoll(TO_RAD(footprint.pos.yRot), TO_RAD(footprint.pos.xRot), TO_RAD(footprint.pos.zRot));
 				Vector3 p1 = Vector3(-64, 0, -64);
 				Vector3 p2 = Vector3(64, 0, -64);
 				Vector3 p3 = Vector3(64, 0, 64);
