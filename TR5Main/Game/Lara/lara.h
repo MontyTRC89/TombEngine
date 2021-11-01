@@ -16,6 +16,7 @@ struct COLL_INFO;
 #define LARA_SLOW_TURN ANGLE(4.0f)	// turn maxes
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
+#define LARA_CRAWL_TURN ANGLE(2.0f)
 #define LARA_GRAB_THRESHOLD ANGLE(30.0f)
 
 // TODO: In the future, the player model should be probed for the number of bones between the hips (exclusive) and head (inclusive).
