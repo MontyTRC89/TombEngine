@@ -1366,9 +1366,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
