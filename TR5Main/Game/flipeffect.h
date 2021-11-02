@@ -7,7 +7,6 @@
 constexpr auto NUM_FLIPEFFECTS = 47;
 
 extern int FlipEffect;
-extern short FXType;
 
 extern std::function<EffectFunction> effect_routines[];
 
