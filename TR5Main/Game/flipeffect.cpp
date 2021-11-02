@@ -2,28 +2,21 @@
 #include "flipeffect.h"
 #include "Lara.h"
 #include "control/lot.h"
-#include "effects\hair.h"
-#include "animation.h"
-#include "sphere.h"
+#include "effects/hair.h"
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
 #include "collide.h"
-#include "savegame.h"
-#include "Sound\sound.h"
-#include "tr5_rats_emitter.h"
-#include "tr5_bats_emitter.h"
+#include "Sound/sound.h"
 #include "tr5_spider_emitter.h"
 #include "tr5_pushableblock.h"
 #include "pickup.h"
 #include "puzzles_keys.h"
 #include "lara_fire.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "effects\weather.h"
-#include "effects\footprint.h"
-#include "effects\groundfx.h"
-#include "effects\debris.h"
+#include "effects/tomb4fx.h"
+#include "effects/weather.h"
+#include "effects/footprint.h"
+#include "effects/debris.h"
 #include "items.h"
 
 using std::function;
@@ -117,111 +110,6 @@ void AddLeftFootprint(ITEM_INFO* item)
 void AddRightFootprint(ITEM_INFO* item)
 {
 	AddFootprint(item, true);
-}
-
-void AddFootprint(ITEM_INFO* item, bool rightFoot)
-{
-	if (item != LaraItem)
-		return;
-
-	auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
-	PHD_VECTOR position;
-	GetLaraJointPosition(&position, foot);
-
-	auto fx = sound_effects::SFX_TR4_LARA_FEET;
-	auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
-	auto floor = result.BottomBlock;
-
-	if (result.Position.Bridge >= 0)
-		return;
-
-	switch (floor->Material)
-	{
-	case GroundMaterial::Concrete:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
-		break;
-
-	case GroundMaterial::Grass:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
-		break;
-
-	case GroundMaterial::Gravel:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_GRAVEL;
-		break;
-
-	case GroundMaterial::Ice:
-		fx = sound_effects::SFX_TR3_FOOTSTEPS_ICE;
-		break;
-
-	case GroundMaterial::Marble:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_MARBLE;
-		break;
-
-	case GroundMaterial::Metal:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
-		break;
-
-	case GroundMaterial::Mud:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_MUD;
-		break;
-
-	case GroundMaterial::OldMetal:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
-		break;
-
-	case GroundMaterial::OldWood:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
-		break;
-
-	case GroundMaterial::Sand:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
-		break;
-
-	case GroundMaterial::Snow:
-		fx = sound_effects::SFX_TR3_FOOTSTEPS_SNOW;
-		break;
-
-	case GroundMaterial::Stone:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
-		break;
-
-	case GroundMaterial::Water:
-		fx = sound_effects::SFX_TR4_LARA_WET_FEET;
-		break;
-
-	case GroundMaterial::Wood:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
-		break;
-	}
-	
-	// HACK: must be here until reference wad2 is revised
-	if (fx != sound_effects::SFX_TR4_LARA_FEET)
-		SoundEffect(fx, &item->pos, 0);
-
-	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
-
-	auto c = phd_cos(item->pos.yRot + ANGLE(180));
-	auto s = phd_sin(item->pos.yRot + ANGLE(180));
-	auto yRot = TO_RAD(item->pos.yRot);
-	auto xRot = plane.x * s + plane.y * c;
-	auto zRot = plane.y * s - plane.x * c;
-
-	auto footPos = Vector3();
-	if (!CheckFootOnFloor(*item, foot, footPos))
-		return;
-
-	FOOTPRINT_STRUCT footprint = {};
-	footprint.Position = footPos;
-	footprint.Rotation = Vector3(xRot, yRot, zRot);
-	footprint.LifeStartFading = 30 * 10;
-	footprint.StartOpacity = 0.25f;
-	footprint.Life = 30 * 20;
-	footprint.Active = true;
-	footprint.RightFoot = rightFoot;
-
-	if (footprints.size() >= MAX_FOOTPRINTS)
-		footprints.pop_back();
-	footprints.push_front(footprint);
 }
 
 void ResetHair(ITEM_INFO* item)
