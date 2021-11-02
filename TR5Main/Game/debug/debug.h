@@ -8,7 +8,8 @@ constexpr bool DebugBuild = false;
 #include <string_view>
 #include <iostream>
 
-inline void assertion(const bool& expr, const char* msg) noexcept {
+inline void assertion(const bool& expr, const char* msg) 
+{
 	if constexpr (DebugBuild) {
 		if (!expr) throw std::runtime_error(msg);
 	}
