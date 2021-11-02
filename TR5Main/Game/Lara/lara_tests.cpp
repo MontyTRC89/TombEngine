@@ -1522,7 +1522,8 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2) + 4, 0);
-
+	
+	// TODO: This interferes with the one-step stand-to-crouch vault where the floor is lower than one step.
 	if ((probe.Position.Ceiling - y) < 0)
 		return true;
 

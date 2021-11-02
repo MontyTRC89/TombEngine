@@ -316,6 +316,8 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
+	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem when
+	// she becomes airborne within a crawlspace, as collision handling will push her back very rapidly. @Sezz 2021.11.02
 	if (LaraDeflectEdgeDuck(item, coll))
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
@@ -623,7 +625,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Allow standing vault up 2 steps when spawning flare while standing. @Sezz 2021.10.16
 
 		// TODO: Flare not working.
-		if (TrInput & IN_SPRINT ||
+		if (TrInput & IN_SPRINT && TestLaraCrawlForward(item, coll) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(Lara.gunType) && // TODO: From here or from crouch, it needs to be consistent.
 			TestLaraDrawWeaponsFromCrawlIdle(item)))
