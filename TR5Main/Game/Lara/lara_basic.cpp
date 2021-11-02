@@ -98,7 +98,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.isMoving)
 		return;
 
-	// TODO: If stopping and not holding WALK, Lara won't turn. @Sezz 2021.10.09
+	// TODO: If stopping and holding WALK without FORWARD, Lara can't turn. @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
@@ -116,19 +116,11 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, 16);
 	}
 
-	// TODO: Idle crouch state dispatch. @Sezz 2021.10.11
-	/*if (TestLaraKeepDucked(coll))
-	{
-		item->goalAnimState = LS_STOP;
-
-		return;
-	}*/
-
 	if (TrInput & IN_FORWARD)
 	{
 		if (Lara.waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK)
+		else if (TrInput & IN_WALK) [[likely]]
 			item->goalAnimState = LS_WALK_FORWARD;
 		else
 			item->goalAnimState = LS_RUN_FORWARD;
@@ -418,7 +410,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -767,7 +759,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Allowing Lara to roll at ledges is silly @Sezz 2021.10.18
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
@@ -775,7 +766,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -929,6 +920,19 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	if (TrInput & IN_LEFT)
+	{
+		item->goalAnimState = LS_TURN_LEFT_SLOW;
+
+		return;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
+		return;
+	}
+
 	if (TrInput & IN_LSTEP &&
 		TestLaraStepLeft(item, coll))
 	{
@@ -940,19 +944,6 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 		TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
-		return;
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
-
-		return;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
@@ -1160,7 +1151,6 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
 
-	// TODO: Test if Lara can get stuck here. Presumably, falling and sliding should have precedence instead. @Sezz 2021.09.28
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
@@ -1852,7 +1842,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if ((TrInput & IN_DUCK) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
