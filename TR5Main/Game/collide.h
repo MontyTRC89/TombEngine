@@ -39,9 +39,9 @@ struct COLL_POSITION
 {
 	int Floor;
 	int Ceiling;
+	int Bridge;
 	float SplitAngle;
 	bool Slope;
-	bool Bridge;
 	bool DiagonalStep;
 
 	bool HasDiagonalSplit() { return SplitAngle == 45.0f * RADIAN || SplitAngle == 135.0f * RADIAN; }

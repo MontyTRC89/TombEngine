@@ -1232,8 +1232,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
-	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor + 1, false, false) >= 0;
-	result.Position.Slope = !result.Position.Bridge && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
+	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor + 1, false, false);
+	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
