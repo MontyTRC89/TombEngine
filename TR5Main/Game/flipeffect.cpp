@@ -124,11 +124,9 @@ void AddFootprint(ITEM_INFO* item, bool rightFoot)
 	if (item != LaraItem)
 		return;
 
+	auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
 	PHD_VECTOR position;
-	if (rightFoot)
-		GetLaraJointPosition(&position, LM_LFOOT);
-	else
-		GetLaraJointPosition(&position, LM_RFOOT);
+	GetLaraJointPosition(&position, foot);
 
 	auto fx = sound_effects::SFX_TR4_LARA_FEET;
 	auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
@@ -208,7 +206,7 @@ void AddFootprint(ITEM_INFO* item, bool rightFoot)
 	auto zRot = plane.y * s - plane.x * c;
 
 	auto footPos = Vector3();
-	if (!CheckFootOnFloor(*item, (rightFoot ? LM_RFOOT : LM_LFOOT), footPos))
+	if (!CheckFootOnFloor(*item, foot, footPos))
 		return;
 
 	FOOTPRINT_STRUCT footprint = {};
