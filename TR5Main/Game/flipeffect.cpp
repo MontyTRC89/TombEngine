@@ -30,7 +30,6 @@ using std::function;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
 
-short FXType;
 int FlipEffect;
 
 function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
