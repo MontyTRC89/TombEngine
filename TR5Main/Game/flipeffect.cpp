@@ -30,7 +30,6 @@ using std::function;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
 
-short FXType;
 int FlipEffect;
 
 function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
@@ -67,8 +66,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	VoidEffect,					//29
 	LaraLocation,				//30
 	ClearSpidersPatch,			//31
-	AddFootprint,				//32
-	VoidEffect,					//33
+	AddLeftFootprint,			//32
+	AddRightFootprint,			//33
 	VoidEffect,					//34
 	VoidEffect,					//35
 	VoidEffect,					//36
@@ -110,13 +109,23 @@ void Puzzle(ITEM_INFO* item)
 	do_puzzle();
 }
 
-void AddFootprint(ITEM_INFO* item)
+void AddLeftFootprint(ITEM_INFO* item)
+{
+	AddFootprint(item, false);
+}
+
+void AddRightFootprint(ITEM_INFO* item)
+{
+	AddFootprint(item, true);
+}
+
+void AddFootprint(ITEM_INFO* item, bool rightFoot)
 {
 	if (item != LaraItem)
 		return;
 
 	PHD_VECTOR position;
-	if (FXType == (int)SOUND_PLAYCONDITION::Land)
+	if (rightFoot)
 		GetLaraJointPosition(&position, LM_LFOOT);
 	else
 		GetLaraJointPosition(&position, LM_RFOOT);
@@ -198,34 +207,22 @@ void AddFootprint(ITEM_INFO* item)
 	auto xRot = plane.x * s + plane.y * c;
 	auto zRot = plane.y * s - plane.x * c;
 
-	FOOTPRINT_STRUCT footprint = {};
-	auto preciseFootPosition = Vector3();
+	auto footPos = Vector3();
+	if (!CheckFootOnFloor(*item, (rightFoot ? LM_RFOOT : LM_LFOOT), footPos))
+		return;
 
+	FOOTPRINT_STRUCT footprint = {};
+	footprint.Position = footPos;
 	footprint.Rotation = Vector3(xRot, yRot, zRot);
 	footprint.LifeStartFading = 30 * 10;
 	footprint.StartOpacity = 0.25f;
 	footprint.Life = 30 * 20;
 	footprint.Active = true;
+	footprint.RightFoot = rightFoot;
 
-	if (CheckFootOnFloor(*item, LM_LFOOT, preciseFootPosition))
-	{
-		if (footprints.size() >= MAX_FOOTPRINTS)
-			footprints.pop_back();
-		
-		footprint.Position = preciseFootPosition;
-		footprint.RightFoot = false;
-		footprints.push_front(footprint);
-	}
-
-	if (CheckFootOnFloor(*item, LM_RFOOT, preciseFootPosition))
-	{
-		if (footprints.size() >= MAX_FOOTPRINTS)
-			footprints.pop_back();
-
-		footprint.Position = preciseFootPosition;
-		footprint.RightFoot = true;
-		footprints.push_front(footprint);
-	}
+	if (footprints.size() >= MAX_FOOTPRINTS)
+		footprints.pop_back();
+	footprints.push_front(footprint);
 }
 
 void ResetHair(ITEM_INFO* item)
