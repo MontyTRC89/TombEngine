@@ -115,43 +115,17 @@ void AddFootprint(ITEM_INFO* item)
 	if (item != LaraItem)
 		return;
 
-	bool rightFoot;
-	auto footPos = Vector3();
-
-	if (CheckFootOnFloor(*item, LM_LFOOT, footPos))
-	{
-		rightFoot = false;
-	}
-	else if (CheckFootOnFloor(*item, LM_RFOOT, footPos))
-	{
-		rightFoot = true;
-	}
+	PHD_VECTOR position;
+	if (FXType == (int)SOUND_PLAYCONDITION::Land)
+		GetLaraJointPosition(&position, LM_LFOOT);
 	else
-		return;
-
-	auto floor = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber).Block;
-	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-
-	auto c = phd_cos(item->pos.yRot + ANGLE(180));
-	auto s = phd_sin(item->pos.yRot + ANGLE(180));
-	auto yRot = TO_RAD(item->pos.yRot);
-	auto xRot = plane.x * s + plane.y * c;
-	auto zRot = plane.y * s - plane.x * c;
-
-	FOOTPRINT_STRUCT footprint = {};
-	footprint.Position = footPos;
-	footprint.Rotation = Vector3(xRot, yRot, zRot); 
-	footprint.RightFoot = rightFoot;
-	footprint.LifeStartFading = 30 * 10;
-	footprint.StartOpacity = 0.25f;
-	footprint.Life = 30 * 20;
-	footprint.Active = true;
-
-	if (footprints.size() >= MAX_FOOTPRINTS)
-		footprints.pop_back();
-	footprints.push_front(footprint);
+		GetLaraJointPosition(&position, LM_RFOOT);
 
 	auto fx = sound_effects::SFX_TR4_LARA_FEET;
+	auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
+	auto floor = result.BottomBlock;
+
+	position.y = result.Position.Floor - 4;
 
 	switch (floor->Material)
 	{
@@ -211,10 +185,47 @@ void AddFootprint(ITEM_INFO* item)
 		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
 		break;
 	}
-
+	
 	// HACK: must be here until reference wad2 is revised
 	if (fx != sound_effects::SFX_TR4_LARA_FEET)
 		SoundEffect(fx, &item->pos, 0);
+
+	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
+
+	auto c = phd_cos(item->pos.yRot + ANGLE(180));
+	auto s = phd_sin(item->pos.yRot + ANGLE(180));
+	auto yRot = TO_RAD(item->pos.yRot);
+	auto xRot = plane.x * s + plane.y * c;
+	auto zRot = plane.y * s - plane.x * c;
+
+	FOOTPRINT_STRUCT footprint = {};
+	auto preciseFootPosition = Vector3();
+
+	footprint.Rotation = Vector3(xRot, yRot, zRot);
+	footprint.LifeStartFading = 30 * 10;
+	footprint.StartOpacity = 0.25f;
+	footprint.Life = 30 * 20;
+	footprint.Active = true;
+
+	if (CheckFootOnFloor(*item, LM_LFOOT, preciseFootPosition))
+	{
+		if (footprints.size() >= MAX_FOOTPRINTS)
+			footprints.pop_back();
+		
+		footprint.Position = preciseFootPosition;
+		footprint.RightFoot = false;
+		footprints.push_front(footprint);
+	}
+
+	if (CheckFootOnFloor(*item, LM_RFOOT, preciseFootPosition))
+	{
+		if (footprints.size() >= MAX_FOOTPRINTS)
+			footprints.pop_back();
+
+		footprint.Position = preciseFootPosition;
+		footprint.RightFoot = true;
+		footprints.push_front(footprint);
+	}
 }
 
 void ResetHair(ITEM_INFO* item)
