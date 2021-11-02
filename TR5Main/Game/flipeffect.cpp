@@ -132,7 +132,7 @@ void AddFootprint(ITEM_INFO* item, bool rightFoot)
 	auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
 	auto floor = result.BottomBlock;
 
-	if (floor->InsideBridge(position.x, position.z, result.Position.Floor + 1, false, false) >= 0)
+	if (result.Position.Bridge >= 0)
 		return;
 
 	switch (floor->Material)
