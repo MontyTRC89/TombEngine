@@ -29,20 +29,19 @@ namespace Footprints {
 			return false;
 		}
 
-		auto pos = PHD_VECTOR();
+		PHD_VECTOR pos;
+
+		pos.x = pos.z = 0;
 		pos.y = FOOT_HEIGHT_OFFSET;
 
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
 
-		bool result = abs(pos.y - height) < (STEP_SIZE / 8);
-		if (result)
-		{
-			outFootprintPosition.x = pos.x;
-			outFootprintPosition.y = height - 8; // Avoid Z-fighting
-			outFootprintPosition.z = pos.z;
-		}
-		return result;
+		outFootprintPosition.x = pos.x;
+		outFootprintPosition.y = height - 8;
+		outFootprintPosition.z = pos.z;
+
+		return abs(pos.y - height) < 32;
 	}
 
 	void UpdateFootprints()
