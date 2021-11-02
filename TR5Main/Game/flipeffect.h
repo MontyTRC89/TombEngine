@@ -7,11 +7,11 @@
 constexpr auto NUM_FLIPEFFECTS = 47;
 
 extern int FlipEffect;
-extern short FXType;
 
 extern std::function<EffectFunction> effect_routines[];
 
-void AddFootprint(ITEM_INFO* item);
+void AddLeftFootprint(ITEM_INFO* item);
+void AddRightFootprint(ITEM_INFO* item);
 void VoidEffect(ITEM_INFO* item);
 void FinishLevel(ITEM_INFO* item);
 void Turn180(ITEM_INFO* item);
@@ -41,4 +41,6 @@ void MeshSwapToPour(ITEM_INFO* item);
 void MeshSwapFromPour(ITEM_INFO* item); 
 void FlashOrange(ITEM_INFO* item);
 
+
+void AddFootprint(ITEM_INFO* item, bool rightFoot);
 void DoFlipEffect(int number, ITEM_INFO* item = NULL);

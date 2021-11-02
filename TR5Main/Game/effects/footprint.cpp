@@ -41,7 +41,7 @@ namespace Footprints {
 		outFootprintPosition.y = height - 8;
 		outFootprintPosition.z = pos.z;
 
-		return abs(pos.y - height) < 32;
+		return abs(pos.y - height) < 64;
 	}
 
 	void UpdateFootprints()

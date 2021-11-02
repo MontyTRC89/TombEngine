@@ -423,7 +423,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
 		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_LEFT;
 	}
 	else if (TrInput & IN_RSTEP)
@@ -431,7 +431,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
 		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
 
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope&& collCeilingResult.Position.Ceiling <= 0)
+		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
 			item->goalAnimState = LS_STEP_RIGHT;
 	}
 	else if (TrInput & IN_LEFT)
