@@ -147,6 +147,7 @@ void AnimateItem(ITEM_INFO* item)
 					break;
 				}
 
+				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
 				DoFlipEffect(effectID, item);
 
