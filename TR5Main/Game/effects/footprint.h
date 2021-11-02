@@ -24,6 +24,7 @@ namespace Footprints {
 	constexpr int FOOT_HEIGHT_OFFSET = 64;
 
 	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition);
+	void AddFootprint(ITEM_INFO* item, bool rightFoot);
 	void UpdateFootprints();
 
 }}}
