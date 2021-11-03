@@ -2716,7 +2716,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(ffpX, ffpZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
+			auto bridge = block->InsideBridge(ffpX, ffpZ, height, true, y == height);
 
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
