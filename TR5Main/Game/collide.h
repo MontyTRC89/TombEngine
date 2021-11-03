@@ -167,7 +167,6 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
-bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
