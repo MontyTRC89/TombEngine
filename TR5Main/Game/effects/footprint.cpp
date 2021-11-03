@@ -4,7 +4,6 @@
 #include "animation.h"
 #include "collide.h"
 #include "sound.h"
-#include "effects/groundfx.h"
 #include "effects/footprint.h"
 #include "level.h"
 #include "items.h"
@@ -23,10 +22,10 @@ namespace Footprints {
 		short roomNumber = item.roomNumber;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		if (!(floor->Material == GroundMaterial::Sand   ||
-			  floor->Material == GroundMaterial::Snow   ||
-			  floor->Material == GroundMaterial::Gravel ||
-			  floor->Material == GroundMaterial::Mud)) 
+		if (!(floor->Material == (int)GroundMaterial::Sand   ||
+			  floor->Material == (int)GroundMaterial::Snow   ||
+			  floor->Material == (int)GroundMaterial::Gravel ||
+			  floor->Material == (int)GroundMaterial::Mud)) 
 		{
 			return false;
 		}
@@ -58,7 +57,7 @@ namespace Footprints {
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
-		auto fx = sound_effects::SFX_TR4_LARA_FEET;
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
@@ -70,64 +69,64 @@ namespace Footprints {
 		switch (floor->Material)
 		{
 		case GroundMaterial::Concrete:
-			fx = sound_effects::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 			break;
 
 		case GroundMaterial::Grass:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
 			break;
 
 		case GroundMaterial::Gravel:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_GRAVEL;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_GRAVEL;
 			break;
 
 		case GroundMaterial::Ice:
-			fx = sound_effects::SFX_TR3_FOOTSTEPS_ICE;
+			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_ICE;
 			break;
 
 		case GroundMaterial::Marble:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_MARBLE;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MARBLE;
 			break;
 
 		case GroundMaterial::Metal:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
 			break;
 
 		case GroundMaterial::Mud:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_MUD;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MUD;
 			break;
 
 		case GroundMaterial::OldMetal:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
 			break;
 
 		case GroundMaterial::OldWood:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
 			break;
 
 		case GroundMaterial::Sand:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
 			break;
 
 		case GroundMaterial::Snow:
-			fx = sound_effects::SFX_TR3_FOOTSTEPS_SNOW;
+			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_SNOW;
 			break;
 
 		case GroundMaterial::Stone:
-			fx = sound_effects::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 			break;
 
 		case GroundMaterial::Water:
-			fx = sound_effects::SFX_TR4_LARA_WET_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 			break;
 
 		case GroundMaterial::Wood:
-			fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
+			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
 			break;
 		}
 
 		// HACK: must be here until reference wad2 is revised
-		if (fx != sound_effects::SFX_TR4_LARA_FEET)
+		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
 			SoundEffect(fx, &item->pos, 0);
 
 		// Calculate footprint tilts
