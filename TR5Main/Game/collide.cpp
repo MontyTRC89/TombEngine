@@ -2598,31 +2598,6 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 	return false;
 }
 
-bool SnapToQuadrant(short& angle, int interval)
-{
-	if (abs(angle) <= ANGLE(interval))
-	{
-		angle = 0;
-		return true;
-	}
-	else if (angle >= ANGLE(90 - interval) && angle <= ANGLE(interval + 90))
-	{
-		angle = ANGLE(90);
-		return true;
-	}
-	else if (angle >= ANGLE(180 - interval) || angle <= -ANGLE(180 - interval))
-	{
-		angle = ANGLE(180);
-		return true;
-	}
-	else if (angle >= -ANGLE(interval + 90) && angle <= -ANGLE(90 - interval))
-	{
-		angle = -ANGLE(90);
-		return true;
-	}
-	return false;
-}
-
 int GetQuadrant(short angle)
 {
 	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
