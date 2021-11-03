@@ -203,7 +203,7 @@ void TroopsControl(short itemNumber)
 
 		// Vehicle handling
 		if (Lara.Vehicle != NO_ITEM && info.bite)
-			creature->mood == ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 

@@ -98,8 +98,8 @@ void FireHarpoon()
 
 			AddActiveItem(itemNumber);
 
-			Savegame.Level.AmmoUsed++;
-			Savegame.Game.AmmoUsed++;
+			Statistics.Level.AmmoUsed++;
+			Statistics.Game.AmmoUsed++;
 		}
 	}
 }
@@ -370,8 +370,8 @@ void FireGrenade()
 
 			item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
 
-			Savegame.Level.AmmoUsed++;
-			Savegame.Game.AmmoUsed++;
+			Statistics.Level.AmmoUsed++;
+			Statistics.Game.AmmoUsed++;
 		}
 	}
 }
@@ -1126,7 +1126,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3)) 
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3)) 
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -1211,7 +1211,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_HK)// && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
@@ -1514,7 +1514,7 @@ void RifleHandler(int weaponType)
 	{
 		Lara.torsoXrot = Lara.leftArm.xRot;
 		Lara.torsoYrot = Lara.leftArm.yRot;
-		if (Camera.oldType != LOOK_CAMERA && !BinocularRange)
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
 		{
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
@@ -1631,8 +1631,8 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 			SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
 
-			Savegame.Level.AmmoUsed++;
-			Savegame.Game.AmmoUsed++;
+			Statistics.Level.AmmoUsed++;
+			Statistics.Game.AmmoUsed++;
 		}
 	}
 }
@@ -1728,8 +1728,8 @@ void FireRocket()
 
 			SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
 
-			Savegame.Level.AmmoUsed++;
-			Savegame.Game.AmmoUsed++;
+			Statistics.Level.AmmoUsed++;
+			Statistics.Game.AmmoUsed++;
 		}
 	}
 }
@@ -1751,10 +1751,10 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 					HitTarget(dest, 0, Weapons[weapon].explosiveDamage, 1);
 					if (dest != LaraItem)
 					{
-						Savegame.Game.AmmoHits++;
+						Statistics.Game.AmmoHits++;
 						if (dest->hitPoints <= 0)
 						{
-							Savegame.Level.Kills++;
+							Statistics.Level.Kills++;
 							CreatureDie((dest - g_Level.Items.data()), 1);
 						}
 					}
@@ -1786,7 +1786,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->dG = spark->sG >> 1;
 		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -128 * phd_sin(random << 4);
@@ -2001,7 +2001,7 @@ void FireShotgun()
 		SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 20971524);
 		SoundEffect(Weapons[WEAPON_SHOTGUN].sampleNum, &LaraItem->pos, 0);
 		
-		Savegame.Game.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 	}
 }
 

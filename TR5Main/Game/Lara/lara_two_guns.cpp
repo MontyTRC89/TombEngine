@@ -120,7 +120,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 					angleRight[0] = Lara.rightArm.yRot + LaraItem->pos.yRot;
 					angleRight[1] = Lara.rightArm.xRot;
 
-					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight))
+					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight) != FireWeaponType::FW_NOAMMO)
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = weaponType;
@@ -135,7 +135,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 						if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_UZI)
 							UziRight = true;
 
-						Savegame.Game.AmmoUsed++;
+						Statistics.Game.AmmoUsed++;
 					}
 				}
 
@@ -208,7 +208,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 				angleLeft[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
 				angleLeft[1] = Lara.leftArm.xRot;
 
-				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft))
+				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft) != FireWeaponType::FW_NOAMMO)
 				{
 					if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_REVOLVER)
 					{
@@ -233,7 +233,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 					if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_UZI)
 						UziLeft = true;
 
-					Savegame.Game.AmmoUsed++;
+					Statistics.Game.AmmoUsed++;
 				}
 
 				frameLeft = p->recoilAnim;
@@ -298,7 +298,7 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 		Lara.torsoYrot = Lara.leftArm.yRot / 2;
 		Lara.torsoXrot = Lara.leftArm.xRot / 2;
 
-		if (Camera.oldType != LOOK_CAMERA)
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
 		{
 			Lara.headYrot = Lara.torsoYrot;
 			Lara.headXrot = Lara.torsoXrot;
@@ -309,7 +309,7 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 		Lara.torsoYrot = Lara.rightArm.yRot / 2;
 		Lara.torsoXrot = Lara.rightArm.xRot / 2;
 
-		if (Camera.oldType != LOOK_CAMERA)
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
 		{
 			Lara.headYrot = Lara.torsoYrot;
 			Lara.headXrot = Lara.torsoXrot;
@@ -320,7 +320,7 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 		Lara.torsoYrot = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
 		Lara.torsoXrot = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
 
-		if (Camera.oldType != LOOK_CAMERA)
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
 		{
 			Lara.headYrot = Lara.torsoYrot;
 			Lara.headXrot = Lara.torsoXrot;

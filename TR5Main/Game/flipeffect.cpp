@@ -2,35 +2,27 @@
 #include "flipeffect.h"
 #include "Lara.h"
 #include "control/lot.h"
-#include "effects\hair.h"
-#include "animation.h"
-#include "sphere.h"
+#include "effects/hair.h"
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
 #include "collide.h"
-#include "savegame.h"
-#include "Sound\sound.h"
-#include "tr5_rats_emitter.h"
-#include "tr5_bats_emitter.h"
+#include "Sound/sound.h"
 #include "tr5_spider_emitter.h"
 #include "tr5_pushableblock.h"
 #include "pickup.h"
 #include "puzzles_keys.h"
 #include "lara_fire.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "effects\weather.h"
-#include "effects\footprint.h"
-#include "effects\groundfx.h"
-#include "effects\debris.h"
+#include "effects/tomb4fx.h"
+#include "effects/weather.h"
+#include "effects/footprint.h"
+#include "effects/debris.h"
 #include "items.h"
 
 using std::function;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
 
-short FXType;
 int FlipEffect;
 
 function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
@@ -67,8 +59,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	VoidEffect,					//29
 	LaraLocation,				//30
 	ClearSpidersPatch,			//31
-	AddFootprint,				//32
-	VoidEffect,					//33
+	AddLeftFootprint,			//32
+	AddRightFootprint,			//33
 	VoidEffect,					//34
 	VoidEffect,					//35
 	VoidEffect,					//36
@@ -102,133 +94,22 @@ void MeshSwapFromPour(ITEM_INFO* item)
 
 void Pickup(ITEM_INFO* item)
 {
-	do_pickup();
+	DoPickup();
 }
 
 void Puzzle(ITEM_INFO* item)
 {
-	do_puzzle();
+	DoPuzzle();
 }
 
-void AddFootprint(ITEM_INFO* item)
+void AddLeftFootprint(ITEM_INFO* item)
 {
-	if (item != LaraItem)
-		return;
+	AddFootprint(item, false);
+}
 
-	PHD_VECTOR position;
-	if (FXType == SFX_LANDONLY)
-		GetLaraJointPosition(&position, LM_LFOOT);
-	else
-		GetLaraJointPosition(&position, LM_RFOOT);
-
-	auto fx = sound_effects::SFX_TR4_LARA_FEET;
-	auto floor = GetCollisionResult(position.x, position.y, position.z, item->roomNumber).BottomBlock;
-
-	switch (floor->Material)
-	{
-	case GroundMaterial::Concrete:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
-		break;
-
-	case GroundMaterial::Grass:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
-		break;
-
-	case GroundMaterial::Gravel:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_GRAVEL;
-		break;
-
-	case GroundMaterial::Ice:
-		fx = sound_effects::SFX_TR3_FOOTSTEPS_ICE;
-		break;
-
-	case GroundMaterial::Marble:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_MARBLE;
-		break;
-
-	case GroundMaterial::Metal:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
-		break;
-
-	case GroundMaterial::Mud:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_MUD;
-		break;
-
-	case GroundMaterial::OldMetal:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_METAL;
-		break;
-
-	case GroundMaterial::OldWood:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
-		break;
-
-	case GroundMaterial::Sand:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
-		break;
-
-	case GroundMaterial::Snow:
-		fx = sound_effects::SFX_TR3_FOOTSTEPS_SNOW;
-		break;
-
-	case GroundMaterial::Stone:
-		fx = sound_effects::SFX_TR4_LARA_FEET;
-		break;
-
-	case GroundMaterial::Water:
-		fx = sound_effects::SFX_TR4_LARA_WET_FEET;
-		break;
-
-	case GroundMaterial::Wood:
-		fx = sound_effects::SFX_TR4_FOOTSTEPS_WOOD;
-		break;
-	}
-	
-	// HACK: must be here until reference wad2 is revised
-	if (fx != sound_effects::SFX_TR4_LARA_FEET)
-		SoundEffect(fx, &item->pos, 0);
-
-	FOOTPRINT_STRUCT footprint;
-
-	auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
-
-	auto x = Vector2(plane.x * WALL_SIZE, WALL_SIZE);
-	auto z = Vector2(WALL_SIZE, plane.y * WALL_SIZE);
-
-	auto xRot = FROM_RAD(atan2(0 - x.y, 0 - x.x));
-	auto yRot = item->pos.yRot;
-	auto zRot = FROM_RAD(atan2(0 - z.y, 0 - z.x));
-
-	auto footprintPosition = PHD_3DPOS(position.x, position.y, position.z, xRot, yRot, zRot);
-
-	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
-	{
-		if (footprints.size() >= MAX_FOOTPRINTS)
-			footprints.pop_back();
-		
-		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
-		footprint.pos = footprintPosition;
-		footprint.foot = 0;
-		footprint.lifeStartFading = 30 * 10;
-		footprint.startOpacity = 64;
-		footprint.life = 30 * 20;
-		footprint.active = true;
-		footprints.push_front(footprint);
-	}
-
-	if (CheckFootOnFloor(*item, LM_RFOOT, footprintPosition))
-	{
-		if (footprints.size() >= MAX_FOOTPRINTS)
-			footprints.pop_back();
-
-		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
-		footprint.pos = footprintPosition;
-		footprint.foot = 1;
-		footprint.lifeStartFading = 30*10;
-		footprint.startOpacity = 64;
-		footprint.life = 30 * 20;
-		footprint.active = true;
-		footprints.push_front(footprint);
-	}
+void AddRightFootprint(ITEM_INFO* item)
+{
+	AddFootprint(item, true);
 }
 
 void ResetHair(ITEM_INFO* item)

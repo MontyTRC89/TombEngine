@@ -187,7 +187,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -218,7 +218,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -452,7 +452,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		}
 		else
 		{
-			MessageBox(NULL, "ID_MERCENARY_AUTOPISTOLS1 not found !", NULL, MB_OK);
+			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -559,7 +559,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_DRAGON_BACK].loaded)
-			printf("FATAL: ID_DRAGON_BACK need ID_DRAGON_BACK !");
+			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK!", LogLevel::Error);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -579,7 +579,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			printf("FATAL: ID_DRAGON_BACK need ID_MARCO_BARTOLI !");
+			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI!", LogLevel::Error);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;

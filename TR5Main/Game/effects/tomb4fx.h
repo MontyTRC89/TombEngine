@@ -1,6 +1,8 @@
 #pragma once
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
+#include "effects/effects.h"
 #include "lara_struct.h"
+
 struct ITEM_INFO;
 
 struct SMOKE_SPARKS
@@ -30,7 +32,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	byte transType;
+	TransTypeEnum transType;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;

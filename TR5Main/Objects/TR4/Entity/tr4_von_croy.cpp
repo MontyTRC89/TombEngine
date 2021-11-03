@@ -289,7 +289,7 @@ void VonCroyControl(short itemNumber)
 	short rot = 0;
 	int dy, height, ceiling, flags;
 
-	printf("State: %d\n", item->currentAnimState);
+	TENLog("State:" + std::to_string(item->currentAnimState), LogLevel::Info);
 	
 	switch (item->currentAnimState)
 	{
@@ -643,10 +643,10 @@ void VonCroyControl(short itemNumber)
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 120)
 		{
 			TestTriggers(
-				creature->aiTarget.pos.xPos,
-				creature->aiTarget.pos.yPos,
-				creature->aiTarget.pos.zPos,
-				creature->aiTarget.roomNumber,
+				creature->aiTarget->pos.xPos,
+				creature->aiTarget->pos.yPos,
+				creature->aiTarget->pos.zPos,
+				creature->aiTarget->roomNumber,
 				true);
 
 			creature->reachedGoal = false;
@@ -766,10 +766,10 @@ void VonCroyControl(short itemNumber)
 		}
 
 		TestTriggers(
-			creature->aiTarget.pos.xPos,
-			creature->aiTarget.pos.yPos,
-			creature->aiTarget.pos.zPos,
-			creature->aiTarget.roomNumber,
+			creature->aiTarget->pos.xPos,
+			creature->aiTarget->pos.yPos,
+			creature->aiTarget->pos.zPos,
+			creature->aiTarget->roomNumber,
 			true);
 
 		creature->reachedGoal = false;

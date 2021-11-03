@@ -73,7 +73,9 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
 		{
-			item->goalAnimState = LS_MONKEYSWING_FORWARD;
+			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
+			if (monkeyFront)
+				item->goalAnimState = LS_MONKEYSWING_FORWARD;
 		}
 		else if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
 		{
@@ -216,8 +218,9 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 
 		GetCollisionInfo(coll, item);
 
-		if (coll->CollisionType == CT_FRONT
-			|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
+		bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
+
+		if (!monkeyFront || coll->CollisionType == CT_FRONT	|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		{
 			item->animNumber = LA_MONKEYSWING_IDLE;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -456,7 +459,10 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->CollisionType)
+	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
+		return 0;
+
+	if (coll->CollisionType == CT_NONE)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
@@ -494,7 +500,10 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		return 0;
 
-	if (!coll->CollisionType)
+	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
+		return 0;
+
+	if (coll->CollisionType == CT_NONE)
 		return 1;
 
 	oct = GetDirOctant(item->pos.yRot);
