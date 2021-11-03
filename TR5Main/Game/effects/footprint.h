@@ -7,11 +7,11 @@ namespace Effects {
 namespace Footprints {
 
 	constexpr size_t MAX_FOOTPRINTS = 20;
+	constexpr auto FOOTPRINT_SIZE = 64.0f;
 
 	struct FOOTPRINT_STRUCT 
 	{
-		Vector3 Position;
-		Vector3 Rotation;
+		Vector3 Position[4];
 		bool RightFoot;
 		int Life;
 		int LifeStartFading;
