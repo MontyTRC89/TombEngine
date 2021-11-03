@@ -610,22 +610,9 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-			{
-				Matrix rot = Matrix::CreateFromYawPitchRoll(footprint.Rotation.y, footprint.Rotation.x, footprint.Rotation.z);
-				Vector3 p1 = Vector3( 64, 0,  64);
-				Vector3 p2 = Vector3(-64, 0,  64);
-				Vector3 p3 = Vector3(-64, 0, -64);
-				Vector3 p4 = Vector3( 64, 0, -64);
-				p1 = XMVector3Transform(p1, rot);
-				p2 = XMVector3Transform(p2, rot);
-				p3 = XMVector3Transform(p3, rot);
-				p4 = XMVector3Transform(p4, rot);
-				p1 += Vector3(footprint.Position.x, footprint.Position.y, footprint.Position.z);
-				p2 += Vector3(footprint.Position.x, footprint.Position.y, footprint.Position.z);
-				p3 += Vector3(footprint.Position.x, footprint.Position.y, footprint.Position.z);
-				p4 += Vector3(footprint.Position.x, footprint.Position.y, footprint.Position.z);
-				addSprite3D(&m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.Opacity), 0, 1, {1,1}, BLENDMODE_SUBTRACTIVE, view);
-			}
+				addSprite3D(&m_sprites[spriteIndex], 
+					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
+					Vector4(footprint.Opacity), 0, 1, { 1,1 }, BLENDMODE_SUBTRACTIVE, view);
 		}
 	}
 

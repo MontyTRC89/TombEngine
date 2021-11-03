@@ -59,9 +59,11 @@ namespace Footprints {
 		auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
+		// Don't process material if foot has hit bridge object
 		if (result.Position.Bridge >= 0)
 			return;
 
+		// Choose material for footstep sound
 		switch (floor->Material)
 		{
 		case GroundMaterial::Concrete:
@@ -125,27 +127,59 @@ namespace Footprints {
 		if (fx != sound_effects::SFX_TR4_LARA_FEET)
 			SoundEffect(fx, &item->pos, 0);
 
+		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
-
 		auto c = phd_cos(item->pos.yRot + ANGLE(180));
 		auto s = phd_sin(item->pos.yRot + ANGLE(180));
 		auto yRot = TO_RAD(item->pos.yRot);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 
+		// Don't process actual footprint placement if foot isn't on floor
 		auto footPos = Vector3();
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
+		// Calculate footprint positions
+		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
+		auto p1 = Vector3(-FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
+		auto p2 = Vector3(-FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
+		auto p3 = Vector3( FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
+		auto rot = Matrix::CreateFromYawPitchRoll(yRot, xRot, zRot);
+		p0 = XMVector3Transform(p0, rot);
+		p1 = XMVector3Transform(p1, rot);
+		p2 = XMVector3Transform(p2, rot);
+		p3 = XMVector3Transform(p3, rot);
+		p0 += Vector3(footPos.x, footPos.y, footPos.z);
+		p1 += Vector3(footPos.x, footPos.y, footPos.z);
+		p2 += Vector3(footPos.x, footPos.y, footPos.z);
+		p3 += Vector3(footPos.x, footPos.y, footPos.z);
+
+		// Get blocks for every footprint corner
+		auto c1 = GetCollisionResult(p0.x, position.y - STEP_SIZE, p0.z, item->roomNumber);
+		auto c2 = GetCollisionResult(p1.x, position.y - STEP_SIZE, p1.z, item->roomNumber);
+		auto c3 = GetCollisionResult(p2.x, position.y - STEP_SIZE, p2.z, item->roomNumber);
+		auto c4 = GetCollisionResult(p3.x, position.y - STEP_SIZE, p3.z, item->roomNumber);
+
+		// Don't process actual footprint placement if all foot corners aren't on the same tilt level
+		if ((c1.TiltX != c2.TiltX) || (c2.TiltX != c3.TiltX) || (c3.TiltX != c4.TiltX))
+			return;
+		if ((c1.TiltZ != c2.TiltZ) || (c2.TiltZ != c3.TiltZ) || (c3.TiltZ != c4.TiltZ))
+			return;
+
+		// Construct footprint
 		FOOTPRINT_STRUCT footprint = {};
-		footprint.Position = footPos;
-		footprint.Rotation = Vector3(xRot, yRot, zRot);
+		footprint.Position[0] = p0;
+		footprint.Position[1] = p1;
+		footprint.Position[2] = p2;
+		footprint.Position[3] = p3;
 		footprint.LifeStartFading = 30 * 10;
 		footprint.StartOpacity = 0.25f;
 		footprint.Life = 30 * 20;
 		footprint.Active = true;
 		footprint.RightFoot = rightFoot;
 
+		// Add footprint
 		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
 		footprints.push_front(footprint);
