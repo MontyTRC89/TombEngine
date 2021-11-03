@@ -177,11 +177,7 @@ void ControlTeleporter(short itemNumber)
 
 	if (item->triggerFlags == 666)
 	{
-		if (item->itemFlags[0] == 15)
-		{
-			//PlaySoundTrack("xa12_z_10", SOUND_TRACK_ONESHOT);
-		}
-		else if (item->itemFlags[0] == 70)
+		if (item->itemFlags[0] == 70)
 		{
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);

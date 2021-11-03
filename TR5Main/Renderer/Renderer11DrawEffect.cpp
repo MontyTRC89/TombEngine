@@ -607,25 +607,12 @@ namespace TEN::Renderer
 		for (auto i = footprints.begin(); i != footprints.end(); i++) 
 		{
 			FOOTPRINT_STRUCT& footprint = *i;
-			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + footprint.foot;
+			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
-			if (footprint.active && g_Level.Sprites.size() > spriteIndex)
-			{
-				Matrix rot = Matrix::CreateRotationY(TO_RAD(footprint.pos.yRot) + PI);
-				Vector3 p1 = Vector3(-64, 0, -64);
-				Vector3 p2 = Vector3(64, 0, -64);
-				Vector3 p3 = Vector3(64, 0, 64);
-				Vector3 p4 = Vector3(-64, 0, 64);
-				p1 = XMVector3Transform(p1, rot);
-				p2 = XMVector3Transform(p2, rot);
-				p3 = XMVector3Transform(p3, rot);
-				p4 = XMVector3Transform(p4, rot);
-				p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-				p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-				p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-				p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-				addSprite3D(&m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, {1,1}, BLENDMODE_SUBTRACTIVE, view);
-			}
+			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
+				addSprite3D(&m_sprites[spriteIndex], 
+					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
+					Vector4(footprint.Opacity), 0, 1, { 1,1 }, BLENDMODE_SUBTRACTIVE, view);
 		}
 	}
 

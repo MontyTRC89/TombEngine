@@ -746,7 +746,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int grenade)
 	{
 		if (item->hitPoints > 0)
 		{
-			Savegame.Level.AmmoHits++;
+			Statistics.Level.AmmoHits++;
 
 			if (item->hitPoints >= damage)
 				item->hitPoints -= damage;
@@ -827,7 +827,7 @@ FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_I
 	}
 	else
 	{
-		Savegame.Game.AmmoHits++;
+		Statistics.Game.AmmoHits++;
 		destination = source + direction * bestDistance;
 
 		GAME_VECTOR vDest;

@@ -1,135 +1,132 @@
 #pragma once
+
 #include <bass.h>
 #include <bass_fx.h>
 #include "control/control.h"
 #include "sound_effects.h"
 
-enum SFX_TYPES
+constexpr auto SFX_ALWAYS                    = 2;
+constexpr auto SOUND_BASS_UNITS              = 1.0f / 1024.0f;	// TR->BASS distance unit coefficient
+constexpr auto SOUND_MAXVOL_RADIUS           = 1024.0f;		// Max. volume hearing distance
+constexpr auto SOUND_OMNIPRESENT_ORIGIN      = Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f);
+constexpr auto SOUND_MAX_SAMPLES             = 8192; // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
+constexpr auto SOUND_MAX_CHANNELS            = 32; // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
+constexpr auto SOUND_LEGACY_SOUNDMAP_SIZE    = 450;
+constexpr auto SOUND_NEW_SOUNDMAP_MAX_SIZE   = 4096;
+constexpr auto SOUND_LEGACY_TRACKTABLE_SIZE  = 136;
+constexpr auto SOUND_FLAG_NO_PAN             = (1<<12);	// Unused flag
+constexpr auto SOUND_FLAG_RND_PITCH          = (1<<13);
+constexpr auto SOUND_FLAG_RND_GAIN           = (1<<14);
+constexpr auto SOUND_MAX_PITCH_CHANGE        = 0.09f;
+constexpr auto SOUND_MAX_GAIN_CHANGE         = 0.0625f;
+constexpr auto SOUND_32BIT_SILENCE_LEVEL     = 4.9e-04f;
+constexpr auto SOUND_SAMPLE_FLAGS            = (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT);
+constexpr auto SOUND_XFADETIME_BGM           = 5000;
+constexpr auto SOUND_XFADETIME_BGM_START     = 1500;
+constexpr auto SOUND_XFADETIME_ONESHOT       = 200;
+constexpr auto SOUND_XFADETIME_CUTSOUND      = 100;
+constexpr auto SOUND_XFADETIME_HIJACKSOUND   = 50;
+constexpr auto SOUND_BGM_DAMP_COEFFICIENT    = 0.5f;
+
+enum class SOUNDTRACK_PLAYTYPE
 {
-	SFX_LANDANDWATER = 0,
-	SFX_LANDONLY = (1 << 14),
-	SFX_WATERONLY = (2 << 14)
+	OneShot,
+	BGM,
+	Count
 };
 
-#define SFX_ALWAYS 2
+enum class SOUND_PLAYCONDITION
+{
+	LandAndWater = 0,
+	Land  = (1 << 14),
+	Water = (2 << 14)
+};
 
-#define SOUND_BASS_UNITS			 1.0f / 1024.0f	// TR->BASS distance unit coefficient
-#define SOUND_MAXVOL_RADIUS			 1024.0f		// Max. volume hearing distance
-#define SOUND_OMNIPRESENT_ORIGIN     Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
-#define SOUND_MAX_SAMPLES			 8192 // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
-#define SOUND_MAX_CHANNELS			 32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
-#define SOUND_LEGACY_SOUNDMAP_SIZE	 450
-#define SOUND_NEW_SOUNDMAP_MAX_SIZE	 4096
-#define SOUND_LEGACY_TRACKTABLE_SIZE 136
-#define SOUND_FLAG_NO_PAN			 (1<<12)	// Unused flag
-#define SOUND_FLAG_RND_PITCH		 (1<<13)
-#define SOUND_FLAG_RND_GAIN			 (1<<14)
-#define SOUND_MAX_PITCH_CHANGE		 0.09f
-#define SOUND_MAX_GAIN_CHANGE		 0.0625f
-#define SOUND_32BIT_SILENCE_LEVEL	 4.9e-04f
-#define SOUND_SAMPLE_FLAGS			 (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT)
-#define SOUND_XFADETIME_BGM			 5000
-#define SOUND_XFADETIME_BGM_START	 1500
-#define SOUND_XFADETIME_ONESHOT		 200
-#define SOUND_XFADETIME_CUTSOUND	 100
-#define SOUND_XFADETIME_HIJACKSOUND	 50
-#define SOUND_BGM_DAMP_COEFFICIENT	 0.6f
+enum class SOUND_PLAYTYPE
+{
+	Normal,
+	Wait,
+	Restart,
+	Looped
+};
 
-#define TRACK_FOUND_SECRET			"073_Secret"
-#define TRACKS_PREFIX				"Audio\\%s.%s"
+enum class REVERB_TYPE
+{
+	Outside,  // 0x00   no reverberation
+	Small,	  // 0x01   little reverberation
+	Medium,   // 0x02
+	Large,	  // 0x03
+	Pipe,	  // 0x04   highest reverberation, almost never used
+	Count
+};
+
+enum class SOUND_STATE
+{
+	Idle,
+	Ending,
+	Ended
+};
+
+enum class SOUND_FILTER
+{
+	Reverb,
+	Compressor,
+	Lowpass,
+	Count
+};
 
 struct SoundEffectSlot
 {
-	short state;
-	short effectID;
-	float gain;
-	HCHANNEL channel;
-	Vector3 origin;
+	SOUND_STATE State;
+	short EffectID;
+	float Gain;
+	HCHANNEL Channel;
+	Vector3 Origin;
 };
 
 struct SoundTrackSlot
 {
-	HSTREAM channel;
-	std::string track;
+	HSTREAM Channel;
+	std::string Track;
 };
 
-enum sound_track_types
+struct SampleInfo
 {
-	SOUND_TRACK_ONESHOT,
-	SOUND_TRACK_BGM,
-
-	NUM_SOUND_TRACK_TYPES
+	short Number;
+	byte Volume;
+	byte Radius;
+	byte Randomness;
+	signed char Pitch;
+	short Flags;
 };
 
-enum sound_filters
-{
-	SOUND_FILTER_REVERB,
-	SOUND_FILTER_COMPRESSOR,
-	SOUND_FILTER_LOWPASS,
-
-	NUM_SOUND_FILTERS
-};
-
-enum sound_states
-{
-	SOUND_STATE_IDLE,
-	SOUND_STATE_ENDING,
-	SOUND_STATE_ENDED
-};
-
-enum sound_flags
-{ 
-	SOUND_NORMAL, 
-	SOUND_WAIT, 
-	SOUND_RESTART, 
-	SOUND_LOOPED 
-};
-
-enum reverb_type
-{
-	RVB_OUTSIDE,	   // 0x00   no reverberation
-	RVB_SMALL_ROOM,	   // 0x01   little reverberation
-	RVB_MEDIUM_ROOM,   // 0x02
-	RVB_LARGE_ROOM,	   // 0x03
-	RVB_PIPE,		   // 0x04   highest reverberation, almost never used
-
-	NUM_REVERB_TYPES
-};
-
-struct SAMPLE_INFO
-{
-	short number;
-	byte volume;
-	byte radius;
-	byte randomness;
-	signed char pitch;
-	short flags;
-};
-
-struct AudioTrack
+struct SoundTrackInfo
 {
 	std::string Name;
-	byte Mask;
-	bool looped;
+	SOUNDTRACK_PLAYTYPE Mode;
+	int Mask;
 };
 
-extern std::unordered_map<std::string, AudioTrack> SoundTracks;
-extern std::string CurrentLoopedSoundTrack;
+extern std::map<std::string, int> SoundTrackMap;
+extern std::vector<SoundTrackInfo> SoundTracks;
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
-bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
-void Sound_FreeSamples();
-void Sound_Stop();
+bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
+void FreeSamples();
+void StopAllSounds();
 
-void PlaySoundTrack(short track, short flags);
-void PlaySoundTrack(std::string trackName, unsigned int mode);
-void PlaySoundTrack(std::string trackName, DWORD mask, DWORD unknown);
-void PlaySoundTrack(int index, DWORD mask, DWORD unknown);
+void PlaySoundTrack(std::string trackName, SOUNDTRACK_PLAYTYPE mode, QWORD position = 0);
+void PlaySoundTrack(std::string trackName, short mask = 0);
+void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTracks();
+void ClearSoundTrackMasks();
+void PlaySecretTrack();
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
+
+std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 
