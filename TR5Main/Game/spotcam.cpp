@@ -39,7 +39,7 @@ int CameraFOV[MAX_CAMERA];
 int CameraSpeed[MAX_CAMERA];
 QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
-int Unk_0051D024;
+bool SpotCamFirstLook;
 short CurrentSplineCamera;
 int LastSpotCam;
 int LaraHealth;
@@ -369,7 +369,6 @@ void CalculateSpotCameras()
 	short spline_cnt; // $s3
 	int next_spline_camera; // $s0
 	int n; // $s5
-	static int bFirstLook; // offset 0x18 dword_A0AC4?
 	int dx; // $v1
 	int dy; // $s0
 	int dz; // $s1
@@ -498,7 +497,7 @@ void CalculateSpotCameras()
 
 	if (!(TrInput & IN_LOOK))
 	{
-		Unk_0051D024 = 0;
+		SpotCamFirstLook = false;
 	}
 
 	if (s->flags & SCF_DISABLE_BREAKOUT
@@ -561,7 +560,7 @@ void CalculateSpotCameras()
 		if (CheckTrigger)
 		{
 			CAMERA_TYPE oldType = Camera.type;
-			Camera.type = HEAVY_CAMERA;
+			Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
 			if (CurrentLevel != 0)
 			{
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -757,7 +756,7 @@ void CalculateSpotCameras()
 					if (CheckTrigger)
 					{
 						CAMERA_TYPE oldType = Camera.type;
-						Camera.type = HEAVY_CAMERA;
+						Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
 						if (CurrentLevel)
 						{
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -779,8 +778,8 @@ void CalculateSpotCameras()
 					UseSpotCam = 0;
 					Lara.uncontrollable = false;
 					CheckTrigger = 0;
-					Camera.oldType = FIXED_CAMERA;
-					Camera.type = CHASE_CAMERA;
+					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 					Camera.speed = 1;
 
 					if (s->flags & SCF_PAN_TO_LARA_CAM)
@@ -821,8 +820,8 @@ void CalculateSpotCameras()
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
 					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
-					Camera.oldType = FIXED_CAMERA;
-					Camera.type = CHASE_CAMERA;
+					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 					Camera.speed = 1;
 
 					int elevation = Camera.targetElevation;
@@ -880,10 +879,10 @@ void CalculateSpotCameras()
 	}
 	else if (s->flags & SCF_TRACKING_CAM)
 	{
-		if (!Unk_0051D024)
+		if (!SpotCamFirstLook)
 		{
-			Camera.oldType = FIXED_CAMERA;
-			Unk_0051D024 = true;
+			Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+			SpotCamFirstLook = true;
 		}
 
 		CalculateCamera();

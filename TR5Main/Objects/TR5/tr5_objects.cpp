@@ -36,7 +36,6 @@
 #include "tr5_bodypart.h"
 #include "tr5_teleporter.h"
 #include "tr5_highobject.h"
-#include "tr4_bubbles.h"
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
 /// traps
@@ -58,7 +57,6 @@
 #include "lara_flare.h"
 #include "lara_initialise.h"
 #include "pickup.h"
-#include "effects\flmtorch.h"
 #include "setup.h"
 #include "switch.h"
 #include "objects.h"
@@ -882,7 +880,6 @@ static void StartBaddy(OBJECT_INFO *obj)
 static void StartObject(OBJECT_INFO *obj)
 {
 	InitPickupItem(obj, FlareControl, ID_FLARE_ITEM);
-	InitPickupItem(obj, TorchControl, ID_BURNING_TORCH_ITEM, true);
 
 	for (int objNumber = ID_SEARCH_OBJECT1; objNumber <= ID_SEARCH_OBJECT4; objNumber++)
 		InitSearchObject(obj, objNumber);
@@ -1209,7 +1206,6 @@ static void StartShatter(OBJECT_INFO *obj)
 
 static void StartProjectiles(OBJECT_INFO *obj)
 {
-	InitProjectile(obj, TEN::entities::all::ControlEnemyMissile, ID_ENERGY_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);

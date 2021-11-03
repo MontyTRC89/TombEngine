@@ -40,23 +40,14 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
-
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 
-#include "Game/rope.h"
+#include "Objects/Generic/Object/rope.h"
 
-using namespace TEN::Game::Rope;
+using namespace TEN::Entities::Generic;
 using std::function;
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Control::Volumes;
-
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
@@ -430,7 +421,8 @@ void LaraControl(short itemNumber)
 
 	Lara.isDucked = false;
 
-	bool isWater = g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+	bool isWater = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+	bool isSwamp = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP;
 
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -461,7 +453,7 @@ void LaraControl(short itemNumber)
 					{
 						item->goalAnimState = LS_STOP;
 					}
-					else if (isWater & ENV_FLAG_SWAMP)
+					else if (isSwamp)
 					{
 						if (item->currentAnimState == LS_SWANDIVE_START 
 							|| item->currentAnimState == LS_SWANDIVE_END)			// Is Lara swan-diving?
@@ -473,7 +465,7 @@ void LaraControl(short itemNumber)
 						item->frameNumber = GF(LA_WADE, 0);
 					}
 				}
-				else if (!(isWater & ENV_FLAG_SWAMP))
+				else if (!isSwamp)
 				{
 					Lara.air = 1800;
 					Lara.waterStatus = LW_UNDERWATER;
@@ -691,7 +683,7 @@ void LaraControl(short itemNumber)
 			Camera.targetElevation = -ANGLE(22);
 			if (hfw >= WADE_DEPTH)
 			{
-				if (hfw > SWIM_DEPTH && !(isWater & ENV_FLAG_SWAMP))
+				if (hfw > SWIM_DEPTH && !isSwamp)
 				{
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - hfw;
@@ -832,7 +824,7 @@ void LaraControl(short itemNumber)
 		break;
 	}
 
-	Savegame.Game.Distance += sqrt(
+	Statistics.Game.Distance += sqrt(
 		SQUARE(item->pos.xPos - oldX) +
 		SQUARE(item->pos.yPos - oldY) +
 		SQUARE(item->pos.zPos - oldZ));
@@ -852,7 +844,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -976,7 +968,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1090,7 +1082,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.NoQuadrants = true;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
@@ -1257,9 +1249,9 @@ void AnimateLara(ITEM_INFO* item)
 				}
 
 				flags = cmd[1] & 0xC000;
-				if (flags == SFX_LANDANDWATER ||
-					(flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
-					(flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
+				if ( flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
+					(flags == (int)SOUND_PLAYCONDITION::Land && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
+					(flags == (int)SOUND_PLAYCONDITION::Water && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 				}
@@ -1274,7 +1266,6 @@ void AnimateLara(ITEM_INFO* item)
 					break;
 				}
 
-				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
 				DoFlipEffect(effectID, item);
 
@@ -1342,14 +1333,8 @@ void AnimateLara(ITEM_INFO* item)
 	if (Lara.ropePtr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
-	{
-		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle);
-		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle);
-
-		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
-		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
-	}
+	if (!Lara.isMoving)
+		MoveItem(item, Lara.moveAngle, item->speed, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

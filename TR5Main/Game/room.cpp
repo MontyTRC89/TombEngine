@@ -50,9 +50,7 @@ void DoFlipMap(short group)
 		}
 	}
 
-	int status = FlipStats[group] == 0;
-	FlipStats[group] = status;
-	FlipStatus = status;
+	FlipStatus = FlipStats[group] = !FlipStats[group];
 
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
@@ -83,12 +81,16 @@ void RemoveRoomFlipItems(ROOM_INFO* r)
 	{
 		ITEM_INFO* item = &g_Level.Items[linkNum];
 
-		if (item->flags & 0x100 && Objects[item->objectNumber].intelligent && item->hitPoints <= 0 && item->hitPoints != NOT_TARGETABLE)
+		if (item->flags & ONESHOT 
+			&& Objects[item->objectNumber].intelligent 
+			&& item->hitPoints <= 0 
+			&& item->hitPoints != NOT_TARGETABLE)
 		{
 			KillItem(linkNum);
 		}
 	}
 }
+
 int IsObjectInRoom(short roomNumber, short objectNumber)
 {
 	short itemNumber = g_Level.Rooms[roomNumber].itemNumber;

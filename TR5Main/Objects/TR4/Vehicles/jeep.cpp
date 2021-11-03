@@ -1,11 +1,7 @@
 #include "framework.h"
 #include "jeep.h"
 #include "lara.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "effects/effects.h"
 #include "collide.h"
 #include "lara_one_gun.h"
@@ -113,10 +109,6 @@ bool JeepNoGetOff;
 short Unk_0080DE1A;
 int Unk_0080DDE8;
 short Unk_0080DE24;
-
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
@@ -340,7 +332,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = COLADD;
+	spark->transType = TransTypeEnum::COLADD;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
@@ -417,7 +409,6 @@ static int JeepCheckGetOff()
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
-			CurrentLoopedSoundTrack = 110;
 			return false;
 		}
 	}
@@ -429,13 +420,7 @@ static int GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) && 
-#ifdef NEW_INV
-		GLOBAL_inventoryitemchosen != ID_PUZZLE_ITEM1
-#else
-		g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1
-#endif
-		)
+	if (!(TrInput & IN_ACTION) && g_Inventory.Get_inventoryItemChosen() != ID_PUZZLE_ITEM1)
 		return 0;
 
 	if (item->flags & 0x100)
@@ -472,32 +457,18 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen == ID_PUZZLE_ITEM1)
+			if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				GLOBAL_inventoryitemchosen = NO_ITEM;
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (have_i_got_object(ID_PUZZLE_ITEM1))
-					GLOBAL_enterinventory = ID_PUZZLE_ITEM1;
+				if (g_Inventory.have_i_got_object(ID_PUZZLE_ITEM1))
+					g_Inventory.Set_enterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}
-#else
-			if (g_Inventory.GetSelectedObject() == ID_PUZZLE_ITEM1)
-			{
-				g_Inventory.SetSelectedObject(NO_ITEM);
-				return 1;
-			}
-			else
-			{
-				if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory.SetEnterObject(ID_PUZZLE_ITEM1);
-				return 0;
-			}
-#endif
 		}
 		else
 			return 0;
@@ -507,32 +478,18 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen == ID_PUZZLE_ITEM1)
+			if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				GLOBAL_inventoryitemchosen = NO_ITEM;
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (have_i_got_object(ID_PUZZLE_ITEM1))
-					GLOBAL_enterinventory = ID_PUZZLE_ITEM1;
+				if (g_Inventory.have_i_got_object(ID_PUZZLE_ITEM1))
+					g_Inventory.Set_enterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}
-#else
-			if (g_Inventory.GetSelectedObject() == ID_PUZZLE_ITEM1)
-			{
-				g_Inventory.SetSelectedObject(NO_ITEM);
-				return 1;
-			}
-			else
-			{
-				if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory.SetEnterObject(ID_PUZZLE_ITEM1);
-				return 0;
-			}
-#endif
 		}
 		else
 			return 0;
@@ -1603,8 +1560,6 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			jeep->unknown2 = 0;
 
 			item->flags |= 0x20;
-
-			CurrentLoopedSoundTrack = 98;
 		}
 		else
 			ObjectCollision(itemNumber, l, coll);
