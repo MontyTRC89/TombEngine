@@ -156,15 +156,22 @@ namespace Footprints {
 		p3 += Vector3(footPos.x, footPos.y, footPos.z);
 
 		// Get blocks for every footprint corner
-		auto c1 = GetCollisionResult(p0.x, position.y - STEP_SIZE, p0.z, item->roomNumber);
-		auto c2 = GetCollisionResult(p1.x, position.y - STEP_SIZE, p1.z, item->roomNumber);
-		auto c3 = GetCollisionResult(p2.x, position.y - STEP_SIZE, p2.z, item->roomNumber);
-		auto c4 = GetCollisionResult(p3.x, position.y - STEP_SIZE, p3.z, item->roomNumber);
+		auto c0 = GetCollisionResult(p0.x, position.y - STEP_SIZE, p0.z, item->roomNumber);
+		auto c1 = GetCollisionResult(p1.x, position.y - STEP_SIZE, p1.z, item->roomNumber);
+		auto c2 = GetCollisionResult(p2.x, position.y - STEP_SIZE, p2.z, item->roomNumber);
+		auto c3 = GetCollisionResult(p3.x, position.y - STEP_SIZE, p3.z, item->roomNumber);
 
-		// Don't process actual footprint placement if all foot corners aren't on the same tilt level
-		if ((c1.TiltX != c2.TiltX) || (c2.TiltX != c3.TiltX) || (c3.TiltX != c4.TiltX))
+		// Don't process footprint placement if all foot corners aren't on the same tilt level
+		if ((c0.TiltX != c1.TiltX) || (c1.TiltX != c2.TiltX) || (c2.TiltX != c3.TiltX))
 			return;
-		if ((c1.TiltZ != c2.TiltZ) || (c2.TiltZ != c3.TiltZ) || (c3.TiltZ != c4.TiltZ))
+		if ((c0.TiltZ != c1.TiltZ) || (c1.TiltZ != c2.TiltZ) || (c2.TiltZ != c3.TiltZ))
+			return;
+
+		// Don't process footprint placement if all foot corners aren't on the same height
+		if ((abs(c0.Position.Floor - c1.Position.Floor) > STEP_SIZE / 2) ||
+			(abs(c1.Position.Floor - c2.Position.Floor) > STEP_SIZE / 2) ||
+			(abs(c2.Position.Floor - c3.Position.Floor) > STEP_SIZE / 2) ||
+			(abs(c3.Position.Floor - c0.Position.Floor) > STEP_SIZE / 2))
 			return;
 
 		// Construct footprint
