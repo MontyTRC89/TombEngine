@@ -28,11 +28,25 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
-enum SPLAT_COLL
+enum class COLL_PROBE_MODE
 {
-	SPLAT_NONE,
-	SPLAT_WALL,
-	SPLAT_STEP
+	QUADRANTS,
+	FREE_FORWARD,
+	FREE_FLAT
+};
+
+enum class SPLAT_COLL
+{
+	NONE,
+	WALL,
+	STEP
+};
+
+enum class CORNER_RESULT
+{
+	NONE,
+	INNER,
+	OUTER
 };
 
 struct COLL_POSITION
@@ -63,12 +77,13 @@ struct COLL_RESULT
 
 struct COLL_SETUP
 {
+	COLL_PROBE_MODE Mode;   // Probe rotation mode
+
 	bool SlopesAreWalls;    // Treat steep slopes as walls
 	bool SlopesArePits;     // Treat steep slopes as pits
 	bool DeathFlagIsPit;    // Treat death sectors as pits
 	bool EnableObjectPush;  // Can be pushed by objects
 	bool EnableSpaz;        // Push is treated as hurt
-	bool NoQuadrants;       // Use unconstrained probe rotation not bound to quadrants
 						    
 	int   Radius;           // Collision bounds horizontal size
 	int   Height;			// Collision bounds vertical size
@@ -106,8 +121,8 @@ struct COLL_INFO
 
 	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
 	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight(); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft(); }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90)); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
 struct OBJECT_COLLISION_BOUNDS
@@ -127,6 +142,10 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* 
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
+void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
+void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
@@ -151,7 +170,6 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
-Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);

@@ -41,6 +41,4 @@ void MeshSwapToPour(ITEM_INFO* item);
 void MeshSwapFromPour(ITEM_INFO* item); 
 void FlashOrange(ITEM_INFO* item);
 
-
-void AddFootprint(ITEM_INFO* item, bool rightFoot);
 void DoFlipEffect(int number, ITEM_INFO* item = NULL);

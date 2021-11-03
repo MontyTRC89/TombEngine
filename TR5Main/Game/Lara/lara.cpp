@@ -844,7 +844,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -968,7 +968,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1082,7 +1082,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	coll->Setup.NoQuadrants = true;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
@@ -1333,14 +1333,8 @@ void AnimateLara(ITEM_INFO* item)
 	if (Lara.ropePtr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
-	{
-		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle);
-		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle);
-
-		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90));
-		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90));
-	}
+	if (!Lara.isMoving)
+		MoveItem(item, Lara.moveAngle, item->speed, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);
