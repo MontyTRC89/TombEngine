@@ -6,20 +6,24 @@ struct ITEM_INFO;
 struct COLL_INFO;
 
 SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
-bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll);
+bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false, bool heightLimit = false);
+bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraKeepDucked(COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll);
 int  TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge);
-int  TestLaraHangLeftCorner(ITEM_INFO* item, COLL_INFO* coll);
-int  TestLaraHangRightCorner(ITEM_INFO* item, COLL_INFO* coll);
-int  TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
+CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
 bool TestHangSwingIn(ITEM_INFO* item, short angle);
 bool TestHangFeet(ITEM_INFO* item, short angle);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
+bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist);
+bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
 bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle);
 

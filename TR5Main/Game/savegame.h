@@ -7,9 +7,9 @@
 #include "GameFlowScript.h"
 #include "GameLogicScript.h"	
 
-#define SAVEGAME_BUFFER_SIZE 1048576
+constexpr auto SAVEGAME_MAX = 16;
 
-struct STATS
+struct Stats
 {
 	unsigned int Timer;
 	unsigned int Distance;
@@ -20,47 +20,30 @@ struct STATS
 	unsigned char HealthUsed;
 };
 
-struct SAVEGAME_INFO
+struct GameStats
 {
-	short Checksum;
-	unsigned short VolumeCD;
-	unsigned short VolumeFX;
-	short ScreenX;
-	short ScreenY;
-	unsigned char ControlOption;
-	bool VibrateOn;
-	bool AutoTarget;
-	STATS Level;
-	STATS Game;
-	short WeaponObject;
-	short WeaponAnim;
-	short WeaponFrame;
-	short WeaponCurrent;
-	short WeaponGoal;
-	unsigned int CutSceneTriggered1;
-	unsigned int CutSceneTriggered2;
-	byte GameComplete;
-	unsigned char LevelNumber;
-	unsigned char CampaignSecrets[4];
-	unsigned char TLCount;
+	Stats Game;
+	Stats Level;
 };
 
 struct SaveGameHeader
 {
-	std::string levelName;
-	int days;
-	int hours;
-	int minutes;
-	int seconds;
-	int level;
-	int timer;
-	int count;
-	bool present;
+	std::string LevelName;
+	int Days;
+	int Hours;
+	int Minutes;
+	int Seconds;
+	int Level;
+	int Timer;
+	int Count;
+	bool Present;
 };
 
-extern SAVEGAME_INFO Savegame;
+extern GameStats Statistics;
+extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
-class SaveGame {
+class SaveGame 
+{
 private:
 	static FileStream* m_stream;
 	static std::vector<LuaVariable> m_luaVariables;
@@ -72,3 +55,5 @@ public:
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
 };
+
+void LoadSavegameInfos();

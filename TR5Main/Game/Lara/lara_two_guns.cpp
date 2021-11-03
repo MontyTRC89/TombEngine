@@ -135,7 +135,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 						if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_UZI)
 							UziRight = true;
 
-						Savegame.Game.AmmoUsed++;
+						Statistics.Game.AmmoUsed++;
 					}
 				}
 
@@ -233,7 +233,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 					if (static_cast<LARA_WEAPON_TYPE>(weaponType) == LARA_WEAPON_TYPE::WEAPON_UZI)
 						UziLeft = true;
 
-					Savegame.Game.AmmoUsed++;
+					Statistics.Game.AmmoUsed++;
 				}
 
 				frameLeft = p->recoilAnim;

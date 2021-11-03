@@ -143,7 +143,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
 			{
-				Sound_Stop();
+				StopAllSounds();
 
 				g_Inventory.Set_invMode(IM_SAVE);
 
@@ -152,7 +152,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
 			{
-				Sound_Stop();
+				StopAllSounds();
 
 				g_Inventory.Set_invMode(IM_LOAD);
 
@@ -161,7 +161,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
 			{
-				Sound_Stop();
+				StopAllSounds();
 				g_Renderer.DumpGameScene();
 				g_Inventory.Set_invMode(IM_PAUSE);
 				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
@@ -170,7 +170,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
-				Sound_Stop();
+				StopAllSounds();
 
 				if (g_Inventory.S_CallInventory2(1))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
@@ -423,7 +423,7 @@ unsigned CALLBACK GameMain(void *)
 {
 	try 
 	{
-		logD("Starting GameMain...");
+		TENLog("Starting GameMain...", LogLevel::Info);
 
 		TimeInit();
 
@@ -456,8 +456,7 @@ unsigned CALLBACK GameMain(void *)
 
 GAME_STATUS DoTitle(int index)
 {
-	//DB_Log(2, "DoTitle - DLL");
-	printf("DoTitle\n");
+	TENLog("DoTitle", LogLevel::Info);
 
 	// Reset all the globals for the game which needs this
 	CleanUp();
@@ -473,7 +472,7 @@ GAME_STATUS DoTitle(int index)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		Sound_Stop();
+		StopAllSounds();
 
 		// Run the level script
 		GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -496,9 +495,7 @@ GAME_STATUS DoTitle(int index)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
+		Statistics.Level.Timer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -506,7 +503,7 @@ GAME_STATUS DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		PlaySoundTrack("083_horus", SOUND_TRACK_BGM);
+		PlaySoundTrack(83);
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -564,11 +561,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
-		Savegame.Level.Timer = 0;
-		Savegame.Level.Distance = 0;
-		Savegame.Level.AmmoUsed = 0;
-		Savegame.Level.AmmoHits = 0;
-		Savegame.Level.Kills = 0;
+		Statistics.Level.Timer = 0;
+		Statistics.Level.Distance = 0;
+		Statistics.Level.AmmoUsed = 0;
+		Statistics.Level.AmmoHits = 0;
+		Statistics.Level.Kills = 0;
 	}
 
 	// Reset all the globals for the game which needs this
@@ -581,7 +578,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	Sound_Stop();
+	StopAllSounds();
 
 	// Run the level script
 	GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -595,6 +592,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 		});
 	}
+
+	// Play default background music
+	PlaySoundTrack(ambient, SOUNDTRACK_PLAYTYPE::BGM);
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -625,9 +625,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
+		Statistics.Level.Timer = 0;
 	}
 
 	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
@@ -635,9 +633,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
-
-	// Play background music
-	PlaySoundTrack(ambient, SOUND_TRACK_BGM);
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -673,7 +668,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
-			Sound_Stop();
+			StopAllSounds();
 			StopSoundTracks();
 
 			return result;
@@ -980,4 +975,7 @@ void CleanUp()
 	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
+
+	// Clear soundtrack masks
+	ClearSoundTrackMasks();
 }

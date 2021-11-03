@@ -537,16 +537,13 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = -64;
 	coll->Setup.Height = height;
 	
-	COLL_INFO c1;
-	COLL_INFO c2;
-	memcpy(&c1, coll, sizeof(COLL_INFO));
-	memcpy(&c2, coll, sizeof(COLL_INFO));
-
 	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0));
-	
+
+	auto c1 = *coll;
 	c1.Setup.ForwardAngle += ANGLE(45);
 	GetCollisionInfo(&c1, item, PHD_VECTOR(0, height / 2, 0));
-	
+
+	auto c2 = *coll;
 	c2.Setup.ForwardAngle -= ANGLE(45);
 	GetCollisionInfo(&c2, item, PHD_VECTOR(0, height / 2, 0));
 	
