@@ -6,6 +6,6 @@ struct COLL_INFO;
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void PuzzleDone(ITEM_INFO* item, short itemNum);
-void do_puzzle();
+void DoPuzzle();
 /*keys*/
 void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

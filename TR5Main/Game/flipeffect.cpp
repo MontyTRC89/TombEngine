@@ -94,12 +94,12 @@ void MeshSwapFromPour(ITEM_INFO* item)
 
 void Pickup(ITEM_INFO* item)
 {
-	do_pickup();
+	DoPickup();
 }
 
 void Puzzle(ITEM_INFO* item)
 {
-	do_puzzle();
+	DoPuzzle();
 }
 
 void AddLeftFootprint(ITEM_INFO* item)
