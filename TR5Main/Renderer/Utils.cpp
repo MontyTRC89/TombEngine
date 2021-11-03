@@ -9,7 +9,8 @@ namespace TEN::Renderer::Utils {
 	using std::string;
 	using Microsoft::WRL::ComPtr;
 	using std::vector;
-	void Utils::throwIfFailed(const HRESULT& res) noexcept {
+	void Utils::throwIfFailed(const HRESULT& res) 
+	{
 		if(FAILED(res)){
 			std::string message = std::system_category().message(res);
 			TENLog(message, LogLevel::Error);
@@ -17,7 +18,8 @@ namespace TEN::Renderer::Utils {
 		}
 	}
 
-	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) {
+	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) 
+	{
 		ComPtr<ID3D10Blob> errors;
 		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(),errors.GetAddressOf()));
 		ComPtr<ID3D11VertexShader> shader;
@@ -29,6 +31,7 @@ namespace TEN::Renderer::Utils {
 		}
 		return shader;
 	}
+
 	ComPtr<ID3D11PixelShader> compilePixelShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ComPtr<ID3D10Blob>& bytecode) {
 		ComPtr<ID3D10Blob> errors;
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
