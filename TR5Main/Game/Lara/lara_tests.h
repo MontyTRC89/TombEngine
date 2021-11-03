@@ -5,6 +5,11 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 
+// -----------------------------
+// TEST FUNCTIONS
+// For State Control & Collision
+// -----------------------------
+
 SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);

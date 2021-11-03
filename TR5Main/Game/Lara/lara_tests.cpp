@@ -16,7 +16,10 @@
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-/*this file has all the generic test functions called in lara's state code*/
+// -----------------------------
+// TEST FUNCTIONS
+// For State Control & Collision
+// -----------------------------
 
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool heightLimit)
@@ -1248,6 +1251,21 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 }
 
+bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
+
+	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
+		probe.Position.Floor - y >= -(STEPUP_HEIGHT) &&
+		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 {
 	// TODO: Objects? Lara will attempt to jump against them.
@@ -1266,21 +1284,6 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	// TODO: Ceilings.
 	if (probeA.Position.Floor - y < -STEPUP_HEIGHT &&
 		probeB.Position.Floor - y < -STEPUP_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
-{
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
-
-	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
-		probe.Position.Floor - y >= -(STEPUP_HEIGHT) &&
-		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))
 	{
 		return true;
 	}
