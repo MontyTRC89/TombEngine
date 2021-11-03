@@ -14,6 +14,7 @@ void GameScriptRotation::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptRotation>("Rotation",
 		sol::constructors<GameScriptRotation(int, int, int)>(),
+		sol::meta_function::to_string, &GameScriptRotation::ToString,
 
 /// (int) rotation about x axis
 //@mem x
