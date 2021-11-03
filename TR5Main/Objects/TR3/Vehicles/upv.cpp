@@ -154,7 +154,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
 			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
-		Savegame.Game.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 
 		lr ^= 1;
 	}
@@ -179,7 +179,7 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = COLADD;
+	sptr->transType = TransTypeEnum::COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -439,7 +439,7 @@ static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.NoQuadrants = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	if ((v->pos.xRot >= -16384) && (v->pos.xRot <= 16384))
 		coll->Setup.ForwardAngle = Lara.moveAngle = v->pos.yRot;

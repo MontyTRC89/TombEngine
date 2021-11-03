@@ -3,11 +3,7 @@
 #include "Specific/phd_global.h"
 #include "lara.h"
 #include "animation.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "room.h"
 #include "effects/debris.h"
 #include "health.h"
@@ -16,7 +12,6 @@
 #include "lara_flare.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
-#include "effects/flmtorch.h"
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
@@ -28,76 +23,50 @@
 #include "pickup/pickup_weapon.h"
 #include "pickup/pickup_consumable.h"
 #include "pickup/pickup_misc_items.h"
+#include "Objects/Generic/Object/burning_torch.h"
+#include "Game/collide.h"
 
-OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
-{
-	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0x0000, 0x0000,
-	0x0000, 0x0000
-};
-static PHD_VECTOR PickUpPosition(0, 0, -100); // offset 0xA1350
-OBJECT_COLLISION_BOUNDS HiddenPickUpBounds = // offset 0xA135C
-{
-	0xFF00, 0x0100, 0xFF9C, 0x0064, 0xFCE0, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR HiddenPickUpPosition(0, 0, -690); // offset 0xA1374
-OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds = // offset 0xA1380
-{
-	0xFF00, 0x0100, 0xFF9C, 0x0064, 0x00C8, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215); // offset 0xA1398
-OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds = // offset 0xA13A4
-{
-	0xFE00, 0x0000, 0xFF9C, 0x0064, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240); // offset 0xA13BC
-OBJECT_COLLISION_BOUNDS PlinthPickUpBounds = // offset 0xA13C8
-{
-	0xFF00, 0x0100, 0xFD80, 0x0280, 0xFE01, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0x0000, 0x0000
-};
-static PHD_VECTOR PlinthPickUpPosition(0, 0, -460); // offset 0xA13E0
-OBJECT_COLLISION_BOUNDS PickUpBoundsUW = // offset 0xA13EC
-{
-	0xFE00, 0x0200, 0xFE00, 0x0200, 0xFE00, 0x0200, 0xE002, 0x1FFE, 0xE002, 0x1FFE,
-	0xE002, 0x1FFE
-};
-static PHD_VECTOR PickUpPositionUW(0, -200, -350); // offset 0xA1404
-OBJECT_COLLISION_BOUNDS SOBounds = // offset 0xA144C
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
-static PHD_VECTOR SOPos(0, 0, 0); // offset 0xA1464
-short SearchCollectFrames[4] =
-{
-	0x00B4, 0x0064, 0x0099, 0x0053
-};
-short SearchAnims[4] =
-{
-	0x01D0, 0x01D1, 0x01D2, 0x01D8
-};
-short SearchOffsets[4] =
-{
-	0x00A0, 0x0060, 0x00A0, 0x0070
-};
-OBJECT_COLLISION_BOUNDS MSBounds = // offset 0xA1488
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
-	0xF8E4, 0x071C
-};
+using namespace TEN::Entities::Generic;
+
+static PHD_VECTOR PickUpPosition(0, 0, -100);
+OBJECT_COLLISION_BOUNDS PickUpBounds = 
+{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), 0, 0, 0, 0 };
+
+static PHD_VECTOR HiddenPickUpPosition(0, 0, -690);
+OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
+{ -256, 256, -100, 100, -800, -256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215);
+OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
+{ -256, 256, -100, 100, 200, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240);
+OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
+{ -512, 0, -100, 100, 0, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR PlinthPickUpPosition(0, 0, -460);
+OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
+{ -256, 256, -640, 640, -511, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+
+static PHD_VECTOR PickUpPositionUW(0, -200, -350);
+OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
+{ -512, 512, -512, 512, -512, 512, ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45) };
+
+static PHD_VECTOR SOPos(0, 0, 0);
+OBJECT_COLLISION_BOUNDS SOBounds =
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+
+short SearchCollectFrames[4] = { 180, 100, 153, 83 };
+short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
+short SearchOffsets[4] = { 160, 96, 160, 112 };
+
+OBJECT_COLLISION_BOUNDS MSBounds =
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 int NumRPickups;
 short RPickups[16];
 short getThisItemPlease = NO_ITEM;
 PHD_VECTOR OldPickupPos;
-#ifndef NEW_INV
-extern Inventory g_Inventory;
-#endif
-
-
 
 void PickedUpObject(GAME_OBJECT_ID objID, int count)
 {
@@ -110,9 +79,6 @@ void PickedUpObject(GAME_OBJECT_ID objID, int count)
 	{
 		// item isn't any of the above; do nothing
 	}
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 }
 
 int GetInventoryCount(GAME_OBJECT_ID objID)
@@ -160,9 +126,6 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objID, int count)
 		{
 			// item isn't any of the above; do nothing
 		}
-#ifndef NEW_INV
-	g_Inventory.LoadObjects(false);
-#endif
 }
 
 void CollectCarriedItems(ITEM_INFO* item) 
@@ -180,7 +143,7 @@ void CollectCarriedItems(ITEM_INFO* item)
 	item->carriedItem = NO_ITEM;
 }
 
-void do_pickup()
+void DoPickup()
 {
 	if (getThisItemPlease == NO_ITEM)
 		return;
@@ -237,7 +200,7 @@ void do_pickup()
 	}
 	else
 	{
-		if (LaraItem->animNumber == LA_UNDERWATER_PICKUP)//dirty but what can I do, it uses the same state
+		if (LaraItem->animNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
 		{
 			AddDisplayPickup(item->objectNumber);
 			if (!(item->triggerFlags & 0xC0))
@@ -376,13 +339,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (
-#ifdef NEW_INV
-		GLOBAL_inventoryitemchosen == NO_ITEM
-#else
-		g_Inventory.GetSelectedObject() == NO_ITEM 
-#endif
-		|| triggerFlags != 2)
+	if (!(TrInput & IN_ACTION) && 
+		(g_Inventory.Get_inventoryItemChosen() == NO_ITEM || triggerFlags != 2)
 		|| BinocularRange
 		|| (l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || Lara.gunStatus)
 		&& (l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || Lara.gunStatus)
@@ -477,11 +435,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		if (!Lara.isMoving)
 		{
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen == NO_ITEM)
+			if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
 			{
-				if (have_i_got_object(ID_CROWBAR_ITEM))
-					GLOBAL_enterinventory = ID_CROWBAR_ITEM;
+				if (g_Inventory.have_i_got_object(ID_CROWBAR_ITEM))
+					g_Inventory.Set_enterInventory(ID_CROWBAR_ITEM);
 
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -489,7 +446,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if (GLOBAL_inventoryitemchosen != ID_CROWBAR_ITEM)
+			if (g_Inventory.Get_inventoryItemChosen() != ID_CROWBAR_ITEM)
 			{
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -497,28 +454,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			GLOBAL_inventoryitemchosen = -1;
-#else
-			if (g_Inventory.GetSelectedObject() == NO_ITEM)
-			{
-				if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
-					g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
-				item->pos.xRot = oldXrot;
-				item->pos.yRot = oldYrot;
-				item->pos.zRot = oldZrot;
-				return;
-			}
-
-			if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
-			{
-				item->pos.xRot = oldXrot;
-				item->pos.yRot = oldYrot;
-				item->pos.zRot = oldZrot;
-				return;
-			}
-
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 		}
 		if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
 		{
@@ -1104,11 +1040,7 @@ void SearchObjectControl(short itemNumber)
 int UseSpecialItem(ITEM_INFO* item)
 {
 	int flag = 0;
-#ifdef NEW_INV
-	int use = GLOBAL_inventoryitemchosen;
-#else
-	int use = g_Inventory.GetSelectedObject();
-#endif
+	int use = g_Inventory.Get_inventoryItemChosen();
 
 	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS && use != NO_ITEM)
 	{
@@ -1166,11 +1098,7 @@ int UseSpecialItem(ITEM_INFO* item)
 			item->currentAnimState = LS_MISC_CONTROL;
 			Lara.gunStatus = LG_HANDS_BUSY;
 
-#ifdef NEW_INV
-			GLOBAL_inventoryitemchosen = NO_ITEM;
-#else
-			g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+			g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 
 			return 1;
 		}

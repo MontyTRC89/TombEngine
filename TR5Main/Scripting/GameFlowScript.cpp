@@ -172,12 +172,14 @@ void GameFlow::SetGameFarView(byte val)
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
 {
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
+	SoundTracks.clear();
+
 	for (auto t : tracks) {
-		AudioTrack track;
+		SoundTrackInfo track;
 		track.Name = t.trackName;
 		track.Mask = 0;
-		track.looped = t.looped;
-		SoundTracks.insert_or_assign(track.Name, track);
+		track.Mode = t.looped ? SOUNDTRACK_PLAYTYPE::BGM : SOUNDTRACK_PLAYTYPE::OneShot;
+		SoundTracks.push_back(track);
 	}
 }
 
@@ -233,8 +235,6 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		CurrentLoopedSoundTrack = level->AmbientTrack;
-
 		GAME_STATUS status;
 
 		if (CurrentLevel == 0)
@@ -263,35 +263,32 @@ bool GameFlow::DoGameflow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, CurrentLoopedSoundTrack, loadFromSavegame);
+			status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
 			loadFromSavegame = false;
 		}
 
 		switch (status)
 		{
-		case GAME_STATUS_EXIT_GAME:
+		case GAME_STATUS::GAME_STATUS_EXIT_GAME:
 			return true;
-		case GAME_STATUS_EXIT_TO_TITLE:
+		case GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE:
 			CurrentLevel = 0;
 			break;
-		case GAME_STATUS_NEW_GAME:
+		case GAME_STATUS::GAME_STATUS_NEW_GAME:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
 			InitialiseGame = true;
 			break;
-		case GAME_STATUS_LOAD_GAME:
+		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
 			// Load the header of the savegame for getting the level to load
-			char fileName[255];
-			ZeroMemory(fileName, 255);
-			sprintf(fileName, "savegame.%d", SelectedSaveGame);
-			SaveGame::LoadHeader(fileName, &header);
+			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
 			// Load level
 			CurrentLevel = header.Level;
 			loadFromSavegame = true;
 
 			break;
-		case GAME_STATUS_LEVEL_COMPLETED:
+		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
 			if (LevelComplete == Levels.size())
 			{
 				// TODO: final credits

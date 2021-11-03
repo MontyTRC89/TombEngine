@@ -4,11 +4,6 @@
 #include "control/lot.h"
 #include "objects.h"
 #include "Lara.h"
-#ifdef NEW_INV
-#include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "animation.h"
 #include "sphere.h"
 #include "camera.h"

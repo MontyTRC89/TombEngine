@@ -17,8 +17,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 {
 	HRESULT res;
 
-	//DB_Log(2, "Renderer::Initialise - DLL");
-	logD("Initializing DX11");
+	TENLog("Initializing DX11...", LogLevel::Info);
 
 	CoInitialize(NULL);
 

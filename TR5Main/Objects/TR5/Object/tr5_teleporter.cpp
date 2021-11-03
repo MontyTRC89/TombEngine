@@ -144,7 +144,7 @@ void ControlTeleporter(short itemNumber)
 					v35->FadeToBlack = 4;
 					v35->Life = 24;
 					v35->sLife = 24;
-					v35->TransType = 2;
+					v35->TransType = TransTypeEnum::COLADD;
 					v35->x = src.xPos;
 					v35->y = src.yPos;
 					v35->z = src.zPos;
@@ -177,11 +177,7 @@ void ControlTeleporter(short itemNumber)
 
 	if (item->triggerFlags == 666)
 	{
-		if (item->itemFlags[0] == 15)
-		{
-			//PlaySoundTrack("xa12_z_10", SOUND_TRACK_ONESHOT);
-		}
-		else if (item->itemFlags[0] == 70)
+		if (item->itemFlags[0] == 70)
 		{
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);

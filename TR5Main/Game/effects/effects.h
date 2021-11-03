@@ -1,5 +1,6 @@
 #pragma once
 #include "Specific\phd_global.h"
+
 struct ITEM_INFO;
 struct COLL_INFO;
 
@@ -32,7 +33,7 @@ enum SpriteEnumFlag
 	SP_PLASMAEXP = 0x2000
 };
 
-enum TransTypeEnum
+enum class TransTypeEnum
 {
 	NOTRANS,
 	SEMITRANS,

@@ -1,6 +1,6 @@
 #pragma once
 
-enum sound_effects
+enum SOUND_EFFECTS
 {
 	SFX_TR4_LARA_FEET = 0,
 	SFX_TR4_LARA_CLIMB2 = 1,

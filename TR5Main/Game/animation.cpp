@@ -8,6 +8,7 @@
 #include "Sound/sound.h"
 #include "flipeffect.h"
 #include "items.h"
+#include "collide.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -121,12 +122,12 @@ void AnimateItem(ITEM_INFO* item)
 					}
 					else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 					{
-						if (!flags || flags == SFX_WATERONLY && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
+						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
 						{
 							SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 						}
 					}
-					else if (!flags || flags == SFX_LANDONLY && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 					{
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 					}
@@ -147,7 +148,6 @@ void AnimateItem(ITEM_INFO* item)
 					break;
 				}
 
-				FXType = cmd[1] & 0xC000;
 				effectID = cmd[1] & 0x3FFF;
 				DoFlipEffect(effectID, item);
 
@@ -181,11 +181,7 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
-	item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
-
-	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90));
-	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90));
+	MoveItem(item, item->pos.yRot, item->speed, lateral);
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();
@@ -322,6 +318,15 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
 	{
 		pos->yRot += rot;
 	}
+}
+
+bool TestLastFrame(ITEM_INFO* item, short animNumber)
+{
+	if ((animNumber >= 0) && (item->animNumber != animNumber))
+		return false;
+
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	return (item->frameNumber >= anim->frameEnd);
 }
 
 short GF(short animIndex, short frameToStart)

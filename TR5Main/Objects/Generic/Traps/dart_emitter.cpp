@@ -168,7 +168,7 @@ namespace TEN::Entities::Traps
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 4;
 
-		spark->transType = COLADD;
+		spark->transType = TransTypeEnum::COLADD;
 
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	

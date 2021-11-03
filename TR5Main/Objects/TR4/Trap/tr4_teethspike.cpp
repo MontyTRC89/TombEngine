@@ -40,14 +40,14 @@ namespace TEN::Entities::TR4
 
 		short rotations[8] =
 		{
-			0x8000,
-			0xa000,
-			0xc000,
-			0xe000,
-			0,
-			0x2000,
-			0x4000,
-			0x6000
+			ANGLE(180),
+			ANGLE(225),
+			ANGLE(270),
+			ANGLE(315),
+			ANGLE(0),
+			ANGLE(45),
+			ANGLE(90),
+			ANGLE(135)
 		};
 
 		if (item->triggerFlags & 8)

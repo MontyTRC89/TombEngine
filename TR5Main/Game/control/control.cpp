@@ -9,11 +9,7 @@
 #include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
-#ifdef NEW_INV
 #include "newinv2.h"
-#else
-#include "inventory.h"
-#endif
 #include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
@@ -79,7 +75,7 @@ int LevelComplete;
 
 bool  InItemControlLoop;
 short ItemNewRoomNo;
-short ItemNewRooms[512];
+short ItemNewRooms[MAX_ROOMS];
 short NextItemActive;
 short NextItemFree;
 short NextFxActive;
@@ -90,11 +86,6 @@ int LaraDrawType;
 
 int WeaponDelay;
 int WeaponEnemyTimer;
-
-#ifndef NEW_INV
-int LastInventoryItem;
-extern Inventory g_Inventory;
-#endif
 
 int DrawPhase()
 {
@@ -134,7 +125,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (S_UpdateInput() == -1)
-				return GAME_STATUS_NONE;
+				return GAME_STATUS::GAME_STATUS_NONE;
 		}
 
 		// Has Lara control been disabled?
@@ -148,79 +139,65 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
-#ifdef NEW_INV
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_PAUSE && GLOBAL_invMode != IM_PAUSE && LaraItem->hitPoints > 0)
+			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
 			{
-				Sound_Stop();
-				g_Renderer.DumpGameScene();
-				GLOBAL_invMode = IM_PAUSE;
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
+				StopAllSounds();
+
+				g_Inventory.Set_invMode(IM_SAVE);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if ((DbInput & IN_DESELECT || GLOBAL_enterinventory != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
+			{
+				StopAllSounds();
+
+				g_Inventory.Set_invMode(IM_LOAD);
+
+				if (g_Inventory.S_CallInventory2(0))
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+			}
+			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
+			{
+				StopAllSounds();
+				g_Renderer.DumpGameScene();
+				g_Inventory.Set_invMode(IM_PAUSE);
+				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
+				g_Inventory.Set_pause_selected_option(0);
+			}
+			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
-				Sound_Stop();
+				StopAllSounds();
 
-				if (S_CallInventory2())
-					return GAME_STATUS_LOAD_GAME;
+				if (g_Inventory.S_CallInventory2(1))
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 		}
 
-		while (GLOBAL_invMode == IM_PAUSE)
+		while (g_Inventory.Get_invMode() == IM_PAUSE)
 		{
-			DrawInv();
+			g_Inventory.DrawInv();
 			g_Renderer.SyncRenderer();
 
-			int z = DoPauseMenu();
+			int z = g_Inventory.DoPauseMenu();
 
 			if (z == INV_RESULT_EXIT_TO_TILE)
-				return GAME_STATUS_EXIT_TO_TITLE;
+				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
-#else
-		if (CurrentLevel != 0 && !g_Renderer.isFading())
-		{
-			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && LaraItem->hitPoints > 0)
-			{
-				// Stop all sounds
-				Sound_Stop();
-				int inventoryResult = g_Inventory.DoInventory();
-				switch (inventoryResult)
-				{
-				case INV_RESULT_LOAD_GAME:
-					return GAME_STATUS_LOAD_GAME;
-				case INV_RESULT_EXIT_TO_TILE:
-					return GAME_STATUS_EXIT_TO_TITLE;
-				}
-			}
-		}
-#endif
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
-			return GAME_STATUS_LEVEL_COMPLETED;
+			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
 
 		int oldInput = TrInput;
 
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-#ifdef NEW_INV
-			return GAME_STATUS_EXIT_TO_TITLE;//maybe do game over menu like some PSX versions have??
-#else
-			int inventoryResult = g_Inventory.DoInventory();
-			switch (inventoryResult)
-			{
-			case INV_RESULT_NEW_GAME:
-				return GAME_STATUS_NEW_GAME;
-			case INV_RESULT_LOAD_GAME:
-				return GAME_STATUS_LOAD_GAME;
-			case INV_RESULT_EXIT_TO_TILE:
-				return GAME_STATUS_EXIT_TO_TITLE;
-			}
-#endif
+			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
 		}
 
 		if (demoMode && TrInput == -1)
@@ -362,13 +339,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
-#ifdef NEW_INV
-			if (GLOBAL_inventoryitemchosen != -1)
+			if (g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
 			{
 				SayNo();
-				GLOBAL_inventoryitemchosen = -1;
+				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
 			}
-#endif
+
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
 			if (level->LaraType == LARA_TYPE::YOUNG)
@@ -440,14 +416,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
-	return GAME_STATUS_NONE;
+	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
 unsigned CALLBACK GameMain(void *)
 {
 	try 
 	{
-		logD("Starting GameMain...");
+		TENLog("Starting GameMain...", LogLevel::Info);
 
 		TimeInit();
 
@@ -480,8 +456,7 @@ unsigned CALLBACK GameMain(void *)
 
 GAME_STATUS DoTitle(int index)
 {
-	//DB_Log(2, "DoTitle - DLL");
-	printf("DoTitle\n");
+	TENLog("DoTitle", LogLevel::Info);
 
 	// Reset all the globals for the game which needs this
 	CleanUp();
@@ -497,7 +472,7 @@ GAME_STATUS DoTitle(int index)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		Sound_Stop();
+		StopAllSounds();
 
 		// Run the level script
 		GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -520,12 +495,7 @@ GAME_STATUS DoTitle(int index)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
-#ifndef NEW_INV
-		LastInventoryItem = -1;
-#endif
+		Statistics.Level.Timer = 0;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -533,7 +503,7 @@ GAME_STATUS DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		PlaySoundTrack("083_horus", SOUND_TRACK_BGM);
+		PlaySoundTrack(83);
 
 		// Initialise ponytails
 		InitialiseHair();
@@ -543,7 +513,7 @@ GAME_STATUS DoTitle(int index)
 		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
-#ifdef NEW_INV
+
 		int status = 0, frames;
 		while (!status)
 		{
@@ -553,7 +523,7 @@ GAME_STATUS DoTitle(int index)
 			S_UpdateInput();
 			SetDebounce = false;
 
-			status = TitleOptions();
+			status = g_Inventory.TitleOptions();
 
 			if (status)
 				break;
@@ -564,18 +534,9 @@ GAME_STATUS DoTitle(int index)
 		}
 
 		inventoryResult = status;
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
 	}
 	else
-	{
-#ifdef NEW_INV
-		inventoryResult = TitleOptions();
-#else
-		inventoryResult = g_Inventory.DoTitleInventory();
-#endif
-	}
+		inventoryResult = g_Inventory.TitleOptions();
 
 	StopSoundTracks();
 
@@ -585,14 +546,14 @@ GAME_STATUS DoTitle(int index)
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
-		return GAME_STATUS_NEW_GAME;
+		return GAME_STATUS::GAME_STATUS_NEW_GAME;
 	case INV_RESULT_LOAD_GAME:
-		return GAME_STATUS_LOAD_GAME;
+		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 	case INV_RESULT_EXIT_GAME:
-		return GAME_STATUS_EXIT_GAME;
+		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
-	return GAME_STATUS_NEW_GAME;
+	return GAME_STATUS::GAME_STATUS_NEW_GAME;
 }
 
 GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
@@ -600,11 +561,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
-		Savegame.Level.Timer = 0;
-		Savegame.Level.Distance = 0;
-		Savegame.Level.AmmoUsed = 0;
-		Savegame.Level.AmmoHits = 0;
-		Savegame.Level.Kills = 0;
+		Statistics.Level.Timer = 0;
+		Statistics.Level.Distance = 0;
+		Statistics.Level.AmmoUsed = 0;
+		Statistics.Level.AmmoHits = 0;
+		Statistics.Level.Kills = 0;
 	}
 
 	// Reset all the globals for the game which needs this
@@ -617,7 +578,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	Sound_Stop();
+	StopAllSounds();
 
 	// Run the level script
 	GameScriptLevel* level = g_GameFlow->Levels[index];
@@ -632,13 +593,13 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		});
 	}
 
+	// Play default background music
+	PlaySoundTrack(ambient, SOUNDTRACK_PLAYTYPE::BGM);
+
 	// Restore the game?
 	if (loadFromSavegame)
 	{
-		char fileName[255];
-		ZeroMemory(fileName, 255);
-		sprintf(fileName, "savegame.%d", g_GameFlow->SelectedSaveGame);
-		SaveGame::Load(fileName);
+		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
 		Camera.pos.x = LaraItem->pos.xPos + 256;
 		Camera.pos.y = LaraItem->pos.yPos + 256;
@@ -664,27 +625,14 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 			InitialiseGame = false;
 		}
 
-		Savegame.Level.Timer = 0;
-		if (CurrentLevel == 1)
-			Savegame.TLCount = 0;
+		Statistics.Level.Timer = 0;
 	}
-#ifndef NEW_INV
-	LastInventoryItem = -1;
-#endif
 
-#ifdef NEW_INV
-	GLOBAL_inventoryitemchosen = NO_ITEM;
-	GLOBAL_enterinventory = NO_ITEM;
-#else
-	g_Inventory.SetEnterObject(NO_ITEM);
-	g_Inventory.SetSelectedObject(NO_ITEM);
-#endif
+	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+	g_Inventory.Set_enterInventory(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
-
-	// Play background music
-	PlaySoundTrack(ambient, SOUND_TRACK_BGM);
 
 	// Initialise ponytails
 	InitialiseHair();
@@ -713,14 +661,14 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		nframes = DrawPhase();
 		Sound_UpdateScene();
 
-		if (result == GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
+			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
+			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
 			// Here is the only way for exiting from the loop
-			Sound_Stop();
+			StopAllSounds();
 			StopSoundTracks();
 
 			return result;
@@ -1027,4 +975,7 @@ void CleanUp()
 	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
+
+	// Clear soundtrack masks
+	ClearSoundTrackMasks();
 }
