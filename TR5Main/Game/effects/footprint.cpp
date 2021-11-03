@@ -52,11 +52,14 @@ namespace Footprints {
 			return;
 
 		auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
-		PHD_VECTOR position;
-		GetLaraJointPosition(&position, foot);
+
+		// Don't process actual footprint placement if foot isn't on floor
+		auto footPos = Vector3();
+		if (!CheckFootOnFloor(*item, foot, footPos))
+			return;
 
 		auto fx = sound_effects::SFX_TR4_LARA_FEET;
-		auto result = GetCollisionResult(position.x, position.y - STEP_SIZE, position.z, item->roomNumber);
+		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
 		// Don't process material if foot has hit bridge object
@@ -128,17 +131,12 @@ namespace Footprints {
 			SoundEffect(fx, &item->pos, 0);
 
 		// Calculate footprint tilts
-		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(position.x, position.z)];
+		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
 		auto c = phd_cos(item->pos.yRot + ANGLE(180));
 		auto s = phd_sin(item->pos.yRot + ANGLE(180));
 		auto yRot = TO_RAD(item->pos.yRot);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
-
-		// Don't process actual footprint placement if foot isn't on floor
-		auto footPos = Vector3();
-		if (!CheckFootOnFloor(*item, foot, footPos))
-			return;
 
 		// Calculate footprint positions
 		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
@@ -156,10 +154,10 @@ namespace Footprints {
 		p3 += Vector3(footPos.x, footPos.y, footPos.z);
 
 		// Get blocks for every footprint corner
-		auto c0 = GetCollisionResult(p0.x, position.y - STEP_SIZE, p0.z, item->roomNumber);
-		auto c1 = GetCollisionResult(p1.x, position.y - STEP_SIZE, p1.z, item->roomNumber);
-		auto c2 = GetCollisionResult(p2.x, position.y - STEP_SIZE, p2.z, item->roomNumber);
-		auto c3 = GetCollisionResult(p3.x, position.y - STEP_SIZE, p3.z, item->roomNumber);
+		auto c0 = GetCollisionResult(p0.x, footPos.y - STEP_SIZE, p0.z, item->roomNumber);
+		auto c1 = GetCollisionResult(p1.x, footPos.y - STEP_SIZE, p1.z, item->roomNumber);
+		auto c2 = GetCollisionResult(p2.x, footPos.y - STEP_SIZE, p2.z, item->roomNumber);
+		auto c3 = GetCollisionResult(p3.x, footPos.y - STEP_SIZE, p3.z, item->roomNumber);
 
 		// Don't process footprint placement if all foot corners aren't on the same tilt level
 		if ((c0.TiltX != c1.TiltX) || (c1.TiltX != c2.TiltX) || (c2.TiltX != c3.TiltX))
