@@ -193,7 +193,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
 	item->status = ITEM_ACTIVE;
 }
 
-void do_puzzle()
+void DoPuzzle()
 {
 	puzzleItem = Lara.interactedItem;
 	ITEM_INFO* item = &g_Level.Items[puzzleItem];
