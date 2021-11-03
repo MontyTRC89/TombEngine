@@ -118,6 +118,12 @@ namespace Footprints {
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
 			SoundEffect(fx, &item->pos, 0);
 
+		if (floor->Material != (int)GroundMaterial::Sand &&
+			floor->Material != (int)GroundMaterial::Snow &&
+			floor->Material != (int)GroundMaterial::Gravel &&
+			floor->Material != (int)GroundMaterial::Mud)
+			return;
+
 		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
 		auto c = phd_cos(item->pos.yRot + ANGLE(180));
