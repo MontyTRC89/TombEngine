@@ -21,19 +21,8 @@ namespace Footprints {
 		int z = item.pos.zPos;
 		short roomNumber = item.roomNumber;
 
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		if (!(floor->Material == (int)GroundMaterial::Sand   ||
-			  floor->Material == (int)GroundMaterial::Snow   ||
-			  floor->Material == (int)GroundMaterial::Gravel ||
-			  floor->Material == (int)GroundMaterial::Mud)) 
-		{
-			return false;
-		}
-
-		PHD_VECTOR pos;
-
-		pos.x = pos.z = 0;
-		pos.y = FOOT_HEIGHT_OFFSET;
+		auto floor = GetFloor(x, y, z, &roomNumber);
+		auto pos = PHD_VECTOR(0, FOOT_HEIGHT_OFFSET, 0);
 
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
@@ -57,7 +46,6 @@ namespace Footprints {
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
-		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
@@ -65,6 +53,7 @@ namespace Footprints {
 		if (result.Position.Bridge >= 0)
 			return;
 
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 		// Choose material for footstep sound
 		switch (floor->Material)
 		{
