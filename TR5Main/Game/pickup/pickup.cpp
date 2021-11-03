@@ -143,7 +143,7 @@ void CollectCarriedItems(ITEM_INFO* item)
 	item->carriedItem = NO_ITEM;
 }
 
-void do_pickup()
+void DoPickup()
 {
 	if (getThisItemPlease == NO_ITEM)
 		return;
@@ -200,7 +200,7 @@ void do_pickup()
 	}
 	else
 	{
-		if (LaraItem->animNumber == LA_UNDERWATER_PICKUP)//dirty but what can I do, it uses the same state
+		if (LaraItem->animNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
 		{
 			AddDisplayPickup(item->objectNumber);
 			if (!(item->triggerFlags & 0xC0))

@@ -547,19 +547,19 @@ namespace TEN::Renderer
                 y = 44;
                 LoadSavegameInfos();
 
-                for (int n = 1; n < MAX_SAVEGAMES + 1; n++)
+                for (int n = 1; n < SAVEGAME_MAX + 1; n++)
                 {
-                    if (!g_NewSavegameInfos[n - 1].present)
+                    if (!SavegameInfos[n - 1].Present)
                         drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK : 0));
                     else
                     {
-                        sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n-1].count);
+                        sprintf(stringBuffer, "%05d", SavegameInfos[n-1].Count);
                         drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                        drawString(250, y, (char*)g_NewSavegameInfos[n-1].levelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                        drawString(250, y, (char*)SavegameInfos[n-1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                        sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n-1].days, g_NewSavegameInfos[n-1].hours, g_NewSavegameInfos[n-1].minutes, g_NewSavegameInfos[n-1].seconds);
+                        sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), SavegameInfos[n-1].Days, SavegameInfos[n-1].Hours, SavegameInfos[n-1].Minutes, SavegameInfos[n-1].Seconds);
                         drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                             PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK : 0));
                     }
@@ -1008,21 +1008,21 @@ namespace TEN::Renderer
         else
             drawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-        for (int n = 1; n < MAX_SAVEGAMES + 1; n++)
+        for (int n = 1; n < SAVEGAME_MAX + 1; n++)
         {
             int n2 = n - 1;
 
-            if (!g_NewSavegameInfos[n - 1].present)
+            if (!SavegameInfos[n - 1].Present)
                 drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
             else
             {
-                sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n - 1].count);
+                sprintf(stringBuffer, "%05d", SavegameInfos[n - 1].Count);
                 drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                drawString(250, y, (char*)g_NewSavegameInfos[n - 1].levelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                drawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), g_NewSavegameInfos[n - 1].days, g_NewSavegameInfos[n - 1].hours, g_NewSavegameInfos[n - 1].minutes, g_NewSavegameInfos[n - 1].seconds);
+                sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), SavegameInfos[n - 1].Days, SavegameInfos[n - 1].Hours, SavegameInfos[n - 1].Minutes, SavegameInfos[n - 1].Seconds);
                 drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
             }
@@ -1073,13 +1073,13 @@ namespace TEN::Renderer
 
         sprintf(buffer, "%02d:%02d:%02d", (Days * 24) + Hours, Min, Sec);
         drawString(500, ypos + 3 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%dm", Savegame.Game.Distance / 419);
+        sprintf(buffer, "%dm", Statistics.Game.Distance / 419);
         drawString(500, ypos + 4 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d", Savegame.Game.AmmoUsed);
+        sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
         drawString(500, ypos + 5 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d", Savegame.Game.HealthUsed);
+        sprintf(buffer, "%d", Statistics.Game.HealthUsed);
         drawString(500, ypos + 6 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
-        sprintf(buffer, "%d / 36", Savegame.Game.Secrets);
+        sprintf(buffer, "%d / 36", Statistics.Game.Secrets);
         drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 
         drawAllStrings();

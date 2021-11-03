@@ -10,6 +10,7 @@
 #include "sound/sound.h"
 #include "level.h"
 #include "setup.h"
+#include "sound.h"
 #include "flipeffect.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
@@ -23,6 +24,8 @@
 #include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "Objects/Generic/Object/rope.h"
 
+#include <filesystem>
+
 using namespace TEN::Effects::Fire;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -30,20 +33,47 @@ using namespace TEN::Entities::Generic;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
-using std::string;
-using std::vector;
+
+const std::string SAVEGAME_PATH = "Save//";
+
+GameStats Statistics;
+SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::m_stream;
-vector<LuaVariable> SaveGame::m_luaVariables;
+std::vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
 
-SAVEGAME_INFO Savegame;
+void LoadSavegameInfos()
+{
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+		SavegameInfos[i].Present = false;
+
+	if (!std::filesystem::exists(SAVEGAME_PATH))
+		return;
+
+	// try to load the savegame
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
+		auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(i);
+		auto savegamePtr = fopen(fileName.c_str(), "rb");
+
+		if (savegamePtr == NULL)
+			continue;
+
+		fclose(savegamePtr);
+
+		SavegameInfos[i].Present = true;
+		SaveGame::LoadHeader(i, &SavegameInfos[i]);
+
+		fclose(savegamePtr);
+	}
+
+	return;
+}
 
 bool SaveGame::Save(int slot)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
 
 	ITEM_INFO itemToSerialize{};
 	FlatBufferBuilder fbb{};
@@ -65,23 +95,23 @@ bool SaveGame::Save(int slot)
 	auto headerOffset = sghb.Finish();
 
 	Save::SaveGameStatisticsBuilder sgLevelStatisticsBuilder{ fbb };
-	sgLevelStatisticsBuilder.add_ammo_hits(Savegame.Level.AmmoHits);
-	sgLevelStatisticsBuilder.add_ammo_used(Savegame.Level.AmmoUsed);
-	sgLevelStatisticsBuilder.add_kills(Savegame.Level.Kills);
-	sgLevelStatisticsBuilder.add_medipacks_used(Savegame.Level.HealthUsed);
-	sgLevelStatisticsBuilder.add_distance(Savegame.Level.Distance);
-	sgLevelStatisticsBuilder.add_secrets(Savegame.Level.Secrets);
-	sgLevelStatisticsBuilder.add_timer(Savegame.Level.Timer);
+	sgLevelStatisticsBuilder.add_ammo_hits(Statistics.Level.AmmoHits);
+	sgLevelStatisticsBuilder.add_ammo_used(Statistics.Level.AmmoUsed);
+	sgLevelStatisticsBuilder.add_kills(Statistics.Level.Kills);
+	sgLevelStatisticsBuilder.add_medipacks_used(Statistics.Level.HealthUsed);
+	sgLevelStatisticsBuilder.add_distance(Statistics.Level.Distance);
+	sgLevelStatisticsBuilder.add_secrets(Statistics.Level.Secrets);
+	sgLevelStatisticsBuilder.add_timer(Statistics.Level.Timer);
 	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
 
 	Save::SaveGameStatisticsBuilder sgGameStatisticsBuilder{ fbb };
-	sgGameStatisticsBuilder.add_ammo_hits(Savegame.Game.AmmoHits);
-	sgGameStatisticsBuilder.add_ammo_used(Savegame.Game.AmmoUsed);
-	sgGameStatisticsBuilder.add_kills(Savegame.Game.Kills);
-	sgGameStatisticsBuilder.add_medipacks_used(Savegame.Game.HealthUsed);
-	sgGameStatisticsBuilder.add_distance(Savegame.Game.Distance);
-	sgGameStatisticsBuilder.add_secrets(Savegame.Game.Secrets);
-	sgGameStatisticsBuilder.add_timer(Savegame.Game.Timer);
+	sgGameStatisticsBuilder.add_ammo_hits(Statistics.Game.AmmoHits);
+	sgGameStatisticsBuilder.add_ammo_used(Statistics.Game.AmmoUsed);
+	sgGameStatisticsBuilder.add_kills(Statistics.Game.Kills);
+	sgGameStatisticsBuilder.add_medipacks_used(Statistics.Game.HealthUsed);
+	sgGameStatisticsBuilder.add_distance(Statistics.Game.Distance);
+	sgGameStatisticsBuilder.add_secrets(Statistics.Game.Secrets);
+	sgGameStatisticsBuilder.add_timer(Statistics.Game.Timer);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
 
 	// Lara
@@ -359,7 +389,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_reached_goal(creature->reachedGoal);
 
 			creatureOffset = creatureBuilder.Finish();
-		}
+		} 
 
 		Save::Position position = Save::Position(
 			(int32_t)itemToSerialize.pos.xPos,
@@ -411,13 +441,35 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
 		}
+		else if (itemToSerialize.data.is<short>())
+		{
+			short& data = itemToSerialize.data;
+			serializedItem.add_data_type(Save::ItemData::Short);
+			serializedItem.add_data(data);
+		}
+		else if (itemToSerialize.data.is<int>())
+		{
+			int& data = itemToSerialize.data;
+			serializedItem.add_data_type(Save::ItemData::Int);
+			serializedItem.add_data(data);
+		}
 
 		auto serializedItemOffset = serializedItem.Finish();
 		serializedItems.push_back(serializedItemOffset);
 	}
 
-	auto ambientTrackOffset = fbb.CreateString(CurrentLoopedSoundTrack);
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+
+	// Soundtrack playheads
+	auto bgmTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM);
+	auto oneshotTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::OneShot);
+	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
+	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
+
+	// Legacy soundtrack map
+	std::vector<int> soundTrackMap;
+	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.Mask); }
+	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
 	std::vector<int> flipMaps;
@@ -657,7 +709,11 @@ bool SaveGame::Save(int slot)
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_items(serializedItemsOffset);
-	sgb.add_ambient_track(ambientTrackOffset);
+	sgb.add_ambient_track(bgmTrackOffset);
+	sgb.add_ambient_position(bgmTrackData.second);
+	sgb.add_oneshot_track(oneshotTrackOffset);
+	sgb.add_oneshot_position(oneshotTrackData.second);
+	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_flip_effect(FlipEffect);
@@ -685,6 +741,9 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
+	if (!std::filesystem::exists(SAVEGAME_PATH))
+		std::filesystem::create_directory(SAVEGAME_PATH);
+
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
 	fileOut.write((char*)bufferToSerialize, bufferSize);
@@ -695,9 +754,7 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -724,7 +781,19 @@ bool SaveGame::Load(int slot)
 	FlipStatus = s->flip_status();
 	//FlipTimer = s->flip_timer();
 
-	CurrentLoopedSoundTrack = s->ambient_track()->str();
+	// Restore soundtracks
+	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM, s->ambient_position());
+	PlaySoundTrack(s->oneshot_track()->str(), SOUNDTRACK_PLAYTYPE::OneShot, s->oneshot_position());
+
+	// Legacy soundtrack map
+	for (int i = 0; i < s->cd_flags()->size(); i++)
+	{
+		// Safety check for cases when soundtrack map was externally modified and became smaller
+		if (i >= SoundTracks.size())
+			break;
+
+		SoundTracks[i].Mask = s->cd_flags()->Get(i);
+	}
 
 	// Static objects
 	for (int i = 0; i < s->static_meshes()->size(); i++)
@@ -769,25 +838,42 @@ bool SaveGame::Load(int slot)
 	// Items
 	for (int i = 0; i < s->items()->size(); i++)
 	{
-		if (i >= g_Level.NumItems)
-			break;
-
 		const Save::Item* savedItem = s->items()->Get(i);
-		ITEM_INFO* item = &g_Level.Items[i];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-		// Kill immediately item if already killed and continue
-		if (savedItem->flags() & IFLAG_KILLED)
+		short itemNumber = i;
+		bool dynamicItem = false;
+
+		if (i >= g_Level.NumItems)
 		{
-			KillItem(i);
-			item->status = ITEM_DEACTIVATED;
-			item->flags |= ONESHOT;
-			continue;
+			// Items beyond items level space must be active
+			if (!savedItem->active())
+				continue;
+
+			// Items beyond items level space must be initialised differently
+			itemNumber = CreateItem();
+			if (itemNumber == NO_ITEM)
+				continue;
+			dynamicItem = true;
 		}
 
-		// If not triggered, don't load remaining data
-		if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
-			continue;
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+		if (!dynamicItem)
+		{
+			// Kill immediately item if already killed and continue
+			if (savedItem->flags() & IFLAG_KILLED)
+			{
+				KillItem(i);
+				item->status = ITEM_DEACTIVATED;
+				item->flags |= ONESHOT;
+				continue;
+			}
+
+			// If not triggered, don't load remaining data
+			if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+				continue;
+		}
 
 		item->pos.xPos = savedItem->position()->x_pos();
 		item->pos.yPos = savedItem->position()->y_pos();
@@ -796,11 +882,27 @@ bool SaveGame::Load(int slot)
 		item->pos.yRot = savedItem->position()->y_rot();
 		item->pos.zRot = savedItem->position()->z_rot();
 
+		short roomNumber = savedItem->room_number();
+
+		if (dynamicItem)
+		{
+			item->roomNumber = roomNumber;
+
+			InitialiseItem(itemNumber);
+			
+			// InitialiseItem could overwrite position so restore it
+			item->pos.xPos = savedItem->position()->x_pos();
+			item->pos.yPos = savedItem->position()->y_pos();
+			item->pos.zPos = savedItem->position()->z_pos();
+			item->pos.xRot = savedItem->position()->x_rot();
+			item->pos.yRot = savedItem->position()->y_rot();
+			item->pos.zRot = savedItem->position()->z_rot();
+		}
+
 		item->speed = savedItem->speed();
 		item->fallspeed = savedItem->fall_speed();
 
 		// Do the correct way for assigning new room number
-		short roomNumber = savedItem->room_number();
 		if (item->objectNumber == ID_LARA)
 		{
 			LaraItem->location.roomNumber = roomNumber;
@@ -888,6 +990,12 @@ bool SaveGame::Load(int slot)
 			creature->mood = (MOOD_TYPE)savedCreature->mood();
 			creature->patrol2 = savedCreature->patrol2();
 			creature->reachedGoal = savedCreature->reached_goal();
+		}
+		else if (savedItem->data_type() == Save::ItemData::Short)
+		{
+			auto data = savedItem->data();
+			auto savedData = (Save::Short*)data;
+			item->data = savedData->scalar();
 		}
 
 		// Mesh stuff
@@ -1258,9 +1366,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	char fileName[255];
-	ZeroMemory(fileName, 255);
-	sprintf(fileName, "savegame.%d", slot);
+	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -1273,15 +1379,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
-	header->level = s->header()->level();
-	header->levelName = s->header()->level_name()->str();
-	header->days = s->header()->days();
-	header->hours = s->header()->hours();
-	header->minutes = s->header()->minutes();
-	header->seconds = s->header()->seconds();
-	header->level = s->header()->level();
-	header->timer = s->header()->timer();
-	header->count = s->header()->count();
+	header->Level = s->header()->level();
+	header->LevelName = s->header()->level_name()->str();
+	header->Days = s->header()->days();
+	header->Hours = s->header()->hours();
+	header->Minutes = s->header()->minutes();
+	header->Seconds = s->header()->seconds();
+	header->Level = s->header()->level();
+	header->Timer = s->header()->timer();
+	header->Count = s->header()->count();
 
 	return true;
 }

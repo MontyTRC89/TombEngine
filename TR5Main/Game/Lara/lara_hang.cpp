@@ -27,6 +27,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -41,8 +42,6 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->animNumber == LA_REACH_TO_HANG)
 	{
-		int flag;
-
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
 			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
@@ -50,14 +49,19 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_LEFT;
 				return;
 			}
-			flag = TestLaraHangLeftCorner(item, coll);
-			if (flag != 0)
+
+			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
-				if (flag <= 0)
-					item->goalAnimState = LS_SHIMMY_INNER_LEFT;
-				else
-					item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
+			case CORNER_RESULT::INNER:
+				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
 				return;
+			
+			case CORNER_RESULT::OUTER:
+				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
+				return;
+			
+			default:
+				break;
 			}
 		}
 
@@ -68,15 +72,19 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_RIGHT;
 				return;
 			}
-			flag = TestLaraHangRightCorner(item, coll);
-			if (flag != 0)
-			{
-				if (flag <= 0)
-					item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
-				else
-					item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
 
+			switch (TestLaraHangCorner(item, coll, 90.0f))
+			{
+			case CORNER_RESULT::INNER:
+				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
 				return;
+
+			case CORNER_RESULT::OUTER:
+				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
+				return;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -91,31 +99,28 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->Front.Floor > -850)
+			if (coll->Front.Floor > -850 && TestValidLedge(item, coll) && !coll->HitStatic)
 			{
 				if (coll->Front.Floor < -650 &&
 					coll->Front.Floor >= coll->Front.Ceiling &&
 					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
 					coll->Front.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
+					if (TrInput & IN_WALK)
 					{
-						if (TrInput & IN_WALK)
-						{
-							item->goalAnimState = LS_HANDSTAND;
-						}
-						else if (TrInput & IN_DUCK)
-						{
-							item->goalAnimState = LS_HANG_TO_CRAWL;
-							item->requiredAnimState = LS_CROUCH_IDLE;
-						}
-						else
-						{
-							item->goalAnimState = LS_GRABBING;
-						}
-
-						return;
+						item->goalAnimState = LS_HANDSTAND;
 					}
+					else if (TrInput & IN_DUCK)
+					{
+						item->goalAnimState = LS_HANG_TO_CRAWL;
+						item->requiredAnimState = LS_CROUCH_IDLE;
+					}
+					else
+					{
+						item->goalAnimState = LS_GRABBING;
+					}
+
+					return;
 				}
 
 				if (coll->Front.Floor < -650 &&
@@ -123,25 +128,22 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->Front.Floor - coll->FrontLeft.Ceiling >= -256 &&
 					coll->Front.Floor - coll->FrontRight.Ceiling >= -256)
 				{
-					if (abs(coll->FrontLeft.Floor - coll->FrontRight.Floor) < 60 && !coll->HitStatic)
-					{
-						item->goalAnimState = LS_HANG_TO_CRAWL;
-						item->requiredAnimState = LS_CROUCH_IDLE;
+					item->goalAnimState = LS_HANG_TO_CRAWL;
+					item->requiredAnimState = LS_CROUCH_IDLE;
 
-						return;
-					}
-				}
+					return;
+			}
 			}
 
 			if (Lara.climbStatus != 0 &&
 				coll->Middle.Ceiling <= -256 &&
-				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < 60)
+				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
 					item->goalAnimState = LS_LADDER_IDLE;
 				}
-				else
+				else if (TestLastFrame(item))
 				{
 					item->animNumber = LA_LADDER_SHIMMY_UP;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -162,7 +164,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				item->goalAnimState = LS_LADDER_IDLE;
 			}
-			else
+			else if (TestLastFrame(item))
 			{
 				item->animNumber = LA_LADDER_SHIMMY_DOWN;
 				item->goalAnimState = LS_HANG;
@@ -179,6 +181,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangleft*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -201,6 +204,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangright*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
@@ -310,8 +314,6 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->animNumber == LA_HANG_FEET_IDLE)
 	{
-		int flag;
-
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
 			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
@@ -319,14 +321,19 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_FEET_LEFT;
 				return;
 			}
-			flag = TestLaraHangLeftCorner(item, coll);
-			if (flag != 0)
+
+			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
-				if (flag <= 0)
-					item->goalAnimState = LS_SHIMMY_FEET_INNER_LEFT;
-				else
-					item->goalAnimState = LS_SHIMMY_FEET_OUTER_LEFT;
+			case CORNER_RESULT::INNER:
+				item->goalAnimState = LS_SHIMMY_FEET_INNER_LEFT;
 				return;
+
+			case CORNER_RESULT::OUTER:
+				item->goalAnimState = LS_SHIMMY_FEET_OUTER_LEFT;
+				return;
+
+			default:
+				break;
 			}
 		}
 
@@ -337,14 +344,19 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_FEET_RIGHT;
 				return;
 			}
-			flag = TestLaraHangRightCorner(item, coll);
-			if (flag != 0)
+
+			switch (TestLaraHangCorner(item, coll, 90.0f))
 			{
-				if (flag <= 0)
-					item->goalAnimState = LS_SHIMMY_FEET_INNER_RIGHT;
-				else
-					item->goalAnimState = LS_SHIMMY_FEET_OUTER_RIGHT;
+			case CORNER_RESULT::INNER:
+				item->goalAnimState = LS_SHIMMY_FEET_INNER_RIGHT;
 				return;
+
+			case CORNER_RESULT::OUTER:
+				item->goalAnimState = LS_SHIMMY_FEET_OUTER_RIGHT;
+				return;
+
+			default:
+				break;
 			}
 		}
 
