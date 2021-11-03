@@ -554,7 +554,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE))
+		if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))

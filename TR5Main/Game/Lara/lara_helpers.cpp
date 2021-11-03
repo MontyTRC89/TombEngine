@@ -6,6 +6,7 @@
 #include "level.h"
 #include "lara.h"
 #include "lara_tests.h"
+#include "lara_collide.h"
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -107,25 +108,12 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Keeping legacy quadrant snaps for now. @Sezz 2021.10.16
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
-	switch (GetQuadrant(item->pos.yRot))
-	{
-	case NORTH:
-		item->pos.yRot = 0;
-		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 225;
-		break;
-	case EAST:
-		item->pos.yRot = ANGLE(90.0f);
-		item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 225;
-		break;
-	case SOUTH:
-		item->pos.yRot = -ANGLE(180.0f);
-		item->pos.zPos = (item->pos.zPos | 0x3FF) - 225;
-		break;
-	case WEST:
-		item->pos.yRot = -ANGLE(90.0f);
-		item->pos.xPos = (item->pos.xPos | 0x3FF) - 225;
-		break;
-	}
+	coll->Setup.ForwardAngle += ANGLE(180);
+	GetCollisionInfo(coll, item);
+	SnapItemToLedge(item, coll);
+	MoveItem(item, coll->Setup.ForwardAngle, -(coll->Setup.Radius - STEP_SIZE / 2));
+	item->pos.yRot += ANGLE(180);
+	LaraResetGravityStatus(item, coll);
 }
 
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
