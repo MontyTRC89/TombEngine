@@ -10,6 +10,16 @@ enum class CLIMB_DIRECTION : short
 	West  = 0x0800
 };
 
+static CLIMB_DIRECTION LeftIntRightExtTab[4] =
+{
+	CLIMB_DIRECTION::West, CLIMB_DIRECTION::North, CLIMB_DIRECTION::East, CLIMB_DIRECTION::South
+};
+
+static CLIMB_DIRECTION LeftExtRightIntTab[4] =
+{
+	CLIMB_DIRECTION::East, CLIMB_DIRECTION::South, CLIMB_DIRECTION::West, CLIMB_DIRECTION::North
+};
+
 short GetClimbFlags(int x, int y, int z, short roomNumber);
 short GetClimbFlags(FLOOR_INFO* floor);
 

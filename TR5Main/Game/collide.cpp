@@ -595,6 +595,76 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Shift.x = 0;
 }
 
+void MoveItem(ITEM_INFO* item, short angle, int x, int y)
+{
+	if (!x && !y)
+		return;
+
+	auto s = phd_sin(angle);
+	auto c = phd_cos(angle);
+
+	if (x != 0)
+	{
+		item->pos.xPos += round(x * s);
+		item->pos.zPos += round(x * c);
+	}
+
+	if (y != 0)
+	{
+		item->pos.xPos += round(y * s);
+		item->pos.zPos += round(y * c);
+	}
+}
+
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier)
+{
+	item->pos.xRot = 0;
+	item->pos.yRot = coll->NearestLedgeAngle;
+	item->pos.zRot = 0;
+	item->pos.xPos += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->pos.zPos += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+}
+
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier)
+{
+	auto backup = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = angle;
+
+	float dist;
+	auto ang = GetNearestLedgeAngle(item, coll, dist);
+
+	coll->Setup.ForwardAngle = backup;
+
+	item->pos.xRot = 0;
+	item->pos.yRot = ang;
+	item->pos.zRot = 0;
+	item->pos.xPos += round(phd_sin(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+	item->pos.zPos += round(phd_cos(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+}
+
+void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll)
+{
+	SnapItemToLedge(item, coll);
+
+	int dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
+
+	switch (dir)
+	{
+	case NORTH:
+		item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		break;
+	case EAST:
+		item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		break;
+	case SOUTH:
+		item->pos.zPos = (item->pos.zPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		break;
+	case WEST:
+		item->pos.xPos = (item->pos.xPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		break;
+	}
+}
+
 int FindGridShift(int x, int z)
 {
 	if ((x / SECTOR(1)) == (z / SECTOR(1)))
@@ -1232,7 +1302,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
-	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor + 1, false, false);
+	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor, true, false);
 	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
@@ -1277,7 +1347,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	// Get side probe offsets depending on quadrant.
 	// If unconstrained mode is specified, don't use quadrant.
-	switch (coll->Setup.NoQuadrants ? -1 : quadrant)
+	switch (coll->Setup.Mode == COLL_PROBE_MODE::QUADRANTS ? quadrant : -1)
 	{
 	case 0:
 		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -1319,10 +1389,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		// No valid quadrant, return true probe offsets from object rotation.
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = (xfront * 0.5f) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		zleft  = (zfront * 0.5f) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		xright = (xfront * 0.5f) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
-		zright = (zfront * 0.5f) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		xleft  = (xfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		zleft  = (zfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		xright = (xfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		zright = (zfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
 		break;
 	}
 
@@ -1342,7 +1412,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	// Debug angle and distance
 	// g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
 	// g_Renderer.printDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
-
+	
 	// TEST 2: CENTERPOINT PROBE
 
 	collResult = GetCollisionResult(x, y, z, item->roomNumber);
@@ -1678,7 +1748,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 			}
 		}
-		coll->CollisionType = CT_FRONT;
+		coll->CollisionType = (coll->CollisionType == CT_TOP ? CT_TOP_FRONT : CT_FRONT);
 		return;
 	}
 
@@ -2558,31 +2628,6 @@ int GetQuadrant(short angle)
 	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
 }
 
-Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
-{
-	auto vect = Vector2(xPos, zPos);
-
-	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
-
-	switch (dir)
-	{
-	case NORTH:
-		vect.y = (zPos | (GRID_SNAP_SIZE - 1)) - radius;
-		break;
-	case EAST:
-		vect.x = (xPos | (GRID_SNAP_SIZE - 1)) - radius;
-		break;
-	case SOUTH:
-		vect.y = (zPos & ~(GRID_SNAP_SIZE - 1)) + radius;
-		break;
-	case WEST:
-		vect.x = (xPos & ~(GRID_SNAP_SIZE - 1)) + radius;
-		break;
-	}
-
-	return vect;
-}
-
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
@@ -2595,184 +2640,254 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
-	auto frontalOffset = coll->Setup.Radius * 0.2f;
+	auto frontalOffset = coll->Setup.Radius * 0.3f;
 	auto x = item->pos.xPos + frontalOffset * s;
 	auto z = item->pos.zPos + frontalOffset * c;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
-
 	int headroom = abs(bounds->Y2 - bounds->Y1) / 20.0f;
 	int yPoints[2] = { item->pos.yPos + bounds->Y1 + headroom,
 					   item->pos.yPos + bounds->Y2 - headroom };
 
-	// Determine horizontal probe coordinates
-	int eX = x + coll->Setup.Radius * s;
-	int eZ = z + coll->Setup.Radius * c;
-
 	// Prepare test data
-	float distance = 0.0f;
-	float closestDistance = FLT_MAX;
-	int   closestPlane = -1;
-	short result = 0;
-	
+	float finalDistance[2] = { FLT_MAX, FLT_MAX };
+	short finalResult[2] = { 0 };
+	bool  hitBridge = false;
+
 	// Do a two-pass surface test for all possible planes in a block.
 	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
 
-	for (int s = 0; s < 2; s++)
+	for (int h = 0; h < 2; h++)
 	{
 		// Use either bottom or top Y point to test
-		auto y = yPoints[s];
+		auto y = yPoints[h];
 
-		// Debug probe point
-		// g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 64, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		// Prepare test data
+		Ray   originRay;
+		Plane closestPlane[3] = { };
+		float closestDistance[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
+		short result[3] = { };
 
-		// Get true room number and block, based on current Y position
-		auto room = GetRoom(item->location, eX, y, eZ).roomNumber;
-		auto block = GetCollisionResult(eX, y, eZ, room).Block;
-
-		// Get native surface heights
-		auto floorHeight = block->FloorHeight(eX, eZ, y);
-		auto ceilingHeight = block->CeilingHeight(eX, eZ, y);
-
-		// If ceiling height tests lower than Y value, it means ceiling
-		// ledge is in front and we should use it instead of floor.
-		bool useCeilingLedge = ceilingHeight > y;
-		int height = useCeilingLedge ? ceilingHeight : floorHeight;
-
-		// Determine if there is a bridge in front
-		auto bridge = block->InsideBridge(eX, eZ, height + 1, false, y == height); // Submerge 1 unit to detect possible bridge
-
-		// We don't need actual corner heights to build planes, so just use normalized value here
-		auto fY = height - 1;
-		auto cY = height + 1;
-
-		// Calculate ray
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
-		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
-		auto ray = Ray(Vector3(x, cY, z), direction);
-
-		if (bridge >= 0) // Surface is inside bridge
-		{
-			// Get and test DX item coll bounds
-			auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-			auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].pos, bounds);
-
-			// Decompose bounds into planes
-			Vector3 corners[8];
-			dxBounds.GetCorners(corners);
-			Plane plane[4] =
-			{
-				Plane(corners[2], corners[1], corners[0]),
-				Plane(corners[0], corners[4], corners[3]),
-				Plane(corners[5], corners[6], corners[7]),
-				Plane(corners[6], corners[5], corners[1])
-			};
-
-			// Mark if test succeeded (this flag is needed because we do two-pass test)
-			bool foundNearestPlane = false;
-
-			// Find closest bridge edge plane
-			for (int i = 0; i < 4; i++)
-			{
-				// No plane intersection, quickly discard
-				if (!ray.Intersects(plane[i], distance))
-					continue;
-
-				// Process plane intersection only if distance is smaller
-				// than already found minimum
-				if (distance < closestDistance)
-				{
-					closestPlane = i;
-					closestDistance = distance;
-					foundNearestPlane = true;
-				}
-			}
-
-			// Don't store result if no test succeeded
-			if (!foundNearestPlane)
-				continue;
-
-			auto normal = plane[closestPlane].Normal();
-			result = FROM_RAD(atan2(normal.x, normal.z));
-
-			// If a first pass is in progress, don't do second one because
-			// bottom point is most likely lower than the bridge itself and may interfere.
+		// If bridge was hit on the first pass, stop checking
+		if (h == 1 && hitBridge)
 			break;
-		}
-		else // Surface is inside block
+
+		for (int p = 0; p < 3; p++)
 		{
-			// Determine if we should use floor or ceiling split angle based on early tests.
-			auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
+			// Prepare test data
+			float distance = 0.0f;
 
-			// Get horizontal block corner coordinates
-			auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
-			auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
-			auto cX = fX + WALL_SIZE + 1;
-			auto cZ = fZ + WALL_SIZE + 1;
+			// Determine horizontal probe coordinates
+			int eX = x;
+			int eZ = z;
 
-			// Get split angle coordinates
-			auto sX = fX + 1 + WALL_SIZE / 2;
-			auto sZ = fZ + 1 + WALL_SIZE / 2;
-			auto sShiftX = coll->Setup.Radius * sin(splitAngle);
-			auto sShiftZ = coll->Setup.Radius * cos(splitAngle);
-
-			// Get block edge planes + split angle plane
-			Plane plane[5] =
+			// Determine if probe must be shifted (if left or right probe)
+			if (p > 0)
 			{
-				Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
-				Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
-				Plane(Vector3(cX, fY, fZ), Vector3(cX, cY, fZ), Vector3(fX, cY, fZ)), // South
-				Plane(Vector3(cX, fY, cZ), Vector3(cX, cY, cZ), Vector3(cX, cY, fZ)), // East
-				Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
-			};
+				auto s2 = phd_sin(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90) : ANGLE(-90)));
+				auto c2 = phd_cos(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90) : ANGLE(-90)));
 
-			// If split angle exists, take split plane into account too.
-			auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
+				// Slightly extend width beyond coll radius to hit adjacent blocks for sure
+				eX += s2 * (coll->Setup.Radius * 2);
+				eZ += c2 * (coll->Setup.Radius * 2);
+			}
 
-			// Mark if test succeeded (this flag is needed because we do two-pass test)
-			bool foundNearestPlane = false;
+			// Debug probe point
+			// g_Renderer.addDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-			// Find closest block edge plane
-			for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
+			// Determine front floor probe offset.
+			// It is needed to identify if there is bridge or ceiling split in front.
+			auto frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
+			auto ffpX = eX + frontFloorProbeOffset * s;
+			auto ffpZ = eZ + frontFloorProbeOffset * c;
+
+			// Get front floor block
+			auto room = GetRoom(item->location, ffpX, y, ffpZ).roomNumber;
+			auto block = GetCollisionResult(ffpX, y, ffpZ, room).Block;
+
+			// Get front floor surface heights
+			auto floorHeight = block->BridgeFloorHeight(ffpX, ffpZ, y); // HACK? FloorHeight never returns real bridge height!
+			auto ceilingHeight = block->CeilingHeight(ffpX, ffpZ, y);
+
+			// If ceiling height tests lower than Y value, it means ceiling
+			// ledge is in front and we should use it instead of floor.
+			bool useCeilingLedge = ceilingHeight > y;
+			int height = useCeilingLedge ? ceilingHeight : floorHeight;
+
+			// Determine if there is a bridge in front
+			auto bridge = block->InsideBridge(ffpX, ffpZ, height, true, y == height);
+
+			// Determine floor probe offset.
+			// This must be slightly in front of own coll radius so no bridge misfires occur.
+			auto floorProbeOffset = coll->Setup.Radius * 0.3f;
+			auto fpX = eX + floorProbeOffset * s;
+			auto fpZ = eZ + floorProbeOffset * c;
+
+			// Debug probe point
+			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+			// Get true room number and block, based on derived height
+			room = GetRoom(item->location, fpX, height, fpZ).roomNumber;
+			block = GetCollisionResult(fpX, height, fpZ, room).Block;
+
+			// We don't need actual corner heights to build planes, so just use normalized value here
+			auto fY = height - 1;
+			auto cY = height + 1;
+
+			// Calculate ray
+			auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
+			auto ray = Ray(Vector3(eX, cY, eZ), direction);
+
+			// Debug ray direction
+			// g_Renderer.addLine3D(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
+
+			// Keep origin ray to calculate true centerpoint distance to ledge later
+			if (p == 0)
+				originRay = Ray(Vector3(eX, cY, eZ), direction);
+
+			if (bridge >= 0) // Surface is inside bridge
 			{
-				// No plane intersection, quickly discard
-				if (!ray.Intersects(plane[i], distance))
-					continue;
+				// Get and test DX item coll bounds
+				auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
+				auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].pos, bounds);
 
-				// Process plane intersection only if distance is smaller
-				// than already found minimum
-				if (distance < closestDistance)
+				// Decompose bounds into planes
+				Vector3 corners[8];
+				dxBounds.GetCorners(corners);
+				Plane plane[4] =
 				{
-					closestDistance = distance;
-					closestPlane = i;
-					foundNearestPlane = true;
+					Plane(corners[2], corners[1], corners[0]),
+					Plane(corners[0], corners[4], corners[3]),
+					Plane(corners[5], corners[6], corners[7]),
+					Plane(corners[6], corners[5], corners[1])
+				};
+
+				// Find closest bridge edge plane
+				for (int i = 0; i < 4; i++)
+				{
+					// No plane intersection, quickly discard
+					if (!ray.Intersects(plane[i], distance))
+						continue;
+
+					// Process plane intersection only if distance is smaller
+					// than already found minimum
+					if (distance < closestDistance[p])
+					{
+						closestPlane[p] = plane[i];
+						closestDistance[p] = distance;
+						auto normal = closestPlane[p].Normal();
+						result[p] = FROM_RAD(atan2(normal.x, normal.z));
+						hitBridge = true;
+					}
 				}
 			}
-
-			// Don't store result if no test succeeded
-			if (!foundNearestPlane)
-				continue;
-
-			// Store according rotation.
-			// For block edges (cases 0-3), return ordinary normal values.
-			// For split angle (case 4), return axis perpendicular to split angle (hence + ANGLE(90)) and dependent on
-			// origin sector plane, which determines the direction of edge normal.
-
-			if (closestPlane == 4)
+			else // Surface is inside block
 			{
-				auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(x, z) : block->SectorPlane(x, z);
-				result = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90);
+				// Determine if we should use floor or ceiling split angle based on early tests.
+				auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
+
+				// Get horizontal block corner coordinates
+				auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
+				auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
+				auto cX = fX + WALL_SIZE + 1;
+				auto cZ = fZ + WALL_SIZE + 1;
+
+				// Debug used block
+				// g_Renderer.addDebugSphere(Vector3(round(eX / WALL_SIZE) * WALL_SIZE + 512, y, round(eZ / WALL_SIZE) * WALL_SIZE + 512), 16, Vector4(1, 1, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+				// Get split angle coordinates
+				auto sX = fX + 1 + WALL_SIZE / 2;
+				auto sZ = fZ + 1 + WALL_SIZE / 2;
+				auto sShiftX = coll->Setup.Radius * sin(splitAngle);
+				auto sShiftZ = coll->Setup.Radius * cos(splitAngle);
+
+				// Get block edge planes + split angle plane
+				Plane plane[5] =
+				{
+					Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
+					Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
+					Plane(Vector3(cX, fY, fZ), Vector3(cX, cY, fZ), Vector3(fX, cY, fZ)), // South
+					Plane(Vector3(cX, fY, cZ), Vector3(cX, cY, cZ), Vector3(cX, cY, fZ)), // East
+					Plane(Vector3(sX, cY, sZ), Vector3(sX, fY, sZ), Vector3(sX + sShiftX, cY, sZ + sShiftZ)) // Split
+				};
+
+				// If split angle exists, take split plane into account too.
+				auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
+
+				// Find closest block edge plane
+				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
+				{
+					// No plane intersection, quickly discard
+					if (!ray.Intersects(plane[i], distance))
+						continue;
+
+					// Process plane intersection only if distance is smaller
+					// than already found minimum
+					if (distance < closestDistance[p])
+					{
+						closestDistance[p] = distance;
+						closestPlane[p] = plane[i];
+
+						// Store according rotation.
+						// For block edges (cases 0-3), return ordinary normal values.
+						// For split angle (case 4), return axis perpendicular to split angle (hence + ANGLE(90)) and dependent on
+						// origin sector plane, which determines the direction of edge normal.
+
+						if (i == 4)
+						{
+							auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(eX, eZ) : block->SectorPlane(eX, eZ);
+							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90);
+						}
+						else
+						{
+							auto normal = closestPlane[p].Normal();
+							result[p] = FROM_RAD(atan2(normal.x, normal.z)) + ANGLE(180.0f);
+						}
+					}
+				}
 			}
-			else
+		}
+
+		// Compare all 3 probe results and prioritize resulting angle based on
+		// angle occurence. This approach is needed to filter out false detections
+		// on the near-zero thickness edges of diagonal geometry which probes tend to tunnel through.
+
+		std::set<short> angles;
+		for (int p = 0; p < 3; p++)
+		{
+			// Prioritize ledge angle which was twice recognized
+			if (!angles.insert(result[p]).second)
 			{
-				auto normal = plane[closestPlane].Normal();
-				result = FROM_RAD(atan2(normal.x, normal.z));
+				// Find existing angle in results
+				int firstEqualAngle;
+				for (firstEqualAngle = 0; firstEqualAngle < 3; firstEqualAngle++)
+					if (result[firstEqualAngle] == result[p])
+						break;
+				
+				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
+				float dist1 = FLT_MAX;
+				float dist2 = FLT_MAX;
+				auto r1 = originRay.Intersects(closestPlane[p], dist1);
+				auto r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
+				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : (r1 ? dist1 : dist2);
+
+				finalResult[h] = result[p];
+				break;
 			}
+		}
+
+		// Store first result in case all 3 results are different (no priority) or long-distance misfire occured
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
+		{
+			finalDistance[h] = closestDistance[0];
+			finalResult[h] = result[0];
 		}
 	}
 
-	// Return distance closest to probe contact point, not ray origin point.
-	dist = closestDistance - (coll->Setup.Radius - frontalOffset);
-	return result;
+	// Return upper probe result in case it returned lower distance or has hit a bridge.
+	auto usedProbe = ((finalDistance[0] < finalDistance[1]) || hitBridge) ? 0 : 1;
+	dist = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
+	return finalResult[usedProbe];
 }
