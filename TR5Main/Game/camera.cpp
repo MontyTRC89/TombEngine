@@ -57,14 +57,12 @@ CAMERA_INFO Camera;
 GAME_VECTOR ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
-int SniperCameraActive;
 int BinocularRange;
 int BinocularOn;
 CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
 int PhdPerspective;
 short CurrentFOV;
-int GetLaraOnLOS;
 
 int RumbleTimer = 0;
 int RumbleCounter = 0;

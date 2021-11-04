@@ -79,13 +79,9 @@ void ControlGunShip(short itemNumber)
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);
 
-		GetLaraOnLOS = 1;
-
 		PHD_VECTOR hitPos;
 		MESH_INFO* hitMesh = NULL;
-		int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh);
-
-		GetLaraOnLOS = 0;
+		int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 
 		if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 		{
