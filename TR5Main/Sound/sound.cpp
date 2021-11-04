@@ -355,7 +355,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
-	if (Sound_CheckBASSError("Opening soundtrack '%s'", false, fullTrackName))
+	if (Sound_CheckBASSError("Opening soundtrack '%s'", false, fullTrackName.c_str()))
 		return;
 
 	float masterVolume = (float)GlobalMusicVolume / 100.0f;
@@ -395,7 +395,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 	if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
 		BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
 
-	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName))
+	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.c_str()))
 		return;
 
 	BASS_Soundtrack[(int)mode].Channel = stream;
