@@ -866,7 +866,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
-	// Process Vehicles
+	// Process vehicles.
 	if (Lara.Vehicle != NO_ITEM)
 	{
 		switch (g_Level.Items[Lara.Vehicle].objectNumber)
@@ -912,7 +912,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		default:
-			// Boats are processed like normal items in loop
+			// Boats are processed like normal items in loop.
 			LaraGun();
 			return;
 		}
@@ -927,9 +927,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.poseCount = 0;
 
-	// Handle current Lara status
+	// Handle current Lara status.
 	lara_control_routines[item->currentAnimState](item, coll);
 
+	// Reset lean.
 	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (abs(item->pos.zRot) > ANGLE(0.1f))
@@ -938,7 +939,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot = 0;
 	}
 
-	// LEGACY
+	// LEGACY lean reset.
 	/*if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
 		item->pos.zRot = 0;
 	else if (item->pos.zRot < -ANGLE(1.0f))
@@ -946,7 +947,20 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		item->pos.zRot -= ANGLE(1.0f);*/
 
-	if (Lara.turnRate < -ANGLE(2.0f))
+	// Reset turn rate.
+	int sign = (Lara.turnRate >= 0) ? 1 : -1;
+	if (abs(Lara.turnRate) > ANGLE(2.0f))
+		Lara.turnRate -= ANGLE(2.0f) * sign;
+	else if (abs(Lara.turnRate) > ANGLE(0.5f))
+		Lara.turnRate -= ANGLE(0.5f) * sign;
+	else if (abs(Lara.turnRate) > ANGLE(0.1f))
+		Lara.turnRate += Lara.turnRate / -2;
+	else
+		Lara.turnRate = 0;
+	item->pos.yRot += Lara.turnRate;
+
+	// LEGACY turn rate reset.
+	/*if (Lara.turnRate < -ANGLE(2.0f))
 		Lara.turnRate += ANGLE(2.0f);
 	else if (Lara.turnRate > ANGLE(2.0f))
 		Lara.turnRate -= ANGLE(2.0f);
@@ -956,17 +970,17 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate -= ANGLE(0.5f);
 	else
 		Lara.turnRate = 0;
-	item->pos.yRot += Lara.turnRate;
+	item->pos.yRot += Lara.turnRate;*/
 
-	// Animate Lara
+	// Animate Lara.
 	AnimateLara(item);
 
 	if (Lara.ExtraAnim == -1)
 	{
-		// Check for collision with items
+		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
-		// Handle Lara collision
+		// Handle Lara collision.
 		if (Lara.Vehicle == NO_ITEM)
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
@@ -974,10 +988,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
-	// Handle weapons
+	// Handle weapons.
 	LaraGun();
 
-	// Test for flags & triggers
+	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(item);
