@@ -1767,6 +1767,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
+			// MAGIC: Force slight push-out to the right side to avoid stucking
+			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
+
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
@@ -1814,6 +1817,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
+			// MAGIC: Force slight push-out to the right side to avoid stucking
+			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
+
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
