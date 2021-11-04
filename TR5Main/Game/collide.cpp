@@ -2513,9 +2513,9 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
 	if (!radiusDivide)
-		radiusDivide = 1;
+		return;
 
-	GAME_VECTOR pos;
+	GAME_VECTOR pos = {};
 	pos.x = item->pos.xPos;
 	pos.y = item->pos.yPos;
 	pos.z = item->pos.zPos;
@@ -2540,6 +2540,10 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 
 	auto frontHDif = backHeight  - frontHeight;
 	auto sideHDif  = rightHeight - leftHeight;
+
+	// Don't align if height differences are too large
+	if ((abs(frontHDif) > STEPUP_HEIGHT) || (abs(sideHDif) > STEPUP_HEIGHT))
+		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
