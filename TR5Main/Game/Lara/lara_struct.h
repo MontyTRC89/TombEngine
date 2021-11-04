@@ -1078,8 +1078,6 @@ struct LaraInfo
 	byte ropeFlag;
 	byte moveCount;
 	int ropeCount;
-	byte wetcloth;
-	byte bottle;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
