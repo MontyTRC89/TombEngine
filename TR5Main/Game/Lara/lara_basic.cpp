@@ -836,8 +836,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		if (TrInput & IN_SPRINT ||
-			Lara.gunStatus == LG_READY ||	// TODO: Check torch. @Sezz 2021.10.10
-			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_TORCH)) // Why are these weapons??? @Sezz 2021.10.10
+			(Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH) ||
+			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE)) // Why are these weapons??? @Sezz 2021.10.10
 		{
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		}
@@ -849,8 +849,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_SPRINT ||
-			Lara.gunStatus == LG_READY ||
-			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_TORCH))
+			(Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH) ||
+			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE))
 		{
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		}
