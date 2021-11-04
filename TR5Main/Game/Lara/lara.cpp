@@ -948,13 +948,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.zRot -= ANGLE(1.0f);*/
 
 	// Reset turn rate.
-	int sign = (Lara.turnRate >= 0) ? 1 : -1;
+	int sign = copysign(1, Lara.turnRate);
 	if (abs(Lara.turnRate) > ANGLE(2.0f))
 		Lara.turnRate -= ANGLE(2.0f) * sign;
 	else if (abs(Lara.turnRate) > ANGLE(0.5f))
 		Lara.turnRate -= ANGLE(0.5f) * sign;
-	else if (abs(Lara.turnRate) > ANGLE(0.1f))
-		Lara.turnRate += Lara.turnRate / -2;
 	else
 		Lara.turnRate = 0;
 	item->pos.yRot += Lara.turnRate;
@@ -964,10 +962,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate += ANGLE(2.0f);
 	else if (Lara.turnRate > ANGLE(2.0f))
 		Lara.turnRate -= ANGLE(2.0f);
-	else if (Lara.turnRate < -ANGLE(0.5f))
-		Lara.turnRate += ANGLE(0.5f);
-	else if (Lara.turnRate > ANGLE(0.5f))
-		Lara.turnRate -= ANGLE(0.5f);
 	else
 		Lara.turnRate = 0;
 	item->pos.yRot += Lara.turnRate;*/

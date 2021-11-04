@@ -30,7 +30,7 @@ using namespace TEN::Entities::Generic;
 
 static PHD_VECTOR PickUpPosition(0, 0, -100);
 OBJECT_COLLISION_BOUNDS PickUpBounds = 
-{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), 0, 0, 0, 0 };
+{ -256, 256, -200, 200, -256, 256, -ANGLE(10.0f), ANGLE(10.0f), 0, 0, -ANGLE(2.0f), ANGLE(2.0f) }; // TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04
 
 static PHD_VECTOR HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
