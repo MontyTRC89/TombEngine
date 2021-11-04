@@ -1239,19 +1239,15 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 }
 
 // Overload of GetCollisionResult which can be used to probe collision parameters in a given
-// direction at a given distance from a given item.
+// direction, distance, and angle from a given item.
 
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height)
 {
-	auto x = item->pos.xPos;
-	auto y = item->pos.yPos;
-	auto z = item->pos.zPos;
+	auto xProbe = item->pos.xPos + phd_sin(angle) * dist;
+	auto yProbe = item->pos.yPos + height;
+	auto zProbe = item->pos.zPos + phd_cos(angle) * dist;
 
-	auto xP = x + phd_sin(angle) * dist;
-	auto yP = y + height;
-	auto zP = z + phd_cos(angle) * dist;
-
-	return GetCollisionResult(xP, yP, zP, GetRoom(item->location, xP, yP, zP).roomNumber);
+	return GetCollisionResult(xProbe, yProbe, zProbe, GetRoom(item->location, xProbe, yProbe, zProbe).roomNumber);
 }
 
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters

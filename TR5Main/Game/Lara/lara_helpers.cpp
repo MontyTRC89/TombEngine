@@ -49,23 +49,24 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	// states had a linear transition of 50 units per frame, so not all original behaviour can be restored from here;
 	// as that is so, I have left commented legacy step code in their respective col functions). @Sezz 2021.10.09
 	int div = 3;
-	if (abs(coll->Middle.Floor) <= STEPUP_HEIGHT / 2 &&
-		abs(coll->Middle.Floor) >= div &&
-		coll->Middle.Floor != NO_HEIGHT)
+	if (coll->Middle.Floor != NO_HEIGHT)
 	{
-		item->pos.yPos += coll->Middle.Floor / div;
+		if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&			// Upper floor range.
+			abs(coll->Middle.Floor) >= div)
+		{
+			item->pos.yPos += coll->Middle.Floor / div;
+		}
+		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Lower floor range.
+			abs(coll->Middle.Floor) >= div)
+		{
+			if (coll->Middle.Floor >= -50)			// Upper floor range.
+				item->pos.yPos += 50;
+			else if (coll->Middle.Floor <= 50)		// Lower floor range.
+				item->pos.yPos -= 50;
+		}
+		else
+			item->pos.yPos += coll->Middle.Floor;
 	}
-	else if (abs(coll->Middle.Floor) > STEPUP_HEIGHT / 2 &&
-		abs(coll->Middle.Floor) >= div &&
-		coll->Middle.Floor != NO_HEIGHT)
-	{
-		if (coll->Middle.Floor >= -50)
-			item->pos.yPos += 50;
-		else if (coll->Middle.Floor <= 50)
-			item->pos.yPos -= 50;
-	}
-	else if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
 }
 
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
