@@ -808,7 +808,7 @@ bool SaveGame::Load(int slot)
 			short roomNumber = staticMesh->room_number();
 			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, &roomNumber);
 			TestTriggers(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, staticMesh->room_number(), true, 0);
-			floor->Stopper = 0;
+			floor->Stopper = false;
 		}
 	}
 
