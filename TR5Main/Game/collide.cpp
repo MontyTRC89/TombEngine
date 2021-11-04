@@ -2512,41 +2512,35 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
-	FLOOR_INFO* floor;
-	BOUNDING_BOX* bounds;
-	GAME_VECTOR pos;
-	int ratioXZ, frontHDif, sideHDif;
-	int frontX, frontZ, leftX, leftZ, rightX, rightZ;
-	int frontHeight, backHeight, leftHeight, rightHeight;
-	int radiusZ, radiusX;
+	if (!radiusDivide)
+		radiusDivide = 1;
 
-	bounds = GetBoundsAccurate(item);
+	GAME_VECTOR pos;
 	pos.x = item->pos.xPos;
 	pos.y = item->pos.yPos;
 	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
-	radiusX = bounds->X2;
-	radiusZ = bounds->Z2 / radiusDivide; // need divide in any case else it's too much !
 
-	ratioXZ = radiusZ / radiusX;
-	frontX = phd_sin(item->pos.yRot) * radiusZ;
-	frontZ = phd_cos(item->pos.yRot) * radiusZ;
-	leftX = -frontZ * ratioXZ;
-	leftZ = frontX * ratioXZ;
-	rightX = frontZ * ratioXZ;
-	rightZ = -frontX * ratioXZ;
+	auto bounds = GetBoundsAccurate(item);
+	auto radiusX = bounds->X2;
+	auto radiusZ = bounds->Z2 / radiusDivide; // Need divide in any case else it's too much !
 
-	floor = GetFloor(pos.x + frontX, pos.y, pos.z + frontZ, &pos.roomNumber);
-	frontHeight = GetFloorHeight(floor, pos.x + frontX, pos.y, pos.z + frontZ);
-	floor = GetFloor(pos.x - frontX, pos.y, pos.z - frontZ, &pos.roomNumber);
-	backHeight = GetFloorHeight(floor, pos.x - frontX, pos.y, pos.z - frontZ);
-	floor = GetFloor(pos.x + leftX, pos.y, pos.z + leftZ, &pos.roomNumber);
-	leftHeight = GetFloorHeight(floor, pos.x + leftX, pos.y, pos.z + leftZ);
-	floor = GetFloor(pos.x + rightX, pos.y, pos.z + rightZ, &pos.roomNumber);
-	rightHeight = GetFloorHeight(floor, pos.x + rightX, pos.y, pos.z + rightZ);
+	auto ratioXZ = radiusZ / radiusX;
+	auto frontX = phd_sin(item->pos.yRot) * radiusZ;
+	auto frontZ = phd_cos(item->pos.yRot) * radiusZ;
+	auto leftX  = -frontZ * ratioXZ;
+	auto leftZ  =  frontX * ratioXZ;
+	auto rightX =  frontZ * ratioXZ;
+	auto rightZ = -frontX * ratioXZ;
 
-	frontHDif = backHeight - frontHeight;
-	sideHDif = rightHeight - leftHeight;
+	auto frontHeight = GetCollisionResult(pos.x + frontX, pos.y, pos.z + frontZ, pos.roomNumber).Position.Floor;
+	auto backHeight  = GetCollisionResult(pos.x - frontX, pos.y, pos.z - frontZ, pos.roomNumber).Position.Floor;
+	auto leftHeight  = GetCollisionResult(pos.x + leftX,  pos.y, pos.z + leftZ,  pos.roomNumber).Position.Floor;
+	auto rightHeight = GetCollisionResult(pos.x + rightX, pos.y, pos.z + rightZ, pos.roomNumber).Position.Floor;
+
+	auto frontHDif = backHeight  - frontHeight;
+	auto sideHDif  = rightHeight - leftHeight;
+
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
 	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
