@@ -932,8 +932,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
-		if (abs(item->pos.zRot) > ANGLE(0.0f))
+		if (abs(item->pos.zRot) > ANGLE(0.1f))
 			item->pos.zRot += item->pos.zRot / -6;
+		else
+			item->pos.zRot = 0;
 	}
 
 	// LEGACY
