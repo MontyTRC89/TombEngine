@@ -62,11 +62,9 @@ extern int BinocularRange;
 extern int BinocularOn;
 extern CAMERA_TYPE BinocularOldCamera;
 extern int LaserSight;
-extern int SniperCount;
 extern int PhdPerspective;
 extern short CurrentFOV;
 extern int GetLaraOnLOS;
-extern int SniperOverlay;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);

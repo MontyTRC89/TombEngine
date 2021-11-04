@@ -121,7 +121,7 @@ void UpdateHealthBar(int flash)
 		|| (Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH)
 		|| (Lara.poisoned >= 256))
 	{
-		if (!BinocularRange && !SniperOverlay)
+		if (!BinocularRange)
 		{
 			DrawHealthBar(HealthBar / 1000.0f);
 		}

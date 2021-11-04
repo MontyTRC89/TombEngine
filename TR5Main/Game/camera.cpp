@@ -53,7 +53,6 @@ GAME_VECTOR LookCamTarget;
 int LSHKTimer = 0;
 int LSHKShotsFired = 0;
 PHD_VECTOR CamOldPos;
-int TLFlag = 0;
 CAMERA_INFO Camera;
 GAME_VECTOR ForcedFixedCamera;
 int UseForcedFixedCamera;
@@ -63,11 +62,9 @@ int BinocularRange;
 int BinocularOn;
 CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
-int SniperCount;
 int PhdPerspective;
 short CurrentFOV;
 int GetLaraOnLOS;
-int SniperOverlay;
 
 int RumbleTimer = 0;
 int RumbleCounter = 0;
@@ -223,7 +220,6 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		|| OldCam.target.y != Camera.target.y
 		|| OldCam.target.z != Camera.target.z
 		|| Camera.oldType != Camera.type
-		|| SniperOverlay
 		|| BinocularOn < 0)
 	{
 		OldCam.pos.xRot = LaraItem->pos.xRot;
@@ -794,73 +790,6 @@ void FixedCamera(ITEM_INFO* item)
 
 		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
 		moveSpeed = camera->speed * 8 + 1;
-
-		if (camera->flags & 2)
-		{
-			SniperOverlay = 1;
-			
-			Camera.target.x = (Camera.target.x + 2 * LastTarget.x) / 3;
-			Camera.target.y = (Camera.target.y + 2 * LastTarget.y) / 3;
-			Camera.target.z = (Camera.target.z + 2 * LastTarget.z) / 3;
-			
-			if (SniperCount)
-			{
-				SniperCount--;
-			}
-			else
-			{
-				to.x = Camera.target.x + ((Camera.target.x - Camera.pos.x) >> 1);
-				to.y = Camera.target.y + ((Camera.target.y - Camera.pos.y) >> 1);
-				to.z = Camera.target.z + ((Camera.target.z - Camera.pos.z) >> 1);
-				
-				int los = LOS(&from, &to);
-				GetLaraOnLOS = 1;
-
-				PHD_VECTOR pos;
-				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
-				objLos = (objLos != NO_LOS_ITEM && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
-
-				if (!(GetRandomControl() & 0x3F)
-					|| !(GlobalCounter & 0x3F)
-					|| objLos && !(GlobalCounter & 0xF) && GetRandomControl() & 1)
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, 0, 83886084);
-					SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
-
-					auto R = 192;
-					auto G = (GetRandomControl() & 0x1F) + 160;
-					auto B = 0;
-					Weather.Flash(R, G, B, 0.04f);
-					
-					SniperCount = 15;
-					
-					if (objLos && GetRandomControl() & 3)
-					{
-						DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->roomNumber);
-						LaraItem->hitPoints -= 100;
-						GetLaraOnLOS = 0;
-					}
-					else if (objLos < 0)
-					{
-						MESH_INFO* mesh = CollidedMeshes[0];
-						if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
-						{
-							ShatterObject(0, mesh, 128, to.roomNumber, 0);
-							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-							SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
-						}
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-						GetLaraOnLOS = 0;
-					}
-					else if (!los)
-					{
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-					}
-				}
-				GetLaraOnLOS = 0;
-			}
-		}
 	}
 
 	Camera.fixedCamera = 1;
@@ -1528,10 +1457,6 @@ void ConfirmCameraTargetPos()
 
 void CalculateCamera()
 {
-	SniperOverlay = 0;
-	// FIXME
-	//SniperCamActive = 0;
-
 	CamOldPos.x = Camera.pos.x;
 	CamOldPos.y = Camera.pos.y;
 	CamOldPos.z = Camera.pos.z;
@@ -1561,31 +1486,27 @@ void CalculateCamera()
 		}
 	}
 
-	if (TLFlag == 1 && Camera.underwater != 0)
+	// Camera is in a water room, play water sound effect.
+
+	if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 	{
-		Camera.underwater = 0;
+		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
+		if (Camera.underwater == 0)
+		{
+			Camera.underwater = 1;
+		}
 	}
-	TLFlag = 0;
-		//Camera is in a water room, play water sound effect.
-		if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+	else
+	{
+		if (Camera.underwater != 0)
 		{
-			SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
-			if (Camera.underwater == 0)
-			{
-				Camera.underwater = 1;
-			}
+			Camera.underwater = 0;
 		}
-		else
-		{
-			if (Camera.underwater != 0)
-			{
-				Camera.underwater = 0;
-			}
-		}
+	}
 
 	if (Camera.type == CAMERA_TYPE::CINEMATIC_CAMERA)
 	{
-		//Legacy_do_new_cutscene_camera();
+		// Legacy_do_new_cutscene_camera();
 		return;
 	}
 
@@ -1744,7 +1665,6 @@ void CalculateCamera()
 		}
 		else
 		{
-			SniperCount = 30;
 			Camera.fixedCamera = 1;
 			Camera.speed = 1;
 		}
