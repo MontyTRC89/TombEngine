@@ -1438,9 +1438,9 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
-		Lara.Vehicle == NO_ITEM &&									// Not in a vehicle.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Flare is not being handled.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0) &&		// Flare is not being handled.
+		Lara.Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1462,7 +1462,7 @@ bool TestLaraStep(COLL_INFO* coll)
 
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Middle.Floor < -STEP_SIZE / 2 &&			// Lower floor boundary.
+	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&		// Lower floor boundary.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor boundary.
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
@@ -1730,7 +1730,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
 
-	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Lowest floor boundary.
+	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor boundary.
 		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
 		probe.Position.Floor != NO_HEIGHT)
 	{
