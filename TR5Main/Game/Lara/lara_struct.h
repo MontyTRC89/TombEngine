@@ -980,9 +980,13 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool Pose;						// Crossed arms AFK
+	bool CrawlExtended;				// Extended crawl meneuverability
 	bool CrouchRoll;				// Crouch roll
-	bool Monkey180Roll;				// Monkey swing 180 turn
+	bool Monkey180Turn;				// Monkey swing 180 turn
+	bool MonkeyAutoJump;			// Auto jump to monkey swing
+	bool FeetHang;					// LAU-style ledge hanging with legs
 
+	// No. @Sezz 2021.11.05
 	bool Crawl1clickup;				// Crawl step-up
 	bool Crawl1clickdown;			// Crawl step-down
 	bool CrawlExit1click;			// Crawl exit down step
@@ -991,13 +995,17 @@ struct AnimsNew
 	bool CrawlVault1click;			// Standing vault to crouch (one step)
 	bool CrawlVault2click;			// Standing vault to crouch (two steps)
 	bool CrawlVault3click;			// Standing vault to crouch (three steps)
-	bool MonkeyVault;				// Auto jump to monkey swing
 	bool CrawlExitJump;				// TR5 crawl exit flip
-	bool SwandiveRollRun;			// Swandive roll > run transition
-	bool OscillateHanging;			// TR1/2 hang on thin ledge
-	bool FeetHanging;				// LAU-style ledge hanging with legs
 	bool CrawlFlexWaterPullUp;
 	bool CrawlFlexSubmerged;
+
+	// This should be done in WAD. @Sezz 2021.11.05
+	bool SwandiveRollRun;			// Swandive roll > run transition
+
+	// This will have to be default; monkey hang and ledge hang should not mix because it complicates things.
+	// If someone *really* wants to torture the player with the slow swing-in,
+	// they can easily swap out the animation inside the WAD. @Sezz 2021.11.05
+	bool OscillateHanging;			// TR1/2 hang on thin ledge
 };
 
 #ifdef NEW_TIGHTROPE

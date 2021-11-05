@@ -602,12 +602,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.turnRate = LARA_CRAWL_TURN;
 
 	// TODO: LUA
-	Lara.NewAnims.Crawl1clickdown = true;
-	Lara.NewAnims.Crawl1clickup = true;
-	Lara.NewAnims.CrawlExit1click = true;
-	Lara.NewAnims.CrawlExit2click = true;
-	Lara.NewAnims.CrawlExit3click = true;
-	Lara.NewAnims.CrawlExitJump = true;
+	Lara.NewAnims.CrawlExtended = true;
 
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -630,7 +625,8 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlVault(item, coll))
+				TestLaraCrawlVault(item, coll) &&
+				Lara.NewAnims.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 
@@ -1101,7 +1097,8 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlVault(item, coll))
+				TestLaraCrawlVault(item, coll) &&
+				Lara.NewAnims.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 

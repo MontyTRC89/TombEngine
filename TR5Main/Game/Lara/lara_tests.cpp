@@ -91,7 +91,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.NewAnims.CrawlVault1click = true;
 	Lara.NewAnims.CrawlVault2click = true;
 	Lara.NewAnims.CrawlVault3click = true;
-	Lara.NewAnims.MonkeyVault = false;
+	Lara.NewAnims.MonkeyAutoJump = false;
 
 	if (TestValidLedge(item, coll))
 	{
@@ -257,7 +257,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Auto jump to monkey swing.
 	if (Lara.canMonkeySwing &&
-		Lara.NewAnims.MonkeyVault)
+		Lara.NewAnims.MonkeyAutoJump)
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
@@ -308,8 +308,6 @@ bool TestLaraKeepDucked(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// LEGACY
-// TODO: Gradually replace calls with new TestLaraSlide() (currently TestLaraSlideNew()) and SetLaraSlideState(). @Sezz 2021.09.27
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	static short oldAngle = 1;
@@ -1127,9 +1125,9 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 bool TestHangFeet(ITEM_INFO* item, short angle)
 {
 	//##LUA debug etc.
-	Lara.NewAnims.FeetHanging = 0;
+	Lara.NewAnims.FeetHang = 0;
 
-	if (Lara.climbStatus || !Lara.NewAnims.FeetHanging)
+	if (Lara.climbStatus || !Lara.NewAnims.FeetHang)
 		return false;
 
 	int x = item->pos.xPos;
@@ -1735,7 +1733,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
 
 	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor bound.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling bound.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Gap is optically feasible for action.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
