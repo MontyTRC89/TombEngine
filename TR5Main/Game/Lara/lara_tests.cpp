@@ -281,11 +281,26 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraKeepDucked(COLL_INFO* coll)
+bool TestLaraKeepDucked(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Cannot use as a failsafe; this is bugged with slanted ceilings reaching the ground. @Sezz 2021.10.15
-	if (coll->Middle.Ceiling >= -LARA_HEIGHT_CRAWL || // Was -362.
-		coll->Front.Ceiling >= -LARA_HEIGHT_CRAWL) // TODO: Going out of a crawlspace backwards, Lara can sometimes stop and restart; the probes reset to the front and this returns true.
+	// TODO: Temporary. coll->Setup.Radius is currently only set to
+	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
+	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
+	auto radius = (item->currentAnimState == LS_CROUCH_IDLE ||
+		item->currentAnimState == LS_CROUCH_TURN_LEFT ||
+		item->currentAnimState == LS_CROUCH_TURN_RIGHT)
+		? LARA_RAD : LARA_RAD_CRAWL;
+
+	auto y = item->pos.yPos;
+	auto probeFront = GetCollisionResult(item, coll->Setup.ForwardAngle, radius, 0);
+	auto probeBack = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), radius, 0);
+
+	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
+	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches.
+	// A buffer might help, but improved collision handling would presumably eliminate this issue as a side product. @Sezz 2021.10.15
+	if ((coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle would clamp.
+		(probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||				// Front would clamp.
+		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT)					// Back would clamp.
 	{
 		return true;
 	}
@@ -1257,7 +1272,7 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
 
 	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
-		probe.Position.Floor - y >= -(STEPUP_HEIGHT) &&
+		probe.Position.Floor - y >= -STEPUP_HEIGHT &&
 		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))
 	{
 		return true;
@@ -1271,9 +1286,7 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	// TODO: Objects? Lara will attempt to jump against them.
 	// TODO: Check for ceilings! @Sezz 2021.10.16
 
-	auto x = item->pos.xPos;
 	auto y = item->pos.yPos;
-	auto z = item->pos.zPos;
 
 	auto angleA = angle - ANGLE(15.0f);
 	auto angleB = angle + ANGLE(15.0f);
@@ -1429,15 +1442,6 @@ bool TestLaraFall(COLL_INFO* coll)
 	return true;
 }
 
-// TODO: Remane when legacy TestLaraSlide() is removed.
-bool TestLaraSlideNew(COLL_INFO* coll)
-{
-	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
-		return false;
-
-	return true;
-}
-
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 {
 	if (gunType == LARA_WEAPON_TYPE::WEAPON_SHOTGUN ||
@@ -1518,8 +1522,10 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
 {
-	// TODO: coll->Setup.Radius not working in crawl states; it's always LARA_RAD?
-	// Function below (TestLaraMoveCrawl()) is a clone to account for this.
+	// TODO: coll->Setup.Radius is currently only set to
+	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
+	// For tests called in crawl control functions, then, it will store the wrong radius.
+	// Function below (TestLaraMoveCrawl()) is a clone to account for this. @Sezz 2021.11.05
 	// TODO: Current probe radius is fixed and overshoots by a wide margin at 0 degrees to a wall. No issues,
 	// but for more accuracy in the future, get distance to nearest wall/ceiling/object instead. @Sezz 2021.11.04
 
