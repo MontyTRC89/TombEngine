@@ -743,10 +743,10 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 		{
 			BOUNDING_BOX* frame = (BOUNDING_BOX*)GetBestFrame(item);
 			STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
-			if (frame->X1 <= s->collisionBox.X2 && 
-				frame->X2 >= s->collisionBox.X1 && 
-				frame->Z1 <= s->collisionBox.Z2 && 
-				frame->Z2 >= s->collisionBox.Z1 && 
+			if ((frame->X1 + item->pos.xPos) <= (s->collisionBox.X2 + mesh->pos.xPos) && 
+				(frame->X2 + item->pos.xPos) >= (s->collisionBox.X1 + mesh->pos.xPos) && 
+				(frame->Z1 + item->pos.zPos) <= (s->collisionBox.Z2 + mesh->pos.zPos) && 
+				(frame->Z2 + item->pos.zPos) >= (s->collisionBox.Z1 + mesh->pos.zPos) && 
 				(s->collisionBox.X1 || s->collisionBox.X2))
 			{
 				found = mesh->staticNumber;
