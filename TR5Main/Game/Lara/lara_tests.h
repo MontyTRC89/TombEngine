@@ -49,13 +49,14 @@ void GetTighRopeFallOff(int Regularity);
 #endif // !NEW_TIGHTROPE
 
 // TODO: New, organise later.
+bool TestLaraFall(COLL_INFO* coll);
+bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
+
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraFall(COLL_INFO* coll);
-bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
 
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound);
 bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound);
