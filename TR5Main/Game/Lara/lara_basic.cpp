@@ -371,7 +371,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Do something about wade checks. @Sezz 2021.10.17
 
 	// Pseudo action queue which makes JUMP input take complete precedence.
-	// This creates a committal lock to perform a forward jump when JUMP is pressed and released while allowJump isn't true yet.
+	// Creates a committal lock to perform a forward jump when JUMP is pressed and released while allowJump isn't true yet.
 	static bool commitToJump = false;
 
 	if ((TrInput & IN_JUMP || commitToJump) &&

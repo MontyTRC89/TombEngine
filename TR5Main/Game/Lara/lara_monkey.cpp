@@ -68,7 +68,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item);
 
 		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-		Lara.NewAnims.Monkey180Roll = 1;
+		Lara.NewAnims.Monkey180Turn = 1;
 
 
 		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
@@ -93,7 +93,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && Lara.NewAnims.Monkey180Roll)
+		else if (TrInput & IN_ROLL && Lara.NewAnims.Monkey180Turn)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
