@@ -218,12 +218,8 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraVault(item, coll))
 		return;
@@ -575,12 +571,8 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraVault(item, coll))
 		return;
@@ -1165,12 +1157,8 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	ShiftItem(item, coll);
 
@@ -1444,12 +1432,8 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraStep(coll))
 	{
@@ -2336,12 +2320,8 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	// TODO: Better handling.
 	if (coll->Middle.Ceiling > -100)
@@ -2510,12 +2490,8 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraStep(coll))
 	{
@@ -2995,12 +2971,8 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraStep(coll))
 	{
@@ -3157,12 +3129,8 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraStep(coll))
 	{
@@ -3206,12 +3174,8 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (coll->Middle.Floor > STEPUP_HEIGHT / 2) // Was 200.
 	{
@@ -3512,12 +3476,8 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	// TODO: Do NOT give builders such a silly level of granular control over new anims.
 	// 1) Eventually, there could be hundreds of them.
@@ -4113,12 +4073,8 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraSlideNew(coll))
-	{
-		SetLaraSlideState(item, coll);
-
+	if (TestLaraSlide(item, coll))
 		return;
-	}
 
 	if (TestLaraStep(coll))
 	{
