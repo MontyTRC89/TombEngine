@@ -14,7 +14,7 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraKeepDucked(COLL_INFO* coll);
+bool TestLaraKeepDucked(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll);
@@ -50,7 +50,6 @@ void GetTighRopeFallOff(int Regularity);
 
 // TODO: New, organise later.
 bool TestLaraFall(COLL_INFO* coll);
-bool TestLaraSlideNew(COLL_INFO* coll);	// Rename to TestLaraSlide() when legacy function of the same name is gone. @Sezz 2021.09.27
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
