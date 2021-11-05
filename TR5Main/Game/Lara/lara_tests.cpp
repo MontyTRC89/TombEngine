@@ -1418,82 +1418,6 @@ void GetTighRopeFallOff(int regularity) {
 }
 #endif // !NEW_TIGHTROPE
 
-bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
-{
-	if (gunType == WEAPON_SHOTGUN ||
-		gunType == WEAPON_HK ||
-		gunType == WEAPON_CROSSBOW ||
-		gunType == WEAPON_TORCH ||
-		gunType == WEAPON_GRENADE_LAUNCHER ||
-		gunType == WEAPON_HARPOON_GUN ||
-		gunType == WEAPON_ROCKET_LAUNCHER ||
-		gunType == WEAPON_SNOWMOBILE)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0) &&		// Flare is not being handled.
-		Lara.Vehicle == NO_ITEM)									// Not in a vehicle.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-// TODO: Try using each state's BadStep up/down.  @Sezz 2021.10.11
-bool TestLaraStep(COLL_INFO* coll)
-{
-	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor boundary.
-		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor boundary.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&		// Lower floor boundary.
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor boundary.
-		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
-		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
-		item->currentAnimState != LS_CRAWL_FORWARD)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->Middle.Floor > STEP_SIZE / 2 &&			// Upper floor boundary.
-		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor boundary.
-		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
-		item->currentAnimState != LS_WADE_FORWARD &&
-		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT &&
-		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
-		item->currentAnimState != LS_CRAWL_FORWARD)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraFall(COLL_INFO* coll)
 {
 	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
@@ -1514,19 +1438,97 @@ bool TestLaraSlideNew(COLL_INFO* coll)
 	return true;
 }
 
+bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
+{
+	if (gunType == LARA_WEAPON_TYPE::WEAPON_SHOTGUN ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_HK ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_CROSSBOW ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_TORCH ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_GRENADE_LAUNCHER ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_HARPOON_GUN ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER ||
+		gunType == LARA_WEAPON_TYPE::WEAPON_SNOWMOBILE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0) &&		// Flare is not being handled. TODO: Will she pose with weapons drawn?
+		Lara.Vehicle == NO_ITEM)									// Not in a vehicle.
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// TODO: Try using each state's BadStepUp/Down.  @Sezz 2021.10.11
+bool TestLaraStep(COLL_INFO* coll)
+{
+	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound.
+		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor bound.
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&		// Lower floor bound.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor bound.
+		coll->Middle.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
+		item->currentAnimState != LS_CRAWL_FORWARD)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->Middle.Floor > (STEP_SIZE / 2) &&			// Upper floor bound.
+		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor bound.
+		coll->Middle.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
+		item->currentAnimState != LS_WADE_FORWARD &&
+		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_SPRINT &&
+		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
+		item->currentAnimState != LS_CRAWL_FORWARD)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // TODO: This function should become obsolete in the future with more accurate and accessible collision detection.
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
 {
+	// TODO: coll->Setup.Radius not working in crawl states; it's always LARA_RAD?
+	// Function below (TestLaraMoveCrawl()) is a clone to account for this.
+	// TODO: Current probe radius is fixed and overshoots by a wide margin at 0 degrees to a wall. No issues,
+	// but for more accuracy in the future, get distance to nearest wall/ceiling/object instead. @Sezz 2021.11.04
+
 	auto y = item->pos.yPos;
-	// TODO: coll->Setup.Radius not working in crawl states.
 	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0); // Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
-	// TODO: Radius overshoot. Probe for nearest ledge angle in a given direction.
-
-	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor boundary.
-		(probe.Position.Floor - y) >= upperBound &&					// Upper floor boundary.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&		// Lower ceiling boundary.
+	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&					// Upper floor bound.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&		// Lowest ceiling bound.
 		!probe.Position.Slope &&									// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1541,9 +1543,9 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4, 0);
 
-	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor boundary.
-		(probe.Position.Floor - y) >= upperBound &&					// Upper floor boundary.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lower ceiling boundary.
+	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&					// Upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lowest ceiling bound.
 		!probe.Position.Slope &&									// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1564,9 +1566,9 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 	return false;
 
-	// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
-	// Additionally, run forward test needs to incorporate a unique ceiling check. @Sezz 2021.10.28
-	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
+	// TODO: TestLaraMove() call not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
+	// Additionally, run forward test needs to incorporate a unique ceiling check (as above). @Sezz 2021.10.28
+	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
@@ -1579,45 +1581,43 @@ bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 
 	return false;
 
-	// TODO: Not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
-	// Additionally, unique front collision checks are required. @Sezz 2021.10.28
-	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk and run state collision functions.
+	// TODO: Same issues as in TestLaraRunForward().
+	//return TestLaraMove(item, coll, coll->Setup.ForwardAngle, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using bad heights defined in walk back state collision function.
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk back state collision function.
 }
 
 bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using bad heights defined in hop back state collision function.
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in hop back state collision function.
 }
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using bad heights defined in step left state collision functions.
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step left state collision functions.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using bad heights defined in step right state collision function.
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step right state collision function.
 }
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMoveCrawl(item, coll, coll->Setup.ForwardAngle, STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using bad heights defined in crawl state collision functions.
+	return TestLaraMoveCrawl(item, coll, coll->Setup.ForwardAngle, STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
 }
 
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMoveCrawl(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using bad heights defined in crawl state collision functions.
+	return TestLaraMoveCrawl(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
 }
 
 bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
-	if (Lara.gunStatus == LG_NO_ARMS &&
-		/*Lara.waterSurfaceDist >= -STEP_SIZE &&*/
+	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Not handling flare.
 	{
@@ -1630,7 +1630,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TestLaraCrawlForward(item, coll) &&
-		Lara.gunStatus == LG_NO_ARMS &&
+		Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
 		Lara.waterSurfaceDist >= -STEP_SIZE &&						// Water depth is optically feasible for action.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Not handling flare.
@@ -1641,16 +1641,14 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// BUG: If Lara crawls up/down into an area under a slanted ceiling, she will sometimes teleport back.
-// I'm unable to reproduce this every time so I'm not sure what the exact conditions for it are. @Sezz 2021.10.17
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if ((probe.Position.Floor - y) <= -STEP_SIZE &&																			// Lower floor boundary. Synced with highest crawl snap tolerance.
-		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&																		// Upper floor boundary. Synced with bad height up.
-		(coll->Middle.Ceiling + probe.Position.Floor + y - LARA_HEIGHT_CRAWL) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
+	if ((probe.Position.Floor - y) <= -STEP_SIZE &&																			// Lower floor bound. Synced with crawl states' BadHeightUp.
+		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&																		// Upper floor bound.
+		((coll->Front.Ceiling - LARA_HEIGHT_CRAWL) - (probe.Position.Floor - y)) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Gap is optically feasible for action.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1665,9 +1663,9 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&									// Lower floor boundary. Synced with crawl exit jump.
-		(probe.Position.Floor - y) >= STEP_SIZE &&										// Upper floor boundary. Synced with lowest crawl snap tolerance.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Check this. Lara gets pushed around a lot.
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&									// Lower floor bound. Synced with crawl exit jump's highest floor bound.
+		(probe.Position.Floor - y) >= STEP_SIZE &&										// Upper floor bound. Synced with crawl states' BadHeightDown.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&				// Gap is optically feasible for action.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1682,9 +1680,9 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor boundary. Synced with crawl exit jump.
-		(probe.Position.Floor - y) >= STEP_SIZE &&									// Upper floor boundary. Synced with lowest crawl snap tolerance.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Lowest ceiling boundary. TODO: Not detected at corners?
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor bound. Synced with crawl exit jump's highest floor bound.
+		(probe.Position.Floor - y) >= STEP_SIZE &&									// Upper floor bound. Synced with crawl states' BadHeightDown.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Gap is optically feasible for action.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&			// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1699,8 +1697,8 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, STEP_SIZE, 0);
 
-	if ((probe.Position.Floor - y) > STEPUP_HEIGHT &&							// Highest floor boundary. Synced with crawl down step and crawl exit down step.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Lowest ceiling boundary.
+	if ((probe.Position.Floor - y) > STEPUP_HEIGHT &&							// Highest floor bound. Synced with crawl down step and crawl exit down step's lower floor bounds.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1730,8 +1728,8 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
 
-	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor boundary.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling boundary.
+	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor bound.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Lowest ceiling bound.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;

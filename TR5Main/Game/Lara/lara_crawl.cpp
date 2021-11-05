@@ -178,9 +178,9 @@ void old_lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -303,9 +303,9 @@ void old_lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot;
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -590,7 +590,6 @@ void old_lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -873,9 +872,9 @@ void old_lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot;
 	Lara.torsoXrot = 0; // TODO: More pleasing reset. @Sezz 2021.10.28
 	Lara.torsoYrot = 0;
 	item->fallspeed = 0;
@@ -1189,9 +1188,9 @@ void old_lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot;
 	Lara.torsoXrot = 0;
 	Lara.torsoYrot = 0;
 	item->gravityStatus = false;
@@ -1361,9 +1360,9 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
 	Lara.keepDucked = TestLaraKeepDucked(coll);
 	Lara.isDucked = true;
+	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
