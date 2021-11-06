@@ -1322,11 +1322,17 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				DoLaraCrawlToHangSnap(item, coll);
 				item->goalAnimState = LS_CRAWL_TO_HANG;
+
+				return;
 			}
-			else [[likely]]
+			else if (TestLaraCrawlForward(item, coll) &&
+				coll->CollisionType != CT_FRONT &&
+				coll->CollisionType != CT_TOP_FRONT) [[likely]]
+			{
 				item->goalAnimState = LS_CRAWL_BACK;
 
-			return;
+				return;
+			}
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
@@ -1668,32 +1674,25 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TestHangSwingIn(item, item->pos.yRot))
 		{
-
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
 			item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->frameNumber = GF(LA_JUMP_UP_TO_MONKEYSWING, 0);
 			item->currentAnimState = LS_MONKEYSWING_IDLE;
 			item->goalAnimState = LS_MONKEYSWING_IDLE;
 		}
 		else
 		{
+			item->animNumber = LA_REACH_TO_HANG;
+			item->frameNumber = GF(LA_REACH_TO_HANG, 12);
+			item->currentAnimState = LS_HANG;
+
 			if (TestHangFeet(item, item->pos.yRot))
-			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
 				item->goalAnimState = LS_HANG_FEET;
-			}
 			else
-			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
 				item->goalAnimState = LS_HANG;
-			}
 		}
 
 		GetCollisionInfo(coll, item);
