@@ -324,3 +324,18 @@ void GetLaraDeadlyBounds()
 	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds.Z1;
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
 }
+
+bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height)
+{
+	auto oldPos = item->pos;
+
+	item->pos.xPos += dist * phd_sin(item->pos.yRot + angle);
+	item->pos.yPos += height;
+	item->pos.zPos += dist * phd_cos(item->pos.yRot + angle);
+
+	auto result = GetCollidedObjects(item, LARA_RAD, 1, CollidedItems, CollidedMeshes, 0);
+
+	item->pos = oldPos;
+
+	return result;
+}

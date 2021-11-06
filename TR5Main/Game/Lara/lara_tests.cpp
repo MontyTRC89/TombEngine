@@ -1730,12 +1730,12 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Probe for objects.
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), LARA_RAD_CRAWL + 4, 0);
 
-	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor bound.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Gap is optically feasible for action.
+	if (!TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD_CRAWL + 4, 0) &&		// No obstruction.
+		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&											// Highest floor bound.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&								// Gap is optically feasible for action.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1748,9 +1748,10 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
 {
 	if (item->animNumber == LA_CRAWL_IDLE ||
-		(item->animNumber == LA_CROUCH_TO_CRAWL_START &&
-			item->frameNumber >= GF(LA_CROUCH_TO_CRAWL_START, 8)))
+		(item->animNumber == LA_CROUCH_TO_CRAWL_START && item->frameNumber >= GF(LA_CROUCH_TO_CRAWL_START, 8)))
+	{
 		return true;
+	}
 
 	return false;
 }
