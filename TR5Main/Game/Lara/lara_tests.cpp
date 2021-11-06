@@ -1731,9 +1731,8 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Probe for objects.
-
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), coll->Setup.Radius + STEP_SIZE / 2, 0);
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), LARA_RAD_CRAWL + 4, 0);
 
 	if ((probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor bound.
 		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Gap is optically feasible for action.
