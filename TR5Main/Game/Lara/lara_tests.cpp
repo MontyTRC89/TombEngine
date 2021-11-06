@@ -98,11 +98,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		bool success = false;
 
 		// Vault to crouch up one step.
-		if (coll->Front.Floor < 0 &&				// Lower floor boundary.
-			coll->Front.Floor >= -STEP_SIZE &&		// Upper floor boundary.
+		if (coll->Front.Floor < 0 &&					// Lower floor bound.
+			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor bound.
 			Lara.NewAnims.CrawlVault1click)
 		{
-			if (abs(coll->Front.Ceiling - coll->Front.Floor) < STEP_SIZE)		// Clamp buffer.
+			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL)		// Front clamp buffer. Presumably, nothing more necessary, but tend to this in the future. @Sezz 2021.11.06
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
@@ -114,13 +114,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		// Vault up two steps.
-		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&				// Lower floor boundary.
-			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE / 2))		// Upper floor boundary.
+		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&				// Lower floor bound.
+			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE / 2))		// Upper floor bound.
 		{
 			// Vault to stand up two steps.
-			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&				// Front clamp buffer.
-				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&		// Left clamp buffer.
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)		// Right clamp buffer.
+			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT/* &&				// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
+				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT &&		// Left clamp buffer. // TODO: Ceilings don't push, so these are unnecessary for now. @Sezz 2021.11.06
+				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT*/)		// Right clamp buffer.
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
@@ -136,7 +136,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				success = true;
 			}
 			// Vault to crouch up two steps.
-			else if (abs(coll->Front.Ceiling - coll->Front.Floor) < STOP_SIZE &&		// Clamp buffer.
+			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
+				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
+				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
 				Lara.NewAnims.CrawlVault2click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
@@ -149,13 +151,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		// Vault up three steps.
-		else if (coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE / 2) &&		// Lower floor boundary.
-			coll->Front.Floor >= -(WALL_SIZE - STEP_SIZE / 2))				// Upper floor boundary.
+		else if (coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE / 2) &&		// Lower floor bound.
+			coll->Front.Floor >= -(WALL_SIZE - STEP_SIZE / 2))				// Upper floor bound.
 		{
 			// Vault to stand up three steps.
-			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&				// Front clamp buffer.
-				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&		// Left clamp buffer.
-				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)		// Right clamp buffer.
+			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT/* &&				// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
+				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT &&		// Left clamp buffer. // TODO: Ceilings don't push, so these are unnecessary for now. @Sezz 2021.11.06
+				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT*/)		// Right clamp buffer.
 			{
 #if 0
 				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
@@ -171,7 +173,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				success = true;
 			}
 			// Vault to crouch up three steps.
-			else if (abs(coll->Front.Ceiling - coll->Front.Floor) < STEP_SIZE &&		// Clamp buffer.
+			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
+				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
+				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
 				Lara.NewAnims.CrawlVault3click)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
@@ -184,8 +188,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		// Auto jump.
-		else if (coll->Front.Floor >= -(WALL_SIZE * 2 - STEP_SIZE / 2) &&		// Upper floor boundary.
-			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2))					// Lower floor boundary.
+		else if (coll->Front.Floor >= -(WALL_SIZE * 2 - STEP_SIZE / 2) &&		// Upper floor bound.
+			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2))					// Lower floor bound.
 		{
 #if 0
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
@@ -211,10 +215,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Begin ladder climb.
 	if (Lara.climbStatus)
 	{
-		if (coll->Front.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||			// Upper front floor boundary.
-			coll->FrontLeft.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||		// Upper left floor boundary.
-			coll->FrontRight.Floor > -STOP_SIZE ||							// Upper right floor boundary.
-			coll->Middle.Ceiling > -(WALL_SIZE + STEP_SIZE / 2 + 6) ||		// Upper ceiling boundary.
+		if (coll->Front.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||			// Upper front floor bound.
+			coll->FrontLeft.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||		// Upper left floor bound.
+			coll->FrontRight.Floor > -STOP_SIZE ||							// Upper right floor bound.
+			coll->Middle.Ceiling > -(WALL_SIZE + STEP_SIZE / 2 + 6) ||		// Upper ceiling bound.
 			Lara.waterStatus == LW_WADE)
 		{
 			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (STOP_SIZE - 6)) &&
@@ -292,14 +296,13 @@ bool TestLaraKeepDucked(ITEM_INFO* item, COLL_INFO* coll)
 		? LARA_RAD : LARA_RAD_CRAWL;
 
 	auto y = item->pos.yPos;
-	auto probeFront = GetCollisionResult(item, coll->Setup.ForwardAngle, radius, 0);
 	auto probeBack = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), radius, 0);
 
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches.
 	// A buffer might help, but improved collision handling would presumably eliminate this issue as a side product. @Sezz 2021.10.15
 	if ((coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle would clamp.
-		(probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||				// Front would clamp.
+		(coll->Front.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Front would clamp.
 		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT)					// Back would clamp.
 	{
 		return true;
@@ -1564,8 +1567,8 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2) + 4, 0);
 	
-	// TODO: This interferes with the one-step stand-to-crouch vault where the floor is lower than one step.
-	if ((probe.Position.Ceiling - y) < 0)
+	// BUG: This interferes with the one-step stand-to-crouch vault where the floor is lower than STEP_SIZE.
+	if ((probe.Position.Ceiling - y) < 0)		// Hack to ensure Lara can run off diagonal ledges. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
 		return true;
 
 	return false;
