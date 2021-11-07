@@ -54,21 +54,16 @@ GAME_VECTOR LookCamTarget;
 int LSHKTimer = 0;
 int LSHKShotsFired = 0;
 PHD_VECTOR CamOldPos;
-int TLFlag = 0;
 CAMERA_INFO Camera;
 GAME_VECTOR ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
-int SniperCameraActive;
 int BinocularRange;
 int BinocularOn;
 CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
-int SniperCount;
 int PhdPerspective;
 short CurrentFOV;
-int GetLaraOnLOS;
-int SniperOverlay;
 
 int RumbleTimer = 0;
 int RumbleCounter = 0;
@@ -110,6 +105,14 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	{
 		room2 = room;
 		floor = GetFloor(x, y, z, &room);
+
+
+		if (g_Level.Rooms[room2].flags & ENV_FLAG_SWAMP)
+		{
+			flag = 1;
+			break;
+		}
+
 		h = GetFloorHeight(floor, x, y, z);
 		c = GetCeiling(floor, x, y, z);
 		if (h != NO_HEIGHT && c != NO_HEIGHT && c < h)
@@ -224,7 +227,6 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		|| OldCam.target.y != Camera.target.y
 		|| OldCam.target.z != Camera.target.z
 		|| Camera.oldType != Camera.type
-		|| SniperOverlay
 		|| BinocularOn < 0)
 	{
 		OldCam.pos.xRot = LaraItem->pos.xRot;
@@ -284,10 +286,15 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 
 	short roomNumber = Camera.pos.roomNumber;
-	FLOOR_INFO* floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNumber);
-	int height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	auto yPos = Camera.pos.y;
 
-	if (Camera.pos.y < GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z) || Camera.pos.y > height)
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		yPos = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+
+	FLOOR_INFO* floor = GetFloor(Camera.pos.x, yPos, Camera.pos.z, &roomNumber);
+	int height = GetFloorHeight(floor, Camera.pos.x, yPos, Camera.pos.z);
+
+	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) || yPos > height)
 	{
 		mgLOS(&Camera.target, &Camera.pos, 0);
 		
@@ -374,16 +381,18 @@ void ChaseCamera(ITEM_INFO* item)
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
-	if (g_Level.Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[Camera.target.roomNumber].y - 256;
+	short roomNumber = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+	
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
 
 	int x = Camera.target.x;
 	int y = Camera.target.y;
 	int z = Camera.target.z;
 
-	short roomNumber = Camera.target.roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	roomNumber = Camera.target.roomNumber;
+	auto floor = GetFloor(x, y, z, &roomNumber);
 	int h = GetFloorHeight(floor, x, y, z);
 	int c = GetCeiling(floor, x, y, z);
 
@@ -536,8 +545,14 @@ void CombatCamera(ITEM_INFO* item)
 		Camera.targetAngle = Lara.headYrot + Lara.torsoYrot;
 		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15);
 	}
-	
-	FLOOR_INFO* floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
+
+	short roomNumber = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+
+	auto floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
 	int h = GetFloorHeight(floor, Camera.target.x, Camera.target.y, Camera.target.z);
 	int c = GetCeiling(floor, Camera.target.x, Camera.target.y, Camera.target.z);
 	
@@ -563,7 +578,7 @@ void CombatCamera(ITEM_INFO* item)
 	int y = Camera.target.y;
 	int z = Camera.target.z;
 
-	short roomNumber = Camera.target.roomNumber;
+	roomNumber = Camera.target.roomNumber;
 	floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &roomNumber);
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
@@ -797,73 +812,6 @@ void FixedCamera(ITEM_INFO* item)
 
 		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
 		moveSpeed = camera->speed * 8 + 1;
-
-		if (camera->flags & 2)
-		{
-			SniperOverlay = 1;
-			
-			Camera.target.x = (Camera.target.x + 2 * LastTarget.x) / 3;
-			Camera.target.y = (Camera.target.y + 2 * LastTarget.y) / 3;
-			Camera.target.z = (Camera.target.z + 2 * LastTarget.z) / 3;
-			
-			if (SniperCount)
-			{
-				SniperCount--;
-			}
-			else
-			{
-				to.x = Camera.target.x + ((Camera.target.x - Camera.pos.x) >> 1);
-				to.y = Camera.target.y + ((Camera.target.y - Camera.pos.y) >> 1);
-				to.z = Camera.target.z + ((Camera.target.z - Camera.pos.z) >> 1);
-				
-				int los = LOS(&from, &to);
-				GetLaraOnLOS = 1;
-
-				PHD_VECTOR pos;
-				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
-				objLos = (objLos != NO_LOS_ITEM && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
-
-				if (!(GetRandomControl() & 0x3F)
-					|| !(GlobalCounter & 0x3F)
-					|| objLos && !(GlobalCounter & 0xF) && GetRandomControl() & 1)
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, 0, 83886084);
-					SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
-
-					auto R = 192;
-					auto G = (GetRandomControl() & 0x1F) + 160;
-					auto B = 0;
-					Weather.Flash(R, G, B, 0.04f);
-					
-					SniperCount = 15;
-					
-					if (objLos && GetRandomControl() & 3)
-					{
-						DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->roomNumber);
-						LaraItem->hitPoints -= 100;
-						GetLaraOnLOS = 0;
-					}
-					else if (objLos < 0)
-					{
-						MESH_INFO* mesh = CollidedMeshes[0];
-						if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
-						{
-							ShatterObject(0, mesh, 128, to.roomNumber, 0);
-							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-							SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
-						}
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-						GetLaraOnLOS = 0;
-					}
-					else if (!los)
-					{
-						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
-					}
-				}
-				GetLaraOnLOS = 0;
-			}
-		}
 	}
 
 	Camera.fixedCamera = 1;
@@ -1533,10 +1481,6 @@ void ConfirmCameraTargetPos()
 
 void CalculateCamera()
 {
-	SniperOverlay = 0;
-	// FIXME
-	//SniperCamActive = 0;
-
 	CamOldPos.x = Camera.pos.x;
 	CamOldPos.y = Camera.pos.y;
 	CamOldPos.z = Camera.pos.z;
@@ -1566,31 +1510,27 @@ void CalculateCamera()
 		}
 	}
 
-	if (TLFlag == 1 && Camera.underwater != 0)
+	// Camera is in a water room, play water sound effect.
+
+	if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 	{
-		Camera.underwater = 0;
+		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
+		if (Camera.underwater == 0)
+		{
+			Camera.underwater = 1;
+		}
 	}
-	TLFlag = 0;
-		//Camera is in a water room, play water sound effect.
-		if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+	else
+	{
+		if (Camera.underwater != 0)
 		{
-			SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
-			if (Camera.underwater == 0)
-			{
-				Camera.underwater = 1;
-			}
+			Camera.underwater = 0;
 		}
-		else
-		{
-			if (Camera.underwater != 0)
-			{
-				Camera.underwater = 0;
-			}
-		}
+	}
 
 	if (Camera.type == CAMERA_TYPE::CINEMATIC_CAMERA)
 	{
-		//Legacy_do_new_cutscene_camera();
+		// Legacy_do_new_cutscene_camera();
 		return;
 	}
 
@@ -1749,7 +1689,6 @@ void CalculateCamera()
 		}
 		else
 		{
-			SniperCount = 30;
 			Camera.fixedCamera = 1;
 			Camera.speed = 1;
 		}

@@ -2059,7 +2059,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
-void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
+void AdjustStopperFlag(ITEM_INFO* item, int dir, bool set)
 {
 	int x = item->pos.xPos;
 	int z = item->pos.zPos;

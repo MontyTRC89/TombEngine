@@ -3,6 +3,7 @@
 #include "animation.h"
 #include "pickup.h"
 #include "lara.h"
+#include "lara_tests.h"
 #include "camera.h"
 #include "level.h"
 #include "control/control.h"
@@ -121,7 +122,7 @@ void UpdateHealthBar(int flash)
 		|| (Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH)
 		|| (Lara.poisoned >= 256))
 	{
-		if (!BinocularRange && !SniperOverlay)
+		if (!BinocularRange)
 		{
 			DrawHealthBar(HealthBar / 1000.0f);
 		}
@@ -153,8 +154,7 @@ void UpdateAirBar(int flash)
 	{
 		if ((Lara.waterStatus != LW_UNDERWATER)
 			&& (Lara.waterStatus != LW_SURFACE)
-			&& (!((g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)
-				&& (Lara.waterSurfaceDist < -775))))
+			&& (!(TestLaraSwamp(LaraItem) && (Lara.waterSurfaceDist < -775))))
 			return;
 	}
 

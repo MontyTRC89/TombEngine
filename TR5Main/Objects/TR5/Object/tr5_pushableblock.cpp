@@ -183,7 +183,7 @@ void PushableBlockControl(short itemNumber)
 			if (pushable->hasFloorCeiling)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, false);
 			}
 		}
 
@@ -362,7 +362,7 @@ void PushableBlockControl(short itemNumber)
 			if (pushable->hasFloorCeiling)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, 0);
+				AdjustStopperFlag(item, item->itemFlags[0] + 0x8000, false);
 			}
 		}
 
@@ -456,7 +456,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (pushable->hasFloorCeiling)
 		{
 			//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
-			AdjustStopperFlag(item, item->itemFlags[0], 0);
+			AdjustStopperFlag(item, item->itemFlags[0], false);
 		}
 	}
 	else
