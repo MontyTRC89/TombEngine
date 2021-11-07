@@ -3153,7 +3153,29 @@ void old_lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_ROLL_FORWARD (23)
-// Control:		lara_void_func()
+// Collision:	lara_col_roll2()
+void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_LEFT &&
+		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
+	}
+	else if (TrInput & IN_RIGHT &&
+		!(TrInput & IN_JUMP))
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
+	}
+
+	item->goalAnimState = LS_ROLL_BACK;
+}
+
+// State:		LS_ROLL_FORWARD (23)
+// Control:		lara_as_roll2()
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 0;
@@ -3448,7 +3470,41 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_ROLL_FORWARD (45)
-// Control:		lara_void_func()
+// Collision:	lara_col_roll()
+void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_LEFT &&
+		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
+	{
+		Lara.turnRate -= LARA_TURN_RATE;
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
+	}
+	else if (TrInput & IN_RIGHT &&
+		!(TrInput & IN_JUMP))
+	{
+		Lara.turnRate += LARA_TURN_RATE;
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
+	}
+
+	// TODO: Interpolation instead.
+	Lara.NewAnims.SwandiveRollRun = true;
+
+	if (TrInput & IN_FORWARD &&
+		item->animNumber == LA_SWANDIVE_ROLL &&
+		Lara.NewAnims.SwandiveRollRun)
+	{
+		item->goalAnimState = LS_RUN_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_ROLL_FORWARD;
+}
+
+// State:		LS_ROLL_FORWARD (45)
+// Control:		lara_as_roll()
 void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot;
@@ -3478,18 +3534,6 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 		return;
-
-	// TODO: Do NOT give builders such a silly level of granular control over new anims.
-	// 1) Eventually, there could be hundreds of them.
-	// 2) Builders will deliberately hurt the player for the sake of "faithfulness to the originals",
-	// and that's a terrible reason to make this an option. Let's not even remotely suggest that bad design is acceptable.
-	// TODO: Control function. @Sezz 2021.10.15
-	Lara.NewAnims.SwandiveRollRun = true;
-
-	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && Lara.NewAnims.SwandiveRollRun)
-	{
-		item->goalAnimState = LS_RUN_FORWARD;
-	}
 
 	ShiftItem(item, coll);
 
@@ -3551,17 +3595,16 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_swandive*/
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
+
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-
 		if (Lara.turnRate < -LARA_JUMP_TURN)
 			Lara.turnRate = -LARA_JUMP_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-
 		if (Lara.turnRate > LARA_JUMP_TURN)
 			Lara.turnRate = LARA_JUMP_TURN;
 	}
