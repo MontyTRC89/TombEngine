@@ -351,14 +351,16 @@ void GameScriptItemInfo::SetHP(short hp)
 	if(Objects[m_item->objectNumber].intelligent &&
 		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
 	{
-		ScriptAssert(false, "Invalid value: " + hp);
+		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
 		if (hp < 0)
 		{
 			hp = 0;
+			ScriptWarn("Setting HP to 0.");
 		}
 		else if (hp > Objects[m_item->objectNumber].hitPoints)
 		{
 			hp = Objects[m_item->objectNumber].hitPoints;
+			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
 		}
 	}
 

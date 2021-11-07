@@ -57,16 +57,12 @@ extern CAMERA_INFO Camera;
 extern GAME_VECTOR ForcedFixedCamera;
 extern int UseForcedFixedCamera;
 extern int NumberCameras;
-extern int SniperCameraActive;
 extern int BinocularRange;
 extern int BinocularOn;
 extern CAMERA_TYPE BinocularOldCamera;
 extern int LaserSight;
-extern int SniperCount;
 extern int PhdPerspective;
 extern short CurrentFOV;
-extern int GetLaraOnLOS;
-extern int SniperOverlay;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);

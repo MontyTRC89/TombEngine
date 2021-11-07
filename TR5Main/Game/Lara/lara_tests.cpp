@@ -83,6 +83,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
+	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -768)
+		return false;
+
 	// TODO: Enable with lua!
 	Lara.NewAnims.CrawlVault1click = 1;
 	Lara.NewAnims.CrawlVault2click = 1;
@@ -112,11 +115,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
 				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
-#if 0
-				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
-					return false;
-#endif
-
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -142,11 +140,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
 				coll->FrontRight.Floor - coll->FrontRight.Ceiling >= 0)
 			{
-#if 0
-				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
-					return 0;
-#endif
-
 				item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -168,11 +161,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
 		{
-#if 0
-			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-				return false;
-#endif
-
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->goalAnimState = LS_JUMP_UP;
@@ -1382,4 +1370,14 @@ bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll)
 
 	return true;
 #endif
+}
+
+bool TestLaraSwamp(ITEM_INFO* item)
+{
+	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) != 0;
+}
+
+bool TestLaraWater(ITEM_INFO* item)
+{
+	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) != 0;
 }

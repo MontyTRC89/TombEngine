@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "lara.h"
 #include "lara_initialise.h"
+#include "lara_tests.h"
 #include "health.h"
 #include "items.h"
 #include "setup.h"
@@ -99,9 +100,6 @@ void InitialiseLara(int restore)
 	InitialiseLaraAnims(LaraItem);
 	Lara.BeetleLife = 3;
 	DashTimer = 120;
-
-	Lara.bottle = 0;
-	Lara.wetcloth = CLOTH_MISSING;
 }
 
 void LaraInitialiseMeshes()
@@ -139,7 +137,7 @@ void LaraInitialiseMeshes()
 
 void InitialiseLaraAnims(ITEM_INFO* item)
 {
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (TestLaraWater(item))
 	{
 		Lara.waterStatus = LW_UNDERWATER;
 		item->goalAnimState = LS_UNDERWATER_STOP;
