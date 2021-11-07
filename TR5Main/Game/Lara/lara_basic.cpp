@@ -921,39 +921,12 @@ void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void LaraSwampStop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Clean this.
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
 		coll->CollisionType != CT_TOP_FRONT)
 	{
-		/*bool wade = false;
-
-		if ((fHeight.Position.Floor > -(STEPUP_HEIGHT - 1) &&
-			TestLaraSwamp(item) ||
-			(fHeight.Position.Floor < (STEPUP_HEIGHT - 1) &&
-				fHeight.Position.Floor > -(STEPUP_HEIGHT - 1)))
-		{
-			wade = true;*/
 		item->goalAnimState = LS_WADE_FORWARD;
-		/*}
-
-		if (!wade)
-		{
-			Lara.moveAngle = item->pos.yRot;
-			coll->Setup.BadHeightDown = NO_BAD_POS;
-			coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-			coll->Setup.BadCeilingHeight = 0;
-			coll->Setup.SlopesAreWalls = true;
-			coll->Setup.Radius = LARA_RAD + 2;
-			coll->Setup.ForwardAngle = Lara.moveAngle;
-			GetCollisionInfo(coll, item);
-
-			if (TestLaraVault(item, coll))
-				return;
-
-			coll->Setup.Radius = LARA_RAD;
-		}*/
-
+		
 		return;
 	}
 
