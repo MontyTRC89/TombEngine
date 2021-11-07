@@ -104,6 +104,14 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	{
 		room2 = room;
 		floor = GetFloor(x, y, z, &room);
+
+
+		if (g_Level.Rooms[room2].flags & ENV_FLAG_SWAMP)
+		{
+			flag = 1;
+			break;
+		}
+
 		h = GetFloorHeight(floor, x, y, z);
 		c = GetCeiling(floor, x, y, z);
 		if (h != NO_HEIGHT && c != NO_HEIGHT && c < h)
@@ -277,10 +285,15 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 
 	short roomNumber = Camera.pos.roomNumber;
-	FLOOR_INFO* floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNumber);
-	int height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	auto yPos = Camera.pos.y;
 
-	if (Camera.pos.y < GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z) || Camera.pos.y > height)
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		yPos = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+
+	FLOOR_INFO* floor = GetFloor(Camera.pos.x, yPos, Camera.pos.z, &roomNumber);
+	int height = GetFloorHeight(floor, Camera.pos.x, yPos, Camera.pos.z);
+
+	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) || yPos > height)
 	{
 		mgLOS(&Camera.target, &Camera.pos, 0);
 		
@@ -365,16 +378,18 @@ void ChaseCamera(ITEM_INFO* item)
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
-	if (g_Level.Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[Camera.target.roomNumber].y - 256;
+	short roomNumber = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+	
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
 
 	int x = Camera.target.x;
 	int y = Camera.target.y;
 	int z = Camera.target.z;
 
-	short roomNumber = Camera.target.roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	roomNumber = Camera.target.roomNumber;
+	auto floor = GetFloor(x, y, z, &roomNumber);
 	int h = GetFloorHeight(floor, x, y, z);
 	int c = GetCeiling(floor, x, y, z);
 

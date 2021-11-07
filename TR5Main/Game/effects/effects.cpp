@@ -1216,49 +1216,50 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-	if (room->flags & ENV_FLAG_WATER)
-	{
-		short roomNumber2 = item->roomNumber;
-		GetFloor(item->pos.xPos, room->y - 128, item->pos.zPos, &roomNumber2);
+	if (!(room->flags & ENV_FLAG_WATER))
+		return;
 
-		ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
-		if (!(room2->flags & ENV_FLAG_WATER))
+	short roomNumber2 = item->roomNumber;
+	GetFloor(item->pos.xPos, room->y - 128, item->pos.zPos, &roomNumber2);
+
+	ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
+
+	if (room2->flags & ENV_FLAG_WATER)
+		return;
+
+	ANIM_FRAME* frame = GetBestFrame(item);
+	if (item->pos.yPos + frame->boundingBox.Y1 > wh)
+		return;
+
+	if (item->pos.yPos + frame->boundingBox.Y2 < wh)
+		return;
+
+	if (item->fallspeed <= 0 || wd >= 474 || SplashCount != 0)
+	{
+		if (!(Wibble & 0xF))
 		{
-			ANIM_FRAME* frame = GetBestFrame(item);
-			if (item->pos.yPos + frame->boundingBox.Y1 <= wh)
+			if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_STOP)
 			{
-				if (item->pos.yPos + frame->boundingBox.Y2 >= wh)
+				if (item->currentAnimState == LS_STOP)
 				{
-					if (item->fallspeed <= 0 || wd >= 474 || SplashCount != 0)
-					{
-						if (!(Wibble & 0xF))
-						{
-							if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_STOP)
-							{
-								if (item->currentAnimState == LS_STOP)
-								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-								}
-								else
-								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-								}
-							}
-						}
-					}
-					else
-					{
-						SplashSetup.y = wh;
-						SplashSetup.x = item->pos.xPos;
-						SplashSetup.z = item->pos.zPos;
-						SplashSetup.innerRadius = 16;
-						SplashSetup.splashPower = item->speed;
-						SetupSplash(&SplashSetup,roomNumber);
-						SplashCount = 16;
-					}
+					SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				}
+				else
+				{
+					SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				}
 			}
 		}
+	}
+	else
+	{
+		SplashSetup.y = wh;
+		SplashSetup.x = item->pos.xPos;
+		SplashSetup.z = item->pos.zPos;
+		SplashSetup.innerRadius = 16;
+		SplashSetup.splashPower = item->speed;
+		SetupSplash(&SplashSetup,roomNumber);
+		SplashCount = 16;
 	}
 }
 
