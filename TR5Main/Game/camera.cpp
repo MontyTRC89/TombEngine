@@ -163,7 +163,7 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 
 void InitialiseCamera()
 {
-	Camera.shift = LaraItem->pos.yPos - 1024;
+	Camera.shift = LaraItem->pos.yPos - WALL_SIZE;
 	
 	LastTarget.x = LaraItem->pos.xPos;
 	LastTarget.y = Camera.shift;
@@ -327,12 +327,12 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 	int ceiling = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-	if (Camera.pos.y - 255 < ceiling && Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+	if (Camera.pos.y - (STEP_SIZE - 1) < ceiling && Camera.pos.y + (STEP_SIZE - 1) > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
 		Camera.pos.y = (height + ceiling) >> 1;
-	else if (Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = height - 255;
-	else if (Camera.pos.y - 255 < ceiling && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = ceiling + 255;
+	else if (Camera.pos.y + (STEP_SIZE - 1) > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+		Camera.pos.y = height - (STEP_SIZE - 1);
+	else if (Camera.pos.y - (STEP_SIZE - 1) < ceiling && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+		Camera.pos.y = ceiling + (STEP_SIZE - 1);
 	else if (ceiling >= height || height == NO_HEIGHT || ceiling == NO_HEIGHT)
 	{
 		Camera.pos.x = ideal->x;
@@ -511,8 +511,8 @@ void UpdateCameraElevation()
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
 		pos1.x = 0;
-		pos1.y = -256;
-		pos1.z = 2048;
+		pos1.y = -STEP_SIZE;
+		pos1.z = WALL_SIZE * 2;
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.z = pos1.z - pos.z;
@@ -713,12 +713,12 @@ int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		h = GetFloorHeight(floor, x, y, z);
 		c = GetCeiling(floor, x, y, z);
 
-		if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 			y = (h + c) >> 1;
-		else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = h - 255;
-		else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = c + 255;
+		else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			y = h - (STEP_SIZE - 1);
+		else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			y = c + (STEP_SIZE - 1);
 	}
 
 	roomNumber = ideal->roomNumber;
@@ -756,12 +756,12 @@ int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		h = GetFloorHeight(floor, x, y, z);
 		c = GetCeiling(floor, x, y, z);
 
-		if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 			y = (h + c) >> 1;
-		else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = h - 255;
-		else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = c + 255;
+		else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			y = h - (STEP_SIZE - 1);
+		else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			y = c + (STEP_SIZE - 1);
 	}
 
 	roomNumber = ideal->roomNumber;
@@ -871,10 +871,10 @@ void LookCamera(ITEM_INFO* item)
 		GetLaraJointPosition(&pos, LM_HEAD);
 		
 		roomNumber = LaraItem->roomNumber;
-		floor = GetFloor(pos.x, pos.y + 256, pos.z, &roomNumber);
+		floor = GetFloor(pos.x, pos.y + STEP_SIZE, pos.z, &roomNumber);
 		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			pos.y = g_Level.Rooms[roomNumber].y - 256;
+			pos.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
 			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 		}
 		else
@@ -894,7 +894,7 @@ void LookCamera(ITEM_INFO* item)
 	PHD_VECTOR pos2;
 	pos2.x = 0;
 	pos2.y = 0;
-	pos2.z = -1024;
+	pos2.z = -WALL_SIZE;
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	PHD_VECTOR pos3;
@@ -915,10 +915,10 @@ void LookCamera(ITEM_INFO* item)
 	for (i = 0; i < 8; i++)
 	{
 		roomNumber = roomNumber2;
-		floor = GetFloor(x, y + 256, z, &roomNumber2);
+		floor = GetFloor(x, y + STEP_SIZE, z, &roomNumber2);
 		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
 		{
-			y = g_Level.Rooms[roomNumber2].y - 256;
+			y = g_Level.Rooms[roomNumber2].y - STEP_SIZE;
 			break;
 		}
 		else
@@ -1028,12 +1028,12 @@ void LookCamera(ITEM_INFO* item)
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
 
-	if (y - 255 < c && y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+	if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
 		Camera.pos.y = (h + c) >> 1;
-	else if (y + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = h - 255;
-	else if (y - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = c + 255;
+	else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		Camera.pos.y = h - (STEP_SIZE - 1);
+	else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		Camera.pos.y = c + (STEP_SIZE - 1);
 
 	x = Camera.pos.x;
 	y = Camera.pos.y;
@@ -1043,7 +1043,7 @@ void LookCamera(ITEM_INFO* item)
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
 	if ((g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
-		Camera.pos.y = g_Level.Rooms[roomNumber].y - 256;
+		Camera.pos.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
 	else if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
 		mgLOS(&Camera.target, &Camera.pos, 0);
 
@@ -1156,14 +1156,14 @@ void BinocularCamera(ITEM_INFO* item)
 		headYrot = -ANGLE(80);
 
 	int x = LaraItem->pos.xPos;
-	int y = LaraItem->pos.yPos - 512;
+	int y = LaraItem->pos.yPos - (WALL_SIZE / 2);
 	int z = LaraItem->pos.zPos;
 
 	short roomNumber = LaraItem->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int c = GetCeiling(floor, x, y, z);
-	if (c <= y - 256)
-		y -= 256;
+	if (c <= y - STEP_SIZE)
+		y -= STEP_SIZE;
 	else
 		y = c + 64;
 
@@ -1425,7 +1425,7 @@ void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
 	
 	if (!LOS(&pos1, &pos2))
 	{
-		int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * 256;
+		int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * STEP_SIZE;
 		
 		if (l + 8 > 31)
 			l = 31;
@@ -1545,7 +1545,7 @@ void CalculateCamera()
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	
 	int x;
-	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->pos.yPos - 256;
+	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->pos.yPos - STEP_SIZE;
 	int z;
 
 	if (Camera.item)
