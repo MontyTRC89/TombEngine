@@ -79,7 +79,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_right_fast,//20
 	lara_as_stepright,//21
 	lara_as_stepleft,//22
-	lara_void_func,
+	lara_as_roll2,
 	lara_as_slide,//24
 	lara_as_backjump,//25
 	lara_as_rightjump,//26
@@ -101,7 +101,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_usekey,//42
 	lara_as_usepuzzle,//43
 	lara_as_uwdeath,//44
-	lara_void_func,//45
+	lara_as_roll,//45
 	lara_as_special,//46
 	lara_as_surfback,//47
 	lara_as_surfleft,//48

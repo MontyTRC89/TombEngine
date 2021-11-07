@@ -652,8 +652,6 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			// BUG: If Lara is stopped while crawling back, this test will fail.
-			// I'm certain it's not due to shifts or the use of BadHeightUp/Down. @Sezz 2021.10.22
 			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_BACK;

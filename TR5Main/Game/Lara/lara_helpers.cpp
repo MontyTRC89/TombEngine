@@ -106,7 +106,6 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// TODO: Keeping legacy quadrant snaps for now. @Sezz 2021.10.16
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.ForwardAngle += ANGLE(180);
