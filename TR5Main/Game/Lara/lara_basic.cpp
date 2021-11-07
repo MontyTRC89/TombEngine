@@ -963,8 +963,8 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = false;
 
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+
+		LaraSnapToHeight(item, coll);
 	}
 }
 
