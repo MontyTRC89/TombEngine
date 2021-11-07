@@ -1253,12 +1253,12 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	}
 	else
 	{
-		SplashSetup.y = wh;
+		SplashSetup.y = wh - 1;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.innerRadius = 16;
 		SplashSetup.splashPower = item->speed;
-		SetupSplash(&SplashSetup,roomNumber);
+		SetupSplash(&SplashSetup, roomNumber);
 		SplashCount = 16;
 	}
 }
@@ -1272,7 +1272,7 @@ void Splash(ITEM_INFO* item)
 	if (room->flags & ENV_FLAG_WATER)
 	{
 		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
-		SplashSetup.y = wh;
+		SplashSetup.y = wh - 1;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.splashPower = item->fallspeed;
