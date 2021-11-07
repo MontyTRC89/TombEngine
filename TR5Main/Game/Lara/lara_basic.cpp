@@ -668,8 +668,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->speed = 0;
 
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraSnapToHeight(item, coll);
 	}
 }
 
