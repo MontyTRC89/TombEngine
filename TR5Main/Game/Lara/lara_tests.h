@@ -67,6 +67,9 @@ bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
 

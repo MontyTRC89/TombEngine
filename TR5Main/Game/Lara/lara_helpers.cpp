@@ -7,6 +7,7 @@
 #include "lara.h"
 #include "lara_tests.h"
 #include "lara_collide.h"
+#include "setup.h"
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -17,7 +18,8 @@
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TestLaraStepUp(item, coll))
+	if (TestLaraStepUp(item, coll) &&
+		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_STEP_UP;
 
@@ -28,7 +30,8 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 	}
-	else if (TestLaraStepDown(item, coll))
+	else if (TestLaraStepDown(item, coll) &&
+		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_STEP_DOWN;
 
@@ -51,18 +54,23 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	int div = 3;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
-		if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&			// Upper floor range.
-			abs(coll->Middle.Floor) >= div)
+		if (TestLaraSwamp(item) &&
+			coll->Middle.Floor > 0)
 		{
-			item->pos.yPos += coll->Middle.Floor / div;
+			item->pos.yPos += SWAMP_GRAVITY;
 		}
 		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Lower floor range.
 			abs(coll->Middle.Floor) >= div)
 		{
-			if (coll->Middle.Floor >= -50)			// Upper floor range.
-				item->pos.yPos += 50;
-			else if (coll->Middle.Floor <= 50)		// Lower floor range.
+			if (coll->Middle.Floor <= 50)			// Lower floor range.
 				item->pos.yPos -= 50;
+			else if (coll->Middle.Floor >= -50)		// Upper floor range.
+				item->pos.yPos += 50;
+		}
+		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&			// Upper floor range.
+			abs(coll->Middle.Floor) >= div)
+		{
+			item->pos.yPos += coll->Middle.Floor / div;
 		}
 		else
 			item->pos.yPos += coll->Middle.Floor;
