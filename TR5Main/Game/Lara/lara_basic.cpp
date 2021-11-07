@@ -463,8 +463,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->goalAnimState = LS_WADE_FORWARD;
-
 			bool wade = false;
 
 			if (TestLaraSwamp(item))
@@ -494,6 +492,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 				coll->Setup.Radius = LARA_RAD;
 			}
+			else
+				item->goalAnimState = LS_WADE_FORWARD;
 		}
 		else if (TrInput & IN_BACK)
 		{
