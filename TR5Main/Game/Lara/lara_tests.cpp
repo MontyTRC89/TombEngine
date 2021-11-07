@@ -1464,7 +1464,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Try using each state's BadStepUp/Down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound.
+	if (/*coll->Middle.Floor <= STEPUP_HEIGHT &&*/		// Lower floor bound. Interferes with swamp sinking.
 		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor bound.
 	{
 		return true;
@@ -1478,6 +1478,7 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&		// Lower floor bound.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
+		item->currentAnimState != LS_WADE_FORWARD &&
 		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
 		item->currentAnimState != LS_HOP_BACK &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
@@ -1495,9 +1496,9 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
+		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_WADE_FORWARD &&
 		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1598,6 +1599,21 @@ bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step right state collision function.
+}
+
+bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);
+}
+
+bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle - ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);
+}
+
+bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);
 }
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
