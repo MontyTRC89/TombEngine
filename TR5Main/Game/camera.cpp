@@ -541,8 +541,14 @@ void CombatCamera(ITEM_INFO* item)
 		Camera.targetAngle = Lara.headYrot + Lara.torsoYrot;
 		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15);
 	}
-	
-	FLOOR_INFO* floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
+
+	short roomNumber = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+
+	auto floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
 	int h = GetFloorHeight(floor, Camera.target.x, Camera.target.y, Camera.target.z);
 	int c = GetCeiling(floor, Camera.target.x, Camera.target.y, Camera.target.z);
 	
@@ -568,7 +574,7 @@ void CombatCamera(ITEM_INFO* item)
 	int y = Camera.target.y;
 	int z = Camera.target.z;
 
-	short roomNumber = Camera.target.roomNumber;
+	roomNumber = Camera.target.roomNumber;
 	floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &roomNumber);
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
