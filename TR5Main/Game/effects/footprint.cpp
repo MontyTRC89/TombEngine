@@ -46,6 +46,10 @@ namespace Footprints {
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
+		// Randomize foot position slightly to avoid patterns
+		footPos.x += (GetRandomControl() & 10) - 5;
+		footPos.z += (GetRandomControl() & 10) - 5;
+
 		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
