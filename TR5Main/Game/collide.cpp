@@ -600,17 +600,19 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 	if (!x && !y)
 		return;
 
-	auto s = phd_sin(angle);
-	auto c = phd_cos(angle);
-
 	if (x != 0)
 	{
+		auto s = phd_sin(angle);
+		auto c = phd_cos(angle);
 		item->pos.xPos += round(x * s);
 		item->pos.zPos += round(x * c);
 	}
 
 	if (y != 0)
 	{
+
+		auto s = phd_sin(angle + ANGLE(90));
+		auto c = phd_cos(angle + ANGLE(90));
 		item->pos.xPos += round(y * s);
 		item->pos.zPos += round(y * c);
 	}
@@ -1781,6 +1783,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
+			// MAGIC: Force slight push-out to the left side to avoid stucking
+			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
+
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
@@ -1829,6 +1834,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
+			// MAGIC: Force slight push-out to the right side to avoid stucking
+			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
+
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
 		}
@@ -2521,41 +2529,39 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
-	FLOOR_INFO* floor;
-	BOUNDING_BOX* bounds;
-	GAME_VECTOR pos;
-	int ratioXZ, frontHDif, sideHDif;
-	int frontX, frontZ, leftX, leftZ, rightX, rightZ;
-	int frontHeight, backHeight, leftHeight, rightHeight;
-	int radiusZ, radiusX;
+	if (!radiusDivide)
+		return;
 
-	bounds = GetBoundsAccurate(item);
+	GAME_VECTOR pos = {};
 	pos.x = item->pos.xPos;
 	pos.y = item->pos.yPos;
 	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
-	radiusX = bounds->X2;
-	radiusZ = bounds->Z2 / radiusDivide; // need divide in any case else it's too much !
 
-	ratioXZ = radiusZ / radiusX;
-	frontX = phd_sin(item->pos.yRot) * radiusZ;
-	frontZ = phd_cos(item->pos.yRot) * radiusZ;
-	leftX = -frontZ * ratioXZ;
-	leftZ = frontX * ratioXZ;
-	rightX = frontZ * ratioXZ;
-	rightZ = -frontX * ratioXZ;
+	auto bounds = GetBoundsAccurate(item);
+	auto radiusX = bounds->X2;
+	auto radiusZ = bounds->Z2 / radiusDivide; // Need divide in any case else it's too much !
 
-	floor = GetFloor(pos.x + frontX, pos.y, pos.z + frontZ, &pos.roomNumber);
-	frontHeight = GetFloorHeight(floor, pos.x + frontX, pos.y, pos.z + frontZ);
-	floor = GetFloor(pos.x - frontX, pos.y, pos.z - frontZ, &pos.roomNumber);
-	backHeight = GetFloorHeight(floor, pos.x - frontX, pos.y, pos.z - frontZ);
-	floor = GetFloor(pos.x + leftX, pos.y, pos.z + leftZ, &pos.roomNumber);
-	leftHeight = GetFloorHeight(floor, pos.x + leftX, pos.y, pos.z + leftZ);
-	floor = GetFloor(pos.x + rightX, pos.y, pos.z + rightZ, &pos.roomNumber);
-	rightHeight = GetFloorHeight(floor, pos.x + rightX, pos.y, pos.z + rightZ);
+	auto ratioXZ = radiusZ / radiusX;
+	auto frontX = phd_sin(item->pos.yRot) * radiusZ;
+	auto frontZ = phd_cos(item->pos.yRot) * radiusZ;
+	auto leftX  = -frontZ * ratioXZ;
+	auto leftZ  =  frontX * ratioXZ;
+	auto rightX =  frontZ * ratioXZ;
+	auto rightZ = -frontX * ratioXZ;
 
-	frontHDif = backHeight - frontHeight;
-	sideHDif = rightHeight - leftHeight;
+	auto frontHeight = GetCollisionResult(pos.x + frontX, pos.y, pos.z + frontZ, pos.roomNumber).Position.Floor;
+	auto backHeight  = GetCollisionResult(pos.x - frontX, pos.y, pos.z - frontZ, pos.roomNumber).Position.Floor;
+	auto leftHeight  = GetCollisionResult(pos.x + leftX,  pos.y, pos.z + leftZ,  pos.roomNumber).Position.Floor;
+	auto rightHeight = GetCollisionResult(pos.x + rightX, pos.y, pos.z + rightZ, pos.roomNumber).Position.Floor;
+
+	auto frontHDif = backHeight  - frontHeight;
+	auto sideHDif  = rightHeight - leftHeight;
+
+	// Don't align if height differences are too large
+	if ((abs(frontHDif) > STEPUP_HEIGHT) || (abs(sideHDif) > STEPUP_HEIGHT))
+		return;
+
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
 	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
@@ -2610,31 +2616,6 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
 		return true;
 
-	return false;
-}
-
-bool SnapToQuadrant(short& angle, int interval)
-{
-	if (abs(angle) <= ANGLE(interval))
-	{
-		angle = 0;
-		return true;
-	}
-	else if (angle >= ANGLE(90 - interval) && angle <= ANGLE(interval + 90))
-	{
-		angle = ANGLE(90);
-		return true;
-	}
-	else if (angle >= ANGLE(180 - interval) || angle <= -ANGLE(180 - interval))
-	{
-		angle = ANGLE(180);
-		return true;
-	}
-	else if (angle >= -ANGLE(interval + 90) && angle <= -ANGLE(90 - interval))
-	{
-		angle = -ANGLE(90);
-		return true;
-	}
 	return false;
 }
 

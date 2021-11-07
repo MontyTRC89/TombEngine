@@ -87,6 +87,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
+		return false;
+
 	// TODO: LUA
 	Lara.NewAnims.CrawlVault1click = true;
 	Lara.NewAnims.CrawlVault2click = true;
@@ -122,11 +125,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT &&		// Left clamp buffer. // TODO: Ceilings don't push, so these are unnecessary for now. @Sezz 2021.11.06
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT*/)		// Right clamp buffer.
 			{
-#if 0
-				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
-					return false;
-#endif
-
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GF(LA_VAULT_TO_STAND_2CLICK_START, 0);
@@ -159,11 +157,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT &&		// Left clamp buffer. // TODO: Ceilings don't push, so these are unnecessary for now. @Sezz 2021.11.06
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT*/)		// Right clamp buffer.
 			{
-#if 0
-				if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
-					return 0;
-#endif
-
 				item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GF(LA_VAULT_TO_STAND_3CLICK, 0);
@@ -191,11 +184,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		else if (coll->Front.Floor >= -(WALL_SIZE * 2 - STEP_SIZE / 2) &&		// Upper floor bound.
 			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2))					// Lower floor bound.
 		{
-#if 0
-			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
-				return false;
-#endif
-
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GF(LA_STAND_SOLID, 0);
 			item->goalAnimState = LS_JUMP_UP;
@@ -1754,4 +1742,14 @@ bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
 	}
 
 	return false;
+}
+
+bool TestLaraSwamp(ITEM_INFO* item)
+{
+	return g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP;
+}
+
+bool TestLaraWater(ITEM_INFO* item)
+{
+	return g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
 }

@@ -298,26 +298,19 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 	return hit;
 }
 
-int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh)
+int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
 {
-	int r, m;
-	ROOM_INFO* room;
-	short linknum;
-	ITEM_INFO* item;
-	PHD_3DPOS pos;
-	MESH_INFO* meshp;
-	BOUNDING_BOX* box;
-
 	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
 
-	for (r = 0; r < NumberLosRooms; ++r)
+	for (int r = 0; r < NumberLosRooms; ++r)
 	{
-		room = &g_Level.Rooms[LosRooms[r]];
+		PHD_3DPOS pos;
+		auto room = &g_Level.Rooms[LosRooms[r]];
 
-		for (m = 0; m < room->mesh.size(); m++)
+		for (int m = 0; m < room->mesh.size(); m++)
 		{
-			meshp = &room->mesh[m];
+			auto meshp = &room->mesh[m];
 
 			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
@@ -334,27 +327,32 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 			}
 		}
 
-		for (linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+		for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 		{
-			item = &g_Level.Items[linknum];
+			auto item = &g_Level.Items[linknum];
 
-			if (item->status != ITEM_DEACTIVATED && item->status != ITEM_INVISIBLE
-				&& (item->objectNumber != ID_LARA
-					&& Objects[item->objectNumber].collision != NULL
-					|| item->objectNumber == ID_LARA
-					&& GetLaraOnLOS))
+			if ((item->status == ITEM_DEACTIVATED) || (item->status == ITEM_INVISIBLE))
+				continue;
+
+			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->objectNumber != priorityObject))
+				continue;
+
+			if ((item->objectNumber != ID_LARA) && (Objects[item->objectNumber].collision == NULL))
+				continue;
+
+			if ((item->objectNumber == ID_LARA) && (priorityObject != ID_LARA))
+				continue;
+
+			auto box = GetBoundsAccurate(item);
+
+			pos.xPos = item->pos.xPos;
+			pos.yPos = item->pos.yPos;
+			pos.zPos = item->pos.zPos;
+			pos.yRot = item->pos.yRot;
+
+			if (DoRayBox(start, end, box, &pos, vec, linknum))
 			{
-				box = GetBoundsAccurate(item);
-
-				pos.xPos = item->pos.xPos;
-				pos.yPos = item->pos.yPos;
-				pos.zPos = item->pos.zPos;
-				pos.yRot = item->pos.yRot;
-
-				if (DoRayBox(start, end, box, &pos, vec, linknum))
-				{
-					end->roomNumber = LosRooms[r];
-				}
+				end->roomNumber = LosRooms[r];
 			}
 		}
 	}
