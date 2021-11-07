@@ -1464,7 +1464,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Try using each state's BadStepUp/Down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (/*coll->Middle.Floor <= STEPUP_HEIGHT &&*/		// Lower floor bound. Interferes with swamp sinking.
+	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound.
 		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor bound.
 	{
 		return true;
@@ -1475,13 +1475,13 @@ bool TestLaraStep(COLL_INFO* coll)
 
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&		// Lower floor bound.
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor bound.
+	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&			// Lower floor bound.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&				// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WADE_FORWARD &&
-		item->currentAnimState != LS_WALK_BACK &&		// No step up anim exists for these states.
+		item->currentAnimState != LS_WADE_FORWARD &&		// No step up anim exists for these states.
+		item->currentAnimState != LS_WALK_BACK &&
 		item->currentAnimState != LS_HOP_BACK &&
-		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step up handled differently.
+		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
 		return true;

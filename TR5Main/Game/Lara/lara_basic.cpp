@@ -1559,7 +1559,10 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.waterStatus == LW_WADE)
 	{
-		LaraWadeTurnRight(item, coll);
+		if (TestLaraSwamp(item))
+			LaraSwampTurnRight(item, coll);
+		else [[likely]]
+			LaraWadeTurnRight(item, coll);
 
 		return;
 	}
@@ -1670,8 +1673,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning right in wade-height water.
 void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_JUMP &&
-		!TestLaraSwamp(item))
+	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -1703,6 +1705,53 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_RSTEP &&
 		TestLaraStepRight(item, coll))
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
+	if (TrInput & IN_RIGHT)
+	{
+		if (Lara.turnRate > LARA_SLOW_TURN)
+			Lara.turnRate = LARA_SLOW_TURN;
+
+		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for turning right in swamps.
+void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
+	{
+		item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+	else if (TrInput & IN_BACK &&
+		TestLaraWalkBackSwamp(item, coll))
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeftSwamp(item, coll))
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRightSwamp(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
 
@@ -1829,7 +1878,10 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.waterStatus == LW_WADE)
 	{
-		LaraWadeTurnLeft(item, coll);
+		if (TestLaraSwamp(item))
+			LaraSwampTurnLeft(item, coll);
+		else [[likely]]
+			LaraWadeTurnLeft(item, coll);
 
 		return;
 	}
@@ -1939,14 +1991,60 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning left in wade-height water.
 void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_JUMP &&
-		!TestLaraSwamp(item))
+	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
 		return;
 	}
 
+	if (TrInput & IN_FORWARD &&
+		coll->CollisionType != CT_FRONT &&
+		coll->CollisionType != CT_TOP_FRONT)
+	{
+		item->goalAnimState = LS_WADE_FORWARD;
+
+		return;
+	}
+	else if (TrInput & IN_BACK &&
+		TestLaraWalkBack(item, coll))
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	if (TrInput & IN_LSTEP &&
+		TestLaraStepLeft(item, coll))
+	{
+		item->goalAnimState = LS_STEP_LEFT;
+
+		return;
+	}
+	else if (TrInput & IN_RSTEP &&
+		TestLaraStepRight(item, coll))
+	{
+		item->goalAnimState = LS_STEP_RIGHT;
+
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		if (Lara.turnRate < -LARA_SLOW_TURN)
+			Lara.turnRate = -LARA_SLOW_TURN;
+
+		item->goalAnimState = LS_TURN_LEFT_SLOW;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for turning left in swamps.
+void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
+{
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
 		coll->CollisionType != CT_TOP_FRONT)
@@ -2978,7 +3076,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 
@@ -3136,7 +3234,7 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 
@@ -3175,7 +3273,7 @@ void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_MED_TURN;
 	}
 
-	item->goalAnimState = LS_ROLL_BACK; //?
+	item->goalAnimState = LS_ROLL_BACK;
 }
 
 // State:		LS_ROLL_FORWARD (23)
@@ -3875,7 +3973,8 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	// TODO: This check can be simpler. @Sezz 2021.11.08
+	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 

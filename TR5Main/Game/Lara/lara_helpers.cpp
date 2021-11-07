@@ -51,7 +51,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	// comment everything EXCEPT the last two lines. Lara will simply snap to the surface as before (although the LS_RUN and LS_WADE_FORWARD
 	// states had a linear transition of 50 units per frame, so not all original behaviour can be restored from here;
 	// as that is so, I have left commented legacy step code in their respective col functions). @Sezz 2021.10.09
-	int div = 3;
+	int div = 2;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
 		if (TestLaraSwamp(item) &&
