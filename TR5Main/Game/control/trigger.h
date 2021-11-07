@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct FLOOR_INFO;
+class FLOOR_INFO;
 
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 

@@ -16,6 +16,8 @@ bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraKeepDucked(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraSwamp(ITEM_INFO* item);
+bool TestLaraWater(ITEM_INFO* item);
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll);

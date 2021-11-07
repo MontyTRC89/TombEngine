@@ -721,7 +721,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Refine this handling. Create LS_WADE_IDLE state? Might complicate things. @Sezz 2021.09.28
-	if (Lara.waterStatus == LW_WADE)
+	if (Lara.waterStatus == LW_WADE ||
+		TestLaraSwamp(item))
 	{
 		LaraWadeStop(item, coll);
 
@@ -861,7 +862,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 void LaraWadeStop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_JUMP &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -1032,16 +1033,14 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.waterStatus == LW_WADE)
 	{
-		if (TrInput & IN_JUMP && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		if (TrInput & IN_JUMP && !TestLaraSwamp(item))
 			item->goalAnimState = LS_JUMP_PREPARE;
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->goalAnimState = LS_WADE_FORWARD;
-
 			bool wade = false;
 
-			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+			if (TestLaraSwamp(item))
 			{
 				if (fheight.Position.Floor > -(STEPUP_HEIGHT - 1))
 					wade = true;
@@ -1068,10 +1067,12 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 				coll->Setup.Radius = LARA_RAD;
 			}
+			else
+				item->goalAnimState = LS_WADE_FORWARD;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TrInput & IN_WALK)
+			if (TestLaraSwamp(item) || (TrInput & IN_WALK))
 			{
 				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
 					item->goalAnimState = LS_WALK_BACK;
@@ -1086,7 +1087,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_JUMP)
 		{
-			if (coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
+			if (!TestLaraSwamp(item) && coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 				item->goalAnimState = LS_JUMP_PREPARE;
 		}
 		else if (TrInput & IN_FORWARD)
@@ -1164,15 +1165,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Vaulting from this state.
 
-#if 1
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-#else
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
-#endif
+	LaraSnapToHeight(item, coll);
 }
 
 // LEGACY
@@ -1201,16 +1194,7 @@ void old_lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	ShiftItem(item, coll);
-
-#if 1
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-#else
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
-#endif
+	LaraSnapToHeight(item, coll);
 }
 
 void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1274,7 +1258,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->speed < 0)
 		Lara.moveAngle = item->pos.yRot;
 
-	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
 		if (LaraLandedBad(item, coll))
 		{
@@ -1636,7 +1620,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_JUMP &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -1762,11 +1746,7 @@ void old_lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
 
-#if 1
-	if (coll->Middle.Floor > 100)
-#else
-	if (coll->Middle.Floor > 100 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
-#endif
+	if (coll->Middle.Floor > 100 && !TestLaraSwamp(item))
 	{
 		item->fallspeed = 0;
 		item->animNumber = LA_FALL_START;
@@ -1780,15 +1760,7 @@ void old_lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-#if 1
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-#else
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
-#endif
+	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_TURN_LEFT_SLOW (7)
@@ -1917,7 +1889,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_JUMP &&
-		!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
 
@@ -2089,7 +2061,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 	LaraSlideEdgeJump(item, coll);
 
-	if (coll->Middle.Floor <= 0)
+	if (coll->Middle.Floor <= 0 || TestLaraSwamp(item))
 	{
 		if (LaraLandedBad(item, coll))
 		{
@@ -2493,7 +2465,8 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) &&
+		!TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 
@@ -2507,16 +2480,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 		GetChange(item, &g_Level.Anims[item->animNumber]);
 	}*/
 
-	// TODO
-#if 0
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
-#else
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-#endif
+	LaraSnapToHeight(item, coll);
 }
 
 // LEGACY
@@ -2557,15 +2521,7 @@ void old_lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-#if 0
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
-#else
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-#endif
+	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_TURN_RIGHT_FAST (20)
@@ -3454,18 +3410,15 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
+	if (item->fallspeed > 0 &&  (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_STOP;
 
-		item->fallspeed = 0;
-		item->gravityStatus = 0;
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraResetGravityStatus(item, coll);
+		LaraSnapToHeight(item, coll);
 	}
 }
 
@@ -3699,7 +3652,7 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	if (TestLaraSwamp(item))
 	{
 		LaraWadeSwamp(item, coll);
 
@@ -3779,7 +3732,7 @@ void old_lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	if (TestLaraSwamp(item))
 	{
 		if (TrInput & IN_LEFT)
 		{
@@ -3859,8 +3812,9 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.zRot = 0;
 
-		if (!coll->Front.Slope && coll->Front.Floor < -(STEPUP_HEIGHT) &&
-			!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		if (coll->Front.Floor < -STEPUP_HEIGHT &&
+			!coll->Front.Slope &&
+			!TestLaraSwamp(item))
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -3873,19 +3827,15 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll)
-		&& !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (TestLaraStep(coll) && 
+		!TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 
 		return;
 	}
 
-	// Swamp step. TODO: Test it when swamps work again. @Sezz 2021.10.25
-	if (coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;
-	else if (coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
+	LaraSnapToHeight(item, coll);
 }
 
 // LEGACY
@@ -3915,7 +3865,7 @@ void old_lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.zRot = 0;
 
 
-		if (!coll->Front.Slope && coll->Front.Floor < -((STEP_SIZE * 5) / 2) && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+		if (!coll->Front.Slope && coll->Front.Floor < -((STEP_SIZE * 5) / 2) && !TestLaraSwamp(item))
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -3926,22 +3876,19 @@ void old_lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_STEP_UP;
 		GetChange(item, &g_Level.Anims[item->animNumber]);
 	}
 
-	if (coll->Middle.Floor >= 50 && !(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP))
+	if (coll->Middle.Floor >= 50 && !TestLaraSwamp(item))
 	{
 		item->pos.yPos += 50;
 		return;
 	}
 
-	if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->Middle.Floor < 0)
-		item->pos.yPos += coll->Middle.Floor;   // Enforce to floor height.. if not a swamp room.
-	else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->Middle.Floor)
-		item->pos.yPos += SWAMP_GRAVITY;
+	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_SPRINT (73)

@@ -146,7 +146,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		}
 	} while (roomIndex != NO_ROOM);
 
-	if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
+	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
 		{

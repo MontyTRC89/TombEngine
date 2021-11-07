@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "lara_flare.h"
+#include "lara_tests.h"
 #include "level.h"
 #include "setup.h"
 #include "Sound/sound.h"
@@ -22,7 +23,7 @@ void FlareControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	if (TestLaraSwamp(item))
 	{
 		KillItem(itemNumber);
 		return;
