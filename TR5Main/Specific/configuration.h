@@ -2,7 +2,7 @@
 
 #include "input.h"
 
-#define REGKEY_ROOT				"Software\\TR5Main\\TR5Main"
+#define REGKEY_ROOT				"Software\\TombEngine\\TombEngine"
 
 #define REGKEY_ADAPTER			"Adapter"
 #define REGKEY_SCREEN_WIDTH		"ScreenWidth"

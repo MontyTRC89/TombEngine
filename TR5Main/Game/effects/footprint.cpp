@@ -21,19 +21,8 @@ namespace Footprints {
 		int z = item.pos.zPos;
 		short roomNumber = item.roomNumber;
 
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		if (!(floor->Material == (int)GroundMaterial::Sand   ||
-			  floor->Material == (int)GroundMaterial::Snow   ||
-			  floor->Material == (int)GroundMaterial::Gravel ||
-			  floor->Material == (int)GroundMaterial::Mud)) 
-		{
-			return false;
-		}
-
-		PHD_VECTOR pos;
-
-		pos.x = pos.z = 0;
-		pos.y = FOOT_HEIGHT_OFFSET;
+		auto floor = GetFloor(x, y, z, &roomNumber);
+		auto pos = PHD_VECTOR(0, FOOT_HEIGHT_OFFSET, 0);
 
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
@@ -57,7 +46,10 @@ namespace Footprints {
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
-		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+		// Randomize foot position slightly to avoid patterns
+		footPos.x += (GetRandomControl() & 10) - 5;
+		footPos.z += (GetRandomControl() & 10) - 5;
+
 		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
@@ -65,62 +57,63 @@ namespace Footprints {
 		if (result.Position.Bridge >= 0)
 			return;
 
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 		// Choose material for footstep sound
 		switch (floor->Material)
 		{
-		case GroundMaterial::Concrete:
+		case FLOOR_MATERIAL::Concrete:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 			break;
 
-		case GroundMaterial::Grass:
+		case FLOOR_MATERIAL::Grass:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
 			break;
 
-		case GroundMaterial::Gravel:
+		case FLOOR_MATERIAL::Gravel:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_GRAVEL;
 			break;
 
-		case GroundMaterial::Ice:
+		case FLOOR_MATERIAL::Ice:
 			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_ICE;
 			break;
 
-		case GroundMaterial::Marble:
+		case FLOOR_MATERIAL::Marble:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MARBLE;
 			break;
 
-		case GroundMaterial::Metal:
+		case FLOOR_MATERIAL::Metal:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
 			break;
 
-		case GroundMaterial::Mud:
+		case FLOOR_MATERIAL::Mud:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MUD;
 			break;
 
-		case GroundMaterial::OldMetal:
+		case FLOOR_MATERIAL::OldMetal:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
 			break;
 
-		case GroundMaterial::OldWood:
+		case FLOOR_MATERIAL::OldWood:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
 			break;
 
-		case GroundMaterial::Sand:
+		case FLOOR_MATERIAL::Sand:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
 			break;
 
-		case GroundMaterial::Snow:
+		case FLOOR_MATERIAL::Snow:
 			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_SNOW;
 			break;
 
-		case GroundMaterial::Stone:
+		case FLOOR_MATERIAL::Stone:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 			break;
 
-		case GroundMaterial::Water:
+		case FLOOR_MATERIAL::Water:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 			break;
 
-		case GroundMaterial::Wood:
+		case FLOOR_MATERIAL::Wood:
 			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
 			break;
 		}
@@ -128,6 +121,12 @@ namespace Footprints {
 		// HACK: must be here until reference wad2 is revised
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
 			SoundEffect(fx, &item->pos, 0);
+
+		if (floor->Material != FLOOR_MATERIAL::Sand &&
+			floor->Material != FLOOR_MATERIAL::Snow &&
+			floor->Material != FLOOR_MATERIAL::Gravel &&
+			floor->Material != FLOOR_MATERIAL::Mud)
+			return;
 
 		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];

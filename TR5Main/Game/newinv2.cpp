@@ -1485,6 +1485,7 @@ void InventoryClass::handle_sound_settings_input(bool pause)
 			{
 				// Save the configuration
 				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+				SaveConfiguration();
 
 				pause_menu_to_display = pause_main_menu;
 				pause_selected_option = 1;
@@ -1504,6 +1505,7 @@ void InventoryClass::handle_sound_settings_input(bool pause)
 			{
 				// Save the configuration
 				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+				SaveConfiguration();
 
 				title_menu_to_display = title_options_menu;
 				title_selected_option = 2;

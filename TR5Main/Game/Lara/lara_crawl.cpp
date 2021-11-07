@@ -348,7 +348,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(23.0f);
 
-	if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER)
+	if (TestLaraWater(item))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 		item->requiredAnimState = LS_STOP;
