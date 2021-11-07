@@ -7,7 +7,9 @@
 #include "collide.h"
 #include "control/control.h"
 #include "lara_collide.h"
+#include "lara_tests.h"
 #include "items.h"
+#include "setup.h"
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
@@ -302,6 +304,14 @@ void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll)
 		item->gravityStatus = false;
 		item->fallspeed = 0;
 	}
+}
+
+void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
+		item->pos.yPos += SWAMP_GRAVITY;
+	else if (coll->Middle.Floor != NO_HEIGHT)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 short GetDirOctant(int rot)

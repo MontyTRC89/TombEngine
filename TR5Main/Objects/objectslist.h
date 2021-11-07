@@ -2,6 +2,8 @@
 
 enum GAME_OBJECT_ID : short
 {
+	ID_NO_OBJECT = -1,
+
 	/* Lara Primary Slot */
 	ID_LARA,
 	ID_LARA_EXTRA_ANIMS,
