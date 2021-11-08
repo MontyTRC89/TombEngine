@@ -46,7 +46,7 @@ namespace TEN::Renderer
 
 		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
 				y >= r->maxceiling && y <= r->minfloor &&
-				z >= r->z && z <= r->z + r->ySize * 1024.0f);
+				z >= r->z && z <= r->z + r->zSize * 1024.0f);
 	}
 
 	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
@@ -655,7 +655,7 @@ namespace TEN::Renderer
 
 			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
 										 (room->minfloor + room->maxceiling) / 2.0f,
-										 room->z + room->ySize * WALL_SIZE / 2.0f);
+										 room->z + room->zSize * WALL_SIZE / 2.0f);
 			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();

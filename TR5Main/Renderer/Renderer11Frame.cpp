@@ -339,7 +339,7 @@ namespace TEN::Renderer
 			RendererLight *light = m_dynamicLights[i];
 
 			Vector3 boxMin = Vector3(r->x - WALL_SIZE, -r->minfloor, r->z - WALL_SIZE);
-			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->ySize * WALL_SIZE);
+			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->zSize * WALL_SIZE);
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
 			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1
