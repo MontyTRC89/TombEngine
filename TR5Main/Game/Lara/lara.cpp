@@ -455,46 +455,49 @@ void LaraControl(short itemNumber)
 			if (hfw == NO_HEIGHT || hfw < WADE_DEPTH)
 				break;
 
-			if (wd > SWIM_DEPTH - STEP_SIZE && isWater && !isSwamp)
+			if (wd > SWIM_DEPTH - STEP_SIZE && !isSwamp)
 			{
-				Lara.air = 1800;
-				Lara.waterStatus = LW_UNDERWATER;
-				item->gravityStatus = false;
-				item->pos.yPos += 100;
-
-				UpdateItemRoom(LaraItem, 0);
-				StopSoundEffect(SFX_TR4_LARA_FALL);
-
-				if (item->currentAnimState == LS_SWANDIVE_START)
+				if (isWater)
 				{
-					item->pos.xRot = -ANGLE(45);
-					item->goalAnimState = LS_DIVE;
-					AnimateLara(item);
-					item->fallspeed *= 2;
-				}
-				else if (item->currentAnimState == LS_SWANDIVE_END)
-				{
-					item->pos.xRot = -ANGLE(85);
-					item->goalAnimState = LS_DIVE;
-					AnimateLara(item);
-					item->fallspeed *= 2;
-				}
-				else
-				{
-					item->pos.xRot = -ANGLE(45);
-					item->animNumber = LA_FREEFALL_DIVE;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->currentAnimState = LS_DIVE;
-					item->goalAnimState = LS_UNDERWATER_FORWARD;
-					item->fallspeed = 3 * item->fallspeed / 2;
-				}
+					Lara.air = 1800;
+					Lara.waterStatus = LW_UNDERWATER;
+					item->gravityStatus = false;
+					item->pos.yPos += 100;
 
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
+					UpdateItemRoom(LaraItem, 0);
+					StopSoundEffect(SFX_TR4_LARA_FALL);
 
-				Splash(LaraItem);
+					if (item->currentAnimState == LS_SWANDIVE_START)
+					{
+						item->pos.xRot = -ANGLE(45);
+						item->goalAnimState = LS_DIVE;
+						AnimateLara(item);
+						item->fallspeed *= 2;
+					}
+					else if (item->currentAnimState == LS_SWANDIVE_END)
+					{
+						item->pos.xRot = -ANGLE(85);
+						item->goalAnimState = LS_DIVE;
+						AnimateLara(item);
+						item->fallspeed *= 2;
+					}
+					else
+					{
+						item->pos.xRot = -ANGLE(45);
+						item->animNumber = LA_FREEFALL_DIVE;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->currentAnimState = LS_DIVE;
+						item->goalAnimState = LS_UNDERWATER_FORWARD;
+						item->fallspeed = 3 * item->fallspeed / 2;
+					}
+
+					Lara.torsoYrot = 0;
+					Lara.torsoXrot = 0;
+					Lara.headYrot = 0;
+					Lara.headXrot = 0;
+
+					Splash(LaraItem);
+				}
 			}
 			else if (hfw > WADE_DEPTH)
 			{
