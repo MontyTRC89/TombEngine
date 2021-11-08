@@ -21,11 +21,11 @@ namespace Environment
 		int Room;
 		Vector3 Position;
 		Vector3 Velocity;
-		float Turbulence;
 
 		float Life;
 		float Size;
 
+		bool Enabled;
 		bool Stopped;
 	};
 
