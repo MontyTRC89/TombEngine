@@ -891,7 +891,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 	if (BinocularRange)
 	{
 		BinocularRange = 0;
-		LaserSight = 0;
+		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		LaraItem->meshBits = -1;
 		Lara.busy = false;
