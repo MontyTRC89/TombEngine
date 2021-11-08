@@ -8,7 +8,6 @@ enum class CAMERA_TYPE
 	FIXED_CAMERA,
 	LOOK_CAMERA,
 	COMBAT_CAMERA,
-	CINEMATIC_CAMERA,
 	HEAVY_CAMERA
 };
 
@@ -77,7 +76,6 @@ void FixedCamera(ITEM_INFO* item);
 void LookCamera(ITEM_INFO* item);
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
 void BinocularCamera(ITEM_INFO* item);
-void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
 void LookLeftRight();
