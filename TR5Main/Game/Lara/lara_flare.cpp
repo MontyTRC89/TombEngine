@@ -51,7 +51,7 @@ void FlareControl(short itemNumber)
 	item->pos.zPos += zv;
 
 
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed += (5 - item->speed) / 2;
