@@ -219,17 +219,9 @@ namespace Environment
 			Particles.push_back(part);
 		}
 
-		std::set<int> toRemove;
-
 		for (int i = 0; i < Particles.size(); i++)
 		{
 			auto& p = Particles[i];
-
-			if (!p.Enabled)
-			{
-				toRemove.insert(i);
-				continue;
-			}
 
 			auto oldPos = p.Position;
 
@@ -252,7 +244,7 @@ namespace Environment
 
 				if (coll.RoomNumber == p.Room)
 				{
-					toRemove.insert(i); // Spawned in same room, needs to be on portal
+					p.Enabled = false; // Spawned in same room, needs to be on portal
 					continue;
 				}
 				else if (inSubstance || landed)
@@ -297,9 +289,9 @@ namespace Environment
 			p.Life -= 2;
 		}
 
-		for (auto v = toRemove.rbegin(); v != toRemove.rend(); v++)
-		{
-			Particles.erase(Particles.begin() + *v);
-		}
+		// Clean up dead particles
+		if (Particles.size() > 0)
+			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
+			// std::erase_if(Particles, [](const WeatherParticle& part) { return !part.Enabled; });
 	}
 }}}
