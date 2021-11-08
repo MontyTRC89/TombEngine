@@ -1616,6 +1616,7 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraMove(item, coll, coll->Setup.ForwardAngle + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);
 }
 
+// Currently unused; LaraCollideStopCrawl() handles front collision. @Sezz 2021.11.08
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return TestLaraMoveCrawl(item, coll, coll->Setup.ForwardAngle, STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
