@@ -58,7 +58,7 @@ int NumberCameras;
 int BinocularRange;
 int BinocularOn;
 CAMERA_TYPE BinocularOldCamera;
-int LaserSight;
+bool LaserSight;
 int PhdPerspective;
 short CurrentFOV;
 

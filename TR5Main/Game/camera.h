@@ -59,7 +59,7 @@ extern int NumberCameras;
 extern int BinocularRange;
 extern int BinocularOn;
 extern CAMERA_TYPE BinocularOldCamera;
-extern int LaserSight;
+extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
 
