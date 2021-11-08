@@ -519,7 +519,7 @@ void BaboonControl(short itemNumber)
                     pos.x = item->pos.xPos + SECTOR(1);
                     pos.z = item->pos.zPos;
                     break;
-                case 0:      // NORTH (NOP) maybe okay now with TR5Main
+                case 0:      // NORTH (NOP) maybe okay now with TombEngine
                     pos.x = item->pos.xPos;
                     pos.z = item->pos.zPos + SECTOR(1);
                     break;

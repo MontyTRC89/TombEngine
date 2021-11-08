@@ -172,7 +172,7 @@ enum LARA_STATE
 	LS_PICKUP_FROM_CHEST = 137,
 	LS_UNKNOWN_6 = 138,
 
-	// TEN
+	// TombEngine
 	LS_HANG_FEET = 139,
 	LS_SHIMMY_FEET_RIGHT = 140,
 	LS_SHIMMY_FEET_LEFT = 141,
@@ -704,7 +704,7 @@ enum LARA_ANIM
 	LA_LOOT_CHEST = 472,									// Search chest on ground
 	LA_LADDER_TO_CROUCH = 473,								// Pull up from ladder > crouch
 
-	// TEN
+	// TombEngine
 	LA_VAULT_TO_CROUCH_1CLICK = 474, 						// Vault standing up 1-click > crouch
 	LA_VAULT_TO_CROUCH_2CLICK = 475,						// Vault standing up 2-click > crouch
 	LA_VAULT_TO_CROUCH_3CLICK = 476,						// Vault standing up 2-click > crouch
