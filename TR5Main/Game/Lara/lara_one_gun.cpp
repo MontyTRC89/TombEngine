@@ -104,7 +104,7 @@ void FireHarpoon()
 	}
 }
 
-void ControlHarpoonBolt(short itemNumber)
+void HarpoonBoltControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -376,7 +376,7 @@ void FireGrenade()
 	}
 }
 
-void ControlGrenade(short itemNumber)
+void GrenadeControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -466,7 +466,7 @@ void ControlGrenade(short itemNumber)
 	// Check if above water and update speed and fallspeed
 	bool aboveWater = false;
 	bool someFlag = false;
-	if (g_Level.Rooms[item->roomNumber].flags & 1)
+	if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		aboveWater = false;
 		someFlag = false;
@@ -773,7 +773,7 @@ void ControlGrenade(short itemNumber)
 	}
 }
 
-void ControlRocket(short itemNumber)
+void RocketControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1281,7 +1281,7 @@ enum CROSSBOW_TYPE
 	CROSSBOW_EXPLODE
 };
 
-void ControlCrossbowBolt(short itemNumber)
+void CrossbowBoltControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 

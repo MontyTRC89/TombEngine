@@ -688,9 +688,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->CeilingHeight(x, z));
 			floor = GetSector(room, x - room->x, z - room->z);
@@ -700,9 +700,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			room = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->FloorHeight(x, z));
 			floor = GetSector(room, x - room->x, z - room->z);
@@ -878,23 +878,23 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			zBlock = 0;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->ySize - 2)
-				xBlock = r->ySize - 2;
+			else if (xBlock > r->xSize - 2)
+				xBlock = r->xSize - 2;
 		}
-		else if (zBlock >= r->xSize - 1)
+		else if (zBlock >= r->zSize - 1)
 		{
-			zBlock = r->xSize - 1;
+			zBlock = r->zSize - 1;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->ySize - 2)
-				xBlock = r->ySize - 2;
+			else if (xBlock > r->xSize - 2)
+				xBlock = r->xSize - 2;
 		}
 		else if (xBlock < 0)
 			xBlock = 0;
-		else if (xBlock >= r->ySize)
-			xBlock = r->ySize - 1;
+		else if (xBlock >= r->xSize)
+			xBlock = r->xSize - 1;
 
-		floor = &r->floor[zBlock + xBlock * r->xSize];
+		floor = &r->floor[zBlock + xBlock * r->zSize];
 		adjoiningRoom = floor->WallPortal;
 
 		if (adjoiningRoom != NO_ROOM)
@@ -906,16 +906,16 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-		while (floor->RoomAbove(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto r = &g_Level.Rooms[floor->RoomAbove(x, z, y).value_or(floor->Room)];
+			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
 
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
 				return r->minfloor;
 
 			floor = GetSector(r, x - r->x, z - r->z);
 
-			if (floor->RoomAbove(x, z, y).value_or(NO_ROOM) == NO_ROOM)
+			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
 		}
 
@@ -923,16 +923,16 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto r = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
+			auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				return r->maxceiling;
 
 			floor = GetSector(r, x - r->x, z - r->z);
 
-			if (floor->RoomBelow(x, z, y).value_or(NO_ROOM) == NO_ROOM)
+			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
 		}
 	}

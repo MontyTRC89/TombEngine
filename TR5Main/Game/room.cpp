@@ -131,8 +131,8 @@ int IsRoomOutside(int x, int y, int z)
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
-			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->zSize - 1) * 1024))))
+			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->xSize - 1) * 1024)))))
 		{
 			IsRoomOutsideNo = roomNumber;
 
@@ -153,9 +153,10 @@ int IsRoomOutside(int x, int y, int z)
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z) 
 {
-	int sectorX = (x) / SECTOR(1);
-	int sectorZ = (z) / SECTOR(1);
-	int index = sectorZ + sectorX * r->xSize;
+	int sectorX = std::clamp(x / SECTOR(1), 0, r->xSize - 1);
+	int sectorZ = std::clamp(z / SECTOR(1), 0, r->zSize - 1);
+
+	int index = sectorZ + sectorX * r->zSize;
 	if (index > r->floor.size()) 
 	{
 		return nullptr;
