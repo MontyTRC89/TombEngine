@@ -1287,9 +1287,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	// Probe bottom block through portals.
-	while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+	while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 	{
-		auto r = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
+		auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 		floor = GetSector(r, x - r->x, z - r->z);
 	}
 
@@ -1304,7 +1304,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
-	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor, true, false);
+	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
@@ -2688,8 +2688,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			auto block = GetCollisionResult(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight = block->BridgeFloorHeight(ffpX, ffpZ, y); // HACK? FloorHeight never returns real bridge height!
-			auto ceilingHeight = block->CeilingHeight(ffpX, ffpZ, y);
+			auto floorHeight = block->BridgeFloorHeight(ffpX, y, ffpZ); // HACK? FloorHeight never returns real bridge height!
+			auto ceilingHeight = block->CeilingHeight(ffpX, y, ffpZ);
 
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
@@ -2697,7 +2697,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(ffpX, ffpZ, height, true, y == height);
+			auto bridge = block->InsideBridge(ffpX, height, ffpZ, true, y == height);
 
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
