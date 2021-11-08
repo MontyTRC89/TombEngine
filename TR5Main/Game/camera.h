@@ -19,10 +19,10 @@ struct CAMERA_INFO
 	CAMERA_TYPE oldType; // size=4, offset=36
 	int shift; // size=0, offset=40
 	int flags; // size=0, offset=44
-	int fixedCamera; // size=0, offset=48
+	bool fixedCamera; // size=0, offset=48
+	bool underwater; // size=0, offset=60
 	int numberFrames; // size=0, offset=52
 	int bounce; // size=0, offset=56
-	int underwater; // size=0, offset=60
 	int targetDistance; // size=0, offset=64
 	short targetAngle; // size=0, offset=68
 	short targetElevation; // size=0, offset=70
