@@ -103,7 +103,7 @@ struct ROOM_INFO
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 	int xSize;
-	int ySize;
+	int zSize;
 	std::vector<FLOOR_INFO> floor;
 	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;

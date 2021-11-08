@@ -275,9 +275,9 @@ namespace TEN::Floordata
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
-		const auto xRoom = (z - room.z) / SECTOR(1);
-		const auto yRoom = (x - room.x) / SECTOR(1);
-		auto pos = VectorInt2{xRoom, yRoom};
+		const auto zRoom = (z - room.z) / SECTOR(1);
+		const auto xRoom = (x - room.x) / SECTOR(1);
+		auto pos = VectorInt2{xRoom, zRoom};
 
 		if (pos.x < 0)
 		{
@@ -292,9 +292,9 @@ namespace TEN::Floordata
 		{
 			pos.y = 0;
 		}
-		else if (pos.y > room.ySize - 1)
+		else if (pos.y > room.zSize - 1)
 		{
-			pos.y = room.ySize - 1;
+			pos.y = room.zSize - 1;
 		}
 
 		return pos;
@@ -303,7 +303,7 @@ namespace TEN::Floordata
 	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
-		return room.floor[room.xSize * pos.y + pos.x];
+		return room.floor[room.zSize * pos.x + pos.y];
 	}
 
 	FLOOR_INFO& GetFloor(int roomNumber, int x, int z)
@@ -787,8 +787,8 @@ namespace TEN::Floordata
 		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
 
 		// Run through all blocks enclosed in AABB
-		for (int x = 0; x < room->ySize; x++)
-			for (int z = 0; z < room->xSize; z++)
+		for (int x = 0; x < room->xSize; x++)
+			for (int z = 0; z < room->zSize; z++)
 			{
 				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
 				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
