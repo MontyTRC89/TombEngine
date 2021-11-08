@@ -375,6 +375,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Update weather
 		Weather.Update();
 
+		for (auto p : Weather.Particles)
+		{
+			g_Renderer.addLine3D(p.Position, p.Position + Vector3(16), Vector4::One);
+		}
+
 		// Update special FX
 		TriggerLaraDrips();
 		UpdateSparks();
