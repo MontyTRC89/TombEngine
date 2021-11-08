@@ -186,12 +186,12 @@ namespace Environment
 
 			newParticlesCount++;
 
-			auto radius = (GetRandomDraw() & (WALL_SIZE * 4 - 1));
-			auto angle  = (GetRandomDraw() & (8190));
+			auto radius = (GetRandomDraw() & (WALL_SIZE * 8 - 1)) - WALL_SIZE * 4;
+			short angle  = (GetRandomDraw() & 0xFFFF);
 
 			auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
-			auto yPos = Camera.pos.y - (WALL_SIZE + GetRandomDraw() & (WALL_SIZE * 2 - 1));
 			auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
+			auto yPos = Camera.pos.y - (WALL_SIZE * 2 + GetRandomDraw() & (WALL_SIZE * 2 - 1));
 
 
 			if (IsRoomOutside(xPos, yPos, zPos) < 0)
