@@ -557,31 +557,53 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		GAME_VECTOR s;
-		s.x = (i * 256) - 0x80;
-		s.y = -256;
-		s.z = 0;
+		s.x = (i * coll->Setup.Radius) - coll->Setup.Radius;
+		s.y = -(WALL_SIZE / 2);
+		s.z = -(STEP_SIZE / 2);
 
-		GetLaraJointPosition((PHD_VECTOR*)&s, LM_HEAD);
+		GetLaraJointPosition((PHD_VECTOR*)&s, LM_TORSO);
 		s.roomNumber = item->roomNumber;
 
 		GAME_VECTOR d;
-		d.x = s.x + phd_sin(item->pos.yRot) * 768;
+		d.x = s.x + ((WALL_SIZE * phd_sin(item->pos.yRot)));
 		d.y = s.y;
-		d.z = s.z + phd_cos(item->pos.yRot) * 768;
+		d.z = s.z + ((WALL_SIZE * phd_cos(item->pos.yRot)));
 
 		LOS(&s, &d);
-		
-		PHD_VECTOR v;
-		MESH_INFO* mesh;
 
-		// CHECK
-		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != NO_LOS_ITEM)
+		PHD_VECTOR v;
+		MESH_INFO* staticMesh;
+		auto objectonlos2 = ObjectOnLOS2(&s, &d, &v, &staticMesh);
+
+		if (objectonlos2 != NO_LOS_ITEM)
 		{
-			coll->HitStatic = true;
-		}*/
+			if (objectonlos2 >= 0)
+			{
+				if (!Objects[g_Level.Items[objectonlos2].objectNumber].isPickup)
+				{
+					coll->HitStatic = true;
+					return;
+				}
+			}
+			else
+			{
+				if (staticMesh->flags & StaticMeshFlags::SM_VISIBLE)
+				{
+					auto stat = &StaticObjects[staticMesh->staticNumber];
+
+					if (stat->collisionBox.X1 || stat->collisionBox.X2 ||
+						stat->collisionBox.Y1 || stat->collisionBox.Y2 ||
+						stat->collisionBox.Z1 || stat->collisionBox.Z2)
+					{
+						coll->HitStatic = true;
+						return;
+					}
+				}
+			}
+		}
 	}
 }
 
