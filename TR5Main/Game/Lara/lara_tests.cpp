@@ -87,7 +87,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -768)
+	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -768)
 		return false;
 
 	// TODO: LUA
