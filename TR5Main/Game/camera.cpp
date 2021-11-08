@@ -186,7 +186,7 @@ void InitialiseCamera()
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.bounce = 0;
 	Camera.number = -1;
-	Camera.fixedCamera = 0;
+	Camera.fixedCamera = false;
 	
 	AlterFOV(14560);
 	
@@ -809,7 +809,7 @@ void FixedCamera(ITEM_INFO* item)
 		moveSpeed = camera->speed * 8 + 1;
 	}
 
-	Camera.fixedCamera = 1;
+	Camera.fixedCamera = true;
 
 	MoveCamera(&from, moveSpeed);
 
@@ -1481,30 +1481,26 @@ void CalculateCamera()
 	if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 	{
 		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
-		if (Camera.underwater == 0)
-		{
-			Camera.underwater = 1;
-		}
+		if (Camera.underwater == false)
+			Camera.underwater = true;
 	}
 	else
 	{
-		if (Camera.underwater != 0)
-		{
-			Camera.underwater = 0;
-		}
+		if (Camera.underwater == true)
+			Camera.underwater = false;
 	}
 
 	ITEM_INFO* item;
-	int fixedCamera = 0;
+	bool fixedCamera = false;
 	if (Camera.item != NULL && (Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
 	{
 		item = Camera.item;
-		fixedCamera = 1;
+		fixedCamera = true;
 	}
 	else
 	{
 		item = LaraItem;
-		fixedCamera = 0;
+		fixedCamera = false;
 	}
 
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
@@ -1575,7 +1571,7 @@ void CalculateCamera()
 			Camera.speed = Camera.type != CAMERA_TYPE::LOOK_CAMERA ? 8 : 4;
 		}
 
-		Camera.fixedCamera = 0;
+		Camera.fixedCamera = false;
 		if (Camera.type == CAMERA_TYPE::LOOK_CAMERA)
 			LookCamera(item);
 		else
@@ -1629,7 +1625,7 @@ void CalculateCamera()
 
 		if (fixedCamera == Camera.fixedCamera)
 		{
-			Camera.fixedCamera = 0;
+			Camera.fixedCamera = false;
 			if (Camera.speed != 1 && Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && BinocularOn >= 0)
 			{
 				if (TargetSnaps <= 8)
@@ -1649,7 +1645,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			Camera.fixedCamera = 1;
+			Camera.fixedCamera = true;
 			Camera.speed = 1;
 		}
 
