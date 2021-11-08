@@ -2,6 +2,7 @@
 #include "camera.h"
 #include "savegame.h"
 #include "weather.h"
+#include "collide.h"
 #include "Sound\sound.h"
 #include "Scripting\GameScriptLevel.h"
 
@@ -185,12 +186,12 @@ namespace Environment
 
 			newParticlesCount++;
 
-			auto radius = (GetRandomDraw() & WALL_SIZE * 4);
-			auto angle  = (GetRandomDraw() & ANGLE(45));
+			auto radius = (GetRandomDraw() & (WALL_SIZE * 4 - 1));
+			auto angle  = (GetRandomDraw() & (8190));
 
-			auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius) >> 12);
-			auto yPos = Camera.pos.y + (-WALL_SIZE - GetRandomDraw() & (WALL_SIZE * 2 - 1));
-			auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius) >> 12);
+			auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
+			auto yPos = Camera.pos.y - (WALL_SIZE + GetRandomDraw() & (WALL_SIZE * 2 - 1));
+			auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
 
 
 			if (IsRoomOutside(xPos, yPos, zPos) < 0)
@@ -206,10 +207,14 @@ namespace Environment
 			part.Position.y = yPos;
 			part.Position.z = zPos;
 			part.Stopped = false;
+			part.Enabled = true;
 			part.Velocity.x =  (GetRandomDraw() & 7) - 4;
 			part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
 			part.Velocity.z =  (GetRandomDraw() & 7) - 4;
 			part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
+
+			part.Type = WeatherType::Snow;
+			part.Size = 16 + (GetRandomDraw() & 7 - 4);
 
 			Particles.push_back(part);
 		}
@@ -220,7 +225,7 @@ namespace Environment
 		{
 			auto& p = Particles[i];
 
-			if (p.Stopped)
+			if (!p.Enabled)
 			{
 				toRemove.insert(i);
 				continue;
@@ -228,32 +233,36 @@ namespace Environment
 
 			auto oldPos = p.Position;
 
-			p.Position.x += p.Velocity.x;
-			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
-			p.Position.z += p.Velocity.z;
+			if (!p.Stopped)
+			{
+				p.Position.x += p.Velocity.x;
+				p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
+				p.Position.z += p.Velocity.z;
+			}
 
 			auto& r = g_Level.Rooms[p.Room];
 
 			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
-				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.xSize - 1) << 10)) ||
-				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.ySize - 1) << 10)))
+				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
+				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
 			{
-				short room_number = p.Room;
-				GetFloor(p.Position.x, p.Position.y, p.Position.z, &room_number);
+				auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+				bool landed = coll.Position.Floor < p.Position.y;
 
-				if (room_number == p.Room)
+				if (coll.RoomNumber == p.Room)
 				{
-					toRemove.insert(i);
+					toRemove.insert(i); // Spawned in same room, needs to be on portal
 					continue;
 				}
-				else if (g_Level.Rooms[room_number].flags & ENV_FLAG_WATER)
+				else if (inSubstance || landed)
 				{
-					p.Stopped = 1;
+					p.Stopped = true;
 					p.Position = oldPos;
 					p.Life = (p.Life > 16) ? 16 : p.Life;
 				}
 				else
-					p.Room = room_number;
+					p.Room = coll.RoomNumber;
 			}
 
 			if (!p.Life ||
@@ -262,26 +271,30 @@ namespace Environment
 			{
 				if (!p.Life)
 				{
-					p.Position.x = 0;	// Turn it off.
+					p.Enabled = false;	// Turn it off.
 					continue;
 				}
 				else if (p.Life > 16)
 					p.Life = 16;
 			}
 
-			if (p.Velocity.x < (WindFinalX << 2))
-				p.Velocity.x += 2;
-			else if (p.Velocity.x > (WindFinalX << 2))
-				p.Velocity.x -= 2;
+			if (!p.Stopped)
+			{
+				if (p.Velocity.x < (WindFinalX << 2))
+					p.Velocity.x += 2;
+				else if (p.Velocity.x > (WindFinalX << 2))
+					p.Velocity.x -= 2;
 
-			if (p.Velocity.z < (WindFinalZ << 2))
-				p.Velocity.z += 2;
-			else if (p.Velocity.z > (WindFinalZ << 2))
-				p.Velocity.z -= 2;
+				if (p.Velocity.z < (WindFinalZ << 2))
+					p.Velocity.z += 2;
+				else if (p.Velocity.z > (WindFinalZ << 2))
+					p.Velocity.z -= 2;
+
+				if (((int)p.Velocity.y & 7) < 7)
+					p.Velocity.y++;
+			}
 
 			p.Life -= 2;
-			if (((int)p.Velocity.y & 7) < 7)
-				p.Velocity.y++;
 		}
 
 		for (auto v = toRemove.rbegin(); v != toRemove.rend(); v++)

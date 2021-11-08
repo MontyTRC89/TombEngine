@@ -377,7 +377,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		for (auto p : Weather.Particles)
 		{
-			g_Renderer.addLine3D(p.Position, p.Position + Vector3(16), Vector4::One);
+			g_Renderer.addLine3D(p.Position, p.Position + Vector3(p.Size), Vector4::One);
 		}
 
 		// Update special FX
