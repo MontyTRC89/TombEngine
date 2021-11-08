@@ -192,21 +192,61 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
+
 		if (TrInput & IN_LEFT)
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
 		else if (TrInput & IN_RIGHT)
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		else
 			item->goalAnimState = LS_STOP;
+
 		AnimateLara(item);
 		break;
+
 	default:
 		item->goalAnimState = LS_STOP;
+
 		if (item->animNumber != LA_STAND_SOLID)
 		{
 			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[LA_STAND_SOLID].frameBase;
+			item->frameNumber = GF(LA_STAND_SOLID, 0);
 		}
+
+		break;
+	}
+}
+
+void LaraCollideStopCrawl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	switch (coll->Setup.OldAnimState)
+	{
+	case LS_CRAWL_IDLE:
+	case LS_CRAWL_TURN_LEFT:
+	case LS_CRAWL_TURN_RIGHT:
+		item->currentAnimState = coll->Setup.OldAnimState;
+		item->animNumber = coll->Setup.OldAnimNumber;
+		item->frameNumber = coll->Setup.OldFrameNumber;
+
+		if (TrInput & IN_LEFT)
+			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+		else if (TrInput & IN_RIGHT)
+			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+		else
+			item->goalAnimState = LS_CRAWL_IDLE;
+
+		AnimateLara(item);
+		break;
+
+	default:
+		item->currentAnimState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
+
+		if (item->animNumber != LA_CRAWL_IDLE)
+		{
+			item->animNumber = LA_CRAWL_IDLE;
+			item->frameNumber = GF(LA_CRAWL_IDLE, 0);
+		}
+
 		break;
 	}
 }

@@ -35,6 +35,8 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
+	Camera.targetElevation = -ANGLE(24.0f);
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -266,7 +268,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	Camera.targetElevation = -ANGLE(20.0f);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -400,6 +402,8 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
 
+	Camera.targetElevation = -ANGLE(24.0f);
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -470,6 +474,8 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableSpaz = false;
+
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
 	{
@@ -586,6 +592,8 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
+	Camera.targetElevation = -ANGLE(24.0f);
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -632,10 +640,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			// TODO: Diagonal issues.
-			else if (coll->CollisionType != CT_FRONT &&
-				coll->CollisionType != CT_TOP_FRONT &&
-				TestLaraCrawlForward(item, coll)) [[likely]]
+			else [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -875,8 +880,6 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesArePits = true;
 	GetCollisionInfo(coll, item);
 
-	Camera.targetElevation = -ANGLE(23.0f);
-
 	if (TestLaraFall(coll))
 	{
 		Lara.gunStatus = LG_NO_ARMS;
@@ -1045,11 +1048,12 @@ void old_lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.keepDucked = TestLaraKeepDucked(item, coll);
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	Camera.targetElevation = -ANGLE(23.0f);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
 	{
@@ -1078,9 +1082,6 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
 
-	// TEMP
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
-
 	// TODO: Probe ahead please.
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
@@ -1102,9 +1103,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll) &&
-				coll->CollisionType != CT_FRONT &&
-				coll->CollisionType != CT_TOP_FRONT) [[likely]]
+			else [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -1189,18 +1188,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeDuck(item, coll))
-	{
-		item->currentAnimState = LS_CRAWL_IDLE;
-		item->goalAnimState = LS_CRAWL_IDLE;
-
-		if (item->animNumber != LA_CRAWL_IDLE)
-		{
-			item->animNumber = LA_CRAWL_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		}
-
-		return;
-	}
+		LaraCollideStopCrawl(item, coll);
 	
 	if (TestLaraFall(coll))
 	{
@@ -1280,7 +1268,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	Camera.targetElevation = -ANGLE(23.0f);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
 	{
@@ -1360,22 +1348,8 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, true);
 
-	// TODO: Binoculars?
-
-	// TODO: Generic deflect.
 	if (LaraDeflectEdgeDuck(item, coll))
-	{
-		item->currentAnimState = LS_CRAWL_IDLE;
-		item->goalAnimState = LS_CRAWL_IDLE;
-
-		if (item->animNumber != LA_CRAWL_IDLE)
-		{
-			item->animNumber = LA_CRAWL_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		}
-
-		return;
-	}
+		LaraCollideStopCrawl(item, coll);
 
 	if (TestLaraFall(coll))
 	{
@@ -1459,7 +1433,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	Camera.targetElevation = -ANGLE(23.0f);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
 	{
@@ -1550,7 +1524,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
-	Camera.targetElevation = -ANGLE(23.0f);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
 	{
