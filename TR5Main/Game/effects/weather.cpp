@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "camera.h"
 #include "savegame.h"
 #include "weather.h"
 #include "Sound\sound.h"
@@ -10,6 +11,11 @@ namespace Environment
 {
 	EnvironmentController Weather;
 
+	EnvironmentController::EnvironmentController()
+	{
+		Particles.reserve(WEATHER_PARTICLES_COUNT);
+	}
+
 	void EnvironmentController::Update()
 	{
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -18,6 +24,7 @@ namespace Environment
 		UpdateStorm(level);
 		UpdateWind(level);
 		UpdateFlash(level);
+		UpdateWeather(level);
 	}
 
 	void EnvironmentController::Clear()
@@ -165,5 +172,121 @@ namespace Environment
 
 		if (FlashProgress == 0.0f)
 			FlashColorBase = Vector3::Zero;
+	}
+
+	void EnvironmentController::UpdateWeather(GameScriptLevel* level)
+	{
+		int newParticlesCount = 0;
+
+		while (Particles.size() < WEATHER_PARTICLES_COUNT)
+		{
+			if (newParticlesCount >= 16)
+				break;
+
+			newParticlesCount++;
+
+			auto radius = (GetRandomDraw() & WALL_SIZE * 4);
+			auto angle  = (GetRandomDraw() & ANGLE(45));
+
+			auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius) >> 12);
+			auto yPos = Camera.pos.y + (-WALL_SIZE - GetRandomDraw() & (WALL_SIZE * 2 - 1));
+			auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius) >> 12);
+
+
+			if (IsRoomOutside(xPos, yPos, zPos) < 0)
+				continue;
+
+			if (g_Level.Rooms[IsRoomOutsideNo].flags & ENV_FLAG_WATER)
+				continue;
+
+			auto part = WeatherParticle();
+
+			part.Room = IsRoomOutsideNo;
+			part.Position.x = xPos;
+			part.Position.y = yPos;
+			part.Position.z = zPos;
+			part.Stopped = false;
+			part.Velocity.x =  (GetRandomDraw() & 7) - 4;
+			part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
+			part.Velocity.z =  (GetRandomDraw() & 7) - 4;
+			part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
+
+			Particles.push_back(part);
+		}
+
+		std::set<int> toRemove;
+
+		for (int i = 0; i < Particles.size(); i++)
+		{
+			auto& p = Particles[i];
+
+			if (p.Stopped)
+			{
+				toRemove.insert(i);
+				continue;
+			}
+
+			auto oldPos = p.Position;
+
+			p.Position.x += p.Velocity.x;
+			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
+			p.Position.z += p.Velocity.z;
+
+			auto& r = g_Level.Rooms[p.Room];
+
+			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
+				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.xSize - 1) << 10)) ||
+				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.ySize - 1) << 10)))
+			{
+				short room_number = p.Room;
+				GetFloor(p.Position.x, p.Position.y, p.Position.z, &room_number);
+
+				if (room_number == p.Room)
+				{
+					toRemove.insert(i);
+					continue;
+				}
+				else if (g_Level.Rooms[room_number].flags & ENV_FLAG_WATER)
+				{
+					p.Stopped = 1;
+					p.Position = oldPos;
+					p.Life = (p.Life > 16) ? 16 : p.Life;
+				}
+				else
+					p.Room = room_number;
+			}
+
+			if (!p.Life ||
+				abs(Camera.pos.x - p.Position.x) > 6000 ||
+				abs(Camera.pos.z - p.Position.z) > 6000)
+			{
+				if (!p.Life)
+				{
+					p.Position.x = 0;	// Turn it off.
+					continue;
+				}
+				else if (p.Life > 16)
+					p.Life = 16;
+			}
+
+			if (p.Velocity.x < (WindFinalX << 2))
+				p.Velocity.x += 2;
+			else if (p.Velocity.x > (WindFinalX << 2))
+				p.Velocity.x -= 2;
+
+			if (p.Velocity.z < (WindFinalZ << 2))
+				p.Velocity.z += 2;
+			else if (p.Velocity.z > (WindFinalZ << 2))
+				p.Velocity.z -= 2;
+
+			p.Life -= 2;
+			if (((int)p.Velocity.y & 7) < 7)
+				p.Velocity.y++;
+		}
+
+		for (auto v = toRemove.rbegin(); v != toRemove.rend(); v++)
+		{
+			Particles.erase(Particles.begin() + *v);
+		}
 	}
 }}}
