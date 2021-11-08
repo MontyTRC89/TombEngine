@@ -873,23 +873,23 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			zBlock = 0;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->ySize - 2)
-				xBlock = r->ySize - 2;
+			else if (xBlock > r->xSize - 2)
+				xBlock = r->xSize - 2;
 		}
-		else if (zBlock >= r->xSize - 1)
+		else if (zBlock >= r->zSize - 1)
 		{
-			zBlock = r->xSize - 1;
+			zBlock = r->zSize - 1;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->ySize - 2)
-				xBlock = r->ySize - 2;
+			else if (xBlock > r->xSize - 2)
+				xBlock = r->xSize - 2;
 		}
 		else if (xBlock < 0)
 			xBlock = 0;
-		else if (xBlock >= r->ySize)
-			xBlock = r->ySize - 1;
+		else if (xBlock >= r->xSize)
+			xBlock = r->xSize - 1;
 
-		floor = &r->floor[zBlock + xBlock * r->xSize];
+		floor = &r->floor[zBlock + xBlock * r->zSize];
 		adjoiningRoom = floor->WallPortal;
 
 		if (adjoiningRoom != NO_ROOM)
