@@ -153,8 +153,9 @@ int IsRoomOutside(int x, int y, int z)
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z) 
 {
-	int sectorX = (x) / SECTOR(1);
-	int sectorZ = (z) / SECTOR(1);
+	int sectorX = std::clamp(x / SECTOR(1), 0, r->xSize - 1);
+	int sectorZ = std::clamp(z / SECTOR(1), 0, r->zSize - 1);
+
 	int index = sectorZ + sectorX * r->zSize;
 	if (index > r->floor.size()) 
 	{
