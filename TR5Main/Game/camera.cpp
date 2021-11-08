@@ -2,24 +2,22 @@
 #include "camera.h"
 #include "animation.h"
 #include "lara.h"
-#include "effects\effects.h"
-#include "effects\debris.h"
+#include "effects/effects.h"
+#include "effects/debris.h"
 #include "lara_fire.h"
-#include "lara.h"
-#include "effects\weather.h"
-#include "sphere.h"
+#include "effects/weather.h"
 #include "level.h"
 #include "setup.h"
 #include "collide.h"
-#include "Sound\sound.h"
-#include "control\los.h"
+#include "Sound/sound.h"
+#include "control/los.h"
 #include "savegame.h"
 #include "input.h"
 #include "items.h"
 #include "Objects/Generic/Object/burning_torch.h"
 
-using namespace TEN::Entities::Generic;
 using TEN::Renderer::g_Renderer;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
 
 struct OLD_CAMERA
@@ -1408,33 +1406,6 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 }
 
-void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
-{
-	GAME_VECTOR pos1;
-	pos1.x = src->x;
-	pos1.y = src->y;
-	pos1.z = src->z;
-	pos1.roomNumber = LaraItem->roomNumber;
-
-	GAME_VECTOR pos2;
-	pos2.x = target->x;
-	pos2.y = target->y;
-	pos2.z = target->z;
-
-	TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
-	
-	if (!LOS(&pos1, &pos2))
-	{
-		int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * STEP_SIZE;
-		
-		if (l + 8 > 31)
-			l = 31;
-		
-		if (color - l >= 0)
-			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
-	}
-}
-
 void ConfirmCameraTargetPos() 
 {
 	PHD_VECTOR pos;
@@ -1521,12 +1492,6 @@ void CalculateCamera()
 		{
 			Camera.underwater = 0;
 		}
-	}
-
-	if (Camera.type == CAMERA_TYPE::CINEMATIC_CAMERA)
-	{
-		// Legacy_do_new_cutscene_camera();
-		return;
 	}
 
 	ITEM_INFO* item;

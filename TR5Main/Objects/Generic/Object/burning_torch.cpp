@@ -11,6 +11,7 @@
 #include "Game/effects/effects.h"
 #include "Specific/setup.h"
 #include "Game/collide.h"
+#include "Game/control/los.h"
 
 using namespace TEN::Entities::Effects;
 
@@ -252,6 +253,33 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+		}
+	}
+
+	void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
+	{
+		GAME_VECTOR pos1;
+		pos1.x = src->x;
+		pos1.y = src->y;
+		pos1.z = src->z;
+		pos1.roomNumber = LaraItem->roomNumber;
+
+		GAME_VECTOR pos2;
+		pos2.x = target->x;
+		pos2.y = target->y;
+		pos2.z = target->z;
+
+		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
+
+		if (!LOS(&pos1, &pos2))
+		{
+			int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * STEP_SIZE;
+
+			if (l + 8 > 31)
+				l = 31;
+
+			if (color - l >= 0)
+				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
 		}
 	}
 
