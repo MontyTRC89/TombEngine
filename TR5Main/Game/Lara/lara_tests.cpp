@@ -1549,6 +1549,39 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	return true;
 }
 
+void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
+{
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+
+	if (waterDepth == NO_HEIGHT)
+	{
+		item->fallspeed = 0;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+	}
+
+	// Height check was at STEP_SIZE * 2 before but changed to this 
+	// because now Lara surfaces on a head level, not mid-body level.
+
+	if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
+	{
+		item->animNumber = LA_UNDERWATER_TO_STAND;
+		item->frameNumber = GF(LA_UNDERWATER_TO_STAND, 0);
+		item->currentAnimState = LS_ONWATER_EXIT;
+		item->goalAnimState = LS_STOP;
+		item->pos.zRot = 0;
+		item->pos.xRot = 0;
+		item->speed = 0;
+		item->fallspeed = 0;
+		item->gravityStatus = false;
+		Lara.waterStatus = LW_WADE;
+		item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	}
+}
+
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int regularity) {
 	if(LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
