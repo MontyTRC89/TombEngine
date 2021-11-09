@@ -509,13 +509,18 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_STOP;
 				else if (isSwamp)
 				{
-					if (item->currentAnimState == LS_SWANDIVE_START || item->currentAnimState == LS_SWANDIVE_END)
+					if (item->currentAnimState == LS_SWANDIVE_START ||
+						item->currentAnimState == LS_SWANDIVE_END)
+					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
-
-					item->goalAnimState = LS_WADE_FORWARD;
-					item->currentAnimState = LS_WADE_FORWARD;
-					item->animNumber = LA_WADE;
-					item->frameNumber = GF(LA_WADE, 0);
+					}
+					else
+					{
+						item->goalAnimState = LS_WADE_FORWARD;
+						item->currentAnimState = LS_WADE_FORWARD;
+						item->animNumber = LA_WADE;
+						item->frameNumber = GF(LA_WADE, 0);
+					}
 				}
 			}
 
