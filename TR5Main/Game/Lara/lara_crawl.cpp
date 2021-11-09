@@ -274,13 +274,13 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 6);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate = LARA_CROUCH_ROLL_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 6);
+		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
 	}
 
 	// TODO: Make crouch roll deplete sprint meter? @Sezz 2021.10.22
