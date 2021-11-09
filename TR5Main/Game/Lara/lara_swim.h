@@ -1,5 +1,4 @@
 #pragma once
-
 #include "collide.h"
 
 void LaraWaterCurrent(COLL_INFO* coll);
@@ -20,4 +19,4 @@ void UpdateSubsuitAngles();
 void SwimTurnSubsuit(ITEM_INFO* item);
 void SwimTurn(ITEM_INFO* item);
 void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll);
-void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
+void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
