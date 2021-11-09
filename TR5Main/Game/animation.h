@@ -55,6 +55,9 @@ struct BONE_MUTATOR
 
 void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
+void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart = 0, bool ignoreGoalState = false, bool ignoreCurrentState = false);
+short GetFrameNumber(ITEM_INFO* item, short frameToStart);
+short GetFrameNumber(short objectID, short animNumber, short frameToStart);
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
@@ -65,6 +68,3 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot);
 bool TestLastFrame(ITEM_INFO* item, short animNumber = -1);
 
 void DrawAnimatingItem(ITEM_INFO* item);
-
-short GF(short animIndex, short frameToStart); // for lara
-short GF2(short objectID, short animIndex, short frameToStart); // for entity

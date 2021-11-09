@@ -14,10 +14,8 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->goalAnimState == LS_UNDERWATER_FORWARD)
 	{
-		item->currentAnimState = LS_DIVE;
-		item->animNumber = LA_ONWATER_DIVE;
+		SetAnimation(item, LA_ONWATER_DIVE, 0, true);
 		item->pos.xRot = -8190;
-		item->frameNumber = GF(LA_ONWATER_DIVE, 0);
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
 	}
