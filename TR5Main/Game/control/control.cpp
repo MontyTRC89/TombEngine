@@ -333,7 +333,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			// Control Lara
 			InItemControlLoop = true;
-			LaraControl(Lara.itemNumber);
+			LaraControl(LaraItem, &LaraCollision);
 			InItemControlLoop = false;
 			KillMoveItems();
 
