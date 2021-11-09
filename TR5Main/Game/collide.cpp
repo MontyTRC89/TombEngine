@@ -170,36 +170,40 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 	return (numItems || numMeshes);
 }
 
+std::set<int> CollectConnectedRooms(int roomNumber)
+{
+	std::set<int> result;
+	
+	if (g_Level.Rooms.size() <= roomNumber)
+		return result;
+
+	result.insert(roomNumber);
+
+	auto room = &g_Level.Rooms[roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
+		result.insert(room->doors[i].room);
+
+	for (auto i : result)
+		for (int j = 0; j < room->doors.size(); j++)
+			result.insert(room->doors[j].room);
+
+	return result;
+}
+
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->HitTallObject = false;
 
-	short roomsToCheck[128];
-	short numRoomsToCheck = 0;
-	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
-
-	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
+	for (auto i : CollectConnectedRooms(item->roomNumber))
 	{
-		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-	}
-
-	for (int i = 0; i < numRoomsToCheck; i++)
-	{
-		for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
-			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+			auto mesh = &g_Level.Rooms[i].mesh[j];
 
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				int x = abs(item->pos.xPos - mesh->pos.xPos);
-				int y = abs(item->pos.yPos - mesh->pos.yPos);
-				int z = abs(item->pos.zPos - mesh->pos.zPos);
-
-				if (x < COLLISION_CHECK_DISTANCE &&
-					y < COLLISION_CHECK_DISTANCE &&
-					z < COLLISION_CHECK_DISTANCE)
+				if (phd_Distance(&item->pos, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
 					auto stInfo = StaticObjects[mesh->staticNumber];
 					if (CollideSolidBounds(item, stInfo.collisionBox, mesh->pos, coll))
@@ -557,46 +561,66 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto bounds = GetBoundsAccurate(item);
+	auto height = abs(bounds->Y2 + bounds->Y1);
+
 	for (int i = 0; i < 3; i++)
 	{
-		GAME_VECTOR s;
-		s.x = (i * coll->Setup.Radius) - coll->Setup.Radius;
-		s.y = -(WALL_SIZE / 2);
-		s.z = -(STEP_SIZE / 2);
+		auto s = (i != 1) ? phd_sin(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
+		auto c = (i != 1) ? phd_cos(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
 
-		GetLaraJointPosition((PHD_VECTOR*)&s, LM_TORSO);
-		s.roomNumber = item->roomNumber;
+		auto x = item->pos.xPos + (s * (coll->Setup.Radius));
+		auto y = item->pos.yPos - height - STEP_SIZE;
+		auto z = item->pos.zPos + (c * (coll->Setup.Radius));
 
-		GAME_VECTOR d;
-		d.x = s.x + ((WALL_SIZE * phd_sin(item->pos.yRot)));
-		d.y = s.y;
-		d.z = s.z + ((WALL_SIZE * phd_cos(item->pos.yRot)));
+		auto origin = Vector3(x, y, z);
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		LOS(&s, &d);
+		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
-		PHD_VECTOR v;
-		MESH_INFO* staticMesh;
-		auto objectonlos2 = ObjectOnLOS2(&s, &d, &v, &staticMesh);
-
-		if (objectonlos2 != NO_LOS_ITEM)
+		for (auto i : CollectConnectedRooms(item->roomNumber))
 		{
-			if (objectonlos2 >= 0)
+			short itemNumber = g_Level.Rooms[i].itemNumber;
+			while (itemNumber != NO_ITEM)
 			{
-				if (!Objects[g_Level.Items[objectonlos2].objectNumber].isPickup)
-				{
-					coll->HitStatic = true;
-					return;
-				}
-			}
-			else
-			{
-				if (staticMesh->flags & StaticMeshFlags::SM_VISIBLE)
-				{
-					auto stat = &StaticObjects[staticMesh->staticNumber];
+				auto item2 = &g_Level.Items[itemNumber];
+				auto obj = &Objects[item2->objectNumber];
 
-					if (stat->collisionBox.X1 || stat->collisionBox.X2 ||
-						stat->collisionBox.Y1 || stat->collisionBox.Y2 ||
-						stat->collisionBox.Z1 || stat->collisionBox.Z2)
+				if (obj->isPickup || obj->collision == nullptr || !item2->collidable || item2->status == ITEM_INVISIBLE)
+				{
+					itemNumber = item2->nextItem;
+					continue;
+				}
+
+				if (phd_Distance(&item->pos, &item2->pos) < COLLISION_CHECK_DISTANCE)
+				{
+					auto box = TO_DX_BBOX(item2->pos, GetBoundsAccurate(item2));
+					float dist;
+
+					if (box.Intersects(origin, direction, dist) && dist < coll->Setup.Radius * 2)
+					{
+						coll->HitStatic = true;
+						return;
+					}
+				}
+
+				itemNumber = item2->nextItem;
+			}
+
+			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+			{
+				auto mesh = &g_Level.Rooms[i].mesh[j];
+
+				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				if (phd_Distance(&item->pos, &mesh->pos) < COLLISION_CHECK_DISTANCE)
+				{
+					auto box = TO_DX_BBOX(mesh->pos, &StaticObjects[mesh->staticNumber].collisionBox);
+					float dist;
+
+					if (box.Intersects(origin, direction, dist) && dist < coll->Setup.Radius * 2)
 					{
 						coll->HitStatic = true;
 						return;
@@ -2389,19 +2413,9 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	if (l->hitPoints > 0)
 	{
 		short* door, numDoors;
-		short roomsToCheck[128];
-		short numRoomsToCheck = 0;
-		roomsToCheck[numRoomsToCheck++] = l->roomNumber;
-
-		ROOM_INFO* room = &g_Level.Rooms[l->roomNumber];
-		for (int i = 0; i < room->doors.size(); i++)
+		for (auto i : CollectConnectedRooms(l->roomNumber))
 		{
-			roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-		}
-
-		for (int i = 0; i < numRoomsToCheck; i++)
-		{
-			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
 				item = &g_Level.Items[itemNumber];
@@ -2410,33 +2424,21 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 					obj = &Objects[item->objectNumber];
 					if (obj->collision != nullptr)
 					{
-						int x = abs(l->pos.xPos - item->pos.xPos); 
-						int y = abs(l->pos.yPos - item->pos.yPos);
-						int z = abs(l->pos.zPos - item->pos.zPos);
-
-						if (x < COLLISION_CHECK_DISTANCE &&
-							y < COLLISION_CHECK_DISTANCE &&
-							z < COLLISION_CHECK_DISTANCE)
+						if (phd_Distance(&item->pos, &l->pos) < COLLISION_CHECK_DISTANCE)
 							obj->collision(itemNumber, l, coll);
 					}
 				}
 				itemNumber = item->nextItem;
 			}
 
-			for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 			{
-				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+				MESH_INFO* mesh = &g_Level.Rooms[i].mesh[j];
 
 				// Only process meshes which are visible and non-solid
 				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
 				{
-					int x = abs(l->pos.xPos - mesh->pos.xPos);
-					int y = abs(l->pos.yPos - mesh->pos.yPos);
-					int z = abs(l->pos.zPos - mesh->pos.zPos);
-
-					if (x < COLLISION_CHECK_DISTANCE &&
-						y < COLLISION_CHECK_DISTANCE && 
-						z < COLLISION_CHECK_DISTANCE)
+					if (phd_Distance(&mesh->pos, &l->pos) < COLLISION_CHECK_DISTANCE)
 					{
 						if (TestBoundsCollideStatic(l, mesh, coll->Setup.Radius))
 						{
