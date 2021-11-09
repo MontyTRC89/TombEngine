@@ -87,7 +87,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -768)
+	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
 		return false;
 
 	// TODO: LUA
@@ -1403,6 +1403,220 @@ bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
+}
+
+bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->CollisionType == CT_FRONT ||
+		coll->Middle.Slope ||
+		coll->Middle.Floor >= 0)
+	{
+		return false;
+	}
+
+	if (coll->Middle.Floor >= -(STEP_SIZE / 2))
+	{
+		item->animNumber = LA_STAND_IDLE;
+		item->frameNumber = GF(LA_STAND_IDLE, 0);
+		item->goalAnimState = LS_STOP;
+		item->currentAnimState = LS_STOP;
+	}
+	else
+	{
+		item->animNumber = LA_ONWATER_TO_WADE_1CLICK;
+		item->frameNumber = GF(LA_ONWATER_TO_WADE_1CLICK, 0);
+		item->currentAnimState = LS_ONWATER_EXIT;
+		item->goalAnimState = LS_STOP;
+	}
+
+	item->pos.yPos += coll->Middle.Floor + (STOP_SIZE + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
+
+	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
+
+	item->pos.zRot = 0;
+	item->pos.xRot = 0;
+	item->gravityStatus = false;
+	item->speed = 0;
+	item->fallspeed = 0;
+	Lara.waterStatus = LW_WADE;
+
+	return true;
+}
+
+
+bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
+		return false;
+
+	// TODO: Enable with lua!
+	Lara.NewAnims.CrawlFlexWaterPullUp = true;
+	Lara.NewAnims.CrawlFlexSubmerged = true;
+
+	if (Lara.gunStatus &&
+		(Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
+	{
+		return false;
+	}
+
+	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
+		return false;
+
+	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
+	if (frontFloor <= -STOP_SIZE ||
+		frontFloor > (STEP_SIZE + STEP_SIZE / 4 - 4))
+	{
+		return false;
+	}
+
+	if (!TestValidLedge(item, coll))
+		return false;
+
+	auto surface = LaraCollisionAboveFront(item, coll->Setup.ForwardAngle, (STEP_SIZE * 2), STEP_SIZE);
+	auto headroom = surface.Position.Floor - surface.Position.Ceiling;
+
+	if (frontFloor <= -STEP_SIZE)
+	{
+		if (headroom < LARA_HEIGHT)
+		{
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			{
+				item->animNumber = LA_ONWATER_TO_CROUCH_1CLICK;
+				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_1CLICK, 0);
+				item->goalAnimState = LA_CROUCH_IDLE;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			item->animNumber = LA_ONWATER_TO_STAND_1CLICK;
+			item->frameNumber = GF(LA_ONWATER_TO_STAND_1CLICK, 0);
+			item->goalAnimState = LS_STOP;
+		}
+	}
+	else if (frontFloor > (STEP_SIZE / 2))
+	{
+		if (headroom < LARA_HEIGHT)
+		{
+			if (Lara.NewAnims.CrawlFlexSubmerged)
+			{
+				item->animNumber = LA_ONWATER_TO_CROUCH_M1CLICK;
+				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_M1CLICK, 0);
+				item->goalAnimState = LA_CROUCH_IDLE;
+			}
+			else
+				return false;
+		}
+		else
+			item->animNumber = LA_ONWATER_TO_STAND_M1CLICK;
+
+		item->frameNumber = GF(item->animNumber, 0);
+	}
+
+	else
+	{
+		if (headroom < LARA_HEIGHT)
+		{
+			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			{
+				item->animNumber = LA_ONWATER_TO_CROUCH_0CLICK;
+				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_0CLICK, 0);
+				item->goalAnimState = LA_CROUCH_IDLE;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			item->animNumber = LA_ONWATER_TO_STAND_0CLICK;
+			item->frameNumber = GF(LA_ONWATER_TO_STAND_0CLICK, 0);
+			item->goalAnimState = LS_STOP;
+		}
+	}
+
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	SnapItemToLedge(item, coll, 1.7f);
+
+	item->pos.yPos += frontFloor - 5;
+	item->currentAnimState = LS_ONWATER_EXIT;
+	item->gravityStatus = false;
+	item->speed = 0;
+	item->fallspeed = 0;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.waterStatus = LW_ABOVE_WATER;
+
+	return true;
+}
+
+bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for water to ladder move
+{
+	if (!(TrInput & IN_ACTION) ||
+		!Lara.climbStatus ||
+		coll->CollisionType != CT_FRONT)
+	{
+		return false;
+	}
+
+	if (Lara.gunStatus &&
+		(Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
+	{
+		return false;
+	}
+
+	if (!TestLaraClimbStance(item, coll))
+		return false;
+
+	short rot = item->pos.yRot;
+
+	if (rot >= -ANGLE(35.0f) && rot <= ANGLE(35.0f))
+		rot = 0;
+	else if (rot >= ANGLE(55.0f) && rot <= ANGLE(125.0f))
+		rot = ANGLE(90.0f);
+	else if (rot >= ANGLE(145.0f) || rot <= -ANGLE(145.0f))
+		rot = ANGLE(180.0f);
+	else if (rot >= -ANGLE(125.0f) && rot <= -ANGLE(55.0f))
+		rot = -ANGLE(90.0f);
+
+	if (rot & 0x3FFF)
+		return false;
+
+	switch ((unsigned short)rot / ANGLE(90.0f))
+	{
+	case NORTH:
+		item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		break;
+
+	case EAST:
+		item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		break;
+
+	case SOUTH:
+		item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD + 1;
+		break;
+
+	case WEST:
+		item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD + 1;
+		break;
+	}
+
+	item->animNumber = LA_ONWATER_IDLE;
+	item->frameNumber = GF(LA_ONWATER_IDLE, 0);
+	item->currentAnimState = LS_ONWATER_STOP;
+	item->goalAnimState = LS_LADDER_IDLE;
+	AnimateLara(item);
+
+	item->pos.yRot = rot;
+	item->pos.yPos -= 10;//otherwise she falls back into the water
+	item->pos.zRot = 0;
+	item->pos.xRot = 0;
+	item->gravityStatus = false;
+	item->speed = 0;
+	item->fallspeed = 0;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.waterStatus = LW_ABOVE_WATER;
+
+	return true;
 }
 
 #ifndef NEW_TIGHTROPE
