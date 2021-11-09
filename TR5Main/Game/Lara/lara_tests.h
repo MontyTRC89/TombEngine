@@ -42,6 +42,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll);
+void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
 
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);

@@ -2,7 +2,6 @@
 #include "collide.h"
 
 void LaraWaterCurrent(COLL_INFO* coll);
-int GetWaterDepth(int x, int y, int z, short roomNumber);
 void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll);
@@ -18,5 +17,3 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateSubsuitAngles();
 void SwimTurnSubsuit(ITEM_INFO* item);
 void SwimTurn(ITEM_INFO* item);
-void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll);
-void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
