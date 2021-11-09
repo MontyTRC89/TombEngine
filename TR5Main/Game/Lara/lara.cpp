@@ -518,40 +518,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater;
 
-					switch (item->currentAnimState)
-					{
-					case LS_WALK_BACK:
-						item->animNumber = LA_ONWATER_IDLE_TO_SWIM_BACK;
-						item->frameNumber = GF(LA_ONWATER_IDLE_TO_SWIM_BACK, 0);
-						item->goalAnimState = LS_ONWATER_BACK;
-						item->currentAnimState = LS_ONWATER_BACK;
-
-						break;
-
-					case LS_STEP_RIGHT:
-						item->animNumber = LA_ONWATER_SWIM_RIGHT;
-						item->frameNumber = GF(LA_ONWATER_SWIM_RIGHT, 0);
-						item->goalAnimState = LS_ONWATER_RIGHT;
-						item->currentAnimState = LS_ONWATER_RIGHT;
-
-						break;
-
-					case LS_STEP_LEFT:
-						item->animNumber = LA_ONWATER_SWIM_LEFT;
-						item->frameNumber = GF(LA_ONWATER_SWIM_LEFT, 0);
-						item->goalAnimState = LS_ONWATER_LEFT;
-						item->currentAnimState = LS_ONWATER_LEFT;
-
-						break;
-
-					default:
-						item->animNumber = LA_ONWATER_SWIM;
-						item->frameNumber = GF(LA_ONWATER_SWIM, 0);
-						item->goalAnimState = LS_ONWATER_FORWARD;
-						item->currentAnimState = LS_ONWATER_FORWARD;
-
-						break;
-					}
+					item->animNumber = LA_ONWATER_IDLE;
+					item->frameNumber = GF(LA_ONWATER_IDLE, 0);
+					item->goalAnimState = LS_ONWATER_STOP;
+					item->currentAnimState = LS_ONWATER_STOP;
 
 					item->gravityStatus = false;
 					item->fallspeed = 0;
@@ -693,41 +663,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater;
 
-					// This doesn't even work as intended; case is always default. @Sezz 2021.11.09
-					switch (item->currentAnimState)
-					{
-					case LS_WALK_BACK:
-						item->animNumber = LA_ONWATER_IDLE_TO_SWIM_BACK;
-						item->frameNumber = GF(LA_ONWATER_IDLE_TO_SWIM_BACK, 0);
-						item->goalAnimState = LS_ONWATER_BACK;
-						item->currentAnimState = LS_ONWATER_BACK;
-
-						break;
-
-					case LS_STEP_RIGHT:
-						item->animNumber = LA_ONWATER_SWIM_RIGHT;
-						item->frameNumber = GF(LA_ONWATER_SWIM_RIGHT, 0);
-						item->goalAnimState = LS_ONWATER_RIGHT;
-						item->currentAnimState = LS_ONWATER_RIGHT;
-
-						break;
-
-					case LS_STEP_LEFT:
-						item->animNumber = LA_ONWATER_SWIM_LEFT;
-						item->frameNumber = GF(LA_ONWATER_SWIM_LEFT, 0);
-						item->goalAnimState = LS_ONWATER_LEFT;
-						item->currentAnimState = LS_ONWATER_LEFT;
-
-						break;
-
-					default:
-						item->animNumber = LA_ONWATER_SWIM;
-						item->frameNumber = GF(LA_ONWATER_SWIM, 0);
-						item->goalAnimState = LS_ONWATER_FORWARD;
-						item->currentAnimState = LS_ONWATER_FORWARD;
-
-						break;
-					}
+					item->animNumber = LA_ONWATER_IDLE;
+					item->frameNumber = GF(LA_ONWATER_IDLE, 0);
+					item->goalAnimState = LS_ONWATER_STOP;
+					item->currentAnimState = LS_ONWATER_STOP;
 
 					item->gravityStatus = false;
 					item->fallspeed = 0;
