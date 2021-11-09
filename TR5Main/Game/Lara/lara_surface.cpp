@@ -8,6 +8,7 @@
 #include "Lara.h"
 #include "level.h"
 #include "input.h"
+#include "lara_collide.h"
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
@@ -380,17 +381,10 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor >= -(STEP_SIZE / 2))
 	{
-		if (item->goalAnimState == LS_ONWATER_LEFT)
-			item->goalAnimState = LS_STEP_LEFT;
-		else if (item->goalAnimState == LS_ONWATER_RIGHT)
-			item->goalAnimState = LS_STEP_RIGHT;
-		else
-		{
-			item->animNumber = LA_WADE;
-			item->frameNumber = GF(LA_WADE, 0);
-			item->goalAnimState = LS_WADE_FORWARD;
-			item->currentAnimState = LS_WADE_FORWARD;
-		}
+		item->animNumber = LA_STAND_IDLE;
+		item->frameNumber = GF(LA_STAND_IDLE, 0);
+		item->goalAnimState = LS_STOP;
+		item->currentAnimState = LS_STOP;
 	}
 	else
 	{
@@ -400,7 +394,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 	}
 
-	item->pos.yPos += coll->Front.Floor + (STOP_SIZE + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
+	item->pos.yPos += coll->Middle.Floor + (STOP_SIZE + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
 
 	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 
