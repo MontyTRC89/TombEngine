@@ -631,7 +631,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->animNumber = LA_FALL_START;
 			item->currentAnimState = LS_JUMP_FORWARD;
 			item->goalAnimState = LS_JUMP_FORWARD;
-			item->frameNumber = GF(LS_JUMP_FORWARD, 0);
+			item->frameNumber = GF(LA_FALL_START, 0);
 			item->pos.yPos += 256;
 			item->gravityStatus = true;
 			item->speed = 2;
