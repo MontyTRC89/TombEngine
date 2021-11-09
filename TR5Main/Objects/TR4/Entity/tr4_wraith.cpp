@@ -79,8 +79,8 @@ namespace TEN::Entities::TR4
 		{
 			ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
 
-			x = room->x + room->ySize * 1024 / 2 - item->pos.xPos;
-			z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
+			x = room->x + room->xSize * 1024 / 2 - item->pos.xPos;
+			z = room->z + room->zSize * 1024 / 2 - item->pos.zPos;
 
 			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - 768);

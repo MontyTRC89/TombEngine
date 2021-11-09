@@ -1209,10 +1209,10 @@ static void StartProjectiles(OBJECT_INFO *obj)
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);
-	InitProjectile(obj, ControlGrenade, ID_GRENADE);
-	InitProjectile(obj, ControlRocket, ID_ROCKET);
-	InitProjectile(obj, ControlHarpoonBolt, ID_HARPOON);
-	InitProjectile(obj, ControlCrossbowBolt, ID_CROSSBOW_BOLT);
+	InitProjectile(obj, GrenadeControl, ID_GRENADE);
+	InitProjectile(obj, RocketControl, ID_ROCKET);
+	InitProjectile(obj, HarpoonBoltControl, ID_HARPOON);
+	InitProjectile(obj, CrossbowBoltControl, ID_CROSSBOW_BOLT);
 }
 
 static void StartPickup(OBJECT_INFO *obj)

@@ -277,6 +277,17 @@ the WadTool animation editor.
 
 void GameScriptItemInfo::Init()
 {
+	bool cond = IsPointInRoom(m_item->pos, m_item->roomNumber);
+	std::string err{ "Position of item \"{}\" does not match its room ID." };
+	if (!ScriptAssertF(cond, err, m_item->luaName))
+	{
+		ScriptWarn("Resetting to the center of the room.");
+		PHD_3DPOS center = GetRoomCenter(m_item->roomNumber);
+		// reset position but not rotation
+		m_item->pos.xPos = center.xPos;
+		m_item->pos.yPos = center.yPos;
+		m_item->pos.zPos = center.zPos;
+	}
 	InitialiseItem(m_num);
 	m_initialised = true;
 }
@@ -501,9 +512,10 @@ short GameScriptItemInfo::GetRoom() const
 
 void GameScriptItemInfo::SetRoom(short room)
 {	
-	if (room < 0 || static_cast<size_t>(room) >= g_Level.Rooms.size())
+	const size_t nRooms = g_Level.Rooms.size();
+	if (room < 0 || static_cast<size_t>(room) >= nRooms)
 	{
-		ScriptAssert(false, std::string{ "Invalid room number: " } + std::to_string(room));
+		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", room, nRooms);
 		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
 		return;
 	}

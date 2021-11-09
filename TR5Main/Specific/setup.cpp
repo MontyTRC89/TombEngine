@@ -41,7 +41,7 @@ void InitialiseGameFlags()
 
 	FlipEffect = -1;
 	FlipStatus = 0;
-	Camera.underwater = 0;
+	Camera.underwater = false;
 }
 
 void ObjectObjects()
