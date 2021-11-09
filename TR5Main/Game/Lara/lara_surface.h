@@ -1,8 +1,8 @@
 #pragma once
 
-
 struct ITEM_INFO;
 struct COLL_INFO;
+
 void _cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll);
 void _cdecl lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll);
