@@ -15,3 +15,5 @@ void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll);
 short GetDirOctant(int rot);
 void GetLaraDeadlyBounds();
+
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
