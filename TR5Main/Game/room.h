@@ -103,7 +103,7 @@ struct ROOM_INFO
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 	int xSize;
-	int ySize;
+	int zSize;
 	std::vector<FLOOR_INFO> floor;
 	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;
@@ -132,6 +132,8 @@ void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);
 void RemoveRoomFlipItems(ROOM_INFO* r);
 int IsObjectInRoom(short roomNumber, short objectNumber);
+bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
+PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

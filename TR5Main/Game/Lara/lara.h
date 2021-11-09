@@ -52,7 +52,7 @@ extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
 extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
-void LaraControl(short itemNumber);
+void LaraControl(ITEM_INFO* item, COLL_INFO* coll);
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll);
