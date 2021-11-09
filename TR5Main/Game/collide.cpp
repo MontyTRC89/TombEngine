@@ -1093,35 +1093,23 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 			switch (direction)
 			{
 				case 0:
-					LaraItem->animNumber = LA_SIDESTEP_LEFT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
-					LaraItem->goalAnimState = LS_STEP_LEFT;
-					LaraItem->currentAnimState = LS_STEP_LEFT;
+					SetAnimation(LaraItem, LA_SIDESTEP_LEFT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 1:
-					LaraItem->animNumber = LA_WALK;
-					LaraItem->frameNumber = GF(LA_WALK, 0);
-					LaraItem->goalAnimState = LS_WALK_FORWARD;
-					LaraItem->currentAnimState = LS_WALK_FORWARD;
+					SetAnimation(LaraItem, LA_WALK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 2:
-					LaraItem->animNumber = LA_SIDESTEP_RIGHT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
-					LaraItem->goalAnimState = LS_STEP_RIGHT;
-					LaraItem->currentAnimState = LS_STEP_RIGHT;
+					SetAnimation(LaraItem, LA_SIDESTEP_RIGHT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 3:
 				default:
-					LaraItem->animNumber = LA_WALK_BACK;
-					LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
-					LaraItem->goalAnimState = LS_WALK_BACK;
-					LaraItem->currentAnimState = LS_WALK_BACK;
+					SetAnimation(LaraItem, LA_WALK_BACK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 			}
