@@ -180,31 +180,28 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		item->animNumber = LA_UNDERWATER_ROLL_180_START;
-		item->frameNumber = GF(LA_UNDERWATER_ROLL_180_START, 0);
-		item->currentAnimState = LS_UNDERWATER_ROLL;
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		return;
 	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+		SwimTurnSubsuit(item);
 	else
-	{
-		if (TrInput & IN_LOOK)
-			LookUpDown();
+		SwimTurn(item);
 
-		if (LaraDrawType == LARA_TYPE::DIVESUIT)
-			SwimTurnSubsuit(item);
-		else
-			SwimTurn(item);
+	if (TrInput & IN_JUMP)
+		item->goalAnimState = LS_UNDERWATER_FORWARD;
 
-		if (TrInput & IN_JUMP)
-			item->goalAnimState = LS_UNDERWATER_FORWARD;
+	item->fallspeed -= 6;
 
-		item->fallspeed -= 6;
+	if (item->fallspeed < 0)
+		item->fallspeed = 0;
 
-		if (item->fallspeed < 0)
-			item->fallspeed = 0;
-
-		if (Lara.gunStatus == LG_HANDS_BUSY)
-			Lara.gunStatus = LG_NO_ARMS;
-	}
+	if (Lara.gunStatus == LG_HANDS_BUSY)
+		Lara.gunStatus = LG_NO_ARMS;
 }
 
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
@@ -216,18 +213,13 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL)
+	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		{
-			item->animNumber = LA_UNDERWATER_ROLL_180_START;
-			item->frameNumber = GF(LA_UNDERWATER_ROLL_180_START, 0);
-			item->currentAnimState = LS_UNDERWATER_ROLL;
-
-			return;
-		}
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		return;
 	}
-	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
+	
+	if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		SwimTurn(item);
 	else
 		SwimTurnSubsuit(item);
@@ -252,18 +244,13 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL)
+	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		{
-			item->animNumber = LA_UNDERWATER_ROLL_180_START;
-			item->frameNumber = GF(LA_UNDERWATER_ROLL_180_START, 0);
-			item->currentAnimState = LS_UNDERWATER_ROLL;
-
-			return;
-		}
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		return;
 	}
-	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
+	
+	if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		SwimTurn(item);
 	else
 		SwimTurnSubsuit(item);
