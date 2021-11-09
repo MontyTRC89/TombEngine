@@ -117,7 +117,7 @@ void InitialiseSpotCam(short Sequence)
 	}
 
 	BinocularRange = 0;
-	LaserSight = 0;
+	LaserSight = false;
 
 	AlterFOV(16380);
 

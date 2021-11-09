@@ -131,8 +131,8 @@ int IsRoomOutside(int x, int y, int z)
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
-			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->zSize - 1) * 1024))))
+			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->xSize - 1) * 1024)))))
 		{
 			IsRoomOutsideNo = roomNumber;
 
@@ -153,12 +153,41 @@ int IsRoomOutside(int x, int y, int z)
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z) 
 {
-	int sectorX = (x) / SECTOR(1);
-	int sectorZ = (z) / SECTOR(1);
-	int index = sectorZ + sectorX * r->xSize;
+	int sectorX = std::clamp(x / SECTOR(1), 0, r->xSize - 1);
+	int sectorZ = std::clamp(z / SECTOR(1), 0, r->zSize - 1);
+
+	int index = sectorZ + sectorX * r->zSize;
 	if (index > r->floor.size()) 
 	{
 		return nullptr;
 	}
 	return &r->floor[index];
 }
+
+bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber)
+{
+	int x = pos.xPos;
+	int y = pos.yPos;
+	int z = pos.zPos;
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+	int xSector = (x - r->x) / SECTOR(1);
+	int zSector = (z - r->z) / SECTOR(1);
+
+	return (xSector >= 0 && xSector <= r->xSize - 1) &&
+		(zSector >= 0 && zSector <= r->zSize - 1) &&
+		(y <= r->minfloor && y >= r->maxceiling); // up is negative y axis, hence y should be "less" than floor
+}
+
+PHD_3DPOS GetRoomCenter(int roomNumber)
+{
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+	auto halfLength = SECTOR(r->xSize)/2;
+	auto halfDepth = SECTOR(r->zSize)/2;
+	auto halfHeight = (r->maxceiling - r->minfloor) / 2;
+	PHD_3DPOS center;
+	center.xPos = r->x + halfLength;
+	center.yPos = r->minfloor + halfHeight;
+	center.zPos = r->z + halfDepth;
+	return center;
+}
+
