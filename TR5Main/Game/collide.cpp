@@ -184,8 +184,11 @@ std::set<int> CollectConnectedRooms(int roomNumber)
 		result.insert(room->doors[i].room);
 
 	for (auto i : result)
+	{
+		room = &g_Level.Rooms[i];
 		for (int j = 0; j < room->doors.size(); j++)
 			result.insert(room->doors[j].room);
+	}
 
 	return result;
 }
