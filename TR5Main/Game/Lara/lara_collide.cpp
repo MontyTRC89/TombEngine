@@ -375,6 +375,46 @@ void GetLaraDeadlyBounds()
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
 }
 
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_SURFSWIM, 0));
+	ShiftItem(item, coll);
+
+	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
+		coll->Middle.Floor < 0 && coll->Middle.Slope)
+	{
+		item->fallspeed = 0;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+	}
+	else if (coll->CollisionType == CT_LEFT)
+	{
+		item->pos.yRot += ANGLE(5);
+	}
+	else if (coll->CollisionType == CT_RIGHT)
+	{
+		item->pos.yRot -= ANGLE(5);
+	}
+
+	if (GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) - item->pos.yPos > -100)
+	{
+		TestLaraWaterStepOut(item, coll);
+	}
+	else
+	{
+		item->goalAnimState = LS_UNDERWATER_FORWARD;
+		item->currentAnimState = LS_DIVE;
+		item->animNumber = LA_ONWATER_DIVE;
+		item->pos.xRot = -8190;
+		item->frameNumber = GF(LA_ONWATER_DIVE, 0);
+		item->fallspeed = 80;
+		Lara.waterStatus = LW_UNDERWATER;
+	}
+}
+
 bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height)
 {
 	auto oldPos = item->pos;

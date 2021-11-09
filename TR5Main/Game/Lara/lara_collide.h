@@ -19,6 +19,8 @@ void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll);
 short GetDirOctant(int rot);
 void GetLaraDeadlyBounds();
 
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
+
 // TODO: Temporary placement.
 bool TestLaraHitCeiling(COLL_INFO* coll);
 void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);
