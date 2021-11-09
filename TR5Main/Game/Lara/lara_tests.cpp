@@ -83,7 +83,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -768)
+	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
 		return false;
 
 	// TODO: Enable with lua!
