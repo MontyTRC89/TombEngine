@@ -66,15 +66,7 @@ namespace Environment
 		FlashColorBase = Vector3::Zero;
 
 		// Clear weather
-		Weather = WeatherType::None;
-		WeatherStrength = 1.0f;
 		Particles.clear();
-	}
-
-	void EnvironmentController::SetWeather(WeatherType weather, float strength)
-	{
-		Weather = weather;
-		WeatherStrength = strength;
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
@@ -330,14 +322,14 @@ namespace Environment
 		if (Particles.size() > 0)
 			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
 
-		if (Weather == WeatherType::None || WeatherStrength == 0.0f)
+		if (level->Weather == WeatherType::None || level->WeatherStrength == 0.0f)
 			return;
 
-		int spawnDensity = round((float)(Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * WeatherStrength);
-		int maxCount = (Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
+		int spawnDensity = round((float)(level->Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * level->WeatherStrength);
+		int maxCount = (level->Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
 		int newParticlesCount = 0;
 
-		if (Weather != WeatherType::None)
+		if (level->Weather != WeatherType::None)
 		{
 			while (Particles.size() < maxCount)
 			{
@@ -361,7 +353,7 @@ namespace Environment
 
 				auto part = WeatherParticle();
 
-				switch (Weather)
+				switch (level->Weather)
 				{
 				case WeatherType::Snow:
 					part.Size = MAX_SNOW_SIZE + ((GetRandomDraw() & (MAX_SNOW_SIZE / 2)) - (MAX_SNOW_SIZE / 2));
@@ -380,7 +372,7 @@ namespace Environment
 					break;
 				}
 
-				part.Type = Weather;
+				part.Type = level->Weather;
 				part.Room = IsRoomOutsideNo;
 				part.Position.x = xPos;
 				part.Position.y = yPos;

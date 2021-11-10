@@ -360,7 +360,7 @@ void LaraGun()
 		{
 			Lara.requestGunType = Lara.lastGunType;
 		}
-		else if (TrInput & IN_FLARE && (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_TYPE::YOUNG))
+		else if (TrInput & IN_FLARE && (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LaraType::Young))
 		{
 			if (LaraItem->currentAnimState == LS_CROUCH_IDLE && LaraItem->animNumber != LA_CROUCH_IDLE)
 				return;
