@@ -11,6 +11,7 @@
 #include "lara_tests.h"
 #include "items.h"
 #include "setup.h"
+#include "GameFlowScript.h"
 #include "GameScriptLevel.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
@@ -370,8 +371,9 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	int height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
-	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
-		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	if (height < ((level->LaraType == LaraType::Divesuit) << 6) + 200)
+		height = ((level->LaraType == LaraType::Divesuit) << 6) + 200;
 
 	coll->Setup.BadHeightUp = -(STEP_SIZE / 4);
 	coll->Setup.Height = height;
