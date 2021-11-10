@@ -207,7 +207,7 @@ namespace Environment
 
 			auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 			auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-			auto yPos = Camera.pos.y - (WALL_SIZE * 2 + GetRandomDraw() & (WALL_SIZE * 2 - 1));
+			auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GetRandomDraw() & (WALL_SIZE * 4 - 1));
 
 
 			if (IsRoomOutside(xPos, yPos, zPos) < 0)
@@ -231,7 +231,7 @@ namespace Environment
 			part.StartLife = part.Life;
 
 			part.Type = WeatherType::Snow;
-			part.Size = 16 + (GetRandomDraw() & 7 - 4);
+			part.Size = MAX_SNOW_SIZE + (GetRandomDraw() & (MAX_SNOW_SIZE / 2) - (MAX_SNOW_SIZE / 2));
 
 			Particles.push_back(part);
 		}
@@ -297,17 +297,19 @@ namespace Environment
 			if (!p.Stopped)
 			{
 				if (p.Velocity.x < (WindFinalX << 2))
-					p.Velocity.x += 2;
+					p.Velocity.x += GenerateFloat(0.5f, 2.5f);
 				else if (p.Velocity.x > (WindFinalX << 2))
-					p.Velocity.x -= 2;
+					p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
 
 				if (p.Velocity.z < (WindFinalZ << 2))
-					p.Velocity.z += 2;
+					p.Velocity.z += GenerateFloat(0.5f, 2.5f);
 				else if (p.Velocity.z > (WindFinalZ << 2))
-					p.Velocity.z -= 2;
+					p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
 
-				if (((int)p.Velocity.y & 7) < 7)
-					p.Velocity.y++;
+				float maxVelocity = p.Size / 2;
+
+				if (p.Velocity.y < maxVelocity)
+					p.Velocity.y += p.Size / 10.0f;
 			}
 
 			p.Life -= 2;

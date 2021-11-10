@@ -16,6 +16,7 @@
 #include "effects/spark.h"
 #include "effects/drip.h"
 #include "effects/explosion.h"
+#include "effects/weather.h"
 #include "Quad/RenderQuad.h"
 #include "particle/SimpleParticle.h"
 #include "Renderer/RendererSprites.h"
@@ -23,6 +24,7 @@
 #include "items.h"
 
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Environment;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -411,6 +413,24 @@ namespace TEN::Renderer
 								   BLENDMODE_ADDITIVE,view);
 			}
 		}
+	}
+
+	void Renderer11::drawWeatherParticles(RenderView& view) 
+	{		
+		for (auto p : Weather.GetParticles())
+		{
+			if (!p.Enabled)
+				continue;
+
+			if (p.Type == WeatherType::Snow)
+			{
+				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					p.Position,
+					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
+					0.0f, 1.0f, Vector2(p.Size),
+					BLENDMODE_ADDITIVE, view);
+			}
+	}
 	}
 
 	bool Renderer11::drawGunFlashes(RenderView& view) {

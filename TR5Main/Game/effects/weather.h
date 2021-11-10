@@ -7,8 +7,11 @@ namespace Effects {
 namespace Environment 
 {
 	constexpr auto WEATHER_PARTICLES_COUNT = 512;
-	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 16;
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
+
+	constexpr auto MAX_SNOW_SIZE = 32;
+	constexpr auto MAX_RAIN_SIZE = 32;
 
 	enum class WeatherType
 	{
