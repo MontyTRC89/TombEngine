@@ -57,8 +57,10 @@ namespace Environment
 		short   SkyLayer2Position() { return SkyPosition2; }
 
 		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
+		WeatherType GetWeather() { return Weather; };
+		float GetWeatherStrength() { return WeatherStrength; };
+		void  SetWeather(WeatherType weather, float strength);
 
-		void SetWeather(WeatherType weather, float strength);
 		void Flash(int r, int g, int b, float speed);
 		void Update();
 		void Clear();
