@@ -612,7 +612,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				else
 				{
 					SetAnimation(item, LA_STAND_IDLE);
-					item->goalAnimState = LS_WADE_FORWARD;
+					item->goalAnimState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
 					Lara.waterStatus = LW_WADE;
 
 					AnimateItem(item);
