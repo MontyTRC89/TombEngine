@@ -6,17 +6,18 @@ namespace TEN {
 namespace Effects {
 namespace Environment 
 {
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
 	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
-	constexpr auto SNOW_PARTICLES_COUNT_DIVIDER = 2;
 
-	constexpr auto SNOW_SPAWN_DENSITY = 16;
-	constexpr auto RAIN_SPAWN_DENSITY = 32;
-
-	constexpr auto MAX_SNOW_SIZE = 32;
-	constexpr auto MAX_RAIN_SIZE = 128;
+	constexpr auto MAX_SNOW_SIZE = 32.0f;
+	constexpr auto MAX_RAIN_SIZE = 128.0f;
+	
+	constexpr auto WEATHER_PARTICLE_HORIZONTAL_SPEED = 8.0f;
+	constexpr auto SNOW_SPEED = 128.0f;
+	constexpr auto RAIN_SPEED = 256.0f;
 
 	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
-	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16.0f;
 
 	constexpr auto SKY_POSITION_LIMIT = 9728;
 
