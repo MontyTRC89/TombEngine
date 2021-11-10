@@ -19,7 +19,7 @@ namespace Environment
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
 
 
-	constexpr auto SKY_POSITION_LIMIT = WALL_SIZE * 10;
+	constexpr auto SKY_POSITION_LIMIT = 9728;
 
 	enum class WeatherType
 	{
