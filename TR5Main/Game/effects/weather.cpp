@@ -284,7 +284,7 @@ namespace Environment
 
 				case WeatherType::Rain:
 
-					auto random = GetRandomDraw();
+					auto random = GenerateInt();
 					if ((random & 3) != 3)
 					{
 						p.Velocity.x += (float)((random & 3) - 1);
@@ -341,7 +341,7 @@ namespace Environment
 
 				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GetRandomDraw() & (WALL_SIZE * 4 - 1));
+				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GenerateInt() & (WALL_SIZE * 4 - 1));
 
 				if (IsRoomOutside(xPos, yPos, zPos) < 0)
 					continue;
@@ -354,9 +354,9 @@ namespace Environment
 				switch (level->Weather)
 				{
 				case WeatherType::Snow:
-					part.Size = GenerateFloat(MAX_SNOW_SIZE / 2, MAX_SNOW_SIZE);
+					part.Size = GenerateFloat(MAX_SNOW_SIZE / 3, MAX_SNOW_SIZE);
 					part.Velocity.y = GenerateFloat(SNOW_SPEED / 4, SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
-					part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
+					part.Life = (SNOW_SPEED / 3) + ((SNOW_SPEED / 2) - ((int)part.Velocity.y >> 2));
 					break;
 
 				case WeatherType::Rain:
