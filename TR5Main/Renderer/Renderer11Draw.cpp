@@ -2265,10 +2265,9 @@ namespace TEN::Renderer
 
         // Bars
         int flash = FlashIt();
-        if (DashTimer < 120)
-            drawBar(DashTimer / 120.0f, g_DashBar,ID_DASH_BAR_TEXTURE,0,0);
-        UpdateHealthBar(flash);
-        UpdateAirBar(flash);
+        UpdateSprintBar();
+        UpdateHealthBar(LaraItem, flash);
+        UpdateAirBar(LaraItem, flash);
         DrawAllPickups();
 
 		drawOverlays(view); // Draw binoculars or lasersight

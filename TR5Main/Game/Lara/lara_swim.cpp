@@ -22,81 +22,6 @@ struct SUBSUIT_INFO
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
 
-void LaraWaterCurrent(COLL_INFO* coll)
-{
-	if (Lara.currentActive)
-	{
-		SINK_INFO* sink = &g_Level.Sinks[Lara.currentActive - 1];
-
-		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
-		Lara.currentXvel += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.currentXvel) / 16;
-		Lara.currentZvel += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.currentZvel) / 16;
-
-		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
-	}
-	else
-	{
-		int shift = 0;
-
-		if (abs(Lara.currentXvel) <= 16)
-			shift = (abs(Lara.currentXvel) > 8) + 2;
-		else
-			shift = 4;
-		Lara.currentXvel -= Lara.currentXvel >> shift;
-
-		if (abs(Lara.currentXvel) < 4)
-			Lara.currentXvel = 0;
-
-		if (abs(Lara.currentZvel) <= 16)
-			shift = (abs(Lara.currentZvel) > 8) + 2;
-		else
-			shift = 4;
-		Lara.currentZvel -= Lara.currentZvel >> shift;
-
-		if (abs(Lara.currentZvel) < 4)
-			Lara.currentZvel = 0;
-
-		if (!Lara.currentXvel && !Lara.currentZvel)
-			return;
-	}
-
-	LaraItem->pos.xPos += Lara.currentXvel >> 8;
-	LaraItem->pos.zPos += Lara.currentZvel >> 8;
-	Lara.currentActive = 0;
-
-	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-
-	GetCollisionInfo(coll, LaraItem, PHD_VECTOR(0, 200, 0));
-	
-	if (coll->CollisionType == CT_FRONT)
-	{
-		if (LaraItem->pos.xRot > ANGLE(35.0f))
-			LaraItem->pos.xRot += ANGLE(1.0f);
-		else if (LaraItem->pos.xRot < -ANGLE(35.0f))
-			LaraItem->pos.xRot -= ANGLE(1.0f);
-		else
-			LaraItem->fallspeed = 0;
-	}
-	else if (coll->CollisionType == CT_TOP)
-		LaraItem->pos.xRot -= ANGLE(1.0f);
-	else if (coll->CollisionType == CT_TOP_FRONT)
-		LaraItem->fallspeed = 0;
-	else if (coll->CollisionType == CT_LEFT)
-		LaraItem->pos.yRot += ANGLE(5.0f);
-	else if (coll->CollisionType == CT_RIGHT)
-		LaraItem->pos.yRot -= ANGLE(5.0f);
-
-	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
-		LaraItem->pos.yPos += coll->Middle.Floor;
-
-	ShiftItem(LaraItem, coll);
-
-	coll->Setup.OldPosition.x = LaraItem->pos.xPos;
-	coll->Setup.OldPosition.y = LaraItem->pos.yPos;
-	coll->Setup.OldPosition.z = LaraItem->pos.zPos;
-}
-
 void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
@@ -396,4 +321,79 @@ void SwimDive(ITEM_INFO* item)
 	item->pos.xRot = ANGLE(-45.0f);
 	item->fallspeed = 80;
 	Lara.waterStatus = LW_UNDERWATER;
+}
+
+void LaraWaterCurrent(COLL_INFO* coll)
+{
+	if (Lara.currentActive)
+	{
+		SINK_INFO* sink = &g_Level.Sinks[Lara.currentActive - 1];
+
+		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
+		Lara.currentXvel += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.currentXvel) / 16;
+		Lara.currentZvel += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.currentZvel) / 16;
+
+		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
+	}
+	else
+	{
+		int shift = 0;
+
+		if (abs(Lara.currentXvel) <= 16)
+			shift = (abs(Lara.currentXvel) > 8) + 2;
+		else
+			shift = 4;
+		Lara.currentXvel -= Lara.currentXvel >> shift;
+
+		if (abs(Lara.currentXvel) < 4)
+			Lara.currentXvel = 0;
+
+		if (abs(Lara.currentZvel) <= 16)
+			shift = (abs(Lara.currentZvel) > 8) + 2;
+		else
+			shift = 4;
+		Lara.currentZvel -= Lara.currentZvel >> shift;
+
+		if (abs(Lara.currentZvel) < 4)
+			Lara.currentZvel = 0;
+
+		if (!Lara.currentXvel && !Lara.currentZvel)
+			return;
+	}
+
+	LaraItem->pos.xPos += Lara.currentXvel >> 8;
+	LaraItem->pos.zPos += Lara.currentZvel >> 8;
+	Lara.currentActive = 0;
+
+	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+
+	GetCollisionInfo(coll, LaraItem, PHD_VECTOR(0, 200, 0));
+
+	if (coll->CollisionType == CT_FRONT)
+	{
+		if (LaraItem->pos.xRot > ANGLE(35.0f))
+			LaraItem->pos.xRot += ANGLE(1.0f);
+		else if (LaraItem->pos.xRot < -ANGLE(35.0f))
+			LaraItem->pos.xRot -= ANGLE(1.0f);
+		else
+			LaraItem->fallspeed = 0;
+	}
+	else if (coll->CollisionType == CT_TOP)
+		LaraItem->pos.xRot -= ANGLE(1.0f);
+	else if (coll->CollisionType == CT_TOP_FRONT)
+		LaraItem->fallspeed = 0;
+	else if (coll->CollisionType == CT_LEFT)
+		LaraItem->pos.yRot += ANGLE(5.0f);
+	else if (coll->CollisionType == CT_RIGHT)
+		LaraItem->pos.yRot -= ANGLE(5.0f);
+
+	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
+		LaraItem->pos.yPos += coll->Middle.Floor;
+
+	ShiftItem(LaraItem, coll);
+
+	coll->Setup.OldPosition.x = LaraItem->pos.xPos;
+	coll->Setup.OldPosition.y = LaraItem->pos.yPos;
+	coll->Setup.OldPosition.z = LaraItem->pos.zPos;
 }
