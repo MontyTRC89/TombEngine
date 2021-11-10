@@ -17,7 +17,7 @@ namespace Environment
 {
 	EnvironmentController Weather;
 
-	float WeatherParticle::Transparency()
+	float WeatherParticle::Transparency() const
 	{
 		float result = WEATHER_PARTICLES_TRANSPARENCY;
 
@@ -210,10 +210,8 @@ namespace Environment
 
 	void EnvironmentController::UpdateWeather(GameScriptLevel* level)
 	{
-		for (int i = 0; i < Particles.size(); i++)
+		for (auto& p : Particles)
 		{
-			auto& p = Particles[i];
-
 			auto oldPos = p.Position;
 
 			if (!p.Stopped)
