@@ -714,12 +714,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	case LW_UNDERWATER:
 		if (item->hitPoints >= 0)
 		{
-			if (LaraDrawType == LARA_TYPE::DIVESUIT)
-			{
-				/* Hardcoded code */
-			}
-			else
+			auto level = g_GameFlow->GetLevel(CurrentLevel);
+			if (level->LaraType != LaraType::Divesuit)
 				Lara.air--;
+
 			if (Lara.air < 0)
 			{
 			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && Lara.anxiety < 251)
@@ -912,7 +910,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (level->LaraType == LaraType::Divesuit)
 	{
 		if (Lara.turnRate < -ANGLE(0.5f))
 			Lara.turnRate += ANGLE(0.5f);
@@ -930,7 +930,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yRot += Lara.turnRate;
 
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	if (level->LaraType == LaraType::Divesuit)
 		UpdateSubsuitAngles();
 
 	if (item->pos.zRot < -ANGLE(2.0f))
@@ -945,7 +945,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->pos.xRot > ANGLE(85.0f))
 		item->pos.xRot = ANGLE(85.0f);
 
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	if (level->LaraType == LaraType::Divesuit)
 	{
 		if (item->pos.zRot > ANGLE(44.0f))
 			item->pos.zRot = ANGLE(44.0f);

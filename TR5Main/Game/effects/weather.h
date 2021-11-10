@@ -20,13 +20,6 @@ namespace Environment
 
 	constexpr auto SKY_POSITION_LIMIT = 9728;
 
-	enum class WeatherType
-	{
-		None,
-		Rain,
-		Snow
-	};
-
 	struct WeatherParticle
 	{
 		WeatherType Type;
@@ -65,8 +58,6 @@ namespace Environment
 
 	private:
 		// Weather
-		float WeatherStrength = 1.0f;
-		WeatherType Weather = WeatherType::Snow;
 		std::vector<WeatherParticle> Particles;
 
 		// Sky

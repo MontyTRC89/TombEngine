@@ -1044,8 +1044,8 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		g_Renderer.updateProgress(20);
 
-		WeatherType = ReadInt8();
-		LaraDrawType = ReadInt8();
+		ReadInt8(); // TODO: Remove!
+		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
 		g_Renderer.updateProgress(40);

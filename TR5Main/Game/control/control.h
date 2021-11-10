@@ -58,9 +58,6 @@ extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
-extern int WeatherType;
-extern int LaraDrawType;
-
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
 
