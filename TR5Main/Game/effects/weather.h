@@ -9,11 +9,11 @@ namespace Environment
 	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
 	constexpr auto SNOW_PARTICLES_COUNT_DIVIDER = 2;
 
-	constexpr auto SNOW_SPAWN_DENSITY = 32;
-	constexpr auto RAIN_SPAWN_DENSITY = 256;
+	constexpr auto SNOW_SPAWN_DENSITY = 16;
+	constexpr auto RAIN_SPAWN_DENSITY = 32;
 
 	constexpr auto MAX_SNOW_SIZE = 32;
-	constexpr auto MAX_RAIN_SIZE = 96;
+	constexpr auto MAX_RAIN_SIZE = 128;
 
 	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
@@ -57,14 +57,15 @@ namespace Environment
 
 		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
 
+		void SetWeather(WeatherType weather, float strength);
 		void Flash(int r, int g, int b, float speed);
 		void Update();
 		void Clear();
 
 	private:
 		// Weather
+		float WeatherStrength = 1.0f;
 		WeatherType Weather = WeatherType::Snow;
-		int WeatherStrength;
 		std::vector<WeatherParticle> Particles;
 
 		// Sky

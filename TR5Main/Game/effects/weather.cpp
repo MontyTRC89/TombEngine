@@ -62,8 +62,16 @@ namespace Environment
 		FlashProgress = 0.0f;
 		FlashColorBase = Vector3::Zero;
 
-		// Clear weather particles
+		// Clear weather
+		Weather = WeatherType::None;
+		WeatherStrength = 1.0f;
 		Particles.clear();
+	}
+
+	void EnvironmentController::SetWeather(WeatherType weather, float strength)
+	{
+		Weather = weather;
+		WeatherStrength = strength;
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
@@ -203,13 +211,10 @@ namespace Environment
 		if (Particles.size() > 0)
 			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
 
-		// TEST!
-		Weather = WeatherType::Rain;
-
 		if (Weather == WeatherType::None)
 			return;
 
-		int spawnDensity = (Weather == WeatherType::Rain) ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY;
+		int spawnDensity = round((float)(Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * WeatherStrength);
 		int maxCount = (Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
 		int newParticlesCount = 0;
 
