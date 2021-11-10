@@ -39,6 +39,10 @@ constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_VELOCITY = 12;
 constexpr auto LARA_POSE_TIME = 30 * 30;		// 30 frames * 30 = 30 seconds to AFK pose.
 
+constexpr auto LARA_HEALTH_MAX = 1000.0f;
+constexpr auto LARA_AIR_MAX = 1800.0f;
+constexpr auto LARA_SPRINT_MAX = 120.0f;
+
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
 extern COLL_INFO LaraCollision;
