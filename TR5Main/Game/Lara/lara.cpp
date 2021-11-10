@@ -479,7 +479,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					{
 						item->pos.xRot = -ANGLE(45.0f);
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->goalAnimState = LS_UNDERWATER_FORWARD;
 						item->fallspeed = 3 * item->fallspeed / 2;
 					}
 
