@@ -857,6 +857,81 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 	return 0;
 }
 
+int GetWaterDepth(int x, int y, int z, short roomNumber)
+{
+	FLOOR_INFO* floor;
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+
+	short roomIndex = NO_ROOM;
+	do
+	{
+		int zFloor = (z - r->z) / SECTOR(1);
+		int xFloor = (x - r->x) / SECTOR(1);
+
+		if (zFloor <= 0)
+		{
+			zFloor = 0;
+			if (xFloor < 1)
+				xFloor = 1;
+			else if (xFloor > r->xSize - 2)
+				xFloor = r->xSize - 2;
+		}
+		else if (zFloor >= r->zSize - 1)
+		{
+			zFloor = r->zSize - 1;
+			if (xFloor < 1)
+				xFloor = 1;
+			else if (xFloor > r->xSize - 2)
+				xFloor = r->xSize - 2;
+		}
+		else if (xFloor < 0)
+			xFloor = 0;
+		else if (xFloor >= r->xSize)
+			xFloor = r->xSize - 1;
+
+		floor = &r->floor[zFloor + xFloor * r->zSize];
+		roomIndex = floor->WallPortal;
+		if (roomIndex != NO_ROOM)
+		{
+			roomNumber = roomIndex;
+			r = &g_Level.Rooms[roomIndex];
+		}
+	} while (roomIndex != NO_ROOM);
+
+	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	{
+		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+			{
+				int wh = floor->CeilingHeight(x, z);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return (GetFloorHeight(floor, x, y, z) - wh);
+			}
+			floor = GetSector(r, x - r->x, z - r->z);
+		}
+
+		return DEEP_WATER;
+	}
+	else
+	{
+		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+			{
+				int wh = floor->FloorHeight(x, z);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return (GetFloorHeight(floor, x, y, z) - wh);
+			}
+			floor = GetSector(r, x - r->x, z - r->z);
+		}
+
+		return NO_HEIGHT;
+	}
+}
+
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *r = &g_Level.Rooms[roomNumber];
