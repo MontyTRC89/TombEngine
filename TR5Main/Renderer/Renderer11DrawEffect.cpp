@@ -123,7 +123,7 @@ namespace TEN::Renderer
 						addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 							c,
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							SPRITE_ROTATION_90_DEGREES,
+							(PI / 2),
 							1.0f,
 							{ arc->width * 8.0f,
 							Vector3::Distance(pos1, pos2) },
