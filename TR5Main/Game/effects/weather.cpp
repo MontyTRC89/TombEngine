@@ -3,14 +3,30 @@
 #include "savegame.h"
 #include "weather.h"
 #include "collide.h"
-#include "Sound\sound.h"
-#include "Scripting\GameScriptLevel.h"
+#include "effects/effects.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Scripting/GameScriptLevel.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN {
 namespace Effects {
 namespace Environment 
 {
 	EnvironmentController Weather;
+
+	float WeatherParticle::Transparency()
+	{
+		if (Life <= WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
+			return Life / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+
+		if ((StartLife - Life) < (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
+			return (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+
+		return 1.0f;
+	}
 
 	EnvironmentController::EnvironmentController()
 	{
@@ -181,7 +197,7 @@ namespace Environment
 
 		while (Particles.size() < WEATHER_PARTICLES_COUNT)
 		{
-			if (newParticlesCount >= 16)
+			if (newParticlesCount > WEATHER_PARTICLES_SPAWN_DENSITY)
 				break;
 
 			newParticlesCount++;
@@ -212,6 +228,7 @@ namespace Environment
 			part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
 			part.Velocity.z =  (GetRandomDraw() & 7) - 4;
 			part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
+			part.StartLife = part.Life;
 
 			part.Type = WeatherType::Snow;
 			part.Size = 16 + (GetRandomDraw() & 7 - 4);
@@ -251,7 +268,14 @@ namespace Environment
 				{
 					p.Stopped = true;
 					p.Position = oldPos;
-					p.Life = (p.Life > 16) ? 16 : p.Life;
+					p.Life = (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE) ? WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE : p.Life;
+
+					if (inSubstance)
+					{
+						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
+							RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
+							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+					}
 				}
 				else
 					p.Room = coll.RoomNumber;
@@ -266,8 +290,8 @@ namespace Environment
 					p.Enabled = false;	// Turn it off.
 					continue;
 				}
-				else if (p.Life > 16)
-					p.Life = 16;
+				else if (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
+					p.Life = WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 			}
 
 			if (!p.Stopped)

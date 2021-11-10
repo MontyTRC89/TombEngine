@@ -7,6 +7,8 @@ namespace Effects {
 namespace Environment 
 {
 	constexpr auto WEATHER_PARTICLES_COUNT = 512;
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 16;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
 
 	enum class WeatherType
 	{
@@ -22,11 +24,14 @@ namespace Environment
 		Vector3 Position;
 		Vector3 Velocity;
 
+		float StartLife;
 		float Life;
 		float Size;
 
 		bool Enabled;
 		bool Stopped;
+
+		float Transparency();
 	};
 
 
@@ -41,14 +46,15 @@ namespace Environment
 		short   SkyLayer1Position() { return SkyPosition1; }
 		short   SkyLayer2Position() { return SkyPosition2; }
 
-		// Weather particles
-		std::vector<WeatherParticle> Particles;
+		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
 
 		void Flash(int r, int g, int b, float speed);
 		void Update();
 		void Clear();
 
 	private:
+		// Weather particles
+		std::vector<WeatherParticle> Particles;
 
 		// Sky
 		Vector4 SkyCurrentColor = Vector4::Zero;
