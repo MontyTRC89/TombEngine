@@ -1650,21 +1650,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-			item->frameNumber = GF(LA_JUMP_UP_TO_MONKEYSWING, 0);
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
+			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		}
 		else
 		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 12);
-			item->currentAnimState = LS_HANG;
+			SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 			if (TestHangFeet(item, item->pos.yRot))
 				item->goalAnimState = LS_HANG_FEET;
-			else
-				item->goalAnimState = LS_HANG;
 		}
 
 		GetCollisionInfo(coll, item);

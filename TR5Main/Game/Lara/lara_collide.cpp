@@ -211,7 +211,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->animNumber != LA_STAND_SOLID)
 		{
 			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = GF(LA_STAND_SOLID, 0);
+			item->frameNumber = GetFrameNumber(item, 0);
 		}
 
 		break;
@@ -246,7 +246,7 @@ void LaraCollideStopCrawl(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->animNumber != LA_CRAWL_IDLE)
 		{
 			item->animNumber = LA_CRAWL_IDLE;
-			item->frameNumber = GF(LA_CRAWL_IDLE, 0);
+			item->frameNumber = GetFrameNumber(item, 0);
 		}
 
 		break;
