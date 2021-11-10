@@ -188,7 +188,7 @@ void InitialiseCamera()
 	Camera.pos.z = LastTarget.z - 100;
 	Camera.pos.roomNumber = LaraItem->roomNumber;
 
-	Camera.targetDistance = WALL_SIZE + STOP_SIZE;
+	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
 	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
@@ -306,9 +306,9 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	{
 		mgLOS(&Camera.target, &Camera.pos, 0);
 		
-		if (abs(Camera.pos.x - ideal->x) < (STOP_SIZE + STEP_SIZE) &&
-			abs(Camera.pos.y - ideal->y) < (STOP_SIZE + STEP_SIZE) &&
-			abs(Camera.pos.z - ideal->z) < (STOP_SIZE + STEP_SIZE))
+		if (abs(Camera.pos.x - ideal->x) < (WALL_SIZE - STEP_SIZE) &&
+			abs(Camera.pos.y - ideal->y) < (WALL_SIZE - STEP_SIZE) &&
+			abs(Camera.pos.z - ideal->z) < (WALL_SIZE - STEP_SIZE))
 		{
 			to.x = Camera.pos.x;
 			to.y = Camera.pos.y;
@@ -621,7 +621,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = WALL_SIZE + STOP_SIZE;
+	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
