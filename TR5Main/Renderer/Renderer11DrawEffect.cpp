@@ -438,7 +438,7 @@ namespace TEN::Renderer
 				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.6f, 0.7f, 0.7f, p.Transparency()),
-					0.0f, 1.0f, Vector2(4, p.Size), BLENDMODE_ADDITIVE, -v, view);
+					-(PI / 2.0f), 1.0f, Vector2(p.Size, TEN::Effects::Drip::DRIP_WIDTH), BLENDMODE_ADDITIVE, -v, view);
 				break;
 			}
 		}
@@ -721,10 +721,10 @@ namespace TEN::Renderer
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				billboardMatrix = scale * rotation * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
@@ -747,10 +747,10 @@ namespace TEN::Renderer
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
-				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
+				billboardMatrix = scale * rotation * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
