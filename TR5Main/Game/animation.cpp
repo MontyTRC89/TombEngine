@@ -286,6 +286,41 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 	return(interp);
 }
 
+short GetFrameNumber(ITEM_INFO* item, short frameToStart)
+{
+	return GetFrameNumber(item->objectNumber, item->animNumber, frameToStart);
+}
+
+short GetFrameNumber(short objectID, short animNumber, short frameToStart)
+{
+	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
+}
+
+void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
+{
+	auto index = Objects[item->objectNumber].animIndex + animIndex;
+
+	if (index < 0 || index >= g_Level.Anims.size())
+	{
+		TENLog(std::string("Attempt to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->objectNumber), LogLevel::Warning);
+		return;
+	}
+
+	item->animNumber = index;
+	item->frameNumber = g_Level.Anims[index].frameBase + frameToStart;
+	item->currentAnimState = g_Level.Anims[index].currentAnimState;
+	item->goalAnimState = item->currentAnimState;
+}
+
+bool TestLastFrame(ITEM_INFO* item, short animNumber)
+{
+	if ((animNumber >= 0) && (item->animNumber != animNumber))
+		return false;
+
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	return (item->frameNumber >= anim->frameEnd);
+}
+
 void DrawAnimatingItem(ITEM_INFO* item)
 {
 	// TODO: to refactor
@@ -318,23 +353,4 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
 	{
 		pos->yRot += rot;
 	}
-}
-
-bool TestLastFrame(ITEM_INFO* item, short animNumber)
-{
-	if ((animNumber >= 0) && (item->animNumber != animNumber))
-		return false;
-
-	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
-	return (item->frameNumber >= anim->frameEnd);
-}
-
-short GF(short animIndex, short frameToStart)
-{
-	return g_Level.Anims[animIndex].frameBase + frameToStart;
-}
-
-short GF2(short objectID, short animIndex, short frameToStart)
-{
-	return g_Level.Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
 }
