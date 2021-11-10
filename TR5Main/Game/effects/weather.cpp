@@ -332,10 +332,7 @@ namespace Environment
 		if (Particles.size() > 0)
 			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
 
-		Weather = WeatherType::Rain;
-		WeatherStrength = 1;
-
-		if (Weather == WeatherType::None)
+		if (Weather == WeatherType::None || WeatherStrength == 0.0f)
 			return;
 
 		int spawnDensity = round((float)(Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * WeatherStrength);
