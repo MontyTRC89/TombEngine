@@ -415,8 +415,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	if (item->currentAnimState != LS_SPRINT && DashTimer < 120)
-		DashTimer++;
+	if (item->currentAnimState != LS_SPRINT && Lara.sprintTimer < LARA_SPRINT_MAX)
+		Lara.sprintTimer++;
 
 	Lara.isDucked = false;
 
@@ -513,7 +513,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_ONWATER_IDLE);
 
 					Lara.waterStatus = LW_SURFACE;
-					item->pos.yPos += 1 - heightFromWater;
+					item->pos.yPos += 1 - heightFromWater; // BUG: Crawl exit flip results in Lara teleporting above the surface because of this. @Sezz 2021.11.10
 					item->gravityStatus = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
@@ -698,13 +698,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 		}
-		else if (Lara.air < 1800 && item->hitPoints >= 0)
+		else if (Lara.air < LARA_AIR_MAX && item->hitPoints >= 0)
 		{
 			if (Lara.Vehicle == NO_ITEM) // only for the upv !!
 			{
 				Lara.air += 10;
-				if (Lara.air > 1800)
-					Lara.air = 1800;
+				if (Lara.air > LARA_AIR_MAX)
+					Lara.air = LARA_AIR_MAX;
 			}
 		}
 
@@ -738,8 +738,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->hitPoints >= 0)
 		{
 			Lara.air += 10;
-			if (Lara.air > 1800)
-				Lara.air = 1800;
+			if (Lara.air > LARA_AIR_MAX)
+				Lara.air = LARA_AIR_MAX;
 		}
 
 		LaraSurface(item, coll);
@@ -777,8 +777,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
-	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
+	if (TrInput & IN_LOOK && Lara.look &&
+		Lara.ExtraAnim == NO_ITEM)
+	{
 		LookLeftRight();
+	}
 	else
 		ResetLook();
 
@@ -912,62 +915,50 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 	{
-		if (Lara.turnRate < -ANGLE(0.5))
-		{
-			Lara.turnRate += ANGLE(0.5);
-		}
-		else if (Lara.turnRate > ANGLE(0.5))
-		{
-			Lara.turnRate -= ANGLE(0.5);
-		}
+		if (Lara.turnRate < -ANGLE(0.5f))
+			Lara.turnRate += ANGLE(0.5f);
+		else if (Lara.turnRate > ANGLE(0.5f))
+			Lara.turnRate -= ANGLE(0.5f);
 		else
-		{
 			Lara.turnRate = 0;
-		}
 	}
-	else if (Lara.turnRate < -ANGLE(2))
-	{
-		Lara.turnRate += ANGLE(2);
-	}
-	else if (Lara.turnRate > ANGLE(2))
-	{
-		Lara.turnRate -= ANGLE(2);
-	}
+	else if (Lara.turnRate < -ANGLE(2.0f))
+		Lara.turnRate += ANGLE(2.0f);
+	else if (Lara.turnRate > ANGLE(2.0f))
+		Lara.turnRate -= ANGLE(2.0f);
 	else
-	{
 		Lara.turnRate = 0;
-	}
 
 	item->pos.yRot += Lara.turnRate;
 
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 		UpdateSubsuitAngles();
 
-	if (item->pos.zRot < -ANGLE(2))
-		item->pos.zRot += ANGLE(2);
-	else if (item->pos.zRot > ANGLE(2))
-		item->pos.zRot -= ANGLE(2);
+	if (item->pos.zRot < -ANGLE(2.0f))
+		item->pos.zRot += ANGLE(2.0f);
+	else if (item->pos.zRot > ANGLE(2.0f))
+		item->pos.zRot -= ANGLE(2.0f);
 	else
 		item->pos.zRot = 0;
 
-	if (item->pos.xRot < -ANGLE(85))
-		item->pos.xRot = -ANGLE(85);
-	else if (item->pos.xRot > ANGLE(85))
-		item->pos.xRot = ANGLE(85);
+	if (item->pos.xRot < -ANGLE(85.0f))
+		item->pos.xRot = -ANGLE(85.0f);
+	else if (item->pos.xRot > ANGLE(85.0f))
+		item->pos.xRot = ANGLE(85.0f);
 
 	if (LaraDrawType == LARA_TYPE::DIVESUIT)
 	{
-		if (item->pos.zRot > ANGLE(44))
-			item->pos.zRot = ANGLE(44);
-		else if (item->pos.zRot < -ANGLE(44))
-			item->pos.zRot = -ANGLE(44);
+		if (item->pos.zRot > ANGLE(44.0f))
+			item->pos.zRot = ANGLE(44.0f);
+		else if (item->pos.zRot < -ANGLE(44.0f))
+			item->pos.zRot = -ANGLE(44.0f);
 	}
 	else
 	{
-		if (item->pos.zRot > ANGLE(22))
-			item->pos.zRot = ANGLE(22);
-		else if (item->pos.zRot < -ANGLE(22))
-			item->pos.zRot = -ANGLE(22);
+		if (item->pos.zRot > ANGLE(22.0f))
+			item->pos.zRot = ANGLE(22.0f);
+		else if (item->pos.zRot < -ANGLE(22.0f))
+			item->pos.zRot = -ANGLE(22.0f);
 	}
 
 	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
@@ -995,7 +986,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Camera.targetElevation = -ANGLE(22);
+	Camera.targetElevation = -ANGLE(22.0f);
 
 	coll->Setup.BadHeightDown = 32512;
 	coll->Setup.BadHeightUp = -128;
@@ -1024,12 +1015,12 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
+	if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2.0f))
 		item->pos.zRot = 0;
 	else if (item->pos.zRot < 0)
-		item->pos.zRot += ANGLE(2);
+		item->pos.zRot += ANGLE(2.0f);
 	else
-		item->pos.zRot -= ANGLE(2);
+		item->pos.zRot -= ANGLE(2.0f);
 
 	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
 		LaraWaterCurrent(coll);

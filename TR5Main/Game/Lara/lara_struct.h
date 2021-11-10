@@ -997,6 +997,7 @@ struct LaraTightrope
 	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
 };
 #endif
+
 struct LaraInfo
 {
 	short itemNumber;
@@ -1010,6 +1011,7 @@ struct LaraInfo
 	short poseCount;
 	short hitFrame;
 	short hitDirection;
+	int sprintTimer;
 	short air;
 	short diveCount;
 	short deathCount;
