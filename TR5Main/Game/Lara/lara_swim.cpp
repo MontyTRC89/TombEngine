@@ -107,6 +107,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 
@@ -142,21 +143,11 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 	
 	if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		SwimTurn(item);
-		if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		{
-			item->animNumber = LA_UNDERWATER_ROLL_180_START;
-			item->frameNumber = GF(LA_UNDERWATER_ROLL_180_START, 0);
-			item->currentAnimState = LS_UNDERWATER_ROLL;
-
-			return;
-		}
-	}
-	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
@@ -184,23 +175,11 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 	
 	if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		SwimTurn(item);
-	if (TrInput & IN_ROLL)
-	{
-		if (LaraDrawType != LARA_TYPE::DIVESUIT)
-		{
-			item->animNumber = LA_UNDERWATER_ROLL_180_START;
-			item->frameNumber = GF(LA_UNDERWATER_ROLL_180_START, 0);
-			item->currentAnimState = LS_UNDERWATER_ROLL;
-
-			return;
-		}
-	}
-	else if (LaraDrawType != LARA_TYPE::DIVESUIT)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
