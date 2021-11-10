@@ -35,7 +35,7 @@ void InitialiseLara(int restore)
 	Lara.look = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
-	Lara.air = 1800;
+	Lara.air = LARA_AIR_MAX;
 	Lara.weaponItem = NO_ITEM;
 	PoisonFlag = 0;
 	Lara.poisoned = 0;
@@ -59,7 +59,7 @@ void InitialiseLara(int restore)
 	Lara.location = -1;
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
-	LaraItem->hitPoints = 1000;
+	LaraItem->hitPoints = LARA_HEALTH_MAX;
 	Lara.gunStatus = LG_NO_ARMS;
 	memset(&Lara.NewAnims, 0, sizeof(AnimsNew));	//make sure script changes these AFTER Lara is initialized?
 
@@ -99,7 +99,7 @@ void InitialiseLara(int restore)
 
 	InitialiseLaraAnims(LaraItem);
 	Lara.BeetleLife = 3;
-	DashTimer = 120;
+	Lara.sprintTimer = LARA_SPRINT_MAX;
 }
 
 void LaraInitialiseMeshes()
