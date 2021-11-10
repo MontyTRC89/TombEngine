@@ -87,7 +87,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS)
 		return false;
 
-	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
+	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -(WALL_SIZE - STEP_SIZE))
 		return false;
 
 	// TODO: LUA
@@ -117,8 +117,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		// Vault up two steps.
-		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&				// Lower floor bound.
-			coll->Front.Floor >= -(STOP_SIZE + STEP_SIZE / 2))		// Upper floor bound.
+		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&					// Lower floor bound.
+			coll->Front.Floor >= -(STEP_SIZE * 2 + STEP_SIZE / 2))		// Upper floor bound.
 		{
 			// Vault to stand up two steps.
 			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT/* &&				// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
@@ -129,7 +129,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GF(LA_VAULT_TO_STAND_2CLICK_START, 0);
 				item->goalAnimState = LS_STOP;
-				item->pos.yPos += coll->Front.Floor + STOP_SIZE;
+				item->pos.yPos += coll->Front.Floor + (STEP_SIZE * 2);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
@@ -143,14 +143,14 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->frameNumber = GF(LA_VAULT_TO_CROUCH_2CLICK, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + STOP_SIZE;
+				item->pos.yPos += coll->Front.Floor + (STEP_SIZE * 2);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
 		// Vault up three steps.
-		else if (coll->Front.Floor <= -(STOP_SIZE + STEP_SIZE / 2) &&		// Lower floor bound.
-			coll->Front.Floor >= -(WALL_SIZE - STEP_SIZE / 2))				// Upper floor bound.
+		else if (coll->Front.Floor <= -(STEP_SIZE * 2 + STEP_SIZE / 2) &&		// Lower floor bound.
+			coll->Front.Floor >= -(WALL_SIZE - STEP_SIZE / 2))					// Upper floor bound.
 		{
 			// Vault to stand up three steps.
 			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT/* &&				// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
@@ -161,7 +161,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GF(LA_VAULT_TO_STAND_3CLICK, 0);
 				item->goalAnimState = LS_STOP;
-				item->pos.yPos += coll->Front.Floor + (STOP_SIZE + STEP_SIZE);
+				item->pos.yPos += coll->Front.Floor + (WALL_SIZE - STEP_SIZE);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
@@ -175,7 +175,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->frameNumber = GF(LA_VAULT_TO_CROUCH_3CLICK, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + (STOP_SIZE + STEP_SIZE);
+				item->pos.yPos += coll->Front.Floor + (WALL_SIZE - STEP_SIZE);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
@@ -205,12 +205,12 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (coll->Front.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||			// Upper front floor bound.
 			coll->FrontLeft.Floor > -(WALL_SIZE * 2 - STEP_SIZE / 2) ||		// Upper left floor bound.
-			coll->FrontRight.Floor > -STOP_SIZE ||							// Upper right floor bound.
+			coll->FrontRight.Floor > -(STEP_SIZE * 2) ||					// Upper right floor bound.
 			coll->Middle.Ceiling > -(WALL_SIZE + STEP_SIZE / 2 + 6) ||		// Upper ceiling bound.
 			Lara.waterStatus == LW_WADE)
 		{
-			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (STOP_SIZE - 6)) &&
-				coll->Middle.Ceiling <= -(STOP_SIZE + 6))
+			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (STEP_SIZE * 2 - 6)) &&
+				coll->Middle.Ceiling <= -(STEP_SIZE * 2 + 6))
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
@@ -257,7 +257,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (ceiling > (WALL_SIZE * 2 - STEP_SIZE) ||
 			ceiling < -(WALL_SIZE * 2 - STEP_SIZE) ||
-			abs(ceiling) == (STOP_SIZE + STEP_SIZE))
+			abs(ceiling) == (WALL_SIZE - STEP_SIZE))
 		{
 			return false;
 		}
@@ -966,10 +966,10 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -700, STOP_SIZE, &shift_r) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -700, (STEP_SIZE * 2), &shift_r) != 1)
 		return false;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -700, STOP_SIZE, &shift_l) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -700, (STEP_SIZE * 2), &shift_l) != 1)
 		return false;
 
 	if (shift_r)
@@ -1436,7 +1436,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 	}
 
-	item->pos.yPos += coll->Middle.Floor + (STOP_SIZE + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
+	item->pos.yPos += coll->Middle.Floor + (STEP_SIZE * 2 + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
 
 	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 
@@ -1449,7 +1449,6 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	return true;
 }
-
 
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -1470,7 +1469,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
-	if (frontFloor <= -STOP_SIZE ||
+	if (frontFloor <= -(STEP_SIZE * 2) ||
 		frontFloor > (STEP_SIZE + STEP_SIZE / 4 - 4))
 	{
 		return false;
