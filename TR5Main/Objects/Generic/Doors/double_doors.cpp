@@ -49,8 +49,7 @@ namespace TEN::Entities::Doors
 			{
 				if (MoveLaraPosition(&DoubleDoorPos, item, l))
 				{
-					SetAnimation(item, LA_DOUBLEDOOR_OPEN_PUSH, 0, true);
-					l->currentAnimState = LS_DOUBLEDOOR_PUSH;
+					SetAnimation(l, LA_DOUBLEDOOR_OPEN_PUSH);
 
 					AddActiveItem(itemNum);
 

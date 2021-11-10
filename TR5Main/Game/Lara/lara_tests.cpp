@@ -1019,22 +1019,19 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor;
-	int floorHeight, ceilingHeight, g, m, j;
 
 	z += phd_cos(angle) * (STEP_SIZE / 2);
 	x += phd_sin(angle) * (STEP_SIZE / 2);
 
-	floor = GetFloor(x, y, z, &roomNum);
-	floorHeight = GetFloorHeight(floor, x, y, z);
-	ceilingHeight = GetCeiling(floor, x, y, z);
-	g = floorHeight - y;
-	m = ceilingHeight - y;
-	j = y - (STEP_SIZE / 2) - ceilingHeight;
+	auto floor = GetFloor(x, y, z, &roomNum);
+	int floorHeight = GetFloorHeight(floor, x, y, z);
+	int ceilingHeight = GetCeiling(floor, x, y, z);
+	int m = ceilingHeight - y;
+	int j = y - (STEP_SIZE / 2) - ceilingHeight;
 
 	if (floorHeight != NO_HEIGHT)
 	{
-		if (g > 0 && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
+		if (floorHeight < y && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
 			return true;
 	}
 
@@ -1341,35 +1338,24 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexWaterPullUp)
-			{
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK, 0, true, true);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
 		}
 		else
-		{
-			SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK, 0, true, true);
-			item->goalAnimState = LS_STOP;
-		}
+			SetAnimation(item, LA_ONWATER_TO_STAND_1CLICK);
 	}
 	else if (frontFloor > (STEP_SIZE / 2))
 	{
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexSubmerged)
-			{
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK, 0, true, true);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
 		}
 		else
-			item->animNumber = LA_ONWATER_TO_STAND_M1CLICK;
-
-		item->frameNumber = GetFrameNumber(item, 0);
+			SetAnimation(item, LA_ONWATER_TO_STAND_M1CLICK);
 	}
 
 	else
@@ -1377,18 +1363,12 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexWaterPullUp)
-			{
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK, 0, true, true);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;
 		}
 		else
-		{
-			SetAnimation(item, LA_ONWATER_TO_STAND_0CLICK, 0, true, true);
-			item->goalAnimState = LS_STOP;
-		}
+			SetAnimation(item, LA_ONWATER_TO_STAND_0CLICK);
 	}
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);

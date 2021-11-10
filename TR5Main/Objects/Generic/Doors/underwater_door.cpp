@@ -49,8 +49,7 @@ namespace TEN::Entities::Doors
 			{
 				if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 				{
-					SetAnimation(item, LA_UNDERWATER_DOOR_OPEN, 0, true);
-					l->currentAnimState = LS_MISC_CONTROL;
+					SetAnimation(l, LA_UNDERWATER_DOOR_OPEN);
 					l->fallspeed = 0;
 					item->status = ITEM_ACTIVE;
 

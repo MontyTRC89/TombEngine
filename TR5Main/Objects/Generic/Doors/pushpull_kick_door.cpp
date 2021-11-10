@@ -70,7 +70,7 @@ namespace TEN::Entities::Doors
 				{
 					if (MoveLaraPosition(&PullDoorPos, item, l))
 					{
-						SetAnimation(item, LA_DOOR_OPEN_PULL);
+						SetAnimation(l, LA_DOOR_OPEN_PULL);
 						item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PULL;
 						openTheDoor = true;
 					}
@@ -85,7 +85,7 @@ namespace TEN::Entities::Doors
 					{
 						if (MoveLaraPosition(&KickDoorPos, item, l))
 						{
-							SetAnimation(item, LA_DOOR_OPEN_KICK);
+							SetAnimation(l, LA_DOOR_OPEN_KICK);
 							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
@@ -98,7 +98,7 @@ namespace TEN::Entities::Doors
 					{
 						if (MoveLaraPosition(&PushDoorPos, item, l))
 						{
-							SetAnimation(item, LA_DOOR_OPEN_PUSH);
+							SetAnimation(l, LA_DOOR_OPEN_PUSH);
 							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}

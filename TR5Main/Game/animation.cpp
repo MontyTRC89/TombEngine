@@ -296,7 +296,7 @@ short GetFrameNumber(short objectID, short animNumber, short frameToStart)
 	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
 }
 
-void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart, bool ignoreGoalState, bool ignoreCurrentState)
+void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 {
 	auto index = Objects[item->objectNumber].animIndex + animIndex;
 
@@ -308,12 +308,8 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart, bool ign
 
 	item->animNumber = index;
 	item->frameNumber = g_Level.Anims[index].frameBase + frameToStart;
-
-	if (!ignoreCurrentState)
-		item->currentAnimState = g_Level.Anims[index].currentAnimState;
-
-	if (!ignoreGoalState)
-		item->goalAnimState = item->currentAnimState;
+	item->currentAnimState = g_Level.Anims[index].currentAnimState;
+	item->goalAnimState = item->currentAnimState;
 }
 
 bool TestLastFrame(ITEM_INFO* item, short animNumber)
