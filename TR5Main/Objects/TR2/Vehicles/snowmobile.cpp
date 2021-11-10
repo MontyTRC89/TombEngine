@@ -310,35 +310,11 @@ bool SkidooCheckGetOff()
 
 void DoSnowEffect(ITEM_INFO* skidoo)
 {
+	auto material = GetCollisionResult(skidoo).BottomBlock->Material;
+	if (material != FLOOR_MATERIAL::Ice && material != FLOOR_MATERIAL::Snow)
+		return;
+
 	TEN::Effects::TriggerSnowmobileSnow(skidoo);
-	// OLD SPARK EFFECT
-	/*SPARKS* spark = &Sparks[GetFreeSpark()];
-	spark->on = 1;
-	spark->sR = 64;
-	spark->sG = 64;
-	spark->sB = 64;
-	spark->dR = 64;
-	spark->dG = 64;
-	spark->dB = 64;
-	spark->colFadeSpeed = 1;
-	spark->transType = TransTypeEnum::COLADD;
-	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-	spark->fadeToBlack = spark->life - 4;
-	spark->x = (GetRandomControl() & 255) + skidoo->pos.xPos - 8;
-	spark->y = (GetRandomControl() & 15) + skidoo->pos.yPos - 8;
-	spark->z = (GetRandomControl() & 255) + skidoo->pos.zPos - 8;
-	spark->xVel = 0;
-	spark->zVel = 0;
-	spark->friction = 0;
-	spark->flags = 538;
-	spark->yVel = (GetRandomControl() & 0x7F) - 256;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-	spark->scalar = 3;
-	spark->maxYvel = 0;
-	spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-	spark->gravity = -spark->yVel >> 2;
-	spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 32;
-	spark->dSize = 2 * spark->size;*/
 }
 
 void SkidooAnimation(ITEM_INFO* skidoo, int collide, bool dead)
