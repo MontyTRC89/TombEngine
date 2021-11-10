@@ -8,6 +8,7 @@
 #include "Lara.h"
 #include "level.h"
 #include "input.h"
+#include "lara_collide.h"
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
