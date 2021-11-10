@@ -203,7 +203,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT && DashTimer)
+	if (TrInput & IN_SPRINT && Lara.sprintTimer)
 	{
 		item->goalAnimState = LS_SPRINT;
 		return;
@@ -1873,13 +1873,13 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 73*/
 	/*collision: lara_col_dash*/
-	if (item->hitPoints <= 0 || !DashTimer || !(TrInput & IN_SPRINT) || Lara.waterStatus == LW_WADE)
+	if (item->hitPoints <= 0 || !Lara.sprintTimer || !(TrInput & IN_SPRINT) || Lara.waterStatus == LW_WADE)
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
 		return;
 	}
 
-	DashTimer--;
+	Lara.sprintTimer--;
 
 	if (TrInput & IN_DUCK
 		&& (Lara.gunStatus == LG_NO_ARMS
