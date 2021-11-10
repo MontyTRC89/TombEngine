@@ -1002,7 +1002,7 @@ void UpdateSplashes()
 	}
 }
 
-void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID, float rotation)
+void SetupRipple(int x, int y, int z, float size, char flags, unsigned int spriteID, float rotation)
 {
 	RIPPLE_STRUCT* ripple;
 	int i;
