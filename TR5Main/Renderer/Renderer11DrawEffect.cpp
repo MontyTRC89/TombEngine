@@ -422,15 +422,26 @@ namespace TEN::Renderer
 			if (!p.Enabled)
 				continue;
 
-			if (p.Type == WeatherType::Snow)
+			switch (p.Type)
 			{
+			case WeatherType::Snow:
 				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
 					BLENDMODE_ADDITIVE, view);
+				break;
+
+			case WeatherType::Rain:
+				Vector3 v;
+				p.Velocity.Normalize(v);
+				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
+					p.Position,
+					Vector4(0.6f, 0.7f, 0.7f, p.Transparency()),
+					0.0f, 1.0f, Vector2(4, p.Size), BLENDMODE_ADDITIVE, -v, view);
+				break;
 			}
-	}
+		}
 	}
 
 	bool Renderer11::drawGunFlashes(RenderView& view) {
@@ -1082,7 +1093,7 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v,view);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
@@ -1096,7 +1107,7 @@ namespace TEN::Renderer
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v,view);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
