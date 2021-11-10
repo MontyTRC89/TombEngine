@@ -149,20 +149,14 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, int divisor)
 // frame, resulting in an unacceptable delay. Changing the order in which routine functions are executed is not a viable solution. @Sezz 2021.09.26
 void SetLaraFallState(ITEM_INFO* item)
 {
-	item->animNumber = LA_FALL_START;
-	item->currentAnimState = LS_JUMP_FORWARD;
-	item->goalAnimState = LS_JUMP_FORWARD;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	SetAnimation(item, LA_FALL_START);
 	item->fallspeed = 0;
 	item->gravityStatus = true;
 }
 
 void SetLaraFallBackState(ITEM_INFO* item)
 {
-	item->animNumber = LA_FALL_BACK;
-	item->currentAnimState = LS_FALL_BACK;
-	item->goalAnimState = LS_FALL_BACK;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	SetAnimation(item, LA_FALL_BACK);
 	item->fallspeed = 0;
 	item->gravityStatus = true;
 }
