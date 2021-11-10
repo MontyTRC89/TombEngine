@@ -417,7 +417,7 @@ namespace TEN::Renderer
 
 	void Renderer11::drawWeatherParticles(RenderView& view) 
 	{		
-		for (auto p : Weather.GetParticles())
+		for (auto& p : Weather.GetParticles())
 		{
 			if (!p.Enabled)
 				continue;
