@@ -17,3 +17,4 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateSubsuitAngles();
 void SwimTurnSubsuit(ITEM_INFO* item);
 void SwimTurn(ITEM_INFO* item);
+void SwimDive(ITEM_INFO* item);

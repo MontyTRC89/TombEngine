@@ -180,7 +180,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
@@ -215,7 +215,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 	
@@ -246,7 +246,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START, 0, true);
+		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 	
@@ -386,4 +386,14 @@ void SwimTurn(ITEM_INFO* item)
 
 		item->pos.zRot += LARA_LEAN_RATE * 2;
 	}
+}
+
+void SwimDive(ITEM_INFO* item)
+{
+
+	SetAnimation(item, LA_ONWATER_DIVE);
+	item->goalAnimState = LS_UNDERWATER_FORWARD;
+	item->pos.xRot = ANGLE(-45.0f);
+	item->fallspeed = 80;
+	Lara.waterStatus = LW_UNDERWATER;
 }
