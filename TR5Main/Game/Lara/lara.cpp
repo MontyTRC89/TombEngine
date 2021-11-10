@@ -685,7 +685,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
-		if (isSwamp	&& Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE + 7))
+		if (isSwamp	&& Lara.waterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
 			if (item->hitPoints >= 0)
 			{
