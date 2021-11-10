@@ -210,9 +210,7 @@ namespace TEN::Entities::Doors
 
 				if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 				{
-					l->animNumber = LA_DOOR_OPEN_CROWBAR;
-					l->frameNumber = GF(LA_DOOR_OPEN_CROWBAR, 0);
-					l->currentAnimState = LS_MISC_CONTROL;
+					SetAnimation(l, LA_DOOR_OPEN_CROWBAR);
 					item->pos.yRot ^= ANGLE(180);
 
 					AddActiveItem(itemNum);
