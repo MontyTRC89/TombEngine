@@ -510,6 +510,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->currentAnimState == LS_SWANDIVE_END)
 					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
+					}
 
 					SetAnimation(item, LA_WADE);
 				}
