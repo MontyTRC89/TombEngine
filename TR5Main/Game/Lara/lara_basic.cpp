@@ -390,7 +390,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_SPRINT &&
-		DashTimer &&
+		Lara.sprintTimer &&
 		Lara.waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_SPRINT;
@@ -4016,7 +4016,7 @@ void old_lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_dash()
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
-	DashTimer--; // TODO: Move global to LaraItem? health.cpp needs deglobalisation in general. @Sezz 2021.09.29
+	Lara.sprintTimer--; // TODO: Move global to LaraItem? health.cpp needs deglobalisation in general. @Sezz 2021.09.29
 
 	if (item->hitPoints <= 0)
 	{
@@ -4065,7 +4065,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && DashTimer > 0) [[likely]]
+		else if (TrInput & IN_SPRINT && Lara.sprintTimer > 0) [[likely]]
 			item->goalAnimState = LS_SPRINT;
 		else
 			item->goalAnimState = LS_RUN_FORWARD;
