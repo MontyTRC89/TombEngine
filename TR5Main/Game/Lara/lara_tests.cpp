@@ -357,7 +357,6 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
