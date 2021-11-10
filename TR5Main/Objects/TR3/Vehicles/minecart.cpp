@@ -588,7 +588,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_GETOUT:
 		if (l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 7)
 		{
-			if ((l->frameNumber == GF2(ID_MINECART, 7, 0) + 20) && (cart->Flags & CF_MESH))
+			if ((l->frameNumber == GetFrameNumber(v, 20)) && (cart->Flags & CF_MESH))
 			{
 				Lara.meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 
@@ -615,9 +615,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->pos.yRot = v->pos.yRot + 0x4000;
 			l->pos.zRot = 0;
 
-			l->animNumber = 13;
-			l->frameNumber = GF(11, 0);
-			l->currentAnimState = l->goalAnimState = 2;
+			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
@@ -636,16 +634,14 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->pos.yRot = v->pos.yRot - 0x4000;
 			l->pos.zRot = 0;
 
-			l->animNumber = 11;
-			l->frameNumber = GF(11, 0);
-			l->currentAnimState = l->goalAnimState = 2;
+			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		break;
 
 	case CART_GETIN:
-		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 5) && (l->frameNumber == GF2(ID_MINECART, 5, 0) + 20) && (!cart->Flags & CF_MESH))
+		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 5) && (l->frameNumber == GetFrameNumber(v, 20)) && (!cart->Flags & CF_MESH))
 		{
 			MESH tmp = g_Level.Meshes[Lara.meshPtrs[LM_RHAND]];
 
@@ -686,9 +682,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_HIT:
-		if ((l->hitPoints <= 0) && (l->frameNumber == GF2(ID_MINECART, 34, 0) + 28))
+		if ((l->hitPoints <= 0) && (l->frameNumber == GetFrameNumber(v, 34) + 28))
 		{
-			l->frameNumber = GF2(ID_MINECART, 34, 0) + 28;
+			l->frameNumber = GetFrameNumber(v, 34) + 28;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | (CF_NOANIM);
 			cart->Speed = v->speed = 0;
 		}

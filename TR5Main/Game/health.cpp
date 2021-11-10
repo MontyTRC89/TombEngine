@@ -16,14 +16,13 @@ short PickupY;
 short CurrentPickup;
 DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 short PickupVel;
-int OldHitPoints = 1000;
+int OldHitPoints = LARA_HEALTH_MAX;
 int HealthBarTimer = 40;
 float HealthBar = OldHitPoints;
 float MutateAmount = 0;
 int FlashState = 0;
 int FlashCount = 0;
 int PoisonFlag = 0;
-int DashTimer = 0;
 extern RendererHUDBar* g_HealthBar;
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_AirBar;
@@ -39,6 +38,7 @@ void DrawHealthBarOverlay(int value)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
+
 		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
 	}
 }
@@ -46,19 +46,17 @@ void DrawHealthBarOverlay(int value)
 void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
-	{
 		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
-	}
 }
 
-void UpdateHealthBar(int flash)
+void UpdateHealthBar(ITEM_INFO* item, int flash)
 {
-	int hitPoints = LaraItem->hitPoints;
+	auto hitPoints = item->hitPoints;
 
 	if (hitPoints < 0)
 		hitPoints = 0;
-	else if (hitPoints > 1000)
-		hitPoints = 1000;
+	else if (hitPoints > LARA_HEALTH_MAX)
+		hitPoints = LARA_HEALTH_MAX;
 
 	// OPT: smoothly transition health bar display.
 	if (EnableSmoothHealthBar)
@@ -72,8 +70,8 @@ void UpdateHealthBar(int flash)
 
 		if (HealthBar - MutateAmount < 0)
 			MutateAmount = HealthBar;
-		else if (HealthBar - MutateAmount > 1000)
-			MutateAmount = HealthBar - 1000;
+		else if (HealthBar - MutateAmount > LARA_HEALTH_MAX)
+			MutateAmount = HealthBar - LARA_HEALTH_MAX;
 
 		HealthBar -= MutateAmount / 3;
 		MutateAmount -= MutateAmount / 3;
@@ -100,36 +98,32 @@ void UpdateHealthBar(int flash)
 		HealthBarTimer = 0;
 
 	// Flash when at 1/4 capacity AND HP bar is not transitioning.
-	if (HealthBar <= 1000 / 4)
+	if (HealthBar <= LARA_HEALTH_MAX / 4)
 	{
 		if (!BinocularRange)
 		{
 			if (flash)
-				DrawHealthBar(HealthBar / 1000.0f);
+				DrawHealthBar(HealthBar / LARA_HEALTH_MAX);
 			else
 				DrawHealthBar(0);
 		}
 		else
 		{
 			if (flash)
-				DrawHealthBarOverlay(HealthBar / 1000.0f);
+				DrawHealthBarOverlay(HealthBar / LARA_HEALTH_MAX);
 			else
 				DrawHealthBarOverlay(0);
 		}
 	}
-	else if ((HealthBarTimer > 0)
-		|| (HealthBar <= 0)
-		|| (Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH)
-		|| (Lara.poisoned >= 256))
+	else if (HealthBarTimer > 0 ||
+		HealthBar <= 0 ||
+		Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH ||
+		Lara.poisoned >= 256)
 	{
 		if (!BinocularRange)
-		{
-			DrawHealthBar(HealthBar / 1000.0f);
-		}
+			DrawHealthBar(HealthBar / LARA_HEALTH_MAX);
 		else
-		{
-			DrawHealthBarOverlay(HealthBar / 1000.0f);
-		}
+			DrawHealthBarOverlay(HealthBar / LARA_HEALTH_MAX);
 	}
 
 	if (PoisonFlag)
@@ -139,47 +133,49 @@ void UpdateHealthBar(int flash)
 void DrawAirBar(float value)
 {
 	if (CurrentLevel)
-	{
 		g_Renderer.drawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
-	}
 }
 
-void UpdateAirBar(int flash)
+void UpdateAirBar(ITEM_INFO* item, int flash)
 {
-	if (Lara.air == 1800 || LaraItem->hitPoints <= 0)
+	if (Lara.air == LARA_AIR_MAX || item->hitPoints <= 0)
 		return;
 
-	if ((Lara.Vehicle == NO_ITEM)
-		|| (g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV))
+	if (Lara.Vehicle == NO_ITEM ||
+		g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV)
 	{
-		if ((Lara.waterStatus != LW_UNDERWATER)
-			&& (Lara.waterStatus != LW_SURFACE)
-			&& (!(TestLaraSwamp(LaraItem) && (Lara.waterSurfaceDist < -775))))
+		if (Lara.waterStatus != LW_UNDERWATER &&
+			Lara.waterStatus != LW_SURFACE &&
+			!(TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
 			return;
 	}
 
 	int air = Lara.air;
 	if (air < 0)
 		air = 0;
-	else if (air > 1800)
-		air = 1800;
-	if (air <= 450)
+	else if (air > LARA_AIR_MAX)
+		air = LARA_AIR_MAX;
+	if (air <= (LARA_AIR_MAX / 4))
 	{
 		if (flash)
-			DrawAirBar(air / 1800.0f);
+			DrawAirBar(air / LARA_AIR_MAX);
 		else
 			DrawAirBar(0);
 	}
 	else
-		DrawAirBar(air / 1800.0f);
+		DrawAirBar(air / LARA_AIR_MAX);
 }
 
-void DrawDashBar(int value)
+void DrawSprintBar(float value)
 {
 	if (CurrentLevel)
-	{
-		g_Renderer.drawBar(value, ::g_DashBar,ID_DASH_BAR_TEXTURE,0,0);
-	}
+		g_Renderer.drawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
+}
+
+void UpdateSprintBar()
+{
+	if (Lara.sprintTimer < LARA_SPRINT_MAX)
+		DrawSprintBar(Lara.sprintTimer / LARA_SPRINT_MAX);
 }
 
 void DrawAllPickups()
@@ -223,6 +219,7 @@ void DrawAllPickups()
 		if (i == MAX_COLLECTED_PICKUPS)
 		{
 			CurrentPickup = 0;
+
 			return;
 		}
 	}
@@ -237,11 +234,11 @@ void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
-		
 		if (pickup->life < 0)
 		{
 			pickup->life = 45;
 			pickup->objectNumber = objectNumber;
+
 			break;
 		}
 
@@ -272,5 +269,6 @@ int FlashIt()
 		FlashState ^= 1;
 		FlashCount = 5;
 	}
+
 	return FlashState;
 }
