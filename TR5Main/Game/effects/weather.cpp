@@ -304,7 +304,7 @@ namespace Environment
 							p.Velocity.z = 4;
 					}
 
-					if (p.Velocity.y < p.Size * 2)
+					if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
 						p.Velocity.y += p.Size / 5.0f;
 
 					break;
@@ -325,12 +325,13 @@ namespace Environment
 			return;
 
 		int newParticlesCount = 0;
+		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
 
 		if (level->Weather != WeatherType::None)
 		{
 			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
-				if (newParticlesCount > WEATHER_PARTICLES_SPAWN_DENSITY)
+				if (newParticlesCount > density)
 					break;
 
 				newParticlesCount++;
@@ -361,7 +362,7 @@ namespace Environment
 
 				case WeatherType::Rain:
 					part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
-					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE);
+					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->WeatherStrength, 0.6f, 1.0f);
 					part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
 					break;
 				}
