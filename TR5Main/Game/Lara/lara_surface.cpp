@@ -9,18 +9,10 @@
 #include "level.h"
 #include "input.h"
 #include "lara_collide.h"
+#include "lara_swim.h"
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	if (item->goalAnimState == LS_UNDERWATER_FORWARD)
-	{
-		item->currentAnimState = LS_DIVE;
-		item->animNumber = LA_ONWATER_DIVE;
-		item->pos.xRot = -8190;
-		item->frameNumber = GF(LA_ONWATER_DIVE, 0);
-		item->fallspeed = 80;
-		Lara.waterStatus = LW_UNDERWATER;
-	}
 	Lara.moveAngle = item->pos.yRot;
 	LaraSurfaceCollision(item, coll);
 }
@@ -101,12 +93,10 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		Lara.diveCount++;
 		if (Lara.diveCount == 10)
-			item->goalAnimState = LS_UNDERWATER_FORWARD;
+			SwimDive(item);
 	}
 	else
-	{
 		Lara.diveCount = 0;
-	}
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)

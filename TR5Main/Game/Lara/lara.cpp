@@ -486,10 +486,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					else
 					{
 						item->pos.xRot = -ANGLE(45.0f);
-						item->animNumber = LA_FREEFALL_DIVE;
-						item->frameNumber = GF(LA_FREEFALL_DIVE, 0);
-						item->currentAnimState = LS_DIVE;
-						item->goalAnimState = LS_UNDERWATER_FORWARD;
+						SetAnimation(item, LA_FREEFALL_DIVE);
 						item->fallspeed = 3 * item->fallspeed / 2;
 					}
 
@@ -513,14 +510,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->currentAnimState == LS_SWANDIVE_END)
 					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
-					}
-					else
-					{
-						item->goalAnimState = LS_WADE_FORWARD;
-						item->currentAnimState = LS_WADE_FORWARD;
-						item->animNumber = LA_WADE;
-						item->frameNumber = GF(LA_WADE, 0);
-					}
+
+					SetAnimation(item, LA_WADE);
 				}
 			}
 
@@ -528,14 +519,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (heightFromWater > SWIM_DEPTH)
 				{
+					SetAnimation(item, LA_ONWATER_IDLE);
+
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater; // BUG: Crawl exit flip results in Lara teleporting above the surface because of this. @Sezz 2021.11.10
-
-					item->animNumber = LA_ONWATER_IDLE;
-					item->frameNumber = GF(LA_ONWATER_IDLE, 0);
-					item->goalAnimState = LS_ONWATER_STOP;
-					item->currentAnimState = LS_ONWATER_STOP;
-
 					item->gravityStatus = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
@@ -572,10 +559,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= STEP_SIZE)
 					{
-						item->animNumber = LA_FALL_START;
-						item->frameNumber = GF(LA_FALL_START, 0);
-						item->goalAnimState = LS_JUMP_FORWARD;
-						item->currentAnimState = LS_JUMP_FORWARD;
+						SetAnimation(item, LA_FALL_START);
 						item->speed = item->fallspeed / 4;
 						item->gravityStatus = true;
 						item->fallspeed = 0;
@@ -589,11 +573,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else
 					{
+						SetAnimation(item, LA_UNDERWATER_RESURFACE);
 						item->pos.yPos = waterHeight;
-						item->animNumber = LA_UNDERWATER_RESURFACE;
-						item->frameNumber = GF(LA_UNDERWATER_RESURFACE, 0);
-						item->goalAnimState = LS_ONWATER_STOP;
-						item->currentAnimState = LS_ONWATER_STOP;
 						item->fallspeed = 0;
 						item->pos.zRot = 0;
 						item->pos.xRot = 0;
@@ -611,11 +592,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
+				SetAnimation(item, LA_UNDERWATER_RESURFACE);
 				item->pos.yPos = waterHeight + 1;
-				item->animNumber = LA_UNDERWATER_RESURFACE;
-				item->frameNumber = GF(LA_UNDERWATER_RESURFACE, 0);
-				item->goalAnimState = LS_ONWATER_STOP;
-				item->currentAnimState = LS_ONWATER_STOP;
 				item->fallspeed = 0;
 				item->pos.zRot = 0;
 				item->pos.xRot = 0;
@@ -636,20 +614,15 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (heightFromWater <= WADE_DEPTH)
 				{
-					item->animNumber = LA_FALL_START;
-					item->frameNumber = GF(LA_FALL_START, 0);
-					item->goalAnimState = LS_JUMP_FORWARD;
-					item->currentAnimState = LS_JUMP_FORWARD;
+					SetAnimation(item, LA_FALL_START);
 					item->speed = item->fallspeed / 4;
 					item->gravityStatus = true;
 					Lara.waterStatus = LW_ABOVE_WATER;
 				}
 				else
 				{
-					item->animNumber = LA_STAND_IDLE;
-					item->frameNumber = GF(LA_STAND_IDLE, 0);
-					item->goalAnimState = LS_WADE_FORWARD;
-					item->currentAnimState = LS_STOP;
+					SetAnimation(item, LA_STAND_IDLE);
+					item->goalAnimState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
 					Lara.waterStatus = LW_WADE;
 
 					AnimateItem(item);
@@ -673,14 +646,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (heightFromWater > SWIM_DEPTH && !isSwamp)
 				{
+					SetAnimation(item, LA_ONWATER_IDLE);
+
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater;
-
-					item->animNumber = LA_ONWATER_IDLE;
-					item->frameNumber = GF(LA_ONWATER_IDLE, 0);
-					item->goalAnimState = LS_ONWATER_STOP;
-					item->currentAnimState = LS_ONWATER_STOP;
-
 					item->gravityStatus = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
@@ -726,7 +695,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
-		if (isSwamp	&& Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE + 7))
+		if (isSwamp	&& Lara.waterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
 			if (item->hitPoints >= 0)
 			{
