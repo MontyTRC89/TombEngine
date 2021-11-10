@@ -19,13 +19,15 @@ namespace Environment
 
 	float WeatherParticle::Transparency()
 	{
+		float result = WEATHER_PARTICLES_TRANSPARENCY;
+
 		if (Life <= WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-			return Life / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+			result *= Life / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 
 		if ((StartLife - Life) < (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-			return (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+			result *= (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 
-		return 1.0f;
+		return result;
 	}
 
 	EnvironmentController::EnvironmentController()

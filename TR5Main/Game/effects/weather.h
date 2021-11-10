@@ -13,6 +13,8 @@ namespace Environment
 	constexpr auto MAX_SNOW_SIZE = 32;
 	constexpr auto MAX_RAIN_SIZE = 32;
 
+	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
+
 	enum class WeatherType
 	{
 		Rain,
