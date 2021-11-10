@@ -100,10 +100,7 @@ void DoppelgangerControl(short itemNum)
 
 		if (h >= lh + WALL_SIZE + 1 && !LaraItem->gravityStatus) // added +1 to avoid bacon dying when exiting water rooms
 		{
-			item->goalAnimState = LS_FREEFALL;      	// Make Player Stop Immediately
-			item->currentAnimState = LS_FREEFALL;   	// and Skip directly into fastfall
-			item->frameNumber = GF(LA_JUMP_WALL_SMASH_START, 0);
-			item->animNumber = LA_JUMP_WALL_SMASH_START;
+			SetAnimation(item, LA_JUMP_WALL_SMASH_START);
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 			item->speed = 0;

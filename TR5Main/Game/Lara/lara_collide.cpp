@@ -7,9 +7,11 @@
 #include "collide.h"
 #include "control/control.h"
 #include "lara_collide.h"
+#include "lara_swim.h"
 #include "lara_tests.h"
 #include "items.h"
 #include "setup.h"
+#include "GameScriptLevel.h"
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
@@ -310,4 +312,183 @@ void GetLaraDeadlyBounds()
 	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds.Y2;
 	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds.Z1;
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
+}
+
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->Setup.ForwardAngle = Lara.moveAngle;
+
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_SURFSWIM, 0));
+	ShiftItem(item, coll);
+
+	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
+		coll->Middle.Floor < 0 && coll->Middle.Slope)
+	{
+		item->fallspeed = 0;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+	}
+	else if (coll->CollisionType == CT_LEFT)
+	{
+		item->pos.yRot += ANGLE(5);
+	}
+	else if (coll->CollisionType == CT_RIGHT)
+	{
+		item->pos.yRot -= ANGLE(5);
+	}
+
+	if (GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) - item->pos.yPos > -100)
+	{
+		TestLaraWaterStepOut(item, coll);
+	}
+	else
+		SwimDive(item);
+}
+
+void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
+
+	if (item->pos.xRot < -ANGLE(90.0f) ||
+		item->pos.xRot > ANGLE(90.0f))
+	{
+		Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
+		coll->Setup.ForwardAngle = item->pos.yRot - ANGLE(180.0f);
+	}
+	else
+	{
+		Lara.moveAngle = item->pos.yRot;
+		coll->Setup.ForwardAngle = item->pos.yRot;
+	}
+
+	int height = LARA_HEIGHT * phd_sin(item->pos.xRot);
+	height = abs(height);
+
+	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
+		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
+
+	coll->Setup.BadHeightUp = -(STEP_SIZE / 4);
+	coll->Setup.Height = height;
+
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0));
+
+	auto c1 = *coll;
+	c1.Setup.ForwardAngle += ANGLE(45.0f);
+	GetCollisionInfo(&c1, item, PHD_VECTOR(0, height / 2, 0));
+
+	auto c2 = *coll;
+	c2.Setup.ForwardAngle -= ANGLE(45.0f);
+	GetCollisionInfo(&c2, item, PHD_VECTOR(0, height / 2, 0));
+
+	ShiftItem(item, coll);
+
+	int flag = 0;
+
+	switch (coll->CollisionType)
+	{
+	case CT_FRONT:
+		if (item->pos.xRot <= ANGLE(25.0f))
+		{
+			if (item->pos.xRot >= -ANGLE(25.0f))
+			{
+				if (item->pos.xRot > ANGLE(5.0f))
+					item->pos.xRot += ANGLE(0.5f);
+				else if (item->pos.xRot < -ANGLE(5.0f))
+					item->pos.xRot -= ANGLE(0.5f);
+				else if (item->pos.xRot > 0)
+					item->pos.xRot += 45;
+				else if (item->pos.xRot < 0)
+					item->pos.xRot -= 45;
+				else
+				{
+					item->fallspeed = 0;
+					flag = 1;
+				}
+			}
+			else
+			{
+				item->pos.xRot -= ANGLE(1.0f);
+				flag = 1;
+			}
+		}
+		else
+		{
+			item->pos.xRot += ANGLE(1.0f);
+			flag = 1;
+		}
+
+		if (c1.CollisionType == CT_LEFT)
+			item->pos.yRot += ANGLE(2.0f);
+		else if (c1.CollisionType == CT_RIGHT)
+			item->pos.yRot -= ANGLE(2.0f);
+		else if (c2.CollisionType == CT_LEFT)
+			item->pos.yRot += ANGLE(2.0f);
+		else if (c2.CollisionType == CT_RIGHT)
+			item->pos.yRot -= ANGLE(2.0f);
+
+		break;
+
+	case CT_TOP:
+		if (item->pos.xRot >= -8190)
+		{
+			flag = 1;
+			item->pos.xRot -= ANGLE(1.0f);
+		}
+
+		break;
+
+	case CT_TOP_FRONT:
+		item->fallspeed = 0;
+		flag = 1;
+
+		break;
+
+	case CT_LEFT:
+		item->pos.yRot += ANGLE(2.0f);
+		flag = 1;
+
+		break;
+
+	case CT_RIGHT:
+		item->pos.yRot -= ANGLE(2.0f);
+		flag = 1;
+
+		break;
+
+	case CT_CLAMP:
+		flag = 2;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
+		item->fallspeed = 0;
+
+		break;
+	}
+
+	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
+	{
+		flag = 1;
+		item->pos.xRot += ANGLE(1.0f);
+		item->pos.yPos += coll->Middle.Floor;
+	}
+
+	if (oldX == item->pos.xPos &&
+		oldY == item->pos.yPos &&
+		oldZ == item->pos.zPos &&
+		oldXrot == item->pos.xRot &&
+		oldYrot == item->pos.yRot ||
+		flag != 1)
+	{
+		if (flag == 2)
+			return;
+	}
+
+	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
+		TestLaraWaterDepth(item, coll);
 }

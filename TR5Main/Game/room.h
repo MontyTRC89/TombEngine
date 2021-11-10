@@ -132,6 +132,8 @@ void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);
 void RemoveRoomFlipItems(ROOM_INFO* r);
 int IsObjectInRoom(short roomNumber, short objectNumber);
+bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
+PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

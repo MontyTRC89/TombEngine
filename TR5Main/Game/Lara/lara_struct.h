@@ -170,7 +170,7 @@ enum LARA_STATE
 	LS_UNKNOWN_4 = 135,
 	LS_UNKNOWN_5 = 136,
 	LS_PICKUP_FROM_CHEST = 137,
-	LS_UNKNOWN_6 = 138,
+	LS_LADDER_TO_CROUCH = 138,
 
 	// TombEngine
 	LS_HANG_FEET = 139,
@@ -997,6 +997,7 @@ struct LaraTightrope
 	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
 };
 #endif
+
 struct LaraInfo
 {
 	short itemNumber;
@@ -1010,6 +1011,7 @@ struct LaraInfo
 	short poseCount;
 	short hitFrame;
 	short hitDirection;
+	int sprintTimer;
 	short air;
 	short diveCount;
 	short deathCount;
