@@ -1,4 +1,6 @@
 #pragma once
+#include "items.h"
+
 #define MAX_COLLECTED_PICKUPS 32
 
 enum GAME_OBJECT_ID : short;
@@ -11,10 +13,11 @@ struct DISPLAY_PICKUP
 
 void DrawHealthBarOverlay(int value);
 void DrawHealthBar(float value);
-void UpdateHealthBar(int flash);
+void UpdateHealthBar(ITEM_INFO* item, int flash);
 void DrawAirBar(float value);
-void UpdateAirBar(int flash);
-void DrawDashBar(int value);
+void UpdateAirBar(ITEM_INFO* item, int flash);
+void DrawSprintBar(float value);
+void UpdateSprintBar();
 void AddDisplayPickup(GAME_OBJECT_ID objectNumber);
 void DrawAllPickups();
 void InitialisePickupDisplay();
@@ -31,6 +34,5 @@ extern float HealthBar;
 extern float MutateAmount;
 extern int FlashState;
 extern int PoisonFlag;
-extern int DashTimer;
 
 extern bool EnableSmoothHealthBar;
