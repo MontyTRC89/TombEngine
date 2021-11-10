@@ -109,22 +109,22 @@ enum QUAD_ANIM_STATES {
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY/2)/256)
 
 #define QUADBIKE_TURNL_A		3
-#define QUADBIKE_TURNL_F		GF2(ID_QUAD, QUADBIKE_TURNL_A, 0)
+#define QUADBIKE_TURNL_F		GetFrameNumber(ID_QUAD, QUADBIKE_TURNL_A, 0)
 #define QUADBIKE_TURNR_A		20
-#define QUADBIKE_TURNR_F		GF2(ID_QUAD, QUADBIKE_TURNR_A, 0)
+#define QUADBIKE_TURNR_F		GetFrameNumber(ID_QUAD, QUADBIKE_TURNR_A, 0)
 
 #define QUADBIKE_FALLSTART_A	6
-#define QUADBIKE_FALLSTART_F	GF2(ID_QUAD, QUADBIKE_FALLSTART_A, 0)
+#define QUADBIKE_FALLSTART_F	GetFrameNumber(ID_QUAD, QUADBIKE_FALLSTART_A, 0)
 #define QUADBIKE_FALL_A		7
-#define QUADBIKE_FALL_F		GF2(ID_QUAD, QUADBIKE_FALL_A, 0)
+#define QUADBIKE_FALL_F		GetFrameNumber(ID_QUAD, QUADBIKE_FALL_A, 0)
 #define QUADBIKE_GETONR_A	9
-#define QUADBIKE_GETONR_F	GF2(ID_QUAD, QUADBIKE_GETONR_A, 0)
+#define QUADBIKE_GETONR_F	GetFrameNumber(ID_QUAD, QUADBIKE_GETONR_A, 0)
 #define Q_HITB_A			11
 #define Q_HITF_A			12
 #define Q_HITL_A			14
 #define Q_HITR_A			13
 #define QUADBIKE_GETONL_A	23
-#define QUADBIKE_GETONL_F	GF2(ID_QUAD, QUADBIKE_GETONL_A, 0)
+#define QUADBIKE_GETONL_F	GetFrameNumber(ID_QUAD, QUADBIKE_GETONL_A, 0)
 #define QUADBIKE_FALLSTART2_A	25
 
 BITE_INFO quadEffectsPositions[6] = { 
@@ -210,9 +210,7 @@ static int QuadCheckGetOff()
 			else
 				LaraItem->pos.yRot -= ANGLE(90);
 
-			LaraItem->animNumber = LA_STAND_SOLID;
-			LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
-			LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
+			SetAnimation(item, LA_STAND_SOLID);
 			LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
 			LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
@@ -228,10 +226,7 @@ static int QuadCheckGetOff()
 			{
 				PHD_VECTOR pos = { 0, 0, 0 };
 
-				LaraItem->animNumber = LA_FREEFALL;
-				LaraItem->frameNumber = GF(LA_FREEFALL, 0);
-				LaraItem->currentAnimState = LS_FREEFALL;
-
+				SetAnimation(item, LA_FREEFALL);
 				GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
 
 				LaraItem->pos.xPos = pos.x;

@@ -1097,7 +1097,7 @@ void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TestLaraSwamp(item) || (TrInput & IN_WALK))
+			if (TestLaraSwamp(item) || Lara.waterStatus == LW_WADE || (TrInput & IN_WALK))
 			{
 				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
 					item->goalAnimState = LS_WALK_BACK;

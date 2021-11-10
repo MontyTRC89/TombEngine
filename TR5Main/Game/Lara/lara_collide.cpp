@@ -7,6 +7,7 @@
 #include "collide.h"
 #include "control/control.h"
 #include "lara_collide.h"
+#include "lara_swim.h"
 #include "lara_tests.h"
 #include "items.h"
 #include "setup.h"
@@ -405,15 +406,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 		TestLaraWaterStepOut(item, coll);
 	}
 	else
-	{
-		item->goalAnimState = LS_UNDERWATER_FORWARD;
-		item->currentAnimState = LS_DIVE;
-		item->animNumber = LA_ONWATER_DIVE;
-		item->pos.xRot = -8190;
-		item->frameNumber = GF(LA_ONWATER_DIVE, 0);
-		item->fallspeed = 80;
-		Lara.waterStatus = LW_UNDERWATER;
-	}
+		SwimDive(item);
 }
 
 void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)

@@ -326,10 +326,7 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->currentAnimState == LS_SLIDE_BACK && oldAngle == angle)
 			return true;
 
-		item->animNumber = LA_SLIDE_BACK_START;
-		item->goalAnimState = LS_SLIDE_BACK;
-		item->currentAnimState = LS_SLIDE_BACK;
-		item->frameNumber = GF(LA_SLIDE_BACK_START, 0);
+		SetAnimation(item, LA_SLIDE_BACK_START);
 		item->pos.yRot = angle + ANGLE(180.0f);
 	}
 	else
@@ -337,10 +334,7 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->currentAnimState == LS_SLIDE_FORWARD && oldAngle == angle)
 			return true;
 
-		item->animNumber = LA_SLIDE_FORWARD;
-		item->goalAnimState = LS_SLIDE_FORWARD;
-		item->frameNumber = GF(LA_SLIDE_FORWARD, 0);
-		item->currentAnimState = LS_SLIDE_FORWARD;
+		SetAnimation(item, LA_SLIDE_FORWARD);
 		item->pos.yRot = angle;
 	}
 
@@ -420,10 +414,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		item->currentAnimState = LS_MONKEYSWING_IDLE;
-		item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-		item->frameNumber = GF(LA_JUMP_UP_TO_MONKEYSWING, 0);
+		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
@@ -453,27 +444,14 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestHangSwingIn(item, angle))
 	{
-		item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-		item->frameNumber = GF(LA_JUMP_UP_TO_MONKEYSWING, 0);
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		item->currentAnimState = LS_MONKEYSWING_IDLE;
+		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 	}
 	else
 	{
+		SetAnimation(item, LA_REACH_TO_HANG, 12);
+
 		if (TestHangFeet(item, angle))
-		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 12);
-			item->currentAnimState = LS_HANG;
 			item->goalAnimState = LS_HANG_FEET;
-		}
-		else
-		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 12);
-			item->currentAnimState = LS_HANG;
-			item->goalAnimState = LS_HANG;
-		}
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -512,10 +490,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoXrot = 0;
 		Lara.gunStatus = LG_HANDS_BUSY;
 
-		item->animNumber = LA_REACH_TO_MONKEYSWING;
-		item->frameNumber = GF(LA_REACH_TO_MONKEYSWING, 0);
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		item->currentAnimState = LS_MONKEYSWING_IDLE;
+		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
@@ -551,10 +526,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			item->animNumber = LA_REACH_TO_HANG_OSCILLATE;
-			item->frameNumber = GF(LA_REACH_TO_HANG_OSCILLATE, 0);
-			item->currentAnimState = LS_HANG;
-			item->goalAnimState = LS_HANG;
+			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
 		}
 		else
 		{
@@ -562,28 +534,15 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			item->animNumber = LA_REACH_TO_MONKEYSWING;
-			item->frameNumber = GF(LA_REACH_TO_MONKEYSWING, 0);
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
+			SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		}
 	}
 	else
 	{
+		SetAnimation(item, LA_REACH_TO_HANG);
+
 		if (TestHangFeet(item, angle))
-		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 0);
-			item->currentAnimState = LS_HANG;
 			item->goalAnimState = LS_HANG_FEET;
-		}
-		else
-		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 0);
-			item->currentAnimState = LS_HANG;
-			item->goalAnimState = LS_HANG;
-		}
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -666,10 +625,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, dir);
 					item->pos.yPos = coll->Setup.OldPosition.y;
-					item->currentAnimState = LS_HANG;
-					item->goalAnimState = LS_HANG;
-					item->animNumber = LA_REACH_TO_HANG;
-					item->frameNumber = GF(LA_REACH_TO_HANG, 21);
+					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 
 				result = true;
@@ -677,7 +633,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			else
 			{
 				if (item->animNumber == LA_REACH_TO_HANG &&
-					item->frameNumber == GF(LA_REACH_TO_HANG, 21) &&
+					item->frameNumber == GetFrameNumber(item, 21) &&
 					TestLaraClimbStance(item, coll))
 				{
 					item->goalAnimState = LS_LADDER_IDLE;
@@ -686,10 +642,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->animNumber = LA_FALL_START;
-			item->currentAnimState = LS_JUMP_FORWARD;
-			item->goalAnimState = LS_JUMP_FORWARD;
-			item->frameNumber = GF(LA_FALL_START, 0);
+			SetAnimation(item, LA_FALL_START);
 			item->pos.yPos += 256;
 			item->gravityStatus = true;
 			item->speed = 2;
@@ -758,18 +711,12 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				if (item->currentAnimState == LS_SHIMMY_LEFT ||
 					item->currentAnimState == LS_SHIMMY_RIGHT)
 				{
-					item->currentAnimState = LS_HANG;
-					item->goalAnimState = LS_HANG;
-					item->animNumber = LA_REACH_TO_HANG;
-					item->frameNumber = GF(LA_REACH_TO_HANG, 21);
+					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT ||
 					item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
 				{
-					item->currentAnimState = LS_HANG_FEET;
-					item->goalAnimState = LS_HANG_FEET;
-					item->animNumber = LA_HANG_FEET_IDLE;
-					item->frameNumber = GF(LA_HANG_FEET_IDLE, 0);
+					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
 
 				result = true;
@@ -777,10 +724,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->currentAnimState = LS_JUMP_UP;
-			item->goalAnimState = LS_JUMP_UP;
-			item->animNumber = LA_JUMP_UP;
-			item->frameNumber = GF(LA_JUMP_UP, 9);
+			SetAnimation(item, LA_JUMP_UP, 9);
 			frame = (ANIM_FRAME*)GetBoundsAccurate(item);
 			item->pos.xPos += coll->Shift.x;
 			item->pos.yPos += frame->boundingBox.Y2;
@@ -1132,22 +1076,19 @@ bool TestHangFeet(ITEM_INFO* item, short angle)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor;
-	int floorHeight, ceilingHeight, g, m, j;
 
 	z += phd_cos(angle) * (STEP_SIZE / 2);
 	x += phd_sin(angle) * (STEP_SIZE / 2);
 
-	floor = GetFloor(x, y, z, &roomNum);
-	floorHeight = GetFloorHeight(floor, x, y, z);
-	ceilingHeight = GetCeiling(floor, x, y, z);
-	g = floorHeight - y;
-	m = ceilingHeight - y;
-	j = y - (STEP_SIZE / 2) - ceilingHeight;
+	auto floor = GetFloor(x, y, z, &roomNum);
+	int floorHeight = GetFloorHeight(floor, x, y, z);
+	int ceilingHeight = GetCeiling(floor, x, y, z);
+	int m = ceilingHeight - y;
+	int j = y - (STEP_SIZE / 2) - ceilingHeight;
 
 	if (floorHeight != NO_HEIGHT)
 	{
-		if (g > 0 && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
+		if (floorHeight < y && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
 			return true;
 	}
 
@@ -1185,10 +1126,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_JUMP_FORWARD;
-		item->currentAnimState = LS_JUMP_FORWARD;
-		item->animNumber = LA_FALL_START;
-		item->frameNumber = GF(LA_FALL_START, 0);
+		SetAnimation(item, LA_FALL_START);
 
 		item->gravityStatus = true;
 		item->speed = 2;
@@ -1203,17 +1141,11 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	{
 		if (Lara.isClimbing)
 		{
-			item->animNumber = LA_LADDER_IDLE;
-			item->frameNumber = GF(LA_LADDER_IDLE, 0);
-			item->goalAnimState = LS_LADDER_IDLE;
-			item->currentAnimState = LS_LADDER_IDLE;
+			SetAnimation(item, LA_LADDER_IDLE);
 		}
 		else
 		{
-			item->animNumber = LA_REACH_TO_HANG;
-			item->frameNumber = GF(LA_REACH_TO_HANG, 21);
-			item->goalAnimState = LS_HANG;
-			item->currentAnimState = LS_HANG;
+			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
 		coll->Setup.OldPosition.x = Lara.cornerX;
@@ -1230,10 +1162,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_JUMP_FORWARD;
-		item->currentAnimState = LS_JUMP_FORWARD;
-		item->animNumber = LA_FALL_START;
-		item->frameNumber = GF(LA_FALL_START, 0);
+		SetAnimation(item, LA_FALL_START);
 
 		item->gravityStatus = true;
 		item->speed = 2;
@@ -1246,11 +1175,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	}
 	else if (flip)
 	{
-
-		item->animNumber = LA_HANG_FEET_IDLE;
-		item->frameNumber = GF(LA_HANG_FEET_IDLE, 0);
-		item->goalAnimState = LS_HANG_FEET;
-		item->currentAnimState = LS_HANG_FEET;
+		SetAnimation(item, LA_HANG_FEET_IDLE);
 
 		coll->Setup.OldPosition.x = Lara.cornerX;
 		item->pos.xPos = Lara.cornerX;
@@ -1423,16 +1348,11 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor >= -(STEP_SIZE / 2))
 	{
-		item->animNumber = LA_STAND_IDLE;
-		item->frameNumber = GF(LA_STAND_IDLE, 0);
-		item->goalAnimState = LS_STOP;
-		item->currentAnimState = LS_STOP;
+		SetAnimation(item, LA_STAND_IDLE);
 	}
 	else
 	{
-		item->animNumber = LA_ONWATER_TO_WADE_1CLICK;
-		item->frameNumber = GF(LA_ONWATER_TO_WADE_1CLICK, 0);
-		item->currentAnimState = LS_ONWATER_EXIT;
+		SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK);
 		item->goalAnimState = LS_STOP;
 	}
 
@@ -1486,38 +1406,24 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexWaterPullUp)
-			{
-				item->animNumber = LA_ONWATER_TO_CROUCH_1CLICK;
-				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_1CLICK, 0);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
 		}
 		else
-		{
-			item->animNumber = LA_ONWATER_TO_STAND_1CLICK;
-			item->frameNumber = GF(LA_ONWATER_TO_STAND_1CLICK, 0);
-			item->goalAnimState = LS_STOP;
-		}
+			SetAnimation(item, LA_ONWATER_TO_STAND_1CLICK);
 	}
 	else if (frontFloor > (STEP_SIZE / 2))
 	{
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexSubmerged)
-			{
-				item->animNumber = LA_ONWATER_TO_CROUCH_M1CLICK;
-				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_M1CLICK, 0);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
 		}
 		else
-			item->animNumber = LA_ONWATER_TO_STAND_M1CLICK;
-
-		item->frameNumber = GF(item->animNumber, 0);
+			SetAnimation(item, LA_ONWATER_TO_STAND_M1CLICK);
 	}
 
 	else
@@ -1525,20 +1431,12 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (Lara.NewAnims.CrawlFlexWaterPullUp)
-			{
-				item->animNumber = LA_ONWATER_TO_CROUCH_0CLICK;
-				item->frameNumber = GF(LA_ONWATER_TO_CROUCH_0CLICK, 0);
-				item->goalAnimState = LA_CROUCH_IDLE;
-			}
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;
 		}
 		else
-		{
-			item->animNumber = LA_ONWATER_TO_STAND_0CLICK;
-			item->frameNumber = GF(LA_ONWATER_TO_STAND_0CLICK, 0);
-			item->goalAnimState = LS_STOP;
-		}
+			SetAnimation(item, LA_ONWATER_TO_STAND_0CLICK);
 	}
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
@@ -1606,9 +1504,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 		break;
 	}
 
-	item->animNumber = LA_ONWATER_IDLE;
-	item->frameNumber = GF(LA_ONWATER_IDLE, 0);
-	item->currentAnimState = LS_ONWATER_STOP;
+	SetAnimation(item, LA_ONWATER_IDLE);
 	item->goalAnimState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
@@ -1644,9 +1540,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
 	{
-		item->animNumber = LA_UNDERWATER_TO_STAND;
-		item->frameNumber = GF(LA_UNDERWATER_TO_STAND, 0);
-		item->currentAnimState = LS_ONWATER_EXIT;
+		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		item->goalAnimState = LS_STOP;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
@@ -1662,10 +1556,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 void GetTighRopeFallOff(int regularity) {
 	if(LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 	{
-		LaraItem->goalAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
-		LaraItem->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
-		LaraItem->animNumber = LA_TIGHTROPE_FALL_LEFT;
-		LaraItem->frameNumber = GF(LA_TIGHTROPE_FALL_LEFT, 0);
+		SetAnimation(LaraItem, LA_TIGHTROPE_FALL_LEFT);
 	}
 
 	if(!Lara.tightRopeFall && !(GetRandomControl() & regularity))
