@@ -6,17 +6,21 @@ namespace TEN {
 namespace Effects {
 namespace Environment 
 {
-	constexpr auto WEATHER_PARTICLES_COUNT = 512;
-	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
-	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
+	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
+	constexpr auto SNOW_PARTICLES_COUNT_DIVIDER = 2;
+
+	constexpr auto SNOW_SPAWN_DENSITY = 32;
+	constexpr auto RAIN_SPAWN_DENSITY = 256;
 
 	constexpr auto MAX_SNOW_SIZE = 32;
-	constexpr auto MAX_RAIN_SIZE = 32;
+	constexpr auto MAX_RAIN_SIZE = 96;
 
 	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16;
 
 	enum class WeatherType
 	{
+		None,
 		Rain,
 		Snow
 	};
@@ -58,7 +62,9 @@ namespace Environment
 		void Clear();
 
 	private:
-		// Weather particles
+		// Weather
+		WeatherType Weather = WeatherType::Snow;
+		int WeatherStrength;
 		std::vector<WeatherParticle> Particles;
 
 		// Sky
@@ -91,6 +97,8 @@ namespace Environment
 		void UpdateFlash(GameScriptLevel* level);
 		void UpdateWeather(GameScriptLevel* level);
 		void UpdateLightning();
+
+		void SpawnWeatherParticles(GameScriptLevel* level);
 	};
 
 	extern EnvironmentController Weather;
