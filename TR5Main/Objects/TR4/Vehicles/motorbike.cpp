@@ -555,7 +555,7 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
-			DashTimer = 120;
+			Lara.sprintTimer = 120;
 			return true;
 		}
 
@@ -1200,14 +1200,14 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         motorbike->revs = 0;
     }
 
-    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && DashTimer)
+    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && Lara.sprintTimer)
     {
         motorbike->flags |= FL_BOOST;
-        DashTimer -= 2;
-        if (DashTimer > MOTORBIKE_ACCEL)//hmm
+        Lara.sprintTimer -= 2;
+        if (Lara.sprintTimer > MOTORBIKE_ACCEL)//hmm
         {
             motorbike->flags &= ~FL_BOOST;
-            DashTimer = 0;
+            Lara.sprintTimer = 0;
         }
     }
     else
