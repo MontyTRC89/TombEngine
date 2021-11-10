@@ -28,7 +28,7 @@ namespace Environment
 			result *= (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 
 		if (Type == WeatherType::Rain)
-			result *= 0.4f;
+			result *= 0.45f;
 
 		return result;
 	}
@@ -278,7 +278,7 @@ namespace Environment
 						p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
 
 					if (p.Velocity.y < p.Size / 2)
-						p.Velocity.y += p.Size / 10.0f;
+						p.Velocity.y += p.Size / 5.0f;
 
 					break;
 
@@ -304,11 +304,10 @@ namespace Environment
 							p.Velocity.z = 4;
 					}
 
-					if (p.Velocity.y < p.Size * 4)
-						p.Velocity.y += p.Size / 4.0f;
+					if (p.Velocity.y < p.Size * 2)
+						p.Velocity.y += p.Size / 5.0f;
 
-					if (p.Life > 512)
-						p.Enabled = false;
+					break;
 				}
 			}
 
@@ -325,21 +324,20 @@ namespace Environment
 		if (level->Weather == WeatherType::None || level->WeatherStrength == 0.0f)
 			return;
 
-		int spawnDensity = round((float)(level->Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * level->WeatherStrength);
-		int maxCount = (level->Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
 		int newParticlesCount = 0;
 
 		if (level->Weather != WeatherType::None)
 		{
-			while (Particles.size() < maxCount)
+			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
-				if (newParticlesCount > spawnDensity)
+				if (newParticlesCount > WEATHER_PARTICLES_SPAWN_DENSITY)
 					break;
 
 				newParticlesCount++;
 
-				auto radius = (GetRandomDraw() & (WALL_SIZE * 8 - 1)) - WALL_SIZE * 4;
-				short angle = (GetRandomDraw() & 0xFFFF);
+				auto distance = level->Weather == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
+				auto radius = GenerateInt(0, distance);
+				short angle = GenerateInt(ANGLE(0), ANGLE(180));
 
 				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
@@ -356,21 +354,20 @@ namespace Environment
 				switch (level->Weather)
 				{
 				case WeatherType::Snow:
-					part.Size = MAX_SNOW_SIZE + ((GetRandomDraw() & (MAX_SNOW_SIZE / 2)) - (MAX_SNOW_SIZE / 2));
-					part.Velocity.x = (GetRandomDraw() & 7) - 4;
-					part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
-					part.Velocity.z = (GetRandomDraw() & 7) - 4;
+					part.Size = GenerateFloat(MAX_SNOW_SIZE / 2, MAX_SNOW_SIZE);
+					part.Velocity.y = GenerateFloat(SNOW_SPEED / 4, SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
 					part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
 					break;
 
 				case WeatherType::Rain:
-					part.Size = MAX_RAIN_SIZE + GenerateInt(-MAX_RAIN_SIZE / 4, MAX_RAIN_SIZE / 4);
-					part.Velocity.x = (GetRandomDraw() & 7) - 4;
-					part.Velocity.y = ((GetRandomDraw() & 3) + 24);
-					part.Velocity.z = (GetRandomDraw() & 7) - 4;
-					part.Life = 256 - (int)part.Velocity.y;
+					part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
+					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE);
+					part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
 					break;
 				}
+
+				part.Velocity.x = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
+				part.Velocity.z = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 
 				part.Type = level->Weather;
 				part.Room = IsRoomOutsideNo;
