@@ -179,7 +179,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (resultRight != -1 || resultLeft != -1)
 					{
-						item->goalAnimState = LS_UNKNOWN_6;
+						item->goalAnimState = LS_LADDER_TO_CROUCH;
 						item->requiredAnimState = LS_CROUCH_IDLE;
 					}
 					else
@@ -346,7 +346,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				item->goalAnimState = LS_UNKNOWN_6;
+				item->goalAnimState = LS_LADDER_TO_CROUCH;
 				item->requiredAnimState = LS_CROUCH_IDLE;
 			}
 		}
