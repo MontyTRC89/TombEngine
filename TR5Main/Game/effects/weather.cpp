@@ -27,6 +27,9 @@ namespace Environment
 		if ((StartLife - Life) < (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
 			result *= (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 
+		if (Type == WeatherType::Rain)
+			result *= 0.4f;
+
 		return result;
 	}
 
@@ -88,28 +91,28 @@ namespace Environment
 		if (level->Layer1.Enabled)
 		{
 			SkyPosition1 += level->Layer1.CloudSpeed;
-			if (SkyPosition1 <= 9728)
+			if (SkyPosition1 <= SKY_POSITION_LIMIT)
 			{
 				if (SkyPosition1 < 0)
-					SkyPosition1 += 9728;
+					SkyPosition1 += SKY_POSITION_LIMIT;
 			}
 			else
 			{
-				SkyPosition1 -= 9728;
+				SkyPosition1 -= SKY_POSITION_LIMIT;
 			}
 		}
 
 		if (level->Layer2.Enabled)
 		{
 			SkyPosition2 += level->Layer2.CloudSpeed;
-			if (SkyPosition2 <= 9728)
+			if (SkyPosition2 <= SKY_POSITION_LIMIT)
 			{
 				if (SkyPosition2 < 0)
-					SkyPosition2 += 9728;
+					SkyPosition2 += SKY_POSITION_LIMIT;
 			}
 			else
 			{
-				SkyPosition2 -= 9728;
+				SkyPosition2 -= SKY_POSITION_LIMIT;
 			}
 		}
 	}
@@ -203,76 +206,6 @@ namespace Environment
 
 		if (FlashProgress == 0.0f)
 			FlashColorBase = Vector3::Zero;
-	}
-
-	void EnvironmentController::SpawnWeatherParticles(GameScriptLevel* level)
-	{
-		// Clean up dead particles
-		if (Particles.size() > 0)
-			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
-
-		if (Weather == WeatherType::None)
-			return;
-
-		int spawnDensity = round((float)(Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * WeatherStrength);
-		int maxCount = (Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
-		int newParticlesCount = 0;
-
-		if (Weather != WeatherType::None)
-		{
-			while (Particles.size() < maxCount)
-			{
-				if (newParticlesCount > spawnDensity)
-					break;
-
-				newParticlesCount++;
-
-				auto radius = (GetRandomDraw() & (WALL_SIZE * 8 - 1)) - WALL_SIZE * 4;
-				short angle = (GetRandomDraw() & 0xFFFF);
-
-				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
-				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GetRandomDraw() & (WALL_SIZE * 4 - 1));
-
-				if (IsRoomOutside(xPos, yPos, zPos) < 0)
-					continue;
-
-				if (g_Level.Rooms[IsRoomOutsideNo].flags & ENV_FLAG_WATER)
-					continue;
-
-				auto part = WeatherParticle();
-
-				switch (Weather)
-				{
-				case WeatherType::Snow:
-					part.Size = MAX_SNOW_SIZE + ((GetRandomDraw() & (MAX_SNOW_SIZE / 2)) - (MAX_SNOW_SIZE / 2));
-					part.Velocity.x = (GetRandomDraw() & 7) - 4;
-					part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
-					part.Velocity.z = (GetRandomDraw() & 7) - 4;
-					part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
-					break;
-
-				case WeatherType::Rain:
-					part.Size = MAX_RAIN_SIZE + GenerateInt(-MAX_RAIN_SIZE / 4, MAX_RAIN_SIZE / 4);
-					part.Velocity.x = (GetRandomDraw() & 7) - 4;
-					part.Velocity.y = ((GetRandomDraw() & 3) + 24);
-					part.Velocity.z = (GetRandomDraw() & 7) - 4;
-					part.Life = 256 - (int)part.Velocity.y;
-					break;
-				}
-
-				part.Type = Weather;
-				part.Room = IsRoomOutsideNo;
-				part.Position.x = xPos;
-				part.Position.y = yPos;
-				part.Position.z = zPos;
-				part.Stopped = false;
-				part.Enabled = true;
-				part.StartLife = part.Life;
-
-				Particles.push_back(part);
-			}
-		}
 	}
 
 	void EnvironmentController::UpdateWeather(GameScriptLevel* level)
@@ -382,7 +315,7 @@ namespace Environment
 					}
 
 					if (p.Velocity.y < p.Size * 4)
-						p.Velocity.y += p.Size / 2.0f;
+						p.Velocity.y += p.Size / 4.0f;
 
 					if (p.Life > 512)
 						p.Enabled = false;
@@ -390,6 +323,79 @@ namespace Environment
 			}
 
 			p.Life -= 2;
+		}
+	}
+
+	void EnvironmentController::SpawnWeatherParticles(GameScriptLevel* level)
+	{
+		// Clean up dead particles
+		if (Particles.size() > 0)
+			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
+
+		Weather = WeatherType::Rain;
+		WeatherStrength = 1;
+
+		if (Weather == WeatherType::None)
+			return;
+
+		int spawnDensity = round((float)(Weather == WeatherType::Rain ? RAIN_SPAWN_DENSITY : SNOW_SPAWN_DENSITY) * WeatherStrength);
+		int maxCount = (Weather == WeatherType::Rain) ? WEATHER_PARTICLES_MAX_COUNT : WEATHER_PARTICLES_MAX_COUNT / SNOW_PARTICLES_COUNT_DIVIDER;
+		int newParticlesCount = 0;
+
+		if (Weather != WeatherType::None)
+		{
+			while (Particles.size() < maxCount)
+			{
+				if (newParticlesCount > spawnDensity)
+					break;
+
+				newParticlesCount++;
+
+				auto radius = (GetRandomDraw() & (WALL_SIZE * 8 - 1)) - WALL_SIZE * 4;
+				short angle = (GetRandomDraw() & 0xFFFF);
+
+				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
+				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
+				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GetRandomDraw() & (WALL_SIZE * 4 - 1));
+
+				if (IsRoomOutside(xPos, yPos, zPos) < 0)
+					continue;
+
+				if (g_Level.Rooms[IsRoomOutsideNo].flags & ENV_FLAG_WATER)
+					continue;
+
+				auto part = WeatherParticle();
+
+				switch (Weather)
+				{
+				case WeatherType::Snow:
+					part.Size = MAX_SNOW_SIZE + ((GetRandomDraw() & (MAX_SNOW_SIZE / 2)) - (MAX_SNOW_SIZE / 2));
+					part.Velocity.x = (GetRandomDraw() & 7) - 4;
+					part.Velocity.y = ((GetRandomDraw() & 15) + 8) << 3;
+					part.Velocity.z = (GetRandomDraw() & 7) - 4;
+					part.Life = 48 + (64 - ((int)part.Velocity.y >> 2));
+					break;
+
+				case WeatherType::Rain:
+					part.Size = MAX_RAIN_SIZE + GenerateInt(-MAX_RAIN_SIZE / 4, MAX_RAIN_SIZE / 4);
+					part.Velocity.x = (GetRandomDraw() & 7) - 4;
+					part.Velocity.y = ((GetRandomDraw() & 3) + 24);
+					part.Velocity.z = (GetRandomDraw() & 7) - 4;
+					part.Life = 256 - (int)part.Velocity.y;
+					break;
+				}
+
+				part.Type = Weather;
+				part.Room = IsRoomOutsideNo;
+				part.Position.x = xPos;
+				part.Position.y = yPos;
+				part.Position.z = zPos;
+				part.Stopped = false;
+				part.Enabled = true;
+				part.StartLife = part.Life;
+
+				Particles.push_back(part);
+			}
 		}
 	}
 }}}

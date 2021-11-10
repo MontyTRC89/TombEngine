@@ -437,7 +437,7 @@ namespace TEN::Renderer
 				p.Velocity.Normalize(v);
 				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
-					Vector4(0.6f, 0.7f, 0.7f, p.Transparency()),
+					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, view);
 				break;
 			}
