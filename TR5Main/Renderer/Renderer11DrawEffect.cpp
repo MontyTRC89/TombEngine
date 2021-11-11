@@ -16,6 +16,7 @@
 #include "effects/spark.h"
 #include "effects/drip.h"
 #include "effects/explosion.h"
+#include "effects/weather.h"
 #include "Quad/RenderQuad.h"
 #include "particle/SimpleParticle.h"
 #include "Renderer/RendererSprites.h"
@@ -23,6 +24,7 @@
 #include "items.h"
 
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Environment;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -121,7 +123,7 @@ namespace TEN::Renderer
 						addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 							c,
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							SPRITE_ROTATION_90_DEGREES,
+							(PI / 2),
 							1.0f,
 							{ arc->width * 8.0f,
 							Vector3::Distance(pos1, pos2) },
@@ -413,6 +415,35 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer11::drawWeatherParticles(RenderView& view) 
+	{		
+		for (auto& p : Weather.GetParticles())
+		{
+			if (!p.Enabled)
+				continue;
+
+			switch (p.Type)
+			{
+			case WeatherType::Snow:
+				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					p.Position,
+					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
+					0.0f, 1.0f, Vector2(p.Size),
+					BLENDMODE_ADDITIVE, view);
+				break;
+
+			case WeatherType::Rain:
+				Vector3 v;
+				p.Velocity.Normalize(v);
+				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
+					p.Position,
+					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
+					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, view);
+				break;
+			}
+		}
+	}
+
 	bool Renderer11::drawGunFlashes(RenderView& view) {
 		if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
 			return true;
@@ -690,10 +721,10 @@ namespace TEN::Renderer
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				billboardMatrix = scale * rotation * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 				m_stSprite.billboardMatrix = billboardMatrix;
 				m_stSprite.color = spr.color;
 				m_stSprite.isBillboard = true;
@@ -716,10 +747,10 @@ namespace TEN::Renderer
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
 
-				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
+				billboardMatrix = scale * rotation * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
@@ -1062,7 +1093,7 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v,view);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
@@ -1076,7 +1107,7 @@ namespace TEN::Renderer
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v,view);
+			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 

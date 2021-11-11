@@ -75,28 +75,32 @@ void GameScriptLevel::Register(sol::state* state)
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
 //
-// __(thunder sounds not yet implemented)__
 //@mem storm
 		"storm", &GameScriptLevel::Storm,
 
 /// (WeatherType) Choose weather effect.
-// Must be one of the values `WeatherType.NORMAL`, `WeatherType.RAIN`, or `WeatherType.SNOW`.
+// Must be one of the values `WeatherType.None`, `WeatherType.Rain`, or `WeatherType.Snow`.
 //
-// __(not yet implemented)__
 //@mem weather
 		"weather", &GameScriptLevel::Weather,
+
+/// (float) Choose weather strength.
+// Must be value between `0.1` and `1.0`.
+//
+//@mem weatherStrength
+		"weatherStrength", sol::property(&GameScriptLevel::SetWeatherStrength),
 
 /*** (LaraType) Must be one of the LaraType values.
 These are:
 
-	NORMAL  
-	YOUNG
-	BUNHEAD
-	CATSUIT
-	DIVESUIT
-	INVISIBLE
+	Normal  
+	Young
+	Bunhead
+	Catsuit
+	Divesuit
+	Invisible
 
-e.g. `myLevel.laraType = LaraType.DIVESUIT`
+e.g. `myLevel.laraType = LaraType.Divesuit`
 
  __(not yet fully implemented)__
  @mem laraType*/
@@ -112,20 +116,6 @@ e.g. `myLevel.laraType = LaraType.DIVESUIT`
 // __(not yet implemented)__
 //@mem mirror
 		"mirror", &GameScriptLevel::Mirror,
-
-/*** (byte) Default speed of "UVRotate" animated textures.
-
-Must be in the range [-64, 64].
-
-A level texture can be set in Tomb Editor to use "UVRotate" animation.
-This gives the effect of the texture looping downwards or upwards in place.
-Positive values will cause the texture to loop downwards, and negative values
-will cause an upwards loop. The higher a positive number or the lower a negative
-number, the faster the scroll will be.
-
-__(not yet implemented)__
-@mem UVRotate*/
-		"UVRotate", sol::property(&GameScriptLevel::SetUVRotate),
 
 /*** (byte) The maximum draw distance for level.
 Given in sectors (blocks).
@@ -151,18 +141,18 @@ __(not yet implemented)__
 		);
 }
 
-void GameScriptLevel::SetUVRotate(byte val)
+void GameScriptLevel::SetWeatherStrength(float val)
 {
-	bool cond = val <= 64 && val >= -64;
-	std::string msg{ "UVRotate value must be in the range [-64, 64]." };
+	bool cond = val <= 1.0f && val >= 0.0f;
+	std::string msg{ "weatherStrength value must be in the range [0.1, 1.0]." };
 	if (!ScriptAssert(cond, msg))
 	{
-		ScriptWarn("Setting UVRotate to 0.");
-		UVRotate = 0;
+		ScriptWarn("Setting weatherStrength view to 1.");
+		WeatherStrength = 1.0f;
 	}
 	else
 	{
-		UVRotate = val;
+		WeatherStrength = val;
 	}
 }
 

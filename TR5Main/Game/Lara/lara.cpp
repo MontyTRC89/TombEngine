@@ -520,26 +520,32 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (heightFromWater > SWIM_DEPTH)
 				{
-					SetAnimation(item, LA_ONWATER_IDLE);
-
-					Lara.waterStatus = LW_SURFACE;
-					item->pos.yPos += 1 - heightFromWater; // BUG: Crawl exit flip results in Lara teleporting above the surface because of this. @Sezz 2021.11.10
+					if (isSwamp)
+						SetAnimation(item, LA_WADE);
+					else
+					{
+						SetAnimation(item, LA_ONWATER_IDLE);
+						Lara.waterStatus = LW_SURFACE;
+						item->pos.yPos += 1 - heightFromWater;
+						Lara.diveCount = 0;
+					}
+					
 					item->gravityStatus = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
 					item->pos.xRot = 0;
-					Lara.diveCount = 0;
 					Lara.torsoYrot = 0;
 					Lara.torsoXrot = 0;
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;
-
+					
 					UpdateItemRoom(item, 0);
 				}
 			}
 			else
 			{
 				Lara.waterStatus = LW_ABOVE_WATER;
+
 				if (item->currentAnimState == LS_WADE_FORWARD)
 					item->goalAnimState = LS_RUN_FORWARD;
 			}
@@ -725,12 +731,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	case LW_UNDERWATER:
 		if (item->hitPoints >= 0)
 		{
-			if (LaraDrawType == LARA_TYPE::DIVESUIT)
-			{
-				/* Hardcoded code */
-			}
-			else
+			auto level = g_GameFlow->GetLevel(CurrentLevel);
+			if (level->LaraType != LaraType::Divesuit)
 				Lara.air--;
+
 			if (Lara.air < 0)
 			{
 			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && Lara.anxiety < 251)
@@ -954,8 +958,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	// TODO: Move turn rate clamps to swim state functions! Divesuit needs its own states first.  @Sezz 2021.09.26
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (level->LaraType == LaraType::Divesuit)
 	{
 		if (Lara.turnRate < -ANGLE(0.5f))
 			Lara.turnRate += ANGLE(0.5f);
@@ -973,7 +978,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yRot += Lara.turnRate;
 
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	if (level->LaraType == LaraType::Divesuit)
 		UpdateSubsuitAngles();
 
 	// TODO: Conditions seem fine, but test this thoroughly. Different from surface. @Sezz 2021.09.26
@@ -996,7 +1001,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->pos.xRot > ANGLE(85.0f))
 		item->pos.xRot = ANGLE(85.0f);
 
-	if (LaraDrawType == LARA_TYPE::DIVESUIT)
+	if (level->LaraType == LaraType::Divesuit)
 	{
 		if (item->pos.zRot > ANGLE(44.0f))
 			item->pos.zRot = ANGLE(44.0f);
