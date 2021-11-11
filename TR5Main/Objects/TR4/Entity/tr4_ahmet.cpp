@@ -376,10 +376,9 @@ namespace TEN::Entities::TR4
         item->pos.yPos = (item->itemFlags[1] * 256);
         item->pos.zPos = (item->itemFlags[2] * 1024) + 512;
 
-        IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-
-        if (item->roomNumber != IsRoomOutsideNo)
-            ItemNewRoom(itemNumber, IsRoomOutsideNo);
+        auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+        if (item->roomNumber != outsideRoom)
+            ItemNewRoom(itemNumber, outsideRoom);
 
         item->animNumber = Objects[item->objectNumber].animIndex;
         item->goalAnimState = 1;
