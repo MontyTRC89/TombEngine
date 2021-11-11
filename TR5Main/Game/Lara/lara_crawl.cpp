@@ -567,7 +567,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->currentAnimState = LS_CRAWL_IDLE;
 		item->goalAnimState = LS_CRAWL_IDLE;
@@ -710,7 +710,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->currentAnimState = LS_CRAWL_IDLE;
 		item->goalAnimState = LS_CRAWL_IDLE;
