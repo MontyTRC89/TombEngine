@@ -317,7 +317,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem when
 	// she becomes airborne within a crawlspace, as collision handling will push her back very rapidly. @Sezz 2021.11.02
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
 		item->pos.yPos = coll->Setup.OldPosition.y;
@@ -1188,7 +1188,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 	
 	if (TestLaraFall(coll))
@@ -1237,7 +1237,7 @@ void old_lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->currentAnimState = LS_CRAWL_IDLE;
 		item->goalAnimState = LS_CRAWL_IDLE;
@@ -1349,7 +1349,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 
 	if (TestLaraFall(coll))
@@ -1400,7 +1400,7 @@ void old_lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item, true);
 
-	if (LaraDeflectEdgeDuck(item, coll))
+	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->currentAnimState = LS_CRAWL_IDLE;
 		item->goalAnimState = LS_CRAWL_IDLE;

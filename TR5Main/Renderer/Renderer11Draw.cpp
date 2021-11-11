@@ -2248,6 +2248,7 @@ namespace TEN::Renderer
         drawFootprints(view);
         drawDripParticles(view);
         drawBlood(view);
+		drawWeatherParticles(view);
         drawSparks(view);
         drawBubbles(view);
         drawDrips(view);

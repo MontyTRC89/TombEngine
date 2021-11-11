@@ -100,11 +100,12 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_WATER_DEATH;
-
 		return;
 	}
 
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
@@ -114,10 +115,10 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-		if (LaraDrawType == LARA_TYPE::DIVESUIT)
-			SwimTurnSubsuit(item);
-		else
-			SwimTurn(item, coll);
+	if (level->LaraType == LaraType::Divesuit)
+		SwimTurnSubsuit(item);
+	else
+		SwimTurn(item, coll);
 
 	if (TrInput & IN_JUMP)
 		item->goalAnimState = LS_UNDERWATER_FORWARD;
@@ -136,18 +137,19 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_WATER_DEATH;
-
 		return;
 	}
 
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
 		return;
 	}
 	
-	if (LaraDrawType != LARA_TYPE::DIVESUIT)
+	if (level->LaraType != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
@@ -168,18 +170,19 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_WATER_DEATH;
-
 		return;
 	}
 
-	if (TrInput & IN_ROLL && LaraDrawType != LARA_TYPE::DIVESUIT)
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
 		return;
 	}
 	
-	if (LaraDrawType != LARA_TYPE::DIVESUIT)
+	if (level->LaraType != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
