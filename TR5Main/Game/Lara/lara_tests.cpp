@@ -1785,8 +1785,12 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TestLaraCrawlForward(item, coll) &&
-		Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE, 0);
+
+	if ((probe.Position.Floor - y) <= (STEP_SIZE - 1) &&			// Lower floor bound.
+		(probe.Position.Floor - y) >= -(STEP_SIZE - 1) &&			// Upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lowest ceiling bound.
 		Lara.waterSurfaceDist >= -STEP_SIZE &&						// Water depth is optically feasible for action.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0))		// Not handling flare.

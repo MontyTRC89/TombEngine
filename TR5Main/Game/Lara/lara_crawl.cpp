@@ -60,6 +60,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if ((TrInput & IN_SPRINT) &&
 			TestLaraCrouchRoll(item, coll) &&
+			Lara.gunStatus == LG_NO_ARMS &&
 			Lara.NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
@@ -619,10 +620,10 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Allow standing vault up 2 steps when spawning flare while standing. @Sezz 2021.10.16
 
 		// TODO: Flare not working.
-		if (TrInput & IN_SPRINT && TestLaraCrawlForward(item, coll) ||
-			(TrInput & (IN_DRAW | IN_FLARE) &&
+		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
+			((TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(Lara.gunType) && // TODO: From here or from crouch, it needs to be consistent.
-			TestLaraDrawWeaponsFromCrawlIdle(item)))
+			TestLaraDrawWeaponsFromCrawlIdle(item))))
 		{
 			Lara.gunStatus = LG_NO_ARMS;
 			item->goalAnimState = LS_CROUCH_IDLE;
@@ -1086,7 +1087,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT)
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
 
@@ -1447,7 +1448,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT)
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
 
@@ -1538,7 +1539,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT)
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
 
