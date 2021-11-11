@@ -3993,7 +3993,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_SLOW_TURN)
 			Lara.turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 10);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, 9);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -4001,7 +4001,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_SLOW_TURN)
 			Lara.turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 10);
+		DoLaraLean(item, coll, LARA_LEAN_MAX, 9);
 	}
 
 	if (TrInput & IN_JUMP)
