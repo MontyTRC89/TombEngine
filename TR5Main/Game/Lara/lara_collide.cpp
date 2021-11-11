@@ -16,7 +16,7 @@
 
 /*this file has all the generic **collision** test functions called in lara's state code*/
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
@@ -26,7 +26,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -40,7 +40,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 
-	return 0;
+	return false;
 }
 
 void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -106,7 +106,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
@@ -115,7 +115,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 		item->gravityStatus = false;
 		item->speed = 0;
 
-		return 1;
+		return true;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -129,10 +129,10 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(2.0f);
 	}
 
-	return 0;
+	return false;
 }
 
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_TOP || coll->CollisionType == CT_CLAMP)
 	{
@@ -150,9 +150,10 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
-	return 0;
+
+	return false;
 }
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
