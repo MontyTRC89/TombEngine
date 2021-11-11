@@ -81,9 +81,6 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
-int WeatherType;
-int LaraDrawType;
-
 int WeaponDelay;
 int WeaponEnemyTimer;
 
@@ -347,7 +344,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
-			if (level->LaraType == LARA_TYPE::YOUNG)
+			if (level->LaraType == LaraType::Young)
 				HairControl(0, 1, 0);
 		}
 

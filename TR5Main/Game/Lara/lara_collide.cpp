@@ -11,6 +11,7 @@
 #include "lara_tests.h"
 #include "items.h"
 #include "setup.h"
+#include "GameFlowScript.h"
 #include "GameScriptLevel.h"
 
 // -----------------------------
@@ -18,7 +19,7 @@
 // For State Control & Collision
 // -----------------------------
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
@@ -28,7 +29,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -42,7 +43,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 
-	return 0;
+	return false;
 }
 
 void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -108,7 +109,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
@@ -117,7 +118,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 		item->gravityStatus = false;
 		item->speed = 0;
 
-		return 1;
+		return true;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -131,7 +132,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
 	}
 
-	return 0;
+	return false;
 }
 
 // TODO: Move the following two functions to lara_tests.cpp and lara_helpers.cpp?
@@ -160,7 +161,7 @@ void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 
 // LEGACY
 // TODO: Gradually replace usage with TestLaraHitCeiling() and SetLaraHitCeiling(). @Sezz 2021.09.27
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_TOP || coll->CollisionType == CT_CLAMP)
 	{
@@ -177,9 +178,10 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 		item->gravityStatus = false;
 
-		return 1;
+		return true;
 	}
-	return 0;
+
+	return false;
 }
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
@@ -433,8 +435,9 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	int height = LARA_HEIGHT * phd_sin(item->pos.xRot);
 	height = abs(height);
 
-	if (height < ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200)
-		height = ((LaraDrawType == LARA_TYPE::DIVESUIT) << 6) + 200;
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	if (height < ((level->LaraType == LaraType::Divesuit) << 6) + 200)
+		height = ((level->LaraType == LaraType::Divesuit) << 6) + 200;
 
 	coll->Setup.BadHeightUp = -(STEP_SIZE / 4);
 	coll->Setup.Height = height;
