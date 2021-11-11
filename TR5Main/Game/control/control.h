@@ -62,7 +62,6 @@ extern int WeaponDelay;
 extern int WeaponEnemyTimer;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
-extern short IsRoomOutsideNo;
 
 int DrawPhase();
 

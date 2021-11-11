@@ -103,7 +103,7 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int y, int z) const
 std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
 {
 	const auto room = CeilingCollision.Portals[plane];
-	return room != -1 ? std::optional{room} : std::nullopt;
+	return room != NO_ROOM ? std::optional{room} : std::nullopt;
 }
 
 std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const

@@ -254,7 +254,7 @@ namespace Environment
 			{
 				if (p.Life <= 0)
 				{
-					p.Enabled = false;	// Turn it off.
+					p.Enabled = false;
 					continue;
 				}
 				else if (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
@@ -343,11 +343,18 @@ namespace Environment
 				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
 				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GenerateInt() & (WALL_SIZE * 4 - 1));
+				
+				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);
 
-				if (IsRoomOutside(xPos, yPos, zPos) < 0)
+				if (outsideRoom == NO_ROOM)
 					continue;
 
-				if (g_Level.Rooms[IsRoomOutsideNo].flags & ENV_FLAG_WATER)
+				if (g_Level.Rooms[outsideRoom].flags & ENV_FLAG_WATER)
+					continue;
+
+				auto coll = GetCollisionResult(xPos, yPos, zPos, outsideRoom);
+
+				if (!(coll.Position.Ceiling + WALL_SIZE < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
 					continue;
 
 				auto part = WeatherParticle();
@@ -371,7 +378,7 @@ namespace Environment
 				part.Velocity.z = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 
 				part.Type = level->Weather;
-				part.Room = IsRoomOutsideNo;
+				part.Room = outsideRoom;
 				part.Position.x = xPos;
 				part.Position.y = yPos;
 				part.Position.z = zPos;
