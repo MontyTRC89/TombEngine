@@ -509,26 +509,32 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (heightFromWater > SWIM_DEPTH)
 				{
-					SetAnimation(item, LA_ONWATER_IDLE);
-
-					Lara.waterStatus = LW_SURFACE;
-					item->pos.yPos += 1 - heightFromWater; // BUG: Crawl exit flip results in Lara teleporting above the surface because of this. @Sezz 2021.11.10
+					if (isSwamp)
+						SetAnimation(item, LA_WADE);
+					else
+					{
+						SetAnimation(item, LA_ONWATER_IDLE);
+						Lara.waterStatus = LW_SURFACE;
+						item->pos.yPos += 1 - heightFromWater;
+						Lara.diveCount = 0;
+					}
+					
 					item->gravityStatus = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
 					item->pos.xRot = 0;
-					Lara.diveCount = 0;
 					Lara.torsoYrot = 0;
 					Lara.torsoXrot = 0;
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;
-
+					
 					UpdateItemRoom(item, 0);
 				}
 			}
 			else
 			{
 				Lara.waterStatus = LW_ABOVE_WATER;
+
 				if (item->currentAnimState == LS_WADE_FORWARD)
 					item->goalAnimState = LS_RUN_FORWARD;
 			}
