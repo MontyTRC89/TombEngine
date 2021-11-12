@@ -188,8 +188,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1; // Was STEPUP_HEIGHT; crouching onto a step-high ledge from a run was unsightly. @Sezz 2021.10.22
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1); // Was -STEPUP_HEIGHT.
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
@@ -284,8 +284,6 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
 	}
 
-	// TODO: Make crouch roll deplete sprint meter? @Sezz 2021.10.22
-
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
@@ -316,7 +314,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem when
-	// she becomes airborne within a crawlspace, as collision handling will push her back very rapidly. @Sezz 2021.11.02
+	// she becomes airborne within a crawlspace as collision handling will push her back very rapidly. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
@@ -327,7 +325,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(coll))
 	{
 		Lara.gunStatus = LG_NO_ARMS;
-		item->speed /= 3;				// Truncate speed to prevent flying off. TODO: Truncate on a curve. @Sezz 2021.06.27
+		item->speed /= 3;				// Truncate speed to prevent flying off.
 		SetLaraFallState(item);
 
 		return;
@@ -480,7 +478,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_CROUCH_IDLE; // TODO: Dispatch death state. @Sezz 2021.10.03
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}

@@ -701,7 +701,6 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	// Permit turning when Lara is stationary and cannot dispatch into a true turn.
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
 	{
@@ -779,15 +778,16 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Create new LS_WADE_BACK state? Its function would make a direct call to lara_as_back(). @Sezz 2021.06.27
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK &&
-			TestLaraWalkBack(item, coll))
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if (TestLaraWalkBack(item, coll))
+			{
+				item->goalAnimState = LS_WALK_BACK;
 
-			return;
+				return;
+			}
 		}
-		else if (!(TrInput & IN_WALK) &&
-			TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -1574,15 +1574,16 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK &&
-			TestLaraWalkBack(item, coll))
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if (TestLaraWalkBack(item, coll))
+			{
+				item->goalAnimState = LS_WALK_BACK;
 
-			return;
+				return;
+			}
 		}
-		else if (!(TrInput & IN_WALK) &&
-			TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -1890,15 +1891,16 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK &&
-			TestLaraWalkBack(item, coll))
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if (TestLaraWalkBack(item, coll))
+			{
+				item->goalAnimState = LS_WALK_BACK;
 
-			return;
+				return;
+			}
 		}
-		else if (!(TrInput & IN_WALK) &&
-			TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -2682,15 +2684,16 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK &&
-			TestLaraWalkBack(item, coll))
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WALK_BACK;
+			if (TestLaraWalkBack(item, coll))
+			{
+				item->goalAnimState = LS_WALK_BACK;
 
-			return;
+				return;
+			}
 		}
-		else if (!(TrInput & IN_WALK) &&
-			TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -2844,21 +2847,16 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (Lara.waterStatus == LW_WADE)
+		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_WADE_FORWARD;
+			if (TestLaraWalkBack(item, coll))
+			{
+				item->goalAnimState = LS_WALK_BACK;
 
-			return;
+				return;
+			}
 		}
-		else if (TrInput & IN_WALK &&
-			TestLaraWalkBack(item, coll))
-		{
-			item->goalAnimState = LS_WALK_BACK;
-
-			return;
-		}
-		else if (!(TrInput & IN_WALK) &&
-			TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_HOP_BACK;
 
@@ -2885,10 +2883,10 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
-		else if (Lara.turnRate > -LARA_MED_TURN)
+		if (Lara.turnRate > -LARA_MED_TURN)
 			Lara.turnRate = -LARA_MED_TURN;
+		else if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_FAST;
 
