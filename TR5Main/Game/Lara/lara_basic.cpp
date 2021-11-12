@@ -1511,7 +1511,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: This can't be anywhere below the run dispatch because tests to prevent forward/back movement currently don't exist.
+	// TODO: This can't be anywhere below the run dispatch because a test to prevent forward movement without embedding currently can't exist. @Sezz 2021.11.12
 	Lara.turnRate += LARA_TURN_RATE;
 
 	if (Lara.waterStatus == LW_WADE)
@@ -1610,6 +1610,11 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	// the player presses and holds the button to turn the opposite way. @Sezz 2021.10.16
 	if (TrInput & IN_RIGHT)
 	{
+		if (Lara.turnRate < 0)
+			Lara.turnRate = 0;
+		else if (Lara.turnRate > LARA_FAST_TURN)
+			Lara.turnRate = LARA_FAST_TURN;
+
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
 			if (Lara.turnRate > LARA_SLOW_TURN)
@@ -1617,7 +1622,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		}
-		else if (Lara.turnRate > LARA_SLOW_TURN)
+		else if (Lara.turnRate > LARA_MED_TURN)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1671,8 +1676,8 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		if (Lara.turnRate > LARA_MED_TURN)
+			Lara.turnRate = LARA_MED_TURN;
 
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
@@ -1926,6 +1931,11 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
+		if (Lara.turnRate > 0)
+			Lara.turnRate = 0;
+		else if (Lara.turnRate < -LARA_FAST_TURN)
+			Lara.turnRate = -LARA_FAST_TURN;
+
 		if (TrInput & IN_WALK)
 		{
 			if (Lara.turnRate < -LARA_SLOW_TURN)
@@ -1933,7 +1943,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
 		}
-		else if (Lara.turnRate < -LARA_SLOW_TURN)
+		else if (Lara.turnRate < -LARA_MED_TURN)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1987,8 +1997,8 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		if (Lara.turnRate < -LARA_MED_TURN)
+			Lara.turnRate = -LARA_MED_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
