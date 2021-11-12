@@ -65,7 +65,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 									if (!radius)
 									{
 										collidedItems[0] = NULL;
-										return 1;
+										return true;
 									}
 								}
 							}
@@ -153,7 +153,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 							{
 								collidedItems[numItems++] = item;
 								if (!radius)
-									return 1;
+									return true;
 							}
 						}
 					}
