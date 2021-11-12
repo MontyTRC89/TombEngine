@@ -618,7 +618,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 
 	if (Lara.gunType == WEAPON_FLARE)
 	{
-		CreateFlare(ID_FLARE_ITEM, FALSE);
+		CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
 		undraw_flare_meshes();
 		Lara.flareControlLeft = 0;
 		Lara.requestGunType = WEAPON_NONE;
