@@ -402,7 +402,7 @@ void LaraGun()
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 				{
-					CreateFlare(ID_FLARE_ITEM, 0);
+					CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 					undraw_flare_meshes();
 					Lara.flareControlLeft = false;
 					Lara.flareAge = 0;
@@ -471,7 +471,7 @@ void LaraGun()
 			break;
 
 		case WEAPON_FLARE:
-			draw_flare();
+			draw_flare(LaraItem);
 			break;
 
 		default:
@@ -481,7 +481,7 @@ void LaraGun()
 		break;
 
 	case LG_SPECIAL:
-		draw_flare();
+		draw_flare(LaraItem);
 		break;
 
 	case LG_UNDRAW_GUNS:
@@ -505,7 +505,7 @@ void LaraGun()
 			break;
 
 		case WEAPON_FLARE:
-			undraw_flare();
+			undraw_flare(LaraItem);
 			break;
 
 		default:
