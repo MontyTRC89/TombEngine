@@ -1081,7 +1081,6 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
 
-	// TODO: Probe ahead please.
 	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
 		Lara.waterStatus != LW_WADE)
 	{

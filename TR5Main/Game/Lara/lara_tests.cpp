@@ -1666,10 +1666,11 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0); // Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
-	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor bound.
-		(probe.Position.Floor - y) >= upperBound &&					// Upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&		// Lowest ceiling bound.
-		!probe.Position.Slope &&									// No slope.
+	if ((probe.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&								// Upper floor bound.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&					// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
+		!probe.Position.Slope &&												// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1683,10 +1684,11 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4, 0);
 
-	if ((probe.Position.Floor - y) <= lowerBound &&					// Lower floor bound.
-		(probe.Position.Floor - y) >= upperBound &&					// Upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lowest ceiling bound.
-		!probe.Position.Slope &&									// No slope.
+	if ((probe.Position.Floor - y) <= lowerBound &&										// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&							// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
+		!probe.Position.Slope &&														// No slope.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1700,7 +1702,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius * sqrt(2) + 4, 0);
 	
-	// BUG: This interferes with the one-step stand-to-crouch vault where the floor is lower than STEP_SIZE.
+	// BUG: This interferes with the one-step stand-to-crouch vault where the ceiling is lower than Lara's height.
 	if ((probe.Position.Ceiling - y) < 0)		// Hack to ensure Lara can run off diagonal ledges. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
 		return true;
 
