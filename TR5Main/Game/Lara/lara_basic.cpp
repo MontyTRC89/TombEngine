@@ -231,34 +231,6 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor > STEP_SIZE / 2)
-	{
-		if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor <= STEP_SIZE / 2)
-		{
-			coll->Middle.Floor = 0;
-		}
-		else
-		{
-			item->goalAnimState = LS_STEP_DOWN;
-			GetChange(item, &g_Level.Anims[item->animNumber]);
-		}
-	}
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
-	{
-		if (coll->Front.Floor == NO_HEIGHT ||
-			coll->Front.Floor < -STEPUP_HEIGHT ||
-			coll->Front.Floor >= -STEP_SIZE / 2)
-		{
-			coll->Middle.Floor = 0;
-		}
-		else
-		{
-			item->goalAnimState = LS_STEP_UP;
-			GetChange(item, &g_Level.Anims[item->animNumber]);
-		}
-	}*/
 }
 
 // LEGACY
@@ -1443,22 +1415,6 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor <= 200)
-	{
-		if (LaraDeflectEdge(item, coll))
-			LaraCollideStop(item, coll);
-
-		if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
-	}
-	else
-	{
-		SetAnimation(item, LA_FALL_BACK);
-		item->fallspeed = 0;
-		item->gravityStatus = true;
-	}*/
 }
 
 // LEGACY
@@ -2570,13 +2526,6 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor > STEP_SIZE / 2 && coll->Middle.Floor < STEPUP_HEIGHT)
-	{
-		item->goalAnimState = LS_STEP_BACK_DOWN;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
-	}*/
 }
 
 // LEGACY
@@ -3028,10 +2977,6 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;*/
 }
 
 // LEGACY
@@ -3186,10 +3131,6 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;*/
 }
 
 // LEGACY
@@ -3269,10 +3210,6 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;*/
 }
 
 // LEGACY
@@ -3599,10 +3536,6 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;*/
 }
 
 // LEGACY
@@ -3934,13 +3867,27 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	// TODO: This check can be simpler. @Sezz 2021.11.08
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
 
 		return;
 	}
+
+	// LEGACY step
+	/*if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !TestLaraSwamp(item))
+	{
+		item->goalAnimState = LS_STEP_UP;
+		GetChange(item, &g_Level.Anims[item->animNumber]);
+	}
+
+	if (coll->Middle.Floor >= 50 && !TestLaraSwamp(item))
+	{
+		item->pos.yPos += 50;
+		return;
+	}
+	
+	LaraSnapToHeight(item, coll);*/
 }
 
 // LEGACY
