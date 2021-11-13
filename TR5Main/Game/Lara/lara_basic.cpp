@@ -3200,7 +3200,7 @@ void old_lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_stepright(item, coll);
 }
 
-// State:		LS_ROLL_FORWARD (23)
+// State:		LS_ROLL_BACK(23)
 // Collision:	lara_col_roll2()
 void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -3219,10 +3219,17 @@ void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.turnRate = LARA_MED_TURN;
 	}
 
-	item->goalAnimState = LS_ROLL_BACK;
+	if (TrInput & IN_ROLL)
+	{
+		item->goalAnimState = LS_ROLL_BACK;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
 }
 
-// State:		LS_ROLL_FORWARD (23)
+// State:		LS_ROLL_BACK (23)
 // Control:		lara_as_roll2()
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -3542,7 +3549,14 @@ void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_ROLL_FORWARD; //?
+	if (TrInput & IN_ROLL)
+	{
+		item->goalAnimState = LS_ROLL_FORWARD;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
 }
 
 // State:		LS_ROLL_FORWARD (45)
