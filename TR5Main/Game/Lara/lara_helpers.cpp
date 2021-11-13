@@ -44,13 +44,12 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Height difference is below threshold for step dispatch or step animation doesn't exist; translate Lara to new floor height.
-	// TODO: Try using bad heights native to each state.
 	// TODO: Follow cube root curve instead of doing this ugly thing.
 	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
 	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:
-	// comment everything EXCEPT the last two lines. Lara will simply snap to the surface as before (although the LS_RUN and LS_WADE_FORWARD
-	// states had a linear transition of 50 units per frame, so not all original behaviour can be restored from here;
-	// as that is so, I have left commented legacy step code in their respective col functions). @Sezz 2021.10.09
+	// 1) comment everything below except the first and last conditions,
+	// 2) uncomment the legacy blocks of code in run, sprint, and wade forward collision functions, and
+	// 3) comment the blocks above them which this function. @Sezz 2021.11.13
 	int div = 2;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
@@ -59,7 +58,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += SWAMP_GRAVITY;
 		}
-		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Lower floor range.
+		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Inner range.
 			abs(coll->Middle.Floor) >= div)
 		{
 			if (coll->Middle.Floor <= 50)			// Lower floor range.
@@ -67,7 +66,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 			else if (coll->Middle.Floor >= -50)		// Upper floor range.
 				item->pos.yPos += 50;
 		}
-		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&			// Upper floor range.
+		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Outer range.
 			abs(coll->Middle.Floor) >= div)
 		{
 			item->pos.yPos += coll->Middle.Floor / div;

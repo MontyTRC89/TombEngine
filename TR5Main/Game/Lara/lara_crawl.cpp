@@ -703,7 +703,6 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
