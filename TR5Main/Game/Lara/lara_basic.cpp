@@ -131,54 +131,6 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 0*/
-	/*collision: lara_col_walk*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	if (!Lara.isMoving)
-	{
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
-		}
-
-		if (TrInput & IN_FORWARD)
-		{
-			if (Lara.waterStatus == LW_WADE)
-			{
-				item->goalAnimState = LS_WADE_FORWARD;
-			}
-			else if (TrInput & IN_WALK)
-			{
-				item->goalAnimState = LS_WALK_FORWARD;
-			}
-			else
-			{
-				item->goalAnimState = LS_RUN_FORWARD;
-			}
-		}
-		else
-		{
-			item->goalAnimState = LS_STOP;
-		}
-	}
-}
-
 // State:		LA_WALK_FORWARD (0)
 // Control:		lara_as_walk_forward()
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
@@ -230,73 +182,6 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraStep(item, coll);
 
 		return;
-	}
-}
-
-// LEGACY
-void old_lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 0*/
-	/*state code: lara_as_walk*/
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.DeathFlagIsPit = 1;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
-	{
-		if (LaraDeflectEdge(item, coll))
-		{
-			item->goalAnimState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->animNumber]))
-				return;
-
-			LaraCollideStop(item, coll);
-		}
-
-		if (!LaraFallen(item, coll))
-		{
-			if (coll->Middle.Floor > STEP_SIZE / 2)
-			{
-				if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor <= STEP_SIZE / 2)
-				{
-					coll->Middle.Floor = 0;
-				}
-				else
-				{
-					item->goalAnimState = LS_STEP_DOWN;
-					GetChange(item, &g_Level.Anims[item->animNumber]);
-				}
-			}
-			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
-			{
-				if (coll->Front.Floor == NO_HEIGHT ||
-					coll->Front.Floor < -STEPUP_HEIGHT ||
-					coll->Front.Floor >= -STEP_SIZE / 2)
-				{
-					coll->Middle.Floor = 0;
-				}
-				else
-				{
-					item->goalAnimState = LS_STEP_UP;
-					GetChange(item, &g_Level.Anims[item->animNumber]);
-				}
-			}
-
-			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT && coll->CollisionType != CT_FRONT)
-				item->pos.yPos += coll->Middle.Floor;
-		}
 	}
 }
 
@@ -402,99 +287,6 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 1*/
-	/*collision: lara_col_run*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_DEATH;
-		return;
-	}
-
-	if (TrInput & IN_ROLL)
-	{
-		SetAnimation(item, LA_ROLL_180_START, 2);
-		return;
-	}
-
-	if (TrInput & IN_SPRINT && Lara.sprintTimer)
-	{
-		item->goalAnimState = LS_SPRINT;
-		return;
-	}
-
-	if (TrInput & IN_DUCK &&
-		Lara.waterStatus != LW_WADE &&
-		(Lara.gunStatus == LG_NO_ARMS ||
-			Lara.gunType == WEAPON_NONE ||
-			Lara.gunType == WEAPON_PISTOLS ||
-			Lara.gunType == WEAPON_REVOLVER ||
-			Lara.gunType == WEAPON_UZI ||
-			Lara.gunType == WEAPON_FLARE))
-	{
-		item->goalAnimState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
-
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
-
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
-	}
-
-	static bool doJump = false;
-
-	if (item->animNumber == LA_STAND_TO_RUN)
-	{
-		doJump = false;
-	}
-	else if (item->animNumber == LA_RUN)
-	{
-		if (item->frameNumber == 4)
-			doJump = true;
-	}
-	else
-	{
-		doJump = true;
-	}
-
-	if (TrInput & IN_JUMP && doJump && !item->gravityStatus)
-	{
-		item->goalAnimState = LS_JUMP_FORWARD;
-	}
-	else if (TrInput & IN_FORWARD)
-	{
-		if (Lara.waterStatus == LW_WADE)
-		{
-			item->goalAnimState = LS_WADE_FORWARD;
-		}
-		else
-		{
-			if (TrInput & IN_WALK)
-				item->goalAnimState = LS_WALK_FORWARD;
-			else
-				item->goalAnimState = LS_RUN_FORWARD;
-		}
-	}
-	else
-	{
-		item->goalAnimState = LS_STOP;
-	}
-}
-
 // State:		LS_RUN_FORWARD (1)
 // Control:		lara_as_run()
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
@@ -577,76 +369,6 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 	//	else
 	//		item->pos.yPos += 50; // do the default aligment
 	//}
-}
-
-// LEGACY
-void old_lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 1*/
-	/*state code: lara_col_run*/
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-
-	GetCollisionInfo(coll, item);
-	LaraResetGravityStatus(item, coll);
-
-	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
-	{
-		if (LaraDeflectEdge(item, coll))
-		{
-			item->pos.zRot = 0;
-
-			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
-			{
-				item->goalAnimState = LS_SPLAT;
-				if (GetChange(item, &g_Level.Anims[item->animNumber]))
-				{
-					item->currentAnimState = LS_SPLAT;
-					return;
-				}
-			}
-
-			LaraCollideStop(item, coll);
-		}
-
-		if (!LaraFallen(item, coll))
-		{
-			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
-			{
-				if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor < -STEPUP_HEIGHT || coll->Front.Floor >= -STEP_SIZE / 2)
-				{
-					coll->Middle.Floor = 0;
-				}
-				else
-				{
-					item->goalAnimState = LS_STEP_UP;
-					GetChange(item, &g_Level.Anims[item->animNumber]);
-				}
-			}
-
-			if (!TestLaraSlide(item, coll) && coll->CollisionType != CT_FRONT)
-			{
-				if (coll->Middle.Floor < 50)
-				{
-					if (coll->Middle.Floor != NO_HEIGHT)
-						item->pos.yPos += coll->Middle.Floor;
-				}
-				else
-				{
-					item->goalAnimState = LS_STEP_DOWN; // for theoretical running stepdown anims, not in default anims
-					if (GetChange(item, &g_Level.Anims[item->animNumber]))
-						item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
-					else
-						item->pos.yPos += 50; // do the default aligment
-				}
-			}
-		}
-	}
 }
 
 // State:		LS_STOP (2)
@@ -938,188 +660,6 @@ void LaraSwampStop(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 2*/
-	/*collision: lara_col_stop*/
-	COLL_RESULT fheight = {}; fheight.Position.Floor = NO_HEIGHT;
-	COLL_RESULT rheight = {}; rheight.Position.Floor = NO_HEIGHT;
-
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_DEATH;
-		return;
-	}
-
-	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT && item->animNumber != LA_SPRINT_TO_STAND_LEFT)
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-
-	// Handles waterskin and clockwork beetle
-	if (UseSpecialItem(item))
-		return;
-
-	if (TrInput & IN_ROLL && Lara.waterStatus != LW_WADE)
-	{
-		SetAnimation(item, LA_ROLL_180_START, 2);
-		return;
-	}
-
-	if (TrInput & IN_DUCK
-		&& Lara.waterStatus != LW_WADE
-		&& item->currentAnimState == LS_STOP
-		&& (Lara.gunStatus == LG_NO_ARMS
-			|| Lara.gunType == WEAPON_NONE
-			|| Lara.gunType == WEAPON_PISTOLS
-			|| (Lara.gunType == WEAPON_REVOLVER && !LaserSight)
-			|| Lara.gunType == WEAPON_UZI
-			|| Lara.gunType == WEAPON_FLARE))
-	{
-		item->goalAnimState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	item->goalAnimState = LS_STOP;
-
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	if (TrInput & IN_LSTEP)
-	{
-		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48);
-		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot - ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
-
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
-			item->goalAnimState = LS_STEP_LEFT;
-	}
-	else if (TrInput & IN_RSTEP)
-	{
-		auto collFloorResult = LaraCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48);
-		auto collCeilingResult = LaraCeilingCollisionFront(item, item->pos.yRot + ANGLE(90.0f), LARA_RAD + 48, LARA_HEIGHT);
-
-		if ((collFloorResult.Position.Floor < 128 && collFloorResult.Position.Floor > -128) && !collFloorResult.Position.Slope && collCeilingResult.Position.Ceiling <= 0)
-			item->goalAnimState = LS_STEP_RIGHT;
-	}
-	else if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
-
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
-
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-	}
-
-	if (TrInput & IN_FORWARD)
-		fheight = LaraCollisionFront(item, item->pos.yRot, LARA_RAD + 4);
-	else if (TrInput & IN_BACK)
-		rheight = LaraCollisionFront(item, item->pos.yRot - ANGLE(180.0f), LARA_RAD + 4); // TR3: item->pos.yRot + ANGLE(180)?
-
-	if (Lara.waterStatus == LW_WADE)
-	{
-		if (TrInput & IN_JUMP && !TestLaraSwamp(item))
-			item->goalAnimState = LS_JUMP_PREPARE;
-
-		if (TrInput & IN_FORWARD)
-		{
-			bool wade = false;
-
-			if (TestLaraSwamp(item))
-			{
-				if (fheight.Position.Floor > -(STEPUP_HEIGHT - 1))
-					wade = true;
-			}
-			else
-			{
-				if ((fheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (fheight.Position.Floor > -(STEPUP_HEIGHT - 1)))
-					wade = true;
-			}
-
-			if (!wade)
-			{
-				Lara.moveAngle = item->pos.yRot;
-				coll->Setup.BadHeightDown = NO_BAD_POS;
-				coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-				coll->Setup.BadCeilingHeight = 0;
-				coll->Setup.SlopesAreWalls = true;
-				coll->Setup.Radius = LARA_RAD + 2;
-				coll->Setup.ForwardAngle = Lara.moveAngle;
-
-				GetCollisionInfo(coll, item);
-				if (TestLaraVault(item, coll))
-					return;
-
-				coll->Setup.Radius = LARA_RAD;
-			}
-			else
-				item->goalAnimState = LS_WADE_FORWARD;
-		}
-		else if (TrInput & IN_BACK)
-		{
-			if (TestLaraSwamp(item) || Lara.waterStatus == LW_WADE || (TrInput & IN_WALK))
-			{
-				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
-					item->goalAnimState = LS_WALK_BACK;
-			}
-			else if (rheight.Position.Floor > -(STEPUP_HEIGHT - 1))
-			{
-				item->goalAnimState = LS_HOP_BACK;
-			}
-		}
-	}
-	else
-	{
-		if (TrInput & IN_JUMP)
-		{
-			if (!TestLaraSwamp(item) && coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
-				item->goalAnimState = LS_JUMP_PREPARE;
-		}
-		else if (TrInput & IN_FORWARD)
-		{
-			auto cheight = LaraCeilingCollisionFront(item, item->pos.yRot, LARA_RAD + 4, LARA_HEIGHT);
-
-			// Don't try to move if there is slope in front
-			if (fheight.Position.Slope && (fheight.Position.Floor < 0 || cheight.Position.Ceiling > 0))
-				return; // item->goalAnimState = LS_STOP was removed here because it prevented Lara from rotating while still holding forward. -- Lwmte, 17.09.2021
-
-			if (TestLaraVault(item, coll))
-				return;
-
-			if (TrInput & IN_WALK)
-			{
-				if (coll->CollisionType == CT_FRONT) // Never try to walk if there's collision in front
-					return;
-				item->goalAnimState = LS_WALK_FORWARD;
-			}
-			else
-			{
-				if (cheight.Position.Ceiling > 0) // Only try to run if there's no overhang ceiling in front
-					return;
-				item->goalAnimState = LS_RUN_FORWARD;
-			}
-		}
-		else if (TrInput & IN_BACK)
-		{
-			if (TrInput & IN_WALK)
-			{
-				if ((rheight.Position.Floor < (STEPUP_HEIGHT - 1)) && (rheight.Position.Floor > -(STEPUP_HEIGHT - 1)) && !rheight.Position.Slope)
-					item->goalAnimState = LS_WALK_BACK;
-			}
-			else if (rheight.Position.Floor > -(STEPUP_HEIGHT - 1))
-			{
-				item->goalAnimState = LS_HOP_BACK;
-			}
-		}
-	}
-}
-
 // State:		LS_STOP (2)
 // Control:		lara_as_stop()
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
@@ -1156,35 +696,6 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Vaulting from this state.
 
-	LaraSnapToHeight(item, coll);
-}
-
-// LEGACY
-void old_lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 2*/
-	/*state code: lara_as_stop*/
-	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (LaraHitCeiling(item, coll))
-		return;
-
-	if (LaraFallen(item, coll))
-		return;
-
-	if (TestLaraSlide(item, coll))
-		return;
-
-	ShiftItem(item, coll);
 	LaraSnapToHeight(item, coll);
 }
 
@@ -1354,26 +865,6 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state: 5*/
-	/*collision: lara_col_fastback*/
-	item->goalAnimState = LS_STOP;
-	if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
-	}
-}
-
 // State:		LS_HOP_BACK (5)
 // Control:		lara_as_fastback()
 void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
@@ -1414,45 +905,6 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraStep(item, coll);
 
 		return;
-	}
-}
-
-// LEGACY
-void old_lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state: 5*/
-	/*state code: lara_as_fastback*/
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
-
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.SlopesArePits = true;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (!LaraHitCeiling(item, coll))
-	{
-		if (coll->Middle.Floor <= 200)
-		{
-			if (LaraDeflectEdge(item, coll))
-				LaraCollideStop(item, coll);
-
-			if (!TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
-				item->pos.yPos += coll->Middle.Floor;
-		}
-		else
-		{
-			SetAnimation(item, LA_FALL_BACK);
-			item->fallspeed = 0;
-			item->gravityStatus = true;
-		}
 	}
 }
 
@@ -1690,93 +1142,11 @@ void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state: 6*/
-	/*collision: */
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-
-		return;
-	}
-
-	Lara.turnRate += LARA_TURN_RATE;
-
-	if (Lara.gunStatus != LG_READY || Lara.waterStatus == LW_WADE)
-	{
-		if (Lara.turnRate > LARA_SLOW_TURN)
-		{
-			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
-				Lara.turnRate = LARA_SLOW_TURN;
-			else
-				item->goalAnimState;// = LS_TURN_FAST;
-		}
-	}
-	else
-	{
-		item->goalAnimState;// = LS_TURN_FAST;
-	}
-
-	// Don't try to move forward if button isn't pressed or there's no headroom in front
-	if (!(TrInput & IN_FORWARD))
-	{
-		if (!(TrInput & IN_RIGHT))
-			item->goalAnimState = LS_STOP;
-
-		return;
-	}
-
-	if (Lara.waterStatus == LW_WADE)
-	{
-		item->goalAnimState = LS_WADE_FORWARD;
-	}
-	else if (TrInput & IN_WALK)
-	{
-		item->goalAnimState = LS_WALK_FORWARD;
-	}
-	else
-	{
-		item->goalAnimState = LS_RUN_FORWARD;
-	}
-}
-
 // State:		LS_TURN_RIGHT_SLOW (6)
 // Control:		lara_as_turn_r()
 void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_stop(item, coll);
-}
-
-// LEGACY
-void old_lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state: 6*/
-	/*state code: lara_as_turn_r*/
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-	Lara.moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (coll->Middle.Floor > 100 && !TestLaraSwamp(item))
-	{
-		SetAnimation(item, LA_FALL_START);
-		item->fallspeed = 0;
-		item->gravityStatus = true;
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
-		return;
-
-	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_TURN_LEFT_SLOW (7)
@@ -2009,57 +1379,6 @@ void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_STOP;
-}
-
-// LEGACY
-void old_lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 7*/
-	/*collision: lara_col_turn_l*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	Lara.turnRate -= LARA_TURN_RATE;
-
-	if (Lara.gunStatus != LG_READY || Lara.waterStatus == LW_WADE)
-	{
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-		{
-			if (TrInput & IN_WALK || Lara.waterStatus == LW_WADE)
-				Lara.turnRate = -LARA_SLOW_TURN;
-			else
-				item->goalAnimState;// = LS_TURN_FAST; // Dead state.
-		}
-	}
-	else
-	{
-		item->goalAnimState;// = LS_TURN_FAST; // Dead state.
-	}
-
-	// Don't try to move forward if button isn't pressed or there's no headroom in front
-	if (!(TrInput & IN_FORWARD) || coll->CollisionType == CT_FRONT)
-	{
-		if (!(TrInput & IN_LEFT))
-			item->goalAnimState = LS_STOP;
-
-		return;
-	}
-
-	if (Lara.waterStatus == LW_WADE)
-	{
-		item->goalAnimState = LS_WADE_FORWARD;
-	}
-	else if (TrInput & IN_WALK)
-	{
-		item->goalAnimState = LS_WALK_FORWARD;
-	}
-	else
-	{
-		item->goalAnimState = LS_RUN_FORWARD;
-	}
 }
 
 // State:		LS_TURN_LEFT_SLOW (7)
@@ -2301,37 +1620,8 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_JUMP_UP;
-}
 
-// LEGACY
-void old_lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 15*/
-	/*collision: lara_col_compress*/
-	if (Lara.waterStatus != LW_WADE)
-	{
-		if (TrInput & IN_FORWARD && !TestLaraFacingCorner(item, item->pos.yRot, 256) && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
-		{
-			item->goalAnimState = LS_JUMP_FORWARD;
-			Lara.moveAngle = item->pos.yRot;
-		}
-		else if (TrInput & IN_LEFT && !TestLaraFacingCorner(item, item->pos.yRot - ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
-		{
-			item->goalAnimState = LS_JUMP_LEFT;
-			Lara.moveAngle = item->pos.yRot - ANGLE(90);
-		}
-		else if (TrInput & IN_RIGHT && !TestLaraFacingCorner(item, item->pos.yRot + ANGLE(90.0f), 256) && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
-		{
-			item->goalAnimState = LS_JUMP_RIGHT;
-			Lara.moveAngle = item->pos.yRot + ANGLE(90);
-		}
-		else if (TrInput & IN_BACK && !TestLaraFacingCorner(item, item->pos.yRot - ANGLE(180.0f), 256) && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
-		{
-			item->goalAnimState = LS_JUMP_BACK;
-			Lara.moveAngle = item->pos.yRot + ANGLE(180);
-		}
-	}
-
+	// TODO: What is this? @Sezz 2021.11.13
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
 }
@@ -2373,40 +1663,6 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor > -STEP_SIZE && coll->Middle.Floor < STEP_SIZE)
 		item->pos.yPos += coll->Middle.Floor;
-}
-
-// LEGACY
-void old_lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 15*/
-	/*state code: lara_as_compress*/
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (!LaraFallen(item, coll))
-	{
-		if (coll->Middle.Ceiling > -100)
-		{
-			SetAnimation(item, LA_STAND_SOLID);
-			item->speed = 0;
-			item->fallspeed = 0;
-			item->gravityStatus = false;
-
-			item->pos.xPos = coll->Setup.OldPosition.x;
-			item->pos.yPos = coll->Setup.OldPosition.y;
-			item->pos.zPos = coll->Setup.OldPosition.z;
-		}
-
-		if (coll->Middle.Floor > -256 && coll->Middle.Floor < 256)
-			item->pos.yPos += coll->Middle.Floor;
-	}
 }
 
 // State:		LS_WALK_BACK (16)
@@ -2452,39 +1708,6 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 16*/
-	/*collision: lara_col_back*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	if (!Lara.isMoving)
-	{
-		if ((TrInput & IN_BACK) && ((TrInput & IN_WALK) || Lara.waterStatus == LW_WADE))
-			item->goalAnimState = LS_WALK_BACK;
-		else
-			item->goalAnimState = LS_STOP;
-
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
-		}
-	}
-}
-
 // State:		LS_WALK_BACK (16)
 // Control:		lara_as_back()
 void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
@@ -2526,47 +1749,6 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-}
-
-// LEGACY
-void old_lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 16*/
-	/*state code: lara_as_back*/
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
-
-	if (Lara.waterStatus == LW_WADE)
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-	else
-		coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (LaraHitCeiling(item, coll))
-		return;
-
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
-	if (LaraFallen(item, coll))
-		return;
-
-	if (coll->Middle.Floor > STEP_SIZE / 2 && coll->Middle.Floor < STEPUP_HEIGHT)
-	{
-		item->goalAnimState = LS_STEP_BACK_DOWN;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
-	}
-
-	if (TestLaraSlide(item, coll))
-		return;
-
-	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_TURN_RIGHT_FAST (20)
@@ -2696,41 +1878,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_turn_right_fast()
 void lara_col_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_stop(item, coll);
-}
-
-// LEGACY
-void lara_as_fastturn(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 20*/
-	/*collision: lara_col_fastturn*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	if (Lara.turnRate < 0)
-	{
-		Lara.turnRate = -LARA_FAST_TURN;
-
-		if (!(TrInput & IN_LEFT))
-			item->goalAnimState = LS_STOP;
-	}
-	else
-	{
-		Lara.turnRate = LARA_FAST_TURN;
-
-		if (!(TrInput & IN_RIGHT))
-			item->goalAnimState = LS_STOP;
-	}
-}
-
-// LEGACY
-void lara_col_fastturn(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 20*/
-	/*state code: lara_as_fastturn*/
 	lara_col_stop(item, coll);
 }
 
@@ -2901,46 +2048,11 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 21*/
-	/*collision: lara_col_stepright*/
-	Lara.look = false;
-
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	if (!Lara.isMoving)
-	{
-		if (!(TrInput & IN_RSTEP))
-		{
-			item->goalAnimState = LS_STOP;
-		}
-
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
-		}
-	}
-}
-
 // State:		LS_STEP_RIGHT (21)
 // Control:		lara_as_stepright()
 void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
 	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
 	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
 	coll->Setup.BadCeilingHeight = 0;
@@ -2976,43 +2088,6 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraStep(item, coll);
 
 		return;
-	}
-}
-
-// LEGACY
-void old_lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 21*/
-	/*state code: lara_as_stepright*/
-	if (item->currentAnimState == LS_STEP_RIGHT)
-		Lara.moveAngle = item->pos.yRot + ANGLE(90);
-	else
-		Lara.moveAngle = item->pos.yRot - ANGLE(90);
-
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
-	if (Lara.waterStatus == LW_WADE)
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-	else
-		coll->Setup.BadHeightDown = 128;
-
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.SlopesArePits = true;
-
-	coll->Setup.BadHeightUp = -128;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (!LaraHitCeiling(item, coll))
-	{
-		if (LaraDeflectEdge(item, coll))
-			LaraCollideStop(item, coll);
-
-		if (!LaraFallen(item, coll) && !TestLaraSlide(item, coll) && coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
 	}
 }
 
@@ -3055,46 +2130,11 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 22*/
-	/*collision: lara_col_stepleft*/
-	Lara.look = false;
-
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	if (!Lara.isMoving)
-	{
-		if (!(TrInput & IN_LSTEP))
-		{
-			item->goalAnimState = LS_STOP;
-		}
-
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
-		}
-	}
-}
-
 // State:		LS_STEP_LEFT (22)
 // Control:		lara_as_stepleft()
 void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
 	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
 	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
 	coll->Setup.BadCeilingHeight = 0;
@@ -3131,14 +2171,6 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-}
-
-// LEGACY
-void old_lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 22*/
-	/*state code: lara_as_stepleft*/
-	lara_col_stepright(item, coll);
 }
 
 // State:		LS_ROLL_BACK(23)
@@ -3210,44 +2242,6 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-}
-
-// LEGACY
-void old_lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 23*/
-	/*state code: lara_void_func*/
-	Camera.laraNode = 0;
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
-
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (LaraHitCeiling(item, coll))
-		return;
-	if (TestLaraSlide(item, coll))
-		return;
-
-	if (coll->Middle.Floor > 200)
-	{
-		SetAnimation(item, LA_FALL_BACK);
-		item->fallspeed = 0;
-		item->gravityStatus = true;
-		return;
-	}
-
-	ShiftItem(item, coll);
-
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
 }
 
 void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -3538,46 +2532,6 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// LEGACY
-void old_lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 45*/
-	/*state code: lara_void_func*/
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = false;
-	coll->Setup.SlopesAreWalls = true;
-
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (LaraHitCeiling(item, coll))
-		return;
-	if (TestLaraSlide(item, coll))
-		return;
-	if (LaraFallen(item, coll))
-		return;
-
-	//##LUA debug etc.
-	Lara.NewAnims.SwandiveRollRun = 1;
-
-	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && Lara.NewAnims.SwandiveRollRun)
-	{
-		item->goalAnimState = LS_RUN_FORWARD;
-	}
-
-	ShiftItem(item, coll);
-
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
-}
-
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 52*/
@@ -3759,76 +2713,6 @@ void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_STOP;
 }
 
-// LEGACY
-void old_lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 65*/
-	/*collision: lara_col_wade*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_STOP;
-		return;
-	}
-
-	Camera.targetElevation = -ANGLE(22.0f);
-
-	if (TestLaraSwamp(item))
-	{
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
-
-			DoLaraLean(item, coll, -LARA_LEAN_MAX / 2, 16);
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
-
-			DoLaraLean(item, coll, LARA_LEAN_MAX / 2, 16);
-		}
-
-		if (TrInput & IN_FORWARD)
-			item->goalAnimState = LS_WADE_FORWARD;
-		else
-			item->goalAnimState = LS_STOP;
-	}
-	else
-	{
-		if (TrInput & IN_LEFT)
-		{
-			Lara.turnRate -= LARA_TURN_RATE;
-			if (Lara.turnRate < -LARA_FAST_TURN)
-				Lara.turnRate = -LARA_FAST_TURN;
-
-			DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			Lara.turnRate += LARA_TURN_RATE;
-			if (Lara.turnRate > LARA_FAST_TURN)
-				Lara.turnRate = LARA_FAST_TURN;
-
-			DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
-		}
-
-		if (TrInput & IN_FORWARD)
-		{
-			if (Lara.waterStatus == LW_ABOVE_WATER)
-				item->goalAnimState = LS_RUN_FORWARD;
-			else
-				item->goalAnimState = LS_WADE_FORWARD;
-		}
-		else
-		{
-			item->goalAnimState = LS_STOP;
-		}
-	}
-}
-
 // State:		LS_WADE_FORWARD (65)
 // Control:		lara_as_wade()
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
@@ -3888,59 +2772,6 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	
 	LaraSnapToHeight(item, coll);*/
-}
-
-// LEGACY
-void old_lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 65*/
-	/*state code: lara_as_wade*/
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.SlopesAreWalls = true;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (LaraHitCeiling(item, coll))
-		return;
-
-	if (TestLaraVault(item, coll))
-		return;
-
-	if (LaraDeflectEdge(item, coll))
-	{
-		item->pos.zRot = 0;
-
-
-		if (!coll->Front.Slope && coll->Front.Floor < -((STEP_SIZE * 5) / 2) && !TestLaraSwamp(item))
-		{
-			item->goalAnimState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->animNumber]))
-				return;
-		}
-
-		LaraCollideStop(item, coll);
-	}
-
-
-	if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !TestLaraSwamp(item))
-	{
-		item->goalAnimState = LS_STEP_UP;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
-	}
-
-	if (coll->Middle.Floor >= 50 && !TestLaraSwamp(item))
-	{
-		item->pos.yPos += 50;
-		return;
-	}
-
-	LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_SPRINT (73)
@@ -4005,68 +2836,6 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_STOP;
-}
-
-// LEGACY
-void old_lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 73*/
-	/*collision: lara_col_dash*/
-	if (item->hitPoints <= 0 || !Lara.sprintTimer || !(TrInput & IN_SPRINT) || Lara.waterStatus == LW_WADE)
-	{
-		item->goalAnimState = LS_RUN_FORWARD;
-		return;
-	}
-
-	Lara.sprintTimer--;
-
-	if (TrInput & IN_DUCK
-		&& (Lara.gunStatus == LG_NO_ARMS
-			|| Lara.gunType == WEAPON_NONE
-			|| Lara.gunType == WEAPON_PISTOLS
-			|| Lara.gunType == WEAPON_REVOLVER
-			|| Lara.gunType == WEAPON_UZI
-			|| Lara.gunType == WEAPON_FLARE))
-	{
-		item->goalAnimState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
-
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
-
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
-	}
-
-	if (!(TrInput & IN_JUMP) || item->gravityStatus)
-	{
-		if (TrInput & IN_FORWARD)
-		{
-			if (TrInput & IN_WALK)
-				item->goalAnimState = LS_WALK_FORWARD;
-			else
-				item->goalAnimState = LS_SPRINT;
-		}
-		else if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
-		{
-			item->goalAnimState = LS_STOP;
-		}
-	}
-	else
-	{
-		item->goalAnimState = LS_SPRINT_ROLL;
-	}
 }
 
 // State:		LS_SPRINT (73)
@@ -4147,69 +2916,6 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 	//}
 }
 
-// LEGACY
-void old_lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 73*/
-	/*state code: lara_as_dash*/
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	coll->Setup.SlopesAreWalls = true;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (!LaraHitCeiling(item, coll) && !TestLaraVault(item, coll))
-	{
-		if (LaraDeflectEdge(item, coll))
-		{
-			item->pos.zRot = 0;
-
-			if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
-			{
-				item->goalAnimState = LS_SPLAT;
-				if (GetChange(item, &g_Level.Anims[item->animNumber]))
-				{
-					item->currentAnimState = LS_SPLAT;
-					return;
-				}
-			}
-
-			LaraCollideStop(item, coll);
-		}
-
-		if (!LaraFallen(item, coll))
-		{
-			if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
-			{
-				item->goalAnimState = LS_STEP_UP;
-				GetChange(item, &g_Level.Anims[item->animNumber]);
-			}
-
-			if (!TestLaraSlide(item, coll))
-			{
-				if (coll->Middle.Floor < 50)
-				{
-					if (coll->Middle.Floor != NO_HEIGHT)
-						item->pos.yPos += coll->Middle.Floor;
-				}
-				else
-				{
-					item->goalAnimState = LS_STEP_DOWN; // for theoretical sprint stepdown anims, not in default anims
-					if (GetChange(item, &g_Level.Anims[item->animNumber]))
-						item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
-					else
-						item->pos.yPos += 50; // do the default aligment
-				}
-			}
-		}
-	}
-}
-
 // State:		LS_SPRINT_ROLL (74)
 // Collision:	lara_col_dashdive()
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
@@ -4239,18 +2945,6 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->goalAnimState = LS_FREEFALL;
 	}
-}
-
-// LEGACY
-void old_lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 74*/
-	/*collision: lara_col_dashdive*/
-	if (item->goalAnimState != LS_DEATH &&
-		item->goalAnimState != LS_STOP &&
-		item->goalAnimState != LS_RUN_FORWARD &&
-		item->fallspeed > LARA_FREEFALL_SPEED)
-		item->goalAnimState = LS_FREEFALL;
 }
 
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
