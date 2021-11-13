@@ -10,6 +10,7 @@ namespace TEN::Renderer {
 		ComPtr<ID3D11Buffer> Buffer;
 		VertexBuffer() {};
 		VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices);
+		bool Fill(std::vector<RendererVertex> data);
 	};
 
 }

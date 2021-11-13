@@ -28,7 +28,7 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 	if (isBillboard) {
-		output.Position = mul(mul(float4(input.Position, 1.0f),billboardMatrix), ViewProjection);
+		output.Position = mul(mul(float4(input.Position, 1.0f), billboardMatrix), ViewProjection);
 	} else {
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
 	}
@@ -42,6 +42,6 @@ PixelShaderInput VS(VertexShaderInput input)
 
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
-	float4 output = Texture.Sample(Sampler, input.UV)*input.Color;
+	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 	return output;
 }

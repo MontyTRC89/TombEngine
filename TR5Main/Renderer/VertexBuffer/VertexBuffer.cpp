@@ -3,6 +3,7 @@
 #include "Renderer11.h"
 namespace TEN::Renderer {
 	using namespace TEN::Renderer::Utils;
+
 	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices) {
 		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};
@@ -17,4 +18,8 @@ namespace TEN::Renderer {
 		throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 	}
 
+	bool VertexBuffer::Fill(std::vector<RendererVertex> data)
+	{
+		return true;
+	}
 }
