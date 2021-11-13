@@ -5,11 +5,11 @@
 namespace TEN::Renderer {
 	struct RenderView;
 	struct RendererSprite;
+
 	struct RendererSpriteToDraw
 	{
 		RENDERER_SPRITE_TYPE Type;
 		RendererSprite* Sprite;
-		float Distance;
 		float Scale;
 		DirectX::SimpleMath::Vector3 pos;
 		DirectX::SimpleMath::Vector3 vtx1;

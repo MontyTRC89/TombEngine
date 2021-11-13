@@ -117,6 +117,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_dynamicLights = createVector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
 	m_lines3DToDraw = createVector<RendererLine3D*>(MAX_LINES_3D);
 	m_lines2DToDraw = createVector<RendererLine2D*>(MAX_LINES_2D);
+	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
 
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
@@ -275,7 +276,7 @@ void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	if (FAILED(res))
 		return false;*/
 
-		// Initialise viewport
+	// Initialise viewport
 	m_viewport.TopLeftX = 0;
 	m_viewport.TopLeftY = 0;
 	m_viewport.Width = w;

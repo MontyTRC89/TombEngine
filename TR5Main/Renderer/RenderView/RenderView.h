@@ -7,12 +7,15 @@
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "memory\LinearArrayBuffer.h"
 #include "RendererSprites.h"
+#include "RendererTransparentFace.h"
+
 namespace TEN::Renderer {
 	struct RendererStatic;
 	struct RendererItem;
 	struct RendererLight;
 	struct RendererEffect;
 	struct RendererRoom;
+	struct RendererTransparentFace;
 	constexpr auto MAX_ROOMS_DRAW = 256;
 	constexpr auto MAX_STATICS_DRAW = 128;
 	constexpr auto MAX_EFFECTS_DRAW = 16;
@@ -44,6 +47,7 @@ namespace TEN::Renderer {
 		std::vector<RendererItem*> itemsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
 		std::vector<RendererSpriteToDraw> spritesToDraw;
+		std::vector<RendererTransparentFace> transparentFaces;
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);
