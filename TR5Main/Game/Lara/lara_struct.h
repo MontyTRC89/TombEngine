@@ -1050,7 +1050,7 @@ struct LaraInfo
 	bool flareControlLeft;
 	bool look;
 	bool burn;
-	bool keepDucked;
+	bool keepCrouched;
 	bool isMoving;
 	bool canMonkeySwing;
 	byte burnBlue;
