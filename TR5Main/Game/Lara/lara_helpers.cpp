@@ -49,7 +49,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:
 	// 1) comment everything below except the first and last conditions,
 	// 2) uncomment the legacy blocks of code in run, sprint, and wade forward collision functions, and
-	// 3) comment the blocks above them which this function. @Sezz 2021.11.13
+	// 3) comment the blocks above them which call this function. @Sezz 2021.11.13
 	int div = 2;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
