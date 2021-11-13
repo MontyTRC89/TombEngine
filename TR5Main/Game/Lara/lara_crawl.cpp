@@ -1301,7 +1301,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_BACK)
 		{
 			// TODO: Not quite working.
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
+			/*if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
 				DoLaraCrawlToHangSnap(item, coll);
@@ -1309,9 +1309,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll) &&
-				coll->CollisionType != CT_FRONT &&
-				coll->CollisionType != CT_TOP_FRONT) [[likely]]
+			else [[likely]]*/
 			{
 				item->goalAnimState = LS_CRAWL_BACK;
 
