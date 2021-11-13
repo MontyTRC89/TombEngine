@@ -1422,7 +1422,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t flare_control_left = 0;
   bool look = false;
   bool burn = false;
-  bool keep_ducked = false;
+  bool keep_crouched = false;
   bool is_moving = false;
   bool can_monkey_swing = false;
   int32_t burn_blue = 0;
@@ -1714,7 +1714,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool burn() const {
     return GetField<uint8_t>(VT_BURN, 0) != 0;
   }
-  bool keep_ducked() const {
+  bool keep_crouched() const {
     return GetField<uint8_t>(VT_KEEP_DUCKED, 0) != 0;
   }
   bool is_moving() const {
@@ -2184,8 +2184,8 @@ struct LaraBuilder {
   void add_burn(bool burn) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN, static_cast<uint8_t>(burn), 0);
   }
-  void add_keep_ducked(bool keep_ducked) {
-    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_DUCKED, static_cast<uint8_t>(keep_ducked), 0);
+  void add_keep_crouched(bool keep_crouched) {
+    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_DUCKED, static_cast<uint8_t>(keep_crouched), 0);
   }
   void add_is_moving(bool is_moving) {
     fbb_.AddElement<uint8_t>(Lara::VT_IS_MOVING, static_cast<uint8_t>(is_moving), 0);
@@ -2463,7 +2463,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_ducked = false,
+    bool keep_crouched = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
@@ -2649,7 +2649,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_can_monkey_swing(can_monkey_swing);
   builder_.add_is_moving(is_moving);
-  builder_.add_keep_ducked(keep_ducked);
+  builder_.add_keep_crouched(keep_crouched);
   builder_.add_burn(burn);
   builder_.add_look(look);
   return builder_.Finish();
@@ -2694,7 +2694,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_ducked = false,
+    bool keep_crouched = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
@@ -2818,7 +2818,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       flare_control_left,
       look,
       burn,
-      keep_ducked,
+      keep_crouched,
       is_moving,
       can_monkey_swing,
       burn_blue,
@@ -5107,7 +5107,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = flare_control_left(); _o->flare_control_left = _e; }
   { auto _e = look(); _o->look = _e; }
   { auto _e = burn(); _o->burn = _e; }
-  { auto _e = keep_ducked(); _o->keep_ducked = _e; }
+  { auto _e = keep_crouched(); _o->keep_crouched = _e; }
   { auto _e = is_moving(); _o->is_moving = _e; }
   { auto _e = can_monkey_swing(); _o->can_monkey_swing = _e; }
   { auto _e = burn_blue(); _o->burn_blue = _e; }
@@ -5227,7 +5227,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _flare_control_left = _o->flare_control_left;
   auto _look = _o->look;
   auto _burn = _o->burn;
-  auto _keep_ducked = _o->keep_ducked;
+  auto _keep_crouched = _o->keep_crouched;
   auto _is_moving = _o->is_moving;
   auto _can_monkey_swing = _o->can_monkey_swing;
   auto _burn_blue = _o->burn_blue;
@@ -5339,7 +5339,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _flare_control_left,
       _look,
       _burn,
-      _keep_ducked,
+      _keep_crouched,
       _is_moving,
       _can_monkey_swing,
       _burn_blue,
