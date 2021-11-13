@@ -232,7 +232,14 @@ namespace TEN::Renderer
 				for (int p = 0; p < levelBucket->polygons.size(); p++)
 				{
 					POLYGON* poly = &levelBucket->polygons[p];
+					RendererPolygon newPoly;
 
+					newPoly.shape = poly->shape;
+					newPoly.centre = (
+						room->positions[poly->indices[0]] +
+						room->positions[poly->indices[1]] +
+						room->positions[poly->indices[2]]) / 3.0f;
+					
 					int baseVertices = lastVertex;
 
 					for (int k = 0; k < poly->indices.size(); k++)
@@ -270,6 +277,13 @@ namespace TEN::Renderer
 						bucket.Indices[lastIndex + 4] = baseVertices + 3; //.push_back(baseVertices + 3);
 						bucket.Indices[lastIndex + 5] = baseVertices + 1; //.push_back(baseVertices + 1);
 
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
+
 						lastIndex += 6;
 						totalRoomsIndices += 6;
 					}
@@ -279,9 +293,16 @@ namespace TEN::Renderer
 						bucket.Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
 						bucket.Indices[lastIndex + 2] = baseVertices + 2; //.push_back(baseVertices + 2);
 
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
+						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
+
 						lastIndex += 3;
 						totalRoomsIndices += 3;
 					}
+
+					bucket.Polygons.push_back(newPoly);
+
 				}
 				r->buckets.push_back(bucket);
 				

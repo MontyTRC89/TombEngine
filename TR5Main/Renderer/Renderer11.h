@@ -32,6 +32,7 @@
 #include <d3d9types.h>
 
 struct CAMERA_INFO;
+
 namespace TEN::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
@@ -41,7 +42,7 @@ namespace TEN::Renderer
 	//constexpr auto MAX_LIGHTS_DRAW = 16384;
 	constexpr auto MAX_DYNAMIC_LIGHTS = 16384;
 	constexpr auto MAX_DRAW_STATICS = 16384;
-	constexpr auto MAX_Bones = 32;
+	constexpr auto MAX_BONES = 32;
 	constexpr auto MAX_SPRITES = 16384;
 	constexpr auto REFERENCE_RES_WIDTH = 800;
 	constexpr auto REFERENCE_RES_HEIGHT = 450;
@@ -150,7 +151,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight> Lights;
 		std::vector<RendererStatic> Statics;
 		bool Visited;
-		float Distance;
+		int Distance;
 		int RoomNumber;
 	};
 	
@@ -205,8 +206,6 @@ namespace TEN::Renderer
 	
 		~RendererObject()
 		{
-			/*for (int i = 0; i < ObjectMeshes.size(); i++)
-				delete ObjectMeshes[i];*/
 			for (int i = 0; i < LinearizedBones.size(); i++)
 				delete LinearizedBones[i];
 		}
@@ -406,6 +405,7 @@ namespace TEN::Renderer
 		IndexBuffer m_moveablesIndexBuffer;
 		VertexBuffer m_staticsVertexBuffer;
 		IndexBuffer m_staticsIndexBuffer;
+		VertexBuffer m_transparentFacesVertexBuffer;
 		std::vector<RendererRoom> m_rooms;
 		DirectX::SimpleMath::Matrix m_hairsMatrices[12];
 		short m_numHairVertices;
@@ -455,6 +455,7 @@ namespace TEN::Renderer
 		RendererLight m_lights[MAX_LIGHTS];
 		int m_nextLight;
 		int m_currentY;
+		std::vector<RendererTransparentFace> m_transparentFaces;
 
 		// Debug variables
 		int m_numDrawCalls = 0;
@@ -501,6 +502,8 @@ namespace TEN::Renderer
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
+		void drawRoomsTransparent(std::vector<RendererVertex> vertices, RendererRoom* room, int texture, bool animated, BLEND_MODES blendMode, bool doubleSided, RenderView& view);
+		//void drawSpritesTransparent(std::vector<RendererVertex> vertices, bool transparent, bool animated, BLEND_MODES blendMode, bool doubleSided);
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
@@ -520,6 +523,7 @@ namespace TEN::Renderer
 		void drawEffect(RenderView& view,RendererEffect* effect, bool transparent);
 		void drawSplahes(RenderView& view);
 		void drawSprites(RenderView& view);
+		void drawTransparentFaces(RenderView& view);
 		void drawLines3D(RenderView& view);
 		void drawLines2D();
 		void drawRects2D();

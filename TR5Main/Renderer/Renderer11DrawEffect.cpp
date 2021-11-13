@@ -664,161 +664,203 @@ namespace TEN::Renderer
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
 		for (auto& spr : view.spritesToDraw) {
-			Matrix billboardMatrix;
-			if(spr.BlendMode != currentBlendMode)
+			// Calculate matrices for sprites
+			Matrix spriteMatrix;
+			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+
+			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				currentBlendMode = spr.BlendMode;
-				setBlendMode(spr.BlendMode);
-			}
-			m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
-			ID3D11SamplerState* sampler = m_states->LinearClamp();
-			m_context->PSSetSamplers(0, 1, &sampler);
-			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				//Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
-				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				billboardMatrix = scale* /*rotation **/Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
-			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+			{
 				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
-
-				billboardMatrix = scale/**rotation*/ * Matrix::CreateConstrainedBillboard(
+				spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
 					nullptr,
 					&quadForward);
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
-			} else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Matrix translation = Matrix::CreateTranslation(spr.pos);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
-
-				billboardMatrix = scale * rotation * translation;
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
-			}else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Vector3 p0t = spr.vtx1;
-				Vector3 p1t = spr.vtx2;
-				Vector3 p2t = spr.vtx3;
-				Vector3 p3t = spr.vtx4;
-
-				RendererVertex v0;
-				v0.Position.x = p0t.x;
-				v0.Position.y = p0t.y;
-				v0.Position.z = p0t.z;
-				v0.UV.x = spr.Sprite->UV[0].x;
-				v0.UV.y = spr.Sprite->UV[0].y;
-				v0.Color = spr.color;
-
-				RendererVertex v1;
-				v1.Position.x = p1t.x;
-				v1.Position.y = p1t.y;
-				v1.Position.z = p1t.z;
-				v1.UV.x = spr.Sprite->UV[1].x;
-				v1.UV.y = spr.Sprite->UV[1].y;
-				v1.Color = spr.color;
-
-				RendererVertex v2;
-				v2.Position.x = p2t.x;
-				v2.Position.y = p2t.y;
-				v2.Position.z = p2t.z;
-				v2.UV.x = spr.Sprite->UV[2].x;
-				v2.UV.y = spr.Sprite->UV[2].y;
-				v2.Color = spr.color;
-
-				RendererVertex v3;
-				v3.Position.x = p3t.x;
-				v3.Position.y = p3t.y;
-				v3.Position.z = p3t.z;
-				v3.UV.x = spr.Sprite->UV[3].x;
-				v3.UV.y = spr.Sprite->UV[3].y;
-				v3.Color = spr.color;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = false;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_primitiveBatch->Begin();
-				m_primitiveBatch->DrawTriangle(v0, v1, v3);
-				m_primitiveBatch->DrawTriangle(v1, v2, v3);
-				m_primitiveBatch->End();
 			}
-			m_numDrawCalls++;
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+			{
+				Matrix translation = Matrix::CreateTranslation(spr.pos);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
+				spriteMatrix = scale * rotation * translation;
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+			{
+				spriteMatrix = Matrix::Identity;
+			}
+
+			if (spr.BlendMode == BLENDMODE_ALPHABLEND
+				|| spr.BlendMode == BLENDMODE_EXCLUDE
+				|| spr.BlendMode == BLENDMODE_LIGHTEN
+				|| spr.BlendMode == BLENDMODE_SCREEN
+				|| spr.BlendMode == BLENDMODE_SUBTRACTIVE
+				|| spr.BlendMode == BLENDMODE_NOZTEST)
+			{
+				// Collect sprites
+				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				RendererTransparentFace face;
+				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
+				face.sprite = &spr;
+				face.distance = distance;
+				face.world = spriteMatrix;
+				view.transparentFaces.push_back(face);
+			}
+			else
+			{
+				// Draw sprites immediately
+				if (spr.BlendMode != currentBlendMode)
+				{
+					currentBlendMode = spr.BlendMode;
+					setBlendMode(spr.BlendMode);
+				}
+				m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
+				ID3D11SamplerState* sampler = m_states->LinearClamp();
+				m_context->PSSetSamplers(0, 1, &sampler);
+				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					Vector3 p0t = spr.vtx1;
+					Vector3 p1t = spr.vtx2;
+					Vector3 p2t = spr.vtx3;
+					Vector3 p3t = spr.vtx4;
+
+					RendererVertex v0;
+					v0.Position.x = p0t.x;
+					v0.Position.y = p0t.y;
+					v0.Position.z = p0t.z;
+					v0.UV.x = spr.Sprite->UV[0].x;
+					v0.UV.y = spr.Sprite->UV[0].y;
+					v0.Color = spr.color;
+
+					RendererVertex v1;
+					v1.Position.x = p1t.x;
+					v1.Position.y = p1t.y;
+					v1.Position.z = p1t.z;
+					v1.UV.x = spr.Sprite->UV[1].x;
+					v1.UV.y = spr.Sprite->UV[1].y;
+					v1.Color = spr.color;
+
+					RendererVertex v2;
+					v2.Position.x = p2t.x;
+					v2.Position.y = p2t.y;
+					v2.Position.z = p2t.z;
+					v2.UV.x = spr.Sprite->UV[2].x;
+					v2.UV.y = spr.Sprite->UV[2].y;
+					v2.Color = spr.color;
+
+					RendererVertex v3;
+					v3.Position.x = p3t.x;
+					v3.Position.y = p3t.y;
+					v3.Position.z = p3t.z;
+					v3.UV.x = spr.Sprite->UV[3].x;
+					v3.UV.y = spr.Sprite->UV[3].y;
+					v3.Color = spr.color;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = false;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_primitiveBatch->Begin();
+					m_primitiveBatch->DrawTriangle(v0, v1, v3);
+					m_primitiveBatch->DrawTriangle(v1, v2, v3);
+					m_primitiveBatch->End();
+				}
+				m_numDrawCalls++;
+			}
 		}
 		//m_context->RSSetState(m_states->CullCounterClockwise());
 		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
