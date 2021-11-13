@@ -31,7 +31,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.13.21
 
-	Lara.keepDucked = TestLaraKeepDucked(item, coll); // TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. @Sezz 2021.10.14
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll); // TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. @Sezz 2021.10.14
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 
@@ -52,7 +52,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 		Lara.turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
 		Lara.waterStatus != LW_WADE)
 	{
 		// TODO: LUA
@@ -136,7 +136,7 @@ void old_lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 
 	if ((TrInput & IN_FORWARD || TrInput & IN_BACK)
-		&& (TrInput & IN_DUCK || Lara.keepDucked)
+		&& (TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.gunStatus == LG_NO_ARMS
 		&& Lara.waterStatus != LW_WADE
 		|| Lara.waterSurfaceDist == 256
@@ -155,7 +155,7 @@ void old_lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	}
 	else if ((TrInput & IN_SPRINT) /*crouch roll*/
-		&& (TrInput & IN_DUCK || Lara.keepDucked)
+		&& (TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.gunStatus == LG_NO_ARMS
 		&& Lara.waterStatus != LW_WADE
 		|| Lara.waterSurfaceDist == 256
@@ -181,7 +181,7 @@ void old_lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
@@ -236,14 +236,14 @@ void old_lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = TestLaraKeepDucked(item, coll);
+		Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 		ShiftItem(item, coll);
 
 		if (coll->Middle.Floor != NO_HEIGHT)
 			item->pos.yPos += coll->Middle.Floor;
 
 		if (TrInput & IN_DUCK && Lara.waterStatus != LW_WADE ||
-			Lara.keepDucked ||
+			Lara.keepCrouched ||
 			item->animNumber != LA_CROUCH_IDLE)
 		{
 			if (TrInput & IN_LEFT)
@@ -300,7 +300,7 @@ void old_lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot;
 	item->gravityStatus = 0;
@@ -378,7 +378,7 @@ void old_lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.gunStatus = LG_NO_ARMS;
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = TestLaraKeepDucked(item, coll);
+		Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 
 		if (coll->Middle.Floor < coll->Setup.BadHeightUp)//hit a wall, stop
 		{
@@ -415,7 +415,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.turnRate = -LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
 		Lara.waterStatus != LW_WADE)
 	{
 		if ((TrInput & IN_SPRINT) &&
@@ -488,7 +488,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
 		Lara.waterStatus != LW_WADE)
 	{
 		if ((TrInput & IN_SPRINT) &&
@@ -571,7 +571,7 @@ void old_lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = TestLaraKeepDucked(item, coll);
+		Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 		ShiftItem(item, coll);
 
 		if (coll->Middle.Floor != NO_HEIGHT)
@@ -611,7 +611,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: LUA
 	Lara.NewAnims.CrawlExtended = true;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
 		Lara.waterStatus != LW_WADE)
 	{
 		// TODO: Not all weapons are classified as standing weapons??
@@ -862,7 +862,7 @@ void old_lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot;
 	Lara.torsoXrot = 0; // TODO: More pleasing reset. @Sezz 2021.10.28
@@ -927,13 +927,13 @@ void old_lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			int slope = abs(coll->FrontLeft.Floor - coll->FrontRight.Floor);
 
-			Lara.keepDucked = TestLaraKeepDucked(item, coll);
+			Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 			ShiftItem(item, coll);
 
 			if (coll->Middle.Floor != NO_HEIGHT && coll->Middle.Floor > -256)
 				item->pos.yPos += coll->Middle.Floor;
 
-			if (TrInput & IN_DUCK || Lara.keepDucked &&
+			if (TrInput & IN_DUCK || Lara.keepCrouched &&
 				(!(TrInput & IN_FLARE) && !(TrInput & IN_DRAW) || TrInput & IN_FORWARD) &&
 				Lara.waterStatus != LW_WADE)
 			{
@@ -1047,7 +1047,7 @@ void old_lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -1081,7 +1081,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked) &&
+	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
 		Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -1140,7 +1140,7 @@ void old_lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(23.0f);
 
 	if (TrInput & IN_FORWARD
-		&& (TrInput & IN_DUCK || Lara.keepDucked)
+		&& (TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_LEFT)
@@ -1168,7 +1168,7 @@ void old_lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot;
 	Lara.torsoXrot = 0;
@@ -1295,7 +1295,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.torsoZrot = Lara.headZrot;*/
 	}
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked)
+	if ((TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
@@ -1329,7 +1329,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepDucked = TestLaraKeepDucked(item, coll);
+	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
 	Lara.isDucked = true;
 	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
@@ -1440,7 +1440,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.turnRate = -LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked)
+	if ((TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -1531,7 +1531,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepDucked)
+	if ((TrInput & IN_DUCK || Lara.keepCrouched)
 		&& Lara.waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))

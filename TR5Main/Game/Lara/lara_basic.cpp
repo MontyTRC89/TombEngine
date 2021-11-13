@@ -1539,7 +1539,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -2649,7 +2649,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -2812,7 +2812,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
 		Lara.waterStatus != LW_WADE)
 	{
@@ -4033,7 +4033,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepDucked(coll)*/) &&
+	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
 		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
