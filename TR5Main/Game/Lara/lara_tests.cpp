@@ -1887,10 +1887,11 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(180.0f), LARA_RAD_CRAWL * sqrt(2) + 4, 0);
+	auto objectCollided = TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD_CRAWL * sqrt(2) + 4, 0);
 
-	if (!TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), LARA_RAD_CRAWL * sqrt(2) + 4, 0) &&		// No obstruction.
-		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&											// Highest floor bound.
-		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&								// Gap is optically feasible for action.
+	if (!objectCollided &&														// No obstruction.
+		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&					// Highest floor bound.
+		(probe.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&		// Gap is optically feasible for action.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
