@@ -1193,8 +1193,8 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
 
 	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
-		probe.Position.Floor - y >= -STEPUP_HEIGHT &&
-		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))
+		probe.Position.Floor - y >= -STEPUP_HEIGHT &&									// Highest floor bound.
+		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))		// Lowest ceiling bound.
 	{
 		return true;
 	}
