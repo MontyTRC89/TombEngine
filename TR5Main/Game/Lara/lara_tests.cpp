@@ -1594,7 +1594,8 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
+	if (!TestLaraSwamp(item) &&
+		Lara.gunStatus == LG_NO_ARMS &&								// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(Lara.gunType != WEAPON_FLARE || Lara.flareAge > 0) &&		// Flare is not being handled. TODO: Will she pose with weapons drawn?
 		Lara.Vehicle == NO_ITEM)									// Not in a vehicle.
