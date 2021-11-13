@@ -174,13 +174,12 @@ namespace TEN::Entities::TR4
 		item->pos.yPos += item->speed * phd_sin(item->pos.xRot);
 		item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
 
-		IsRoomOutsideNo = NO_ROOM;
-		IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		if (item->roomNumber != IsRoomOutsideNo && IsRoomOutsideNo != NO_ROOM)
+		auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (item->roomNumber != outsideRoom && outsideRoom != NO_ROOM)
 		{
-			ItemNewRoom(itemNumber, IsRoomOutsideNo);
+			ItemNewRoom(itemNumber, outsideRoom);
 
-			ROOM_INFO* r = &g_Level.Rooms[IsRoomOutsideNo];
+			auto r = &g_Level.Rooms[outsideRoom];
 			short linkNum = NO_ITEM;
 			for (linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
 			{

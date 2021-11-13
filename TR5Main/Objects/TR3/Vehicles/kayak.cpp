@@ -1205,7 +1205,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			CreateFlare(ID_FLARE_ITEM, 0);
+			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = 0;
 			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
