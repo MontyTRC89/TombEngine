@@ -116,7 +116,7 @@ namespace TEN::Entities::Generic
 				else if (Lara.leftArm.frameNumber == 12)
 				{
 					Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-					CreateFlare(ID_BURNING_TORCH_ITEM, 1);
+					CreateFlare(LaraItem, ID_BURNING_TORCH_ITEM, 1);
 				}
 			}
 
@@ -136,7 +136,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.leftArm.frameNumber == 36)
 			{
 				Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-				CreateFlare(ID_BURNING_TORCH_ITEM, 0);
+				CreateFlare(LaraItem, ID_BURNING_TORCH_ITEM, 0);
 			}
 			break;
 		case 3:
@@ -180,7 +180,7 @@ namespace TEN::Entities::Generic
 	void GetFlameTorch()
 	{
 		if (Lara.gunType == WEAPON_FLARE)
-			CreateFlare(ID_FLARE_ITEM, 0);
+			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 
 		Lara.requestGunType = WEAPON_TORCH;
 		Lara.gunType = WEAPON_TORCH;

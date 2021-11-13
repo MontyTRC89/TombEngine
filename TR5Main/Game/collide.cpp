@@ -65,7 +65,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 									if (!radius)
 									{
 										collidedItems[0] = NULL;
-										return 1;
+										return true;
 									}
 								}
 							}
@@ -153,7 +153,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 							{
 								collidedItems[numItems++] = item;
 								if (!radius)
-									return 1;
+									return true;
 							}
 						}
 					}
@@ -1820,7 +1820,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
-			// MAGIC: Force slight push-out to the left side to avoid stucking
+			// HACK: Force slight push-out to the left side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
@@ -1871,7 +1871,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
-			// MAGIC: Force slight push-out to the right side to avoid stucking
+			// HACK: Force slight push-out to the right side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;

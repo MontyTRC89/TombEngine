@@ -147,7 +147,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			CreateFlare(ID_FLARE_ITEM, 0);
+			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = false;
 			Lara.requestGunType = WEAPON_NONE;

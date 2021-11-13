@@ -1200,7 +1200,11 @@ void InventoryClass::handle_control_settings_input(bool pause)
 				{
 					if (selectedKey != DIK_ESCAPE)
 					{
-						KeyboardLayout[1][title_selected_option - 1] = selectedKey;
+						if (pause)
+							KeyboardLayout[1][pause_selected_option] = selectedKey;
+						else
+							KeyboardLayout[1][title_selected_option] = selectedKey;
+
 						DefaultConflict();
 						DbInput = 0;
 						CurrentSettings.waitingForkey = false;
@@ -1209,10 +1213,18 @@ void InventoryClass::handle_control_settings_input(bool pause)
 				}
 			}
 
-			g_Renderer.renderTitle();
-			Camera.numberFrames = g_Renderer.SyncRenderer();
-			int nframes = Camera.numberFrames;
-			ControlPhase(nframes, 0);
+			if (pause)
+			{
+				g_Renderer.renderInventory();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+			}
+			else
+			{
+				g_Renderer.renderTitle();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+				int nframes = Camera.numberFrames;
+				ControlPhase(nframes, 0);
+			}
 
 			SetDebounce = true;
 			S_UpdateInput();
