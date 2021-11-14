@@ -75,7 +75,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_back,//16
 	lara_as_swim,//17
 	lara_as_glide,//18
-	lara_as_null,//19
+	lara_as_controlledl,//19
 	lara_as_turn_right_fast,//20
 	lara_as_stepright,//21
 	lara_as_stepleft,//22
@@ -143,8 +143,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crawl_turn_left,//84
 	lara_as_crawl_turn_right,//85
 	lara_as_crawl_back,//86
-	lara_as_null,
-	lara_as_null,
+	lara_as_controlledl,
+	lara_as_controlledl,
 	lara_as_controlled,
 	lara_as_ropel,
 	lara_as_roper,
