@@ -516,7 +516,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	ANIM_FRAME* frame;
 
 	auto delta = 0;
-	auto flag = 0;
+	auto flag = false;
 	auto angle = Lara.moveAngle;
 
 	if (angle == (short) (item->pos.yRot - ANGLE(90.0f)))
@@ -530,7 +530,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto hdif = LaraFloorFront(item, angle, coll->Setup.Radius);
 	if (hdif < 200)
-		flag = 1;
+		flag = true;
 
 	auto cdif = LaraCeilingFront(item, angle, coll->Setup.Radius, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
@@ -599,12 +599,12 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			coll->Front.Floor <= 0)
 		{
 			if (flag && hdif > 0 && delta > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor)
-				flag = 0;
+				flag = false;
 
 			frame = (ANIM_FRAME*)GetBoundsAccurate(item);
 			auto front = coll->Front.Floor;
 			auto dfront = coll->Front.Floor - frame->boundingBox.Y1;
-			auto flag2 = 0;
+			auto flag2 = false;
 			auto x = item->pos.xPos;
 			auto z = item->pos.zPos;
 
@@ -624,7 +624,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			else if (!TestValidLedge(item, coll, true))
 			{
 				if (delta < 0 && coll->FrontLeft.Floor != coll->Front.Floor || delta > 0 && coll->FrontRight.Floor != coll->Front.Floor)
-					flag2 = 1;
+					flag2 = true;
 			}
 
 			coll->Front.Floor = front;
@@ -635,8 +635,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				!flag && 
 				!coll->HitStatic && 
 				cdif <= -950 && 
-				dfront >= -60 &&
-				dfront <= 60 &&
+				dfront >= -SLOPE_DIFFERENCE &&
+				dfront <= SLOPE_DIFFERENCE &&
 				TestValidLedgeAngle(item, coll))
 			{
 				if (item->speed != 0)
@@ -661,6 +661,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
 
+				item->pos.yPos += dfront;
 				result = true;
 			}
 		}
@@ -819,7 +820,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
 	// Difference between two indicates difference in height between ledges.
-	auto frontFloor = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius + STEP_SIZE / 2) + item->pos.yPos;
+	auto frontFloor = LaraCollisionAboveFront(item, Lara.moveAngle, coll->Setup.Radius + STEP_SIZE / 2, LARA_HEIGHT).Position.Floor;
 	auto laraUpperBound = item->pos.yPos - coll->Setup.Height;
 
 	// If difference is above 1/2 click, return false (ledge is out of reach).
