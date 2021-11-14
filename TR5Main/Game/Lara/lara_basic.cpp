@@ -525,6 +525,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		if (TrInput & IN_SPRINT ||
+			info->turnRate <= -LARA_SLOW_TURN ||
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE)) // Why are these weapons??? @Sezz 2021.10.10
 		{
@@ -538,6 +539,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_SPRINT ||
+			info->turnRate >= LARA_SLOW_TURN ||
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
