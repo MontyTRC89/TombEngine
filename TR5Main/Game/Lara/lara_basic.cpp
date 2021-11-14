@@ -41,7 +41,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
 }
@@ -61,13 +61,15 @@ void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 
 	if (item->frameNumber == TestLastFrame(item, item->animNumber) - 1)
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 
 		if (UseForcedFixedCamera)
 			UseForcedFixedCamera = 0;
@@ -76,7 +78,9 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 }
@@ -89,6 +93,8 @@ void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_walk()
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -97,30 +103,30 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Implement item alignment properly. @Sezz 2021.11.01
-	if (Lara.isMoving)
+	if (info->isMoving)
 		return;
 
 	// TODO: If stopping and holding WALK without FORWARD, Lara can't turn. @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, 10);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, 10);
 	}
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
+		if (info->waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK) [[likely]]
 			item->goalAnimState = LS_WALK_FORWARD;
@@ -137,7 +143,9 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_walk_forward()
 void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
@@ -146,7 +154,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -191,6 +199,8 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_run()
 void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -200,17 +210,17 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_FAST_TURN)
+			info->turnRate = -LARA_FAST_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_FAST_TURN)
+			info->turnRate = LARA_FAST_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
 	}
@@ -235,7 +245,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if ((TrInput & IN_JUMP || commitToJump) &&
 		!item->gravityStatus &&
-		Lara.waterStatus != LW_WADE)
+		info->waterStatus != LW_WADE)
 	{
 		commitToJump = TrInput & IN_FORWARD;
 
@@ -249,8 +259,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_SPRINT &&
-		Lara.sprintTimer &&
-		Lara.waterStatus != LW_WADE)
+		info->sprintTimer &&
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_SPRINT;
 
@@ -258,7 +268,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		Lara.waterStatus != LW_WADE)
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -266,8 +276,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_DUCK &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE)
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)) &&
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -276,7 +286,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
+		if (info->waterStatus == LW_WADE)
 			item->goalAnimState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
@@ -293,12 +303,14 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_run()
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
 
@@ -379,7 +391,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->look = ((TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
+	info->look = ((TestLaraSwamp(item) && info->waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
@@ -398,26 +410,26 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (TrInput & IN_LOOK && Lara.look)
+	if (TrInput & IN_LOOK && info->look)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 	}
 	else if (TrInput & IN_RIGHT &&
 		!(TrInput & IN_JUMP))
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 	}
 
 	// TODO: Refine this handling. Create LS_WADE_IDLE state? Might complicate things. @Sezz 2021.09.28
-	if (Lara.waterStatus == LW_WADE)
+	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
 			LaraSwampStop(item, coll);
@@ -443,7 +455,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_DUCK &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -513,8 +525,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		if (TrInput & IN_SPRINT ||
-			(Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH) ||
-			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE)) // Why are these weapons??? @Sezz 2021.10.10
+			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
+			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE)) // Why are these weapons??? @Sezz 2021.10.10
 		{
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		}
@@ -526,8 +538,8 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_SPRINT ||
-			(Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH) ||
-			(Lara.gunStatus == LG_DRAW_GUNS && Lara.gunType != WEAPON_FLARE))
+			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
+			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		}
@@ -541,11 +553,11 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Without animation blending, the AFK pose animation's
 	// movement lock will be rather obnoxious.
 	// TODO: Adding some idle breathing would be nice. @Sezz 2021.10.31
-	Lara.NewAnims.Pose = false;
+	info->NewAnims.Pose = false;
 
-	if (Lara.poseCount == LARA_POSE_TIME &&
+	if (info->poseCount == LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
-		Lara.NewAnims.Pose)
+		info->NewAnims.Pose)
 	{
 		item->goalAnimState = LS_POSE;
 
@@ -670,7 +682,9 @@ void LaraSwampStop(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_stop()
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
@@ -678,7 +692,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -707,6 +721,8 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 3*/
 	/*collision: */
 	if (item->goalAnimState == LS_SWANDIVE_START ||
@@ -717,13 +733,13 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState != LS_STOP &&
 		item->goalAnimState != LS_RUN_FORWARD)
 	{
-		if (Lara.gunStatus == LG_NO_ARMS && TrInput & IN_ACTION)
+		if (info->gunStatus == LG_NO_ARMS && TrInput & IN_ACTION)
 			item->goalAnimState = LS_REACH;
 
 		if (TrInput & IN_BACK || TrInput & IN_ROLL)
 			item->goalAnimState = LS_JUMP_ROLL_180;
 
-		if (Lara.gunStatus == LG_NO_ARMS && TrInput & IN_WALK)
+		if (info->gunStatus == LG_NO_ARMS && TrInput & IN_WALK)
 			item->goalAnimState = LS_SWANDIVE_START;
 
 		if (item->fallspeed > LARA_FREEFALL_SPEED)
@@ -732,39 +748,41 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
+		info->turnRate -= LARA_TURN_RATE;
 
-		if (Lara.turnRate < -LARA_JUMP_TURN)
-			Lara.turnRate = -LARA_JUMP_TURN;
+		if (info->turnRate < -LARA_JUMP_TURN)
+			info->turnRate = -LARA_JUMP_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
+		info->turnRate += LARA_TURN_RATE;
 
-		if (Lara.turnRate > LARA_JUMP_TURN)
-			Lara.turnRate = LARA_JUMP_TURN;
+		if (info->turnRate > LARA_JUMP_TURN)
+			info->turnRate = LARA_JUMP_TURN;
 	}
 }
 
 void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 3*/
 	/*state code: lara_as_forwardjump*/
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot + ANGLE(180);
+		info->moveAngle = item->pos.yRot + ANGLE(180);
 	else
-		Lara.moveAngle = item->pos.yRot;
+		info->moveAngle = item->pos.yRot;
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot;
+		info->moveAngle = item->pos.yRot;
 
 	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
@@ -774,7 +792,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			if (Lara.waterStatus == LW_WADE)
+			if (info->waterStatus == LW_WADE)
 			{
 				item->goalAnimState = LS_STOP;
 			}
@@ -844,19 +862,21 @@ void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_fastback()
 void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_MED_TURN)
+			info->turnRate = -LARA_MED_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 2, 10);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_MED_TURN)
+			info->turnRate = LARA_MED_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 2, 10);
 	}
@@ -875,7 +895,9 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_fastback()
 void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.SlopesAreWalls = false;
@@ -883,7 +905,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -918,7 +940,9 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_r()
 void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+	LaraInfo*& info = item->data;
+
+	info->look = (TestLaraSwamp(item) && info->waterStatus == LW_WADE) ? false : true;
 
 	if (item->hitPoints <= 0)
 	{
@@ -928,9 +952,9 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: This can't be anywhere below the run dispatch because a test to prevent forward movement without embedding currently can't exist. @Sezz 2021.11.12
-	Lara.turnRate += LARA_TURN_RATE;
+	info->turnRate += LARA_TURN_RATE;
 
-	if (Lara.waterStatus == LW_WADE)
+	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
 			LaraSwampTurnRight(item, coll);
@@ -956,7 +980,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -1026,19 +1050,19 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	// the player presses and holds the button to turn the opposite way. @Sezz 2021.10.16
 	if (TrInput & IN_RIGHT)
 	{
-		if (Lara.turnRate < 0)
-			Lara.turnRate = 0;
-		else if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
+		if (info->turnRate < 0)
+			info->turnRate = 0;
+		else if (info->turnRate > LARA_FAST_TURN)
+			info->turnRate = LARA_FAST_TURN;
 
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
-			if (Lara.turnRate > LARA_SLOW_TURN)
-				Lara.turnRate = LARA_SLOW_TURN;
+			if (info->turnRate > LARA_SLOW_TURN)
+				info->turnRate = LARA_SLOW_TURN;
 
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		}
-		else if (Lara.turnRate > LARA_MED_TURN)
+		else if (info->turnRate > LARA_MED_TURN)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1052,6 +1076,8 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning right in wade-height water.
 void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
@@ -1092,8 +1118,8 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
+		if (info->turnRate > LARA_MED_TURN)
+			info->turnRate = LARA_MED_TURN;
 
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
@@ -1106,6 +1132,8 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning right in swamps.
 void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
 		coll->CollisionType != CT_TOP_FRONT)
@@ -1139,8 +1167,8 @@ void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
@@ -1161,7 +1189,9 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_l()
 void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+	LaraInfo*& info = item->data;
+
+	info->look = (TestLaraSwamp(item) && info->waterStatus == LW_WADE) ? false : true;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1170,9 +1200,9 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.turnRate -= LARA_TURN_RATE;
+	info->turnRate -= LARA_TURN_RATE;
 
-	if (Lara.waterStatus == LW_WADE)
+	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
 			LaraSwampTurnLeft(item, coll);
@@ -1198,7 +1228,7 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -1267,19 +1297,19 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (Lara.turnRate > 0)
-			Lara.turnRate = 0;
-		else if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
+		if (info->turnRate > 0)
+			info->turnRate = 0;
+		else if (info->turnRate < -LARA_FAST_TURN)
+			info->turnRate = -LARA_FAST_TURN;
 
 		if (TrInput & IN_WALK)
 		{
-			if (Lara.turnRate < -LARA_SLOW_TURN)
-				Lara.turnRate = -LARA_SLOW_TURN;
+			if (info->turnRate < -LARA_SLOW_TURN)
+				info->turnRate = -LARA_SLOW_TURN;
 
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
 		}
-		else if (Lara.turnRate < -LARA_MED_TURN)
+		else if (info->turnRate < -LARA_MED_TURN)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1293,6 +1323,8 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning left in wade-height water.
 void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_JUMP)
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
@@ -1333,8 +1365,8 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
+		if (info->turnRate < -LARA_MED_TURN)
+			info->turnRate = -LARA_MED_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
@@ -1347,6 +1379,8 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning left in swamps.
 void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
 		coll->CollisionType != CT_TOP_FRONT)
@@ -1380,8 +1414,8 @@ void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
@@ -1400,39 +1434,44 @@ void lara_col_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 8*/
 	/*collision: lara_col_death*/
-	Lara.look = false;
+	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+
 	if (BinocularRange)
 	{
 		BinocularRange = 0;
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		LaraItem->meshBits = -1;
-		Lara.busy = false;
+		info->busy = false;
 	}
 }
 
 void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 8*/
 	/*state code: lara_as_death*/
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 
-	Lara.moveAngle = item->pos.yRot;
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
 
 	item->hitPoints = -1;
-	Lara.air = -1;
+	info->air = -1;
 
 	if (coll->Middle.Floor != NO_HEIGHT)
 		item->pos.yPos += coll->Middle.Floor;
@@ -1449,6 +1488,8 @@ void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 9*/
 	/*state code: lara_as_fastfall*/
 	item->gravityStatus = true;
@@ -1457,7 +1498,7 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraSlideEdgeJump(item, coll);
 
@@ -1488,18 +1529,20 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 11*/
 	/*state code: lara_as_reach*/
-	if (Lara.ropePtr == -1)
+	if (info->ropePtr == -1)
 		item->gravityStatus = true;
 
-	Lara.moveAngle = item->pos.yRot;
+	info->moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
@@ -1509,7 +1552,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	LaraSlideEdgeJump(item, coll);
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
 
@@ -1532,12 +1575,16 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 }
 
 void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
@@ -1546,7 +1593,7 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
 
@@ -1565,6 +1612,8 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_compress()
 void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	// TODO: dispatch
 	/*if (item->hitPoints <= 0)
 	{
@@ -1573,7 +1622,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}*/
 
-	if (Lara.waterStatus == LW_WADE)
+	if (info->waterStatus == LW_WADE)
 	{
 		item->goalAnimState = LS_JUMP_UP;
 
@@ -1583,22 +1632,22 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT &&
 		TrInput & (IN_FORWARD | IN_BACK))
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 	}
 	else if (TrInput & IN_RIGHT &&
 		TrInput & (IN_FORWARD | IN_BACK))
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 	}
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
-		Lara.moveAngle = item->pos.yRot;
+		info->moveAngle = item->pos.yRot;
 		item->goalAnimState = LS_JUMP_FORWARD;
 
 		return;
@@ -1606,7 +1655,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_BACK &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
 	{
-		Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
+		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 		item->goalAnimState = LS_JUMP_BACK;
 
 		return;
@@ -1615,7 +1664,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT &&
 		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
-		Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_LEFT;
 
 		return;
@@ -1623,7 +1672,7 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
 	{
-		Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_RIGHT;
 
 		return;
@@ -1640,12 +1689,14 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_as_compress()
 void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(coll))
@@ -1679,7 +1730,9 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_back()
 void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+	LaraInfo*& info = item->data;
+
+	info->look = (TestLaraSwamp(item) && info->waterStatus == LW_WADE) ? false : true;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1688,29 +1741,29 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (Lara.isMoving)
+	if (info->isMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, 10);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, 10);
 	}
 
 	if (TrInput & IN_BACK &&
-		(TrInput & IN_WALK || Lara.waterStatus == LW_WADE))
+		(TrInput & IN_WALK || info->waterStatus == LW_WADE))
 	{
 		item->goalAnimState = LS_WALK_BACK;
 
@@ -1724,15 +1777,17 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_back()
 void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot + ANGLE(180);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = Lara.waterStatus == LW_WADE ? NO_BAD_POS : STEPUP_HEIGHT;
+	coll->Setup.BadHeightDown = info->waterStatus == LW_WADE ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -1767,6 +1822,8 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_right_fast()
 void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1785,7 +1842,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		Lara.waterStatus != LW_WADE)
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -1793,8 +1850,8 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE)
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)) &&
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -1803,7 +1860,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		if (info->waterStatus == LW_WADE)		// Should not be possible, but here for security.
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1872,11 +1929,11 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Hold WALK to slow down again.
 	if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate < LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
-		else if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate < LARA_MED_TURN)
+			info->turnRate = LARA_MED_TURN;
+		else if (info->turnRate > LARA_FAST_TURN)
+			info->turnRate = LARA_FAST_TURN;
 
 		item->goalAnimState = LS_TURN_RIGHT_FAST;
 
@@ -1897,6 +1954,8 @@ void lara_col_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_left_fast()
 void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1913,7 +1972,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		Lara.waterStatus != LW_WADE)
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
 
@@ -1921,8 +1980,8 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)) &&
-		Lara.waterStatus != LW_WADE)
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)) &&
+		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -1931,7 +1990,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		if (info->waterStatus == LW_WADE)		// Should not be possible, but here for security.
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -2000,11 +2059,11 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate > -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
-		else if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate > -LARA_MED_TURN)
+			info->turnRate = -LARA_MED_TURN;
+		else if (info->turnRate < -LARA_FAST_TURN)
+			info->turnRate = -LARA_FAST_TURN;
 
 		item->goalAnimState = LS_TURN_LEFT_FAST;
 
@@ -2025,7 +2084,9 @@ void lara_col_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stepright()
 void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2034,20 +2095,20 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (Lara.isMoving)
+	if (info->isMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 	}
 
 	if (TrInput & IN_RSTEP)
@@ -2064,15 +2125,17 @@ void lara_as_stepright(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_stepright()
 void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
-	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
-	coll->Setup.BadCeilingHeight = 0;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
+	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2107,7 +2170,9 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stepleft()
 void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2116,20 +2181,20 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (Lara.isMoving)
+	if (info->isMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 	}
 
 	if (TrInput & IN_LSTEP)
@@ -2146,15 +2211,17 @@ void lara_as_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_stepleft()
 void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
-	coll->Setup.BadHeightDown = (Lara.waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
-	coll->Setup.BadCeilingHeight = 0;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
+	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2189,7 +2256,9 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll2()
 void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 
 	if (TrInput & IN_ROLL)
 	{
@@ -2205,15 +2274,17 @@ void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_roll2()
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	Camera.laraNode = 0;
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	info->moveAngle = item->pos.yRot + ANGLE(180);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2245,9 +2316,11 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 25*/
 	/*collision: lara_col_backjump*/
-	Lara.look = false;
+	info->look = false;
 
 	Camera.targetAngle = ANGLE(135.0f);
 	if (item->fallspeed <= LARA_FREEFALL_SPEED)
@@ -2269,17 +2342,21 @@ void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 25*/
 	/*state code: lara_as_backjump*/
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	info->moveAngle = item->pos.yRot + ANGLE(180);
 	lara_col_jumper(item, coll);
 }
 
 void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 26*/
 	/*collision: lara_col_rightjump*/
-	Lara.look = false;
+	info->look = false;
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
 	else if (TrInput & IN_LEFT && item->goalAnimState != LS_STOP)
@@ -2288,17 +2365,21 @@ void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 26*/
 	/*state code: lara_as_rightjump*/
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	info->moveAngle = item->pos.yRot + ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
 void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 27*/
 	/*collision: lara_col_leftjump*/
-	Lara.look = false;
+	info->look = false;
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
 	else if (TrInput & IN_RIGHT && item->goalAnimState != LS_STOP)
@@ -2307,20 +2388,24 @@ void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 27*/
 	/*state code: lara_as_leftjump*/
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	info->moveAngle = item->pos.yRot - ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
 void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*states 25, 26, 27*/
 	/*state code: none, but is called in lara_col_backjump, lara_col_rightjump and lara_col_leftjump*/
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
@@ -2342,7 +2427,9 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 
 	/*state 28*/
 	/*collision: lara_col_upjump*/
@@ -2354,6 +2441,8 @@ void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 28*/
 	/*state code: lara_as_upjump*/
 	if (item->hitPoints <= 0)
@@ -2362,13 +2451,13 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.moveAngle = item->pos.yRot;
+	info->moveAngle = item->pos.yRot;
 
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = item->speed < 0 ? Lara.moveAngle + ANGLE(180.0f) : Lara.moveAngle;
+	coll->Setup.ForwardAngle = item->speed < 0 ? info->moveAngle + ANGLE(180.0f) : info->moveAngle;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	GetCollisionInfo(coll, item);
@@ -2416,27 +2505,31 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 29*/
 	/*collision: lara_col_fallback*/
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
 
 	if (TrInput & IN_ACTION)
-		if (Lara.gunStatus == LG_NO_ARMS)
+		if (info->gunStatus == LG_NO_ARMS)
 			item->goalAnimState = LS_REACH;
 }
 
 void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 29*/
 	/*state code: lara_as_fallback*/
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
+	info->moveAngle = item->pos.yRot + ANGLE(180);
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
@@ -2456,14 +2549,16 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll()
 void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
 
 	// TODO: Interpolation instead.
-	Lara.NewAnims.SwandiveRollRun = true;
+	info->NewAnims.SwandiveRollRun = true;
 
 	if (TrInput & IN_FORWARD &&
 		item->animNumber == LA_SWANDIVE_ROLL &&
-		Lara.NewAnims.SwandiveRollRun)
+		info->NewAnims.SwandiveRollRun)
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
 
@@ -2484,7 +2579,9 @@ void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_roll()
 void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -2492,7 +2589,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2524,25 +2621,27 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 52*/
 	/*collision: lara_col_swandive*/
-	Lara.look = false;
+	info->look = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_JUMP_TURN)
-			Lara.turnRate = -LARA_JUMP_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_JUMP_TURN)
+			info->turnRate = -LARA_JUMP_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 16);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_JUMP_TURN)
-			Lara.turnRate = LARA_JUMP_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_JUMP_TURN)
+			info->turnRate = LARA_JUMP_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 16);
 	}
@@ -2553,15 +2652,17 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 52*/
 	/*state code: lara_as_swandive*/
-	Lara.moveAngle = item->pos.yRot;
+	info->moveAngle = item->pos.yRot;
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
@@ -2589,15 +2690,17 @@ void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 53*/
 	/*state code: lara_as_fastdive*/
-	Lara.moveAngle = item->pos.yRot;
+	info->moveAngle = item->pos.yRot;
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
@@ -2628,8 +2731,9 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_wade()
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+	LaraInfo*& info = item->data;
 
+	info->look = (TestLaraSwamp(item) && info->waterStatus == LW_WADE) ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->hitPoints <= 0)
@@ -2648,24 +2752,24 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_FAST_TURN)
-			Lara.turnRate = -LARA_FAST_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_FAST_TURN)
+			info->turnRate = -LARA_FAST_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 10);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_FAST_TURN)
-			Lara.turnRate = LARA_FAST_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_FAST_TURN)
+			info->turnRate = LARA_FAST_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 10);
 	}
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_ABOVE_WATER)
+		if (info->waterStatus == LW_ABOVE_WATER)
 			item->goalAnimState = LS_RUN_FORWARD;
 		else [[likely]]
 			item->goalAnimState = LS_WADE_FORWARD;
@@ -2679,19 +2783,21 @@ void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for wading in a swamp.
 void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 5 * 3, 12);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 5 * 3, 12);
 	}
@@ -2710,12 +2816,14 @@ void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_wade()
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2771,7 +2879,9 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_dash()
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.sprintTimer--; // TODO: Move global to LaraItem? health.cpp needs deglobalisation in general. @Sezz 2021.09.29
+	LaraInfo*& info = item->data;
+
+	info->sprintTimer--;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2782,17 +2892,17 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 9);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 9);
 	}
@@ -2805,7 +2915,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
-		(Lara.gunStatus == LG_NO_ARMS || !IsStandingWeapon(Lara.gunType)))
+		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
 
@@ -2816,11 +2926,11 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	// under some condition allows Lara to run around in the water room. Investigate. @Sezz 2021.09.29
 	if (TrInput & IN_FORWARD)
 	{
-		if (Lara.waterStatus == LW_WADE)
+		if (info->waterStatus == LW_WADE)
 			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && Lara.sprintTimer > 0) [[likely]]
+		else if (TrInput & IN_SPRINT && info->sprintTimer > 0) [[likely]]
 			item->goalAnimState = LS_SPRINT;
 		else
 			item->goalAnimState = LS_RUN_FORWARD;
@@ -2835,12 +2945,14 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_dash()
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2913,19 +3025,21 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_dashdive()
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, 10);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
 		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, 10);
 	}
@@ -2942,12 +3056,14 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	/*state 74*/
 	/*state code: lara_as_dashdive*/
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot + ANGLE(180);
+		info->moveAngle = item->pos.yRot + ANGLE(180);
 	else
-		Lara.moveAngle = item->pos.yRot;
+		info->moveAngle = item->pos.yRot;
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
@@ -2955,14 +3071,14 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.SlopesAreWalls = true;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
 	if (!LaraFallen(item, coll))
 	{
 		if (item->speed < 0)
-			Lara.moveAngle = item->pos.yRot;
+			info->moveAngle = item->pos.yRot;
 
 		if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 		{
@@ -2970,7 +3086,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				item->goalAnimState = LS_DEATH;
 			}
-			else if (Lara.waterStatus == LW_WADE || !(TrInput & IN_FORWARD) || TrInput & IN_WALK)
+			else if (info->waterStatus == LW_WADE || !(TrInput & IN_FORWARD) || TrInput & IN_WALK)
 			{
 				item->goalAnimState = LS_STOP;
 			}
