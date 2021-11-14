@@ -20,43 +20,10 @@
 using std::vector;
 using namespace TEN::Math::Random;
 
-enum QUAD_EFFECTS_POSITIONS {
-	EXHAUST_LEFT = 0,
-	EXHAUST_RIGHT,
-	BACKLEFT_TYRE,
-	BACKRIGHT_TYRE,
-	FRONTRIGHT_TYRE,
-	FRONTLEFT_TYRE
-};
-
-enum QUAD_FLAGS {
-	QUAD_FLAGS_DEAD = 0x80,
-	QUAD_FLAGS_IS_FALLING = 0x40
-};
-
-enum QUAD_ANIM_STATES {
-	QUAD_STATE_DRIVE = 1,
-	QUAD_STATE_TURNL = 2,
-	QUAD_STATE_SLOW = 5,
-	QUAD_STATE_BRAKE = 6,
-	QUAD_STATE_BIKEDEATH = 7,
-	QUAD_STATE_FALL = 8,
-	QUAD_STATE_GETONR = 9,
-	QUAD_STATE_GETOFFR = 10,
-	QUAD_STATE_HITBACK = 11,
-	QUAD_STATE_HITFRONT = 12,
-	QUAD_STATE_HITLEFT = 13,
-	QUAD_STATE_HITRIGHT = 14,
-	QUAD_STATE_STOP = 15,
-	QUAD_STATE_LAND = 17,
-	QUAD_STATE_STOPSLOWLY = 18,
-	QUAD_STATE_FALLDEATH = 19,
-	QUAD_STATE_FALLOFF = 20,
-	QUAD_STATE_WHEELIE = 21,
-	QUAD_STATE_TURNR = 22,
-	QUAD_STATE_GETONL = 23,
-	QUAD_STATE_GETOFFL = 24,
-};
+bool QuadHandbrakeStarting;
+bool QuadCanHandbrakeStart;
+int QuadSmokeStart;
+bool QuadNoGetOff;
 
 BITE_INFO quadEffectsPositions[6] = {
 	{ -56, -32, -380, 0	},
@@ -66,11 +33,6 @@ BITE_INFO quadEffectsPositions[6] = {
 	{ 90, 180, -32, 6 },
 	{ -90, 180, -32, 7 }
 };
-
-bool QuadHandbrakeStarting;
-bool QuadCanHandbrakeStart;
-int QuadSmokeStart;
-bool QuadNoGetOff;
 
 static void QuadbikeExplode(ITEM_INFO* item)
 {
