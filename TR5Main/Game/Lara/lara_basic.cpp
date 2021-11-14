@@ -1064,7 +1064,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		}
-		else if (info->turnRate > LARA_MED_TURN)
+		else if (info->turnRate > LARA_SLOW_TURN)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1169,8 +1169,8 @@ void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN / 2)
+			info->turnRate = LARA_SLOW_TURN / 2;
 
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
@@ -1416,8 +1416,8 @@ void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN / 2)
+			info->turnRate = -LARA_SLOW_TURN / 2;
 
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
@@ -2790,16 +2790,16 @@ void LaraWadeSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN / 2)
+			info->turnRate = -LARA_SLOW_TURN / 2;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 5 * 3, 12);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN / 2)
+			info->turnRate = LARA_SLOW_TURN / 2;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 5 * 3, 12);
 	}
