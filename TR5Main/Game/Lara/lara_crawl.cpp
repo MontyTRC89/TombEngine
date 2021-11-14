@@ -31,10 +31,11 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.13.21
 
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll); // TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. @Sezz 2021.10.14
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll); // TODO: This MUST be true on the first frame that Lara climbs up into a crawlspace. @Sezz 2021.10.14
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -48,20 +49,20 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		Lara.turnRate = -LARA_CRAWL_TURN;
+		info->turnRate = -LARA_CRAWL_TURN;
 	else if (TrInput & IN_RIGHT)
-		Lara.turnRate = LARA_CRAWL_TURN;
+		info->turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
-		Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		// TODO: LUA
-		Lara.NewAnims.CrouchRoll = true;
+		info->NewAnims.CrouchRoll = true;
 
 		if ((TrInput & IN_SPRINT) &&
 			TestLaraCrouchRoll(item, coll) &&
-			Lara.gunStatus == LG_NO_ARMS &&
-			Lara.NewAnims.CrouchRoll)
+			info->gunStatus == LG_NO_ARMS &&
+			info->NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -103,9 +104,11 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.isDucked = true;
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -118,7 +121,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(coll))
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
 
 		return;
@@ -137,20 +140,21 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate = -LARA_CROUCH_ROLL_TURN;
+		info->turnRate = -LARA_CROUCH_ROLL_TURN;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate = LARA_CROUCH_ROLL_TURN;
+		info->turnRate = LARA_CROUCH_ROLL_TURN;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
 	}
@@ -162,9 +166,11 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.isDucked = true;
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -186,7 +192,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(coll))
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 		item->speed /= 3;				// Truncate speed to prevent flying off.
 		SetLaraFallState(item);
 
@@ -217,8 +223,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.EnableSpaz = false;
+	LaraInfo*& info = item->data;
 
+	coll->Setup.EnableSpaz = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -231,14 +238,14 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	Lara.turnRate = -LARA_CRAWL_TURN;
+	info->turnRate = -LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
-		Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if ((TrInput & IN_SPRINT) &&
 			TestLaraCrouchRoll(item, coll) &&
-			Lara.NewAnims.CrouchRoll)
+			info->NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -279,8 +286,9 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.EnableSpaz = false;
+	LaraInfo*& info = item->data;
 
+	coll->Setup.EnableSpaz = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -293,14 +301,14 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	Lara.turnRate = LARA_CRAWL_TURN;
+	info->turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
-		Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if ((TrInput & IN_SPRINT) &&
 			TestLaraCrouchRoll(item, coll) &&
-			Lara.NewAnims.CrouchRoll)
+			info->NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -345,10 +353,11 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.gunStatus = LG_HANDS_BUSY;
+	LaraInfo*& info = item->data;
+
+	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -362,15 +371,15 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		Lara.turnRate = -LARA_CRAWL_TURN;
+		info->turnRate = -LARA_CRAWL_TURN;
 	else if (TrInput & IN_RIGHT)
-		Lara.turnRate = LARA_CRAWL_TURN;
+		info->turnRate = LARA_CRAWL_TURN;
 
 	// TODO: LUA
-	Lara.NewAnims.CrawlExtended = true;
+	info->NewAnims.CrawlExtended = true;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
-		Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		// TODO: Not all weapons are classified as standing weapons??
 		// TODO: Allow standing vault up 2 steps when spawning flare while standing. @Sezz 2021.10.16
@@ -378,10 +387,10 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			((TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(Lara.gunType) && // TODO: From here or from crouch, it needs to be consistent.
+			!IsStandingWeapon(info->gunType) && // TODO: From here or from crouch, it needs to be consistent.
 			TestLaraDrawWeaponsFromCrawlIdle(item))))
 		{
-			Lara.gunStatus = LG_NO_ARMS;
+			info->gunStatus = LG_NO_ARMS;
 			item->goalAnimState = LS_CROUCH_IDLE;
 
 			return;
@@ -391,7 +400,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll) &&
-				Lara.NewAnims.CrawlExtended)
+				info->NewAnims.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 
@@ -440,7 +449,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.gunStatus = LG_NO_ARMS;
+	info->gunStatus = LG_NO_ARMS;
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
@@ -448,14 +457,16 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.isDucked = true;
-	Lara.moveAngle = item->pos.yRot;
-	Lara.torsoXrot = 0; // TODO: More pleasing reset. @Sezz 2021.10.28
-	Lara.torsoYrot = 0;
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0; // TODO: More pleasing reset. @Sezz 2021.10.28
+	info->torsoYrot = 0;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightDown = STEP_SIZE - 1;
@@ -467,7 +478,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(coll))
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
 
 		return;
@@ -486,11 +497,12 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.gunStatus = LG_HANDS_BUSY;
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -502,26 +514,26 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		// TODO: Flexing.
-		/*Lara.headZrot -= (Lara.headZrot + LARA_CRAWL_FLEX) / 12;
-		Lara.torsoZrot = Lara.headZrot;*/
+		/*info->headZrot -= (info->headZrot + LARA_CRAWL_FLEX) / 12;
+		info->torsoZrot = info->headZrot;*/
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
-		/*Lara.headZrot += (LARA_CRAWL_FLEX - Lara.headZrot) / 12;
-		Lara.torsoZrot = Lara.headZrot;*/
+		/*info->headZrot += (LARA_CRAWL_FLEX - info->headZrot) / 12;
+		info->torsoZrot = info->headZrot;*/
 	}
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched) &&
-		Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -534,7 +546,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll) &&
-				Lara.NewAnims.CrawlExtended)
+				info->NewAnims.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 
@@ -560,21 +572,23 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.isDucked = true;
-	Lara.moveAngle = item->pos.yRot;
-	Lara.torsoXrot = 0;
-	Lara.torsoYrot = 0;
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because new anims do not submerge Lara. Resolve this. @Sezz 2021.10.31
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because new anims do not submerge info-> Resolve this. @Sezz 2021.10.31
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -582,7 +596,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestLaraFall(coll))
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
 
 		return;
@@ -605,11 +619,12 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = false;
-	Lara.gunStatus = LG_HANDS_BUSY;
+	LaraInfo*& info = item->data;
+
+	info->look = false;
+	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -621,26 +636,26 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_SLOW_TURN)
-			Lara.turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN)
+			info->turnRate = -LARA_SLOW_TURN;
 
 		// TODO: Flexing.
-		/*Lara.headZrot -= (Lara.headZrot + LARA_CRAWL_FLEX) / 12;
-		Lara.torsoZrot = Lara.headZrot;*/
+		/*info->headZrot -= (info->headZrot + LARA_CRAWL_FLEX) / 12;
+		info->torsoZrot = info->headZrot;*/
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_SLOW_TURN)
-			Lara.turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN)
+			info->turnRate = LARA_SLOW_TURN;
 
-		/*Lara.headZrot += (LARA_CRAWL_FLEX - Lara.headZrot) / 12;
-		Lara.torsoZrot = Lara.headZrot;*/
+		/*info->headZrot += (LARA_CRAWL_FLEX - info->headZrot) / 12;
+		info->torsoZrot = info->headZrot;*/
 	}
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched)
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched)
+		&& info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -673,9 +688,11 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.keepCrouched = TestLaraKeepCrouched(item, coll);
-	Lara.isDucked = true;
-	Lara.moveAngle = item->pos.yRot + ANGLE(180.0f);
+	LaraInfo*& info = item->data;
+
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -685,7 +702,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -693,7 +710,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(coll))
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
 
 		return;
@@ -716,10 +733,11 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.gunStatus = LG_HANDS_BUSY;
+	LaraInfo*& info = item->data;
+
+	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -729,10 +747,10 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.turnRate = -LARA_CRAWL_TURN;
+	info->turnRate = -LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched)
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched)
+		&& info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -785,10 +803,11 @@ void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.gunStatus = LG_HANDS_BUSY;
+	LaraInfo*& info = item->data;
+
+	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -798,10 +817,10 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.turnRate = LARA_CRAWL_TURN;
+	info->turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || Lara.keepCrouched)
-		&& Lara.waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched)
+		&& info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -852,11 +871,12 @@ void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	LaraInfo*& info = item->data;
 
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = false;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(45.0f);
 
 	if (item->animNumber == LA_CRAWL_TO_HANG_END)
 	{
@@ -864,9 +884,9 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.BadHeightDown = NO_BAD_POS;
 		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = Lara.moveAngle;
+		coll->Setup.ForwardAngle = info->moveAngle;
 
-		Lara.moveAngle = item->pos.yRot;
+		info->moveAngle = item->pos.yRot;
 
 		MoveItem(item, item->pos.yRot, -STEP_SIZE);
 		GetCollisionInfo(coll, item);
@@ -874,10 +894,10 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TestHangSwingIn(item, item->pos.yRot))
 		{
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
+			info->headYrot = 0;
+			info->headXrot = 0;
+			info->torsoYrot = 0;
+			info->torsoXrot = 0;
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		}
 		else
@@ -895,6 +915,6 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = 2;
 		item->fallspeed = 1;
 
-		Lara.gunStatus = LG_HANDS_BUSY;
+		info->gunStatus = LG_HANDS_BUSY;
 	}
 }

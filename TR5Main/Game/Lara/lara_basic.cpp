@@ -33,7 +33,9 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
@@ -375,7 +377,9 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = ((TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
+	LaraInfo*& info = item->data;
+
+	info->look = ((TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
