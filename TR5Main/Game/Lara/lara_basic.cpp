@@ -375,6 +375,8 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
 		item->animNumber != LA_SPRINT_TO_STAND_LEFT)
@@ -392,7 +394,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (TrInput & IN_LOOK)
+	if (TrInput & IN_LOOK && Lara.look)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT &&
@@ -912,6 +914,8 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_r()
 void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1153,6 +1157,8 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_l()
 void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -1669,6 +1675,8 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_back()
 void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_STOP; // TODO dispatch
@@ -2177,21 +2185,6 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll2()
 void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_LEFT &&
-		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
-	}
-	else if (TrInput & IN_RIGHT &&
-		!(TrInput & IN_JUMP))
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
-	}
-
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_BACK;
@@ -2453,21 +2446,6 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll()
 void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_LEFT &&
-		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
-	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
-	}
-	else if (TrInput & IN_RIGHT &&
-		!(TrInput & IN_JUMP))
-	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
-	}
-
 	// TODO: Interpolation instead.
 	Lara.NewAnims.SwandiveRollRun = true;
 
@@ -2637,6 +2615,8 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_wade()
 void lara_as_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->hitPoints <= 0)
