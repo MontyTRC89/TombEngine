@@ -176,7 +176,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlled,
 	lara_as_swimcheat,
 	lara_as_trpose,//119
-	lara_as_null,//120
+	lara_as_controlledl,//120
 	lara_as_trwalk,//121
 	lara_as_trfall,//122
 	lara_as_trfall,//123
@@ -191,14 +191,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_parallelbars,//128
 	lara_as_pbleapoff,//129
 	lara_as_null,//130
-	lara_as_null,//131
-	lara_as_null,//132
+	lara_as_controlledl,//131
+	lara_as_controlledl,//132
 	lara_as_null,//133
 	lara_as_null,//134
 	lara_as_null,//135
 	lara_as_null,//136
 	lara_as_null,//137
-	lara_as_null,//138
+	lara_as_controlledl,//138
 	lara_as_null,//ara_as_hang_feet,//139
 	lara_as_hang_feet_shimmyr,//140
 	lara_as_hang_feet_shimmyl,//141
