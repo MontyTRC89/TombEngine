@@ -2687,8 +2687,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			float distance = 0.0f;
 
 			// Determine horizontal probe coordinates
-			int eX = x;
-			int eZ = z;
+			auto eX = x;
+			auto eZ = z;
 
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)
