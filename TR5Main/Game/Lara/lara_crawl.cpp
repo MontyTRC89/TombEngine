@@ -605,6 +605,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = false;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;

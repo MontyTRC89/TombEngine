@@ -63,7 +63,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 
-	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
+	if (item->frameNumber == TestLastFrame(item, item->animNumber) - 1)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 
@@ -375,7 +375,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_stop()
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = (TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) ? false : true;
+	Lara.look = ((TestLaraSwamp(item) && Lara.waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	// TODO: Hardcoding. @Sezz 2021.09.28
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
@@ -2185,6 +2185,8 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll2()
 void lara_as_roll2(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = false;
+
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_BACK;
@@ -2241,6 +2243,8 @@ void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 25*/
 	/*collision: lara_col_backjump*/
+	Lara.look = false;
+
 	Camera.targetAngle = ANGLE(135.0f);
 	if (item->fallspeed <= LARA_FREEFALL_SPEED)
 	{
@@ -2334,6 +2338,8 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = false;
+
 	/*state 28*/
 	/*collision: lara_col_upjump*/
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
@@ -2446,6 +2452,8 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll()
 void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
+	Lara.look = false;
+
 	// TODO: Interpolation instead.
 	Lara.NewAnims.SwandiveRollRun = true;
 
@@ -2514,6 +2522,7 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 52*/
 	/*collision: lara_col_swandive*/
+	Lara.look = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
 
