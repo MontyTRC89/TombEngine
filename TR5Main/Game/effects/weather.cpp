@@ -222,6 +222,7 @@ namespace Environment
 			{
 				if (p.Type == WeatherType::Snow)
 					p.Size *= WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR;
+
 				continue;
 			}
 
