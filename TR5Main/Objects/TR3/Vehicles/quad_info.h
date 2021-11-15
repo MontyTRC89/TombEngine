@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 struct QUAD_INFO {
 	int velocity;
 	short frontRot;
