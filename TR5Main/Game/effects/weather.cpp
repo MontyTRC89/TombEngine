@@ -381,7 +381,7 @@ namespace Environment
 
 				auto coll = GetCollisionResult(xPos, yPos, zPos, outsideRoom);
 
-				if (!(coll.Position.Ceiling - WALL_SIZE < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
+				if (!(coll.Position.Ceiling < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
 					continue;
 
 				auto part = WeatherParticle();
