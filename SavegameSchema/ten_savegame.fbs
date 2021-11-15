@@ -135,6 +135,7 @@ table Lara {
 	fired: bool;
 	water_surface_dist: int32;
 	last_position: Vector3;
+	next_corner_position: Vector3;
 	mesh_ptrs: [int32];
 	target_angles: [int32];
 	turn_rate: int32;
@@ -147,8 +148,6 @@ table Lara {
 	torso_z_rot: int32;
 	left_arm: LaraArmInfo;
 	right_arm: LaraArmInfo;
-	corner_x: int32;
-	corner_z: int32;
 	rope_segment: int32;
 	rope_direction: int32;
 	rope_arc_front: int32;
