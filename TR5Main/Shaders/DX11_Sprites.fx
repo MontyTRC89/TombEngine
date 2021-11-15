@@ -34,7 +34,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 	
 	output.Normal = input.Normal;
-	output.Color = color;
+	output.Color = input.Color * color;
 	output.UV = input.UV;
 
 	return output;

@@ -695,20 +695,16 @@ namespace TEN::Renderer
 				spriteMatrix = Matrix::Identity;
 			}
 
-			if (spr.BlendMode == BLENDMODE_ALPHABLEND
-				|| spr.BlendMode == BLENDMODE_EXCLUDE
-				|| spr.BlendMode == BLENDMODE_LIGHTEN
-				|| spr.BlendMode == BLENDMODE_SCREEN
-				|| spr.BlendMode == BLENDMODE_SUBTRACTIVE
-				|| spr.BlendMode == BLENDMODE_NOZTEST)
+			if (isSortingRequired(spr.BlendMode))
 			{
 				// Collect sprites
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
-				face.sprite = &spr;
+				face.info.sprite = &spr;
 				face.distance = distance;
-				face.world = spriteMatrix;
+				face.info.world = spriteMatrix;
+				face.info.blendMode = spr.BlendMode;
 				view.transparentFaces.push_back(face);
 			}
 			else
@@ -865,6 +861,45 @@ namespace TEN::Renderer
 		//m_context->RSSetState(m_states->CullCounterClockwise());
 		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
+	}
+
+	void Renderer11::drawSpritesTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view)
+	{
+		setBlendMode(info->blendMode);
+
+		m_context->PSSetShaderResources(0, 1, info->sprite->Sprite->Texture->ShaderResourceView.GetAddressOf());
+		ID3D11SamplerState* sampler = m_states->LinearClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0; 
+		m_context->RSSetState(m_states->CullNone());
+		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+		m_stMisc.AlphaTest = true;
+		m_cbMisc.updateData(m_stMisc, m_context.Get());
+		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+		VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
+		
+		m_context->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(
+			info->sprite->Type== RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 
+			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
+			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_stSprite.billboardMatrix = Matrix::Identity;
+		m_stSprite.color = Vector4::One;
+		m_stSprite.isBillboard = false;
+		m_cbSprite.updateData(m_stSprite, m_context.Get());
+		m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+		m_context->Draw(vertices.size(), 0);
+
+		m_numDrawCalls++;
 	}
 
 	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) {
