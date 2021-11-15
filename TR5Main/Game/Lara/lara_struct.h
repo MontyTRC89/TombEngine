@@ -1045,6 +1045,7 @@ struct LaraInfo
 	bool fired;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
+	PHD_VECTOR nextCornerPos;
 	FX_INFO* spazEffect;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
@@ -1060,8 +1061,6 @@ struct LaraInfo
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
 	CREATURE_INFO* creature;
-	int cornerX;
-	int cornerZ;
 	byte ropeSegment;
 	byte ropeDirection;
 	short ropeArcFront;
