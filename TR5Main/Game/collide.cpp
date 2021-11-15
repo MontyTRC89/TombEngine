@@ -1277,8 +1277,8 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-// Overload of GetCollisionResult which can be used to probe collision parameters in a given
-// direction, distance, and angle from a given item.
+// Overload of GetCollisionResult which can be used to probe collision parameters
+// from a given item.
 
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height)
 {
@@ -2690,8 +2690,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			float distance = 0.0f;
 
 			// Determine horizontal probe coordinates
-			int eX = x;
-			int eZ = z;
+			auto eX = x;
+			auto eZ = z;
 
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)

@@ -509,10 +509,7 @@ void ChaseCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = Ideals[farthestnum].x;
-	ideal.y = Ideals[farthestnum].y;
-	ideal.z = Ideals[farthestnum].z;
+	GAME_VECTOR ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
 	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
@@ -521,19 +518,13 @@ void ChaseCamera(ITEM_INFO* item)
 
 void UpdateCameraElevation()
 {
-	PHD_VECTOR pos;
-	PHD_VECTOR pos1;
 
 	if (Camera.laraNode != -1)
 	{
-		pos.z = 0;
-		pos.y = 0;
-		pos.x = 0;
+		PHD_VECTOR pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		pos1.x = 0;
-		pos1.y = -STEP_SIZE;
-		pos1.z = WALL_SIZE * 2;
+		PHD_VECTOR pos1 = { 0, -STEP_SIZE, WALL_SIZE * 2 };
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.z = pos1.z - pos.z;
@@ -703,10 +694,7 @@ void CombatCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = Ideals[farthestnum].x;
-	ideal.y = Ideals[farthestnum].y;
-	ideal.z = Ideals[farthestnum].z;
+	GAME_VECTOR ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
 	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
@@ -938,10 +926,7 @@ void LookCamera(ITEM_INFO* item)
 	else
 		OldCam.pos.yRot = Lara.headYrot;
 
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = STEP_SIZE / 16;
-	pos.z = STEP_SIZE / 4;
+	PHD_VECTOR pos = { 0, STEP_SIZE / 16, STEP_SIZE / 4 };
 	GetLaraJointPosition(&pos, LM_HEAD);
 	
 	short roomNum = LaraItem->roomNumber;
@@ -954,9 +939,7 @@ void LookCamera(ITEM_INFO* item)
 		pos.y > floorHeight ||
 		pos.y < ceilingHeight)
 	{
-		pos.x = 0;
-		pos.y = STEP_SIZE / 16;
-		pos.z = 0;
+		pos = { 0, STEP_SIZE / 16 , 0 };
 		GetLaraJointPosition(&pos, LM_HEAD);
 		
 		roomNum = LaraItem->roomNumber;
@@ -984,16 +967,10 @@ void LookCamera(ITEM_INFO* item)
 		}
 	}
 
-	PHD_VECTOR pos2;
-	pos2.x = 0;
-	pos2.y = 0;
-	pos2.z = -WALL_SIZE;
+	PHD_VECTOR pos2 = { 0, 0, -WALL_SIZE };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
-	PHD_VECTOR pos3;
-	pos3.x = 0;
-	pos3.y = 0;
-	pos3.z = WALL_SIZE * 2;
+	PHD_VECTOR pos3 = { 0, 0, WALL_SIZE * 2 };
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -1041,10 +1018,7 @@ void LookCamera(ITEM_INFO* item)
 		z -= dz;
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = x;
-	ideal.y = y;
-	ideal.z = z;
+	GAME_VECTOR ideal = { x, y, z };
 	ideal.roomNumber = roomNum;
 
 	if (OldCam.pos.xRot == Lara.headXrot &&
@@ -1383,15 +1357,8 @@ void BinocularCamera(ITEM_INFO* item)
 			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
 	}
 
-	PHD_VECTOR src;
-	src.x = Camera.pos.x;
-	src.y = Camera.pos.y;
-	src.z = Camera.pos.z;
-
-	PHD_VECTOR target;
-	target.x = Camera.target.x;
-	target.y = Camera.target.y;
-	target.z = Camera.target.z;
+	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
+	PHD_VECTOR target = { Camera.target.x, Camera.target.y, Camera.target.z };
 
 	if (LaserSight)
 	{
@@ -1529,11 +1496,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 void ConfirmCameraTargetPos() 
 {
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-
+	PHD_VECTOR pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
@@ -1712,10 +1675,7 @@ void CalculateCamera()
 			Camera.flags != CF_CHASE_OBJECT &&
 			(Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
-			PHD_VECTOR pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
+			PHD_VECTOR pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;

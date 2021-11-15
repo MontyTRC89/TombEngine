@@ -1,4 +1,5 @@
 #pragma once
+
 struct QUAD_INFO {
 	int velocity;
 	short frontRot;
@@ -6,7 +7,7 @@ struct QUAD_INFO {
 	int revs;
 	int engineRevs;
 	short trackMesh;
-	int skidooTurn;
+	int turnRate;
 	int leftFallspeed;
 	int rightFallspeed;
 	short momentumAngle;
