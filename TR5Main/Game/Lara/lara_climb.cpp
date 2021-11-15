@@ -616,9 +616,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 	{
 		item->pos.xPos = x;
-		Lara.cornerX = x;
 		item->pos.zPos = z;
-		Lara.cornerZ = z;
+		Lara.nextCornerPos.x = x;
+		Lara.nextCornerPos.y = item->pos.yPos;
+		Lara.nextCornerPos.z = z;
 		item->pos.yRot += ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -662,9 +663,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 		{
 			item->pos.xPos = newX;
-			Lara.cornerX = newX;
 			item->pos.zPos = newZ;
-			Lara.cornerZ = newZ;
+			Lara.nextCornerPos.x = newX;
+			Lara.nextCornerPos.y = item->pos.yPos;
+			Lara.nextCornerPos.z = newZ;
 			item->pos.yRot -= ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift) != 0;
@@ -714,9 +716,10 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 	{
 		item->pos.xPos = x;
-		Lara.cornerX = x;
 		item->pos.zPos = z;
-		Lara.cornerZ = z;
+		Lara.nextCornerPos.x = x;
+		Lara.nextCornerPos.y = item->pos.yPos;
+		Lara.nextCornerPos.z = z;
 		item->pos.yRot -= ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -760,10 +763,9 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			item->pos.xPos = newX;
-			Lara.cornerX = newX;
-			item->pos.zPos = newZ;
-			Lara.cornerZ = newZ;
+			item->pos.xPos = Lara.nextCornerPos.x = newX;
+			item->pos.yPos = Lara.nextCornerPos.y = item->pos.yPos;
+			item->pos.zPos = Lara.nextCornerPos.z = newZ;
 			item->pos.yRot += ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);

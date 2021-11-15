@@ -513,26 +513,24 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	ANIM_FRAME* frame;
-
 	auto delta = 0;
 	auto flag = false;
 	auto angle = Lara.moveAngle;
 
-	if (angle == (short) (item->pos.yRot - ANGLE(90.0f)))
+	if (Lara.moveAngle == (short) (item->pos.yRot - ANGLE(90.0f)))
 		delta = -coll->Setup.Radius;
-	else if (angle == (short) (item->pos.yRot + ANGLE(90.0f)))
+	else if (Lara.moveAngle == (short) (item->pos.yRot + ANGLE(90.0f)))
 		delta = coll->Setup.Radius;
 
 	auto s = phd_sin(Lara.moveAngle);
 	auto c = phd_cos(Lara.moveAngle);
 	auto testShift = Vector2(s * delta, c * delta);
 
-	auto hdif = LaraFloorFront(item, angle, coll->Setup.Radius);
+	auto hdif = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius);
 	if (hdif < 200)
 		flag = true;
 
-	auto cdif = LaraCeilingFront(item, angle, coll->Setup.Radius, 0);
+	auto cdif = LaraCeilingFront(item, Lara.moveAngle, coll->Setup.Radius, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
@@ -601,9 +599,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			if (flag && hdif > 0 && delta > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor)
 				flag = false;
 
-			frame = (ANIM_FRAME*)GetBoundsAccurate(item);
 			auto front = coll->Front.Floor;
-			auto dfront = coll->Front.Floor - frame->boundingBox.Y1;
+			auto dfront = coll->Front.Floor - GetBoundsAccurate(item)->Y1;
 			auto flag2 = false;
 			auto x = item->pos.xPos;
 			auto z = item->pos.zPos;
@@ -635,8 +632,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				!flag && 
 				!coll->HitStatic && 
 				cdif <= -950 && 
-				dfront >= -SLOPE_DIFFERENCE &&
-				dfront <= SLOPE_DIFFERENCE &&
+				abs(dfront) < SLOPE_DIFFERENCE &&
 				TestValidLedgeAngle(item, coll))
 			{
 				if (item->speed != 0)
@@ -661,16 +657,14 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
 
-				item->pos.yPos += dfront;
 				result = true;
 			}
 		}
 		else
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
-			frame = (ANIM_FRAME*)GetBoundsAccurate(item);
 			item->pos.xPos += coll->Shift.x;
-			item->pos.yPos += frame->boundingBox.Y2;
+			item->pos.yPos += GetBoundsAccurate(item)->Y2;
 			item->pos.zPos += coll->Shift.z;
 			item->gravityStatus = true;
 			item->speed = 2;
@@ -701,6 +695,9 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	// Quadrant is only used for ladder checks
 	auto quadrant = GetQuadrant(item->pos.yRot);
 
+	// Get bounding box height for further ledge height calculations
+	auto bounds = GetBoundsAccurate(item);
+
 	// Virtually rotate Lara 90 degrees to the right and snap to nearest ledge, if any.
 	short newAngle = item->pos.yRot + ANGLE(testAngle);
 	item->pos.yRot = newAngle;
@@ -715,9 +712,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		item->pos.xPos += s * coll->Setup.Radius / 2;
 		item->pos.zPos += c * coll->Setup.Radius / 2;
 
-		// FIXME? Those hacky fields are still used somewhere to align her...
-		Lara.cornerX = item->pos.xPos;
-		Lara.cornerZ = item->pos.zPos;
+		// Store next position
+		Lara.nextCornerPos.x = item->pos.xPos;
+		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.z = item->pos.zPos;
 
 		auto result = TestLaraValidHangPos(item, coll);
 
@@ -778,9 +776,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	// Do further testing only if test angle is equal to resulting edge angle
 	if (newAngle == item->pos.yRot)
 	{
-		// FIXME? Those hacky fields are still used somewhere to align her...
-		Lara.cornerX = item->pos.xPos;
-		Lara.cornerZ = item->pos.zPos;
+		// Store next position
+		Lara.nextCornerPos.x = item->pos.xPos;
+		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.z = item->pos.zPos;
 
 		if (TestLaraValidHangPos(item, coll))
 		{
@@ -1091,12 +1090,9 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
-		coll->Setup.OldPosition.x = Lara.cornerX;
-		item->pos.xPos = Lara.cornerX;
-
-		coll->Setup.OldPosition.z = Lara.cornerZ;
-		item->pos.zPos = Lara.cornerZ;
-
+		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.x;
+		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.y;
+		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.z;
 		item->pos.yRot += rot;
 	}
 }
@@ -1120,12 +1116,9 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	{
 		SetAnimation(item, LA_HANG_FEET_IDLE);
 
-		coll->Setup.OldPosition.x = Lara.cornerX;
-		item->pos.xPos = Lara.cornerX;
-
-		coll->Setup.OldPosition.z = Lara.cornerZ;
-		item->pos.zPos = Lara.cornerZ;
-
+		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.x;
+		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.y;
+		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.z;
 		item->pos.yRot += rot;
 	}
 }
