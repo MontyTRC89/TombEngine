@@ -231,9 +231,43 @@ namespace Environment
 			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
 			p.Position.z += p.Velocity.z;
 
+			COLL_RESULT coll;
+			bool collisionCalculated = false;
+
 			if (p.CollisionCheckDelay <= 0)
 			{
-				auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				
+				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
+				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
+				collisionCalculated = true;
+			}
+			else
+				p.CollisionCheckDelay--;
+
+			auto& r = g_Level.Rooms[p.Room];
+
+			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
+				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
+				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
+			{
+				if (!collisionCalculated)
+				{
+					coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+					collisionCalculated = true;
+				}
+
+				if (coll.RoomNumber == p.Room)
+				{
+					p.Enabled = false; // Out of room bounds, delete
+					continue;
+				}
+				else
+					p.Room = coll.RoomNumber;
+			}
+
+			if (collisionCalculated)
+			{
 				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
 				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
 
@@ -253,29 +287,7 @@ namespace Environment
 					if (p.Type == WeatherType::Rain)
 						p.Enabled = false;
 				}
-
-				auto& r = g_Level.Rooms[p.Room];
-
-				if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
-					p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
-					p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
-				{
-					if (coll.RoomNumber == p.Room)
-					{
-						p.Enabled = false; // Out of room bounds, delete
-						continue;
-					}
-					else
-						p.Room = coll.RoomNumber;
-				}
-
-				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
-				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
 			}
-			else
-				p.CollisionCheckDelay--;
-
-
 
 			switch (p.Type)
 			{
@@ -364,7 +376,7 @@ namespace Environment
 				if (outsideRoom == NO_ROOM)
 					continue;
 
-				if (g_Level.Rooms[outsideRoom].flags & ENV_FLAG_WATER)
+				if (g_Level.Rooms[outsideRoom].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 					continue;
 
 				auto coll = GetCollisionResult(xPos, yPos, zPos, outsideRoom);
