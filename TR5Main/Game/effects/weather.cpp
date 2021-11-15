@@ -215,34 +215,36 @@ namespace Environment
 
 			auto& r = g_Level.Rooms[p.Room];
 
+
+			auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+			bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+			bool landed = coll.Position.Floor < p.Position.y;
+
+			if (inSubstance || landed)
+			{
+				p.Stopped = true;
+				p.Position = oldPos;
+				p.Life = (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE) ? WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE : p.Life;
+
+				if (inSubstance)
+				{
+					SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
+						RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
+						Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				}
+
+				if (p.Type == WeatherType::Rain)
+					p.Enabled = false;
+			}
+
 			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
 				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
 				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
 			{
-				auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
-				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = coll.Position.Floor < p.Position.y;
-
 				if (coll.RoomNumber == p.Room)
 				{
 					p.Enabled = false; // Spawned in same room, needs to be on portal
 					continue;
-				}
-				else if (inSubstance || landed)
-				{
-					p.Stopped = true;
-					p.Position = oldPos;
-					p.Life = (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE) ? WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE : p.Life;
-
-					if (inSubstance)
-					{
-						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
-							RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
-							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-					}
-
-					if (p.Type == WeatherType::Rain)
-						p.Enabled = false;
 				}
 				else
 					p.Room = coll.RoomNumber;
