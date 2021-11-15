@@ -204,116 +204,124 @@ namespace Environment
 	{
 		for (auto& p : Particles)
 		{
-			auto oldPos = p.Position;
+			p.Life -= 2;
 
-			if (!p.Stopped)
+			if (p.Life <= 0)
 			{
-				p.Position.x += p.Velocity.x;
-				p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
-				p.Position.z += p.Velocity.z;
+				p.Enabled = false;
+				continue;
 			}
 
-			auto& r = g_Level.Rooms[p.Room];
-
-
-			auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
-			bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-			bool landed = coll.Position.Floor < p.Position.y;
-
-			if (inSubstance || landed)
-			{
-				p.Stopped = true;
-				p.Position = oldPos;
-				p.Life = (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE) ? WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE : p.Life;
-
-				if (inSubstance)
-				{
-					SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
-						RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
-						Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-				}
-
-				if (p.Type == WeatherType::Rain)
-					p.Enabled = false;
-			}
-
-			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
-				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
-				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
-			{
-				if (coll.RoomNumber == p.Room)
-				{
-					p.Enabled = false; // Spawned in same room, needs to be on portal
-					continue;
-				}
-				else
-					p.Room = coll.RoomNumber;
-			}
-
-			if (p.Life <= 0 ||
-				abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
+			if (abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
 				abs(Camera.pos.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
 			{
-				if (p.Life <= 0)
-				{
-					p.Enabled = false;
-					continue;
-				}
-				else if (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-					p.Life = WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+				p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 			}
 
-			if (!p.Stopped)
+			if (p.Stopped)
 			{
-				switch (p.Type)
-				{
-				case WeatherType::Snow:
-
-					if (p.Velocity.x < (WindFinalX << 2))
-						p.Velocity.x += GenerateFloat(0.5f, 2.5f);
-					else if (p.Velocity.x > (WindFinalX << 2))
-						p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
-
-					if (p.Velocity.z < (WindFinalZ << 2))
-						p.Velocity.z += GenerateFloat(0.5f, 2.5f);
-					else if (p.Velocity.z > (WindFinalZ << 2))
-						p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
-
-					if (p.Velocity.y < p.Size / 2)
-						p.Velocity.y += p.Size / 5.0f;
-
-					break;
-
-				case WeatherType::Rain:
-
-					auto random = GenerateInt();
-					if ((random & 3) != 3)
-					{
-						p.Velocity.x += (float)((random & 3) - 1);
-						if (p.Velocity.x < -4)
-							p.Velocity.x = -4;
-						else if (p.Velocity.x > 4)
-							p.Velocity.x = 4;
-					}
-
-					random = (random >> 2) & 3;
-					if (random != 3)
-					{
-						p.Velocity.z += random - 1;
-						if (p.Velocity.z < -4)
-							p.Velocity.z = -4;
-						else if (p.Velocity.z > 4)
-							p.Velocity.z = 4;
-					}
-
-					if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
-						p.Velocity.y += p.Size / 5.0f;
-
-					break;
-				}
+				if (p.Type == WeatherType::Snow)
+					p.Size *= WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR;
+				continue;
 			}
 
-			p.Life -= 2;
+			auto oldPos = p.Position;
+			p.Position.x += p.Velocity.x;
+			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
+			p.Position.z += p.Velocity.z;
+
+			if (p.CollisionCheckDelay <= 0)
+			{
+				auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
+
+				if (inSubstance || landed)
+				{
+					p.Stopped = true;
+					p.Position = oldPos;
+					p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
+
+					if (inSubstance)
+					{
+						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
+							RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
+							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+					}
+
+					if (p.Type == WeatherType::Rain)
+						p.Enabled = false;
+				}
+
+				auto& r = g_Level.Rooms[p.Room];
+
+				if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
+					p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
+					p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
+				{
+					if (coll.RoomNumber == p.Room)
+					{
+						p.Enabled = false; // Out of room bounds, delete
+						continue;
+					}
+					else
+						p.Room = coll.RoomNumber;
+				}
+
+				auto coeff = std::min(abs(coll.Position.Floor - p.Position.y), abs(coll.Position.Ceiling - p.Position.y));
+				p.CollisionCheckDelay = std::min(floor(coeff / p.Velocity.y), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
+			}
+			else
+				p.CollisionCheckDelay--;
+
+
+
+			switch (p.Type)
+			{
+			case WeatherType::Snow:
+
+				if (p.Velocity.x < (WindFinalX << 2))
+					p.Velocity.x += GenerateFloat(0.5f, 2.5f);
+				else if (p.Velocity.x > (WindFinalX << 2))
+					p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
+
+				if (p.Velocity.z < (WindFinalZ << 2))
+					p.Velocity.z += GenerateFloat(0.5f, 2.5f);
+				else if (p.Velocity.z > (WindFinalZ << 2))
+					p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
+
+				if (p.Velocity.y < p.Size / 2)
+					p.Velocity.y += p.Size / 5.0f;
+
+				break;
+
+			case WeatherType::Rain:
+
+				auto random = GenerateInt();
+				if ((random & 3) != 3)
+				{
+					p.Velocity.x += (float)((random & 3) - 1);
+					if (p.Velocity.x < -4)
+						p.Velocity.x = -4;
+					else if (p.Velocity.x > 4)
+						p.Velocity.x = 4;
+				}
+
+				random = (random >> 2) & 3;
+				if (random != 3)
+				{
+					p.Velocity.z += random - 1;
+					if (p.Velocity.z < -4)
+						p.Velocity.z = -4;
+					else if (p.Velocity.z > 4)
+						p.Velocity.z = 4;
+				}
+
+				if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
+					p.Velocity.y += p.Size / 5.0f;
+
+				break;
+			}
 		}
 	}
 
@@ -327,9 +335,9 @@ namespace Environment
 			return;
 
 		int newParticlesCount = 0;
-		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
+		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength * (int)level->Weather;
 
-		if (level->Weather != WeatherType::None)
+		if (density > 0.0f && level->Weather != WeatherType::None)
 		{
 			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
@@ -386,6 +394,7 @@ namespace Environment
 				part.Position.z = zPos;
 				part.Stopped = false;
 				part.Enabled = true;
+				part.CollisionCheckDelay = 0;
 				part.StartLife = part.Life;
 
 				Particles.push_back(part);

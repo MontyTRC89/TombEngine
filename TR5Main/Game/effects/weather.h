@@ -8,6 +8,7 @@ namespace Environment
 {
 	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
 	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
+	constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 4.0f;
 
 	constexpr auto MAX_SNOW_SIZE = 32.0f;
 	constexpr auto MAX_RAIN_SIZE = 128.0f;
@@ -17,7 +18,8 @@ namespace Environment
 	constexpr auto RAIN_SPEED = 256.0f;
 
 	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
-	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 16.0f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR = 1.0f - (1.0f / (WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE * 2));
 
 	constexpr auto SKY_POSITION_LIMIT = 9728;
 
@@ -31,6 +33,7 @@ namespace Environment
 
 		float StartLife;
 		float Life;
+		float CollisionCheckDelay;
 		float Size;
 
 		bool Enabled;
