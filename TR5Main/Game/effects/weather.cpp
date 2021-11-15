@@ -269,8 +269,8 @@ namespace Environment
 						p.Room = coll.RoomNumber;
 				}
 
-				auto coeff = std::min(abs(coll.Position.Floor - p.Position.y), abs(coll.Position.Ceiling - p.Position.y));
-				p.CollisionCheckDelay = std::min(floor(coeff / p.Velocity.y), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
+				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
+				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
 			}
 			else
 				p.CollisionCheckDelay--;
@@ -336,7 +336,11 @@ namespace Environment
 			return;
 
 		int newParticlesCount = 0;
-		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength * (int)level->Weather;
+		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
+
+		// Snow is falling twice as fast, and must be spawned accordingly fast
+		if (level->Weather == WeatherType::Snow)
+			density *= 2;
 
 		if (density > 0.0f && level->Weather != WeatherType::None)
 		{
