@@ -25,19 +25,19 @@ namespace Environment
 
 	struct WeatherParticle
 	{
-		WeatherType Type;
+		WeatherType Type = WeatherType::None;
 
-		int Room;
-		Vector3 Position;
-		Vector3 Velocity;
+		int Room = -1;
+		Vector3 Position = Vector3::Zero;
+		Vector3 Velocity = Vector3::Zero;
 
-		float StartLife;
-		float Life;
-		float CollisionCheckDelay;
-		float Size;
+		float StartLife = 0.0f;
+		float Life = 0.0f;
+		float CollisionCheckDelay = 0.0f;
+		float Size = 0.0f;
 
-		bool Enabled;
-		bool Stopped;
+		bool Enabled = false;
+		bool Stopped = false;
 
 		float Transparency() const;
 	};
