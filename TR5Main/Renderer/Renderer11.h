@@ -502,8 +502,9 @@ namespace TEN::Renderer
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
-		void drawRoomsTransparent(std::vector<RendererVertex> vertices, RendererRoom* room, int texture, bool animated, BLEND_MODES blendMode, bool doubleSided, RenderView& view);
-		//void drawSpritesTransparent(std::vector<RendererVertex> vertices, bool transparent, bool animated, BLEND_MODES blendMode, bool doubleSided);
+		void drawRoomsTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawSpritesTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawStaticsTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
@@ -565,6 +566,17 @@ namespace TEN::Renderer
 		void drawLaraMesh(RendererMesh* mesh, bool transparent);
 		void drawSimpleParticles(RenderView& view); 
 		void setBlendMode(BLEND_MODES blendMode);
+
+		inline bool isSortingRequired(BLEND_MODES blendMode)
+		{
+			return (blendMode == BLENDMODE_ALPHABLEND
+				|| blendMode == BLENDMODE_EXCLUDE
+				|| blendMode == BLENDMODE_LIGHTEN
+				|| blendMode == BLENDMODE_SCREEN
+				|| blendMode == BLENDMODE_SUBTRACTIVE
+				|| blendMode == BLENDMODE_NOZTEST);
+		}
+
 	public:
 		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
 		void drawBar(float percent, const RendererHUDBar * const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);

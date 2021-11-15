@@ -10,21 +10,28 @@ namespace TEN::Renderer {
 	struct RendererRoom;
 	struct RendererItem;
 	struct RendererStatic;
+	struct RendererObject;
+
+	struct RendererTransparentFaceInfo
+	{
+		RendererPolygon* polygon;
+		RendererSpriteToDraw* sprite;
+		RendererRoom* room;
+		RendererItem* item;
+		RendererStatic* staticMesh;
+		Vector4 color;
+		Matrix world;
+		Vector3 position;
+		int texture;
+		bool animated;
+		bool doubleSided;
+		BLEND_MODES blendMode;
+	};
 
 	struct RendererTransparentFace
 	{
 		RendererTransparentFaceType type;
 		int distance;
-		RendererPolygon* polygon;
-		Vector4 color;
-		Matrix world;
-		int texture;
-		bool animated;
-		bool doubleSided;
-		BLEND_MODES blendMode;
-		RendererSpriteToDraw* sprite;
-		RendererRoom* room;
-		RendererItem* item;
-		RendererStatic* staticMesh;
+		RendererTransparentFaceInfo info;
 	};
 }
