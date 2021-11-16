@@ -297,8 +297,8 @@ void StopSoundEffect(short effectID)
 void StopAllSounds()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].Channel != NULL && BASS_ChannelIsActive(SoundSlot[i].Channel))
-			BASS_ChannelStop(SoundSlot[i].Channel);
+		Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
+
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 }
 
@@ -581,10 +581,13 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return;
 
-	if (fadeout > 0)
-		BASS_ChannelSlideAttribute(SoundSlot[index].Channel, BASS_ATTRIB_VOL, -1.0f, fadeout);
-	else
-		BASS_ChannelStop(SoundSlot[index].Channel);
+	if (SoundSlot[index].Channel != NULL && BASS_ChannelIsActive(SoundSlot[index].Channel))
+	{
+		if (fadeout > 0)
+			BASS_ChannelSlideAttribute(SoundSlot[index].Channel, BASS_ATTRIB_VOL, -1.0f, fadeout);
+		else
+			BASS_ChannelStop(SoundSlot[index].Channel);
+	}
 
 	SoundSlot[index].Channel = NULL;
 	SoundSlot[index].State = SOUND_STATE::Idle;
