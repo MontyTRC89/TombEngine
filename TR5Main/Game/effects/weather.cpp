@@ -206,17 +206,25 @@ namespace Environment
 		{
 			p.Life -= 2;
 
+			// Disable particle if it is dead. It will be cleaned on next call of
+			// SpawnWeatherParticles().
+
 			if (p.Life <= 0)
 			{
 				p.Enabled = false;
 				continue;
 			}
 
+			// Check if particle got out of collision check radius, and fade it out if it did.
+
 			if (abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
 				abs(Camera.pos.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
 			{
 				p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 			}
+
+			// If particle was locked (after landing or stucking in substance such as water or swamp),
+			// fade it out and bypass any collision checks and movement updates.
 
 			if (p.Stopped)
 			{
@@ -225,6 +233,8 @@ namespace Environment
 
 				continue;
 			}
+
+			// Backup old position and progress new position according to velocity.
 
 			auto oldPos = p.Position;
 			p.Position.x += p.Velocity.x;
@@ -237,6 +247,11 @@ namespace Environment
 			if (p.CollisionCheckDelay <= 0)
 			{
 				coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+
+				// Determine collision checking frequency based on nearest floor/ceiling surface position.
+				// If floor and ceiling is too far, don't do precise collision checks, instead doing it 
+				// every 5th frame. If particle approaches floor or ceiling, make checks more frequent.
+				// This allows to avoid unnecessary thousands of calls to GetCollisionResult for every particle.
 				
 				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
 				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
@@ -246,6 +261,8 @@ namespace Environment
 				p.CollisionCheckDelay--;
 
 			auto& r = g_Level.Rooms[p.Room];
+
+			// Check if particle got out of room bounds
 
 			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
 				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
@@ -259,15 +276,20 @@ namespace Environment
 
 				if (coll.RoomNumber == p.Room)
 				{
-					p.Enabled = false; // Out of room bounds, delete
+					p.Enabled = false; // Not landed on door, so out of room bounds - delete
 					continue;
 				}
 				else
 					p.Room = coll.RoomNumber;
 			}
 
+			// If collision was updated, process with position checks.
+
 			if (collisionCalculated)
 			{
+				// If particle is inside water or swamp, count it as "inSubstance".
+				// If particle got below floor or above ceiling, count it as "landed".
+
 				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
 				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
 
@@ -277,6 +299,8 @@ namespace Environment
 					p.Position = oldPos;
 					p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 
+					// Produce ripples if particle got into substance (water or swamp).
+
 					if (inSubstance)
 					{
 						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
@@ -284,10 +308,14 @@ namespace Environment
 							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 					}
 
+					// Immediately disable rain particle because it doesn't need fading out.
+
 					if (p.Type == WeatherType::Rain)
 						p.Enabled = false;
 				}
 			}
+
+			// Update velocities for every particle type.
 
 			switch (p.Type)
 			{
