@@ -179,9 +179,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			g_Inventory.DrawInventory();
 			g_Renderer.SyncRenderer();
 
-			int z = g_Inventory.DoPauseMenu();
-
-			if (z == INV_RESULT_EXIT_TO_TILE)
+			if (g_Inventory.DoPauseMenu() == InventoryResult::ExitToTitle)
 				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
 
@@ -461,7 +459,7 @@ GAME_STATUS DoTitle(int index)
 	// Load the level
 	LoadLevelFile(index);
 
-	int inventoryResult;
+	InventoryResult inventoryResult;
 
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
@@ -515,8 +513,10 @@ GAME_STATUS DoTitle(int index)
 
 		ControlPhase(2, 0);
 
-		int status = 0, frames;
-		while (!status)
+		int frames = 0;
+		auto status = InventoryResult::None;
+
+		while (status == InventoryResult::None)
 		{
 			g_Renderer.renderTitle();
 
@@ -526,7 +526,7 @@ GAME_STATUS DoTitle(int index)
 
 			status = g_Inventory.TitleOptions();
 
-			if (status)
+			if (status != InventoryResult::None)
 				break;
 
 			Camera.numberFrames = g_Renderer.SyncRenderer();
@@ -546,11 +546,11 @@ GAME_STATUS DoTitle(int index)
 
 	switch (inventoryResult)
 	{
-	case INV_RESULT_NEW_GAME:
+	case InventoryResult::NewGame:
 		return GAME_STATUS::GAME_STATUS_NEW_GAME;
-	case INV_RESULT_LOAD_GAME:
+	case InventoryResult::LoadGame:
 		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-	case INV_RESULT_EXIT_GAME:
+	case InventoryResult::ExitGame:
 		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 

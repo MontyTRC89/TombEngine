@@ -580,12 +580,10 @@ void InventoryClass::DoDebouncedInput()
 	}
 }
 
-int InventoryClass::TitleOptions()
+InventoryResult InventoryClass::TitleOptions()
 {
-	int ret;
+	auto ret = InventoryResult::None;
 	static short selected_option_bak;
-
-	ret = 0;
 
 	/*stuff for credits go here!*/
 
@@ -596,7 +594,7 @@ int InventoryClass::TitleOptions()
 		break;
 
 	case Menu::SelectLevel:
-		ret = 0;
+		ret = InventoryResult::None;
 		option_count = g_GameFlow->GetNumLevels() - 2;
 		break;
 
@@ -673,7 +671,7 @@ int InventoryClass::TitleOptions()
 					menu_to_display = Menu::SelectLevel;
 				}
 				else
-					ret = INV_RESULT_NEW_GAME;
+					ret = InventoryResult::NewGame;
 
 				break;
 
@@ -690,7 +688,7 @@ int InventoryClass::TitleOptions()
 				break;
 
 			case 3:
-				ret = INV_RESULT_EXIT_GAME;
+				ret = InventoryResult::ExitGame;
 				break;
 			}
 		}
@@ -700,7 +698,7 @@ int InventoryClass::TitleOptions()
 			g_GameFlow->SelectedLevelForNewGame = selected_option;
 			menu_to_display = Menu::Title;
 			selected_option = 0;
-			ret = INV_RESULT_NEW_GAME_SELECTED_LEVEL;
+			ret = InventoryResult::NewGameSelectedLevel;
 		}
 		else if (menu_to_display == Menu::LoadGame)
 		{
@@ -711,7 +709,7 @@ int InventoryClass::TitleOptions()
 				SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 				g_GameFlow->SelectedSaveGame = selected_option;
 				selected_option = 0;
-				ret = INV_RESULT_LOAD_GAME;
+				ret = InventoryResult::LoadGame;
 			}
 		}
 		else if (menu_to_display == Menu::Options)
@@ -1186,7 +1184,7 @@ void InventoryClass::HandleSoundSettingsInput(bool pause)
 	}
 }
 
-int InventoryClass::DoPauseMenu()
+InventoryResult InventoryClass::DoPauseMenu()
 {
 	//basically mini title
 
@@ -1255,7 +1253,7 @@ int InventoryClass::DoPauseMenu()
 		{
 			invMode = InventoryMode::None;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-			return INV_RESULT_NONE;
+			return InventoryResult::None;
 		}
 
 		if (menu_to_display == Menu::Statistics || menu_to_display == Menu::Options)
@@ -1284,7 +1282,7 @@ int InventoryClass::DoPauseMenu()
 
 			case 2:
 				invMode = InventoryMode::None;
-				return INV_RESULT_EXIT_TO_TILE;
+				return InventoryResult::ExitToTitle;
 			}
 		}
 		else if (menu_to_display == Menu::Options)
@@ -1310,7 +1308,7 @@ int InventoryClass::DoPauseMenu()
 		}
 	}
 
-	return INV_RESULT_NONE;
+	return InventoryResult::None;
 }
 
 /*inventory*/
