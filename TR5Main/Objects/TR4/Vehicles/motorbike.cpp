@@ -301,7 +301,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
         return false;
 
-    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Inventory.Get_inventoryItemChosen() != ID_PUZZLE_ITEM1)
+    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Inventory.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
         return false;
 
     dx = LaraItem->pos.xPos - item->pos.xPos;
@@ -369,10 +369,10 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             short angle = phd_atan(item->pos.zPos - laraitem->pos.zPos, item->pos.xPos - laraitem->pos.xPos) - item->pos.yRot;
             if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
             {
-                if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
+                if (g_Inventory.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
                 {
                     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_UNLOCK;
-                    g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+                    g_Inventory.SetInventoryItemChosen(NO_ITEM);
                 }
                 else
                 {

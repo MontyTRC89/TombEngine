@@ -60,7 +60,7 @@ namespace TEN::Renderer
         x *= (ScreenWidth / 800.0f);
         y *= (ScreenHeight / 600.0f);
 
-		auto index = g_Inventory.convert_obj_to_invobj(objectNum);
+		auto index = g_Inventory.ConvertObjectToInventoryItem(objectNum);
 
 		if (index != -1)
 		{
@@ -124,7 +124,7 @@ namespace TEN::Renderer
             {
                 INVOBJ* objme;
 
-                objme = &inventry_objects_list[g_Inventory.convert_obj_to_invobj(objectNum)];
+                objme = &inventry_objects_list[g_Inventory.ConvertObjectToInventoryItem(objectNum)];
 
                 if (!(objme->meshbits & (1 << n)))
                     continue;
@@ -489,13 +489,13 @@ namespace TEN::Renderer
         int y = 400;
         short lastY;
         RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
-        RendererDisplayMode* mode = &adapter->DisplayModes[g_Inventory.Get_CurrentSettings().videoMode];
-        __int64 title_option = g_Inventory.Get_title_selected_option();
-        title_menus title_menu = g_Inventory.Get_title_menu_to_display();
+        RendererDisplayMode* mode = &adapter->DisplayModes[g_Inventory.GetCurrentSettings().videoMode];
+        __int64 title_option = g_Inventory.GetSelectedOption();
+        Menu title_menu = g_Inventory.GetMenuToDisplay();
 
         switch (title_menu)
         {
-        case title_main_menu:
+        case Menu::Title:
             a:
             if (title_option == 0)
                 drawString(400, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
@@ -524,7 +524,7 @@ namespace TEN::Renderer
                 drawString(400, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
             break;
 
-        case title_select_level:
+        case Menu::SelectLevel:
             lastY = 50;
 
             drawString(400, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
@@ -541,7 +541,7 @@ namespace TEN::Renderer
             }
             break;
 
-        case title_load_game:
+        case Menu::LoadGame:
             if (g_GameFlow->EnableLoadSave)
             {
                 y = 44;
@@ -570,8 +570,8 @@ namespace TEN::Renderer
             else
                 goto a;
             break;
-        case title_options_menu:
-            
+
+        case Menu::Options:            
             y = 350;
 
             if (title_option == 0)
@@ -595,7 +595,7 @@ namespace TEN::Renderer
 
             break;
 
-        case title_display_menu:
+        case Menu::Display:
             y = 200;
 
             drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
@@ -620,7 +620,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (title_option == 1 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (title_option == 1 ? PRINTSTRING_BLINK : 0));
 
@@ -630,7 +630,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (title_option == 2 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (title_option == 2 ? PRINTSTRING_BLINK : 0));
 
@@ -640,7 +640,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (title_option == 3 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (title_option == 3 ? PRINTSTRING_BLINK : 0));
 
@@ -650,7 +650,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (title_option == 4 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (title_option == 4 ? PRINTSTRING_BLINK : 0));
 
@@ -669,7 +669,7 @@ namespace TEN::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 6 ? PRINTSTRING_BLINK : 0));
             break;
 
-        case title_controls_menu:
+        case Menu::Controls:
             y = 40;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
@@ -682,9 +682,9 @@ namespace TEN::Renderer
                 drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
                     PRINTSTRING_COLOR_WHITE,
                     PRINTSTRING_OUTLINE | (title_option == k ? PRINTSTRING_BLINK : 0) |
-                    (g_Inventory.Get_CurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                    (g_Inventory.GetCurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                if (g_Inventory.Get_CurrentSettings().waitingForkey && title_option == k)
+                if (g_Inventory.GetCurrentSettings().waitingForkey && title_option == k)
                 {
                     drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                         PRINTSTRING_COLOR_YELLOW,
@@ -712,7 +712,7 @@ namespace TEN::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 17 ? PRINTSTRING_BLINK : 0));
             break;
 
-        case title_sounds_menu:
+        case Menu::Sound:
             y = 200;
 
             drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
@@ -724,7 +724,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (title_option == 0 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (title_option == 0 ? PRINTSTRING_BLINK : 0));
 
@@ -734,7 +734,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | (title_option == 1 ? PRINTSTRING_BLINK : 0));
-            drawBar(g_Inventory.Get_CurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar,ID_SFX_BAR_TEXTURE,0,false);
+            drawBar(g_Inventory.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar,ID_SFX_BAR_TEXTURE,0,false);
 
             y += 25;
 
@@ -742,7 +742,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | (title_option == 2 ? PRINTSTRING_BLINK : 0));
-            drawBar(g_Inventory.Get_CurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,false);
+            drawBar(g_Inventory.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,false);
             y += 25;
 
             // Apply and cancel
@@ -764,13 +764,13 @@ namespace TEN::Renderer
         char stringBuffer[255];
         int y;
         RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
-        RendererDisplayMode* mode = &adapter->DisplayModes[g_Inventory.Get_CurrentSettings().videoMode];
-        pause_menus pause_menu = g_Inventory.Get_pause_menu_to_display();
-        __int64 pause_option = g_Inventory.Get_pause_selected_option();
+        RendererDisplayMode* mode = &adapter->DisplayModes[g_Inventory.GetCurrentSettings().videoMode];
+        Menu pause_menu = g_Inventory.GetMenuToDisplay();
+        __int64 pause_option = g_Inventory.GetSelectedOption();
 
         switch (pause_menu)
         {
-        case pause_main_menu:
+        case Menu::Pause:
             y = 275;
 
             if (pause_option == 0)
@@ -794,11 +794,11 @@ namespace TEN::Renderer
 
             break;
 
-        case pause_statistics:
+        case Menu::Statistics:
             drawStatistics();
             break;
 
-        case pause_options_menu:
+        case Menu::Options:
             y = 275;
 
             if (pause_option == 0)
@@ -822,7 +822,7 @@ namespace TEN::Renderer
 
             break;
 
-        case pause_display_menu:
+        case Menu::Display:
             y = 200;
 
             drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
@@ -847,7 +847,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (pause_option == 1 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.Windowed ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (pause_option == 1 ? PRINTSTRING_BLINK : 0));
 
@@ -857,7 +857,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (pause_option == 2 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (pause_option == 2 ? PRINTSTRING_BLINK : 0));
 
@@ -867,7 +867,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (pause_option == 3 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (pause_option == 3 ? PRINTSTRING_BLINK : 0));
 
@@ -877,7 +877,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (pause_option == 4 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (pause_option == 4 ? PRINTSTRING_BLINK : 0));
 
@@ -896,7 +896,7 @@ namespace TEN::Renderer
                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 6 ? PRINTSTRING_BLINK : 0));
             break;
 
-        case pause_controls_menu:
+        case Menu::Controls:
             y = 40;
 
             drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
@@ -909,9 +909,9 @@ namespace TEN::Renderer
                 drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
                     PRINTSTRING_COLOR_WHITE,
                     PRINTSTRING_OUTLINE | (pause_option == k ? PRINTSTRING_BLINK : 0) |
-                    (g_Inventory.Get_CurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                    (g_Inventory.GetCurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                if (g_Inventory.Get_CurrentSettings().waitingForkey && pause_option == k)
+                if (g_Inventory.GetCurrentSettings().waitingForkey && pause_option == k)
                 {
                     drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                         PRINTSTRING_COLOR_YELLOW,
@@ -940,7 +940,7 @@ namespace TEN::Renderer
 
             break;
 
-        case pause_sounds_menu:
+        case Menu::Sound:
             y = 200;
 
             drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
@@ -952,7 +952,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (pause_option == 0 ? PRINTSTRING_BLINK : 0));
-            drawString(400, y, g_GameFlow->GetString(g_Inventory.Get_CurrentSettings().conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
+            drawString(400, y, g_GameFlow->GetString(g_Inventory.GetCurrentSettings().conf.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                 PRINTSTRING_COLOR_WHITE,
                 PRINTSTRING_OUTLINE | (pause_option == 0 ? PRINTSTRING_BLINK : 0));
 
@@ -962,7 +962,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | (pause_option == 1 ? PRINTSTRING_BLINK : 0));
-            drawBar(g_Inventory.Get_CurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
+            drawBar(g_Inventory.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
 
             y += 25;
 
@@ -970,7 +970,7 @@ namespace TEN::Renderer
             drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                 PRINTSTRING_COLOR_ORANGE,
                 PRINTSTRING_OUTLINE | (pause_option == 2 ? PRINTSTRING_BLINK : 0));
-            drawBar(g_Inventory.Get_CurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
+            drawBar(g_Inventory.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE,0,0);
             y += 25;
 
             // Apply and cancel
@@ -994,16 +994,16 @@ namespace TEN::Renderer
     {
         if (!g_GameFlow->EnableLoadSave)
         {
-            g_Inventory.Set_invMode(IM_INGAME);
+            g_Inventory.SetInventoryMode(InventoryMode::InGame);
             return;
         }
         
-        short selection = g_Inventory.Get_LoadSaveSelection();
+        short selection = g_Inventory.GetLoadSaveSelection();
         char stringBuffer[255];
         long y = 70;
         LoadSavegameInfos();
 
-        if (g_Inventory.Get_invMode() == IM_LOAD)
+        if (g_Inventory.GetInventoryMode() == InventoryMode::Load)
             drawString(400, 40, "Load Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
         else
             drawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
@@ -1035,16 +1035,16 @@ namespace TEN::Renderer
 
     void Renderer11::renderNewInventory()
     {
-        g_Inventory.draw_current_object_list(RING_INVENTORY);
+        g_Inventory.DrawCurrentObjectList(RING_INVENTORY);
        
-        g_Inventory.handle_inventry_menu();
+        g_Inventory.HandleInventoryMenu();
 
         if (g_Inventory.GetRings(RING_AMMO)->ringactive)
-            g_Inventory.draw_current_object_list(RING_AMMO);
+            g_Inventory.DrawCurrentObjectList(RING_AMMO);
 
-        g_Inventory.draw_ammo_selector();
-        g_Inventory.fade_ammo_selector();
-        g_Inventory.draw_compass();
+        g_Inventory.DrawAmmoSelector();
+        g_Inventory.FadeAmmoSelector();
+        g_Inventory.DrawCompass();
         drawAllStrings();
     }
 
@@ -1119,7 +1119,7 @@ namespace TEN::Renderer
 
         saved_scale = obj->scale1;
         obj->scale1 = scaler;
-        drawObjectOn2DPosition(400, 300, g_Inventory.convert_invobj_to_obj(inv_item), xrot, yrot, zrot, obj->scale1);
+        drawObjectOn2DPosition(400, 300, g_Inventory.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->scale1);
         obj->scale1 = saved_scale;
     }
 
@@ -1127,7 +1127,7 @@ namespace TEN::Renderer
     {
         INVOBJ* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
         short currentPage = Lara.Diary.currentPage;
-        drawObjectOn2DPosition(400, 300, g_Inventory.convert_invobj_to_obj(INV_OBJECT_OPEN_DIARY), obj->xrot, obj->yrot, obj->zrot, obj->scale1);
+        drawObjectOn2DPosition(400, 300, g_Inventory.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot, obj->yrot, obj->zrot, obj->scale1);
 
         for (int i = 0; i < MaxStringsPerPage; i++)
         {
@@ -1203,9 +1203,9 @@ namespace TEN::Renderer
 
         if (CurrentLevel == 0)
         {
-            title_menus title_menu = g_Inventory.Get_title_menu_to_display();
+            Menu title_menu = g_Inventory.GetMenuToDisplay();
 
-            if (title_menu == title_main_menu || title_menu == title_options_menu)
+            if (title_menu == Menu::Title || title_menu == Menu::Options)
                 drawLogo = 1;
             else
                 drawLogo = 0;
@@ -1230,40 +1230,40 @@ namespace TEN::Renderer
             return;
         }
         
-        inv_modes mode = g_Inventory.Get_invMode();
+        InventoryMode mode = g_Inventory.GetInventoryMode();
 
-        if (mode == IM_LOAD || mode == IM_SAVE)
+        if (mode == InventoryMode::Load || mode == InventoryMode::Save)
         {
             renderLoadSaveMenu();
             return;
         }
 
-        if (mode == IM_INGAME)
+        if (mode == InventoryMode::InGame)
         {
           renderNewInventory();
           return;
         }
 
-        if (mode == IM_STATS)
+        if (mode == InventoryMode::Statistics)
         {
             drawStatistics();
             return;
         }
 
-        if (mode == IM_EXAMINE)
+        if (mode == InventoryMode::Examine)
         {
             drawExamines();
             return;
         }
 
-        if (mode == IM_PAUSE)
+        if (mode == InventoryMode::Pause)
         {
-            pause_menus pause_menu = g_Inventory.Get_pause_menu_to_display();
+            Menu pause_menu = g_Inventory.GetMenuToDisplay();
 
-            if (pause_menu == pause_main_menu || pause_menu == pause_options_menu)
+            if (pause_menu == Menu::Pause || pause_menu == Menu::Options)
             {
-                guiRect.left  = pause_menu == pause_main_menu ? 335 : 295;
-                guiRect.right = pause_menu == pause_main_menu ? 135 : 215;
+                guiRect.left  = pause_menu == Menu::Pause ? 335 : 295;
+                guiRect.right = pause_menu == Menu::Pause ? 135 : 215;
                 guiRect.top = 265;
                 guiRect.bottom = 100;
                 addQuad2D(guiRect, 0, 0, 64, 180);
@@ -1273,7 +1273,7 @@ namespace TEN::Renderer
             return;
         }
 
-        if (mode == IM_DIARY)
+        if (mode == InventoryMode::Diary)
         {
             drawDiary();
             return;

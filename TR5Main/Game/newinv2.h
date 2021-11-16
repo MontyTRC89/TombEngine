@@ -2,29 +2,19 @@
 #include "configuration.h"
 #include <Scripting/LanguageScript.h>
 
-enum inv_modes
+enum class InventoryMode
 {
-	IM_NONE,
-	IM_INGAME,
-	IM_PAUSE,
-	IM_STATS,
-	IM_EXAMINE,
-	IM_DIARY,
-	IM_LOAD,
-	IM_SAVE
+	None,
+	InGame,
+	Pause,
+	Statistics,
+	Examine,
+	Diary,
+	Load,
+	Save
 };
 
-enum pause_menus
-{
-	pause_main_menu,
-	pause_statistics,
-	pause_options_menu,
-	pause_display_menu,
-	pause_controls_menu,
-	pause_sounds_menu
-};
-
-enum menu_types
+enum class MenuTypes
 {
 	MENU_TYPE_nothing,
 	MENU_TYPE_USE,
@@ -78,15 +68,17 @@ enum ring_types
 	RING_AMMO
 };
 
-enum title_menus
+enum class Menu
 {
-	title_main_menu,
-	title_select_level,
-	title_load_game,
-	title_options_menu,
-	title_display_menu,
-	title_controls_menu,
-	title_sounds_menu
+	Title,
+	Pause,
+	Statistics,
+	SelectLevel,
+	LoadGame,
+	Options,
+	Display,
+	Controls,
+	Sound
 };
 
 enum inv_objects
@@ -394,70 +386,68 @@ struct INVOBJ
 class InventoryClass
 {
 public:
-	int S_CallInventory2(bool reset_mode);	//the mother(fucker) of all
+	int CallInventory(bool reset_mode);
 	int TitleOptions();
 	int DoPauseMenu();
-	void handle_inventry_menu();
-	void DrawInv();
-	void draw_current_object_list(int ringnum);
-	int have_i_got_object(short object_number);
-	int convert_obj_to_invobj(short obj);
-	int convert_invobj_to_obj(int obj);
-	void fade_ammo_selector();
-	void draw_ammo_selector();
-	bool do_special_waterskin_combine_bullshit(int flag);
-	void draw_compass();
+	void HandleInventoryMenu();
+	void DrawInventory();
+	void DrawCurrentObjectList(int ringnum);
+	int IsObjectInInventory(short object_number);
+	int ConvertObjectToInventoryItem(short obj);
+	int ConvertInventoryItemToObject(int obj);
+	void FadeAmmoSelector();
+	void DrawAmmoSelector();
+	bool PerformWaterskinCombine(int flag);
+	void DrawCompass();
 
 	//getters
 	RINGME* GetRings(char num);
-	short Get_title_selected_option();
-	title_menus Get_title_menu_to_display();
-	short Get_pause_selected_option();
-	pause_menus Get_pause_menu_to_display();
-	inv_modes Get_invMode();
-	int Get_inventoryItemChosen();
-	int Get_enterInventory();
-	int Get_lastInvItem();
-	titleSettings Get_CurrentSettings();
-	short Get_LoadSaveSelection();
+	short GetSelectedOption();
+	Menu GetMenuToDisplay();
+	InventoryMode GetInventoryMode();
+	int GetInventoryItemChosen();
+	int GetEnterInventory();
+	int GetLastInventoryItem();
+	titleSettings GetCurrentSettings();
+	short GetLoadSaveSelection();
 
 	//setters
-	void Set_pause_selected_option(short menu);
-	void Set_pause_menu_to_display(pause_menus menu);
-	void Set_invMode(inv_modes mode);
-	void Set_enterInventory(int num);
-	void Set_inventoryItemChosen(int num);
+	void SetSelectedOption(short menu);
+	void SetMenuToDisplay(Menu menu);
+	void SetInventoryMode(InventoryMode mode);
+	void SetEnterInventory(int num);
+	void SetInventoryItemChosen(int num);
 
 private:
-	void do_debounced_input();
-	void clear_input_vars(bool flag);
-	void handle_display_setting_input(bool pause);
-	void handle_control_settings_input(bool pause);
-	void handle_sound_settings_input(bool pause);
-	void fillSound();
-	bool do_these_objects_combine(int obj1, int obj2);
-	void init_inventry();
+	void DoDebouncedInput();
+	void ClearInputVariables(bool flag);
+	void HandleDisplaySettingsInput(bool pause);
+	void HandleControlSettingsInput(bool pause);
+	void HandleSoundSettingsInput(bool pause);
+	void FillSound();
+	bool DoObjectsCombine(int obj1, int obj2);
+	void InitializeInventory();
 	void FillDisplayOptions();
-	bool is_item_currently_combinable(short obj);
-	bool have_i_got_item(short obj);
-	void combine_these_two_objects(short obj1, short obj2);
-	void setup_objectlist_startposition(short newobj);
-	void setup_objectlist_startposition2(short newobj);
-	void handle_object_changeover(int ringnum);
-	void setup_ammo_selector();
-	void construct_object_list();
-	void seperate_object(short obj);
-	void insert_object_into_list(int num);
-	void insert_object_into_list_v2(int num);
-	void use_current_item();
-	void spinback(unsigned short* angle);
-	void update_laras_weapons_status();
-	void do_stats_mode();
-	void do_examine_mode();
-	void do_diary();
-	int do_load();
-	void do_save();
-	void construct_combine_object_list();
+	bool IsItemCurrentlyCombinable(short obj);
+	bool IsItemInInventory(short obj);
+	void CombineObjects(short obj1, short obj2);
+	void SetupObjectListStartPosition(short newobj);
+	void SetupObjectListStartPosition2(short newobj);
+	void HandleObjectChangeover(int ringnum);
+	void SetupAmmoSelector();
+	void ConstructObjectList();
+	void SeparateObject(short obj);
+	void InsertObjectIntoList(int num);
+	void InsertObjectIntoList_v2(int num);
+	void UseCurrentItem();
+	void SpinBack(unsigned short* angle);
+	void UpdateWeaponStatus();
+	void DoStatisticsMode();
+	void DoExamineMode();
+	void DoDiary();
+	int DoLoad();
+	void DoSave();
+	void ConstructCombineObjectList();
 	
 	/*vars*/
 	//input
@@ -492,7 +482,7 @@ private:
 	unsigned char ammo_active;
 	int OBJLIST_SPACING;
 	currentOptionsStuff current_options[3];
-	inv_modes invMode;
+	InventoryMode invMode;
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
@@ -533,15 +523,9 @@ private:
 	char StashedCurrentHarpoonAmmoType;
 	char StashedCurrentRocketAmmoType;
 
-	//pause
-	int pause_flag;
-	pause_menus pause_menu_to_display = pause_main_menu;
-	short pause_selected_option;
-
-	//title
-	short title_selected_option;
-	title_menus title_menu_to_display = title_main_menu;
-	int settings_flag;
+	Menu menu_to_display = Menu::Title;
+	short selected_option;
+	int option_count;
 
 	titleSettings CurrentSettings;
 
