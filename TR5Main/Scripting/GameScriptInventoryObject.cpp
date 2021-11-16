@@ -29,7 +29,7 @@ associated getters and setters.
 	@tparam ItemAction action is this usable, equippable, or examinable?
 	@return an InventoryObject
 */
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, item_options a_action) :
+GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, rotflags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
@@ -44,7 +44,7 @@ GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, 
 void GameScriptInventoryObject::Register(sol::state * lua)
 {
 	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
-		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, rotflags, int, item_options), GameScriptInventoryObject()>(),
+		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, rotflags, int, ItemOptions), GameScriptInventoryObject()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
 */
@@ -99,15 +99,15 @@ e.g. `myItem.action = ItemAction.EXAMINE`
 }
 
 // Add validation so the user can't choose something unimplemented
-void GameScriptInventoryObject::SetAction(item_options a_action)
+void GameScriptInventoryObject::SetAction(ItemOptions a_action)
 {
-	bool isSupported = (a_action == item_options::OPT_EQUIP) ||
-		(a_action == item_options::OPT_USE) ||
-		(a_action == item_options::OPT_EXAMINABLE);
+	bool isSupported = (a_action == ItemOptions::OPT_EQUIP) ||
+		(a_action == ItemOptions::OPT_USE) ||
+		(a_action == ItemOptions::OPT_EXAMINABLE);
 
 	if (!ScriptAssert(isSupported, "Unsupported item action: " + std::to_string(a_action)))
 	{
-		item_options def = item_options::OPT_USE;
+		ItemOptions def = ItemOptions::OPT_USE;
 		ScriptWarn("Defaulting to " + std::to_string(def));
 		action = def;
 	}
