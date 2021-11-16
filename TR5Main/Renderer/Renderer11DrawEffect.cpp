@@ -863,7 +863,7 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::drawSpritesTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view)
+	void Renderer11::drawSpritesTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view)
 	{
 		setBlendMode(info->blendMode);
 
@@ -900,6 +900,7 @@ namespace TEN::Renderer
 		m_context->Draw(vertices.size(), 0);
 
 		m_numDrawCalls++;
+		m_numTransparentDrawCalls++;
 	}
 
 	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) {

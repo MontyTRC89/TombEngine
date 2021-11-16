@@ -33,5 +33,46 @@ namespace TEN::Renderer {
 		RendererTransparentFaceType type;
 		int distance;
 		RendererTransparentFaceInfo info;
+
+		RendererTransparentFace()
+		{
+
+		}
+
+		RendererTransparentFace(const RendererTransparentFace& source)
+		{
+			type = source.type;
+			distance = source.distance;
+			info.animated = source.info.animated;
+			info.blendMode = source.info.blendMode;
+			info.color = source.info.color;
+			info.doubleSided = source.info.doubleSided;
+			info.item = source.info.item;
+			info.polygon = source.info.polygon;
+			info.position = source.info.position;
+			info.room = source.info.room;
+			info.sprite = source.info.sprite;
+			info.staticMesh = source.info.staticMesh;
+			info.texture = source.info.texture;
+			info.world = source.info.world;
+		}
+
+		RendererTransparentFace(RendererTransparentFace& source)
+		{
+			type = source.type;
+			distance = source.distance;
+			info.animated = source.info.animated;
+			info.blendMode = source.info.blendMode;
+			info.color = source.info.color;
+			info.doubleSided = source.info.doubleSided;
+			info.item = source.info.item;
+			info.polygon = source.info.polygon;
+			info.position = source.info.position;
+			info.room = source.info.room;
+			info.sprite = source.info.sprite;
+			info.staticMesh = source.info.staticMesh;
+			info.texture = source.info.texture;
+			info.world = source.info.world;
+		}
 	};
 }
