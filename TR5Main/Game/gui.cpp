@@ -394,7 +394,7 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
 };
 
-TitleSettings GuiController::GetCurrentSettings()
+SettingsData GuiController::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
@@ -894,30 +894,77 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 void GuiController::HandleControlSettingsInput(bool pause)
 {
-	CurrentSettings.waitingForkey = 0;
-
+	CurrentSettings.waitingForkey = false;
 	memcpy(&CurrentSettings.conf.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
+
+	if (CurrentSettings.ignoreInput)
+	{
+		if (!TrInput)
+			CurrentSettings.ignoreInput = false;
+		return;
+	}
 
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
-
 	DoDebouncedInput();
 
-	if (goDeselect)
+	if (goSelect && selected_option != 16 && selected_option != 17)
 	{
-		if (!CurrentSettings.waitingForkey)
-		{
-			menu_to_display = Menu::Options;
-			selected_option = 1;
-		}
-		else
-			CurrentSettings.waitingForkey = 0;
-
-		return;
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		CurrentSettings.waitingForkey = true;
 	}
 
-	if (!CurrentSettings.waitingForkey)
+	if (CurrentSettings.waitingForkey)
+	{
+		TrInput = 0;
+		DbInput = 0;
+		ZeroMemory(KeyMap, 256);
+
+		while (true)
+		{
+			int selectedKey = 0;
+			for (selectedKey = 0; selectedKey < 256; selectedKey++)
+			{
+				if (KeyMap[selectedKey] & 0x80)
+					break;
+			}
+
+			if (selectedKey == 256)
+				selectedKey = 0;
+
+			if (selectedKey && g_KeyNames[selectedKey])
+			{
+				if (selectedKey != DIK_ESCAPE)
+				{
+					KeyboardLayout[1][selected_option] = selectedKey;
+					DefaultConflict();
+				}
+
+				CurrentSettings.waitingForkey = false;
+				CurrentSettings.ignoreInput = true;
+				return;
+			}
+
+			if (pause)
+			{
+				g_Renderer.renderInventory();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+			}
+			else
+			{
+				g_Renderer.renderTitle();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+				int nframes = Camera.numberFrames;
+				ControlPhase(nframes, 0);
+			}
+
+			SetDebounce = true;
+			S_UpdateInput();
+			SetDebounce = false;
+		}
+	}
+	else
 	{
 		if (goUp)
 		{
@@ -959,71 +1006,11 @@ void GuiController::HandleControlSettingsInput(bool pause)
 				return;
 			}
 		}
-	}
 
-	if (KeyMap[DIK_RETURN] && selected_option != 16 && selected_option != 17)
-	{
-		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-		CurrentSettings.waitingForkey = 1;
-	}
-
-	if (CurrentSettings.waitingForkey)
-	{
-		TrInput = 0;
-		DbInput = 0;
-		ZeroMemory(KeyMap, 256);
-
-		while (true)
+		if (goDeselect)
 		{
-			if (DbInput & IN_DESELECT)
-			{
-				CurrentSettings.waitingForkey = false;
-				break;
-			}
-
-			int selectedKey = 0;
-			for (selectedKey = 0; selectedKey < 256; selectedKey++)
-			{
-				if (KeyMap[selectedKey] & 0x80)
-					break;
-			}
-
-			if (selectedKey == 256)
-				selectedKey = 0;
-
-			if (selectedKey && g_KeyNames[selectedKey])
-			{
-				if (!(selectedKey == DIK_RETURN || selectedKey == DIK_LEFT || selectedKey == DIK_RIGHT ||
-					selectedKey == DIK_UP || selectedKey == DIK_DOWN))
-				{
-					if (selectedKey != DIK_ESCAPE)
-					{
-						KeyboardLayout[1][selected_option] = selectedKey;
-
-						DefaultConflict();
-						DbInput = 0;
-						CurrentSettings.waitingForkey = false;
-						return;
-					}
-				}
-			}
-
-			if (pause)
-			{
-				g_Renderer.renderInventory();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
-			}
-			else
-			{
-				g_Renderer.renderTitle();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
-				int nframes = Camera.numberFrames;
-				ControlPhase(nframes, 0);
-			}
-
-			SetDebounce = true;
-			S_UpdateInput();
-			SetDebounce = false;
+			menu_to_display = Menu::Options;
+			selected_option = 1;
 		}
 	}
 }

@@ -366,9 +366,10 @@ struct AmmoList
 	unsigned short	zrot;
 };
 
-struct TitleSettings
+struct SettingsData
 {
-	bool waitingForkey;//waiting for a key to be pressed when configuring controls
+	bool waitingForkey = false; // Waiting for a key to be pressed when configuring controls
+	bool ignoreInput = false;   // Ignore input unless all keys were released
 	int videoMode;
 	GameConfiguration conf;
 };
@@ -420,7 +421,7 @@ public:
 	int GetInventoryItemChosen();
 	int GetEnterInventory();
 	int GetLastInventoryItem();
-	TitleSettings GetCurrentSettings();
+	SettingsData GetCurrentSettings();
 	short GetLoadSaveSelection();
 
 	// Setters
@@ -539,7 +540,7 @@ private:
 	short selected_option;
 	int option_count;
 
-	TitleSettings CurrentSettings;
+	SettingsData CurrentSettings;
 
 	// Load / save
 	short selected_slot;
