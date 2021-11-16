@@ -90,7 +90,7 @@ using namespace TEN::Math::Random;
 #define QUAD_IN_ACCELERATE	IN_ACTION
 #define QUAD_IN_BRAKE		IN_JUMP
 #define QUAD_IN_DRIFT		(IN_DUCK | IN_SPRINT)
-#define QUAD_IN_UNMOUNT		IN_ROLL
+#define QUAD_IN_DISMOUNT		IN_ROLL
 #define QUAD_IN_LEFT		IN_LEFT
 #define QUAD_IN_RIGHT		IN_RIGHT
 
@@ -101,8 +101,8 @@ enum QuadState {
 	QUAD_STATE_BRAKE = 6,
 	QUAD_STATE_BIKE_DEATH = 7,
 	QUAD_STATE_FALL = 8,
-	QUAD_STATE_GET_ON_RIGHT = 9,
-	QUAD_STATE_GET_OFF_RIGHT = 10,
+	QUAD_STATE_MOUNT_RIGHT = 9,
+	QUAD_STATE_DISMOUNT_RIGHT = 10,
 	QUAD_STATE_HIT_BACK = 11,
 	QUAD_STATE_HIT_FRONT = 12,
 	QUAD_STATE_HIT_LEFT = 13,
@@ -114,22 +114,26 @@ enum QuadState {
 	QUAD_STATE_FALL_OFF = 20,
 	QUAD_STATE_WHEELIE = 21, // Unused.
 	QUAD_STATE_TURN_RIGHT = 22,
-	QUAD_STATE_GET_ON_LEFT = 23,
-	QUAD_STATE_GET_OFF_LEFT = 24,
+	QUAD_STATE_MOUNT_LEFT = 23,
+	QUAD_STATE_DISMOUNT_LEFT = 24,
+};
+
+enum QuadAnim {
+
 };
 
 enum QuadFlags {
-	QUAD_FLAGS_DEAD = 0x80,
-	QUAD_FLAGS_IS_FALLING = 0x40
+	QUAD_FLAG_DEAD = 0x80,
+	QUAD_FLAG_IS_FALLING = 0x40
 };
 
 enum QuadEffectPosition {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
-	BACKLEFT_TYRE,
-	BACKRIGHT_TYRE,
-	FRONTRIGHT_TYRE,
-	FRONTLEFT_TYRE
+	FRONT_LEFT_TYRE,
+	FRONT_RIGHT_TYRE,
+	BACK_LEFT_TYRE,
+	BACK_RIGHT_TYRE
 };
 
 BITE_INFO quadEffectsPositions[6] = {
@@ -228,10 +232,10 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 	if (laraInfo->Vehicle == NO_ITEM)
 		return true;
 
-	if ((lara->currentAnimState == QUAD_STATE_GET_OFF_RIGHT || lara->currentAnimState == QUAD_STATE_GET_OFF_LEFT) &&
+	if ((lara->currentAnimState == QUAD_STATE_DISMOUNT_RIGHT || lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT) &&
 		TestLastFrame(lara, lara->animNumber))
 	{
-		if (lara->currentAnimState == QUAD_STATE_GET_OFF_LEFT)
+		if (lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT)
 			lara->pos.yRot += ANGLE(90.0f);
 		else
 			lara->pos.yRot -= ANGLE(90.0f);
@@ -266,7 +270,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		}
 		else if (lara->currentAnimState == QUAD_STATE_FALL_DEATH)
 		{
-			quadInfo->flags |= QUAD_FLAGS_DEAD;
+			quadInfo->flags |= QUAD_FLAG_DEAD;
 			lara->goalAnimState = LS_DEATH;
 			lara->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 			lara->speed = 0;
@@ -293,12 +297,8 @@ static int GetOnQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, COLL_INFO* coll)
 		return false;
 	}
 
-	auto dx = lara->pos.xPos - quad->pos.xPos;
-	auto dz = lara->pos.zPos - quad->pos.zPos;
-
-	int distance = dx * dx + dz * dz;
-
-	if (distance > 170000)
+	auto dist = pow(lara->pos.xPos - quad->pos.xPos, 2) + pow(lara->pos.zPos - quad->pos.zPos, 2);
+	if (dist > 170000)
 		return false;
 
 	auto probe = GetCollisionResult(quad);
@@ -841,14 +841,14 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 		case QUAD_STATE_IDLE:
 			if (dead)
 				lara->goalAnimState = QUAD_STATE_BIKE_DEATH;
-			else if (TrInput & QUAD_IN_UNMOUNT &&
+			else if (TrInput & QUAD_IN_DISMOUNT &&
 				quadInfo->velocity == 0 &&
 				!QuadNoGetOff)
 			{
 				if (TrInput & QUAD_IN_LEFT && CanQuadbikeGetOff(-1))
-					lara->goalAnimState = QUAD_STATE_GET_OFF_LEFT;
+					lara->goalAnimState = QUAD_STATE_DISMOUNT_LEFT;
 				else if (TrInput & QUAD_IN_RIGHT && CanQuadbikeGetOff(1))
-					lara->goalAnimState = QUAD_STATE_GET_OFF_RIGHT;
+					lara->goalAnimState = QUAD_STATE_DISMOUNT_RIGHT;
 			}
 			else if (TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE))
 				lara->goalAnimState = QUAD_STATE_DRIVE;
@@ -934,7 +934,7 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 			if (quad->pos.yPos == quad->floor)
 				lara->goalAnimState = QUAD_STATE_LAND;
 			else if (quad->fallspeed > TERMINAL_FALLSPEED)
-				quadInfo->flags |= QUAD_FLAGS_IS_FALLING;
+				quadInfo->flags |= QUAD_FLAG_IS_FALLING;
 
 			break;
 
@@ -1190,12 +1190,12 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 		if (ang > -ANGLE(45.0f) && ang < ANGLE(135.0f))
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUADBIKE_GETONL_A;
-			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_GET_ON_LEFT;
+			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_MOUNT_LEFT;
 		}
 		else
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUADBIKE_GETONR_A;
-			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_GET_ON_RIGHT;
+			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_MOUNT_RIGHT;
 		}
 
 		lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
@@ -1320,10 +1320,10 @@ int QuadBikeControl(void)
 	{
 		switch (lara->currentAnimState)
 		{
-		case QUAD_STATE_GET_ON_LEFT:
-		case QUAD_STATE_GET_ON_RIGHT:
-		case QUAD_STATE_GET_OFF_LEFT:
-		case QUAD_STATE_GET_OFF_RIGHT:
+		case QUAD_STATE_MOUNT_LEFT:
+		case QUAD_STATE_MOUNT_RIGHT:
+		case QUAD_STATE_DISMOUNT_LEFT:
+		case QUAD_STATE_DISMOUNT_RIGHT:
 			drive = -1;
 			collide = false;
 
@@ -1373,7 +1373,7 @@ int QuadBikeControl(void)
 	quad->pos.xRot += ((xRot - quad->pos.xRot) / 2);
 	quad->pos.zRot += ((zRot - quad->pos.zRot) / 2);
 
-	if (!(quadInfo->flags & QUAD_FLAGS_DEAD))
+	if (!(quadInfo->flags & QUAD_FLAG_DEAD))
 	{
 		if (roomNumber != quad->roomNumber)
 		{
@@ -1396,7 +1396,7 @@ int QuadBikeControl(void)
 
 		Camera.targetElevation = -ANGLE(30.0f);
 
-		if (quadInfo->flags & QUAD_FLAGS_IS_FALLING)
+		if (quadInfo->flags & QUAD_FLAG_IS_FALLING)
 		{
 			if (quad->pos.yPos == quad->floor)
 			{
@@ -1410,10 +1410,10 @@ int QuadBikeControl(void)
 		}
 	}
 
-	if (lara->currentAnimState != QUAD_STATE_GET_ON_RIGHT &&
-		lara->currentAnimState != QUAD_STATE_GET_ON_LEFT &&
-		lara->currentAnimState != QUAD_STATE_GET_OFF_RIGHT &&
-		lara->currentAnimState != QUAD_STATE_GET_OFF_LEFT)
+	if (lara->currentAnimState != QUAD_STATE_MOUNT_RIGHT &&
+		lara->currentAnimState != QUAD_STATE_MOUNT_LEFT &&
+		lara->currentAnimState != QUAD_STATE_DISMOUNT_RIGHT &&
+		lara->currentAnimState != QUAD_STATE_DISMOUNT_LEFT)
 	{
 		PHD_VECTOR pos;
 		int speed = 0;

@@ -833,7 +833,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_BIGGUN:
-			if (BigGunControl(coll))
+			if (BigGunControl(item, coll))
 				return;
 			break;
 
