@@ -94,20 +94,6 @@ using namespace TEN::Math::Random;
 #define QUAD_IN_LEFT		IN_LEFT
 #define QUAD_IN_RIGHT		IN_RIGHT
 
-enum QuadEffectPosition {
-	EXHAUST_LEFT = 0,
-	EXHAUST_RIGHT,
-	BACKLEFT_TYRE,
-	BACKRIGHT_TYRE,
-	FRONTRIGHT_TYRE,
-	FRONTLEFT_TYRE
-};
-
-enum QuadFlags {
-	QUAD_FLAGS_DEAD = 0x80,
-	QUAD_FLAGS_IS_FALLING = 0x40
-};
-
 enum QuadState {
 	QUAD_STATE_DRIVE = 1,
 	QUAD_STATE_TURN_LEFT = 2,
@@ -123,13 +109,27 @@ enum QuadState {
 	QUAD_STATE_HIT_RIGHT = 14,
 	QUAD_STATE_IDLE = 15,
 	QUAD_STATE_LAND = 17,
-	QUAD_STATE_IDLE_SLOWLY = 18,
+	QUAD_STATE_STOP_SLOWLY = 18,
 	QUAD_STATE_FALL_DEATH = 19,
 	QUAD_STATE_FALL_OFF = 20,
 	QUAD_STATE_WHEELIE = 21, // Unused.
 	QUAD_STATE_TURN_RIGHT = 22,
 	QUAD_STATE_GET_ON_LEFT = 23,
 	QUAD_STATE_GET_OFF_LEFT = 24,
+};
+
+enum QuadFlags {
+	QUAD_FLAGS_DEAD = 0x80,
+	QUAD_FLAGS_IS_FALLING = 0x40
+};
+
+enum QuadEffectPosition {
+	EXHAUST_LEFT = 0,
+	EXHAUST_RIGHT,
+	BACKLEFT_TYRE,
+	BACKRIGHT_TYRE,
+	FRONTRIGHT_TYRE,
+	FRONTLEFT_TYRE
 };
 
 BITE_INFO quadEffectsPositions[6] = {
@@ -890,7 +890,7 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 
 		case QUAD_STATE_BRAKE:
 		case QUAD_STATE_SLOW:
-		case QUAD_STATE_IDLE_SLOWLY:
+		case QUAD_STATE_STOP_SLOWLY:
 			if ((quadInfo->velocity / 256) == 0)
 				lara->goalAnimState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_LEFT)
