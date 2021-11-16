@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "jeep.h"
 #include "lara.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "effects/effects.h"
 #include "collide.h"
 #include "lara_one_gun.h"
@@ -420,7 +420,7 @@ static int GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) && g_Inventory.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
+	if (!(TrInput & IN_ACTION) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
 		return 0;
 
 	if (item->flags & 0x100)
@@ -457,15 +457,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-			if (g_Inventory.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
+			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory.SetEnterInventory(ID_PUZZLE_ITEM1);
+				if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM1))
+					g_Gui.SetEnterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}
@@ -478,15 +478,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-			if (g_Inventory.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
+			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory.SetEnterInventory(ID_PUZZLE_ITEM1);
+				if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM1))
+					g_Gui.SetEnterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}

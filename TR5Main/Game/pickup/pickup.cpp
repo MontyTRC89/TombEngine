@@ -3,7 +3,7 @@
 #include "Specific/phd_global.h"
 #include "lara.h"
 #include "animation.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "room.h"
 #include "effects/debris.h"
 #include "health.h"
@@ -340,7 +340,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	
 	if (!(TrInput & IN_ACTION) && 
-		(g_Inventory.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2)
+		(g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2)
 		|| BinocularRange
 		|| (l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || Lara.gunStatus)
 		&& (l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || Lara.gunStatus)
@@ -435,10 +435,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		if (!Lara.isMoving)
 		{
-			if (g_Inventory.GetInventoryItemChosen() == NO_ITEM)
+			if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 			{
-				if (g_Inventory.IsObjectInInventory(ID_CROWBAR_ITEM))
-					g_Inventory.SetEnterInventory(ID_CROWBAR_ITEM);
+				if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
+					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -446,7 +446,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if (g_Inventory.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
+			if (g_Gui.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 			{
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
@@ -454,7 +454,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			g_Inventory.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_ITEM);
 		}
 		if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
 		{
@@ -1040,7 +1040,7 @@ void SearchObjectControl(short itemNumber)
 int UseSpecialItem(ITEM_INFO* item)
 {
 	int flag = 0;
-	int use = g_Inventory.GetInventoryItemChosen();
+	int use = g_Gui.GetInventoryItemChosen();
 
 	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS && use != NO_ITEM)
 	{
@@ -1098,7 +1098,7 @@ int UseSpecialItem(ITEM_INFO* item)
 			item->currentAnimState = LS_MISC_CONTROL;
 			Lara.gunStatus = LG_HANDS_BUSY;
 
-			g_Inventory.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_ITEM);
 
 			return 1;
 		}

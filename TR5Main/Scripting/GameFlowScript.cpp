@@ -4,7 +4,7 @@
 #include "savegame.h"
 #include "GameScriptInventoryObject.h"
 #include "InventorySlots.h"
-#include "Game/newinv2.h"
+#include "Game/gui.h"
 
 /***
 Scripts that will be run on game startup.

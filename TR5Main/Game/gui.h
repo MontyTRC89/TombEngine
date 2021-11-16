@@ -395,7 +395,7 @@ struct InventoryObject
 	short rot_flags;
 };
 
-class InventoryClass
+class GuiController
 {
 public:
 	int CallInventory(bool reset_mode);
@@ -607,6 +607,6 @@ void combine_Examine7(int flag);
 void combine_Examine8(int flag);
 void combine_ClockWorkBeetle(int flag);
 
-extern InventoryClass g_Inventory;
+extern GuiController g_Gui;
 extern InventoryObject inventry_objects_list[];
 extern const char* controlmsgs[];
