@@ -1,5 +1,5 @@
 #pragma once
-#include "newinv2.h"
+#include "gui.h"
 #include "objectslist.h"
 #include <utility>
 

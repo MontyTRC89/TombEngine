@@ -40,7 +40,7 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
-#include "newinv2.h"
+#include "gui.h"
 
 #include "Objects/Generic/Object/rope.h"
 
