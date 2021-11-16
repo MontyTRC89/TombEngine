@@ -4,7 +4,7 @@
 #include "control/box.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
@@ -58,7 +58,7 @@ void LagoonWitchControl(short itemNumber)
 	}
 	else
 	{
-		if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM2))
+		if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM2))
 		{
 			item->aiBits = 0;
 			creature->enemy = LaraItem;

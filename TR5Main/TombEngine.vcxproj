@@ -176,7 +176,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Game\memory\Vector.h" />
-    <ClInclude Include="Game\newinv2.h" />
+    <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -555,7 +555,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\newinv2.cpp" />
+    <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\particle\SimpleParticle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />

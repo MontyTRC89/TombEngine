@@ -26,7 +26,6 @@
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\newinv2.cpp" />
     <ClCompile Include="Game\particle\SimpleParticle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
@@ -316,6 +315,7 @@
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
+    <ClCompile Include="Game\gui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -360,7 +360,6 @@
     <ClInclude Include="Game\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Game\memory\Vector.h" />
-    <ClInclude Include="Game\newinv2.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -709,6 +708,7 @@
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
+    <ClInclude Include="Game\gui.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

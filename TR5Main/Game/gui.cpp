@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "animation.h"
 #include "control/control.h"
 #include "lara_fire.h"
@@ -20,7 +20,7 @@
 #include "items.h"
 
 using namespace TEN::Renderer;
-InventoryClass g_Inventory;
+GuiController g_Gui;
 
 const char* optmessages[] =
 {
@@ -394,77 +394,77 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
 };
 
-TitleSettings InventoryClass::GetCurrentSettings()
+TitleSettings GuiController::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
 
-InventoryRing* InventoryClass::GetRings(char num)
+InventoryRing* GuiController::GetRings(char num)
 {
 	return rings[num];
 }
 
-short InventoryClass::GetSelectedOption()
+short GuiController::GetSelectedOption()
 {
 	return selected_option;
 }
 
-Menu InventoryClass::GetMenuToDisplay()
+Menu GuiController::GetMenuToDisplay()
 {
 	return menu_to_display;
 }
 
-void InventoryClass::SetSelectedOption(short menu)
+void GuiController::SetSelectedOption(short menu)
 {
 	selected_option = menu;
 }
 
-void InventoryClass::SetMenuToDisplay(Menu menu)
+void GuiController::SetMenuToDisplay(Menu menu)
 {
 	menu_to_display = menu;
 }
 
-InventoryMode InventoryClass::GetInventoryMode()
+InventoryMode GuiController::GetInventoryMode()
 {
 	return invMode;
 }
 
-void InventoryClass::SetInventoryMode(InventoryMode mode)
+void GuiController::SetInventoryMode(InventoryMode mode)
 {
 	invMode = mode;
 }
 
-void InventoryClass::SetInventoryItemChosen(int num)
+void GuiController::SetInventoryItemChosen(int num)
 {
 	inventoryItemChosen = num;
 }
 
-int InventoryClass::GetInventoryItemChosen()
+int GuiController::GetInventoryItemChosen()
 {
 	return inventoryItemChosen;
 }
 
-void InventoryClass::SetEnterInventory(int num)
+void GuiController::SetEnterInventory(int num)
 {
 	enterInventory = num;
 }
 
-int InventoryClass::GetEnterInventory()
+int GuiController::GetEnterInventory()
 {
 	return enterInventory;
 }
 
-int InventoryClass::GetLastInventoryItem()
+int GuiController::GetLastInventoryItem()
 {
 	return lastInvItem;
 }
 
-void InventoryClass::DrawInventory()
+void GuiController::DrawInventory()
 {
 	g_Renderer.renderInventory();
 }
 
-void InventoryClass::ClearInputVariables(bool flag)
+void GuiController::ClearInputVariables(bool flag)
 {
 	goUp = goDown = goRight = goLeft = goSelect = goDeselect = 0;
 	if (flag)
@@ -476,7 +476,7 @@ void InventoryClass::ClearInputVariables(bool flag)
 	}
 }
 
-void InventoryClass::DoDebouncedInput()
+void GuiController::DoDebouncedInput()
 {
 	ClearInputVariables(1);
 
@@ -580,7 +580,7 @@ void InventoryClass::DoDebouncedInput()
 	}
 }
 
-InventoryResult InventoryClass::TitleOptions()
+InventoryResult GuiController::TitleOptions()
 {
 	auto ret = InventoryResult::None;
 	static short selected_option_bak;
@@ -738,7 +738,7 @@ InventoryResult InventoryClass::TitleOptions()
 	return ret;
 }
 
-void InventoryClass::FillDisplayOptions()
+void GuiController::FillDisplayOptions()
 {
 	// Copy configuration to a temporary object
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
@@ -759,7 +759,7 @@ void InventoryClass::FillDisplayOptions()
 	}
 }
 
-void InventoryClass::HandleDisplaySettingsInput(bool pause)
+void GuiController::HandleDisplaySettingsInput(bool pause)
 {
 	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
@@ -892,7 +892,7 @@ void InventoryClass::HandleDisplaySettingsInput(bool pause)
 	}
 }
 
-void InventoryClass::HandleControlSettingsInput(bool pause)
+void GuiController::HandleControlSettingsInput(bool pause)
 {
 	CurrentSettings.waitingForkey = 0;
 
@@ -1028,12 +1028,12 @@ void InventoryClass::HandleControlSettingsInput(bool pause)
 	}
 }
 
-void InventoryClass::FillSound()
+void GuiController::FillSound()
 {
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
 
-void InventoryClass::HandleSoundSettingsInput(bool pause)
+void GuiController::HandleSoundSettingsInput(bool pause)
 {
 	SetDebounce = true;
 	S_UpdateInput();
@@ -1184,7 +1184,7 @@ void InventoryClass::HandleSoundSettingsInput(bool pause)
 	}
 }
 
-InventoryResult InventoryClass::DoPauseMenu()
+InventoryResult GuiController::DoPauseMenu()
 {
 	//basically mini title
 
@@ -1313,7 +1313,7 @@ InventoryResult InventoryClass::DoPauseMenu()
 
 /*inventory*/
 
-bool InventoryClass::DoObjectsCombine(int obj1, int obj2)
+bool GuiController::DoObjectsCombine(int obj1, int obj2)
 {
 	for (int n = 0; n < max_combines; n++)
 	{
@@ -1329,7 +1329,7 @@ bool InventoryClass::DoObjectsCombine(int obj1, int obj2)
 	return 0;
 }
 
-bool InventoryClass::IsItemCurrentlyCombinable(short obj)
+bool GuiController::IsItemCurrentlyCombinable(short obj)
 {
 	if (obj < INV_OBJECT_SMOL_WATERSKIN || obj > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
@@ -1364,7 +1364,7 @@ bool InventoryClass::IsItemCurrentlyCombinable(short obj)
 	return 0;
 }
 
-bool InventoryClass::IsItemInInventory(short obj)
+bool GuiController::IsItemInInventory(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == obj)
@@ -1373,7 +1373,7 @@ bool InventoryClass::IsItemInInventory(short obj)
 	return 0;
 }
 
-void InventoryClass::CombineObjects(short obj1, short obj2)
+void GuiController::CombineObjects(short obj1, short obj2)
 {
 	int n;
 
@@ -1394,7 +1394,7 @@ void InventoryClass::CombineObjects(short obj1, short obj2)
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-void InventoryClass::SeparateObject(short obj)
+void GuiController::SeparateObject(short obj)
 {
 	int n;
 
@@ -1407,21 +1407,21 @@ void InventoryClass::SeparateObject(short obj)
 	SetupObjectListStartPosition(combine_table[n].item1);
 }
 
-void InventoryClass::SetupObjectListStartPosition(short newobj)
+void GuiController::SetupObjectListStartPosition(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newobj)
 			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
-void InventoryClass::HandleObjectChangeover(int ringnum)
+void GuiController::HandleObjectChangeover(int ringnum)
 {
 	current_selected_option = 0;
 	menu_active = 1;
 	SetupAmmoSelector();
 }
 
-void InventoryClass::SetupAmmoSelector()
+void GuiController::SetupAmmoSelector()
 {
 	int num;
 	unsigned __int64 opts;
@@ -1549,7 +1549,7 @@ void InventoryClass::SetupAmmoSelector()
 	}
 }
 
-void InventoryClass::InsertObjectIntoList(int num)
+void GuiController::InsertObjectIntoList(int num)
 {
 	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = num;
 	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
@@ -1559,7 +1559,7 @@ void InventoryClass::InsertObjectIntoList(int num)
 	rings[(int)RingTypes::Inventory]->numobjectsinlist++;
 }
 
-void InventoryClass::InsertObjectIntoList_v2(int num)
+void GuiController::InsertObjectIntoList_v2(int num)
 {
 	unsigned __int64 opts = inventry_objects_list[num].opts;
 
@@ -1576,7 +1576,7 @@ void InventoryClass::InsertObjectIntoList_v2(int num)
 	}
 }
 
-void InventoryClass::ConstructObjectList()
+void GuiController::ConstructObjectList()
 {
 	rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
 
@@ -1788,7 +1788,7 @@ void InventoryClass::ConstructObjectList()
 	ammo_active = 0;
 }
 
-void InventoryClass::ConstructCombineObjectList()
+void GuiController::ConstructCombineObjectList()
 {
 	rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
 
@@ -1859,7 +1859,7 @@ void InventoryClass::ConstructCombineObjectList()
 	rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
-void InventoryClass::InitializeInventory()
+void GuiController::InitializeInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(14560);
@@ -1948,19 +1948,19 @@ void InventoryClass::InitializeInventory()
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-int InventoryClass::IsObjectInInventory(short object_number)
+int GuiController::IsObjectInInventory(short object_number)
 {
 	return GetInventoryCount(from_underlying(object_number));
 }
 
-void InventoryClass::SetupObjectListStartPosition2(short newobj)
+void GuiController::SetupObjectListStartPosition2(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newobj)
 			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
-int InventoryClass::ConvertObjectToInventoryItem(short obj)
+int GuiController::ConvertObjectToInventoryItem(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
@@ -1971,12 +1971,12 @@ int InventoryClass::ConvertObjectToInventoryItem(short obj)
 	return -1;
 }
 
-int InventoryClass::ConvertInventoryItemToObject(int obj)
+int GuiController::ConvertInventoryItemToObject(int obj)
 {
 	return inventry_objects_list[obj].object_number;
 }
 
-void InventoryClass::FadeAmmoSelector()
+void GuiController::FadeAmmoSelector()
 {
 	if (rings[(int)RingTypes::Inventory]->ringactive && (rptLeft >= 8 || rptRight >= 8))
 		ammo_selector_fade_val = 0;
@@ -2004,7 +2004,7 @@ void InventoryClass::FadeAmmoSelector()
 	}
 }
 
-void InventoryClass::UseCurrentItem()
+void GuiController::UseCurrentItem()
 {
 	short invobject, gmeobject;
 	long OldBinocular;
@@ -2263,7 +2263,7 @@ void InventoryClass::UseCurrentItem()
 	}
 }
 
-void InventoryClass::HandleInventoryMenu()
+void GuiController::HandleInventoryMenu()
 {
 	int n;
 	unsigned __int64 opts;
@@ -2603,7 +2603,7 @@ void InventoryClass::HandleInventoryMenu()
 }
 
 //this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
-void InventoryClass::UpdateWeaponStatus()
+void GuiController::UpdateWeaponStatus()
 {
 	if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
@@ -2634,7 +2634,7 @@ void InventoryClass::UpdateWeaponStatus()
 	}
 }
 
-void InventoryClass::SpinBack(unsigned short* angle)
+void GuiController::SpinBack(unsigned short* angle)
 {
 	unsigned short val;
 	unsigned short val2;
@@ -2676,7 +2676,7 @@ void InventoryClass::SpinBack(unsigned short* angle)
 	}
 }
 
-void InventoryClass::DrawAmmoSelector()
+void GuiController::DrawAmmoSelector()
 {
 	int n;
 	int xpos;
@@ -2751,7 +2751,7 @@ void InventoryClass::DrawAmmoSelector()
 	}
 }
 
-void InventoryClass::DrawCurrentObjectList(int ringnum)
+void GuiController::DrawCurrentObjectList(int ringnum)
 {
 	int n;
 	int maxobj;
@@ -3172,7 +3172,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 	}
 }
 
-int InventoryClass::CallInventory(bool reset_mode)
+int GuiController::CallInventory(bool reset_mode)
 {
 	int return_value;
 
@@ -3264,7 +3264,7 @@ int InventoryClass::CallInventory(bool reset_mode)
 	return return_value;
 }
 
-void InventoryClass::DoStatisticsMode()
+void GuiController::DoStatisticsMode()
 {
 	invMode = InventoryMode::Statistics;
 
@@ -3276,7 +3276,7 @@ void InventoryClass::DoStatisticsMode()
 	}
 }
 
-void InventoryClass::DoExamineMode()
+void GuiController::DoExamineMode()
 {
 	invMode = InventoryMode::Examine;
 
@@ -3288,7 +3288,7 @@ void InventoryClass::DoExamineMode()
 	}
 }
 
-void InventoryClass::DrawCompass()
+void GuiController::DrawCompass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
@@ -3297,7 +3297,7 @@ void InventoryClass::DrawCompass()
 	Matrix::CreateRotationY(compass_angle);
 }
 
-void InventoryClass::DoDiary()
+void GuiController::DoDiary()
 {
 	invMode = InventoryMode::Diary;
 
@@ -3321,12 +3321,12 @@ void InventoryClass::DoDiary()
 	}
 }
 
-short InventoryClass::GetLoadSaveSelection()
+short GuiController::GetLoadSaveSelection()
 {
 	return selected_slot;
 }
 
-int InventoryClass::DoLoad()
+int GuiController::DoLoad()
 {
 	invMode = InventoryMode::Load;
 
@@ -3373,7 +3373,7 @@ int InventoryClass::DoLoad()
 	return 0;
 }
 
-void InventoryClass::DoSave()
+void GuiController::DoSave()
 {
 	invMode = InventoryMode::Save;
 
@@ -3866,7 +3866,7 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings |= 1;//get beetle
 }
 
-bool InventoryClass::PerformWaterskinCombine(int flag)
+bool GuiController::PerformWaterskinCombine(int flag)
 {
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
