@@ -798,7 +798,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		switch (g_Level.Items[Lara.Vehicle].objectNumber)
 		{
 		case ID_QUAD:
-			if (QuadBikeControl())
+			if (QuadBikeControl(item, coll))
 				return;
 			break;
 
