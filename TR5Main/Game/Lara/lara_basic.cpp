@@ -1120,8 +1120,8 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (info->turnRate > LARA_MED_TURN)
-			info->turnRate = LARA_MED_TURN;
+		if (info->turnRate > (LARA_SLOW_TURN + ANGLE(1.5f)))
+			info->turnRate = LARA_SLOW_TURN + ANGLE(1.5f);
 
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
@@ -1367,8 +1367,8 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (info->turnRate < -LARA_MED_TURN)
-			info->turnRate = -LARA_MED_TURN;
+		if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(1.5f)))
+			info->turnRate = -(LARA_SLOW_TURN + ANGLE(1.5f));
 
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
