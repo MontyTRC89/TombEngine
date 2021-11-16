@@ -14,6 +14,18 @@ enum class InventoryMode
 	Save
 };
 
+enum class InventoryResult
+{
+	None,
+	UseItem,
+	NewGame,
+	LoadGame,
+	SaveGame,
+	ExitGame,
+	ExitToTitle,
+	NewGameSelectedLevel
+};
+
 enum class MenuType
 {
 	None,
@@ -387,8 +399,8 @@ class InventoryClass
 {
 public:
 	int CallInventory(bool reset_mode);
-	int TitleOptions();
-	int DoPauseMenu();
+	InventoryResult TitleOptions();
+	InventoryResult DoPauseMenu();
 	void HandleInventoryMenu();
 	void DrawInventory();
 	void DrawCurrentObjectList(int ringnum);
@@ -400,7 +412,7 @@ public:
 	bool PerformWaterskinCombine(int flag);
 	void DrawCompass();
 
-	//getters
+	// Getters
 	InventoryRing* GetRings(char num);
 	short GetSelectedOption();
 	Menu GetMenuToDisplay();
@@ -411,7 +423,7 @@ public:
 	TitleSettings GetCurrentSettings();
 	short GetLoadSaveSelection();
 
-	//setters
+	// Setters
 	void SetSelectedOption(short menu);
 	void SetMenuToDisplay(Menu menu);
 	void SetInventoryMode(InventoryMode mode);
@@ -450,14 +462,14 @@ private:
 	void ConstructCombineObjectList();
 	
 	/*vars*/
-	//input
+	// Input
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 	long rptRight, rptLeft;
 	bool stop_killing_me_you_dumb_input_system;
 	bool stop_killing_me_you_dumb_input_system2;
 
-	//inventory
+	// Inventory
 	short combine_obj1;
 	short combine_obj2;
 	char useItem;
@@ -488,7 +500,7 @@ private:
 	int lastInvItem;
 	bool ExitInvLoop;
 
-	//ammo vars
+	// Ammo vars
 	unsigned short AmountShotGunAmmo1;
 	unsigned short AmountShotGunAmmo2;
 	unsigned short AmountHKAmmo1;
@@ -529,7 +541,7 @@ private:
 
 	TitleSettings CurrentSettings;
 
-	//loadsave
+	// Load / save
 	short selected_slot;
 };
 
@@ -594,16 +606,6 @@ void combine_Examine6(int flag);
 void combine_Examine7(int flag);
 void combine_Examine8(int flag);
 void combine_ClockWorkBeetle(int flag);
-
-// Inventory results
-#define INV_RESULT_NONE						0
-#define INV_RESULT_USE_ITEM					1
-#define INV_RESULT_NEW_GAME					2
-#define INV_RESULT_LOAD_GAME				3
-#define INV_RESULT_SAVE_GAME				4
-#define INV_RESULT_EXIT_GAME				5
-#define INV_RESULT_EXIT_TO_TILE				6
-#define INV_RESULT_NEW_GAME_SELECTED_LEVEL	7
 
 extern InventoryClass g_Inventory;
 extern InventoryObject inventry_objects_list[];
