@@ -76,7 +76,7 @@ and if it's a weapon, add its ammo handling shit. (look at vars at the beginning
 if it's combineable, add its things to the combine_table and don't forget to increment max_combines!!
 */
 
-COMBINELIST combine_table[max_combines] =
+CombineList combine_table[max_combines] =
 {
 	{combine_revolver_lasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER},
 	{combine_crossbow_lasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER},
@@ -140,7 +140,7 @@ COMBINELIST combine_table[max_combines] =
 	{combine_ClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
-INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
+InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {
 	// Weapons
 
@@ -394,7 +394,7 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
 };
 
-titleSettings InventoryClass::GetCurrentSettings()
+TitleSettings InventoryClass::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
@@ -1550,7 +1550,7 @@ bool InventoryClass::IsItemCurrentlyCombinable(short obj)
 bool InventoryClass::IsItemInInventory(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[RING_INVENTORY]->current_object_list[i].invitem == obj)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == obj)
 			return 1;
 
 	return 0;
@@ -1574,7 +1574,7 @@ void InventoryClass::CombineObjects(short obj1, short obj2)
 	combine_table[n].combine_routine(0);
 	ConstructObjectList();
 	SetupObjectListStartPosition(combine_table[n].combined_item);
-	HandleObjectChangeover(RING_INVENTORY);
+	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
 void InventoryClass::SeparateObject(short obj)
@@ -1593,8 +1593,8 @@ void InventoryClass::SeparateObject(short obj)
 void InventoryClass::SetupObjectListStartPosition(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[RING_INVENTORY]->current_object_list[i].invitem == newobj)
-			rings[RING_INVENTORY]->curobjinlist = i;
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newobj)
+			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
 void InventoryClass::HandleObjectChangeover(int ringnum)
@@ -1610,11 +1610,11 @@ void InventoryClass::SetupAmmoSelector()
 	unsigned __int64 opts;
 
 	num = 0;
-	opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+	opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 	ammo_selector_flag = 0;
 	num_ammo_slots = 0;
 
-	if (rings[RING_AMMO]->ringactive)
+	if (rings[(int)RingTypes::Ammo]->ringactive)
 		return;
 	
 	ammo_object_list[0].xrot = 0;
@@ -1734,12 +1734,12 @@ void InventoryClass::SetupAmmoSelector()
 
 void InventoryClass::InsertObjectIntoList(int num)
 {
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].invitem = num;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].xrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].yrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].zrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].bright = 32;
-	rings[RING_INVENTORY]->numobjectsinlist++;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = num;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].bright = 32;
+	rings[(int)RingTypes::Inventory]->numobjectsinlist++;
 }
 
 void InventoryClass::InsertObjectIntoList_v2(int num)
@@ -1748,23 +1748,23 @@ void InventoryClass::InsertObjectIntoList_v2(int num)
 
 	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
-		if (rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem != num)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem != num)
 		{
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].invitem = num;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].xrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].yrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].zrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist++].bright = 32;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = num;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist++].bright = 32;
 		}
 	}
 }
 
 void InventoryClass::ConstructObjectList()
 {
-	rings[RING_INVENTORY]->numobjectsinlist = 0;
+	rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[RING_INVENTORY]->current_object_list[i].invitem = NO_ITEM;
+		rings[(int)RingTypes::Inventory]->current_object_list[i].invitem = NO_ITEM;
 
 	CurrentPistolsAmmoType = 0;
 	CurrentUziAmmoType = 0;
@@ -1961,22 +1961,22 @@ void InventoryClass::ConstructObjectList()
 		InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 	}
 
-	rings[RING_INVENTORY]->objlistmovement = 0;
-	rings[RING_INVENTORY]->curobjinlist = 0;
-	rings[RING_INVENTORY]->ringactive = 1;
-	rings[RING_AMMO]->objlistmovement = 0;
-	rings[RING_AMMO]->curobjinlist = 0;
-	rings[RING_AMMO]->ringactive = 0;
-	HandleObjectChangeover(RING_INVENTORY);
+	rings[(int)RingTypes::Inventory]->objlistmovement = 0;
+	rings[(int)RingTypes::Inventory]->curobjinlist = 0;
+	rings[(int)RingTypes::Inventory]->ringactive = 1;
+	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	rings[(int)RingTypes::Ammo]->ringactive = 0;
+	HandleObjectChangeover((int)RingTypes::Inventory);
 	ammo_active = 0;
 }
 
 void InventoryClass::ConstructCombineObjectList()
 {
-	rings[RING_AMMO]->numobjectsinlist = 0;
+	rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[RING_AMMO]->current_object_list[i].invitem = NO_ITEM;
+		rings[(int)RingTypes::Ammo]->current_object_list[i].invitem = NO_ITEM;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
@@ -2037,9 +2037,9 @@ void InventoryClass::ConstructCombineObjectList()
 		if (Lara.ExaminesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
-	rings[RING_AMMO]->objlistmovement = 0;
-	rings[RING_AMMO]->curobjinlist = 0;
-	rings[RING_AMMO]->ringactive = 0;
+	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
 void InventoryClass::InitializeInventory()
@@ -2128,7 +2128,7 @@ void InventoryClass::InitializeInventory()
 	combine_obj2 = 0;
 	normal_ring_fade_val = 128;
 	normal_ring_fade_dir = 0;
-	HandleObjectChangeover(RING_INVENTORY);
+	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
 int InventoryClass::IsObjectInInventory(short object_number)
@@ -2139,8 +2139,8 @@ int InventoryClass::IsObjectInInventory(short object_number)
 void InventoryClass::SetupObjectListStartPosition2(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (inventry_objects_list[rings[RING_INVENTORY]->current_object_list[i].invitem].object_number == newobj)
-			rings[RING_INVENTORY]->curobjinlist = i;
+		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newobj)
+			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
 int InventoryClass::ConvertObjectToInventoryItem(short obj)
@@ -2161,7 +2161,7 @@ int InventoryClass::ConvertInventoryItemToObject(int obj)
 
 void InventoryClass::FadeAmmoSelector()
 {
-	if (rings[RING_INVENTORY]->ringactive && (rptLeft >= 8 || rptRight >= 8))
+	if (rings[(int)RingTypes::Inventory]->ringactive && (rptLeft >= 8 || rptRight >= 8))
 		ammo_selector_fade_val = 0;
 	else if (ammo_selector_fade_dir == 1)
 	{
@@ -2196,7 +2196,7 @@ void InventoryClass::UseCurrentItem()
 	Lara.oldBusy = false;
 	BinocularRange = 0;
 	LaraItem->meshBits = -1;
-	invobject = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	gmeobject = inventry_objects_list[invobject].object_number;
 
 	if (Lara.waterStatus == LW_ABOVE_WATER || Lara.waterStatus == LW_WADE)
@@ -2454,20 +2454,20 @@ void InventoryClass::HandleInventoryMenu()
 	int ypos;
 	int num;
 
-	if (rings[RING_AMMO]->ringactive)
+	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
 		g_Renderer.drawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
 
-		if (rings[RING_INVENTORY]->objlistmovement)
+		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
 
-		if (rings[RING_AMMO]->objlistmovement)
+		if (rings[(int)RingTypes::Ammo]->objlistmovement)
 			return;
 
 		if (goSelect)
 		{
-			short invItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
-			short ammoItem = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
+			short invItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+			short ammoItem = rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
 
 			if (DoObjectsCombine(invItem, ammoItem))
 			{
@@ -2521,11 +2521,11 @@ void InventoryClass::HandleInventoryMenu()
 	}
 	else
 	{
-		num = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+		num = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 
 		for (n = 0; n < 3; n++)
 		{
-			current_options[n].type = 0;
+			current_options[n].type = MenuType::None;
 			current_options[n].text = 0;
 		}
 
@@ -2533,53 +2533,53 @@ void InventoryClass::HandleInventoryMenu()
 
 		if (!ammo_active)
 		{
-			opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if ((opts & OPT_LOAD))
 			{
-				current_options[0].type = MENU_TYPE_LOAD;
+				current_options[0].type = MenuType::Load;
 				current_options[0].text = g_GameFlow->GetString(optmessages[6]);
 				n = 1;
 			}
 
 			if ((opts & OPT_SAVE))
 			{
-				current_options[n].type = MENU_TYPE_SAVE;
+				current_options[n].type = MenuType::Save;
 				current_options[n].text = g_GameFlow->GetString(optmessages[7]);
 				n++;
 			}
 
 			if ((opts & OPT_EXAMINABLE))
 			{
-				current_options[n].type = MENU_TYPE_EXAMINE;
+				current_options[n].type = MenuType::Examine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[8]);
 				n++;
 			}
 
 			if ((opts & OPT_STATS))
 			{
-				current_options[n].type = MENU_TYPE_STATS;
+				current_options[n].type = MenuType::Statistics;
 				current_options[n].text = g_GameFlow->GetString(optmessages[9]);
 				n++;
 			}
 
 			if ((opts & OPT_USE))
 			{
-				current_options[n].type = MENU_TYPE_USE;
+				current_options[n].type = MenuType::Use;
 				current_options[n].text = g_GameFlow->GetString(optmessages[0]);
 				n++;
 			}
 
 			if ((opts & OPT_EQUIP))
 			{
-				current_options[n].type = MENU_TYPE_EQUIP;
+				current_options[n].type = MenuType::Equip;
 				current_options[n].text = g_GameFlow->GetString(optmessages[4]);
 				n++;
 			}
 
 			if ((opts & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN)))
 			{
-				current_options[n].type = MENU_TYPE_CHOOSEAMMO;
+				current_options[n].type = MenuType::ChooseAmmo;
 				current_options[n].text = g_GameFlow->GetString(optmessages[1]);
 				n++;
 			}
@@ -2588,7 +2588,7 @@ void InventoryClass::HandleInventoryMenu()
 			{
 				if (IsItemCurrentlyCombinable(num))
 				{
-					current_options[n].type = MENU_TYPE_COMBINE;
+					current_options[n].type = MenuType::Combine;
 					current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 					n++;
 				}
@@ -2596,39 +2596,39 @@ void InventoryClass::HandleInventoryMenu()
 
 			if ((opts & OPT_ALWAYSCOMBINE))
 			{
-				current_options[n].type = MENU_TYPE_COMBINE;
+				current_options[n].type = MenuType::Combine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 				n++;
 			}
 
 			if ((opts & OPT_SEPERATABLE))
 			{
-				current_options[n].type = MENU_TYPE_SEPERATE;
+				current_options[n].type = MenuType::Seperate;
 				current_options[n].text = g_GameFlow->GetString(optmessages[3]);
 				n++;
 			}
 
 			if (opts & OPT_DIARY)
 			{
-				current_options[n].type = MENU_TYPE_DIARY;
+				current_options[n].type = MenuType::Diary;
 				current_options[n].text = g_GameFlow->GetString(optmessages[11]);
 				n++;
 			}
 		}
 		else
 		{
-			current_options[0].type = MENU_TYPE_AMMO1;
+			current_options[0].type = MenuType::Ammo1;
 			current_options[0].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[0].invitem].objname);
-			current_options[1].type = MENU_TYPE_AMMO2;
+			current_options[1].type = MenuType::Ammo2;
 			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
 			n = 2;
 
-			opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if (opts & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
-				current_options[2].type = MENU_TYPE_AMMO3;
+				current_options[2].type = MenuType::Ammo3;
 				current_options[2].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[2].invitem].objname);
 			}
 
@@ -2659,7 +2659,7 @@ void InventoryClass::HandleInventoryMenu()
 			}
 		}
 
-		if (menu_active && !rings[RING_INVENTORY]->objlistmovement && !rings[RING_AMMO]->objlistmovement)
+		if (menu_active && !rings[(int)RingTypes::Inventory]->objlistmovement && !rings[(int)RingTypes::Ammo]->objlistmovement)
 		{
 			if (goUp && current_selected_option > 0)
 			{
@@ -2691,13 +2691,13 @@ void InventoryClass::HandleInventoryMenu()
 
 			if (goSelect)
 			{
-				if (current_options[current_selected_option].type != 5 && current_options[current_selected_option].type != 1)
+				if (current_options[current_selected_option].type != MenuType::Equip && current_options[current_selected_option].type != MenuType::Use)
 					SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
 				switch (current_options[current_selected_option].type)
 				{
-				case MENU_TYPE_CHOOSEAMMO:
-					rings[RING_INVENTORY]->ringactive = 0;
+				case MenuType::ChooseAmmo:
+					rings[(int)RingTypes::Inventory]->ringactive = 0;
 					ammo_active = 1;
 					Stashedcurrent_selected_option = current_selected_option;
 					StashedCurrentPistolsAmmoType = CurrentPistolsAmmoType;
@@ -2711,53 +2711,53 @@ void InventoryClass::HandleInventoryMenu()
 					StashedCurrentRocketAmmoType = CurrentRocketAmmoType;
 					break;
 
-				case MENU_TYPE_LOAD:
+				case MenuType::Load:
 					//fill_up_savegames_array//or maybe not?
 					invMode = InventoryMode::Load;
 					break;
 
-				case MENU_TYPE_SAVE:
+				case MenuType::Save:
 					//fill_up_savegames_array
 					invMode = InventoryMode::Save;
 					break;
 
-				case MENU_TYPE_EXAMINE:
+				case MenuType::Examine:
 					invMode = InventoryMode::Examine;
 					break;
 
-				case MENU_TYPE_STATS:
+				case MenuType::Statistics:
 					invMode = InventoryMode::Statistics;
 					break;
 
-				case MENU_TYPE_AMMO1:
-				case MENU_TYPE_AMMO2:
-				case MENU_TYPE_AMMO3:
+				case MenuType::Ammo1:
+				case MenuType::Ammo2:
+				case MenuType::Ammo3:
 					ammo_active = 0;
-					rings[RING_INVENTORY]->ringactive = 1;
+					rings[(int)RingTypes::Inventory]->ringactive = 1;
 					current_selected_option = 0;
 					break;
 
-				case MENU_TYPE_COMBINE:
+				case MenuType::Combine:
 					ConstructCombineObjectList();
-					rings[RING_INVENTORY]->ringactive = 0;
-					rings[RING_AMMO]->ringactive = 1;
+					rings[(int)RingTypes::Inventory]->ringactive = 0;
+					rings[(int)RingTypes::Ammo]->ringactive = 1;
 					ammo_selector_flag = 0;
 					menu_active = 0;
 					combine_ring_fade_dir = 1;
 					break;
 
-				case MENU_TYPE_SEPERATE:
+				case MenuType::Seperate:
 					seperate_type_flag = 1;
 					normal_ring_fade_dir = 2;
 					break;
 
-				case MENU_TYPE_EQUIP:
-				case MENU_TYPE_USE:
+				case MenuType::Equip:
+				case MenuType::Use:
 					menu_active = 0;
 					useItem = 1;
 					break;
 
-				case MENU_TYPE_DIARY:
+				case MenuType::Diary:
 					invMode = InventoryMode::Diary;
 					Lara.Diary.currentPage = 1;
 					break;
@@ -2769,7 +2769,7 @@ void InventoryClass::HandleInventoryMenu()
 				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				goDeselect = 0;
 				ammo_active = 0;
-				rings[RING_INVENTORY]->ringactive = 1;
+				rings[(int)RingTypes::Inventory]->ringactive = 1;
 				CurrentPistolsAmmoType = StashedCurrentPistolsAmmoType;
 				CurrentUziAmmoType = StashedCurrentUziAmmoType;
 				CurrentRevolverAmmoType = StashedCurrentRevolverAmmoType;
@@ -2864,7 +2864,7 @@ void InventoryClass::DrawAmmoSelector()
 	int n;
 	int xpos;
 	unsigned short xrot, yrot, zrot;
-	INVOBJ* objme;
+	InventoryObject* objme;
 	char invTextBuffer[256];
 	int x, y;
 
@@ -2953,7 +2953,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 	if (rings[ringnum]->current_object_list <= 0)
 		return;
 
-	if (ringnum == RING_AMMO)
+	if (ringnum == (int)RingTypes::Ammo)
 	{
 		ammo_selector_fade_val = 0;
 		ammo_selector_fade_dir = 0;
@@ -2982,13 +2982,13 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 					normal_ring_fade_dir = 2;
 				else
 				{
-					rings[RING_INVENTORY]->ringactive = 1;
+					rings[(int)RingTypes::Inventory]->ringactive = 1;
 					menu_active = 1;
-					rings[RING_AMMO]->ringactive = 0;
-					HandleObjectChangeover(RING_INVENTORY);
+					rings[(int)RingTypes::Ammo]->ringactive = 0;
+					HandleObjectChangeover((int)RingTypes::Inventory);
 				}
 
-				rings[RING_AMMO]->ringactive = 0;
+				rings[(int)RingTypes::Ammo]->ringactive = 0;
 			}
 		}
 	}
@@ -3001,7 +3001,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 		{
 			normal_ring_fade_val = 128;
 			normal_ring_fade_dir = 0;
-			rings[RING_INVENTORY]->ringactive = 1;
+			rings[(int)RingTypes::Inventory]->ringactive = 1;
 			menu_active = 1;
 		}
 
@@ -3027,9 +3027,9 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 				SetupObjectListStartPosition(combine_obj1);
 			}
 			else if (seperate_type_flag)
-				SeparateObject(rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem);
+				SeparateObject(rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem);
 
-			HandleObjectChangeover(RING_INVENTORY);
+			HandleObjectChangeover((int)RingTypes::Inventory);
 		}
 	}
 
@@ -3102,9 +3102,9 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 			if (!minobj && !maxobj)
 				shade = 128;
 
-			if (ringnum == RING_AMMO && combine_ring_fade_val < 128 && shade)
+			if (ringnum == (int)RingTypes::Ammo && combine_ring_fade_val < 128 && shade)
 				shade = combine_ring_fade_val;
-			else if (ringnum == RING_INVENTORY && normal_ring_fade_val < 128 && shade)
+			else if (ringnum == (int)RingTypes::Inventory && normal_ring_fade_val < 128 && shade)
 				shade = normal_ring_fade_val;
 
 			if (!i)
@@ -3219,12 +3219,12 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 						sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 				}
 
-				if (ringnum == RING_INVENTORY)
+				if (ringnum == (int)RingTypes::Inventory)
 					objmeup = (int)(phd_centery - (phd_winymax + 1) * 0.0625 * 3.0);
 				else
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
-				g_Renderer.drawString(phd_centerx, ringnum == RING_INVENTORY ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+				g_Renderer.drawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3282,7 +3282,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 			y2 = 430;//combine 
 			short obj = ConvertInventoryItemToObject(rings[ringnum]->current_object_list[n].invitem);
 			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.drawObjectOn2DPosition(x, ringnum == RING_INVENTORY ? y : y2, obj, xrot, yrot, zrot, scaler);
+			g_Renderer.drawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
 
 			if (++n >= rings[ringnum]->numobjectsinlist)
 				n = 0;
@@ -3334,7 +3334,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 
 						rings[ringnum]->objlistmovement = 0;
 
-						if (ringnum == RING_INVENTORY)
+						if (ringnum == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
 					}
 				}
@@ -3347,7 +3347,7 @@ void InventoryClass::DrawCurrentObjectList(int ringnum)
 
 					rings[ringnum]->objlistmovement = 0;
 
-					if (ringnum == RING_INVENTORY)
+					if (ringnum == (int)RingTypes::Inventory)
 						HandleObjectChangeover(0);
 				}
 			}
@@ -3364,8 +3364,8 @@ int InventoryClass::CallInventory(bool reset_mode)
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
 
-	rings[RING_INVENTORY] = &pcring1;
-	rings[RING_AMMO] = &pcring2;
+	rings[(int)RingTypes::Inventory] = &pcring1;
+	rings[(int)RingTypes::Ammo] = &pcring2;
 	g_Renderer.DumpGameScene();
 
 	if (reset_mode)
@@ -3434,7 +3434,7 @@ int InventoryClass::CallInventory(bool reset_mode)
 			break;
 	}
 
-	lastInvItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	UpdateWeaponStatus();
 
 	if (useItem)

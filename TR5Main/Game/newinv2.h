@@ -14,25 +14,25 @@ enum class InventoryMode
 	Save
 };
 
-enum class MenuTypes
+enum class MenuType
 {
-	MENU_TYPE_nothing,
-	MENU_TYPE_USE,
-	MENU_TYPE_CHOOSEAMMO,
-	MENU_TYPE_COMBINE,
-	MENU_TYPE_SEPERATE,
-	MENU_TYPE_EQUIP,
-	MENU_TYPE_AMMO1,
-	MENU_TYPE_AMMO2,
-	MENU_TYPE_AMMO3,
-	MENU_TYPE_LOAD,
-	MENU_TYPE_SAVE,
-	MENU_TYPE_EXAMINE,
-	MENU_TYPE_STATS,
-	MENU_TYPE_DIARY
+	None,
+	Use,
+	ChooseAmmo,
+	Combine,
+	Seperate,
+	Equip,
+	Ammo1,
+	Ammo2,
+	Ammo3,
+	Load,
+	Save,
+	Examine,
+	Statistics,
+	Diary
 };
 
-enum item_options : uint64_t
+enum ItemOptions : uint64_t
 {
 	OPT_ALWAYSCOMBINE = 1 << 0,
 	OPT_EQUIP = 1 << 1,
@@ -62,10 +62,10 @@ enum rotflags
 	INV_ROT_Z = 4
 };
 
-enum ring_types
+enum class RingTypes
 {
-	RING_INVENTORY,
-	RING_AMMO
+	Inventory,
+	Ammo
 };
 
 enum class Menu
@@ -321,13 +321,13 @@ enum inv_objects
 	INVENTORY_TABLE_SIZE
 };
 
-struct currentOptionsStuff
+struct MenuOption
 {
-	int type;
+	MenuType type;
 	char const* text;
 };
 
-struct OBJLIST
+struct ObjectList
 {
 	short invitem;
 	unsigned short xrot;
@@ -338,14 +338,14 @@ struct OBJLIST
 
 struct RINGME
 {
-	OBJLIST current_object_list[INVENTORY_TABLE_SIZE + 1];
+	ObjectList current_object_list[INVENTORY_TABLE_SIZE + 1];
 	int ringactive;
 	int objlistmovement;
 	int curobjinlist;
 	int numobjectsinlist;
 };
 
-struct AMMOLIST
+struct AmmoList
 {
 	short	   		invitem;
 	short	 		amount;
@@ -354,14 +354,14 @@ struct AMMOLIST
 	unsigned short	zrot;
 };
 
-struct titleSettings
+struct TitleSettings
 {
 	bool waitingForkey;//waiting for a key to be pressed when configuring controls
 	int videoMode;
 	GameConfiguration conf;
 };
 
-struct COMBINELIST
+struct CombineList
 {
 	void (*combine_routine)(int flag);
 	short item1;
@@ -369,7 +369,7 @@ struct COMBINELIST
 	short combined_item;
 };
 
-struct INVOBJ
+struct InventoryObject
 {
 	short object_number;
 	short yoff;
@@ -408,7 +408,7 @@ public:
 	int GetInventoryItemChosen();
 	int GetEnterInventory();
 	int GetLastInventoryItem();
-	titleSettings GetCurrentSettings();
+	TitleSettings GetCurrentSettings();
 	short GetLoadSaveSelection();
 
 	//setters
@@ -472,7 +472,7 @@ private:
 	char ammo_selector_flag;
 	char num_ammo_slots;
 	char* current_ammo_type;
-	AMMOLIST ammo_object_list[3];
+	AmmoList ammo_object_list[3];
 	short ammo_selector_fade_val;
 	short ammo_selector_fade_dir;
 	short combine_ring_fade_val;
@@ -481,7 +481,7 @@ private:
 	short normal_ring_fade_dir;
 	unsigned char ammo_active;
 	int OBJLIST_SPACING;
-	currentOptionsStuff current_options[3];
+	MenuOption current_options[3];
 	InventoryMode invMode;
 	int inventoryItemChosen;
 	int enterInventory;
@@ -527,7 +527,7 @@ private:
 	short selected_option;
 	int option_count;
 
-	titleSettings CurrentSettings;
+	TitleSettings CurrentSettings;
 
 	//loadsave
 	short selected_slot;
@@ -606,5 +606,5 @@ void combine_ClockWorkBeetle(int flag);
 #define INV_RESULT_NEW_GAME_SELECTED_LEVEL	7
 
 extern InventoryClass g_Inventory;
-extern INVOBJ inventry_objects_list[];
+extern InventoryObject inventry_objects_list[];
 extern const char* controlmsgs[];

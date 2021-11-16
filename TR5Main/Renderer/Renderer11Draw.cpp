@@ -122,7 +122,7 @@ namespace TEN::Renderer
 
             /*if (GLOBAL_invMode)
             {
-                INVOBJ* objme;
+                InventoryObject* objme;
 
                 objme = &inventry_objects_list[g_Inventory.ConvertObjectToInventoryItem(objectNum)];
 
@@ -1035,12 +1035,12 @@ namespace TEN::Renderer
 
     void Renderer11::renderNewInventory()
     {
-        g_Inventory.DrawCurrentObjectList(RING_INVENTORY);
+        g_Inventory.DrawCurrentObjectList((int)RingTypes::Inventory);
        
         g_Inventory.HandleInventoryMenu();
 
-        if (g_Inventory.GetRings(RING_AMMO)->ringactive)
-            g_Inventory.DrawCurrentObjectList(RING_AMMO);
+        if (g_Inventory.GetRings((int)RingTypes::Ammo)->ringactive)
+            g_Inventory.DrawCurrentObjectList((int)RingTypes::Ammo);
 
         g_Inventory.DrawAmmoSelector();
         g_Inventory.FadeAmmoSelector();
@@ -1090,8 +1090,8 @@ namespace TEN::Renderer
         static short xrot = 0, yrot = 0, zrot = 0;
         static float scaler = 1.2f;
         float saved_scale;
-        short inv_item = g_Inventory.GetRings(RING_INVENTORY)->current_object_list[g_Inventory.GetRings(RING_INVENTORY)->curobjinlist].invitem;
-        INVOBJ* obj = &inventry_objects_list[inv_item];
+        short inv_item = g_Inventory.GetRings((int)RingTypes::Inventory)->current_object_list[g_Inventory.GetRings((int)RingTypes::Inventory)->curobjinlist].invitem;
+        InventoryObject* obj = &inventry_objects_list[inv_item];
 
         if (TrInput & IN_LEFT)
             yrot += ANGLE(3);
@@ -1125,7 +1125,7 @@ namespace TEN::Renderer
 
     void Renderer11::drawDiary()
     {
-        INVOBJ* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
+        InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
         short currentPage = Lara.Diary.currentPage;
         drawObjectOn2DPosition(400, 300, g_Inventory.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot, obj->yrot, obj->zrot, obj->scale1);
 
