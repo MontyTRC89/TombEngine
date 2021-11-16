@@ -196,10 +196,7 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->animNumber = LA_ROLL_180_START;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 2;
-		item->currentAnimState = LS_ROLL_FORWARD;
-		item->goalAnimState = LS_STOP;
+		SetAnimation(item, LA_ROLL_180_START, 2);
 		return;
 	}
 
@@ -392,10 +389,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL && Lara.waterStatus != LW_WADE)
 	{
-		item->animNumber = LA_ROLL_180_START;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 2;
-		item->currentAnimState = LS_ROLL_FORWARD;
-		item->goalAnimState = LS_STOP;
+		SetAnimation(item, LA_ROLL_180_START, 2);
 		return;
 	}
 
@@ -730,13 +724,8 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		else
 		{
 			item->fallspeed = 0;
-
-			item->animNumber = LA_FALL_BACK;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_FALL_BACK;
-			item->goalAnimState = LS_FALL_BACK;
-
 			item->gravityStatus = true;
+			SetAnimation(item, LA_FALL_BACK);
 		}
 	}
 }
@@ -810,11 +799,8 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor > 100 && !TestLaraSwamp(item))
 	{
 		item->fallspeed = 0;
-		item->animNumber = LA_FALL_START;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_JUMP_FORWARD;
-		item->goalAnimState = LS_JUMP_FORWARD;
 		item->gravityStatus = true;
+		SetAnimation(item, LA_FALL_START);
 		return;
 	}
 
@@ -947,22 +933,14 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor <= 0 || TestLaraSwamp(item))
 	{
 		if (LaraLandedBad(item, coll))
-		{
 			item->goalAnimState = LS_DEATH;
-		}
 		else
-		{
-			item->goalAnimState = LS_STOP;
-			item->currentAnimState = LS_STOP;
-			item->animNumber = LA_FREEFALL_LAND;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		}
+			SetAnimation(item, LA_FREEFALL_LAND);
 
 		StopSoundEffect(SFX_TR4_LARA_FALL);
 
 		item->fallspeed = 0;
 		item->gravityStatus = false;
-
 
 		LaraSnapToHeight(item, coll);
 	}
@@ -1102,10 +1080,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (coll->Middle.Ceiling > -100)
 		{
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_STOP;
-			item->currentAnimState = LS_STOP;
+			SetAnimation(item, LA_STAND_SOLID);
 
 			item->speed = 0;
 			item->fallspeed = 0;
@@ -1362,12 +1337,9 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor > 200)
 	{
-		item->animNumber = LA_FALL_BACK;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = LS_FALL_BACK;
-		item->goalAnimState = LS_FALL_BACK;
 		item->fallspeed = 0;
 		item->gravityStatus = true;
+		SetAnimation(item, LA_FALL_BACK);
 		return;
 	}
 

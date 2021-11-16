@@ -1058,10 +1058,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraWater(item) || (Lara.waterSurfaceDist > 0 && Lara.waterSurfaceDist != NO_HEIGHT))
 		{
 			Lara.waterStatus = LW_UNDERWATER;
-			item->animNumber = LA_UNDERWATER_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_UNDERWATER_STOP;
-			item->goalAnimState = LS_UNDERWATER_STOP;
+			SetAnimation(item, LA_UNDERWATER_IDLE);
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
 			Lara.headYrot = 0;
@@ -1070,8 +1067,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 		else
 		{
 			Lara.waterStatus = LW_ABOVE_WATER;
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			SetAnimation(item, LA_STAND_SOLID);
 			item->pos.zRot = 0;
 			item->pos.xRot = 0;
 			Lara.torsoYrot = 0;

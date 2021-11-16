@@ -104,9 +104,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (resultRight == -1 || resultLeft == -1)
 		{
-			item->animNumber = LA_LADDER_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_LADDER_IDLE;
+			SetAnimation(item, LA_LADDER_IDLE);
 			item->goalAnimState = LS_HANG;
 
 			AnimateLara(item);
@@ -498,8 +496,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 
 	if (coll->Setup.OldAnimState != LS_LADDER_IDLE)
 	{	
-		item->animNumber = LA_LADDER_IDLE;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		SetAnimation(item, LA_LADDER_IDLE);
 		return;
 	}
 
@@ -537,19 +534,9 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		if (flag)
 		{
 			if (flag <= 0)
-			{
-				item->animNumber = LA_LADDER_LEFT_CORNER_INNER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
-				item->currentAnimState = LS_SHIMMY_INNER_LEFT;
-			}
+				SetAnimation(item, LA_LADDER_LEFT_CORNER_INNER_START);
 			else
-			{
-				item->animNumber = LA_LADDER_LEFT_CORNER_OUTER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
-				item->currentAnimState = LS_SHIMMY_OUTER_LEFT;
-			}
+				SetAnimation(item, LA_LADDER_LEFT_CORNER_OUTER_START);
 
 			return;
 		}
@@ -561,19 +548,9 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		if (flag)
 		{
 			if (flag <= 0)
-			{
-				item->animNumber = LA_LADDER_RIGHT_CORNER_INNER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
-				item->currentAnimState = LS_SHIMMY_INNER_RIGHT;
-			}
+				SetAnimation(item, LA_LADDER_RIGHT_CORNER_INNER_START);
 			else
-			{
-				item->animNumber = LA_LADDER_RIGHT_CORNER_OUTER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
-				item->currentAnimState = LS_SHIMMY_OUTER_RIGHT;
-			}
+				SetAnimation(item, LA_LADDER_RIGHT_CORNER_OUTER_START);
 
 			return;
 		}
@@ -997,10 +974,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.headYrot = 0;
 	Lara.headXrot = 0;
 
-	item->goalAnimState = LS_JUMP_FORWARD;
-	item->currentAnimState = LS_JUMP_FORWARD;
-	item->animNumber = LA_FALL_START;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	SetAnimation(item, LA_FALL_START);
 
 	item->speed = 2;
 	item->gravityStatus = true;
