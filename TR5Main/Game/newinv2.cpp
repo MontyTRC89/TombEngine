@@ -867,6 +867,7 @@ void InventoryClass::HandleDisplaySettingsInput(bool pause)
 	if (goSelect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+
 		if (selected_option == 5)
 		{
 			// Save the configuration
@@ -883,12 +884,12 @@ void InventoryClass::HandleDisplaySettingsInput(bool pause)
 				CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
 
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = 1;
+			selected_option = pause ? 1 : 0;
 		}
 		else if (selected_option == 6)
 		{
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = 1;
+			selected_option = pause ? 1 : 0;
 		}
 	}
 }
@@ -942,64 +943,30 @@ void InventoryClass::HandleControlSettingsInput(bool pause)
 
 		if (goSelect)
 		{
-			if (pause)
+			if (selected_option == 16) // Apply
 			{
-				if (selected_option == 16)//apply
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
-					SaveConfiguration();
-					menu_to_display = Menu::Pause;
-					selected_option = 2;
-					return;
-				}
-
-				if (selected_option == 17)//cancel
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					menu_to_display = Menu::Pause;
-					selected_option = 1;
-					return;
-				}
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				SaveConfiguration();
+				menu_to_display = pause ? Menu::Pause : Menu::Options;
+				selected_option = pause ? 2 : 1;
+				return;
 			}
-			else
-			{
-				if (selected_option == 16)//apply
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
-					SaveConfiguration();
-					menu_to_display = Menu::Options;
-					selected_option = 1;
-					return;
-				}
 
-				if (selected_option == 17)//cancel
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					menu_to_display = Menu::Options;
-					selected_option = 1;
-					return;
-				}
+			if (selected_option == 17) // Cancel
+			{
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				menu_to_display = pause ? Menu::Pause : Menu::Options;
+				selected_option = 1;
+				return;
 			}
 		}
 	}
 
-	if (pause)
+	if (KeyMap[DIK_RETURN] && selected_option != 16 && selected_option != 17)
 	{
-		if (KeyMap[DIK_RETURN] && selected_option != 16 && selected_option != 17)
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			CurrentSettings.waitingForkey = 1;
-		}
-	}
-	else
-	{
-		if (KeyMap[DIK_RETURN] && selected_option != 16 && selected_option != 17)
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			CurrentSettings.waitingForkey = 1;
-		}
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		CurrentSettings.waitingForkey = 1;
 	}
 
 	if (CurrentSettings.waitingForkey)
@@ -1033,10 +1000,7 @@ void InventoryClass::HandleControlSettingsInput(bool pause)
 				{
 					if (selectedKey != DIK_ESCAPE)
 					{
-						if (pause)
-							KeyboardLayout[1][selected_option] = selectedKey;
-						else
-							KeyboardLayout[1][selected_option] = selectedKey;
+						KeyboardLayout[1][selected_option] = selectedKey;
 
 						DefaultConflict();
 						DbInput = 0;
@@ -1080,16 +1044,8 @@ void InventoryClass::HandleSoundSettingsInput(bool pause)
 
 	if (goDeselect)
 	{
-		if (pause)
-		{
-			menu_to_display = Menu::Options;
-			selected_option = 2;
-		}
-		else
-		{
-			menu_to_display = Menu::Options;
-			selected_option = 2;
-		}
+		menu_to_display = Menu::Options;
+		selected_option = 2;
 
 		SetVolumeMusic(g_Configuration.MusicVolume);
 		SetVolumeFX(g_Configuration.SfxVolume);
@@ -1098,224 +1054,110 @@ void InventoryClass::HandleSoundSettingsInput(bool pause)
 
 	if (goLeft)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (selected_option)
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 1:
+			if (CurrentSettings.conf.MusicVolume > 0)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume > 0)
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume--;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume--;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume > 0)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume--;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
-		}
-		else
-		{
-			switch (selected_option)
+
+			break;
+
+		case 2:
+			if (CurrentSettings.conf.SfxVolume > 0)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume > 0)
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume--;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume--;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume > 0)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume--;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
+
+			break;
 		}
 	}
 
 	if (goRight)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (selected_option)
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 1:
+			if (CurrentSettings.conf.MusicVolume < 100)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume < 100)
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume++;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume++;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume < 100)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume++;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
-		}
-		else
-		{
-			switch (selected_option)
+
+			break;
+
+		case 2:
+			if (CurrentSettings.conf.SfxVolume < 100)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume < 100)
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume++;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume++;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume < 100)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume++;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
+
+			break;
 		}
 	}
 
 	if (goUp)
 	{
-		if (pause)
-		{
-			if (selected_option <= 0)
-				selected_option += option_count;
-			else
-				selected_option--;
-		}
+		if (selected_option <= 0)
+			selected_option += option_count;
 		else
-		{
-			if (selected_option <= 0)
-				selected_option += option_count;
-			else
-				selected_option--;
-		}
+			selected_option--;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
 	{
-		if (pause)
-		{
-			if (selected_option < option_count)
-				selected_option++;
-			else
-				selected_option -= option_count;
-		}
+		if (selected_option < option_count)
+			selected_option++;
 		else
-		{
-			if (selected_option < option_count)
-				selected_option++;
-			else
-				selected_option -= option_count;
-		}
+			selected_option -= option_count;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
@@ -1324,45 +1166,22 @@ void InventoryClass::HandleSoundSettingsInput(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
-		if (pause)
+		if (selected_option == 3)
 		{
-			if (selected_option == 3)
-			{
-				// Save the configuration
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
+			// Save the configuration
+			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			SaveConfiguration();
 
-				menu_to_display = Menu::Pause;
-				selected_option = 1;
-			}
-			else if (selected_option == 4)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-				SetVolumeMusic(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				menu_to_display = Menu::Pause;
-				selected_option = 1;
-			}
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 2;
 		}
-		else
+		else if (selected_option == 4)
 		{
-			if (selected_option == 3)
-			{
-				// Save the configuration
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
-
-				menu_to_display = Menu::Options;
-				selected_option = 2;
-			}
-			else if (selected_option == 4)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-				SetVolumeMusic(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				menu_to_display = Menu::Options;
-				selected_option = 2;
-			}
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeFX(g_Configuration.SfxVolume);
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 2;
 		}
 	}
 }
