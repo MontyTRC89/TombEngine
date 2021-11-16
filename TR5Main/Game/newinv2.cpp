@@ -949,7 +949,7 @@ void InventoryClass::HandleControlSettingsInput(bool pause)
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = pause ? 2 : 1;
+				selected_option = 1;
 				return;
 			}
 
