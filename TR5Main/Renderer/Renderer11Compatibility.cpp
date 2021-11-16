@@ -726,7 +726,7 @@ namespace TEN::Renderer
 
 			for (int j = 0; j < msh->buckets.size(); j++)
 			{
-				RendererBucket *bucket = &msh->buckets[j];
+				RendererBucket* bucket = &msh->buckets[j];
 
 				bucket->StartVertex = baseStaticsVertex;
 				bucket->StartIndex = baseStaticsIndex;

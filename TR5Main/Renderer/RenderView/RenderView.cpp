@@ -10,6 +10,7 @@ namespace TEN::Renderer {
 		viewport.Height = h;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
+		transparentFaces.reserve(MAX_TRANSPARENT_FACES);
 	}
 
 	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) {
@@ -21,6 +22,7 @@ namespace TEN::Renderer {
 		viewport.Height = h;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
+		transparentFaces.reserve(MAX_TRANSPARENT_FACES);
 	}
 
 	void RenderView::fillConstantBuffer(CCameraMatrixBuffer& bufferToFill) {

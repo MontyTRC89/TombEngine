@@ -459,6 +459,7 @@ namespace TEN::Renderer
 
 		// Debug variables
 		int m_numDrawCalls = 0;
+		int m_numTransparentDrawCalls = 0;
 		RENDERER_DEBUG_PAGE m_numDebugPage = RENDERER_DEBUG_PAGE::NO_PAGE;
 	
 		// Times for debug
@@ -502,9 +503,9 @@ namespace TEN::Renderer
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
-		void drawRoomsTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
-		void drawSpritesTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
-		void drawStaticsTransparent(std::vector<RendererVertex> vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawRoomsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawSpritesTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawStaticsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
