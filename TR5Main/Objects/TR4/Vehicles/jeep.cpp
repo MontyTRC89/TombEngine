@@ -420,7 +420,7 @@ static int GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) && g_Inventory.Get_inventoryItemChosen() != ID_PUZZLE_ITEM1)
+	if (!(TrInput & IN_ACTION) && g_Inventory.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
 		return 0;
 
 	if (item->flags & 0x100)
@@ -457,15 +457,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-			if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
+			if (g_Inventory.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+				g_Inventory.SetInventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory.have_i_got_object(ID_PUZZLE_ITEM1))
-					g_Inventory.Set_enterInventory(ID_PUZZLE_ITEM1);
+				if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM1))
+					g_Inventory.SetEnterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}
@@ -478,15 +478,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-			if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
+			if (g_Inventory.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+				g_Inventory.SetInventoryItemChosen(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory.have_i_got_object(ID_PUZZLE_ITEM1))
-					g_Inventory.Set_enterInventory(ID_PUZZLE_ITEM1);
+				if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM1))
+					g_Inventory.SetEnterInventory(ID_PUZZLE_ITEM1);
 
 				return 0;
 			}
