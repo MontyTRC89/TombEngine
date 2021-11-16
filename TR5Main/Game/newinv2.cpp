@@ -67,9 +67,9 @@ const char* controlmsgs[] =
 #define phd_centery phd_winymax / 2
 
 /*
-if you wanna add an object to the inventory, edit the inv_objects array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
+if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
 the #s MUST MATCH.
-i.e if uzi item is #2 in inv_objects (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
+i.e if uzi item is #2 in InventoryObjectTypes (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
 
 note: don't forget to add your object to the proper list construction function
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file)
@@ -399,7 +399,7 @@ TitleSettings InventoryClass::GetCurrentSettings()
 	return CurrentSettings;
 }
 
-RINGME* InventoryClass::GetRings(char num)
+InventoryRing* InventoryClass::GetRings(char num)
 {
 	return rings[num];
 }

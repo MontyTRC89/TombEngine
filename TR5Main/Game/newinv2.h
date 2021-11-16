@@ -55,7 +55,7 @@ enum ItemOptions : uint64_t
 	OPT_DIARY = 1 << 18
 };
 
-enum rotflags
+enum RotationFlags
 {
 	INV_ROT_X = 1,
 	INV_ROT_Y = 2,
@@ -81,7 +81,7 @@ enum class Menu
 	Sound
 };
 
-enum inv_objects
+enum InventoryObjectTypes
 {
 	// Weapons and ammos
 	INV_OBJECT_PISTOLS,
@@ -336,7 +336,7 @@ struct ObjectList
 	unsigned short bright;
 };
 
-struct RINGME
+struct InventoryRing
 {
 	ObjectList current_object_list[INVENTORY_TABLE_SIZE + 1];
 	int ringactive;
@@ -401,7 +401,7 @@ public:
 	void DrawCompass();
 
 	//getters
-	RINGME* GetRings(char num);
+	InventoryRing* GetRings(char num);
 	short GetSelectedOption();
 	Menu GetMenuToDisplay();
 	InventoryMode GetInventoryMode();
@@ -464,9 +464,9 @@ private:
 	char seperate_type_flag;
 	char combine_type_flag;
 	int compassNeedleAngle;
-	RINGME pcring1;
-	RINGME pcring2;
-	RINGME* rings[2];
+	InventoryRing pcring1;
+	InventoryRing pcring2;
+	InventoryRing* rings[2];
 	int current_selected_option;
 	int menu_active;
 	char ammo_selector_flag;
