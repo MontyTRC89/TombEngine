@@ -5,6 +5,6 @@
 
 struct ItemEnumPair
 {
-	std::pair<GAME_OBJECT_ID, inv_objects> m_pair;
-	ItemEnumPair(GAME_OBJECT_ID id, inv_objects id2) : m_pair { id, id2 } {}
+	std::pair<GAME_OBJECT_ID, InventoryObjectTypes> m_pair;
+	ItemEnumPair(GAME_OBJECT_ID id, InventoryObjectTypes id2) : m_pair { id, id2 } {}
 };
