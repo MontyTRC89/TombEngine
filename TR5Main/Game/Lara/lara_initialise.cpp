@@ -140,19 +140,13 @@ void InitialiseLaraAnims(ITEM_INFO* item)
 	if (TestLaraWater(item))
 	{
 		Lara.waterStatus = LW_UNDERWATER;
-		item->goalAnimState = LS_UNDERWATER_STOP;
-		item->currentAnimState = LS_UNDERWATER_STOP;
 		item->fallspeed = 0;
-		item->animNumber = LA_UNDERWATER_IDLE;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else
 	{
 		Lara.waterStatus = LW_ABOVE_WATER;
-		item->goalAnimState = LS_STOP;
-		item->currentAnimState = LS_STOP;
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		SetAnimation(item, LA_STAND_SOLID);
 	}
 }
 

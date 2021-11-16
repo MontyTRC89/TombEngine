@@ -226,10 +226,8 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 				// TODO: fix ObjectOnLOS2
 				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == NO_LOS_ITEM)
 				{*/
-				item->animNumber = LA_CRAWL_JUMP_FLIP_DOWN;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_MISC_CONTROL;
-				item->currentAnimState = LS_MISC_CONTROL;
+
+				SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				/*}*/
 			}
@@ -249,10 +247,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit3click)
 			{
-				item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_MISC_CONTROL;
-				item->currentAnimState = LS_MISC_CONTROL;
+				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 			}
@@ -273,10 +268,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit2click)
 			{
-				item->animNumber = LA_CRAWL_JUMP_DOWN_23CLICK;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_MISC_CONTROL;
-				item->currentAnimState = LS_MISC_CONTROL;
+				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 			}
@@ -296,10 +288,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit1click)
 			{
-				item->animNumber = LA_CRAWL_JUMP_DOWN_1CLICK;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_MISC_CONTROL;
-				item->currentAnimState = LS_MISC_CONTROL;
+				SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 			}
@@ -314,22 +303,15 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512 &&
 			Lara.NewAnims.Crawl1clickup)
 		{
-			item->animNumber = LA_CRAWL_UP_STEP;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->goalAnimState = LS_MISC_CONTROL;
-			item->currentAnimState = LS_MISC_CONTROL;
+			SetAnimation(item, LA_CRAWL_UP_STEP);
 		}
-		else
-			if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
+		else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
 				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
 				LaraCeilingFront(item, item->pos.yRot, 256, -256) <= -512 &&
 				Lara.NewAnims.Crawl1clickdown)
-			{
-				item->animNumber = LA_CRAWL_DOWN_STEP;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_MISC_CONTROL;
-				item->currentAnimState = LS_MISC_CONTROL;
-			}
+		{
+			SetAnimation(item, LA_CRAWL_DOWN_STEP);
+		}
 	}
 
 	Lara.gunStatus = LG_HANDS_BUSY;
@@ -478,19 +460,9 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)
 						}
 					}
 					else if (TrInput & IN_LEFT)
-					{
-						item->animNumber = LA_CRAWL_TURN_LEFT;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = LS_CRAWL_TURN_LEFT;
-						item->goalAnimState = LS_CRAWL_TURN_LEFT;
-					}
+						SetAnimation(item, LA_CRAWL_TURN_LEFT);
 					else if (TrInput & IN_RIGHT)
-					{
-						item->animNumber = LA_CRAWL_TURN_RIGHT;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = LS_CRAWL_TURN_RIGHT;
-						item->goalAnimState = LS_CRAWL_TURN_RIGHT;
-					}
+						SetAnimation(item, LA_CRAWL_TURN_RIGHT);
 				}
 			}
 			else
@@ -574,8 +546,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->animNumber != LA_CRAWL_IDLE)
 		{
-			item->animNumber = LA_CRAWL_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			SetAnimation(item, LA_CRAWL_IDLE);
 		}
 	}
 	else if (LaraFallen(item, coll))
@@ -717,8 +688,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->animNumber != LA_CRAWL_IDLE)
 		{
-			item->animNumber = LA_CRAWL_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			SetAnimation(item, LA_CRAWL_IDLE);
 		}
 	}
 	else if (LaraFallen(item, coll))
@@ -823,25 +793,18 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
+			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		}
 		else
 		{
 			if (TestHangFeet(item, item->pos.yRot))
 			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
+				SetAnimation(item, LA_REACH_TO_HANG);
 				item->goalAnimState = LS_HANG_FEET;
 			}
 			else
 			{
-				item->animNumber = LA_REACH_TO_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = LS_HANG;
+				SetAnimation(item, LA_REACH_TO_HANG);
 				item->goalAnimState = LS_HANG;
 			}
 		}
