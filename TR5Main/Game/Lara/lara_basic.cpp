@@ -1054,8 +1054,8 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (info->turnRate < 0)
 			info->turnRate = 0;
-		else if (info->turnRate > LARA_FAST_TURN)
-			info->turnRate = LARA_FAST_TURN;
+		else if (info->turnRate > (LARA_MED_TURN + ANGLE(1.0f)))
+			info->turnRate = LARA_MED_TURN + ANGLE(1.0f);
 
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
@@ -1301,8 +1301,8 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (info->turnRate > 0)
 			info->turnRate = 0;
-		else if (info->turnRate < -LARA_FAST_TURN)
-			info->turnRate = -LARA_FAST_TURN;
+		else if (info->turnRate < -(LARA_MED_TURN + ANGLE(1.0f)))
+			info->turnRate = -(LARA_MED_TURN + ANGLE(1.0f));
 
 		if (TrInput & IN_WALK)
 		{
