@@ -138,7 +138,7 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
-						if (!g_Inventory.have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						if (!g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{

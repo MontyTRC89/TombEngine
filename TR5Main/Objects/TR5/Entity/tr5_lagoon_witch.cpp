@@ -58,7 +58,7 @@ void LagoonWitchControl(short itemNumber)
 	}
 	else
 	{
-		if (g_Inventory.have_i_got_object(ID_PUZZLE_ITEM2))
+		if (g_Inventory.IsObjectInInventory(ID_PUZZLE_ITEM2))
 		{
 			item->aiBits = 0;
 			creature->enemy = LaraItem;

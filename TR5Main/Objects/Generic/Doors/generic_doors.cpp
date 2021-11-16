@@ -166,7 +166,7 @@ namespace TEN::Entities::Doors
 
 		if (item->triggerFlags == 2
 			&& item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
-			&& ((TrInput & IN_ACTION || g_Inventory.Get_inventoryItemChosen() == ID_CROWBAR_ITEM)
+			&& ((TrInput & IN_ACTION || g_Inventory.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 				&& l->currentAnimState == LS_STOP
 				&& l->animNumber == LA_STAND_IDLE
 				&& !l->hitStatus
@@ -178,11 +178,11 @@ namespace TEN::Entities::Doors
 			{
 				if (!Lara.isMoving)
 				{
-					if (g_Inventory.Get_inventoryItemChosen() == NO_ITEM)
+					if (g_Inventory.GetInventoryItemChosen() == NO_ITEM)
 					{
-						if (g_Inventory.have_i_got_object(ID_CROWBAR_ITEM))
+						if (g_Inventory.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
-							g_Inventory.Set_enterInventory(ID_CROWBAR_ITEM);
+							g_Inventory.SetEnterInventory(ID_CROWBAR_ITEM);
 							item->pos.yRot ^= ANGLE(180);
 						}
 						else
@@ -199,14 +199,14 @@ namespace TEN::Entities::Doors
 						return;
 					}
 
-					if (g_Inventory.Get_inventoryItemChosen() != ID_CROWBAR_ITEM)
+					if (g_Inventory.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 					{
 						item->pos.yRot ^= ANGLE(180);
 						return;
 					}
 				}
 
-				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+				g_Inventory.SetInventoryItemChosen(NO_ITEM);
 
 				if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 				{
