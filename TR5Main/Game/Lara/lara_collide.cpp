@@ -56,21 +56,11 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 			if (coll->Middle.Floor <= 512)
 			{
 				if (coll->Middle.Floor <= 128)
-				{
-					item->goalAnimState = LS_GRAB_TO_FALL;
-					item->currentAnimState = LS_GRAB_TO_FALL;
-
-					item->animNumber = LA_JUMP_UP_LAND;
-					item->frameNumber = g_Level.Anims[LA_JUMP_UP_LAND].frameBase;
-				}
+					SetAnimation(item, LA_JUMP_UP_LAND);
 			}
 			else
 			{
-				item->goalAnimState = LS_FREEFALL;
-				item->currentAnimState = LS_FREEFALL;
-
-				item->animNumber = LA_JUMP_WALL_SMASH_START;
-				item->frameNumber = g_Level.Anims[LA_JUMP_WALL_SMASH_START].frameBase + 1;
+				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 			}
 
 			item->speed /= 4;
@@ -140,11 +130,7 @@ bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos = coll->Setup.OldPosition.y;
 		item->pos.zPos = coll->Setup.OldPosition.z;
 
-		item->goalAnimState = LS_STOP;
-		item->currentAnimState = LS_STOP;
-
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		SetAnimation(item, LA_STAND_SOLID);
 
 		item->speed = 0;
 		item->fallspeed = 0;
@@ -185,8 +171,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STOP;
 		if (item->animNumber != LA_STAND_SOLID)
 		{
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = g_Level.Anims[LA_STAND_SOLID].frameBase;
+			SetAnimation(item, LA_STAND_SOLID);
 		}
 		break;
 	}

@@ -1,4 +1,5 @@
 #pragma once
+
 struct BIGGUNINFO {
 	short xRot;
 	short yRot;
