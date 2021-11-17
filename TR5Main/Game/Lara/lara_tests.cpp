@@ -289,9 +289,10 @@ bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches.
 	// A buffer might help, but improved collision handling would presumably eliminate this issue as a side product. @Sezz 2021.10.15
-	if ((coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle would clamp.
-		(coll->Front.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Front would clamp.
-		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT)					// Back would clamp.
+	if (TestLaraCrawlVault(item, coll) ||
+		(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle is not a clamp.
+		(coll->Front.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Front is not a clamp.
+		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT)					// Back is not a clamp.
 	{
 		return true;
 	}
@@ -1609,7 +1610,6 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&			// Lower floor bound.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&				// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WADE_FORWARD &&		// No step up anim exists for these states.
 		item->currentAnimState != LS_WALK_BACK &&
 		item->currentAnimState != LS_HOP_BACK &&
 		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
