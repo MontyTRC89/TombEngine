@@ -9,7 +9,7 @@
 #include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
@@ -138,50 +138,48 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
+			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
 
-				g_Inventory.Set_invMode(IM_SAVE);
+				g_Gui.SetInventoryMode(InventoryMode::Save);
 
-				if (g_Inventory.S_CallInventory2(0))
+				if (g_Gui.CallInventory(false))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
+			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
 
-				g_Inventory.Set_invMode(IM_LOAD);
+				g_Gui.SetInventoryMode(InventoryMode::Load);
 
-				if (g_Inventory.S_CallInventory2(0))
+				if (g_Gui.CallInventory(false))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
+			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->hitPoints > 0)
 			{
 				StopAllSounds();
 				g_Renderer.DumpGameScene();
-				g_Inventory.Set_invMode(IM_PAUSE);
-				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
-				g_Inventory.Set_pause_selected_option(0);
+				g_Gui.SetInventoryMode(InventoryMode::Pause);
+				g_Gui.SetMenuToDisplay(Menu::Pause);
+				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				StopAllSounds();
 
-				if (g_Inventory.S_CallInventory2(1))
+				if (g_Gui.CallInventory(true))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 		}
 
-		while (g_Inventory.Get_invMode() == IM_PAUSE)
+		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Inventory.DrawInv();
+			g_Gui.DrawInventory();
 			g_Renderer.SyncRenderer();
 
-			int z = g_Inventory.DoPauseMenu();
-
-			if (z == INV_RESULT_EXIT_TO_TILE)
+			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
 				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
 
@@ -336,10 +334,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			g_Renderer.updateLaraAnimations(true);
 
-			if (g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
+			if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 			{
 				SayNo();
-				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
 			}
 
 			// Update Lara's ponytails
@@ -461,7 +459,7 @@ GAME_STATUS DoTitle(int index)
 	// Load the level
 	LoadLevelFile(index);
 
-	int inventoryResult;
+	InventoryResult inventoryResult;
 
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
@@ -502,6 +500,10 @@ GAME_STATUS DoTitle(int index)
 		// Play background music
 		PlaySoundTrack(83);
 
+		// Initialize menu
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
+
 		// Initialise ponytails
 		InitialiseHair();
 
@@ -511,8 +513,10 @@ GAME_STATUS DoTitle(int index)
 
 		ControlPhase(2, 0);
 
-		int status = 0, frames;
-		while (!status)
+		int frames = 0;
+		auto status = InventoryResult::None;
+
+		while (status == InventoryResult::None)
 		{
 			g_Renderer.renderTitle();
 
@@ -520,9 +524,9 @@ GAME_STATUS DoTitle(int index)
 			S_UpdateInput();
 			SetDebounce = false;
 
-			status = g_Inventory.TitleOptions();
+			status = g_Gui.TitleOptions();
 
-			if (status)
+			if (status != InventoryResult::None)
 				break;
 
 			Camera.numberFrames = g_Renderer.SyncRenderer();
@@ -533,7 +537,7 @@ GAME_STATUS DoTitle(int index)
 		inventoryResult = status;
 	}
 	else
-		inventoryResult = g_Inventory.TitleOptions();
+		inventoryResult = g_Gui.TitleOptions();
 
 	StopSoundTracks();
 
@@ -542,11 +546,11 @@ GAME_STATUS DoTitle(int index)
 
 	switch (inventoryResult)
 	{
-	case INV_RESULT_NEW_GAME:
+	case InventoryResult::NewGame:
 		return GAME_STATUS::GAME_STATUS_NEW_GAME;
-	case INV_RESULT_LOAD_GAME:
+	case InventoryResult::LoadGame:
 		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-	case INV_RESULT_EXIT_GAME:
+	case InventoryResult::ExitGame:
 		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
@@ -625,8 +629,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		Statistics.Level.Timer = 0;
 	}
 
-	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
-	g_Inventory.Set_enterInventory(NO_ITEM);
+	g_Gui.SetInventoryItemChosen(NO_ITEM);
+	g_Gui.SetEnterInventory(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
