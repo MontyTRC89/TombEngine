@@ -449,7 +449,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			Camera.targetElevation = -ANGLE(22.0f);
 
 			if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
-				!isSwamp)
+				!isSwamp &&
+				item->currentAnimState != LS_RUN_FORWARD &&		// Prevent ridiculous entrances when stepping down into wade-height water. @Sezz 2021.11.17
+				item->currentAnimState != LS_WALK_FORWARD &&
+				item->currentAnimState != LS_WALK_BACK)
 			{
 				if (isWater)
 				{
