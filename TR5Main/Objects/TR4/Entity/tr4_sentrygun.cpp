@@ -3,7 +3,7 @@
 #include "control/box.h"
 #include "effects/effects.h"
 #include "items.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "level.h"
 #include "control/lot.h"
 #include "effects/tomb4fx.h"
@@ -138,7 +138,7 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
-						if (!g_Inventory.have_i_got_object(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{
