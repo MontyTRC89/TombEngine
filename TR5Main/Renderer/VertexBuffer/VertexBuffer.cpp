@@ -18,8 +18,24 @@ namespace TEN::Renderer {
 		throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 	}
 
-	bool VertexBuffer::Fill(std::vector<RendererVertex> data)
+	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices) {
+		HRESULT res;
+		D3D11_BUFFER_DESC desc = {};
+
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = sizeof(RendererVertex) * numVertices;
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer)); 
+	}
+
+	bool VertexBuffer::Update(ID3D11DeviceContext* context, std::vector<RendererVertex>* data)
 	{
+		D3D11_MAPPED_SUBRESOURCE resource;
+		context->Map(Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+		memcpy(resource.pData, data->data(), data->size() * sizeof(RendererVertex));
+		context->Unmap(Buffer.Get(), 0);
+
 		return true;
 	}
 }
