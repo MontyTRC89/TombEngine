@@ -57,6 +57,7 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_back(ITEM_INFO* item, COLL_INFO* coll);
+void LaraSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_back(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll);
