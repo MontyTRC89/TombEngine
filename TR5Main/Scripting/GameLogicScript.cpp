@@ -12,7 +12,7 @@
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
 #include "pickup.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "ObjectIDs.h"
 #include "GameScriptDisplayString.h"
 #include "ReservedScriptNames.h"
