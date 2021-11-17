@@ -204,35 +204,102 @@ namespace Environment
 	{
 		for (auto& p : Particles)
 		{
-			auto oldPos = p.Position;
+			p.Life -= 2;
 
-			if (!p.Stopped)
+			// Disable particle if it is dead. It will be cleaned on next call of
+			// SpawnWeatherParticles().
+
+			if (p.Life <= 0)
 			{
-				p.Position.x += p.Velocity.x;
-				p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
-				p.Position.z += p.Velocity.z;
+				p.Enabled = false;
+				continue;
 			}
 
+			// Check if particle got out of collision check radius, and fade it out if it did.
+
+			if (abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
+				abs(Camera.pos.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
+			{
+				p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
+			}
+
+			// If particle was locked (after landing or stucking in substance such as water or swamp),
+			// fade it out and bypass any collision checks and movement updates.
+
+			if (p.Stopped)
+			{
+				if (p.Type == WeatherType::Snow)
+					p.Size *= WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR;
+
+				continue;
+			}
+
+			// Backup old position and progress new position according to velocity.
+
+			auto oldPos = p.Position;
+			p.Position.x += p.Velocity.x;
+			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
+			p.Position.z += p.Velocity.z;
+
+			COLL_RESULT coll;
+			bool collisionCalculated = false;
+
+			if (p.CollisionCheckDelay <= 0)
+			{
+				coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+
+				// Determine collision checking frequency based on nearest floor/ceiling surface position.
+				// If floor and ceiling is too far, don't do precise collision checks, instead doing it 
+				// every 5th frame. If particle approaches floor or ceiling, make checks more frequent.
+				// This allows to avoid unnecessary thousands of calls to GetCollisionResult for every particle.
+				
+				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
+				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
+				collisionCalculated = true;
+			}
+			else
+				p.CollisionCheckDelay--;
+
 			auto& r = g_Level.Rooms[p.Room];
+
+			// Check if particle got out of room bounds
 
 			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
 				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
 				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
 			{
-				auto coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
-				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = coll.Position.Floor < p.Position.y;
+				if (!collisionCalculated)
+				{
+					coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+					collisionCalculated = true;
+				}
 
 				if (coll.RoomNumber == p.Room)
 				{
-					p.Enabled = false; // Spawned in same room, needs to be on portal
+					p.Enabled = false; // Not landed on door, so out of room bounds - delete
 					continue;
 				}
-				else if (inSubstance || landed)
+				else
+					p.Room = coll.RoomNumber;
+			}
+
+			// If collision was updated, process with position checks.
+
+			if (collisionCalculated)
+			{
+				// If particle is inside water or swamp, count it as "inSubstance".
+				// If particle got below floor or above ceiling, count it as "landed".
+
+				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
+
+				if (inSubstance || landed)
 				{
 					p.Stopped = true;
 					p.Position = oldPos;
-					p.Life = (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE) ? WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE : p.Life;
+					p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
+
+					// Produce ripples if particle got into substance (water or swamp).
 
 					if (inSubstance)
 					{
@@ -241,77 +308,61 @@ namespace Environment
 							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 					}
 
+					// Immediately disable rain particle because it doesn't need fading out.
+
 					if (p.Type == WeatherType::Rain)
 						p.Enabled = false;
 				}
-				else
-					p.Room = coll.RoomNumber;
 			}
 
-			if (p.Life <= 0 ||
-				abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
-				abs(Camera.pos.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
+			// Update velocities for every particle type.
+
+			switch (p.Type)
 			{
-				if (p.Life <= 0)
+			case WeatherType::Snow:
+
+				if (p.Velocity.x < (WindFinalX << 2))
+					p.Velocity.x += GenerateFloat(0.5f, 2.5f);
+				else if (p.Velocity.x > (WindFinalX << 2))
+					p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
+
+				if (p.Velocity.z < (WindFinalZ << 2))
+					p.Velocity.z += GenerateFloat(0.5f, 2.5f);
+				else if (p.Velocity.z > (WindFinalZ << 2))
+					p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
+
+				if (p.Velocity.y < p.Size / 2)
+					p.Velocity.y += p.Size / 5.0f;
+
+				break;
+
+			case WeatherType::Rain:
+
+				auto random = GenerateInt();
+				if ((random & 3) != 3)
 				{
-					p.Enabled = false;
-					continue;
+					p.Velocity.x += (float)((random & 3) - 1);
+					if (p.Velocity.x < -4)
+						p.Velocity.x = -4;
+					else if (p.Velocity.x > 4)
+						p.Velocity.x = 4;
 				}
-				else if (p.Life > WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-					p.Life = WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
-			}
 
-			if (!p.Stopped)
-			{
-				switch (p.Type)
+				random = (random >> 2) & 3;
+				if (random != 3)
 				{
-				case WeatherType::Snow:
-
-					if (p.Velocity.x < (WindFinalX << 2))
-						p.Velocity.x += GenerateFloat(0.5f, 2.5f);
-					else if (p.Velocity.x > (WindFinalX << 2))
-						p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
-
-					if (p.Velocity.z < (WindFinalZ << 2))
-						p.Velocity.z += GenerateFloat(0.5f, 2.5f);
-					else if (p.Velocity.z > (WindFinalZ << 2))
-						p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
-
-					if (p.Velocity.y < p.Size / 2)
-						p.Velocity.y += p.Size / 5.0f;
-
-					break;
-
-				case WeatherType::Rain:
-
-					auto random = GenerateInt();
-					if ((random & 3) != 3)
-					{
-						p.Velocity.x += (float)((random & 3) - 1);
-						if (p.Velocity.x < -4)
-							p.Velocity.x = -4;
-						else if (p.Velocity.x > 4)
-							p.Velocity.x = 4;
-					}
-
-					random = (random >> 2) & 3;
-					if (random != 3)
-					{
-						p.Velocity.z += random - 1;
-						if (p.Velocity.z < -4)
-							p.Velocity.z = -4;
-						else if (p.Velocity.z > 4)
-							p.Velocity.z = 4;
-					}
-
-					if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
-						p.Velocity.y += p.Size / 5.0f;
-
-					break;
+					p.Velocity.z += random - 1;
+					if (p.Velocity.z < -4)
+						p.Velocity.z = -4;
+					else if (p.Velocity.z > 4)
+						p.Velocity.z = 4;
 				}
-			}
 
-			p.Life -= 2;
+				if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
+					p.Velocity.y += p.Size / 5.0f;
+
+				break;
+			}
 		}
 	}
 
@@ -327,7 +378,11 @@ namespace Environment
 		int newParticlesCount = 0;
 		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
 
-		if (level->Weather != WeatherType::None)
+		// Snow is falling twice as fast, and must be spawned accordingly fast
+		if (level->Weather == WeatherType::Snow)
+			density *= 2;
+
+		if (density > 0.0f && level->Weather != WeatherType::None)
 		{
 			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
@@ -349,12 +404,12 @@ namespace Environment
 				if (outsideRoom == NO_ROOM)
 					continue;
 
-				if (g_Level.Rooms[outsideRoom].flags & ENV_FLAG_WATER)
+				if (g_Level.Rooms[outsideRoom].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 					continue;
 
 				auto coll = GetCollisionResult(xPos, yPos, zPos, outsideRoom);
 
-				if (!(coll.Position.Ceiling + WALL_SIZE < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
+				if (!(coll.Position.Ceiling < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
 					continue;
 
 				auto part = WeatherParticle();
@@ -384,6 +439,7 @@ namespace Environment
 				part.Position.z = zPos;
 				part.Stopped = false;
 				part.Enabled = true;
+				part.CollisionCheckDelay = 0;
 				part.StartLife = part.Life;
 
 				Particles.push_back(part);

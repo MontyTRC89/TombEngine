@@ -82,10 +82,7 @@ void LaraCheatyBits()
 				if (Lara.waterStatus != LW_FLYCHEAT)
 				{
 					Lara.waterStatus = LW_FLYCHEAT;
-					LaraItem->animNumber = LA_DOZY;
-					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-					LaraItem->currentAnimState = LA_ONWATER_IDLE_TO_SWIM;
-					LaraItem->goalAnimState = LA_ONWATER_IDLE_TO_SWIM;
+					SetAnimation(LaraItem, LA_DOZY);
 					LaraItem->gravityStatus = false;
 					LaraItem->pos.xRot = ANGLE(30);
 					LaraItem->fallspeed = 30;
