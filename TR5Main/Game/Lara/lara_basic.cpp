@@ -1746,6 +1746,14 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->isMoving)
 		return;
 
+	if (TestLaraSwamp(item) &&
+		info->waterStatus == LW_WADE)
+	{
+		LaraSwampWalkBack(item, coll);
+
+		return;
+	}
+
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
@@ -1766,6 +1774,39 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_BACK &&
 		(TrInput & IN_WALK || info->waterStatus == LW_WADE))
+	{
+		item->goalAnimState = LS_WALK_BACK;
+
+		return;
+	}
+
+	item->goalAnimState = LS_STOP;
+}
+
+// Pseudo-state for walking back in swamps.
+void LaraSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	if (TrInput & IN_LEFT)
+	{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN / 3)
+			info->turnRate = -LARA_SLOW_TURN / 3;
+
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
+
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN / 3)
+			info->turnRate = LARA_SLOW_TURN / 3;
+
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
+	}
+
+	if (TrInput & IN_BACK)
 	{
 		item->goalAnimState = LS_WALK_BACK;
 
