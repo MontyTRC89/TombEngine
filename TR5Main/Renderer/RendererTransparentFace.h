@@ -17,6 +17,7 @@ namespace TEN::Renderer {
 		RendererPolygon* polygon;
 		RendererSpriteToDraw* sprite;
 		RendererRoom* room;
+		RendererBucket* bucket;
 		RendererItem* item;
 		RendererStatic* staticMesh;
 		Vector4 color;
@@ -55,6 +56,7 @@ namespace TEN::Renderer {
 			info.staticMesh = source.info.staticMesh;
 			info.texture = source.info.texture;
 			info.world = source.info.world;
+			info.bucket = source.info.bucket;
 		}
 
 		RendererTransparentFace(RendererTransparentFace& source)
@@ -73,6 +75,7 @@ namespace TEN::Renderer {
 			info.staticMesh = source.info.staticMesh;
 			info.texture = source.info.texture;
 			info.world = source.info.world;
+			info.bucket = source.info.bucket;
 		}
 	};
 }
