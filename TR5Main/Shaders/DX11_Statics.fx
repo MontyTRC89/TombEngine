@@ -7,6 +7,11 @@ cbuffer StaticMatrixBuffer : register(b1)
 	float4 Color;
 };
 
+cbuffer MiscBuffer : register(b3)
+{
+	int AlphaTest;
+};
+
 #include "./VertexInput.hlsli"
 
 struct PixelShaderInput
@@ -35,10 +40,12 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	clip(output.w - 0.5f);
+	if (AlphaTest && output.w < 0.01f) {
+		discard;
+	}
 	float3 colorMul = min(input.Color.xyz, 1.0f);
 	output.xyz = output.xyz * colorMul.xyz;
-	output.w = 1.0f;
+	//output.w = 1.0f;
 
 	return output;
 }

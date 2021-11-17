@@ -129,6 +129,8 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
+	m_transparentFacesVertexBuffer = VertexBuffer(m_device.Get(), 100000);
+
 	D3D11_BLEND_DESC blendStateDesc{};
 	blendStateDesc.AlphaToCoverageEnable = false;
 	blendStateDesc.IndependentBlendEnable = false;
