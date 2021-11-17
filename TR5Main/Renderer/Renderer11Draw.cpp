@@ -2263,9 +2263,10 @@ namespace TEN::Renderer
             if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
             {
                 // For rooms, we already pass world coordinates, just copy vertices
-                for (int i = 0; i < face.info.polygon->vertices.size(); i++)
+                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                for (int i = 0; i < numVertices; i++)
                 {
-                    vertices.push_back(face.info.polygon->vertices[i]);
+                    vertices.push_back(face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]]);
                 }
             }
             else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
@@ -2274,11 +2275,11 @@ namespace TEN::Renderer
             }
             else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
             {
-                // For rooms, we already pass world coordinates, just copy vertices
-                for (int i = 0; i < face.info.polygon->vertices.size(); i++)
+                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                for (int i = 0; i < numVertices; i++)
                 {
                     // Transform vertices on the CPU
-                    RendererVertex v = face.info.polygon->vertices[i];
+                    RendererVertex v = face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]];
                     v.Position = Vector3::Transform(v.Position, face.info.world);
                     v.Color = face.info.color;
                     vertices.push_back(v);
@@ -2964,6 +2965,7 @@ namespace TEN::Renderer
                             face.info.room = &room;
                             face.info.staticMesh = staticToDraw;
                             face.info.world = Matrix::CreateTranslation(face.info.position);
+                            face.info.bucket = &bucket;
                             view.transparentFaces.push_back(face);
                         }
                     }
@@ -3080,6 +3082,7 @@ namespace TEN::Renderer
                         face.info.texture = bucket.texture;
                         face.info.room = room;
                         face.info.blendMode = bucket.blendMode;
+                        face.info.bucket = &bucket;
                         view.transparentFaces.push_back(face);
                     }
                 }

@@ -270,32 +270,27 @@ namespace TEN::Renderer
 
 					if (poly->shape == 0)
 					{
-						bucket.Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
-						bucket.Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
-						bucket.Indices[lastIndex + 2] = baseVertices + 3; //.push_back(baseVertices + 3);
-						bucket.Indices[lastIndex + 3] = baseVertices + 2; //.push_back(baseVertices + 2);
-						bucket.Indices[lastIndex + 4] = baseVertices + 3; //.push_back(baseVertices + 3);
-						bucket.Indices[lastIndex + 5] = baseVertices + 1; //.push_back(baseVertices + 1);
+						newPoly.baseIndex = lastIndex;
 
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
+						bucket.Indices[lastIndex + 0] = baseVertices + 0;
+						bucket.Indices[lastIndex + 1] = baseVertices + 1;
+						bucket.Indices[lastIndex + 2] = baseVertices + 3;
+						bucket.Indices[lastIndex + 3] = baseVertices + 2;
+						bucket.Indices[lastIndex + 4] = baseVertices + 3;
+						bucket.Indices[lastIndex + 5] = baseVertices + 1;
+
+						newPoly.baseIndex = lastIndex;
 
 						lastIndex += 6;
 						totalRoomsIndices += 6;
 					}
 					else
 					{
-						bucket.Indices[lastIndex + 0] = baseVertices + 0; //.push_back(baseVertices);
-						bucket.Indices[lastIndex + 1] = baseVertices + 1; //.push_back(baseVertices + 1);
-						bucket.Indices[lastIndex + 2] = baseVertices + 2; //.push_back(baseVertices + 2);
+						newPoly.baseIndex = lastIndex;
 
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
-						newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
+						bucket.Indices[lastIndex + 0] = baseVertices + 0;
+						bucket.Indices[lastIndex + 1] = baseVertices + 1;
+						bucket.Indices[lastIndex + 2] = baseVertices + 2;
 
 						lastIndex += 3;
 						totalRoomsIndices += 3;
