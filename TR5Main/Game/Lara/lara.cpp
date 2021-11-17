@@ -876,14 +876,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot = 0;
 	}
 
-	// LEGACY lean reset.
-	/*if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
-		item->pos.zRot = 0;
-	else if (item->pos.zRot < -ANGLE(1.0f))
-		item->pos.zRot += ANGLE(1.0f);
-	else
-		item->pos.zRot -= ANGLE(1.0f);*/
-
 	// Reset turn rate.
 	int sign = copysign(1, Lara.turnRate);
 	if (abs(Lara.turnRate) > ANGLE(2.0f))
@@ -893,15 +885,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		Lara.turnRate = 0;
 	item->pos.yRot += Lara.turnRate;
-
-	// LEGACY turn rate reset.
-	/*if (Lara.turnRate < -ANGLE(2.0f))
-		Lara.turnRate += ANGLE(2.0f);
-	else if (Lara.turnRate > ANGLE(2.0f))
-		Lara.turnRate -= ANGLE(2.0f);
-	else
-		Lara.turnRate = 0;
-	item->pos.yRot += Lara.turnRate;*/
 
 	// Animate Lara.
 	AnimateLara(item);
