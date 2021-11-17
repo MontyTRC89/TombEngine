@@ -2385,9 +2385,9 @@ namespace TEN::Renderer
         UINT offset = 0;
 
         // Set vertex buffer
-        VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
+        m_transparentFacesVertexBuffer.Update(m_context.Get(), &vertices);
 
-        m_context->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
@@ -2481,9 +2481,10 @@ namespace TEN::Renderer
         UINT offset = 0;
 
         // Set vertex buffer
-        VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
+        // VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
+        m_transparentFacesVertexBuffer.Update(m_context.Get(), &vertices);
 
-        m_context->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
@@ -2502,6 +2503,10 @@ namespace TEN::Renderer
         m_stStatic.Color = Vector4::One;
         m_cbStatic.updateData(m_stStatic, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+
+        m_stMisc.AlphaTest = false;
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
+        m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         setBlendMode(info->blendMode);
         m_context->Draw(vertices.size(), 0);
@@ -2915,6 +2920,10 @@ namespace TEN::Renderer
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
+        m_stMisc.AlphaTest = true;
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
+        m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
+
         for (int i = 0; i < view.staticsToDraw.size(); i++)
         {
             MESH_INFO *msh = view.staticsToDraw[i]->Mesh;
@@ -2966,13 +2975,14 @@ namespace TEN::Renderer
                             face.info.staticMesh = staticToDraw;
                             face.info.world = Matrix::CreateTranslation(face.info.position);
                             face.info.bucket = &bucket;
+                            face.info.blendMode = bucket.blendMode;
                             view.transparentFaces.push_back(face);
                         }
                     }
                     else
-                    {
+                    {   
                         setBlendMode(bucket.blendMode);
-                        m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                        m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);                        
                     }
 				}
             }

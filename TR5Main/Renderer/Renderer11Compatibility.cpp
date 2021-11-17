@@ -209,7 +209,7 @@ namespace TEN::Renderer
 			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
 			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 			r->Statics.resize(room->mesh.size());
-
+			  
 			if (room->positions.size() == 0)
 				continue;
 
@@ -287,7 +287,7 @@ namespace TEN::Renderer
 					else
 					{
 						newPoly.baseIndex = lastIndex;
-
+ 
 						bucket.Indices[lastIndex + 0] = baseVertices + 0;
 						bucket.Indices[lastIndex + 1] = baseVertices + 1;
 						bucket.Indices[lastIndex + 2] = baseVertices + 2;
