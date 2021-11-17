@@ -489,40 +489,22 @@ namespace TEN::Renderer
 
 				if (poly->shape == 0)
 				{
+					newPoly.baseIndex = lastIndex;
+
 					bucket.Indices[lastIndex++] = baseVertices;
 					bucket.Indices[lastIndex++] = baseVertices + 1;
 					bucket.Indices[lastIndex++] = baseVertices + 3;
 					bucket.Indices[lastIndex++] = baseVertices + 2;
 					bucket.Indices[lastIndex++] = baseVertices + 3;
 					bucket.Indices[lastIndex++] = baseVertices + 1;
-
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 3]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
-
-					/*bucket->Indices.push_back(baseVertices);
-					bucket->Indices.push_back(baseVertices + 1);
-					bucket->Indices.push_back(baseVertices + 3);
-					bucket->Indices.push_back(baseVertices + 2);
-					bucket->Indices.push_back(baseVertices + 3);
-					bucket->Indices.push_back(baseVertices + 1);*/
 				}
 				else
 				{
+					newPoly.baseIndex = lastIndex;
+
 					bucket.Indices[lastIndex++] = baseVertices;
 					bucket.Indices[lastIndex++] = baseVertices + 1;
 					bucket.Indices[lastIndex++] = baseVertices + 2;
-
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 0]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 1]);
-					newPoly.vertices.push_back(bucket.Vertices[baseVertices + 2]);
-					
-					/*bucket->Indices.push_back(baseVertices);
-					bucket->Indices.push_back(baseVertices + 1);
-					bucket->Indices.push_back(baseVertices + 2);*/
 				}
 
 				bucket.Polygons.push_back(newPoly);
