@@ -1,4 +1,5 @@
 #pragma once
+
 struct SKIDOO_INFO {
 	short trackMesh;
 	int skidooTurn;
