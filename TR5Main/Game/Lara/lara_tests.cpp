@@ -772,7 +772,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		// Store next position
 		Lara.nextCornerPos.x = item->pos.xPos;
-		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
 		Lara.nextCornerPos.z = item->pos.zPos;
 
 		auto result = TestLaraValidHangPos(item, coll);
@@ -836,7 +836,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	{
 		// Store next position
 		Lara.nextCornerPos.x = item->pos.xPos;
-		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
 		Lara.nextCornerPos.z = item->pos.zPos;
 
 		if (TestLaraValidHangPos(item, coll))

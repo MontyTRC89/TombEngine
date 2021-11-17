@@ -145,10 +145,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				}
 				else if (TestLastFrame(item))
 				{
-					item->animNumber = LA_LADDER_SHIMMY_UP;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->goalAnimState = LS_HANG;
-					item->currentAnimState = LS_HANG;
+					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 				}
 			}
 
@@ -166,10 +163,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else if (TestLastFrame(item))
 			{
-				item->animNumber = LA_LADDER_SHIMMY_DOWN;
-				item->goalAnimState = LS_HANG;
-				item->currentAnimState = LS_HANG;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
 			}
 		}
 	}
@@ -414,10 +408,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				item->animNumber = LA_LADDER_SHIMMY_UP;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_HANG;
-				item->currentAnimState = LS_HANG;
+				SetAnimation(item, LA_LADDER_SHIMMY_UP);
 			}
 		}
 
