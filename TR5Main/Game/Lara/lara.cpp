@@ -40,7 +40,7 @@
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
-#include "newinv2.h"
+#include "gui.h"
 
 #include "Objects/Generic/Object/rope.h"
 
@@ -458,7 +458,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
 				!isSwamp &&
-				item->currentAnimState != LS_RUN_FORWARD &&
+				item->currentAnimState != LS_RUN_FORWARD &&		// Prevent ridiculous entrances when stepping down into wade-height water. @Sezz 2021.11.17
 				item->currentAnimState != LS_WALK_FORWARD &&
 				item->currentAnimState != LS_WALK_BACK)
 			{

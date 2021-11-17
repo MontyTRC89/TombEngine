@@ -5,7 +5,7 @@
 #include "control/box.h"
 #include "items.h"
 #include "control/lot.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
