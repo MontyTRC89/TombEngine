@@ -283,7 +283,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 		if (Lara.turnRate < -LARA_MED_TURN)
 			Lara.turnRate = -LARA_MED_TURN;
 
-		item->pos.zRot -= LARA_LEAN_RATE * 2;
+		item->pos.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -291,7 +291,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 		if (Lara.turnRate > LARA_MED_TURN)
 			Lara.turnRate = LARA_MED_TURN;
 
-		item->pos.zRot += LARA_LEAN_RATE * 2;
+		item->pos.zRot += LARA_LEAN_RATE;
 	}
 }
 
@@ -308,7 +308,7 @@ void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate < -LARA_MED_TURN)
 			Lara.turnRate = -LARA_MED_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 8);
+		item->pos.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -316,7 +316,7 @@ void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.turnRate > LARA_MED_TURN)
 			Lara.turnRate = LARA_MED_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 8);
+		item->pos.zRot += LARA_LEAN_RATE;
 	}
 
 	// LEGACY sample:

@@ -150,13 +150,13 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		info->turnRate = -LARA_CROUCH_ROLL_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, 7);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate = LARA_CROUCH_ROLL_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX, 7);
+		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
 	item->goalAnimState = LS_CROUCH_IDLE;
