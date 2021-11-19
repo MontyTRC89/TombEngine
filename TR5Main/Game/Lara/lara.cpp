@@ -777,6 +777,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
@@ -794,22 +796,22 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
-	if (TrInput & IN_LOOK && Lara.look &&
-		Lara.ExtraAnim == NO_ITEM)
+	if (TrInput & IN_LOOK && info->look &&
+		info->ExtraAnim == NO_ITEM)
 	{
 		LookLeftRight();
 	}
 	else
 		ResetLook();
 
-	Lara.look = true;
+	info->look = true;
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
-	if (Lara.Vehicle != NO_ITEM)
+	if (info->Vehicle != NO_ITEM)
 	{
-		switch (g_Level.Items[Lara.Vehicle].objectNumber)
+		switch (g_Level.Items[info->Vehicle].objectNumber)
 		{
 		case ID_QUAD:
 			if (QuadBikeControl(item, coll))
@@ -858,20 +860,29 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	if (Lara.poseCount < LARA_POSE_TIME &&
+	// Reset running jump timer.
+	if (item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_WALK_FORWARD &&
+		item->currentAnimState != LS_JUMP_FORWARD)
+	{
+		info->jumpCount = 0;
+	}
+
+	// Increment/reset AFK pose timer.
+	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)))
 	{
-		Lara.poseCount++;
+		info->poseCount++;
 	}
 	else
-		Lara.poseCount = 0;
+		info->poseCount = 0;
 
 	// Handle current Lara status.
 	lara_control_routines[item->currentAnimState](item, coll);
 
 	// Reset lean.
-	if (!Lara.isMoving || (Lara.isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if (!info->isMoving || (info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (abs(item->pos.zRot) > ANGLE(0.1f))
 			item->pos.zRot += item->pos.zRot / -6;
@@ -880,29 +891,29 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Reset turn rate.
-	int sign = copysign(1, Lara.turnRate);
-	if (abs(Lara.turnRate) > ANGLE(2.0f))
-		Lara.turnRate -= ANGLE(2.0f) * sign;
-	else if (abs(Lara.turnRate) > ANGLE(0.5f))
-		Lara.turnRate -= ANGLE(0.5f) * sign;
+	int sign = copysign(1, info->turnRate);
+	if (abs(info->turnRate) > ANGLE(2.0f))
+		info->turnRate -= ANGLE(2.0f) * sign;
+	else if (abs(info->turnRate) > ANGLE(0.5f))
+		info->turnRate -= ANGLE(0.5f) * sign;
 	else
-		Lara.turnRate = 0;
-	item->pos.yRot += Lara.turnRate;
+		info->turnRate = 0;
+	item->pos.yRot += info->turnRate;
 
-	// Animate Lara.
+	// Animate info->
 	AnimateLara(item);
 
-	if (Lara.ExtraAnim == -1)
+	if (info->ExtraAnim == -1)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
 		// Handle Lara collision.
-		if (Lara.Vehicle == NO_ITEM)
+		if (info->Vehicle == NO_ITEM)
 			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
+	//if (info->gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.

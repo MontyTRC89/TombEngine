@@ -19,7 +19,6 @@ namespace TEN::Renderer {
 	struct RendererMesh;
 }
 
-
 #pragma region state_and_animation
 enum LARA_STATE
 {
@@ -1002,9 +1001,7 @@ struct AnimsNew
 	// This should be done in WAD. @Sezz 2021.11.05
 	bool SwandiveRollRun;			// Swandive roll > run transition
 
-	// This will have to be default; monkey hang and ledge hang should not mix because it complicates things.
-	// If someone *really* wants to torture the player with the slow swing-in,
-	// they can easily swap out the animation inside the WAD. @Sezz 2021.11.05
+	// This will have to be default.
 	bool OscillateHanging;			// TR1/2 hang on thin ledge
 };
 
@@ -1029,6 +1026,7 @@ struct LaraInfo
 	LARA_WATER_STATUS waterStatus; // LW_enum
 	short climbStatus;
 	short poseCount;
+	int jumpCount;
 	short hitFrame;
 	short hitDirection;
 	int sprintTimer;
