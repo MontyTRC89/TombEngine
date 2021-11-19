@@ -832,7 +832,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_SNOWMOBILE:
-			if (SkidooControl())
+			if (SkidooControl(item, coll))
 				return;
 			break;
 
