@@ -95,6 +95,10 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->jumpCount++;
+	if (info->jumpCount > LARA_JUMP_TIME / 2 + 2) // TODO: Remove the "+ 2" once anim blending becomes a feature,; right now, it is a temporary solution to prevent stuttering. @Sezz 2021.11.19 
+		info->jumpCount = LARA_JUMP_TIME / 2 + 2;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -102,7 +106,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Implement item alignment properly. @Sezz 2021.11.01
+	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
 	if (info->isMoving)
 		return;
 
@@ -113,7 +117,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_SLOW_TURN)
 			info->turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -121,7 +125,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_SLOW_TURN)
 			info->turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
 	if (TrInput & IN_FORWARD)
@@ -201,6 +205,8 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->jumpCount++;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -225,33 +231,21 @@ void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	static bool allowJump = false;
-
-	if (item->animNumber == LA_STAND_TO_RUN)
-		allowJump = false;
-	else if (item->animNumber == LA_RUN)
-	{
-		if (item->frameNumber == 4)
-			allowJump = true;
-	}
-	else
-		allowJump = true;
-
-	// TODO: Do something about wade checks. @Sezz 2021.10.17
+	// TODO: Do something about wade checks someday. @Sezz 2021.10.17
 
 	// Pseudo action queue which makes JUMP input take complete precedence.
 	// Creates a committal lock to perform a forward jump when JUMP is pressed and released while allowJump isn't true yet.
-	static bool commitToJump = false;
+	static bool commitJump = false;
 
-	if ((TrInput & IN_JUMP || commitToJump) &&
+	if ((TrInput & IN_JUMP || commitJump) &&
 		!item->gravityStatus &&
 		info->waterStatus != LW_WADE)
 	{
-		commitToJump = TrInput & IN_FORWARD;
+		commitJump = TrInput & IN_FORWARD;
 
-		if (allowJump)
+		if (info->jumpCount >= LARA_JUMP_TIME)
 		{
-			commitToJump = false;
+			commitJump = false;
 			item->goalAnimState = LS_JUMP_FORWARD;
 		}
 
@@ -557,7 +551,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Adding some idle breathing would be nice. @Sezz 2021.10.31
 	info->NewAnims.Pose = false;
 
-	if (info->poseCount == LARA_POSE_TIME &&
+	if (info->poseCount >= LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		info->NewAnims.Pose)
 	{
@@ -724,6 +718,11 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
+	// Update running jump counter in perparation for possible dispatch soon after landing.
+	info->jumpCount++;
+	if (info->jumpCount > LARA_JUMP_TIME / 2)
+		info->jumpCount = LARA_JUMP_TIME / 2;
 
 	/*state 3*/
 	/*collision: */

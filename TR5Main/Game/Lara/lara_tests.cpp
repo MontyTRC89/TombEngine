@@ -288,9 +288,8 @@ bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches.
-	// A buffer might help, but improved collision handling would presumably eliminate this issue as a side product. @Sezz 2021.10.15
-	if (TestLaraCrawlVault(item, coll) ||
-		(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle is not a clamp.
+	// A buffer might help, but improved collision handling would presumably eliminate this issue entirely. @Sezz 2021.10.15
+	if ((coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Middle is not a clamp.
 		(coll->Front.Ceiling - LARA_HEIGHT_CRAWL) >= -LARA_HEIGHT ||		// Front is not a clamp.
 		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT)					// Back is not a clamp.
 	{
@@ -1890,13 +1889,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 // Entirely temporary. @Sezz 2021.10.16
 bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
 {
-	if (item->animNumber == LA_CRAWL_IDLE ||
-		(item->animNumber == LA_CROUCH_TO_CRAWL_START && item->frameNumber >= GetFrameNumber(item, 8)))
-	{
-		return true;
-	}
-
-	return false;
+	return item->animNumber != LA_CROUCH_TO_CRAWL_START;
 }
 
 bool TestLaraSwamp(ITEM_INFO* item)
