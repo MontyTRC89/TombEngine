@@ -37,6 +37,8 @@ constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_VELOCITY = 12;
+
+constexpr auto LARA_JUMP_TIME = 22;				// Frames to count before running jump is possible.
 constexpr auto LARA_POSE_TIME = 30 * 30;		// 30 frames * 30 = 30 seconds to AFK pose.
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
