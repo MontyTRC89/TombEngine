@@ -103,8 +103,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (coll->Front.Floor < -650 &&
 					coll->Front.Floor >= coll->Front.Ceiling &&
-					coll->Front.Floor >= coll->FrontLeft.Ceiling &&
-					coll->Front.Floor >= coll->FrontRight.Ceiling)
+					coll->FrontLeft.Floor >= coll->FrontLeft.Ceiling &&
+					coll->FrontRight.Floor >= coll->FrontRight.Ceiling)
 				{
 					if (TrInput & IN_WALK)
 					{
@@ -125,8 +125,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 				if (coll->Front.Floor < -650 &&
 					coll->Front.Floor - coll->Front.Ceiling >= -256 &&
-					coll->Front.Floor - coll->FrontLeft.Ceiling >= -256 &&
-					coll->Front.Floor - coll->FrontRight.Ceiling >= -256)
+					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -256 &&
+					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -256)
 				{
 					item->goalAnimState = LS_HANG_TO_CRAWL;
 					item->requiredAnimState = LS_CROUCH_IDLE;
