@@ -210,8 +210,8 @@ void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 	SKIDOO_INFO* skidooInfo = (SKIDOO_INFO*)skidoo->data;
 	WEAPON_INFO* wepInfo = &Weapons[WEAPON_SNOWMOBILE];
 
-	LaraGetNewTarget(wepInfo);
-	AimWeapon(wepInfo, &laraInfo->rightArm);
+	LaraGetNewTarget(lara, wepInfo);
+	AimWeapon(lara, wepInfo, &laraInfo->rightArm);
 
 	if (TrInput & SKIDOO_IN_FIRE && !skidoo->itemFlags[0])
 	{

@@ -173,7 +173,7 @@ void DoPickup()
 		{
 			Lara.requestGunType = WEAPON_FLARE;
 			Lara.gunType = WEAPON_FLARE;
-			InitialiseNewWeapon();
+			InitialiseNewWeapon(LaraItem);
 			Lara.gunStatus = LG_SPECIAL;
 			Lara.flareAge = (int)(item->data) & 0x7FFF;
 			draw_flare_meshes(LaraItem);
@@ -190,7 +190,7 @@ void DoPickup()
 			{
 				Lara.requestGunType = WEAPON_FLARE;
 				Lara.gunType = WEAPON_FLARE;
-				InitialiseNewWeapon();
+				InitialiseNewWeapon(LaraItem);
 				Lara.gunStatus = LG_SPECIAL;
 				Lara.flareAge = (short)(item->data) & 0x7FFF;
 				KillItem(pickupitem);

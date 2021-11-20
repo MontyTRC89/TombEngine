@@ -147,7 +147,7 @@ void undraw_flare(ITEM_INFO* lara)
 				info->gunType = info->lastGunType;
 				info->gunStatus = LG_NO_ARMS;
 
-				InitialiseNewWeapon();
+				InitialiseNewWeapon(lara);
 
 				info->target = NULL;
 				info->rightArm.lock = false;
@@ -204,7 +204,7 @@ void undraw_flare(ITEM_INFO* lara)
 			info->gunType = info->lastGunType;
 			info->gunStatus = LG_NO_ARMS;
 
-			InitialiseNewWeapon();
+			InitialiseNewWeapon(lara);
 
 			info->flareControlLeft = false;
 			info->target = NULL;
