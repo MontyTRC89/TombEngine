@@ -2,13 +2,13 @@
 #include "lara_struct.h"
 
 // -----------------------------
-// CRAWLING & CROUCHING
+// CRAWL & CROUCH
 // Control & Collision Functions
 // -----------------------------
 
-// ----------
-// CROUCHING:
-// ----------
+// -------
+// CROUCH:
+// -------
 
 void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll);
@@ -19,9 +19,9 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 
-// ---------
-// CRAWLING:
-// ---------
+// ------
+// CRAWL:
+// ------
 
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll);

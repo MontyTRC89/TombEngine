@@ -14,13 +14,13 @@
 #include "control/control.h"
 
 // -----------------------------
-// CRAWLING & CROUCHING
+// CRAWL & CROUCH
 // Control & Collision Functions
 // -----------------------------
 
-// ----------
-// CROUCHING:
-// ----------
+// -------
+// CROUCH:
+// -------
 
 // State:		LS_CROUCH_IDLE (71)
 // Collision:	lara_col_crouch_idle()
@@ -345,9 +345,9 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_crouch_idle(item, coll);
 }
 
-// ---------
-// CRAWLING:
-// ---------
+// ------
+// CRAWL:
+// ------
 
 // State:		LS_CRAWL_IDLE (80)
 // Collision:	lara_col_crawl_idle()
