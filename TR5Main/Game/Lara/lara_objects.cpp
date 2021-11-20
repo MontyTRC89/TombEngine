@@ -286,68 +286,80 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 /*tightropes*/
 #ifdef NEW_TIGHTROPE
 
-void lara_trbalance_mesh() {
-	LaraItem->pos.zRot = Lara.tightrope.balance / 4;
-	Lara.torsoZrot = -Lara.tightrope.balance;
+void lara_trbalance_mesh(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+
+	item->pos.zRot = info->tightrope.balance / 4;
+	info->torsoZrot = -info->tightrope.balance;
 }
 
-void lara_trbalance_regen() {
-	if(Lara.tightrope.timeOnTightrope <= 32)
-		Lara.tightrope.timeOnTightrope = 0;
+void lara_trbalance_regen(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+
+	if (info->tightrope.timeOnTightrope <= 32)
+		info->tightrope.timeOnTightrope = 0;
 	else 
-		Lara.tightrope.timeOnTightrope -= 32;
-	if(Lara.tightrope.balance > 0)
+		info->tightrope.timeOnTightrope -= 32;
+
+	if (info->tightrope.balance > 0)
 	{
-		if(Lara.tightrope.balance <= 128)
-			Lara.tightrope.balance = 0;
-		else Lara.tightrope.balance -= 128;
+		if (info->tightrope.balance <= 128)
+			info->tightrope.balance = 0;
+		else
+			info->tightrope.balance -= 128;
 	}
-	if(Lara.tightrope.balance < 0)
+
+	if (info->tightrope.balance < 0)
 	{
-		if(Lara.tightrope.balance >= -128)
-			Lara.tightrope.balance = 0;
-		else Lara.tightrope.balance += 128;
+		if (info->tightrope.balance >= -128)
+			info->tightrope.balance = 0;
+		else
+			info->tightrope.balance += 128;
 	}
 }
 
-void lara_trbalance() {
-	if(TrInput & IN_LEFT)
-		Lara.tightrope.balance -= 256;
-	if(TrInput & IN_RIGHT)
-		Lara.tightrope.balance += 256;
-	const int factor = ((Lara.tightrope.timeOnTightrope >> 7 )& 0xFF)* 128;
-	if(Lara.tightrope.balance < 0)
-	{
-		Lara.tightrope.balance -= factor;
-		if((Lara.tightrope.balance) <= -8000)
-			Lara.tightrope.balance = -8000;
-	} else if(Lara.tightrope.balance > 0)
-	{
-		Lara.tightrope.balance += factor;
-		if((Lara.tightrope.balance) >= 8000)
-			Lara.tightrope.balance = 8000;
+void lara_trbalance(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+	const int factor = ((info->tightrope.timeOnTightrope >> 7) & 0xFF) * 128;
 
-	} else
-		Lara.tightrope.balance = GetRandomControl() & 1 ? -1 : 1;
-	
+	if (TrInput & IN_LEFT)
+		info->tightrope.balance += 256;
+	if (TrInput & IN_RIGHT)
+		info->tightrope.balance -= 256;
+
+	if (info->tightrope.balance < 0)
+	{
+		info->tightrope.balance -= factor;
+		if (info->tightrope.balance <= -8000)
+			info->tightrope.balance = -8000;
+
+	}
+	else if (info->tightrope.balance > 0)
+	{
+		info->tightrope.balance += factor;
+		if (info->tightrope.balance >= 8000)
+			info->tightrope.balance = 8000;
+	}
+	else
+		info->tightrope.balance = GetRandomControl() & 1 ? -1 : 1;
 }
 
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if(TrInput & IN_LOOK)
-	{
-		LookLeftRight();
+	if (TrInput & IN_LOOK)
 		LookUpDown();
-	}
-	lara_trbalance_regen();
-	lara_trbalance_mesh();
-	if(TrInput & IN_FORWARD)
-	{
+
+	lara_trbalance_regen(item);
+	lara_trbalance_mesh(item);
+
+	if (TrInput & IN_FORWARD)
 		item->goalAnimState = LS_TIGHTROPE_FORWARD;
-	}
-	else if((TrInput & IN_ROLL) || (TrInput & IN_BACK))
+	else if (TrInput & (IN_ROLL | IN_BACK))
 	{
-		if(item->animNumber == LA_TIGHTROPE_IDLE)
+		if (item->animNumber == LA_TIGHTROPE_IDLE)
 		{
 			item->currentAnimState = LS_TIGHTROPE_TURN_180;
 			item->animNumber = LA_TIGHTROPE_TURN_180;
@@ -356,71 +368,70 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll) {
+void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	lara_trbalance_regen();
-	lara_trbalance_mesh();
-	if(item->animNumber == LA_TIGHTROPE_END && item->frameNumber == g_Level.Anims[LA_TIGHTROPE_END].frameEnd)
+
+	lara_trbalance_regen(item);
+	lara_trbalance_mesh(item);
+
+	if (item->animNumber == LA_TIGHTROPE_END &&
+		TestLastFrame(item, item->animNumber))
 	{
-		Lara.torsoZrot = 0;
+		info->torsoZrot = 0;
 		item->pos.zRot = 0;
 	}
 }
+
 void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	
-	short roomNumber = item->roomNumber;
-	if(GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-	   item->pos.xPos, item->pos.yPos, item->pos.zPos) == item->pos.yPos && Lara.tightrope.canGoOff)
+	LaraInfo*& info = item->data;
+
+	auto probe = GetCollisionResult(item);
+	if (probe.Position.Floor == item->pos.yPos &&
+		info->tightrope.canGoOff)
 	{
-		lara_trbalance_regen();
+		lara_trbalance_regen(item);
 		item->goalAnimState = LS_TIGHTROPE_EXIT;
 	}
 	
-	if(item->goalAnimState != LS_TIGHTROPE_EXIT &&
-	   ((TrInput & IN_BACK || TrInput & IN_ROLL || !(TrInput & IN_FORWARD))))
+	if (item->goalAnimState != LS_TIGHTROPE_EXIT &&
+	   (TrInput & (IN_BACK | IN_ROLL) || !(TrInput & IN_FORWARD)))
 	{
 		item->goalAnimState = LS_TIGHTROPE_IDLE;
 	}
-	Lara.tightrope.timeOnTightrope++;
-	lara_trbalance();
-	lara_trbalance_mesh();
-	if((Lara.tightrope.balance) >= 8000)
-	{
-		item->animNumber = LA_TIGHTROPE_FALL_RIGHT;
-		item->currentAnimState = LS_TIGHTROPE_UNBALANCE_RIGHT;
-		item->frameNumber = g_Level.Anims[LA_TIGHTROPE_FALL_RIGHT].frameBase;
-	} else 	if(Lara.tightrope.balance <= -8000)
-	{
-		item->animNumber = LA_TIGHTROPE_FALL_LEFT;
-		item->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
-		item->frameNumber = g_Level.Anims[LA_TIGHTROPE_FALL_LEFT].frameBase;
-	}
+
+	info->tightrope.timeOnTightrope++;
+	lara_trbalance(item);
+	lara_trbalance_mesh(item);
+
+	if (info->tightrope.balance >= 8000)
+		SetAnimation(item, LA_TIGHTROPE_FALL_RIGHT);
+	else if (info->tightrope.balance <= -8000)
+		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
 }
 
-
-void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
+void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
+{
 	/*states 122, 123*/
 	/*collision: lara_default_col*/
-	lara_trbalance_regen();
-	lara_trbalance_mesh();
-	if(item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-	{
-		PHD_VECTOR pos;
-		pos.x = 0;
-		pos.y = 0;
-		pos.z = 0;
+	lara_trbalance_regen(item);
+	lara_trbalance_mesh(item);
 
+	if (TestLastFrame(item, item->animNumber))
+	{
+		PHD_VECTOR pos{ 0, 75, 0 };
 		GetLaraJointPosition(&pos, LM_RFOOT);
 
 		item->pos.xPos = pos.x;
-		item->pos.yPos = pos.y + 75;
+		item->pos.yPos = pos.y;
 		item->pos.zPos = pos.z;
 
 		item->goalAnimState = LS_FREEFALL;
 		item->currentAnimState = LS_FREEFALL;
-
 		item->animNumber = LA_FREEFALL;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
@@ -429,11 +440,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 	}
 }
 
-
 #else
-
-
-
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 119*/
