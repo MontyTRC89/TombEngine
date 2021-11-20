@@ -286,12 +286,12 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	LaraGetNewTarget(weapon);
+	LaraGetNewTarget(LaraItem, weapon);
 	if (TrInput & IN_ACTION)
-		LaraTargetInfo(weapon);
+		LaraTargetInfo(LaraItem, weapon);
 
-	AimWeapon(weapon, &Lara.leftArm);
-	AimWeapon(weapon, &Lara.rightArm);
+	AimWeapon(LaraItem, weapon, &Lara.leftArm);
+	AimWeapon(LaraItem, weapon, &Lara.rightArm);
 
 	if (Lara.leftArm.lock && !Lara.rightArm.lock)
 	{
@@ -367,9 +367,9 @@ void draw_pistol_meshes(LARA_WEAPON_TYPE weaponType)
 	}
 	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
 
-	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
+	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_RHAND;
 	if (static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER)
-		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_LHAND;
+		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_LHAND;
 }
 
 void ready_pistols(LARA_WEAPON_TYPE weaponType)
