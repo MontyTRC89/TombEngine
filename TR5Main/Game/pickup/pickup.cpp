@@ -176,7 +176,7 @@ void DoPickup()
 			InitialiseNewWeapon();
 			Lara.gunStatus = LG_SPECIAL;
 			Lara.flareAge = (int)(item->data) & 0x7FFF;
-			draw_flare_meshes();
+			draw_flare_meshes(LaraItem);
 			KillItem(pickupitem);
 
 			item->pos.xRot = oldXrot;

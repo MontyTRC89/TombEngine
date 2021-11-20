@@ -403,7 +403,7 @@ void LaraGun()
 				if (Lara.gunType == WEAPON_FLARE)
 				{
 					CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
-					undraw_flare_meshes();
+					undraw_flare_meshes(LaraItem);
 					Lara.flareControlLeft = false;
 					Lara.flareAge = 0;
 				}
@@ -577,8 +577,8 @@ void LaraGun()
 				Lara.flareControlLeft = false;
 			}
 
-			DoFlareInHand(Lara.flareAge);
-			set_flare_arm(Lara.leftArm.frameNumber);
+			DoFlareInHand(LaraItem, Lara.flareAge);
+			set_flare_arm(LaraItem, Lara.leftArm.frameNumber);
 		}
 		break;
 
@@ -588,8 +588,8 @@ void LaraGun()
 			if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
-				DoFlareInHand(Lara.flareAge);
-				set_flare_arm(Lara.leftArm.frameNumber);
+				DoFlareInHand(LaraItem, Lara.flareAge);
+				set_flare_arm(LaraItem, Lara.leftArm.frameNumber);
 			}
 		}
 		break;
@@ -642,7 +642,7 @@ void InitialiseNewWeapon()
 		Lara.rightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		Lara.leftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		if (Lara.gunStatus != LG_NO_ARMS)
-			draw_flare_meshes();
+			draw_flare_meshes(LaraItem);
 		break;
 
 	default:
