@@ -1198,24 +1198,28 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 {
-	// TODO: Hard objects? Lara will attempt to jump against them.
+	auto angleA = angle + ANGLE(15.0f);
+	auto angleB = angle - ANGLE(15.0f);
 
-	auto y = item->pos.yPos;
+	auto vecA = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angleA),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angleA),
+		item->roomNumber);
 
-	auto angleA = angle - ANGLE(15.0f);
-	auto angleB = angle + ANGLE(15.0f);
+	auto vecB = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angleB),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angleB),
+		item->roomNumber);
 
-	auto probeA = GetCollisionResult(item, angleA, dist, 0);
-	auto probeB = GetCollisionResult(item, angleB, dist, 0);
+	auto pos = GAME_VECTOR(item->pos.xPos,
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos,
+		item->roomNumber);
 
-	// TODO: Ceilings.
-	if ((probeA.Position.Floor - y) < -STEPUP_HEIGHT &&
-		(probeB.Position.Floor - y) < -STEPUP_HEIGHT)
-	{
-		return true;
-	}
+	auto resultA = LOS(&pos, &vecA);
+	auto resultB = LOS(&pos, &vecB);
 
-	return false;
+	return (resultA == 0 && resultB == 0);
 }
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)

@@ -22,7 +22,7 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	// Update running jump counter in perparation for possible dispatch soon after landing.
+	// Update running jump counter in preparation for possible dispatch soon after landing.
 	info->jumpCount++;
 	if (info->jumpCount > LARA_JUMP_TIME / 2)
 		info->jumpCount = LARA_JUMP_TIME / 2;
