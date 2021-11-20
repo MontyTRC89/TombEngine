@@ -65,7 +65,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 									if (!radius)
 									{
 										collidedItems[0] = NULL;
-										return 1;
+										return true;
 									}
 								}
 							}
@@ -153,7 +153,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 							{
 								collidedItems[numItems++] = item;
 								if (!radius)
-									return 1;
+									return true;
 							}
 						}
 					}
@@ -170,36 +170,43 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 	return (numItems || numMeshes);
 }
 
+std::set<int> CollectConnectedRooms(int roomNumber)
+{
+	std::set<int> result;
+	
+	if (g_Level.Rooms.size() <= roomNumber)
+		return result;
+
+	result.insert(roomNumber);
+
+	auto room = &g_Level.Rooms[roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
+		result.insert(room->doors[i].room);
+
+	for (auto i : result)
+	{
+		room = &g_Level.Rooms[i];
+		for (int j = 0; j < room->doors.size(); j++)
+			result.insert(room->doors[j].room);
+	}
+
+	return result;
+}
+
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->HitTallObject = false;
 
-	short roomsToCheck[128];
-	short numRoomsToCheck = 0;
-	roomsToCheck[numRoomsToCheck++] = item->roomNumber;
-
-	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
+	for (auto i : CollectConnectedRooms(item->roomNumber))
 	{
-		roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-	}
-
-	for (int i = 0; i < numRoomsToCheck; i++)
-	{
-		for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
-			auto mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+			auto mesh = &g_Level.Rooms[i].mesh[j];
 
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				int x = abs(item->pos.xPos - mesh->pos.xPos);
-				int y = abs(item->pos.yPos - mesh->pos.yPos);
-				int z = abs(item->pos.zPos - mesh->pos.zPos);
-
-				if (x < COLLISION_CHECK_DISTANCE &&
-					y < COLLISION_CHECK_DISTANCE &&
-					z < COLLISION_CHECK_DISTANCE)
+				if (phd_Distance(&item->pos, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
 					auto stInfo = StaticObjects[mesh->staticNumber];
 					if (CollideSolidBounds(item, stInfo.collisionBox, mesh->pos, coll))
@@ -557,31 +564,73 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 {
-	for (int i = 0; i < 2; i++)
+	auto bounds = GetBoundsAccurate(item);
+	auto height = abs(bounds->Y2 + bounds->Y1);
+
+	for (int i = 0; i < 3; i++)
 	{
-		GAME_VECTOR s;
-		s.x = (i * 256) - 0x80;
-		s.y = -256;
-		s.z = 0;
+		auto s = (i != 1) ? phd_sin(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
+		auto c = (i != 1) ? phd_cos(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
 
-		GetLaraJointPosition((PHD_VECTOR*)&s, LM_HEAD);
-		s.roomNumber = item->roomNumber;
+		auto x = item->pos.xPos + (s * (coll->Setup.Radius));
+		auto y = item->pos.yPos - height - STEP_SIZE;
+		auto z = item->pos.zPos + (c * (coll->Setup.Radius));
 
-		GAME_VECTOR d;
-		d.x = s.x + phd_sin(item->pos.yRot) * 768;
-		d.y = s.y;
-		d.z = s.z + phd_cos(item->pos.yRot) * 768;
+		auto origin = Vector3(x, y, z);
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		LOS(&s, &d);
-		
-		PHD_VECTOR v;
-		MESH_INFO* mesh;
+		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
-		// CHECK
-		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != NO_LOS_ITEM)
+		for (auto i : CollectConnectedRooms(item->roomNumber))
 		{
-			coll->HitStatic = true;
-		}*/
+			short itemNumber = g_Level.Rooms[i].itemNumber;
+			while (itemNumber != NO_ITEM)
+			{
+				auto item2 = &g_Level.Items[itemNumber];
+				auto obj = &Objects[item2->objectNumber];
+
+				if (obj->isPickup || obj->collision == nullptr || !item2->collidable || item2->status == ITEM_INVISIBLE)
+				{
+					itemNumber = item2->nextItem;
+					continue;
+				}
+
+				if (phd_Distance(&item->pos, &item2->pos) < COLLISION_CHECK_DISTANCE)
+				{
+					auto box = TO_DX_BBOX(item2->pos, GetBoundsAccurate(item2));
+					float dist;
+
+					if (box.Intersects(origin, direction, dist) && dist < coll->Setup.Radius * 2)
+					{
+						coll->HitStatic = true;
+						return;
+					}
+				}
+
+				itemNumber = item2->nextItem;
+			}
+
+			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+			{
+				auto mesh = &g_Level.Rooms[i].mesh[j];
+
+				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				if (phd_Distance(&item->pos, &mesh->pos) < COLLISION_CHECK_DISTANCE)
+				{
+					auto box = TO_DX_BBOX(mesh->pos, &StaticObjects[mesh->staticNumber].collisionBox);
+					float dist;
+
+					if (box.Intersects(origin, direction, dist) && dist < coll->Setup.Radius * 2)
+					{
+						coll->HitStatic = true;
+						return;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -1044,35 +1093,23 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 			switch (direction)
 			{
 				case 0:
-					LaraItem->animNumber = LA_SIDESTEP_LEFT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
-					LaraItem->goalAnimState = LS_STEP_LEFT;
-					LaraItem->currentAnimState = LS_STEP_LEFT;
+					SetAnimation(LaraItem, LA_SIDESTEP_LEFT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 1:
-					LaraItem->animNumber = LA_WALK;
-					LaraItem->frameNumber = GF(LA_WALK, 0);
-					LaraItem->goalAnimState = LS_WALK_FORWARD;
-					LaraItem->currentAnimState = LS_WALK_FORWARD;
+					SetAnimation(LaraItem, LA_WALK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 2:
-					LaraItem->animNumber = LA_SIDESTEP_RIGHT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
-					LaraItem->goalAnimState = LS_STEP_RIGHT;
-					LaraItem->currentAnimState = LS_STEP_RIGHT;
+					SetAnimation(LaraItem, LA_SIDESTEP_RIGHT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 3:
 				default:
-					LaraItem->animNumber = LA_WALK_BACK;
-					LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
-					LaraItem->goalAnimState = LS_WALK_BACK;
-					LaraItem->currentAnimState = LS_WALK_BACK;
+					SetAnimation(LaraItem, LA_WALK_BACK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 			}
@@ -1240,6 +1277,18 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
+// Overload of GetCollisionResult which can be used to probe collision parameters
+// from a given item.
+
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height)
+{
+	auto xProbe = item->pos.xPos + phd_sin(angle) * dist;
+	auto yProbe = item->pos.yPos + height;
+	auto zProbe = item->pos.zPos + phd_cos(angle) * dist;
+
+	return GetCollisionResult(xProbe, yProbe, zProbe, GetRoom(item->location, xProbe, yProbe, zProbe).roomNumber);
+}
+
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
 // such as floor height under specific item.
 
@@ -1287,9 +1336,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 
 	// Probe bottom block through portals.
-	while (floor->RoomBelow(x, z, y).value_or(NO_ROOM) != NO_ROOM)
+	while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 	{
-		auto r = &g_Level.Rooms[floor->RoomBelow(x, z, y).value_or(floor->Room)];
+		auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 		floor = GetSector(r, x - r->x, z - r->z);
 	}
 
@@ -1304,7 +1353,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
-	result.Position.Bridge = result.BottomBlock->InsideBridge(x, z, result.Position.Floor, true, false);
+	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
@@ -1769,7 +1818,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
-			// MAGIC: Force slight push-out to the left side to avoid stucking
+			// HACK: Force slight push-out to the left side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
@@ -1819,7 +1868,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
-			// MAGIC: Force slight push-out to the right side to avoid stucking
+			// HACK: Force slight push-out to the right side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
@@ -2367,19 +2416,9 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	if (l->hitPoints > 0)
 	{
 		short* door, numDoors;
-		short roomsToCheck[128];
-		short numRoomsToCheck = 0;
-		roomsToCheck[numRoomsToCheck++] = l->roomNumber;
-
-		ROOM_INFO* room = &g_Level.Rooms[l->roomNumber];
-		for (int i = 0; i < room->doors.size(); i++)
+		for (auto i : CollectConnectedRooms(l->roomNumber))
 		{
-			roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-		}
-
-		for (int i = 0; i < numRoomsToCheck; i++)
-		{
-			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
 				item = &g_Level.Items[itemNumber];
@@ -2388,33 +2427,21 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 					obj = &Objects[item->objectNumber];
 					if (obj->collision != nullptr)
 					{
-						int x = abs(l->pos.xPos - item->pos.xPos); 
-						int y = abs(l->pos.yPos - item->pos.yPos);
-						int z = abs(l->pos.zPos - item->pos.zPos);
-
-						if (x < COLLISION_CHECK_DISTANCE &&
-							y < COLLISION_CHECK_DISTANCE &&
-							z < COLLISION_CHECK_DISTANCE)
+						if (phd_Distance(&item->pos, &l->pos) < COLLISION_CHECK_DISTANCE)
 							obj->collision(itemNumber, l, coll);
 					}
 				}
 				itemNumber = item->nextItem;
 			}
 
-			for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
+			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 			{
-				MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
+				MESH_INFO* mesh = &g_Level.Rooms[i].mesh[j];
 
 				// Only process meshes which are visible and non-solid
 				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
 				{
-					int x = abs(l->pos.xPos - mesh->pos.xPos);
-					int y = abs(l->pos.yPos - mesh->pos.yPos);
-					int z = abs(l->pos.zPos - mesh->pos.zPos);
-
-					if (x < COLLISION_CHECK_DISTANCE &&
-						y < COLLISION_CHECK_DISTANCE && 
-						z < COLLISION_CHECK_DISTANCE)
+					if (phd_Distance(&mesh->pos, &l->pos) < COLLISION_CHECK_DISTANCE)
 					{
 						if (TestBoundsCollideStatic(l, mesh, coll->Setup.Radius))
 						{
@@ -2660,8 +2687,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			float distance = 0.0f;
 
 			// Determine horizontal probe coordinates
-			int eX = x;
-			int eZ = z;
+			auto eX = x;
+			auto eZ = z;
 
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)
@@ -2688,8 +2715,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			auto block = GetCollisionResult(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight = block->BridgeFloorHeight(ffpX, ffpZ, y); // HACK? FloorHeight never returns real bridge height!
-			auto ceilingHeight = block->CeilingHeight(ffpX, ffpZ, y);
+			auto floorHeight = block->BridgeFloorHeight(ffpX, y, ffpZ); // HACK? FloorHeight never returns real bridge height!
+			auto ceilingHeight = block->CeilingHeight(ffpX, y, ffpZ);
 
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
@@ -2697,7 +2724,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front
-			auto bridge = block->InsideBridge(ffpX, ffpZ, height, true, y == height);
+			auto bridge = block->InsideBridge(ffpX, height, ffpZ, true, y == height);
 
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.

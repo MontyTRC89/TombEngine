@@ -1,5 +1,7 @@
 #pragma once
-struct RUBBER_BOAT_INFO {
+
+struct RUBBER_BOAT_INFO
+{
 	int boatTurn;
 	int leftFallspeed;
 	int rightFallspeed;

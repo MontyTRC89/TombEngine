@@ -58,14 +58,10 @@ extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
-extern int WeatherType;
-extern int LaraDrawType;
-
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
-extern short IsRoomOutsideNo;
 
 int DrawPhase();
 
@@ -88,6 +84,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);	
 int GetWaterSurface(int x, int y, int z, short roomNumber);
+int GetWaterDepth(int x, int y, int z, short roomNumber);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
 

@@ -760,9 +760,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
-			l->animNumber = LA_UNDERWATER_DEATH;
-			l->frameNumber = GF(LA_UNDERWATER_DEATH, 17);
-			l->currentAnimState = l->goalAnimState = LS_WATER_DEATH;
+			SetAnimation(v, LA_UNDERWATER_DEATH, 17);
 			l->fallspeed = 0;
 			l->gravityStatus = 0;
 			l->pos.xRot = l->pos.zRot = 0;
@@ -873,8 +871,8 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			CreateFlare(ID_FLARE_ITEM, 0);
-			undraw_flare_meshes();
+			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
+			undraw_flare_meshes(l);
 			Lara.flareControlLeft = false;
 			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
@@ -891,15 +889,11 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (l->currentAnimState == LS_ONWATER_STOP || l->currentAnimState == LS_ONWATER_FORWARD)
 		{
-			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETONSURF_A;
-			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, SUB_GETONSURF_A, 0);
-			l->currentAnimState = l->goalAnimState = SUBS_GETON;
+			SetAnimation(v, SUB_GETONSURF_A);
 		}
 		else
 		{
-			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + SUB_GETON_A;
-			l->frameNumber = GF2(ID_UPV, SUB_GETON_A, 0);
-			l->currentAnimState = l->goalAnimState = SUBS_GETON;
+			SetAnimation(v, SUB_GETON_A);
 		}
 
 		AnimateItem(l);
@@ -1063,9 +1057,7 @@ int SubControl(void)
 
 		sub->RotX = 0;
 
-		v->animNumber = SUB_POSE_A;
-		v->frameNumber = GF2(ID_UPV, SUB_POSE_A, 0);
-		v->goalAnimState = v->currentAnimState = SUBS_POSE;
+		SetAnimation(v, SUB_POSE_A);
 		v->fallspeed = 0;
 		v->speed = 0;
 		v->gravityStatus = true;

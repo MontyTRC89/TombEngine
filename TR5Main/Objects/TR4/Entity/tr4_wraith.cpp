@@ -79,8 +79,8 @@ namespace TEN::Entities::TR4
 		{
 			ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
 
-			x = room->x + room->ySize * 1024 / 2 - item->pos.xPos;
-			z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
+			x = room->x + room->xSize * 1024 / 2 - item->pos.xPos;
+			z = room->z + room->zSize * 1024 / 2 - item->pos.zPos;
 
 			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - 768);
@@ -174,13 +174,12 @@ namespace TEN::Entities::TR4
 		item->pos.yPos += item->speed * phd_sin(item->pos.xRot);
 		item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
 
-		IsRoomOutsideNo = NO_ROOM;
-		IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		if (item->roomNumber != IsRoomOutsideNo && IsRoomOutsideNo != NO_ROOM)
+		auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (item->roomNumber != outsideRoom && outsideRoom != NO_ROOM)
 		{
-			ItemNewRoom(itemNumber, IsRoomOutsideNo);
+			ItemNewRoom(itemNumber, outsideRoom);
 
-			ROOM_INFO* r = &g_Level.Rooms[IsRoomOutsideNo];
+			auto r = &g_Level.Rooms[outsideRoom];
 			short linkNum = NO_ITEM;
 			for (linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
 			{
