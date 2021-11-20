@@ -493,6 +493,11 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	roomNumber = item->roomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
 	floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
+	if (floor->Box < 0)
+		return false;
+
 	height = g_Level.Boxes[floor->Box].height;
 	nextHeight = 0;
 
@@ -2094,7 +2099,7 @@ void InitialiseItemBoxData()
 	{
 		for (const auto& mesh : r.mesh)
 		{
-			long index = ((mesh.pos.zPos - r.z) / 1024) + r.xSize * ((mesh.pos.xPos - r.x) / 1024);
+			long index = ((mesh.pos.zPos - r.z) / 1024) + r.zSize * ((mesh.pos.xPos - r.x) / 1024);
 
 			if (index > r.floor.size())
 				continue;

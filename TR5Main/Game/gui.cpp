@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "animation.h"
 #include "control/control.h"
 #include "lara_fire.h"
@@ -20,7 +20,7 @@
 #include "items.h"
 
 using namespace TEN::Renderer;
-InventoryClass g_Inventory;
+GuiController g_Gui;
 
 const char* optmessages[] =
 {
@@ -67,16 +67,16 @@ const char* controlmsgs[] =
 #define phd_centery phd_winymax / 2
 
 /*
-if you wanna add an object to the inventory, edit the inv_objects array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
+if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
 the #s MUST MATCH.
-i.e if uzi item is #2 in inv_objects (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
+i.e if uzi item is #2 in InventoryObjectTypes (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
 
 note: don't forget to add your object to the proper list construction function
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file)
 if it's combineable, add its things to the combine_table and don't forget to increment max_combines!!
 */
 
-COMBINELIST combine_table[max_combines] =
+CombineList combine_table[max_combines] =
 {
 	{combine_revolver_lasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER},
 	{combine_crossbow_lasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER},
@@ -140,7 +140,7 @@ COMBINELIST combine_table[max_combines] =
 	{combine_ClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
-INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
+InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {
 	// Weapons
 
@@ -394,87 +394,77 @@ INVOBJ inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
 };
 
-titleSettings InventoryClass::Get_CurrentSettings()
+SettingsData GuiController::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
 
-RINGME* InventoryClass::GetRings(char num)
+InventoryRing* GuiController::GetRings(char num)
 {
 	return rings[num];
 }
 
-short InventoryClass::Get_title_selected_option()
+short GuiController::GetSelectedOption()
 {
-	return title_selected_option;
+	return selected_option;
 }
 
-title_menus InventoryClass::Get_title_menu_to_display()
+Menu GuiController::GetMenuToDisplay()
 {
-	return title_menu_to_display;
+	return menu_to_display;
 }
 
-void InventoryClass::Set_pause_selected_option(short menu)
+void GuiController::SetSelectedOption(short menu)
 {
-	pause_selected_option = menu;
+	selected_option = menu;
 }
 
-short InventoryClass::Get_pause_selected_option()
+void GuiController::SetMenuToDisplay(Menu menu)
 {
-	return pause_selected_option;
+	menu_to_display = menu;
 }
 
-void InventoryClass::Set_pause_menu_to_display(pause_menus menu)
-{
-	pause_menu_to_display = menu;
-}
-
-pause_menus InventoryClass::Get_pause_menu_to_display()
-{
-	return pause_menu_to_display;
-}
-
-inv_modes InventoryClass::Get_invMode()
+InventoryMode GuiController::GetInventoryMode()
 {
 	return invMode;
 }
 
-void InventoryClass::Set_invMode(inv_modes mode)
+void GuiController::SetInventoryMode(InventoryMode mode)
 {
 	invMode = mode;
 }
 
-void InventoryClass::Set_inventoryItemChosen(int num)
+void GuiController::SetInventoryItemChosen(int num)
 {
 	inventoryItemChosen = num;
 }
 
-int InventoryClass::Get_inventoryItemChosen()
+int GuiController::GetInventoryItemChosen()
 {
 	return inventoryItemChosen;
 }
 
-void InventoryClass::Set_enterInventory(int num)
+void GuiController::SetEnterInventory(int num)
 {
 	enterInventory = num;
 }
 
-int InventoryClass::Get_enterInventory()
+int GuiController::GetEnterInventory()
 {
 	return enterInventory;
 }
 
-int InventoryClass::Get_lastInvItem()
+int GuiController::GetLastInventoryItem()
 {
 	return lastInvItem;
 }
 
-void InventoryClass::DrawInv()
+void GuiController::DrawInventory()
 {
 	g_Renderer.renderInventory();
 }
 
-void InventoryClass::clear_input_vars(bool flag)
+void GuiController::ClearInputVariables(bool flag)
 {
 	goUp = goDown = goRight = goLeft = goSelect = goDeselect = 0;
 	if (flag)
@@ -486,9 +476,9 @@ void InventoryClass::clear_input_vars(bool flag)
 	}
 }
 
-void InventoryClass::do_debounced_input()
+void GuiController::DoDebouncedInput()
 {
-	clear_input_vars(1);
+	ClearInputVariables(1);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -550,7 +540,7 @@ void InventoryClass::do_debounced_input()
 	{
 		dbSelect = 1;
 
-		if (invMode == IM_SAVE)
+		if (invMode == InventoryMode::Save)
 		{
 			if (!stop_killing_me_you_dumb_input_system)
 			{
@@ -559,7 +549,7 @@ void InventoryClass::do_debounced_input()
 				stop_killing_me_you_dumb_input_system = dbSelect;
 			}
 		}
-		else if (invMode == IM_LOAD)
+		else if (invMode == InventoryMode::Load)
 		{
 			if (!stop_killing_me_you_dumb_input_system)
 			{
@@ -590,158 +580,156 @@ void InventoryClass::do_debounced_input()
 	}
 }
 
-int InventoryClass::TitleOptions()
+InventoryResult GuiController::TitleOptions()
 {
-	int ret;
+	auto ret = InventoryResult::None;
 	static short selected_option_bak;
-
-	ret = 0;
 
 	/*stuff for credits go here!*/
 
-	switch (title_menu_to_display)
+	switch (menu_to_display)
 	{
-	case title_main_menu:
-		settings_flag = 3;
+	case Menu::Title:
+		option_count = 3;
 		break;
 
-	case title_select_level:
-		ret = 0;
-		settings_flag = g_GameFlow->GetNumLevels() - 2;
+	case Menu::SelectLevel:
+		ret = InventoryResult::None;
+		option_count = g_GameFlow->GetNumLevels() - 2;
 		break;
 
-	case title_load_game:
-		settings_flag = SAVEGAME_MAX - 1;
+	case Menu::LoadGame:
+		option_count = SAVEGAME_MAX - 1;
 		break;
 
-	case title_options_menu:
-		settings_flag = 2;
+	case Menu::Options:
+		option_count = 2;
 		break;
 
-	case title_display_menu:
-		settings_flag = 6;
-		handle_display_setting_input(0);
+	case Menu::Display:
+		option_count = 6;
+		HandleDisplaySettingsInput(0);
 		break;
 
-	case title_controls_menu:
-		settings_flag = 17;
-		handle_control_settings_input(0);
+	case Menu::Controls:
+		option_count = 17;
+		HandleControlSettingsInput(0);
 		break;
 
-	case title_sounds_menu:
-		settings_flag = 4;
-		handle_sound_settings_input(0);
+	case Menu::Sound:
+		option_count = 4;
+		HandleSoundSettingsInput(0);
 		break;
 	}
 
-	do_debounced_input();
+	DoDebouncedInput();
 
-	if (title_menu_to_display == title_main_menu || title_menu_to_display == title_select_level ||
-		title_menu_to_display == title_load_game || title_menu_to_display == title_options_menu)
+	if (menu_to_display == Menu::Title || menu_to_display == Menu::SelectLevel ||
+		menu_to_display == Menu::LoadGame || menu_to_display == Menu::Options)
 	{
 		if (goUp)
 		{
-			if (title_selected_option <= 0)
-				title_selected_option += settings_flag;
+			if (selected_option <= 0)
+				selected_option += option_count;
 			else
-				title_selected_option--;
+				selected_option--;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
 		{
-			if (title_selected_option < settings_flag)
-				title_selected_option++;
+			if (selected_option < option_count)
+				selected_option++;
 			else
-				title_selected_option -= settings_flag;
+				selected_option -= option_count;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
-		if (goDeselect && title_menu_to_display != title_main_menu)
+		if (goDeselect && menu_to_display != Menu::Title)
 		{
-			title_menu_to_display = title_main_menu;
-			title_selected_option = selected_option_bak;
+			menu_to_display = Menu::Title;
+			selected_option = selected_option_bak;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		}
 	}
 
 	if (goSelect)
 	{
-		if (title_menu_to_display == title_main_menu)
+		if (menu_to_display == Menu::Title)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 
-			switch (title_selected_option)
+			switch (selected_option)
 			{
 			case 0:
 				if (g_GameFlow->PlayAnyLevel)
 				{
-					selected_option_bak = title_selected_option;
-					title_selected_option = 0;
-					title_menu_to_display = title_select_level;
+					selected_option_bak = selected_option;
+					selected_option = 0;
+					menu_to_display = Menu::SelectLevel;
 				}
 				else
-					ret = INV_RESULT_NEW_GAME;
+					ret = InventoryResult::NewGame;
 
 				break;
 
 			case 1:
-				selected_option_bak = title_selected_option;
-				title_selected_option = 0;
-				title_menu_to_display = title_load_game;
+				selected_option_bak = selected_option;
+				selected_option = 0;
+				menu_to_display = Menu::LoadGame;
 				break;
 
 			case 2:
-				selected_option_bak = title_selected_option;
-				title_selected_option = 0;
-				title_menu_to_display = title_options_menu;
+				selected_option_bak = selected_option;
+				selected_option = 0;
+				menu_to_display = Menu::Options;
 				break;
 
 			case 3:
-				ret = INV_RESULT_EXIT_GAME;
+				ret = InventoryResult::ExitGame;
 				break;
 			}
 		}
-		else if (title_menu_to_display == title_select_level)
+		else if (menu_to_display == Menu::SelectLevel)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-			g_GameFlow->SelectedLevelForNewGame = title_selected_option;
-			title_menu_to_display = title_main_menu;
-			title_selected_option = 0;
-			ret = INV_RESULT_NEW_GAME_SELECTED_LEVEL;
+			g_GameFlow->SelectedLevelForNewGame = selected_option;
+			menu_to_display = Menu::Title;
+			selected_option = 0;
+			ret = InventoryResult::NewGameSelectedLevel;
 		}
-		else if (title_menu_to_display == title_load_game)
+		else if (menu_to_display == Menu::LoadGame)
 		{
-			if (!SavegameInfos[title_selected_option].Present)
+			if (!SavegameInfos[selected_option].Present)
 				SayNo();
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-				g_GameFlow->SelectedSaveGame = title_selected_option;
-				title_selected_option = 0;
-				ret = INV_RESULT_LOAD_GAME;
+				g_GameFlow->SelectedSaveGame = selected_option;
+				selected_option = 0;
+				ret = InventoryResult::LoadGame;
 			}
 		}
-		else if (title_menu_to_display == 3)
+		else if (menu_to_display == Menu::Options)
 		{
-			switch (title_selected_option)
+			switch (selected_option)
 			{
 			case 0:
 				FillDisplayOptions();
-				title_menu_to_display = title_display_menu;
+				menu_to_display = Menu::Display;
 				break;
 
 			case 1:
-				title_menu_to_display = title_controls_menu;
-				title_selected_option = 0;
+				menu_to_display = Menu::Controls;
+				selected_option = 0;
 				break;
 
 			case 2:
-				fillSound();
-				title_menu_to_display = title_sounds_menu;
-				title_selected_option = 0;
+				FillSound();
+				menu_to_display = Menu::Sound;
+				selected_option = 0;
 				break;
 			}
 		}
@@ -750,7 +738,7 @@ int InventoryClass::TitleOptions()
 	return ret;
 }
 
-void InventoryClass::FillDisplayOptions()
+void GuiController::FillDisplayOptions()
 {
 	// Copy configuration to a temporary object
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
@@ -771,7 +759,7 @@ void InventoryClass::FillDisplayOptions()
 	}
 }
 
-void InventoryClass::handle_display_setting_input(bool pause)
+void GuiController::HandleDisplaySettingsInput(bool pause)
 {
 	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
@@ -780,195 +768,96 @@ void InventoryClass::handle_display_setting_input(bool pause)
 	S_UpdateInput();
 	SetDebounce = false;
 
-	do_debounced_input();
+	DoDebouncedInput();
 
 	if (goDeselect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-
-		if (pause)
-		{
-			pause_menu_to_display = pause_options_menu;
-			pause_selected_option = 0;
-		}
-		else
-		{
-			title_menu_to_display = title_options_menu;
-			title_selected_option = 0;
-		}
-
+		menu_to_display = Menu::Options;
+		selected_option = 0;
 		return;
 	}
 
 	if (goLeft)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (pause_selected_option)
-			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				if (CurrentSettings.videoMode > 0)
-					CurrentSettings.videoMode--;
-				break;
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			if (CurrentSettings.videoMode > 0)
+				CurrentSettings.videoMode--;
+			break;
 
-			case 1:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
-				break;
+		case 1:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			break;
 
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
-				break;
+		case 2:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			break;
 
-			case 3:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
-				break;
+		case 3:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			break;
 
-			case 4:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
-				break;
-			}
+		case 4:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			break;
 		}
-		else
-		{
-			switch (title_selected_option)
-			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				if (CurrentSettings.videoMode > 0)
-					CurrentSettings.videoMode--;
-				break;
-
-			case 1:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
-				break;
-
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
-				break;
-
-			case 3:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
-				break;
-
-			case 4:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
-				break;
-			}
-		}
-		
 	}
 
 	if (goRight)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (pause_selected_option)
-			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
-					CurrentSettings.videoMode++;
-				break;
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
+				CurrentSettings.videoMode++;
+			break;
 
-			case 1:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
-				break;
+		case 1:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			break;
 
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
-				break;
+		case 2:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			break;
 
-			case 3:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
-				break;
+		case 3:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			break;
 
-			case 4:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
-				break;
-			}
-		}
-		else
-		{
-			switch (title_selected_option)
-			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
-					CurrentSettings.videoMode++;
-				break;
-
-			case 1:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
-				break;
-
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
-				break;
-
-			case 3:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
-				break;
-
-			case 4:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
-				break;
-			}
+		case 4:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			break;
 		}
 	}
 
 	if (goUp)
 	{
-		if (pause)
-		{
-			if (pause_selected_option <= 0)
-				pause_selected_option += pause_flag;
-			else
-				pause_selected_option--;
-		}
+		if (selected_option <= 0)
+			selected_option += option_count;
 		else
-		{
-			if (title_selected_option <= 0)
-				title_selected_option += settings_flag;
-			else
-				title_selected_option--;
-		}
+			selected_option--;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
 	{
-		if (pause)
-		{
-			if (pause_selected_option < pause_flag)
-				pause_selected_option++;
-			else
-				pause_selected_option -= pause_flag;
-		}
+		if (selected_option < option_count)
+			selected_option++;
 		else
-		{
-			if (title_selected_option < settings_flag)
-				title_selected_option++;
-			else
-				title_selected_option -= settings_flag;
-		}
+			selected_option -= option_count;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
@@ -977,196 +866,53 @@ void InventoryClass::handle_display_setting_input(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
-		if (pause)
+		if (selected_option == 5)
 		{
-			if (pause_selected_option == 5)
-			{
-				// Save the configuration
-				RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
-				CurrentSettings.conf.Width = mode->Width;
-				CurrentSettings.conf.Height = mode->Height;
-				CurrentSettings.conf.RefreshRate = mode->RefreshRate;
+			// Save the configuration
+			RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
+			CurrentSettings.conf.Width = mode->Width;
+			CurrentSettings.conf.Height = mode->Height;
+			CurrentSettings.conf.RefreshRate = mode->RefreshRate;
 
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
+			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			SaveConfiguration();
 
-				// Reset screen and go back
-				g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
-					CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
+			// Reset screen and go back
+			g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
+				CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
 
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
-			}
-			else if (pause_selected_option == 6)
-			{
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
-			}
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 0;
 		}
-		else
+		else if (selected_option == 6)
 		{
-			if (title_selected_option == 5)
-			{
-				// Save the configuration
-				RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
-				CurrentSettings.conf.Width = mode->Width;
-				CurrentSettings.conf.Height = mode->Height;
-				CurrentSettings.conf.RefreshRate = mode->RefreshRate;
-
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
-
-				// Reset screen and go back
-				g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
-					CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
-
-				title_menu_to_display = title_options_menu;
-				title_selected_option = 0;
-			}
-			else if (title_selected_option == 6)
-			{
-				title_menu_to_display = title_options_menu;
-				title_selected_option = 0;
-			}
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 0;
 		}
 	}
 }
 
-void InventoryClass::handle_control_settings_input(bool pause)
+void GuiController::HandleControlSettingsInput(bool pause)
 {
-	CurrentSettings.waitingForkey = 0;
-
+	CurrentSettings.waitingForkey = false;
 	memcpy(&CurrentSettings.conf.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
+
+	if (CurrentSettings.ignoreInput)
+	{
+		if (!TrInput)
+			CurrentSettings.ignoreInput = false;
+		return;
+	}
 
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
+	DoDebouncedInput();
 
-	do_debounced_input();
-
-	if (goDeselect)
+	if (goSelect && selected_option != 16 && selected_option != 17)
 	{
-		if (!CurrentSettings.waitingForkey)
-		{
-			if (pause)
-			{
-				pause_menu_to_display = pause_options_menu;
-				pause_selected_option = 1;
-			}
-			else
-			{
-				title_menu_to_display = title_options_menu;
-				title_selected_option = 1;
-			}
-		}
-		else
-			CurrentSettings.waitingForkey = 0;
-
-		return;
-	}
-
-	if (!CurrentSettings.waitingForkey)
-	{
-		if (goUp)
-		{
-			if (pause)
-			{
-				if (pause_selected_option <= 0)
-					pause_selected_option += pause_flag;
-				else
-					pause_selected_option--;
-			}
-			else
-			{
-				if (title_selected_option <= 0)
-					title_selected_option += settings_flag;
-				else
-					title_selected_option--;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-		}
-
-		if (goDown)
-		{
-			if (pause)
-			{
-				if (pause_selected_option < pause_flag)
-					pause_selected_option++;
-				else
-					pause_selected_option -= pause_flag;
-			}
-			else
-			{
-				if (title_selected_option < settings_flag)
-					title_selected_option++;
-				else
-					title_selected_option -= settings_flag;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
-		}
-
-		if (goSelect)
-		{
-			if (pause)
-			{
-				if (pause_selected_option == 16)//apply
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
-					SaveConfiguration();
-					pause_menu_to_display = pause_main_menu;
-					pause_selected_option = 2;
-					return;
-				}
-
-				if (pause_selected_option == 17)//cancel
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					pause_menu_to_display = pause_main_menu;
-					pause_selected_option = 1;
-					return;
-				}
-			}
-			else
-			{
-				if (title_selected_option == 16)//apply
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
-					SaveConfiguration();
-					title_menu_to_display = title_options_menu;
-					title_selected_option = 1;
-					return;
-				}
-
-				if (title_selected_option == 17)//cancel
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-					title_menu_to_display = title_options_menu;
-					title_selected_option = 1;
-					return;
-				}
-			}
-		}
-	}
-
-	if (pause)
-	{
-		if (KeyMap[DIK_RETURN] && pause_selected_option != 16 && pause_selected_option != 17)
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			CurrentSettings.waitingForkey = 1;
-		}
-	}
-	else
-	{
-		if (KeyMap[DIK_RETURN] && title_selected_option != 16 && title_selected_option != 17)
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-			CurrentSettings.waitingForkey = 1;
-		}
+		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		CurrentSettings.waitingForkey = true;
 	}
 
 	if (CurrentSettings.waitingForkey)
@@ -1177,12 +923,6 @@ void InventoryClass::handle_control_settings_input(bool pause)
 
 		while (true)
 		{
-			if (DbInput & IN_DESELECT)
-			{
-				CurrentSettings.waitingForkey = false;
-				break;
-			}
-
 			int selectedKey = 0;
 			for (selectedKey = 0; selectedKey < 256; selectedKey++)
 			{
@@ -1195,56 +935,102 @@ void InventoryClass::handle_control_settings_input(bool pause)
 
 			if (selectedKey && g_KeyNames[selectedKey])
 			{
-				if (!(selectedKey == DIK_RETURN || selectedKey == DIK_LEFT || selectedKey == DIK_RIGHT ||
-					selectedKey == DIK_UP || selectedKey == DIK_DOWN))
+				if (selectedKey != DIK_ESCAPE)
 				{
-					if (selectedKey != DIK_ESCAPE)
-					{
-						KeyboardLayout[1][title_selected_option - 1] = selectedKey;
-						DefaultConflict();
-						DbInput = 0;
-						CurrentSettings.waitingForkey = false;
-						return;
-					}
+					KeyboardLayout[1][selected_option] = selectedKey;
+					DefaultConflict();
 				}
+
+				CurrentSettings.waitingForkey = false;
+				CurrentSettings.ignoreInput = true;
+				return;
 			}
 
-			g_Renderer.renderTitle();
-			Camera.numberFrames = g_Renderer.SyncRenderer();
-			int nframes = Camera.numberFrames;
-			ControlPhase(nframes, 0);
+			if (pause)
+			{
+				g_Renderer.renderInventory();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+			}
+			else
+			{
+				g_Renderer.renderTitle();
+				Camera.numberFrames = g_Renderer.SyncRenderer();
+				int nframes = Camera.numberFrames;
+				ControlPhase(nframes, 0);
+			}
 
 			SetDebounce = true;
 			S_UpdateInput();
 			SetDebounce = false;
 		}
 	}
+	else
+	{
+		if (goUp)
+		{
+			if (selected_option <= 0)
+				selected_option += option_count;
+			else
+				selected_option--;
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		}
+
+		if (goDown)
+		{
+			if (selected_option < option_count)
+				selected_option++;
+			else
+				selected_option -= option_count;
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		}
+
+		if (goSelect)
+		{
+			if (selected_option == 16) // Apply
+			{
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				SaveConfiguration();
+				menu_to_display = pause ? Menu::Pause : Menu::Options;
+				selected_option = 1;
+				return;
+			}
+
+			if (selected_option == 17) // Cancel
+			{
+				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				menu_to_display = pause ? Menu::Pause : Menu::Options;
+				selected_option = 1;
+				return;
+			}
+		}
+
+		if (goDeselect)
+		{
+			menu_to_display = Menu::Options;
+			selected_option = 1;
+		}
+	}
 }
 
-void InventoryClass::fillSound()
+void GuiController::FillSound()
 {
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
 
-void InventoryClass::handle_sound_settings_input(bool pause)
+void GuiController::HandleSoundSettingsInput(bool pause)
 {
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
-	do_debounced_input();
+	DoDebouncedInput();
 
 	if (goDeselect)
 	{
-		if (pause)
-		{
-			pause_menu_to_display = pause_options_menu;
-			pause_selected_option = 2;
-		}
-		else
-		{
-			title_menu_to_display = title_options_menu;
-			title_selected_option = 2;
-		}
+		menu_to_display = Menu::Options;
+		selected_option = 2;
 
 		SetVolumeMusic(g_Configuration.MusicVolume);
 		SetVolumeFX(g_Configuration.SfxVolume);
@@ -1253,224 +1039,110 @@ void InventoryClass::handle_sound_settings_input(bool pause)
 
 	if (goLeft)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (pause_selected_option)
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 1:
+			if (CurrentSettings.conf.MusicVolume > 0)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume > 0)
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume--;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume--;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume > 0)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume--;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
-		}
-		else
-		{
-			switch (title_selected_option)
+
+			break;
+
+		case 2:
+			if (CurrentSettings.conf.SfxVolume > 0)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume > 0)
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume--;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume--;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume > 0)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume--;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
+
+			break;
 		}
 	}
 
 	if (goRight)
 	{
-		if (pause)
+		switch (selected_option)
 		{
-			switch (pause_selected_option)
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
+			break;
+
+		case 1:
+			if (CurrentSettings.conf.MusicVolume < 100)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume < 100)
+				static int db = 0;
+				CurrentSettings.conf.MusicVolume++;
+				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume++;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume < 100)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume++;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
-		}
-		else
-		{
-			switch (title_selected_option)
+
+			break;
+
+		case 2:
+			if (CurrentSettings.conf.SfxVolume < 100)
 			{
-			case 0:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-				CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-				break;
-
-			case 1:
-				if (CurrentSettings.conf.MusicVolume < 100)
+				static int db = 0;
+				CurrentSettings.conf.SfxVolume++;
+				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				if (!db)
 				{
-					static int db = 0;
-					CurrentSettings.conf.MusicVolume++;
-					SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					db = 10;
 				}
-
-				break;
-
-			case 2:
-				if (CurrentSettings.conf.SfxVolume < 100)
-				{
-					static int db = 0;
-					CurrentSettings.conf.SfxVolume++;
-					SetVolumeFX(CurrentSettings.conf.SfxVolume);
-					if (!db)
-					{
-						SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-						db = 10;
-					}
-					else
-						db -= 2;
-				}
-
-				break;
+				else
+					db -= 2;
 			}
+
+			break;
 		}
 	}
 
 	if (goUp)
 	{
-		if (pause)
-		{
-			if (pause_selected_option <= 0)
-				pause_selected_option += pause_flag;
-			else
-				pause_selected_option--;
-		}
+		if (selected_option <= 0)
+			selected_option += option_count;
 		else
-		{
-			if (title_selected_option <= 0)
-				title_selected_option += settings_flag;
-			else
-				title_selected_option--;
-		}
+			selected_option--;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
 	if (goDown)
 	{
-		if (pause)
-		{
-			if (pause_selected_option < pause_flag)
-				pause_selected_option++;
-			else
-				pause_selected_option -= pause_flag;
-		}
+		if (selected_option < option_count)
+			selected_option++;
 		else
-		{
-			if (title_selected_option < settings_flag)
-				title_selected_option++;
-			else
-				title_selected_option -= settings_flag;
-		}
+			selected_option -= option_count;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
@@ -1479,107 +1151,84 @@ void InventoryClass::handle_sound_settings_input(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
 
-		if (pause)
+		if (selected_option == 3)
 		{
-			if (pause_selected_option == 3)
-			{
-				// Save the configuration
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
+			// Save the configuration
+			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			SaveConfiguration();
 
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
-			}
-			else if (pause_selected_option == 4)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-				SetVolumeMusic(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				pause_menu_to_display = pause_main_menu;
-				pause_selected_option = 1;
-			}
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 2;
 		}
-		else
+		else if (selected_option == 4)
 		{
-			if (title_selected_option == 3)
-			{
-				// Save the configuration
-				memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
-				SaveConfiguration();
-
-				title_menu_to_display = title_options_menu;
-				title_selected_option = 2;
-			}
-			else if (title_selected_option == 4)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
-				SetVolumeMusic(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				title_menu_to_display = title_options_menu;
-				title_selected_option = 2;
-			}
+			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeFX(g_Configuration.SfxVolume);
+			menu_to_display = pause ? Menu::Pause : Menu::Options;
+			selected_option = pause ? 1 : 2;
 		}
 	}
 }
 
-int InventoryClass::DoPauseMenu()
+InventoryResult GuiController::DoPauseMenu()
 {
 	//basically mini title
 
-	switch (pause_menu_to_display)
+	switch (menu_to_display)
 	{
-	case pause_main_menu:
-		pause_flag = 2;
+	case Menu::Pause:
+		option_count = 2;
 		break;
 
-	case pause_statistics:
-		pause_flag = 0;
+	case Menu::Statistics:
+		option_count = 0;
 		break;
 
-	case pause_options_menu:
-		pause_flag = 2;
+	case Menu::Options:
+		option_count = 2;
 		break;
 
-	case pause_display_menu:
-		pause_flag = 6;
-		handle_display_setting_input(1);
+	case Menu::Display:
+		option_count = 6;
+		HandleDisplaySettingsInput(1);
 		break;
 
-	case pause_controls_menu:
-		pause_flag = 17;
-		handle_control_settings_input(1);
+	case Menu::Controls:
+		option_count = 17;
+		HandleControlSettingsInput(1);
 		break;
 
-	case pause_sounds_menu:
-		pause_flag = 4;
-		handle_sound_settings_input(1);
+	case Menu::Sound:
+		option_count = 4;
+		HandleSoundSettingsInput(1);
 		break;
 	}
 
-	clear_input_vars(1);
+	ClearInputVariables(1);
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
-	do_debounced_input();
+	DoDebouncedInput();
 
-	if (pause_menu_to_display == pause_main_menu || pause_menu_to_display == pause_options_menu)
+	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
 	{
 		if (goUp)
 		{
-			if (pause_selected_option <= 0)
-				pause_selected_option += pause_flag;
+			if (selected_option <= 0)
+				selected_option += option_count;
 			else
-				pause_selected_option--;
+				selected_option--;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
 		if (goDown)
 		{
-			if (pause_selected_option < pause_flag)
-				pause_selected_option++;
+			if (selected_option < option_count)
+				selected_option++;
 			else
-				pause_selected_option -= pause_flag;
+				selected_option -= option_count;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
@@ -1587,71 +1236,71 @@ int InventoryClass::DoPauseMenu()
 
 	if (goDeselect)
 	{
-		if (pause_menu_to_display == pause_main_menu)
+		if (menu_to_display == Menu::Pause)
 		{
-			invMode = IM_NONE;
+			invMode = InventoryMode::None;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-			return INV_RESULT_NONE;
+			return InventoryResult::None;
 		}
 
-		if (pause_menu_to_display == pause_statistics || pause_menu_to_display == pause_options_menu)
+		if (menu_to_display == Menu::Statistics || menu_to_display == Menu::Options)
 		{
-			pause_selected_option = pause_menu_to_display == pause_statistics ? 0 : 1;
-			pause_menu_to_display = pause_main_menu;
+			selected_option = menu_to_display == Menu::Statistics ? 0 : 1;
+			menu_to_display = Menu::Pause;
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		}
 	}
 
 	if (goSelect)
 	{
-		if (pause_menu_to_display == pause_main_menu)
+		if (menu_to_display == Menu::Pause)
 		{
-			switch (pause_selected_option)
+			switch (selected_option)
 			{
 			case 0:
-				pause_selected_option = 0;
-				pause_menu_to_display = pause_statistics;
+				selected_option = 0;
+				menu_to_display = Menu::Statistics;
 				break;
 
 			case 1:
-				pause_selected_option = 0;
-				pause_menu_to_display = pause_options_menu;
+				selected_option = 0;
+				menu_to_display = Menu::Options;
 				break;
 
 			case 2:
-				invMode = IM_NONE;
-				return INV_RESULT_EXIT_TO_TILE;
+				invMode = InventoryMode::None;
+				return InventoryResult::ExitToTitle;
 			}
 		}
-		else if (pause_menu_to_display == pause_options_menu)
+		else if (menu_to_display == Menu::Options)
 		{
-			switch (pause_selected_option)
+			switch (selected_option)
 			{
 			case 0:
 				FillDisplayOptions();
-				pause_menu_to_display = pause_display_menu;
+				menu_to_display = Menu::Display;
 				break;
 
 			case 1:
-				pause_selected_option = 0;
-				pause_menu_to_display = pause_controls_menu;
+				selected_option = 0;
+				menu_to_display = Menu::Controls;
 				break;
 
 			case 2:
-				fillSound();
-				pause_selected_option = 0;
-				pause_menu_to_display = pause_sounds_menu;
+				FillSound();
+				selected_option = 0;
+				menu_to_display = Menu::Sound;
 				break;
 			}
 		}
 	}
 
-	return INV_RESULT_NONE;
+	return InventoryResult::None;
 }
 
 /*inventory*/
 
-bool InventoryClass::do_these_objects_combine(int obj1, int obj2)
+bool GuiController::DoObjectsCombine(int obj1, int obj2)
 {
 	for (int n = 0; n < max_combines; n++)
 	{
@@ -1667,18 +1316,18 @@ bool InventoryClass::do_these_objects_combine(int obj1, int obj2)
 	return 0;
 }
 
-bool InventoryClass::is_item_currently_combinable(short obj)
+bool GuiController::IsItemCurrentlyCombinable(short obj)
 {
 	if (obj < INV_OBJECT_SMOL_WATERSKIN || obj > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
 		for (int n = 0; n < max_combines; n++)
 		{
 			if (combine_table[n].item1 == obj)
-				if (have_i_got_item(combine_table[n].item2))
+				if (IsItemInInventory(combine_table[n].item2))
 					return 1;
 
 			if (combine_table[n].item2 == obj)
-				if (have_i_got_item(combine_table[n].item1))
+				if (IsItemInInventory(combine_table[n].item1))
 					return 1;
 		}
 	}
@@ -1686,7 +1335,7 @@ bool InventoryClass::is_item_currently_combinable(short obj)
 	{
 		for (int n = 0; n < 4; n++)
 		{
-			if (have_i_got_item(n + INV_OBJECT_SMOL_WATERSKIN))
+			if (IsItemInInventory(n + INV_OBJECT_SMOL_WATERSKIN))
 				return 1;
 		}
 	}
@@ -1694,7 +1343,7 @@ bool InventoryClass::is_item_currently_combinable(short obj)
 	{
 		for (int n = 0; n < 6; n++)
 		{
-			if (have_i_got_item(n + INV_OBJECT_BIG_WATERSKIN))
+			if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN))
 				return 1;
 		}
 	}
@@ -1702,16 +1351,16 @@ bool InventoryClass::is_item_currently_combinable(short obj)
 	return 0;
 }
 
-bool InventoryClass::have_i_got_item(short obj)
+bool GuiController::IsItemInInventory(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[RING_INVENTORY]->current_object_list[i].invitem == obj)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == obj)
 			return 1;
 
 	return 0;
 }
 
-void InventoryClass::combine_these_two_objects(short obj1, short obj2)
+void GuiController::CombineObjects(short obj1, short obj2)
 {
 	int n;
 
@@ -1727,12 +1376,12 @@ void InventoryClass::combine_these_two_objects(short obj1, short obj2)
 	}
 
 	combine_table[n].combine_routine(0);
-	construct_object_list();
-	setup_objectlist_startposition(combine_table[n].combined_item);
-	handle_object_changeover(RING_INVENTORY);
+	ConstructObjectList();
+	SetupObjectListStartPosition(combine_table[n].combined_item);
+	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-void InventoryClass::seperate_object(short obj)
+void GuiController::SeparateObject(short obj)
 {
 	int n;
 
@@ -1741,35 +1390,35 @@ void InventoryClass::seperate_object(short obj)
 			break;
 
 	combine_table[n].combine_routine(1);
-	construct_object_list();
-	setup_objectlist_startposition(combine_table[n].item1);
+	ConstructObjectList();
+	SetupObjectListStartPosition(combine_table[n].item1);
 }
 
-void InventoryClass::setup_objectlist_startposition(short newobj)
+void GuiController::SetupObjectListStartPosition(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[RING_INVENTORY]->current_object_list[i].invitem == newobj)
-			rings[RING_INVENTORY]->curobjinlist = i;
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newobj)
+			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
-void InventoryClass::handle_object_changeover(int ringnum)
+void GuiController::HandleObjectChangeover(int ringnum)
 {
 	current_selected_option = 0;
 	menu_active = 1;
-	setup_ammo_selector();
+	SetupAmmoSelector();
 }
 
-void InventoryClass::setup_ammo_selector()
+void GuiController::SetupAmmoSelector()
 {
 	int num;
 	unsigned __int64 opts;
 
 	num = 0;
-	opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+	opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 	ammo_selector_flag = 0;
 	num_ammo_slots = 0;
 
-	if (rings[RING_AMMO]->ringactive)
+	if (rings[(int)RingTypes::Ammo]->ringactive)
 		return;
 	
 	ammo_object_list[0].xrot = 0;
@@ -1887,39 +1536,39 @@ void InventoryClass::setup_ammo_selector()
 	}
 }
 
-void InventoryClass::insert_object_into_list(int num)
+void GuiController::InsertObjectIntoList(int num)
 {
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].invitem = num;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].xrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].yrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].zrot = 0;
-	rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->numobjectsinlist].bright = 32;
-	rings[RING_INVENTORY]->numobjectsinlist++;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = num;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].bright = 32;
+	rings[(int)RingTypes::Inventory]->numobjectsinlist++;
 }
 
-void InventoryClass::insert_object_into_list_v2(int num)
+void GuiController::InsertObjectIntoList_v2(int num)
 {
 	unsigned __int64 opts = inventry_objects_list[num].opts;
 
 	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
-		if (rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem != num)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem != num)
 		{
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].invitem = num;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].xrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].yrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist].zrot = 0;
-			rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->numobjectsinlist++].bright = 32;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = num;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist++].bright = 32;
 		}
 	}
 }
 
-void InventoryClass::construct_object_list()
+void GuiController::ConstructObjectList()
 {
-	rings[RING_INVENTORY]->numobjectsinlist = 0;
+	rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[RING_INVENTORY]->current_object_list[i].invitem = NO_ITEM;
+		rings[(int)RingTypes::Inventory]->current_object_list[i].invitem = NO_ITEM;
 
 	CurrentPistolsAmmoType = 0;
 	CurrentUziAmmoType = 0;
@@ -1928,31 +1577,31 @@ void InventoryClass::construct_object_list()
 	CurrentGrenadeGunAmmoType = 0;
 	CurrentCrossBowAmmoType = 0;
 
-	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_TYPE::YOUNG))
+	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
 		if (Lara.Weapons[WEAPON_PISTOLS].Present)
-			insert_object_into_list(INV_OBJECT_PISTOLS);
+			InsertObjectIntoList(INV_OBJECT_PISTOLS);
 		else if (AmountPistolsAmmo)
-			insert_object_into_list(INV_OBJECT_PISTOLS_AMMO);
+			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
 
 		if (Lara.Weapons[WEAPON_UZI].Present)
-			insert_object_into_list(INV_OBJECT_UZIS);
+			InsertObjectIntoList(INV_OBJECT_UZIS);
 		else if (AmountUziAmmo)
-			insert_object_into_list(INV_OBJECT_UZI_AMMO);
+			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
 
 		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
 			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
-				insert_object_into_list(INV_OBJECT_REVOLVER_LASER);
+				InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
 			else
-				insert_object_into_list(INV_OBJECT_REVOLVER);
+				InsertObjectIntoList(INV_OBJECT_REVOLVER);
 		}
 		else if (AmountRevolverAmmo)
-			insert_object_into_list(INV_OBJECT_REVOLVER_AMMO);
+			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
 
 		if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 		{
-			insert_object_into_list(INV_OBJECT_SHOTGUN);
+			InsertObjectIntoList(INV_OBJECT_SHOTGUN);
 
 			if (Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO2)
 				CurrentShotGunAmmoType = 1;
@@ -1960,28 +1609,28 @@ void InventoryClass::construct_object_list()
 		else
 		{
 			if (AmountShotGunAmmo1)
-				insert_object_into_list(INV_OBJECT_SHOTGUN_AMMO1);
+				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO1);
 
 			if (AmountShotGunAmmo2)
-				insert_object_into_list(INV_OBJECT_SHOTGUN_AMMO2);
+				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
 		if (Lara.Weapons[WEAPON_HK].Present)
 		{
 			if (Lara.Weapons[WEAPON_HK].HasSilencer)
-				insert_object_into_list(INV_OBJECT_HK_SILENCER);
+				InsertObjectIntoList(INV_OBJECT_HK_SILENCER);
 			else
-				insert_object_into_list(INV_OBJECT_HK);
+				InsertObjectIntoList(INV_OBJECT_HK);
 		}
 		else if (AmountHKAmmo1)
-			insert_object_into_list(INV_OBJECT_HK_AMMO);
+			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
 		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
 				if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
-					insert_object_into_list(INV_OBJECT_CROSSBOW_LASER);
+					InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
 				else
-					insert_object_into_list(INV_OBJECT_CROSSBOW);
+					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
 
 				if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO2)
 					CurrentCrossBowAmmoType = 1;
@@ -1992,18 +1641,18 @@ void InventoryClass::construct_object_list()
 		else
 		{
 			if (AmountCrossBowAmmo1)
-				insert_object_into_list(INV_OBJECT_CROSSBOW_AMMO1);
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO1);
 
 			if (AmountCrossBowAmmo2)
-				insert_object_into_list(INV_OBJECT_CROSSBOW_AMMO2);
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO2);
 
 			if (AmountCrossBowAmmo3)
-				insert_object_into_list(INV_OBJECT_CROSSBOW_AMMO3);
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
 		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 		{
-			insert_object_into_list(INV_OBJECT_GRENADE_LAUNCHER);
+			InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
 
 			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO2)
 				CurrentGrenadeGunAmmoType = 1;
@@ -2014,196 +1663,196 @@ void InventoryClass::construct_object_list()
 		else
 		{
 			if (AmountGrenadeAmmo1)
-				insert_object_into_list(INV_OBJECT_GRENADE_AMMO1);
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO1);
 
 			if (AmountGrenadeAmmo2)
-				insert_object_into_list(INV_OBJECT_GRENADE_AMMO2);
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO2);
 
 			if (AmountGrenadeAmmo3)
-				insert_object_into_list(INV_OBJECT_GRENADE_AMMO3);
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO3);
 		}
 
 		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
-			insert_object_into_list(INV_OBJECT_ROCKET_LAUNCHER);
+			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
 		else if (AmountRocketsAmmo)
-			insert_object_into_list(INV_OBJECT_ROCKET_AMMO);
+			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
 
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Present)
-			insert_object_into_list(INV_OBJECT_HARPOON_GUN);
+			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
 		else if (AmountHarpoonAmmo)
-			insert_object_into_list(INV_OBJECT_HARPOON_AMMO);
+			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
 
 		if (Lara.Lasersight)
-			insert_object_into_list(INV_OBJECT_LASERSIGHT);
+			InsertObjectIntoList(INV_OBJECT_LASERSIGHT);
 
 		if (Lara.Silencer)
-			insert_object_into_list(INV_OBJECT_SILENCER);
+			InsertObjectIntoList(INV_OBJECT_SILENCER);
 
 		if (Lara.Binoculars)
-			insert_object_into_list(INV_OBJECT_BINOCULARS);
+			InsertObjectIntoList(INV_OBJECT_BINOCULARS);
 
 		if (Lara.NumFlares)
-			insert_object_into_list(INV_OBJECT_FLARES);
+			InsertObjectIntoList(INV_OBJECT_FLARES);
 	}
 
-	insert_object_into_list(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
+	InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
 	if (Lara.NumSmallMedipacks)
-		insert_object_into_list(INV_OBJECT_SMALL_MEDIPACK);
+		InsertObjectIntoList(INV_OBJECT_SMALL_MEDIPACK);
 
 	if (Lara.NumLargeMedipacks)
-		insert_object_into_list(INV_OBJECT_LARGE_MEDIPACK);
+		InsertObjectIntoList(INV_OBJECT_LARGE_MEDIPACK);
 
 	if (Lara.Crowbar)
-		insert_object_into_list(INV_OBJECT_CROWBAR);
+		InsertObjectIntoList(INV_OBJECT_CROWBAR);
 
 	if (Lara.hasBeetleThings)
 	{
 		if (Lara.hasBeetleThings & 1)
-			insert_object_into_list(INV_OBJECT_BEETLE);
+			InsertObjectIntoList(INV_OBJECT_BEETLE);
 
 		if (Lara.hasBeetleThings & 2)
-			insert_object_into_list(INV_OBJECT_BEETLE_PART1);
+			InsertObjectIntoList(INV_OBJECT_BEETLE_PART1);
 
 		if (Lara.hasBeetleThings & 4)
-			insert_object_into_list(INV_OBJECT_BEETLE_PART2);
+			InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 	}
 
 	if (Lara.small_waterskin)
-		insert_object_into_list((Lara.small_waterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+		InsertObjectIntoList((Lara.small_waterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
 
 	if (Lara.big_waterskin)
-		insert_object_into_list((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+		InsertObjectIntoList((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLES; i++)
 		if (Lara.Puzzles[i])
-			insert_object_into_list(INV_OBJECT_PUZZLE1 + i);
+			InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
-			insert_object_into_list(INV_OBJECT_PUZZLE1_COMBO1 + i);
+			InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_KEYS; i++)
 		if (Lara.Keys[i])
-			insert_object_into_list(INV_OBJECT_KEY1 + i);
+			InsertObjectIntoList(INV_OBJECT_KEY1 + i);
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
 		if (Lara.KeysCombo[i])
-			insert_object_into_list(INV_OBJECT_KEY1_COMBO1 + i);
+			InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS; i++)
 		if (Lara.Pickups[i])
-			insert_object_into_list(INV_OBJECT_PICKUP1 + i);
+			InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		if (Lara.PickupsCombo[i])
-			insert_object_into_list(INV_OBJECT_PICKUP1_COMBO1 + i);
+			InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES; i++)
 		if (Lara.Examines[i])
-			insert_object_into_list(INV_OBJECT_EXAMINE1 + i);
+			InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		if (Lara.ExaminesCombo[i])
-			insert_object_into_list(INV_OBJECT_EXAMINE1_COMBO1 + i);
+			InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
 	if (Lara.Diary.Present)
-		insert_object_into_list(INV_OBJECT_DIARY);
+		InsertObjectIntoList(INV_OBJECT_DIARY);
 
 	if (g_GameFlow->EnableLoadSave)
 	{
-		insert_object_into_list(INV_OBJECT_LOAD_FLOPPY);
-		insert_object_into_list(INV_OBJECT_SAVE_FLOPPY);
+		InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
+		InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 	}
 
-	rings[RING_INVENTORY]->objlistmovement = 0;
-	rings[RING_INVENTORY]->curobjinlist = 0;
-	rings[RING_INVENTORY]->ringactive = 1;
-	rings[RING_AMMO]->objlistmovement = 0;
-	rings[RING_AMMO]->curobjinlist = 0;
-	rings[RING_AMMO]->ringactive = 0;
-	handle_object_changeover(RING_INVENTORY);
+	rings[(int)RingTypes::Inventory]->objlistmovement = 0;
+	rings[(int)RingTypes::Inventory]->curobjinlist = 0;
+	rings[(int)RingTypes::Inventory]->ringactive = 1;
+	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	rings[(int)RingTypes::Ammo]->ringactive = 0;
+	HandleObjectChangeover((int)RingTypes::Inventory);
 	ammo_active = 0;
 }
 
-void InventoryClass::construct_combine_object_list()
+void GuiController::ConstructCombineObjectList()
 {
-	rings[RING_AMMO]->numobjectsinlist = 0;
+	rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[RING_AMMO]->current_object_list[i].invitem = NO_ITEM;
+		rings[(int)RingTypes::Ammo]->current_object_list[i].invitem = NO_ITEM;
 
-	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_TYPE::YOUNG))
+	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
 		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
 			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
-				insert_object_into_list_v2(INV_OBJECT_REVOLVER_LASER);
+				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
 			else
-				insert_object_into_list_v2(INV_OBJECT_REVOLVER);
+				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
 		}
 
 		if (Lara.Weapons[WEAPON_HK].Present)
-			insert_object_into_list_v2(INV_OBJECT_HK);
+			InsertObjectIntoList_v2(INV_OBJECT_HK);
 
 		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
 			if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
-				insert_object_into_list_v2(INV_OBJECT_CROSSBOW_LASER);
+				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
 			else
-				insert_object_into_list_v2(INV_OBJECT_CROSSBOW);
+				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
 		}
 
 		if (Lara.Lasersight)
-			insert_object_into_list_v2(INV_OBJECT_LASERSIGHT);
+			InsertObjectIntoList_v2(INV_OBJECT_LASERSIGHT);
 
 		if (Lara.Silencer)
-			insert_object_into_list_v2(INV_OBJECT_SILENCER);
+			InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
 	}
 
 	if (Lara.hasBeetleThings)
 	{
 		if (Lara.hasBeetleThings & 2)
-			insert_object_into_list_v2(INV_OBJECT_BEETLE_PART1);
+			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART1);
 
 		if (Lara.hasBeetleThings & 4)
-			insert_object_into_list_v2(INV_OBJECT_BEETLE_PART2);
+			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
 	if (Lara.small_waterskin)
-		insert_object_into_list_v2(Lara.small_waterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+		InsertObjectIntoList_v2(Lara.small_waterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
 
 	if (Lara.big_waterskin)
-		insert_object_into_list_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+		InsertObjectIntoList_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
-			insert_object_into_list_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
+			InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
 		if (Lara.KeysCombo[i])
-			insert_object_into_list_v2(INV_OBJECT_KEY1_COMBO1 + i);
+			InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		if (Lara.PickupsCombo[i])
-			insert_object_into_list_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
+			InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		if (Lara.ExaminesCombo[i])
-			insert_object_into_list_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
+			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
-	rings[RING_AMMO]->objlistmovement = 0;
-	rings[RING_AMMO]->curobjinlist = 0;
-	rings[RING_AMMO]->ringactive = 0;
+	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
-void InventoryClass::init_inventry()
+void GuiController::InitializeInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(14560);
 	Lara.busy = 0;
 	inventoryItemChosen = NO_ITEM;
-	clear_input_vars(0);
+	ClearInputVariables(0);
 	useItem = 0;
 
 	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].hasInfinite())
@@ -2228,23 +1877,23 @@ void InventoryClass::init_inventry()
 	AmountGrenadeAmmo1 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
 	AmountGrenadeAmmo2 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
 	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
-	construct_object_list();
+	ConstructObjectList();
 
 	if (enterInventory == NO_ITEM)
 	{
 		if (lastInvItem != NO_ITEM)
 		{
-			if (have_i_got_item(lastInvItem))
-				setup_objectlist_startposition(lastInvItem);
+			if (IsItemInInventory(lastInvItem))
+				SetupObjectListStartPosition(lastInvItem);
 			else//son of a bitch
 			{
 				if (lastInvItem >= INV_OBJECT_SMOL_WATERSKIN && lastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
 				{
 					for (int i = INV_OBJECT_SMOL_WATERSKIN; i <= INV_OBJECT_SMOL_WATERSKIN3L; i++)
 					{
-						if (have_i_got_item(i))
+						if (IsItemInInventory(i))
 						{
-							setup_objectlist_startposition(i);
+							SetupObjectListStartPosition(i);
 							break;
 						}
 					}
@@ -2253,9 +1902,9 @@ void InventoryClass::init_inventry()
 				{
 					for (int i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
 					{
-						if (have_i_got_item(i))
+						if (IsItemInInventory(i))
 						{
-							setup_objectlist_startposition(i);
+							SetupObjectListStartPosition(i);
 							break;
 						}
 					}
@@ -2267,8 +1916,8 @@ void InventoryClass::init_inventry()
 	}
 	else
 	{
-		if (have_i_got_object(enterInventory))
-			setup_objectlist_startposition2(enterInventory);
+		if (IsObjectInInventory(enterInventory))
+			SetupObjectListStartPosition2(enterInventory);
 
 		enterInventory = NO_ITEM;
 	}
@@ -2283,22 +1932,22 @@ void InventoryClass::init_inventry()
 	combine_obj2 = 0;
 	normal_ring_fade_val = 128;
 	normal_ring_fade_dir = 0;
-	handle_object_changeover(RING_INVENTORY);
+	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-int InventoryClass::have_i_got_object(short object_number)
+int GuiController::IsObjectInInventory(short object_number)
 {
 	return GetInventoryCount(from_underlying(object_number));
 }
 
-void InventoryClass::setup_objectlist_startposition2(short newobj)
+void GuiController::SetupObjectListStartPosition2(short newobj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (inventry_objects_list[rings[RING_INVENTORY]->current_object_list[i].invitem].object_number == newobj)
-			rings[RING_INVENTORY]->curobjinlist = i;
+		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newobj)
+			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
-int InventoryClass::convert_obj_to_invobj(short obj)
+int GuiController::ConvertObjectToInventoryItem(short obj)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
@@ -2309,14 +1958,14 @@ int InventoryClass::convert_obj_to_invobj(short obj)
 	return -1;
 }
 
-int InventoryClass::convert_invobj_to_obj(int obj)
+int GuiController::ConvertInventoryItemToObject(int obj)
 {
 	return inventry_objects_list[obj].object_number;
 }
 
-void InventoryClass::fade_ammo_selector()
+void GuiController::FadeAmmoSelector()
 {
-	if (rings[RING_INVENTORY]->ringactive && (rptLeft >= 8 || rptRight >= 8))
+	if (rings[(int)RingTypes::Inventory]->ringactive && (rptLeft >= 8 || rptRight >= 8))
 		ammo_selector_fade_val = 0;
 	else if (ammo_selector_fade_dir == 1)
 	{
@@ -2342,7 +1991,7 @@ void InventoryClass::fade_ammo_selector()
 	}
 }
 
-void InventoryClass::use_current_item()
+void GuiController::UseCurrentItem()
 {
 	short invobject, gmeobject;
 	long OldBinocular;
@@ -2351,7 +2000,7 @@ void InventoryClass::use_current_item()
 	Lara.oldBusy = false;
 	BinocularRange = 0;
 	LaraItem->meshBits = -1;
-	invobject = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	gmeobject = inventry_objects_list[invobject].object_number;
 
 	if (Lara.waterStatus == LW_ABOVE_WATER || Lara.waterStatus == LW_WADE)
@@ -2400,7 +2049,7 @@ void InventoryClass::use_current_item()
 					if (Lara.gunType != WEAPON_FLARE)
 					{
 						TrInput = IN_FLARE;
-						LaraGun();
+						LaraGun(LaraItem);
 						TrInput = 0;
 					}
 
@@ -2601,7 +2250,7 @@ void InventoryClass::use_current_item()
 	}
 }
 
-void InventoryClass::handle_inventry_menu()
+void GuiController::HandleInventoryMenu()
 {
 	int n;
 	unsigned __int64 opts;
@@ -2609,22 +2258,22 @@ void InventoryClass::handle_inventry_menu()
 	int ypos;
 	int num;
 
-	if (rings[RING_AMMO]->ringactive)
+	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
 		g_Renderer.drawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
 
-		if (rings[RING_INVENTORY]->objlistmovement)
+		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
 
-		if (rings[RING_AMMO]->objlistmovement)
+		if (rings[(int)RingTypes::Ammo]->objlistmovement)
 			return;
 
 		if (goSelect)
 		{
-			short invItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
-			short ammoItem = rings[RING_AMMO]->current_object_list[rings[RING_AMMO]->curobjinlist].invitem;
+			short invItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+			short ammoItem = rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
 
-			if (do_these_objects_combine(invItem, ammoItem))
+			if (DoObjectsCombine(invItem, ammoItem))
 			{
 				combine_ring_fade_dir = 2;
 				combine_type_flag = 1;
@@ -2634,7 +2283,7 @@ void InventoryClass::handle_inventry_menu()
 			}
 			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				if (do_special_waterskin_combine_bullshit(1))
+				if (PerformWaterskinCombine(1))
 				{
 					combine_type_flag = 2;
 					combine_ring_fade_dir = 2;
@@ -2647,7 +2296,7 @@ void InventoryClass::handle_inventry_menu()
 			}
 			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN && invItem <= INV_OBJECT_SMOL_WATERSKIN3L && ammoItem >= INV_OBJECT_BIG_WATERSKIN && ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
-				if (do_special_waterskin_combine_bullshit(0))
+				if (PerformWaterskinCombine(0))
 				{
 					combine_type_flag = 2;
 					combine_ring_fade_dir = 2;
@@ -2676,11 +2325,11 @@ void InventoryClass::handle_inventry_menu()
 	}
 	else
 	{
-		num = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
+		num = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 
 		for (n = 0; n < 3; n++)
 		{
-			current_options[n].type = 0;
+			current_options[n].type = MenuType::None;
 			current_options[n].text = 0;
 		}
 
@@ -2688,62 +2337,62 @@ void InventoryClass::handle_inventry_menu()
 
 		if (!ammo_active)
 		{
-			opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if ((opts & OPT_LOAD))
 			{
-				current_options[0].type = MENU_TYPE_LOAD;
+				current_options[0].type = MenuType::Load;
 				current_options[0].text = g_GameFlow->GetString(optmessages[6]);
 				n = 1;
 			}
 
 			if ((opts & OPT_SAVE))
 			{
-				current_options[n].type = MENU_TYPE_SAVE;
+				current_options[n].type = MenuType::Save;
 				current_options[n].text = g_GameFlow->GetString(optmessages[7]);
 				n++;
 			}
 
 			if ((opts & OPT_EXAMINABLE))
 			{
-				current_options[n].type = MENU_TYPE_EXAMINE;
+				current_options[n].type = MenuType::Examine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[8]);
 				n++;
 			}
 
 			if ((opts & OPT_STATS))
 			{
-				current_options[n].type = MENU_TYPE_STATS;
+				current_options[n].type = MenuType::Statistics;
 				current_options[n].text = g_GameFlow->GetString(optmessages[9]);
 				n++;
 			}
 
 			if ((opts & OPT_USE))
 			{
-				current_options[n].type = MENU_TYPE_USE;
+				current_options[n].type = MenuType::Use;
 				current_options[n].text = g_GameFlow->GetString(optmessages[0]);
 				n++;
 			}
 
 			if ((opts & OPT_EQUIP))
 			{
-				current_options[n].type = MENU_TYPE_EQUIP;
+				current_options[n].type = MenuType::Equip;
 				current_options[n].text = g_GameFlow->GetString(optmessages[4]);
 				n++;
 			}
 
 			if ((opts & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN)))
 			{
-				current_options[n].type = MENU_TYPE_CHOOSEAMMO;
+				current_options[n].type = MenuType::ChooseAmmo;
 				current_options[n].text = g_GameFlow->GetString(optmessages[1]);
 				n++;
 			}
 
 			if ((opts & OPT_COMBINABLE))
 			{
-				if (is_item_currently_combinable(num))
+				if (IsItemCurrentlyCombinable(num))
 				{
-					current_options[n].type = MENU_TYPE_COMBINE;
+					current_options[n].type = MenuType::Combine;
 					current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 					n++;
 				}
@@ -2751,39 +2400,39 @@ void InventoryClass::handle_inventry_menu()
 
 			if ((opts & OPT_ALWAYSCOMBINE))
 			{
-				current_options[n].type = MENU_TYPE_COMBINE;
+				current_options[n].type = MenuType::Combine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 				n++;
 			}
 
 			if ((opts & OPT_SEPERATABLE))
 			{
-				current_options[n].type = MENU_TYPE_SEPERATE;
+				current_options[n].type = MenuType::Seperate;
 				current_options[n].text = g_GameFlow->GetString(optmessages[3]);
 				n++;
 			}
 
 			if (opts & OPT_DIARY)
 			{
-				current_options[n].type = MENU_TYPE_DIARY;
+				current_options[n].type = MenuType::Diary;
 				current_options[n].text = g_GameFlow->GetString(optmessages[11]);
 				n++;
 			}
 		}
 		else
 		{
-			current_options[0].type = MENU_TYPE_AMMO1;
+			current_options[0].type = MenuType::Ammo1;
 			current_options[0].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[0].invitem].objname);
-			current_options[1].type = MENU_TYPE_AMMO2;
+			current_options[1].type = MenuType::Ammo2;
 			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
 			n = 2;
 
-			opts = inventry_objects_list[rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem].opts;
+			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if (opts & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
-				current_options[2].type = MENU_TYPE_AMMO3;
+				current_options[2].type = MenuType::Ammo3;
 				current_options[2].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[2].invitem].objname);
 			}
 
@@ -2814,7 +2463,7 @@ void InventoryClass::handle_inventry_menu()
 			}
 		}
 
-		if (menu_active && !rings[RING_INVENTORY]->objlistmovement && !rings[RING_AMMO]->objlistmovement)
+		if (menu_active && !rings[(int)RingTypes::Inventory]->objlistmovement && !rings[(int)RingTypes::Ammo]->objlistmovement)
 		{
 			if (goUp && current_selected_option > 0)
 			{
@@ -2846,13 +2495,13 @@ void InventoryClass::handle_inventry_menu()
 
 			if (goSelect)
 			{
-				if (current_options[current_selected_option].type != 5 && current_options[current_selected_option].type != 1)
+				if (current_options[current_selected_option].type != MenuType::Equip && current_options[current_selected_option].type != MenuType::Use)
 					SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 
 				switch (current_options[current_selected_option].type)
 				{
-				case MENU_TYPE_CHOOSEAMMO:
-					rings[RING_INVENTORY]->ringactive = 0;
+				case MenuType::ChooseAmmo:
+					rings[(int)RingTypes::Inventory]->ringactive = 0;
 					ammo_active = 1;
 					Stashedcurrent_selected_option = current_selected_option;
 					StashedCurrentPistolsAmmoType = CurrentPistolsAmmoType;
@@ -2866,54 +2515,54 @@ void InventoryClass::handle_inventry_menu()
 					StashedCurrentRocketAmmoType = CurrentRocketAmmoType;
 					break;
 
-				case MENU_TYPE_LOAD:
+				case MenuType::Load:
 					//fill_up_savegames_array//or maybe not?
-					invMode = IM_LOAD;
+					invMode = InventoryMode::Load;
 					break;
 
-				case MENU_TYPE_SAVE:
+				case MenuType::Save:
 					//fill_up_savegames_array
-					invMode = IM_SAVE;
+					invMode = InventoryMode::Save;
 					break;
 
-				case MENU_TYPE_EXAMINE:
-					invMode = IM_EXAMINE;
+				case MenuType::Examine:
+					invMode = InventoryMode::Examine;
 					break;
 
-				case MENU_TYPE_STATS:
-					invMode = IM_STATS;
+				case MenuType::Statistics:
+					invMode = InventoryMode::Statistics;
 					break;
 
-				case MENU_TYPE_AMMO1:
-				case MENU_TYPE_AMMO2:
-				case MENU_TYPE_AMMO3:
+				case MenuType::Ammo1:
+				case MenuType::Ammo2:
+				case MenuType::Ammo3:
 					ammo_active = 0;
-					rings[RING_INVENTORY]->ringactive = 1;
+					rings[(int)RingTypes::Inventory]->ringactive = 1;
 					current_selected_option = 0;
 					break;
 
-				case MENU_TYPE_COMBINE:
-					construct_combine_object_list();
-					rings[RING_INVENTORY]->ringactive = 0;
-					rings[RING_AMMO]->ringactive = 1;
+				case MenuType::Combine:
+					ConstructCombineObjectList();
+					rings[(int)RingTypes::Inventory]->ringactive = 0;
+					rings[(int)RingTypes::Ammo]->ringactive = 1;
 					ammo_selector_flag = 0;
 					menu_active = 0;
 					combine_ring_fade_dir = 1;
 					break;
 
-				case MENU_TYPE_SEPERATE:
+				case MenuType::Seperate:
 					seperate_type_flag = 1;
 					normal_ring_fade_dir = 2;
 					break;
 
-				case MENU_TYPE_EQUIP:
-				case MENU_TYPE_USE:
+				case MenuType::Equip:
+				case MenuType::Use:
 					menu_active = 0;
 					useItem = 1;
 					break;
 
-				case MENU_TYPE_DIARY:
-					invMode = IM_DIARY;
+				case MenuType::Diary:
+					invMode = InventoryMode::Diary;
 					Lara.Diary.currentPage = 1;
 					break;
 				}
@@ -2924,7 +2573,7 @@ void InventoryClass::handle_inventry_menu()
 				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 				goDeselect = 0;
 				ammo_active = 0;
-				rings[RING_INVENTORY]->ringactive = 1;
+				rings[(int)RingTypes::Inventory]->ringactive = 1;
 				CurrentPistolsAmmoType = StashedCurrentPistolsAmmoType;
 				CurrentUziAmmoType = StashedCurrentUziAmmoType;
 				CurrentRevolverAmmoType = StashedCurrentRevolverAmmoType;
@@ -2941,7 +2590,7 @@ void InventoryClass::handle_inventry_menu()
 }
 
 //this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
-void InventoryClass::update_laras_weapons_status()
+void GuiController::UpdateWeaponStatus()
 {
 	if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
@@ -2972,7 +2621,7 @@ void InventoryClass::update_laras_weapons_status()
 	}
 }
 
-void InventoryClass::spinback(unsigned short* angle)
+void GuiController::SpinBack(unsigned short* angle)
 {
 	unsigned short val;
 	unsigned short val2;
@@ -3014,12 +2663,12 @@ void InventoryClass::spinback(unsigned short* angle)
 	}
 }
 
-void InventoryClass::draw_ammo_selector()
+void GuiController::DrawAmmoSelector()
 {
 	int n;
 	int xpos;
 	unsigned short xrot, yrot, zrot;
-	INVOBJ* objme;
+	InventoryObject* objme;
 	char invTextBuffer[256];
 	int x, y;
 
@@ -3052,9 +2701,9 @@ void InventoryClass::draw_ammo_selector()
 			}
 			else
 			{
-				spinback(&ammo_object_list[n].xrot);
-				spinback(&ammo_object_list[n].yrot);
-				spinback(&ammo_object_list[n].zrot);
+				SpinBack(&ammo_object_list[n].xrot);
+				SpinBack(&ammo_object_list[n].yrot);
+				SpinBack(&ammo_object_list[n].zrot);
 			}
 
 			xrot = ammo_object_list[n].xrot;
@@ -3062,7 +2711,7 @@ void InventoryClass::draw_ammo_selector()
 			zrot = ammo_object_list[n].zrot;
 			x = phd_centerx - 300 + xpos;
 			y = 430;
-			short obj = convert_invobj_to_obj(ammo_object_list[n].invitem);
+			short obj = ConvertInventoryItemToObject(ammo_object_list[n].invitem);
 			float scaler = inventry_objects_list[ammo_object_list[n].invitem].scale1;
 
 			if (n == *current_ammo_type)
@@ -3089,7 +2738,7 @@ void InventoryClass::draw_ammo_selector()
 	}
 }
 
-void InventoryClass::draw_current_object_list(int ringnum)
+void GuiController::DrawCurrentObjectList(int ringnum)
 {
 	int n;
 	int maxobj;
@@ -3108,7 +2757,7 @@ void InventoryClass::draw_current_object_list(int ringnum)
 	if (rings[ringnum]->current_object_list <= 0)
 		return;
 
-	if (ringnum == RING_AMMO)
+	if (ringnum == (int)RingTypes::Ammo)
 	{
 		ammo_selector_fade_val = 0;
 		ammo_selector_fade_dir = 0;
@@ -3137,13 +2786,13 @@ void InventoryClass::draw_current_object_list(int ringnum)
 					normal_ring_fade_dir = 2;
 				else
 				{
-					rings[RING_INVENTORY]->ringactive = 1;
+					rings[(int)RingTypes::Inventory]->ringactive = 1;
 					menu_active = 1;
-					rings[RING_AMMO]->ringactive = 0;
-					handle_object_changeover(RING_INVENTORY);
+					rings[(int)RingTypes::Ammo]->ringactive = 0;
+					HandleObjectChangeover((int)RingTypes::Inventory);
 				}
 
-				rings[RING_AMMO]->ringactive = 0;
+				rings[(int)RingTypes::Ammo]->ringactive = 0;
 			}
 		}
 	}
@@ -3156,7 +2805,7 @@ void InventoryClass::draw_current_object_list(int ringnum)
 		{
 			normal_ring_fade_val = 128;
 			normal_ring_fade_dir = 0;
-			rings[RING_INVENTORY]->ringactive = 1;
+			rings[(int)RingTypes::Inventory]->ringactive = 1;
 			menu_active = 1;
 		}
 
@@ -3173,18 +2822,18 @@ void InventoryClass::draw_current_object_list(int ringnum)
 			if (combine_type_flag == 1)
 			{
 				combine_type_flag = 0;
-				combine_these_two_objects(combine_obj1, combine_obj2);
+				CombineObjects(combine_obj1, combine_obj2);
 			}
 			else if (combine_type_flag == 2)
 			{
 				combine_type_flag = 0;
-				construct_object_list();
-				setup_objectlist_startposition(combine_obj1);
+				ConstructObjectList();
+				SetupObjectListStartPosition(combine_obj1);
 			}
 			else if (seperate_type_flag)
-				seperate_object(rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem);
+				SeparateObject(rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem);
 
-			handle_object_changeover(RING_INVENTORY);
+			HandleObjectChangeover((int)RingTypes::Inventory);
 		}
 	}
 
@@ -3257,9 +2906,9 @@ void InventoryClass::draw_current_object_list(int ringnum)
 			if (!minobj && !maxobj)
 				shade = 128;
 
-			if (ringnum == RING_AMMO && combine_ring_fade_val < 128 && shade)
+			if (ringnum == (int)RingTypes::Ammo && combine_ring_fade_val < 128 && shade)
 				shade = combine_ring_fade_val;
-			else if (ringnum == RING_INVENTORY && normal_ring_fade_val < 128 && shade)
+			else if (ringnum == (int)RingTypes::Inventory && normal_ring_fade_val < 128 && shade)
 				shade = normal_ring_fade_val;
 
 			if (!i)
@@ -3374,12 +3023,12 @@ void InventoryClass::draw_current_object_list(int ringnum)
 						sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
 				}
 
-				if (ringnum == RING_INVENTORY)
+				if (ringnum == (int)RingTypes::Inventory)
 					objmeup = (int)(phd_centery - (phd_winymax + 1) * 0.0625 * 3.0);
 				else
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
-				g_Renderer.drawString(phd_centerx, ringnum == RING_INVENTORY ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+				g_Renderer.drawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3395,9 +3044,9 @@ void InventoryClass::draw_current_object_list(int ringnum)
 			}
 			else
 			{
-				spinback(&rings[ringnum]->current_object_list[n].xrot);
-				spinback(&rings[ringnum]->current_object_list[n].yrot);
-				spinback(&rings[ringnum]->current_object_list[n].zrot);
+				SpinBack(&rings[ringnum]->current_object_list[n].xrot);
+				SpinBack(&rings[ringnum]->current_object_list[n].yrot);
+				SpinBack(&rings[ringnum]->current_object_list[n].zrot);
 			}
 
 			xrot = rings[ringnum]->current_object_list[n].xrot;
@@ -3435,9 +3084,9 @@ void InventoryClass::draw_current_object_list(int ringnum)
 			x = 400 + xoff + i * OBJLIST_SPACING;
 			y = 150;
 			y2 = 430;//combine 
-			short obj = convert_invobj_to_obj(rings[ringnum]->current_object_list[n].invitem);
+			short obj = ConvertInventoryItemToObject(rings[ringnum]->current_object_list[n].invitem);
 			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.drawObjectOn2DPosition(x, ringnum == RING_INVENTORY ? y : y2, obj, xrot, yrot, zrot, scaler);
+			g_Renderer.drawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
 
 			if (++n >= rings[ringnum]->numobjectsinlist)
 				n = 0;
@@ -3489,8 +3138,8 @@ void InventoryClass::draw_current_object_list(int ringnum)
 
 						rings[ringnum]->objlistmovement = 0;
 
-						if (ringnum == RING_INVENTORY)
-							handle_object_changeover(0);
+						if (ringnum == (int)RingTypes::Inventory)
+							HandleObjectChangeover(0);
 					}
 				}
 				else
@@ -3502,15 +3151,15 @@ void InventoryClass::draw_current_object_list(int ringnum)
 
 					rings[ringnum]->objlistmovement = 0;
 
-					if (ringnum == RING_INVENTORY)
-						handle_object_changeover(0);
+					if (ringnum == (int)RingTypes::Inventory)
+						HandleObjectChangeover(0);
 				}
 			}
 		}
 	}
 }
 
-int InventoryClass::S_CallInventory2(bool reset_mode)
+int GuiController::CallInventory(bool reset_mode)
 {
 	int return_value;
 
@@ -3519,14 +3168,14 @@ int InventoryClass::S_CallInventory2(bool reset_mode)
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
 
-	rings[RING_INVENTORY] = &pcring1;
-	rings[RING_AMMO] = &pcring2;
+	rings[(int)RingTypes::Inventory] = &pcring1;
+	rings[(int)RingTypes::Ammo] = &pcring2;
 	g_Renderer.DumpGameScene();
 
 	if (reset_mode)
-		invMode = IM_INGAME;
+		invMode = InventoryMode::InGame;
 
-	init_inventry();
+	InitializeInventory();
 	Camera.numberFrames = 2;
 
 	while (true)
@@ -3554,25 +3203,25 @@ int InventoryClass::S_CallInventory2(bool reset_mode)
 		if (return_value)
 			return return_value;
 
-		do_debounced_input();
+		DoDebouncedInput();
 
-		if (invMode == IM_STATS)
-			do_stats_mode();
+		if (invMode == InventoryMode::Statistics)
+			DoStatisticsMode();
 		
-		if (invMode == IM_EXAMINE)
-			do_examine_mode();
+		if (invMode == InventoryMode::Examine)
+			DoExamineMode();
 
-		if (invMode == IM_DIARY)
-			do_diary();
+		if (invMode == InventoryMode::Diary)
+			DoDiary();
 
-		if (invMode == IM_LOAD)
-			return_value = do_load();
+		if (invMode == InventoryMode::Load)
+			return_value = DoLoad();
 
-		if (invMode == IM_SAVE)
-			do_save();
+		if (invMode == InventoryMode::Save)
+			DoSave();
 
-		DrawInv();
-		draw_compass();
+		DrawInventory();
+		DrawCompass();
 
 		if (useItem && !TrInput)
 			val = 1;
@@ -3589,44 +3238,44 @@ int InventoryClass::S_CallInventory2(bool reset_mode)
 			break;
 	}
 
-	lastInvItem = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
-	update_laras_weapons_status();
+	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+	UpdateWeaponStatus();
 
 	if (useItem)
-		use_current_item();
+		UseCurrentItem();
 
 	Lara.busy = Lara.oldBusy;
-	invMode = IM_NONE;
-	clear_input_vars(0);
+	invMode = InventoryMode::None;
+	ClearInputVariables(0);
 
 	return return_value;
 }
 
-void InventoryClass::do_stats_mode()
+void GuiController::DoStatisticsMode()
 {
-	invMode = IM_STATS;
+	invMode = InventoryMode::Statistics;
 
 	if (goDeselect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		invMode = IM_NONE;
+		invMode = InventoryMode::None;
 	}
 }
 
-void InventoryClass::do_examine_mode()
+void GuiController::DoExamineMode()
 {
-	invMode = IM_EXAMINE;
+	invMode = InventoryMode::Examine;
 
 	if (goDeselect)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		invMode = IM_NONE;
+		invMode = InventoryMode::None;
 	}
 }
 
-void InventoryClass::draw_compass()
+void GuiController::DrawCompass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
@@ -3635,9 +3284,9 @@ void InventoryClass::draw_compass()
 	Matrix::CreateRotationY(compass_angle);
 }
 
-void InventoryClass::do_diary()
+void GuiController::DoDiary()
 {
-	invMode = IM_DIARY;
+	invMode = InventoryMode::Diary;
 
 	if (goRight && Lara.Diary.currentPage < Lara.Diary.numPages)
 	{
@@ -3655,18 +3304,18 @@ void InventoryClass::do_diary()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		invMode = IM_NONE;
+		invMode = InventoryMode::None;
 	}
 }
 
-short InventoryClass::Get_LoadSaveSelection()
+short GuiController::GetLoadSaveSelection()
 {
 	return selected_slot;
 }
 
-int InventoryClass::do_load()
+int GuiController::DoLoad()
 {
-	invMode = IM_LOAD;
+	invMode = InventoryMode::Load;
 
 	if (goDown)
 	{
@@ -3705,15 +3354,15 @@ int InventoryClass::do_load()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		invMode = IM_INGAME;
+		invMode = InventoryMode::InGame;
 	}
 
 	return 0;
 }
 
-void InventoryClass::do_save()
+void GuiController::DoSave()
 {
-	invMode = IM_SAVE;
+	invMode = InventoryMode::Save;
 
 	if (goDown)
 	{
@@ -3746,7 +3395,7 @@ void InventoryClass::do_save()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
 		goDeselect = 0;
-		invMode = IM_INGAME;
+		invMode = InventoryMode::InGame;
 	}
 }
 
@@ -4204,7 +3853,7 @@ void combine_ClockWorkBeetle(int flag)
 	Lara.hasBeetleThings |= 1;//get beetle
 }
 
-bool InventoryClass::do_special_waterskin_combine_bullshit(int flag)
+bool GuiController::PerformWaterskinCombine(int flag)
 {
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;

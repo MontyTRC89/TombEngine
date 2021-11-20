@@ -2,47 +2,49 @@
 #include "configuration.h"
 #include <Scripting/LanguageScript.h>
 
-enum inv_modes
+enum class InventoryMode
 {
-	IM_NONE,
-	IM_INGAME,
-	IM_PAUSE,
-	IM_STATS,
-	IM_EXAMINE,
-	IM_DIARY,
-	IM_LOAD,
-	IM_SAVE
+	None,
+	InGame,
+	Pause,
+	Statistics,
+	Examine,
+	Diary,
+	Load,
+	Save
 };
 
-enum pause_menus
+enum class InventoryResult
 {
-	pause_main_menu,
-	pause_statistics,
-	pause_options_menu,
-	pause_display_menu,
-	pause_controls_menu,
-	pause_sounds_menu
+	None,
+	UseItem,
+	NewGame,
+	LoadGame,
+	SaveGame,
+	ExitGame,
+	ExitToTitle,
+	NewGameSelectedLevel
 };
 
-enum menu_types
+enum class MenuType
 {
-	MENU_TYPE_nothing,
-	MENU_TYPE_USE,
-	MENU_TYPE_CHOOSEAMMO,
-	MENU_TYPE_COMBINE,
-	MENU_TYPE_SEPERATE,
-	MENU_TYPE_EQUIP,
-	MENU_TYPE_AMMO1,
-	MENU_TYPE_AMMO2,
-	MENU_TYPE_AMMO3,
-	MENU_TYPE_LOAD,
-	MENU_TYPE_SAVE,
-	MENU_TYPE_EXAMINE,
-	MENU_TYPE_STATS,
-	MENU_TYPE_DIARY
+	None,
+	Use,
+	ChooseAmmo,
+	Combine,
+	Seperate,
+	Equip,
+	Ammo1,
+	Ammo2,
+	Ammo3,
+	Load,
+	Save,
+	Examine,
+	Statistics,
+	Diary
 };
 
-enum item_options : uint64_t
+enum ItemOptions : uint64_t
 {
 	OPT_ALWAYSCOMBINE = 1 << 0,
 	OPT_EQUIP = 1 << 1,
@@ -65,31 +67,33 @@ enum item_options : uint64_t
 	OPT_DIARY = 1 << 18
 };
 
-enum rotflags
+enum RotationFlags
 {
 	INV_ROT_X = 1,
 	INV_ROT_Y = 2,
 	INV_ROT_Z = 4
 };
 
-enum ring_types
+enum class RingTypes
 {
-	RING_INVENTORY,
-	RING_AMMO
+	Inventory,
+	Ammo
 };
 
-enum title_menus
+enum class Menu
 {
-	title_main_menu,
-	title_select_level,
-	title_load_game,
-	title_options_menu,
-	title_display_menu,
-	title_controls_menu,
-	title_sounds_menu
+	Title,
+	Pause,
+	Statistics,
+	SelectLevel,
+	LoadGame,
+	Options,
+	Display,
+	Controls,
+	Sound
 };
 
-enum inv_objects
+enum InventoryObjectTypes
 {
 	// Weapons and ammos
 	INV_OBJECT_PISTOLS,
@@ -329,13 +333,13 @@ enum inv_objects
 	INVENTORY_TABLE_SIZE
 };
 
-struct currentOptionsStuff
+struct MenuOption
 {
-	int type;
+	MenuType type;
 	char const* text;
 };
 
-struct OBJLIST
+struct ObjectList
 {
 	short invitem;
 	unsigned short xrot;
@@ -344,16 +348,16 @@ struct OBJLIST
 	unsigned short bright;
 };
 
-struct RINGME
+struct InventoryRing
 {
-	OBJLIST current_object_list[INVENTORY_TABLE_SIZE + 1];
+	ObjectList current_object_list[INVENTORY_TABLE_SIZE + 1];
 	int ringactive;
 	int objlistmovement;
 	int curobjinlist;
 	int numobjectsinlist;
 };
 
-struct AMMOLIST
+struct AmmoList
 {
 	short	   		invitem;
 	short	 		amount;
@@ -362,14 +366,15 @@ struct AMMOLIST
 	unsigned short	zrot;
 };
 
-struct titleSettings
+struct SettingsData
 {
-	bool waitingForkey;//waiting for a key to be pressed when configuring controls
+	bool waitingForkey = false; // Waiting for a key to be pressed when configuring controls
+	bool ignoreInput = false;   // Ignore input unless all keys were released
 	int videoMode;
 	GameConfiguration conf;
 };
 
-struct COMBINELIST
+struct CombineList
 {
 	void (*combine_routine)(int flag);
 	short item1;
@@ -377,7 +382,7 @@ struct COMBINELIST
 	short combined_item;
 };
 
-struct INVOBJ
+struct InventoryObject
 {
 	short object_number;
 	short yoff;
@@ -391,98 +396,96 @@ struct INVOBJ
 	short rot_flags;
 };
 
-class InventoryClass
+class GuiController
 {
 public:
-	int S_CallInventory2(bool reset_mode);	//the mother(fucker) of all
-	int TitleOptions();
-	int DoPauseMenu();
-	void handle_inventry_menu();
-	void DrawInv();
-	void draw_current_object_list(int ringnum);
-	int have_i_got_object(short object_number);
-	int convert_obj_to_invobj(short obj);
-	int convert_invobj_to_obj(int obj);
-	void fade_ammo_selector();
-	void draw_ammo_selector();
-	bool do_special_waterskin_combine_bullshit(int flag);
-	void draw_compass();
+	int CallInventory(bool reset_mode);
+	InventoryResult TitleOptions();
+	InventoryResult DoPauseMenu();
+	void HandleInventoryMenu();
+	void DrawInventory();
+	void DrawCurrentObjectList(int ringnum);
+	int IsObjectInInventory(short object_number);
+	int ConvertObjectToInventoryItem(short obj);
+	int ConvertInventoryItemToObject(int obj);
+	void FadeAmmoSelector();
+	void DrawAmmoSelector();
+	bool PerformWaterskinCombine(int flag);
+	void DrawCompass();
 
-	//getters
-	RINGME* GetRings(char num);
-	short Get_title_selected_option();
-	title_menus Get_title_menu_to_display();
-	short Get_pause_selected_option();
-	pause_menus Get_pause_menu_to_display();
-	inv_modes Get_invMode();
-	int Get_inventoryItemChosen();
-	int Get_enterInventory();
-	int Get_lastInvItem();
-	titleSettings Get_CurrentSettings();
-	short Get_LoadSaveSelection();
+	// Getters
+	InventoryRing* GetRings(char num);
+	short GetSelectedOption();
+	Menu GetMenuToDisplay();
+	InventoryMode GetInventoryMode();
+	int GetInventoryItemChosen();
+	int GetEnterInventory();
+	int GetLastInventoryItem();
+	SettingsData GetCurrentSettings();
+	short GetLoadSaveSelection();
 
-	//setters
-	void Set_pause_selected_option(short menu);
-	void Set_pause_menu_to_display(pause_menus menu);
-	void Set_invMode(inv_modes mode);
-	void Set_enterInventory(int num);
-	void Set_inventoryItemChosen(int num);
+	// Setters
+	void SetSelectedOption(short menu);
+	void SetMenuToDisplay(Menu menu);
+	void SetInventoryMode(InventoryMode mode);
+	void SetEnterInventory(int num);
+	void SetInventoryItemChosen(int num);
 
 private:
-	void do_debounced_input();
-	void clear_input_vars(bool flag);
-	void handle_display_setting_input(bool pause);
-	void handle_control_settings_input(bool pause);
-	void handle_sound_settings_input(bool pause);
-	void fillSound();
-	bool do_these_objects_combine(int obj1, int obj2);
-	void init_inventry();
+	void DoDebouncedInput();
+	void ClearInputVariables(bool flag);
+	void HandleDisplaySettingsInput(bool pause);
+	void HandleControlSettingsInput(bool pause);
+	void HandleSoundSettingsInput(bool pause);
+	void FillSound();
+	bool DoObjectsCombine(int obj1, int obj2);
+	void InitializeInventory();
 	void FillDisplayOptions();
-	bool is_item_currently_combinable(short obj);
-	bool have_i_got_item(short obj);
-	void combine_these_two_objects(short obj1, short obj2);
-	void setup_objectlist_startposition(short newobj);
-	void setup_objectlist_startposition2(short newobj);
-	void handle_object_changeover(int ringnum);
-	void setup_ammo_selector();
-	void construct_object_list();
-	void seperate_object(short obj);
-	void insert_object_into_list(int num);
-	void insert_object_into_list_v2(int num);
-	void use_current_item();
-	void spinback(unsigned short* angle);
-	void update_laras_weapons_status();
-	void do_stats_mode();
-	void do_examine_mode();
-	void do_diary();
-	int do_load();
-	void do_save();
-	void construct_combine_object_list();
+	bool IsItemCurrentlyCombinable(short obj);
+	bool IsItemInInventory(short obj);
+	void CombineObjects(short obj1, short obj2);
+	void SetupObjectListStartPosition(short newobj);
+	void SetupObjectListStartPosition2(short newobj);
+	void HandleObjectChangeover(int ringnum);
+	void SetupAmmoSelector();
+	void ConstructObjectList();
+	void SeparateObject(short obj);
+	void InsertObjectIntoList(int num);
+	void InsertObjectIntoList_v2(int num);
+	void UseCurrentItem();
+	void SpinBack(unsigned short* angle);
+	void UpdateWeaponStatus();
+	void DoStatisticsMode();
+	void DoExamineMode();
+	void DoDiary();
+	int DoLoad();
+	void DoSave();
+	void ConstructCombineObjectList();
 	
 	/*vars*/
-	//input
+	// Input
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 	long rptRight, rptLeft;
 	bool stop_killing_me_you_dumb_input_system;
 	bool stop_killing_me_you_dumb_input_system2;
 
-	//inventory
+	// Inventory
 	short combine_obj1;
 	short combine_obj2;
 	char useItem;
 	char seperate_type_flag;
 	char combine_type_flag;
 	int compassNeedleAngle;
-	RINGME pcring1;
-	RINGME pcring2;
-	RINGME* rings[2];
+	InventoryRing pcring1;
+	InventoryRing pcring2;
+	InventoryRing* rings[2];
 	int current_selected_option;
 	int menu_active;
 	char ammo_selector_flag;
 	char num_ammo_slots;
 	char* current_ammo_type;
-	AMMOLIST ammo_object_list[3];
+	AmmoList ammo_object_list[3];
 	short ammo_selector_fade_val;
 	short ammo_selector_fade_dir;
 	short combine_ring_fade_val;
@@ -491,14 +494,14 @@ private:
 	short normal_ring_fade_dir;
 	unsigned char ammo_active;
 	int OBJLIST_SPACING;
-	currentOptionsStuff current_options[3];
-	inv_modes invMode;
+	MenuOption current_options[3];
+	InventoryMode invMode;
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
 	bool ExitInvLoop;
 
-	//ammo vars
+	// Ammo vars
 	unsigned short AmountShotGunAmmo1;
 	unsigned short AmountShotGunAmmo2;
 	unsigned short AmountHKAmmo1;
@@ -533,19 +536,13 @@ private:
 	char StashedCurrentHarpoonAmmoType;
 	char StashedCurrentRocketAmmoType;
 
-	//pause
-	int pause_flag;
-	pause_menus pause_menu_to_display = pause_main_menu;
-	short pause_selected_option;
+	Menu menu_to_display = Menu::Title;
+	short selected_option;
+	int option_count;
 
-	//title
-	short title_selected_option;
-	title_menus title_menu_to_display = title_main_menu;
-	int settings_flag;
+	SettingsData CurrentSettings;
 
-	titleSettings CurrentSettings;
-
-	//loadsave
+	// Load / save
 	short selected_slot;
 };
 
@@ -611,16 +608,6 @@ void combine_Examine7(int flag);
 void combine_Examine8(int flag);
 void combine_ClockWorkBeetle(int flag);
 
-// Inventory results
-#define INV_RESULT_NONE						0
-#define INV_RESULT_USE_ITEM					1
-#define INV_RESULT_NEW_GAME					2
-#define INV_RESULT_LOAD_GAME				3
-#define INV_RESULT_SAVE_GAME				4
-#define INV_RESULT_EXIT_GAME				5
-#define INV_RESULT_EXIT_TO_TILE				6
-#define INV_RESULT_NEW_GAME_SELECTED_LEVEL	7
-
-extern InventoryClass g_Inventory;
-extern INVOBJ inventry_objects_list[];
+extern GuiController g_Gui;
+extern InventoryObject inventry_objects_list[];
 extern const char* controlmsgs[];

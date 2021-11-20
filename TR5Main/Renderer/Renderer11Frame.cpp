@@ -52,12 +52,15 @@ namespace TEN::Renderer
 
 			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
-			RendererItem* newItem = &m_items[itemNum];
-			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-			Vector3 min = (Vector3(bounds->X1, bounds->Y1, bounds->Z1)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			Vector3 max = (Vector3(bounds->X2, bounds->Y2, bounds->Z2)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+			auto bounds = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+			Vector3 min = bounds.Center - bounds.Extents;
+			Vector3 max = bounds.Center + bounds.Extents;
+
 			if (!renderView.camera.frustum.AABBInFrustum(min, max))
 				continue;
+
+			auto newItem = &m_items[itemNum];
 			newItem->Item = item;
 			newItem->Id = itemNum;
 			newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
@@ -77,24 +80,29 @@ namespace TEN::Renderer
 		if (m_rooms.size() < roomNumber) {
 			return;
 		}
-		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = room.Room;
+
+		auto& room = m_rooms[roomNumber];
+		auto r = room.Room;
+
 		if (r->mesh.size() <= 0)
 			return;
+
 		int numStatics = r->mesh.size();
 		for (int i = 0; i < numStatics; i++)
 		{
-			MESH_INFO* mesh = &r->mesh[i];
+			auto mesh = &r->mesh[i];
 			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 			{
-				RendererStatic* newStatic = &room.Statics[i];
-				STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
-				Vector3 min = Vector3(sinfo->visibilityBox.X1, sinfo->visibilityBox.Y1, sinfo->visibilityBox.Z1);
-				Vector3 max = Vector3(sinfo->visibilityBox.X2, sinfo->visibilityBox.Y2, sinfo->visibilityBox.Z2);
-				min += Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
-				max += Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
+				auto newStatic = &room.Statics[i];
+				auto sinfo = &StaticObjects[mesh->staticNumber];
+
+				auto bounds = TO_DX_BBOX(mesh->pos, &sinfo->visibilityBox);
+				Vector3 min = bounds.Center - bounds.Extents;
+				Vector3 max = bounds.Center + bounds.Extents;
+
 				if (!renderView.camera.frustum.AABBInFrustum(min, max))
 					continue;
+
 				Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->pos.yRot));
 				Vector3 translation = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 				newStatic->Mesh = mesh;
@@ -339,7 +347,7 @@ namespace TEN::Renderer
 			RendererLight *light = m_dynamicLights[i];
 
 			Vector3 boxMin = Vector3(r->x - WALL_SIZE, -r->minfloor, r->z - WALL_SIZE);
-			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->ySize * WALL_SIZE);
+			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->zSize * WALL_SIZE);
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
 			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1

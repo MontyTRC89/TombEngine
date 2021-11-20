@@ -12,7 +12,6 @@ byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
 int FlipMap[MAX_FLIPMAP];
 
-short IsRoomOutsideNo;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 void DoFlipMap(short group)
@@ -117,48 +116,75 @@ int IsObjectInRoom(short roomNumber, short objectNumber)
 int IsRoomOutside(int x, int y, int z)
 {
 	if (x < 0 || z < 0)
-		return -2;
+		return NO_ROOM;
 
 	int xTable = x / 1024;
 	int zTable = z / 1024;
 
 	if (OutsideRoomTable[xTable][zTable].size() == 0)
-		return -2;
+		return NO_ROOM;
 
 	for (size_t i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+		auto r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
-			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->zSize - 1) * 1024))))
+			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->xSize - 1) * 1024)))))
 		{
-			IsRoomOutsideNo = roomNumber;
-
-			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+			auto floor = GetFloor(x, y, z, &roomNumber);
 			int height = GetFloorHeight(floor, x, y, z);
 			if (height == NO_HEIGHT || y > height)
-				return -2;
+				return NO_ROOM;
 			height = GetCeiling(floor, x, y, z);
 			if (y < height)
-				return -2;
+				return NO_ROOM;
 
-			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? 1 : -3);
+			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? roomNumber : NO_ROOM);
 		}
 	}
 
-	return -2;
+	return NO_ROOM;
 }
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z) 
 {
-	int sectorX = (x) / SECTOR(1);
-	int sectorZ = (z) / SECTOR(1);
-	int index = sectorZ + sectorX * r->xSize;
+	int sectorX = std::clamp(x / SECTOR(1), 0, r->xSize - 1);
+	int sectorZ = std::clamp(z / SECTOR(1), 0, r->zSize - 1);
+
+	int index = sectorZ + sectorX * r->zSize;
 	if (index > r->floor.size()) 
 	{
 		return nullptr;
 	}
 	return &r->floor[index];
 }
+
+bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber)
+{
+	int x = pos.xPos;
+	int y = pos.yPos;
+	int z = pos.zPos;
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+	int xSector = (x - r->x) / SECTOR(1);
+	int zSector = (z - r->z) / SECTOR(1);
+
+	return (xSector >= 0 && xSector <= r->xSize - 1) &&
+		(zSector >= 0 && zSector <= r->zSize - 1) &&
+		(y <= r->minfloor && y >= r->maxceiling); // up is negative y axis, hence y should be "less" than floor
+}
+
+PHD_3DPOS GetRoomCenter(int roomNumber)
+{
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+	auto halfLength = SECTOR(r->xSize)/2;
+	auto halfDepth = SECTOR(r->zSize)/2;
+	auto halfHeight = (r->maxceiling - r->minfloor) / 2;
+	PHD_3DPOS center;
+	center.xPos = r->x + halfLength;
+	center.yPos = r->minfloor + halfHeight;
+	center.zPos = r->z + halfDepth;
+	return center;
+}
+

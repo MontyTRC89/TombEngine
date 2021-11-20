@@ -633,10 +633,12 @@ void ReadRooms()
 			room.doors.push_back(door);
 		}
 
+		room.zSize = ReadInt32();
 		room.xSize = ReadInt32();
-		room.ySize = ReadInt32();
-		room.floor.reserve(room.xSize * room.ySize);
-		for (int j = 0; j < room.xSize * room.ySize; j++)
+
+		room.floor.reserve(room.zSize * room.xSize);
+
+		for (int j = 0; j < room.zSize * room.xSize; j++)
 		{
 			FLOOR_INFO floor;
 
@@ -1042,8 +1044,8 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		g_Renderer.updateProgress(20);
 
-		WeatherType = ReadInt8();
-		LaraDrawType = ReadInt8();
+		ReadInt8(); // TODO: Remove!
+		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
 		g_Renderer.updateProgress(40);
@@ -1323,7 +1325,7 @@ void BuildOutsideRoomsTable()
 				int rx = (r->x / 1024);
 				int rz = (r->z / 1024);
 
-				if (x >= rx + 1 && z >= rz + 1 && x <= (rx + r->ySize - 2) && z <= (rz + r->xSize - 2))
+				if (x >= rx + 1 && z >= rz + 1 && x <= (rx + r->xSize - 2) && z <= (rz + r->zSize - 2))
 					OutsideRoomTable[x][z].push_back(i);
 			}
 		}

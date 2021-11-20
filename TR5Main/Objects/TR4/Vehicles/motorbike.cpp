@@ -4,7 +4,7 @@
 #include "control/control.h"
 #include "effects/effects.h"
 #include "lara.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "collide.h"
 #include "lara_flare.h"
 #include "setup.h"
@@ -301,7 +301,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
         return false;
 
-    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Inventory.Get_inventoryItemChosen() != ID_PUZZLE_ITEM1)
+    if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
         return false;
 
     dx = LaraItem->pos.xPos - item->pos.xPos;
@@ -356,8 +356,8 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 
             if (Lara.gunType == WEAPON_FLARE)
             {
-                CreateFlare(ID_FLARE_ITEM, FALSE);
-                undraw_flare_meshes();
+                CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
+                undraw_flare_meshes(laraitem);
                 Lara.flareControlLeft = false;
                 Lara.gunType = WEAPON_NONE;
                 Lara.requestGunType = WEAPON_NONE;
@@ -369,10 +369,10 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             short angle = phd_atan(item->pos.zPos - laraitem->pos.zPos, item->pos.xPos - laraitem->pos.xPos) - item->pos.yRot;
             if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
             {
-                if (g_Inventory.Get_inventoryItemChosen() == ID_PUZZLE_ITEM1)
+                if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
                 {
                     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_UNLOCK;
-                    g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+                    g_Gui.SetInventoryItemChosen(NO_ITEM);
                 }
                 else
                 {
@@ -555,7 +555,7 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
-			DashTimer = 120;
+			Lara.sprintTimer = 120;
 			return true;
 		}
 
@@ -1200,14 +1200,14 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         motorbike->revs = 0;
     }
 
-    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && DashTimer)
+    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && Lara.sprintTimer)
     {
         motorbike->flags |= FL_BOOST;
-        DashTimer -= 2;
-        if (DashTimer > MOTORBIKE_ACCEL)//hmm
+        Lara.sprintTimer -= 2;
+        if (Lara.sprintTimer > MOTORBIKE_ACCEL)//hmm
         {
             motorbike->flags &= ~FL_BOOST;
-            DashTimer = 0;
+            Lara.sprintTimer = 0;
         }
     }
     else
