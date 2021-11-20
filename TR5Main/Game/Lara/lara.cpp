@@ -842,7 +842,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 		default:
 			// Boats are processed like normal items in loop
-			LaraGun();
+			LaraGun(item);
 			return;
 		}
 	}
@@ -882,7 +882,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons
-	LaraGun();
+	LaraGun(item);
 
 	// Test for flags & triggers
 	ProcessSectorFlags(item);
@@ -985,7 +985,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, 0);
 
-	LaraGun();
+	LaraGun(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1045,7 +1045,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, 100);
 
-	LaraGun();
+	LaraGun(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
