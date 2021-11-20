@@ -103,6 +103,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	info->isDucked = true;
 	info->moveAngle = item->pos.yRot;
@@ -116,7 +117,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
@@ -136,6 +137,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -188,7 +190,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		info->gunStatus = LG_NO_ARMS;
 		item->speed /= 3;				// Truncate speed to prevent flying off.
@@ -222,6 +224,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableSpaz = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -470,7 +473,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesArePits = true;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
@@ -490,6 +493,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -586,7 +590,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 	
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
@@ -612,6 +616,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->look = false;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -673,6 +678,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	info->isDucked = true;
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
@@ -691,7 +697,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		info->gunStatus = LG_NO_ARMS;
 		SetLaraFallState(item);
@@ -717,6 +723,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -783,6 +790,7 @@ void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
