@@ -1,7 +1,8 @@
 #include "framework.h"
 
-#include "Lara.h"
+#include "lara.h"
 #include "lara_basic.h"
+#include "lara_jump.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
 #include "lara_crawl.h"
