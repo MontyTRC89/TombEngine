@@ -33,6 +33,9 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll);
 /*end parallel bars*/
 /*-*/
 /*tightropes*/
+#ifdef NEW_TIGHTROPE
+void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll);
+#endif // NEW_TIGHTROPE
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll);
