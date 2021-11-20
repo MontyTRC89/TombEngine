@@ -177,7 +177,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -333,7 +333,7 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -698,7 +698,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -1700,7 +1700,7 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -1842,7 +1842,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -2190,7 +2190,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -2276,7 +2276,7 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -2641,7 +2641,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 
@@ -3024,7 +3024,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraFall(coll))
+	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
 

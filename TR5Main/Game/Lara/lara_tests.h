@@ -56,7 +56,7 @@ void GetTighRopeFallOff(int Regularity);
 #endif // !NEW_TIGHTROPE
 
 // TODO: New, organise later.
-bool TestLaraFall(COLL_INFO* coll);
+bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
