@@ -985,14 +985,6 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += item->pos.zRot / -8;
 	}
 
-	// LEGACY
-	/*if (item->pos.zRot < -ANGLE(2))
-		item->pos.zRot += ANGLE(2);
-	else if (item->pos.zRot > ANGLE(2))
-		item->pos.zRot -= ANGLE(2);
-	else
-		item->pos.zRot = 0;*/
-
 	if (item->pos.xRot < -ANGLE(85.0f))
 		item->pos.xRot = -ANGLE(85.0f);
 	else if (item->pos.xRot > ANGLE(85.0f))

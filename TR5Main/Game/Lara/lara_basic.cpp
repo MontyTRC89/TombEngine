@@ -96,7 +96,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME / 2 + 2) // TODO: Remove the "+ 2" once anim blending becomes a feature,; right now, it is a temporary solution to prevent stuttering. @Sezz 2021.11.19 
+	if (info->jumpCount > LARA_JUMP_TIME / 2 + 2) // TODO: Remove the "+ 2" when anim blending becomes a feature; right now, it is a temporary measure to avoid stuttering. @Sezz 2021.11.19 
 		info->jumpCount = LARA_JUMP_TIME / 2 + 2;
 
 	if (item->hitPoints <= 0)
@@ -2661,12 +2661,13 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_SWANDIVE_START (52)
+// Control:		lara_col_swandive()
 void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 52*/
-	/*collision: lara_col_swandive*/
+	info->gunStatus = LG_HANDS_BUSY;
 	info->look = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
@@ -2688,34 +2689,33 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
+	// TODO: Why?
 	if (item->fallspeed > LARA_FREEFALL_SPEED && item->goalAnimState != LS_DIVE)
 		item->goalAnimState = LS_SWANDIVE_END;
 }
 
+// State:		LS_SWANDIVE_START (52)
+// Control:		lara_as_swandive()
 void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 52*/
-	/*state code: lara_as_swandive*/
 	info->moveAngle = item->pos.yRot;
-
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraDeflectEdgeJump(item, coll);
 
-	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && !TestLaraSwamp(item) &&
+		item->fallspeed > 0)
 	{
 		item->goalAnimState = LS_STOP;
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraSnapToHeight(item, coll);
 	}
 }
 
