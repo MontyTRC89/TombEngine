@@ -34,7 +34,7 @@ using namespace TEN::Effects::Environment;
 
 void FireHarpoon()
 {
-	Ammo& ammos = GetAmmo(WEAPON_CROSSBOW);
+	Ammo& ammos = GetAmmo(LaraItem, WEAPON_CROSSBOW);
 	if (ammos.getCount() != 0)
 	{
 		Lara.hasFired = true;
@@ -104,7 +104,7 @@ void FireHarpoon()
 	}
 }
 
-void ControlHarpoonBolt(short itemNumber)
+void HarpoonBoltControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -235,7 +235,7 @@ void ControlHarpoonBolt(short itemNumber)
 
 			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
 			{
-				HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
+				HitTarget(LaraItem, currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
 			}
 
 			// All other items (like puzzles) can't be hit
@@ -292,7 +292,7 @@ void FireGrenade()
 	int y = 0;
 	int z = 0;
 	
-	Ammo& ammo = GetAmmo(WEAPON_GRENADE_LAUNCHER);
+	Ammo& ammo = GetAmmo(LaraItem, WEAPON_GRENADE_LAUNCHER);
 	if (ammo != size_t{ 0 })
 	{
 		Lara.hasFired = true;
@@ -376,7 +376,7 @@ void FireGrenade()
 	}
 }
 
-void ControlGrenade(short itemNumber)
+void GrenadeControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -466,7 +466,7 @@ void ControlGrenade(short itemNumber)
 	// Check if above water and update speed and fallspeed
 	bool aboveWater = false;
 	bool someFlag = false;
-	if (g_Level.Rooms[item->roomNumber].flags & 1)
+	if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		aboveWater = false;
 		someFlag = false;
@@ -773,7 +773,7 @@ void ControlGrenade(short itemNumber)
 	}
 }
 
-void ControlRocket(short itemNumber)
+void RocketControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1281,7 +1281,7 @@ enum CROSSBOW_TYPE
 	CROSSBOW_EXPLODE
 };
 
-void ControlCrossbowBolt(short itemNumber)
+void CrossbowBoltControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1396,7 +1396,7 @@ void ControlCrossbowBolt(short itemNumber)
 					else if (currentItem->objectNumber != ID_LARA)
 					{
 						// Normal hit
-						HitTarget(currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
+						HitTarget(LaraItem, currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
 
 						// Poisoned ammos
 						if (item->itemFlags[0] == CROSSBOW_POISON)
@@ -1505,10 +1505,10 @@ void RifleHandler(int weaponType)
 
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	LaraGetNewTarget(weapon);
+	LaraGetNewTarget(LaraItem, weapon);
 	if (TrInput & IN_ACTION)
-		LaraTargetInfo(weapon);
-	AimWeapon(weapon, &Lara.leftArm);
+		LaraTargetInfo(LaraItem, weapon);
+	AimWeapon(LaraItem, weapon, &Lara.leftArm);
 
 	if (Lara.leftArm.lock)
 	{
@@ -1555,7 +1555,7 @@ void RifleHandler(int weaponType)
 
 void FireCrossbow(PHD_3DPOS* pos)
 {
-	Ammo& ammos = GetAmmo(WEAPON_CROSSBOW);
+	Ammo& ammos = GetAmmo(LaraItem, WEAPON_CROSSBOW);
 	if (ammos)
 	{
 		Lara.hasFired = true;
@@ -1662,7 +1662,7 @@ void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
 
 void FireRocket()
 {
-	Ammo& ammos = GetAmmo(WEAPON_ROCKET_LAUNCHER);
+	Ammo& ammos = GetAmmo(LaraItem, WEAPON_ROCKET_LAUNCHER);
 	if (ammos) {
 		Lara.hasFired = true;
 
@@ -1748,7 +1748,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 				// TODO: in TR4 condition was objectNumber != (ID_MUMMY, ID_SKELETON, ID_SETHA)
 				if (!obj->undead)
 				{
-					HitTarget(dest, 0, Weapons[weapon].explosiveDamage, 1);
+					HitTarget(LaraItem, dest, 0, Weapons[weapon].explosiveDamage, 1);
 					if (dest != LaraItem)
 					{
 						Statistics.Game.AmmoHits++;
@@ -1884,7 +1884,7 @@ void undraw_shotgun_meshes(int weapon)
 void draw_shotgun_meshes(int weaponType)
 {
 	Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
-	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
+	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
 void HitSpecial(ITEM_INFO* projectile, ITEM_INFO* target, int flags)

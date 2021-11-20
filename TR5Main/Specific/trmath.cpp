@@ -85,6 +85,13 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 	angles[1] = FROM_RAD(-atan2(y, vector.z));
 }
 
+int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
+{
+	auto v1 = Vector3(first->xPos, first->yPos, first->zPos);
+	auto v2 = Vector3(second->xPos, second->yPos, second->zPos);
+	return (int)round(Vector3::Distance(v1, v2));
+}
+
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	Matrix world = Matrix::CreateFromYawPitchRoll(

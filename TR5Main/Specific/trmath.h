@@ -54,6 +54,7 @@ int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 void phd_GetVectorAngles(int x, int y, int z, short* angles);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
+int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index);

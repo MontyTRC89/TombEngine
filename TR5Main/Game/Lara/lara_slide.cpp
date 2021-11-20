@@ -38,27 +38,16 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 				}
 				else
 					item->goalAnimState = LS_STOP;
+
 				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			}
 		}
 		else
 		{
 			if (item->currentAnimState == LS_SLIDE_FORWARD)
-			{
-				item->animNumber = LA_FALL_START;
-				item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-
-				item->currentAnimState = LS_JUMP_FORWARD;
-				item->goalAnimState = LS_JUMP_FORWARD;
-			}
+				SetAnimation(item, LA_FALL_START);
 			else
-			{
-				item->animNumber = LA_FALL_BACK;
-				item->frameNumber = g_Level.Anims[LA_FALL_BACK].frameBase;
-
-				item->currentAnimState = LS_FALL_BACK;
-				item->goalAnimState = LS_FALL_BACK;
-			}
+				SetAnimation(item, LA_FALL_BACK);
 
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 
@@ -111,7 +100,10 @@ void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_slide*/
 	Camera.targetElevation = -ANGLE(45.0f); // FIXED
 	if ((TrInput & IN_JUMP) && !(TrInput & IN_BACK))
+	{
 		item->goalAnimState = LS_JUMP_FORWARD;
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	}
 }
 
 void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)
@@ -129,6 +121,7 @@ void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_JUMP) && !(TrInput & IN_FORWARD))
 	{
 		item->goalAnimState = LS_JUMP_BACK;
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	}
 }
 

@@ -104,9 +104,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (resultRight == -1 || resultLeft == -1)
 		{
-			item->animNumber = LA_LADDER_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_LADDER_IDLE;
+			SetAnimation(item, LA_LADDER_IDLE);
 			item->goalAnimState = LS_HANG;
 
 			AnimateLara(item);
@@ -179,7 +177,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (resultRight != -1 || resultLeft != -1)
 					{
-						item->goalAnimState = LS_UNKNOWN_6;
+						item->goalAnimState = LS_LADDER_TO_CROUCH;
 						item->requiredAnimState = LS_CROUCH_IDLE;
 					}
 					else
@@ -346,7 +344,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				item->goalAnimState = LS_UNKNOWN_6;
+				item->goalAnimState = LS_LADDER_TO_CROUCH;
 				item->requiredAnimState = LS_CROUCH_IDLE;
 			}
 		}
@@ -498,8 +496,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 
 	if (coll->Setup.OldAnimState != LS_LADDER_IDLE)
 	{	
-		item->animNumber = LA_LADDER_IDLE;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		SetAnimation(item, LA_LADDER_IDLE);
 		return;
 	}
 
@@ -537,19 +534,9 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		if (flag)
 		{
 			if (flag <= 0)
-			{
-				item->animNumber = LA_LADDER_LEFT_CORNER_INNER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
-				item->currentAnimState = LS_SHIMMY_INNER_LEFT;
-			}
+				SetAnimation(item, LA_LADDER_LEFT_CORNER_INNER_START);
 			else
-			{
-				item->animNumber = LA_LADDER_LEFT_CORNER_OUTER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
-				item->currentAnimState = LS_SHIMMY_OUTER_LEFT;
-			}
+				SetAnimation(item, LA_LADDER_LEFT_CORNER_OUTER_START);
 
 			return;
 		}
@@ -561,19 +548,9 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		if (flag)
 		{
 			if (flag <= 0)
-			{
-				item->animNumber = LA_LADDER_RIGHT_CORNER_INNER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
-				item->currentAnimState = LS_SHIMMY_INNER_RIGHT;
-			}
+				SetAnimation(item, LA_LADDER_RIGHT_CORNER_INNER_START);
 			else
-			{
-				item->animNumber = LA_LADDER_RIGHT_CORNER_OUTER_START;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
-				item->currentAnimState = LS_SHIMMY_OUTER_RIGHT;
-			}
+				SetAnimation(item, LA_LADDER_RIGHT_CORNER_OUTER_START);
 
 			return;
 		}
@@ -616,9 +593,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 	{
 		item->pos.xPos = x;
-		Lara.cornerX = x;
 		item->pos.zPos = z;
-		Lara.cornerZ = z;
+		Lara.nextCornerPos.x = x;
+		Lara.nextCornerPos.y = item->pos.yPos;
+		Lara.nextCornerPos.z = z;
 		item->pos.yRot += ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -662,9 +640,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 		{
 			item->pos.xPos = newX;
-			Lara.cornerX = newX;
 			item->pos.zPos = newZ;
-			Lara.cornerZ = newZ;
+			Lara.nextCornerPos.x = newX;
+			Lara.nextCornerPos.y = item->pos.yPos;
+			Lara.nextCornerPos.z = newZ;
 			item->pos.yRot -= ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift) != 0;
@@ -714,9 +693,10 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 	{
 		item->pos.xPos = x;
-		Lara.cornerX = x;
 		item->pos.zPos = z;
-		Lara.cornerZ = z;
+		Lara.nextCornerPos.x = x;
+		Lara.nextCornerPos.y = item->pos.yPos;
+		Lara.nextCornerPos.z = z;
 		item->pos.yRot -= ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -760,10 +740,9 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			item->pos.xPos = newX;
-			Lara.cornerX = newX;
-			item->pos.zPos = newZ;
-			Lara.cornerZ = newZ;
+			item->pos.xPos = Lara.nextCornerPos.x = newX;
+			item->pos.yPos = Lara.nextCornerPos.y = item->pos.yPos;
+			item->pos.zPos = Lara.nextCornerPos.z = newZ;
 			item->pos.yRot += ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
@@ -995,10 +974,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.headYrot = 0;
 	Lara.headXrot = 0;
 
-	item->goalAnimState = LS_JUMP_FORWARD;
-	item->currentAnimState = LS_JUMP_FORWARD;
-	item->animNumber = LA_FALL_START;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	SetAnimation(item, LA_FALL_START);
 
 	item->speed = 2;
 	item->gravityStatus = true;

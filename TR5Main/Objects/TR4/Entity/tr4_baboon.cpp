@@ -156,11 +156,12 @@ static void UpdateRespawnedBaboon(short itemNumber)
         return;
 
     item->pos = baboon->pos;
-    // TODO: Warning: IsRoomOutside() is Empty !!
-    IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-    if (item->roomNumber != IsRoomOutsideNo)
-        ItemNewRoom(itemNumber, IsRoomOutsideNo);
-    if (baboon->count < baboon->max_count)
+
+    auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+    if (item->roomNumber != outsideRoom && outsideRoom != NO_ROOM)
+        ItemNewRoom(itemNumber, outsideRoom);
+    
+	if (baboon->count < baboon->max_count)
         baboon->count++;
 
     item->animNumber = obj->animIndex + BABOON_SIT_IDLE_ANIM;

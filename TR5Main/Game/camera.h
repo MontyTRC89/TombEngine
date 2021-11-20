@@ -8,7 +8,6 @@ enum class CAMERA_TYPE
 	FIXED_CAMERA,
 	LOOK_CAMERA,
 	COMBAT_CAMERA,
-	CINEMATIC_CAMERA,
 	HEAVY_CAMERA
 };
 
@@ -20,10 +19,10 @@ struct CAMERA_INFO
 	CAMERA_TYPE oldType; // size=4, offset=36
 	int shift; // size=0, offset=40
 	int flags; // size=0, offset=44
-	int fixedCamera; // size=0, offset=48
+	bool fixedCamera; // size=0, offset=48
+	bool underwater; // size=0, offset=60
 	int numberFrames; // size=0, offset=52
 	int bounce; // size=0, offset=56
-	int underwater; // size=0, offset=60
 	int targetDistance; // size=0, offset=64
 	short targetAngle; // size=0, offset=68
 	short targetElevation; // size=0, offset=70
@@ -60,7 +59,7 @@ extern int NumberCameras;
 extern int BinocularRange;
 extern int BinocularOn;
 extern CAMERA_TYPE BinocularOldCamera;
-extern int LaserSight;
+extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
 
@@ -72,12 +71,11 @@ void MoveCamera(GAME_VECTOR* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);
 void UpdateCameraElevation();
 void CombatCamera(ITEM_INFO* item);
-int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
+bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
 void FixedCamera(ITEM_INFO* item);
 void LookCamera(ITEM_INFO* item);
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
 void BinocularCamera(ITEM_INFO* item);
-void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
 void LookLeftRight();
