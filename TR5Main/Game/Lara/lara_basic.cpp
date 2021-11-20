@@ -1417,7 +1417,7 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP; // TODO dispatch
+		item->goalAnimState = LS_DEATH;
 
 		return;
 	}
