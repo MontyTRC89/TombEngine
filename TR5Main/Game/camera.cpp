@@ -2049,7 +2049,7 @@ void ItemsCollideCamera()
 		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
 			continue;
 
-		auto bounds = &stat->visibilityBox;
+		auto bounds = &stat->collisionBox;
 		if (TestBoundsCollideCamera(bounds, &mesh->pos, 1024))
 			ItemPushCamera(bounds, &mesh->pos, rad);
 
