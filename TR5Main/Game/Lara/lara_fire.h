@@ -29,6 +29,7 @@ struct WEAPON_INFO
 	short sampleNum;
 	byte explosiveDamage;
 };
+
 enum WeaponState {
 	WSTATE_AIM =0,
 	WSTATE_DRAW = 1,
@@ -43,15 +44,15 @@ extern WEAPON_INFO Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(int weaponType);
-void LaraGun();
-Ammo& GetAmmo(int weaponType);
-void InitialiseNewWeapon();
-GAME_OBJECT_ID WeaponObjectMesh(int weaponType);
-void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
-void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
+void LaraGun(ITEM_INFO* lara);
+Ammo& GetAmmo(ITEM_INFO* lara, int weaponType);
+void InitialiseNewWeapon(ITEM_INFO* lara);
+GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* lara, int weaponType);
+void AimWeapon(ITEM_INFO* lara, WEAPON_INFO* winfo, LARA_ARM* arm);
+void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int damage, int flag);
 FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
-void LaraTargetInfo(WEAPON_INFO* weapon);
+void LaraTargetInfo(ITEM_INFO* lara, WEAPON_INFO* weapon);
 bool CheckForHoldingState(int state);
-void LaraGetNewTarget(WEAPON_INFO* weapon);
+void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weapon);
 HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon);
