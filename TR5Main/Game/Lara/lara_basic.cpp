@@ -2044,12 +2044,8 @@ void lara_as_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 
-	// TODO: Interpolation instead.
-	info->NewAnims.SwandiveRollRun = true;
-
 	if (TrInput & IN_FORWARD &&
-		item->animNumber == LA_SWANDIVE_ROLL &&
-		info->NewAnims.SwandiveRollRun)
+		item->animNumber == LA_SWANDIVE_ROLL)
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
 
