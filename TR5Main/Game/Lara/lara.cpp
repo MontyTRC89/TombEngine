@@ -155,11 +155,11 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlledl,
 	lara_as_controlled,
 	lara_as_pickup,//98
-	lara_as_null,//99
-	lara_as_null,//100
-	lara_as_null,//101
-	lara_as_poleleft,//102
-	lara_as_poleright,//103
+	lara_as_pole_idle,//99
+	lara_as_pole_up,//100
+	lara_as_pole_down,//101
+	lara_as_pole_turn_clockwise,//102
+	lara_as_pole_turn_counter_clockwise,//103
 	lara_as_pulley,//104
 	lara_as_duckl,//105
 	lara_as_duckr,//106
@@ -314,11 +314,11 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
-	lara_col_polestat,
-	lara_col_poleup,
-	lara_col_poledown,
-	lara_void_func,
-	lara_void_func,
+	lara_col_pole_idle,
+	lara_col_pole_up,
+	lara_col_pole_down,
+	lara_col_pole_turn_clockwise,
+	lara_col_pole_turn_counter_clockwise,
 	lara_default_col,
 	lara_col_ducklr,
 	lara_col_ducklr,
