@@ -13,9 +13,15 @@
 
 using namespace TEN::Entities::Generic;
 
-/*This file has "all" lara_as/lara_col functions where Lara is interacting with an object.*/
+// -----------------------------------
+// MISCELLANEOUS INTERACTABLE OBJECTS
+// State Control & Collision Functions
+// -----------------------------------
 
-/*pickups*/
+// ------
+// PICKUP
+// ------
+
 void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 39, 98*/
@@ -41,9 +47,11 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 		Lara.gunStatus = LG_NO_ARMS;
 }
-/*end pickups*/
-/*-*/
-/*switches*/
+
+// ------
+// SWITCH
+// ------
+
 void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*states 40, 126*/
@@ -93,9 +101,11 @@ void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 }
-/*end switches*/
-/*-*/
-/*puzzles and keys*/
+
+// ----------
+// RECEPTACLE
+// ----------
+
 void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 42*/
@@ -131,9 +141,11 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 }
-/*end puzzles and keys*/
-/*-*/
-/*pushables*/
+
+// --------
+// PUSHABLE
+// --------
+
 void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 36*/
@@ -170,9 +182,11 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION))
 		item->goalAnimState = LS_STOP;
 }
-/*end pushables*/
-/*-*/
-/*pulley*/
+
+// ------
+// PULLEY
+// ------
+
 void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 104*/
@@ -230,9 +244,11 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 		&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 		Lara.gunStatus = LG_NO_ARMS;
 }
-/*end pulley*/
-/*-*/
-/*parallel bars*/
+
+// --------------
+// HORIZONTAL BAR
+// --------------
+
 void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 128*/
@@ -281,9 +297,11 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState = LS_REACH;
 	}
 }
-/*end parallel bars*/
-/*-*/
-/*tightropes*/
+
+// ---------
+// TIGHTROPE
+// ---------
+
 #ifdef NEW_TIGHTROPE
 
 void lara_trbalance_mesh(ITEM_INFO* item)
@@ -594,10 +612,12 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-#endif // NEW_TIGHTROPE
-/*end tightropes*/
-/*-*/
-/*ropes*/
+#endif
+
+// ----
+// ROPE
+// ----
+
 void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 90*/
@@ -779,196 +799,400 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_void_func*/
 	LaraClimbRope(item, coll);
 }
-/*end ropes*/
-/*-*/
-/*poles*/
-void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)
+
+// -------------
+// VERTICAL POLE
+// -------------
+
+// TODO: Move test functions to lara_tests.cpp when lara_state_cleaning_etc branch is merged.
+bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 99*/
-	/*state code: lara_as_null*/
+	// TODO: Accuracy.
+	return (coll->Middle.Ceiling < -STEP_SIZE);
+}
+
+bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return (coll->Middle.Floor > 0);
+}
+
+// State:		LS_POLE_IDLE (99)
+// Collision:	lara_col_pole_idle()
+void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->goalAnimState = LS_FREEFALL; // TODO: Death state dispatch.
+
 		return;
 	}
 
-	coll->Setup.EnableSpaz = false;
-	coll->Setup.EnableObjectPush = false;
+	if (TrInput & IN_LOOK)
+		LookUpDown();
 
-	if (item->animNumber == LA_POLE_IDLE)
+	if (TrInput & IN_ACTION)
 	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
-		Lara.moveAngle = item->pos.yRot;
-
-		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.SlopesAreWalls = true;
-
-		GetCollisionInfo(coll, item);
-
-		if (TrInput & IN_ACTION)
+		if (item->currentAnimState == LA_POLE_IDLE) // Hack.
 		{
-			item->goalAnimState = LS_POLE_IDLE;
-
 			if (TrInput & IN_LEFT)
 			{
-				item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
+				info->turnRate += LARA_TURN_RATE;
+				if (info->turnRate > LARA_SLOW_TURN)
+					info->turnRate = LARA_SLOW_TURN;
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
+				info->turnRate -= LARA_TURN_RATE;
+				if (info->turnRate < -LARA_SLOW_TURN)
+					info->turnRate = -LARA_SLOW_TURN;
 			}
-
-			if (TrInput & IN_LOOK)
-				LookUpDown();
-
-			if (TrInput & IN_FORWARD)
-			{
-				short roomNum = item->roomNumber;
-
-				if (item->pos.yPos - GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-					item->pos.xPos, item->pos.yPos, item->pos.zPos) > SECTOR(1))
-				{
-					item->goalAnimState = LS_POLE_UP;
-				}
-			}
-			else if (TrInput & IN_BACK && coll->Middle.Floor > 0)
-			{
-				item->goalAnimState = LS_POLE_DOWN;
-				item->itemFlags[2] = 0;
-			}
-
-			if (TrInput & IN_JUMP)
-				item->goalAnimState = LS_JUMP_BACK;
 		}
-		else if (coll->Middle.Floor <= 0)
+
+		// TODO: Add forward jump.
+		if (TrInput & IN_JUMP)
 		{
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_JUMP_BACK;
+
+			return;
 		}
-		else
+
+		if (TrInput & IN_FORWARD &&
+			TestLaraPoleUp(item, coll))
 		{
-			item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
-			item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
-			item->goalAnimState = LS_FREEFALL;
+			item->goalAnimState = LS_POLE_UP;
+
+			return;
 		}
+		else if (TrInput & IN_BACK &&
+			TestLaraPoleDown(item, coll))
+		{
+			item->itemFlags[2] = 0; // Doesn't seem necessary?
+			item->goalAnimState = LS_POLE_DOWN;
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
+
+			return;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
+
+			return;
+		}
+
+		item->goalAnimState = LS_POLE_IDLE;
+
+		return;
 	}
+
+	if (coll->Middle.Floor <= 0)
+	{
+		item->goalAnimState = LS_STOP;
+
+		return;
+	}
+
+	// TODO: This should not be required. Update anim's root displacement + set position distance.
+	//item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+	//item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
+	item->goalAnimState = LS_FREEFALL;
 }
 
-void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_POLE_IDLE (99)
+// Control:		lara_as_pole_idle()
+void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state: 100*/
-	/*state code: lara_as_null*/
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	LaraInfo*& info = item->data;
 
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || item->hitPoints <= 0)
-		item->goalAnimState = LS_POLE_IDLE;
-
-	short roomNumber = item->roomNumber;
-
-	if (item->pos.yPos -
-		GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-			item->pos.xPos, item->pos.yPos, item->pos.zPos) < SECTOR(1))
-		item->goalAnimState = LS_POLE_IDLE;
-}
-
-void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state: 101*/
-	/*state code: lara_as_null*/
-	coll->Setup.EnableSpaz = false;
-	coll->Setup.EnableObjectPush = false;
-
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	if ((TrInput & (IN_BACK | IN_ACTION)) != (IN_BACK | IN_ACTION) || item->hitPoints <= 0)
-		item->goalAnimState = LS_POLE_IDLE;
-
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-
-	Lara.moveAngle = item->pos.yRot;
-
-	coll->Setup.SlopesAreWalls = true;
-
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-
+	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
 	if (coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
+}
+
+// State:		LS_POLE_UP (100)
+// Collision:	lara_col_pole_up()
+void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+
+	if (item->hitPoints <= 0)
 	{
-		short roomNumber = item->roomNumber;
-		item->floor = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber),
-			item->pos.xPos, item->pos.yPos - LARA_HEIGHT, item->pos.zPos);
+		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
+
+		return;
+	}
+
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_LEFT)
+		{
+			info->turnRate += LARA_TURN_RATE;
+			if (info->turnRate > LARA_SLOW_TURN)
+				info->turnRate = LARA_SLOW_TURN;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			info->turnRate -= LARA_TURN_RATE;
+			if (info->turnRate < -LARA_SLOW_TURN)
+				info->turnRate = -LARA_SLOW_TURN;
+		}
+
+		if (TrInput & IN_FORWARD &&
+			TestLaraPoleUp(item, coll))
+		{
+			item->goalAnimState = LS_POLE_UP;
+
+			return;
+		}
 
 		item->goalAnimState = LS_POLE_IDLE;
-		item->itemFlags[2] = 0;
+
+		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall?
+}
+
+// State:		LS_POLE_UP (100)
+// Control:		lara_as_pole_up()
+void lara_col_pole_up(ITEM_INFO* item, COLL_INFO* coll)
+{
+	lara_col_pole_idle(item, coll);
+
+	// TODO: Stop at top of pole.
+}
+
+// State:		LS_POLE_DOWN (101)
+// Collision:	lara_col_pole_down()
+void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+
+	if (item->hitPoints <= 0)
 	{
-		item->pos.yRot += 256;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		item->pos.yRot -= 256;
+		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
+
+		return;
 	}
 
-	if (item->animNumber == LA_POLE_DOWN_END)
-	{
-		item->itemFlags[2] -= SECTOR(1);
-	}
-	else
-	{
-		item->itemFlags[2] += 256;
-	}
-
-	// CHECK
+	// TODO: In WAD.
 	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->pos, 0);
 
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_LEFT)
+		{
+			info->turnRate += LARA_TURN_RATE;
+			if (info->turnRate > LARA_SLOW_TURN)
+				info->turnRate = LARA_SLOW_TURN;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			info->turnRate -= LARA_TURN_RATE;
+			if (info->turnRate < -LARA_SLOW_TURN)
+				info->turnRate = -LARA_SLOW_TURN;
+		}
+
+		if (TrInput & IN_BACK &&
+			TestLaraPoleDown(item, coll))
+		{
+			item->goalAnimState = LS_POLE_DOWN;
+
+			return;
+		}
+
+		item->itemFlags[2] = 0; // ??
+		item->goalAnimState = LS_POLE_IDLE;
+
+		return;
+	}
+
+	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall?
+}
+
+// State:		LS_POLE_DOWN (101)
+// Control:		lara_as_pole_down()
+void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.Radius = LARA_RAD;
+	GetCollisionInfo(coll, item);
+
+	// Translate Lara down.
+	if (item->animNumber == LA_POLE_DOWN_END)
+		item->itemFlags[2] -= WALL_SIZE;
+	else
+		item->itemFlags[2] += STEP_SIZE;
+
+	// Clamp speed.
 	if (item->itemFlags[2] < 0)
 		item->itemFlags[2] = 0;
-	else if (item->itemFlags[2] > ANGLE(90.0f))
-		item->itemFlags[2] = ANGLE(90.0f);
+	else if (item->itemFlags[2] > SHRT_MAX / 2)
+		item->itemFlags[2] = SHRT_MAX / 2;
 
 	item->pos.yPos += item->itemFlags[2] >> 8;
+
+	if (coll->Middle.Floor < 0)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
-void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_POLE_TURN_CLOCKWISE (102)
+// Collision:	lara_col_pole_turn_clockwise()
+void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 102*/
-	/*collision: lara_void_func*/
+	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	if (!(TrInput & IN_LEFT) || !(TrInput & IN_ACTION) || (TrInput & (IN_FORWARD | IN_BACK)) || item->hitPoints <= 0)
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climp up.
+
+			return;
+		}
+		else if (TrInput & IN_BACK &&
+			TestLaraPoleDown(item, coll))
+		{
+			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			info->turnRate += LARA_TURN_RATE;
+			if (info->turnRate > LARA_SLOW_TURN + ANGLE(0.5f))
+				info->turnRate = LARA_SLOW_TURN + ANGLE(0.5f);
+
+			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
+
+			return;
+		}
+
 		item->goalAnimState = LS_POLE_IDLE;
-	else
-		item->pos.yRot += 256;
+
+		return;
+	}
+
+	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall.
 }
 
-void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_POLE_TURN_CLOCKWISE (102)
+// Control:		lara_as_pole_turn_clockwise()
+void lara_col_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state: 103*/
-	/*collision: lara_void_func*/
+	lara_col_pole_idle(item, coll);
+}
+
+// State:		LS_POLE_TURN_COUNTER_CLOCKWISE (103)
+// Collision:	lara_col_pole_turn_counter_clockwise()
+void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	if (!(TrInput & IN_RIGHT) || !(TrInput & IN_ACTION) || (TrInput & (IN_FORWARD | IN_BACK)) || item->hitPoints <= 0)
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
+
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_FORWARD)
+		{
+			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb up.
+
+			return;
+		}
+		else if (TrInput & IN_BACK &&
+			TestLaraPoleDown(item, coll))
+		{
+			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
+
+			return;
+		}
+
+		if (TrInput & IN_RIGHT)
+		{
+			info->turnRate -= LARA_TURN_RATE;
+			if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(0.5f)))
+				info->turnRate = -(LARA_SLOW_TURN + ANGLE(0.5f));
+
+			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
+
+			return;
+		}
+
 		item->goalAnimState = LS_POLE_IDLE;
-	else
-		item->pos.yRot -= 256;
+
+		return;
+	}
+
+	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall.
 }
-/*end poles*/
-/*-*/
-/*deathslide*/
+
+// State:		LS_POLE_TURN_COUNTER_CLOCKWISE (103)
+// Control:		lara_col_pole_turn_counter_clockwise()
+void lara_col_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
+{
+	lara_col_pole_idle(item, coll);
+}
+
+// --------
+// ZIP-LINE
+// --------
+
 void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 70*/
@@ -990,4 +1214,3 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 	}
 }
-/*end deathslide*/
