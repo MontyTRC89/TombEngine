@@ -138,6 +138,14 @@ namespace TEN::Renderer
 			}
 			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_roomTextures[i] = tex;
+
+#ifdef DUMP_TEXTURES
+			char filename[255];ifdef DUMP_TEXTURES
+			sprintf(filename, "dump\\room_%d.png", i);
+
+			std::ofstream outfile(filename, std::ios::out | std::ios::binary);
+			outfile.write(reinterpret_cast<const char*>(texture->colorMapData.data()), texture->colorMapData.size());
+#endif
 		}
 
 		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
@@ -167,6 +175,14 @@ namespace TEN::Renderer
 			}
 			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_moveablesTextures[i] = tex;
+
+#ifdef DUMP_TEXTURES
+			char filename[255];
+			sprintf(filename, "dump\\moveable_%d.png", i);
+
+			std::ofstream outfile(filename, std::ios::out | std::ios::binary);
+			outfile.write(reinterpret_cast<const char*>(texture->colorMapData.data()), texture->colorMapData.size());
+#endif
 		}
 
 		m_staticsTextures.resize(g_Level.StaticsTextures.size());
@@ -181,6 +197,14 @@ namespace TEN::Renderer
 			}
 			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_staticsTextures[i] = tex;
+
+#ifdef DUMP_TEXTURES
+			char filename[255];
+			sprintf(filename, "dump\\static_%d.png", i);
+
+			std::ofstream outfile(filename, std::ios::out | std::ios::binary);
+			outfile.write(reinterpret_cast<const char*>(texture->colorMapData.data()), texture->colorMapData.size());
+#endif
 		}
 
 		m_spritesTextures.resize(g_Level.SpritesTextures.size());

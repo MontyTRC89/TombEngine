@@ -863,7 +863,7 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::drawSpritesTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view)
+	void Renderer11::drawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
 	{
 		setBlendMode(info->blendMode);
 
@@ -883,13 +883,11 @@ namespace TEN::Renderer
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
 		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-		VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
-		
-		m_context->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(
-			info->sprite->Type== RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 
-			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
-			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
+
+		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		m_stSprite.billboardMatrix = Matrix::Identity;
@@ -897,7 +895,7 @@ namespace TEN::Renderer
 		m_stSprite.isBillboard = false;
 		m_cbSprite.updateData(m_stSprite, m_context.Get());
 		m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-		m_context->Draw(vertices.size(), 0);
+		m_context->Draw(m_transparentFacesVertices.size(), 0);
 
 		m_numDrawCalls++;
 		m_numTransparentDrawCalls++;

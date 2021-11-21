@@ -24,6 +24,7 @@ namespace TEN::Renderer {
 		Matrix world;
 		Vector3 position;
 		int texture;
+		int bone;
 		bool animated;
 		bool doubleSided;
 		BLEND_MODES blendMode;
