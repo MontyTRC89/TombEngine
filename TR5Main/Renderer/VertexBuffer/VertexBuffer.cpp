@@ -31,10 +31,17 @@ namespace TEN::Renderer {
 
 	bool VertexBuffer::Update(ID3D11DeviceContext* context, std::vector<RendererVertex>* data)
 	{
-		D3D11_MAPPED_SUBRESOURCE resource;
-		context->Map(Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-		memcpy(resource.pData, data->data(), data->size() * sizeof(RendererVertex));
-		context->Unmap(Buffer.Get(), 0);
+		TENLog("VertexBuffer::Update NumVertices: " + std::to_string(data->size()));
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT res = context->Map(Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		if (SUCCEEDED(res)) {
+			void* dataPtr = (mappedResource.pData);
+			memcpy(dataPtr, data->data(), data->size() * sizeof(RendererVertex));
+			context->Unmap(Buffer.Get(), 0);
+		}
+		else
+			TENLog("Could not update constant buffer! " + std::to_string(res), LogLevel::Error);
 
 		return true;
 	}

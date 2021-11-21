@@ -2174,7 +2174,9 @@ namespace TEN::Renderer
         int lastType = 0;
 
         std::vector<RendererVertex> vertices;
-        vertices.reserve(5000);
+        //vertices.reserve(50000);
+
+        m_transparentFacesVertices.clear();
 
         bool outputPolygons = false;
         bool oldAnimated = false;
@@ -2210,7 +2212,21 @@ namespace TEN::Renderer
                             || oldInfo->texture != face.info.texture
                             || oldInfo->animated != face.info.animated
                             || oldInfo->blendMode != face.info.blendMode
-                            || oldInfo->doubleSided != face.info.doubleSided))
+                            || oldInfo->doubleSided != face.info.doubleSided
+                            || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                    {
+                        outputPolygons = true;
+                    }
+                    else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
+                             (oldInfo->blendMode != face.info.blendMode
+                              || oldInfo->item->Id != face.info.item->Id
+                              || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                    {
+                        outputPolygons = true;
+                    }
+                    else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC &&
+                             (oldInfo->blendMode != face.info.blendMode 
+                              || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
                     {
                         outputPolygons = true;
                     }
@@ -2218,7 +2234,8 @@ namespace TEN::Renderer
                         (oldInfo->blendMode != face.info.blendMode
                             || oldInfo->sprite->Type != face.info.sprite->Type
                             || oldInfo->sprite->color != face.info.sprite->color
-                            || oldInfo->sprite->Sprite != face.info.sprite->Sprite))
+                            || oldInfo->sprite->Sprite != face.info.sprite->Sprite
+                            || m_transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
                     {
                         outputPolygons = true;
                     }
@@ -2234,23 +2251,23 @@ namespace TEN::Renderer
                 // Here we send polygons to the GPU for drawing and we clear the vertex buffer
                 if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
                 {
-                    drawRoomsTransparent(vertices, oldInfo, view);
+                    drawRoomsTransparent(oldInfo, view);
                 }
                 else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
                 {
-                    
+                    drawItemsTransparent(oldInfo, view);
                 }
                 else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
                 {
-                    drawStaticsTransparent(vertices, oldInfo, view);
+                    drawStaticsTransparent(oldInfo, view);
                 }
                 else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
                 {
-                    drawSpritesTransparent(vertices, oldInfo, view);
+                    drawSpritesTransparent(oldInfo, view);
                 }
 
                 outputPolygons = false;
-                vertices.clear();
+                m_transparentFacesVertices.clear();
             }
 
 
@@ -2266,12 +2283,17 @@ namespace TEN::Renderer
                 int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
                 for (int i = 0; i < numVertices; i++)
                 {
-                    vertices.push_back(face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]]);
+                    m_transparentFacesVertices.push_back(face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]]);
                 }
             }
             else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
             {
-
+                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                for (int i = 0; i < numVertices; i++)
+                {
+                    RendererVertex v = face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]];
+                    m_transparentFacesVertices.push_back(v);
+                }
             }
             else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
             {
@@ -2282,7 +2304,7 @@ namespace TEN::Renderer
                     RendererVertex v = face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]];
                     v.Position = Vector3::Transform(v.Position, face.info.world);
                     v.Color = face.info.color;
-                    vertices.push_back(v);
+                    m_transparentFacesVertices.push_back(v);
                 }
             }
             else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
@@ -2353,39 +2375,41 @@ namespace TEN::Renderer
                 v3.UV = uv3;
                 v3.Color = spr->color;
 
-                vertices.push_back(v0);
-                vertices.push_back(v1);
-                vertices.push_back(v2);
-                vertices.push_back(v3);
+                m_transparentFacesVertices.push_back(v0);
+                m_transparentFacesVertices.push_back(v1);
+                m_transparentFacesVertices.push_back(v3);
+                m_transparentFacesVertices.push_back(v2);
+                m_transparentFacesVertices.push_back(v3);
+                m_transparentFacesVertices.push_back(v1);
             }
         }
 
         // Here we send polygons to the GPU for drawing and we clear the vertex buffer
         if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
         {
-            drawRoomsTransparent(vertices, oldInfo, view);
+            drawRoomsTransparent(oldInfo, view);
         }
         else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
         {
-
+            drawItemsTransparent(oldInfo, view);
         }
         else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
         {
-            drawStaticsTransparent(vertices, oldInfo, view);
+            drawStaticsTransparent(oldInfo, view);
         }
         else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
         {
-            drawSpritesTransparent(vertices, oldInfo, view);
+            drawSpritesTransparent(oldInfo, view);
         }
     }
 
-    void Renderer11::drawRoomsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view)
+    void Renderer11::drawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
         // Set vertex buffer
-        m_transparentFacesVertexBuffer.Update(m_context.Get(), &vertices);
+        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
 
         m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2469,20 +2493,19 @@ namespace TEN::Renderer
         }
        
         setBlendMode(info->blendMode);
-        m_context->Draw(vertices.size(), 0);
+        m_context->Draw(m_transparentFacesVertices.size(), 0);
 
         m_numDrawCalls++;
         m_numTransparentDrawCalls++;
     }
 
-    void Renderer11::drawStaticsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view)
+    void Renderer11::drawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
         // Set vertex buffer
-        // VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), vertices.size(), vertices.data());
-        m_transparentFacesVertexBuffer.Update(m_context.Get(), &vertices);
+        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
 
         m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2509,7 +2532,7 @@ namespace TEN::Renderer
         m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         setBlendMode(info->blendMode);
-        m_context->Draw(vertices.size(), 0);
+        m_context->Draw(m_transparentFacesVertices.size(), 0);
 
         m_numDrawCalls++;
         m_numTransparentDrawCalls++;
@@ -2818,13 +2841,90 @@ namespace TEN::Renderer
 				}
 				if (bucket.Vertices.size() == 0)
 					continue;
-				if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
-					continue;
 
-				setBlendMode(bucket.blendMode);
-				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                if (isSortingRequired(bucket.blendMode))
+                {
+                    // Collect transparent faces
+                    for (int j = 0; j < bucket.Polygons.size(); j++)
+                    {
+                        RendererPolygon* p = &bucket.Polygons[j];
+                        Vector3 centre = Vector3::Transform(p->centre, item->AnimationTransforms[k] * item->World);
+                        int distance = (centre - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+                        RendererTransparentFace face;
+                        face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
+                        face.info.polygon = p;
+                        face.distance = distance;
+                        face.info.position = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
+                        face.info.animated = bucket.animated;
+                        face.info.texture = bucket.texture;
+                        face.info.room = &room;
+                        face.info.item = item;
+                        face.info.bucket = &bucket;
+                        face.info.blendMode = bucket.blendMode;
+                        face.info.bone = k;
+                        view.transparentFaces.push_back(face);
+                    }
+                }
+                else
+                {
+                    // Draw immediately
+                    setBlendMode(bucket.blendMode);
+                    m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                }
 			}
         }
+    }
+
+    void Renderer11::drawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
+    {
+        UINT stride = sizeof(RendererVertex);
+        UINT offset = 0;
+
+        // Set vertex buffer
+        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
+
+        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_context->IASetInputLayout(m_inputLayout.Get());
+
+        RendererRoom& room = m_rooms[info->item->Item->roomNumber];
+        RendererObject& moveableObj = *m_moveableObjects[info->item->Item->objectNumber];
+        OBJECT_INFO* obj = &Objects[info->item->Item->objectNumber];
+
+        // Set shaders
+        m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
+        m_context->PSSetShader(m_psItems.Get(), NULL, 0);
+
+        m_stItem.World = info->item->World;
+        m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
+        m_stItem.AmbientLight = room.AmbientLight;
+        memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * 32);
+        m_cbItem.updateData(m_stItem, m_context.Get());
+        m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+        m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+        m_stLights.NumLights = info->item->Lights.size();
+        for (int j = 0; j < info->item->Lights.size(); j++)
+            memcpy(&m_stLights.Lights[j], info->item->Lights[j], sizeof(ShaderLight));
+        m_cbLights.updateData(m_stLights, m_context.Get());
+        m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+
+        // Set texture
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[info->bucket->texture])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[info->bucket->texture])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
+        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        m_context->PSSetSamplers(0, 1, &sampler);
+
+        m_stMisc.AlphaTest = false;
+        m_cbMisc.updateData(m_stMisc, m_context.Get());
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+        setBlendMode(info->blendMode);
+        m_context->Draw(m_transparentFacesVertices.size(), 0);
+
+        m_numDrawCalls++;
+        m_numTransparentDrawCalls++;
     }
 
     void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
