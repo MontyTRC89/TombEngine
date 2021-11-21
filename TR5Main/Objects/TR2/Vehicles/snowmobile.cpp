@@ -210,8 +210,8 @@ void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 	SKIDOO_INFO* skidooInfo = (SKIDOO_INFO*)skidoo->data;
 	WEAPON_INFO* wepInfo = &Weapons[WEAPON_SNOWMOBILE];
 
-	LaraGetNewTarget(wepInfo);
-	AimWeapon(wepInfo, &laraInfo->rightArm);
+	LaraGetNewTarget(lara, wepInfo);
+	AimWeapon(lara, wepInfo, &laraInfo->rightArm);
 
 	if (TrInput & SKIDOO_IN_FIRE && !skidoo->itemFlags[0])
 	{
@@ -665,7 +665,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 	if (laraInfo->gunType == WEAPON_FLARE)
 	{
 		CreateFlare(lara, ID_FLARE_ITEM, false);
-		undraw_flare_meshes();
+		undraw_flare_meshes(lara);
 		laraInfo->flareControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
 		laraInfo->gunStatus = LG_NO_ARMS;

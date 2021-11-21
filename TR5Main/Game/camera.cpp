@@ -1363,7 +1363,7 @@ void BinocularCamera(ITEM_INFO* item)
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(Lara.gunType);
+		Ammo& ammo = GetAmmo(LaraItem, Lara.gunType);
 
 		if (!(InputBusy & IN_ACTION) ||
 			WeaponDelay ||

@@ -156,11 +156,11 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlledl,
 	lara_as_controlled,
 	lara_as_pickup,//98
-	lara_as_null,//99
-	lara_as_null,//100
-	lara_as_null,//101
-	lara_as_poleleft,//102
-	lara_as_poleright,//103
+	lara_as_pole_idle,//99
+	lara_as_pole_up,//100
+	lara_as_pole_down,//101
+	lara_as_pole_turn_clockwise,//102
+	lara_as_pole_turn_counter_clockwise,//103
 	lara_as_pulley,//104
 	lara_as_crouch_turn_left,//105
 	lara_as_crouch_turn_right,//106
@@ -319,11 +319,11 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
-	lara_col_polestat,
-	lara_col_poleup,
-	lara_col_poledown,
-	lara_void_func,
-	lara_void_func,
+	lara_col_pole_idle,
+	lara_col_pole_up,
+	lara_col_pole_down,
+	lara_col_pole_turn_clockwise,
+	lara_col_pole_turn_counter_clockwise,
 	lara_default_col,
 	lara_col_crouch_turn_left,
 	lara_col_crouch_turn_right,
@@ -857,7 +857,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 		default:
 			// Boats are processed like normal items in loop.
-			LaraGun();
+			LaraGun(item);
 			return;
 		}
 	}
@@ -919,7 +919,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.
-	LaraGun();
+	LaraGun(item);
 
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
@@ -1023,7 +1023,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, 0);
 
-	LaraGun();
+	LaraGun(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1091,7 +1091,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateItemRoom(item, 100);
 
-	LaraGun();
+	LaraGun(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
