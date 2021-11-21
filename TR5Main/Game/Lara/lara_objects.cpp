@@ -1088,7 +1088,8 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climp up.
 
@@ -1149,7 +1150,8 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb up.
 
