@@ -981,28 +981,17 @@ struct AnimsNew
 	bool Pose;						// Crossed arms AFK
 	bool CrawlExtended;				// Extended crawl meneuverability
 	bool CrouchRoll;				// Crouch roll
-	bool Monkey180Turn;				// Monkey swing 180 turn
-	bool MonkeyAutoJump;			// Auto jump to monkey swing
 	bool FeetHang;					// LAU-style ledge hanging with legs
 
-	// No. @Sezz 2021.11.05
-	bool Crawl1clickup;				// Crawl step-up
-	bool Crawl1clickdown;			// Crawl step-down
-	bool CrawlExit1click;			// Crawl exit down step
-	bool CrawlExit2click;			// Crawl exit jump (two steps)
-	bool CrawlExit3click;			// Crawl exit jump (three steps)
-	bool CrawlVault1click;			// Standing vault to crouch (one step)
-	bool CrawlVault2click;			// Standing vault to crouch (two steps)
-	bool CrawlVault3click;			// Standing vault to crouch (three steps)
-	bool CrawlExitJump;				// TR5 crawl exit flip
-	bool CrawlFlexWaterPullUp;
-	bool CrawlFlexSubmerged;
-
-	// This should be done in WAD. @Sezz 2021.11.05
-	bool SwandiveRollRun;			// Swandive roll > run transition
-
-	// This will have to be default.
+	// This will have to be default. LD can copy the monkey swing-in anim if they're that set on annoying the player.
+	// Mechanics specific to the monkey swing shouldn't mix with ledge hanging as bugs can occur.
 	bool OscillateHanging;			// TR1/2 hang on thin ledge
+
+	// Why?? This should be a player setting.
+	bool MonkeyAutoJump;			// Auto jump to monkey swing
+
+	// This shouldn't be up to the LD.
+	bool Monkey180Turn;				// Monkey swing 180 turn
 };
 
 #ifdef NEW_TIGHTROPE
