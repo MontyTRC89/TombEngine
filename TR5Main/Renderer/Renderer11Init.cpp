@@ -118,6 +118,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_lines3DToDraw = createVector<RendererLine3D*>(MAX_LINES_3D);
 	m_lines2DToDraw = createVector<RendererLine2D*>(MAX_LINES_2D);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
+	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
 
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
@@ -129,7 +130,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
-	m_transparentFacesVertexBuffer = VertexBuffer(m_device.Get(), 100000);
+	m_transparentFacesVertexBuffer = VertexBuffer(m_device.Get(), MAX_TRANSPARENT_VERTICES);
 
 	D3D11_BLEND_DESC blendStateDesc{};
 	blendStateDesc.AlphaToCoverageEnable = false;

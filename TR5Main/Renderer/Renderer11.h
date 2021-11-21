@@ -406,6 +406,7 @@ namespace TEN::Renderer
 		VertexBuffer m_staticsVertexBuffer;
 		IndexBuffer m_staticsIndexBuffer;
 		VertexBuffer m_transparentFacesVertexBuffer;
+		std::vector<RendererVertex> m_transparentFacesVertices;
 		std::vector<RendererRoom> m_rooms;
 		DirectX::SimpleMath::Matrix m_hairsMatrices[12];
 		short m_numHairVertices;
@@ -503,10 +504,11 @@ namespace TEN::Renderer
 		bool sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		void drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void drawRooms(bool transparent, bool animated, RenderView& view);
-		void drawRoomsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
-		void drawSpritesTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
-		void drawStaticsTransparent(std::vector<RendererVertex>& vertices, RendererTransparentFaceInfo* info, RenderView& view);
+		void drawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
+		void drawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view);
+		void drawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void drawItems(bool transparent, bool animated,RenderView& view);
+		void drawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated);
 		void drawBaddieGunflashes(RenderView& view);
 		void drawStatics(bool transparent, RenderView& view);
