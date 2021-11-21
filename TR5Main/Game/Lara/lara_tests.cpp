@@ -1363,15 +1363,16 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
 
-	// TODO: Enable with lua!
-	Lara.NewAnims.CrawlFlexWaterPullUp = true;
-	Lara.NewAnims.CrawlFlexSubmerged = true;
+	// TODO: LUA
+	info->NewAnims.CrawlExtended = true;
 
-	if (Lara.gunStatus &&
-		(Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
+	if (info->gunStatus &&
+		(info->gunStatus != LG_READY || info->gunType != WEAPON_FLARE))
 	{
 		return false;
 	}
@@ -1396,7 +1397,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			if (info->NewAnims.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
@@ -1408,7 +1409,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexSubmerged)
+			if (info->NewAnims.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
@@ -1421,7 +1422,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			if (info->NewAnims.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;
@@ -1438,8 +1439,8 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->speed = 0;
 	item->fallspeed = 0;
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.waterStatus = LW_ABOVE_WATER;
+	info->gunStatus = LG_HANDS_BUSY;
+	info->waterStatus = LW_ABOVE_WATER;
 
 	return true;
 }
