@@ -722,7 +722,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->pos.xPos += coll->Shift.x;
-			item->pos.yPos += GetBoundsAccurate(item)->Y2;
+			item->pos.yPos += GetBoundsAccurate(item)->Y2 * 2.4f;
 			item->pos.zPos += coll->Shift.z;
 			item->gravityStatus = true;
 			item->speed = 2;
