@@ -58,7 +58,7 @@ namespace Environment
 		StormSkyColor2 = 1;
 
 		// Clear wind vars
-		WindCurrent = WindFinalX = WindFinalZ = 0;
+		WindCurrent = WindX = WindZ = 0;
 		WindAngle = WindDAngle = 2048;
 
 		// Clear flash vars
@@ -183,8 +183,8 @@ namespace Environment
 
 		WindAngle = (WindAngle + ((WindDAngle - WindAngle) >> 3)) & 0x1FFE;
 
-		WindFinalX = WindCurrent * phd_sin(WindAngle << 3);
-		WindFinalZ = WindCurrent * phd_cos(WindAngle << 3);
+		WindX = WindCurrent * phd_sin(WindAngle << 3);
+		WindZ = WindCurrent * phd_cos(WindAngle << 3);
 	}
 
 	void EnvironmentController::UpdateFlash(GameScriptLevel* level)
@@ -321,14 +321,14 @@ namespace Environment
 			{
 			case WeatherType::Snow:
 
-				if (p.Velocity.x < (WindFinalX << 2))
+				if (p.Velocity.x < (WindX << 2))
 					p.Velocity.x += GenerateFloat(0.5f, 2.5f);
-				else if (p.Velocity.x > (WindFinalX << 2))
+				else if (p.Velocity.x > (WindX << 2))
 					p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
 
-				if (p.Velocity.z < (WindFinalZ << 2))
+				if (p.Velocity.z < (WindZ << 2))
 					p.Velocity.z += GenerateFloat(0.5f, 2.5f);
-				else if (p.Velocity.z > (WindFinalZ << 2))
+				else if (p.Velocity.z > (WindZ << 2))
 					p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
 
 				if (p.Velocity.y < p.Size / 2)
