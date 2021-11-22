@@ -264,7 +264,7 @@ namespace Environment
 
 			// Check if particle got out of room bounds
 
-			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
+			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
 				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
 				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
 			{
