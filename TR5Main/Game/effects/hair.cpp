@@ -127,7 +127,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
-	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Reducing sphere - from tomb5 
+	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
 	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_LINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
@@ -135,7 +135,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
 	sphere[4].z = pos.z;
-	sphere[4].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Reducing sphere - from tomb5
+	sphere[4].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5
 
 	if (youngLara)
 	{
