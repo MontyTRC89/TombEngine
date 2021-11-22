@@ -173,30 +173,39 @@ namespace TEN::Renderer
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
 
-		for (int i = 0; i < MAX_SPARKS; i++) {
+		for (int i = 0; i < MAX_SPARKS; i++) 
+		{
 			SPARKS* spark = &Sparks[i];
-			if (spark->on) {
-				if (spark->flags & SP_DEF) {
+			if (spark->on) 
+			{
+				if (spark->flags & SP_DEF) 
+				{
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 
-					if (spark->flags & SP_FX) {
+					if (spark->flags & SP_FX) 
+					{
 						FX_INFO* fx = &EffectList[spark->fxObj];
 
 						pos.x += fx->pos.xPos;
 						pos.y += fx->pos.yPos;
 						pos.z += fx->pos.zPos;
 
-						if ((spark->sLife - spark->life) > (rand() & 7) + 4) {
+						if ((spark->sLife - spark->life) > (rand() & 7) + 4) 
+						{
 							spark->flags &= ~SP_FX;
 							spark->x = pos.x;
 							spark->y = pos.y;
 							spark->z = pos.z;
 						}
-					} else if (!(spark->flags & SP_ITEM)) {
+					} 
+					else if (!(spark->flags & SP_ITEM)) 
+					{
 						pos.x = spark->x;
 						pos.y = spark->y;
 						pos.z = spark->z;
-					} else {
+					}
+					else 
+					{
 						ITEM_INFO* item = &g_Level.Items[spark->fxObj];
 
 						if (spark->flags & SP_NODEATTACH) {
@@ -232,7 +241,9 @@ namespace TEN::Renderer
 								spark->y = pos.y;
 								spark->z = pos.z;
 							}
-						} else {
+						} 
+						else 
+						{
 							pos.x += item->pos.xPos;
 							pos.y += item->pos.yPos;
 							pos.z += item->pos.zPos;
@@ -244,14 +255,19 @@ namespace TEN::Renderer
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, 
 									   {spark->size, spark->size},
-						BLENDMODE_ADDITIVE,view);
-				} else {
+						BLENDMODE_ADDITIVE, view);
+				} 
+				else 
+				{
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 					v.Normalize();
-					//AddSpriteBillboardConstrained(m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], pos, Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark., spark->size, BLENDMODE_ALPHABLEND, v);
-
-					addLine3D(Vector3(spark->x, spark->y, spark->z), Vector3(spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f));
+					addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
+						pos, 
+						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
+						TO_RAD(spark->rotAng), 
+						spark->scalar, 
+						Vector2(4, spark->size), BLENDMODE_ADDITIVE, v, view);
 				}
 			}
 		}
@@ -318,8 +334,12 @@ namespace TEN::Renderer
 		for (int i = 0; i < MAX_DRIPS; i++) {
 			DRIP_STRUCT* drip = &Drips[i];
 
-			if (drip->on) {
-				addLine3D(Vector3(drip->x, drip->y, drip->z), Vector3(drip->x, drip->y + 24.0f, drip->z), Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f));
+			if (drip->on) 
+			{
+				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+					Vector3(drip->x, drip->y, drip->z),
+					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
+					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, view);
 			}
 		}
 	}

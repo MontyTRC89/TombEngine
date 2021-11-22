@@ -373,7 +373,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		Weather.Update();
 
 		// Update special FX
-		TriggerLaraDrips();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
