@@ -68,19 +68,19 @@ namespace TEN::Effects::Lara
 		if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_COLD))
 			return;
 
-		switch (item->currentAnimState)
+		switch (item->animNumber)
 		{
-		case LS_STOP:
+		case LA_STAND_IDLE:
 			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
-		case LS_CROUCH_IDLE:
+		case LA_CROUCH_IDLE:
 			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
-		case LS_CRAWL_IDLE:
+		case LA_CRAWL_IDLE:
 			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
