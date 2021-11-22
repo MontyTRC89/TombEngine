@@ -37,6 +37,7 @@ namespace TEN{
 			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count);
 			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
 			void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
+			void TriggerBreathSmoke(long x, long y, long z, short angle);
 		}
 	}
 
