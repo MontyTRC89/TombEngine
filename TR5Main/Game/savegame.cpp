@@ -6,6 +6,7 @@
 #include "control/lot.h"
 #include "spotcam.h"
 #include "traps.h"
+#include "floordata.h"
 #include "room.h"
 #include "sound/sound.h"
 #include "level.h"
@@ -30,6 +31,7 @@ using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Floordata;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -1017,7 +1019,8 @@ bool SaveGame::Load(int slot)
 			&& (item->flags & ONESHOT))
 			item->meshBits = 0x00100;
 
-		// TODO: specific RAISING_BLOCK hacks
+		if (obj->floor != nullptr)
+			UpdateBridgeItem(itemNumber);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
