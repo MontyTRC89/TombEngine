@@ -291,7 +291,7 @@ namespace Environment
 				// If particle got below floor or above ceiling, count it as "landed".
 
 				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
+				bool landed = (coll.Position.Floor <= p.Position.y) || (coll.Position.Ceiling >= p.Position.y);
 
 				if (inSubstance || landed)
 				{
