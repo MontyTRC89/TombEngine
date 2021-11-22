@@ -2253,7 +2253,7 @@ namespace TEN::Renderer
         drawBubbles(view);
         drawDrips(view);
         drawRipples(view);
-        //drawUnderwaterDust(view);
+        drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
         drawLightning(view);
