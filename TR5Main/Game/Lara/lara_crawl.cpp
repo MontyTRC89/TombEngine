@@ -648,7 +648,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			// TODO: Crawl-to-hang dispatch not working directly from here. Must be idle.
+			// TODO: Crawl-to-hang dispatch not working directly from here. Must be idle. Hardly noticeable, but it would be preferable for this to be seamless. @Sezz 2021.11.23
 			/*if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
