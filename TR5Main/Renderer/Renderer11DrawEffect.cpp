@@ -884,7 +884,7 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
 		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
-		m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
