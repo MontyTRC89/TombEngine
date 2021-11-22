@@ -3070,7 +3070,7 @@ namespace TEN::Renderer
             {
                 RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-                Matrix world = (Matrix::CreateRotationY(TO_RAD(msh->pos.yRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+                Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot), TO_RAD(msh->pos.zRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
                 m_stStatic.World = world;
                 m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
                 m_stStatic.Color = msh->color;
@@ -3102,7 +3102,7 @@ namespace TEN::Renderer
                             face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
                             face.info.room = &room;
                             face.info.staticMesh = staticToDraw;
-                            face.info.world = Matrix::CreateTranslation(face.info.position);
+                            face.info.world = world;
                             face.info.bucket = &bucket;
                             face.info.blendMode = bucket.blendMode;
                             view.transparentFaces.push_back(face);
