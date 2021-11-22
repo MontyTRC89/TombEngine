@@ -958,6 +958,13 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 				info->turnRate = -LARA_SLOW_TURN;
 		}
 
+		if (TrInput & IN_JUMP)
+		{
+			item->goalAnimState = LS_POLE_IDLE;
+
+			return;
+		}
+
 		if (TrInput & IN_FORWARD &&
 			TestLaraPoleUp(item, coll))
 		{
@@ -1015,6 +1022,13 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate -= LARA_TURN_RATE;
 			if (info->turnRate < -LARA_SLOW_TURN)
 				info->turnRate = -LARA_SLOW_TURN;
+		}
+
+		if (TrInput & IN_JUMP)
+		{
+			item->goalAnimState = LS_POLE_IDLE;
+
+			return;
 		}
 
 		if (TrInput & IN_BACK &&
