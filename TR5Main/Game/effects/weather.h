@@ -47,7 +47,7 @@ namespace Environment
 	public:
 		EnvironmentController();
 
-		Vector3 Wind() { return Vector3(WindFinalX / 2.0f, 0, WindFinalZ / 2.0f); }
+		Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
 		Vector3 FlashColor() { return FlashColorBase * sin(FlashProgress * PI / 2.0f); }
 		Vector4 SkyColor() { return SkyCurrentColor; }
 		short   SkyLayer1Position() { return SkyPosition1; }
@@ -69,8 +69,8 @@ namespace Environment
 		short   SkyPosition2 = 0;
 
 		// Wind
-		int WindFinalX = 0;
-		int WindFinalZ = 0;
+		int WindX = 0;
+		int WindZ = 0;
 		int WindAngle = 0;
 		int WindDAngle = 0;
 		int WindCurrent = 0;
