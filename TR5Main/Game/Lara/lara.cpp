@@ -39,6 +39,7 @@
 #include "gui.h"
 
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Generic;
@@ -432,6 +433,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
+
+	TriggerLaraDrips(item);
 
 	short roomNumber;
 
