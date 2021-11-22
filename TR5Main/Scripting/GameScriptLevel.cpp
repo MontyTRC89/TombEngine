@@ -53,7 +53,7 @@ void GameScriptLevel::Register(sol::state* state)
 //@mem layer2
 		"layer2", &GameScriptLevel::Layer2,
 
-/// (@{Color}) distance fog RGB color.
+/// (@{Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
 // If not provided, distance fog will be black.
 //
