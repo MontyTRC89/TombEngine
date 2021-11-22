@@ -36,6 +36,9 @@ enum HEADINGS
 
 constexpr int MAX_ROOMS = 1024;
 
+constexpr int WIBBLE_SPEED = 4;
+constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED;
+
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
