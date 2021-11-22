@@ -2092,7 +2092,7 @@ namespace TEN::Renderer
 		if (CurrentLevel != 0)
 		{
 			m_currentY = 60;
-#ifdef _DEBUG
+
 			ROOM_INFO* r = &g_Level.Rooms[LaraItem->roomNumber];
 
 			switch (m_numDebugPage)
@@ -2138,7 +2138,6 @@ namespace TEN::Renderer
 				printDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
-#endif
 		}
 	}
 
@@ -2409,7 +2408,7 @@ namespace TEN::Renderer
         UINT offset = 0;
 
         // Set vertex buffer
-        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
+        //m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
         m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2493,19 +2492,27 @@ namespace TEN::Renderer
         }
        
         setBlendMode(info->blendMode);
-        m_context->Draw(m_transparentFacesVertices.size(), 0);
+       
+        int drawnVertices = 0;
+        while (drawnVertices < m_transparentFacesVertices.size())
+        {
+            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > m_transparentFacesVertices.size() ?
+                m_transparentFacesVertices.size() - drawnVertices : TRANSPARENT_BUCKET_SIZE);
 
-        m_numDrawCalls++;
-        m_numTransparentDrawCalls++;
+            m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, drawnVertices, count);
+            m_context->Draw(count, 0);
+
+            m_numDrawCalls++;
+            m_numTransparentDrawCalls++;
+
+            drawnVertices += TRANSPARENT_BUCKET_SIZE;
+        }
     }
 
     void Renderer11::drawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
-
-        // Set vertex buffer
-        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
 
         m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2532,10 +2539,21 @@ namespace TEN::Renderer
         m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         setBlendMode(info->blendMode);
-        m_context->Draw(m_transparentFacesVertices.size(), 0);
 
-        m_numDrawCalls++;
-        m_numTransparentDrawCalls++;
+        int drawnVertices = 0;
+        while (drawnVertices < m_transparentFacesVertices.size())
+        {
+            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > m_transparentFacesVertices.size() ?
+                m_transparentFacesVertices.size() - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+
+            m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, drawnVertices, count);
+            m_context->Draw(count, 0);
+
+            m_numDrawCalls++;
+            m_numTransparentDrawCalls++;
+
+            drawnVertices += TRANSPARENT_BUCKET_SIZE;
+        }
     }
 
     void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
@@ -2881,7 +2899,7 @@ namespace TEN::Renderer
         UINT offset = 0;
 
         // Set vertex buffer
-        m_transparentFacesVertexBuffer.Update(m_context.Get(), &m_transparentFacesVertices);
+        //m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
         m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2921,10 +2939,21 @@ namespace TEN::Renderer
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         setBlendMode(info->blendMode);
-        m_context->Draw(m_transparentFacesVertices.size(), 0);
 
-        m_numDrawCalls++;
-        m_numTransparentDrawCalls++;
+        int drawnVertices = 0;
+        while (drawnVertices < m_transparentFacesVertices.size())
+        {
+            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > m_transparentFacesVertices.size() ?
+                m_transparentFacesVertices.size() - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+
+            m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, drawnVertices, count);
+            m_context->Draw(count, 0);
+
+            m_numDrawCalls++;
+            m_numTransparentDrawCalls++;
+
+            drawnVertices += TRANSPARENT_BUCKET_SIZE;
+        }
     }
 
     void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
