@@ -4,7 +4,7 @@
 
 constexpr auto HAIR_MAX = 2; // HAIR_NORMAL = 0, HAIR_YOUNG = 1
 constexpr auto HAIR_SEGMENTS = 6; // classic = 7, young = 14
-constexpr auto HAIR_SPHERE = 5; // current hair max collision
+constexpr auto HAIR_SPHERE = 6; // current hair max collision
 
 struct ANIM_FRAME;
 

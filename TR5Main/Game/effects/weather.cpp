@@ -58,7 +58,7 @@ namespace Environment
 		StormSkyColor2 = 1;
 
 		// Clear wind vars
-		WindCurrent = WindFinalX = WindFinalZ = 0;
+		WindCurrent = WindX = WindZ = 0;
 		WindAngle = WindDAngle = 2048;
 
 		// Clear flash vars
@@ -183,8 +183,8 @@ namespace Environment
 
 		WindAngle = (WindAngle + ((WindDAngle - WindAngle) >> 3)) & 0x1FFE;
 
-		WindFinalX = WindCurrent * phd_sin(WindAngle << 3);
-		WindFinalZ = WindCurrent * phd_cos(WindAngle << 3);
+		WindX = WindCurrent * phd_sin(WindAngle << 3);
+		WindZ = WindCurrent * phd_cos(WindAngle << 3);
 	}
 
 	void EnvironmentController::UpdateFlash(GameScriptLevel* level)
@@ -264,7 +264,7 @@ namespace Environment
 
 			// Check if particle got out of room bounds
 
-			if (p.Position.y <= r.maxceiling || p.Position.y >= r.minfloor ||
+			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
 				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
 				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
 			{
@@ -291,7 +291,7 @@ namespace Environment
 				// If particle got below floor or above ceiling, count it as "landed".
 
 				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = (coll.Position.Floor < p.Position.y) || (coll.Position.Ceiling > p.Position.y);
+				bool landed = (coll.Position.Floor <= p.Position.y) || (coll.Position.Ceiling >= p.Position.y);
 
 				if (inSubstance || landed)
 				{
@@ -321,14 +321,14 @@ namespace Environment
 			{
 			case WeatherType::Snow:
 
-				if (p.Velocity.x < (WindFinalX << 2))
+				if (p.Velocity.x < (WindX << 2))
 					p.Velocity.x += GenerateFloat(0.5f, 2.5f);
-				else if (p.Velocity.x > (WindFinalX << 2))
+				else if (p.Velocity.x > (WindX << 2))
 					p.Velocity.x -= GenerateFloat(0.5f, 2.5f);
 
-				if (p.Velocity.z < (WindFinalZ << 2))
+				if (p.Velocity.z < (WindZ << 2))
 					p.Velocity.z += GenerateFloat(0.5f, 2.5f);
-				else if (p.Velocity.z > (WindFinalZ << 2))
+				else if (p.Velocity.z > (WindZ << 2))
 					p.Velocity.z -= GenerateFloat(0.5f, 2.5f);
 
 				if (p.Velocity.y < p.Size / 2)

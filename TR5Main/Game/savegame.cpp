@@ -6,6 +6,7 @@
 #include "control/lot.h"
 #include "spotcam.h"
 #include "traps.h"
+#include "floordata.h"
 #include "room.h"
 #include "sound/sound.h"
 #include "level.h"
@@ -17,7 +18,7 @@
 #include "tr5_spider_emitter.h"
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Game/misc.h"
 #include "Game/puzzles_keys.h"
@@ -26,10 +27,11 @@
 
 #include <filesystem>
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Floordata;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -1017,7 +1019,8 @@ bool SaveGame::Load(int slot)
 			&& (item->flags & ONESHOT))
 			item->meshBits = 0x00100;
 
-		// TODO: specific RAISING_BLOCK hacks
+		if (obj->floor != nullptr)
+			UpdateBridgeItem(itemNumber);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
@@ -1291,7 +1294,7 @@ bool SaveGame::Load(int slot)
 			flag = 1;
 			Lara.burnSmoke = 0;
 		}
-		LaraBurn();
+		LaraBurn(LaraItem);
 		if (flag)
 			Lara.burnSmoke = 1;
 	}

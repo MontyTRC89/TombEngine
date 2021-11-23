@@ -89,7 +89,7 @@ void ControlMissile(short fxNumber)
 		{
 			LaraItem->hitPoints -= 3;
 			LaraItem->hitStatus = 1;
-			LaraBurn();
+			LaraBurn(LaraItem);
 			return;
 		}
 	}*/
