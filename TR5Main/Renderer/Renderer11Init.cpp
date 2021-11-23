@@ -102,6 +102,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
 	m_cbRoom = createConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = createConstantBuffer<CAnimatedBuffer>();
+	m_cbOmniFogBuffer = createConstantBuffer<COmniFogBuffer>();
 
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();

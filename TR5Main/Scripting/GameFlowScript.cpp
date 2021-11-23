@@ -23,6 +23,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
 	GameScriptLevel::Register(m_lua);
 	GameScriptSkyLayer::Register(m_lua);
+	GameScriptFog::Register(m_lua);
 	GameScriptMirror::Register(m_lua);
 	GameScriptInventoryObject::Register(m_lua);
 	GameScriptSettings::Register(m_lua);

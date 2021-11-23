@@ -1,4 +1,6 @@
 #include "./Math.hlsli"
+#include "./FogBuffer.hlsli"
+
 #define LT_SUN		0
 #define LT_POINT	1
 #define LT_SPOT		2
@@ -48,6 +50,7 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 	float3 ReflectionVector : TEXCOORD1;
 	float3x3 TBN : TBN;
+	float Fog : FOG;
 };
 Texture2D NormalTexture : register(t2);
 Texture2D Texture : register(t0);
@@ -99,6 +102,12 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
 	output.Color = col;
+
+	float4 d = length(CamPositionWS - WorldPosition);
+	if (FogMaxDistance == 0)
+		output.Fog = 1;
+	else
+		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
 	
 	return output;
 }
@@ -205,5 +214,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	output.xyz *= lighting.xyz;
 	output.xyz *= colorMul.xyz;
+
+	if (FogMaxDistance != 0)
+		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+
 	return output;
 }

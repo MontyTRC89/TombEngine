@@ -1,6 +1,8 @@
 #include "CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
+#include "./FogBuffer.hlsli"
+
 struct RendererLight {
 	float4 Position;
 	float4 Color;
@@ -37,6 +39,7 @@ cbuffer RoomBuffer : register(b5)
 	float4 AmbientColor;
 	int Water;
 };
+
 struct AnimatedFrameUV
 {
 	float2 topLeft;
@@ -44,10 +47,10 @@ struct AnimatedFrameUV
 	float2 bottomRight;
 	float2 bottomLeft;
 };
+
 cbuffer AnimatedBuffer : register(b6) {
 	AnimatedFrameUV AnimFrames[32];
 	uint numAnimFrames;
-	
 }
 
 struct PixelShaderInput
@@ -59,6 +62,7 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
 	float3x3 TBN : TBN;
+	float Fog : FOG;
 };
 Texture2D NormalTexture : register(t3);
 Texture2D Texture : register(t0);
@@ -150,6 +154,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
 	output.TBN = TBN;
+
+	float4 d = length(CamPositionWS - output.WorldPosition);
+	if (FogMaxDistance == 0)
+		output.Fog = 1;
+	else
+		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+
 	return output;
 }
 
@@ -249,6 +260,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 	
 	output.xyz = output.xyz * lighting;
+
+	if (FogMaxDistance != 0)
+		output.xyz = lerp(output.xyz, FogColor, input.Fog);
 
 	return output;
 }
