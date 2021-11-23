@@ -1,35 +1,23 @@
 #pragma once
-#include "framework.h"
 
-typedef DWORD D3DCOLOR;
+#include "GameScriptColor.h"
 
 namespace sol {
 	class state;
-	template <typename T> struct as_table_t;
 }
 
-class GameScriptFog {
-public:
-	byte r{ 0 };
-	byte g{ 0 };
-	byte b{ 0 };
-	byte minDistance{ 0 };
-	byte maxDistance{ 0 };
+struct GameScriptFog
+{
+	bool Enabled{ false };
+	byte R{ 0 };
+	byte G{ 0 };
+	byte B{ 0 };
+	short MinDistance{ 0 };
+	short MaxDistance{ 0 };
 
-	GameScriptFog(byte r, byte g, byte b, int minDistance, int maxDistance);
+	GameScriptFog() = default;
+	GameScriptFog(GameScriptColor const& col, short minDistance, short maxDistance);
+	void SetColor(GameScriptColor const& col);
 
-	byte								GetR() const;
-	void								SetR(byte v);
-	byte								GetG() const;
-	void								SetG(byte v);
-	byte								GetB() const;
-	void								SetB(byte v);
-	int									GetMinDistance() const;
-	void								SetMinDistance(int v);
-	int									GetMaxDistance() const;
-	void								SetMaxDistance(int v);
-
-	std::string ToString() const;
-
-	static void Register(sol::state* state);
+	static void Register(sol::state*);
 };
