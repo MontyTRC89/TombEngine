@@ -521,16 +521,15 @@ void CalculateSpotCameras()
 			Camera.target.z = ctz;
 		}
 
-		IsRoomOutsideNo = -1;
-		IsRoomOutside(cpx, cpy, cpz);
-		if (IsRoomOutsideNo == -1)
+		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
+		if (outsideRoom == NO_ROOM)
 		{
 			Camera.pos.roomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 		}
 		else
 		{
-			Camera.pos.roomNumber = IsRoomOutsideNo;
+			Camera.pos.roomNumber = outsideRoom;
 		}
 
 		AlterFOV(cfov);

@@ -4,7 +4,7 @@
 #include "savegame.h"
 #include "GameScriptInventoryObject.h"
 #include "InventorySlots.h"
-#include "Game/newinv2.h"
+#include "Game/gui.h"
 
 /***
 Scripts that will be run on game startup.
@@ -250,7 +250,7 @@ bool GameFlow::DoGameflow()
 				GameScriptInventoryObject* obj = &level->InventoryObjects[i];
 				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
 				{
-					INVOBJ* invObj = &inventry_objects_list[obj->slot];
+					InventoryObject* invObj = &inventry_objects_list[obj->slot];
 
 					invObj->objname = obj->name.c_str();
 					invObj->scale1 = obj->scale;

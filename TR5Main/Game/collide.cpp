@@ -65,7 +65,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 									if (!radius)
 									{
 										collidedItems[0] = NULL;
-										return 1;
+										return true;
 									}
 								}
 							}
@@ -153,7 +153,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 							{
 								collidedItems[numItems++] = item;
 								if (!radius)
-									return 1;
+									return true;
 							}
 						}
 					}
@@ -184,8 +184,11 @@ std::set<int> CollectConnectedRooms(int roomNumber)
 		result.insert(room->doors[i].room);
 
 	for (auto i : result)
+	{
+		room = &g_Level.Rooms[i];
 		for (int j = 0; j < room->doors.size(); j++)
 			result.insert(room->doors[j].room);
+	}
 
 	return result;
 }
@@ -1090,35 +1093,23 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 			switch (direction)
 			{
 				case 0:
-					LaraItem->animNumber = LA_SIDESTEP_LEFT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
-					LaraItem->goalAnimState = LS_STEP_LEFT;
-					LaraItem->currentAnimState = LS_STEP_LEFT;
+					SetAnimation(LaraItem, LA_SIDESTEP_LEFT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 1:
-					LaraItem->animNumber = LA_WALK;
-					LaraItem->frameNumber = GF(LA_WALK, 0);
-					LaraItem->goalAnimState = LS_WALK_FORWARD;
-					LaraItem->currentAnimState = LS_WALK_FORWARD;
+					SetAnimation(LaraItem, LA_WALK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 2:
-					LaraItem->animNumber = LA_SIDESTEP_RIGHT;
-					LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
-					LaraItem->goalAnimState = LS_STEP_RIGHT;
-					LaraItem->currentAnimState = LS_STEP_RIGHT;
+					SetAnimation(LaraItem, LA_SIDESTEP_RIGHT);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 
 				case 3:
 				default:
-					LaraItem->animNumber = LA_WALK_BACK;
-					LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
-					LaraItem->goalAnimState = LS_WALK_BACK;
-					LaraItem->currentAnimState = LS_WALK_BACK;
+					SetAnimation(LaraItem, LA_WALK_BACK);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					break;
 			}
@@ -1284,6 +1275,18 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
+}
+
+// Overload of GetCollisionResult which can be used to probe collision parameters
+// from a given item.
+
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height)
+{
+	auto xProbe = item->pos.xPos + phd_sin(angle) * dist;
+	auto yProbe = item->pos.yPos + height;
+	auto zProbe = item->pos.zPos + phd_cos(angle) * dist;
+
+	return GetCollisionResult(xProbe, yProbe, zProbe, GetRoom(item->location, xProbe, yProbe, zProbe).roomNumber);
 }
 
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
@@ -1815,7 +1818,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
-			// MAGIC: Force slight push-out to the left side to avoid stucking
+			// HACK: Force slight push-out to the left side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
@@ -1865,7 +1868,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{
-			// MAGIC: Force slight push-out to the right side to avoid stucking
+			// HACK: Force slight push-out to the right side to avoid stucking
 			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
@@ -2684,8 +2687,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			float distance = 0.0f;
 
 			// Determine horizontal probe coordinates
-			int eX = x;
-			int eZ = z;
+			auto eX = x;
+			auto eZ = z;
 
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)

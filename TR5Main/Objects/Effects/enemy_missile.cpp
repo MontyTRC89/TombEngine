@@ -8,11 +8,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/Control/control.h"
 #include "Game/collide.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::TR4;
 
 namespace TEN::Entities::Effects
@@ -297,7 +297,7 @@ namespace TEN::Entities::Effects
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
-				LaraBurn();
+				LaraBurn(LaraItem);
 			}
 			else if (fx->flag1)
 			{
@@ -320,7 +320,7 @@ namespace TEN::Entities::Effects
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 					fx->pos.yPos += 256;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
-					LaraBurn();
+					LaraBurn(LaraItem);
 					break;
 				}
 			}

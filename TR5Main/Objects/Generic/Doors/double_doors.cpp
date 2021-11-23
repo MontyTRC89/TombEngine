@@ -5,7 +5,7 @@
 #include "control/box.h"
 #include "items.h"
 #include "control/lot.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
@@ -49,9 +49,7 @@ namespace TEN::Entities::Doors
 			{
 				if (MoveLaraPosition(&DoubleDoorPos, item, l))
 				{
-					l->animNumber = LA_DOUBLEDOOR_OPEN_PUSH;
-					l->frameNumber = GF(LA_DOUBLEDOOR_OPEN_PUSH, 0);
-					l->currentAnimState = LS_DOUBLEDOOR_PUSH;
+					SetAnimation(l, LA_DOUBLEDOOR_OPEN_PUSH);
 
 					AddActiveItem(itemNum);
 
