@@ -124,7 +124,6 @@ void PushableBlockControl(short itemNumber)
 	short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 
 	int x, z;
-	short roomNumber;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
 	PUSHABLE_INFO* pushable = item->data;
@@ -144,9 +143,7 @@ void PushableBlockControl(short itemNumber)
 	// control block falling
 	if (item->gravityStatus)
 	{
-		roomNumber = item->roomNumber;
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		int floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos + 10, item->pos.zPos);
+		auto floorHeight = GetCollisionResult(item->pos.xPos, item->pos.yPos + 10, item->pos.zPos, item->roomNumber).Position.Floor;
 
 		if (item->pos.yPos < floorHeight - item->fallspeed)
 		{
@@ -173,8 +170,7 @@ void PushableBlockControl(short itemNumber)
 
 			if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
 			{
-				roomNumber = item->roomNumber;
-				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, 1, item->flags & IFLAG_ACTIVATION_MASK);
+				TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 			}
 			
 			RemoveActiveItem(itemNumber);
@@ -239,9 +235,8 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (pushable->canFall) // check if pushable is about to fall
 			{
-				roomNumber = item->roomNumber;
-				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos + 10, item->pos.zPos) > item->pos.yPos)
+				auto floorHeight = GetCollisionResult(item->pos.xPos, item->pos.yPos + 10, item->pos.zPos, item->roomNumber).Position.Floor;
+				if (floorHeight > item->pos.yPos)
 				{
 					item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
@@ -350,8 +345,7 @@ void PushableBlockControl(short itemNumber)
 			FindStack(itemNumber);
 			AddBridgeStack(itemNumber);
 
-			roomNumber = item->roomNumber;
-			TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
+			TestTriggers(item, true, item->flags & IFLAG_ACTIVATION_MASK);
 		}
 
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
@@ -391,7 +385,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if ((l->currentAnimState != LS_PUSHABLE_GRAB
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
-			|| Lara.cornerX != (int)item))
+			|| Lara.nextCornerPos.x != itemNum))
 		{
 			if (!pushable->hasFloorCeiling)
 				ObjectCollision(itemNum, l, coll);
@@ -493,7 +487,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->goalAnimState = LS_PUSHABLE_GRAB;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.cornerX = (int)item;
+				Lara.nextCornerPos.x = itemNum;
 				item->pos.yRot = rot;
 			}
 			else
@@ -506,7 +500,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->goalAnimState = LS_PUSHABLE_GRAB;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.cornerX = (int)item;
+					Lara.nextCornerPos.x = itemNum;
 					item->pos.yRot = rot;
 				}
 				else

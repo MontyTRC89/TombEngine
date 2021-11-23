@@ -9,7 +9,7 @@
 #include "effects/hair.h"
 #include "items.h"
 #include "flipeffect.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "control/lot.h"
 #include "health.h"
 #include "savegame.h"
@@ -53,9 +53,11 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
@@ -80,9 +82,6 @@ short NextItemActive;
 short NextItemFree;
 short NextFxActive;
 short NextFxFree;
-
-int WeatherType;
-int LaraDrawType;
 
 int WeaponDelay;
 int WeaponEnemyTimer;
@@ -141,50 +140,48 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Inventory.Get_invMode() != IM_SAVE)
+			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
 
-				g_Inventory.Set_invMode(IM_SAVE);
+				g_Gui.SetInventoryMode(InventoryMode::Save);
 
-				if (g_Inventory.S_CallInventory2(0))
+				if (g_Gui.CallInventory(false))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if (TrInput & IN_LOAD && g_Inventory.Get_invMode() != IM_LOAD)
+			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
 
-				g_Inventory.Set_invMode(IM_LOAD);
+				g_Gui.SetInventoryMode(InventoryMode::Load);
 
-				if (g_Inventory.S_CallInventory2(0))
+				if (g_Gui.CallInventory(false))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if (TrInput & IN_PAUSE && g_Inventory.Get_invMode() != IM_PAUSE && LaraItem->hitPoints > 0)
+			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->hitPoints > 0)
 			{
 				StopAllSounds();
 				g_Renderer.DumpGameScene();
-				g_Inventory.Set_invMode(IM_PAUSE);
-				g_Inventory.Set_pause_menu_to_display(pause_main_menu);
-				g_Inventory.Set_pause_selected_option(0);
+				g_Gui.SetInventoryMode(InventoryMode::Pause);
+				g_Gui.SetMenuToDisplay(Menu::Pause);
+				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Inventory.Get_enterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				StopAllSounds();
 
-				if (g_Inventory.S_CallInventory2(1))
+				if (g_Gui.CallInventory(true))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
 		}
 
-		while (g_Inventory.Get_invMode() == IM_PAUSE)
+		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Inventory.DrawInv();
+			g_Gui.DrawInventory();
 			g_Renderer.SyncRenderer();
 
-			int z = g_Inventory.DoPauseMenu();
-
-			if (z == INV_RESULT_EXIT_TO_TILE)
+			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
 				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 		}
 
@@ -333,21 +330,21 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 			// Control Lara
 			InItemControlLoop = true;
-			LaraControl(Lara.itemNumber);
+			LaraControl(LaraItem, &LaraCollision);
 			InItemControlLoop = false;
 			KillMoveItems();
 
 			g_Renderer.updateLaraAnimations(true);
 
-			if (g_Inventory.Get_inventoryItemChosen() != NO_ITEM)
+			if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 			{
 				SayNo();
-				g_Inventory.Set_inventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
 			}
 
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
-			if (level->LaraType == LARA_TYPE::YOUNG)
+			if (level->LaraType == LaraType::Young)
 				HairControl(0, 1, 0);
 		}
 
@@ -367,7 +364,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Update oscillator seed
-		Wibble = (Wibble + 4) & 0xFC;
+		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
 		// Smash shatters and clear stopper flags under them
 		UpdateShatters();
@@ -376,7 +373,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		Weather.Update();
 
 		// Update special FX
-		TriggerLaraDrips();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -386,7 +382,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		TEN::Effects::Lightning::UpdateLightning();
+		UpdateLightning();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
@@ -394,11 +390,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		TEN::Effects::Drip::UpdateDripParticles();
+		UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		TEN::Entities::TR4::UpdateScarabs();
-		TEN::Entities::TR4::UpdateLocusts();
+		UpdateScarabs();
+		UpdateLocusts();
 		AnimateWaterfalls();
 
 		// Rumble screen (like in submarine level of TRC)
@@ -464,7 +460,7 @@ GAME_STATUS DoTitle(int index)
 	// Load the level
 	LoadLevelFile(index);
 
-	int inventoryResult;
+	InventoryResult inventoryResult;
 
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
@@ -505,6 +501,10 @@ GAME_STATUS DoTitle(int index)
 		// Play background music
 		PlaySoundTrack(83);
 
+		// Initialize menu
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
+
 		// Initialise ponytails
 		InitialiseHair();
 
@@ -514,8 +514,10 @@ GAME_STATUS DoTitle(int index)
 
 		ControlPhase(2, 0);
 
-		int status = 0, frames;
-		while (!status)
+		int frames = 0;
+		auto status = InventoryResult::None;
+
+		while (status == InventoryResult::None)
 		{
 			g_Renderer.renderTitle();
 
@@ -523,9 +525,9 @@ GAME_STATUS DoTitle(int index)
 			S_UpdateInput();
 			SetDebounce = false;
 
-			status = g_Inventory.TitleOptions();
+			status = g_Gui.TitleOptions();
 
-			if (status)
+			if (status != InventoryResult::None)
 				break;
 
 			Camera.numberFrames = g_Renderer.SyncRenderer();
@@ -536,7 +538,7 @@ GAME_STATUS DoTitle(int index)
 		inventoryResult = status;
 	}
 	else
-		inventoryResult = g_Inventory.TitleOptions();
+		inventoryResult = g_Gui.TitleOptions();
 
 	StopSoundTracks();
 
@@ -545,11 +547,11 @@ GAME_STATUS DoTitle(int index)
 
 	switch (inventoryResult)
 	{
-	case INV_RESULT_NEW_GAME:
+	case InventoryResult::NewGame:
 		return GAME_STATUS::GAME_STATUS_NEW_GAME;
-	case INV_RESULT_LOAD_GAME:
+	case InventoryResult::LoadGame:
 		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-	case INV_RESULT_EXIT_GAME:
+	case InventoryResult::ExitGame:
 		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
@@ -628,8 +630,8 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		Statistics.Level.Timer = 0;
 	}
 
-	g_Inventory.Set_inventoryItemChosen(NO_ITEM);
-	g_Inventory.Set_enterInventory(NO_ITEM);
+	g_Gui.SetInventoryItemChosen(NO_ITEM);
+	g_Gui.SetEnterInventory(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
@@ -855,6 +857,81 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		return 1;
 	}
 	return 0;
+}
+
+int GetWaterDepth(int x, int y, int z, short roomNumber)
+{
+	FLOOR_INFO* floor;
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+
+	short roomIndex = NO_ROOM;
+	do
+	{
+		int zFloor = (z - r->z) / SECTOR(1);
+		int xFloor = (x - r->x) / SECTOR(1);
+
+		if (zFloor <= 0)
+		{
+			zFloor = 0;
+			if (xFloor < 1)
+				xFloor = 1;
+			else if (xFloor > r->xSize - 2)
+				xFloor = r->xSize - 2;
+		}
+		else if (zFloor >= r->zSize - 1)
+		{
+			zFloor = r->zSize - 1;
+			if (xFloor < 1)
+				xFloor = 1;
+			else if (xFloor > r->xSize - 2)
+				xFloor = r->xSize - 2;
+		}
+		else if (xFloor < 0)
+			xFloor = 0;
+		else if (xFloor >= r->xSize)
+			xFloor = r->xSize - 1;
+
+		floor = &r->floor[zFloor + xFloor * r->zSize];
+		roomIndex = floor->WallPortal;
+		if (roomIndex != NO_ROOM)
+		{
+			roomNumber = roomIndex;
+			r = &g_Level.Rooms[roomIndex];
+		}
+	} while (roomIndex != NO_ROOM);
+
+	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	{
+		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+			{
+				int wh = floor->CeilingHeight(x, z);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return (GetFloorHeight(floor, x, y, z) - wh);
+			}
+			floor = GetSector(r, x - r->x, z - r->z);
+		}
+
+		return DEEP_WATER;
+	}
+	else
+	{
+		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+			{
+				int wh = floor->FloorHeight(x, z);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return (GetFloorHeight(floor, x, y, z) - wh);
+			}
+			floor = GetSector(r, x - r->x, z - r->z);
+		}
+
+		return NO_HEIGHT;
+	}
 }
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)

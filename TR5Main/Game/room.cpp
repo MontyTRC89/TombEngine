@@ -7,12 +7,12 @@
 #include "items.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Floordata;
 
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
 int FlipMap[MAX_FLIPMAP];
 
-short IsRoomOutsideNo;
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 void DoFlipMap(short group)
@@ -64,14 +64,8 @@ void AddRoomFlipItems(ROOM_INFO* r)
 	{
 		ITEM_INFO* item = &g_Level.Items[linkNum];
 
-		//if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
-		//	AlterFloorHeight(item, -1024);
-
-		if (item->objectNumber == ID_RAISING_BLOCK2)
-		{
-			//if (item->itemFlags[1])
-			//	AlterFloorHeight(item, -2048);
-		}
+		if (Objects[item->objectNumber].floor != nullptr)
+			UpdateBridgeItem(linkNum);
 	}
 }
 
@@ -88,6 +82,9 @@ void RemoveRoomFlipItems(ROOM_INFO* r)
 		{
 			KillItem(linkNum);
 		}
+
+		if (Objects[item->objectNumber].floor != nullptr)
+			UpdateBridgeItem(linkNum, true);
 	}
 }
 
@@ -117,38 +114,36 @@ int IsObjectInRoom(short roomNumber, short objectNumber)
 int IsRoomOutside(int x, int y, int z)
 {
 	if (x < 0 || z < 0)
-		return -2;
+		return NO_ROOM;
 
 	int xTable = x / 1024;
 	int zTable = z / 1024;
 
 	if (OutsideRoomTable[xTable][zTable].size() == 0)
-		return -2;
+		return NO_ROOM;
 
 	for (size_t i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+		auto r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
 			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->zSize - 1) * 1024))))
 			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->xSize - 1) * 1024)))))
 		{
-			IsRoomOutsideNo = roomNumber;
-
-			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+			auto floor = GetFloor(x, y, z, &roomNumber);
 			int height = GetFloorHeight(floor, x, y, z);
 			if (height == NO_HEIGHT || y > height)
-				return -2;
+				return NO_ROOM;
 			height = GetCeiling(floor, x, y, z);
 			if (y < height)
-				return -2;
+				return NO_ROOM;
 
-			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? 1 : -3);
+			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? roomNumber : NO_ROOM);
 		}
 	}
 
-	return -2;
+	return NO_ROOM;
 }
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z) 

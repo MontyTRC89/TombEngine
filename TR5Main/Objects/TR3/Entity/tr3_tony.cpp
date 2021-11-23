@@ -12,9 +12,9 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "collide.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 
 enum TonyFlameType
 {
@@ -428,7 +428,7 @@ void ControlTonyFireBall(short fxNumber)
 			LaraItem->hitStatus = true;
 			KillEffect(fxNumber);
 			LaraItem->hitPoints -= 200;
-			//LaraBurn();
+			LaraBurn(LaraItem);
 			return;
 		}
 	}
