@@ -344,6 +344,16 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
+bool TestLaraSwamp(ITEM_INFO* item)
+{
+	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP);
+}
+
+bool TestLaraWater(ITEM_INFO* item)
+{
+	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER);
+}
+
 SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 {
 	int x = item->pos.xPos;
@@ -1198,17 +1208,17 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 {
-	auto angleA = angle + ANGLE(15.0f);
-	auto angleB = angle - ANGLE(15.0f);
+	auto angle1 = angle + ANGLE(15.0f);
+	auto angle2 = angle - ANGLE(15.0f);
 
-	auto vecA = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angleA),
+	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
 		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angleA),
+		item->pos.zPos + dist * phd_cos(angle1),
 		item->roomNumber);
 
-	auto vecB = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angleB),
+	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
 		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angleB),
+		item->pos.zPos + dist * phd_cos(angle2),
 		item->roomNumber);
 
 	auto pos = GAME_VECTOR(item->pos.xPos,
@@ -1216,10 +1226,10 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 		item->pos.zPos,
 		item->roomNumber);
 
-	auto resultA = LOS(&pos, &vecA);
-	auto resultB = LOS(&pos, &vecB);
+	auto result1 = LOS(&pos, &vec1);
+	auto result2 = LOS(&pos, &vec2);
 
-	return (resultA == 0 && resultB == 0);
+	return (result1 == 0 && result2 == 0);
 }
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
@@ -1289,14 +1299,26 @@ COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int 
 	return probe;
 }
 
+bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
+		info->waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap bug when lara wades off a ledge into a dry room. @Sezz 2021.09.26
+	{
+		return false;
+	}
+
+	return true;
+}
+
+// TODO: Gradually replace calls.
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
 	if (info->waterStatus == LW_WADE || coll->Middle.Floor <= STEPUP_HEIGHT)
-	{
 		return false;
-	}
 
 	SetAnimation(item, LA_FALL_START);
 	item->fallspeed = 0;
@@ -1546,28 +1568,13 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int regularity) {
-	if(LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
-	{
+	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 		SetAnimation(LaraItem, LA_TIGHTROPE_FALL_LEFT);
-	}
 
-	if(!Lara.tightRopeFall && !(GetRandomControl() & regularity))
+	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
 		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
 }
-#endif // !NEW_TIGHTROPE
-
-bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
-		info->waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap BUG when lara wades off a ledge into a dry room. @Sezz 2021.09.26
-	{
-		return false;
-	}
-
-	return true;
-}
+#endif
 
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 {
@@ -1592,9 +1599,9 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!TestLaraSwamp(item) &&
 		info->gunStatus == LG_NO_ARMS &&								// Hands are free.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&							// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0) &&		// Flare is not being handled. TODO: Will she pose with weapons drawn?
-		info->Vehicle == NO_ITEM)									// Not in a vehicle.
+		info->Vehicle == NO_ITEM)										// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1602,7 +1609,6 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// TODO: Try using each state's BadStepUp/Down.  @Sezz 2021.10.11
 bool TestLaraStep(COLL_INFO* coll)
 {
 	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound.
@@ -1648,7 +1654,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// TODO: This function should become obsolete in the future with more accurate and accessible collision detection.
+// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
 {
@@ -1656,11 +1662,9 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in crawl control functions, then, it will store the wrong radius.
 	// Function below (TestLaraMoveCrawl()) is a clone to account for this. @Sezz 2021.11.05
-	// TODO: Current probe radius is fixed and overshoots by a wide margin at 0 degrees to a wall. No issues,
-	// but for more accuracy in the future, get distance to nearest wall/ceiling/object instead. @Sezz 2021.11.04
 
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset of 4 required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
 	if ((probe.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
 		(probe.Position.Floor - y) >= upperBound &&								// Upper floor bound.
@@ -1735,7 +1739,7 @@ bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step left state collision functions.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step left state collision function.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
@@ -1745,23 +1749,23 @@ bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using BadHeightUp defined in walk back state collision function.
 }
 
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);			// Using BadHeightUp defined in step left state collision function.
 }
 
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);			// Using BadHeightUp defined in step right state collision function.
 }
 
 // Currently unused; LaraCollideStopCrawl() handles front collision. @Sezz 2021.11.08
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMoveCrawl(item, coll, item->pos.yRot, STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
+	return TestLaraMoveCrawl(item, coll, item->pos.yRot, STEP_SIZE - 1, -(STEP_SIZE - 1));				// Using BadHeightUp/Down defined in crawl state collision functions.
 }
 
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
@@ -1898,20 +1902,4 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
-}
-
-// Entirely temporary. @Sezz 2021.10.16
-bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item)
-{
-	return item->animNumber != LA_CROUCH_TO_CRAWL_START;
-}
-
-bool TestLaraSwamp(ITEM_INFO* item)
-{
-	return g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP;
-}
-
-bool TestLaraWater(ITEM_INFO* item)
-{
-	return g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
 }

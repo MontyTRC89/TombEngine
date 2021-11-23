@@ -117,7 +117,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_SLOW_TURN)
 			info->turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -125,7 +125,7 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_SLOW_TURN)
 			info->turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 
 	if (TrInput & IN_FORWARD)
@@ -772,7 +772,7 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_MED_TURN)
 			info->turnRate = -LARA_MED_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 2, LARA_LEAN_RATE / 2);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -780,7 +780,7 @@ void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_MED_TURN)
 			info->turnRate = LARA_MED_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 2, LARA_LEAN_RATE / 2);
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
 	if (TrInput & IN_ROLL)
@@ -1439,7 +1439,7 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_SLOW_TURN)
 			info->turnRate = -LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 2);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 
 	}
 	else if (TrInput & IN_RIGHT)
@@ -1448,7 +1448,7 @@ void lara_as_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_SLOW_TURN)
 			info->turnRate = LARA_SLOW_TURN;
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 2);
+		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
 	if (TrInput & IN_BACK &&
