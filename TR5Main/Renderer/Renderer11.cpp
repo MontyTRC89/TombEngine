@@ -3,7 +3,7 @@
 #include "gameflow.h"
 #include "camera.h"
 #include "effects/tomb4fx.h"
-#include "Specific/clock.h"
+#include "Specific/clock.h" 
 #include "Specific/trmath.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
@@ -12,7 +12,7 @@
 using std::vector;
 
 namespace TEN::Renderer 
-{
+{ 
 	using namespace TEN::Renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;

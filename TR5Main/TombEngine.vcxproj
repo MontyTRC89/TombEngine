@@ -179,6 +179,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\newinv2.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\OmniFogBuffer.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Specific\phd_global.h" />
@@ -867,6 +868,9 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
+    </None>
+    <None Include="Shaders\FogBuffer.hlsli">
+      <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Shaders\Math.hlsli" />
     <None Include="Shaders\VertexInput.hlsli" />

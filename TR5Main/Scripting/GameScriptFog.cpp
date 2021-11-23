@@ -1,116 +1,56 @@
 #include "framework.h"
 #include "GameScriptFog.h"
+/*** Describes a layer of moving clouds.
+As seen in TR4's City of the Dead.
 
-/***
-An RGBA or RGB color.
-Components are specified in bytes; all values are clamped to [0, 255].
-
-@miscclass Color
+@pregameclass SkyLayer
 @pragma nostrip
 */
-
-void GameScriptFog::Register(sol::state* state)
+ 
+void GameScriptFog::Register(sol::state* lua)
 {
-	state->new_usertype<GameScriptFog>("Fog",
-		sol::constructors<GameScriptFog(byte, byte, byte, int, int)>(),
-		sol::meta_function::to_string, &GameScriptFog::ToString,
+	lua->new_usertype<GameScriptFog>("Fog",
+		sol::constructors<GameScriptFog(GameScriptColor const&, short, short)>(),
 
-		/// (int) red component
-		//@mem r
-		"r", sol::property(&GameScriptFog::GetR, &GameScriptFog::SetR),
+		/// (@{Color}) RGB sky color
+		//@mem color
+		"color", sol::property(&GameScriptFog::SetColor),
 
-		/// (int) green component
-		//@mem g
-		"g", sol::property(&GameScriptFog::GetG, &GameScriptFog::SetG),
+		/*** (int) min distance.
 
-		/// (int) blue component
-		//@mem b
-		"b", sol::property(&GameScriptFog::GetB, &GameScriptFog::SetB),
+		This is the distance at which the fog starts 
 
-		/// (int) the distance at fog starts (in sectors)
-		//@mem minDistance
-		"minDistance", sol::property(&GameScriptFog::GetMinDistance, &GameScriptFog::SetMinDistance),
+		@mem minDistance*/
+		"minDistance", &GameScriptFog::MinDistance,
 
-		/// (int) the distance at fog reaches the max strength (in sectors)
-		//@mem maxDistance
-		"maxDistance", sol::property(&GameScriptFog::GetMaxDistance, &GameScriptFog::SetMaxDistance)
+		/*** (int) max distance.
+
+		This is the distance at which the fog reaches the maximum strength
+
+		@mem maxDistance*/
+		"maxDistance", & GameScriptFog::MaxDistance
 		);
 }
 
 /***
-@int R red component
-@int G green component
-@int B blue component
-@int minDistance min distance of the fog
-@int maxDistance max distance of the fog
-@return A Fog object.
-@function Fog.new
+@tparam Color color RGB color
+@tparam int speed cloud speed
+@return A SkyLayer object.
+@function SkyLayer.new
 */
-GameScriptFog::GameScriptFog(byte r, byte g, byte b, int minDistance, int maxDistance)
+GameScriptFog::GameScriptFog(GameScriptColor const& col, short minDistance, short maxDistance)
 {
-	SetR(r);
-	SetG(g);
-	SetB(b);
-	SetMinDistance(minDistance);
-	SetMaxDistance(maxDistance);
+	SetColor(col);
+	MinDistance = minDistance;
+	MaxDistance = maxDistance;
+	Enabled = true;
 }
 
-byte GameScriptFog::GetR() const
+void GameScriptFog::SetColor(GameScriptColor const& col)
 {
-	return r;
+	R = col.GetR();
+	G = col.GetG();
+	B = col.GetB();
 }
 
-void GameScriptFog::SetR(byte v)
-{
-	r = std::clamp<byte>(v, 0, 255);
-}
 
-byte GameScriptFog::GetG() const
-{
-	return g;
-}
-
-void GameScriptFog::SetG(byte v)
-{
-	g = std::clamp<byte>(v, 0, 255);
-}
-
-byte GameScriptFog::GetB() const
-{
-	return b;
-}
-
-void GameScriptFog::SetB(byte v)
-{
-	b = std::clamp<byte>(v, 0, 255);
-}
-
-int GameScriptFog::GetMinDistance() const
-{
-	return minDistance;
-}
-
-void GameScriptFog::SetMinDistance(int v)
-{
-	minDistance = std::clamp<byte>(v, 0, 200);
-}
-
-int GameScriptFog::GetMaxDistance() const
-{
-	return maxDistance;
-}
-
-void GameScriptFog::SetMaxDistance(int v)
-{
-	maxDistance = std::clamp<byte>(v, 0, 200);
-}
-
-/***
-@tparam Color color this color
-@treturn string A string showing the r, g, b, and a values of the color
-@function __tostring
-*/
-std::string GameScriptFog::ToString() const
-{
-	return "{" + std::to_string(r) + ", " + std::to_string(g) + ", " + std::to_string(b) + ", " + std::to_string(minDistance) + ", " + std::to_string(maxDistance) + "}";
-}

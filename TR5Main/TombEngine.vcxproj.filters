@@ -712,6 +712,7 @@
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\OmniFogBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
@@ -763,5 +764,6 @@
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\SSAO.fx" />
     <None Include="Shaders\Transparent.fx" />
+    <None Include="Shaders\FogBuffer.hlsli" />
   </ItemGroup>
 </Project>

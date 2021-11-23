@@ -49,7 +49,7 @@ struct GameScriptLevel
 	GameScriptSkyLayer Layer2;
 	bool Horizon{ false };
 	bool ColAddHorizon{ false };
-	GameScriptFog Fog{ 0, 0, 0, 0, 0 };
+	GameScriptFog Fog;
 	bool Storm{ false };
 	WEATHER_TYPE Weather{ WEATHER_TYPE::NORMAL };
 	bool Rumble{ false };
