@@ -867,9 +867,9 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: This should not be required. Update anim's root displacement + set position distance.
-	//item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
-	//item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
+	// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
+	item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+	item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
 	item->goalAnimState = LS_FREEFALL;
 }
 
