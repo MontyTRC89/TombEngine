@@ -868,8 +868,11 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-	item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
-	item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
+	if (item->animNumber == LA_POLE_IDLE)
+	{
+		item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+		item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
+	}
 	item->goalAnimState = LS_FREEFALL;
 }
 
