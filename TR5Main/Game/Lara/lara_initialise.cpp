@@ -35,6 +35,7 @@ void InitialiseLara(int restore)
 	Lara.look = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
+	Lara.sprintTimer = LARA_SPRINT_MAX;
 	Lara.air = LARA_AIR_MAX;
 	Lara.weaponItem = NO_ITEM;
 	PoisonFlag = 0;
@@ -99,7 +100,6 @@ void InitialiseLara(int restore)
 
 	InitialiseLaraAnims(LaraItem);
 	Lara.BeetleLife = 3;
-	Lara.sprintTimer = LARA_SPRINT_MAX;
 }
 
 void LaraInitialiseMeshes()
