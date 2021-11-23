@@ -12,10 +12,10 @@
 #include "people.h"
 #include "effects/tomb4fx.h"
 #include "tr4_wraith_info.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "items.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 
 namespace TEN::Entities::TR4
 {
@@ -276,7 +276,7 @@ namespace TEN::Entities::TR4
 					item->itemFlags[1] += 400;
 					if (item->itemFlags[1] > 8000)
 					{
-						LaraBurn();
+						LaraBurn(LaraItem);
 					}
 				}
 			}

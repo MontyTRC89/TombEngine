@@ -12,9 +12,9 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
 #define STATE_HITMAN_STOP					1
@@ -562,7 +562,7 @@ void HitmanControl(short itemNumber)
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
-					LaraBurn();
+					LaraBurn(LaraItem);
 					Lara.burnCount = 48;
 					Lara.burnBlue = 1;
 					LaraItem->hitPoints = 0;

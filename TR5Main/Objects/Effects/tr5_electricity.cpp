@@ -10,10 +10,10 @@
 #include "Sound\sound.h"
 #include "sphere.h"
 #include "traps.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "items.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 
 void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int flags)
 {
@@ -200,7 +200,7 @@ void ElectricityWiresControl(short itemNumber)
 					TriggerLaraElectricitySparks(0);
 
 				item->itemFlags[0] = 28;
-				LaraBurn();
+				LaraBurn(LaraItem);
 				Lara.burnBlue = 1;
 				Lara.burnCount = 48;
 				LaraItem->hitPoints = 0;
@@ -279,7 +279,7 @@ void ElectricityWiresControl(short itemNumber)
 				else
 				{
 					item->itemFlags[0] = 28;
-					LaraBurn();
+					LaraBurn(LaraItem);
 					Lara.burnBlue = 1;
 					Lara.burnCount = 48;
 					LaraItem->hitPoints = 0;

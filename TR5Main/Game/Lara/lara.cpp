@@ -13,7 +13,6 @@
 #include "lara_surface.h"
 #include "lara_swim.h"
 #include "lara_one_gun.h"
-#include "lara_two_guns.h"
 #include "lara_cheat.h"
 #include "lara_climb.h"
 #include "lara_initialise.h"
@@ -23,32 +22,31 @@
 #include "quad.h"
 #include "snowmobile.h"
 #include "jeep.h"
-#include "boat.h"
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
 
 #include "animation.h"
 #include "GameFlowScript.h"
-#include "health.h"
 #include "flipeffect.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "savegame.h"
 #include "rope.h"
-#include "rubberboat.h"
 #include "misc.h"
-#include "control\volume.h"
+#include "control/volume.h"
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
 #include "gui.h"
 
-#include "Objects/Generic/Object/rope.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Control::Volumes;
 using std::function;
 using TEN::Renderer::g_Renderer;
-using namespace TEN::Control::Volumes;
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
@@ -444,6 +442,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
+
+	TriggerLaraDrips(item);
 
 	short roomNumber;
 
@@ -920,6 +920,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Handle weapons.
 	LaraGun(item);
+
+	// Handle breath.
+	LaraBreath(item);
 
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);

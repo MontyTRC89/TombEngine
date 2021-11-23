@@ -15,10 +15,10 @@
 #include "generic_switch.h"
 #include "collide.h"
 #include "control/box.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "items.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
@@ -110,7 +110,7 @@ void ExplosionControl(short itemNumber)
 					{
 						LaraItem->hitPoints -= distance / 16;
 						if (distance < 768)
-							LaraBurn();
+							LaraBurn(LaraItem);
 					}
 				}
 			}

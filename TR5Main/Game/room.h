@@ -80,7 +80,8 @@ enum RoomEnumFlag
 	ENV_FLAG_NO_LENSFLARE = 0x0080, // Was quicksand in TR3.
 	ENV_FLAG_MIST = 0x0100,
 	ENV_FLAG_CAUSTICS = 0x0200,
-	ENV_FLAG_UNKNOWN3 = 0x0400
+	ENV_FLAG_UNKNOWN3 = 0x0400,
+	ENV_FLAG_COLD = 0x1000
 };
 
 enum StaticMeshFlags : short
