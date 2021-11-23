@@ -173,7 +173,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							{
 								if (Objects[item->objectNumber].intelligent)
 								{
-									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
+									HitTarget(LaraItem, item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{

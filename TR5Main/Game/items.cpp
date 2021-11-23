@@ -75,6 +75,9 @@ void KillItem(short itemNum)
 		if (item == Lara.target)
 			Lara.target = NULL;
 
+		if (Objects[itemNum].floor != nullptr)
+			UpdateBridgeItem(itemNum, true);
+
 		if (itemNum >= g_Level.NumItems)
 		{
 			item->nextItem = NextItemFree;

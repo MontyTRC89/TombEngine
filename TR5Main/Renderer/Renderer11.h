@@ -524,6 +524,7 @@ namespace TEN::Renderer
 		void drawSmokes(RenderView& view);
 		void drawLightning(RenderView& view);
 		void drawBlood(RenderView& view);
+		void drawWeatherParticles(RenderView& view);
 		void drawDrips(RenderView& view);
 		void drawBubbles(RenderView& view);
 		void drawEffects(RenderView& view,bool transparent);

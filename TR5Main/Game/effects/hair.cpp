@@ -47,7 +47,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	OBJECT_INFO* object = &Objects[ID_LARA];
 	ANIM_FRAME* frame;
 	int spaz;
-	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_TYPE::YOUNG;
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
 
 	if (framePtr == NULL)
 	{
@@ -104,7 +104,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[0].r = (int)mesh->sphere.Radius;
 
 	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_TORSO]];
-	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	pos = { (int)mesh->sphere.Center.x - 10, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z + 25 }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
@@ -114,7 +114,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
 	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HEAD]];
-	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	pos = { (int)mesh->sphere.Center.x - 2, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
@@ -127,7 +127,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
-	sphere[3].r = (int)mesh->sphere.Radius * 3 / 2;
+	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
 	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_LINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
@@ -135,7 +135,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
 	sphere[4].z = pos.z;
-	sphere[4].r = (int)mesh->sphere.Radius * 3 / 2;
+	sphere[4].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5
 
 	if (youngLara)
 	{
@@ -143,7 +143,13 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 		sphere[1].y = (sphere[1].y + sphere[2].y) / 2;
 		sphere[1].z = (sphere[1].z + sphere[2].z) / 2;
 	}
-	
+
+	// Extra neck sphere - from tomb5
+	sphere[5].x = (2 * sphere[2].x + sphere[1].x) / 3;
+	sphere[5].y = (2 * sphere[2].y + sphere[1].y) / 3;
+	sphere[5].z = (2 * sphere[2].z + sphere[1].z) / 3;
+	sphere[5].r = youngLara ? 0 : (int)(3.0f * (float)sphere[2].r / 4.0f);
+
 	Matrix world;
 	g_Renderer.getBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 

@@ -5,7 +5,7 @@
 #include "control/box.h"
 #include "items.h"
 #include "control/lot.h"
-#include "newinv2.h"
+#include "gui.h"
 #include "input.h"
 #include "pickup.h"
 #include "sound.h"
@@ -49,9 +49,7 @@ namespace TEN::Entities::Doors
 			{
 				if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 				{
-					l->animNumber = LA_UNDERWATER_DOOR_OPEN;
-					l->frameNumber = GF(LA_UNDERWATER_DOOR_OPEN, 0);
-					l->currentAnimState = LS_MISC_CONTROL;
+					SetAnimation(l, LA_UNDERWATER_DOOR_OPEN);
 					l->fallspeed = 0;
 					item->status = ITEM_ACTIVE;
 

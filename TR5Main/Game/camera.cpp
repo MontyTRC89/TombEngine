@@ -84,60 +84,70 @@ void AlterFOV(int value)
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 {
-	int x, y, z, dx, dy, dz, i, h, c;
-	short room, room2;
+	int floorHeight, ceilingHeight;
 	FLOOR_INFO* floor;
-	int flag, result;
 
-	x = start->x;
-	y = start->y;
-	z = start->z;
-	room = start->roomNumber;
-	dx = target->x - x >> 3;
-	dy = target->y - y >> 3;
-	dz = target->z - z >> 3;
-	flag = 0;
-	result = 0;
+	auto x = start->x;
+	auto y = start->y;
+	auto z = start->z;
+	auto roomNum = start->roomNumber;
+	auto roomNum2 = roomNum;
+	auto dx = target->x - x >> 3;
+	auto dy = target->y - y >> 3;
+	auto dz = target->z - z >> 3;
+	auto flag = false;
+	auto result = false;
+
+	int i;
 	for (i = 0; i < 8; ++i)
 	{
-		room2 = room;
-		floor = GetFloor(x, y, z, &room);
+		roomNum2 = roomNum;
+		floor = GetFloor(x, y, z, &roomNum);
 
-
-		if (g_Level.Rooms[room2].flags & ENV_FLAG_SWAMP)
+		if (g_Level.Rooms[roomNum2].flags & ENV_FLAG_SWAMP)
 		{
-			flag = 1;
+			flag = true;
+
 			break;
 		}
 
-		h = GetFloorHeight(floor, x, y, z);
-		c = GetCeiling(floor, x, y, z);
-		if (h != NO_HEIGHT && c != NO_HEIGHT && c < h)
+		floorHeight = GetFloorHeight(floor, x, y, z);
+		ceilingHeight = GetCeiling(floor, x, y, z);
+		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
 		{
-			if (y > h)
+			if (y > floorHeight)
 			{
-				if (y - h >= push)
+				if (y - floorHeight >= push)
 				{
-					flag = 1;
+					flag = true;
+
 					break;
 				}
-				y = h;
+
+				y = floorHeight;
 			}
-			if (y < c) {
-				if (c - y >= push)
+
+			if (y < ceilingHeight)
+			{
+				if (ceilingHeight - y >= push)
 				{
-					flag = 1;
+					flag = true;
+
 					break;
 				}
-				y = c;
+
+				y = ceilingHeight;
 			}
-			result = 1;
+
+			result = true;
 		}
 		else if (result)
 		{
-			flag = 1;
+			flag = true;
+
 			break;
 		}
+
 		x += dx;
 		y += dy;
 		z += dz;
@@ -150,13 +160,13 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 		z -= dz;
 	}
 
-	GetFloor(x, y, z, &room2);
+	GetFloor(x, y, z, &roomNum2);
 	target->x = x;
 	target->y = y;
 	target->z = z;
-	target->roomNumber = room2;
+	target->roomNumber = roomNum2;
 
-	return flag == 0;
+	return !flag;
 }
 
 void InitialiseCamera()
@@ -178,7 +188,7 @@ void InitialiseCamera()
 	Camera.pos.z = LastTarget.z - 100;
 	Camera.pos.roomNumber = LaraItem->roomNumber;
 
-	Camera.targetDistance = 1536;
+	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
 	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
@@ -204,27 +214,27 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		BinocularOn++;
 	}
 
-	if (OldCam.pos.xRot != LaraItem->pos.xRot
-		|| OldCam.pos.yRot != LaraItem->pos.yRot
-		|| OldCam.pos.zRot != LaraItem->pos.zRot
-		|| OldCam.pos2.xRot != Lara.headXrot
-		|| OldCam.pos2.yRot != Lara.headYrot
-		|| OldCam.pos2.xPos != Lara.torsoXrot
-		|| OldCam.pos2.yPos != Lara.torsoYrot
-		|| OldCam.pos.xPos != LaraItem->pos.xPos
-		|| OldCam.pos.yPos != LaraItem->pos.yPos
-		|| OldCam.pos.zPos != LaraItem->pos.zPos
-		|| OldCam.currentAnimState != LaraItem->currentAnimState
-		|| OldCam.goalAnimState != LaraItem->goalAnimState
-		|| OldCam.targetDistance != Camera.targetDistance
-		|| OldCam.targetElevation != Camera.targetElevation
-		|| OldCam.actualElevation != Camera.actualElevation
-		|| OldCam.actualAngle != Camera.actualAngle
-		|| OldCam.target.x != Camera.target.x
-		|| OldCam.target.y != Camera.target.y
-		|| OldCam.target.z != Camera.target.z
-		|| Camera.oldType != Camera.type
-		|| BinocularOn < 0)
+	if (OldCam.pos.xRot != LaraItem->pos.xRot ||
+		OldCam.pos.yRot != LaraItem->pos.yRot ||
+		OldCam.pos.zRot != LaraItem->pos.zRot ||
+		OldCam.pos2.xRot != Lara.headXrot ||
+		OldCam.pos2.yRot != Lara.headYrot ||
+		OldCam.pos2.xPos != Lara.torsoXrot ||
+		OldCam.pos2.yPos != Lara.torsoYrot ||
+		OldCam.pos.xPos != LaraItem->pos.xPos ||
+		OldCam.pos.yPos != LaraItem->pos.yPos ||
+		OldCam.pos.zPos != LaraItem->pos.zPos ||
+		OldCam.currentAnimState != LaraItem->currentAnimState ||
+		OldCam.goalAnimState != LaraItem->goalAnimState ||
+		OldCam.targetDistance != Camera.targetDistance ||
+		OldCam.targetElevation != Camera.targetElevation ||
+		OldCam.actualElevation != Camera.actualElevation ||
+		OldCam.actualAngle != Camera.actualAngle ||
+		OldCam.target.x != Camera.target.x ||
+		OldCam.target.y != Camera.target.y ||
+		OldCam.target.z != Camera.target.z ||
+		Camera.oldType != Camera.type ||
+		BinocularOn < 0)
 	{
 		OldCam.pos.xRot = LaraItem->pos.xRot;
 		OldCam.pos.yRot = LaraItem->pos.yRot;
@@ -282,22 +292,23 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		}
 	}
 
-	short roomNumber = Camera.pos.roomNumber;
+	auto roomNum = Camera.pos.roomNumber;
 	auto yPos = Camera.pos.y;
 
-	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
-		yPos = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP)
+		yPos = g_Level.Rooms[roomNum].y - STEP_SIZE;
 
-	FLOOR_INFO* floor = GetFloor(Camera.pos.x, yPos, Camera.pos.z, &roomNumber);
-	int height = GetFloorHeight(floor, Camera.pos.x, yPos, Camera.pos.z);
+	FLOOR_INFO* floor = GetFloor(Camera.pos.x, yPos, Camera.pos.z, &roomNum);
+	auto floorHeight = GetFloorHeight(floor, Camera.pos.x, yPos, Camera.pos.z);
 
-	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) || yPos > height)
+	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) ||
+		yPos > floorHeight)
 	{
 		mgLOS(&Camera.target, &Camera.pos, 0);
 		
-		if (abs(Camera.pos.x - ideal->x) < 768
-			&& abs(Camera.pos.y - ideal->y) < 768
-			&& abs(Camera.pos.z - ideal->z) < 768)
+		if (abs(Camera.pos.x - ideal->x) < (WALL_SIZE - STEP_SIZE) &&
+			abs(Camera.pos.y - ideal->y) < (WALL_SIZE - STEP_SIZE) &&
+			abs(Camera.pos.z - ideal->z) < (WALL_SIZE - STEP_SIZE))
 		{
 			to.x = Camera.pos.x;
 			to.y = Camera.pos.y;
@@ -309,7 +320,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 			from.z = ideal->z;
 			from.roomNumber = ideal->roomNumber;
 
-			if (!mgLOS(&from, &to, 0) && ++CameraSnaps >= 8)
+			if (!mgLOS(&from, &to, 0) &&
+				++CameraSnaps >= 8)
 			{
 				Camera.pos.x = ideal->x;
 				Camera.pos.y = ideal->y;
@@ -320,18 +332,37 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		}
 	}
 
-	roomNumber = Camera.pos.roomNumber;
-	floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNumber);
-	height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	int ceiling = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	roomNum = Camera.pos.roomNumber;
+	floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNum);
+	floorHeight = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	auto ceilingHeight = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-	if (Camera.pos.y - (STEP_SIZE - 1) < ceiling && Camera.pos.y + (STEP_SIZE - 1) > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = (height + ceiling) >> 1;
-	else if (Camera.pos.y + (STEP_SIZE - 1) > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = height - (STEP_SIZE - 1);
-	else if (Camera.pos.y - (STEP_SIZE - 1) < ceiling && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
-		Camera.pos.y = ceiling + (STEP_SIZE - 1);
-	else if (ceiling >= height || height == NO_HEIGHT || ceiling == NO_HEIGHT)
+	auto buffer = STEP_SIZE - 1;
+	if ((Camera.pos.y - buffer) < ceilingHeight &&
+		(Camera.pos.y + buffer) > floorHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT &&
+		floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = (floorHeight + ceilingHeight) >> 1;
+	}
+	else if ((Camera.pos.y + buffer) > floorHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT &&
+		floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = floorHeight - buffer;
+	}
+	else if ((Camera.pos.y - buffer) < ceilingHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT &&
+		floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = ceilingHeight + buffer;
+	}
+	else if (ceilingHeight >= floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT)
 	{
 		Camera.pos.x = ideal->x;
 		Camera.pos.y = ideal->y;
@@ -362,36 +393,35 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 void ChaseCamera(ITEM_INFO* item)
 {
 	if (!Camera.targetElevation)
-	{
-		Camera.targetElevation = -ANGLE(10);
-	}
+		Camera.targetElevation = -ANGLE(10.0f);
 
 	Camera.targetElevation += item->pos.xRot;
 	UpdateCameraElevation();
 	
-	if (Camera.actualElevation > ANGLE(85))
-		Camera.actualElevation = ANGLE(85);
-	else if (Camera.actualElevation < -ANGLE(85))
-		Camera.actualElevation = -ANGLE(85);
+	if (Camera.actualElevation > ANGLE(85.0f))
+		Camera.actualElevation = ANGLE(85.0f);
+	else if (Camera.actualElevation < -ANGLE(85.0f))
+		Camera.actualElevation = -ANGLE(85.0f);
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	short roomNumber = Camera.target.roomNumber;
-	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+	short roomNum = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNum);
 	
-	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNum].y - STEP_SIZE;
 
-	int x = Camera.target.x;
-	int y = Camera.target.y;
-	int z = Camera.target.z;
+	auto x = Camera.target.x;
+	auto y = Camera.target.y;
+	auto z = Camera.target.z;
 
-	roomNumber = Camera.target.roomNumber;
-	auto floor = GetFloor(x, y, z, &roomNumber);
-	int h = GetFloorHeight(floor, x, y, z);
-	int c = GetCeiling(floor, x, y, z);
+	roomNum = Camera.target.roomNumber;
+	auto floor = GetFloor(x, y, z, &roomNum);
+	auto floorHeight = GetFloorHeight(floor, x, y, z);
+	auto ceilingHeight = GetCeiling(floor, x, y, z);
 
-	if ((((y < c) || (h < y)) || (h <= c)) || ((h == NO_HEIGHT || (c == NO_HEIGHT))))
+	if (((y < ceilingHeight || floorHeight < y) || floorHeight <= ceilingHeight) ||
+		(floorHeight == NO_HEIGHT || ceilingHeight == NO_HEIGHT))
 	{
 		TargetSnaps++;
 		Camera.target.x = LastTarget.x;
@@ -400,14 +430,10 @@ void ChaseCamera(ITEM_INFO* item)
 		Camera.target.roomNumber = LastTarget.roomNumber;
 	}
 	else
-	{
 		TargetSnaps = 0;
-	}
 	
 	for (int i = 0; i < 5; i++)
-	{
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
-	}
 
 	int farthest = 0x7FFFFFFF;
 	int farthestnum = 0;
@@ -418,13 +444,9 @@ void ChaseCamera(ITEM_INFO* item)
 		short angle;
 
 		if (i == 0)
-		{
 			angle = Camera.actualAngle;
-		}
 		else
-		{
-			angle = (i - 1) * ANGLE(90);
-		}
+			angle = (i - 1) * ANGLE(90.0f);
 
 		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
@@ -447,6 +469,7 @@ void ChaseCamera(ITEM_INFO* item)
 				if (i == 0)
 				{
 					farthestnum = 0;
+
 					break;
 				}
 
@@ -479,38 +502,29 @@ void ChaseCamera(ITEM_INFO* item)
 				if ((dx + dz) > 0x90000)
 				{
 					farthestnum = 0;
+
 					break;
 				}
 			}
 		}
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = Ideals[farthestnum].x;
-	ideal.y = Ideals[farthestnum].y;
-	ideal.z = Ideals[farthestnum].z;
+	GAME_VECTOR ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
-	CameraCollisionBounds(&ideal, 384, 1);
-
+	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
 	MoveCamera(&ideal, Camera.speed);
 }
 
 void UpdateCameraElevation()
 {
-	PHD_VECTOR pos;
-	PHD_VECTOR pos1;
 
 	if (Camera.laraNode != -1)
 	{
-		pos.z = 0;
-		pos.y = 0;
-		pos.x = 0;
+		PHD_VECTOR pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		pos1.x = 0;
-		pos1.y = -STEP_SIZE;
-		pos1.z = WALL_SIZE * 2;
+		PHD_VECTOR pos1 = { 0, -STEP_SIZE, WALL_SIZE * 2 };
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.z = pos1.z - pos.z;
@@ -518,9 +532,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-	{
 		Camera.actualAngle = LaraItem->pos.yRot + Camera.targetAngle;
-	}
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) >> 3;
 }
@@ -538,32 +550,37 @@ void CombatCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.targetAngle = Lara.headYrot + Lara.torsoYrot;
-		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15);
+		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15.0f);
 	}
 
-	short roomNumber = Camera.target.roomNumber;
-	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNumber);
+	auto roomNum = Camera.target.roomNumber;
+	GetFloor(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, &roomNum);
 
-	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[roomNum].y - STEP_SIZE;
 
 	auto floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
-	int h = GetFloorHeight(floor, Camera.target.x, Camera.target.y, Camera.target.z);
-	int c = GetCeiling(floor, Camera.target.x, Camera.target.y, Camera.target.z);
+	auto floorHeight = GetFloorHeight(floor, Camera.target.x, Camera.target.y, Camera.target.z);
+	auto ceilingHeight = GetCeiling(floor, Camera.target.x, Camera.target.y, Camera.target.z);
 	
-	if (c + 64 > h - 64 && h != NO_HEIGHT && c != NO_HEIGHT)
+	auto buffer = STEP_SIZE / 4;
+	if ((ceilingHeight + buffer) > (floorHeight - buffer) &&
+		floorHeight != NO_HEIGHT &&
+		ceilingHeight != NO_HEIGHT)
 	{
-		Camera.target.y = (c + h) >> 1;
+		Camera.target.y = (ceilingHeight + floorHeight) >> 1;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.target.y > h - 64 && h != NO_HEIGHT)
+	else if (Camera.target.y > (floorHeight - buffer) &&
+		floorHeight != NO_HEIGHT)
 	{
-		Camera.target.y = h - 64;
+		Camera.target.y = floorHeight - buffer;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.target.y < c + 64 && c != NO_HEIGHT)
+	else if (Camera.target.y < (ceilingHeight + buffer) &&
+		ceilingHeight != NO_HEIGHT)
 	{
-		Camera.target.y = c + 64;
+		Camera.target.y = ceilingHeight + buffer;
 		Camera.targetElevation = 0;
 	}
 
@@ -573,12 +590,16 @@ void CombatCamera(ITEM_INFO* item)
 	int y = Camera.target.y;
 	int z = Camera.target.z;
 
-	roomNumber = Camera.target.roomNumber;
-	floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
+	roomNum = Camera.target.roomNumber;
+	floor = GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilingHeight = GetCeiling(floor, x, y, z);
 	
-	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
+	if (y < ceilingHeight ||
+		y > floorHeight ||
+		ceilingHeight >= floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT)
 	{
 		TargetSnaps++;
 		Camera.target.x = LastTarget.x;
@@ -587,21 +608,17 @@ void CombatCamera(ITEM_INFO* item)
 		Camera.target.roomNumber = LastTarget.roomNumber;
 	}
 	else
-	{
 		TargetSnaps = 0;
-	}
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = 1536;
+	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
-	{
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
-	}
 
-	int farthest = 0x7FFFFFFF;
+	int farthest = INT_MAX;
 	int farthestnum = 0;
 	GAME_VECTOR temp[2];
 
@@ -610,13 +627,9 @@ void CombatCamera(ITEM_INFO* item)
 		short angle;
 
 		if (i == 0)
-		{
 			angle = Camera.actualAngle;
-		}
 		else
-		{
-			angle = (i - 1) * ANGLE(90);
-		}
+			angle = (i - 1) * ANGLE(90.0f);
 
 		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
@@ -634,11 +647,13 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 ||
+				mgLOS(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
 					farthestnum = 0;
+
 					break;
 				}
 
@@ -663,7 +678,8 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 ||
+				mgLOS(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
@@ -671,110 +687,169 @@ void CombatCamera(ITEM_INFO* item)
 				if ((dx + dz) > 0x90000)
 				{
 					farthestnum = 0;
+
 					break;
 				}
 			}
 		}
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = Ideals[farthestnum].x;
-	ideal.y = Ideals[farthestnum].y;
-	ideal.z = Ideals[farthestnum].z;
+	GAME_VECTOR ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
-	CameraCollisionBounds(&ideal, 384, 1);
+	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
 
 	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
-	{
 		Camera.speed = 1;
-	}
 
 	MoveCamera(&ideal, Camera.speed);
 }
 
-int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
+bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 {
-	int x = ideal->x;
-	int y = ideal->y;
-	int z = ideal->z;
+	auto x = ideal->x;
+	auto y = ideal->y;
+	auto z = ideal->z;
 
-	short roomNumber;
 	FLOOR_INFO* floor;
-	int h;
-	int c;
+	short roomNum;
+	int floorHeight, ceilingHeight;
 	
 	if (yFirst)
 	{
-		roomNumber = ideal->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		h = GetFloorHeight(floor, x, y, z);
-		c = GetCeiling(floor, x, y, z);
+		roomNum = ideal->roomNumber;
+		floor = GetFloor(x, y, z, &roomNum);
+		floorHeight = GetFloorHeight(floor, x, y, z);
+		ceilingHeight = GetCeiling(floor, x, y, z);
 
-		if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = (h + c) >> 1;
-		else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = h - (STEP_SIZE - 1);
-		else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = c + (STEP_SIZE - 1);
+		auto buffer = STEP_SIZE - 1;
+		if ((y - buffer) < ceilingHeight &&
+			(y + buffer) > floorHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = (floorHeight + ceilingHeight) >> 1;
+		}
+		else if ((y + buffer) > floorHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = floorHeight - buffer;
+		}
+		else if ((y - buffer) < ceilingHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = ceilingHeight + buffer;
+		}
 	}
 
-	roomNumber = ideal->roomNumber;
-	floor = GetFloor(x - push, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x - push, y, z);
-	c = GetCeiling(floor, x - push, y, z);
-	if (y > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || y < c)
+	roomNum = ideal->roomNumber;
+	floor = GetFloor(x - push, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x - push, y, z);
+	ceilingHeight = GetCeiling(floor, x - push, y, z);
+	if (y > floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight ||
+		y < ceilingHeight)
+	{
 		x = (x & (~1023)) + push;
+	}
 
-	roomNumber = ideal->roomNumber;
-	floor = GetFloor(x, y, z - push, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z - push);
-	c = GetCeiling(floor, x, y, z - push);
-	if (y > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || y < c)
+	roomNum = ideal->roomNumber;
+	floor = GetFloor(x, y, z - push, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z - push);
+	ceilingHeight = GetCeiling(floor, x, y, z - push);
+	if (y > floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight ||
+		y < ceilingHeight)
+	{
 		z = (z & (~1023)) + push;
+	}
 
-	roomNumber = ideal->roomNumber;
-	floor = GetFloor(x + push, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x + push, y, z);
-	c = GetCeiling(floor, x + push, y, z);
-	if (y > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || y < c)
+	roomNum = ideal->roomNumber;
+	floor = GetFloor(x + push, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x + push, y, z);
+	ceilingHeight = GetCeiling(floor, x + push, y, z);
+	if (y > floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight ||
+		y < ceilingHeight)
+	{
 		x = (x | 1023) - push;
+	}
 
-	roomNumber = ideal->roomNumber;
-	floor = GetFloor(x, y, z + push, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z + push);
-	c = GetCeiling(floor, x, y, z + push);
-	if (y > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || y < c)
+	roomNum = ideal->roomNumber;
+	floor = GetFloor(x, y, z + push, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z + push);
+	ceilingHeight = GetCeiling(floor, x, y, z + push);
+	if (y > floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight ||
+		y < ceilingHeight)
+	{
 		z = (z | 1023) - push;
+	}
 
 	if (!yFirst)
 	{
-		roomNumber = ideal->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		h = GetFloorHeight(floor, x, y, z);
-		c = GetCeiling(floor, x, y, z);
+		roomNum = ideal->roomNumber;
+		floor = GetFloor(x, y, z, &roomNum);
+		floorHeight = GetFloorHeight(floor, x, y, z);
+		ceilingHeight = GetCeiling(floor, x, y, z);
 
-		if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = (h + c) >> 1;
-		else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = h - (STEP_SIZE - 1);
-		else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-			y = c + (STEP_SIZE - 1);
+		auto buffer = STEP_SIZE - 1;
+		if ((y - buffer) < ceilingHeight &&
+			(y + buffer) > floorHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = (floorHeight + ceilingHeight) >> 1;
+		}
+		else if ((y + buffer) > floorHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = floorHeight - buffer;
+		}
+		else if ((y - buffer) < ceilingHeight &&
+			ceilingHeight < floorHeight &&
+			ceilingHeight != NO_HEIGHT &&
+			floorHeight != NO_HEIGHT)
+		{
+			y = ceilingHeight + buffer;
+		}
 	}
 
-	roomNumber = ideal->roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
-	if (y > h || y < c || h == NO_HEIGHT || c == NO_HEIGHT || c >= h)
-		return 1;
+	roomNum = ideal->roomNumber;
+	floor = GetFloor(x, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilingHeight = GetCeiling(floor, x, y, z);
+	if (y > floorHeight ||
+		y < ceilingHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight)
+	{
+		return true;
+	}
 
 	floor = GetFloor(x, y, z, &ideal->roomNumber);
 	ideal->x = x;
 	ideal->y = y;
 	ideal->z = z;
 
-	return 0;
+	return false;
 }
 
 void FixedCamera(ITEM_INFO* item)
@@ -823,24 +898,24 @@ void FixedCamera(ITEM_INFO* item)
 
 void LookCamera(ITEM_INFO* item)
 {
-	short headXrot = Lara.headXrot;
-	short headYrot = Lara.headYrot;
-	short torsoXrot = Lara.torsoXrot;
-	short torsoYrot = Lara.torsoYrot;
+	auto headXrot = Lara.headXrot;
+	auto headYrot = Lara.headYrot;
+	auto torsoXrot = Lara.torsoXrot;
+	auto torsoYrot = Lara.torsoYrot;
 
 	Lara.torsoXrot = 0;
 	Lara.torsoYrot = 0;
 	Lara.headXrot <<= 1;
 	Lara.headYrot <<= 1;
 
-	if (Lara.headXrot > ANGLE(55)) 
-		Lara.headXrot = ANGLE(55);
-	else if (Lara.headXrot < -ANGLE(75)) 
-		Lara.headXrot = -ANGLE(75);
-	if (Lara.headYrot < -ANGLE(80))
-		Lara.headYrot = -ANGLE(80);
-	else if (Lara.headYrot > ANGLE(80))
-		Lara.headYrot = ANGLE(80);
+	if (Lara.headXrot > ANGLE(55.0f)) 
+		Lara.headXrot = ANGLE(55.0f);
+	else if (Lara.headXrot < -ANGLE(75.0f))
+		Lara.headXrot = -ANGLE(75.0f);
+	if (Lara.headYrot < -ANGLE(80.0f))
+		Lara.headYrot = -ANGLE(80.0f);
+	else if (Lara.headYrot > ANGLE(80.0f))
+		Lara.headYrot = ANGLE(80.0f);
 
 	if (abs(Lara.headXrot - OldCam.pos.xRot) >= 16)
 		OldCam.pos.xRot = (Lara.headXrot + OldCam.pos.xRot) >> 1;
@@ -851,54 +926,51 @@ void LookCamera(ITEM_INFO* item)
 	else
 		OldCam.pos.yRot = Lara.headYrot;
 
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 16;
-	pos.z = 64;
+	PHD_VECTOR pos = { 0, STEP_SIZE / 16, STEP_SIZE / 4 };
 	GetLaraJointPosition(&pos, LM_HEAD);
 	
-	short roomNumber = LaraItem->roomNumber;
-	FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-	int h = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-	int c = GetCeiling(floor, pos.x, pos.y, pos.z);
-	if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || pos.y > h || pos.y < c)
+	short roomNum = LaraItem->roomNumber;
+	FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNum);
+	auto floorHeight = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+	auto ceilingHeight = GetCeiling(floor, pos.x, pos.y, pos.z);
+	if (floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		ceilingHeight >= floorHeight ||
+		pos.y > floorHeight ||
+		pos.y < ceilingHeight)
 	{
-		pos.x = 0;
-		pos.y = 16;
-		pos.z = 0;
+		pos = { 0, STEP_SIZE / 16 , 0 };
 		GetLaraJointPosition(&pos, LM_HEAD);
 		
-		roomNumber = LaraItem->roomNumber;
-		floor = GetFloor(pos.x, pos.y + STEP_SIZE, pos.z, &roomNumber);
-		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		roomNum = LaraItem->roomNumber;
+		floor = GetFloor(pos.x, pos.y + STEP_SIZE, pos.z, &roomNum);
+		if (g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP)
 		{
-			pos.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
-			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+			pos.y = g_Level.Rooms[roomNum].y - STEP_SIZE;
+			floor = GetFloor(pos.x, pos.y, pos.z, &roomNum);
 		}
 		else
-			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+			floor = GetFloor(pos.x, pos.y, pos.z, &roomNum);
 
-		h = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-		c = GetCeiling(floor, pos.x, pos.y, pos.z);
-		if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || pos.y > h || pos.y < c)
+		floorHeight = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+		ceilingHeight = GetCeiling(floor, pos.x, pos.y, pos.z);
+		if (floorHeight == NO_HEIGHT ||
+			ceilingHeight == NO_HEIGHT ||
+			ceilingHeight >= floorHeight ||
+			pos.y > floorHeight ||
+			pos.y < ceilingHeight)
 		{
 			pos.x = 0;
-			pos.y = 16;
-			pos.z = -64;
+			pos.y = STEP_SIZE / 16;
+			pos.z = -(STEP_SIZE / 4);
 			GetLaraJointPosition(&pos, LM_HEAD);
 		}
 	}
 
-	PHD_VECTOR pos2;
-	pos2.x = 0;
-	pos2.y = 0;
-	pos2.z = -WALL_SIZE;
+	PHD_VECTOR pos2 = { 0, 0, -WALL_SIZE };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
-	PHD_VECTOR pos3;
-	pos3.x = 0;
-	pos3.y = 0;
-	pos3.z = 2048;
+	PHD_VECTOR pos3 = { 0, 0, WALL_SIZE * 2 };
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -912,19 +984,28 @@ void LookCamera(ITEM_INFO* item)
 	int i = 0;
 	for (i = 0; i < 8; i++)
 	{
-		roomNumber = roomNumber2;
+		roomNum = roomNumber2;
 		floor = GetFloor(x, y + STEP_SIZE, z, &roomNumber2);
 		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
 		{
 			y = g_Level.Rooms[roomNumber2].y - STEP_SIZE;
+
 			break;
 		}
 		else
 			floor = GetFloor(x, y, z, &roomNumber2);
-		h = GetFloorHeight(floor, x, y, z);
-		c = GetCeiling(floor, x, y, z);
-		if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || y > h || y < c)
+
+		floorHeight = GetFloorHeight(floor, x, y, z);
+		ceilingHeight = GetCeiling(floor, x, y, z);
+		if (floorHeight == NO_HEIGHT ||
+			ceilingHeight == NO_HEIGHT ||
+			ceilingHeight >= floorHeight ||
+			y > floorHeight ||
+			y < ceilingHeight)
+		{
 			break;
+		}
+
 		x += dx;
 		y += dy;
 		z += dz;
@@ -937,11 +1018,8 @@ void LookCamera(ITEM_INFO* item)
 		z -= dz;
 	}
 
-	GAME_VECTOR ideal;
-	ideal.x = x;
-	ideal.y = y;
-	ideal.z = z;
-	ideal.roomNumber = roomNumber;
+	GAME_VECTOR ideal = { x, y, z };
+	ideal.roomNumber = roomNum;
 
 	if (OldCam.pos.xRot == Lara.headXrot &&
 		OldCam.pos.yRot == Lara.headYrot &&
@@ -978,7 +1056,7 @@ void LookCamera(ITEM_INFO* item)
 		LookCamTarget.z = pos3.z;
 	}
 
-	CameraCollisionBounds(&ideal, 224, 1);
+	CameraCollisionBounds(&ideal, (STEP_SIZE - STEP_SIZE / 8), 1);
 
 	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
 	{
@@ -1021,38 +1099,65 @@ void LookCamera(ITEM_INFO* item)
 	x = Camera.pos.x;
 	y = Camera.pos.y;
 	z = Camera.pos.z;
-	roomNumber = Camera.pos.roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
+	roomNum = Camera.pos.roomNumber;
+	floor = GetFloor(x, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilingHeight = GetCeiling(floor, x, y, z);
 
-	if (y - (STEP_SIZE - 1) < c && y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = (h + c) >> 1;
-	else if (y + (STEP_SIZE - 1) > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = h - (STEP_SIZE - 1);
-	else if (y - (STEP_SIZE - 1) < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
-		Camera.pos.y = c + (STEP_SIZE - 1);
+	auto buffer = STEP_SIZE - 1;
+	if ((y - buffer) < ceilingHeight &&
+		(y + buffer) > floorHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT && floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = (floorHeight + ceilingHeight) >> 1;
+	}
+	else if ((y + buffer) > floorHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT &&
+		floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = floorHeight - buffer;
+	}
+	else if ((y - buffer) < ceilingHeight &&
+		ceilingHeight < floorHeight &&
+		ceilingHeight != NO_HEIGHT &&
+		floorHeight != NO_HEIGHT)
+	{
+		Camera.pos.y = ceilingHeight + buffer;
+	}
 
 	x = Camera.pos.x;
 	y = Camera.pos.y;
 	z = Camera.pos.z;
-	roomNumber = Camera.pos.roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
-	if ((g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
-		Camera.pos.y = g_Level.Rooms[roomNumber].y - STEP_SIZE;
-	else if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
+	roomNum = Camera.pos.roomNumber;
+	floor = GetFloor(x, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilingHeight = GetCeiling(floor, x, y, z);
+	if ((g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP))
+		Camera.pos.y = g_Level.Rooms[roomNum].y - STEP_SIZE;
+	else if (y < ceilingHeight ||
+		y > floorHeight ||
+		ceilingHeight >= floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT)
+	{
 		mgLOS(&Camera.target, &Camera.pos, 0);
+	}
 
 	x = Camera.pos.x;
 	y = Camera.pos.y;
 	z = Camera.pos.z;
-	roomNumber = Camera.pos.roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
-	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT || (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
+	roomNum = Camera.pos.roomNumber;
+	floor = GetFloor(x, y, z, &roomNum);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilingHeight = GetCeiling(floor, x, y, z);
+	if (y < ceilingHeight ||
+		y > floorHeight ||
+		ceilingHeight >= floorHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT ||
+		g_Level.Rooms[roomNum].flags & ENV_FLAG_SWAMP)
 	{
 		Camera.pos.x = pos.x;
 		Camera.pos.y = pos.y;
@@ -1088,24 +1193,19 @@ void LookCamera(ITEM_INFO* item)
 
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 {
-	int distance;
-
-	distance = sqrt(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
+	int distance = sqrt(
+		SQUARE(item->pos.xPos - Camera.pos.x) +
+		SQUARE(item->pos.yPos - Camera.pos.y) +
+		SQUARE(item->pos.zPos - Camera.pos.z));
 	if (distance < maxDistance)
 	{
 		if (maxDistance == -1)
-		{
 			Camera.bounce = bounce;
-		}
 		else
-		{
 			Camera.bounce = -(bounce * (maxDistance - distance) / maxDistance);
-		}
 	}
 	else if (maxDistance == -1)
-	{
 		Camera.bounce = bounce;
-	}
 }
 
 void BinocularCamera(ITEM_INFO* item)
@@ -1118,9 +1218,7 @@ void BinocularCamera(ITEM_INFO* item)
 	if (!LaserSight)
 	{
 		if (InputBusy & IN_DRAW)
-		{
 			exittingBinos = 1;
-		}
 		else if (exittingBinos)
 		{
 			exittingBinos = 0;
@@ -1133,6 +1231,7 @@ void BinocularCamera(ITEM_INFO* item)
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
 			Camera.type = BinocularOldCamera;
+
 			return;
 		}
 	}
@@ -1143,37 +1242,37 @@ void BinocularCamera(ITEM_INFO* item)
 	short headXrot = Lara.headXrot * 2;
 	short headYrot = Lara.headYrot;
 
-	if (headXrot > ANGLE(75))
-		headXrot = ANGLE(75);
-	else if (headXrot < -ANGLE(75))
-		headXrot = -ANGLE(75);
+	if (headXrot > ANGLE(75.0f))
+		headXrot = ANGLE(75.0f);
+	else if (headXrot < -ANGLE(75.0f))
+		headXrot = -ANGLE(75.0f);
 
-	if (headYrot > ANGLE(80))
-		headYrot = ANGLE(80);
-	else if (headYrot < -ANGLE(80))
-		headYrot = -ANGLE(80);
+	if (headYrot > ANGLE(80.0f))
+		headYrot = ANGLE(80.0f);
+	else if (headYrot < -ANGLE(80.0f))
+		headYrot = -ANGLE(80.0f);
 
-	int x = LaraItem->pos.xPos;
-	int y = LaraItem->pos.yPos - (WALL_SIZE / 2);
-	int z = LaraItem->pos.zPos;
+	auto x = LaraItem->pos.xPos;
+	auto y = LaraItem->pos.yPos - (WALL_SIZE / 2);
+	auto z = LaraItem->pos.zPos;
 
-	short roomNumber = LaraItem->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int c = GetCeiling(floor, x, y, z);
-	if (c <= y - STEP_SIZE)
+	short roomNum = LaraItem->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
+	auto ceilingHeight = GetCeiling(floor, x, y, z);
+	if (ceilingHeight <= (y - STEP_SIZE))
 		y -= STEP_SIZE;
 	else
-		y = c + 64;
+		y = ceilingHeight + (STEP_SIZE / 4);
 
 	Camera.pos.x = x;
 	Camera.pos.y = y;
 	Camera.pos.z = z;	
-	Camera.pos.roomNumber = roomNumber;
+	Camera.pos.roomNumber = roomNum;
 	
-	int l = 20736 * phd_cos(headXrot);
+	int l = (WALL_SIZE * 20 + STEP_SIZE) * phd_cos(headXrot);
 	
 	int tx = x + l * phd_sin(LaraItem->pos.yRot + headYrot);
-	int ty = y - 20736 * phd_sin(headXrot);
+	int ty = y - (WALL_SIZE * 20 + STEP_SIZE) * phd_sin(headXrot);
 	int tz = z + l * phd_cos(LaraItem->pos.yRot + headYrot);
 
 	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
@@ -1195,9 +1294,9 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.y += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.z += 16 * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.x += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.y += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.z += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.bounce += 5;
 		}
 		else
@@ -1258,27 +1357,23 @@ void BinocularCamera(ITEM_INFO* item)
 			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
 	}
 
-	PHD_VECTOR src;
-	src.x = Camera.pos.x;
-	src.y = Camera.pos.y;
-	src.z = Camera.pos.z;
-
-	PHD_VECTOR target;
-	target.x = Camera.target.x;
-	target.y = Camera.target.y;
-	target.z = Camera.target.z;
+	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
+	PHD_VECTOR target = { Camera.target.x, Camera.target.y, Camera.target.z };
 
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(Lara.gunType);
+		Ammo& ammo = GetAmmo(LaraItem, Lara.gunType);
 
-		if (!(InputBusy & IN_ACTION) || WeaponDelay || !ammo)
+		if (!(InputBusy & IN_ACTION) ||
+			WeaponDelay ||
+			!ammo)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
 				if (Lara.gunType != WEAPON_CROSSBOW)
 					WeaponDelay = 0;
+
 				LSHKShotsFired = 0;
 				Camera.bounce = 0;
 			}
@@ -1290,6 +1385,7 @@ void BinocularCamera(ITEM_INFO* item)
 				firing = 1;
 				WeaponDelay = 16;
 				Statistics.Game.AmmoUsed++;
+
 				if (!ammo.hasInfinite())
 					(ammo)--;
 
@@ -1306,10 +1402,9 @@ void BinocularCamera(ITEM_INFO* item)
 				{
 					WeaponDelay = 12;
 					firing = 1;
+
 					if (Lara.Weapons[WEAPON_HK].HasSilencer)
-					{
 						SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
-					}
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
@@ -1325,12 +1420,12 @@ void BinocularCamera(ITEM_INFO* item)
 							LSHKShotsFired = 0;
 							WeaponDelay = 12;
 						}
+
 						LSHKTimer = 4;
 						firing = 1;
+
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
-						{
 							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
-						}
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
@@ -1342,9 +1437,7 @@ void BinocularCamera(ITEM_INFO* item)
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
-						{
 							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
-						}
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
@@ -1357,9 +1450,7 @@ void BinocularCamera(ITEM_INFO* item)
 					if (LSHKTimer)
 					{
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
-						{
 							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
-						}
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
@@ -1370,10 +1461,9 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						LSHKTimer = 4;
 						firing = 1;
+
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
-						{
 							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
-						}
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
@@ -1400,19 +1490,13 @@ void BinocularCamera(ITEM_INFO* item)
 			// Reimplement this mode?
 		}
 		else
-		{
 			LaraTorch(&src, &target, Lara.headYrot, 192);
-		}
 	}
 }
 
 void ConfirmCameraTargetPos() 
 {
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-
+	PHD_VECTOR pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
@@ -1428,16 +1512,20 @@ void ConfirmCameraTargetPos()
 		Camera.target.z = LaraItem->pos.zPos;
 	}
 
-	int x = Camera.target.x;
-	int y = Camera.target.y;
-	int z = Camera.target.z;
+	auto x = Camera.target.x;
+	auto y = Camera.target.y;
+	auto z = Camera.target.z;
 
 	short roomNumber = Camera.target.roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int h = GetFloorHeight(floor, x, y, z);
-	int c = GetCeiling(floor, x, y, z);
+	auto floorHeight = GetFloorHeight(floor, x, y, z);
+	auto ceilingHeight = GetCeiling(floor, x, y, z);
 
-	if (y < c || h < y || h <= c || h == NO_HEIGHT || c == NO_HEIGHT)
+	if (y < ceilingHeight ||
+		floorHeight < y ||
+		floorHeight <= ceilingHeight ||
+		floorHeight == NO_HEIGHT ||
+		ceilingHeight == NO_HEIGHT)
 	{
 		Camera.target.x = pos.x;
 		Camera.target.y = pos.y;
@@ -1457,28 +1545,22 @@ void CalculateCamera()
 		BinocularCamera(LaraItem);
 
 		if (BinocularRange != 0)
-		{
 			return;
-		}
 	}
 
 	if (BinocularOn == 1)
-	{
 		BinocularOn = -8;
-	}
 
 	if (UseForcedFixedCamera != 0)
 	{
 		Camera.type = CAMERA_TYPE::FIXED_CAMERA;
 		if (Camera.oldType != CAMERA_TYPE::FIXED_CAMERA)
-		{
 			Camera.speed = 1;
-		}
 	}
 
 	// Camera is in a water room, play water sound effect.
 
-	if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+	if (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER)
 	{
 		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
 		if (Camera.underwater == false)
@@ -1492,7 +1574,8 @@ void CalculateCamera()
 
 	ITEM_INFO* item;
 	bool fixedCamera = false;
-	if (Camera.item != NULL && (Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
+	if (Camera.item != NULL &&
+		(Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
 	{
 		item = Camera.item;
 		fixedCamera = true;
@@ -1513,8 +1596,8 @@ void CalculateCamera()
 	{
 		if (!fixedCamera)
 		{
-			int dx = Camera.item->pos.xPos - item->pos.xPos;
-			int dz = Camera.item->pos.zPos - item->pos.zPos;
+			auto dx = Camera.item->pos.xPos - item->pos.xPos;
+			auto dz = Camera.item->pos.zPos - item->pos.zPos;
 			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
 			short angle = phd_atan(dz, dx) - item->pos.yRot;
 			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->pos.yPos);
@@ -1522,22 +1605,22 @@ void CalculateCamera()
 			angle >>= 1;
 			tilt >>= 1;
 
-			if (angle > -ANGLE(50) && angle < ANGLE(50) && tilt > -ANGLE(85) && tilt < ANGLE(85))
+			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
 			{
 				short change = angle - Lara.headYrot;
-				if (change > ANGLE(4))
-					Lara.headYrot += ANGLE(4);
-				else if (change < -ANGLE(4))
-					Lara.headYrot -= ANGLE(4);
+				if (change > ANGLE(4.0f))
+					Lara.headYrot += ANGLE(4.0f);
+				else if (change < -ANGLE(4.0f))
+					Lara.headYrot -= ANGLE(4.0f);
 				else
 					Lara.headYrot += change;
 				Lara.torsoYrot = Lara.headYrot;
 
 				change = tilt - Lara.headXrot;
-				if (change > ANGLE(4))
-					Lara.headXrot += ANGLE(4);
-				else if (change < -ANGLE(4))
-					Lara.headXrot -= ANGLE(4);
+				if (change > ANGLE(4.0f))
+					Lara.headXrot += ANGLE(4.0f);
+				else if (change < -ANGLE(4.0f))
+					Lara.headXrot -= ANGLE(4.0f);
 				else
 					Lara.headXrot += change;
 				Lara.torsoXrot = Lara.headXrot;
@@ -1548,7 +1631,8 @@ void CalculateCamera()
 		}
 	}
 
-	if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
+	if (Camera.type == CAMERA_TYPE::LOOK_CAMERA ||
+		Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 	{
 		if (Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 		{
@@ -1587,14 +1671,11 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->roomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA
-			&& Camera.flags != CF_CHASE_OBJECT
-			&& (Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
+		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA &&
+			Camera.flags != CF_CHASE_OBJECT &&
+			(Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
-			PHD_VECTOR pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
+			PHD_VECTOR pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;
@@ -1607,7 +1688,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			int shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
+			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
 			x = item->pos.xPos + shift * phd_sin(item->pos.yRot);
 			z = item->pos.zPos + shift * phd_cos(item->pos.yRot);
 
@@ -1626,7 +1707,9 @@ void CalculateCamera()
 		if (fixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = false;
-			if (Camera.speed != 1 && Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && BinocularOn >= 0)
+			if (Camera.speed != 1 &&
+				Camera.oldType != CAMERA_TYPE::LOOK_CAMERA &&
+				BinocularOn >= 0)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1638,9 +1721,7 @@ void CalculateCamera()
 					Camera.target.z = z;
 				}
 				else
-				{
 					TargetSnaps = 0;
-				}
 			}
 		}
 		else
@@ -1651,9 +1732,9 @@ void CalculateCamera()
 
 		GetFloor(x, y, z, &Camera.target.roomNumber);
 
-		if (abs(LastTarget.x - Camera.target.x) < 4
-			&& abs(LastTarget.y - Camera.target.y) < 4
-			&& abs(LastTarget.z - Camera.target.z) < 4)
+		if (abs(LastTarget.x - Camera.target.x) < 4 &&
+			abs(LastTarget.y - Camera.target.y) < 4 &&
+			abs(LastTarget.z - Camera.target.z) < 4)
 		{
 			Camera.target.x = LastTarget.x;
 			Camera.target.y = LastTarget.y;
@@ -1669,7 +1750,8 @@ void CalculateCamera()
 	Camera.fixedCamera = fixedCamera;
 	Camera.last = Camera.number;
 
-	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA || Camera.timer == -1)
+	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA ||
+		Camera.timer == -1)
 	{
 		Camera.type = CAMERA_TYPE::CHASE_CAMERA;
 		Camera.speed = 10;
@@ -1709,11 +1791,13 @@ void LookLeftRight()
 				Lara.headYrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY
-		&& Lara.Vehicle == NO_ITEM 
-		&& !Lara.leftArm.lock 
-		&& !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY &&
+		Lara.Vehicle == NO_ITEM &&
+		!Lara.leftArm.lock &&
+		!Lara.rightArm.lock)
+	{
 		Lara.torsoYrot = Lara.headYrot;
+	}
 }
 
 void LookUpDown()
@@ -1741,11 +1825,13 @@ void LookUpDown()
 				Lara.headXrot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY 
-		&& Lara.Vehicle == NO_ITEM 
-		&& !Lara.leftArm.lock 
-		&& !Lara.rightArm.lock)
+	if (Lara.gunStatus != LG_HANDS_BUSY &&
+		Lara.Vehicle == NO_ITEM &&
+		!Lara.leftArm.lock &&
+		!Lara.rightArm.lock)
+	{
 		Lara.torsoXrot = Lara.headXrot;
+	}
 }
 
 void ResetLook()
@@ -1762,10 +1848,10 @@ void ResetLook()
 		else
 			Lara.headYrot = 0;
 
-		if (Lara.gunStatus != LG_HANDS_BUSY 
-			&& !Lara.leftArm.lock 
-			&& !Lara.rightArm.lock
-			&& Lara.Vehicle == NO_ITEM)
+		if (Lara.gunStatus != LG_HANDS_BUSY &&
+			!Lara.leftArm.lock &&
+			!Lara.rightArm.lock &&
+			 Lara.Vehicle == NO_ITEM)
 		{
 			Lara.torsoYrot = Lara.headYrot;
 			Lara.torsoXrot = Lara.headXrot;
@@ -1794,6 +1880,7 @@ void RumbleScreen()
 		{
 			RumbleCounter = 0;
 			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+
 			return;
 		}
 	}

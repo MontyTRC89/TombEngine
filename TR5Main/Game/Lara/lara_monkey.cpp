@@ -222,10 +222,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!monkeyFront || coll->CollisionType == CT_FRONT	|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
 		{
-			item->animNumber = LA_MONKEYSWING_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
+			SetAnimation(item, LA_MONKEYSWING_IDLE);
 		}
 		else
 		{
@@ -293,10 +290,7 @@ void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->animNumber = LA_MONKEYSWING_IDLE;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			SetAnimation(item, LA_MONKEYSWING_IDLE);
 		}
 	}
 	else
@@ -346,10 +340,7 @@ void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->animNumber = LA_MONKEYSWING_IDLE;
-			item->currentAnimState = LS_MONKEYSWING_IDLE;
-			item->goalAnimState = LS_MONKEYSWING_IDLE;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			SetAnimation(item, LA_MONKEYSWING_IDLE);
 		}
 	}
 	else
@@ -535,10 +526,7 @@ void MonkeySwingFall(ITEM_INFO* item)
 {
 	if (item->currentAnimState != LS_MONKEYSWING_TURN_180)
 	{
-		item->goalAnimState = LS_JUMP_UP;
-		item->currentAnimState = LS_JUMP_UP;
-		item->animNumber = LA_JUMP_UP;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
+		SetAnimation(item, LA_JUMP_UP, 9);
 
 		item->speed = 2;
 		item->gravityStatus = true;

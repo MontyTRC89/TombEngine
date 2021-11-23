@@ -18,12 +18,12 @@
 #include "smoke.h"
 #include "Specific\prng.h"
 #include "Renderer11.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "items.h"
 
-using namespace TEN::Effects::Fire;
 using TEN::Renderer::g_Renderer;
-using TEN::Effects::Explosion::TriggerExplosion;
+using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
@@ -291,7 +291,7 @@ void UpdateSparks()
 			int ds = dl * (spark->dSize - spark->sSize);
 			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
-			spark->size = lerp(spark->sSize, spark->dSize,alpha );
+			spark->size = lerp(spark->sSize, spark->dSize, alpha);
 
 			if (spark->flags & SP_FIRE && !Lara.burn || spark->flags & SP_DAMAGE)
 			{
@@ -304,7 +304,7 @@ void UpdateSparks()
 						if (spark->z + ds > DeadlyBounds[4] && spark->z - ds < DeadlyBounds[5])
 						{
 							if (spark->flags & SP_FIRE)
-								LaraBurn();
+								LaraBurn(LaraItem);
 							else
 								LaraItem->hitPoints -= 2;
 						}
@@ -1002,7 +1002,7 @@ void UpdateSplashes()
 	}
 }
 
-void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID, float rotation)
+void SetupRipple(int x, int y, int z, float size, char flags, unsigned int spriteID, float rotation)
 {
 	RIPPLE_STRUCT* ripple;
 	int i;

@@ -9,6 +9,7 @@ struct COLL_INFO;
 #define LARA_LEAN_MAX ANGLE(11.0f)
 #define LARA_LEAN_DASH_MAX ANGLE(16.0f)
 #define LARA_TURN_RATE ANGLE(2.25f)
+#define SUB_SUIT_TURN_RATE ANGLE(0.75f)
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_SLOW_TURN ANGLE(4.0f)
 #define LARA_MED_TURN  ANGLE(6.0f)
@@ -29,6 +30,10 @@ constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_VELOCITY = 12;
 
+constexpr auto LARA_HEALTH_MAX = 1000.0f;
+constexpr auto LARA_AIR_MAX = 1800.0f;
+constexpr auto LARA_SPRINT_MAX = 120.0f;
+
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
 extern COLL_INFO LaraCollision;
@@ -42,7 +47,7 @@ extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
 extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
-void LaraControl(short itemNumber);
+void LaraControl(ITEM_INFO* item, COLL_INFO* coll);
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll);
