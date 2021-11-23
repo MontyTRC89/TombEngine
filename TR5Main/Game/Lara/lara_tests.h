@@ -40,6 +40,7 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist);
 COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h);
 COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h);
 
+bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
@@ -53,10 +54,8 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
 
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);
-#endif // !NEW_TIGHTROPE
+#endif
 
-// TODO: New, organise later.
-bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
@@ -86,4 +85,3 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraDrawWeaponsFromCrawlIdle(ITEM_INFO* item);

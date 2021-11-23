@@ -19,11 +19,6 @@ struct COLL_INFO;
 #define LARA_CRAWL_TURN ANGLE(2.0f)
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
 
-// TODO: In the future, the player model should be probed for the number of bones between the hips (exclusive) and head (inclusive).
-// Divide the flex angle by the number of bones to be flexed, and apply the result to each bone. @Sezz
-#define LARA_CRAWL_FLEX ANGLE(30.0f) / 2		// 2 = hardcoded number of bones to flex.
-#define LARA_SWIM_FLEX ANGLE(24.0f) / 2
-
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY = 600;		// Lara height in monkey swing states.

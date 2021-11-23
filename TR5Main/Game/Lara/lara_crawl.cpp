@@ -385,7 +385,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(info->gunType) &&
-			TestLaraDrawWeaponsFromCrawlIdle(item)))
+			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
 			info->gunStatus = LG_NO_ARMS;
 			item->goalAnimState = LS_CROUCH_IDLE;
@@ -512,19 +512,12 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		info->turnRate -= LARA_TURN_RATE;
 		if (info->turnRate < -LARA_SLOW_TURN)
 			info->turnRate = -LARA_SLOW_TURN;
-
-		// TODO: Flexing.
-		/*info->headZrot -= (info->headZrot + LARA_CRAWL_FLEX) / 12;
-		info->torsoZrot = info->headZrot;*/
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
 		if (info->turnRate > LARA_SLOW_TURN)
 			info->turnRate = LARA_SLOW_TURN;
-
-		/*info->headZrot += (LARA_CRAWL_FLEX - info->headZrot) / 12;
-		info->torsoZrot = info->headZrot;*/
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&

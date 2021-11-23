@@ -1071,14 +1071,6 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += item->pos.zRot / -8;
 	}
 
-	// LEGACY
-	/*if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
-		item->pos.zRot = 0;
-	else if (item->pos.zRot < 0)
-		item->pos.zRot += ANGLE(2.0f);
-	else
-		item->pos.zRot -= ANGLE(2);*/
-
 	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
 		LaraWaterCurrent(coll);
 

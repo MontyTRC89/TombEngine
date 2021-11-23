@@ -44,13 +44,10 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Height difference is below threshold for step dispatch or step animation doesn't exist; translate Lara to new floor height.
-	// TODO: Follow cube root curve instead of doing this ugly thing.
 	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
-	// Leg IK may correct for it, but until I get that working, for any future developments that see Lara phasing below the floor:
-	// 1) comment everything below except the first and last conditions,
-	// 2) uncomment the legacy blocks of code in run, sprint, and wade forward collision functions, and
-	// 3) comment the blocks above them which call this function. @Sezz 2021.11.13
-	int div = 2;
+	int div = 2; // 3?
+	int linearRate = 50;
+	int threshold = STEP_SIZE / 8;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
 		if (TestLaraSwamp(item) &&
@@ -59,15 +56,15 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.yPos += SWAMP_GRAVITY;
 		}
 		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Inner range.
-			abs(coll->Middle.Floor) >= div)
+			abs(coll->Middle.Floor) > threshold)
 		{
-			if (coll->Middle.Floor <= 50)			// Lower floor range.
-				item->pos.yPos -= 50;
-			else if (coll->Middle.Floor >= -50)		// Upper floor range.
-				item->pos.yPos += 50;
+			if (coll->Middle.Floor <= linearRate)			// Lower floor range.
+				item->pos.yPos -= linearRate;
+			else if (coll->Middle.Floor >= -linearRate)		// Upper floor range.
+				item->pos.yPos += linearRate;
 		}
 		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Outer range.
-			abs(coll->Middle.Floor) >= div)
+			abs(coll->Middle.Floor) > threshold)
 		{
 			item->pos.yPos += coll->Middle.Floor / div;
 		}
@@ -138,8 +135,6 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
 	}
 }
 
-// TODO: State dispatch to a new LS_FALL state. The issue is that goal states set in collision functions are only actuated on the following
-// frame, resulting in an unacceptable delay. Changing the order in which routine functions are executed is not a viable solution. @Sezz 2021.09.26
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
