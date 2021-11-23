@@ -12,10 +12,10 @@
 #include "weather.h"
 #include "Specific/setup.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "items.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 
@@ -154,7 +154,7 @@ namespace TEN::Entities::Effects
 						SQUARE(LaraItem->pos.zPos - item->pos.zPos) < SQUARE(512))
 					&& Lara.waterStatus != LW_FLYCHEAT)
 				{
-					LaraBurn();
+					LaraBurn(LaraItem);
 				}
 			}
 		}
@@ -628,7 +628,7 @@ namespace TEN::Entities::Effects
 						int dz = LaraItem->pos.zPos - item->pos.zPos;
 
 						if (SQUARE(dx) + SQUARE(dz) < SQUARE(450))
-							LaraBurn();
+							LaraBurn(LaraItem);
 					}
 				}
 			}

@@ -225,7 +225,7 @@ void DisableBubbles();
 void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
-void TriggerLaraDrips();
+void TriggerLaraDrips(ITEM_INFO* item);
 
 constexpr auto EXPLODE_HIT_EFFECT = 258;
 constexpr auto EXPLODE_NORMAL = 256;

@@ -13,9 +13,9 @@
 #include "Sound/sound.h"
 #include "tr5_laserhead_info.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
 struct LASER_HEAD_STRUCT
@@ -568,7 +568,7 @@ void LaserHeadControl(short itemNumber)
 
 											if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 											{
-												LaraBurn();
+												LaraBurn(LaraItem);
 												Lara.burnCount = 48;
 												Lara.burnBlue = 2;
 												LaraItem->hitPoints = 0;
