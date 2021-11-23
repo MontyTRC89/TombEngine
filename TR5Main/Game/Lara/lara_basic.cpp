@@ -168,15 +168,6 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (LaraDeflectEdge(item, coll))
-	{
-		item->goalAnimState = LS_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->animNumber]))
-			return;
-
-		LaraCollideStop(item, coll);
-	}
-
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
@@ -189,6 +180,15 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraVault(item, coll))
 		return;
+
+	if (LaraDeflectEdge(item, coll))
+	{
+		item->goalAnimState = LS_SPLAT;
+		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			return;
+
+		LaraCollideStop(item, coll);
+	}
 
 	if (TestLaraStep(coll) &&
 		coll->CollisionType != CT_FRONT)
@@ -315,6 +315,19 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	if (TestLaraFall(item, coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+		return;
+
+	if (TestLaraVault(item, coll))
+		return;
+
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->pos.zRot = 0;
@@ -332,19 +345,6 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		LaraCollideStop(item, coll);
 	}
-
-	if (TestLaraFall(item, coll))
-	{
-		SetLaraFallState(item);
-
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
-		return;
-
-	if (TestLaraVault(item, coll))
-		return;
 
 	if (TestLaraStep(coll) &&
 		coll->CollisionType != CT_FRONT)
@@ -817,9 +817,6 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
 	if (coll->Middle.Floor > STEPUP_HEIGHT / 2)
 	{
 		SetLaraFallBackState(item);
@@ -829,6 +826,9 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 		return;
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
 
 	if (TestLaraStep(coll))
 	{
@@ -1519,9 +1519,6 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
@@ -1531,6 +1528,9 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 		return;
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
 
 	if (TestLaraStep(coll))
 	{
@@ -1867,9 +1867,6 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
@@ -1879,6 +1876,9 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 		return;
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
 
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
@@ -1953,9 +1953,6 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
@@ -1965,6 +1962,9 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 		return;
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
 
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
@@ -2220,6 +2220,9 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	if (TestLaraVault(item, coll))
+		return;
+
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->pos.zRot = 0;
@@ -2235,9 +2238,6 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 		LaraCollideStop(item, coll);
 	}
-
-	if (TestLaraVault(item, coll))
-		return;
 
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
@@ -2349,7 +2349,14 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestLaraFall(item, coll))
+	{
+		SetLaraFallState(item);
+
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -2369,14 +2376,7 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraFall(item, coll))
-	{
-		SetLaraFallState(item);
-
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
+	if (TestLaraVault(item, coll))
 		return;
 
 	if (TestLaraStep(coll))
