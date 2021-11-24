@@ -605,27 +605,44 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+	auto bounds = GetBoundsAccurate(item);
+	auto realHeight = bounds->Y2 - bounds->Y1;
 
 	/*state 52*/
 	/*state code: lara_as_swandive*/
 	info->moveAngle = item->pos.yRot;
-
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	coll->Setup.Height = (realHeight <= (LARA_HEIGHT / 3 * 2)) ? LARA_HEIGHT_CRAWL : LARA_HEIGHT;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
+
 	LaraDeflectEdgeJump(item, coll);
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
-		item->goalAnimState = LS_STOP;
+		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
+
+		if (info->keepCrouched ||
+			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT)
+		{
+			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
+
+			if (!info->keepCrouched) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
+			{
+				item->pos.xPos += (STEP_SIZE / 2) * phd_sin(coll->Setup.ForwardAngle);
+				item->pos.zPos += (STEP_SIZE / 2) * phd_cos(coll->Setup.ForwardAngle);
+			}
+		}
+		else [[likely]]
+			item->goalAnimState = LS_STOP;
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
+		info->gunStatus = LG_NO_ARMS;
 
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraSnapToHeight(item, coll);
 	}
 }
 
