@@ -860,20 +860,17 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	GetCollisionInfo(coll, item); // HACK: Lara may step off poles in mid-air upon reload without this.
 	if (coll->Middle.Floor <= 0)
-	{
 		item->goalAnimState = LS_STOP;
-
-		return;
-	}
-
-	// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-	if (item->animNumber == LA_POLE_IDLE)
+	else
 	{
+		item->goalAnimState = LS_FREEFALL;
+
+		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
 		item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
 		item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
 	}
-	item->goalAnimState = LS_FREEFALL;
 }
 
 // State:		LS_POLE_IDLE (99)
