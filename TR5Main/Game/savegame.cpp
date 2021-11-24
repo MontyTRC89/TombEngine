@@ -281,6 +281,7 @@ bool SaveGame::Save(int slot)
 	lara.add_is_ducked(Lara.isDucked);
 	lara.add_is_moving(Lara.isMoving);
 	lara.add_item_number(Lara.itemNumber);
+	lara.add_jump_count(Lara.jumpCount);
 	lara.add_keep_crouched(Lara.keepCrouched);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
@@ -329,6 +330,7 @@ bool SaveGame::Save(int slot)
 	lara.add_silencer(Lara.Silencer);
 	lara.add_small_waterskin(Lara.small_waterskin);
 	lara.add_spaz_effect_count(Lara.spazEffectCount);
+	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
 	lara.add_torch(Lara.Torch);
@@ -1191,6 +1193,7 @@ bool SaveGame::Load(int slot)
 	Lara.isDucked = s->lara()->is_ducked();
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
+	Lara.jumpCount = s->lara()->jump_count();
 	Lara.keepCrouched = s->lara()->keep_crouched();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
@@ -1249,6 +1252,7 @@ bool SaveGame::Load(int slot)
 	Lara.Silencer = s->lara()->silencer();
 	Lara.small_waterskin = s->lara()->small_waterskin();
 	Lara.spazEffectCount = s->lara()->spaz_effect_count();
+	Lara.sprintTimer = s->lara()->sprint_timer();
 	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
 	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
 	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
