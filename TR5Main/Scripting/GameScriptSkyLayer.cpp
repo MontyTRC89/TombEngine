@@ -1,5 +1,7 @@
 #include "framework.h"
+#include <sol.hpp>
 #include "GameScriptSkyLayer.h"
+
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
 
