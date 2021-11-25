@@ -621,12 +621,16 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraDeflectEdgeJump(item, coll);
 
+	// TODO: LUA.
+	info->NewAnims.CrawlspaceSwandive = true;
+
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
 
 		if (info->keepCrouched ||
-			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT)
+			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
+			info->NewAnims.CrawlspaceSwandive)
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
