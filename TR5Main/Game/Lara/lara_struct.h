@@ -978,20 +978,21 @@ struct LARA_ARM
 
 struct AnimsNew
 {
-	bool Pose;						// Crossed arms AFK
-	bool CrawlExtended;				// Extended crawl meneuverability
-	bool CrouchRoll;				// Crouch roll
-	bool FeetHang;					// LAU-style ledge hanging with legs
+	bool Pose;						// Crossed arms AFK.
+	bool CrawlExtended;				// Extended crawl meneuverability.
+	bool CrawlspaceSwandive;		// Swandive into crawlspaces.
+	bool CrouchRoll;				// Crouch roll.
+	bool FeetHang;					// LAU-style ledge hanging with legs.
 
 	// This will have to be default. LD can copy the monkey swing-in anim if they're that set on annoying the player.
 	// Mechanics specific to the monkey swing shouldn't mix with ledge hanging as bugs can occur.
-	bool OscillateHanging;			// TR1/2 hang on thin ledge
+	bool OscillateHanging;			// TR1/2 hang on thin ledge.
 
 	// Why?? This should be a player setting.
-	bool MonkeyAutoJump;			// Auto jump to monkey swing
+	bool MonkeyAutoJump;			// Auto jump to monkey swing.
 
 	// This shouldn't be up to the LD.
-	bool Monkey180Turn;				// Monkey swing 180 turn
+	bool Monkey180Turn;				// Monkey swing 180 turn.
 };
 
 #ifdef NEW_TIGHTROPE
