@@ -1,4 +1,5 @@
 #include "framework.h"
+#include <sol.hpp>
 #include "GameScriptDisplayString.h"
 #include "ScriptAssert.h"
 #include "ReservedScriptNames.h"

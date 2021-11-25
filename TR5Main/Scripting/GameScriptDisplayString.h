@@ -1,5 +1,7 @@
 #pragma once
 #include "framework.h"
+#include <variant>
+#include <sol.hpp>
 #include "GameScriptColor.h"
 
 enum class DisplayStringOptions : size_t
