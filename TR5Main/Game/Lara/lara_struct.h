@@ -979,7 +979,7 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool Pose;						// Crossed arms AFK.
-	bool CrawlExtended;				// Extended crawl meneuverability.
+	bool CrawlExtended;				// Extended crawl maneuverability.
 	bool CrawlspaceSwandive;		// Swandive into crawlspaces.
 	bool CrouchRoll;				// Crouch roll.
 	bool FeetHang;					// LAU-style ledge hanging with legs.
