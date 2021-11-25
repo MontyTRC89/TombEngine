@@ -385,7 +385,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->animNumber == LA_LADDER_IDLE)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.moveAngle = item->pos.yRot + ANGLE(180);
 		}
 	}
@@ -980,7 +980,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = true;
 	item->fallspeed = 1;
 
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 
 	return 1;
 }

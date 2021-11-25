@@ -302,7 +302,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			laraInfo->Vehicle = NO_ITEM;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 		}
 		else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF &&
 			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara, lara->animNumber)))
@@ -328,7 +328,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			lara->gravityStatus = true;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->moveAngle = skidoo->pos.yRot;
 			skidoo->flags |= ONESHOT;
 			skidoo->collidable = false;
@@ -618,7 +618,7 @@ int SkidooCheckGetOn(ITEM_INFO* lara, ITEM_INFO* skidoo, COLL_INFO* coll)
 	int mountType = 0;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_NO_ARMS ||
+		laraInfo->gunStatus != LG_HANDS_FREE ||
 		lara->gravityStatus)
 	{
 		return mountType = 0;
@@ -668,7 +668,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 		undraw_flare_meshes(lara);
 		laraInfo->flareControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
-		laraInfo->gunStatus = LG_NO_ARMS;
+		laraInfo->gunStatus = LG_HANDS_FREE;
 	}
 
 	if (mountType == 1)

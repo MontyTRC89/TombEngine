@@ -34,16 +34,16 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_FORWARD;
 
 	if (item->goalAnimState != LS_DEATH &&
-		item->goalAnimState != LS_STOP &&
+		item->goalAnimState != LS_IDLE &&
 		item->goalAnimState != LS_RUN_FORWARD)
 	{
-		if (info->gunStatus == LG_NO_ARMS && TrInput & IN_ACTION)
+		if (info->gunStatus == LG_HANDS_FREE && TrInput & IN_ACTION)
 			item->goalAnimState = LS_REACH;
 
 		if (TrInput & IN_BACK || TrInput & IN_ROLL)
 			item->goalAnimState = LS_JUMP_ROLL_180;
 
-		if (info->gunStatus == LG_NO_ARMS && TrInput & IN_WALK)
+		if (info->gunStatus == LG_HANDS_FREE && TrInput & IN_WALK)
 			item->goalAnimState = LS_SWANDIVE_START;
 
 		if (item->fallspeed > LARA_FREEFALL_SPEED)
@@ -98,14 +98,14 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (info->waterStatus == LW_WADE)
 			{
-				item->goalAnimState = LS_STOP;
+				item->goalAnimState = LS_IDLE;
 			}
 			else
 			{
 				if (TrInput & IN_FORWARD && !(TrInput & IN_STEPSHIFT))
 					item->goalAnimState = LS_RUN_FORWARD;
 				else
-					item->goalAnimState = LS_STOP;
+					item->goalAnimState = LS_IDLE;
 			}
 		}
 
@@ -204,7 +204,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 			item->fallspeed = 0;
 			item->gravityStatus = false;
 			if (coll->Middle.Floor != NO_HEIGHT)
@@ -217,7 +217,7 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 14*/
 	/*state code: lara_void_func*/
-	lara_col_stop(item, coll);
+	lara_col_idle(item, coll);
 }
 
 // State:		LS_JUMP_PREPARE (15)
@@ -351,9 +351,9 @@ void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (item->goalAnimState == LS_RUN_FORWARD)
 		{
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 		}
-		else if ((TrInput & IN_FORWARD || TrInput & IN_ROLL) && item->goalAnimState != LS_STOP)
+		else if ((TrInput & IN_FORWARD || TrInput & IN_ROLL) && item->goalAnimState != LS_IDLE)
 		{
 			item->goalAnimState = LS_JUMP_ROLL_180;
 		}
@@ -383,7 +383,7 @@ void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
-	else if (TrInput & IN_LEFT && item->goalAnimState != LS_STOP)
+	else if (TrInput & IN_LEFT && item->goalAnimState != LS_IDLE)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 }
 
@@ -406,7 +406,7 @@ void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
-	else if (TrInput & IN_RIGHT && item->goalAnimState != LS_STOP)
+	else if (TrInput & IN_RIGHT && item->goalAnimState != LS_IDLE)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 }
 
@@ -439,7 +439,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
 		else
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
@@ -471,7 +471,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_upjump*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
@@ -517,7 +517,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
-		item->goalAnimState = LaraLandedBad(item, coll) ? LS_DEATH : LS_STOP;
+		item->goalAnimState = LaraLandedBad(item, coll) ? LS_DEATH : LS_IDLE;
 
 		item->gravityStatus = false;
 		item->fallspeed = 0;
@@ -537,7 +537,7 @@ void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 
 	if (TrInput & IN_ACTION)
-		if (info->gunStatus == LG_NO_ARMS)
+		if (info->gunStatus == LG_HANDS_FREE)
 			item->goalAnimState = LS_REACH;
 }
 
@@ -562,7 +562,7 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
 		else
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 
 		LaraResetGravityStatus(item, coll);
 		LaraSnapToHeight(item, coll);
@@ -637,10 +637,10 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		else [[likely]]
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 
 		LaraSnapToHeight(item, coll);
 	}
@@ -676,7 +676,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		if (item->fallspeed <= 133)
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 		else
 			item->goalAnimState = LS_DEATH;
 

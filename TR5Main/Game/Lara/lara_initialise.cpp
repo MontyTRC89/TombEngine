@@ -61,7 +61,7 @@ void InitialiseLara(int restore)
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = LARA_HEALTH_MAX;
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 	memset(&Lara.NewAnims, 0, sizeof(AnimsNew));	//make sure script changes these AFTER Lara is initialized?
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;
@@ -127,7 +127,7 @@ void LaraInitialiseMeshes()
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	}
 
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.target = NULL;

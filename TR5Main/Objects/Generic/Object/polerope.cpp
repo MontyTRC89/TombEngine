@@ -32,7 +32,7 @@ namespace TEN::Entities::Generic
 
 		if ((TrInput & IN_ACTION)
 			&& !Lara.gunStatus
-			&& l->currentAnimState == LS_STOP
+			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			|| Lara.isMoving
 			&& Lara.interactedItem == itemNumber)
@@ -61,7 +61,7 @@ namespace TEN::Entities::Generic
 				if (Lara.isMoving && Lara.interactedItem == itemNumber)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->pos.yRot = rot;
 			}

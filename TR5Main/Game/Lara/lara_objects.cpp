@@ -50,7 +50,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetDistance = WALL_SIZE;
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 }
 
 // ------
@@ -196,7 +196,7 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(75.0f);
 
 	if (!(TrInput & IN_ACTION))
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 }
 
 // ------
@@ -218,7 +218,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION && pulley->triggerFlags)
 		item->goalAnimState = LS_PULLEY;
 	else
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 
 	if (item->animNumber == LA_PULLEY_PULL &&
 		item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 44)
@@ -253,7 +253,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->animNumber == LA_PULLEY_RELEASE &&
 		item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 	}
 }
 
@@ -862,7 +862,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item); // HACK: Lara may step off poles in mid-air upon reload without this.
 	if (coll->Middle.Floor <= 0)
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 	else if (item->animNumber == LA_POLE_IDLE)
 	{
 		item->goalAnimState = LS_FREEFALL;

@@ -25,7 +25,7 @@ bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		item->speed = 0;
 		item->gravityStatus = false;
 
@@ -173,7 +173,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 {
 	switch (coll->Setup.OldAnimState)
 	{
-	case LS_STOP:
+	case LS_IDLE:
 	case LS_TURN_RIGHT_SLOW:
 	case LS_TURN_LEFT_SLOW:
 	case LS_TURN_RIGHT_FAST:
@@ -187,14 +187,14 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TrInput & IN_RIGHT)
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		else
-			item->goalAnimState = LS_STOP;
+			item->goalAnimState = LS_IDLE;
 
 		AnimateLara(item);
 
 		break;
 
 	default:
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 
 		if (item->animNumber != LA_STAND_SOLID)
 			SetAnimation(item, LA_STAND_SOLID);

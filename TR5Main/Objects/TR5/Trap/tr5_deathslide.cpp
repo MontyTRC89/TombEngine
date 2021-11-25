@@ -25,7 +25,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_NO_ARMS || l->currentAnimState != LS_STOP)
+	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_HANDS_FREE || l->currentAnimState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

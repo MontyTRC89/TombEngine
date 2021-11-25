@@ -37,7 +37,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_RUN_FORWARD;
 				}
 				else
-					item->goalAnimState = LS_STOP;
+					item->goalAnimState = LS_IDLE;
 
 				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			}

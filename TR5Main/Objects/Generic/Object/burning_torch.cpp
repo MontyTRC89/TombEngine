@@ -111,7 +111,7 @@ namespace TEN::Entities::Generic
 					Lara.leftArm.lock = false;
 					Lara.gunType = Lara.lastGunType;
 					Lara.requestGunType = WEAPON_NONE;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				else if (Lara.leftArm.frameNumber == 12)
 				{
@@ -131,7 +131,7 @@ namespace TEN::Entities::Generic
 				Lara.leftArm.lock = false;
 				Lara.lastGunType = WEAPON_NONE;
 				Lara.gunType = WEAPON_NONE;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 			else if (Lara.leftArm.frameNumber == 36)
 			{
@@ -293,7 +293,7 @@ namespace TEN::Entities::Generic
 			|| Lara.litTorch == (item->status == ITEM_ACTIVE)
 			|| item->timer == -1
 			|| !(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_STOP
+			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| l->gravityStatus)
 		{
