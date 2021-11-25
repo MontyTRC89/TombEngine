@@ -1,5 +1,7 @@
 #pragma once
 #include "framework.h"
+#include <sol.hpp>
+
 class LuaHandler {
 protected:
 	sol::state*	m_lua;
