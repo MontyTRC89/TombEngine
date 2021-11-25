@@ -1,4 +1,5 @@
 #include "framework.h"
+#include <sol.hpp>
 #include "ScriptAssert.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptPosition.h"
