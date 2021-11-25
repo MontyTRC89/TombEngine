@@ -43,10 +43,10 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	// Height difference is below threshold for step dispatch or step animation doesn't exist; translate Lara to new floor height.
-	// TODO: This might cause underirable artefacts where an object pushes Lara rapidly up a slope or a platform ascends.
+	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
+	// TODO: This approach might cause underirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	int div = 2; // 3?
-	int linearRate = 50;
+	int rate = 50;
 	int threshold = STEP_SIZE / 8;
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
@@ -55,15 +55,15 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += SWAMP_GRAVITY;
 		}
-		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Inner range.
+		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2) &&		// Outer range.
 			abs(coll->Middle.Floor) > threshold)
 		{
-			if (coll->Middle.Floor <= linearRate)			// Lower floor range.
-				item->pos.yPos -= linearRate;
-			else if (coll->Middle.Floor >= -linearRate)		// Upper floor range.
-				item->pos.yPos += linearRate;
+			if (coll->Middle.Floor <= rate)				// Lower floor range.
+				item->pos.yPos -= rate;
+			else if (coll->Middle.Floor >= -rate)		// Upper floor range.
+				item->pos.yPos += rate;
 		}
-		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Outer range.
+		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
 			abs(coll->Middle.Floor) > threshold)
 		{
 			item->pos.yPos += coll->Middle.Floor / div;

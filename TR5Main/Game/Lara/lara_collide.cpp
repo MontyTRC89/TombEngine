@@ -190,15 +190,14 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_STOP;
 
 		AnimateLara(item);
+
 		break;
 
 	default:
 		item->goalAnimState = LS_STOP;
 
 		if (item->animNumber != LA_STAND_SOLID)
-		{
 			SetAnimation(item, LA_STAND_SOLID);
-		}
 
 		break;
 	}

@@ -863,7 +863,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item); // HACK: Lara may step off poles in mid-air upon reload without this.
 	if (coll->Middle.Floor <= 0)
 		item->goalAnimState = LS_STOP;
-	else
+	else if (item->animNumber == LA_POLE_IDLE)
 	{
 		item->goalAnimState = LS_FREEFALL;
 
@@ -888,6 +888,7 @@ void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
+	// TODO: There's a visible snap if Lara hits the ground at a high velocity.
 	if (coll->Middle.Floor < 0)
 		item->pos.yPos += coll->Middle.Floor;
 }
@@ -1004,7 +1005,7 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->itemFlags[2] = 0; // ??
+		item->itemFlags[2] = 0; // Vertical velocity.
 		item->goalAnimState = LS_POLE_IDLE;
 
 		return;
