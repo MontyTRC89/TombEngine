@@ -172,7 +172,7 @@ void ShootRightGun(ITEM_INFO* item)
 
 void LaraHandsFree(ITEM_INFO* item)
 {
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 }
 
 void KillActiveBaddies(ITEM_INFO* item)

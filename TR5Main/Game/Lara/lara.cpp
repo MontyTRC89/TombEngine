@@ -55,14 +55,14 @@ byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
 {
-	lara_as_walk,
-	lara_as_run,
-	lara_as_stop,
+	lara_as_walk_forward,
+	lara_as_run_forward,
+	lara_as_idle,
 	lara_as_forwardjump,
 	lara_as_pose,//4
-	lara_as_fastback,//5
-	lara_as_turn_r,//6
-	lara_as_turn_l,//7
+	lara_as_run_back,//5
+	lara_as_turn_right_slow,//6
+	lara_as_turn_left_slow,//7
 	lara_as_death,//8
 	lara_as_fastfall,
 	lara_as_hang,
@@ -71,14 +71,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_tread,
 	lara_void_func,
 	lara_as_compress,//15
-	lara_as_back,//16
+	lara_as_walk_back,//16
 	lara_as_swim,//17
 	lara_as_glide,//18
 	lara_as_controlledl,//19
 	lara_as_turn_right_fast,//20
-	lara_as_stepright,//21
-	lara_as_stepleft,//22
-	lara_as_roll2,
+	lara_as_step_right,//21
+	lara_as_step_left,//22
+	lara_as_roll_back,
 	lara_as_slide,//24
 	lara_as_backjump,//25
 	lara_as_rightjump,//26
@@ -100,7 +100,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_usekey,//42
 	lara_as_usepuzzle,//43
 	lara_as_uwdeath,//44
-	lara_as_roll,//45
+	lara_as_roll_forward,//45
 	lara_as_special,//46
 	lara_as_surfback,//47
 	lara_as_surfleft,//48
@@ -120,7 +120,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_as_wade,//65
+	lara_as_wade_forward,//65
 	lara_as_waterroll,//66
 	lara_as_pickupflare,//67
 	lara_void_func,//68
@@ -128,8 +128,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_deathslide,//70
 	lara_as_crouch_idle,//71
 	lara_as_crouch_roll,//72
-	lara_as_dash,
-	lara_as_dashdive,
+	lara_as_sprint,
+	lara_as_sprint_roll,
 	lara_as_hang2,
 	lara_as_monkeyswing,
 	lara_as_monkeyl,
@@ -218,14 +218,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
-	lara_col_walk,
-	lara_col_run,
-	lara_col_stop,
+	lara_col_walk_forward,
+	lara_col_run_forward,
+	lara_col_idle,
 	lara_col_forwardjump,
 	lara_col_pose,
-	lara_col_fastback,
-	lara_col_turn_r,
-	lara_col_turn_l,
+	lara_col_run_back,
+	lara_col_turn_right_slow,
+	lara_col_turn_left_slow,
 	lara_col_death,
 	lara_col_fastfall,
 	lara_col_hang,
@@ -234,14 +234,14 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_tread,
 	lara_col_land,
 	lara_col_compress,
-	lara_col_back,
+	lara_col_walk_back,
 	lara_col_swim,
 	lara_col_glide,
 	lara_default_col,
 	lara_col_turn_right_fast,
-	lara_col_stepright,
-	lara_col_stepleft,
-	lara_col_roll2,
+	lara_col_step_right,
+	lara_col_step_left,
+	lara_col_roll_back,
 	lara_col_slide,
 	lara_col_backjump,
 	lara_col_rightjump,
@@ -263,7 +263,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col,
 	lara_default_col,
 	lara_col_uwdeath,
-	lara_col_roll,
+	lara_col_roll_forward,
 	lara_void_func,
 	lara_col_surfback,
 	lara_col_surfleft,
@@ -283,7 +283,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_wade,
+	lara_col_wade_forward,
 	lara_col_waterroll,
 	lara_default_col,
 	lara_void_func,
@@ -291,8 +291,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_col_crouch_idle,
 	lara_col_crouch_roll,
-	lara_col_dash,
-	lara_col_dashdive,
+	lara_col_sprint,
+	lara_col_sprint_roll,
 	lara_col_hang2,
 	lara_col_monkeyswing,
 	lara_col_monkeyl,
@@ -400,7 +400,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		if (Lara.moveCount > 90)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 
 		++Lara.moveCount;
@@ -414,12 +414,12 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	int oldZ = item->pos.zPos;
 
 	if (Lara.gunStatus == LG_HANDS_BUSY &&
-		item->currentAnimState == LS_STOP &&
-		item->goalAnimState == LS_STOP &&
+		item->currentAnimState == LS_IDLE &&
+		item->goalAnimState == LS_IDLE &&
 		item->animNumber == LA_STAND_IDLE &&
 		!item->gravityStatus)
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	if (item->currentAnimState != LS_SPRINT && Lara.sprintTimer < LARA_SPRINT_MAX)
@@ -508,7 +508,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.waterStatus = LW_WADE;
 
 				if (!item->gravityStatus)
-					item->goalAnimState = LS_STOP;
+					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
 				{
 					if (item->currentAnimState == LS_SWANDIVE_START ||
@@ -863,7 +863,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Reset running jump timer.
-	if (item->currentAnimState != LS_RUN_FORWARD &&
+	if (info->jumpCount < LARA_JUMP_TIME &&
+		item->currentAnimState != LS_RUN_FORWARD &&
 		item->currentAnimState != LS_WALK_FORWARD &&
 		item->currentAnimState != LS_JUMP_FORWARD)
 	{
@@ -1119,7 +1120,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
 		}
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 		LaraInitialiseMeshes();
 		LaraItem->hitPoints = 1000;
 	}
@@ -1164,7 +1165,7 @@ void AnimateLara(ITEM_INFO* item)
 
 				case COMMAND_ATTACK_READY:
 					if (Lara.gunStatus != LG_SPECIAL)
-						Lara.gunStatus = LG_NO_ARMS;
+						Lara.gunStatus = LG_HANDS_FREE;
 					break;
 
 				case COMMAND_SOUND_FX:

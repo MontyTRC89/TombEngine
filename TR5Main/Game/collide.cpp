@@ -833,7 +833,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	if (item == LaraItem && Lara.isMoving && Lara.moveCount > 15)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return true;
@@ -956,7 +956,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 	if (item2 == LaraItem && Lara.isMoving && Lara.moveCount > 15)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return true;
@@ -1194,7 +1194,7 @@ bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	if (Lara.isMoving)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return false;

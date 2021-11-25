@@ -332,7 +332,7 @@ static int GetOnSub(short item_number, COLL_INFO* coll)
 	l = LaraItem;
 	v = &g_Level.Items[item_number];
 
-	if ((!(TrInput & IN_ACTION)) || (Lara.gunStatus != LG_NO_ARMS) || (l->gravityStatus))
+	if ((!(TrInput & IN_ACTION)) || (Lara.gunStatus != LG_HANDS_FREE) || (l->gravityStatus))
 		return 0;
 
 	y = abs(l->pos.yPos - (v->pos.yPos - 128));
@@ -698,7 +698,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			UpdateItemRoom(l, 0);
 
 			Lara.waterStatus = LW_UNDERWATER;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.Vehicle = NO_ITEM;
 
 			v->hitPoints = 0;
@@ -742,7 +742,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			Lara.diveCount = 11;
 			Lara.torsoXrot = Lara.torsoYrot = 0;
 			Lara.headXrot = Lara.headYrot = 0;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.Vehicle = NO_ITEM;
 
 			v->hitPoints = 0;

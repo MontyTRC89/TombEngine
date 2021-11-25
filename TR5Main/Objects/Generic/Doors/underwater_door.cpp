@@ -73,7 +73,7 @@ namespace TEN::Entities::Doors
 				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				l->pos.yRot ^= ANGLE(180);
 			}

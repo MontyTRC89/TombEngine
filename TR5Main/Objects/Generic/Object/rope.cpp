@@ -187,7 +187,7 @@ namespace TEN::Entities::Generic
 		rope = &Ropes[item->triggerFlags];
 		
 		if (TrInput & IN_ACTION 
-			&& Lara.gunStatus == LG_NO_ARMS 
+			&& Lara.gunStatus == LG_HANDS_FREE 
 			&& (l->currentAnimState == LS_REACH
 				|| l->currentAnimState == LS_JUMP_UP) 
 			&& l->gravityStatus 
@@ -643,7 +643,7 @@ namespace TEN::Entities::Generic
 			item->pos.xRot = 0;
 			item->gravityStatus = true;
 
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 
 			if (item->frameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
 			{
@@ -680,7 +680,7 @@ namespace TEN::Entities::Generic
 		item->fallspeed = 0;
 		item->gravityStatus = true;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.ropePtr = -1;
 	}
 

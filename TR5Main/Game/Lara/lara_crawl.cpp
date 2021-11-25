@@ -61,7 +61,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_SPRINT &&
 			TestLaraCrouchRoll(item, coll) &&
-			info->gunStatus == LG_NO_ARMS &&
+			info->gunStatus == LG_HANDS_FREE &&
 			info->NewAnims.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
@@ -95,7 +95,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_STOP;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CROUCH_IDLE (71)
@@ -119,7 +119,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
 
 		return;
@@ -192,7 +192,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 		item->speed /= 3;				// Truncate speed to prevent flying off.
 		SetLaraFallState(item);
 
@@ -272,7 +272,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_STOP;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (105)
@@ -335,7 +335,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_STOP;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
@@ -387,7 +387,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 			!IsStandingWeapon(info->gunType) &&
 			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
-			info->gunStatus = LG_NO_ARMS;
+			info->gunStatus = LG_HANDS_FREE;
 			item->goalAnimState = LS_CROUCH_IDLE;
 
 			return;
@@ -446,7 +446,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->gunStatus = LG_NO_ARMS;
+	info->gunStatus = LG_HANDS_FREE;
 	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
@@ -475,7 +475,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
 
 		return;
@@ -585,7 +585,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
 
 		return;
@@ -692,7 +692,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
 
 		return;

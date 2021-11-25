@@ -86,7 +86,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_NO_ARMS)
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
 		return false;
 
 	if (TestLaraSwamp(item) && info->waterSurfaceDist < -(WALL_SIZE - STEP_SIZE))
@@ -128,7 +128,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GetFrameNumber(item, 0);
-				item->goalAnimState = LS_STOP;
+				item->goalAnimState = LS_IDLE;
 				item->pos.yPos += coll->Front.Floor + (STEP_SIZE * 2);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
@@ -160,7 +160,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GetFrameNumber(item, 0);
-				item->goalAnimState = LS_STOP;
+				item->goalAnimState = LS_IDLE;
 				item->pos.yPos += coll->Front.Floor + (WALL_SIZE - STEP_SIZE);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
@@ -187,7 +187,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_STOP;
+			item->currentAnimState = LS_IDLE;
 			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
 			AnimateLara(item);
 			success = true;
@@ -217,7 +217,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					item->animNumber = LA_STAND_SOLID;
 					item->frameNumber = GetFrameNumber(item, 0);
 					item->goalAnimState = LS_LADDER_IDLE;
-					item->currentAnimState = LS_STOP;
+					item->currentAnimState = LS_IDLE;
 					info->gunStatus = LG_HANDS_BUSY;
 					info->turnRate = 0;
 
@@ -236,7 +236,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
-		item->currentAnimState = LS_STOP;
+		item->currentAnimState = LS_IDLE;
 		info->calcFallSpeed = -116;
 		info->turnRate = 0;
 		
@@ -419,7 +419,7 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_NO_ARMS) || (coll->HitStatic))
+	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_HANDS_FREE) || (coll->HitStatic))
 		return false;
 
 	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
@@ -489,7 +489,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_NO_ARMS) || (coll->HitStatic))
+	if (!(TrInput & IN_ACTION) || (Lara.gunStatus != LG_HANDS_FREE) || (coll->HitStatic))
 		return false;
 
 	if (Lara.canMonkeySwing && coll->CollisionType == CT_TOP)
@@ -655,7 +655,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->gravityStatus = true;
 			item->speed = 2;
 			item->fallspeed = 1;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 	else
@@ -737,7 +737,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->gravityStatus = true;
 			item->speed = 2;
 			item->fallspeed = 1;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 
@@ -1143,7 +1143,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 		item->pos.yPos += STEP_SIZE;
 		item->fallspeed = 1;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 
 		item->pos.yRot += rot / 2;
 	}
@@ -1176,7 +1176,7 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 		item->pos.yPos += STEP_SIZE;
 		item->fallspeed = 1;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 
 		item->pos.yRot += rot / 2;
 	}
@@ -1366,7 +1366,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK);
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 	}
 
 	item->pos.yPos += coll->Middle.Floor + (STEP_SIZE * 2 + STEP_SIZE / 2 + STEP_SIZE / 4 - 9);
@@ -1555,7 +1555,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 	if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		item->speed = 0;
@@ -1598,7 +1598,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (!TestLaraSwamp(item) &&
-		info->gunStatus == LG_NO_ARMS &&								// Hands are free.
+		info->gunStatus == LG_HANDS_FREE &&								// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&							// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0) &&		// Flare is not being handled. TODO: Will she pose with weapons drawn?
 		info->Vehicle == NO_ITEM)										// Not in a vehicle.
@@ -1626,7 +1626,7 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&				// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&
-		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_RUN_BACK &&
 		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1644,7 +1644,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
 		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_WADE_FORWARD &&
-		item->currentAnimState != LS_HOP_BACK &&
+		item->currentAnimState != LS_RUN_BACK &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1777,7 +1777,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->gunStatus == LG_NO_ARMS &&							// Hands are free.
+	if (info->gunStatus == LG_HANDS_FREE &&							// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0))		// Not handling flare.
 	{

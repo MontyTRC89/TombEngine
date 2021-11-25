@@ -129,7 +129,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 
 	if (Lara.gunStatus == LG_HANDS_BUSY)
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 }
 
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)

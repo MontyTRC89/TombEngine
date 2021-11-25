@@ -218,7 +218,7 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 {
 	BOAT_GETON geton = BOAT_GETON::NONE;
 
-	if (Lara.gunStatus != LG_NO_ARMS)
+	if (Lara.gunStatus != LG_HANDS_FREE)
 		return BOAT_GETON::NONE;
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];

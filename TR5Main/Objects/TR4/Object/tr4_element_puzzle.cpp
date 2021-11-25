@@ -244,7 +244,7 @@ namespace TEN::Entities::TR4
                 || !(TrInput & IN_ACTION)
                 || item->triggerFlags != 1 
                 || item->itemFlags[0] != 1
-                || l->currentAnimState != LS_STOP
+                || l->currentAnimState != LS_IDLE
                 || l->animNumber != LA_STAND_IDLE
                 || !Lara.litTorch
                 || l->gravityStatus)
