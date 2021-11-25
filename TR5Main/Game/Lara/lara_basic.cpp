@@ -96,8 +96,8 @@ void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME / 2 + 2) // TODO: Remove the "+ 2" when anim blending becomes a feature; right now, it is a temporary measure to avoid stuttering. @Sezz 2021.11.19 
-		info->jumpCount = LARA_JUMP_TIME / 2 + 2;
+	if (info->jumpCount > LARA_JUMP_TIME / 2 + 4) // TODO: Remove the "+ 4" when anim blending becomes a feature; right now, it is a temporary measure to avoid stuttering. @Sezz 2021.11.19 
+		info->jumpCount = LARA_JUMP_TIME / 2 + 4;
 
 	if (item->hitPoints <= 0)
 	{
@@ -353,30 +353,6 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	//if (coll->Front.Floor == NO_HEIGHT || coll->Front.Floor < -STEPUP_HEIGHT || coll->Front.Floor >= -STEP_SIZE / 2)
-	//{
-	//	coll->Middle.Floor = 0;
-	//}
-	//else
-	//{
-	//	item->goalAnimState = LS_STEP_UP;
-	//	GetChange(item, &g_Level.Anims[item->animNumber]);
-	//}
-	//if (coll->Middle.Floor < 50)
-	//{
-	//	if (coll->Middle.Floor != NO_HEIGHT)
-	//		item->pos.yPos += coll->Middle.Floor;
-	//}
-	//else
-	//{
-	//	item->goalAnimState = LS_STEP_DOWN; // for theoretical running stepdown anims, not in default anims
-	//	if (GetChange(item, &g_Level.Anims[item->animNumber]))
-	//		item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
-	//	else
-	//		item->pos.yPos += 50; // do the default aligment
-	//}
 }
 
 // State:		LS_STOP (2)
@@ -853,8 +829,14 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: This can't be anywhere below the run dispatch because a test to prevent forward movement without embedding currently can't exist. @Sezz 2021.11.12
+	// TODO: This can't be anywhere below the run dispatch because a test to prevent forward movement without
+	// embedding can't exist without breaking the vault mechanic. @Sezz 2021.11.12
+	// Further, LaraCollideStop() may lock Lara in fast turn states. @Sezz 2021.11.25
 	info->turnRate += LARA_TURN_RATE;
+	if (info->turnRate < 0)
+		info->turnRate = 0;
+	else if (info->turnRate > (LARA_MED_TURN + ANGLE(1.0f)))
+		info->turnRate = LARA_MED_TURN + ANGLE(1.0f);
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -881,7 +863,7 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -952,11 +934,6 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 	// the player presses and holds the button to turn the opposite way. @Sezz 2021.10.16
 	if (TrInput & IN_RIGHT)
 	{
-		if (info->turnRate < 0)
-			info->turnRate = 0;
-		else if (info->turnRate > (LARA_MED_TURN + ANGLE(1.0f)))
-			info->turnRate = LARA_MED_TURN + ANGLE(1.0f);
-
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
 			if (info->turnRate > LARA_SLOW_TURN)
@@ -979,6 +956,9 @@ void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
 void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
+	if (info->turnRate > (LARA_SLOW_TURN + ANGLE(1.5f)))
+		info->turnRate = LARA_SLOW_TURN + ANGLE(1.5f);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1020,9 +1000,6 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (info->turnRate > (LARA_SLOW_TURN + ANGLE(1.5f)))
-			info->turnRate = LARA_SLOW_TURN + ANGLE(1.5f);
-
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
 		return;
@@ -1035,6 +1012,9 @@ void LaraWadeTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
+	if (info->turnRate > LARA_SLOW_TURN / 2)
+		info->turnRate = LARA_SLOW_TURN / 2;
 
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
@@ -1069,9 +1049,6 @@ void LaraSwampTurnRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (info->turnRate > LARA_SLOW_TURN / 2)
-			info->turnRate = LARA_SLOW_TURN / 2;
-
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
 		return;
@@ -1103,6 +1080,10 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	info->turnRate -= LARA_TURN_RATE;
+	if (info->turnRate > 0)
+		info->turnRate = 0;
+	else if (info->turnRate < -(LARA_MED_TURN + ANGLE(1.0f)))
+		info->turnRate = -(LARA_MED_TURN + ANGLE(1.0f));
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -1199,11 +1180,6 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (info->turnRate > 0)
-			info->turnRate = 0;
-		else if (info->turnRate < -(LARA_MED_TURN + ANGLE(1.0f)))
-			info->turnRate = -(LARA_MED_TURN + ANGLE(1.0f));
-
 		if (TrInput & IN_WALK)
 		{
 			if (info->turnRate < -LARA_SLOW_TURN)
@@ -1226,6 +1202,9 @@ void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
 void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
+	if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(1.5f)))
+		info->turnRate = -(LARA_SLOW_TURN + ANGLE(1.5f));
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1267,9 +1246,6 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(1.5f)))
-			info->turnRate = -(LARA_SLOW_TURN + ANGLE(1.5f));
-
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
 		return;
@@ -1282,6 +1258,9 @@ void LaraWadeTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
+
+	if (info->turnRate < -LARA_SLOW_TURN / 2)
+		info->turnRate = -LARA_SLOW_TURN / 2;
 
 	if (TrInput & IN_FORWARD &&
 		coll->CollisionType != CT_FRONT &&
@@ -1316,9 +1295,6 @@ void LaraSwampTurnLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (info->turnRate < -LARA_SLOW_TURN / 2)
-			info->turnRate = -LARA_SLOW_TURN / 2;
-
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
 
 		return;
@@ -1553,7 +1529,11 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Wade handling. @Sezz 2021.10.13
+	info->turnRate += LARA_TURN_RATE;
+	if (info->turnRate < LARA_MED_TURN)
+		info->turnRate = LARA_MED_TURN;
+	else if (info->turnRate > LARA_FAST_TURN)
+		info->turnRate = LARA_FAST_TURN;
 
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
@@ -1571,7 +1551,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)) &&
 		info->waterStatus != LW_WADE)
 	{
@@ -1651,12 +1631,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Hold WALK to slow down again.
 	if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate < LARA_MED_TURN)
-			info->turnRate = LARA_MED_TURN;
-		else if (info->turnRate > LARA_FAST_TURN)
-			info->turnRate = LARA_FAST_TURN;
-
 		item->goalAnimState = LS_TURN_RIGHT_FAST;
 
 		return;
@@ -1685,6 +1659,12 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	info->turnRate -= LARA_TURN_RATE;
+	if (info->turnRate > -LARA_MED_TURN)
+		info->turnRate = -LARA_MED_TURN;
+	else if (info->turnRate < -LARA_FAST_TURN)
+		info->turnRate = -LARA_FAST_TURN;
+
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -LARA_HEADROOM * 0.7f)
 	{
@@ -1701,7 +1681,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)) &&
 		info->waterStatus != LW_WADE)
 	{
@@ -1781,12 +1761,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate > -LARA_MED_TURN)
-			info->turnRate = -LARA_MED_TURN;
-		else if (info->turnRate < -LARA_FAST_TURN)
-			info->turnRate = -LARA_FAST_TURN;
-
 		item->goalAnimState = LS_TURN_LEFT_FAST;
 
 		return;
@@ -2245,21 +2219,6 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	/*if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2 && !TestLaraSwamp(item))
-	{
-		item->goalAnimState = LS_STEP_UP;
-		GetChange(item, &g_Level.Anims[item->animNumber]);
-	}
-
-	if (coll->Middle.Floor >= 50 && !TestLaraSwamp(item))
-	{
-		item->pos.yPos += 50;
-		return;
-	}
-	
-	LaraSnapToHeight(item, coll);*/
 }
 
 // State:		LS_SPRINT (73)
@@ -2301,7 +2260,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if ((TrInput & IN_DUCK/* || TestLaraKeepCrouched(coll)*/) &&
+	if (TrInput & IN_DUCK &&
 		(info->gunStatus == LG_NO_ARMS || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
@@ -2314,7 +2273,7 @@ void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		if (info->waterStatus == LW_WADE)
-			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state. @Sezz 2021.09.29
+			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->goalAnimState = LS_WALK_FORWARD;
 		else if (TrInput & IN_SPRINT && info->sprintTimer > 0) [[likely]]
@@ -2385,27 +2344,6 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// LEGACY step
-	//if (coll->Middle.Floor >= -STEPUP_HEIGHT && coll->Middle.Floor < -STEP_SIZE / 2)
-	//{
-	//	item->goalAnimState = LS_STEP_UP;
-	//	GetChange(item, &g_Level.Anims[item->animNumber]);
-	//}
-	//
-	//if (coll->Middle.Floor < 50)
-	//{
-	//	if (coll->Middle.Floor != NO_HEIGHT)
-	//		item->pos.yPos += coll->Middle.Floor;
-	//}
-	//else
-	//{
-	//	item->goalAnimState = LS_STEP_DOWN; // for theoretical sprint stepdown anims, not in default anims
-	//	if (GetChange(item, &g_Level.Anims[item->animNumber]))
-	//		item->pos.yPos += coll->Middle.Floor; // move Lara to middle.Floor
-	//	else
-	//		item->pos.yPos += 50; // do the default aligment
-	//}
 }
 
 // State:		LS_SPRINT_ROLL (74)
