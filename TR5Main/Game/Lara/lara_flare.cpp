@@ -91,7 +91,7 @@ void ready_flare(ITEM_INFO* lara)
 {
 	LaraInfo*& info = lara->data;
 
-	info->gunStatus = LG_NO_ARMS;
+	info->gunStatus = LG_HANDS_FREE;
 	info->leftArm.zRot = 0;
 	info->leftArm.yRot = 0;
 	info->leftArm.xRot = 0;
@@ -126,7 +126,7 @@ void undraw_flare(ITEM_INFO* lara)
 	short frame1 = info->flareFrame;
 	short frame2 = info->leftArm.frameNumber;
 
-	if (lara->goalAnimState == LS_STOP 
+	if (lara->goalAnimState == LS_IDLE 
 		&& info->Vehicle == NO_ITEM)
 	{
 		if (lara->animNumber == LA_STAND_IDLE)
@@ -145,7 +145,7 @@ void undraw_flare(ITEM_INFO* lara)
 			{
 				info->requestGunType = info->lastGunType;
 				info->gunType = info->lastGunType;
-				info->gunStatus = LG_NO_ARMS;
+				info->gunStatus = LG_HANDS_FREE;
 
 				InitialiseNewWeapon(lara);
 
@@ -202,7 +202,7 @@ void undraw_flare(ITEM_INFO* lara)
 			frame2 = 0;
 			info->requestGunType = info->lastGunType;
 			info->gunType = info->lastGunType;
-			info->gunStatus = LG_NO_ARMS;
+			info->gunStatus = LG_HANDS_FREE;
 
 			InitialiseNewWeapon(lara);
 
@@ -394,7 +394,7 @@ void DoFlareInHand(ITEM_INFO* lara, int flare_age)
 
 	if (info->flareAge >= FLARE_AGE)
 	{
-		if (info->gunStatus == LG_NO_ARMS)
+		if (info->gunStatus == LG_HANDS_FREE)
 			info->gunStatus = LG_UNDRAW_GUNS;
 	}
 	else if (info->flareAge != 0)

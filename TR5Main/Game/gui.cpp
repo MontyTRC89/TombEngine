@@ -2009,7 +2009,7 @@ void GuiController::UseCurrentItem()
 		{
 			Lara.requestGunType = WEAPON_PISTOLS;
 
-			if (Lara.gunStatus != LG_NO_ARMS)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
 			if (Lara.gunType == WEAPON_PISTOLS)
@@ -2022,7 +2022,7 @@ void GuiController::UseCurrentItem()
 		{
 			Lara.requestGunType = WEAPON_UZI;
 
-			if (Lara.gunStatus != LG_NO_ARMS)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
 			if (Lara.gunType == WEAPON_UZI)
@@ -2037,7 +2037,7 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_FLARE_INV_ITEM)
 		{
-			if (Lara.gunStatus == LG_NO_ARMS)
+			if (Lara.gunStatus == LG_HANDS_FREE)
 			{
 				if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
 					LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
@@ -2065,7 +2065,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE)
+			if (((LaraItem->currentAnimState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
 				|| (Lara.isDucked && !(TrInput & IN_DUCK)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
@@ -2073,7 +2073,7 @@ void GuiController::UseCurrentItem()
 				Lara.oldBusy = true;
 				BinocularRange = 128;
 
-				if (Lara.gunStatus != LG_NO_ARMS)
+				if (Lara.gunStatus != LG_HANDS_FREE)
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 			}
 
@@ -2167,7 +2167,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_SHOTGUN;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_SHOTGUN)
@@ -2180,7 +2180,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_REVOLVER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_REVOLVER)
@@ -2192,7 +2192,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_HK;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_HK)
@@ -2204,7 +2204,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_CROSSBOW;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_CROSSBOW)
@@ -2216,7 +2216,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_GRENADE_LAUNCHER)
@@ -2228,7 +2228,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_HARPOON_GUN;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_HARPOON_GUN)
@@ -2240,7 +2240,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_ROCKET_LAUNCHER)

@@ -18,7 +18,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
@@ -215,6 +215,14 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 }
 
+void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 54*/
+	/*collision: lara_default_col*/
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+}
+
 /*go around corners*/
 
 void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)
@@ -279,7 +287,7 @@ void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 

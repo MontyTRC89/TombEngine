@@ -307,10 +307,10 @@ void UseClockworkBeetle(short flag)
 	short itemNum;
 
 	if (flag
-		|| LaraItem->currentAnimState == LS_STOP
+		|| LaraItem->currentAnimState == LS_IDLE
 		&& LaraItem->animNumber == LA_STAND_IDLE
 		&& !LaraItem->hitStatus
-		&& Lara.gunStatus == LG_NO_ARMS)
+		&& Lara.gunStatus == LG_HANDS_FREE)
 	{
 		itemNum = CreateItem();
 
