@@ -836,9 +836,9 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
-			pseuso_lara_as_swamp_turn_right_slow(item, coll);
+			pseudo_lara_as_swamp_turn_right_slow(item, coll);
 		else [[likely]]
-			pseuso_lara_as_wade_turn_right_slow(item, coll);
+			pseudo_lara_as_wade_turn_right_slow(item, coll);
 
 		return;
 	}
@@ -946,7 +946,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning right slowly in wade-height water.
-void pseuso_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
+void pseudo_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1002,7 +1002,7 @@ void pseuso_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning right slowly in swamps.
-void pseuso_lara_as_swamp_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
+void pseudo_lara_as_swamp_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
