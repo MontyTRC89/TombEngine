@@ -495,7 +495,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
-	if (floor->Box < 0)
+	if (floor->Box == NO_BOX)
 		return false;
 
 	height = g_Level.Boxes[floor->Box].height;
