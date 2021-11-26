@@ -824,9 +824,6 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: This can't be anywhere below the run dispatch because a test to prevent forward movement without
-	// embedding can't exist right now without breaking the vault mechanic.
-	// Further, LaraCollideStop() may lock Lara in fast turn states. @Sezz 2021.11.25
 	info->turnRate += LARA_TURN_RATE;
 	if (info->turnRate < 0)
 		info->turnRate = 0;
