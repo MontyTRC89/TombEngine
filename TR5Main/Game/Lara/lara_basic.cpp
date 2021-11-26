@@ -657,8 +657,8 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1474,8 +1474,8 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1820,8 +1820,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
 	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1906,8 +1906,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
 	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2167,7 +2167,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
