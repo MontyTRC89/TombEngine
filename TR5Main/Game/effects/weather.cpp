@@ -4,6 +4,7 @@
 #include "weather.h"
 #include "collide.h"
 #include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"
@@ -311,7 +312,10 @@ namespace Environment
 					// Immediately disable rain particle because it doesn't need fading out.
 
 					if (p.Type == WeatherType::Rain)
+					{
 						p.Enabled = false;
+						AddWaterSparks(oldPos.x, oldPos.y, oldPos.z, 6);
+					}
 				}
 			}
 
