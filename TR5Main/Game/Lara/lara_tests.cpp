@@ -1762,7 +1762,6 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);			// Using BadHeightUp defined in step right state collision function.
 }
 
-// Currently unused; LaraCollideStopCrawl() handles front collision. @Sezz 2021.11.08
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return TestLaraMoveCrawl(item, coll, item->pos.yRot, STEP_SIZE - 1, -(STEP_SIZE - 1));				// Using BadHeightUp/Down defined in crawl state collision functions.

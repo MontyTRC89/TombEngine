@@ -99,6 +99,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 
 bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Useless in the best case; Lara does not have to embed in order to perform climbing actions in crawl states. Keeping for security. @Sezz 2021.11.26
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
 		ShiftItem(item, coll);
