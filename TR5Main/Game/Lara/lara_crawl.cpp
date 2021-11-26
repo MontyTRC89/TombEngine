@@ -403,7 +403,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			else [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -636,8 +636,8 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_SLOW_TURN;
 	}
 
-	if ((TrInput & IN_DUCK || info->keepCrouched)
-		&& info->waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -731,8 +731,8 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = -LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || info->keepCrouched)
-		&& info->waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -741,7 +741,8 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			TestLaraCrawlForward(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_FORWARD;
 
@@ -798,8 +799,8 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = LARA_CRAWL_TURN;
 
-	if ((TrInput & IN_DUCK || info->keepCrouched)
-		&& info->waterStatus != LW_WADE)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT &&
 			TestLaraCrouchRoll(item, coll))
@@ -809,7 +810,8 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD &&
+			TestLaraCrawlForward(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_FORWARD;
 
