@@ -86,11 +86,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE ||
+		(TestLaraSwamp(item) && info->waterSurfaceDist < -(WALL_SIZE - STEP_SIZE)))
+	{
 		return false;
-
-	if (TestLaraSwamp(item) && info->waterSurfaceDist < -(WALL_SIZE - STEP_SIZE))
-		return false;
+	}
 
 	// TODO: LUA
 	info->NewAnims.CrawlExtended = true;
@@ -1901,4 +1901,15 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
+}
+
+bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: Accuracy.
+	return (coll->Middle.Ceiling < -STEP_SIZE);
+}
+
+bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return (coll->Middle.Floor > 0);
 }

@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "lara.h"
+#include "lara_tests.h"
 #include "input.h"
 #include "level.h"
 #include "Sound/sound.h"
@@ -769,18 +770,6 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 // VERTICAL POLE
 // -------------
 
-// TODO: Move test functions to lara_tests.cpp when lara_state_cleaning_etc branch is merged.
-bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
-{
-	// TODO: Accuracy.
-	return (coll->Middle.Ceiling < -STEP_SIZE);
-}
-
-bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
-{
-	return (coll->Middle.Floor > 0);
-}
-
 // State:		LS_POLE_IDLE (99)
 // Collision:	lara_col_pole_idle()
 void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
@@ -861,8 +850,11 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	GetCollisionInfo(coll, item); // HACK: Lara may step off poles in mid-air upon reload without this.
-	if (coll->Middle.Floor <= 0)
+	if (coll->Middle.Floor <= 0 &&
+		item->animNumber != LA_POLE_JUMP_BACK) // Hack.
+	{
 		item->goalAnimState = LS_IDLE;
+	}
 	else if (item->animNumber == LA_POLE_IDLE)
 	{
 		item->goalAnimState = LS_FREEFALL;
