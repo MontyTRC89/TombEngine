@@ -615,7 +615,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (item->objectNumber == ID_FLARE_ITEM)
 			{
 				getThisItemPlease = itemNum;
-				l->animNumber = LA_PICKUP_FLARE;
+				l->animNumber = LA_PICKUP;
 				l->currentAnimState = LS_PICKUP_FLARE;
 				flag = 1;
 				Lara.interactedItem = itemNum;
