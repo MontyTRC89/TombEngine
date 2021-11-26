@@ -301,6 +301,9 @@ bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (TestLaraSwamp(item))
+		return false;
+
 	static short oldAngle = 1;
 
 	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
@@ -1666,11 +1669,11 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 
-	if ((probe.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
-		(probe.Position.Floor - y) >= upperBound &&								// Upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&					// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
-		!probe.Position.Slope &&												// No slope.
+	if ((probe.Position.Floor - y) <= lowerBound &&										// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&				// Space is not a clamp.
+		(!probe.Position.Slope || !(TrInput & IN_WALK) || TestLaraSwamp(item))	 &&		// No slope. WALK input and swamp room checks are hacks required due to the limits of this approach.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
