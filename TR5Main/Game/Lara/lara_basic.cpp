@@ -827,8 +827,8 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate += LARA_TURN_RATE;
 	if (info->turnRate < 0)
 		info->turnRate = 0;
-	else if (info->turnRate > (LARA_MED_TURN + ANGLE(1.0f)))
-		info->turnRate = LARA_MED_TURN + ANGLE(1.0f);
+	else if (info->turnRate > LARA_SLOW_MED_TURN)
+		info->turnRate = LARA_SLOW_MED_TURN;
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -1071,8 +1071,8 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate -= LARA_TURN_RATE;
 	if (info->turnRate > 0)
 		info->turnRate = 0;
-	else if (info->turnRate < -(LARA_MED_TURN + ANGLE(1.0f)))
-		info->turnRate = -(LARA_MED_TURN + ANGLE(1.0f));
+	else if (info->turnRate < -LARA_SLOW_MED_TURN)
+		info->turnRate = -LARA_SLOW_MED_TURN;
 
 	if (info->waterStatus == LW_WADE)
 	{
