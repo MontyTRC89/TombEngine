@@ -33,7 +33,6 @@ void KillItem(short itemNum)
 		DetatchSpark(itemNum, SP_ITEM);
 
 		item->active = false;
-		item->reallyActive = false;
 
 		if (NextItemActive == itemNum)
 		{
@@ -362,10 +361,8 @@ void InitialiseItem(short itemNum)
 	item->hitStatus = false;
 	item->collidable = true;
 	item->lookedAt = false;
-	item->dynamicLight = false;
 	item->poisoned = false;
 	item->aiBits = 0;
-	item->reallyActive = false;
 
 	item->timer = 0;
 
@@ -384,7 +381,7 @@ void InitialiseItem(short itemNum)
 	}
 
 	item->touchBits = 0;
-	item->afterDeath = false;
+	item->afterDeath = 0;
 	item->firedWeapon = 0;
 	item->swapMeshFlags = 0;
 
