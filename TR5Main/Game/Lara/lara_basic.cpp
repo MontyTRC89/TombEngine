@@ -2130,16 +2130,16 @@ void pseudo_lara_as_swamp_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN / 2)
-			info->turnRate = -LARA_SLOW_TURN / 2;
+		if (info->turnRate < -LARA_SWAMP_TURN_MAX)
+			info->turnRate = -LARA_SWAMP_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN / 2)
-			info->turnRate = LARA_SLOW_TURN / 2;
+		if (info->turnRate > LARA_SWAMP_TURN_MAX)
+			info->turnRate = LARA_SWAMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
 	}
