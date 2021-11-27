@@ -80,5 +80,5 @@ void ConfirmCameraTargetPos();
 void CalculateCamera();
 void LookLeftRight();
 void LookUpDown();
-void ResetLook();
+void ResetLook(ITEM_INFO* item);
 void RumbleScreen();
