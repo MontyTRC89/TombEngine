@@ -7,17 +7,29 @@ struct COLL_INFO;
 // TODO: Rename these to be consistent and define state-specific rates.
 // State code seems to cherry-pick whatever is handy. @Sezz 2021.09.27
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
-#define LARA_LEAN_RATE ANGLE(1.5f)	// lean rates
+
+// Lean rates
+#define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)
+
+// Turn rates
 #define LARA_TURN_RATE ANGLE(2.25f)
+#define LARA_CRAWL_MOVE_TURN_RATE ANGLE(2.15f)
 #define SUB_SUIT_TURN_RATE ANGLE(0.75f)
 #define LARA_JUMP_TURN ANGLE(3.0f)
 #define LARA_CROUCH_ROLL_TURN ANGLE(2.75f)
-#define LARA_SLOW_TURN ANGLE(4.0f)	// turn maxes
+
+// Max turn rates
+#define LARA_SLOW_TURN ANGLE(4.0f)
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
 #define LARA_CRAWL_TURN ANGLE(2.0f)
+#define LARA_CRAWL_MOVE_TURN ANGLE(3.75f)
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
+
+// Flex
+#define LARA_CRAWL_FLEX ANGLE(40.0f) / 2 // 2 = hardcoded number of bones to flex.
+#define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
