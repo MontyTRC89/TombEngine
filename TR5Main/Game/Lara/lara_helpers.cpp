@@ -152,6 +152,43 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
+void ResetLaraFlex(ITEM_INFO* item, float rate)
+{
+	LaraInfo*& info = item->data;
+
+	// Reset head.
+	if (abs(info->headXrot) > ANGLE(0.1f))
+		info->headXrot += info->headXrot / -rate;
+	else
+		info->headXrot = 0;
+
+	if (abs(info->headYrot) > ANGLE(0.1f))
+		info->headYrot += info->headYrot / -rate;
+	else
+		info->headYrot = 0;
+
+	if (abs(info->headZrot) > ANGLE(0.1f))
+		info->headZrot += info->headZrot / -rate;
+	else
+		info->headZrot = 0;
+
+	// Reset torso.
+	if (abs(info->torsoXrot) > ANGLE(0.1f))
+		info->torsoXrot += info->torsoXrot / -rate;
+	else
+		info->torsoXrot = 0;
+
+	if (abs(info->torsoYrot) > ANGLE(0.1f))
+		info->torsoYrot += info->torsoYrot / -rate;
+	else
+		info->torsoYrot = 0;
+
+	if (abs(info->torsoZrot) > ANGLE(0.1f))
+		info->torsoZrot += info->torsoZrot / -rate;
+	else
+		info->torsoZrot = 0;
+}
+
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);

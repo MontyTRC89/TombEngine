@@ -7,7 +7,6 @@ struct COLL_INFO;
 // TODO: Rename these to be consistent and define state-specific rates.
 // State code seems to cherry-pick whatever is handy. @Sezz 2021.09.27
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
-
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
 
 // Lean rates
@@ -20,8 +19,9 @@ struct COLL_INFO;
 #define SUB_SUIT_TURN_RATE ANGLE(0.75f)
 #define LARA_POLE_TURN_RATE ANGLE(2.25f)
 
-// Max turn rates
+// Turn rate maxes
 #define LARA_SLOW_TURN ANGLE(4.0f)
+#define LARA_SLOW_MED_TURN ANGLE(5.0f)
 #define LARA_MED_TURN ANGLE(6.0f)
 #define LARA_FAST_TURN ANGLE(8.0f)
 #define LARA_WADE_TURN_MAX ANGLE(5.5f)
@@ -32,7 +32,7 @@ struct COLL_INFO;
 #define LARA_CROUCH_ROLL_TURN ANGLE(2.75f)
 #define LARA_POLE_TURN_MAX ANGLE(4.5f)
 
-// Flex
+// Flex rates
 #define LARA_CRAWL_FLEX ANGLE(40.0f) / 2 // 2 = hardcoded number of bones to flex.
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
 
