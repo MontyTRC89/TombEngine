@@ -135,6 +135,23 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
 	}
 }
 
+void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
+{
+	LaraInfo*& info = item->data;
+
+	int sign = copysign(1, maxAngle);
+	rate = copysign(rate, maxAngle);
+
+	info->torsoZrot += std::min(abs(rate), abs(maxAngle - info->torsoZrot) / 6) * sign;
+
+	if (!(TrInput & IN_LOOK) &&
+		item->currentAnimState != LS_CRAWL_BACK)
+	{
+		info->headZrot = info->torsoZrot / 2;
+		info->headYrot = info->headZrot;
+	}
+}
+
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);

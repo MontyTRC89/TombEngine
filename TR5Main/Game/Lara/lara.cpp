@@ -797,6 +797,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
+	info->isDucked = coll->Setup.Height < LARA_HEIGHT; // temp
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
@@ -805,8 +806,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		LookLeftRight();
 	}
-	else
-		ResetLook();
+	else if (!info->isDucked)
+		ResetLook(item);
 
 	info->look = true;
 
@@ -876,7 +877,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
-		!(TrInput & (IN_WAKE | IN_LOOK)))
+		!(TrInput & (IN_WAKE | IN_LOOK))
+		&& info->NewAnims.Pose)
 	{
 		info->poseCount++;
 	}
@@ -893,6 +895,27 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot += item->pos.zRot / -6;
 		else
 			item->pos.zRot = 0;
+	}
+
+	// Reset crawl flex.
+	if (!(TrInput & IN_LOOK) &&
+		info->isDucked &&
+		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+	{
+		if (abs(info->torsoZrot) > ANGLE(0.1f) ||
+			abs(info->headZrot) > ANGLE(0.1f) || 
+			abs(info->headYrot) > ANGLE(0.1f))
+		{
+			info->torsoZrot += info->torsoZrot / -12;
+			info->headZrot += info->headZrot / -12;
+			info->headYrot += info->headYrot / -12;
+		}
+		else
+		{
+			info->torsoZrot = 0;
+			info->headZrot = 0;
+			info->headYrot = 0;
+		}
 	}
 
 	// Reset turn rate.
@@ -958,7 +981,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK && info->look)
 		LookLeftRight();
 	else
-		ResetLook();
+		ResetLook(item);
 
 	info->look = true;
 	info->poseCount = 0;
@@ -1065,7 +1088,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK && info->look)
 		LookLeftRight();
 	else
-		ResetLook();
+		ResetLook(item);
 
 	info->look = true;
 	info->poseCount = 0;

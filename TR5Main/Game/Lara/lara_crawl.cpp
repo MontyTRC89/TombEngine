@@ -355,6 +355,8 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -495,6 +497,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -509,15 +512,19 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN;
+
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN)
+			info->turnRate = LARA_CRAWL_MOVE_TURN;
+
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
@@ -610,6 +617,8 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
 	info->look = false;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -625,15 +634,19 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN;
+
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN)
+			info->turnRate = LARA_CRAWL_MOVE_TURN;
+
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
@@ -717,6 +730,8 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -785,6 +800,8 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
