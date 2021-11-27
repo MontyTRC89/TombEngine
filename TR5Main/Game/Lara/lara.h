@@ -27,6 +27,9 @@ struct COLL_INFO;
 #define LARA_CRAWL_MOVE_TURN ANGLE(3.75f)
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
 
+#define LARA_POLE_TURN_RATE ANGLE(2.25f)
+#define LARA_POLE_TURN_MAX ANGLE(4.5f)
+
 // Flex
 #define LARA_CRAWL_FLEX ANGLE(40.0f) / 2 // 2 = hardcoded number of bones to flex.
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)

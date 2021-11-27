@@ -795,15 +795,15 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				info->turnRate += LARA_TURN_RATE;
-				if (info->turnRate > LARA_SLOW_TURN)
-					info->turnRate = LARA_SLOW_TURN;
+				info->turnRate += LARA_POLE_TURN_RATE;
+				if (info->turnRate > LARA_POLE_TURN_MAX)
+					info->turnRate = LARA_POLE_TURN_MAX;
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				info->turnRate -= LARA_TURN_RATE;
-				if (info->turnRate < -LARA_SLOW_TURN)
-					info->turnRate = -LARA_SLOW_TURN;
+				info->turnRate -= LARA_POLE_TURN_RATE;
+				if (info->turnRate < -LARA_POLE_TURN_MAX)
+					info->turnRate = -LARA_POLE_TURN_MAX;
 			}
 		}
 
@@ -905,15 +905,15 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN)
-				info->turnRate = LARA_SLOW_TURN;
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN)
-				info->turnRate = -LARA_SLOW_TURN;
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -971,15 +971,15 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN)
-				info->turnRate = LARA_SLOW_TURN;
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN)
-				info->turnRate = -LARA_SLOW_TURN;
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -1077,9 +1077,9 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN + ANGLE(0.5f))
-				info->turnRate = LARA_SLOW_TURN + ANGLE(0.5f);
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
 
@@ -1139,9 +1139,9 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(0.5f)))
-				info->turnRate = -(LARA_SLOW_TURN + ANGLE(0.5f));
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
 
 			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 
