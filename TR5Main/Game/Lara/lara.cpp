@@ -2,6 +2,7 @@
 
 #include "lara.h"
 #include "lara_basic.h"
+#include "lara_helpers.h"
 #include "lara_jump.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
@@ -902,23 +903,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		info->isDucked &&
 		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
-		if (abs(info->torsoZrot) > ANGLE(0.1f) ||
-			abs(info->headXrot) > ANGLE(0.1f) ||
-			abs(info->headYrot) > ANGLE(0.1f) ||
-			abs(info->headZrot) > ANGLE(0.1f))
-		{
-			info->torsoZrot += info->torsoZrot / -12;
-			info->headXrot += info->headXrot / -12;
-			info->headYrot += info->headYrot / -12;
-			info->headZrot += info->headZrot / -12;
-		}
-		else
-		{
-			info->torsoZrot = 0;
-			info->headXrot = 0;
-			info->headYrot = 0;
-			info->headZrot = 0;
-		}
+		ResetLaraFlex(item, 12);
 	}
 
 	// Reset turn rate.
