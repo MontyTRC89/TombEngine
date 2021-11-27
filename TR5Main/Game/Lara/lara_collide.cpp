@@ -46,14 +46,12 @@ bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	ShiftItem(item, coll);
 
-	switch (coll->CollisionType)
+	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-	case CT_FRONT:
-	case CT_TOP_FRONT:
 		if (!Lara.climbStatus || item->speed != 2)
 		{
 			if (coll->Middle.Floor <= (STEP_SIZE * 2))
@@ -71,19 +69,20 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 				item->fallspeed = 1;
 		}
 
-		break;
-	case CT_TOP:
+		return true;
+	}
+
+	if (coll->CollisionType == CT_TOP)
+	{
 		if (item->fallspeed <= 0)
 			item->fallspeed = 1;
-
-		break;
-	case CT_LEFT:
+	}
+	else if (coll->CollisionType == CT_LEFT)
 		item->pos.yRot += ANGLE(5.0f);
-		break;
-	case CT_RIGHT:
+	else if (coll->CollisionType == CT_RIGHT)
 		item->pos.yRot -= ANGLE(5.0f);
-		break;
-	case CT_CLAMP:
+	else if (coll->CollisionType == CT_CLAMP)
+	{
 		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
 		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
 
@@ -92,9 +91,9 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->fallspeed <= 0)
 			item->fallspeed = 16;
-
-		break;
 	}
+
+	return false;
 }
 
 bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
