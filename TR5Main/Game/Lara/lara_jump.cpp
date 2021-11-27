@@ -619,7 +619,8 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
-	LaraDeflectEdgeJump(item, coll);
+	if (LaraDeflectEdgeJump(item, coll))
+		info->gunStatus = LG_HANDS_FREE;
 
 	// TODO: LUA.
 	info->NewAnims.CrawlspaceSwandive = true;
