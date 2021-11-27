@@ -641,7 +641,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 		else [[likely]]
-			item->goalAnimState = LS_IDLE;
+			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
 		info->gunStatus = LG_HANDS_FREE;
