@@ -158,7 +158,6 @@ struct ItemT : public flatbuffers::NativeTable {
   bool looked_at = false;
   bool poisoned = false;
   int32_t ai_bits = 0;
-  bool really_active = false;
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
 };
@@ -199,10 +198,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_LOOKED_AT = 60,
     VT_POISONED = 62,
     VT_AI_BITS = 64,
-    VT_REALLY_ACTIVE = 66,
-    VT_SWAP_MESH_FLAGS = 68,
-    VT_DATA_TYPE = 70,
-    VT_DATA = 72
+    VT_SWAP_MESH_FLAGS = 66,
+    VT_DATA_TYPE = 68,
+    VT_DATA = 70
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -296,9 +294,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t ai_bits() const {
     return GetField<int32_t>(VT_AI_BITS, 0);
-  }
-  bool really_active() const {
-    return GetField<uint8_t>(VT_REALLY_ACTIVE, 0) != 0;
   }
   int32_t swap_mesh_flags() const {
     return GetField<int32_t>(VT_SWAP_MESH_FLAGS, 0);
@@ -410,7 +405,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
            VerifyField<uint8_t>(verifier, VT_POISONED) &&
            VerifyField<int32_t>(verifier, VT_AI_BITS) &&
-           VerifyField<uint8_t>(verifier, VT_REALLY_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_SWAP_MESH_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
@@ -607,9 +601,6 @@ struct ItemBuilder {
   void add_ai_bits(int32_t ai_bits) {
     fbb_.AddElement<int32_t>(Item::VT_AI_BITS, ai_bits, 0);
   }
-  void add_really_active(bool really_active) {
-    fbb_.AddElement<uint8_t>(Item::VT_REALLY_ACTIVE, static_cast<uint8_t>(really_active), 0);
-  }
   void add_swap_mesh_flags(int32_t swap_mesh_flags) {
     fbb_.AddElement<int32_t>(Item::VT_SWAP_MESH_FLAGS, swap_mesh_flags, 0);
   }
@@ -663,7 +654,6 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool looked_at = false,
     bool poisoned = false,
     int32_t ai_bits = 0,
-    bool really_active = false,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0) {
@@ -695,7 +685,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_touch_bits(touch_bits);
   builder_.add_floor(floor);
   builder_.add_data_type(data_type);
-  builder_.add_really_active(really_active);
   builder_.add_poisoned(poisoned);
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
@@ -744,7 +733,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool looked_at = false,
     bool poisoned = false,
     int32_t ai_bits = 0,
-    bool really_active = false,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0) {
@@ -782,7 +770,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       looked_at,
       poisoned,
       ai_bits,
-      really_active,
       swap_mesh_flags,
       data_type,
       data);
@@ -4746,7 +4733,6 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = looked_at(); _o->looked_at = _e; }
   { auto _e = poisoned(); _o->poisoned = _e; }
   { auto _e = ai_bits(); _o->ai_bits = _e; }
-  { auto _e = really_active(); _o->really_active = _e; }
   { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
@@ -4791,7 +4777,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _looked_at = _o->looked_at;
   auto _poisoned = _o->poisoned;
   auto _ai_bits = _o->ai_bits;
-  auto _really_active = _o->really_active;
   auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
@@ -4828,7 +4813,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _looked_at,
       _poisoned,
       _ai_bits,
-      _really_active,
       _swap_mesh_flags,
       _data_type,
       _data);

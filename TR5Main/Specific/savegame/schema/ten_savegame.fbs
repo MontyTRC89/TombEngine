@@ -37,7 +37,6 @@ table Item {
 	looked_at: bool;
 	poisoned: bool;
 	ai_bits: int32;
-	really_active: bool;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 }
