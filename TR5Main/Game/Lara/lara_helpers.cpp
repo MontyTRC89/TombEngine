@@ -152,7 +152,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
-void ResetLaraFlex(ITEM_INFO* item, float rate)
+void ResetLaraFlex(ITEM_INFO* item, short rate)
 {
 	LaraInfo*& info = item->data;
 
