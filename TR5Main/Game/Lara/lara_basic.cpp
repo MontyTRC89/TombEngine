@@ -947,8 +947,8 @@ void pseudo_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->turnRate > (LARA_SLOW_TURN + ANGLE(1.5f)))
-		info->turnRate = LARA_SLOW_TURN + ANGLE(1.5f);
+	if (info->turnRate > LARA_WADE_TURN_MAX)
+		info->turnRate = LARA_WADE_TURN_MAX;
 
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
@@ -1003,8 +1003,8 @@ void pseudo_lara_as_swamp_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->turnRate > LARA_SLOW_TURN / 2)
-		info->turnRate = LARA_SLOW_TURN / 2;
+	if (info->turnRate > LARA_SWAMP_TURN_MAX)
+		info->turnRate = LARA_SWAMP_TURN_MAX;
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraRunForward(item, coll))
@@ -1192,8 +1192,8 @@ void pseudo_lara_as_wade_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(1.5f)))
-		info->turnRate = -(LARA_SLOW_TURN + ANGLE(1.5f));
+	if (info->turnRate < -LARA_WADE_TURN_MAX)
+		info->turnRate = -LARA_WADE_TURN_MAX;
 
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
@@ -1248,8 +1248,8 @@ void pseudo_lara_as_swamp_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->turnRate < -LARA_SLOW_TURN / 2)
-		info->turnRate = -LARA_SLOW_TURN / 2;
+	if (info->turnRate < -LARA_SWAMP_TURN_MAX)
+		info->turnRate = -LARA_SWAMP_TURN_MAX;
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraRunForward(item, coll))
