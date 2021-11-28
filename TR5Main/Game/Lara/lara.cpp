@@ -916,7 +916,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		info->turnRate = 0;
 	item->pos.yRot += info->turnRate;
 
-	// Animate info->
+	// Animate Lara.
 	AnimateLara(item);
 
 	if (info->ExtraAnim == -1)
