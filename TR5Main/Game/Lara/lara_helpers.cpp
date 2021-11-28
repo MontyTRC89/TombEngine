@@ -43,9 +43,9 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
 	// TODO: This approach might cause underirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	int div = 2; // 3?
-	int rate = 50;
 	int threshold = STEP_SIZE / 8;
+	int rate = 50;
+	int sign = std::copysign(1, coll->Middle.Floor);
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
 		if (TestLaraSwamp(item) &&
@@ -64,7 +64,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
 			abs(coll->Middle.Floor) > threshold)
 		{
-			item->pos.yPos += coll->Middle.Floor / div;
+			item->pos.yPos += std::max(abs(coll->Middle.Floor / 2), abs(threshold)) * sign;
 		}
 		else
 			item->pos.yPos += coll->Middle.Floor;
