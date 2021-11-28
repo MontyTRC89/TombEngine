@@ -183,9 +183,26 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 		item->frameNumber = coll->Setup.OldFrameNumber;
 
 		if (TrInput & IN_LEFT)
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
+		{
+			// Prevent turn lock against walls.
+			if (item->currentAnimState == LS_TURN_RIGHT_SLOW ||
+				item->currentAnimState == LS_TURN_RIGHT_FAST)
+			{
+				item->goalAnimState = LS_IDLE;
+			}
+			else
+				item->goalAnimState = LS_TURN_LEFT_SLOW;
+		}
 		else if (TrInput & IN_RIGHT)
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		{
+			if (item->currentAnimState == LS_TURN_LEFT_SLOW ||
+				item->currentAnimState == LS_TURN_LEFT_FAST)
+			{
+				item->goalAnimState = LS_IDLE;
+			}
+			else
+				item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		}
 		else
 			item->goalAnimState = LS_IDLE;
 
