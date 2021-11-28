@@ -434,7 +434,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
 		serializedItem.add_poisoned(itemToSerialize.poisoned);
 		serializedItem.add_ai_bits(itemToSerialize.aiBits);
-		serializedItem.add_really_active(itemToSerialize.reallyActive);
 		serializedItem.add_collidable(itemToSerialize.collidable);
 		serializedItem.add_looked_at(itemToSerialize.lookedAt);
 		serializedItem.add_swap_mesh_flags(itemToSerialize.swapMeshFlags);
@@ -953,7 +952,6 @@ bool SaveGame::Load(int slot)
 			AddActiveItem(i);
 
 		item->active = savedItem->active();
-		item->reallyActive = savedItem->really_active();
 		item->hitStatus = savedItem->hit_stauts();
 		item->status = savedItem->status();
 		item->aiBits = savedItem->ai_bits();
