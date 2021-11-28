@@ -1192,7 +1192,11 @@ void TriggerLaraDrips(ITEM_INFO* item)
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
 				dptr->roomNumber = LaraItem->roomNumber;
 
-				Lara.wet[i] -= 4;
+				if (Lara.wet[i] >= 4)
+					Lara.wet[i] -= 4;
+				else
+					Lara.wet[i] = 0;
+
 			}
 		}
 	}
