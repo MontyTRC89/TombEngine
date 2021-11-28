@@ -1614,8 +1614,10 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStep(COLL_INFO* coll)
 {
-	if (coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound.
-		coll->Middle.Floor >= -STEPUP_HEIGHT)		// Upper floor bound.
+	if (abs(coll->Middle.Floor) > 0 &&
+		//coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound. BUG: Wading in water over a pit, Lara will not descend.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor bound.
+		coll->Middle.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
