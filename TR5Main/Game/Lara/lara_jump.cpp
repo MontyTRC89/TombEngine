@@ -612,7 +612,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_swandive*/
 	info->moveAngle = item->pos.yRot;
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	coll->Setup.Height = (realHeight <= (LARA_HEIGHT / 3 * 2)) ? LARA_HEIGHT_CRAWL : LARA_HEIGHT;
+	coll->Setup.Height = realHeight * 0.7f;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
