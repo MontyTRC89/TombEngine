@@ -827,8 +827,8 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate += LARA_TURN_RATE;
 	if (info->turnRate < 0)
 		info->turnRate = 0;
-	else if (info->turnRate > LARA_SLOW_MED_TURN)
-		info->turnRate = LARA_SLOW_MED_TURN;
+	else if (info->turnRate > LARA_MED_FAST_TURN)
+		info->turnRate = LARA_MED_FAST_TURN;
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -931,7 +931,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		}
-		else if (info->turnRate > LARA_SLOW_TURN)
+		else if (info->turnRate > LARA_SLOW_MED_TURN)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1071,8 +1071,8 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate -= LARA_TURN_RATE;
 	if (info->turnRate > 0)
 		info->turnRate = 0;
-	else if (info->turnRate < -LARA_SLOW_MED_TURN)
-		info->turnRate = -LARA_SLOW_MED_TURN;
+	else if (info->turnRate < -LARA_MED_FAST_TURN)
+		info->turnRate = -LARA_MED_FAST_TURN;
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -1176,7 +1176,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
 		}
-		else if (info->turnRate < -LARA_MED_TURN)
+		else if (info->turnRate < -LARA_SLOW_MED_TURN)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;

@@ -22,7 +22,6 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_STEP_UP;
-
 		if (GetChange(item, &g_Level.Anims[item->animNumber]))
 		{
 			item->pos.yPos += coll->Middle.Floor;
@@ -34,7 +33,6 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		!TestLaraSwamp(item))
 	{
 		item->goalAnimState = LS_STEP_DOWN;
-
 		if (GetChange(item, &g_Level.Anims[item->animNumber]))
 		{
 			item->pos.yPos += coll->Middle.Floor;
