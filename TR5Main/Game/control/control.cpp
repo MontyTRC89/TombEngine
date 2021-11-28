@@ -281,7 +281,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);
 
-				if (item->afterDeath < 128 && item->afterDeath > 0 && !(Wibble & 3))
+				if (item->afterDeath > 0 && item->afterDeath < 128 && !(Wibble & 3))
 					item->afterDeath++;
 				if (item->afterDeath == 128)
 					KillItem(itemNum);
