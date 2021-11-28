@@ -878,8 +878,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
-		!(TrInput & (IN_WAKE | IN_LOOK))
-		&& info->NewAnims.Pose)
+		!(TrInput & (IN_WAKE | IN_LOOK)) &&
+		info->NewAnims.Pose)
 	{
 		info->poseCount++;
 	}
