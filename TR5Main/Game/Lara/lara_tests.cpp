@@ -182,7 +182,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		// Auto jump.
 		else if (coll->Front.Floor >= -(WALL_SIZE * 2 - STEP_SIZE / 2) &&		// Upper floor bound.
-			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2))					// Lower floor bound.
+			coll->Front.Floor <= -(WALL_SIZE - STEP_SIZE / 2) &&				// Lower floor bound.
+			!TestLaraSwamp(item))
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -232,7 +233,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			return false;
 		}
 
-		// Auto jump to ladder.
+		// Auto jump to ladder. TODO: Check swamps.
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
@@ -249,6 +250,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Auto jump to monkey swing.
 	if (info->canMonkeySwing &&
+		!TestLaraSwamp(item) &&
 		info->NewAnims.MonkeyAutoJump)
 	{
 		short roomNum = item->roomNumber;
