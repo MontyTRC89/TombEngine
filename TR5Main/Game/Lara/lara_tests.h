@@ -36,8 +36,8 @@ COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h)
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
-void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
+void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip);
+void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, bool flip);
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);

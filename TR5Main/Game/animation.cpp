@@ -296,6 +296,15 @@ short GetFrameNumber(short objectID, short animNumber, short frameToStart)
 	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
 }
 
+int GetFrameCount(short animNumber)
+{
+	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
+		return 0;
+
+	return &g_Level.Anims[animNumber].frameEnd - &g_Level.Anims[animNumber].frameBase;
+}
+
+
 void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 {
 	auto index = Objects[item->objectNumber].animIndex + animIndex;
