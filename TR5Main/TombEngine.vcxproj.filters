@@ -320,6 +320,7 @@
     <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
+    <ClCompile Include="frameworkandsol.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
