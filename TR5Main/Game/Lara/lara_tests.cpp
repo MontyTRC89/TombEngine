@@ -536,8 +536,10 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraCeilingFront(item, Lara.moveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
 		stopped = true;
 
+	// Backup item pos to restore it after coll tests
 	item->pos = oldPos;
 
+	// Setup coll info
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
@@ -556,7 +558,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	bool result = false;
 
-	if (Lara.climbStatus)
+	if (Lara.climbStatus) // Ladder case
 	{
 		if (TrInput & IN_ACTION && item->hitPoints > 0)
 		{
@@ -576,15 +578,14 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if (item->animNumber == LA_REACH_TO_HANG &&
-					item->frameNumber == GetFrameNumber(item, 21) &&
+				if (item->animNumber == LA_REACH_TO_HANG && item->frameNumber == GetFrameNumber(item, 21) &&
 					TestLaraClimbStance(item, coll))
 				{
 					item->goalAnimState = LS_LADDER_IDLE;
 				}
 			}
 		}
-		else
+		else // Death or action release
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->pos.yPos += 256;
@@ -594,11 +595,10 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 	}
-	else
+	else // Normal case
 	{
 		if (TrInput & IN_ACTION && item->hitPoints > 0 && coll->Front.Floor <= 0)
 		{
-
 			if (stopped && hdif > 0 && climbShift != 0 && (climbShift > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
 
@@ -620,8 +620,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 			if ((256 << GetQuadrant(item->pos.yRot)) & GetClimbFlags(x, item->pos.yPos, z, item->roomNumber))
 			{
-				if (!TestLaraHangOnClimbWall(item, coll)) // Reset vertical shift if ladder is encountered next block
-					verticalShift = 0;
+				if (!TestLaraHangOnClimbWall(item, coll)) 
+					verticalShift = 0; // Ignore vertical shift if ladder is encountered next block
 			}
 			else if (!TestValidLedge(item, coll, true))
 			{
@@ -659,7 +659,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				result = true;
 			}
 		}
-		else
+		else  // Death, incorrect ledge or action release
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->pos.xPos += coll->Shift.x;
