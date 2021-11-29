@@ -1068,9 +1068,8 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.xPos;
 		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.yPos;
 		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
+		item->pos.yRot = Lara.nextCornerPos.yRot;
 	}
-
-	item->pos.yRot = Lara.nextCornerPos.yRot;
 }
 
 void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, bool flip)
