@@ -72,7 +72,7 @@ private:
 public:	
 	GameScript(sol::state* lua);
 
-	void								FreeLevelScripts();
+	void								FreeLevelScripts() override;
 
 	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds);
 	
@@ -82,11 +82,11 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
-	void								AssignItemsAndLara();
+	void								AssignItemsAndLara() override;
 
 
-	void								ExecuteScriptFile(const std::string& luaFilename);
-	void								ExecuteFunction(std::string const & name);
+	void								ExecuteScriptFile(const std::string& luaFilename) override;
+	void								ExecuteFunction(std::string const & name) override;
 	void								MakeItemInvisible(short id);
 
 	template <typename R, char const* S>
@@ -96,7 +96,7 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)), false);
 	}
 
-	bool AddName(std::string const& key, VarMapVal val)
+	bool AddName(std::string const& key, VarMapVal val) override
 	{
 		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
 		return m_nameMap.insert(p).second;
@@ -114,14 +114,14 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								ResetVariables();
 
-	void								SetCallbackDrawString(CallbackDrawString cb);
+	void								SetCallbackDrawString(CallbackDrawString cb) override;
 
 	void								ShowString(GameScriptDisplayString const&, sol::optional<float> nSeconds);
-	void								ProcessDisplayStrings(float dt);
-	void								InitCallbacks();
-	void								OnStart();
-	void								OnLoad();
-	void								OnControlPhase(float dt);
-	void								OnSave();
-	void								OnEnd();
+	void								ProcessDisplayStrings(float dt) override;
+	void								InitCallbacks() override;
+	void								OnStart() override;
+	void								OnLoad() override;
+	void								OnControlPhase(float dt) override;
+	void								OnSave() override;
+	void								OnEnd() override;
 };
