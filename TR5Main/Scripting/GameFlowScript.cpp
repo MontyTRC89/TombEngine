@@ -17,7 +17,7 @@ using std::vector;
 using std::unordered_map;
 
 GameFlow* g_GameFlow;
-GameScript* g_GameScript;
+ScriptInterfaceGame* g_GameScript;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 {
