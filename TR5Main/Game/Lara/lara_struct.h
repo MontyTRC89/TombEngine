@@ -1045,7 +1045,7 @@ struct LaraInfo
 	bool fired;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
-	PHD_VECTOR nextCornerPos;
+	PHD_3DPOS nextCornerPos;
 	FX_INFO* spazEffect;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;

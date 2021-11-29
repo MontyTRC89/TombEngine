@@ -58,6 +58,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart = 0);
 short GetFrameNumber(ITEM_INFO* item, short frameToStart);
 short GetFrameNumber(short objectID, short animNumber, short frameToStart);
+int GetFrameCount(short animNumber);
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
