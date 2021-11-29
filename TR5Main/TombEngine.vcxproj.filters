@@ -709,6 +709,7 @@
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
+    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
