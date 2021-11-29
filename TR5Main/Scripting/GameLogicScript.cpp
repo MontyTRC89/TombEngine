@@ -678,6 +678,11 @@ void LuaVariables::SetVariable(sol::table tab, std::string key, sol::object valu
 	}
 }
 
+void GameScript::ExecuteScriptFile(const std::string & luaFilename)
+{
+	ExecuteScript(luaFilename);
+}
+
 void GameScript::ExecuteFunction(std::string const & name)
 {
 	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];

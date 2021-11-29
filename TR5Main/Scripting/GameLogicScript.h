@@ -85,6 +85,7 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	void								AssignItemsAndLara();
 
 
+	void								ExecuteScriptFile(const std::string& luaFilename);
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);
 
