@@ -6,6 +6,7 @@
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
 #include "GameScriptAudioTrack.h"
+#include "ScriptInterfaceGame.h"
 
 enum class TITLE_TYPE
 {
@@ -60,4 +61,4 @@ public:
 };
 
 extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
+extern ScriptInterfaceGame * g_GameScript;
