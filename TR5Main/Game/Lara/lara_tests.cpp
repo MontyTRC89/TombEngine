@@ -526,11 +526,16 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto c = phd_cos(Lara.moveAngle);
 	auto testShift = Vector2(s * delta, c * delta);
 
-	auto hdif = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius);
+	auto oldPos = item->pos;
+	item->pos.xPos += phd_sin(item->pos.yRot) * coll->Setup.Radius * 0.5f;
+	item->pos.zPos += phd_cos(item->pos.yRot) * coll->Setup.Radius * 0.5f;
+
+	auto hdif = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius * 1.5f);
 	if (hdif < 200)
 		flag = true;
+	auto cdif = LaraCeilingFront(item, Lara.moveAngle, coll->Setup.Radius * 1.5f, 0);
+	item->pos = oldPos;
 
-	auto cdif = LaraCeilingFront(item, Lara.moveAngle, coll->Setup.Radius, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
@@ -652,7 +657,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT ||
-					item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
+						 item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
 				{
 					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
