@@ -23,8 +23,6 @@ extern uintptr_t ThreadHandle;
 extern HACCEL hAccTable;
 extern HWND WindowsHandle;
 
-#include <sol.hpp>
-
 #if _DEBUG
 extern std::string commit;
 #endif
