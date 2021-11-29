@@ -316,6 +316,7 @@
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
+    <ClCompile Include="frameworkandsol.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
