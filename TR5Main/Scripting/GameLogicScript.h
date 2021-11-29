@@ -1,4 +1,5 @@
 #pragma once
+#include "ScriptInterfaceGame.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "LuaHandler.h"
@@ -48,15 +49,8 @@ struct LuaVariable
 	bool BoolValue;
 };
 
-using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
-using VarMapVal = std::variant< short,
-	std::reference_wrapper<MESH_INFO>,
-	std::reference_wrapper<LEVEL_CAMERA_INFO>,
-	std::reference_wrapper<SINK_INFO>,
-	std::reference_wrapper<SOUND_SOURCE_INFO>,
-	std::reference_wrapper<AI_OBJECT>>;
-class GameScript : public LuaHandler
+class GameScript : public LuaHandler, public ScriptInterfaceGame
 {
 private:
 
@@ -101,10 +95,9 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)), false);
 	}
 
-	template <typename Value>
-	bool AddName(std::string const& key, Value&& val)
+	bool AddName(std::string const& key, VarMapVal val)
 	{
-		auto p = std::pair<std::string const&, Value>{ key, val };
+		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
 		return m_nameMap.insert(p).second;
 	}
 
