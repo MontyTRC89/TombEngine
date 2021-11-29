@@ -1131,14 +1131,14 @@ bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 							item->roomNumber);
 
 	auto pos  = GAME_VECTOR(item->pos.xPos,
-							item->pos.yPos,
+							item->pos.yPos - (LARA_HEIGHT / 2),
 							item->pos.zPos,
 							item->roomNumber);
 
 	auto result1 = LOS(&pos, &vec1);
 	auto result2 = LOS(&pos, &vec2);
 
-	return (result1 == 0 && result2 == 0);
+	return ((result1 == 0) && (result2 == 0));
 }
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
