@@ -190,6 +190,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
