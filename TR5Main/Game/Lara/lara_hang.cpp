@@ -252,9 +252,7 @@ void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll,
-		item->animNumber == LA_SHIMMY_LEFT_CORNER_OUTER_END ||
-		item->animNumber == LA_LADDER_LEFT_CORNER_OUTER_END);
+	SetCornerAnim(item, coll, TestLastFrame(item));
 }
 
 void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)
@@ -264,9 +262,7 @@ void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll,
-		item->animNumber == LA_SHIMMY_RIGHT_CORNER_OUTER_END ||
-		item->animNumber == LA_LADDER_RIGHT_CORNER_OUTER_END);
+	SetCornerAnim(item, coll, TestLastFrame(item));
 }
 
 void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)
@@ -276,9 +272,7 @@ void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = 0;
 	Camera.laraNode = LM_TORSO;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll,
-		item->animNumber == LA_SHIMMY_LEFT_CORNER_INNER_END ||
-		item->animNumber == LA_LADDER_LEFT_CORNER_INNER_END);
+	SetCornerAnim(item, coll, TestLastFrame(item));
 }
 
 void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
@@ -288,9 +282,7 @@ void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll,
-		item->animNumber == LA_SHIMMY_RIGHT_CORNER_INNER_END ||
-		item->animNumber == LA_LADDER_RIGHT_CORNER_INNER_END);
+	SetCornerAnim(item, coll, TestLastFrame(item));
 }
 
 /*feet hanging and shimmying
@@ -500,8 +492,7 @@ void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
 	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
-	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_INNER].frameEnd) // I don't like this either but it's better than adding 4 new 1 frame anims?
-		SetCornerAnimFeet(item, coll, true);
+	SetCornerAnimFeet(item, coll, TestLastFrame(item));
 }
 
 void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
@@ -510,8 +501,7 @@ void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
 	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
-	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_INNER].frameEnd)
-		SetCornerAnimFeet(item, coll, true);
+	SetCornerAnimFeet(item, coll, TestLastFrame(item));
 }
 
 void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
@@ -520,8 +510,7 @@ void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
 	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
-	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_OUTER].frameEnd)
-		SetCornerAnimFeet(item, coll, true);
+	SetCornerAnimFeet(item, coll, TestLastFrame(item));
 }
 
 void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
@@ -530,6 +519,5 @@ void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
 	//collision: lara_default_col
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
-	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_OUTER].frameEnd)
-		SetCornerAnimFeet(item, coll, true);
+	SetCornerAnimFeet(item, coll, TestLastFrame(item));
 }
