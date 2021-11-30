@@ -305,7 +305,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			laraInfo->gunStatus = LG_NO_ARMS;
 		}
 		else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF &&
-			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara, lara->animNumber)))
+			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara)))
 		{
 			SetAnimation(lara, LA_FREEFALL);
 
