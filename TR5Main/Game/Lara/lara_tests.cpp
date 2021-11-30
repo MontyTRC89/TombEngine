@@ -607,11 +607,16 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	auto c = phd_cos(info->moveAngle);
 	auto testShift = Vector2(s * delta, c * delta);
 
-	auto hdif = LaraFloorFront(item, info->moveAngle, coll->Setup.Radius);
+	auto oldPos = item->pos;
+	item->pos.xPos += phd_sin(item->pos.yRot) * coll->Setup.Radius * 0.5f;
+	item->pos.zPos += phd_cos(item->pos.yRot) * coll->Setup.Radius * 0.5f;
+
+	auto hdif = LaraFloorFront(item, info->moveAngle, coll->Setup.Radius * 1.5f);
 	if (hdif < 200)
 		flag = true;
+	auto cdif = LaraCeilingFront(item, info->moveAngle, coll->Setup.Radius * 1.5f, 0);
+	item->pos = oldPos;
 
-	auto cdif = LaraCeilingFront(item, info->moveAngle, coll->Setup.Radius, 0);
 	auto dir = GetQuadrant(item->pos.yRot);
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
@@ -733,7 +738,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT ||
-					item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
+						 item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
 				{
 					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
@@ -773,6 +778,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 	// Backup old Lara position and frontal collision
 	auto oldPos = item->pos;
+	auto oldMoveAngle = Lara.moveAngle;
 	int oldFrontFloor = coll->Front.Floor;
 
 	// Quadrant is only used for ladder checks
@@ -799,32 +805,22 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		info->nextCornerPos.x = item->pos.xPos;
 		info->nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
 		info->nextCornerPos.z = item->pos.zPos;
+		info->moveAngle = item->pos.yRot;
 
 		auto result = TestLaraValidHangPos(item, coll);
 
-		if (result)
-		{
-			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
-			{
-				// Restore original item positions
-				item->pos = oldPos;
-				info->moveAngle = oldPos.yRot;
+		// Restore original item positions
+		item->pos = oldPos;
+		info->moveAngle = oldMoveAngle;
 
-				return CORNER_RESULT::INNER;
-			}
-		}
+		if (result && (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE))
+			return CORNER_RESULT::INNER;
 
 		if (info->climbStatus)
 		{
 			auto angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
 			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
-			{
-				// Restore original item positions
-				item->pos = oldPos;
-				info->moveAngle = oldPos.yRot;
-
 				return CORNER_RESULT::INNER;
-			}
 		}
 	}
 
@@ -856,6 +852,15 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	info->moveAngle = item->pos.yRot;
 	SnapItemToLedge(item, coll, item->pos.yRot);
 
+	// Additional test if there's a material obstacles blocking outer corner pathway
+	if ((LaraFloorFront(item, item->pos.yRot, 0) < 0) ||
+		(LaraCeilingFront(item, item->pos.yRot, 0, coll->Setup.Height) > 0))
+	{
+		// Restore original item positions
+		item->pos = oldPos;
+		return CORNER_RESULT::NONE;
+	}
+
 	// Do further testing only if test angle is equal to resulting edge angle
 	if (newAngle == item->pos.yRot)
 	{
@@ -863,30 +868,22 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		info->nextCornerPos.x = item->pos.xPos;
 		info->nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
 		info->nextCornerPos.z = item->pos.zPos;
+		info->moveAngle = item->pos.yRot;
 
-		if (TestLaraValidHangPos(item, coll))
-		{
-			if (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE)
-			{
-				// Restore original item positions
-				item->pos = oldPos;
-				info->moveAngle = oldPos.yRot;
+		auto result = TestLaraValidHangPos(item, coll);
 
-				return CORNER_RESULT::OUTER;
-			}
-		}
+		// Restore original item positions
+		item->pos = oldPos;
+		info->moveAngle = oldMoveAngle;
+
+		if (result && (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE))
+			return CORNER_RESULT::OUTER;
 
 		if (info->climbStatus)
 		{
 			auto angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
 			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
-			{
-				// Restore original item positions
-				item->pos = oldPos;
-				info->moveAngle = oldPos.yRot;
-
 				return CORNER_RESULT::OUTER;
-			}
 		}
 	}
 
@@ -1238,24 +1235,24 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	auto angle2 = angle - ANGLE(15.0f);
 
 	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angle1),
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos + dist * phd_cos(angle1),
+							item->roomNumber);
 
 	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angle2),
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos + dist * phd_cos(angle2),
+							item->roomNumber);
 
 	auto pos = GAME_VECTOR(item->pos.xPos,
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos,
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos,
+							item->roomNumber);
 
 	auto result1 = LOS(&pos, &vec1);
 	auto result2 = LOS(&pos, &vec2);
 
-	return (result1 == 0 && result2 == 0);
+	return ((result1 == 0) && (result2 == 0));
 }
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
