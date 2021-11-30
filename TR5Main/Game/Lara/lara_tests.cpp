@@ -1690,7 +1690,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 
 // TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
-bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
+bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope, bool checkDeath)
 {
 	// TODO: coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
@@ -1704,7 +1704,8 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
 		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&				// Space is not a clamp.
-		(!probe.Position.Slope || !(TrInput & IN_WALK) || TestLaraSwamp(item))	 &&		// No slope. WALK input and swamp room checks are hacks required due to the limits of this approach.
+		checkSlope ? !probe.Position.Slope : true &&									// Not a slope.
+		checkDeath ? !probe.Block->Flags.Death : true &&								// Not a death sector. TODO: This doesn't even work.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1744,7 +1745,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: TestLaraMove() call not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
 	// Additionally, run forward test needs to incorporate a unique ceiling check (as above). @Sezz 2021.10.28
-	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
+	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT, false);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
@@ -1758,42 +1759,42 @@ bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 
 	// TODO: Same issues as in TestLaraRunForward().
-	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
+	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT, true, true);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk back state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT, true, true);		// Using BadHeightUp/Down defined in walk back state collision function.
 }
 
 bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in hop back state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT, false);		// Using BadHeightUp/Down defined in hop back state collision function.
 }
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step left state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2, true, true);		// Using BadHeightUp/Down defined in step left state collision function.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step right state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2, true, true);		// Using BadHeightUp/Down defined in step right state collision function.
 }
 
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT);		// Using BadHeightUp defined in walk back state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT, false);		// Using BadHeightUp defined in walk back state collision function.
 }
 
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);			// Using BadHeightUp defined in step left state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2, false);			// Using BadHeightUp defined in step left state collision function.
 }
 
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2);			// Using BadHeightUp defined in step right state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -STEP_SIZE / 2, false);			// Using BadHeightUp defined in step right state collision function.
 }
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
@@ -1825,7 +1826,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE, 0);
+	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE / 2, 0);
 
 	if ((probe.Position.Floor - y) <= (STEP_SIZE - 1) &&			// Lower floor bound.
 		(probe.Position.Floor - y) >= -(STEP_SIZE - 1) &&			// Upper floor bound.
@@ -1852,8 +1853,9 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 		((coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) - (probeA.Position.Floor - y)) <= -(STEP_SIZE / 2 + STEP_SIZE / 8) &&		// Gap is optically feasible for action.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&												// Crossing is not a clamp.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&												// Destination is not a clamp.
-		!probeA.Position.Slope &&																								// Not a slope.
-		probeB.Position.Floor != NO_HEIGHT)
+		!probeA.Position.Slope &&																								// Crossing is not a slope.
+		!probeB.Position.Slope &&																								// Destination is not a slope.
+		probeB.Position.Floor != NO_HEIGHT) // Sezz note: Might be preventing ascent/descent in that one edge case with narrow gap.
 	{
 		return true;
 	}
@@ -1872,7 +1874,8 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 		(probeA.Position.Ceiling - y) <= -(STEP_SIZE / 2 + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Crossing is not a clamp.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Destination is not a clamp.
-		!probeA.Position.Slope &&														// Not a slope.
+		!probeA.Position.Slope &&														// Crossing is not a slope.
+		!probeB.Position.Slope &&														// Destination is not a slope.
 		probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1892,7 +1895,6 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.
-		!probeA.Position.Slope &&													// Not a slope.
 		probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1911,7 +1913,6 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.
-		!probeA.Position.Slope &&													// Not a slope.
 		probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;

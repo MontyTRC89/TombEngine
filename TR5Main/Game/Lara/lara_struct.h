@@ -87,7 +87,7 @@ enum LARA_STATE
 	LS_LADDER_STOP = 59,
 	LS_LADDER_RIGHT = 60,
 	LS_LADDER_DOWN = 61,
-	LS_TEST_1 = 62,	// Used for auto monkey up jump.
+	LS_TEST_1 = 62,	// Used for monkey auto jump.
 	LS_TEST_2 = 63,
 	LS_TEST_3 = 64,
 	LS_WADE_FORWARD = 65,
@@ -738,8 +738,7 @@ enum LARA_ANIM
 
 	NUM_LARA_ANIMS
 
-	// TRASHED ANIMS: 245, 264, 265, 273, 274
-	// @Sezz
+	// TRASHED ANIMS: 245, 265, 266, 268, 273, 274, 278, 280
 };
 #pragma endregion
 
