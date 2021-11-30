@@ -1696,13 +1696,15 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	auto noSlope = checkSlope ? !probe.Position.Slope : true;
+	auto noDeath = checkDeath ? !probe.Block->Flags.Death : true;
 
 	if ((probe.Position.Floor - y) <= lowerBound &&										// Lower floor bound.
 		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
 		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&				// Space is not a clamp.
-		checkSlope ? !probe.Position.Slope : true &&									// Not a slope.
-		checkDeath ? !probe.Block->Flags.Death : true &&								// Not a death sector. TODO: This doesn't even work.
+		noSlope &&																		// Not a slope (if applicable).
+		noDeath &&																		// Not a death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
