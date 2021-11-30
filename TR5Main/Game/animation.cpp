@@ -323,10 +323,13 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 
 bool TestLastFrame(ITEM_INFO* item, short animNumber)
 {
-	if ((animNumber >= 0) && (item->animNumber != animNumber))
+	if (animNumber < 0)
+		animNumber = item->animNumber;
+
+	if (item->animNumber != animNumber)
 		return false;
 
-	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	ANIM_STRUCT* anim = &g_Level.Anims[animNumber];
 	return (item->frameNumber >= anim->frameEnd);
 }
 
