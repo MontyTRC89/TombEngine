@@ -17,8 +17,8 @@ using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int,
 
 class ScriptInterfaceGame {
 public:
+	virtual ~ScriptInterfaceGame() = default;
 	virtual void ProcessDisplayStrings(float dt) = 0;
-
 	
 	virtual void InitCallbacks() = 0;
 
