@@ -584,6 +584,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
@@ -697,6 +698,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
