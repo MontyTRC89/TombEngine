@@ -161,10 +161,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_pulley,//104
 	lara_as_duckl,//105
 	lara_as_duckr,//106
-	lara_as_extcornerl,//107
-	lara_as_extcornerr,//108
-	lara_as_intcornerl,//109
-	lara_as_intcornerr,//110
+	lara_as_corner,//107
+	lara_as_corner,//108
+	lara_as_corner,//109
+	lara_as_corner,//110
 	lara_as_rope,//111
 	lara_as_climbrope,//112
 	lara_as_climbroped,//113
@@ -197,13 +197,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_null,//ara_as_hang_feet,//139
+	lara_as_null,//lara_as_hang_feet,//139
 	lara_as_hang_feet_shimmyr,//140
 	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_inRcorner,//142
-	lara_as_hang_feet_inLcorner,//143
-	lara_as_hang_feet_outRcorner,//144
-	lara_as_hang_feet_outLcorner,//145
+	lara_as_hang_feet_corner,//142
+	lara_as_hang_feet_corner,//143
+	lara_as_hang_feet_corner,//144
+	lara_as_hang_feet_corner,//145
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
