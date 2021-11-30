@@ -129,7 +129,13 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	ShiftItem(item, coll);
-	LaraSnapToHeight(item, coll);
+	
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
 }
 
 // State:		LS_CROUCH_ROLL (72)
@@ -487,7 +493,13 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	ShiftItem(item, coll);
-	LaraSnapToHeight(item, coll);
+	
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
 }
 
 // State:		LS_CRAWL_FORWARD (81)

@@ -683,7 +683,12 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Vaulting from this state.
 
-	LaraSnapToHeight(item, coll);
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+
+		return;
+	}
 }
 
 // State:		LS_POSE (4)
