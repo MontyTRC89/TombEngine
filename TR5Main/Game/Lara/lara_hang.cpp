@@ -245,39 +245,9 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 
 /*go around corners*/
 
-void lara_as_extcornerl(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_corner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 107*/
-	/*collision: lara_default_col*/
-	Camera.laraNode = LM_TORSO;
-	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll, TestLastFrame(item));
-}
-
-void lara_as_extcornerr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 108*/
-	/*collision: lara_default_col*/
-	Camera.laraNode = LM_TORSO;
-	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll, TestLastFrame(item));
-}
-
-void lara_as_intcornerl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 109*/
-	/*collision: lara_default_col*/
-	Camera.targetAngle = 0;
-	Camera.laraNode = LM_TORSO;
-	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll, TestLastFrame(item));
-}
-
-void lara_as_intcornerr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 110*/
 	/*collision: lara_default_col*/
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
@@ -486,38 +456,11 @@ void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 
 //go around corners feet
 
-void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_hang_feet_corner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 142*/
 	//collision: lara_default_col
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
-	SetCornerAnimFeet(item, coll, TestLastFrame(item));
-}
-
-void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 143*/
-	//collision: lara_default_col
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
-	SetCornerAnimFeet(item, coll, TestLastFrame(item));
-}
-
-void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 144*/
-	//collision: lara_default_col
-	Camera.laraNode = 8;
-	Camera.targetElevation = ANGLE(33.0f);
-	SetCornerAnimFeet(item, coll, TestLastFrame(item));
-}
-
-void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 145*/
-	//collision: lara_default_col
-	Camera.laraNode = 8;
+	Camera.laraNode = LM_TORSO;
 	Camera.targetElevation = ANGLE(33.0f);
 	SetCornerAnimFeet(item, coll, TestLastFrame(item));
 }
