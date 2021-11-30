@@ -1473,6 +1473,7 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1819,6 +1820,7 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1905,6 +1907,7 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
+	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
