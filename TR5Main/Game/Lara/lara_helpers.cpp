@@ -64,7 +64,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
 			abs(coll->Middle.Floor) > threshold)
 		{
-			item->pos.yPos += std::max(abs(coll->Middle.Floor / 2), abs(threshold)) * sign;
+			item->pos.yPos += std::max(abs(coll->Middle.Floor / 3), abs(threshold)) * sign;
 		}
 		else
 			item->pos.yPos += coll->Middle.Floor;
@@ -121,16 +121,12 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
 void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
 {
-	if (item->speed)
-	{
-		int sign = copysign(1, maxAngle);
-		rate = copysign(rate, maxAngle);
+	int sign = copysign(1, maxAngle);
 
-		if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-			item->pos.zRot += std::min(abs(rate), abs((maxAngle * 3) / 5 - item->pos.zRot) / 3) * sign;
-		else
-			item->pos.zRot += std::min(abs(rate), abs(maxAngle - item->pos.zRot) / 3) * sign;
-	}
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		item->pos.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->pos.zRot) / 3)) * sign;
+	else
+		item->pos.zRot += std::min(rate, (short)(abs(maxAngle - item->pos.zRot) / 3)) * sign;
 }
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
