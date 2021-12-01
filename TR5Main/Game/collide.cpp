@@ -1553,7 +1553,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->Front.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->Front.Floor > 0 && 
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
@@ -1601,7 +1600,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor > 0 && 
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
@@ -1644,7 +1642,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->FrontLeft.Floor > 0 && 
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
@@ -1692,7 +1689,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleRight.Floor > 0 && 
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
@@ -1735,7 +1731,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->FrontRight.Floor > 0 && 
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
