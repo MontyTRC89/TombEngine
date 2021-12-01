@@ -771,6 +771,8 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 {
+	static constexpr auto poleProbeCollRadius = 16.0f;
+
 	bool atLeastOnePoleCollided = false;
 
 	if (GetCollidedObjects(item, coll->Setup.Radius, true, CollidedItems, CollidedMeshes, 0) && CollidedItems[0])
@@ -779,9 +781,9 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 
 		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
-		auto offset = up ? -STEP_SIZE / 2.0f : 0.0f;
 
-		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), 16.0f);
+		auto offset = up ? -STEP_SIZE : poleProbeCollRadius;
+		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), poleProbeCollRadius);
 		
 		int i = 0;
 		while (CollidedItems[i] != NULL)
@@ -793,7 +795,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 				continue;
 
 			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
-			poleBox.Extents = poleBox.Extents + Vector3(WALL_SIZE, 0, WALL_SIZE);
+			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
 
 			if (poleBox.Intersects(sphere))
 				atLeastOnePoleCollided = true;
