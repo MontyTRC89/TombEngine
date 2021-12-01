@@ -775,7 +775,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, coll->Setup.Radius, true, CollidedItems, CollidedMeshes, 0) && CollidedItems[0])
+	if (GetCollidedObjects(item, coll->Setup.Height, true, CollidedItems, nullptr, 0) && CollidedItems[0])
 	{
 		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
@@ -877,7 +877,8 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_POLE_DOWN;
 			return;
 		}
-		else if (TrInput & IN_LEFT)
+
+		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
 			return;
@@ -1007,11 +1008,9 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 				info->turnRate = -LARA_SLOW_TURN;
 		}
 
-		if (TrInput & IN_BACK &&
-			TestLaraPoleDown(item, coll))
+		if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
 			item->goalAnimState = LS_POLE_DOWN;
-
 			return;
 		}
 
