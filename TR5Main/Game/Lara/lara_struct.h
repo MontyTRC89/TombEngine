@@ -177,9 +177,9 @@ enum LARA_STATE
 	LS_SHIMMY_45_OUTER_RIGHT = 140,
 	LS_SHIMMY_45_INNER_LEFT  = 141,
 	LS_SHIMMY_45_INNER_RIGHT = 142,
-	LS_UNUSED5 = 143, // Foot hang leftovers - may be safely reused
-	LS_UNUSED6 = 144, // Foot hang leftovers - may be safely reused
-	LS_UNUSED7 = 145, // Foot hang leftovers - may be safely reused
+	LS_UNUSED1 = 143, // Foot hang leftovers - may be safely reused
+	LS_UNUSED2 = 144, // Foot hang leftovers - may be safely reused
+	LS_UNUSED3 = 145, // Foot hang leftovers - may be safely reused
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
