@@ -1093,7 +1093,6 @@ struct LaraInfo
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
 	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	AnimsNew NewAnims;//troye's creative naming
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;

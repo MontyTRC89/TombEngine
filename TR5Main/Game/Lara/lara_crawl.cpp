@@ -11,6 +11,7 @@
 #include "items.h"
 #include "camera.h"
 #include "control/control.h"
+#include "Scripting/GameFlowScript.h"
 
 /*this file has all the related functions to ducking and crawling*/
 
@@ -38,11 +39,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
-
-	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED- ## LUA
-	Lara.NewAnims.CrouchRoll = 1;
-
-
+	
 	if ((TrInput & IN_FORWARD || TrInput & IN_BACK)
 		&& (TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.gunStatus == LG_NO_ARMS
@@ -68,7 +65,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)
 		&& Lara.waterStatus != LW_WADE
 		|| Lara.waterSurfaceDist == 256
 		&& !(Lara.waterSurfaceDist > 256)
-		&& Lara.NewAnims.CrouchRoll)
+		&& g_GameFlow->Animations.CrouchRoll)
 	{
 		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  // 4 clicks away from holes in the floor
 			TestLaraWall(item, WALL_SIZE / 2, 0, -256) != SPLAT_COLL::NONE) // 2 clicks away from walls + added a fix in lara_col_crouch_roll, better this way
@@ -194,127 +191,75 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Enable with lua!
-	Lara.NewAnims.Crawl1clickdown = 1;
-	Lara.NewAnims.Crawl1clickup = 1;
-	Lara.NewAnims.CrawlExit1click = 1;
-	Lara.NewAnims.CrawlExit2click = 1;
-	Lara.NewAnims.CrawlExit3click = 1;
-	Lara.NewAnims.CrawlExitJump = 1;
-
-	if (TrInput & IN_JUMP && Lara.NewAnims.CrawlExitJump)
+	if (TrInput & IN_JUMP)
 	{
 		GAME_VECTOR s, d;
-		MESH_INFO* StaticMesh;
-		PHD_VECTOR v;
 
-		if (LaraFloorFront(item, item->pos.yRot, 512) > 768 &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+		s.x = LaraItem->pos.xPos;
+		s.y = LaraItem->pos.yPos - 96;
+		s.z = LaraItem->pos.zPos;
+		s.roomNumber = LaraItem->roomNumber;
+
+		d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
+		d.y = s.y + LARA_HEADROOM;
+		d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
+
+		if (g_GameFlow->Animations.CrawlExtraExits)
 		{
-			s.x = LaraItem->pos.xPos;
-			s.y = LaraItem->pos.yPos - 96;
-			s.z = LaraItem->pos.zPos;
-			s.roomNumber = LaraItem->roomNumber;
-
-			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + LARA_HEADROOM;
-			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
-
 			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 			{
-				// TODO: fix ObjectOnLOS2
-				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == NO_LOS_ITEM)
-				{*/
-
-				SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
-				Lara.gunStatus = LG_HANDS_BUSY;
-				/*}*/
+				if (LaraFloorFront(item, item->pos.yRot, 512) > 768 &&
+					LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
+					LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
+					Lara.gunStatus = LG_HANDS_BUSY;
+				}
+				else if (LaraFloorFront(item, item->pos.yRot, 256) == 768 &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+					Lara.gunStatus = LG_HANDS_BUSY;
+				}
+				else if (LaraFloorFront(item, item->pos.yRot, 256) == 512 &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+					Lara.gunStatus = LG_HANDS_BUSY;
+				}
+				else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
+						 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
+					Lara.gunStatus = LG_HANDS_BUSY;
+				}
 			}
 		}
-		else if (LaraFloorFront(item, item->pos.yRot, 256) == 768 &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-		{
-			s.x = LaraItem->pos.xPos;
-			s.y = LaraItem->pos.yPos - 96;
-			s.z = LaraItem->pos.zPos;
-			s.roomNumber = LaraItem->roomNumber;
-
-			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + LARA_HEADROOM;
-			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
-
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit3click)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-			}
-		}
-		else	if (LaraFloorFront(item, item->pos.yRot, 256) == 512 &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-		{
-
-			s.x = LaraItem->pos.xPos;
-			s.y = LaraItem->pos.yPos - 96;
-			s.z = LaraItem->pos.zPos;
-			s.roomNumber = LaraItem->roomNumber;
-
-			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + LARA_HEADROOM;
-			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
-
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit2click)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-			}
-		}
-		else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-		{
-			s.x = LaraItem->pos.xPos;
-			s.y = LaraItem->pos.yPos - 96;
-			s.z = LaraItem->pos.zPos;
-			s.roomNumber = LaraItem->roomNumber;
-
-			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-			d.y = s.y + LARA_HEADROOM;
-			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
-
-			if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE && Lara.NewAnims.CrawlExit1click)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
-
-			}
-		}
-
 	}
 
 	if ((TrInput & IN_ACTION) && (TrInput & IN_FORWARD) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 	{
-		if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
-			LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512 &&
-			Lara.NewAnims.Crawl1clickup)
+		if (g_GameFlow->Animations.CrawlStep)
 		{
-			SetAnimation(item, LA_CRAWL_UP_STEP);
-		}
-		else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
+			if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
 				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-				LaraCeilingFront(item, item->pos.yRot, 256, -256) <= -512 &&
-				Lara.NewAnims.Crawl1clickdown)
-		{
-			SetAnimation(item, LA_CRAWL_DOWN_STEP);
+				LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512)
+			{
+				SetAnimation(item, LA_CRAWL_UP_STEP);
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
+			else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
+				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
+				LaraCeilingFront(item, item->pos.yRot, 256, -256) <= -512)
+			{
+				SetAnimation(item, LA_CRAWL_DOWN_STEP);
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
 		}
 	}
-
-	Lara.gunStatus = LG_HANDS_BUSY;
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
