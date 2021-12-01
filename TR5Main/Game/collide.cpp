@@ -23,7 +23,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
 	short roomsArray[255];
