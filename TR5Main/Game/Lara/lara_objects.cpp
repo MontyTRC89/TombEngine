@@ -875,11 +875,9 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			item->goalAnimState = LS_POLE_DOWN;
-
 			return;
 		}
-
-		if (TrInput & IN_LEFT)
+		else if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
 			return;
