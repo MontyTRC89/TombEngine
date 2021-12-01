@@ -67,11 +67,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, -45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
+				item->goalAnimState = LS_SHIMMY_45_INNER_LEFT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
+				item->goalAnimState = LS_SHIMMY_45_OUTER_LEFT;
 				return;
 
 			default:
@@ -104,11 +104,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, 45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
+				item->goalAnimState = LS_SHIMMY_45_INNER_RIGHT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
+				item->goalAnimState = LS_SHIMMY_45_OUTER_RIGHT;
 				return;
 
 			default:
