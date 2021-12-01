@@ -93,7 +93,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
-			if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
@@ -118,7 +118,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -143,7 +143,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -1202,7 +1202,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlFlexWaterPullUp)
+			if (g_GameFlow->Animations.CrawlExtra)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
@@ -1214,7 +1214,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlFlexSubmerged)
+			if (g_GameFlow->Animations.CrawlExtra)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
@@ -1227,7 +1227,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlFlexWaterPullUp)
+			if (g_GameFlow->Animations.CrawlExtra)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;

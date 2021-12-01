@@ -192,51 +192,51 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP && g_GameFlow->Animations.CrawlExtraExits)
+	if (g_GameFlow->Animations.CrawlExtra)
 	{
-		GAME_VECTOR s, d;
-
-		s.x = LaraItem->pos.xPos;
-		s.y = LaraItem->pos.yPos - 96;
-		s.z = LaraItem->pos.zPos;
-		s.roomNumber = LaraItem->roomNumber;
-
-		d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
-		d.y = s.y + LARA_HEADROOM;
-		d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
-
-		if (LOS(&s, &d) && 
-			item->animNumber != LA_CROUCH_TO_CRAWL_START && 
-			item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE &&
-			LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) <= 0)
+		if (TrInput & IN_JUMP)
 		{
-			auto floorFront = LaraFloorFront(item, item->pos.yRot, CLICK(1));
+			GAME_VECTOR s, d;
 
-			if (floorFront <= CLICK(1))
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
-			}
-			else if (floorFront <= CLICK(2))
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-			}
-			else if (floorFront <= CLICK(3))
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-			}
-			if (floorFront > CLICK(3))
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
-			}
+			s.x = LaraItem->pos.xPos;
+			s.y = LaraItem->pos.yPos - 96;
+			s.z = LaraItem->pos.zPos;
+			s.roomNumber = LaraItem->roomNumber;
 
-			Lara.gunStatus = LG_HANDS_BUSY;
+			d.x = s.x + 768 * phd_sin(LaraItem->pos.yRot);
+			d.y = s.y + LARA_HEADROOM;
+			d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
+
+			if (LOS(&s, &d) &&
+				item->animNumber != LA_CROUCH_TO_CRAWL_START &&
+				item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE &&
+				LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) != NO_HEIGHT &&
+				LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) <= 0)
+			{
+				auto floorFront = LaraFloorFront(item, item->pos.yRot, CLICK(1));
+
+				if (floorFront <= CLICK(1))
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
+				}
+				else if (floorFront <= CLICK(2))
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+				}
+				else if (floorFront <= CLICK(3))
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+				}
+				if (floorFront > CLICK(3))
+				{
+					SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
+				}
+
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
 		}
-	}
 
-	if ((TrInput & IN_ACTION) && (TrInput & IN_FORWARD) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
-	{
-		if (g_GameFlow->Animations.CrawlStep)
+		if ((TrInput & IN_ACTION) && (TrInput & IN_FORWARD) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
 		{
 			if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
 				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
