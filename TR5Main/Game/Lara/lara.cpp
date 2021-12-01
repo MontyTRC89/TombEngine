@@ -197,13 +197,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_hang,// 139 - Unused
-	lara_as_hang,// 140 - Unused
-	lara_as_hang,// 141 - Unused
-	lara_as_hang,// 142 - Unused
-	lara_as_hang,// 143 - Unused
-	lara_as_hang,// 144 - Unused
-	lara_as_hang,// 145 - Unused
+	lara_as_null,// 139 - Unused
+	lara_as_null,// 140 - Unused
+	lara_as_null,// 141 - Unused
+	lara_as_null,// 142 - Unused
+	lara_as_null,// 143 - Unused
+	lara_as_null,// 144 - Unused
+	lara_as_null,// 145 - Unused
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
