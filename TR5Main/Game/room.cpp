@@ -7,6 +7,7 @@
 #include "items.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Floordata;
 
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
@@ -63,14 +64,8 @@ void AddRoomFlipItems(ROOM_INFO* r)
 	{
 		ITEM_INFO* item = &g_Level.Items[linkNum];
 
-		//if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
-		//	AlterFloorHeight(item, -1024);
-
-		if (item->objectNumber == ID_RAISING_BLOCK2)
-		{
-			//if (item->itemFlags[1])
-			//	AlterFloorHeight(item, -2048);
-		}
+		if (Objects[item->objectNumber].floor != nullptr)
+			UpdateBridgeItem(linkNum);
 	}
 }
 
@@ -87,6 +82,9 @@ void RemoveRoomFlipItems(ROOM_INFO* r)
 		{
 			KillItem(linkNum);
 		}
+
+		if (Objects[item->objectNumber].floor != nullptr)
+			UpdateBridgeItem(linkNum, true);
 	}
 }
 

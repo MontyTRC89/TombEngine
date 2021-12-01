@@ -53,9 +53,11 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
@@ -279,7 +281,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);
 
-				if (item->afterDeath < 128 && item->afterDeath > 0 && !(Wibble & 3))
+				if (item->afterDeath > 0 && item->afterDeath < 128 && !(Wibble & 3))
 					item->afterDeath++;
 				if (item->afterDeath == 128)
 					KillItem(itemNum);
@@ -362,7 +364,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Update oscillator seed
-		Wibble = (Wibble + 4) & 0xFC;
+		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
 		// Smash shatters and clear stopper flags under them
 		UpdateShatters();
@@ -371,7 +373,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		Weather.Update();
 
 		// Update special FX
-		TriggerLaraDrips();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -381,7 +382,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		TEN::Effects::Lightning::UpdateLightning();
+		UpdateLightning();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
@@ -389,11 +390,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		updateSimpleParticles();
-		TEN::Effects::Drip::UpdateDripParticles();
+		UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		TEN::Entities::TR4::UpdateScarabs();
-		TEN::Entities::TR4::UpdateLocusts();
+		UpdateScarabs();
+		UpdateLocusts();
 		AnimateWaterfalls();
 
 		// Rumble screen (like in submarine level of TRC)

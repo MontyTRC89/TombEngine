@@ -594,9 +594,9 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.xPos = x;
 		item->pos.zPos = z;
-		Lara.nextCornerPos.x = x;
-		Lara.nextCornerPos.y = item->pos.yPos;
-		Lara.nextCornerPos.z = z;
+		Lara.nextCornerPos.xPos = x;
+		Lara.nextCornerPos.yPos = item->pos.yPos;
+		Lara.nextCornerPos.zPos = z;
 		item->pos.yRot += ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -641,9 +641,9 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.xPos = newX;
 			item->pos.zPos = newZ;
-			Lara.nextCornerPos.x = newX;
-			Lara.nextCornerPos.y = item->pos.yPos;
-			Lara.nextCornerPos.z = newZ;
+			Lara.nextCornerPos.xPos = newX;
+			Lara.nextCornerPos.yPos = item->pos.yPos;
+			Lara.nextCornerPos.zPos = newZ;
 			item->pos.yRot -= ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift) != 0;
@@ -694,9 +694,9 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.xPos = x;
 		item->pos.zPos = z;
-		Lara.nextCornerPos.x = x;
-		Lara.nextCornerPos.y = item->pos.yPos;
-		Lara.nextCornerPos.z = z;
+		Lara.nextCornerPos.xPos = x;
+		Lara.nextCornerPos.yPos = item->pos.yPos;
+		Lara.nextCornerPos.zPos = z;
 		item->pos.yRot -= ANGLE(90);
 		Lara.moveAngle = item->pos.yRot;
 
@@ -740,9 +740,9 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			item->pos.xPos = Lara.nextCornerPos.x = newX;
-			item->pos.yPos = Lara.nextCornerPos.y = item->pos.yPos;
-			item->pos.zPos = Lara.nextCornerPos.z = newZ;
+			item->pos.xPos = Lara.nextCornerPos.xPos = newX;
+			item->pos.yPos = Lara.nextCornerPos.yPos = item->pos.yPos;
+			item->pos.zPos = Lara.nextCornerPos.zPos = newZ;
 			item->pos.yRot += ANGLE(90);
 			Lara.moveAngle = item->pos.yRot;
 			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
