@@ -2253,7 +2253,7 @@ namespace TEN::Renderer
         drawBubbles(view);
         drawDrips(view);
         drawRipples(view);
-        //drawUnderwaterDust(view);
+        drawUnderwaterDust(view);
         drawSplahes(view);
         drawShockwaves(view);
         drawLightning(view);
@@ -2611,7 +2611,6 @@ namespace TEN::Renderer
         // Set shadow map data
         if (m_shadowLight != NULL)
         {
-
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();

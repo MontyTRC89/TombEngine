@@ -76,10 +76,8 @@ struct ITEM_INFO
 	bool hitStatus;
 	bool collidable;
 	bool lookedAt;
-	bool dynamicLight;
 	bool poisoned;
 	uint8_t aiBits; // AIObjectType enum
-	bool reallyActive;
 	bool inDrawRoom;
 	bool friendly;
 	uint32_t swapMeshFlags;

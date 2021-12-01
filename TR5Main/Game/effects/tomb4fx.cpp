@@ -1,26 +1,27 @@
 #include "framework.h"
-#include "effects\tomb4fx.h"
+#include "effects/tomb4fx.h"
 #include "lara.h"
-#include "effects\effects.h"
+#include "effects/effects.h"
 #include "animation.h"
 #include "setup.h"
 #include "level.h"
-#include "gameflow.h"
-#include "Sound\sound.h"
-#include "effects\bubble.h"
-#include "Specific\trmath.h"
+#include "Sound/sound.h"
+#include "effects/bubble.h"
+#include "Specific/trmath.h"
 #include "GameFlowScript.h"
 #include "smoke.h"
 #include "drip.h"
-#include <effects.h>
+#include "effects.h"
 #include "Renderer11.h"
-#include "effects/effects.h"
 #include "effects/weather.h"
-#include "animation.h"
 #include "items.h"
+#include "Game/floordata.h"
+#include "Specific/prng.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;
+using namespace TEN::Floordata;
+using namespace TEN::Math::Random;
 using namespace TEN::Effects::Environment;
 
 char LaserSightActive = 0;
@@ -1005,20 +1006,23 @@ void AddWaterSparks(int x, int y, int z, int num)
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 
 		spark->on = 1;
-		spark->sR = 64;
-		spark->sG = 64;
-		spark->sB = 64;
-		spark->dR = 32;
-		spark->dG = 32;
-		spark->dB = 32;
+		spark->sR = 127;
+		spark->sG = 127;
+		spark->sB = 127;
+		spark->dR = 48;
+		spark->dG = 48;
+		spark->dB = 48;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
-		spark->life = 24;
-		spark->sLife = 24;
+		spark->life = 10;
+		spark->sLife = 10;
+		spark->sSize = 8;
+		spark->dSize = 32;
+		spark->scalar = 1;
 		spark->transType = TransTypeEnum::COLADD;	
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
-		spark->yVel = -640 - GetRandomControl();
+		spark->yVel = -GenerateInt(128, 256);
 		spark->zVel = phd_cos(random << 4) * 128;
 		spark->friction = 5;
 		spark->flags = SP_NONE;
@@ -1026,7 +1030,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->y = y - (spark->yVel >> 5);
 		spark->z = z + (spark->zVel >> 3);
 		spark->maxYvel = 0;
-		spark->gravity = (GetRandomControl() & 0xF) + 64;
+		spark->gravity = (GetRandomControl() & 0xF);
 	}
 }
 
@@ -1144,23 +1148,29 @@ void UpdateDrips()
 			if (drip->y > height)
 			{
 				if (i % 2 == 0)
-					AddWaterSparks(drip->x, drip->y, drip->z, 1);
+					AddWaterSparks(drip->x, drip->y, drip->z, 6);
 				drip->on = false;
 			}
 		}
 	}
 }
 
-void TriggerLaraDrips()
+void TriggerLaraDrips(ITEM_INFO* item)
 {
-	PHD_VECTOR pos;
+	auto pos = PHD_VECTOR();
 	
 	if (!(Wibble & 0xF))
 	{
-		for (int i = 14; i >= 0; i--)
+		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
+			GetLaraJointPosition(&pos, (LARA_MESHES)i);
+			auto room = GetRoom(item->location, pos.x, pos.y, pos.z).roomNumber;
+
+			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
+				Lara.wet[i] = UCHAR_MAX;
+
 			if (Lara.wet[i] 
-				&& !LaraNodeUnderwater[14 - i] 
+				&& !LaraNodeUnderwater[i] 
 				&& (GetRandomControl() & 0x1FF) < Lara.wet[i])
 			{
 
@@ -1174,15 +1184,19 @@ void TriggerLaraDrips()
 				dptr->y = pos.y;
 				dptr->z = pos.z;
 				dptr->on = 1;
-				dptr->r = (GetRandomControl() & 7) + 16;
-				dptr->g = (GetRandomControl() & 7) + 24;
-				dptr->b = (GetRandomControl() & 7) + 32;
+				dptr->r = (GetRandomControl() & 7) + 64;
+				dptr->g = (GetRandomControl() & 7) + 96;
+				dptr->b = (GetRandomControl() & 7) + 128;
 				dptr->yVel = (GetRandomControl() & 0x1F) + 32;
 				dptr->gravity = (GetRandomControl() & 0x1F) + 32;
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
 				dptr->roomNumber = LaraItem->roomNumber;
 
-				Lara.wet[i] -= 4;
+				if (Lara.wet[i] >= 4)
+					Lara.wet[i] -= 4;
+				else
+					Lara.wet[i] = 0;
+
 			}
 		}
 	}
