@@ -178,6 +178,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)//horrible name.
 			item->pos.yPos += coll->Middle.Floor;
 	}
 }
+
 /*crouch/duck end*/
 /*-*/
 /*crawl start*/
@@ -204,36 +205,32 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 		d.y = s.y + LARA_HEADROOM;
 		d.z = s.z + 768 * phd_cos(LaraItem->pos.yRot);
 
-		if (LOS(&s, &d) && item->animNumber != LA_CROUCH_TO_CRAWL_START && item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE)
+		if (LOS(&s, &d) && 
+			item->animNumber != LA_CROUCH_TO_CRAWL_START && 
+			item->animNumber != LA_CROUCH_TO_CRAWL_CONTINUE &&
+			LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) != NO_HEIGHT &&
+			LaraCeilingFront(item, item->pos.yRot, CLICK(3), CLICK(2)) <= 0)
 		{
-			if (LaraFloorFront(item, item->pos.yRot, 512) > 768 &&
-				LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-				LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
-				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else if (LaraFloorFront(item, item->pos.yRot, 256) == 768 &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else if (LaraFloorFront(item, item->pos.yRot, 256) == 512 &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
-			{
-				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
-			}
-			else if (LaraFloorFront(item, item->pos.yRot, 256) == 256 &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
-					 LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+			auto floorFront = LaraFloorFront(item, item->pos.yRot, CLICK(1));
+
+			if (floorFront <= CLICK(1))
 			{
 				SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
-				Lara.gunStatus = LG_HANDS_BUSY;
 			}
+			else if (floorFront <= CLICK(2))
+			{
+				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+			}
+			else if (floorFront <= CLICK(3))
+			{
+				SetAnimation(item, LA_CRAWL_JUMP_DOWN_23CLICK);
+			}
+			if (floorFront > CLICK(3))
+			{
+				SetAnimation(item, LA_CRAWL_JUMP_FLIP_DOWN);
+			}
+
+			Lara.gunStatus = LG_HANDS_BUSY;
 		}
 	}
 
