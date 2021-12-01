@@ -173,13 +173,13 @@ enum LARA_STATE
 	LS_LADDER_TO_CROUCH = 138,
 
 	// TombEngine
-	LS_HANG_FEET = 139,
-	LS_SHIMMY_FEET_RIGHT = 140,
-	LS_SHIMMY_FEET_LEFT = 141,
-	LS_SHIMMY_FEET_INNER_RIGHT = 142,
-	LS_SHIMMY_FEET_INNER_LEFT = 143,
-	LS_SHIMMY_FEET_OUTER_RIGHT = 144,
-	LS_SHIMMY_FEET_OUTER_LEFT = 145,
+	LS_UNUSED1 = 139, // Foot hang leftovers - may be safely reused
+	LS_UNUSED2 = 140, // Foot hang leftovers - may be safely reused
+	LS_UNUSED3 = 141, // Foot hang leftovers - may be safely reused
+	LS_UNUSED4 = 142, // Foot hang leftovers - may be safely reused
+	LS_UNUSED5 = 143, // Foot hang leftovers - may be safely reused
+	LS_UNUSED6 = 144, // Foot hang leftovers - may be safely reused
+	LS_UNUSED7 = 145, // Foot hang leftovers - may be safely reused
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
@@ -711,17 +711,17 @@ enum LARA_ANIM
 	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
 	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
 	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_HANG_TO_HANG_FEET = 484,								// Hang > hang, feet on wall idle
-	LA_SHIMMY_FEET_RIGHT = 485,								// Shimmy, feet on wall right
-	LA_SHIMMY_FEET_LEFT = 486,								// Shimmy, feet on wall left
-	LA_HANG_FEET_TO_STAND = 487,							// Pull up from hang, feet on wall > stand
-	LA_HANG_FEET_IDLE = 488,								// Hang, feet on wall idle (looped)
-	LA_HANG_FEET_TO_CROUCH = 489,							// Pull up from hang, feet on wall > crouch
-	LA_SHIMMY_FEET_RIGHT_CORNER_INNER = 490,				// Shimmy, feet on wall around inner right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_INNER = 491,					// Shimmy, feet on wall around inner left corner
-	LA_SHIMMY_FEET_RIGHT_CORNER_OUTER = 492,				// Shimmy, feet on wall around outer right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_OUTER = 493,					// Shimmy, feet on wall around outer left corner
-	LA_HANG_FEET_HANDSTAND = 494,							// Hang, feet on wall > stand via handstand
+	LA_UNUSED1  = 484,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED2  = 485,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED3  = 486,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED4  = 487,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED5  = 488,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED6  = 489,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED7  = 490,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED8  = 491,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED9  = 492,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED10 = 493,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED11 = 494,                                      // Foot hang leftovers - may be safely reused
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
@@ -983,7 +983,6 @@ struct AnimsNew
 	bool CrawlExitJump;				// TR5 crawlspace exit with jump!
 	bool SwandiveRollRun;			// the transition from swandive roll to run
 	bool OscillateHanging;			// the thin ledge grab animation from TR1 and 2
-	bool FeetHanging;				// Daniel's super awesome feet hanging
 	bool CrawlFlexWaterPullUp;
 	bool CrawlFlexSubmerged;
 };

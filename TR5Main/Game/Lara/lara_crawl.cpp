@@ -797,16 +797,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else
 		{
-			if (TestHangFeet(item, item->pos.yRot))
-			{
-				SetAnimation(item, LA_REACH_TO_HANG);
-				item->goalAnimState = LS_HANG_FEET;
-			}
-			else
-			{
-				SetAnimation(item, LA_REACH_TO_HANG);
-				item->goalAnimState = LS_HANG;
-			}
+			SetAnimation(item, LA_REACH_TO_HANG, 12);
 		}
 
 		GetCollisionInfo(coll, item);
