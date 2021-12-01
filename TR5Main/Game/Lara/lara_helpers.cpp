@@ -58,7 +58,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
 			abs(coll->Middle.Floor) >= threshold)
 		{
-			item->pos.yPos += std::max(abs(coll->Middle.Floor / 3), threshold) * sign;
+			item->pos.yPos += std::max((int)abs(coll->Middle.Floor / 2.75), threshold) * sign;
 		}
 		else
 			item->pos.yPos += coll->Middle.Floor;
@@ -69,7 +69,7 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
-		if (TrInput & IN_DUCK)
+		if (TrInput & IN_DUCK && TestLaraCrawlDownStep(item, coll))
 			item->goalAnimState = LS_STEP_DOWN;
 		else [[likely]]
 			item->goalAnimState = LS_CRAWL_EXIT_DOWN_STEP;

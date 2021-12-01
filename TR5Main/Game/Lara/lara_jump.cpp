@@ -638,10 +638,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
 			if (!info->keepCrouched) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
-			{
-				item->pos.xPos += (STEP_SIZE / 2) * phd_sin(coll->Setup.ForwardAngle);
-				item->pos.zPos += (STEP_SIZE / 2) * phd_cos(coll->Setup.ForwardAngle);
-			}
+				MoveItem(item, coll->Setup.ForwardAngle, STEP_SIZE / 2);
 		}
 		else [[likely]]
 			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
