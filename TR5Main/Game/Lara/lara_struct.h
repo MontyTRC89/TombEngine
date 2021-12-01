@@ -173,10 +173,10 @@ enum LARA_STATE
 	LS_LADDER_TO_CROUCH = 138,
 
 	// TombEngine
-	LS_UNUSED1 = 139, // Foot hang leftovers - may be safely reused
-	LS_UNUSED2 = 140, // Foot hang leftovers - may be safely reused
-	LS_UNUSED3 = 141, // Foot hang leftovers - may be safely reused
-	LS_UNUSED4 = 142, // Foot hang leftovers - may be safely reused
+	LS_SHIMMY_45_OUTER_LEFT  = 139,
+	LS_SHIMMY_45_OUTER_RIGHT = 140,
+	LS_SHIMMY_45_INNER_LEFT  = 141,
+	LS_SHIMMY_45_INNER_RIGHT = 142,
 	LS_UNUSED5 = 143, // Foot hang leftovers - may be safely reused
 	LS_UNUSED6 = 144, // Foot hang leftovers - may be safely reused
 	LS_UNUSED7 = 145, // Foot hang leftovers - may be safely reused
@@ -572,14 +572,14 @@ enum LARA_ANIM
 	LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END = 352,			// Push turnswitch counter-clockwise (3/3)
 	LA_CROUCH_TURN_LEFT = 353,								// Rotate left crouching (looped)
 	LA_CROUCH_TURN_RIGHT = 354,								// Rotate right crouching (looped)
-	LA_SHIMMY_LEFT_CORNER_OUTER_START = 355,				// Shimmy around outer left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_OUTER_END = 356,					// Shimmy around outer left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_START = 357,				// Shimmy around outer right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_END = 358,					// Shimmy around outer right corner (2/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_START = 359,				// Shimmy around inner left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_END = 360,					// Shimmy around inner left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_START = 361,				// Shimmy around inner right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_END = 362,					// Shimmy around inner right corner (2/2)
+	LA_SHIMMY_LEFT_CORNER_OUTER_90 = 355,				    // Shimmy around outer left corner (90)
+	LA_SHIMMY_LEFT_CORNER_OUTER_45 = 356,					// Shimmy around outer left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_90 = 357,				    // Shimmy around outer right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_45 = 358,					// Shimmy around outer right corner (45)
+	LA_SHIMMY_LEFT_CORNER_INNER_90 = 359,				    // Shimmy around inner left corner (90)
+	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
 	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
 	LA_LADDER_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
@@ -970,7 +970,7 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool CrouchRoll;				// crouch roll
-	bool Monkey180Roll;				// the 180� roll on monkeybars
+	bool Monkey180Roll;				// the 180 degrees roll on monkeybars
 	bool Crawl1clickup;				// going 1 click up in crawlspaces
 	bool Crawl1clickdown;			// going 1 click down in crawlspaces
 	bool CrawlExit1click;			// crawlspace exit at 1 click
