@@ -864,8 +864,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD &&
-			TestLaraPoleUp(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_UP;
 			return;
@@ -890,14 +889,12 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
 	if (coll->Middle.Floor <= 0)
 	{
 		item->goalAnimState = LS_STOP;
-
 		return;
 	}
 
