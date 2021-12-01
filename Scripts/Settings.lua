@@ -16,11 +16,7 @@ settings.errorMode = ErrorMode.WARN;
 SetSettings(settings);
 
 local anims = Animations.new();
-anims.crawlExtraExits = true;
-anims.crawlExtraVaults = true;
-anims.crawlFlexSubmerged = true;
-anims.crawlFlexWaterPullUp = true;
-anims.crawlStep = true;
+anims.crawlExtra = true;
 anims.crouchRoll = true;
 anims.monkeyRoll = true;
 anims.monkeyVault = true;
