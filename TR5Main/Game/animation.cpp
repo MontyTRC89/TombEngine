@@ -315,6 +315,9 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 		return;
 	}
 
+	if (item->animNumber == animIndex)
+		return;
+
 	item->animNumber = index;
 	item->frameNumber = g_Level.Anims[index].frameBase + frameToStart;
 	item->currentAnimState = g_Level.Anims[index].currentAnimState;
