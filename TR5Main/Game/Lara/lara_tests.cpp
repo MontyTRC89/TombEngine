@@ -391,9 +391,6 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
-
-		if (TestHangFeet(item, angle))
-			item->goalAnimState = LS_HANG_FEET;
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -482,9 +479,6 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_REACH_TO_HANG);
-
-		if (TestHangFeet(item, angle))
-			item->goalAnimState = LS_HANG_FEET;
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -650,11 +644,6 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
-				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT || 
-						 item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
-				{
-					SetAnimation(item, LA_HANG_FEET_IDLE);
-				}
 
 				result = true;
 			}
@@ -678,7 +667,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
 {
 	// Lara isn't in stop state yet, bypass test
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
+	if (item->animNumber != LA_REACH_TO_HANG)
 		return CORNER_RESULT::NONE;
 
 	// Static is in the way, bypass test
@@ -972,59 +961,21 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 	return false;
 }
 
-bool TestHangFeet(ITEM_INFO* item, short angle)
-{
-	//##LUA debug etc.
-	Lara.NewAnims.FeetHanging = false;
-
-	if (Lara.climbStatus || !Lara.NewAnims.FeetHanging)
-		return false;
-
-	int x = item->pos.xPos;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-	short roomNum = item->roomNumber;
-
-	z += phd_cos(angle) * (STEP_SIZE / 2);
-	x += phd_sin(angle) * (STEP_SIZE / 2);
-
-	auto floor = GetFloor(x, y, z, &roomNum);
-	int floorHeight = GetFloorHeight(floor, x, y, z);
-	int ceilingHeight = GetCeiling(floor, x, y, z);
-	int m = ceilingHeight - y;
-	int j = y - (STEP_SIZE / 2) - ceilingHeight;
-
-	if (floorHeight != NO_HEIGHT)
-	{
-		if (floorHeight < y && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
-			return true;
-	}
-
-	return false;
-}
-
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
-	int oldx = item->pos.xPos;
-	int oldz = item->pos.zPos;
-	int x = item->pos.xPos;
-	int z = item->pos.zPos;
+	auto oldPos = item->pos;
+
+	static constexpr auto sidewayTestDistance = 16;
+	item->pos.xPos += phd_cos(Lara.moveAngle) * sidewayTestDistance;
+	item->pos.zPos += phd_sin(Lara.moveAngle) * sidewayTestDistance;
 
 	Lara.moveAngle = item->pos.yRot + angle;
-	
-	z += phd_cos(Lara.moveAngle) * 16;
-	x += phd_sin(Lara.moveAngle) * 16;
-
-	item->pos.xPos = x;
-	item->pos.zPos = z;
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	auto res = TestLaraHang(item, coll);
 
-	item->pos.xPos = oldx;
-	item->pos.zPos = oldz;
-
+	item->pos = oldPos;
 	Lara.moveAngle = item->pos.yRot + angle;
 
 	return !res;
@@ -1063,35 +1014,6 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
 		item->pos.yRot = Lara.nextCornerPos.yRot;
 	}
-}
-
-void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, bool flip)
-{
-	if (item->hitPoints <= 0)
-	{
-		SetAnimation(item, LA_FALL_START);
-
-		item->gravityStatus = true;
-		item->speed = 2;
-		item->pos.yPos += STEP_SIZE;
-		item->fallspeed = 1;
-
-		Lara.gunStatus = LG_NO_ARMS;
-
-		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
-		return;
-	}
-
-	if (flip)
-	{
-		SetAnimation(item, LA_HANG_FEET_IDLE);
-
-		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
-	}
-
-	item->pos.yRot = Lara.nextCornerPos.yRot;
 }
 
 bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
