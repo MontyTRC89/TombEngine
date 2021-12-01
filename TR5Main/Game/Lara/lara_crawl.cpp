@@ -215,7 +215,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				auto floorFront = LaraFloorFront(item, item->pos.yRot, CLICK(1));
 
-				if (floorFront <= CLICK(1))
+				if (floorFront >= CLICK(1) / 2 && floorFront <= CLICK(1))
 				{
 					SetAnimation(item, LA_CRAWL_JUMP_DOWN_1CLICK);
 				}
