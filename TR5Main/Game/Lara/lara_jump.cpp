@@ -612,7 +612,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	/*state code: lara_as_swandive*/
 	info->moveAngle = item->pos.yRot;
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	coll->Setup.Height = realHeight * 0.7f;
+	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
@@ -629,7 +629,9 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
 
-		if (info->keepCrouched ||
+		if (TestLaraSlide(item, coll))
+			;
+		else if (info->keepCrouched ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			info->NewAnims.CrawlspaceSwandive)
 		{
@@ -643,8 +645,9 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else [[likely]]
 			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
+
 		item->fallspeed = 0;
-		item->gravityStatus = 0;
+		item->gravityStatus = false;
 		info->gunStatus = LG_HANDS_FREE;
 
 		LaraSnapToHeight(item, coll);

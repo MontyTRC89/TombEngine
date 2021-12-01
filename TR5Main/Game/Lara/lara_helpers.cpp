@@ -53,13 +53,10 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos += SWAMP_GRAVITY;
 		}
-		else if (abs(coll->Middle.Floor) >= (STEPUP_HEIGHT / 2))		// Outer range.
-		{
-			if (abs(coll->Middle.Floor) >= rate)
-				item->pos.yPos += rate * sign;
-		}
-		else if (abs(coll->Middle.Floor) < (STEPUP_HEIGHT / 2) &&		// Inner range.
-			abs(coll->Middle.Floor) > threshold)
+		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))			// Outer range.
+			item->pos.yPos += rate * sign;
+		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
+			abs(coll->Middle.Floor) >= threshold)
 		{
 			item->pos.yPos += std::max(abs(coll->Middle.Floor / 3), threshold) * sign;
 		}
