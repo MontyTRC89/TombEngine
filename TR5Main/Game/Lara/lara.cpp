@@ -129,7 +129,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_roll,//72
 	lara_as_dash,
 	lara_as_dashdive,
-	lara_as_hang2,
+	lara_as_monkey_idle,
 	lara_as_monkeyswing,
 	lara_as_monkeyl,
 	lara_as_monkeyr,
@@ -197,13 +197,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_null,//lara_as_hang_feet,//139
-	lara_as_hang_feet_shimmyr,//140
-	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_corner,//142
-	lara_as_hang_feet_corner,//143
-	lara_as_hang_feet_corner,//144
-	lara_as_hang_feet_corner,//145
+	lara_as_hang,// 139 - Unused
+	lara_as_hang,// 140 - Unused
+	lara_as_hang,// 141 - Unused
+	lara_as_hang,// 142 - Unused
+	lara_as_hang,// 143 - Unused
+	lara_as_hang,// 144 - Unused
+	lara_as_hang,// 145 - Unused
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -288,7 +288,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_crouch_roll,
 	lara_col_dash,
 	lara_col_dashdive,
-	lara_col_hang2,
+	lara_col_monkey_idle,
 	lara_col_monkeyswing,
 	lara_col_monkeyl,
 	lara_col_monkeyr,
@@ -352,13 +352,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_hang_feet,
-	lara_col_hang_feet_shimmyr,
-	lara_col_hang_feet_shimmyl,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_void_func, // 139 - Unused
+	lara_void_func, // 140 - Unused
+	lara_void_func, // 141 - Unused
+	lara_void_func, // 142 - Unused
+	lara_void_func, // 143 - Unused
+	lara_void_func, // 144 - Unused
+	lara_void_func, // 145 - Unused
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,

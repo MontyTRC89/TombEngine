@@ -16,7 +16,7 @@ using namespace TEN::Floordata;
 /*this file has all the related functions to monkeyswinging*/
 
 /*monkeyswing state handling functions*/
-void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*collision: lara_col_hang2*/
@@ -45,7 +45,7 @@ void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 }
 
-void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*state code: lara_as_hang2*/
