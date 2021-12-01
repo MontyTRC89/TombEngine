@@ -682,7 +682,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			VPos.y = v->pos.yPos;
 			VPos.z = v->pos.zPos;
 			VPos.roomNumber = v->roomNumber;
-			mgLOS(&VPos, &LPos, 0);
+			LOSAndReturnTarget(&VPos, &LPos, 0);
 
 			l->pos.xPos = LPos.x;
 			l->pos.yPos = LPos.y;
