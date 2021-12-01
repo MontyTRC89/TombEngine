@@ -2327,7 +2327,8 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(coll) &&
+		coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 
