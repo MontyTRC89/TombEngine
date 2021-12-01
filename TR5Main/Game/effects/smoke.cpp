@@ -1,14 +1,14 @@
 #include <algorithm>
 #include "framework.h"
-#include "Specific\trmath.h"
+#include "Specific/trmath.h"
 #include "smoke.h"
 #include "room.h"
 #include "control/control.h"
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
-#include "Specific\prng.h"
-#include "effects\weather.h"
+#include "Specific/prng.h"
+#include "effects/weather.h"
 #include "items.h"
 
 using namespace TEN::Effects::Environment;
@@ -176,8 +176,8 @@ namespace TEN {
 				SmokeParticle& s = GetFreeSmokeParticle();
 				s = {};
 				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
-				float xVel = std::sin(TO_RAD(angle))*speed;
-				float zVel = std::cos(TO_RAD(angle))*speed;
+				float xVel = std::sin(TO_RAD(angle)) * speed;
+				float zVel = std::cos(TO_RAD(angle)) * speed;
 				s.velocity = Vector3(xVel, GenerateFloat(-1, 4), zVel);
 				s.sourceColor = Vector4(1, 1, 1, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
@@ -209,6 +209,27 @@ namespace TEN {
 				s.destinationSize = GenerateFloat(1024, 1152);
 				s.angularVelocity = GenerateFloat(-0.6, 0.6);
 				s.angularDrag = GenerateFloat(0.87, 0.99);
+			}
+
+			void TriggerBreathSmoke(long x, long y, long z, short angle)
+			{
+				SmokeParticle& s = GetFreeSmokeParticle();
+				s = {};
+				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
+				float xVel = std::sin(TO_RAD(angle)) * GenerateFloat(8, 12);
+				float zVel = std::cos(TO_RAD(angle)) * GenerateFloat(8, 12);
+				s.velocity = Vector3(xVel, 0, zVel);
+				s.sourceColor = Vector4(1, 1, 1, 0.7f);
+				s.destinationColor = Vector4(1, 1, 1, 0);
+				s.sourceSize = GenerateFloat(8, 24);
+				s.active = true;
+				s.affectedByWind = true;
+				s.friction = 0.999f;
+				s.gravity = -0.1f;
+				s.life = GenerateFloat(12, 20);
+				s.destinationSize = GenerateFloat(128, 160);
+				s.angularVelocity = GenerateFloat(-0.5f, 0.5f);
+				s.angularDrag = GenerateFloat(0.95f, 0.95f);
 			}
 		}
 	}

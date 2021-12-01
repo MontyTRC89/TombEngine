@@ -89,6 +89,11 @@
 xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
 xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>CD $(ProjectDir)Specific\savegame\schema\
+CALL gen.bat</Command>
+      <Message>Generating savegame flatbuffer...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -132,6 +137,13 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
 xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
 xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>CD $(ProjectDir)Specific\savegame\schema\
+CALL gen.bat</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generating savegame flatbuffer...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -156,7 +168,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
-    <ClInclude Include="Game\effects\lara_burn.h" />
+    <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
@@ -178,6 +190,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
@@ -569,8 +582,9 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
-    <ClCompile Include="Game\effects\lara_burn.cpp" />
+    <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />

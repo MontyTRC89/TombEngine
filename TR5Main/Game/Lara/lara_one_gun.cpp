@@ -21,9 +21,9 @@
 #include "Sound/sound.h"
 #include "effects/bubble.h"
 #include "generic_switch.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
 
@@ -1765,7 +1765,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 		{
 			LaraItem->hitPoints -= (Weapons[weapon].damage * 5);
 			if (!(g_Level.Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= Weapons[weapon].damage)
-				LaraBurn();
+				LaraBurn(LaraItem);
 		}
 	}
 }

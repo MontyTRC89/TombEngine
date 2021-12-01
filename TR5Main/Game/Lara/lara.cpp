@@ -12,7 +12,6 @@
 #include "lara_surface.h"
 #include "lara_swim.h"
 #include "lara_one_gun.h"
-#include "lara_two_guns.h"
 #include "lara_cheat.h"
 #include "lara_climb.h"
 #include "lara_initialise.h"
@@ -22,32 +21,31 @@
 #include "quad.h"
 #include "snowmobile.h"
 #include "jeep.h"
-#include "boat.h"
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
 
 #include "animation.h"
 #include "GameFlowScript.h"
-#include "health.h"
 #include "flipeffect.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "savegame.h"
 #include "rope.h"
-#include "rubberboat.h"
 #include "misc.h"
-#include "control\volume.h"
+#include "control/volume.h"
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"
 #include "gui.h"
 
-#include "Objects/Generic/Object/rope.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Control::Volumes;
 using std::function;
 using TEN::Renderer::g_Renderer;
-using namespace TEN::Control::Volumes;
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
@@ -131,7 +129,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_roll,//72
 	lara_as_dash,
 	lara_as_dashdive,
-	lara_as_hang2,
+	lara_as_monkey_idle,
 	lara_as_monkeyswing,
 	lara_as_monkeyl,
 	lara_as_monkeyr,
@@ -155,18 +153,18 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlledl,
 	lara_as_controlled,
 	lara_as_pickup,//98
-	lara_as_null,//99
-	lara_as_null,//100
-	lara_as_null,//101
-	lara_as_poleleft,//102
-	lara_as_poleright,//103
+	lara_as_pole_idle,//99
+	lara_as_pole_up,//100
+	lara_as_pole_down,//101
+	lara_as_pole_turn_clockwise,//102
+	lara_as_pole_turn_counter_clockwise,//103
 	lara_as_pulley,//104
 	lara_as_duckl,//105
 	lara_as_duckr,//106
-	lara_as_extcornerl,//107
-	lara_as_extcornerr,//108
-	lara_as_intcornerl,//109
-	lara_as_intcornerr,//110
+	lara_as_corner,//107
+	lara_as_corner,//108
+	lara_as_corner,//109
+	lara_as_corner,//110
 	lara_as_rope,//111
 	lara_as_climbrope,//112
 	lara_as_climbroped,//113
@@ -199,13 +197,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_null,//ara_as_hang_feet,//139
-	lara_as_hang_feet_shimmyr,//140
-	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_inRcorner,//142
-	lara_as_hang_feet_inLcorner,//143
-	lara_as_hang_feet_outRcorner,//144
-	lara_as_hang_feet_outLcorner,//145
+	lara_as_null,//139
+	lara_as_null,//140
+	lara_as_null,//141
+	lara_as_null,//142
+	lara_as_null,// 143 - Unused
+	lara_as_null,// 144 - Unused
+	lara_as_null,// 145 - Unused
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -290,7 +288,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_crouch_roll,
 	lara_col_dash,
 	lara_col_dashdive,
-	lara_col_hang2,
+	lara_col_monkey_idle,
 	lara_col_monkeyswing,
 	lara_col_monkeyl,
 	lara_col_monkeyr,
@@ -314,11 +312,11 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
-	lara_col_polestat,
-	lara_col_poleup,
-	lara_col_poledown,
-	lara_void_func,
-	lara_void_func,
+	lara_col_pole_idle,
+	lara_col_pole_up,
+	lara_col_pole_down,
+	lara_col_pole_turn_clockwise,
+	lara_col_pole_turn_counter_clockwise,
 	lara_default_col,
 	lara_col_ducklr,
 	lara_col_ducklr,
@@ -354,13 +352,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_hang_feet,
-	lara_col_hang_feet_shimmyr,
-	lara_col_hang_feet_shimmyl,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func, // 143 - Unused
+	lara_void_func, // 144 - Unused
+	lara_void_func, // 145 - Unused
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
@@ -435,6 +433,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
+
+	TriggerLaraDrips(item);
 
 	short roomNumber;
 
@@ -883,6 +883,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Handle weapons
 	LaraGun(item);
+
+	// Handle breath
+	LaraBreath(item);
 
 	// Test for flags & triggers
 	ProcessSectorFlags(item);

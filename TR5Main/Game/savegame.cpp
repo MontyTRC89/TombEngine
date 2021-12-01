@@ -6,6 +6,7 @@
 #include "control/lot.h"
 #include "spotcam.h"
 #include "traps.h"
+#include "floordata.h"
 #include "room.h"
 #include "sound/sound.h"
 #include "level.h"
@@ -17,7 +18,7 @@
 #include "tr5_spider_emitter.h"
 #include "fullblock_switch.h"
 #include "itemdata/creature_info.h"
-#include "Game/effects/lara_burn.h"
+#include "Game/effects/lara_fx.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Game/misc.h"
 #include "Game/puzzles_keys.h"
@@ -26,10 +27,11 @@
 
 #include <filesystem>
 
-using namespace TEN::Effects::Fire;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Floordata;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -188,7 +190,8 @@ bool SaveGame::Save(int slot)
 	auto rightArmOffset = rightArm.Finish();
 
 	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
-	Save::Vector3 nextCornerPos = Save::Vector3(Lara.nextCornerPos.x, Lara.nextCornerPos.y, Lara.nextCornerPos.z);
+	Save::Vector3 nextCornerPos = Save::Vector3(Lara.nextCornerPos.xPos, Lara.nextCornerPos.yPos, Lara.nextCornerPos.zPos);
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.nextCornerPos.xRot, Lara.nextCornerPos.yRot, Lara.nextCornerPos.zRot);
 
 	std::vector<int> laraTargetAngles{};
 	laraTargetAngles.push_back(Lara.targetAngles[0]);
@@ -250,6 +253,7 @@ bool SaveGame::Save(int slot)
 	lara.add_can_monkey_swing(Lara.canMonkeySwing);
 	lara.add_climb_status(Lara.climbStatus);
 	lara.add_next_corner_position(&nextCornerPos);
+	lara.add_next_corner_rotation(&nextCornerRot);
 	lara.add_crowbar(Lara.Crowbar);
 	lara.add_current_active(Lara.currentActive);
 	lara.add_current_x_vel(Lara.currentXvel);
@@ -430,7 +434,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
 		serializedItem.add_poisoned(itemToSerialize.poisoned);
 		serializedItem.add_ai_bits(itemToSerialize.aiBits);
-		serializedItem.add_really_active(itemToSerialize.reallyActive);
 		serializedItem.add_collidable(itemToSerialize.collidable);
 		serializedItem.add_looked_at(itemToSerialize.lookedAt);
 		serializedItem.add_swap_mesh_flags(itemToSerialize.swapMeshFlags);
@@ -949,7 +952,6 @@ bool SaveGame::Load(int slot)
 			AddActiveItem(i);
 
 		item->active = savedItem->active();
-		item->reallyActive = savedItem->really_active();
 		item->hitStatus = savedItem->hit_stauts();
 		item->status = savedItem->status();
 		item->aiBits = savedItem->ai_bits();
@@ -1017,7 +1019,8 @@ bool SaveGame::Load(int slot)
 			&& (item->flags & ONESHOT))
 			item->meshBits = 0x00100;
 
-		// TODO: specific RAISING_BLOCK hacks
+		if (obj->floor != nullptr)
+			UpdateBridgeItem(itemNumber);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
@@ -1157,10 +1160,13 @@ bool SaveGame::Load(int slot)
 	Lara.calcFallSpeed = s->lara()->calc_fall_speed();
 	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
 	Lara.climbStatus = s->lara()->climb_status();
-	Lara.nextCornerPos = PHD_VECTOR(
+	Lara.nextCornerPos = PHD_3DPOS(
 		s->lara()->next_corner_position()->x(),
 		s->lara()->next_corner_position()->y(),
-		s->lara()->next_corner_position()->z());
+		s->lara()->next_corner_position()->z(),
+		s->lara()->next_corner_rotation()->x(),
+		s->lara()->next_corner_rotation()->y(),
+		s->lara()->next_corner_rotation()->z());
 	Lara.Crowbar = s->lara()->crowbar();
 	Lara.currentActive = s->lara()->current_active();
 	Lara.currentXvel = s->lara()->current_x_vel();
@@ -1291,7 +1297,7 @@ bool SaveGame::Load(int slot)
 			flag = 1;
 			Lara.burnSmoke = 0;
 		}
-		LaraBurn();
+		LaraBurn(LaraItem);
 		if (flag)
 			Lara.burnSmoke = 1;
 	}
