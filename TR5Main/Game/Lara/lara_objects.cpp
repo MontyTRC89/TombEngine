@@ -775,7 +775,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, coll->Setup.Height, true, CollidedItems, nullptr, 0) && CollidedItems[0])
+	if (GetCollidedObjects(item, WALL_SIZE, true, CollidedItems, nullptr, 0) && CollidedItems[0])
 	{
 		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
