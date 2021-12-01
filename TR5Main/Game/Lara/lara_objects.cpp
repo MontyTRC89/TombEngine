@@ -863,6 +863,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
+			info->gunStatus = LG_NO_ARMS;
 			return;
 		}
 
@@ -892,6 +893,8 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_POLE_IDLE;
 		return;
 	}
+
+	info->gunStatus = LG_NO_ARMS;
 
 	if (coll->Middle.Floor <= 0)
 	{
