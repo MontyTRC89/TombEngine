@@ -2611,7 +2611,6 @@ namespace TEN::Renderer
         // Set shadow map data
         if (m_shadowLight != NULL)
         {
-
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
