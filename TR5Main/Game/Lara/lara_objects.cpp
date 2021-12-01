@@ -769,15 +769,55 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 // VERTICAL POLE
 // -------------
 
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
+{
+	bool atLeastOnePoleCollided = false;
+
+	if (GetCollidedObjects(item, coll->Setup.Radius, true, CollidedItems, CollidedMeshes, 0) && CollidedItems[0])
+	{
+		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+
+		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
+		// check her position. So we add a fixed height offset.
+		auto offset = up ? -STEP_SIZE / 2.0f : 0.0f;
+
+		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), 16.0f);
+		
+		int i = 0;
+		while (CollidedItems[i] != NULL)
+		{
+			auto& obj = CollidedItems[i];
+			i++;
+
+			if (obj->objectNumber != ID_POLEROPE)
+				continue;
+
+			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
+			poleBox.Extents = poleBox.Extents + Vector3(WALL_SIZE, 0, WALL_SIZE);
+
+			if (poleBox.Intersects(sphere))
+				atLeastOnePoleCollided = true;
+		}
+	}
+
+	return atLeastOnePoleCollided;
+}
+
 // TODO: Move test functions to lara_tests.cpp when lara_state_cleaning_etc branch is merged.
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (!TestLaraPoleCollision(item, coll, true))
+		return false;
+
 	// TODO: Accuracy.
 	return (coll->Middle.Ceiling < -STEP_SIZE);
 }
 
 bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (!TestLaraPoleCollision(item, coll, false))
+		return false;
+
 	return (coll->Middle.Floor > 0);
 }
 
@@ -793,7 +833,6 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_FREEFALL; // TODO: Death state dispatch.
-
 		return;
 	}
 
@@ -822,7 +861,6 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
-
 			return;
 		}
 
@@ -830,11 +868,9 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 			TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_UP;
-
 			return;
 		}
-		else if (TrInput & IN_BACK &&
-			TestLaraPoleDown(item, coll))
+		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
 			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			item->goalAnimState = LS_POLE_DOWN;
@@ -845,13 +881,11 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
-
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
-
 			return;
 		}
 
@@ -904,7 +938,6 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
-
 		return;
 	}
 
@@ -923,20 +956,18 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 				info->turnRate = -LARA_SLOW_TURN;
 		}
 
-		if (TrInput & IN_FORWARD &&
-			TestLaraPoleUp(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_UP;
-
 			return;
 		}
 
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
 	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall?
+
 }
 
 // State:		LS_POLE_UP (100)
@@ -944,8 +975,6 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_pole_idle(item, coll);
-
-	// TODO: Stop at top of pole.
 }
 
 // State:		LS_POLE_DOWN (101)
@@ -960,7 +989,6 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
-
 		return;
 	}
 
@@ -1026,7 +1054,8 @@ void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->itemFlags[2] > SHRT_MAX / 2)
 		item->itemFlags[2] = SHRT_MAX / 2;
 
-	item->pos.yPos += item->itemFlags[2] >> 8;
+	if (TestLaraPoleCollision(item, coll, false))
+		item->pos.yPos += item->itemFlags[2] >> 8;
 
 	if (coll->Middle.Floor < 0)
 		item->pos.yPos += coll->Middle.Floor;
@@ -1044,7 +1073,6 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
-
 		return;
 	}
 
@@ -1053,18 +1081,14 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD &&
-			TestLaraPoleUp(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climp up.
-
 			return;
 		}
-		else if (TrInput & IN_BACK &&
-			TestLaraPoleDown(item, coll))
+		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
-
 			return;
 		}
 
@@ -1075,12 +1099,10 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 				info->turnRate = LARA_SLOW_TURN + ANGLE(0.5f);
 
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
-
 			return;
 		}
 
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
@@ -1115,18 +1137,14 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD &&
-			TestLaraPoleUp(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb up.
-
 			return;
 		}
-		else if (TrInput & IN_BACK &&
-			TestLaraPoleDown(item, coll))
+		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
 			item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
-
 			return;
 		}
 
@@ -1137,12 +1155,10 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 				info->turnRate = -(LARA_SLOW_TURN + ANGLE(0.5f));
 
 			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
-
 			return;
 		}
 
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
