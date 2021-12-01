@@ -10,6 +10,7 @@
 #include "items.h"
 #include "camera.h"
 #include "level.h"
+#include "Scripting/GameFlowScript.h"
 
 using namespace TEN::Floordata;
 
@@ -67,10 +68,6 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		GetCollisionInfo(coll, item);
 
-		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-		Lara.NewAnims.Monkey180Roll = 1;
-
-
 		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
 		{
 			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
@@ -93,7 +90,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && Lara.NewAnims.Monkey180Roll)
+		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyRoll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}

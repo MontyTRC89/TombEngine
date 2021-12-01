@@ -61,7 +61,6 @@ void InitialiseLara(int restore)
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = LARA_HEALTH_MAX;
 	Lara.gunStatus = LG_NO_ARMS;
-	memset(&Lara.NewAnims, 0, sizeof(AnimsNew));	//make sure script changes these AFTER Lara is initialized?
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;
 

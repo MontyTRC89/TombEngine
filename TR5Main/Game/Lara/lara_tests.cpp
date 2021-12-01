@@ -11,6 +11,7 @@
 #include "control/los.h"
 #include "items.h"
 #include "Renderer11.h"
+#include "Scripting/GameFlowScript.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
@@ -86,19 +87,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE))
 		return false;
 
-	// TODO: Enable with lua!
-	Lara.NewAnims.CrawlVault1click = 1;
-	Lara.NewAnims.CrawlVault2click = 1;
-	Lara.NewAnims.CrawlVault3click = 1;
-	Lara.NewAnims.MonkeyVault = 1;
-
 	if (TestValidLedge(item, coll))
 	{
 		bool success = false;
 
 		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
 		{
-			if (Lara.NewAnims.CrawlVault1click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
@@ -123,7 +118,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (Lara.NewAnims.CrawlVault2click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -148,7 +143,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (Lara.NewAnims.CrawlVault3click && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtraVaults && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -216,7 +211,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		return true;
 	}
 
-	if (Lara.canMonkeySwing && Lara.NewAnims.MonkeyVault)
+	if (Lara.canMonkeySwing && g_GameFlow->Animations.MonkeyVault)
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
@@ -455,11 +450,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto angle = item->pos.yRot;
 
-	Lara.NewAnims.OscillateHanging = true;
-
 	if (TestHangSwingIn(item, angle))
 	{
-		if (Lara.NewAnims.OscillateHanging)
+		if (g_GameFlow->Animations.OscillateHanging)
 		{
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
@@ -935,8 +928,6 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 	FLOOR_INFO* floor;
 	int floorHeight, ceilingHeight;
 
-	Lara.NewAnims.OscillateHanging = true;
-
 	z += phd_cos(angle) * (STEP_SIZE / 2);
 	x += phd_sin(angle) * (STEP_SIZE / 2);
 
@@ -946,7 +937,7 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 
 	if (floorHeight != NO_HEIGHT)
 	{
-		if (Lara.NewAnims.OscillateHanging)
+		if (g_GameFlow->Animations.OscillateHanging)
 		{
 			if (floorHeight - y > 0 && ceilingHeight - y < -400)
 				return true;
@@ -1185,10 +1176,6 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
 
-	// TODO: Enable with lua!
-	Lara.NewAnims.CrawlFlexWaterPullUp = true;
-	Lara.NewAnims.CrawlFlexSubmerged = true;
-
 	if (Lara.gunStatus &&
 		(Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 	{
@@ -1215,7 +1202,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			if (g_GameFlow->Animations.CrawlFlexWaterPullUp)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
@@ -1227,7 +1214,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexSubmerged)
+			if (g_GameFlow->Animations.CrawlFlexSubmerged)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
@@ -1240,7 +1227,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (Lara.NewAnims.CrawlFlexWaterPullUp)
+			if (g_GameFlow->Animations.CrawlFlexWaterPullUp)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;
