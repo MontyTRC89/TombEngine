@@ -10,13 +10,14 @@
 #include "items.h"
 #include "camera.h"
 #include "level.h"
+#include "Scripting/GameFlowScript.h"
 
 using namespace TEN::Floordata;
 
 /*this file has all the related functions to monkeyswinging*/
 
 /*monkeyswing state handling functions*/
-void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*collision: lara_col_hang2*/
@@ -45,7 +46,7 @@ void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 }
 
-void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 75*/
 	/*state code: lara_as_hang2*/
@@ -66,10 +67,6 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		Lara.moveAngle = item->pos.yRot;
 
 		GetCollisionInfo(coll, item);
-
-		// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-		Lara.NewAnims.Monkey180Roll = 1;
-
 
 		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
 		{
@@ -93,7 +90,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && Lara.NewAnims.Monkey180Roll)
+		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyRoll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
