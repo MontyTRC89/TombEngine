@@ -23,7 +23,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
 	short roomsArray[255];
@@ -123,15 +123,12 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (dx >= -2048
-						&& dx <= 2048
-						&& dy >= -2048
-						&& dy <= 2048
-						&& dz >= -2048
-						&& dz <= 2048
-						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1
-						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2
-						&& collidingItem->floor >= item->pos.yPos)
+					if (dx >= -2048	&& dx <= 2048 && 
+						dy >= -2048	&& dy <= 2048 && 
+						dz >= -2048	&& dz <= 2048 && 
+						collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 && 
+						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2 && 
+						collidingItem->floor >= item->pos.yPos)
 					{
 						float s = phd_sin(item->pos.yRot);
 						float c = phd_cos(item->pos.yRot);
