@@ -3,7 +3,6 @@
 #include "animation.h"
 #include "control/control.h"
 #include "lara_fire.h"
-#include "gameflow.h"
 #include "Sound\sound.h"
 #include "savegame.h"
 #include "Lara.h"

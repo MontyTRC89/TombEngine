@@ -28,7 +28,7 @@ struct SPOTCAM
 	short pad;
 };
 
-enum spotcam_flags
+enum SPOTCAM_FLAGS
 {
 	SCF_CUT_PAN = (1 << 0),					 // 0x0001   cut without panning smoothly
 	SCF_UNUSED = (1 << 1),				     // 0x0002

@@ -5,7 +5,8 @@
 
 constexpr auto NO_LOS_ITEM = INT_MAX;
 
-int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
+bool LOSAndReturnTarget(GAME_VECTOR* start, GAME_VECTOR* target, int push);
+bool LOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
