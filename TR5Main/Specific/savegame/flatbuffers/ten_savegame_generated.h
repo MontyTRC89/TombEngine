@@ -1427,6 +1427,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t water_surface_dist = 0;
   std::unique_ptr<TEN::Save::Vector3> last_position{};
   std::unique_ptr<TEN::Save::Vector3> next_corner_position{};
+  std::unique_ptr<TEN::Save::Vector3> next_corner_rotation{};
   std::vector<int32_t> mesh_ptrs{};
   std::vector<int32_t> target_angles{};
   int32_t turn_rate = 0;
@@ -1545,67 +1546,68 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WATER_SURFACE_DIST = 98,
     VT_LAST_POSITION = 100,
     VT_NEXT_CORNER_POSITION = 102,
-    VT_MESH_PTRS = 104,
-    VT_TARGET_ANGLES = 106,
-    VT_TURN_RATE = 108,
-    VT_MOVE_ANGLE = 110,
-    VT_HEAD_X_ROT = 112,
-    VT_HEAD_Y_ROT = 114,
-    VT_HEAD_Z_ROT = 116,
-    VT_TORSO_X_ROT = 118,
-    VT_TORSO_Y_ROT = 120,
-    VT_TORSO_Z_ROT = 122,
-    VT_LEFT_ARM = 124,
-    VT_RIGHT_ARM = 126,
-    VT_ROPE_SEGMENT = 128,
-    VT_ROPE_DIRECTION = 130,
-    VT_ROPE_ARC_FRONT = 132,
-    VT_ROPE_ARC_BACK = 134,
-    VT_ROPE_LAST_X = 136,
-    VT_ROPE_MAX_X_FORWARD = 138,
-    VT_ROPE_MAX_X_BACKWARD = 140,
-    VT_ROPE_DFRAME = 142,
-    VT_ROPE_FRAME = 144,
-    VT_ROPE_FRAMERATE = 146,
-    VT_ROPE_Y = 148,
-    VT_ROPE_PTR = 150,
-    VT_INTERACTED_ITEM = 152,
-    VT_ROPE_OFFSET = 154,
-    VT_ROPE_DOWN_VEL = 156,
-    VT_ROPE_FLAG = 158,
-    VT_ROPE_COUNT = 160,
-    VT_MOVE_COUNT = 162,
-    VT_LOCATION = 164,
-    VT_HIGHEST_LOCATION = 166,
-    VT_LOCATION_PAD = 168,
-    VT_TIGHTROPE = 170,
-    VT_BEETLE_LIFE = 172,
-    VT_HAS_BEETLE_THINGS = 174,
-    VT_SMALL_WATERSKIN = 176,
-    VT_BIG_WATERSKIN = 178,
-    VT_VEHICLE = 180,
-    VT_EXTRA_ANIM = 182,
-    VT_MINE_L = 184,
-    VT_MINE_R = 186,
-    VT_WEAPONS = 188,
-    VT_PUZZLES = 190,
-    VT_KEYS = 192,
-    VT_PICKUPS = 194,
-    VT_EXAMINES = 196,
-    VT_PUZZLES_COMBO = 198,
-    VT_KEYS_COMBO = 200,
-    VT_PICKUPS_COMBO = 202,
-    VT_EXAMINES_COMBO = 204,
-    VT_SECRETS = 206,
-    VT_LASERSIGHT = 208,
-    VT_CROWBAR = 210,
-    VT_TORCH = 212,
-    VT_SILENCER = 214,
-    VT_BINOCULARS = 216,
-    VT_NUM_LARGE_MEDIPACKS = 218,
-    VT_NUM_SMALL_MEDIPACKS = 220,
-    VT_NUM_FLARES = 222,
-    VT_TARGET_ITEM_NUMBER = 224
+    VT_NEXT_CORNER_ROTATION = 104,
+    VT_MESH_PTRS = 106,
+    VT_TARGET_ANGLES = 108,
+    VT_TURN_RATE = 110,
+    VT_MOVE_ANGLE = 112,
+    VT_HEAD_X_ROT = 114,
+    VT_HEAD_Y_ROT = 116,
+    VT_HEAD_Z_ROT = 118,
+    VT_TORSO_X_ROT = 120,
+    VT_TORSO_Y_ROT = 122,
+    VT_TORSO_Z_ROT = 124,
+    VT_LEFT_ARM = 126,
+    VT_RIGHT_ARM = 128,
+    VT_ROPE_SEGMENT = 130,
+    VT_ROPE_DIRECTION = 132,
+    VT_ROPE_ARC_FRONT = 134,
+    VT_ROPE_ARC_BACK = 136,
+    VT_ROPE_LAST_X = 138,
+    VT_ROPE_MAX_X_FORWARD = 140,
+    VT_ROPE_MAX_X_BACKWARD = 142,
+    VT_ROPE_DFRAME = 144,
+    VT_ROPE_FRAME = 146,
+    VT_ROPE_FRAMERATE = 148,
+    VT_ROPE_Y = 150,
+    VT_ROPE_PTR = 152,
+    VT_INTERACTED_ITEM = 154,
+    VT_ROPE_OFFSET = 156,
+    VT_ROPE_DOWN_VEL = 158,
+    VT_ROPE_FLAG = 160,
+    VT_ROPE_COUNT = 162,
+    VT_MOVE_COUNT = 164,
+    VT_LOCATION = 166,
+    VT_HIGHEST_LOCATION = 168,
+    VT_LOCATION_PAD = 170,
+    VT_TIGHTROPE = 172,
+    VT_BEETLE_LIFE = 174,
+    VT_HAS_BEETLE_THINGS = 176,
+    VT_SMALL_WATERSKIN = 178,
+    VT_BIG_WATERSKIN = 180,
+    VT_VEHICLE = 182,
+    VT_EXTRA_ANIM = 184,
+    VT_MINE_L = 186,
+    VT_MINE_R = 188,
+    VT_WEAPONS = 190,
+    VT_PUZZLES = 192,
+    VT_KEYS = 194,
+    VT_PICKUPS = 196,
+    VT_EXAMINES = 198,
+    VT_PUZZLES_COMBO = 200,
+    VT_KEYS_COMBO = 202,
+    VT_PICKUPS_COMBO = 204,
+    VT_EXAMINES_COMBO = 206,
+    VT_SECRETS = 208,
+    VT_LASERSIGHT = 210,
+    VT_CROWBAR = 212,
+    VT_TORCH = 214,
+    VT_SILENCER = 216,
+    VT_BINOCULARS = 218,
+    VT_NUM_LARGE_MEDIPACKS = 220,
+    VT_NUM_SMALL_MEDIPACKS = 222,
+    VT_NUM_FLARES = 224,
+    VT_TARGET_ITEM_NUMBER = 226
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -1756,6 +1758,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Vector3 *next_corner_position() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_POSITION);
+  }
+  const TEN::Save::Vector3 *next_corner_rotation() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_ROTATION);
   }
   const flatbuffers::Vector<int32_t> *mesh_ptrs() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_PTRS);
@@ -1994,6 +1999,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_LAST_POSITION) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_POSITION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_ROTATION) &&
            VerifyOffset(verifier, VT_MESH_PTRS) &&
            verifier.VerifyVector(mesh_ptrs()) &&
            VerifyOffset(verifier, VT_TARGET_ANGLES) &&
@@ -2230,6 +2236,9 @@ struct LaraBuilder {
   }
   void add_next_corner_position(const TEN::Save::Vector3 *next_corner_position) {
     fbb_.AddStruct(Lara::VT_NEXT_CORNER_POSITION, next_corner_position);
+  }
+  void add_next_corner_rotation(const TEN::Save::Vector3 *next_corner_rotation) {
+    fbb_.AddStruct(Lara::VT_NEXT_CORNER_ROTATION, next_corner_rotation);
   }
   void add_mesh_ptrs(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs) {
     fbb_.AddOffset(Lara::VT_MESH_PTRS, mesh_ptrs);
@@ -2477,6 +2486,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t water_surface_dist = 0,
     const TEN::Save::Vector3 *last_position = 0,
     const TEN::Save::Vector3 *next_corner_position = 0,
+    const TEN::Save::Vector3 *next_corner_rotation = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_angles = 0,
     int32_t turn_rate = 0,
@@ -2593,6 +2603,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_turn_rate(turn_rate);
   builder_.add_target_angles(target_angles);
   builder_.add_mesh_ptrs(mesh_ptrs);
+  builder_.add_next_corner_rotation(next_corner_rotation);
   builder_.add_next_corner_position(next_corner_position);
   builder_.add_last_position(last_position);
   builder_.add_water_surface_dist(water_surface_dist);
@@ -2710,6 +2721,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t water_surface_dist = 0,
     const TEN::Save::Vector3 *last_position = 0,
     const TEN::Save::Vector3 *next_corner_position = 0,
+    const TEN::Save::Vector3 *next_corner_rotation = 0,
     const std::vector<int32_t> *mesh_ptrs = nullptr,
     const std::vector<int32_t> *target_angles = nullptr,
     int32_t turn_rate = 0,
@@ -2835,6 +2847,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       water_surface_dist,
       last_position,
       next_corner_position,
+      next_corner_rotation,
       mesh_ptrs__,
       target_angles__,
       turn_rate,
@@ -5122,6 +5135,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
   { auto _e = last_position(); if (_e) _o->last_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = next_corner_position(); if (_e) _o->next_corner_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = next_corner_rotation(); if (_e) _o->next_corner_rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = mesh_ptrs(); if (_e) { _o->mesh_ptrs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_ptrs[_i] = _e->Get(_i); } } }
   { auto _e = target_angles(); if (_e) { _o->target_angles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->target_angles[_i] = _e->Get(_i); } } }
   { auto _e = turn_rate(); _o->turn_rate = _e; }
@@ -5243,6 +5257,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _water_surface_dist = _o->water_surface_dist;
   auto _last_position = _o->last_position ? _o->last_position.get() : 0;
   auto _next_corner_position = _o->next_corner_position ? _o->next_corner_position.get() : 0;
+  auto _next_corner_rotation = _o->next_corner_rotation ? _o->next_corner_rotation.get() : 0;
   auto _mesh_ptrs = _fbb.CreateVector(_o->mesh_ptrs);
   auto _target_angles = _fbb.CreateVector(_o->target_angles);
   auto _turn_rate = _o->turn_rate;
@@ -5356,6 +5371,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _water_surface_dist,
       _last_position,
       _next_corner_position,
+      _next_corner_rotation,
       _mesh_ptrs,
       _target_angles,
       _turn_rate,

@@ -6,6 +6,7 @@
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
 #include "GameScriptAudioTrack.h"
+#include "GameScriptAnimations.h"
 
 enum class TITLE_TYPE
 {
@@ -37,6 +38,9 @@ public:
 	std::string						IntroImagePath{};
 	std::string						TitleScreenImagePath{};
 
+	// New animation flag table
+	GameScriptAnimations			Animations{};
+
 	// Selected language set
 	std::vector<GameScriptLevel*>	Levels;
 
@@ -49,6 +53,7 @@ public:
 	char const *					GetString(const char* id) const;
 	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
+	void							SetAnimations(GameScriptAnimations const & src);
 	void							SetSettings(GameScriptSettings const & src);
 	GameScriptSettings*				GetSettings();
 	GameScriptLevel*				GetLevel(int id);

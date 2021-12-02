@@ -12,6 +12,7 @@
 #include "lara_jump.h"
 #include "lara_basic.h"
 #include "lara_slide.h"
+#include "Scripting/GameFlowScript.h"
 
 // -----------------------------
 // JUMP
@@ -622,9 +623,6 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 		info->gunStatus = LG_HANDS_FREE;
 
-	// TODO: LUA.
-	info->NewAnims.CrawlspaceSwandive = true;
-
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
@@ -633,7 +631,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 			;
 		else if (info->keepCrouched ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
-			info->NewAnims.CrawlspaceSwandive)
+			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
