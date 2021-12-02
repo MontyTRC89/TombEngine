@@ -368,7 +368,7 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	short roomNum = item->roomNumber;
 
 	FLOOR_INFO* floor;
-	int h, c;
+	int floorHeight, ceilHeight;
 
 	switch (angle)
 	{
@@ -409,13 +409,13 @@ SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
 	}
 
 	floor = GetFloor(x, y, z, &roomNum);
-	h = GetFloorHeight(floor, x, y, z);
-	c = GetCeiling(floor, x, y, z);
+	floorHeight = GetFloorHeight(floor, x, y, z);
+	ceilHeight = GetCeiling(floor, x, y, z);
 
-	if (h == NO_HEIGHT)
+	if (floorHeight == NO_HEIGHT)
 		return SPLAT_COLL::WALL;
 
-	if (y >= h || y <= c)
+	if (y >= floorHeight || y <= ceilHeight)
 		return SPLAT_COLL::STEP;
 
 	return SPLAT_COLL::NONE;
@@ -1540,6 +1540,8 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_WALK_BACK &&
 		item->currentAnimState != LS_RUN_BACK &&
+		item->currentAnimState != LS_SPRINT_DIVE &&
+		item->currentAnimState != LS_SPLAT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1558,6 +1560,8 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_WADE_FORWARD &&
 		item->currentAnimState != LS_RUN_BACK &&
+		item->currentAnimState != LS_SPRINT_DIVE &&
+		item->currentAnimState != LS_SPLAT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1581,12 +1585,11 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 	auto noSlope = checkSlope ? !probe.Position.Slope : true;
 	auto noDeath = checkDeath ? !probe.Block->Flags.Death : true;
 
-	if ((probe.Position.Floor - y) <= lowerBound &&										// Lower floor bound.
-		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&				// Space is not a clamp.
-		noSlope &&																		// No slope (if applicable).
-		noDeath &&																		// No death sector (if applicable).
+	if ((probe.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
+		(probe.Position.Floor - y) >= upperBound &&								// Upper floor bound.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&					// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
+		noSlope && noDeath &&													// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1604,8 +1607,7 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&							// Lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
-		!probe.Position.Slope &&														// No slope.
-		!probe.Block->Flags.Death &&													// No death sector.
+		!probe.Position.Slope && !probe.Block->Flags.Death &&							// No slope or death sector.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1774,8 +1776,7 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	if ((((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&							// Lower floor bound. Synced with crawl exit jump's highest floor bound.
 		(probeA.Position.Floor - y) >= STEP_SIZE) ||								// Upper floor bound. Synced with crawl states' BadHeightDown. OR
-		(probeA.Position.Slope &&													// Crossing is slope.
-		probeB.Position.Slope)) &&													// Destination is slope.
+		(probeA.Position.Slope && probeB.Position.Slope)) &&						// Slopes ahead.
 		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.

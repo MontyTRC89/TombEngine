@@ -101,7 +101,7 @@ enum LARA_STATE
 	LS_CROUCH_IDLE = 71,
 	LS_CROUCH_ROLL = 72,
 	LS_SPRINT = 73,
-	LS_SPRINT_ROLL = 74,
+	LS_SPRINT_DIVE = 74,
 	LS_MONKEYSWING_IDLE = 75,
 	LS_MONKEYSWING_FORWARD = 76,
 	LS_MONKEYSWING_LEFT = 77,
@@ -208,7 +208,7 @@ enum LARA_ANIM
 	LA_RUN_TO_WALK_LEFT = 9,								// Run > walk, right foot first
 	LA_RUN_TO_STAND_RIGHT = 10,								// Run > stand, right foot first
 	LA_STAND_SOLID = 11,									// Stand solid
-																// TODO: gradually remove reliance on this anim for erroneous collisions.
+																// TODO: gradually reduce reliance on this anim for erroneous collisions.
 	LA_TURN_RIGHT_SLOW = 12,								// Rotate right slowly
 	LA_TURN_LEFT_SLOW = 13,									// Rotate left slowly
 	LA_JUMP_FORWARD_LAND_START_UNUSED = 14,					// Forward jump > land (1/2)
@@ -220,7 +220,7 @@ enum LARA_ANIM
 	LA_STAND_TO_WALK_START = 20,							// Stand > walk forward (1/2)
 	LA_STAND_TO_WALK_END = 21,								// Stand > walk forward (1/2)
 	LA_JUMP_FORWARD_TO_FREEFALL_UNUSED = 22,				// Jump > fall (possibly unused?)
-	// TODO: confirm lack of dispatch for this anim.
+																// TODO: confirm lack of dispatch for this anim.
 	LA_FREEFALL = 23,										// Freefall, after falling more than 7 clicks (looped)
 	LA_FREEFALL_LAND = 24,									// Freefall > hard landing
 	LA_FREEFALL_DEATH = 25,									// Freefall death
@@ -232,7 +232,7 @@ enum LARA_ANIM
 	LA_JUMP_UP_LAND = 31,									// Jump up > land
 	LA_JUMP_WALL_SMASH_START = 32,							// Directional jump smash > fall (1/2)
 	LA_JUMP_WALL_SMASH_END = 33,							// Directional jump smash > fall (2/2)
-	// TODO: create matching anims for all directional wall smashes.
+																// TODO: create matching anims for all directional wall smashes.
 	LA_FALL_START = 34,										// Start falling
 	LA_FALL = 35,											// Light fall (looped)
 	LA_FALL_TO_FREEFALL = 36,								// Light fall > freefall
@@ -246,7 +246,6 @@ enum LARA_ANIM
 																// TODO: implement properly.
 	LA_TURN_RIGHT_FAST = 44,								// Rotate right quickly
 	LA_JUMP_FORWARD_TO_FREEFALL_OG = 45,					// Jump forward > fall
-																// TODO: this is the original, but incorrect, linking animation; in WAD should be 49 instead.
 	LA_REACH_TO_FREEFALL_ALTERNATE_UNUSED = 46,				// Reach > freefall
 	LA_ROLL_180_START_ALTERNATE_UNUSED = 47,				// Standing roll 180 (1/2)
 	LA_ROLL_180_END_ALTERNATE_UNUSED = 48,					// Standing roll 180 (2/2)
@@ -365,7 +364,7 @@ enum LARA_ANIM
 	LA_SWANDIVE = 158,										// Swan dive
 	LA_HANG_HANDSTAND = 159,								// Hang > stand via handstand
 	
-															// TR2
+	// TR2
 	LA_STAND_TO_LADDER = 160,								// Stand > ladder idle
 	LA_LADDER_UP = 161,										// Ascend ladder (looped)
 	LA_LADDER_UP_LEFT_END = 162,							// Ascend ladder > ladder idle, left foot first
@@ -428,69 +427,65 @@ enum LARA_ANIM
 	LA_ZIPLINE_RIDE = 215,									// Ride zipline (looped)
 	LA_ZIPLINE_DISMOUNT = 216,								// Ride zipline > jump forward
 	
-															// TR3
-	LA_STAND_TO_CROUCH_START = 217,							// Stand > crouch (1/2)
-	LA_CROUCH_ROLL_FORWARD_START_ALTERNATE = 218,			// Crouch roll forward (1/3)
-																// TODO: this is the original, but incorrect, linking animation; in WAD it should be 47 instead.
-	LA_CROUCH_ROLL_FORWARD_CONTINUE = 219,					// Crouch roll forward (2/3)
-	LA_CROUCH_ROLL_FORWARD_END = 220,						// Crouch roll forward (3/3)
-	LA_CROUCH_TO_STAND = 221,								// Crouch >  stand
-	LA_CROUCH_IDLE = 222,									// Crouch (looped)
-	LA_SPRINT = 223,										// Sprint (looped)
-	LA_RUN_TO_SPRINT_LEFT = 224,							// Run > sprint, left foot first
-	LA_RUN_TO_SPRINT_RIGHT = 225,							// Run > sprint, right foot first
-	LA_SPRINT_TO_STAND_RIGHT = 226,							// Sprint > stand, right foot first
-	LA_SPRINT_TO_STAND_RIGHT_END_ALTERNATE_UNUSED = 227,	// Sprint > stand, right foot first end
-	LA_SPRINT_TO_STAND_LEFT = 228,							// Sprint > stand, left foot first
-	LA_SPRINT_TO_STAND_LEFT_END_ALTERNATE_UNUSED = 229,		// Sprint > stand, left foot first end
-	LA_SPRINT_ROLL_TO_RUN_LEFT_START = 230,					// Sprint roll, left foot first > run (1/2)
+	// TR3
+	LA_STAND_TO_CROUCH_START = 217,									// Stand > crouch (1/2)
+	LA_CROUCH_ROLL_FORWARD_START_ALTERNATE = 218,					// Crouch roll forward (1/3)
+	LA_CROUCH_ROLL_FORWARD_CONTINUE = 219,							// Crouch roll forward (2/3)
+	LA_CROUCH_ROLL_FORWARD_END = 220,								// Crouch roll forward (3/3)
+	LA_CROUCH_TO_STAND = 221,										// Crouch >  stand
+	LA_CROUCH_IDLE = 222,											// Crouch (looped)
+	LA_SPRINT = 223,												// Sprint (looped)
+	LA_RUN_TO_SPRINT_LEFT = 224,									// Run > sprint, left foot first
+	LA_RUN_TO_SPRINT_RIGHT = 225,									// Run > sprint, right foot first
+	LA_SPRINT_TO_STAND_RIGHT = 226,									// Sprint > stand, right foot first
+	LA_SPRINT_TO_STAND_RIGHT_END_ALTERNATE_UNUSED = 227,			// Sprint > stand, right foot first end
+	LA_SPRINT_TO_STAND_LEFT = 228,									// Sprint > stand, left foot first
+	LA_SPRINT_TO_STAND_LEFT_END_ALTERNATE_UNUSED = 229,				// Sprint > stand, left foot first end
+	LA_SPRINT_ROLL_TO_RUN_LEFT_START = 230,							// Sprint roll, left foot first > run (1/2)
 	LA_SPRINT_ROLL_TO_RUN_RIGHT_CONTINUE_ALTERNATE_UNUSED = 231,	// Sprint roll, left foot first > run (2/3)
-	LA_SPRINT_ROLL_TO_RUN_LEFT_END = 232,					// Sprint roll, left foot first > run (2/2)
-	LA_JUMP_UP_TO_MONKEYSWING = 233,						// Jump up > monkey swing
-	LA_MONKEYSWING_IDLE = 234,								// Monkey swing idle (looped)
-	LA_MONKEYSWING_TO_FREEFALL = 235,						// Monkey swing > freefall
-	LA_MONKEYSWING_FORWARD = 236,							// Monkey swing forward (looped)
-	LA_MONKEYSWING_FORWARD_TO_IDLE_RIGHT = 237,				// Monkey-swing forward > monkey swing idle, right hand first
-	LA_MONKEYSWING_FORWARD_TO_IDLE_LEFT = 238,				// Monkey-swing forward > monkey swing idle, left hand first
-	LA_MONKEYSWING_IDLE_TO_FORWARD_LEFT = 239,				// Monkey idle > monkey forward, left hand first
-	LA_SPRINT_ROLL_TO_RUN_LEFT_START_ALTERNATE_UNUSED = 240,	// Sprint roll, left foot first > run (1/3)
-	LA_SPRINT_ROLL_TO_RUN_LEFT_CONTINUE_ALTERNATE_UNUSED = 241,	// Sprint roll, left foot first > run (2/3)
-	LA_SPRINT_ROLL_TO_RUN_LEFT_END_ALTERNATE_UNUSED = 242,		// Sprint roll, left foot first > run (3/3)
-	LA_SPRINT_TO_RUN_LEFT = 243,							// Sprint > run, left foot first
-	LA_SPRINT_TO_RUN_RIGHT = 244,							// Sprint > run, right foot first
-	LA_STAND_TO_CROUCH_END = 245,							// Stand > crouch (2/2)
-	LA_SLIDE_TO_RUN = 246,									// Slide forward > run
-	LA_CROUCH_ROLL_FORWARD_START = 247,						// Crouch roll forward (1/3)
-	LA_JUMP_FORWARD_TO_REACH_1 = 248,						// Jump forward > reach, 1st opportunity
-	LA_JUMP_FORWARD_TO_REACH_2 = 249,						// Jump forward > reach, 2nd opportunity
-	LA_RUN_JUMP_LEFT_TO_REACH = 251,						// Run jump, left foot first > reach
-	LA_MONKEYSWING_IDLE_TO_FORWARD_RIGHT = 252,				// Monkey swing idle > monkey swing forward, right hand first
-	LA_MONKEYSWING_SHIMMY_LEFT = 253,						// Monkey swing shimmy left (looped)
-	LA_MONKEYSWING_SHIMMY_LEFT_END = 254,					// Monkey swing shimmy left > monkey swing idle
-	LA_MONKEYSWING_SHIMMY_RIGHT = 255,						// Monkey swing shimmy right (looped)
-	LA_MONKEYSWING_SHIMMY_RIGHT_END = 256,					// Monkey swing shimmy right > monkey swing idle
-																// TODO: generic shimmy anims between ledges and ladders?
+	LA_SPRINT_ROLL_TO_RUN_LEFT_END = 232,							// Sprint roll, left foot first > run (2/2)
+	LA_JUMP_UP_TO_MONKEYSWING = 233,								// Jump up > monkey swing
+	LA_MONKEYSWING_IDLE = 234,										// Monkey swing idle (looped)
+	LA_MONKEYSWING_TO_FREEFALL = 235,								// Monkey swing > freefall
+	LA_MONKEYSWING_FORWARD = 236,									// Monkey swing forward (looped)
+	LA_MONKEYSWING_FORWARD_TO_IDLE_RIGHT = 237,						// Monkey-swing forward > monkey swing idle, right hand first
+	LA_MONKEYSWING_FORWARD_TO_IDLE_LEFT = 238,						// Monkey-swing forward > monkey swing idle, left hand first
+	LA_MONKEYSWING_IDLE_TO_FORWARD_LEFT = 239,						// Monkey idle > monkey forward, left hand first
+	LA_SPRINT_ROLL_TO_RUN_LEFT_START_ALTERNATE_UNUSED = 240,		// Sprint roll, left foot first > run (1/3)
+	LA_SPRINT_ROLL_TO_RUN_LEFT_CONTINUE_ALTERNATE_UNUSED = 241,		// Sprint roll, left foot first > run (2/3)
+	LA_SPRINT_ROLL_TO_RUN_LEFT_END_ALTERNATE_UNUSED = 242,			// Sprint roll, left foot first > run (3/3)
+	LA_SPRINT_TO_RUN_LEFT = 243,									// Sprint > run, left foot first
+	LA_SPRINT_TO_RUN_RIGHT = 244,									// Sprint > run, right foot first
+	LA_STAND_TO_CROUCH_END = 245,									// Stand > crouch (2/2)
+	LA_SLIDE_TO_RUN = 246,											// Slide forward > run
+	LA_CROUCH_ROLL_FORWARD_START = 247,								// Crouch roll forward (1/3)
+	LA_JUMP_FORWARD_TO_REACH_1 = 248,								// Jump forward > reach, 1st opportunity
+	LA_JUMP_FORWARD_TO_REACH_2 = 249,								// Jump forward > reach, 2nd opportunity
+	LA_RUN_JUMP_LEFT_TO_REACH = 251,								// Run jump, left foot first > reach
+	LA_MONKEYSWING_IDLE_TO_FORWARD_RIGHT = 252,						// Monkey swing idle > monkey swing forward, right hand first
+	LA_MONKEYSWING_SHIMMY_LEFT = 253,								// Monkey swing shimmy left (looped)
+	LA_MONKEYSWING_SHIMMY_LEFT_END = 254,							// Monkey swing shimmy left > monkey swing idle
+	LA_MONKEYSWING_SHIMMY_RIGHT = 255,								// Monkey swing shimmy right (looped)
+	LA_MONKEYSWING_SHIMMY_RIGHT_END = 256,							// Monkey swing shimmy right > monkey swing idle
+																		// TODO: generic shimmy anims between ledges and ladders?
 	LA_MONKEYSWING_TURN_180 = 257,							// Monkey swing turn 180
 	LA_CROUCH_TO_CRAWL_START = 258,							// Crouch > crawl (1/3)
 	LA_CRAWL_TO_CROUCH_START = 259,							// Crawl > crouch (1/3)
 	LA_CRAWL = 260,											// Crawl forward (looped)
 	LA_CRAWL_IDLE_TO_FORWARD = 261,							// Crawl idle > crawl forward
 	LA_CRAWL_TO_IDLE_LEFT = 262,							// Crawl forward > crawl idle, left leg first
-																// TODO: in WAD, link next to 263
 	LA_CRAWL_IDLE = 263,									// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,							// Crawl > crouch (2/2)
 	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,					// Crouch > crawl (3/3)
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.//no dont remove thanks
+	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.
 	LA_CRAWL_TO_IDLE_RIGHT = 267,							// Crawl forward > crawl idle, right leg first
-																// TODO: in WAD, link next to 263
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove. //no dont remove thanks
+	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove.
 	LA_CRAWL_TURN_LEFT = 269,								// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,								// Crawl rotate right (looped)
 	LA_MONKEYSWING_TURN_LEFT = 271,							// Monkey swing rotate left
 	LA_MONKEYSWING_TURN_RIGHT = 272,						// Monkey swing rotate right
 	LA_CROUCH_TO_CRAWL_CONTINUE = 273,						// Crouch > crawl (2/3)
 	LA_CRAWL_TO_CROUCH_CONTINUE = 274,						// Crouch > crawl (2/3)
-																// TODO: properly link to 265 (adjustments to next anim necessary?)
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,						// Crawl > crawl back
 	LA_CRAWL_BACK = 276,									// Crawl back (looped)
 	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,				// Crawl back > crawl idle, right foot first (1/2)
@@ -521,7 +516,6 @@ enum LARA_ANIM
 	LA_CRAWL_DEATH = 301,									// Crawl death
 	LA_CRAWL_TO_HANG_END = 302,								// Crawl > hang (3/3)
 	LA_STAND_TO_CROUCH_ABORT = 303,							// Stand > crouch abort
-																// TODO: implement this, OR the ability for any animation to be wound back like pistol aiming.
 	LA_RUN_TO_CROUCH_LEFT_START = 304,						// Run > crouch, left foot first (1/2)
 	LA_RUN_TO_CROUCH_RIGHT_START = 305,						// Run > crouch, right foot first (1/2)
 	LA_RUN_TO_CROUCH_LEFT_END = 306,						// Run > crouch, left foot first (2/2)
@@ -738,7 +732,8 @@ enum LARA_ANIM
 
 	NUM_LARA_ANIMS
 	
-	// TRASHED ANIMS: 245, 265, 266, 268, 273, 274, 278, 280
+	// TRASHED ANIMS: 
+	// 45, 245, 265, 266, 268, 273, 274, 278, 280
 };
 #pragma endregion
 
