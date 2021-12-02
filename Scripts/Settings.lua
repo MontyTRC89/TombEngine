@@ -22,5 +22,5 @@ anims.crawlspaceSwandive = true;
 anims.monkeyReverse = true;
 anims.monkeyAutoJump = false;
 anims.oscillateHang = true;
-anims.pose = true;
+anims.pose = false;
 SetAnimations(anims);

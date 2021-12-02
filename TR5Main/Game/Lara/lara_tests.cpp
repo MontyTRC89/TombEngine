@@ -1538,10 +1538,6 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor < -(STEP_SIZE / 2) &&			// Lower floor bound.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&				// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_WALK_BACK &&
-		item->currentAnimState != LS_RUN_BACK &&
-		item->currentAnimState != LS_SPRINT_DIVE &&
-		item->currentAnimState != LS_SPLAT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1556,13 +1552,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor > (STEP_SIZE / 2) &&			// Upper floor bound.
 		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor bound.
 		coll->Middle.Floor != NO_HEIGHT &&
-		item->currentAnimState != LS_RUN_FORWARD &&		// No step down anim exists for these states.
-		item->currentAnimState != LS_SPRINT &&
-		item->currentAnimState != LS_WADE_FORWARD &&
-		item->currentAnimState != LS_RUN_BACK &&
-		item->currentAnimState != LS_SPRINT_DIVE &&
-		item->currentAnimState != LS_SPLAT &&
-		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
+		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step down handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
 		return true;
@@ -1621,8 +1611,9 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4, 0);
 	
+	// Hack to ensure Lara can run off diagonal ledges + . coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
 	// BUG: This interferes with the one-step stand-to-crouch vault where the ceiling is lower than Lara's height.
-	if ((probe.Position.Ceiling - y) < 0)		// Hack to ensure Lara can run off diagonal ledges. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
+	if ((probe.Position.Ceiling - y) < 0)
 		return true;
 
 	return false;
