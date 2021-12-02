@@ -1835,13 +1835,55 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
+{
+	static constexpr auto poleProbeCollRadius = 16.0f;
+
+	bool atLeastOnePoleCollided = false;
+
+	if (GetCollidedObjects(item, WALL_SIZE, true, CollidedItems, nullptr, 0) && CollidedItems[0])
+	{
+		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+
+		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
+		// check her position. So we add a fixed height offset.
+
+		auto offset = up ? -STEP_SIZE : poleProbeCollRadius;
+		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), poleProbeCollRadius);
+
+		int i = 0;
+		while (CollidedItems[i] != NULL)
+		{
+			auto& obj = CollidedItems[i];
+			i++;
+
+			if (obj->objectNumber != ID_POLEROPE)
+				continue;
+
+			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
+			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
+
+			if (poleBox.Intersects(sphere))
+				atLeastOnePoleCollided = true;
+		}
+	}
+
+	return atLeastOnePoleCollided;
+}
+
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (!TestLaraPoleCollision(item, coll, true))
+		return false;
+
 	// TODO: Accuracy.
 	return (coll->Middle.Ceiling < -STEP_SIZE);
 }
 
 bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (!TestLaraPoleCollision(item, coll, false))
+		return false;
+
 	return (coll->Middle.Floor > 0);
 }
