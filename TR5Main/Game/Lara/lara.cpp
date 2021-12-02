@@ -131,7 +131,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_roll,//72
 	lara_as_sprint,
 	lara_as_sprint_roll,
-	lara_as_hang2,
+	lara_as_monkey_idle,
 	lara_as_monkeyswing,
 	lara_as_monkeyl,
 	lara_as_monkeyr,
@@ -163,10 +163,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_pulley,//104
 	lara_as_crouch_turn_left,//105
 	lara_as_crouch_turn_right,//106
-	lara_as_extcornerl,//107
-	lara_as_extcornerr,//108
-	lara_as_intcornerl,//109
-	lara_as_intcornerr,//110
+	lara_as_corner,//107
+	lara_as_corner,//108
+	lara_as_corner,//109
+	lara_as_corner,//110
 	lara_as_rope,//111
 	lara_as_climbrope,//112
 	lara_as_climbroped,//113
@@ -198,14 +198,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//135
 	lara_as_null,//136
 	lara_as_null,//137
-	lara_as_controlledl,//138
-	lara_as_null,//ara_as_hang_feet,//139
-	lara_as_hang_feet_shimmyr,//140
-	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_inRcorner,//142
-	lara_as_hang_feet_inLcorner,//143
-	lara_as_hang_feet_outRcorner,//144
-	lara_as_hang_feet_outLcorner,//145
+	lara_as_null,//138
+	lara_as_null,// 139 - Unused
+	lara_as_null,// 140 - Unused
+	lara_as_null,// 141 - Unused
+	lara_as_null,// 142 - Unused
+	lara_as_null,// 143 - Unused
+	lara_as_null,// 144 - Unused
+	lara_as_null,// 145 - Unused
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -294,7 +294,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_crouch_roll,
 	lara_col_sprint,
 	lara_col_sprint_roll,
-	lara_col_hang2,
+	lara_col_monkey_idle,
 	lara_col_monkeyswing,
 	lara_col_monkeyl,
 	lara_col_monkeyr,
@@ -358,13 +358,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_hang_feet,
-	lara_col_hang_feet_shimmyr,
-	lara_col_hang_feet_shimmyl,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_void_func, // 139 - Unused
+	lara_void_func, // 140 - Unused
+	lara_void_func, // 141 - Unused
+	lara_void_func, // 142 - Unused
+	lara_void_func, // 143 - Unused
+	lara_void_func, // 144 - Unused
+	lara_void_func, // 145 - Unused
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
@@ -879,7 +879,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
-		info->NewAnims.Pose)
+		g_GameFlow->Animations.Pose)
 	{
 		info->poseCount++;
 	}

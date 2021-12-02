@@ -143,7 +143,7 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = WALL_SIZE;
 
-	if (TestLastFrame(item, item->animNumber))
+	if (TestLastFrame(item))
 	{
 		if (item->itemFlags[0])
 		{
@@ -291,7 +291,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = 20 * dist + 58;
 	}
 
-	if (TestLastFrame(item, item->animNumber))
+	if (TestLastFrame(item))
 	{
 		SetAnimation(item, LA_REACH);
 		item->pos.xPos += 700 * phd_sin(item->pos.yRot);
@@ -399,7 +399,7 @@ void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 	lara_trbalance_mesh(item);
 
 	if (item->animNumber == LA_TIGHTROPE_END &&
-		TestLastFrame(item, item->animNumber))
+		TestLastFrame(item))
 	{
 		info->torsoZrot = 0;
 		item->pos.zRot = 0;
@@ -441,7 +441,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 	lara_trbalance_regen(item);
 	lara_trbalance_mesh(item);
 
-	if (TestLastFrame(item, item->animNumber))
+	if (TestLastFrame(item))
 	{
 		PHD_VECTOR pos{ 0, 75, 0 };
 		GetLaraJointPosition(&pos, LM_RFOOT);

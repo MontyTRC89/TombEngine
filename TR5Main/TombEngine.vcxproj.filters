@@ -318,6 +318,7 @@
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
+    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -713,6 +714,7 @@
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
+    <ClInclude Include="Scripting\GameScriptAnimations.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

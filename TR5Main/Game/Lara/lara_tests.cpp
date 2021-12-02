@@ -12,6 +12,7 @@
 #include "control/los.h"
 #include "items.h"
 #include "Renderer11.h"
+#include "Scripting/GameFlowScript.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
@@ -92,10 +93,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 	}
 
-	// TODO: LUA
-	info->NewAnims.CrawlExtended = true;
-	info->NewAnims.MonkeyAutoJump = false;
-
 	if (TestValidLedge(item, coll))
 	{
 		bool success = false;
@@ -103,7 +100,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up one step.
 		if (coll->Front.Floor < 0 &&					// Lower floor bound.
 			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor bound.
-			info->NewAnims.CrawlExtended)
+			g_GameFlow->Animations.CrawlExtended)
 		{
 			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL)		// Front clamp buffer. Presumably, nothing more is necessary, but tend to this in the future. @Sezz 2021.11.06
 			{
@@ -137,7 +134,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
-				info->NewAnims.CrawlExtended)
+				g_GameFlow->Animations.CrawlExtended)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
@@ -169,7 +166,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
-				info->NewAnims.CrawlExtended)
+				g_GameFlow->Animations.CrawlExtended)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
@@ -251,7 +248,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to monkey swing.
 	if (info->canMonkeySwing &&
 		!TestLaraSwamp(item) &&
-		info->NewAnims.MonkeyAutoJump)
+		Lara.canMonkeySwing && g_GameFlow->Animations.MonkeyAutoJump)
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
@@ -468,9 +465,6 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
-
-		if (TestHangFeet(item, angle))
-			item->goalAnimState = LS_HANG_FEET;
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -537,11 +531,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto angle = item->pos.yRot;
 
-	info->NewAnims.OscillateHanging = true;
-
 	if (TestHangSwingIn(item, angle))
 	{
-		if (info->NewAnims.OscillateHanging)
+		if (g_GameFlow->Animations.OscillateHang)
 		{
 			info->headYrot = 0;
 			info->headXrot = 0;
@@ -561,9 +553,6 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_REACH_TO_HANG);
-
-		if (TestHangFeet(item, angle))
-			item->goalAnimState = LS_HANG_FEET;
 	}
 
 	auto bounds = GetBoundsAccurate(item);
@@ -594,30 +583,38 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	auto delta = 0;
-	auto flag = false;
 	auto angle = info->moveAngle;
 
-	if (info->moveAngle == (short) (item->pos.yRot - ANGLE(90.0f)))
-		delta = -coll->Setup.Radius;
-	else if (info->moveAngle == (short) (item->pos.yRot + ANGLE(90.0f)))
-		delta = coll->Setup.Radius;
+	auto climbShift = 0;
+	if (info->moveAngle == (short)(item->pos.yRot - ANGLE(90.0f)))
+		climbShift = -coll->Setup.Radius;
+	else if (info->moveAngle == (short)(item->pos.yRot + ANGLE(90.0f)))
+		climbShift = coll->Setup.Radius;
 
-	auto s = phd_sin(info->moveAngle);
-	auto c = phd_cos(info->moveAngle);
-	auto testShift = Vector2(s * delta, c * delta);
-
+	// Temporarily move item a bit closer to the wall to get more precise coll results
 	auto oldPos = item->pos;
 	item->pos.xPos += phd_sin(item->pos.yRot) * coll->Setup.Radius * 0.5f;
 	item->pos.zPos += phd_cos(item->pos.yRot) * coll->Setup.Radius * 0.5f;
 
+	// Get height difference with side spaces (left or right, depending on movement direction)
 	auto hdif = LaraFloorFront(item, info->moveAngle, coll->Setup.Radius * 1.5f);
-	if (hdif < 200)
-		flag = true;
-	auto cdif = LaraCeilingFront(item, info->moveAngle, coll->Setup.Radius * 1.5f, 0);
+
+	// Set stopped flag, if floor height is above footspace which is step size
+	auto stopped = hdif < STEP_SIZE / 2;
+
+	// Set stopped flag, if ceiling height is below headspace which is step size
+	if (LaraCeilingFront(item, info->moveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
+		stopped = true;
+
+	// Backup item pos to restore it after coll tests
 	item->pos = oldPos;
 
-	auto dir = GetQuadrant(item->pos.yRot);
+	// Setup coll info
+	info->moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.ForwardAngle = info->moveAngle;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	auto embedOffset = 4;
@@ -627,20 +624,13 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.xPos += phd_sin(item->pos.yRot) * embedOffset;
 	item->pos.zPos += phd_cos(item->pos.yRot) * embedOffset;
 
-	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.ForwardAngle = info->moveAngle;
-
 	GetCollisionInfo(coll, item);
 
 	bool result = false;
 
-	if (info->climbStatus)
+	if (info->climbStatus) // Ladder case
 	{
-		if (TrInput & IN_ACTION &&
-			item->hitPoints > 0)
+		if (TrInput & IN_ACTION && item->hitPoints > 0)
 		{
 			info->moveAngle = angle;
 
@@ -649,7 +639,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				if (item->animNumber != LA_LADDER_TO_HANG_RIGHT &&
 					item->animNumber != LA_LADDER_TO_HANG_LEFT)
 				{
-					LaraSnapToEdgeOfBlock(item, coll, dir);
+					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->pos.yRot));
 					item->pos.yPos = coll->Setup.OldPosition.y;
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
@@ -658,15 +648,14 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if (item->animNumber == LA_REACH_TO_HANG &&
-					item->frameNumber == GetFrameNumber(item, 21) &&
+				if (item->animNumber == LA_REACH_TO_HANG && item->frameNumber == GetFrameNumber(item, 21) &&
 					TestLaraClimbStance(item, coll))
 				{
 					item->goalAnimState = LS_LADDER_IDLE;
 				}
 			}
 		}
-		else
+		else // Death or action release
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->pos.yPos += 256;
@@ -676,55 +665,49 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			info->gunStatus = LG_HANDS_FREE;
 		}
 	}
-	else
+	else // Normal case
 	{
-		if (TrInput & IN_ACTION &&
-			item->hitPoints > 0 &&
-			coll->Front.Floor <= 0)
+		if (TrInput & IN_ACTION && item->hitPoints > 0 && coll->Front.Floor <= 0)
 		{
-			if (flag && hdif > 0 && delta > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor)
-				flag = false;
+			if (stopped && hdif > 0 && climbShift != 0 && (climbShift > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
+				stopped = false;
 
-			auto front = coll->Front.Floor;
-			auto dfront = coll->Front.Floor - GetBoundsAccurate(item)->Y1;
-			auto flag2 = false;
+			auto verticalShift = coll->Front.Floor - GetBoundsAccurate(item)->Y1;
 			auto x = item->pos.xPos;
 			auto z = item->pos.zPos;
 
-			if (delta != 0)
+			info->moveAngle = angle;
+
+			if (climbShift != 0)
 			{
+				auto s = phd_sin(info->moveAngle);
+				auto c = phd_cos(info->moveAngle);
+				auto testShift = Vector2(s * climbShift, c * climbShift);
+
 				x += testShift.x;
 				z += testShift.y;
 			}
 
-			info->moveAngle = angle;
-
-			if (256 << dir & GetClimbFlags(x, item->pos.yPos, z, item->roomNumber))
+			if ((256 << GetQuadrant(item->pos.yRot)) & GetClimbFlags(x, item->pos.yPos, z, item->roomNumber))
 			{
-				if (!TestLaraHangOnClimbWall(item, coll))
-					dfront = 0;
+				if (!TestLaraHangOnClimbWall(item, coll)) 
+					verticalShift = 0; // Ignore vertical shift if ladder is encountered next block
 			}
 			else if (!TestValidLedge(item, coll, true))
 			{
-				if (delta < 0 && coll->FrontLeft.Floor != coll->Front.Floor || delta > 0 && coll->FrontRight.Floor != coll->Front.Floor)
-					flag2 = true;
+				if ((climbShift < 0 && coll->FrontLeft.Floor  != coll->Front.Floor) ||
+					(climbShift > 0 && coll->FrontRight.Floor != coll->Front.Floor))
+					stopped = true;
 			}
 
-			coll->Front.Floor = front;
-
-			if (!flag2 && 
-				coll->Middle.Ceiling < 0 && 
-				coll->CollisionType == CT_FRONT && 
-				!flag && 
-				!coll->HitStatic && 
-				cdif <= -950 && 
-				abs(dfront) < SLOPE_DIFFERENCE &&
-				TestValidLedgeAngle(item, coll))
+			if (!stopped && 
+				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic && 
+				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
 				if (item->speed != 0)
 					SnapItemToLedge(item, coll);
 
-				item->pos.yPos += dfront;
+				item->pos.yPos += verticalShift;
 			}
 			else
 			{
@@ -732,21 +715,16 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos = coll->Setup.OldPosition.y;
 				item->pos.zPos = coll->Setup.OldPosition.z;
 
-				if (item->currentAnimState == LS_SHIMMY_LEFT ||
+				if (item->currentAnimState == LS_SHIMMY_LEFT || 
 					item->currentAnimState == LS_SHIMMY_RIGHT)
 				{
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
-				}
-				else if (item->currentAnimState == LS_SHIMMY_FEET_LEFT ||
-						 item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
-				{
-					SetAnimation(item, LA_HANG_FEET_IDLE);
 				}
 
 				result = true;
 			}
 		}
-		else
+		else  // Death, incorrect ledge or action release
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->pos.xPos += coll->Shift.x;
@@ -767,7 +745,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	LaraInfo*& info = item->data;
 
 	// Lara isn't in stop state yet, bypass test
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
+	if (item->animNumber != LA_REACH_TO_HANG)
 		return CORNER_RESULT::NONE;
 
 	// Static is in the way, bypass test
@@ -779,95 +757,70 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	// Backup old Lara position and frontal collision
 	auto oldPos = item->pos;
 	auto oldMoveAngle = Lara.moveAngle;
-	int oldFrontFloor = coll->Front.Floor;
-
-	// Quadrant is only used for ladder checks
-	auto quadrant = GetQuadrant(item->pos.yRot);
-
-	// Get bounding box height for further ledge height calculations
-	auto bounds = GetBoundsAccurate(item);
-
-	// Virtually rotate Lara 90 degrees to the right and snap to nearest ledge, if any.
-	short newAngle = item->pos.yRot + ANGLE(testAngle);
-	item->pos.yRot = newAngle;
-	SnapItemToLedge(item, coll, item->pos.yRot);
 
 	// Do further testing only if test angle is equal to resulting edge angle
-	if (newAngle == item->pos.yRot)
+	if (SnapAndTestItemAtNextCornerPosition(item, coll, testAngle, false))
 	{
-		// Push Lara further to the right to avoid false floor hits on the left side
-		auto c = phd_cos(item->pos.yRot + ANGLE(testAngle));
-		auto s = phd_sin(item->pos.yRot + ANGLE(testAngle));
-		item->pos.xPos += s * coll->Setup.Radius / 2;
-		item->pos.zPos += c * coll->Setup.Radius / 2;
+		// Get bounding box height for further ledge height calculations
+		auto bounds = GetBoundsAccurate(item);
 
 		// Store next position
-		info->nextCornerPos.x = item->pos.xPos;
-		info->nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
-		info->nextCornerPos.z = item->pos.zPos;
+		info->nextCornerPos.xPos = item->pos.xPos;
+		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		info->nextCornerPos.zPos = item->pos.zPos;
+		info->nextCornerPos.yRot = item->pos.yRot;
 		info->moveAngle = item->pos.yRot;
-
+		
 		auto result = TestLaraValidHangPos(item, coll);
 
 		// Restore original item positions
 		item->pos = oldPos;
 		info->moveAngle = oldMoveAngle;
 
-		if (result && (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE))
+		if (result)
 			return CORNER_RESULT::INNER;
 
 		if (info->climbStatus)
 		{
 			auto angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
-			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
+			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
 				return CORNER_RESULT::INNER;
 		}
 	}
 
 	// Restore original item positions
 	item->pos = oldPos;
-	info->moveAngle = oldPos.yRot;
+	info->moveAngle = oldMoveAngle;
 
 	// OUTER CORNER TESTS
 
 	// Test if there's a material obstacles blocking outer corner pathway
-	if (LaraFloorFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE) < 0)
-		return CORNER_RESULT::NONE;
-	if (LaraCeilingFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height) > 0)
+	if ((LaraFloorFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE) < 0) ||
+		(LaraCeilingFront(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE, coll->Setup.Height) > 0))
 		return CORNER_RESULT::NONE;
 
 	// Last chance for possible diagonal vs. non-diagonal cases: ray test
 	if (!LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + STEP_SIZE))
 		return CORNER_RESULT::NONE;
 
-	// Push Lara diagonally to other side of corner at distance of 1/2 wall size
-	auto c = phd_cos(item->pos.yRot + ANGLE(testAngle / 2));
-	auto s = phd_sin(item->pos.yRot + ANGLE(testAngle / 2));
-	item->pos.xPos += s * WALL_SIZE / 3;
-	item->pos.zPos += c * WALL_SIZE / 3;
-
-	// Virtually rotate Lara 90 degrees to the left and snap to nearest ledge, if any.
-	newAngle = item->pos.yRot - ANGLE(testAngle);
-	item->pos.yRot = newAngle;
-	info->moveAngle = item->pos.yRot;
-	SnapItemToLedge(item, coll, item->pos.yRot);
+	bool snappable = SnapAndTestItemAtNextCornerPosition(item, coll, testAngle, true);
 
 	// Additional test if there's a material obstacles blocking outer corner pathway
 	if ((LaraFloorFront(item, item->pos.yRot, 0) < 0) ||
 		(LaraCeilingFront(item, item->pos.yRot, 0, coll->Setup.Height) > 0))
-	{
-		// Restore original item positions
-		item->pos = oldPos;
-		return CORNER_RESULT::NONE;
-	}
+		snappable = false;
 
 	// Do further testing only if test angle is equal to resulting edge angle
-	if (newAngle == item->pos.yRot)
+	if (snappable)
 	{
+		// Get bounding box height for further ledge height calculations
+		auto bounds = GetBoundsAccurate(item);
+
 		// Store next position
-		info->nextCornerPos.x = item->pos.xPos;
-		info->nextCornerPos.y = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
-		info->nextCornerPos.z = item->pos.zPos;
+		info->nextCornerPos.xPos = item->pos.xPos;
+		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		info->nextCornerPos.zPos = item->pos.zPos;
+		info->nextCornerPos.yRot = item->pos.yRot;
 		info->moveAngle = item->pos.yRot;
 
 		auto result = TestLaraValidHangPos(item, coll);
@@ -876,20 +829,20 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		item->pos = oldPos;
 		info->moveAngle = oldMoveAngle;
 
-		if (result && (abs(oldFrontFloor - coll->Front.Floor) <= SLOPE_DIFFERENCE))
+		if (result)
 			return CORNER_RESULT::OUTER;
 
 		if (info->climbStatus)
 		{
 			auto angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
-			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[quadrant])
+			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
 				return CORNER_RESULT::OUTER;
 		}
 	}
 
 	// Restore original item positions
 	item->pos = oldPos;
-	info->moveAngle = oldPos.yRot;
+	info->moveAngle = oldMoveAngle;
 
 	return CORNER_RESULT::NONE;
 }
@@ -1064,8 +1017,6 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 	FLOOR_INFO* floor;
 	int floorHeight, ceilingHeight;
 
-	info->NewAnims.OscillateHanging = true;
-
 	z += phd_cos(angle) * (STEP_SIZE / 2);
 	x += phd_sin(angle) * (STEP_SIZE / 2);
 
@@ -1075,7 +1026,7 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 
 	if (floorHeight != NO_HEIGHT)
 	{
-		if (info->NewAnims.OscillateHanging)
+		if (g_GameFlow->Animations.OscillateHang)
 		{
 			if (floorHeight - y > 0 && ceilingHeight - y < -400)
 				return true;
@@ -1090,68 +1041,28 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 	return false;
 }
 
-bool TestHangFeet(ITEM_INFO* item, short angle)
-{
-	LaraInfo*& info = item->data;
-
-	//TODO: LUA
-	info->NewAnims.FeetHang = 0;
-
-	if (info->climbStatus || !info->NewAnims.FeetHang)
-		return false;
-
-	int x = item->pos.xPos;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-	short roomNum = item->roomNumber;
-
-	z += phd_cos(angle) * (STEP_SIZE / 2);
-	x += phd_sin(angle) * (STEP_SIZE / 2);
-
-	auto floor = GetFloor(x, y, z, &roomNum);
-	int floorHeight = GetFloorHeight(floor, x, y, z);
-	int ceilingHeight = GetCeiling(floor, x, y, z);
-	int m = ceilingHeight - y;
-	int j = y - (STEP_SIZE / 2) - ceilingHeight;
-
-	if (floorHeight != NO_HEIGHT)
-	{
-		if (floorHeight < y && m < -(STEP_SIZE / 2) && j > -(STEP_SIZE / 4 + STEP_SIZE / 32))
-			return true;
-	}
-
-	return false;
-}
-
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	LaraInfo*& info = item->data;
-	int oldx = item->pos.xPos;
-	int oldz = item->pos.zPos;
-	int x = item->pos.xPos;
-	int z = item->pos.zPos;
+	auto oldPos = item->pos;
+
+	static constexpr auto sidewayTestDistance = 16;
+	item->pos.xPos += phd_sin(info->moveAngle) * sidewayTestDistance;
+	item->pos.zPos += phd_cos(info->moveAngle) * sidewayTestDistance;
 
 	info->moveAngle = item->pos.yRot + angle;
-	
-	z += phd_cos(info->moveAngle) * 16;
-	x += phd_sin(info->moveAngle) * 16;
-
-	item->pos.xPos = x;
-	item->pos.zPos = z;
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	auto res = TestLaraHang(item, coll);
 
-	item->pos.xPos = oldx;
-	item->pos.zPos = oldz;
-
+	item->pos = oldPos;
 	info->moveAngle = item->pos.yRot + angle;
 
 	return !res;
 }
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
+void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 {
 	LaraInfo*& info = item->data;
 
@@ -1166,9 +1077,11 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 
 		info->gunStatus = LG_HANDS_FREE;
 
-		item->pos.yRot += rot / 2;
+		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
+		return;
 	}
-	else if (flip)
+
+	if (flip)
 	{
 		if (info->isClimbing)
 		{
@@ -1179,38 +1092,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
-		coll->Setup.OldPosition.x = item->pos.xPos = info->nextCornerPos.x;
-		coll->Setup.OldPosition.y = item->pos.yPos = info->nextCornerPos.y;
-		coll->Setup.OldPosition.z = item->pos.zPos = info->nextCornerPos.z;
-		item->pos.yRot += rot;
-	}
-}
-
-void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
-{
-	LaraInfo*& info = item->data;
-
-	if (item->hitPoints <= 0)
-	{
-		SetAnimation(item, LA_FALL_START);
-
-		item->gravityStatus = true;
-		item->speed = 2;
-		item->pos.yPos += STEP_SIZE;
-		item->fallspeed = 1;
-
-		info->gunStatus = LG_HANDS_FREE;
-
-		item->pos.yRot += rot / 2;
-	}
-	else if (flip)
-	{
-		SetAnimation(item, LA_HANG_FEET_IDLE);
-
-		coll->Setup.OldPosition.x = item->pos.xPos = info->nextCornerPos.x;
-		coll->Setup.OldPosition.y = item->pos.yPos = info->nextCornerPos.y;
-		coll->Setup.OldPosition.z = item->pos.zPos = info->nextCornerPos.z;
-		item->pos.yRot += rot;
+		coll->Setup.OldPosition.x = item->pos.xPos = info->nextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->pos.yPos = info->nextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->pos.zPos = info->nextCornerPos.zPos;
+		item->pos.yRot = info->nextCornerPos.yRot;
 	}
 }
 
@@ -1415,9 +1300,6 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
 
-	// TODO: LUA
-	info->NewAnims.CrawlExtended = true;
-
 	if (info->gunStatus &&
 		(info->gunStatus != LG_READY || info->gunType != WEAPON_FLARE))
 	{
@@ -1444,7 +1326,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (info->NewAnims.CrawlExtended)
+			if (g_GameFlow->Animations.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
@@ -1456,7 +1338,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (info->NewAnims.CrawlExtended)
+			if (g_GameFlow->Animations.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
@@ -1469,7 +1351,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (info->NewAnims.CrawlExtended)
+			if (g_GameFlow->Animations.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;

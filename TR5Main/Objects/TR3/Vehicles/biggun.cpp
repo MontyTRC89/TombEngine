@@ -251,7 +251,7 @@ bool BigGunControl(ITEM_INFO* lara, COLL_INFO* coll)
 		bigGun->animNumber = Objects[ID_BIGGUN].animIndex + (lara->animNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
 		bigGun->frameNumber = g_Level.Anims[bigGun->animNumber].frameBase + (lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase);
 
-		if (bigGunInfo->flags & BGUN_FLAG_DISMOUNT && TestLastFrame(lara, lara->animNumber))
+		if (bigGunInfo->flags & BGUN_FLAG_DISMOUNT && TestLastFrame(lara))
 		{
 			SetAnimation(lara, LA_STAND_IDLE);
 			laraInfo->Vehicle = NO_ITEM;
