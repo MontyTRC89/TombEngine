@@ -190,7 +190,8 @@ bool SaveGame::Save(int slot)
 	auto rightArmOffset = rightArm.Finish();
 
 	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
-	Save::Vector3 nextCornerPos = Save::Vector3(Lara.nextCornerPos.x, Lara.nextCornerPos.y, Lara.nextCornerPos.z);
+	Save::Vector3 nextCornerPos = Save::Vector3(Lara.nextCornerPos.xPos, Lara.nextCornerPos.yPos, Lara.nextCornerPos.zPos);
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.nextCornerPos.xRot, Lara.nextCornerPos.yRot, Lara.nextCornerPos.zRot);
 
 	std::vector<int> laraTargetAngles{};
 	laraTargetAngles.push_back(Lara.targetAngles[0]);
@@ -252,6 +253,7 @@ bool SaveGame::Save(int slot)
 	lara.add_can_monkey_swing(Lara.canMonkeySwing);
 	lara.add_climb_status(Lara.climbStatus);
 	lara.add_next_corner_position(&nextCornerPos);
+	lara.add_next_corner_rotation(&nextCornerRot);
 	lara.add_crowbar(Lara.Crowbar);
 	lara.add_current_active(Lara.currentActive);
 	lara.add_current_x_vel(Lara.currentXvel);
@@ -1160,10 +1162,13 @@ bool SaveGame::Load(int slot)
 	Lara.calcFallSpeed = s->lara()->calc_fall_speed();
 	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
 	Lara.climbStatus = s->lara()->climb_status();
-	Lara.nextCornerPos = PHD_VECTOR(
+	Lara.nextCornerPos = PHD_3DPOS(
 		s->lara()->next_corner_position()->x(),
 		s->lara()->next_corner_position()->y(),
-		s->lara()->next_corner_position()->z());
+		s->lara()->next_corner_position()->z(),
+		s->lara()->next_corner_rotation()->x(),
+		s->lara()->next_corner_rotation()->y(),
+		s->lara()->next_corner_rotation()->z());
 	Lara.Crowbar = s->lara()->crowbar();
 	Lara.currentActive = s->lara()->current_active();
 	Lara.currentXvel = s->lara()->current_x_vel();

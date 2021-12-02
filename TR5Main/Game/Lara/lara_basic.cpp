@@ -16,6 +16,7 @@
 #include "collide.h"
 #include "items.h"
 #include "camera.h"
+#include "GameFlowScript.h"
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -517,15 +518,12 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: LUA.
 	// TODO: Without animation blending, the AFK state's
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
-	info->NewAnims.Pose = false;
-
 	if (info->poseCount >= LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
-		info->NewAnims.Pose)
+		g_GameFlow->Animations.Pose)
 	{
 		item->goalAnimState = LS_POSE;
 

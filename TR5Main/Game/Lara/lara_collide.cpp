@@ -296,46 +296,6 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 			return;
 		}
 	}
-
-	if (item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x720;
-			return;
-		case EAST:
-			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0xE0;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0xE0;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x720;
-			return;
-		}
-	}
-
-	if (item->currentAnimState == LS_SHIMMY_FEET_LEFT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0xE0;
-			return;
-		case EAST:
-			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x720;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x720;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0xE0;
-			return;
-		}
-	}
 }
 
 void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll)

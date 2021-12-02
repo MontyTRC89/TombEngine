@@ -385,7 +385,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if ((l->currentAnimState != LS_PUSHABLE_GRAB
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
-			|| Lara.nextCornerPos.x != itemNum))
+			|| Lara.nextCornerPos.xPos != itemNum))
 		{
 			if (!pushable->hasFloorCeiling)
 				ObjectCollision(itemNum, l, coll);
@@ -487,7 +487,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->goalAnimState = LS_PUSHABLE_GRAB;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.nextCornerPos.x = itemNum;
+				Lara.nextCornerPos.xPos = itemNum;
 				item->pos.yRot = rot;
 			}
 			else
@@ -500,7 +500,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->goalAnimState = LS_PUSHABLE_GRAB;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.nextCornerPos.x = itemNum;
+					Lara.nextCornerPos.xPos = itemNum;
 					item->pos.yRot = rot;
 				}
 				else

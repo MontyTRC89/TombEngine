@@ -12,6 +12,7 @@
 #include "items.h"
 #include "camera.h"
 #include "control/control.h"
+#include "Scripting/GameFlowScript.h"
 
 // -----------------------------
 // CRAWL & CROUCH
@@ -56,13 +57,10 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		// TODO: LUA
-		info->NewAnims.CrouchRoll = true;
-
 		if (TrInput & IN_SPRINT &&
 			TestLaraCrouchRoll(item, coll) &&
 			info->gunStatus == LG_HANDS_FREE &&
-			info->NewAnims.CrouchRoll)
+			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -251,7 +249,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT &&
 			TestLaraCrouchRoll(item, coll) &&
-			info->NewAnims.CrouchRoll)
+			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -314,7 +312,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT &&
 			TestLaraCrouchRoll(item, coll) &&
-			info->NewAnims.CrouchRoll)
+			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 
@@ -383,9 +381,6 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 		info->turnRate = LARA_CRAWL_TURN;
 
-	// TODO: LUA
-	info->NewAnims.CrawlExtended = true;
-
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
@@ -405,7 +400,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll) &&
-				info->NewAnims.CrawlExtended)
+				g_GameFlow->Animations.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 
@@ -554,7 +549,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlVault(item, coll) &&
-				info->NewAnims.CrawlExtended)
+				g_GameFlow->Animations.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 
@@ -910,11 +905,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 			info->torsoXrot = 0;
 		}
 		else
-		{
 			SetAnimation(item, LA_REACH_TO_HANG, 12);
-			if (TestHangFeet(item, item->pos.yRot))
-				item->goalAnimState = LS_HANG_FEET;
-		}
 
 		GetCollisionInfo(coll, item);
 		info->gunStatus = LG_HANDS_BUSY;

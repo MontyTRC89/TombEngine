@@ -172,13 +172,13 @@ enum LARA_STATE
 	LS_LADDER_TO_CROUCH = 138,
 
 	// TombEngine
-	LS_HANG_FEET = 139,
-	LS_SHIMMY_FEET_RIGHT = 140,
-	LS_SHIMMY_FEET_LEFT = 141,
-	LS_SHIMMY_FEET_INNER_RIGHT = 142,
-	LS_SHIMMY_FEET_INNER_LEFT = 143,
-	LS_SHIMMY_FEET_OUTER_RIGHT = 144,
-	LS_SHIMMY_FEET_OUTER_LEFT = 145,
+	LS_SHIMMY_45_OUTER_LEFT = 139,
+	LS_SHIMMY_45_OUTER_RIGHT = 140,
+	LS_SHIMMY_45_INNER_LEFT = 141,
+	LS_SHIMMY_45_INNER_RIGHT = 142,
+	LS_UNUSED1 = 143, // Foot hang leftovers - may be safely reused
+	LS_UNUSED2 = 144, // Foot hang leftovers - may be safely reused
+	LS_UNUSED3 = 145, // Foot hang leftovers - may be safely reused
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
@@ -220,7 +220,7 @@ enum LARA_ANIM
 	LA_STAND_TO_WALK_START = 20,							// Stand > walk forward (1/2)
 	LA_STAND_TO_WALK_END = 21,								// Stand > walk forward (1/2)
 	LA_JUMP_FORWARD_TO_FREEFALL_UNUSED = 22,				// Jump > fall (possibly unused?)
-																// TODO: confirm lack of dispatch for this anim.
+	// TODO: confirm lack of dispatch for this anim.
 	LA_FREEFALL = 23,										// Freefall, after falling more than 7 clicks (looped)
 	LA_FREEFALL_LAND = 24,									// Freefall > hard landing
 	LA_FREEFALL_DEATH = 25,									// Freefall death
@@ -232,7 +232,7 @@ enum LARA_ANIM
 	LA_JUMP_UP_LAND = 31,									// Jump up > land
 	LA_JUMP_WALL_SMASH_START = 32,							// Directional jump smash > fall (1/2)
 	LA_JUMP_WALL_SMASH_END = 33,							// Directional jump smash > fall (2/2)
-																// TODO: create matching anims for all directional wall smashes.
+	// TODO: create matching anims for all directional wall smashes.
 	LA_FALL_START = 34,										// Start falling
 	LA_FALL = 35,											// Light fall (looped)
 	LA_FALL_TO_FREEFALL = 36,								// Light fall > freefall
@@ -364,8 +364,8 @@ enum LARA_ANIM
 	LA_SWANDIVE_RIGHT_START = 157,							// Run > swan dive, right foot first
 	LA_SWANDIVE = 158,										// Swan dive
 	LA_HANG_HANDSTAND = 159,								// Hang > stand via handstand
-
-	// TR2
+	
+															// TR2
 	LA_STAND_TO_LADDER = 160,								// Stand > ladder idle
 	LA_LADDER_UP = 161,										// Ascend ladder (looped)
 	LA_LADDER_UP_LEFT_END = 162,							// Ascend ladder > ladder idle, left foot first
@@ -427,8 +427,8 @@ enum LARA_ANIM
 	LA_ZIPLINE_MOUNT = 214,									// Stand > ride sipline
 	LA_ZIPLINE_RIDE = 215,									// Ride zipline (looped)
 	LA_ZIPLINE_DISMOUNT = 216,								// Ride zipline > jump forward
-
-	// TR3
+	
+															// TR3
 	LA_STAND_TO_CROUCH_START = 217,							// Stand > crouch (1/2)
 	LA_CROUCH_ROLL_FORWARD_START_ALTERNATE = 218,			// Crouch roll forward (1/3)
 																// TODO: this is the original, but incorrect, linking animation; in WAD it should be 47 instead.
@@ -575,14 +575,14 @@ enum LARA_ANIM
 	LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END = 352,			// Push turnswitch counter-clockwise (3/3)
 	LA_CROUCH_TURN_LEFT = 353,								// Rotate left crouching (looped)
 	LA_CROUCH_TURN_RIGHT = 354,								// Rotate right crouching (looped)
-	LA_SHIMMY_LEFT_CORNER_OUTER_START = 355,				// Shimmy around outer left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_OUTER_END = 356,					// Shimmy around outer left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_START = 357,				// Shimmy around outer right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_END = 358,					// Shimmy around outer right corner (2/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_START = 359,				// Shimmy around inner left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_END = 360,					// Shimmy around inner left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_START = 361,				// Shimmy around inner right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_END = 362,					// Shimmy around inner right corner (2/2)
+	LA_SHIMMY_LEFT_CORNER_OUTER_90 = 355,				    // Shimmy around outer left corner (90)
+	LA_SHIMMY_LEFT_CORNER_OUTER_45 = 356,					// Shimmy around outer left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_90 = 357,				    // Shimmy around outer right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_45 = 358,					// Shimmy around outer right corner (45)
+	LA_SHIMMY_LEFT_CORNER_INNER_90 = 359,				    // Shimmy around inner left corner (90)
+	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
 	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
 	LA_LADDER_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
@@ -714,17 +714,17 @@ enum LARA_ANIM
 	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
 	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
 	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_HANG_TO_HANG_FEET = 484,								// Hang > hang, feet on wall idle
-	LA_SHIMMY_FEET_RIGHT = 485,								// Shimmy, feet on wall right
-	LA_SHIMMY_FEET_LEFT = 486,								// Shimmy, feet on wall left
-	LA_HANG_FEET_TO_STAND = 487,							// Pull up from hang, feet on wall > stand
-	LA_HANG_FEET_IDLE = 488,								// Hang, feet on wall idle (looped)
-	LA_HANG_FEET_TO_CROUCH = 489,							// Pull up from hang, feet on wall > crouch
-	LA_SHIMMY_FEET_RIGHT_CORNER_INNER = 490,				// Shimmy, feet on wall around inner right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_INNER = 491,					// Shimmy, feet on wall around inner left corner
-	LA_SHIMMY_FEET_RIGHT_CORNER_OUTER = 492,				// Shimmy, feet on wall around outer right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_OUTER = 493,					// Shimmy, feet on wall around outer left corner
-	LA_HANG_FEET_HANDSTAND = 494,							// Hang, feet on wall > stand via handstand
+	LA_UNUSED1 = 484,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED2 = 485,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED3 = 486,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED4 = 487,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED5 = 488,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED6 = 489,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED7 = 490,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED8 = 491,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED9 = 492,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED10 = 493,										// Foot hang leftovers - may be safely reused
+	LA_UNUSED11 = 494,										// Foot hang leftovers - may be safely reused
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
@@ -737,7 +737,7 @@ enum LARA_ANIM
 	LA_POSE_END = 504,										// AFK pose > stand
 
 	NUM_LARA_ANIMS
-
+	
 	// TRASHED ANIMS: 245, 265, 266, 268, 273, 274, 278, 280
 };
 #pragma endregion
@@ -975,25 +975,6 @@ struct LARA_ARM
 	short flash_gun;
 };
 
-struct AnimsNew
-{
-	bool Pose;						// Crossed arms AFK.
-	bool CrawlExtended;				// Extended crawl maneuverability.
-	bool CrawlspaceSwandive;		// Swandive into crawlspaces.
-	bool CrouchRoll;				// Crouch roll.
-	bool FeetHang;					// LAU-style ledge hanging with legs.
-
-	// This will have to be default. LD can copy the monkey swing-in anim if they're that set on annoying the player.
-	// Mechanics specific to the monkey swing shouldn't mix with ledge hanging as bugs can occur.
-	bool OscillateHanging;			// TR1/2 hang on thin ledge.
-
-	// Why?? This should be a player setting.
-	bool MonkeyAutoJump;			// Auto jump to monkey swing.
-
-	// This shouldn't be up to the LD.
-	bool Monkey180Turn;				// Monkey swing 180 turn.
-};
-
 #ifdef NEW_TIGHTROPE
 struct LaraTightrope
 {
@@ -1052,7 +1033,7 @@ struct LaraInfo
 	bool fired;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
-	PHD_VECTOR nextCornerPos;
+	PHD_3DPOS nextCornerPos;
 	FX_INFO* spazEffect;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
@@ -1101,7 +1082,6 @@ struct LaraInfo
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
 	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	AnimsNew NewAnims;//troye's creative naming
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;
