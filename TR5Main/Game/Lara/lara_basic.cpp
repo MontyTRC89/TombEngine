@@ -103,7 +103,6 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -165,14 +164,12 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -191,11 +188,9 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(coll) &&
-		coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -211,7 +206,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -251,12 +245,10 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_SPRINT &&
-		info->sprintTimer &&
+	if (TrInput & IN_SPRINT && info->sprintTimer &&
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_SPRINT;
-
 		return;
 	}
 
@@ -264,7 +256,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -273,7 +264,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -310,14 +300,12 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -337,7 +325,6 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
 				item->currentAnimState = LS_SPLAT;
-
 				return;
 			}
 		}
@@ -345,11 +332,9 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(coll) &&
-		coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -365,12 +350,13 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Hardcoding
 	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
 		item->animNumber != LA_SPRINT_TO_STAND_LEFT)
+	{
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	}
 
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -411,14 +397,12 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -426,7 +410,6 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -437,21 +420,17 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkForward(item, coll))
 			{
 				item->goalAnimState = LS_WALK_FORWARD;
-
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT &&
-			TestLaraRunForward(item, coll))
+		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
 			item->goalAnimState = LS_SPRINT;
-
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_FORWARD;
-
 			return;
 		}
 	}
@@ -462,30 +441,24 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkBack(item, coll))
 			{
 				item->goalAnimState = LS_WALK_BACK;
-
 				return;
 			}
 		}
 		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
-
 			return;
 		}
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -521,12 +494,10 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Without animation blending, the AFK state's
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
-	if (info->poseCount >= LARA_POSE_TIME &&
-		TestLaraPose(item, coll) &&
+	if (info->poseCount >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		g_GameFlow->Animations.Pose)
 	{
 		item->goalAnimState = LS_POSE;
-
 		return;
 	}
 
@@ -542,51 +513,40 @@ void pseudo_lara_as_wade_idle(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-		
 		return;
 	}
 
-	if (TrInput & IN_BACK &&
-		TestLaraWalkBack(item, coll))
+	if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
-
 		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -596,47 +556,37 @@ void pseudo_lara_as_wade_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void pseudo_lara_as_swamp_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-		
 		return;
 	}
 
-	if (TrInput & IN_BACK &&
-		TestLaraWalkBackSwamp(item, coll))
+	if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
-
 		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeftSwamp(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeftSwamp(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRightSwamp(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRightSwamp(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -663,14 +613,12 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -684,7 +632,6 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -696,7 +643,6 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -708,19 +654,16 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_ROLL)
 		{
 			item->goalAnimState = LS_ROLL_FORWARD;
-
 			return;
 		}
 
 		if (TrInput & IN_WAKE)
 		{
 			item->goalAnimState = LS_IDLE;
-
 			return;
 		}
 
 		item->goalAnimState = LS_POSE;
-
 		return;
 	}
 
@@ -760,7 +703,6 @@ void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -787,14 +729,12 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2))
 	{
 		SetLaraFallBackState(item);
-
 		return;
 	}
 
@@ -807,7 +747,6 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -823,7 +762,6 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -847,14 +785,12 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -862,7 +798,6 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -873,21 +808,17 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkForward(item, coll))
 			{
 				item->goalAnimState = LS_WALK_FORWARD;
-
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT &&
-			TestLaraRunForward(item, coll))
+		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
 			item->goalAnimState = LS_SPRINT;
-
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_FORWARD;
-
 			return;
 		}
 	}
@@ -898,30 +829,24 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkBack(item, coll))
 			{
 				item->goalAnimState = LS_WALK_BACK;
-
 				return;
 			}
 		}
 		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
-
 			return;
 		}
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -929,10 +854,10 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
+			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+
 			if (info->turnRate > LARA_SLOW_TURN)
 				info->turnRate = LARA_SLOW_TURN;
-
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 		}
 		else if (info->turnRate > LARA_SLOW_MED_TURN)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
@@ -957,44 +882,34 @@ void pseudo_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-
 		return;
 	}
-	else if (TrInput & IN_BACK &&
-		TestLaraWalkBack(item, coll))
+	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
 	if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-
 		return;
 	}
 
@@ -1009,40 +924,31 @@ void pseudo_lara_as_swamp_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate > LARA_SWAMP_TURN_MAX)
 		info->turnRate = LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-
 		return;
 	}
-	else if (TrInput & IN_BACK &&
-		TestLaraWalkBackSwamp(item, coll))
+	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeftSwamp(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeftSwamp(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRightSwamp(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRightSwamp(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
 	if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_SLOW;
-
 		return;
 	}
 
@@ -1067,7 +973,6 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -1091,14 +996,12 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -1106,7 +1009,6 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -1117,21 +1019,17 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkForward(item, coll))
 			{
 				item->goalAnimState = LS_WALK_FORWARD;
-
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT &&
-			TestLaraRunForward(item, coll))
+		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
 			item->goalAnimState = LS_SPRINT;
-
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_FORWARD;
-
 			return;
 		}
 	}
@@ -1142,31 +1040,25 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkBack(item, coll))
 			{
 				item->goalAnimState = LS_WALK_BACK;
-
 				return;
 			}
 		}
 		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
-
 			return;
 		}
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
 	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -1174,10 +1066,10 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_WALK)
 		{
+			item->goalAnimState = LS_TURN_LEFT_SLOW;
+
 			if (info->turnRate < -LARA_SLOW_TURN)
 				info->turnRate = -LARA_SLOW_TURN;
-
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
 		}
 		else if (info->turnRate < -LARA_SLOW_MED_TURN)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
@@ -1202,44 +1094,34 @@ void pseudo_lara_as_wade_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-
 		return;
 	}
-	else if (TrInput & IN_BACK &&
-		TestLaraWalkBack(item, coll))
+	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
-
 		return;
 	}
 
@@ -1254,40 +1136,31 @@ void pseudo_lara_as_swamp_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate < -LARA_SWAMP_TURN_MAX)
 		info->turnRate = -LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-
 		return;
 	}
-	else if (TrInput & IN_BACK &&
-		TestLaraWalkBack(item, coll))
+	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_SLOW;
-
 		return;
 	}
 
@@ -1301,12 +1174,12 @@ void lara_col_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_turn_right_slow(item, coll);
 }
 
+// State:		LS_DEATH (8)
+// Collision:	lara_col_death()
 void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 8*/
-	/*collision: lara_col_death*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
@@ -1316,36 +1189,40 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		BinocularRange = 0;
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
-		LaraItem->meshBits = -1;
+		item->meshBits = -1;
 		info->busy = false;
 	}
 }
 
+// State:		LS_DEATH (8)
+// Control:	lara_as_death()
 void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
-
-	/*state 8*/
-	/*state code: lara_as_death*/
-	StopSoundEffect(SFX_TR4_LARA_FALL);
 
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
-	ShiftItem(item, coll);
 
+	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->hitPoints = -1;
 	info->air = -1;
 
-	if (coll->Middle.Floor != NO_HEIGHT)
-		item->pos.yPos += coll->Middle.Floor;
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
 }
 
+// State:		LS_SPLAT (12)
+// Collision:	lara_col_splat()
 void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -1353,25 +1230,28 @@ void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 }
 
+// State:		LS_SPLAT (12)
+// Control:		lara_as_splat()
 void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
-
 	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
+
 	ShiftItem(item, coll);
 
-	if (coll->Middle.Floor >= -256 && coll->Middle.Floor <= 256)
-		item->pos.yPos += coll->Middle.Floor;
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_WALK_BACK (16)
@@ -1385,7 +1265,6 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -1396,7 +1275,6 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus == LW_WADE)
 	{
 		pseudo_lara_as_swamp_walk_back(item, coll);
-
 		return;
 	}
 
@@ -1422,7 +1300,6 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 		(TrInput & IN_WALK || info->waterStatus == LW_WADE))
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
@@ -1455,7 +1332,6 @@ void pseudo_lara_as_swamp_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_BACK)
 	{
 		item->goalAnimState = LS_WALK_BACK;
-
 		return;
 	}
 
@@ -1483,14 +1359,12 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -1503,7 +1377,6 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -1517,7 +1390,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -1531,7 +1403,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
@@ -1539,7 +1410,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -1548,7 +1418,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -1559,7 +1428,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraRunForward(item, coll))
 			{
 				item->goalAnimState = LS_WADE_FORWARD;
-
 				return;
 			}
 		}
@@ -1568,21 +1436,17 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkForward(item, coll))
 			{
 				item->goalAnimState = LS_WALK_FORWARD;
-
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT &&
-			TestLaraRunForward(item, coll))
+		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
 			item->goalAnimState = LS_SPRINT;
-
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_FORWARD;
-
 			return;
 		}
 	}
@@ -1593,30 +1457,24 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkBack(item, coll))
 			{
 				item->goalAnimState = LS_WALK_BACK;
-
 				return;
 			}
 		}
 		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
-
 			return;
 		}
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
@@ -1624,7 +1482,6 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_RIGHT)
 	{
 		item->goalAnimState = LS_TURN_RIGHT_FAST;
-
 		return;
 	}
 
@@ -1647,7 +1504,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -1661,7 +1517,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
-
 		return;
 	}
 
@@ -1669,7 +1524,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -1678,7 +1532,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -1689,7 +1542,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraRunForward(item, coll))
 			{
 				item->goalAnimState = LS_WADE_FORWARD;
-
 				return;
 			}
 		}
@@ -1698,21 +1550,17 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkForward(item, coll))
 			{
 				item->goalAnimState = LS_WALK_FORWARD;
-
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT &&
-			TestLaraRunForward(item, coll))
+		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
 			item->goalAnimState = LS_SPRINT;
-
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_FORWARD;
-
 			return;
 		}
 	}
@@ -1723,38 +1571,31 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 			if (TestLaraWalkBack(item, coll))
 			{
 				item->goalAnimState = LS_WALK_BACK;
-
 				return;
 			}
 		}
 		else if (TestLaraHopBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
-
 			return;
 		}
 	}
 
-	if (TrInput & IN_LSTEP &&
-		TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && 	TestLaraStepLeft(item, coll))
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
 	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
-	else if (TrInput & IN_RSTEP &&
-		TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
 		item->goalAnimState = LS_TURN_LEFT_FAST;
-
 		return;
 	}
 
@@ -1778,8 +1619,7 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
-
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
@@ -1802,7 +1642,6 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_RSTEP)
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
-
 		return;
 	}
 	
@@ -1830,14 +1669,12 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -1850,7 +1687,6 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -1865,8 +1701,7 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
-
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
@@ -1889,7 +1724,6 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LSTEP)
 	{
 		item->goalAnimState = LS_STEP_LEFT;
-
 		return;
 	}
 
@@ -1917,14 +1751,12 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -1937,7 +1769,6 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -1953,7 +1784,6 @@ void lara_as_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_BACK;
-
 		return;
 	}
 
@@ -1966,8 +1796,7 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	Camera.laraNode = 0;
-	info->moveAngle = item->pos.yRot + ANGLE(180);
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
@@ -1975,22 +1804,21 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
+	Camera.laraNode = 0;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (coll->Middle.Floor > STEPUP_HEIGHT / 2) // Was 200.
+	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2)) // Was 200.
 	{
 		SetLaraFallBackState(item);
-
 		return;
 	}
 
@@ -1999,7 +1827,6 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -2014,17 +1841,15 @@ void lara_as_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Change swandive roll anim state to something sensible.
 	if (TrInput & IN_FORWARD &&
-		item->animNumber == LA_SWANDIVE_ROLL)
+		item->animNumber == LA_SWANDIVE_ROLL) // Hack.
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
-
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
-
 		return;
 	}
 
@@ -2051,14 +1876,12 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -2070,7 +1893,6 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -2087,14 +1909,12 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_IDLE;
-
 		return;
 	}
 
 	if (TestLaraSwamp(item))
 	{
 		pseudo_lara_as_swamp_wade_forward(item, coll);
-
 		return;
 	}
 
@@ -2153,7 +1973,6 @@ void pseudo_lara_as_swamp_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
-		
 		return;
 	}
 
@@ -2177,7 +1996,6 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
@@ -2203,7 +2021,6 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll) || TestLaraSwamp(item))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -2219,7 +2036,6 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -2242,8 +2058,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_SPRINT_ROLL;
-
+		item->goalAnimState = LS_SPRINT_DIVE;
 		return;
 	}
 
@@ -2251,7 +2066,6 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -2291,14 +2105,12 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -2309,7 +2121,7 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraWall(item, 256, 0, -640) != SPLAT_COLL::NONE)
+		if (coll->HitTallObject || TestLaraWall(item, STEP_SIZE, 0, -(STEP_SIZE * 2 + STEP_SIZE / 2)) != SPLAT_COLL::NONE)
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -2325,18 +2137,16 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll) &&
-		coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
 
-// State:		LS_SPRINT_ROLL (74)
-// Collision:	lara_col_sprint_roll()
-void lara_as_sprint_roll(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SPRINT_DIVE (74)
+// Collision:	lara_col_sprint_dive()
+void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -2367,58 +2177,53 @@ void lara_as_sprint_roll(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_col_sprint_roll(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SPRINT_DIVE (74)
+// Control:		lara_col_sprint_dive()
+void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 74*/
-	/*state code: lara_as_sprint_roll*/
-	if (item->speed < 0)
-		info->moveAngle = item->pos.yRot + ANGLE(180);
-	else
-		info->moveAngle = item->pos.yRot;
-
+	info->moveAngle = (item->speed < 0) ? item->pos.yRot + ANGLE(180.0f) : item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.SlopesAreWalls = true;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
+
 	LaraDeflectEdgeJump(item, coll);
 
-	if (!LaraFallen(item, coll))
+	if (TestLaraFall(item, coll))
 	{
-		if (item->speed < 0)
-			info->moveAngle = item->pos.yRot;
+		SetLaraFallState(item);
+		return;
+	}
 
-		if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
-		{
-			if (LaraLandedBad(item, coll))
-			{
-				item->goalAnimState = LS_DEATH;
-			}
-			else if (info->waterStatus == LW_WADE || !(TrInput & IN_FORWARD) || TrInput & IN_WALK)
-			{
-				item->goalAnimState = LS_IDLE;
-			}
-			else
-			{
-				item->goalAnimState = LS_RUN_FORWARD;
-			}
+	if (item->speed < 0)
+		info->moveAngle = item->pos.yRot; // ???
 
-			item->gravityStatus = false;
-			item->fallspeed = 0;
-			item->pos.yPos += coll->Middle.Floor;
-			item->speed = 0;
+	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	{
+		if (LaraLandedBad(item, coll)) // TODO: It seems Core wanted to make the sprint dive a true jump.
+			item->goalAnimState = LS_DEATH;
+		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->waterStatus == LW_WADE)
+			item->goalAnimState = LS_IDLE;
+		else
+			item->goalAnimState = LS_RUN_FORWARD;
 
-			AnimateLara(item);
-		}
+		item->gravityStatus = false;
+		item->fallspeed = 0;
+		item->pos.yPos += coll->Middle.Floor;
+		item->speed = 0;
 
-		ShiftItem(item, coll);
+		AnimateLara(item);
+	}
 
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+		return;
 	}
 }
