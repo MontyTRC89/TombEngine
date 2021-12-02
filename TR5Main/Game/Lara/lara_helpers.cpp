@@ -67,6 +67,15 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
+	info->headXrot = 0;
+	info->headYrot = 0;
+	info->headZrot = 0;
+
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
 		if (TrInput & IN_DUCK && TestLaraCrawlDownStep(item, coll))
@@ -90,14 +99,12 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlUpStep(item, coll))
 	{
 		item->goalAnimState = LS_STEP_UP;
-
 		return;
 	}
 
 	if (TestLaraCrawlDownStep(item, coll))
 	{
 		item->goalAnimState = LS_STEP_DOWN;
-
 		return;
 	}
 }
