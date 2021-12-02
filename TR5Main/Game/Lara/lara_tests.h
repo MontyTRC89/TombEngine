@@ -84,5 +84,6 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
 
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up);
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll);
