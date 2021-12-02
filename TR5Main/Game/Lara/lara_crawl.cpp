@@ -42,7 +42,6 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -57,39 +56,32 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT &&
-			TestLaraCrouchRoll(item, coll) &&
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			info->gunStatus == LG_HANDS_FREE &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
-
 			return;
 		}
 
-		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrouchToCrawl(item))
+		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_LEFT;
-
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -117,9 +109,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
-
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
@@ -131,7 +122,6 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -196,10 +186,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
+		SetLaraFallState(item);
 		info->gunStatus = LG_HANDS_FREE;
 		item->speed /= 3;				// Truncate speed to prevent flying off.
-		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -211,14 +200,12 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-
 		return;
 	}
 
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -235,7 +222,6 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -247,32 +233,26 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT &&
-			TestLaraCrouchRoll(item, coll) &&
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
-
 			return;
 		}
 
-		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrouchToCrawl(item))
+		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_LEFT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -298,7 +278,6 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -310,32 +289,26 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT &&
-			TestLaraCrouchRoll(item, coll) &&
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
-
 			return;
 		}
 
-		if (TrInput & (IN_FORWARD | IN_BACK) &&
-			TestLaraCrouchToCrawl(item))
+		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CROUCH_IDLE;
-
 		return;
 	}
 
@@ -369,7 +342,6 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -390,43 +362,36 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 			!IsStandingWeapon(info->gunType) &&
 			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
-			info->gunStatus = LG_HANDS_FREE;
 			item->goalAnimState = LS_CROUCH_IDLE;
-
+			info->gunStatus = LG_HANDS_FREE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlVault(item, coll) &&
+			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
 				g_GameFlow->Animations.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
-
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
-
 				return;
 			}
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlToHang(item, coll))
+			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{
-				DoLaraCrawlToHangSnap(item, coll);
 				item->goalAnimState = LS_CRAWL_TO_HANG;
-
+				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
 			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_BACK;
-
 				return;
 			}
 		}
@@ -434,23 +399,20 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CRAWL_TURN_LEFT;
-
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
-
 		return;
 	}
 
-	info->gunStatus = LG_HANDS_FREE;
 	item->goalAnimState = LS_CROUCH_IDLE;
+	info->gunStatus = LG_HANDS_FREE;
 }
 
 // State:		LS_CRAWL_IDLE (80)
@@ -478,9 +440,8 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
-
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
@@ -492,7 +453,6 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -513,7 +473,6 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -537,34 +496,28 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT &&
-			TestLaraCrouchRoll(item, coll))
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlVault(item, coll) &&
+			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
 				g_GameFlow->Animations.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
-
 				return;
 			}
 			else [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
-
 				return;
 			}
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
-
 		return;
 	}
 
@@ -600,9 +553,8 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
-
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 	
@@ -614,7 +566,6 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -636,7 +587,6 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -666,21 +616,18 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 			/*if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
-				DoLaraCrawlToHangSnap(item, coll);
 				item->goalAnimState = LS_CRAWL_TO_HANG;
-
+				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
 			else [[likely]]*/
 			{
 				item->goalAnimState = LS_CRAWL_BACK;
-
 				return;
 			}
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
-
 		return;
 	}
 
@@ -714,9 +661,8 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		info->gunStatus = LG_HANDS_FREE;
 		SetLaraFallState(item);
-
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
@@ -728,7 +674,6 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
-
 		return;
 	}
 }
@@ -749,7 +694,6 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -761,35 +705,28 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
-		if (TrInput & IN_FORWARD &&
-			TestLaraCrawlForward(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_FORWARD;
-
 			return;
 		}
 
-		if (TrInput & IN_BACK &&
-			TestLaraCrawlBack(item, coll))
+		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
-
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_CRAWL_TURN_LEFT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
-
 		return;
 	}
 
@@ -819,7 +756,6 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
-
 		return;
 	}
 
@@ -828,39 +764,31 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (TrInput & IN_SPRINT &&
-			TestLaraCrouchRoll(item, coll))
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_IDLE;
-
 			return;
 		}
 
-		if (TrInput & IN_FORWARD &&
-			TestLaraCrawlForward(item, coll))
+		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_FORWARD;
-
 			return;
 		}
 
-		if (TrInput & IN_BACK &&
-			TestLaraCrawlBack(item, coll))
+		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
 			item->goalAnimState = LS_CRAWL_BACK;
-
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
-
 			return;
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
-
 		return;
 	}
 
@@ -899,10 +827,12 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestHangSwingIn(item, item->pos.yRot))
 		{
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-			info->headYrot = 0;
 			info->headXrot = 0;
-			info->torsoYrot = 0;
+			info->headYrot = 0;
+			info->headZrot = 0;
 			info->torsoXrot = 0;
+			info->torsoYrot = 0;
+			info->torsoZrot = 0;
 		}
 		else
 			SetAnimation(item, LA_REACH_TO_HANG, 12);

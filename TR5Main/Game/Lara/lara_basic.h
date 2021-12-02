@@ -68,5 +68,5 @@ void pseudo_lara_as_swamp_wade_forward(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_sprint_roll(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_sprint_roll(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll);

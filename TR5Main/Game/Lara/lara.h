@@ -34,7 +34,7 @@ struct COLL_INFO;
 #define LARA_POLE_TURN_MAX ANGLE(4.5f)
 
 // Flex rates
-#define LARA_CRAWL_FLEX ANGLE(40.0f) / 2 // 2 = hardcoded number of bones to flex.
+#define LARA_CRAWL_FLEX ANGLE(40.0f) / 2		// 2 = hardcoded number of bones to flex (head and torso).
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.

@@ -821,8 +821,8 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
-			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			item->goalAnimState = LS_POLE_DOWN;
+			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			return;
 		}
 
@@ -911,7 +911,6 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_POLE_IDLE;
-
 			return;
 		}
 
@@ -926,7 +925,6 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall?
-
 }
 
 // State:		LS_POLE_UP (100)
@@ -972,7 +970,6 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_POLE_IDLE;
-
 			return;
 		}
 
@@ -984,7 +981,6 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->itemFlags[2] = 0; // Vertical velocity.
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
