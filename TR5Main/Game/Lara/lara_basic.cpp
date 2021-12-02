@@ -1247,11 +1247,8 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
-	{
-		DoLaraStep(item, coll);
-		return;
-	}
+	if (coll->Middle.Floor >= -STEP_SIZE && coll->Middle.Floor <= STEP_SIZE)
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 // State:		LS_WALK_BACK (16)
