@@ -92,21 +92,17 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
 		if (LaraLandedBad(item, coll))
-		{
 			item->goalAnimState = LS_DEATH;
-		}
 		else
 		{
 			if (info->waterStatus == LW_WADE)
-			{
 				item->goalAnimState = LS_IDLE;
-			}
 			else
 			{
-				if (TrInput & IN_FORWARD && !(TrInput & IN_STEPSHIFT))
-					item->goalAnimState = LS_RUN_FORWARD;
+				if (TrInput & IN_FORWARD && !(TrInput & IN_WALK))
+					SetAnimation(item, LA_LAND_TO_RUN);
 				else
-					item->goalAnimState = LS_IDLE;
+					SetAnimation(item, LA_LAND);
 			}
 		}
 
