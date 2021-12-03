@@ -1087,7 +1087,6 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
-
 		return;
 	}
 
