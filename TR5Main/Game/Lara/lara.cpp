@@ -867,8 +867,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Reset running jump timer.
-	if (info->jumpCount < LARA_JUMP_TIME &&
-		item->currentAnimState != LS_RUN_FORWARD &&
+	if (item->currentAnimState != LS_RUN_FORWARD &&
 		item->currentAnimState != LS_WALK_FORWARD &&
 		item->currentAnimState != LS_JUMP_FORWARD)
 	{

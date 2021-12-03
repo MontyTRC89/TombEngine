@@ -810,7 +810,6 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
-			info->gunStatus = LG_HANDS_FREE;
 			return;
 		}
 
