@@ -34,7 +34,6 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -332,8 +331,6 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -463,8 +460,6 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -576,8 +571,6 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	info->isDucked = true;
 	info->look = false;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
@@ -684,8 +677,6 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
@@ -746,8 +737,6 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
-	info->isDucked = true;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;

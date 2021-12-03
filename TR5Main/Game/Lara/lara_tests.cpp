@@ -1765,12 +1765,12 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeA = GetCollisionResult(item, item->pos.yRot, STEP_SIZE, 0);						// Crossing.
 	auto probeB = GetCollisionResult(item, item->pos.yRot, STEP_SIZE + STEP_SIZE / 2, 0);		// Approximate destination.
 
-	if ((((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&							// Lower floor bound. Synced with crawl exit jump's highest floor bound.
-		(probeA.Position.Floor - y) >= STEP_SIZE) ||								// Upper floor bound. Synced with crawl states' BadHeightDown. OR
-		(probeA.Position.Slope && probeB.Position.Slope)) &&						// Slopes ahead.
-		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.
+	if ((((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor bound. Synced with crawl exit jump's highest floor bound.
+		(probeA.Position.Floor - y) >= STEP_SIZE) ||									// Upper floor bound. Synced with crawl states' BadHeightDown. OR
+		(probeA.Position.Slope && probeB.Position.Slope)) &&							// Slopes ahead.
+		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Gap is optically feasible for action.
+		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&			// Crossing is not a clamp.
+		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&			// Destination is not a clamp.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1785,10 +1785,10 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeA = GetCollisionResult(item, item->pos.yRot, STEP_SIZE, 0);						// Crossing.
 	auto probeB = GetCollisionResult(item, item->pos.yRot, STEP_SIZE + STEP_SIZE / 2, 0);		// Approximate destination.
 
-	if ((probeA.Position.Floor - y) > STEPUP_HEIGHT &&								// Highest floor bound. Synced with crawl down step and crawl exit down step's lower floor bounds.
-		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&			// Gap is optically feasible for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.
+	if ((probeA.Position.Floor - y) > STEPUP_HEIGHT &&									// Highest floor bound. Synced with crawl down step and crawl exit down step's lower floor bounds.
+		(probeA.Position.Ceiling - y) <= -(STEP_SIZE + STEP_SIZE / 4) &&				// Gap is optically feasible for action.
+		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&			// Crossing is not a clamp.
+		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&			// Destination is not a clamp.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;
