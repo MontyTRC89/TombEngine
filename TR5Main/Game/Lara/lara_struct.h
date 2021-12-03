@@ -182,7 +182,7 @@ enum LARA_STATE
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
-	LS_STEP_BACK_DOWN = 149,		// This was unnecessary; a new state can be added in its place. @Sezz 2021.10.18
+	LS_UNUSED4 = 149,		// Vestige of step back down; a new state can be added in its place.
 	LS_LADDER_DISMOUNT_LEFT = 150,
 	LS_LADDER_DISMOUNT_RIGHT = 151,
 	LS_TURN_LEFT_FAST = 152,
@@ -191,6 +191,9 @@ enum LARA_STATE
 	LS_CRAWL_EXIT_FLIP = 155,
 
 	NUM_LARA_STATES
+
+	// TRASHED STATES (please reuse slots before going any higher and remove entries from this list as you go):
+	// 143, 144, 145, 149
 };
 
 enum LARA_ANIM
@@ -732,8 +735,10 @@ enum LARA_ANIM
 
 	NUM_LARA_ANIMS
 	
-	// TRASHED ANIMS: 
-	// 45, 245, 265, 266, 268, 273, 274, 278, 280
+	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
+	// 45,
+	// 245, 265, 266, 268, 273, 274, 278, 280,
+	// 484, 485, 486, 487, 488, 499, 490, 491, 492, 493, 494
 };
 #pragma endregion
 
