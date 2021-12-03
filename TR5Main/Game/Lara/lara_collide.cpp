@@ -54,11 +54,8 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (!Lara.climbStatus || item->speed != 2)
 		{
-			if (coll->Middle.Floor <= (STEP_SIZE * 2))
-			{
-				if (coll->Middle.Floor <= (STEP_SIZE / 2)) // TODO: Deal with this properly. @Sezz 2021.11.20
-					SetAnimation(item, LA_LAND);
-			}
+			if (coll->Middle.Floor <= STEP_SIZE)
+				SetAnimation(item, LA_LAND);
 			else
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 
