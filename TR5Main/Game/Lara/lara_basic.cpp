@@ -202,6 +202,8 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->jumpCount++;
+	if (info->jumpCount > LARA_JUMP_TIME)
+		info->jumpCount = LARA_JUMP_TIME;
 
 	if (item->hitPoints <= 0)
 	{
