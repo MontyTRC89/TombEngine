@@ -18,32 +18,31 @@
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TestLaraStepUp(item, coll) &&
-		!TestLaraSwamp(item))
+	if (!TestLaraSwamp(item))
 	{
-		item->goalAnimState = LS_STEP_UP;
-		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+		if (TestLaraStepUp(item, coll))
 		{
-			item->pos.yPos += coll->Middle.Floor;
-
-			return;
+			item->goalAnimState = LS_STEP_UP;
+			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			{
+				item->pos.yPos += coll->Middle.Floor;
+				return;
+			}
 		}
-	}
-	else if (TestLaraStepDown(item, coll) &&
-		!TestLaraSwamp(item))
-	{
-		item->goalAnimState = LS_STEP_DOWN;
-		if (GetChange(item, &g_Level.Anims[item->animNumber]))
+		else if (TestLaraStepDown(item, coll))
 		{
-			item->pos.yPos += coll->Middle.Floor;
-
-			return;
+			item->goalAnimState = LS_STEP_DOWN;
+			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			{
+				item->pos.yPos += coll->Middle.Floor;
+				return;
+			}
 		}
 	}
 
 	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
 	// TODO: This approach might cause underirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	int threshold = STEP_SIZE / 8;
+	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
 	int rate = 50;
 	int sign = std::copysign(1, coll->Middle.Floor);
 	if (coll->Middle.Floor != NO_HEIGHT)
