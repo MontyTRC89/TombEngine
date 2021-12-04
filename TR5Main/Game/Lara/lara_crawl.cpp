@@ -605,18 +605,8 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				TestLaraCrawlToHang(item, coll))
-			{
-				item->goalAnimState = LS_CRAWL_TO_HANG;
-				DoLaraCrawlToHangSnap(item, coll);
-				return;
-			}
-			else [[likely]]
-			{
-				item->goalAnimState = LS_CRAWL_BACK;
-				return;
-			}
+			item->goalAnimState = LS_CRAWL_BACK;
+			return;
 		}
 
 		item->goalAnimState = LS_CRAWL_IDLE;
