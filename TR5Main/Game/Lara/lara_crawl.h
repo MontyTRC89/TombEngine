@@ -33,4 +33,4 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll);
