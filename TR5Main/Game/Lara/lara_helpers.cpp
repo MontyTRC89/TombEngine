@@ -47,11 +47,8 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	int sign = std::copysign(1, coll->Middle.Floor);
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
-		if (TestLaraSwamp(item) &&
-			coll->Middle.Floor > 0)
-		{
+		if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
 			item->pos.yPos += SWAMP_GRAVITY;
-		}
 		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))			// Outer range.
 			item->pos.yPos += rate * sign;
 		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
