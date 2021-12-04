@@ -37,6 +37,23 @@ GameScriptDisplayString::GameScriptDisplayString() {
 	m_id = reinterpret_cast<DisplayStringIDType>(this);
 }
 
+// Helper type to allow us to more easily specify "give a value of type X or just give nil" parameters.
+// Sol doesn't (at the time of writing) have any mechanisms to do this kind of optional argument without
+// drawbacks, or at least no mechanisms that I could find.
+//
+// sol::optional doesn't distinguish between nil values and values of the wrong type
+// (so we can't provide the user with an error message to tell them they messed up).
+//
+// std::variant works better, providing an error if the user passes in an arg of the wrong type, but
+// the error isn't too helpful and exposes a lot of C++ code which will not help them fix the error.
+//
+// sol::object lets us check that the user has given the right type, but takes valuable type information
+// away from the function's C++ signature, giving us things like void func(sol::object, sol::object, sol::object),
+// even if the function's actual expected parameter types are (for example) float, sol::table, SomeUserType.
+// 
+// This alias is an effort to avoid the above problems.
+template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol::object>;
+
 /*** Create a DisplayString.
 For use in @{Level-specific.ShowString|ShowString} and @{Level-specific.HideString|HideString}.
 @function DisplayString.new
@@ -53,10 +70,10 @@ If true, the str argument will be the key of a translated string specified in
 strings.lua. __Default: false__.
 @return A new DisplayString object.
 */
-std::unique_ptr<GameScriptDisplayString> GameScriptDisplayString::Create(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
+std::unique_ptr<GameScriptDisplayString> CreateString(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
 {
 	auto ptr = std::make_unique<GameScriptDisplayString>();
-	auto id = ptr->m_id;
+	auto id = ptr->GetID();
 	FlagArray f{};
 	if (std::holds_alternative<sol::table>(flags))
 	{
@@ -80,7 +97,7 @@ std::unique_ptr<GameScriptDisplayString> GameScriptDisplayString::Create(std::st
 
 	UserDisplayString ds{ key, x, y, col, f, translated};
 
-	s_setItemCallback(id, ds);
+	GameScriptDisplayString::s_setItemCallback(id, ds);
 	return ptr;
 }
 
@@ -93,7 +110,7 @@ void GameScriptDisplayString::Register(sol::state* state)
 {
 	state->new_usertype<GameScriptDisplayString>(
 		"DisplayString",
-		"new", &GameScriptDisplayString::Create,
+		"new", &CreateString,
 
 		/// (@{Color}) RBG color
 		// @mem col
