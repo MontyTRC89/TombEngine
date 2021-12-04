@@ -1,5 +1,5 @@
-#include "framework.h"
-#include "Scripting/GameFlowScript.h"
+#include "frameworkandsol.h"
+#include "GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Game/savegame.h"
 #include "GameScriptInventoryObject.h"

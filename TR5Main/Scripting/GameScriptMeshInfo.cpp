@@ -1,11 +1,10 @@
 #pragma once
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "GameScriptMeshInfo.h"
 #include "GameScriptPosition.h"
 #include "GameScriptColor.h"
 #include "ScriptUtil.h"
-#include <sol.hpp>
 /***
 Mesh info
 

@@ -861,24 +861,78 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
-    <ClCompile Include="Scripting\GameFlowScript.cpp" />
-    <ClCompile Include="Scripting\GameScriptLevel.cpp" />
-    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptMirror.cpp" />
-    <ClCompile Include="Scripting\GameScriptPosition.cpp" />
-    <ClCompile Include="Scripting\GameScriptRotation.cpp" />
-    <ClCompile Include="Scripting\GameScriptSettings.cpp" />
-    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp" />
-    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptAIObject.cpp" />
-    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp" />
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptColor.cpp" />
-    <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
-    <ClCompile Include="Scripting\GameLogicScript.cpp" />
+    <ClCompile Include="Scripting\GameFlowScript.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptLevel.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptMirror.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptPosition.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptRotation.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSettings.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAIObject.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptColor.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptDisplayString.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameLogicScript.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
   </ItemGroup>
