@@ -307,7 +307,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_crawl_turn_right,
 	lara_col_crawl_back,
 	lara_void_func,
-	lara_col_crawl2hang,
+	lara_col_crawl_to_hang,
 	lara_default_col,
 	lara_void_func,
 	lara_void_func,

@@ -790,7 +790,7 @@ void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	lara_col_crawl_idle(item, coll);
 }
 
-void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
