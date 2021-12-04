@@ -111,10 +111,10 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.ForwardAngle += ANGLE(180.0f);
+	coll->Setup.ForwardAngle = item->pos.yRot + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
 	SnapItemToLedge(item, coll);
-	MoveItem(item, coll->Setup.ForwardAngle, -LARA_RAD_CRAWL);
+	MoveItem(item, item->pos.yRot, -LARA_RAD_CRAWL);
 	item->pos.yRot += ANGLE(180.0f);
 	LaraResetGravityStatus(item, coll);
 }
