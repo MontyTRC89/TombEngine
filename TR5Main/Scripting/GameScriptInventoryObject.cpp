@@ -1,5 +1,4 @@
-#include "framework.h"
-#include <sol.hpp>
+#include "frameworkandsol.h"
 #include "GameScriptInventoryObject.h"
 #include "ScriptAssert.h"
 #include <string>

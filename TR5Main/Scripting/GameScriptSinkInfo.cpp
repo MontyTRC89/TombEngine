@@ -1,10 +1,9 @@
 #pragma once
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "GameScriptSinkInfo.h"
 #include "GameScriptPosition.h"
 #include "ScriptUtil.h"
-#include <sol.hpp>
 /***
 Sink info
 
