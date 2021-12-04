@@ -1,4 +1,4 @@
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "GameLogicScript.h"
 #include "ScriptAssert.h"
 #include "Game/items.h"

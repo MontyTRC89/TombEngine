@@ -1,5 +1,4 @@
-#include "framework.h"
-#include <sol.hpp>
+#include "frameworkandsol.h"
 #include "GameScriptRotation.h"
 #include "Specific/phd_global.h"
 
