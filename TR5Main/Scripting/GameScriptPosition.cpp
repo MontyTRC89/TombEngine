@@ -1,6 +1,5 @@
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "GameScriptPosition.h"
-#include <sol.hpp>
 #include "Specific/phd_global.h"
 
 /***
