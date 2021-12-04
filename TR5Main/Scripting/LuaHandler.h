@@ -1,6 +1,5 @@
 #pragma once
-#include "framework.h"
-#include <sol.hpp>
+#include "frameworkandsol.h"
 
 class LuaHandler {
 protected:

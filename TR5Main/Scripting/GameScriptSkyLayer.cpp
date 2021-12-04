@@ -1,5 +1,4 @@
-#include "framework.h"
-#include <sol.hpp>
+#include "frameworkandsol.h"
 #include "GameScriptSkyLayer.h"
 
 /*** Describes a layer of moving clouds.
@@ -51,5 +50,4 @@ void GameScriptSkyLayer::SetColor(GameScriptColor const & col)
 	G = col.GetG();
 	B = col.GetB();
 }
-
 
