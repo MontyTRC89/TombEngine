@@ -605,15 +605,14 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			// TODO: Crawl-to-hang dispatch not working directly from here. Must be idle. Hardly noticeable, but a seamless dispatch would be preferred. @Sezz 2021.11.23
-			/*if (TrInput & (IN_ACTION | IN_JUMP) &&
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				TestLaraCrawlToHang(item, coll))
 			{
 				item->goalAnimState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
-			else [[likely]]*/
+			else [[likely]]
 			{
 				item->goalAnimState = LS_CRAWL_BACK;
 				return;
