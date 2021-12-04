@@ -1,10 +1,9 @@
 #pragma once
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "GameScriptAIObject.h"
 #include "ScriptAssert.h"
 #include "GameScriptPosition.h"
 #include "ScriptUtil.h"
-#include <sol.hpp>
 /***
 AI object
 
