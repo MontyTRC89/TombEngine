@@ -631,14 +631,14 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll, float rate)
 {
-	item->pos.xPos += coll->Shift.x;
-	item->pos.yPos += coll->Shift.y;
-	item->pos.zPos += coll->Shift.z;
-	coll->Shift.z = 0;
-	coll->Shift.y = 0;
+	item->pos.xPos += coll->Shift.x / rate;
+	item->pos.yPos += coll->Shift.y / rate;
+	item->pos.zPos += coll->Shift.z / rate;
 	coll->Shift.x = 0;
+	coll->Shift.y = 0;
+	coll->Shift.z = 0;
 }
 
 void MoveItem(ITEM_INFO* item, short angle, int x, int y)
