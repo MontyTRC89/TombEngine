@@ -141,7 +141,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
-void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll, float rate = 1.0f);
 void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);

@@ -116,7 +116,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	ShiftItem(item, coll);
+	ShiftItem(item, coll, 2.0f);
 	
 	if (TestLaraStep(coll))
 	{
@@ -194,7 +194,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	ShiftItem(item, coll);
+	ShiftItem(item, coll, 2.0f);
 
 	if (TestLaraHitCeiling(coll))
 	{
@@ -445,7 +445,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	ShiftItem(item, coll);
+	ShiftItem(item, coll, 2.0f);
 	
 	if (TestLaraStep(coll))
 	{
@@ -499,13 +499,14 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
+			// TODO: Due to the nature of current probing methods, Lara may be able to vault slightly too early in some scenarios, resulting in minor issues around diagonal geometry. @Sezz 2021.12.05
+			/*if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
 				g_GameFlow->Animations.CrawlExtended)
 			{
 				DoLaraCrawlVault(item, coll);
 				return;
 			}
-			else [[likely]]
+			else [[likely]]*/
 			{
 				item->goalAnimState = LS_CRAWL_FORWARD;
 				return;
@@ -556,7 +557,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	ShiftItem(item, coll);
+	ShiftItem(item, coll, 2.0f);
 
 	if (TestLaraStep(coll))
 	{
@@ -651,7 +652,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	ShiftItem(item, coll);
+	ShiftItem(item, coll, 2.0f);
 
 	if (TestLaraStep(coll))
 	{
