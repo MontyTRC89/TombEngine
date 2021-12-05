@@ -28,7 +28,6 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
 CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
 bool TestHangSwingIn(ITEM_INFO* item, short angle);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
-bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
 bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle);
@@ -61,8 +60,7 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = false);
-bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound);
+bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);

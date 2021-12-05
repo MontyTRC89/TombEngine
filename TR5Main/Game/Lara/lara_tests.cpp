@@ -1565,39 +1565,34 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope, bool checkDeath)
 {
-	// TODO: coll->Setup.Radius is currently only set to
-	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
-	// For tests called in crawl control functions, then, it will store the wrong radius.
-	// Function below (TestLaraMoveCrawl()) is a clone to account for this. @Sezz 2021.11.05
+	// HACK: coll->Setup.Radius and coll->Setup.Height are only set
+	// in COLLISION functions, then reset by LaraAboveWater() to defaults.
+	// This means they will store the wrong values for tests called in crawl CONTROL functions.
+	// When states become objects, collision setup should occur at the beginning of each state. @Sezz 2021.12.05
+	coll->Setup.Radius = (
+		item->currentAnimState == LS_CRAWL_IDLE || item->currentAnimState == LS_CRAWL_FORWARD ||
+		item->currentAnimState == LS_CRAWL_BACK || item->currentAnimState == LS_CRAWL_TURN_LEFT ||
+		item->currentAnimState == LS_CRAWL_TURN_RIGHT || item->currentAnimState == LS_CRAWL_TO_HANG)
+		? LARA_RAD_CRAWL : LARA_RAD;
+		
+	coll->Setup.Height = (
+		item->currentAnimState == LS_CROUCH_IDLE || item->currentAnimState == LS_CROUCH_ROLL ||
+		item->currentAnimState == LS_CROUCH_TURN_LEFT || item->currentAnimState == LS_CROUCH_TURN_RIGHT ||
+		item->currentAnimState == LS_CRAWL_IDLE || item->currentAnimState == LS_CRAWL_FORWARD ||
+		item->currentAnimState == LS_CRAWL_BACK || item->currentAnimState == LS_CRAWL_TURN_LEFT ||
+		item->currentAnimState == LS_CRAWL_TURN_RIGHT || item->currentAnimState == LS_CRAWL_TO_HANG)
+		? LARA_HEIGHT_CRAWL : LARA_HEIGHT;
 
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
-	auto noSlope = checkSlope ? !probe.Position.Slope : true;
-	auto noDeath = checkDeath ? !probe.Block->Flags.Death : true;
-
-	if ((probe.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
-		(probe.Position.Floor - y) >= upperBound &&								// Upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&					// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT &&		// Space is not a clamp.
-		noSlope && noDeath &&													// No slope or death sector (if applicable).
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound)
-{
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4, 0);
+	auto isSlope = checkSlope ? probe.Position.Slope : false;
+	auto isDeath = checkDeath ? probe.Block->Flags.Death : false;
 
 	if ((probe.Position.Floor - y) <= lowerBound &&										// Lower floor bound.
 		(probe.Position.Floor - y) >= upperBound &&										// Upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&							// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
-		!probe.Position.Slope && !probe.Block->Flags.Death &&							// No slope or death sector.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height &&		// Space is not a clamp.
+		!isSlope && !isDeath &&															// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1611,15 +1606,14 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 	auto y = item->pos.yPos - coll->Setup.Height;
 	auto probe = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4, 0);
 	
-	// Hack to ensure Lara can run off diagonal ledges + . coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
+	// Hack to ensure Lara can run off diagonal ledges and stops on slanted ceilings. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
 	// BUG: This interferes with the one-step stand-to-crouch vault where the ceiling is lower than Lara's height.
 	if ((probe.Position.Ceiling - y) < 0)
 		return true;
 
 	return false;
 
-	// TODO: TestLaraMove() call not useful yet; it can block Lara from climbing. @Sezz 2021.10.22
-	// Additionally, run forward test needs to incorporate a unique ceiling check (as above). @Sezz 2021.10.28
+	// TODO: TestLaraMove() call not useful yet; it can block Lara from climbing. @Sezz 2021.10.28
 	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT, false);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
@@ -1639,22 +1633,22 @@ bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT, true, true);		// Using BadHeightUp/Down defined in walk back state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk back state collision function.
 }
 
 bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT, false);		// Using BadHeightUp/Down defined in hop back state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), NO_BAD_POS, -STEPUP_HEIGHT, false, false);		// Using BadHeightUp/Down defined in hop back state collision function.
 }
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2, true, true);		// Using BadHeightUp/Down defined in step left state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step left state collision function.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2, true, true);		// Using BadHeightUp/Down defined in step right state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), STEP_SIZE / 2, -STEP_SIZE / 2);		// Using BadHeightUp/Down defined in step right state collision function.
 }
 
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
@@ -1674,12 +1668,12 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMoveCrawl(item, coll, item->pos.yRot, STEP_SIZE - 1, -(STEP_SIZE - 1));				// Using BadHeightUp/Down defined in crawl state collision functions.
+	return TestLaraMove(item, coll, item->pos.yRot, STEP_SIZE - 1, -(STEP_SIZE - 1));				// Using BadHeightUp/Down defined in crawl state collision functions.
 }
 
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMoveCrawl(item, coll, item->pos.yRot + ANGLE(180.0f), STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(180.0f), STEP_SIZE - 1, -(STEP_SIZE - 1));		// Using BadHeightUp/Down defined in crawl state collision functions.
 }
 
 bool TestLaraCrouchToCrawl(ITEM_INFO* item)
