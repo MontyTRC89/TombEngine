@@ -868,7 +868,7 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
 			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
-			undraw_flare_meshes(laraItem);
+			UndrawFlareMeshes(laraItem);
 
 			laraInfo->flareControlLeft = false;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
