@@ -3,6 +3,6 @@
 #include "collide.h"
 
 void SubInitialise(short itemNum);
-void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int SubControl(void);
-void SubEffects(short item_number);
+void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
+void SubEffects(short itemNum);
+bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll);
