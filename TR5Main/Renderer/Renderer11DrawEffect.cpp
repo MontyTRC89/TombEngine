@@ -728,6 +728,8 @@ namespace TEN::Renderer
 
 	void Renderer11::drawUnderwaterDust(RenderView& view) 
 	{
+		return;
+
 		if (m_firstUnderwaterDustParticles) {
 			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 				m_underwaterDustParticles[i].Reset = true;
