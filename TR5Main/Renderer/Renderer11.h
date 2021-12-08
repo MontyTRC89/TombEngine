@@ -30,7 +30,6 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
-#include <Renderer/ConstantBuffers/OmniFogBuffer.h>
 
 struct CAMERA_INFO;
 
@@ -363,8 +362,6 @@ namespace TEN::Renderer
 		ConstantBuffer<CStaticBuffer> m_cbStatic;
 		CLightBuffer m_stLights;
 		ConstantBuffer<CLightBuffer> m_cbLights;
-		COmniFogBuffer m_stOmniFogBuffer;
-		ConstantBuffer<COmniFogBuffer> m_cbOmniFogBuffer;
 		CMiscBuffer m_stMisc;
 		ConstantBuffer<CMiscBuffer> m_cbMisc;
 		CRoomBuffer m_stRoom;

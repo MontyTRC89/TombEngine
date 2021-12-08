@@ -1,5 +1,4 @@
 #include "./Math.hlsli"
-#include "./FogBuffer.hlsli"
 
 #define LT_SUN		0
 #define LT_POINT	1
@@ -28,7 +27,7 @@ cbuffer ItemBuffer : register(b1)
 
 cbuffer LightsBuffer : register(b2)
 {
-	RendererLight Lights[48];
+	RendererLight Lights[16];
 	int NumLights;
 	float3 CameraPosition;
 };

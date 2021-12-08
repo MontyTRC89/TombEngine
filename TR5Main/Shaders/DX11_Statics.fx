@@ -1,5 +1,4 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./FogBuffer.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b1)
 {
