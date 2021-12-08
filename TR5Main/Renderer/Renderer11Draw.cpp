@@ -25,6 +25,8 @@
 #include "items.h"
 #include <chrono>
 #include "Objects/Generic/Object/rope.h"
+#include <algorithm>
+#include <execution>
 
 using namespace TEN::Entities::Generic;
 
@@ -2162,245 +2164,266 @@ namespace TEN::Renderer
 
     void Renderer11::drawTransparentFaces(RenderView& view)
     {
-        // Sort faces by distance
-        std::sort(
-            view.transparentFaces.begin(),
-            view.transparentFaces.end(),
-            [](RendererTransparentFace& a, RendererTransparentFace& b) {
-                return a.distance > b.distance;
-            });
+        std::for_each(std::execution::par_unseq,
+            view.roomsToDraw.begin(),
+            view.roomsToDraw.end(),
+            [](RendererRoom* room) {
+                std::sort(
+                    room->transparentFacesToDraw.begin(),
+                    room->transparentFacesToDraw.end(),
+                    [](RendererTransparentFace& a, RendererTransparentFace& b) {
+                        int aDistance = std::floor(a.distance / 256);
+                        int bDistance = std::floor(b.distance / 256);
 
-        int currentBlendMode = -1;
-        int altas = -1;
-        int lastType = 0;
+                        if (aDistance == bDistance)
+                            return a.info.texture < b.info.texture;
+                        else
+                            return aDistance < bDistance;
+                    }
+                );
+            }
+        );
 
-        std::vector<RendererVertex> vertices;
-        //vertices.reserve(50000);
-
-        m_transparentFacesVertices.clear();
-
-        bool outputPolygons = false;
-        bool oldAnimated = false;
-        int oldTexture = -1;
-        RendererTransparentFaceType oldType = RendererTransparentFaceType::TRANSPARENT_FACE_NONE;
-        RendererRoom* oldRoom = nullptr;
-        RendererItem* oldItem = nullptr;
-        RendererStatic* oldStaticMesh = nullptr;
-        bool firstFace = true;
-        BLEND_MODES oldBlendMode = BLEND_MODES::BLENDMODE_OPAQUE;
-        RENDERER_SPRITE_TYPE oldSpriteType;
-        Vector4 oldSpriteColor = Vector4::Zero;
-        RendererSprite* oldSprite = nullptr;
-        bool optimize = true;
-        bool oldDoubleSided = false;
-        
-        RendererTransparentFaceInfo* oldInfo = nullptr;
-
-        for (auto& face : view.transparentFaces)
+        for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
         {
-            if (oldInfo != nullptr)
+            RendererRoom& room = *view.roomsToDraw[r];
+
+            int size = room.transparentFacesToDraw.size();
+            int currentBlendMode = -1;
+            int altas = -1;
+            int lastType = 0;
+
+            std::vector<RendererVertex> vertices;
+            //vertices.reserve(50000);
+
+            m_transparentFacesVertices.clear();
+            m_transparentFacesIndices.clear();
+
+            RendererTransparentFaceType oldType = RendererTransparentFaceType::TRANSPARENT_FACE_NONE;
+            RendererTransparentFaceInfo* oldInfo = nullptr;
+            bool outputPolygons = false;
+
+            for (auto& face : room.transparentFacesToDraw)
             {
-                // Check if it's time to output polygons
-                if (oldType != face.type)
+                if (oldInfo != nullptr)
                 {
-                    outputPolygons = true;
-                }
-                else
-                {
-                    // If same type, check additional conditions
-                    if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM &&
-                        (oldRoom != face.info.room
-                            || oldInfo->texture != face.info.texture
-                            || oldInfo->animated != face.info.animated
-                            || oldInfo->blendMode != face.info.blendMode
-                            || oldInfo->doubleSided != face.info.doubleSided
-                            || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                    // Check if it's time to output polygons
+                    if (oldType != face.type)
                     {
                         outputPolygons = true;
                     }
-                    else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
-                             (oldInfo->blendMode != face.info.blendMode
-                              || oldInfo->item->Id != face.info.item->Id
-                              || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                    else
                     {
-                        outputPolygons = true;
+                        // If same type, check additional conditions
+                        if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM &&
+                            (oldInfo->room != face.info.room
+                                || oldInfo->texture != face.info.texture
+                                || oldInfo->animated != face.info.animated
+                                || oldInfo->blendMode != face.info.blendMode
+                                || m_transparentFacesIndices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                        {
+                            outputPolygons = true;
+                        }
+                        else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
+                            (oldInfo->blendMode != face.info.blendMode
+                                || oldInfo->item->Id != face.info.item->Id
+                                || m_transparentFacesIndices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                        {
+                            outputPolygons = true;
+                        }
+                        else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC &&
+                            (oldInfo->blendMode != face.info.blendMode
+                                || oldInfo->staticMesh != face.info.staticMesh
+                                || m_transparentFacesIndices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                        {
+                            outputPolygons = true;
+                        }
+                        else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
+                            (oldInfo->blendMode != face.info.blendMode
+                                || oldInfo->sprite->Type != face.info.sprite->Type
+                                || oldInfo->sprite->color != face.info.sprite->color
+                                || oldInfo->sprite->Sprite != face.info.sprite->Sprite
+                                || m_transparentFacesIndices.size() + 6 > MAX_TRANSPARENT_VERTICES))
+                        {
+                            outputPolygons = true;
+                        }
                     }
-                    else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC &&
-                             (oldInfo->blendMode != face.info.blendMode 
-                              || m_transparentFacesVertices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+                }
+
+                if (outputPolygons)
+                {
+                    // Here we send polygons to the GPU for drawing and we clear the vertex buffer
+                    if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
                     {
-                        outputPolygons = true;
+                        drawRoomsTransparent(oldInfo, view);
                     }
-                    else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
-                        (oldInfo->blendMode != face.info.blendMode
-                            || oldInfo->sprite->Type != face.info.sprite->Type
-                            || oldInfo->sprite->color != face.info.sprite->color
-                            || oldInfo->sprite->Sprite != face.info.sprite->Sprite
-                            || m_transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
+                    else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
                     {
-                        outputPolygons = true;
+                        drawItemsTransparent(oldInfo, view);
+                    }
+                    else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+                    {
+                        drawStaticsTransparent(oldInfo, view);
+                    }
+                    else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
+                    {
+                        drawSpritesTransparent(oldInfo, view);
                     }
 
+                    outputPolygons = false;
+                    m_transparentFacesVertices.clear();
+                    m_transparentFacesIndices.clear();
                 }
 
-                if (!optimize)
-                    outputPolygons = true;
+                oldInfo = &face.info;
+                oldType = face.type;
+
+                // Accumulate vertices in the buffer
+                if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
+                {
+                    // For rooms, we already pass world coordinates, just copy vertices
+                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
+
+                    /*int* srcData = face.info.bucket->Indices.data();
+                    int* destData = m_transparentFacesIndices.data();
+                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
+
+                    m_numTransparentIndices += numVertices;*/
+
+                    //for (int i = 0; i < numVertices; i++)
+                    //{
+                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
+                    //}
+                }
+                else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
+                {
+                    // For rooms, we already pass world coordinates, just copy vertices
+                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
+
+                    /*int* srcData = face.info.bucket->Indices.data();
+                    int* destData = m_transparentFacesIndices.data();
+                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
+
+                    m_numTransparentIndices += numVertices;*/
+
+                    //for (int i = 0; i < numVertices; i++)
+                    //{
+                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
+                    //}
+                }
+                else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+                {
+                    // For rooms, we already pass world coordinates, just copy vertices
+                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
+
+                    /*int* srcData = face.info.bucket->Indices.data();
+                    int* destData = m_transparentFacesIndices.data();
+                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
+
+                    m_numTransparentIndices += numVertices;*/
+
+                    //for (int i = 0; i < numVertices; i++)
+                    //{
+                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
+                    //}
+                }
+                else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
+                {
+                    // For sprites, we need to compute the corners of the quad and multiply 
+                    // by the world matrix that can be an identity (for 3D sprites) or 
+                    // a billboard matrix. We transform vertices on the CPU because 
+                    // CPUs nowadays are fast enough and we save draw calls, in fact 
+                    // each sprite would require a different world matrix and then 
+                    // we would fall in the case 1 poly = 1 draw call (worst case scenario).
+                    // For the same reason, we store also color directly there and we simply 
+                    // pass a Vector4::One as color to the shader.
+
+                    RendererSpriteToDraw* spr = face.info.sprite;
+
+                    Vector3 p0t;
+                    Vector3 p1t;
+                    Vector3 p2t;
+                    Vector3 p3t;
+
+                    Vector2 uv0;
+                    Vector2 uv1;
+                    Vector2 uv2;
+                    Vector2 uv3;
+
+                    if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+                    {
+                        p0t = spr->vtx1;
+                        p1t = spr->vtx2;
+                        p2t = spr->vtx3;
+                        p3t = spr->vtx4;
+
+                        uv0 = spr->Sprite->UV[0];
+                        uv1 = spr->Sprite->UV[1];
+                        uv2 = spr->Sprite->UV[2];
+                        uv3 = spr->Sprite->UV[3];
+                    }
+                    else
+                    {
+                        p0t = Vector3(-0.5, -0.5, 0);
+                        p1t = Vector3(-0.5, 0.5, 0);
+                        p2t = Vector3(0.5, -0.5, 0);
+                        p3t = Vector3(0.5, 0.5, 0);
+
+                        uv0 = Vector2(0, 0);
+                        uv1 = Vector2(1, 0);
+                        uv2 = Vector2(0, 1);
+                        uv3 = Vector2(1, 1);
+                    }
+
+                    RendererVertex v0;
+                    v0.Position = Vector3::Transform(p0t, face.info.world);
+                    v0.UV = uv0;
+                    v0.Color = spr->color;
+
+                    RendererVertex v1;
+                    v1.Position = Vector3::Transform(p1t, face.info.world);
+                    v1.UV = uv1;
+                    v1.Color = spr->color;
+
+                    RendererVertex v2;
+                    v2.Position = Vector3::Transform(p2t, face.info.world);
+                    v2.UV = uv2;
+                    v2.Color = spr->color;
+
+                    RendererVertex v3;
+                    v3.Position = Vector3::Transform(p3t, face.info.world);
+                    v3.UV = uv3;
+                    v3.Color = spr->color;
+
+                    m_transparentFacesVertices.push_back(v0);
+                    m_transparentFacesVertices.push_back(v1);
+                    m_transparentFacesVertices.push_back(v3);
+                    m_transparentFacesVertices.push_back(v2);
+                    m_transparentFacesVertices.push_back(v3);
+                    m_transparentFacesVertices.push_back(v1);
+                }
             }
 
-            if (outputPolygons)
+            // Here we send polygons to the GPU for drawing and we clear the vertex buffer
+            if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
             {
-                // Here we send polygons to the GPU for drawing and we clear the vertex buffer
-                if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
-                {
-                    drawRoomsTransparent(oldInfo, view);
-                }
-                else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
-                {
-                    drawItemsTransparent(oldInfo, view);
-                }
-                else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
-                {
-                    drawStaticsTransparent(oldInfo, view);
-                }
-                else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
-                {
-                    drawSpritesTransparent(oldInfo, view);
-                }
-
-                outputPolygons = false;
-                m_transparentFacesVertices.clear();
+                drawRoomsTransparent(oldInfo, view);
             }
-
-
-            firstFace = false;
-
-            oldInfo = &face.info;
-            oldType = face.type;
-
-            // Accumulate vertices in the buffer
-            if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
+            else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
             {
-                // For rooms, we already pass world coordinates, just copy vertices
-                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                for (int i = 0; i < numVertices; i++)
-                {
-                    m_transparentFacesVertices.push_back(face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]]);
-                }
+                drawItemsTransparent(oldInfo, view);
             }
-            else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
+            else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
             {
-                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                for (int i = 0; i < numVertices; i++)
-                {
-                    RendererVertex v = face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]];
-                    m_transparentFacesVertices.push_back(v);
-                }
+                drawStaticsTransparent(oldInfo, view);
             }
-            else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+            else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
             {
-                int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                for (int i = 0; i < numVertices; i++)
-                {
-                    // Transform vertices on the CPU
-                    RendererVertex v = face.info.bucket->Vertices[face.info.bucket->Indices[face.info.polygon->baseIndex + i]];
-                    v.Position = Vector3::Transform(v.Position, face.info.world);
-                    v.Color = face.info.color;
-                    m_transparentFacesVertices.push_back(v);
-                }
+                drawSpritesTransparent(oldInfo, view);
             }
-            else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
-            {
-                // For sprites, we need to compute the corners of the quad and multiply 
-                // by the world matrix that can be an identity (for 3D sprites) or 
-                // a billboard matrix. We transform vertices on the CPU because 
-                // CPUs nowadays are fast enough and we save draw calls, in fact 
-                // each sprite would require a different world matrix and then 
-                // we would fall in the case 1 poly = 1 draw call (worst case scenario).
-                // For the same reason, we store also color directly there and we simply 
-                // pass a Vector4::One as color to the shader.
-
-                RendererSpriteToDraw* spr = face.info.sprite;
-
-                Vector3 p0t;
-                Vector3 p1t;
-                Vector3 p2t;
-                Vector3 p3t;
-
-                Vector2 uv0;
-                Vector2 uv1;
-                Vector2 uv2;
-                Vector2 uv3;
-
-                if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-                {
-                    p0t = spr->vtx1;
-                    p1t = spr->vtx2;
-                    p2t = spr->vtx3;
-                    p3t = spr->vtx4;
-
-                    uv0 = spr->Sprite->UV[0];
-                    uv1 = spr->Sprite->UV[1];
-                    uv2 = spr->Sprite->UV[2];
-                    uv3 = spr->Sprite->UV[3];
-                }
-                else
-                {
-                    p0t = Vector3(-0.5, -0.5, 0);
-                    p1t = Vector3(-0.5, 0.5, 0);
-                    p2t = Vector3(0.5, -0.5, 0);
-                    p3t = Vector3(0.5, 0.5, 0);
-
-                    uv0 = Vector2(0, 0);
-                    uv1 = Vector2(1, 0);
-                    uv2 = Vector2(0, 1);
-                    uv3 = Vector2(1, 1);
-                }
-
-                RendererVertex v0;
-                v0.Position = Vector3::Transform(p0t, face.info.world);
-                v0.UV = uv0;
-                v0.Color = spr->color;
-                 
-                RendererVertex v1;
-                v1.Position = Vector3::Transform(p1t, face.info.world);
-                v1.UV = uv1;
-                v1.Color = spr->color;
-
-                RendererVertex v2;
-                v2.Position = Vector3::Transform(p2t, face.info.world);
-                v2.UV = uv2;
-                v2.Color = spr->color;
-
-                RendererVertex v3;
-                v3.Position = Vector3::Transform(p3t, face.info.world);
-                v3.UV = uv3;
-                v3.Color = spr->color;
-
-                m_transparentFacesVertices.push_back(v0);
-                m_transparentFacesVertices.push_back(v1);
-                m_transparentFacesVertices.push_back(v3);
-                m_transparentFacesVertices.push_back(v2);
-                m_transparentFacesVertices.push_back(v3);
-                m_transparentFacesVertices.push_back(v1);
-            }
-        }
-
-        // Here we send polygons to the GPU for drawing and we clear the vertex buffer
-        if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
-        {
-            drawRoomsTransparent(oldInfo, view);
-        }
-        else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
-        {
-            drawItemsTransparent(oldInfo, view);
-        }
-        else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
-        {
-            drawStaticsTransparent(oldInfo, view);
-        }
-        else if (oldType == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
-        {
-            drawSpritesTransparent(oldInfo, view);
         }
     }
 
@@ -2633,7 +2656,6 @@ namespace TEN::Renderer
 		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
 
         drawRooms(false, false, view);
-        drawRooms(false, true, view);
         drawStatics(false, view);
         drawLara(view,false, false);
         drawItems(false, false, view);
@@ -2656,8 +2678,6 @@ namespace TEN::Renderer
         // NOTE: some faces will be drawn immediately, like for additive blending, instead 
         // other blend modes (like alpha blend) will require collecting the faces and draw them
         // sorted in a latter stage
-        drawRooms(true, false, view);
-        drawRooms(true, true, view);
         drawStatics(true, view);
         drawLara(view, true, false);
         drawItems(true, false, view);
@@ -3181,9 +3201,6 @@ namespace TEN::Renderer
         {
             //Draw transparent back-to-front
             int index = i;
-            if (transparent) {
-                index = view.roomsToDraw.size() - 1 - index;
-            }
             RendererRoom* room = view.roomsToDraw[index];
 
             m_stLights.NumLights = view.lightsToDraw.size();
@@ -3193,7 +3210,6 @@ namespace TEN::Renderer
             m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
 
             m_stMisc.Caustics = (room->Room->flags & ENV_FLAG_WATER);
-            m_stMisc.AlphaTest = transparent;
             m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
@@ -3206,15 +3222,6 @@ namespace TEN::Renderer
 
             for (auto& bucket : room->buckets)
             {
-                if (transparent) {
-                    if (bucket.blendMode == BLEND_MODES::BLENDMODE_OPAQUE || bucket.blendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-                        continue;
-                }
-                else {
-                    if (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE && bucket.blendMode != BLEND_MODES::BLENDMODE_ALPHATEST)
-                        continue;
-                }
-
                 if (isSortingRequired(bucket.blendMode))
                 {
                     // Collect transparent faces
@@ -3223,7 +3230,7 @@ namespace TEN::Renderer
                         RendererPolygon* p = &bucket.Polygons[j];
                         int distance = (
                             Vector3(room->Room->x, room->Room->y, room->Room->z) +
-                            p->centre - 
+                            p->centre -
                             Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
                         RendererTransparentFace face;
                         face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
@@ -3234,42 +3241,63 @@ namespace TEN::Renderer
                         face.info.room = room;
                         face.info.blendMode = bucket.blendMode;
                         face.info.bucket = &bucket;
-                        view.transparentFaces.push_back(face);
+                        room->transparentFacesToDraw.push_back(face);
                     }
                 }
                 else
                 {
-                    // Draw geometry
-                    if (animated) {
-                        if (!bucket.animated)
-                            continue;
+                    int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
-                        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                        m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                    for (int pass = 0; pass < passes; pass++)
+                    {
+                        if (pass == 0)
+                        {
+                            m_stMisc.AlphaTest = bucket.blendMode == BLENDMODE_ALPHATEST;
+                            m_cbMisc.updateData(m_stMisc, m_context.Get());
+                            m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                        RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
-                        m_stAnimated.NumFrames = set.NumTextures;
-                        for (unsigned char i = 0; i < set.NumTextures; i++) {
-                            auto& tex = set.Textures[i];
-                            m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
-                            m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
-                            m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
-                            m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
+                            setBlendMode(bucket.blendMode);
                         }
-                        m_cbAnimated.updateData(m_stAnimated, m_context.Get());
-                    }
-                    else {
-                        if (bucket.animated)
-                            continue;
-                        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                        m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                    }
-                    if (bucket.Vertices.size() == 0)
-                        continue;
+                        else
+                        {
+                            m_stMisc.AlphaTest = false;
+                            m_cbMisc.updateData(m_stMisc, m_context.Get());
+                            m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                    setBlendMode(bucket.blendMode);
-                    m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
-                    m_numDrawCalls++;
+                            setBlendMode(BLENDMODE_ALPHABLEND);
+                        }
+
+                        // Draw geometry
+                        if (animated) {
+                            if (!bucket.animated)
+                                continue;
+
+                            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+
+                            RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
+                            m_stAnimated.NumFrames = set.NumTextures;
+                            for (unsigned char i = 0; i < set.NumTextures; i++) {
+                                auto& tex = set.Textures[i];
+                                m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
+                                m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
+                                m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
+                                m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
+                            }
+                            m_cbAnimated.updateData(m_stAnimated, m_context.Get());
+                        }
+                        else {
+                            if (bucket.animated)
+                                continue;
+                            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                        }
+                        if (bucket.Vertices.size() == 0)
+                            continue;
+
+                        m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                        m_numDrawCalls++;
+                    }
                 }
             }
         }
@@ -3390,11 +3418,6 @@ namespace TEN::Renderer
             m_context->IASetInputLayout(m_inputLayout.Get());
             m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-            m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-            sampler = m_states->AnisotropicClamp();
-            m_context->PSSetSamplers(0, 1, &sampler);
-
             RendererObject &moveableObj = *m_moveableObjects[ID_HORIZON];
 
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -3415,6 +3438,11 @@ namespace TEN::Renderer
 
                     if (bucket.Vertices.size() == 0)
                         continue;
+
+                    m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                    m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                    sampler = m_states->AnisotropicClamp();
+                    m_context->PSSetSamplers(0, 1, &sampler);
 
 					setBlendMode(bucket.blendMode);
 
