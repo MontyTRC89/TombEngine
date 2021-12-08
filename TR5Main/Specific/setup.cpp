@@ -383,7 +383,6 @@ void InitialiseSpecialEffects()
 	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
-	WBRoom = -1;
 	TEN::Entities::TR4::ClearScarabs();
 }
 

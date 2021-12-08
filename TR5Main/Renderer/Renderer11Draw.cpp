@@ -7,7 +7,6 @@
 #include "animation.h"
 #include "gui.h"
 #include "lara.h"
-#include "gameflow.h"
 #include "rope.h"
 #include "effects/tomb4fx.h"
 #include "level.h"
@@ -3164,7 +3163,6 @@ namespace TEN::Renderer
         // Set shadow map data
         if (m_shadowLight != NULL)
         {
-
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
