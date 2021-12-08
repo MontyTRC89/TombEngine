@@ -665,7 +665,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 	if (laraInfo->gunType == WEAPON_FLARE)
 	{
 		CreateFlare(lara, ID_FLARE_ITEM, false);
-		undraw_flare_meshes(lara);
+		UndrawFlareMeshes(lara);
 		laraInfo->flareControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
 		laraInfo->gunStatus = LG_HANDS_FREE;

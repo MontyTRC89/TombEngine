@@ -358,7 +358,6 @@ void LaraGun(ITEM_INFO* laraItem)
 
 	if (laraItem->hitPoints <= 0)
 		laraInfo->gunStatus = LG_HANDS_FREE;
-	// Hands are free; can handle weapon.
 	else if (laraInfo->gunStatus == LG_HANDS_FREE)
 	{
 		// Draw weapon.
@@ -408,7 +407,7 @@ void LaraGun(ITEM_INFO* laraItem)
 				if (laraInfo->gunType == WEAPON_FLARE)
 				{
 					CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-					undraw_flare_meshes(laraItem);
+					UndrawFlareMeshes(laraItem);
 					laraInfo->flareControlLeft = false;
 					laraInfo->flareAge = 0;
 				}
@@ -488,7 +487,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			break;
 
 		case WEAPON_FLARE:
-			draw_flare(laraItem);
+			DrawFlare(laraItem);
 
 			break;
 
@@ -501,7 +500,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		break;
 
 	case LG_SPECIAL:
-		draw_flare(laraItem);
+		DrawFlare(laraItem);
 
 		break;
 
@@ -528,7 +527,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			break;
 
 		case WEAPON_FLARE:
-			undraw_flare(laraItem);
+			UndrawFlare(laraItem);
 
 			break;
 
@@ -609,7 +608,7 @@ void LaraGun(ITEM_INFO* laraItem)
 				laraInfo->flareControlLeft = false;
 
 			DoFlareInHand(laraItem, laraInfo->flareAge);
-			set_flare_arm(laraItem, laraInfo->leftArm.frameNumber);
+			SetFlareArm(laraItem, laraInfo->leftArm.frameNumber);
 		}
 
 		break;
@@ -621,7 +620,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			{
 				laraInfo->flareControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->currentAnimState));
 				DoFlareInHand(laraItem, laraInfo->flareAge);
-				set_flare_arm(laraItem, laraInfo->leftArm.frameNumber);
+				SetFlareArm(laraItem, laraInfo->leftArm.frameNumber);
 			}
 		}
 
@@ -680,7 +679,7 @@ void InitialiseNewWeapon(ITEM_INFO* lara)
 		laraInfo->rightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		laraInfo->leftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		if (laraInfo->gunStatus != LG_HANDS_FREE)
-			draw_flare_meshes(lara);
+			DrawFlareMeshes(lara);
 		break;
 
 	default:
