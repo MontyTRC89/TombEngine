@@ -1,5 +1,4 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./FogBuffer.hlsli"
 
 cbuffer MiscBuffer : register(b3)
 {

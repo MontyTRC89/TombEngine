@@ -1,7 +1,6 @@
 #include "CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
-#include "./FogBuffer.hlsli"
 
 struct RendererLight {
 	float4 Position;
@@ -65,6 +64,7 @@ struct PixelShaderInput
 	float Fog : FOG;
 };
 Texture2D NormalTexture : register(t3);
+
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
@@ -171,7 +171,7 @@ float2 texOffset(int u, int v) {
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.01f) {
+	if (AlphaTest && output.w < 0.5f) {
 		discard;
 	}
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;

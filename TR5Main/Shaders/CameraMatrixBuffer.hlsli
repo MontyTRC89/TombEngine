@@ -10,4 +10,7 @@ cbuffer CameraMatrixBuffer : register(b0)
 	uint Frame;
 	uint RoomNumber;
 	uint CameraUnderwater;
+	float4 FogColor;
+	int FogMinDistance;
+	int FogMaxDistance;
 };
