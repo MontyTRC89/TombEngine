@@ -137,7 +137,7 @@ struct OBJECT_COLLISION_BOUNDS
 };
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
 bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
@@ -146,6 +146,7 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
+bool SnapAndTestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);

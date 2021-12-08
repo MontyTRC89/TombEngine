@@ -23,7 +23,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
 	short roomsArray[255];
@@ -123,15 +123,12 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (dx >= -2048
-						&& dx <= 2048
-						&& dy >= -2048
-						&& dy <= 2048
-						&& dz >= -2048
-						&& dz <= 2048
-						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1
-						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2
-						&& collidingItem->floor >= item->pos.yPos)
+					if (dx >= -2048	&& dx <= 2048 && 
+						dy >= -2048	&& dy <= 2048 && 
+						dz >= -2048	&& dz <= 2048 && 
+						collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 && 
+						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2 && 
+						collidingItem->floor >= item->pos.yPos)
 					{
 						float s = phd_sin(item->pos.yRot);
 						float c = phd_cos(item->pos.yRot);
@@ -714,6 +711,47 @@ void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.xPos = (item->pos.xPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
 		break;
 	}
+}
+
+bool SnapAndTestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer)
+{
+	// Determine real turning angle
+	auto turnAngle = outer ? angle : -angle;
+
+	// Determine collision box anchor point and rotate collision box around this anchor point.
+	// Then determine new test position from centerpoint of new collision box position.
+
+	// Push back item a bit to compensate for possible edge ledge cases
+	item->pos.xPos -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_sin(item->pos.yRot));
+	item->pos.zPos -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(item->pos.yRot));
+
+	// Move item at the distance of full collision diameter to movement direction 
+	item->pos.xPos += round((coll->Setup.Radius * 2) * phd_sin(Lara.moveAngle));
+	item->pos.zPos += round((coll->Setup.Radius * 2) * phd_cos(Lara.moveAngle));
+
+	// Determine anchor point
+	auto s = phd_sin(item->pos.yRot);
+	auto c = phd_cos(item->pos.yRot);
+	auto cX = item->pos.xPos + round(coll->Setup.Radius * s);
+	auto cZ = item->pos.zPos + round(coll->Setup.Radius * c);
+	cX += (coll->Setup.Radius * phd_sin(item->pos.yRot + ANGLE(90.0F * -std::copysign(1.0f, angle))));
+	cZ += (coll->Setup.Radius * phd_cos(item->pos.yRot + ANGLE(90.0F * -std::copysign(1.0f, angle))));
+
+	// Determine distance from anchor point to new item position
+	auto dist = Vector2(item->pos.xPos, item->pos.zPos) - Vector2(cX, cZ);
+	s = phd_sin(ANGLE(turnAngle));
+	c = phd_cos(ANGLE(turnAngle));
+
+	// Shift item to a new anchor point
+	item->pos.xPos = dist.x * c - dist.y * s + cX;
+	item->pos.zPos = dist.x * s + dist.y * c + cZ;
+
+	// Virtually rotate item to new angle and snap to nearest ledge, if any.
+	short newAngle = item->pos.yRot - ANGLE(turnAngle);
+	item->pos.yRot = newAngle;
+	SnapItemToLedge(item, coll, item->pos.yRot);
+
+	return newAngle == item->pos.yRot;
 }
 
 int FindGridShift(int x, int z)

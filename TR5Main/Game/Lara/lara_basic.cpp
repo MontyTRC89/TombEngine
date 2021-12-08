@@ -15,6 +15,7 @@
 #include "collide.h"
 #include "items.h"
 #include "camera.h"
+#include "Scripting/GameFlowScript.h"
 
 /*generic functions*/
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
@@ -1579,10 +1580,7 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraFallen(item, coll))
 		return;
 
-	//##LUA debug etc.
-	Lara.NewAnims.SwandiveRollRun = 1;
-
-	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && Lara.NewAnims.SwandiveRollRun)
+	if (TrInput & IN_FORWARD && item->animNumber == LA_SWANDIVE_ROLL && g_GameFlow->Animations.SwandiveRollRun)
 	{
 		item->goalAnimState = LS_RUN_FORWARD;
 	}

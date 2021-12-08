@@ -18,8 +18,6 @@
 using namespace TEN::Effects::Environment;
 
 static short WreckingBallData[2] = {0, 0};
-ITEM_INFO* WBItem;
-short WBRoom;
 
 void InitialiseWreckingBall(short itemNumber)
 {
@@ -295,7 +293,5 @@ void WreckingBallControl(short itemNumber)
 	if (room != item->roomNumber)
 		ItemNewRoom(itemNumber, room);
 	AnimateItem(item);
-	WBItem = item;
-	WBRoom = room;
 }
 

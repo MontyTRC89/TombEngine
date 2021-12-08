@@ -4,6 +4,7 @@
 #include "weather.h"
 #include "collide.h"
 #include "effects/effects.h"
+#include "effects/tomb4fx.h"
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"
@@ -265,8 +266,8 @@ namespace Environment
 			// Check if particle got out of room bounds
 
 			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
-				p.Position.z <= (r.z + WALL_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10)) ||
-				p.Position.x <= (r.x + WALL_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10)))
+				p.Position.z <= (r.z + WALL_SIZE - STEP_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + STEP_SIZE) ||
+				p.Position.x <= (r.x + WALL_SIZE - STEP_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + STEP_SIZE))
 			{
 				if (!collisionCalculated)
 				{
@@ -311,7 +312,10 @@ namespace Environment
 					// Immediately disable rain particle because it doesn't need fading out.
 
 					if (p.Type == WeatherType::Rain)
+					{
 						p.Enabled = false;
+						AddWaterSparks(oldPos.x, oldPos.y, oldPos.z, 6);
+					}
 				}
 			}
 
