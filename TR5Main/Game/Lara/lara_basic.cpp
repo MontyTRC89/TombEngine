@@ -2149,6 +2149,10 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->jumpCount++;
+	if (info->jumpCount > LARA_JUMP_TIME)
+		info->jumpCount = LARA_JUMP_TIME;
+
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
