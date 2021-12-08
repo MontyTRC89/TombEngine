@@ -191,4 +191,26 @@ namespace TEN::Renderer
 
 	}
 
+	float Renderer11::calculateFrameRate()
+	{
+		static int last_time = clock();
+		static int count = 0;
+		static float fps = 0.0f;
+
+		count++;
+		if (count == 10)
+		{
+			double t;
+			time_t this_time;
+			this_time = clock();
+			t = (this_time - last_time) / (double)CLOCKS_PER_SEC;
+			last_time = this_time;
+			fps = (float)(count / t);
+			count = 0;
+		}
+
+		m_fps = fps;
+
+		return fps;
+	}
 }

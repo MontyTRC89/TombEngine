@@ -467,6 +467,7 @@ namespace TEN::Renderer
 		int m_timeUpdate;
 		int m_timeDraw;
 		int m_timeFrame;
+		float m_fps;
 	
 		// Others
 		bool m_firstWeather;
@@ -570,6 +571,7 @@ namespace TEN::Renderer
 		void drawLaraMesh(RendererMesh* mesh, bool transparent);
 		void drawSimpleParticles(RenderView& view); 
 		void setBlendMode(BLEND_MODES blendMode);
+		float calculateFrameRate();
 
 		inline bool isSortingRequired(BLEND_MODES blendMode)
 		{
