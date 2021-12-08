@@ -317,6 +317,7 @@
     <ClCompile Include="Scripting\GameScriptFog.cpp" />
     <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
+    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -664,7 +665,6 @@
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\flipeffect.h" />
-    <ClInclude Include="Game\gameflow.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\items.h" />
@@ -712,6 +712,7 @@
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
+    <ClInclude Include="Scripting\GameScriptAnimations.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
