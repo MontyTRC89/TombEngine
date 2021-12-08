@@ -19,6 +19,7 @@ namespace TEN::Renderer
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++) {
+			m_rooms[i].transparentFacesToDraw.clear();
 			m_rooms[i].Visited = false;
 		}
 
