@@ -30,6 +30,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include "Specific\fast_vector.h"
 
 struct CAMERA_INFO;
 
@@ -153,6 +154,8 @@ namespace TEN::Renderer
 		bool Visited;
 		int Distance;
 		int RoomNumber;
+		// Transparent faces of this room
+		std::vector<RendererTransparentFace> transparentFacesToDraw;
 	};
 	
 	struct RendererRoomNode
@@ -406,7 +409,9 @@ namespace TEN::Renderer
 		VertexBuffer m_staticsVertexBuffer;
 		IndexBuffer m_staticsIndexBuffer;
 		VertexBuffer m_transparentFacesVertexBuffer;
+		IndexBuffer m_transparentFacesIndexBuffer;
 		std::vector<RendererVertex> m_transparentFacesVertices;
+		fast_vector<int> m_transparentFacesIndices;
 		std::vector<RendererRoom> m_rooms;
 		DirectX::SimpleMath::Matrix m_hairsMatrices[12];
 		short m_numHairVertices;
