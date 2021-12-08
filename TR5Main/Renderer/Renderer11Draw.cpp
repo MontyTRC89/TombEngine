@@ -2084,6 +2084,8 @@ namespace TEN::Renderer
 
 		m_currentCausticsFrame++;
 		m_currentCausticsFrame %= 32;
+
+        calculateFrameRate();
 	}
 
 	void Renderer11::drawDebugInfo()
@@ -2100,6 +2102,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
+                printDebugMessage("Fps: %3.2f", m_fps);
 				printDebugMessage("Update time: %d", m_timeUpdate);
 				printDebugMessage("Frame time: %d", m_timeFrame);
 				printDebugMessage("Total draw calls: %d", m_numDrawCalls);
