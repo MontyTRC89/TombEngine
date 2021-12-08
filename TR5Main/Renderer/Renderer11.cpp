@@ -69,8 +69,6 @@ namespace TEN::Renderer
 		m_progress = value;
 	}
 
-
-
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
 			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);

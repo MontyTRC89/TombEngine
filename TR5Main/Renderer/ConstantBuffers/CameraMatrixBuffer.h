@@ -24,7 +24,9 @@ namespace TEN {
 			alignas(4) unsigned int RoomNumber;
 			alignas(4) unsigned int CameraUnderwater;
 			//--
-			
+			alignas(16) Vector4 FogColor;
+			alignas(4) int FogMinDistance;
+			alignas(4) int FogMaxDistance;
 		};
 	}
 }

@@ -2614,25 +2614,21 @@ namespace TEN::Renderer
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GlobalCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        GameScriptFog fog = g_GameFlow->GetLevel(CurrentLevel)->Fog;
+        if (fog.Enabled)
+        {
+            cameraConstantBuffer.FogColor = Vector4(fog.R / 255.0f, fog.G / 255.0f, fog.B / 255.0f, 1.0f);
+            cameraConstantBuffer.FogMinDistance = fog.MinDistance;
+            cameraConstantBuffer.FogMaxDistance = fog.MaxDistance;
+        }
+        else
+        {
+            cameraConstantBuffer.FogMaxDistance = 0;
+        }
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(view, depthTarget);
 		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-
-        GameScriptFog fog = g_GameFlow->GetLevel(CurrentLevel)->Fog;
-        if (fog.Enabled)
-        {
-            m_stOmniFogBuffer.FogColor = Vector4(fog.R / 255.0f, fog.G / 255.0f, fog.B / 255.0f, 1.0f);
-            m_stOmniFogBuffer.FogMinDistance = fog.MinDistance;
-            m_stOmniFogBuffer.FogMaxDistance = fog.MaxDistance;
-        }
-        else
-        {
-            m_stOmniFogBuffer.FogMaxDistance = 0;
-        }
-        m_cbOmniFogBuffer.updateData(m_stOmniFogBuffer, m_context.Get());
-        m_context->VSSetConstantBuffers(7, 1, m_cbOmniFogBuffer.get());
-        m_context->PSSetConstantBuffers(7, 1, m_cbOmniFogBuffer.get());
 
         drawRooms(false, false, view);
         drawRooms(false, true, view);

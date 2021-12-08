@@ -102,7 +102,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
 	m_cbRoom = createConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = createConstantBuffer<CAnimatedBuffer>();
-	m_cbOmniFogBuffer = createConstantBuffer<COmniFogBuffer>();
 
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();
@@ -160,6 +159,8 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
+
+	windowed = true;
 
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
