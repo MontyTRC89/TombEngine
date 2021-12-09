@@ -10,7 +10,6 @@
 
 using namespace TEN::Renderer;
 
-bool GotLaraSpheres;
 SPHERE LaraSpheres[MAX_SPHERES];
 SPHERE CreatureSpheres[MAX_SPHERES];
 
@@ -40,25 +39,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	int flags = 0;
 
 	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int laraSphereCount = 0;
-
-	if (l == LaraItem)
-	{
-		if (!GotLaraSpheres)
-		{
-			laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-			if (l == LaraItem)
-				GotLaraSpheres = true;
-		}
-	}
-	else
-	{
-		GotLaraSpheres = false;
-
-		laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-		if (l == LaraItem)
-			GotLaraSpheres = true;
-	}
+	int laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
 	l->touchBits = 0;
 
