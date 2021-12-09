@@ -44,7 +44,7 @@ extern WEAPON_INFO Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(int weaponType);
-void LaraGun(ITEM_INFO* lara);
+void LaraGun(ITEM_INFO* laraItem);
 Ammo& GetAmmo(ITEM_INFO* lara, int weaponType);
 void InitialiseNewWeapon(ITEM_INFO* lara);
 GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* lara, int weaponType);
