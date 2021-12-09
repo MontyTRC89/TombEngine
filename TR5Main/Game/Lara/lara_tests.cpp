@@ -1062,43 +1062,6 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	return !res;
 }
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
-{
-	LaraInfo*& info = item->data;
-
-	if (item->hitPoints <= 0)
-	{
-		SetAnimation(item, LA_FALL_START);
-
-		item->gravityStatus = true;
-		item->speed = 2;
-		item->pos.yPos += STEP_SIZE;
-		item->fallspeed = 1;
-
-		info->gunStatus = LG_HANDS_FREE;
-
-		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
-		return;
-	}
-
-	if (flip)
-	{
-		if (info->isClimbing)
-		{
-			SetAnimation(item, LA_LADDER_IDLE);
-		}
-		else
-		{
-			SetAnimation(item, LA_REACH_TO_HANG, 21);
-		}
-
-		coll->Setup.OldPosition.x = item->pos.xPos = info->nextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->pos.yPos = info->nextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->pos.zPos = info->nextCornerPos.zPos;
-		item->pos.yRot = info->nextCornerPos.yRot;
-	}
-}
-
 bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	auto y = item->pos.yPos;
@@ -1821,7 +1784,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)
 {
 	static constexpr auto poleProbeCollRadius = 16.0f;
 
@@ -1834,8 +1797,9 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
 
-		auto offset = up ? -STEP_SIZE : poleProbeCollRadius;
-		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), poleProbeCollRadius);
+		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, (laraBox.Extents.y + poleProbeCollRadius + offset) * (up ? -1 : 1), 0), poleProbeCollRadius);
+
+		//g_Renderer.addDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 		int i = 0;
 		while (CollidedItems[i] != NULL)
@@ -1849,8 +1813,13 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
 
+			//g_Renderer.addDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
 			if (poleBox.Intersects(sphere))
+			{
 				atLeastOnePoleCollided = true;
+				break;
+			}
 		}
 	}
 
@@ -1859,7 +1828,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
 
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!TestLaraPoleCollision(item, coll, true))
+	if (!TestLaraPoleCollision(item, coll, true, STEP_SIZE))
 		return false;
 
 	// TODO: Accuracy.

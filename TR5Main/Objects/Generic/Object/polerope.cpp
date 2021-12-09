@@ -6,6 +6,7 @@
 #include "Game/control/lot.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/collide.h"
@@ -28,14 +29,15 @@ namespace TEN::Entities::Generic
 
 	void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto item = &g_Level.Items[itemNumber];
+		auto isLara = (!item->data.is<LaraInfo*>());
 
-		if ((TrInput & IN_ACTION)
-			&& !Lara.gunStatus
-			&& l->currentAnimState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
-			|| Lara.isMoving
-			&& Lara.interactedItem == itemNumber)
+		if (isLara &&
+			TrInput & IN_ACTION && 
+			!Lara.gunStatus && 
+			l->currentAnimState == LS_IDLE && 
+			l->animNumber == LA_STAND_IDLE || Lara.isMoving &&
+			Lara.interactedItem == itemNumber)
 		{
 			short rot = item->pos.yRot;
 			item->pos.yRot = l->pos.yRot;
@@ -66,14 +68,16 @@ namespace TEN::Entities::Generic
 				item->pos.yRot = rot;
 			}
 		}
-		else if (TrInput & IN_ACTION
-			&& !Lara.gunStatus
-			&& l->gravityStatus
-			&& l->fallspeed > Lara.gunStatus
-			&& (l->currentAnimState == LS_REACH
-				|| l->currentAnimState == LS_JUMP_UP))
+		else if (isLara && 
+				 TrInput & IN_ACTION &&
+			     !Lara.gunStatus && 
+				 l->gravityStatus && 
+				 l->fallspeed > Lara.gunStatus && 
+				 l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
 		{
-			if (TestBoundsCollide(item, l, 100))
+			if (TestBoundsCollide(item, l, 100) &&
+				TestLaraPoleCollision(l, coll, true, -STEP_SIZE) &&
+				TestLaraPoleCollision(l, coll, false))
 			{
 				if (TestCollision(item, l))
 				{
@@ -103,9 +107,8 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if ((l->currentAnimState < LS_POLE_IDLE
-				|| l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE)
-				&& l->currentAnimState != LS_JUMP_BACK)
+			if (!isLara || 
+				((l->currentAnimState < LS_POLE_IDLE || l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->currentAnimState != LS_JUMP_BACK))
 				ObjectCollision(itemNumber, l, coll);
 		}
 	}

@@ -9,6 +9,41 @@
 
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
+void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
+{
+	if (item->hitPoints <= 0)
+	{
+		SetAnimation(item, LA_FALL_START);
+
+		item->gravityStatus = true;
+		item->speed = 2;
+		item->pos.yPos += STEP_SIZE;
+		item->fallspeed = 1;
+
+		Lara.gunStatus = LG_HANDS_FREE;
+
+		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
+		return;
+	}
+
+	if (flip)
+	{
+		if (Lara.isClimbing)
+		{
+			SetAnimation(item, LA_LADDER_IDLE);
+		}
+		else
+		{
+			SetAnimation(item, LA_REACH_TO_HANG, 21);
+		}
+
+		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
+		item->pos.yRot = Lara.nextCornerPos.yRot;
+	}
+}
+
 /*normal hanging and shimmying*/
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
