@@ -544,7 +544,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 	return 1;
 }
 
-int LOS(GAME_VECTOR* start, GAME_VECTOR* end)
+bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 {
 	int result1, result2;
 
@@ -559,15 +559,17 @@ int LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 		result1 = zLOS(start, end);
 		result2 = xLOS(start, end);
 	}
+
 	if (result2)
 	{
 		GetFloor(end->x, end->y, end->z, &end->roomNumber);
 		if (ClipTarget(start, end) && result1 == 1 && result2 == 1)
 		{
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+
+	return false;
 }
 
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
@@ -778,4 +780,87 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 		end->roomNumber = flag ? room : room2;
 	}
 	return flag;
+}
+
+bool LOSAndReturnTarget(GAME_VECTOR* start, GAME_VECTOR* target, int push)
+{
+	int floorHeight, ceilingHeight;
+	FLOOR_INFO* floor;
+
+	auto x = start->x;
+	auto y = start->y;
+	auto z = start->z;
+	auto roomNum = start->roomNumber;
+	auto roomNum2 = roomNum;
+	auto dx = target->x - x >> 3;
+	auto dy = target->y - y >> 3;
+	auto dz = target->z - z >> 3;
+	auto flag = false;
+	auto result = false;
+
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		roomNum2 = roomNum;
+		floor = GetFloor(x, y, z, &roomNum);
+
+		if (g_Level.Rooms[roomNum2].flags & ENV_FLAG_SWAMP)
+		{
+			flag = true;
+			break;
+		}
+
+		floorHeight = GetFloorHeight(floor, x, y, z);
+		ceilingHeight = GetCeiling(floor, x, y, z);
+		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
+		{
+			if (y > floorHeight)
+			{
+				if (y - floorHeight >= push)
+				{
+					flag = true;
+					break;
+				}
+
+				y = floorHeight;
+			}
+
+			if (y < ceilingHeight)
+			{
+				if (ceilingHeight - y >= push)
+				{
+					flag = true;
+					break;
+				}
+
+				y = ceilingHeight;
+			}
+
+			result = true;
+		}
+		else if (result)
+		{
+			flag = true;
+			break;
+		}
+
+		x += dx;
+		y += dy;
+		z += dz;
+	}
+
+	if (i)
+	{
+		x -= dx;
+		y -= dy;
+		z -= dz;
+	}
+
+	GetFloor(x, y, z, &roomNum2);
+	target->x = x;
+	target->y = y;
+	target->z = z;
+	target->roomNumber = roomNum2;
+
+	return !flag;
 }
