@@ -65,7 +65,6 @@ extern short CurrentFOV;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
-int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push);
 void InitialiseCamera();
 void MoveCamera(GAME_VECTOR* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);

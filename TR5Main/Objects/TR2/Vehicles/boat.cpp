@@ -248,7 +248,7 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 	{
 		if (LaraItem->fallspeed > 0)
 		{
-			if (rot > -ANGLE(135) && rot < ANGLE(135) && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
+			if (rot > -ANGLE(135) && rot < ANGLE(135) && LaraItem->pos.yPos > boat->pos.yPos)
 				geton = BOAT_GETON::JUMP;
 		}
 		else if (LaraItem->fallspeed == 0)
@@ -827,15 +827,12 @@ void InitialiseSpeedBoat(short itemNum)
 
 void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
-	int geton;
-	ITEM_INFO* boat;
-
 	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
-	boat = &g_Level.Items[itemNum];
+	auto boat = &g_Level.Items[itemNum];
 
-	geton = SpeedBoatCheckGeton(itemNum, coll);
+	auto geton = SpeedBoatCheckGeton(itemNum, coll);
 	if (!geton)
 	{
 		coll->Setup.EnableObjectPush = true;
@@ -843,14 +840,24 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 		return;
 	}
 
-	if (geton == 2)
+	switch (geton)
+	{
+	case BOAT_GETON::WATER_LEFT:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONLW_ANIM;
-	else if (geton == 1)
+		break;
+
+	case BOAT_GETON::WATER_RIGHT:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONRW_ANIM;
-	else if (geton == 3)
+		break;
+
+	case BOAT_GETON::JUMP:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONJ_ANIM;
-	else
+		break;
+
+	default:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETON_START;
+		break;
+	}
 
 	Lara.waterStatus = LW_ABOVE_WATER;
 	litem->pos.xPos = boat->pos.xPos;
