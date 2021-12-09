@@ -27,7 +27,7 @@ cbuffer ItemBuffer : register(b1)
 
 cbuffer LightsBuffer : register(b2)
 {
-	RendererLight Lights[16];
+	RendererLight Lights[48];
 	int NumLights;
 	float3 CameraPosition;
 };

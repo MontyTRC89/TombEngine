@@ -3,6 +3,8 @@
 #include <SimpleMath.h>
 #include "RenderEnums.h"
 
+struct MESH_INFO;
+
 namespace TEN::Renderer {
 	struct RendererBucket;
 	struct RendererPolygon;
@@ -19,7 +21,7 @@ namespace TEN::Renderer {
 		RendererRoom* room;
 		RendererBucket* bucket;
 		RendererItem* item;
-		RendererStatic* staticMesh;
+		MESH_INFO* staticMesh;
 		Vector4 color;
 		Matrix world;
 		Vector3 position;

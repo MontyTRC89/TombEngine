@@ -535,7 +535,7 @@ namespace TEN::Renderer
 		RendererRoom const & room = m_rooms[LaraItem->roomNumber];
 		RendererItem* item = &m_items[Lara.itemNumber];
 
-		m_stItem.AmbientLight = room.AmbientLight;
+		m_stItem.AmbientLight = room.ambientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 		m_stLights.NumLights = item->Lights.size();
@@ -646,7 +646,7 @@ namespace TEN::Renderer
 			RendererRoom const & room = m_rooms[item->Item->roomNumber];
 			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
-			m_stItem.AmbientLight = room.AmbientLight;
+			m_stItem.AmbientLight = room.ambientLight;
 			memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 			m_stLights.NumLights = item->Lights.size();
@@ -1015,6 +1015,7 @@ namespace TEN::Renderer
 
 		m_numDrawCalls++;
 		m_numTransparentDrawCalls++;
+		m_numSpritesTransparentDrawCalls++;
 	}
 
 	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
@@ -1030,7 +1031,7 @@ namespace TEN::Renderer
 
 		m_stItem.World = effect->World;
 		m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
+		m_stItem.AmbientLight = room.ambientLight;
 		Matrix matrices[1] = { Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -1130,9 +1131,9 @@ namespace TEN::Renderer
 				RendererVertex vtx0 = deb->mesh.vertices[0];
 				RendererVertex vtx1 = deb->mesh.vertices[1];
 				RendererVertex vtx2 = deb->mesh.vertices[2];
-				vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
-				vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
-				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx0.Color = m_rooms[deb->roomNumber].ambientLight;
+				vtx1.Color = m_rooms[deb->roomNumber].ambientLight;
+				vtx2.Color = m_rooms[deb->roomNumber].ambientLight;
 				m_context->RSSetState(m_states->CullNone());
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				m_numDrawCalls++;
