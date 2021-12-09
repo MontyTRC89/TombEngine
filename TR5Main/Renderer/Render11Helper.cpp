@@ -97,13 +97,14 @@ namespace TEN::Renderer
 
 	void Renderer11::updateEffects(RenderView& view)
 	{
-		for (int i = 0; i < view.effectsToDraw.size(); i++)
+		for (auto room : view.roomsToDraw)
 		{
-			RendererEffect *fx = view.effectsToDraw[i];
-
-			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
-			view.effectsToDraw[i]->World = rotation * translation;
+			for (auto fx : room->EffectsToDraw)
+			{
+				Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
+				fx->World = rotation * translation;
+			}
 		}
 	}
 
@@ -334,16 +335,18 @@ namespace TEN::Renderer
 		Matrix translation;
 		Matrix rotation;
 
-		for (int i = 0; i < view.itemsToDraw.size(); i++)
+		for (auto room : view.roomsToDraw)
 		{
-			RendererItem *itemToDraw = view.itemsToDraw[i];
-			ITEM_INFO *item = itemToDraw->Item;
+			for (auto itemToDraw : room->ItemsToDraw)
+			{
+				ITEM_INFO* item = itemToDraw->Item;
 
-			// Lara has her own routine
-			if (item->objectNumber == ID_LARA)
-				continue;
+				// Lara has her own routine
+				if (item->objectNumber == ID_LARA)
+					continue;
 
-			updateItemAnimations(itemToDraw->Id, false);
+				updateItemAnimations(itemToDraw->Id, false);
+			}
 		}
 	}
 

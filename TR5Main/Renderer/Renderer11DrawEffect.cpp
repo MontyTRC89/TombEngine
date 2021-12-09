@@ -634,68 +634,69 @@ namespace TEN::Renderer
 
 	void Renderer11::drawBaddieGunflashes(RenderView& view)
 	{
-		for (int i = 0; i < view.itemsToDraw.size(); i++) 
+		for (auto room : view.roomsToDraw)
 		{
-			RendererItem* item = view.itemsToDraw[i];
-
-			// Does the item need gunflash?
-			OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
-			if (obj->biteOffset == -1 || !item->Item->firedWeapon)
-				continue;
-
-			RendererRoom const & room = m_rooms[item->Item->roomNumber];
-			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
-
-			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
-
-			m_stLights.NumLights = item->Lights.size();
-			for (int j = 0; j < item->Lights.size(); j++)
-				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-			m_cbLights.updateData(m_stLights, m_context.Get());
-			m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
-
-			m_stMisc.AlphaTest = true;
-			m_cbMisc.updateData(m_stMisc, m_context.Get());
-			m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-			BITE_INFO* bites[2] = {
-				&EnemyBites[obj->biteOffset],
-				&EnemyBites[obj->biteOffset + 1]
-			};
-
-			int numBites = (bites[0]->meshNum < 0) + 1;
-
-			for (int k = 0; k < numBites; k++) 
+			for (auto item : room->ItemsToDraw)
 			{
-				int joint = abs(bites[k]->meshNum);
+				// Does the item need gunflash?
+				OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+				if (obj->biteOffset == -1 || !item->Item->firedWeapon)
+					continue;
 
-				RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+				RendererRoom const& room = m_rooms[item->Item->roomNumber];
+				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
-				for (auto& flashBucket : flashMesh->buckets) 
+				m_stItem.AmbientLight = room.AmbientLight;
+				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+
+				m_stLights.NumLights = item->Lights.size();
+				for (int j = 0; j < item->Lights.size(); j++)
+					memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+				m_cbLights.updateData(m_stLights, m_context.Get());
+				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				BITE_INFO* bites[2] = {
+					&EnemyBites[obj->biteOffset],
+					&EnemyBites[obj->biteOffset + 1]
+				};
+
+				int numBites = (bites[0]->meshNum < 0) + 1;
+
+				for (int k = 0; k < numBites; k++)
 				{
-					if (flashBucket.blendMode == BLENDMODE_OPAQUE)
-						continue;
-					if (flashBucket.Vertices.size() != 0) 
+					int joint = abs(bites[k]->meshNum);
+
+					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+
+					for (auto& flashBucket : flashMesh->buckets)
 					{
-						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
-						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						if (flashBucket.blendMode == BLENDMODE_OPAQUE)
+							continue;
+						if (flashBucket.Vertices.size() != 0)
+						{
+							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
+							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[joint] * item->World;
-						world = rotationX * world;
-						world = offset * world;
-						world = rotationZ * world;
+							Matrix world = item->AnimationTransforms[joint] * item->World;
+							world = rotationX * world;
+							world = offset * world;
+							world = rotationZ * world;
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+							m_stItem.World = world;
+							m_cbItem.updateData(m_stItem, m_context.Get());
+							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
-						m_numDrawCalls++;
+							m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+							m_numDrawCalls++;
+						}
 					}
 				}
 			}
@@ -821,7 +822,7 @@ namespace TEN::Renderer
 				face.distance = distance;
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
-				view.transparentFaces.push_back(face);
+				//view.TransparentFacesToDraw.push_back(face);
 			}
 			else
 			{
@@ -1076,16 +1077,17 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (int i = 0; i < view.effectsToDraw.size(); i++) 
+		for (auto room : view.roomsToDraw)
 		{
-			RendererEffect* effect = view.effectsToDraw[i];
-			RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
-			OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
+			for (auto effect : room->EffectsToDraw)
+			{
+				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
+				OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
-			if (obj->drawRoutine && obj->loaded)
-				drawEffect(view,effect, transparent);
+				if (obj->drawRoutine && obj->loaded)
+					drawEffect(view, effect, transparent);
+			}
 		}
-
 	}
 
 	void Renderer11::drawDebris(RenderView& view,bool transparent)
