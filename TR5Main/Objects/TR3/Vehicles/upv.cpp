@@ -37,7 +37,7 @@
 #define UPDOWN_LIMIT		ANGLE(80.0f)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
-#define SURFACE_ANGLE		ANGLE(50.0f)
+#define SURFACE_ANGLE		ANGLE(30.0f)
 #define DIVE_ANGLE			ANGLE(15.0f)
 #define DIVE_SPEED			ANGLE(5.0f)
 #define SUB_DRAW_SHIFT		128
@@ -458,13 +458,13 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVInfo->RotX -= WALLDEFLECT;
 		else
 		{
-			if (abs(UPVInfo->Vel) > 0x40000)
+			if (abs(UPVInfo->Vel) >= MAX_SPEED)
 			{
 				laraItem->goalAnimState = UPV_STATE_HIT;
 				UPVInfo->Vel = -UPVInfo->Vel / 2;
 			}
 			else
-			UPVInfo->Vel = 0;
+				UPVInfo->Vel = 0;
 		}
 	}
 	else if (coll->CollisionType == CT_TOP)
@@ -720,11 +720,11 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			GetLaraJointPosition(&vec, LM_HIPS);
 
 			laraItem->pos.xPos = vec.x;
-			laraItem->pos.yPos = laraItem->pos.yPos + 1 - heightFromWater; // ??
+			//laraItem->pos.yPos += -heightFromWater + 1; // Doesn't work as intended.
 			laraItem->pos.yPos = vec.y;
 			laraItem->pos.zPos = vec.z;
 
-			SetAnimation(laraItem, LA_UNDERWATER_RESURFACE);
+			SetAnimation(laraItem, LA_ONWATER_IDLE);
 			laraItem->fallspeed = 0;
 			laraItem->gravityStatus = false;
 			laraItem->pos.xRot = laraItem->pos.zRot = 0;
@@ -742,6 +742,12 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->hitPoints = 0;
+		}
+		else
+		{
+			UPVInfo->RotX -= UPDOWN_ACCEL;
+			if (UPVItem->pos.xRot < 0)
+				UPVItem->pos.xRot = 0;
 		}
 
 		break;
@@ -862,7 +868,7 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
 			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
-			undraw_flare_meshes(laraItem);
+			UndrawFlareMeshes(laraItem);
 
 			laraInfo->flareControlLeft = false;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
