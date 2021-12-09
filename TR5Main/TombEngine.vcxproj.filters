@@ -735,10 +735,6 @@
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
     <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
     <None Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
-    <None Include="Shaders\Basic.fx" />
-    <None Include="Shaders\ClearGBuffer.fx" />
-    <None Include="Shaders\CombineFinal.fx" />
-    <None Include="Shaders\Depth.fx" />
     <None Include="Shaders\DX11_AmbientCubeMap.fx" />
     <None Include="Shaders\DX11_FinalPass.fx" />
     <None Include="Shaders\DX11_FullscreenQuad.fx" />
@@ -751,19 +747,6 @@
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
-    <None Include="Shaders\FillGBuffer.fx" />
-    <None Include="Shaders\FinalPass.fx" />
-    <None Include="Shaders\FXAA.fx" />
-    <None Include="Shaders\Horizon.fx" />
-    <None Include="Shaders\Items.fx" />
-    <None Include="Shaders\Light.fx" />
-    <None Include="Shaders\Rain.fx" />
-    <None Include="Shaders\ReconstructZBuffer.fx" />
-    <None Include="Shaders\Rooms.fx" />
-    <None Include="Shaders\Shader.fx" />
-    <None Include="Shaders\Sprites.fx" />
-    <None Include="Shaders\SSAO.fx" />
-    <None Include="Shaders\Transparent.fx" />
     <None Include="Shaders\FogBuffer.hlsli" />
   </ItemGroup>
 </Project>

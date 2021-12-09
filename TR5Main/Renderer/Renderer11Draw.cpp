@@ -3167,12 +3167,14 @@ namespace TEN::Renderer
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
-        // Set vertex buffer
+
+        // Bind vertex and index buffer
         m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-        // Set shaders
+        
+        // Bind shaders
         if (!animated)
         {
             m_context->VSSetShader(m_vsRooms.Get(), nullptr, 0);
