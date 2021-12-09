@@ -1422,11 +1422,9 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos = coll->Setup.OldPosition.y;
 		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
-
 	// Height check was at STEP_SIZE * 2 before but changed to this 
 	// because now Lara surfaces on a head level, not mid-body level.
-
-	if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
+	else if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		item->goalAnimState = LS_IDLE;
