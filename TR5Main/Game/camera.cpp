@@ -83,92 +83,6 @@ void AlterFOV(int value)
 	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
-int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
-{
-	int floorHeight, ceilingHeight;
-	FLOOR_INFO* floor;
-
-	auto x = start->x;
-	auto y = start->y;
-	auto z = start->z;
-	auto roomNum = start->roomNumber;
-	auto roomNum2 = roomNum;
-	auto dx = target->x - x >> 3;
-	auto dy = target->y - y >> 3;
-	auto dz = target->z - z >> 3;
-	auto flag = false;
-	auto result = false;
-
-	int i;
-	for (i = 0; i < 8; ++i)
-	{
-		roomNum2 = roomNum;
-		floor = GetFloor(x, y, z, &roomNum);
-
-		if (g_Level.Rooms[roomNum2].flags & ENV_FLAG_SWAMP)
-		{
-			flag = true;
-
-			break;
-		}
-
-		floorHeight = GetFloorHeight(floor, x, y, z);
-		ceilingHeight = GetCeiling(floor, x, y, z);
-		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
-		{
-			if (y > floorHeight)
-			{
-				if (y - floorHeight >= push)
-				{
-					flag = true;
-
-					break;
-				}
-
-				y = floorHeight;
-			}
-
-			if (y < ceilingHeight)
-			{
-				if (ceilingHeight - y >= push)
-				{
-					flag = true;
-
-					break;
-				}
-
-				y = ceilingHeight;
-			}
-
-			result = true;
-		}
-		else if (result)
-		{
-			flag = true;
-
-			break;
-		}
-
-		x += dx;
-		y += dy;
-		z += dz;
-	}
-
-	if (i)
-	{
-		x -= dx;
-		y -= dy;
-		z -= dz;
-	}
-
-	GetFloor(x, y, z, &roomNum2);
-	target->x = x;
-	target->y = y;
-	target->z = z;
-	target->roomNumber = roomNum2;
-
-	return !flag;
-}
 
 void InitialiseCamera()
 {
@@ -305,7 +219,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) ||
 		yPos > floorHeight)
 	{
-		mgLOS(&Camera.target, &Camera.pos, 0);
+		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 		
 		if (abs(Camera.pos.x - ideal->x) < (WALL_SIZE - STEP_SIZE) &&
 			abs(Camera.pos.y - ideal->y) < (WALL_SIZE - STEP_SIZE) &&
@@ -321,7 +235,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 			from.z = ideal->z;
 			from.roomNumber = ideal->roomNumber;
 
-			if (!mgLOS(&from, &to, 0) &&
+			if (!LOSAndReturnTarget(&from, &to, 0) &&
 				++CameraSnaps >= 8)
 			{
 				Camera.pos.x = ideal->x;
@@ -455,7 +369,7 @@ void ChaseCamera(ITEM_INFO* item)
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
-		if (mgLOS(&Camera.target, &Ideals[i], 200))
+		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
@@ -467,7 +381,7 @@ void ChaseCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
@@ -497,7 +411,7 @@ void ChaseCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
@@ -638,7 +552,7 @@ void CombatCamera(ITEM_INFO* item)
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
-		if (mgLOS(&Camera.target, &Ideals[i], 200))
+		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
@@ -651,7 +565,7 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
 			if (i == 0 ||
-				mgLOS(&temp[0], &temp[1], 0))
+				LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
@@ -682,7 +596,7 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
 			if (i == 0 ||
-				mgLOS(&temp[0], &temp[1], 0))
+				LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
@@ -1145,7 +1059,7 @@ void LookCamera(ITEM_INFO* item)
 		floorHeight == NO_HEIGHT ||
 		ceilingHeight == NO_HEIGHT)
 	{
-		mgLOS(&Camera.target, &Camera.pos, 0);
+		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 	}
 
 	x = Camera.pos.x;

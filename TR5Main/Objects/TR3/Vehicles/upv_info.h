@@ -1,5 +1,7 @@
 #pragma once
-struct SUB_INFO {
+
+struct SUB_INFO
+{
 	int Vel;
 	int Rot;
 	int RotX;

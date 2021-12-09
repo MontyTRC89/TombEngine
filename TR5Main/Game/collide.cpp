@@ -23,7 +23,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	ROOM_INFO* room;
 	short roomsArray[255];
@@ -123,15 +123,12 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, I
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (dx >= -2048
-						&& dx <= 2048
-						&& dy >= -2048
-						&& dy <= 2048
-						&& dz >= -2048
-						&& dz <= 2048
-						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1
-						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2
-						&& collidingItem->floor >= item->pos.yPos)
+					if (dx >= -2048	&& dx <= 2048 && 
+						dy >= -2048	&& dy <= 2048 && 
+						dz >= -2048	&& dz <= 2048 && 
+						collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 && 
+						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2 && 
+						collidingItem->floor >= item->pos.yPos)
 					{
 						float s = phd_sin(item->pos.yRot);
 						float c = phd_cos(item->pos.yRot);
@@ -2855,7 +2852,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				// Get block edge planes + split angle plane
 				Plane plane[5] =
 				{
-					Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, fZ)), // North 
+					Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // North 
 					Plane(Vector3(fX, cY, fZ), Vector3(fX, cY, cZ), Vector3(fX, fY, cZ)), // West
 					Plane(Vector3(cX, fY, fZ), Vector3(cX, cY, fZ), Vector3(fX, cY, fZ)), // South
 					Plane(Vector3(cX, fY, cZ), Vector3(cX, cY, cZ), Vector3(cX, cY, fZ)), // East
@@ -2912,22 +2909,26 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 				// Find existing angle in results
 				int firstEqualAngle;
 				for (firstEqualAngle = 0; firstEqualAngle < 3; firstEqualAngle++)
+				{
 					if (result[firstEqualAngle] == result[p])
 						break;
+					else if (firstEqualAngle == 2)
+						firstEqualAngle = 0; // No equal angles, use center one
+				}
 				
 				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
 				float dist1 = FLT_MAX;
 				float dist2 = FLT_MAX;
 				auto r1 = originRay.Intersects(closestPlane[p], dist1);
 				auto r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
-				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : (r1 ? dist1 : dist2);
 
+				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : (r1 ? dist1 : dist2);
 				finalResult[h] = result[p];
 				break;
 			}
 		}
 
-		// Store first result in case all 3 results are different (no priority) or long-distance misfire occured
+		// Store first result in case all 3 results are different (no priority) or prioritized result if long-distance misfire occured
 		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
 		{
 			finalDistance[h] = closestDistance[0];

@@ -7,7 +7,6 @@
 #include "animation.h"
 #include "gui.h"
 #include "lara.h"
-#include "gameflow.h"
 #include "rope.h"
 #include "effects/tomb4fx.h"
 #include "level.h"
