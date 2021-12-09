@@ -19,6 +19,8 @@ namespace TEN::Renderer
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++) {
+			m_rooms[i].ItemsToDraw.clear();
+			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
 			m_rooms[i].Visited = false;
@@ -73,7 +75,7 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 			collectLightsForItem(item->roomNumber, newItem, renderView);
-			renderView.itemsToDraw.push_back(newItem);
+			room.ItemsToDraw.push_back(newItem);
 		}
 	}
 
@@ -459,7 +461,7 @@ namespace TEN::Renderer
 
 			collectLightsForEffect(fx->roomNumber, newEffect, renderView);
 
-			renderView.effectsToDraw.push_back(newEffect);
+			room.EffectsToDraw.push_back(newEffect);
 		}
 	}
 

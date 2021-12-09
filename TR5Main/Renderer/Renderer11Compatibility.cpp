@@ -228,9 +228,16 @@ namespace TEN::Renderer
 			ROOM_INFO* room = &g_Level.Rooms[i];
 
 			RendererRoom* r = &m_rooms[i];
+
 			r->RoomNumber = i;
 			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
-			  
+			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
+			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
+			if (room->mesh.size() > 0)
+			{
+				r->StaticsToDraw.reserve(room->mesh.size());
+			}
+
 			if (room->positions.size() == 0)
 				continue;
 
@@ -256,10 +263,6 @@ namespace TEN::Renderer
 					RendererPolygon newPoly;
 
 					newPoly.shape = poly->shape;
-					newPoly.centre = (
-						room->positions[poly->indices[0]] +
-						room->positions[poly->indices[1]] +
-						room->positions[poly->indices[2]]) / 3.0f;
 					
 					int baseVertices = lastVertex;
 

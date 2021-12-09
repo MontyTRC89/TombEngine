@@ -152,6 +152,8 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector4 AmbientLight;
 		std::vector<RendererBucket> Buckets;
 		std::vector<RendererLight> Lights;
+		std::vector<RendererItem*> ItemsToDraw;
+		std::vector<RendererEffect*> EffectsToDraw;
 		std::vector<MESH_INFO*> StaticsToDraw;
 		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 	};
