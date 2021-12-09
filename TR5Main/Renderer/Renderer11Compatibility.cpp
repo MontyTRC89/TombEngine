@@ -228,8 +228,8 @@ namespace TEN::Renderer
 			ROOM_INFO* room = &g_Level.Rooms[i];
 
 			RendererRoom* r = &m_rooms[i];
-			r->roomNumber = i;
-			r->ambientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
+			r->RoomNumber = i;
+			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
 			  
 			if (room->positions.size() == 0)
 				continue;
@@ -320,16 +320,16 @@ namespace TEN::Renderer
 					bucket.Polygons.push_back(newPoly);
 
 				}
-				r->buckets.push_back(bucket);
+				r->Buckets.push_back(bucket);
 				
 			}
 
 			if (room->lights.size() != 0)
 			{
-				r->lights.resize(room->lights.size());
+				r->Lights.resize(room->lights.size());
 				for (int l = 0; l < room->lights.size(); l++)
 				{
-					RendererLight* light = &r->lights[l];
+					RendererLight* light = &r->Lights[l];
 					ROOM_LIGHT* oldLight = &room->lights[l];
 
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
@@ -386,7 +386,7 @@ namespace TEN::Renderer
 			ROOM_INFO* room = &g_Level.Rooms[i];
 			RendererRoom* r = &m_rooms[i];
 			// Merge vertices and indices in a single list
-			for (auto& bucket : r->buckets) {
+			for (auto& bucket : r->Buckets) {
 				bucket.StartVertex = baseRoomVertex;
 				bucket.StartIndex = baseRoomIndex;
 
