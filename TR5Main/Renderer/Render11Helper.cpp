@@ -639,7 +639,7 @@ namespace TEN::Renderer
 			// Pop
 			node = stack[--stackDepth];
 
-			if (m_rooms[node->To].visited)
+			if (m_rooms[node->To].Visited)
 				continue;
 
 			ROOM_INFO *room = &g_Level.Rooms[node->To];
@@ -649,8 +649,8 @@ namespace TEN::Renderer
 										 room->z + room->zSize * WALL_SIZE / 2.0f);
 			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-			m_rooms[node->To].distance = (roomCentre - laraPosition).Length();
-			m_rooms[node->To].visited = true;
+			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
+			m_rooms[node->To].Visited = true;
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
 			g_Level.Rooms[node->To].boundActive = true;
 
@@ -785,8 +785,8 @@ namespace TEN::Renderer
 	{
 		std::swap(m_rooms[roomNumber1], m_rooms[roomNumber2]);
 
-		m_rooms[roomNumber1].roomNumber = roomNumber1;
-		m_rooms[roomNumber2].roomNumber = roomNumber2;
+		m_rooms[roomNumber1].RoomNumber = roomNumber1;
+		m_rooms[roomNumber2].RoomNumber = roomNumber2;
 	}
 
 	RendererMesh* Renderer11::getMesh(int meshIndex)

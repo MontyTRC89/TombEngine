@@ -19,9 +19,9 @@ namespace TEN::Renderer
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++) {
-			m_rooms[i].transparentFacesToDraw.clear();
-			m_rooms[i].staticsToDraw.clear();
-			m_rooms[i].visited = false;
+			m_rooms[i].TransparentFacesToDraw.clear();
+			m_rooms[i].StaticsToDraw.clear();
+			m_rooms[i].Visited = false;
 		}
 
 		getVisibleObjects(-1, baseRoomIndex, renderView);
@@ -34,7 +34,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		short itemNum = NO_ITEM;
 		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
@@ -84,7 +84,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		if (r->mesh.size() <= 0)
 			return;
@@ -104,7 +104,7 @@ namespace TEN::Renderer
 				if (!renderView.camera.frustum.AABBInFrustum(min, max))
 					continue;
 
-				room.staticsToDraw.push_back(mesh);
+				room.StaticsToDraw.push_back(mesh);
 			}
 		}
 	}
@@ -117,7 +117,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		if (r->lights.size() <= 0)
 			return;
@@ -139,7 +139,7 @@ namespace TEN::Renderer
 			tempLights.push_back(light);
 		}
 
-		int numLights = room.lights.size();
+		int numLights = room.Lights.size();
 
 		m_shadowLight = NULL;
 		RendererLight* brightestLight = NULL;
@@ -147,7 +147,7 @@ namespace TEN::Renderer
 
 		for (int j = 0; j < numLights; j++)
 		{
-			RendererLight *light = &room.lights[j];
+			RendererLight *light = &room.Lights[j];
 
 			// Check only lights different from sun
 			if (light->Type == LIGHT_TYPE_SUN)
@@ -219,7 +219,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		LinearArrayBuffer<RendererLight*, 8> tempLights;
 
@@ -239,7 +239,7 @@ namespace TEN::Renderer
 			tempLights.push_back(light);
 		}
 
-		int numLights = room.lights.size();
+		int numLights = room.Lights.size();
 
 		m_shadowLight = NULL;
 		RendererLight *brightestLight = NULL;
@@ -247,7 +247,7 @@ namespace TEN::Renderer
 
 		for (int j = 0; j < numLights; j++)
 		{
-			RendererLight *light = &room.lights[j];
+			RendererLight *light = &room.Lights[j];
 
 			// Check only lights different from sun
 			if (light->Type == LIGHT_TYPE_SUN)
@@ -336,7 +336,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
-		int numLights = room.lights.size();
+		int numLights = room.Lights.size();
 
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < m_dynamicLights.size(); i++)
@@ -376,10 +376,10 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Try room lights
-
-		for (int j = 0; j < room.lights.size(); j++)
+		
+		for (int j = 0; j < room.Lights.size(); j++)
 		{
-			RendererLight *light = &room.lights[j];
+			RendererLight *light = &room.Lights[j];
 
 			Vector4 itemPos = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 			Vector4 lightVector = itemPos - light->Position;
@@ -438,7 +438,7 @@ namespace TEN::Renderer
 			return;
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		short fxNum = NO_ITEM;
 		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
