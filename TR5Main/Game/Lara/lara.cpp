@@ -460,6 +460,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			Camera.targetElevation = -ANGLE(22.0f);
 
+
 			if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
 				!isSwamp &&
 				item->currentAnimState != LS_RUN_FORWARD &&		// Prevent ridiculous entrances when stepping down into wade-height water. @Sezz 2021.11.17
@@ -523,41 +524,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_WADE);
 				}
 			}
-
-			if (heightFromWater >= WADE_DEPTH)
-			{
-				if (heightFromWater > SWIM_DEPTH)
-				{
-					if (isSwamp)
-						SetAnimation(item, LA_WADE);
-					else
-					{
-						SetAnimation(item, LA_ONWATER_IDLE);
-						info->waterStatus = LW_SURFACE;
-						item->pos.yPos += 1 - heightFromWater;
-						info->diveCount = 0;
-					}
-					
-					item->gravityStatus = false;
-					item->fallspeed = 0;
-					item->pos.zRot = 0;
-					item->pos.xRot = 0;
-					info->torsoYrot = 0;
-					info->torsoXrot = 0;
-					info->headYrot = 0;
-					info->headXrot = 0;
-					
-					UpdateItemRoom(item, 0);
-				}
-			}
-			else
-			{
-				info->waterStatus = LW_ABOVE_WATER;
-
-				if (item->currentAnimState == LS_WADE_FORWARD)
-					item->goalAnimState = LS_RUN_FORWARD;
-			}
-
 			break;
 
 		case LW_UNDERWATER:
