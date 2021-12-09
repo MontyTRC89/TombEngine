@@ -42,8 +42,6 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip);
-
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll);
@@ -82,6 +80,6 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up);
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset = 0.0f);
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll);
