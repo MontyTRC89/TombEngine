@@ -146,15 +146,13 @@ namespace TEN::Renderer
 	
 	struct RendererRoom 
 	{
-		ROOM_INFO* Room;
-		DirectX::SimpleMath::Vector4 AmbientLight;
+		bool visited;
+		int distance;
+		short roomNumber;
+		DirectX::SimpleMath::Vector4 ambientLight;
 		std::vector<RendererBucket> buckets;
-		std::vector<RendererLight> Lights;
-		std::vector<RendererStatic> Statics;
-		bool Visited;
-		int Distance;
-		int RoomNumber;
-		// Transparent faces of this room
+		std::vector<RendererLight> lights;
+		std::vector<MESH_INFO*> staticsToDraw;
 		std::vector<RendererTransparentFace> transparentFacesToDraw;
 	};
 	
@@ -464,8 +462,13 @@ namespace TEN::Renderer
 		std::vector<RendererTransparentFace> m_transparentFaces;
 
 		// Debug variables
-		int m_numDrawCalls = 0;
+		int m_numDrawCalls = 0;		
 		int m_numTransparentDrawCalls = 0;
+		int m_numRoomsTransparentDrawCalls = 0;
+		int m_numMoveablesTransparentDrawCalls = 0;
+		int m_numStaticsTransparentDrawCalls = 0;
+		int m_numSpritesTransparentDrawCalls = 0;
+		int m_biggestRoomIndexBuffer = 0;
 		RENDERER_DEBUG_PAGE m_numDebugPage = RENDERER_DEBUG_PAGE::NO_PAGE;
 	
 		// Times for debug

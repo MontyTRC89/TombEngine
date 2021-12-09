@@ -228,11 +228,8 @@ namespace TEN::Renderer
 			ROOM_INFO* room = &g_Level.Rooms[i];
 
 			RendererRoom* r = &m_rooms[i];
-			r->RoomNumber = i;
-			r->Room = room;
-			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
-			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
-			r->Statics.resize(room->mesh.size());
+			r->roomNumber = i;
+			r->ambientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
 			  
 			if (room->positions.size() == 0)
 				continue;
@@ -329,10 +326,10 @@ namespace TEN::Renderer
 
 			if (room->lights.size() != 0)
 			{
-				r->Lights.resize(room->lights.size());
+				r->lights.resize(room->lights.size());
 				for (int l = 0; l < room->lights.size(); l++)
 				{
-					RendererLight* light = &r->Lights[l];
+					RendererLight* light = &r->lights[l];
 					ROOM_LIGHT* oldLight = &room->lights[l];
 
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)

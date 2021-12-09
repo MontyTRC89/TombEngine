@@ -36,13 +36,12 @@ namespace TEN::Renderer
 
 	bool Renderer11::isRoomUnderwater(short roomNumber)
 	{
-		return (m_rooms[roomNumber].Room->flags & ENV_FLAG_WATER);
+		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
 	}
 
 	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
 	{
-		RendererRoom const & room = m_rooms[roomNumber];
-		ROOM_INFO *r = room.Room;
+		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
 				y >= r->maxceiling && y <= r->minfloor &&
@@ -618,16 +617,6 @@ namespace TEN::Renderer
 		return 0;
 	}
 
-	bool SortRoomsFunction(RendererRoom *a, RendererRoom *b)
-	{
-		return (a->Distance < b->Distance);
-	}
-
-	int SortRoomsFunctionNonStd(RendererRoom *a, RendererRoom *b)
-	{
-		return (a->Distance - b->Distance);
-	}
-
 	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView)
 	{
 		// Avoid allocations, 1024 should be fine
@@ -650,7 +639,7 @@ namespace TEN::Renderer
 			// Pop
 			node = stack[--stackDepth];
 
-			if (m_rooms[node->To].Visited)
+			if (m_rooms[node->To].visited)
 				continue;
 
 			ROOM_INFO *room = &g_Level.Rooms[node->To];
@@ -660,8 +649,8 @@ namespace TEN::Renderer
 										 room->z + room->zSize * WALL_SIZE / 2.0f);
 			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
-			m_rooms[node->To].Visited = true;
+			m_rooms[node->To].distance = (roomCentre - laraPosition).Length();
+			m_rooms[node->To].visited = true;
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
 			g_Level.Rooms[node->To].boundActive = true;
 
@@ -794,16 +783,13 @@ namespace TEN::Renderer
 
 	void Renderer11::flipRooms(short roomNumber1, short roomNumber2)
 	{
-		RendererRoom temporary;
+		std::swap(m_rooms[roomNumber1], m_rooms[roomNumber2]);
 
-		temporary = m_rooms[roomNumber1];
-		m_rooms[roomNumber1] = m_rooms[roomNumber2];
-		m_rooms[roomNumber2] = temporary;
-		m_rooms[roomNumber1].Room = &g_Level.Rooms[roomNumber1];
-		m_rooms[roomNumber2].Room = &g_Level.Rooms[roomNumber2];
+		m_rooms[roomNumber1].roomNumber = roomNumber1;
+		m_rooms[roomNumber2].roomNumber = roomNumber2;
 	}
 
-	RendererMesh *Renderer11::getMesh(int meshIndex)
+	RendererMesh* Renderer11::getMesh(int meshIndex)
 	{
 		return m_meshes[meshIndex];
 	}
