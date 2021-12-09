@@ -146,14 +146,14 @@ namespace TEN::Renderer
 	
 	struct RendererRoom 
 	{
-		bool visited;
-		int distance;
-		short roomNumber;
-		DirectX::SimpleMath::Vector4 ambientLight;
-		std::vector<RendererBucket> buckets;
-		std::vector<RendererLight> lights;
-		std::vector<MESH_INFO*> staticsToDraw;
-		std::vector<RendererTransparentFace> transparentFacesToDraw;
+		bool Visited;
+		int Distance;
+		short RoomNumber;
+		DirectX::SimpleMath::Vector4 AmbientLight;
+		std::vector<RendererBucket> Buckets;
+		std::vector<RendererLight> Lights;
+		std::vector<MESH_INFO*> StaticsToDraw;
+		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 	};
 	
 	struct RendererRoomNode

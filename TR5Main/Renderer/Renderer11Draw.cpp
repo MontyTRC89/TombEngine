@@ -175,11 +175,11 @@ namespace TEN::Renderer
         for (int k = 0; k < renderView.roomsToDraw.size(); k++)
         {
             RendererRoom *room = renderView.roomsToDraw[k];
-            int numLights = room->lights.size();
+            int numLights = room->Lights.size();
 
             for (int j = 0; j < numLights; j++)
             {
-                RendererLight *light = &room->lights[j];
+                RendererLight *light = &room->Lights[j];
 
                 // Check only lights different from sun
                 if (light->Type == LIGHT_TYPE_SUN)
@@ -307,7 +307,7 @@ namespace TEN::Renderer
 
         m_stItem.World = m_LaraWorldMatrix;
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-        m_stItem.AmbientLight = room.ambientLight;
+        m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
         m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
@@ -438,7 +438,7 @@ namespace TEN::Renderer
         RendererRoom& room = m_rooms[LaraItem->roomNumber];
         RendererItem* item = &m_items[Lara.itemNumber];
 
-        m_stItem.AmbientLight = room.ambientLight;
+        m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
         m_stLights.NumLights = item->Lights.size();
@@ -1602,7 +1602,7 @@ namespace TEN::Renderer
 
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
-                    m_stItem.AmbientLight = m_rooms[rat->roomNumber].ambientLight;
+                    m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)
@@ -1658,7 +1658,7 @@ namespace TEN::Renderer
 
                         m_stItem.World = world;
                         m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
-                        m_stItem.AmbientLight = m_rooms[bat->roomNumber].ambientLight;
+                        m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
                         m_cbItem.updateData(m_stItem, m_context.Get());
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1699,7 +1699,7 @@ namespace TEN::Renderer
 
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
-                    m_stItem.AmbientLight = m_rooms[beetle->roomNumber].ambientLight;
+                    m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem, m_context.Get());
 
                     for (int b = 0; b < mesh->buckets.size(); b++)
@@ -1747,7 +1747,7 @@ namespace TEN::Renderer
 
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 1.0f);
-                    m_stItem.AmbientLight = m_rooms[locust->roomNumber].ambientLight;
+                    m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
                     m_cbItem.updateData(m_stItem,m_context.Get());
 
                     for (int b = 0; b < mesh->buckets.size(); b++)
@@ -2174,8 +2174,8 @@ namespace TEN::Renderer
             view.roomsToDraw.end(),
             [](RendererRoom* room) {
                 std::sort(
-                    room->transparentFacesToDraw.begin(),
-                    room->transparentFacesToDraw.end(),
+                    room->TransparentFacesToDraw.begin(),
+                    room->TransparentFacesToDraw.end(),
                     [](RendererTransparentFace& a, RendererTransparentFace& b) {
                         int aDistance = std::floor(a.distance / 256);
                         int bDistance = std::floor(b.distance / 256);
@@ -2193,7 +2193,7 @@ namespace TEN::Renderer
         {
             RendererRoom& room = *view.roomsToDraw[r];
 
-            int size = room.transparentFacesToDraw.size();
+            int size = room.TransparentFacesToDraw.size();
             int currentBlendMode = -1;
             int altas = -1;
             int lastType = 0;
@@ -2208,7 +2208,7 @@ namespace TEN::Renderer
             RendererTransparentFaceInfo* oldInfo = nullptr;
             bool outputPolygons = false;
 
-            for (auto& face : room.transparentFacesToDraw)
+            for (auto& face : room.TransparentFacesToDraw)
             {
                 if (oldInfo != nullptr)
                 {
@@ -2437,7 +2437,7 @@ namespace TEN::Renderer
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
-        ROOM_INFO* nativeRoom = &g_Level.Rooms[info->room->roomNumber];
+        ROOM_INFO* nativeRoom = &g_Level.Rooms[info->room->RoomNumber];
 
         // Set vertex buffer
         //m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
@@ -2495,7 +2495,7 @@ namespace TEN::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        m_stRoom.AmbientColor = info->room->ambientLight;
+        m_stRoom.AmbientColor = info->room->AmbientLight;
         m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
         m_cbRoom.updateData(m_stRoom, m_context.Get());
 
@@ -2870,7 +2870,7 @@ namespace TEN::Renderer
 
         m_stItem.World = item->World;
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-        m_stItem.AmbientLight = room.ambientLight;
+        m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
         m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
@@ -2962,7 +2962,7 @@ namespace TEN::Renderer
 
         m_stItem.World = info->item->World;
         m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-        m_stItem.AmbientLight = room.ambientLight;
+        m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * 32);
         m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
@@ -3103,9 +3103,9 @@ namespace TEN::Renderer
 
         for (RendererRoom* room : view.roomsToDraw)
         {
-            for (int i = 0; i < room->staticsToDraw.size(); i++)
+            for (int i = 0; i < room->StaticsToDraw.size(); i++)
             {
-                MESH_INFO* msh = room->staticsToDraw[i];
+                MESH_INFO* msh = room->StaticsToDraw[i];
                 if (!m_staticObjects[msh->staticNumber])
                     continue;
                 RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
@@ -3214,7 +3214,7 @@ namespace TEN::Renderer
             //Draw transparent back-to-front
             int index = i;
             RendererRoom* room = view.roomsToDraw[index];
-            ROOM_INFO* nativeRoom = &g_Level.Rooms[room->roomNumber];
+            ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
@@ -3226,14 +3226,14 @@ namespace TEN::Renderer
             m_cbMisc.updateData(m_stMisc, m_context.Get());
             m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-            m_stRoom.AmbientColor = room->ambientLight;
+            m_stRoom.AmbientColor = room->AmbientLight;
             m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
             m_cbRoom.updateData(m_stRoom, m_context.Get());
 
             m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
             m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
 
-            for (auto& bucket : room->buckets)
+            for (auto& bucket : room->Buckets)
             {
                 if (isSortingRequired(bucket.blendMode))
                 {
@@ -3264,7 +3264,7 @@ namespace TEN::Renderer
                         face.info.room = room;
                         face.info.blendMode = bucket.blendMode;
                         face.info.bucket = &bucket;
-                        room->transparentFacesToDraw.push_back(face);
+                        room->TransparentFacesToDraw.push_back(face);
                     }
                 }
                 else
@@ -3334,7 +3334,7 @@ namespace TEN::Renderer
 		bool anyOutsideRooms = false;
 		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
 		{
-            ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->roomNumber];
+            ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->RoomNumber];
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
 			{
 				anyOutsideRooms = true;
