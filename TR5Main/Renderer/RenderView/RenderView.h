@@ -42,12 +42,8 @@ namespace TEN::Renderer {
 		RenderViewCamera camera;
 		D3D11_VIEWPORT viewport;
 		std::vector<RendererRoom*> roomsToDraw;
-		std::vector<RendererStatic*> staticsToDraw;
-		std::vector<RendererEffect*> effectsToDraw;
-		std::vector<RendererItem*> itemsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
 		std::vector<RendererSpriteToDraw> spritesToDraw;
-		std::vector<RendererTransparentFace> transparentFaces;
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);

@@ -2807,8 +2807,6 @@ namespace TEN::Renderer
         m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-        RendererItem *item = &m_items[Lara.itemNumber];
-
         // Set shaders
         m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
         m_context->PSSetShader(m_psItems.Get(), NULL, 0);
@@ -2824,39 +2822,41 @@ namespace TEN::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        for (int i = 0; i < view.itemsToDraw.size(); i++)
+        for (auto room : view.roomsToDraw)
         {
-            RendererItem* item = view.itemsToDraw[i];
-            RendererRoom& room = m_rooms[item->Item->roomNumber];
-            RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
+            for (auto itemToDraw : room->ItemsToDraw)
+            {
+                ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->Id];
+                RendererRoom& room = m_rooms[nativeItem->roomNumber];
+                RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
 
-			if (moveableObj.DoNotDraw)
-				continue;
-            
-			short objectNumber = item->Item->objectNumber;
+                if (moveableObj.DoNotDraw)
+                    continue;
 
-            if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
-            {
-                // We'll draw waterfalls later
-                continue;
-            }
-			else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
-			{
-				// Wraiths have some additional special effects
-				drawAnimatingItem(view,item, transparent, animated);
-				drawWraithExtra(view,item, transparent, animated);
-			}
-            else if (objectNumber == ID_DARTS)
-            {
-                //TODO: for now legacy way, in the future mesh
-                drawDarts(view, item, transparent, animated);
-            }
-            else
-            {
-                drawAnimatingItem(view,item, transparent, animated);
+                short objectNumber = itemToDraw->Item->objectNumber;
+
+                if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+                {
+                    // We'll draw waterfalls later
+                    continue;
+                }
+                else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
+                {
+                    // Wraiths have some additional special effects
+                    drawAnimatingItem(view, itemToDraw, transparent, animated);
+                    drawWraithExtra(view, itemToDraw, transparent, animated);
+                }
+                else if (objectNumber == ID_DARTS)
+                {
+                    //TODO: for now legacy way, in the future mesh
+                    drawDarts(view, itemToDraw, transparent, animated);
+                }
+                else
+                {
+                    drawAnimatingItem(view, itemToDraw, transparent, animated);
+                }
             }
         }
-
     }
 
     void Renderer11::drawAnimatingItem(RenderView& view,RendererItem* item, bool transparent, bool animated)
@@ -2927,7 +2927,7 @@ namespace TEN::Renderer
                         face.info.bucket = &bucket;
                         face.info.blendMode = bucket.blendMode;
                         face.info.bone = k;
-                        view.transparentFaces.push_back(face);
+                        room.TransparentFacesToDraw.push_back(face);
                     }
                 }
                 else
@@ -3101,13 +3101,13 @@ namespace TEN::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        for (RendererRoom* room : view.roomsToDraw)
+        for (auto room : view.roomsToDraw)
         {
-            for (int i = 0; i < room->StaticsToDraw.size(); i++)
+            for (auto msh : room->StaticsToDraw)
             {
-                MESH_INFO* msh = room->StaticsToDraw[i];
                 if (!m_staticObjects[msh->staticNumber])
                     continue;
+
                 RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
                 if (staticObj.ObjectMeshes.size() > 0)
@@ -3149,7 +3149,7 @@ namespace TEN::Renderer
                                 face.info.world = world;
                                 face.info.bucket = &bucket;
                                 face.info.blendMode = bucket.blendMode;
-                                view.transparentFaces.push_back(face);
+                                room->TransparentFacesToDraw.push_back(face);
                             }
                         }
                         else

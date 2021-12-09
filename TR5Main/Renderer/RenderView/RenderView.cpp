@@ -1,8 +1,11 @@
 #include "framework.h"
 #include "RenderView.h"
-namespace TEN::Renderer {
+
+namespace TEN::Renderer
+{
 	constexpr float EPSILON = 0.00001f;
-	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) {
+	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) 
+	{
 		viewport = {};
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
@@ -10,10 +13,10 @@ namespace TEN::Renderer {
 		viewport.Height = h;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
-		transparentFaces.reserve(MAX_TRANSPARENT_FACES);
 	}
 
-	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) {
+	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) 
+	{
 
 		viewport = {};
 		viewport.TopLeftX = 0;
@@ -22,10 +25,10 @@ namespace TEN::Renderer {
 		viewport.Height = h;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
-		transparentFaces.reserve(MAX_TRANSPARENT_FACES);
 	}
 
-	void RenderView::fillConstantBuffer(CCameraMatrixBuffer& bufferToFill) {
+	void RenderView::fillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
+	{
 		bufferToFill.Projection = camera.Projection;
 		bufferToFill.View = camera.View;
 		bufferToFill.ViewProjection = camera.ViewProjection;
@@ -36,17 +39,15 @@ namespace TEN::Renderer {
 		bufferToFill.RoomNumber = camera.RoomNumber;
 	}
 
-	void RenderView::clear() {
+	void RenderView::clear() 
+	{
 		roomsToDraw.clear();
-		effectsToDraw.clear();
-		staticsToDraw.clear();
 		lightsToDraw.clear();
-		itemsToDraw.clear();
 		spritesToDraw.clear();
-		transparentFaces.clear();
 	}
 
-	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h) {
+	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)
+	{
 		RoomNumber = cam->pos.roomNumber;
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
@@ -68,7 +69,8 @@ namespace TEN::Renderer {
 		frustum.Update(View, Projection);
 	}
 
-	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f) {
+	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f) 
+	{
 		RoomNumber = room;
 		WorldPosition = pos;
 		WorldDirection = dir;
