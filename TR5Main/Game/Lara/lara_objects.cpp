@@ -11,6 +11,7 @@
 #include "items.h"
 #include "control/control.h"
 #include "Objects/Generic/Object/rope.h"
+#include "Game/Lara/lara_tests.h"
 
 using namespace TEN::Entities::Generic;
 
