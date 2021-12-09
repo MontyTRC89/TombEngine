@@ -972,41 +972,6 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	return !res;
 }
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
-{
-	if (item->hitPoints <= 0)
-	{
-		SetAnimation(item, LA_FALL_START);
-
-		item->gravityStatus = true;
-		item->speed = 2;
-		item->pos.yPos += STEP_SIZE;
-		item->fallspeed = 1;
-
-		Lara.gunStatus = LG_NO_ARMS;
-
-		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
-		return;
-	}
-
-	if (flip)
-	{
-		if (Lara.isClimbing)
-		{
-			SetAnimation(item, LA_LADDER_IDLE);
-		}
-		else
-		{
-			SetAnimation(item, LA_REACH_TO_HANG, 21);
-		}
-
-		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
-		item->pos.yRot = Lara.nextCornerPos.yRot;
-	}
-}
-
 bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist)
 {
 	auto angle1 = ang + ANGLE(15);
@@ -1316,6 +1281,48 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	Lara.waterStatus = LW_ABOVE_WATER;
 
 	return true;
+}
+
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)
+{
+	static constexpr auto poleProbeCollRadius = 16.0f;
+
+	bool atLeastOnePoleCollided = false;
+
+	if (GetCollidedObjects(item, WALL_SIZE, true, CollidedItems, nullptr, 0) && CollidedItems[0])
+	{
+		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+
+		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
+		// check her position. So we add a fixed height offset.
+
+		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, (laraBox.Extents.y + poleProbeCollRadius + offset) * (up ? -1 : 1) , 0), poleProbeCollRadius);
+
+		//g_Renderer.addDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+		int i = 0;
+		while (CollidedItems[i] != NULL)
+		{
+			auto& obj = CollidedItems[i];
+			i++;
+
+			if (obj->objectNumber != ID_POLEROPE)
+				continue;
+
+			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
+			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
+
+			//g_Renderer.addDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+
+			if (poleBox.Intersects(sphere))
+			{
+				atLeastOnePoleCollided = true;
+				break;
+			}
+		}
+	}
+
+	return atLeastOnePoleCollided;
 }
 
 void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
